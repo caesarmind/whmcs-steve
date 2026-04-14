@@ -680,6 +680,17 @@ Almost every section starts with a small label above the heading:
 
 This is Apple's signature pattern. Establishes context before the headline.
 
+**Exception for hero variants:** The two bold-statement hero variants — `hp-hero-dark` (dark with stats) and `hp-hero-gradient` (gradient with floating cards) — typically skip the eyebrow. The h1 itself is a confident product statement (e.g. "VPS.", "SSL Certificates.") and the eyebrow would compete with it. Use eyebrows on:
+
+| Hero variant | Eyebrow | Rationale |
+|--------------|---------|-----------|
+| `hp-hero` (centered) | Required | Context label pairs naturally with centered text |
+| `hp-hero-split` (text + visual) | Required | Text column benefits from the small category label |
+| `hp-hero-dark` (dark stats) | Skip | Large h1 + stats row IS the context |
+| `hp-hero-gradient` (floating cards) | Skip | Product name + gradient + cards establishes identity |
+
+Eyebrows are required on all **subsequent** sections (below the hero) regardless of hero variant.
+
 ### Dashboard Page Pattern
 
 All logged-in dashboard pages share the same header anatomy for unified flow. Use `.page-eyebrow` (dashboard variant) + `.page-title` + `.page-subtitle`:
@@ -736,6 +747,16 @@ Use these consistent category labels so users always know where they are:
 ---
 
 ## 15. Component Library
+
+### Inline Styles: When They're Allowed
+
+**Production UI components must use CSS classes and design tokens** — buttons, cards, forms, nav items, lists, tables. Never apply color or spacing via `style=""` on these.
+
+**Inline styles are allowed for decorative mockups** — browser-frame product screenshots, world-map illustrations, server-rack visuals, floating gradient cards, illustrative charts. These are effectively images rendered as markup. Extracting each one-off decoration into a class bloats the CSS for zero reuse.
+
+Rule of thumb:
+- If you'd ship it as an SVG/image in a different codebase → inline styles OK
+- If it's a real UI element a user interacts with → must use classes
 
 ### Quick Reference Table
 

@@ -754,6 +754,18 @@ document.documentElement.setAttribute('data-theme', 'dark');</code></pre>
 &lt;p&gt;Description...&lt;/p&gt;</code></pre>
             <p>This is Apple's signature pattern. Establishes context before the headline.</p>
 
+            <p><strong>Exception for hero variants:</strong> The two bold-statement hero variants skip the eyebrow because the h1 itself is a confident product statement (e.g. "VPS.", "SSL Certificates.") and the eyebrow would compete with it.</p>
+            <table class="sg-table">
+                <thead><tr><th>Hero variant</th><th>Eyebrow</th><th>Rationale</th></tr></thead>
+                <tbody>
+                    <tr><td><code>hp-hero</code> (centered)</td><td>Required</td><td>Context label pairs naturally with centered text</td></tr>
+                    <tr><td><code>hp-hero-split</code> (text + visual)</td><td>Required</td><td>Text column benefits from the small category label</td></tr>
+                    <tr><td><code>hp-hero-dark</code> (dark stats)</td><td>Skip</td><td>Large h1 + stats row IS the context</td></tr>
+                    <tr><td><code>hp-hero-gradient</code> (floating cards)</td><td>Skip</td><td>Product name + gradient + cards establishes identity</td></tr>
+                </tbody>
+            </table>
+            <p>Eyebrows are required on all <strong>subsequent</strong> sections (below the hero) regardless of hero variant.</p>
+
             <h3 class="sg-h">Dashboard Page Pattern</h3>
             <p>All logged-in dashboard pages share the same header anatomy. Use <code>.page-eyebrow</code> + <code>.page-title</code> + <code>.page-subtitle</code>:</p>
 
@@ -821,6 +833,18 @@ document.documentElement.setAttribute('data-theme', 'dark');</code></pre>
             <h2 class="sg-h">15. Component Library</h2>
             <p class="sg-lede">All reusable blocks. See <a href="components.html">components.html</a> for live examples.</p>
 
+            <h3 class="sg-h">Inline Styles: When They're Allowed</h3>
+            <p><strong>Production UI components must use CSS classes and design tokens</strong> — buttons, cards, forms, nav items, lists, tables. Never apply color or spacing via <code>style=""</code> on these.</p>
+            <p><strong>Inline styles are allowed for decorative mockups</strong> — browser-frame product screenshots, world-map illustrations, server-rack visuals, floating gradient cards, illustrative charts. These are effectively images rendered as markup.</p>
+            <div class="sg-callout do">
+                <strong>Rule of thumb</strong>
+                <ul>
+                    <li>If you'd ship it as an SVG/image in a different codebase → inline styles OK</li>
+                    <li>If it's a real UI element a user interacts with → must use classes</li>
+                </ul>
+            </div>
+
+            <h3 class="sg-h">Quick Reference</h3>
             <table class="sg-table">
                 <thead><tr><th>Component</th><th>Class</th><th>When to Use</th></tr></thead>
                 <tbody>
