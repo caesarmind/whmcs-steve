@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WHMCS by Apple</title>
+    <style>
+        /* ============================================
+           WHMCS by Apple — Client Area Dashboard
+           Design System: Cupertino / macOS Ventura+
+           ============================================ */
+
+        /* --- Reset & Base --- */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Colors — Light */
+            --color-bg: #fbfbfd;
+            --color-surface: #ffffff;
+            --color-surface-secondary: #f5f5f7;
+            --color-surface-tertiary: #fafafa;
+            --color-border: #e8e8ed;
+            --color-border-light: #f0f0f5;
+            --color-text-primary: #1d1d1f;
+            --color-text-secondary: #6e6e73;
+            --color-text-tertiary: #86868b;
+            --color-text-quaternary: #aeaeb2;
+            --color-accent: #0071e3;
+            --color-accent-hover: #0077ED;
+            --color-accent-light: rgba(0, 113, 227, 0.08);
+            --color-green: #30d158;
+            --color-green-bg: rgba(48, 209, 88, 0.10);
+            --color-green-text: #248a3d;
+            --color-orange: #ff9f0a;
+            --color-orange-bg: rgba(255, 159, 10, 0.10);
+            --color-orange-text: #c27400;
+            --color-red: #ff3b30;
+            --color-red-bg: rgba(255, 59, 48, 0.10);
+            --color-red-text: #d70015;
+            --color-blue-bg: rgba(0, 113, 227, 0.08);
+            --color-blue-text: #0071e3;
+            --color-gray-bg: rgba(142, 142, 147, 0.12);
+            --color-gray-text: #6e6e73;
+
+            /* Sidebar */
+            --sidebar-width: 260px;
+            --sidebar-bg: rgba(246, 246, 248, 0.80);
+            --sidebar-item-hover: rgba(0, 0, 0, 0.04);
+            --sidebar-item-active: rgba(0, 0, 0, 0.06);
+            --sidebar-icon-bg: #e8e8ed;
+
+            /* Topbar */
+            --topbar-height: 52px;
+            --topbar-bg: rgba(255, 255, 255, 0.72);
+
+            /* Shadows */
+            --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 24px rgba(0, 0, 0, 0.04);
+            --shadow-card-hover: 0 2px 8px rgba(0, 0, 0, 0.06), 0 8px 32px rgba(0, 0, 0, 0.06);
+            --shadow-dropdown: 0 4px 32px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
+            --shadow-topbar: 0 1px 0 rgba(0, 0, 0, 0.06);
+
+            /* Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-pill: 980px;
+
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
+            --transition-medium: 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
+
+            /* Typography */
+            --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-mono: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
+        }
+
+        /* --- Dark Mode --- */
+        [data-theme="dark"] {
+            --color-bg: #1c1c1e;
+            --color-surface: #2c2c2e;
+            --color-surface-secondary: #3a3a3c;
+            --color-surface-tertiary: #252527;
+            --color-border: #3a3a3c;
+            --color-border-light: #2c2c2e;
+            --color-text-primary: #f5f5f7;
+            --color-text-secondary: #a1a1a6;
+            --color-text-tertiary: #8e8e93;
+            --color-text-quaternary: #636366;
+            --color-accent: #2997ff;
+            --color-accent-hover: #40a3ff;
+            --color-accent-light: rgba(41, 151, 255, 0.12);
+            --color-green-bg: rgba(48, 209, 88, 0.16);
+            --color-green-text: #30d158;
+            --color-orange-bg: rgba(255, 159, 10, 0.16);
+            --color-orange-text: #ff9f0a;
+            --color-red-bg: rgba(255, 59, 48, 0.16);
+            --color-red-text: #ff453a;
+            --color-blue-bg: rgba(41, 151, 255, 0.14);
+            --color-blue-text: #2997ff;
+            --color-gray-bg: rgba(142, 142, 147, 0.18);
+            --color-gray-text: #a1a1a6;
+
+            --sidebar-bg: rgba(28, 28, 30, 0.80);
+            --sidebar-item-hover: rgba(255, 255, 255, 0.05);
+            --sidebar-item-active: rgba(255, 255, 255, 0.08);
+            --sidebar-icon-bg: #3a3a3c;
+
+            --topbar-bg: rgba(44, 44, 46, 0.72);
+            --shadow-topbar: 0 1px 0 rgba(255, 255, 255, 0.06);
+            --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.15), 0 4px 24px rgba(0, 0, 0, 0.10);
+            --shadow-card-hover: 0 2px 8px rgba(0, 0, 0, 0.20), 0 8px 32px rgba(0, 0, 0, 0.15);
+            --shadow-dropdown: 0 4px 32px rgba(0, 0, 0, 0.30), 0 0 1px rgba(255, 255, 255, 0.08);
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--color-bg);
+            color: var(--color-text-primary);
+            line-height: 1.47059;
+            letter-spacing: -0.022em;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        a {
+            color: var(--color-accent);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        a:hover {
+            color: var(--color-accent-hover);
+        }
+
+        /* ============================================
+           SIDEBAR — macOS System Settings
+           ============================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-right: 0.5px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 20px 16px 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            -webkit-app-region: drag;
+        }
+
+        .sidebar-logo {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-logo svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .sidebar-brand {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .sidebar-search {
+            padding: 8px 12px 4px;
+        }
+
+        .sidebar-search-input {
+            width: 100%;
+            height: 32px;
+            background: var(--color-surface-secondary);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            padding: 0 10px 0 30px;
+            font-size: 13px;
+            font-family: var(--font-family);
+            color: var(--color-text-primary);
+            outline: none;
+            transition: all var(--transition-fast);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' viewBox='0 0 24 24' stroke='%23aeaeb2' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 10px center;
+        }
+
+        .sidebar-search-input::placeholder {
+            color: var(--color-text-quaternary);
+        }
+
+        .sidebar-search-input:focus {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-accent-light);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 8px 16px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.15);
+            border-radius: 3px;
+        }
+
+        .sidebar-section-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 16px 10px 6px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 10px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+            text-decoration: none;
+            color: var(--color-text-primary);
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: -0.008em;
+            position: relative;
+        }
+
+        .sidebar-item:hover {
+            background: var(--sidebar-item-hover);
+            color: var(--color-text-primary);
+        }
+
+        .sidebar-item.active {
+            background: var(--sidebar-item-active);
+            font-weight: 500;
+        }
+
+        .sidebar-item-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-item-icon svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        .sidebar-item-icon.blue { background: #007aff; color: white; }
+        .sidebar-item-icon.purple { background: #af52de; color: white; }
+        .sidebar-item-icon.orange { background: #ff9500; color: white; }
+        .sidebar-item-icon.green { background: #34c759; color: white; }
+        .sidebar-item-icon.red { background: #ff3b30; color: white; }
+        .sidebar-item-icon.teal { background: #5ac8fa; color: white; }
+        .sidebar-item-icon.gray { background: #8e8e93; color: white; }
+        .sidebar-item-icon.indigo { background: #5856d6; color: white; }
+        .sidebar-item-icon.pink { background: #ff2d55; color: white; }
+
+        .sidebar-item-badge {
+            margin-left: auto;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--color-text-tertiary);
+            background: var(--color-gray-bg);
+            padding: 1px 7px;
+            border-radius: var(--radius-pill);
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 12px;
+            border-top: 0.5px solid var(--color-border);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 8px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        .sidebar-user:hover {
+            background: var(--sidebar-item-hover);
+        }
+
+        .sidebar-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar-user-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-user-email {
+            font-size: 11px;
+            color: var(--color-text-tertiary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ============================================
+           MAIN LAYOUT
+           ============================================ */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Topbar --- */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            height: var(--topbar-height);
+            background: var(--topbar-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 0.5px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            gap: 16px;
+        }
+
+        .topbar-breadcrumb {
+            font-size: 13px;
+            color: var(--color-text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .topbar-breadcrumb-current {
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+
+        .topbar-spacer { flex: 1; }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .topbar-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            position: relative;
+            font-family: var(--font-family);
+        }
+        .topbar-btn:hover {
+            background: var(--sidebar-item-hover);
+            color: var(--color-text-primary);
+        }
+
+        .topbar-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .topbar-notification-dot {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 8px;
+            height: 8px;
+            background: var(--color-red);
+            border-radius: 50%;
+            border: 2px solid var(--topbar-bg);
+        }
+
+        .topbar-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity var(--transition-fast);
+        }
+        .topbar-avatar:hover { opacity: 0.85; }
+
+        /* --- Profile Dropdown --- */
+        .profile-dropdown-wrapper {
+            position: relative;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 240px;
+            background: var(--color-surface);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-dropdown);
+            border: 0.5px solid var(--color-border);
+            padding: 6px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px) scale(0.98);
+            transition: all var(--transition-fast);
+            z-index: 200;
+        }
+
+        .profile-dropdown.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .profile-dropdown-header {
+            padding: 8px 10px;
+            border-bottom: 0.5px solid var(--color-border);
+            margin-bottom: 4px;
+        }
+
+        .profile-dropdown-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .profile-dropdown-email {
+            font-size: 11px;
+            color: var(--color-text-tertiary);
+        }
+
+        .profile-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--color-text-primary);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: var(--font-family);
+        }
+        .profile-dropdown-item:hover {
+            background: var(--color-accent-light);
+            color: var(--color-accent);
+        }
+
+        .profile-dropdown-item svg {
+            width: 16px;
+            height: 16px;
+            color: var(--color-text-secondary);
+            flex-shrink: 0;
+        }
+        .profile-dropdown-item:hover svg {
+            color: var(--color-accent);
+        }
+
+        .profile-dropdown-divider {
+            height: 0.5px;
+            background: var(--color-border);
+            margin: 4px 0;
+        }
+
+        .profile-dropdown-item.danger { color: var(--color-red-text); }
+        .profile-dropdown-item.danger svg { color: var(--color-red-text); }
+        .profile-dropdown-item.danger:hover { background: var(--color-red-bg); color: var(--color-red-text); }
+
+        .theme-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 10px;
+        }
+
+        .theme-toggle-label {
+            font-size: 13px;
+            color: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle-label svg {
+            width: 16px;
+            height: 16px;
+            color: var(--color-text-secondary);
+        }
+
+        /* macOS-style Toggle Switch */
+        .toggle-switch {
+            width: 38px;
+            height: 22px;
+            background: var(--color-surface-secondary);
+            border: 0.5px solid var(--color-border);
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: background var(--transition-fast);
+            flex-shrink: 0;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            position: absolute;
+            top: 1.5px;
+            left: 1.5px;
+            transition: transform var(--transition-fast);
+        }
+
+        .toggle-switch.active {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(16px);
+        }
+
+        /* ============================================
+           CONTENT AREA
+           ============================================ */
+        .content {
+            flex: 1;
+            padding: 40px 48px 60px;
+            max-width: 1120px;
+        }
+
+        /* --- Greeting --- */
+        .greeting {
+            margin-bottom: 36px;
+        }
+
+        .greeting-title {
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1.125;
+            color: var(--color-text-primary);
+        }
+
+        .greeting-subtitle {
+            font-size: 17px;
+            color: var(--color-text-secondary);
+            margin-top: 6px;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+
+        /* --- Summary Tiles --- */
+        .summary-tiles {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 36px;
+        }
+
+        .tile {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: 20px 22px;
+            box-shadow: var(--shadow-card);
+            transition: all var(--transition-medium);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .tile:hover {
+            box-shadow: var(--shadow-card-hover);
+            transform: translateY(-1px);
+            color: inherit;
+        }
+
+        .tile-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .tile-icon svg {
+            width: 19px;
+            height: 19px;
+        }
+
+        .tile-icon.blue { background: var(--color-blue-bg); color: var(--color-blue-text); }
+        .tile-icon.green { background: var(--color-green-bg); color: var(--color-green-text); }
+        .tile-icon.orange { background: var(--color-orange-bg); color: var(--color-orange-text); }
+        .tile-icon.red { background: var(--color-red-bg); color: var(--color-red-text); }
+
+        .tile-value {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            color: var(--color-text-primary);
+        }
+
+        .tile-label {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--color-text-primary);
+        }
+
+        .card-action {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--color-accent);
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            white-space: nowrap;
+        }
+        .card-action:hover { color: var(--color-accent-hover); }
+
+        .card-body {
+            padding: 16px 24px 24px;
+        }
+
+        /* --- Services List --- */
+        .service-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 0.5px solid var(--color-border-light);
+            transition: background var(--transition-fast);
+        }
+        .service-item:last-child {
+            border-bottom: none;
+        }
+
+        .service-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--color-surface-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .service-icon svg {
+            width: 20px;
+            height: 20px;
+            color: var(--color-text-secondary);
+        }
+
+        .service-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .service-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            letter-spacing: -0.008em;
+        }
+
+        .service-domain {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-top: 1px;
+        }
+
+        .service-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .service-due {
+            font-size: 13px;
+            color: var(--color-text-tertiary);
+            text-align: right;
+        }
+
+        .service-due-label {
+            font-size: 11px;
+            color: var(--color-text-quaternary);
+        }
+
+        .service-manage {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--color-accent);
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            white-space: nowrap;
+        }
+
+        /* --- Status Pills --- */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        .status-pill.active {
+            background: var(--color-green-bg);
+            color: var(--color-green-text);
+        }
+
+        .status-pill.pending {
+            background: var(--color-orange-bg);
+            color: var(--color-orange-text);
+        }
+
+        .status-pill.overdue {
+            background: var(--color-red-bg);
+            color: var(--color-red-text);
+        }
+
+        .status-pill.paid {
+            background: var(--color-green-bg);
+            color: var(--color-green-text);
+        }
+
+        .status-pill.unpaid {
+            background: var(--color-orange-bg);
+            color: var(--color-orange-text);
+        }
+
+        .status-pill.cancelled {
+            background: var(--color-gray-bg);
+            color: var(--color-gray-text);
+        }
+
+        .status-pill.open {
+            background: var(--color-blue-bg);
+            color: var(--color-blue-text);
+        }
+
+        .status-pill.answered {
+            background: var(--color-green-bg);
+            color: var(--color-green-text);
+        }
+
+        /* --- Invoice Table --- */
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .invoice-table th {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0 0 10px;
+            text-align: left;
+            border-bottom: 0.5px solid var(--color-border-light);
+        }
+
+        .invoice-table th:last-child {
+            text-align: right;
+        }
+
+        .invoice-table td {
+            padding: 12px 0;
+            font-size: 14px;
+            color: var(--color-text-primary);
+            border-bottom: 0.5px solid var(--color-border-light);
+            vertical-align: middle;
+        }
+
+        .invoice-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .invoice-table tr:hover td {
+            background: var(--color-surface-tertiary);
+        }
+
+        .invoice-table td:last-child {
+            text-align: right;
+        }
+
+        .invoice-id {
+            font-weight: 500;
+            color: var(--color-accent);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .invoice-date {
+            color: var(--color-text-secondary);
+            font-size: 13px;
+        }
+
+        .invoice-amount {
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* --- Two-Column Split --- */
+        .split-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        /* --- Announcement --- */
+        .announcement-tag {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--color-accent);
+            margin-bottom: 6px;
+        }
+
+        .announcement-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+        }
+
+        .announcement-excerpt {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .announcement-date {
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+            margin-top: 10px;
+        }
+
+        /* --- Help Card --- */
+        .help-card-inner {
+            text-align: center;
+            padding: 8px 0;
+        }
+
+        .help-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--color-accent-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+        }
+
+        .help-icon svg {
+            width: 22px;
+            height: 22px;
+            color: var(--color-accent);
+        }
+
+        .help-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
+        }
+
+        .help-subtitle {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin-bottom: 18px;
+        }
+
+        /* --- Buttons --- */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 36px;
+            padding: 0 20px;
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: 14px;
+            font-weight: 500;
+            font-family: var(--font-family);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            letter-spacing: -0.008em;
+        }
+        .btn-primary:hover {
+            background: var(--color-accent-hover);
+            color: white;
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 36px;
+            padding: 0 20px;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-primary);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-pill);
+            font-size: 14px;
+            font-weight: 500;
+            font-family: var(--font-family);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            letter-spacing: -0.008em;
+        }
+        .btn-secondary:hover {
+            background: var(--color-surface);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            color: var(--color-text-primary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* --- Quick Actions --- */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .quick-action {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: var(--color-surface-secondary);
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            color: var(--color-text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+        .quick-action:hover {
+            background: var(--color-border);
+            color: var(--color-text-primary);
+        }
+
+        .quick-action svg {
+            width: 18px;
+            height: 18px;
+            color: var(--color-accent);
+            flex-shrink: 0;
+        }
+
+        /* --- Ticket Item --- */
+        .ticket-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 0.5px solid var(--color-border-light);
+        }
+        .ticket-item:last-child { border-bottom: none; }
+
+        .ticket-priority {
+            width: 4px;
+            height: 32px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        .ticket-priority.high { background: var(--color-red); }
+        .ticket-priority.medium { background: var(--color-orange); }
+        .ticket-priority.low { background: var(--color-green); }
+
+        .ticket-info { flex: 1; }
+
+        .ticket-subject {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .ticket-meta-text {
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+            margin-top: 2px;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 1200px) {
+            .summary-tiles { grid-template-columns: repeat(2, 1fr); }
+            .split-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; }
+            .content { padding: 24px 20px 40px; }
+            .topbar { padding: 0 20px; }
+            .greeting-title { font-size: 26px; }
+            .quick-actions { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+         SIDEBAR
+         ============================================ -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.08 7.13 7.16 8.84 7.14C10.13 7.12 11.34 8.01 12.14 8.01C12.94 8.01 14.41 6.93 15.95 7.11C16.59 7.14 18.37 7.36 19.53 9.06C19.43 9.12 17.2 10.42 17.22 13.11C17.25 16.33 20.05 17.37 20.09 17.38C20.06 17.47 19.61 18.98 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+                </svg>
+            </div>
+            <span class="sidebar-brand">WHMCS</span>
+        </div>
+
+        <div class="sidebar-search">
+            <input type="text" class="sidebar-search-input" placeholder="Search">
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="sidebar-item active">
+                <div class="sidebar-item-icon blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                </div>
+                Dashboard
+            </a>
+
+            <div class="sidebar-section-label">Services</div>
+
+            <a href="#" class="sidebar-item">
+                <div class="sidebar-item-icon purple">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                </div>
+                My Services
+                <span class="sidebar-item-badge">3</span>
+            </a>
+
+            <a href="#" class="sidebar-item">
+                <div class="sidebar-item-icon green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                My Domains
+                <span class="sidebar-item-badge">5</span>
+            </a>
+
+            <div class="sidebar-section-label">Billing</div>
+
+            <a href="#" class="sidebar-item">
+                <div class="sidebar-item-icon orange">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                </div>
+                Invoices
+                <span class="sidebar-item-badge">2</span>
+            </a>
+
+            <a href="#" class="sidebar-item">
+                <div class="sidebar-item-icon teal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                </div>
+                Payment Methods
+            </a>
+
+            <div class="sidebar-section-label">Support</div>
+
+            <a href="#" class="sidebar-item">
+                <div class="sidebar-item-icon red">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                Support Tickets
+                <span class="sidebar-item-badge">1</span>
+            </a>
+
+            <a href="#" class="sidebar-item">
+                <div class="sidebar-item-icon indigo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </div>
+                Knowledge Base
+            </a>
+
+            <a href="#" class="sidebar-item">
+                <div class="sidebar-item-icon pink">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </div>
+                Announcements
+            </a>
+
+            <div class="sidebar-section-label">Account</div>
+
+            <a href="#" class="sidebar-item">
+                <div class="sidebar-item-icon gray">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                My Details
+            </a>
+
+            <a href="#" class="sidebar-item">
+                <div class="sidebar-item-icon gray">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                Security
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user" onclick="toggleProfileDropdown(event)">
+                <div class="sidebar-avatar">AH</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name">Alex Henderson</div>
+                    <div class="sidebar-user-email">alex@example.com</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ============================================
+         MAIN CONTENT
+         ============================================ -->
+    <div class="main">
+
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-breadcrumb">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <span class="topbar-breadcrumb-current">Dashboard</span>
+            </div>
+
+            <div class="topbar-spacer"></div>
+
+            <div class="topbar-actions">
+                <button class="topbar-btn" title="Notifications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    <div class="topbar-notification-dot"></div>
+                </button>
+
+                <button class="topbar-btn" title="Shopping Cart">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                </button>
+
+                <div class="profile-dropdown-wrapper">
+                    <div class="topbar-avatar" onclick="toggleProfileDropdown(event)" title="Account">AH</div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-dropdown-header">
+                            <div class="profile-dropdown-name">Alex Henderson</div>
+                            <div class="profile-dropdown-email">alex@example.com</div>
+                        </div>
+                        <a href="#" class="profile-dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            My Details
+                        </a>
+                        <a href="#" class="profile-dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            Security Settings
+                        </a>
+                        <a href="#" class="profile-dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            Email History
+                        </a>
+                        <div class="profile-dropdown-divider"></div>
+                        <div class="theme-toggle-row">
+                            <span class="theme-toggle-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                                Dark Mode
+                            </span>
+                            <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div>
+                        </div>
+                        <div class="profile-dropdown-divider"></div>
+                        <a href="#" class="profile-dropdown-item danger">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            Sign Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+
+            <!-- Greeting -->
+            <div class="greeting">
+                <h1 class="greeting-title" id="greetingTitle">Good afternoon, Alex.</h1>
+                <p class="greeting-subtitle">Here's what's happening with your account.</p>
+            </div>
+
+            <!-- Summary Tiles -->
+            <div class="summary-tiles">
+                <a href="#" class="tile">
+                    <div class="tile-icon blue">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                    </div>
+                    <div class="tile-value">3</div>
+                    <div class="tile-label">Active Services</div>
+                </a>
+
+                <a href="#" class="tile">
+                    <div class="tile-icon green">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    </div>
+                    <div class="tile-value">5</div>
+                    <div class="tile-label">Domains</div>
+                </a>
+
+                <a href="#" class="tile">
+                    <div class="tile-icon orange">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    </div>
+                    <div class="tile-value">$49.00</div>
+                    <div class="tile-label">Unpaid Invoices</div>
+                </a>
+
+                <a href="#" class="tile">
+                    <div class="tile-icon red">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <div class="tile-value">1</div>
+                    <div class="tile-label">Open Tickets</div>
+                </a>
+            </div>
+
+            <!-- Active Services -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Active Services</h2>
+                    <a href="#" class="card-action">View All <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+                <div class="card-body">
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                        </div>
+                        <div class="service-info">
+                            <div class="service-name">Business Cloud Pro</div>
+                            <div class="service-domain">hendersondesign.com</div>
+                        </div>
+                        <div class="service-meta">
+                            <span class="status-pill active">Active</span>
+                            <div class="service-due">
+                                <div>May 15, 2026</div>
+                                <div class="service-due-label">Next due</div>
+                            </div>
+                            <a href="#" class="service-manage">Manage <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                        </div>
+                        <div class="service-info">
+                            <div class="service-name">WordPress Starter</div>
+                            <div class="service-domain">alexblog.net</div>
+                        </div>
+                        <div class="service-meta">
+                            <span class="status-pill active">Active</span>
+                            <div class="service-due">
+                                <div>Jun 1, 2026</div>
+                                <div class="service-due-label">Next due</div>
+                            </div>
+                            <a href="#" class="service-manage">Manage <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        </div>
+                        <div class="service-info">
+                            <div class="service-name">VPS 4GB — London</div>
+                            <div class="service-domain">api.hendersondesign.com</div>
+                        </div>
+                        <div class="service-meta">
+                            <span class="status-pill active">Active</span>
+                            <div class="service-due">
+                                <div>Apr 28, 2026</div>
+                                <div class="service-due-label">Next due</div>
+                            </div>
+                            <a href="#" class="service-manage">Manage <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Invoices -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Invoices</h2>
+                    <a href="#" class="card-action">View All <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+                <div class="card-body">
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><a href="#" class="invoice-id">#10247</a></td>
+                                <td class="invoice-date">Apr 1, 2026</td>
+                                <td class="invoice-amount">$29.00</td>
+                                <td><span class="status-pill unpaid">Unpaid</span></td>
+                                <td><a href="#" class="service-manage">View <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></td>
+                            </tr>
+                            <tr>
+                                <td><a href="#" class="invoice-id">#10246</a></td>
+                                <td class="invoice-date">Apr 1, 2026</td>
+                                <td class="invoice-amount">$20.00</td>
+                                <td><span class="status-pill unpaid">Unpaid</span></td>
+                                <td><a href="#" class="service-manage">View <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></td>
+                            </tr>
+                            <tr>
+                                <td><a href="#" class="invoice-id">#10189</a></td>
+                                <td class="invoice-date">Mar 1, 2026</td>
+                                <td class="invoice-amount">$29.00</td>
+                                <td><span class="status-pill paid">Paid</span></td>
+                                <td><a href="#" class="service-manage">View <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></td>
+                            </tr>
+                            <tr>
+                                <td><a href="#" class="invoice-id">#10134</a></td>
+                                <td class="invoice-date">Feb 1, 2026</td>
+                                <td class="invoice-amount">$49.00</td>
+                                <td><span class="status-pill paid">Paid</span></td>
+                                <td><a href="#" class="service-manage">View <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Open Tickets -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Open Tickets</h2>
+                    <a href="#" class="card-action">View All <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+                <div class="card-body">
+                    <div class="ticket-item">
+                        <div class="ticket-priority medium"></div>
+                        <div class="ticket-info">
+                            <div class="ticket-subject">SSL certificate not renewing automatically</div>
+                            <div class="ticket-meta-text">#TKT-4821 &middot; Opened Apr 11, 2026 &middot; Medium Priority</div>
+                        </div>
+                        <span class="status-pill answered">Answered</span>
+                        <a href="#" class="service-manage">View <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two-column: Announcement + Help -->
+            <div class="split-row">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Announcements</h2>
+                        <a href="#" class="card-action">View All <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                    </div>
+                    <div class="card-body">
+                        <div class="announcement-tag">Maintenance</div>
+                        <h3 class="announcement-title">Scheduled Network Upgrade — London DC</h3>
+                        <p class="announcement-excerpt">We will be performing a network upgrade across our London data centre on April 20, 2026 between 02:00 and 06:00 UTC. Brief intermittent connectivity may occur during this window.</p>
+                        <div class="announcement-date">Apr 10, 2026</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="help-card-inner">
+                            <div class="help-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            </div>
+                            <div class="help-title">Need help?</div>
+                            <div class="help-subtitle">Our support team is here for you.</div>
+                            <div class="btn-group" style="justify-content: center;">
+                                <a href="#" class="btn-primary">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    New Ticket
+                                </a>
+                                <a href="#" class="btn-secondary">Knowledge Base</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Quick Actions</h2>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <a href="#" class="quick-action">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                            Make a Payment
+                        </a>
+                        <a href="#" class="quick-action">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Register Domain
+                        </a>
+                        <a href="#" class="quick-action">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Order New Service
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================
+         JAVASCRIPT
+         ============================================ -->
+    <script>
+        // Dynamic greeting based on time of day
+        (function() {
+            const hour = new Date().getHours();
+            let greeting;
+            if (hour < 12) greeting = 'Good morning';
+            else if (hour < 17) greeting = 'Good afternoon';
+            else greeting = 'Good evening';
+
+            const el = document.getElementById('greetingTitle');
+            if (el) el.textContent = greeting + ', Alex.';
+        })();
+
+        // Profile dropdown toggle
+        function toggleProfileDropdown(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        // Close dropdown on outside click
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('profileDropdown');
+            const wrapper = dropdown ? dropdown.parentElement : null;
+            if (dropdown && wrapper && !wrapper.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        // Dark mode toggle
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const toggle = document.getElementById('darkModeToggle');
+            const isDark = html.getAttribute('data-theme') === 'dark';
+
+            if (isDark) {
+                html.setAttribute('data-theme', 'light');
+                toggle.classList.remove('active');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                toggle.classList.add('active');
+            }
+        }
+
+        // Check system preference on load
+        (function() {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                const toggle = document.getElementById('darkModeToggle');
+                if (toggle) toggle.classList.add('active');
+            }
+        })();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Builder - WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css">
+    <style>body { display: block; }</style>
+</head>
+<body class="homepage-layout">
+
+<nav class="homepage-nav">
+    <div class="homepage-nav-inner">
+        <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
+        <a href="#">WHMCS</a>
+        <div class="nav-item-dropdown">
+                    <a href="#" class="nav-dropdown-trigger">Hosting <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+                    <div class="nav-mega-menu">
+                        <div class="nav-mega-inner">
+                            <div class="nav-mega-col">
+                                <h4>Web Hosting</h4>
+                                <a href="cloud-hosting.html" class="nav-mega-item"><div class="name">Cloud Hosting</div><div class="tag">Fast NVMe storage, global CDN</div></a>
+                                <a href="vps.html" class="nav-mega-item"><div class="name">VPS</div><div class="tag">Dedicated cores, full root access</div></a>
+                                <a href="#" class="nav-mega-item"><div class="name">Dedicated Servers</div><div class="tag">Enterprise hardware, yours alone</div></a>
+                                <a href="#" class="nav-mega-item"><div class="name">Managed WordPress</div><div class="tag">Optimized for WordPress sites</div></a>
+                            </div>
+                            <div class="nav-mega-col">
+                                <h4>Solutions</h4>
+                                <a href="website-builder.html" class="nav-mega-item"><div class="name">Website Builder</div><div class="tag">Drag and drop, 200+ templates</div></a>
+                                <a href="site-builder.html" class="nav-mega-item"><div class="name">Site Builder</div><div class="tag">Professional templates by industry</div></a>
+                                <a href="email.html" class="nav-mega-item"><div class="name">Professional Email</div><div class="tag">Custom domain, 50GB mailbox</div></a>
+                                <a href="website-backup.html" class="nav-mega-item"><div class="name">Website Backup</div><div class="tag">Daily automatic backups</div></a>
+                            </div>
+                            <div class="nav-mega-col">
+                                <h4>Get Started</h4>
+                                <a href="#" class="nav-mega-item"><div class="name">Compare all plans</div><div class="tag">Find the perfect fit</div></a>
+                                <a href="#" class="nav-mega-item"><div class="name">Free Migration</div><div class="tag">We move your site for you</div></a>
+                                <a href="#" class="nav-mega-item"><div class="name">Enterprise Solutions</div><div class="tag">Custom hosting at scale</div></a>
+                                <a href="support-page.html" class="nav-mega-item"><div class="name">Talk to Sales</div><div class="tag">Get expert advice</div></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        <a href="domains.html">Domains</a>
+        <a href="ssl-certificates.html">SSL</a>
+        <a href="support-page.html">Support</a>
+        <div class="nav-spacer"></div>
+        <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+        <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg></a>
+        <a href="#" onclick="toggleDarkMode(); return false;" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
+        <a href="login.html" class="nav-signin">Sign in</a>
+    </div>
+</nav>
+
+<!-- 1. Hero Centered -->
+<section class="hp-hero">
+    <div class="hp-eyebrow">SITE BUILDER</div>
+    <h1>Beautiful sites,<br>made simple.</h1>
+    <p class="hp-subhead">Pick a template, customize with drag-and-drop, publish in minutes. No coding, no complexity.</p>
+    <div class="hp-cta-row">
+        <a href="clientregister.html" class="hp-buy-btn">Start Building</a>
+        <a href="#templates">Browse templates ›</a>
+    </div>
+
+    <!-- Template preview cards -->
+    <div style="display: flex; gap: 16px; justify-content: center; margin-top: 48px; flex-wrap: wrap;">
+        <!-- Starter -->
+        <div style="width: 200px; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.10); background: #fff;">
+            <div style="height: 120px; background: linear-gradient(135deg, #667eea, #764ba2); position: relative;">
+                <div style="position: absolute; top: 14px; left: 14px;">
+                    <div style="width: 50px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 3px; margin-bottom: 6px;"></div>
+                    <div style="width: 34px; height: 4px; background: rgba(255,255,255,0.4); border-radius: 2px;"></div>
+                </div>
+                <div style="position: absolute; bottom: 14px; right: 14px; width: 36px; height: 36px; background: rgba(255,255,255,0.25); border-radius: 8px;"></div>
+                <div style="position: absolute; bottom: 14px; left: 14px; display: flex; gap: 4px;">
+                    <div style="width: 28px; height: 3px; background: rgba(255,255,255,0.5); border-radius: 2px;"></div>
+                    <div style="width: 28px; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px;"></div>
+                    <div style="width: 28px; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px;"></div>
+                </div>
+            </div>
+            <div style="padding: 12px 14px;">
+                <div style="font-size: 13px; font-weight: 600; color: #1d1d1f;">Starter</div>
+                <div style="font-size: 11px; color: #86868b; margin-top: 2px;">Personal &amp; blog</div>
+            </div>
+        </div>
+        <!-- Business -->
+        <div style="width: 200px; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.10); background: #fff; transform: translateY(-8px);">
+            <div style="height: 120px; background: linear-gradient(135deg, #0071e3, #2997ff); position: relative;">
+                <div style="position: absolute; top: 12px; left: 14px; display: flex; gap: 6px;">
+                    <div style="width: 20px; height: 20px; background: rgba(255,255,255,0.35); border-radius: 5px;"></div>
+                    <div style="width: 20px; height: 20px; background: rgba(255,255,255,0.35); border-radius: 5px;"></div>
+                    <div style="width: 20px; height: 20px; background: rgba(255,255,255,0.35); border-radius: 5px;"></div>
+                </div>
+                <div style="position: absolute; bottom: 14px; left: 14px;">
+                    <div style="width: 60px; height: 5px; background: rgba(255,255,255,0.7); border-radius: 3px; margin-bottom: 5px;"></div>
+                    <div style="width: 80px; height: 4px; background: rgba(255,255,255,0.35); border-radius: 2px; margin-bottom: 4px;"></div>
+                    <div style="width: 55px; height: 4px; background: rgba(255,255,255,0.25); border-radius: 2px;"></div>
+                </div>
+                <div style="position: absolute; top: 12px; right: 14px; width: 24px; height: 24px; background: rgba(255,255,255,0.3); border-radius: 50%;"></div>
+            </div>
+            <div style="padding: 12px 14px;">
+                <div style="font-size: 13px; font-weight: 600; color: #1d1d1f;">Business</div>
+                <div style="font-size: 11px; color: #86868b; margin-top: 2px;">Company &amp; agency</div>
+            </div>
+        </div>
+        <!-- Portfolio -->
+        <div style="width: 200px; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.10); background: #fff;">
+            <div style="height: 120px; background: linear-gradient(135deg, #f5af19, #f12711); position: relative;">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                    <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.35); border-radius: 6px;"></div>
+                    <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.35); border-radius: 6px;"></div>
+                    <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.35); border-radius: 6px;"></div>
+                    <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.35); border-radius: 6px;"></div>
+                </div>
+            </div>
+            <div style="padding: 12px 14px;">
+                <div style="font-size: 13px; font-weight: 600; color: #1d1d1f;">Portfolio</div>
+                <div style="font-size: 11px; color: #86868b; margin-top: 2px;">Creative &amp; photography</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. Alternating Sections -->
+<section class="hp-alternating" id="templates">
+
+    <!-- Row 1: Templates -->
+    <div class="hp-alt-row">
+        <div class="hp-alt-text">
+            <div class="hp-eyebrow" style="color: #af52de;">TEMPLATES</div>
+            <h3>150+ professionally designed templates</h3>
+            <p>Industry-specific starting points for restaurants, portfolios, shops, agencies, and more. Every template is mobile-ready, SEO-optimized, and fully customizable to match your brand.</p>
+        </div>
+        <div class="hp-alt-visual">
+            <div class="visual-box">
+                <div style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <span style="font-size: 13px; font-weight: 600; color: #1d1d1f;">Template Gallery</span>
+                        <span style="font-size: 11px; color: #86868b;">150+ available</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <!-- Template: Restaurant -->
+                        <div style="border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                            <div style="height: 70px; background: linear-gradient(135deg, #f093fb, #f5576c); position: relative;">
+                                <div style="position: absolute; top: 10px; left: 10px;">
+                                    <div style="width: 44px; height: 4px; background: rgba(255,255,255,0.8); border-radius: 2px; margin-bottom: 4px;"></div>
+                                    <div style="width: 28px; height: 3px; background: rgba(255,255,255,0.4); border-radius: 2px;"></div>
+                                </div>
+                                <div style="position: absolute; bottom: 8px; right: 8px; width: 24px; height: 24px; background: rgba(255,255,255,0.25); border-radius: 6px;"></div>
+                            </div>
+                            <div style="padding: 8px 10px; background: #fff;">
+                                <div style="font-size: 10px; font-weight: 600; color: #1d1d1f;">Bistro</div>
+                                <div style="font-size: 9px; color: #86868b;">Restaurant</div>
+                            </div>
+                        </div>
+                        <!-- Template: Portfolio -->
+                        <div style="border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                            <div style="height: 70px; background: linear-gradient(135deg, #667eea, #764ba2); position: relative;">
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); display: grid; grid-template-columns: 1fr 1fr; gap: 3px;">
+                                    <div style="width: 18px; height: 18px; background: rgba(255,255,255,0.3); border-radius: 3px;"></div>
+                                    <div style="width: 18px; height: 18px; background: rgba(255,255,255,0.3); border-radius: 3px;"></div>
+                                    <div style="width: 18px; height: 18px; background: rgba(255,255,255,0.3); border-radius: 3px;"></div>
+                                    <div style="width: 18px; height: 18px; background: rgba(255,255,255,0.3); border-radius: 3px;"></div>
+                                </div>
+                            </div>
+                            <div style="padding: 8px 10px; background: #fff;">
+                                <div style="font-size: 10px; font-weight: 600; color: #1d1d1f;">Showcase</div>
+                                <div style="font-size: 9px; color: #86868b;">Portfolio</div>
+                            </div>
+                        </div>
+                        <!-- Template: Shop -->
+                        <div style="border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                            <div style="height: 70px; background: linear-gradient(135deg, #4facfe, #00f2fe); position: relative;">
+                                <div style="position: absolute; top: 10px; left: 10px; display: flex; gap: 5px;">
+                                    <div style="width: 16px; height: 16px; background: rgba(255,255,255,0.4); border-radius: 4px;"></div>
+                                    <div style="width: 16px; height: 16px; background: rgba(255,255,255,0.4); border-radius: 4px;"></div>
+                                    <div style="width: 16px; height: 16px; background: rgba(255,255,255,0.4); border-radius: 4px;"></div>
+                                </div>
+                                <div style="position: absolute; bottom: 8px; left: 10px; width: 50px; height: 4px; background: rgba(255,255,255,0.6); border-radius: 2px;"></div>
+                            </div>
+                            <div style="padding: 8px 10px; background: #fff;">
+                                <div style="font-size: 10px; font-weight: 600; color: #1d1d1f;">Storefront</div>
+                                <div style="font-size: 9px; color: #86868b;">Online Shop</div>
+                            </div>
+                        </div>
+                        <!-- Template: Agency -->
+                        <div style="border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                            <div style="height: 70px; background: linear-gradient(135deg, #0c3483, #a2b6df); position: relative;">
+                                <div style="position: absolute; top: 12px; left: 10px;">
+                                    <div style="width: 38px; height: 4px; background: rgba(255,255,255,0.7); border-radius: 2px; margin-bottom: 6px;"></div>
+                                    <div style="width: 52px; height: 3px; background: rgba(255,255,255,0.35); border-radius: 2px; margin-bottom: 3px;"></div>
+                                    <div style="width: 40px; height: 3px; background: rgba(255,255,255,0.25); border-radius: 2px;"></div>
+                                </div>
+                                <div style="position: absolute; bottom: 10px; right: 10px; width: 22px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 4px;"></div>
+                            </div>
+                            <div style="padding: 8px 10px; background: #fff;">
+                                <div style="font-size: 10px; font-weight: 600; color: #1d1d1f;">Catalyst</div>
+                                <div style="font-size: 9px; color: #86868b;">Agency</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Drag & Drop (reverse) -->
+    <div class="hp-alt-row reverse">
+        <div class="hp-alt-text">
+            <div class="hp-eyebrow" style="color: #0071e3;">DRAG &amp; DROP</div>
+            <h3>Click, drag, done</h3>
+            <p>Our intuitive visual editor lets anyone build professional pages. Drag content blocks into place, customize colors and fonts, and see changes in real time. No learning curve required.</p>
+        </div>
+        <div class="hp-alt-visual">
+            <div class="visual-box dark">
+                <div style="width: 100%;">
+                    <!-- Toolbar -->
+                    <div style="background: rgba(255,255,255,0.08); border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; gap: 4px;">
+                            <div style="width: 24px; height: 24px; background: rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                            </div>
+                            <div style="width: 24px; height: 24px; background: rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                            </div>
+                            <div style="width: 24px; height: 24px; background: rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            </div>
+                        </div>
+                        <div style="width: 1px; height: 16px; background: rgba(255,255,255,0.1);"></div>
+                        <div style="display: flex; gap: 4px; align-items: center;">
+                            <div style="width: 16px; height: 16px; background: #0071e3; border-radius: 4px;"></div>
+                            <div style="width: 16px; height: 16px; background: #f5f5f7; border-radius: 4px;"></div>
+                            <div style="width: 16px; height: 16px; background: #ff9f0a; border-radius: 4px;"></div>
+                        </div>
+                        <div style="margin-left: auto; font-size: 9px; color: rgba(255,255,255,0.5); font-weight: 600;">B</div>
+                        <div style="font-size: 9px; color: rgba(255,255,255,0.5); font-style: italic;">I</div>
+                        <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-decoration: underline;">U</div>
+                    </div>
+                    <!-- Canvas area -->
+                    <div style="background: rgba(255,255,255,0.04); border-radius: 10px; padding: 16px; position: relative;">
+                        <!-- Hero block with drag handle -->
+                        <div style="border: 2px dashed #0071e3; border-radius: 8px; padding: 14px; margin-bottom: 10px; position: relative;">
+                            <div style="position: absolute; top: -8px; left: 12px; background: #0071e3; color: #fff; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 600;">HEADER</div>
+                            <div style="position: absolute; top: -6px; right: 8px; width: 12px; height: 12px; background: #0071e3; border-radius: 50%; cursor: move;"></div>
+                            <div style="height: 36px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                                <div style="width: 60px; height: 4px; background: rgba(255,255,255,0.7); border-radius: 2px;"></div>
+                            </div>
+                        </div>
+                        <!-- Text block -->
+                        <div style="border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 10px; margin-bottom: 10px; position: relative;">
+                            <div style="position: absolute; top: -6px; right: 8px; width: 10px; height: 10px; background: rgba(255,255,255,0.2); border-radius: 50%; cursor: move;"></div>
+                            <div style="width: 70px; height: 3px; background: rgba(255,255,255,0.5); border-radius: 2px; margin-bottom: 6px;"></div>
+                            <div style="width: 100%; height: 3px; background: rgba(255,255,255,0.12); border-radius: 2px; margin-bottom: 4px;"></div>
+                            <div style="width: 65%; height: 3px; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+                        </div>
+                        <!-- Image grid block being dragged -->
+                        <div style="border: 2px dashed #ff9f0a; border-radius: 8px; padding: 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; position: relative; opacity: 0.85; transform: rotate(1deg);">
+                            <div style="position: absolute; top: -8px; left: 12px; background: #ff9f0a; color: #fff; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 600;">GALLERY</div>
+                            <div style="height: 28px; background: rgba(255,255,255,0.08); border-radius: 4px;"></div>
+                            <div style="height: 28px; background: rgba(255,255,255,0.08); border-radius: 4px;"></div>
+                            <div style="height: 28px; background: rgba(255,255,255,0.08); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: E-commerce -->
+    <div class="hp-alt-row">
+        <div class="hp-alt-text">
+            <div class="hp-eyebrow" style="color: #30d158;">E-COMMERCE</div>
+            <h3>Built-in online store</h3>
+            <p>Sell products directly from your site with inventory management, secure payment processing, and configurable shipping rates. Everything you need to run a store, built right in.</p>
+        </div>
+        <div class="hp-alt-visual">
+            <div class="visual-box" style="background: linear-gradient(180deg, #f0fdf4, #dcfce7);">
+                <div style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <span style="font-size: 13px; font-weight: 600; color: #1d1d1f;">My Store</span>
+                        <span style="font-size: 11px; color: #30d158; font-weight: 500;">3 products</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                        <!-- Product 1 -->
+                        <div style="border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); background: #fff;">
+                            <div style="height: 64px; background: linear-gradient(135deg, #ffecd2, #fcb69f); display: flex; align-items: center; justify-content: center;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+                            </div>
+                            <div style="padding: 8px;">
+                                <div style="font-size: 10px; font-weight: 600; color: #1d1d1f;">Canvas Tote</div>
+                                <div style="font-size: 11px; font-weight: 600; color: #30d158; margin-top: 2px;">$39.00</div>
+                                <div style="margin-top: 6px; background: #1d1d1f; color: #fff; font-size: 8px; font-weight: 600; padding: 4px 8px; border-radius: 6px; text-align: center;">Add to Cart</div>
+                            </div>
+                        </div>
+                        <!-- Product 2 -->
+                        <div style="border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); background: #fff;">
+                            <div style="height: 64px; background: linear-gradient(135deg, #a1c4fd, #c2e9fb); display: flex; align-items: center; justify-content: center;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2980b9" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
+                            </div>
+                            <div style="padding: 8px;">
+                                <div style="font-size: 10px; font-weight: 600; color: #1d1d1f;">Candle Set</div>
+                                <div style="font-size: 11px; font-weight: 600; color: #30d158; margin-top: 2px;">$28.00</div>
+                                <div style="margin-top: 6px; background: #1d1d1f; color: #fff; font-size: 8px; font-weight: 600; padding: 4px 8px; border-radius: 6px; text-align: center;">Add to Cart</div>
+                            </div>
+                        </div>
+                        <!-- Product 3 -->
+                        <div style="border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); background: #fff;">
+                            <div style="height: 64px; background: linear-gradient(135deg, #d4fc79, #96e6a1); display: flex; align-items: center; justify-content: center;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="1.5"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                            </div>
+                            <div style="padding: 8px;">
+                                <div style="font-size: 10px; font-weight: 600; color: #1d1d1f;">Art Print</div>
+                                <div style="font-size: 11px; font-weight: 600; color: #30d158; margin-top: 2px;">$18.00</div>
+                                <div style="margin-top: 6px; background: #1d1d1f; color: #fff; font-size: 8px; font-weight: 600; padding: 4px 8px; border-radius: 6px; text-align: center;">Add to Cart</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Cart bar -->
+                    <div style="background: #fff; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
+                        <div style="font-size: 11px; color: #86868b;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                            2 items
+                        </div>
+                        <div style="background: #30d158; color: #fff; font-size: 10px; font-weight: 600; padding: 5px 12px; border-radius: 20px;">Checkout $67.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<!-- 3. Stats Strip -->
+<section class="hp-stats-strip">
+    <div class="stats-inner">
+        <div class="stat-item">
+            <div class="stat-num">150+</div>
+            <div class="stat-label">Templates</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">10M+</div>
+            <div class="stat-label">Sites published</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">99.9%</div>
+            <div class="stat-label">Uptime</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">0</div>
+            <div class="stat-label">Code needed</div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. Horizontal Scroll Cards -->
+<section class="hp-strip-section">
+    <div class="hp-strip-header">
+        <h2>Everything your site needs.</h2>
+    </div>
+    <div class="hp-strip-scroll">
+
+        <!-- Card a: gold / RESPONSIVE -->
+        <div class="hp-strip-card a">
+            <div class="tag">RESPONSIVE</div>
+            <h3>Every template adapts perfectly to mobile, tablet, and desktop.</h3>
+            <p>Your visitors get a beautiful experience no matter what device they use.</p>
+            <div class="strip-visual">
+                <div style="display: flex; gap: 12px; align-items: flex-end; justify-content: center;">
+                    <!-- Desktop -->
+                    <div style="width: 60px; height: 44px; background: rgba(0,0,0,0.15); border-radius: 4px; border: 2px solid rgba(0,0,0,0.25); position: relative;">
+                        <div style="position: absolute; top: 4px; left: 4px; width: calc(100% - 8px); height: 3px; background: rgba(0,0,0,0.15); border-radius: 1px;"></div>
+                        <div style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); width: 20px; height: 4px; background: rgba(0,0,0,0.2); border-radius: 1px;"></div>
+                    </div>
+                    <!-- Tablet -->
+                    <div style="width: 36px; height: 48px; background: rgba(0,0,0,0.15); border-radius: 4px; border: 2px solid rgba(0,0,0,0.25); position: relative;">
+                        <div style="position: absolute; top: 5px; left: 3px; width: calc(100% - 6px); height: 3px; background: rgba(0,0,0,0.15); border-radius: 1px;"></div>
+                    </div>
+                    <!-- Phone -->
+                    <div style="width: 22px; height: 40px; background: rgba(0,0,0,0.15); border-radius: 4px; border: 2px solid rgba(0,0,0,0.25); position: relative;">
+                        <div style="position: absolute; top: 4px; left: 2px; width: calc(100% - 4px); height: 2px; background: rgba(0,0,0,0.15); border-radius: 1px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card b: dark / SEO BUILT-IN -->
+        <div class="hp-strip-card b">
+            <div class="tag">SEO BUILT-IN</div>
+            <h3>Meta tags, sitemaps, and clean URLs — all automatic.</h3>
+            <p>Rank higher on search engines without hiring a specialist.</p>
+            <div class="strip-visual">
+                <div style="text-align: center;">
+                    <div style="display: inline-block; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 20px;">
+                        <div style="font-size: 36px; font-weight: 700; color: #2997ff; line-height: 1;">A+</div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 4px;">SEO Score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card c: green / FREE SSL -->
+        <div class="hp-strip-card c">
+            <div class="tag">FREE SSL</div>
+            <h3>HTTPS on every site, no extra charge.</h3>
+            <p>Every site you publish is automatically secured with a free SSL certificate.</p>
+            <div class="strip-visual" style="font-size: 72px;">&#128274;</div>
+        </div>
+
+        <!-- Card d: red / CUSTOM DOMAIN -->
+        <div class="hp-strip-card d">
+            <div class="tag">CUSTOM DOMAIN</div>
+            <h3>Connect your own domain or register a new one.</h3>
+            <p>Use a domain you already own or search for a new one — we handle the DNS automatically.</p>
+            <div class="strip-visual">
+                <div style="background: rgba(255,255,255,0.4); border-radius: 10px; padding: 12px 16px; display: inline-flex; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                    <span style="font-size: 13px; font-weight: 600;">mysite.com</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card e: purple / ANALYTICS -->
+        <div class="hp-strip-card e">
+            <div class="tag">ANALYTICS</div>
+            <h3>Built-in visitor tracking and Google Analytics integration.</h3>
+            <p>See who visits your site, where they come from, and which pages perform best.</p>
+            <div class="strip-visual">
+                <div style="display: flex; gap: 6px; align-items: flex-end; justify-content: center; height: 80px;">
+                    <div style="width: 14px; height: 30%; background: rgba(255,255,255,0.3); border-radius: 3px;"></div>
+                    <div style="width: 14px; height: 50%; background: rgba(255,255,255,0.3); border-radius: 3px;"></div>
+                    <div style="width: 14px; height: 75%; background: rgba(255,255,255,0.3); border-radius: 3px;"></div>
+                    <div style="width: 14px; height: 60%; background: rgba(255,255,255,0.3); border-radius: 3px;"></div>
+                    <div style="width: 14px; height: 90%; background: rgba(255,255,255,0.5); border-radius: 3px;"></div>
+                    <div style="width: 14px; height: 100%; background: rgba(255,255,255,0.6); border-radius: 3px;"></div>
+                    <div style="width: 14px; height: 80%; background: rgba(255,255,255,0.4); border-radius: 3px;"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- 5. Pricing Cards -->
+<section class="hp-pricing-section" id="pricing">
+    <h2>Start free, grow anytime.</h2>
+    <p class="sub">All plans include hosting, SSL, and 24/7 support.</p>
+
+    <div class="hp-pricing-grid">
+        <div class="hp-price-card dim">
+            <div class="label">Free</div>
+            <h3>For getting started</h3>
+            <span class="price">$0</span><span class="per">/mo</span>
+            <ul>
+                <li>1 site</li>
+                <li>Subdomain only</li>
+                <li>500 MB storage</li>
+                <li>Basic templates</li>
+                <li>Ads shown</li>
+            </ul>
+            <a class="buy" href="clientregister.html">Start Free</a>
+        </div>
+
+        <div class="hp-price-card highlight">
+            <div class="label" style="color: #0071e3;">Pro - Most popular</div>
+            <h3>For growing businesses</h3>
+            <span class="price">$9.99</span><span class="per">/mo</span>
+            <ul>
+                <li>3 sites</li>
+                <li>Custom domain</li>
+                <li>10 GB storage</li>
+                <li>All templates</li>
+                <li>E-commerce (25 products)</li>
+                <li>No ads</li>
+            </ul>
+            <a class="buy" href="clientregister.html">Select Pro</a>
+        </div>
+
+        <div class="hp-price-card dim">
+            <div class="label">Business</div>
+            <h3>For serious sellers</h3>
+            <span class="price">$19.99</span><span class="per">/mo</span>
+            <ul>
+                <li>Unlimited sites</li>
+                <li>Custom domain</li>
+                <li>50 GB storage</li>
+                <li>All templates</li>
+                <li>Unlimited e-commerce</li>
+                <li>Priority support</li>
+                <li>Analytics</li>
+            </ul>
+            <a class="buy" href="clientregister.html">Select Business</a>
+        </div>
+    </div>
+
+    <div class="hp-compare-link"><a href="#">Compare all Site Builder plans ›</a></div>
+</section>
+
+<section class="hp-features-numbered">
+    <h2>From idea to live in 4 steps.</h2>
+    <div class="hp-numbered-list">
+        <div class="hp-numbered-item"><div class="num">01</div><div><h4>Choose a template</h4><p>Browse 150+ templates organized by industry. Each is professionally designed, mobile-responsive, and fully customizable to match your brand.</p></div></div>
+        <div class="hp-numbered-item"><div class="num">02</div><div><h4>Make it yours</h4><p>Change colors, fonts, images, and layout with simple drag-and-drop tools. Preview changes in real-time on desktop, tablet, and mobile views.</p></div></div>
+        <div class="hp-numbered-item"><div class="num">03</div><div><h4>Add functionality</h4><p>Drag in contact forms, galleries, maps, social feeds, booking widgets, or a full online store. Everything works out of the box with zero configuration.</p></div></div>
+        <div class="hp-numbered-item"><div class="num">04</div><div><h4>Go live</h4><p>Connect your domain, hit publish, and your site is live. Built-in SEO ensures search engines find you, and analytics track your growth from day one.</p></div></div>
+    </div>
+</section>
+
+<section class="hp-testimonials-scroll">
+    <h2>Built by thousands.</h2>
+    <div class="hp-testimonials-strip">
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">As someone with zero tech skills, I built a beautiful portfolio site in one evening. The templates are stunning and editing is completely intuitive.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=hannahmiller') center/cover;">HM</div><div><div class="author-name">Hannah Miller</div><div class="author-role">Illustrator</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Launched my bakery's online ordering system in a weekend. The e-commerce integration handles everything — from product photos to payment processing.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=carlosdiaz') center/cover;">CD</div><div><div class="author-name">Carlos Diaz</div><div class="author-role">Owner, Sweet Spot Bakery</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">I've tried Wix, Squarespace, and WordPress. This is the cleanest, fastest builder I've used. The free tier is genuinely useful — not just a demo.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=nadiarusso') center/cover;">NR</div><div><div class="author-name">Nadia Russo</div><div class="author-role">Blogger</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Built 8 client sites on this platform. The business plan is incredibly good value — unlimited sites, all templates, and the support team is phenomenal.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=alextorres') center/cover;">AT</div><div><div class="author-name">Alex Torres</div><div class="author-role">Freelance Designer</div></div></div></div>
+        <!-- Duplicated slides for infinite scroll -->
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">As someone with zero tech skills, I built a beautiful portfolio site in one evening. The templates are stunning and editing is completely intuitive.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=hannahmiller') center/cover;">HM</div><div><div class="author-name">Hannah Miller</div><div class="author-role">Illustrator</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Launched my bakery's online ordering system in a weekend. The e-commerce integration handles everything — from product photos to payment processing.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=carlosdiaz') center/cover;">CD</div><div><div class="author-name">Carlos Diaz</div><div class="author-role">Owner, Sweet Spot Bakery</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">I've tried Wix, Squarespace, and WordPress. This is the cleanest, fastest builder I've used. The free tier is genuinely useful — not just a demo.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=nadiarusso') center/cover;">NR</div><div><div class="author-name">Nadia Russo</div><div class="author-role">Blogger</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Built 8 client sites on this platform. The business plan is incredibly good value — unlimited sites, all templates, and the support team is phenomenal.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=alextorres') center/cover;">AT</div><div><div class="author-name">Alex Torres</div><div class="author-role">Freelance Designer</div></div></div></div>
+    </div>
+    <div class="carousel-scroll-nav"><button class="carousel-arrow prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><button class="carousel-arrow next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button></div>
+</section>
+
+<section class="hp-locations-section">
+    <h2>Hosted globally.</h2>
+    <p class="loc-sub">Your site is served from the fastest location for each visitor.</p>
+    <div class="hp-loc-grid">
+        <div class="hp-loc-card"><div class="loc-flag">🇺🇸</div><h4>North America</h4><p>Virginia & Oregon</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇬🇧</div><h4>Europe</h4><p>London & Frankfurt</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇸🇬</div><h4>Asia Pacific</h4><p>Singapore & Tokyo</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇦🇺</div><h4>Oceania</h4><p>Sydney, Australia</p></div>
+    </div>
+</section>
+
+<!-- 6. Split CTA -->
+<div class="hp-split-cta-wrapper">
+    <div class="hp-split-cta">
+        <div class="cta-panel dark">
+            <h3>Try it free</h3>
+            <p>No credit card required. Build your first site today.</p>
+            <a href="clientregister.html" class="btn-primary-pill">Start Free</a>
+        </div>
+        <div class="cta-panel light">
+            <h3>See templates</h3>
+            <p>Browse 150+ designs for every industry.</p>
+            <a href="#templates" class="btn-outline-pill">Browse Templates</a>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="hp-footer">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-legal">
+            1. WHMCS is a service of Apple Inc. Pricing shown in USD. Tax not included. Plans renew at standard rates after introductory period. Free domain applies to first year only.<br><br>
+            2. 30-day money-back guarantee applies to hosting plans only. Domain registrations and one-time services are non-refundable. See our Terms of Service for full details.<br><br>
+            To access and use all WHMCS features, please ensure your browser, software, and systems are up to date.
+        </div>
+
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col">
+                <h4>Shop &amp; Learn</h4>
+                <ul>
+                    <li><a href="cloud-hosting.html">Cloud Hosting</a></li>
+                    <li><a href="vps.html">VPS</a></li>
+                    <li><a href="#">Dedicated Servers</a></li>
+                    <li><a href="domains.html">Domains</a></li>
+                    <li><a href="ssl-certificates.html">SSL Certificates</a></li>
+                    <li><a href="#">Email</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Store</h4>
+                <ul>
+                    <li><a href="website-builder.html">Website Builder</a></li>
+                    <li><a href="site-builder.html">Site Builder</a></li>
+                    <li><a href="website-security.html">Website Security</a></li>
+                    <li><a href="website-backup.html">Website Backup</a></li>
+                    <li><a href="email-services.html">Email Services</a></li>
+                    <li><a href="email.html">Professional Email</a></li>
+                    <li><a href="seo-tools.html">SEO Tools</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="login.html">Sign in</a></li>
+                    <li><a href="clientregister.html">Create an account</a></li>
+                    <li><a href="#">Billing</a></li>
+                    <li><a href="#">Refer a friend</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Knowledgebase</a></li>
+                    <li><a href="#">Contact us</a></li>
+                    <li><a href="#">Network status</a></li>
+                    <li><a href="#">Community</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>About WHMCS</h4>
+                <ul>
+                    <li><a href="#">Newsroom</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Legal</a></li>
+                    <li><a href="#">Environment</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="hp-footer-bottom">
+            <div>Copyright &copy; 2026 Apple Inc. All rights reserved.</div>
+            <div class="hp-footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+                <a href="#">Sales Policy</a>
+                <a href="#">Legal</a>
+                <a href="#">Site Map</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="js/apple-theme.js"></script>
+</body>
+</html>

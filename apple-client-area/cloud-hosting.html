@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Hosting - WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css">
+    <style>body { display: block; }</style>
+</head>
+<body class="homepage-layout">
+
+<nav class="homepage-nav">
+    <div class="homepage-nav-inner">
+        <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
+        <a href="#">WHMCS</a>
+        <div class="nav-item-dropdown">
+                    <a href="#" class="nav-dropdown-trigger">Hosting <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+                    <div class="nav-mega-menu">
+                        <div class="nav-mega-inner">
+                            <div class="nav-mega-col">
+                                <h4>Web Hosting</h4>
+                                <a href="cloud-hosting.html" class="nav-mega-item"><div class="name">Cloud Hosting</div><div class="tag">Fast NVMe storage, global CDN</div></a>
+                                <a href="vps.html" class="nav-mega-item"><div class="name">VPS</div><div class="tag">Dedicated cores, full root access</div></a>
+                                <a href="#" class="nav-mega-item"><div class="name">Dedicated Servers</div><div class="tag">Enterprise hardware, yours alone</div></a>
+                                <a href="#" class="nav-mega-item"><div class="name">Managed WordPress</div><div class="tag">Optimized for WordPress sites</div></a>
+                            </div>
+                            <div class="nav-mega-col">
+                                <h4>Solutions</h4>
+                                <a href="website-builder.html" class="nav-mega-item"><div class="name">Website Builder</div><div class="tag">Drag and drop, 200+ templates</div></a>
+                                <a href="site-builder.html" class="nav-mega-item"><div class="name">Site Builder</div><div class="tag">Professional templates by industry</div></a>
+                                <a href="email.html" class="nav-mega-item"><div class="name">Professional Email</div><div class="tag">Custom domain, 50GB mailbox</div></a>
+                                <a href="website-backup.html" class="nav-mega-item"><div class="name">Website Backup</div><div class="tag">Daily automatic backups</div></a>
+                            </div>
+                            <div class="nav-mega-col">
+                                <h4>Get Started</h4>
+                                <a href="#" class="nav-mega-item"><div class="name">Compare all plans</div><div class="tag">Find the perfect fit</div></a>
+                                <a href="#" class="nav-mega-item"><div class="name">Free Migration</div><div class="tag">We move your site for you</div></a>
+                                <a href="#" class="nav-mega-item"><div class="name">Enterprise Solutions</div><div class="tag">Custom hosting at scale</div></a>
+                                <a href="support-page.html" class="nav-mega-item"><div class="name">Talk to Sales</div><div class="tag">Get expert advice</div></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        <a href="domains.html">Domains</a>
+        <a href="ssl-certificates.html">SSL</a>
+        <a href="support-page.html">Support</a>
+        <div class="nav-spacer"></div>
+        <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+        <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg></a>
+        <a href="#" onclick="toggleDarkMode(); return false;" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
+        <a href="login.html" class="nav-signin">Sign in</a>
+    </div>
+</nav>
+
+<!-- 1. Hero Split -->
+<section class="hp-hero-split">
+    <div class="hp-split-text">
+        <div class="hp-eyebrow">CLOUD HOSTING</div>
+        <h1>Engineered<br>for speed.</h1>
+        <p>NVMe-powered storage, a global CDN that puts your content at the edge, and one-click deploys that get you live in seconds. This is hosting built for the modern web.</p>
+        <div class="hp-cta-row">
+            <a href="clientregister.html" class="hp-buy-btn">Get started</a>
+            <a href="#pricing">See plans ›</a>
+        </div>
+    </div>
+    <div class="hp-split-visual">
+        <div class="hp-browser-frame">
+            <div class="hp-browser-bar">
+                <span class="dot" style="background: #ff5f57;"></span>
+                <span class="dot" style="background: #febc2e;"></span>
+                <span class="dot" style="background: #28c840;"></span>
+            </div>
+            <div class="hp-dash-shot" style="padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #1d1d1f;">Server Overview</div>
+                    <div style="display: flex; gap: 6px; align-items: center; font-size: 11px; color: #6e6e73;">
+                        <span style="width: 6px; height: 6px; background: #30d158; border-radius: 50%; display: inline-block;"></span>
+                        All systems healthy
+                    </div>
+                </div>
+                <!-- CPU gauge -->
+                <div style="margin-bottom: 14px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #86868b; margin-bottom: 5px;">
+                        <span>CPU Usage</span><span>23%</span>
+                    </div>
+                    <div style="height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden;">
+                        <div style="width: 23%; height: 100%; background: linear-gradient(90deg, #34c759, #30d158); border-radius: 3px;"></div>
+                    </div>
+                </div>
+                <!-- RAM gauge -->
+                <div style="margin-bottom: 14px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #86868b; margin-bottom: 5px;">
+                        <span>Memory</span><span>1.2 / 4 GB</span>
+                    </div>
+                    <div style="height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden;">
+                        <div style="width: 30%; height: 100%; background: linear-gradient(90deg, #0071e3, #2997ff); border-radius: 3px;"></div>
+                    </div>
+                </div>
+                <!-- Disk gauge -->
+                <div style="margin-bottom: 14px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #86868b; margin-bottom: 5px;">
+                        <span>NVMe Disk</span><span>34.2 / 100 GB</span>
+                    </div>
+                    <div style="height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden;">
+                        <div style="width: 34%; height: 100%; background: linear-gradient(90deg, #af52de, #bf5af2); border-radius: 3px;"></div>
+                    </div>
+                </div>
+                <!-- Bandwidth gauge -->
+                <div style="margin-bottom: 18px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #86868b; margin-bottom: 5px;">
+                        <span>Bandwidth</span><span>128 / 2000 GB</span>
+                    </div>
+                    <div style="height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden;">
+                        <div style="width: 6%; height: 100%; background: linear-gradient(90deg, #ff9f0a, #ffb340); border-radius: 3px;"></div>
+                    </div>
+                </div>
+                <!-- Mini stat tiles -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                    <div style="background: #f5f5f7; border-radius: 10px; padding: 10px; text-align: center;">
+                        <div style="font-size: 18px; font-weight: 600; color: #1d1d1f;">12ms</div>
+                        <div style="font-size: 9px; color: #86868b; margin-top: 2px;">TTFB</div>
+                    </div>
+                    <div style="background: #f5f5f7; border-radius: 10px; padding: 10px; text-align: center;">
+                        <div style="font-size: 18px; font-weight: 600; color: #1d1d1f;">99.9%</div>
+                        <div style="font-size: 9px; color: #86868b; margin-top: 2px;">Uptime</div>
+                    </div>
+                    <div style="background: #f5f5f7; border-radius: 10px; padding: 10px; text-align: center;">
+                        <div style="font-size: 18px; font-weight: 600; color: #30d158;">A+</div>
+                        <div style="font-size: 9px; color: #86868b; margin-top: 2px;">SSL Grade</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. Stats Strip -->
+<section class="hp-stats-strip">
+    <div class="stats-inner">
+        <div class="stat-item">
+            <div class="stat-num">99.9%</div>
+            <div class="stat-label">Guaranteed uptime</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">300+</div>
+            <div class="stat-label">One-click apps</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">22</div>
+            <div class="stat-label">Data centers</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">&lt;200ms</div>
+            <div class="stat-label">Global TTFB</div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. Alternating Sections -->
+<section class="hp-alternating">
+
+    <!-- Row 1: NVMe Storage -->
+    <div class="hp-alt-row">
+        <div class="hp-alt-text">
+            <div class="hp-eyebrow" style="color: #0071e3;">NVMe STORAGE</div>
+            <h2>Blazing-fast read/write.</h2>
+            <p>Every plan runs on enterprise-grade NVMe SSDs with read speeds up to 7,000 MB/s. Your databases load instantly, your pages render in milliseconds, and your visitors never wait.</p>
+        </div>
+        <div class="hp-alt-visual">
+            <div class="visual-box">
+                <div style="width: 100%;">
+                    <!-- Speed comparison bars -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #86868b; margin-bottom: 6px;">
+                            <span style="font-weight: 600; color: #1d1d1f;">NVMe SSD</span>
+                            <span>7,000 MB/s</span>
+                        </div>
+                        <div style="height: 28px; background: #e8e8ed; border-radius: 8px; overflow: hidden; position: relative;">
+                            <div style="width: 95%; height: 100%; background: linear-gradient(90deg, #0071e3, #2997ff); border-radius: 8px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">
+                                <span style="font-size: 10px; font-weight: 600; color: #fff;">Read</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #86868b; margin-bottom: 6px;">
+                            <span style="font-weight: 600; color: #1d1d1f;">NVMe SSD</span>
+                            <span>5,500 MB/s</span>
+                        </div>
+                        <div style="height: 28px; background: #e8e8ed; border-radius: 8px; overflow: hidden;">
+                            <div style="width: 78%; height: 100%; background: linear-gradient(90deg, #5856d6, #7d7aff); border-radius: 8px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">
+                                <span style="font-size: 10px; font-weight: 600; color: #fff;">Write</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #86868b; margin-bottom: 6px;">
+                            <span style="color: #86868b;">SATA SSD</span>
+                            <span>550 MB/s</span>
+                        </div>
+                        <div style="height: 28px; background: #e8e8ed; border-radius: 8px; overflow: hidden;">
+                            <div style="width: 8%; height: 100%; background: #c7c7cc; border-radius: 8px;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #86868b; margin-bottom: 6px;">
+                            <span style="color: #86868b;">HDD</span>
+                            <span>120 MB/s</span>
+                        </div>
+                        <div style="height: 28px; background: #e8e8ed; border-radius: 8px; overflow: hidden;">
+                            <div style="width: 2%; height: 100%; background: #c7c7cc; border-radius: 8px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Global CDN (reverse) -->
+    <div class="hp-alt-row reverse">
+        <div class="hp-alt-text">
+            <div class="hp-eyebrow" style="color: #30d158;">GLOBAL CDN</div>
+            <h2>Content at the edge.</h2>
+            <p>Your assets are cached and delivered from the data center nearest to each visitor. Whether they're in Tokyo, Berlin, or New York, your site loads like it's local.</p>
+        </div>
+        <div class="hp-alt-visual">
+            <div class="visual-box dark" style="position: relative;">
+                <div style="width: 100%; position: relative; min-height: 240px;">
+                    <!-- Globe dot map -->
+                    <svg viewBox="0 0 400 200" style="width: 100%; height: auto;" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Grid dots representing continents -->
+                        <!-- North America -->
+                        <circle cx="80" cy="60" r="3" fill="#30d158" opacity="0.9"/>
+                        <circle cx="90" cy="55" r="2.5" fill="#30d158" opacity="0.7"/>
+                        <circle cx="100" cy="50" r="2" fill="#30d158" opacity="0.5"/>
+                        <circle cx="70" cy="70" r="2" fill="#30d158" opacity="0.6"/>
+                        <circle cx="85" cy="75" r="2.5" fill="#30d158" opacity="0.5"/>
+                        <circle cx="95" cy="65" r="2" fill="#30d158" opacity="0.4"/>
+                        <circle cx="75" cy="55" r="1.5" fill="#30d158" opacity="0.4"/>
+                        <circle cx="105" cy="60" r="1.5" fill="#30d158" opacity="0.3"/>
+                        <!-- South America -->
+                        <circle cx="120" cy="120" r="2.5" fill="#30d158" opacity="0.7"/>
+                        <circle cx="125" cy="130" r="2" fill="#30d158" opacity="0.5"/>
+                        <circle cx="115" cy="140" r="2" fill="#30d158" opacity="0.4"/>
+                        <circle cx="130" cy="145" r="1.5" fill="#30d158" opacity="0.3"/>
+                        <!-- Europe -->
+                        <circle cx="200" cy="50" r="3" fill="#30d158" opacity="0.9"/>
+                        <circle cx="210" cy="45" r="2.5" fill="#30d158" opacity="0.7"/>
+                        <circle cx="190" cy="55" r="2" fill="#30d158" opacity="0.6"/>
+                        <circle cx="205" cy="60" r="2" fill="#30d158" opacity="0.5"/>
+                        <circle cx="215" cy="55" r="1.5" fill="#30d158" opacity="0.4"/>
+                        <circle cx="195" cy="48" r="1.5" fill="#30d158" opacity="0.3"/>
+                        <!-- Africa -->
+                        <circle cx="210" cy="100" r="2" fill="#30d158" opacity="0.5"/>
+                        <circle cx="205" cy="110" r="1.5" fill="#30d158" opacity="0.4"/>
+                        <circle cx="215" cy="115" r="2" fill="#30d158" opacity="0.3"/>
+                        <!-- Asia -->
+                        <circle cx="290" cy="55" r="3" fill="#30d158" opacity="0.9"/>
+                        <circle cx="310" cy="65" r="2.5" fill="#30d158" opacity="0.7"/>
+                        <circle cx="280" cy="60" r="2" fill="#30d158" opacity="0.5"/>
+                        <circle cx="300" cy="50" r="2" fill="#30d158" opacity="0.6"/>
+                        <circle cx="320" cy="70" r="2" fill="#30d158" opacity="0.4"/>
+                        <circle cx="270" cy="70" r="1.5" fill="#30d158" opacity="0.3"/>
+                        <circle cx="330" cy="60" r="1.5" fill="#30d158" opacity="0.3"/>
+                        <!-- Australia -->
+                        <circle cx="330" cy="140" r="2.5" fill="#30d158" opacity="0.7"/>
+                        <circle cx="340" cy="135" r="2" fill="#30d158" opacity="0.5"/>
+                        <circle cx="325" cy="145" r="1.5" fill="#30d158" opacity="0.3"/>
+                        <!-- Connection lines from data centers -->
+                        <line x1="80" y1="60" x2="200" y2="50" stroke="#30d158" stroke-width="0.5" opacity="0.2"/>
+                        <line x1="200" y1="50" x2="290" y2="55" stroke="#30d158" stroke-width="0.5" opacity="0.2"/>
+                        <line x1="290" y1="55" x2="330" y2="140" stroke="#30d158" stroke-width="0.5" opacity="0.2"/>
+                        <line x1="80" y1="60" x2="120" y2="120" stroke="#30d158" stroke-width="0.5" opacity="0.2"/>
+                        <line x1="200" y1="50" x2="210" y2="100" stroke="#30d158" stroke-width="0.5" opacity="0.2"/>
+                        <!-- Data center pulses -->
+                        <circle cx="80" cy="60" r="6" fill="none" stroke="#30d158" stroke-width="1" opacity="0.3">
+                            <animate attributeName="r" values="6;12;6" dur="3s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="200" cy="50" r="6" fill="none" stroke="#30d158" stroke-width="1" opacity="0.3">
+                            <animate attributeName="r" values="6;12;6" dur="3s" begin="1s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.3;0;0.3" dur="3s" begin="1s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="290" cy="55" r="6" fill="none" stroke="#30d158" stroke-width="1" opacity="0.3">
+                            <animate attributeName="r" values="6;12;6" dur="3s" begin="2s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.3;0;0.3" dur="3s" begin="2s" repeatCount="indefinite"/>
+                        </circle>
+                        <!-- Labels -->
+                        <text x="80" y="85" text-anchor="middle" font-size="9" fill="#86868b" font-family="-apple-system, system-ui, sans-serif">US-East</text>
+                        <text x="200" y="75" text-anchor="middle" font-size="9" fill="#86868b" font-family="-apple-system, system-ui, sans-serif">EU-West</text>
+                        <text x="290" y="80" text-anchor="middle" font-size="9" fill="#86868b" font-family="-apple-system, system-ui, sans-serif">AP-Tokyo</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: Automatic Backups -->
+    <div class="hp-alt-row">
+        <div class="hp-alt-text">
+            <div class="hp-eyebrow" style="color: #af52de;">AUTOMATIC BACKUPS</div>
+            <h2>Restore in one click.</h2>
+            <p>Daily automatic backups keep your data safe without any configuration. Need to go back? Pick a restore point from the last 30 days and recover instantly.</p>
+        </div>
+        <div class="hp-alt-visual">
+            <div class="visual-box">
+                <div style="width: 100%;">
+                    <!-- Calendar/timeline backup view -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <span style="font-size: 13px; font-weight: 600; color: #1d1d1f;">Backup Timeline</span>
+                        <span style="font-size: 11px; color: #86868b;">April 2026</span>
+                    </div>
+                    <!-- Calendar grid -->
+                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 20px;">
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Mon</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Tue</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Wed</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Thu</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Fri</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Sat</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Sun</div>
+                        <!-- Week 1 -->
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #86868b;"></div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #86868b;"></div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">1</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">2</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">3</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">4</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">5</div>
+                        <!-- Week 2 -->
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">6</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">7</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">8</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">9</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">10</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">11</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #e8f5e9; border-radius: 6px; color: #1d1d1f;">12</div>
+                        <!-- Week 3 (today highlighted) -->
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #0071e3; border-radius: 6px; color: #fff; font-weight: 600;">13</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #c7c7cc;">14</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #c7c7cc;">15</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #c7c7cc;">16</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #c7c7cc;">17</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #c7c7cc;">18</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #c7c7cc;">19</div>
+                    </div>
+                    <!-- Restore row -->
+                    <div style="background: #fff; border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
+                        <div>
+                            <div style="font-size: 12px; font-weight: 600; color: #1d1d1f;">Apr 13, 2026 - 03:00 AM</div>
+                            <div style="font-size: 10px; color: #86868b; margin-top: 2px;">Full backup - 2.4 GB - Completed</div>
+                        </div>
+                        <div style="background: #0071e3; color: #fff; font-size: 11px; font-weight: 500; padding: 6px 14px; border-radius: 20px; cursor: pointer;">Restore</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<!-- 4. Pricing Cards -->
+<section class="hp-pricing-section" id="pricing">
+    <h2>Pick a plan.<br>Change it anytime.</h2>
+    <p class="sub">Every plan comes with a 30-day money-back guarantee. No hidden fees.</p>
+
+    <div class="hp-pricing-grid">
+        <div class="hp-price-card dim">
+            <div class="label">Starter</div>
+            <h3>For personal sites</h3>
+            <span class="price">$10.17</span><span class="per">/mo, billed annually</span>
+            <ul>
+                <li>20 GB SSD storage</li>
+                <li>500 GB bandwidth</li>
+                <li>1 website</li>
+                <li>Free SSL certificate</li>
+            </ul>
+            <a class="buy" href="clientregister.html">Select Starter</a>
+        </div>
+
+        <div class="hp-price-card highlight">
+            <div class="label" style="color: #0071e3;">Pro - Most popular</div>
+            <h3>For creators &amp; studios</h3>
+            <span class="price">$20.33</span><span class="per">/mo, billed annually</span>
+            <ul>
+                <li>100 GB SSD storage</li>
+                <li>2 TB bandwidth</li>
+                <li>Unlimited websites</li>
+                <li>Free SSL + CDN</li>
+                <li>Priority support</li>
+            </ul>
+            <a class="buy" href="clientregister.html">Select Pro</a>
+        </div>
+
+        <div class="hp-price-card dim">
+            <div class="label">Business</div>
+            <h3>For teams &amp; agencies</h3>
+            <span class="price">$41.58</span><span class="per">/mo, billed annually</span>
+            <ul>
+                <li>500 GB SSD storage</li>
+                <li>Unmetered bandwidth</li>
+                <li>Dedicated IP address</li>
+                <li>Hourly backups</li>
+                <li>99.99% uptime SLA</li>
+            </ul>
+            <a class="buy" href="clientregister.html">Select Business</a>
+        </div>
+    </div>
+
+    <div class="hp-compare-link"><a href="#">Compare all Cloud Hosting plans ›</a></div>
+</section>
+
+<!-- 5. Logo Bar -->
+<section class="hp-logo-bar">
+    <div class="hp-logo-bar-inner">
+        <span class="logo-item">WordPress</span>
+        <span class="logo-item">Joomla</span>
+        <span class="logo-item">Drupal</span>
+        <span class="logo-item">Magento</span>
+        <span class="logo-item">Laravel</span>
+        <span class="logo-item">Node.js</span>
+    </div>
+</section>
+
+<section class="hp-values-section">
+    <h2>Our values lead the way.</h2>
+    <div class="hp-values-grid">
+        <div class="hp-value-item">
+            <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+            <h3>Customer first, always.</h3>
+            <p>Every decision we make starts with one question: does this make hosting better for our customers?</p>
+            <a href="#" class="value-link">Learn about our mission ›</a>
+        </div>
+        <div class="hp-value-item">
+            <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <h3>Privacy is a right.</h3>
+            <p>Your data belongs to you. We never sell customer data, never mine your traffic, and encrypt everything by default.</p>
+            <a href="#" class="value-link">Our privacy commitment ›</a>
+        </div>
+        <div class="hp-value-item">
+            <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <h3>Sustainable infrastructure.</h3>
+            <p>100% renewable energy powers our data centers. We're committed to carbon-neutral operations by 2030.</p>
+            <a href="#" class="value-link">Our green pledge ›</a>
+        </div>
+    </div>
+</section>
+
+<section class="hp-bento-section">
+    <h2>Everything included.</h2>
+    <div class="hp-bento-grid">
+        <div class="hp-bento-card span-2"><div class="bento-icon">⚡</div><h4>NVMe SSD Storage</h4><p>Up to 10x faster read/write speeds than traditional SSDs. Every plan runs on enterprise NVMe drives for blazing performance.</p></div>
+        <div class="hp-bento-card accent"><div class="bento-icon">🌍</div><h4>Global CDN</h4><p>Content cached at 200+ edge locations worldwide for sub-50ms delivery.</p></div>
+        <div class="hp-bento-card"><div class="bento-icon">🔒</div><h4>Free SSL</h4><p>Auto-provisioned Let's Encrypt certificates on every domain.</p></div>
+        <div class="hp-bento-card dark"><div class="bento-icon">📊</div><h4>Real-time Analytics</h4><p>Monitor visitors, bandwidth, and performance from your dashboard.</p></div>
+        <div class="hp-bento-card"><div class="bento-icon">🛡️</div><h4>DDoS Protection</h4><p>Enterprise-grade mitigation handles attacks up to 1 Tbps.</p></div>
+        <div class="hp-bento-card span-2"><div class="bento-icon">📧</div><h4>Email Hosting</h4><p>Create professional email addresses with your domain. Includes webmail, IMAP/POP3, spam filtering, and autoresponders — all managed from one panel.</p></div>
+    </div>
+</section>
+
+<section class="hp-locations-section">
+    <h2>Global infrastructure.</h2>
+    <p class="loc-sub">22 data centers across 6 continents. Your content, closer to your visitors.</p>
+    <div class="hp-loc-grid">
+        <div class="hp-loc-card"><div class="loc-flag">🇺🇸</div><h4>US East</h4><p>Virginia, USA</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇺🇸</div><h4>US West</h4><p>Oregon, USA</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇬🇧</div><h4>Europe West</h4><p>London, UK</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇩🇪</div><h4>Europe Central</h4><p>Frankfurt, DE</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇸🇬</div><h4>Asia Pacific</h4><p>Singapore</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇯🇵</div><h4>Asia East</h4><p>Tokyo, Japan</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇦🇺</div><h4>Oceania</h4><p>Sydney, Australia</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇧🇷</div><h4>South America</h4><p>São Paulo, Brazil</p></div>
+    </div>
+</section>
+
+<section class="hp-testimonial-hero">
+    <div class="quote-mark">"</div>
+    <blockquote>We migrated three client sites to this hosting and the speed improvement was immediate. Page load times dropped by 60% and our clients noticed right away.</blockquote>
+    <div class="quote-author">
+        <div class="quote-avatar" style="background: url('https://i.pravatar.cc/96?u=markrivera') center/cover;">MR</div>
+        <div class="quote-info"><div class="name">Mark Rivera</div><div class="role">Web Developer, Studio34</div></div>
+    </div>
+</section>
+
+<section class="hp-faq-section">
+    <h2>Frequently asked questions.</h2>
+    <p class="faq-sub">Everything you need to know about our cloud hosting.</p>
+    <details class="hp-faq-item"><summary>What is cloud hosting?</summary><div class="faq-body">Cloud hosting uses a network of virtual servers to host your website, providing better reliability and scalability than traditional single-server hosting. Your site is distributed across multiple servers, so if one goes down, others take over seamlessly.</div></details>
+    <details class="hp-faq-item"><summary>Can I upgrade my plan later?</summary><div class="faq-body">Absolutely. You can upgrade or downgrade your plan at any time from your dashboard. Changes take effect immediately and billing is prorated, so you only pay for what you use.</div></details>
+    <details class="hp-faq-item"><summary>Do you offer free migration?</summary><div class="faq-body">Yes! Our team will migrate your existing website from any host for free. Just submit a migration request after signing up and we'll handle the rest — usually within 24 hours.</div></details>
+    <details class="hp-faq-item"><summary>Is there a money-back guarantee?</summary><div class="faq-body">Every hosting plan comes with a 30-day money-back guarantee. If you're not satisfied for any reason, contact support within 30 days for a full refund.</div></details>
+    <details class="hp-faq-item"><summary>What control panel do you use?</summary><div class="faq-body">We provide cPanel, the industry-standard hosting control panel. It includes a file manager, email accounts, database management, one-click installers, and more — all in a clean, intuitive interface.</div></details>
+</section>
+
+<!-- 6. Dark CTA -->
+<section class="hp-final-cta">
+    <h2>Your site deserves<br>better hosting.</h2>
+    <p>Start in minutes. Migrate for free.</p>
+    <div>
+        <a href="clientregister.html" class="btn">Get started</a>
+        <a href="#pricing" class="second-link">Compare plans ›</a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="hp-footer">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-legal">
+            1. WHMCS is a service of Apple Inc. Pricing shown in USD. Tax not included. Plans renew at standard rates after introductory period. Free domain applies to first year only.<br><br>
+            2. 30-day money-back guarantee applies to hosting plans only. Domain registrations and one-time services are non-refundable. See our Terms of Service for full details.<br><br>
+            To access and use all WHMCS features, please ensure your browser, software, and systems are up to date.
+        </div>
+
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col">
+                <h4>Shop &amp; Learn</h4>
+                <ul>
+                    <li><a href="cloud-hosting.html">Cloud Hosting</a></li>
+                    <li><a href="vps.html">VPS</a></li>
+                    <li><a href="#">Dedicated Servers</a></li>
+                    <li><a href="domains.html">Domains</a></li>
+                    <li><a href="ssl-certificates.html">SSL Certificates</a></li>
+                    <li><a href="#">Email</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Store</h4>
+                <ul>
+                    <li><a href="website-builder.html">Website Builder</a></li>
+                    <li><a href="site-builder.html">Site Builder</a></li>
+                    <li><a href="website-security.html">Website Security</a></li>
+                    <li><a href="website-backup.html">Website Backup</a></li>
+                    <li><a href="email-services.html">Email Services</a></li>
+                    <li><a href="email.html">Professional Email</a></li>
+                    <li><a href="seo-tools.html">SEO Tools</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="login.html">Sign in</a></li>
+                    <li><a href="clientregister.html">Create an account</a></li>
+                    <li><a href="#">Billing</a></li>
+                    <li><a href="#">Refer a friend</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Knowledgebase</a></li>
+                    <li><a href="#">Contact us</a></li>
+                    <li><a href="#">Network status</a></li>
+                    <li><a href="#">Community</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>About WHMCS</h4>
+                <ul>
+                    <li><a href="#">Newsroom</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Legal</a></li>
+                    <li><a href="#">Environment</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="hp-footer-bottom">
+            <div>Copyright &copy; 2026 Apple Inc. All rights reserved.</div>
+            <div class="hp-footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+                <a href="#">Sales Policy</a>
+                <a href="#">Legal</a>
+                <a href="#">Site Map</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="js/apple-theme.js"></script>
+</body>
+</html>

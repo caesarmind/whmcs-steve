@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Components Gallery - WHMCS Apple Theme</title>
+    <link rel="stylesheet" href="css/apple-theme.css">
+    <style>
+        body { display: block; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--color-bg); color: var(--color-text-primary); margin: 0; padding: 0; }
+        .gallery-header { padding: 56px 22px 32px; max-width: 1200px; margin: 0 auto; }
+        .gallery-header h1 { font-size: 56px; font-weight: 600; letter-spacing: -0.025em; margin: 0 0 8px; }
+        .gallery-header p { font-size: 17px; color: var(--color-text-secondary); margin: 0; }
+        .gallery-toc { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 24px; margin: 32px auto 0; max-width: 1200px; }
+        .gallery-toc h3 { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-tertiary); margin: 0 0 14px; }
+        .gallery-toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px; }
+        .gallery-toc a { font-size: 13px; color: var(--color-text-primary); text-decoration: none; padding: 6px 10px; border-radius: 6px; transition: background 0.15s; }
+        .gallery-toc a:hover { background: var(--color-surface-secondary); color: var(--color-accent); }
+        .gallery-section { max-width: 1200px; margin: 0 auto; padding: 80px 22px 0; }
+        .gallery-section-title { font-size: 36px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 8px; }
+        .gallery-section-desc { font-size: 17px; color: var(--color-text-secondary); margin: 0 0 32px; }
+        .gallery-block { margin-bottom: 48px; }
+        .gallery-block-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px 12px 0 0; border-bottom: none; }
+        .gallery-block-label .name { font-size: 14px; font-weight: 600; color: var(--color-text-primary); }
+        .gallery-block-label .class { font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--color-accent); background: var(--color-accent-light); padding: 3px 8px; border-radius: 5px; }
+        .gallery-block-frame { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 0 0 12px 12px; overflow: hidden; }
+        .gallery-block-frame > section, .gallery-block-frame > div { margin: 0 !important; }
+        .dark-toggle { position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--color-border); background: var(--color-surface); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(0,0,0,0.08); z-index: 100; }
+        .dark-toggle svg { width: 18px; height: 18px; color: var(--color-text-secondary); }
+        .top-bar { position: sticky; top: 0; background: rgba(251,251,253,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border); padding: 12px 22px; z-index: 50; display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; }
+        .top-bar .brand { font-size: 14px; font-weight: 600; }
+        .top-bar a { font-size: 13px; color: var(--color-link); text-decoration: none; }
+        [data-theme="dark"] .top-bar { background: rgba(28,28,30,0.85); }
+        .gallery-section h2 { color: var(--color-text-primary); }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <span class="brand">WHMCS Apple Theme — Components Gallery</span>
+    <div>
+        <a href="sitemap.html">Sitemap</a> &nbsp;·&nbsp; <a href="index.html">Homepage</a>
+    </div>
+</div>
+
+<div class="gallery-header">
+    <h1>Components Gallery</h1>
+    <p>All reusable blocks and variants used across the homepage and store pages.</p>
+
+    <div class="gallery-toc">
+        <h3>Jump to section</h3>
+        <div class="gallery-toc-grid">
+            <a href="#heroes">Heroes (4)</a>
+            <a href="#pricing">Pricing (3)</a>
+            <a href="#features">Features (6)</a>
+            <a href="#locations">Locations (5)</a>
+            <a href="#testimonials">Testimonials (3)</a>
+            <a href="#faq">FAQ (2)</a>
+            <a href="#trust">Trust & Stats (3)</a>
+            <a href="#cta">CTAs (2)</a>
+            <a href="#apple">Apple-style (2)</a>
+            <a href="#tiles">Product Tiles (1)</a>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ HEROES ============================================ -->
+<div class="gallery-section" id="heroes">
+    <h2 class="gallery-section-title">Heroes</h2>
+    <p class="gallery-section-desc">4 hero variants used across product pages.</p>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Hero — Centered (with CTAs)</span><span class="class">.hp-hero</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-hero" style="padding: 60px 22px 40px;">
+                <div class="hp-eyebrow">CLOUD HOSTING</div>
+                <h1 style="font-size: 56px;">Hosting.<br>Reimagined.</h1>
+                <p class="hp-subhead" style="font-size: 21px;">Everything you need to put your site into the world — fast, secure, beautifully managed.</p>
+                <div class="hp-cta-row"><a href="#" class="hp-buy-btn">Get started</a><a href="#">Learn more ›</a></div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Hero — Split (text + visual)</span><span class="class">.hp-hero-split</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-hero-split" style="padding: 60px 22px;">
+                <div class="hp-split-text">
+                    <div class="hp-eyebrow">EMAIL</div>
+                    <h1>Your brand, every message.</h1>
+                    <p>Custom domain email with calendar, contacts, and 50 GB cloud storage.</p>
+                    <div class="hp-cta-row"><a href="#" class="hp-buy-btn">Get started</a><a href="#">See plans ›</a></div>
+                </div>
+                <div class="hp-split-visual">
+                    <div style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-radius: 18px; width: 100%; min-height: 260px; display: flex; align-items: center; justify-content: center; color: #1d1d1f; font-size: 48px;">📧</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Hero — Dark with Stats</span><span class="class">.hp-hero-dark</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-hero-dark" style="padding: 80px 22px;">
+                <h1>VPS.<br>Raw power, refined.</h1>
+                <p class="hp-hero-sub">Dedicated cores. Your choice of OS. Full root access.</p>
+                <div class="hp-hero-stats">
+                    <div class="hp-hero-stat"><div class="stat-num">8</div><div class="stat-label">vCPU cores</div></div>
+                    <div class="hp-hero-stat"><div class="stat-num">32 GB</div><div class="stat-label">RAM</div></div>
+                    <div class="hp-hero-stat"><div class="stat-num">1 TB</div><div class="stat-label">NVMe SSD</div></div>
+                    <div class="hp-hero-stat"><div class="stat-num">10 Gbps</div><div class="stat-label">Network</div></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Hero — Gradient with Floating Cards</span><span class="class">.hp-hero-gradient</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-hero-gradient green" style="padding: 80px 22px 60px;">
+                <h1>SSL Certificates.</h1>
+                <p class="hp-hero-sub">Trust, built in. Every connection encrypted.</p>
+                <div class="hp-floating-cards">
+                    <div class="hp-floating-card"><div class="card-icon">🔒</div><div class="card-label">Domain Validation</div><div class="card-sub">From $9.99/yr</div></div>
+                    <div class="hp-floating-card"><div class="card-icon">🛡️</div><div class="card-label">Organization</div><div class="card-sub">From $49.99/yr</div></div>
+                    <div class="hp-floating-card"><div class="card-icon">⭐</div><div class="card-label">Extended</div><div class="card-sub">From $149.99/yr</div></div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ PRICING ============================================ -->
+<div class="gallery-section" id="pricing">
+    <h2 class="gallery-section-title">Pricing Blocks</h2>
+    <p class="gallery-section-desc">3 pricing layouts for different product types.</p>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Pricing — 3-Column Cards (Standard)</span><span class="class">.hp-pricing-section</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-pricing-section" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">Pick a plan.</h2>
+                <p class="sub" style="margin-bottom: 32px;">30-day money-back guarantee.</p>
+                <div class="hp-pricing-grid">
+                    <div class="hp-price-card dim">
+                        <div class="label">Starter</div><h3>For personal sites</h3>
+                        <span class="price">$10.17</span><span class="per">/mo</span>
+                        <ul><li>20 GB SSD</li><li>500 GB BW</li><li>Free SSL</li></ul>
+                        <a class="buy" href="#">Select Starter</a>
+                    </div>
+                    <div class="hp-price-card highlight">
+                        <div class="label" style="color: #0071e3;">Pro · Most popular</div><h3>For creators</h3>
+                        <span class="price">$20.33</span><span class="per">/mo</span>
+                        <ul><li>100 GB SSD</li><li>2 TB BW</li><li>SSL + CDN</li><li>Priority support</li></ul>
+                        <a class="buy" href="#">Select Pro</a>
+                    </div>
+                    <div class="hp-price-card dim">
+                        <div class="label">Business</div><h3>For agencies</h3>
+                        <span class="price">$41.58</span><span class="per">/mo</span>
+                        <ul><li>500 GB SSD</li><li>Unmetered BW</li><li>Hourly backups</li></ul>
+                        <a class="buy" href="#">Select Business</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Pricing — Toggle Monthly/Annual</span><span class="class">.hp-pricing-toggle-section</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-pricing-toggle-section" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">Simple, transparent pricing</h2>
+                <p class="sub">Every plan includes mobile access.</p>
+                <div class="hp-billing-toggle"><button class="active" data-cycle="monthly">Monthly</button><button data-cycle="annual">Annual</button></div>
+                <div class="hp-pricing-grid">
+                    <div class="hp-price-card dim"><div class="label">Lite</div><h3>For individuals</h3><span class="price" data-monthly="$1.99" data-annual="$19.99">$1.99</span><span class="per">/mo</span><ul><li>10 GB storage</li><li>1 alias</li></ul><a class="buy" href="#">Select Lite</a></div>
+                    <div class="hp-price-card highlight"><div class="label" style="color: #0071e3;">Pro</div><h3>For teams</h3><span class="price" data-monthly="$4.99" data-annual="$49.99">$4.99</span><span class="per">/mo</span><ul><li>50 GB storage</li><li>10 aliases</li><li>Calendar</li></ul><a class="buy" href="#">Select Pro</a></div>
+                    <div class="hp-price-card dim"><div class="label">Suite</div><h3>For business</h3><span class="price" data-monthly="$9.99" data-annual="$99.99">$9.99</span><span class="per">/mo</span><ul><li>100 GB</li><li>Unlimited</li><li>Admin console</li></ul><a class="buy" href="#">Select Suite</a></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Pricing — "Starting At" Hero</span><span class="class">.hp-pricing-hero</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-pricing-hero" style="padding: 48px 22px;">
+                <div class="price-label">Starting at</div>
+                <div class="price-big">$9.99<span class="per">/yr</span></div>
+                <div class="price-sub">per year for your first domain</div>
+                <ul class="feature-list">
+                    <li>Free WHOIS Privacy</li><li>Auto-Renew</li>
+                    <li>DNS Management</li><li>Email Forwarding</li>
+                    <li>Domain Locking</li><li>Transfer Assistance</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ FEATURES ============================================ -->
+<div class="gallery-section" id="features">
+    <h2 class="gallery-section-title">Feature Blocks</h2>
+    <p class="gallery-section-desc">6 ways to showcase product features.</p>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Features — Icon Cards (3-col)</span><span class="class">.hp-features-section</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-features-section" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">Enterprise features, simple pricing.</h2>
+                <p class="feat-sub">Every feature you need.</p>
+                <div class="hp-feature-cards">
+                    <div class="hp-feature-card"><div class="feat-icon blue">📨</div><h4>Webmail Access</h4><p>Check email from any browser.</p></div>
+                    <div class="hp-feature-card"><div class="feat-icon green">📱</div><h4>Mobile Sync</h4><p>Push to iOS, Android, any device.</p></div>
+                    <div class="hp-feature-card"><div class="feat-icon purple">📅</div><h4>Shared Calendars</h4><p>Schedule meetings together.</p></div>
+                    <div class="hp-feature-card"><div class="feat-icon orange">🛡️</div><h4>Anti-Spam</h4><p>Enterprise-grade filtering.</p></div>
+                    <div class="hp-feature-card"><div class="feat-icon teal">👥</div><h4>Contact Manager</h4><p>Centralized contacts everywhere.</p></div>
+                    <div class="hp-feature-card"><div class="feat-icon red">⚡</div><h4>99.9% Uptime</h4><p>Always available, always reliable.</p></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Features — Numbered Steps</span><span class="class">.hp-features-numbered</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-features-numbered" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">How it works.</h2>
+                <div class="hp-numbered-list">
+                    <div class="hp-numbered-item"><div class="num">01</div><div><h4>Choose your plan</h4><p>Pick the right fit for your needs.</p></div></div>
+                    <div class="hp-numbered-item"><div class="num">02</div><div><h4>Configure your service</h4><p>Customize options and add-ons.</p></div></div>
+                    <div class="hp-numbered-item"><div class="num">03</div><div><h4>Launch in minutes</h4><p>Your service is ready instantly.</p></div></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Features — Bento Grid (Mixed Sizes)</span><span class="class">.hp-bento-section</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-bento-section" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">Everything included.</h2>
+                <div class="hp-bento-grid">
+                    <div class="hp-bento-card span-2"><div class="bento-icon">⚡</div><h4>NVMe SSD Storage</h4><p>Up to 10x faster read/write than traditional SSDs.</p></div>
+                    <div class="hp-bento-card accent"><div class="bento-icon">🌍</div><h4>Global CDN</h4><p>200+ edge locations worldwide.</p></div>
+                    <div class="hp-bento-card"><div class="bento-icon">🔒</div><h4>Free SSL</h4><p>Auto-provisioned certificates.</p></div>
+                    <div class="hp-bento-card dark"><div class="bento-icon">📊</div><h4>Real-time Analytics</h4><p>Monitor visitors and bandwidth.</p></div>
+                    <div class="hp-bento-card"><div class="bento-icon">🛡️</div><h4>DDoS Protection</h4><p>Up to 1 Tbps mitigation.</p></div>
+                    <div class="hp-bento-card span-2"><div class="bento-icon">📧</div><h4>Email Hosting</h4><p>Professional addresses with your domain. Includes spam filtering.</p></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Features — Checklist (2-col)</span><span class="class">.hp-features-checklist</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-features-checklist" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">Everything you need.</h2>
+                <p class="feat-sub">Every plan includes these features.</p>
+                <div class="hp-checklist-grid">
+                    <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Full Root Access</h4><p>Complete control via SSH.</p></div></div>
+                    <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Choice of OS</h4><p>Ubuntu, Debian, CentOS, Arch.</p></div></div>
+                    <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Dedicated IPv4 + IPv6</h4><p>Static IPs included.</p></div></div>
+                    <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>DDoS Protection</h4><p>Enterprise-grade mitigation.</p></div></div>
+                    <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Snapshot Backups</h4><p>One-click snapshots.</p></div></div>
+                    <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>99.99% Uptime SLA</h4><p>Backed by financial credits.</p></div></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Features — Large Icon Grid</span><span class="class">.hp-icon-grid</span></div>
+        <div class="gallery-block-frame">
+            <div class="hp-icon-grid-header" style="padding: 48px 22px 0;"><h2 style="font-size: 36px;">Why choose us?</h2><p>Built for performance and reliability.</p></div>
+            <section class="hp-icon-grid" style="padding: 32px 22px 48px;">
+                <div class="hp-icon-item"><div class="icon-circle blue">🔍</div><h4>Search</h4><p>Find anything instantly.</p></div>
+                <div class="hp-icon-item"><div class="icon-circle green">🛡️</div><h4>Security</h4><p>End-to-end encryption.</p></div>
+                <div class="hp-icon-item"><div class="icon-circle purple">⚡</div><h4>Speed</h4><p>Sub-50ms response times.</p></div>
+                <div class="hp-icon-item"><div class="icon-circle orange">🌍</div><h4>Global</h4><p>Reach any audience.</p></div>
+                <div class="hp-icon-item"><div class="icon-circle teal">📱</div><h4>Mobile</h4><p>Works on every device.</p></div>
+                <div class="hp-icon-item"><div class="icon-circle red">💬</div><h4>Support</h4><p>24/7 expert help.</p></div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Features — Horizontal Scroll Cards</span><span class="class">.hp-strip-scroll</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-strip-section" style="padding: 48px 0;">
+                <div class="hp-strip-header"><h2 style="font-size: 36px;">The little things, done right.</h2></div>
+                <div class="hp-strip-scroll">
+                    <div class="hp-strip-card a"><div class="tag">ONE-CLICK</div><h3>Install 300+ apps in seconds.</h3><p>Skip the setup. Our installer handles everything.</p><div class="strip-visual" style="font-size: 64px;">⚡</div></div>
+                    <div class="hp-strip-card b"><div class="tag">BUILT-IN</div><h3>Automations that just work.</h3><p>Renewals, backups, provisioning — all running in the background.</p><div class="strip-visual" style="font-size: 64px;">⚙️</div></div>
+                    <div class="hp-strip-card c"><div class="tag">ENTERPRISE-GRADE</div><h3>Security without homework.</h3><p>DDoS protection, WAF, malware scanning included.</p><div class="strip-visual" style="font-size: 64px;">🔐</div></div>
+                    <div class="hp-strip-card d"><div class="tag">DEVELOPER-FIRST</div><h3>Full REST API.</h3><p>Provision, bill, and automate everything.</p><div class="strip-visual" style="font-size: 64px;">⌨️</div></div>
+                    <div class="hp-strip-card e"><div class="tag">INTEGRATIONS</div><h3>Connects to everything.</h3><p>Stripe, Slack, Cloudflare — all in one panel.</p><div class="strip-visual" style="font-size: 64px;">🔗</div></div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ LOCATIONS ============================================ -->
+<div class="gallery-section" id="locations">
+    <h2 class="gallery-section-title">Server Location Blocks</h2>
+    <p class="gallery-section-desc">5 ways to display data center locations and global presence.</p>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Locations — Light Cards Grid</span><span class="class">.hp-locations-section</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-locations-section" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">Global infrastructure.</h2>
+                <p class="loc-sub">22 data centers across 6 continents.</p>
+                <div class="hp-loc-grid">
+                    <div class="hp-loc-card"><div class="loc-flag">🇺🇸</div><h4>US East</h4><p>Virginia, USA</p></div>
+                    <div class="hp-loc-card"><div class="loc-flag">🇬🇧</div><h4>Europe West</h4><p>London, UK</p></div>
+                    <div class="hp-loc-card"><div class="loc-flag">🇸🇬</div><h4>Asia Pacific</h4><p>Singapore</p></div>
+                    <div class="hp-loc-card"><div class="loc-flag">🇦🇺</div><h4>Oceania</h4><p>Sydney, Australia</p></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Locations — Dark Cards (with Latency)</span><span class="class">.hp-locations-dark</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-locations-dark" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">Deploy anywhere.</h2>
+                <p class="loc-sub">Choose your data center at deployment.</p>
+                <div class="hp-loc-grid">
+                    <div class="hp-loc-card"><div class="loc-flag">🇺🇸</div><h4>New York</h4><p>US East · 1ms</p></div>
+                    <div class="hp-loc-card"><div class="loc-flag">🇳🇱</div><h4>Amsterdam</h4><p>Europe · 18ms</p></div>
+                    <div class="hp-loc-card"><div class="loc-flag">🇸🇬</div><h4>Singapore</h4><p>Asia · 45ms</p></div>
+                    <div class="hp-loc-card"><div class="loc-flag">🇦🇺</div><h4>Sydney</h4><p>Oceania · 65ms</p></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Locations — Compact Pills</span><span class="class">.hp-locations-compact</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-locations-compact" style="padding: 48px 22px;">
+                <h2 style="font-size: 32px;">Available everywhere.</h2>
+                <p class="loc-sub">Access from any device, anywhere in the world.</p>
+                <div class="loc-pills">
+                    <span class="loc-pill"><span class="flag">🇺🇸</span> US East</span>
+                    <span class="loc-pill"><span class="flag">🇺🇸</span> US West</span>
+                    <span class="loc-pill"><span class="flag">🇬🇧</span> London</span>
+                    <span class="loc-pill"><span class="flag">🇩🇪</span> Frankfurt</span>
+                    <span class="loc-pill"><span class="flag">🇸🇬</span> Singapore</span>
+                    <span class="loc-pill"><span class="flag">🇯🇵</span> Tokyo</span>
+                    <span class="loc-pill"><span class="flag">🇦🇺</span> Sydney</span>
+                    <span class="loc-pill"><span class="flag">🇨🇦</span> Toronto</span>
+                    <span class="loc-pill"><span class="flag">🇧🇷</span> São Paulo</span>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Locations — Visual + Stats Row</span><span class="class">.hp-locations-visual</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-locations-visual" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">Trusted globally.</h2>
+                <p class="loc-sub">Recognized by 99.9% of browsers and devices worldwide.</p>
+                <div class="loc-map-dots" style="margin-bottom: 32px;">
+                    <span class="hp-loc-dot"><span class="dot"></span> North America</span>
+                    <span class="hp-loc-dot"><span class="dot"></span> Europe</span>
+                    <span class="hp-loc-dot"><span class="dot"></span> Asia Pacific</span>
+                    <span class="hp-loc-dot"><span class="dot"></span> South America</span>
+                    <span class="hp-loc-dot"><span class="dot"></span> Africa</span>
+                </div>
+                <div class="loc-stats-row">
+                    <div class="loc-stat"><div class="num">99.9%</div><div class="label">Browser trust</div></div>
+                    <div class="loc-stat"><div class="num">195</div><div class="label">Countries</div></div>
+                    <div class="loc-stat"><div class="num">6</div><div class="label">Continents</div></div>
+                    <div class="loc-stat"><div class="num">5B+</div><div class="label">Devices</div></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Locations — SVG World Map (Animated)</span><span class="class">.hp-locations-map-section</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-locations-map-section dark" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">Worldwide network.</h2>
+                <p class="loc-sub">22 data centers, animated in real-time.</p>
+                <div class="hp-world-map" style="height: 280px; position: relative;">
+                    <svg viewBox="0 0 1000 500" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+                        <path d="M150,120 Q200,100 250,110 L280,130 Q300,150 290,180 L260,200 Q240,220 200,210 L170,190 Q140,160 150,120Z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)"/>
+                        <path d="M420,80 Q500,60 580,80 L620,100 Q650,130 640,170 L600,200 Q560,230 500,220 L450,200 Q420,170 430,130Z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)"/>
+                        <path d="M460,220 Q500,210 530,220 L550,260 Q560,300 540,330 L510,350 Q490,360 470,340 L450,300 Q440,260 460,220Z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)"/>
+                        <path d="M680,100 Q750,80 830,100 L880,140 Q920,180 900,230 L850,270 Q800,300 730,280 L680,240 Q650,190 680,100Z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)"/>
+                        <path d="M800,280 Q840,270 870,290 L890,330 Q900,370 880,400 L850,420 Q820,430 800,410 L780,370 Q770,330 800,280Z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)"/>
+                        <path d="M300,100 Q370,80 420,100 L440,140 Q450,180 430,200 L380,210 Q340,215 310,190 L290,160 Q280,130 300,100Z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)"/>
+                        <circle cx="220" cy="150" r="5" fill="#30d158"><animate attributeName="r" values="5;8;5" dur="2s" repeatCount="indefinite"/></circle>
+                        <circle cx="220" cy="150" r="12" fill="none" stroke="#30d158" stroke-width="1" opacity="0.3"><animate attributeName="r" values="12;20;12" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/></circle>
+                        <circle cx="500" cy="130" r="5" fill="#30d158"><animate attributeName="r" values="5;8;5" dur="2s" repeatCount="indefinite" begin="0.5s"/></circle>
+                        <circle cx="500" cy="130" r="12" fill="none" stroke="#30d158" stroke-width="1" opacity="0.3"><animate attributeName="r" values="12;20;12" dur="2s" repeatCount="indefinite" begin="0.5s"/><animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite" begin="0.5s"/></circle>
+                        <circle cx="760" cy="160" r="5" fill="#30d158"><animate attributeName="r" values="5;8;5" dur="2s" repeatCount="indefinite" begin="1s"/></circle>
+                        <circle cx="350" cy="300" r="5" fill="#30d158"><animate attributeName="r" values="5;8;5" dur="2s" repeatCount="indefinite" begin="1.5s"/></circle>
+                        <circle cx="830" cy="350" r="5" fill="#30d158"><animate attributeName="r" values="5;8;5" dur="2s" repeatCount="indefinite" begin="0.7s"/></circle>
+                        <circle cx="480" cy="250" r="5" fill="#30d158"><animate attributeName="r" values="5;8;5" dur="2s" repeatCount="indefinite" begin="1.2s"/></circle>
+                        <text x="220" y="175" fill="#a1a1a6" font-size="11" text-anchor="middle">N. America</text>
+                        <text x="500" y="155" fill="#a1a1a6" font-size="11" text-anchor="middle">Europe</text>
+                        <text x="760" y="185" fill="#a1a1a6" font-size="11" text-anchor="middle">Asia</text>
+                        <text x="350" y="325" fill="#a1a1a6" font-size="11" text-anchor="middle">S. America</text>
+                        <text x="480" y="275" fill="#a1a1a6" font-size="11" text-anchor="middle">Africa</text>
+                        <text x="830" y="375" fill="#a1a1a6" font-size="11" text-anchor="middle">Oceania</text>
+                    </svg>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ TESTIMONIALS ============================================ -->
+<div class="gallery-section" id="testimonials">
+    <h2 class="gallery-section-title">Testimonial Blocks</h2>
+    <p class="gallery-section-desc">3 testimonial layouts, all carousels with profile pictures.</p>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Testimonials — Hero Quote (Single)</span><span class="class">.hp-testimonial-hero</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-testimonial-hero" style="padding: 64px 22px;">
+                <div class="quote-mark">"</div>
+                <blockquote>We migrated three client sites and the speed improvement was immediate. Page load times dropped by 60% and our clients noticed right away.</blockquote>
+                <div class="quote-author">
+                    <div class="quote-avatar" style="background: url('https://i.pravatar.cc/96?u=markrivera') center/cover;">MR</div>
+                    <div class="quote-info"><div class="name">Mark Rivera</div><div class="role">Web Developer, Studio34</div></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Testimonials — Card Carousel (3-col, dots + arrows)</span><span class="class">.hp-testimonials-grid</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-testimonials-grid" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">What customers say.</h2>
+                <div class="hp-testimonial-cards">
+                    <div class="hp-testimonial-card"><div class="stars">★★★★★</div><div class="quote">Transferred 15 domains here and the process was painless. Auto-renew and WHOIS privacy included free.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=lisachen') center/cover;"></div><div><div class="author-name">Lisa Chen</div><div class="author-role">Founder, PixelAgency</div></div></div></div>
+                    <div class="hp-testimonial-card"><div class="stars">★★★★★</div><div class="quote">The DNS panel is the best I've used. Clean interface, instant propagation, all from one dashboard.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=ryanwalsh') center/cover;"></div><div><div class="author-name">Ryan Walsh</div><div class="author-role">Web Designer</div></div></div></div>
+                    <div class="hp-testimonial-card"><div class="stars">★★★★★</div><div class="quote">Found the perfect .dev domain. Registration was instant, SSL was automatic. Seamless.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=ninakowalski') center/cover;"></div><div><div class="author-name">Nina Kowalski</div><div class="author-role">Software Engineer</div></div></div></div>
+                </div>
+                <div class="carousel-nav">
+                    <button class="carousel-arrow prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+                    <div class="carousel-dots"><button class="carousel-dot active"></button><button class="carousel-dot"></button><button class="carousel-dot"></button></div>
+                    <button class="carousel-arrow next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Testimonials — Dark Scroll Strip (draggable)</span><span class="class">.hp-testimonials-scroll</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-testimonials-scroll" style="padding: 48px 0;">
+                <h2 style="font-size: 36px;">Trusted by developers.</h2>
+                <div class="hp-testimonials-strip">
+                    <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Deploy times are incredible. I went from click to SSH in under a minute.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=jameskim') center/cover;"></div><div><div class="author-name">James Kim</div><div class="author-role">DevOps Engineer</div></div></div></div>
+                    <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Switched from AWS for staging. Same performance, half the cost, real support team.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=sarahlee') center/cover;"></div><div><div class="author-name">Sarah Lee</div><div class="author-role">CTO, Brightpath Labs</div></div></div></div>
+                    <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">We run 12 VPS instances for our microservices. Scaling is seamless — no downtime.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=danielpark') center/cover;"></div><div><div class="author-name">Daniel Park</div><div class="author-role">Backend Lead</div></div></div></div>
+                    <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">The snapshot feature saved us during a botched deployment. Worth every penny.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=anamartinez') center/cover;"></div><div><div class="author-name">Ana Martinez</div><div class="author-role">Freelance Developer</div></div></div></div>
+                </div>
+                <div class="carousel-scroll-nav">
+                    <button class="carousel-arrow prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+                    <button class="carousel-arrow next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ FAQ ============================================ -->
+<div class="gallery-section" id="faq">
+    <h2 class="gallery-section-title">FAQ Blocks</h2>
+    <p class="gallery-section-desc">2 FAQ display styles.</p>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">FAQ — Accordion (single column)</span><span class="class">.hp-faq-section</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-faq-section" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">Frequently asked questions.</h2>
+                <p class="faq-sub">Everything you need to know.</p>
+                <details class="hp-faq-item"><summary>What is cloud hosting?</summary><div class="faq-body">Cloud hosting uses a network of virtual servers, providing better reliability and scalability than traditional single-server hosting.</div></details>
+                <details class="hp-faq-item"><summary>Can I upgrade my plan later?</summary><div class="faq-body">Yes. You can upgrade or downgrade at any time. Changes take effect immediately and billing is prorated.</div></details>
+                <details class="hp-faq-item"><summary>Do you offer free migration?</summary><div class="faq-body">Our team will migrate your existing site for free, usually within 24 hours.</div></details>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">FAQ — Card Grid (2-col)</span><span class="class">.hp-faq-grid</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-faq-grid" style="padding: 48px 22px;">
+                <h2 style="font-size: 36px;">Common questions.</h2>
+                <div class="faq-grid-inner">
+                    <div class="hp-faq-card"><h4>What OS can I run?</h4><p>Choose from Ubuntu, Debian, CentOS, Fedora, or bring your own ISO.</p></div>
+                    <div class="hp-faq-card"><h4>Do I get root access?</h4><p>Yes, every VPS comes with full root access via SSH.</p></div>
+                    <div class="hp-faq-card"><h4>Can I scale resources?</h4><p>Resize CPU, RAM, and storage at any time with zero downtime.</p></div>
+                    <div class="hp-faq-card"><h4>Is there DDoS protection?</h4><p>Enterprise-grade mitigation included at no extra cost.</p></div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ TRUST/STATS ============================================ -->
+<div class="gallery-section" id="trust">
+    <h2 class="gallery-section-title">Trust & Stats Blocks</h2>
+    <p class="gallery-section-desc">3 ways to display social proof and trust signals.</p>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Stats Strip (4 large numbers)</span><span class="class">.hp-stats-strip</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-stats-strip" style="padding: 40px 22px;">
+                <div class="stats-inner">
+                    <div class="hp-stat"><div class="stat-num">99.9%</div><div class="stat-label">Guaranteed uptime</div></div>
+                    <div class="hp-stat"><div class="stat-num">300+</div><div class="stat-label">One-click apps</div></div>
+                    <div class="hp-stat"><div class="stat-num">22</div><div class="stat-label">Data centers</div></div>
+                    <div class="hp-stat"><div class="stat-num">&lt;200ms</div><div class="stat-label">Global TTFB</div></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Trust Bar (compact)</span><span class="class">.hp-trust-bar</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-trust-bar">
+                <div class="trust-inner">
+                    <div class="hp-trust-stat"><div class="stat-num">400+</div><div class="stat-label">TLDs available</div></div>
+                    <div class="hp-trust-stat"><div class="stat-num">2M+</div><div class="stat-label">Domains managed</div></div>
+                    <div class="hp-trust-stat"><div class="stat-num">Free</div><div class="stat-label">WHOIS privacy</div></div>
+                    <div class="hp-trust-stat"><div class="stat-num">ICANN</div><div class="stat-label">Accredited</div></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Logo Bar (partner technologies)</span><span class="class">.hp-logo-bar</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-logo-bar">
+                <div class="hp-logo-bar-inner">
+                    <span class="logo-item">WordPress</span>
+                    <span class="logo-item">Joomla</span>
+                    <span class="logo-item">Drupal</span>
+                    <span class="logo-item">Magento</span>
+                    <span class="logo-item">Laravel</span>
+                    <span class="logo-item">Node.js</span>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ CTA ============================================ -->
+<div class="gallery-section" id="cta">
+    <h2 class="gallery-section-title">CTA Blocks</h2>
+    <p class="gallery-section-desc">2 call-to-action layouts.</p>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">CTA — Dark Band (single CTA)</span><span class="class">.hp-final-cta</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-final-cta" style="padding: 64px 22px;">
+                <h2 style="font-size: 44px;">Your site deserves<br>beautiful hosting.</h2>
+                <p>Start in minutes. Migrate for free. Cancel whenever.</p>
+                <div>
+                    <a href="#" class="btn">Get started</a>
+                    <a href="#" class="second-link">Already a customer? Sign in ›</a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">CTA — Split Panel (two paths)</span><span class="class">.hp-split-cta</span></div>
+        <div class="gallery-block-frame">
+            <div class="hp-split-cta-wrapper" style="padding: 48px 22px;">
+                <div class="hp-split-cta">
+                    <div class="cta-panel dark">
+                        <h3>Spin up a VPS</h3>
+                        <p>Deploy in under a minute.</p>
+                        <a href="#" class="btn-primary-pill">Configure</a>
+                    </div>
+                    <div class="cta-panel light">
+                        <h3>Need a managed solution?</h3>
+                        <p>Our team handles everything.</p>
+                        <a href="#" class="btn-outline-pill">Talk to Sales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ APPLE-STYLE ============================================ -->
+<div class="gallery-section" id="apple">
+    <h2 class="gallery-section-title">Apple-Inspired Blocks</h2>
+    <p class="gallery-section-desc">Adapted from apple.com product pages (iPad, iPhone Air).</p>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">"Our Values Lead the Way" (iPad style)</span><span class="class">.hp-values-section</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-values-section" style="padding: 56px 22px;">
+                <h2 style="font-size: 48px;">Our values lead the way.</h2>
+                <div class="hp-values-grid">
+                    <div class="hp-value-item">
+                        <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+                        <h3>Customer first, always.</h3>
+                        <p>Every decision starts with one question: does this make hosting better for our customers?</p>
+                        <a href="#" class="value-link">Learn about our mission ›</a>
+                    </div>
+                    <div class="hp-value-item">
+                        <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                        <h3>Privacy is a right.</h3>
+                        <p>Your data belongs to you. We never sell customer data or mine your traffic.</p>
+                        <a href="#" class="value-link">Our privacy commitment ›</a>
+                    </div>
+                    <div class="hp-value-item">
+                        <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                        <h3>Sustainable infrastructure.</h3>
+                        <p>100% renewable energy powers our data centers. Carbon-neutral by 2030.</p>
+                        <a href="#" class="value-link">Our green pledge ›</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">"Worth the Upgrade?" (iPhone Air style)</span><span class="class">.hp-upgrade-section</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-upgrade-section" style="padding: 48px 22px;">
+                <h2 style="font-size: 44px;">Worth the upgrade?</h2>
+                <p class="upgrade-sub">See why customers switch from shared hosting to VPS.</p>
+                <div class="hp-upgrade-grid">
+                    <div class="hp-upgrade-item"><div class="upgrade-metric">4x</div><h4>More CPU power</h4><p>Dedicated vCPU cores vs shared resources means consistent performance.</p></div>
+                    <div class="hp-upgrade-item"><div class="upgrade-metric">10x</div><h4>Faster I/O</h4><p>NVMe SSD with dedicated IOPS eliminates the noisy neighbor problem.</p></div>
+                    <div class="hp-upgrade-item"><div class="upgrade-metric">100%</div><h4>Root access</h4><p>Full control over your server environment. Install anything.</p></div>
+                    <div class="hp-upgrade-item"><div class="upgrade-metric">99.99%</div><h4>Uptime SLA</h4><p>Enterprise-grade availability backed by financial credits.</p></div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ TILES ============================================ -->
+<div class="gallery-section" id="tiles">
+    <h2 class="gallery-section-title">Product Tiles</h2>
+    <p class="gallery-section-desc">Apple-style multi-color product showcase tiles (used on homepage).</p>
+
+    <div class="gallery-block">
+        <div class="gallery-block-label"><span class="name">Tiles Grid — 6 color variants</span><span class="class">.hp-tiles-section</span></div>
+        <div class="gallery-block-frame">
+            <section class="hp-tiles-section" style="padding: 24px;">
+                <div class="hp-tiles-inner">
+                    <div class="hp-tiles-row">
+                        <div class="hp-tile hp-tile-light" style="min-height: 320px;">
+                            <div class="hp-tile-eyebrow" style="color: #0071e3;">CLOUD HOSTING</div>
+                            <h2 style="font-size: 32px;">For the sites you're proud of.</h2>
+                            <p style="font-size: 16px;">Blazing-fast NVMe storage, global CDN.</p>
+                        </div>
+                        <div class="hp-tile hp-tile-dark" style="min-height: 320px;">
+                            <div class="hp-tile-eyebrow" style="color: #2997ff;">VPS</div>
+                            <h2 style="font-size: 32px;">Power, on demand.</h2>
+                            <p style="font-size: 16px;">Dedicated cores, your choice of OS.</p>
+                        </div>
+                    </div>
+                    <div class="hp-tiles-row">
+                        <div class="hp-tile hp-tile-sky" style="min-height: 280px;">
+                            <div class="hp-tile-eyebrow">DOMAINS</div>
+                            <h2 class="smaller" style="font-size: 28px;">Find your name.</h2>
+                            <p style="font-size: 15px;">Manage every domain in one place.</p>
+                        </div>
+                        <div class="hp-tile hp-tile-cream" style="min-height: 280px;">
+                            <div class="hp-tile-eyebrow" style="color: #1a7f4e;">SSL</div>
+                            <h2 class="smaller" style="font-size: 28px;">Trusted by default.</h2>
+                            <p style="font-size: 15px;">Free SSL on every plan.</p>
+                        </div>
+                    </div>
+                    <div class="hp-tiles-row">
+                        <div class="hp-tile hp-tile-plum" style="min-height: 280px;">
+                            <div class="hp-tile-eyebrow" style="color: #bf96ff;">GLOBAL</div>
+                            <h2 class="smaller" style="font-size: 28px;">Everywhere, instantly.</h2>
+                            <p style="font-size: 15px;">22 data centers worldwide.</p>
+                        </div>
+                        <div class="hp-tile hp-tile-graphite" style="min-height: 280px;">
+                            <div class="hp-tile-eyebrow" style="color: #ffd60a;">SUPPORT</div>
+                            <h2 class="smaller" style="font-size: 28px;">Human help, always.</h2>
+                            <p style="font-size: 15px;">Real engineers, 24/7.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<div style="height: 80px;"></div>
+
+<button class="dark-toggle" onclick="toggleDarkMode()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+</button>
+
+<script src="js/apple-theme.js"></script>
+</body>
+</html>

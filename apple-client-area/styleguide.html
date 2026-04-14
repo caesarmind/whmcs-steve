@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style Guide - WHMCS Apple Theme</title>
+    <link rel="stylesheet" href="css/apple-theme.css">
+    <style>
+        body { display: block; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--color-bg); color: var(--color-text-primary); margin: 0; padding: 0; }
+
+        /* Layout */
+        .sg-layout { display: grid; grid-template-columns: 260px 1fr; max-width: 1320px; margin: 0 auto; min-height: 100vh; }
+        .sg-sidebar { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 32px 24px; border-right: 1px solid var(--color-border); background: var(--color-surface-secondary); }
+        .sg-main { padding: 56px 56px 120px; max-width: 880px; }
+
+        /* Sidebar */
+        .sg-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--color-border); }
+        .sg-brand svg { width: 22px; height: 22px; color: var(--color-text-primary); }
+        .sg-brand .name { font-size: 14px; font-weight: 600; color: var(--color-text-primary); }
+        .sg-brand .sub { font-size: 11px; color: var(--color-text-tertiary); margin-top: 1px; }
+        .sg-toc-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-tertiary); margin: 24px 0 10px; }
+        .sg-toc { list-style: none; padding: 0; margin: 0; }
+        .sg-toc a { display: block; padding: 7px 12px; font-size: 13px; color: var(--color-text-secondary); text-decoration: none; border-radius: 6px; transition: all 0.15s; }
+        .sg-toc a:hover { background: var(--color-surface); color: var(--color-text-primary); }
+        .sg-toc a.active { background: var(--color-accent-light); color: var(--color-accent); font-weight: 500; }
+
+        /* Headers */
+        .sg-hero { padding: 0 0 48px; border-bottom: 1px solid var(--color-border); margin-bottom: 56px; }
+        .sg-hero h1 { font-size: 56px; font-weight: 600; letter-spacing: -0.025em; margin: 0 0 12px; line-height: 1.05; }
+        .sg-hero p { font-size: 19px; color: var(--color-text-secondary); margin: 0; line-height: 1.4; }
+        .sg-hero .meta { display: flex; gap: 16px; margin-top: 24px; font-size: 13px; color: var(--color-text-tertiary); }
+        .sg-hero .meta a { color: var(--color-link); text-decoration: none; }
+
+        h2.sg-h { font-size: 36px; font-weight: 600; letter-spacing: -0.02em; margin: 80px 0 8px; padding-top: 12px; }
+        h2.sg-h:first-of-type { margin-top: 0; }
+        h2.sg-h + .sg-lede { font-size: 17px; color: var(--color-text-secondary); margin: 0 0 32px; line-height: 1.5; }
+        h3.sg-h { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; margin: 48px 0 12px; }
+        h4.sg-h { font-size: 17px; font-weight: 600; margin: 32px 0 8px; }
+
+        /* Body */
+        .sg-main p { font-size: 15px; line-height: 1.6; color: var(--color-text-primary); margin: 0 0 16px; }
+        .sg-main p.muted { color: var(--color-text-secondary); }
+        .sg-main ul, .sg-main ol { font-size: 15px; line-height: 1.7; padding-left: 22px; margin: 0 0 16px; color: var(--color-text-primary); }
+        .sg-main li { margin: 4px 0; }
+        .sg-main strong { font-weight: 600; }
+        .sg-main em { font-style: normal; color: var(--color-text-secondary); }
+        .sg-main a { color: var(--color-link); text-decoration: none; }
+        .sg-main a:hover { text-decoration: underline; }
+
+        /* Code */
+        code { font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace; font-size: 13px; background: var(--color-surface-secondary); padding: 2px 6px; border-radius: 4px; color: var(--color-accent); }
+        pre { background: #1d1d1f; color: #f5f5f7; padding: 20px 24px; border-radius: 12px; overflow-x: auto; font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.55; margin: 16px 0 24px; }
+        pre code { background: none; padding: 0; color: inherit; font-size: 13px; }
+
+        /* Tables */
+        table.sg-table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+        .sg-table th, .sg-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--color-border-light); }
+        .sg-table th { font-weight: 600; color: var(--color-text-primary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-tertiary); background: var(--color-surface-secondary); }
+        .sg-table td { color: var(--color-text-primary); vertical-align: top; }
+        .sg-table td code { font-size: 12px; }
+        .sg-table .swatch { display: inline-block; width: 24px; height: 24px; border-radius: 6px; vertical-align: middle; margin-right: 8px; border: 1px solid var(--color-border); }
+
+        /* Color swatches grid */
+        .sg-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin: 20px 0 28px; }
+        .sg-swatch-card { border: 1px solid var(--color-border); border-radius: 12px; overflow: hidden; }
+        .sg-swatch-color { height: 80px; }
+        .sg-swatch-info { padding: 12px 14px; }
+        .sg-swatch-info .label { font-size: 12px; font-weight: 600; color: var(--color-text-primary); }
+        .sg-swatch-info .hex { font-size: 11px; color: var(--color-text-tertiary); font-family: 'SF Mono', monospace; margin-top: 2px; }
+
+        /* Type scale demo */
+        .sg-type-row { display: grid; grid-template-columns: 140px 1fr; gap: 24px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--color-border-light); }
+        .sg-type-meta { font-size: 11px; color: var(--color-text-tertiary); font-family: 'SF Mono', monospace; }
+
+        /* Callouts */
+        .sg-callout { padding: 16px 20px; border-radius: 12px; margin: 16px 0 24px; font-size: 14px; line-height: 1.55; }
+        .sg-callout.do { background: rgba(48,209,88,0.08); border-left: 3px solid #30d158; color: var(--color-text-primary); }
+        .sg-callout.dont { background: rgba(255,59,48,0.08); border-left: 3px solid #ff3b30; color: var(--color-text-primary); }
+        .sg-callout strong { display: block; margin-bottom: 6px; font-size: 13px; }
+        .sg-callout.do strong { color: #248a3d; }
+        .sg-callout.dont strong { color: #d70015; }
+        .sg-callout ul { margin: 0; padding-left: 18px; }
+        .sg-callout li { margin: 3px 0; }
+
+        /* Buttons demo */
+        .sg-buttons-demo { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 16px 0 24px; }
+        .demo-btn-primary { background: #0071e3; color: #fff; padding: 10px 24px; border-radius: 980px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; }
+        .demo-btn-outline { background: none; color: #1d1d1f; padding: 9px 22px; border-radius: 980px; font-size: 14px; font-weight: 500; border: 1.5px solid rgba(0,0,0,0.2); cursor: pointer; }
+        .demo-btn-text { color: #0066cc; font-size: 15px; text-decoration: none; }
+
+        /* Card demo */
+        .sg-card-demo { background: var(--color-surface); border: 1px solid var(--color-border-card); border-radius: 18px; padding: 24px; margin: 16px 0; }
+
+        /* Top bar */
+        .sg-topbar { position: sticky; top: 0; background: rgba(251,251,253,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border); padding: 12px 22px; display: flex; align-items: center; justify-content: space-between; z-index: 50; grid-column: 1 / -1; }
+        .sg-topbar .links a { font-size: 13px; color: var(--color-link); text-decoration: none; margin-left: 16px; }
+        [data-theme="dark"] .sg-topbar { background: rgba(28,28,30,0.85); }
+
+        .dark-toggle { position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--color-border); background: var(--color-surface); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(0,0,0,0.08); z-index: 100; }
+        .dark-toggle svg { width: 18px; height: 18px; color: var(--color-text-secondary); }
+
+        /* Spacing demo */
+        .sg-spacing-demo { display: flex; flex-direction: column; gap: 8px; margin: 16px 0 24px; }
+        .sg-spacing-row { display: flex; align-items: center; gap: 16px; }
+        .sg-spacing-bar { background: var(--color-accent-light); height: 24px; border-radius: 4px; }
+        .sg-spacing-label { font-size: 12px; font-family: 'SF Mono', monospace; color: var(--color-text-secondary); width: 60px; }
+
+        /* Radius demo */
+        .sg-radius-demo { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0 24px; align-items: end; }
+        .sg-radius-block { background: var(--color-accent-light); width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--color-accent); font-family: 'SF Mono', monospace; }
+
+        /* Icon demo */
+        .sg-icon-demo { display: flex; gap: 14px; margin: 16px 0 24px; flex-wrap: wrap; }
+        .sg-icon-circle { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+        .sg-icon-circle svg { width: 24px; height: 24px; }
+        .ic-blue { background: rgba(0,113,227,0.1); color: #0071e3; }
+        .ic-green { background: rgba(48,209,88,0.1); color: #30d158; }
+        .ic-purple { background: rgba(175,130,255,0.1); color: #af82ff; }
+        .ic-orange { background: rgba(255,159,10,0.1); color: #ff9f0a; }
+        .ic-red { background: rgba(255,59,48,0.1); color: #ff3b30; }
+        .ic-teal { background: rgba(90,200,250,0.1); color: #5ac8fa; }
+
+        /* Form demo */
+        .sg-form-demo { max-width: 360px; margin: 16px 0 24px; }
+        .sg-form-demo label { display: block; font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+        .sg-form-demo input { display: block; width: 100%; background: var(--color-surface); border: 1px solid #d2d2d7; border-radius: 12px; padding: 12px 16px; font-size: 15px; color: var(--color-text-primary); transition: border-color 0.15s, box-shadow 0.15s; box-sizing: border-box; }
+        .sg-form-demo input:focus { outline: none; border-color: #0071e3; box-shadow: 0 0 0 4px rgba(0,113,227,0.15); }
+        .sg-form-demo .hint { font-size: 12px; color: var(--color-text-secondary); margin-top: 6px; }
+
+        /* Section anchor scroll offset */
+        .sg-section { scroll-margin-top: 80px; }
+
+        @media (max-width: 900px) {
+            .sg-layout { grid-template-columns: 1fr; }
+            .sg-sidebar { position: relative; height: auto; max-height: 240px; }
+            .sg-main { padding: 32px 22px 80px; }
+            .sg-hero h1 { font-size: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sg-layout">
+    <!-- SIDEBAR -->
+    <aside class="sg-sidebar">
+        <div class="sg-brand">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.08 7.13 7.16 8.84 7.14C10.13 7.12 11.34 8.01 12.14 8.01C12.94 8.01 14.41 6.93 15.95 7.11C16.59 7.14 18.37 7.36 19.53 9.06C19.43 9.12 17.2 10.42 17.22 13.11C17.25 16.33 20.05 17.37 20.09 17.38C20.06 17.47 19.61 18.98 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg>
+            <div>
+                <div class="name">Style Guide</div>
+                <div class="sub">WHMCS Apple Theme</div>
+            </div>
+        </div>
+
+        <div class="sg-toc-title">Foundations</div>
+        <ul class="sg-toc">
+            <li><a href="#philosophy">1. Design Philosophy</a></li>
+            <li><a href="#color">2. Color System</a></li>
+            <li><a href="#typography">3. Typography</a></li>
+            <li><a href="#spacing">4. Spacing &amp; Layout</a></li>
+            <li><a href="#radius">5. Border Radius</a></li>
+            <li><a href="#shadows">6. Shadows &amp; Elevation</a></li>
+        </ul>
+
+        <div class="sg-toc-title">Elements</div>
+        <ul class="sg-toc">
+            <li><a href="#buttons">7. Buttons &amp; CTAs</a></li>
+            <li><a href="#cards">8. Cards</a></li>
+            <li><a href="#forms">9. Forms &amp; Inputs</a></li>
+            <li><a href="#icons">10. Iconography</a></li>
+            <li><a href="#motion">11. Animation &amp; Motion</a></li>
+        </ul>
+
+        <div class="sg-toc-title">Patterns</div>
+        <ul class="sg-toc">
+            <li><a href="#responsive">12. Responsive</a></li>
+            <li><a href="#dark">13. Dark Mode</a></li>
+            <li><a href="#sections">14. Section Patterns</a></li>
+            <li><a href="#components">15. Component Library</a></li>
+            <li><a href="#apple">16. Apple-Specific</a></li>
+            <li><a href="#dosdonts">17. Do's &amp; Don'ts</a></li>
+        </ul>
+
+        <div class="sg-toc-title">Resources</div>
+        <ul class="sg-toc">
+            <li><a href="components.html">Component Gallery →</a></li>
+            <li><a href="sitemap.html">Sitemap →</a></li>
+            <li><a href="index.html">Homepage →</a></li>
+        </ul>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="sg-main">
+        <header class="sg-hero">
+            <h1>Style Guide</h1>
+            <p>A comprehensive design system replicating Apple.com standards. Use this as the source of truth when creating new components or pages.</p>
+            <div class="meta">
+                <span>Last updated: 2026-04-14</span>
+                <span>·</span>
+                <a href="components.html">View Component Gallery →</a>
+            </div>
+        </header>
+
+        <!-- 1. PHILOSOPHY -->
+        <section class="sg-section" id="philosophy">
+            <h2 class="sg-h">1. Design Philosophy</h2>
+            <p class="sg-lede">Apple's design language rests on three core principles. Apply these to every new component.</p>
+
+            <h3 class="sg-h">Clarity</h3>
+            <ul>
+                <li><strong>Content is paramount.</strong> UI helps users focus on the task; it should never compete for attention.</li>
+                <li>Use generous whitespace — let elements breathe.</li>
+                <li>One primary action per view. Secondary actions are subordinate (text links, outline buttons).</li>
+                <li>Strong typographic hierarchy makes scanning effortless.</li>
+            </ul>
+
+            <h3 class="sg-h">Deference</h3>
+            <ul>
+                <li><strong>The interface defers to the content.</strong> No decorative elements that don't serve a function.</li>
+                <li>Avoid drop shadows, gradients, and textures unless they convey meaning (depth, state).</li>
+                <li>Translucency and blur create context without obscuring.</li>
+            </ul>
+
+            <h3 class="sg-h">Depth</h3>
+            <ul>
+                <li>Use layers to convey hierarchy: floating cards, modals, dropdowns.</li>
+                <li>Subtle motion reinforces relationships between actions and outcomes.</li>
+                <li>Z-axis matters — closer = more important, farther = supporting.</li>
+            </ul>
+
+            <h3 class="sg-h">Brand Voice</h3>
+            <ul>
+                <li><strong>Confident, not loud.</strong> Big typography, restrained color, large whitespace.</li>
+                <li><strong>Human, not corporate.</strong> "Get started" not "Initiate provisioning."</li>
+                <li><strong>Specific, not vague.</strong> "$10.17/mo" not "Affordable pricing."</li>
+                <li>One claim, one supporting line. Never paragraphs of marketing copy.</li>
+            </ul>
+        </section>
+
+        <!-- 2. COLOR -->
+        <section class="sg-section" id="color">
+            <h2 class="sg-h">2. Color System</h2>
+            <p class="sg-lede">Restrained palette: 90% neutrals, 10% accent. Use semantic colors only for their meaning.</p>
+
+            <h3 class="sg-h">Surface Colors (Light Mode)</h3>
+            <div class="sg-swatches">
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#fbfbfd;border-bottom:1px solid var(--color-border);"></div><div class="sg-swatch-info"><div class="label">--color-bg</div><div class="hex">#fbfbfd</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#ffffff;border-bottom:1px solid var(--color-border);"></div><div class="sg-swatch-info"><div class="label">--color-surface</div><div class="hex">#ffffff</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#f5f5f7;"></div><div class="sg-swatch-info"><div class="label">--surface-secondary</div><div class="hex">#f5f5f7</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#fafafa;border-bottom:1px solid var(--color-border);"></div><div class="sg-swatch-info"><div class="label">--surface-tertiary</div><div class="hex">#fafafa</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#e8e8ed;"></div><div class="sg-swatch-info"><div class="label">--color-border</div><div class="hex">#e8e8ed</div></div></div>
+            </div>
+
+            <h3 class="sg-h">Text Colors</h3>
+            <div class="sg-swatches">
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#1d1d1f;"></div><div class="sg-swatch-info"><div class="label">text-primary</div><div class="hex">#1d1d1f</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#6e6e73;"></div><div class="sg-swatch-info"><div class="label">text-secondary</div><div class="hex">#6e6e73</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#86868b;"></div><div class="sg-swatch-info"><div class="label">text-tertiary</div><div class="hex">#86868b</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#aeaeb2;"></div><div class="sg-swatch-info"><div class="label">text-quaternary</div><div class="hex">#aeaeb2</div></div></div>
+            </div>
+
+            <h3 class="sg-h">Accent &amp; Brand</h3>
+            <div class="sg-swatches">
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#0071e3;"></div><div class="sg-swatch-info"><div class="label">--color-accent</div><div class="hex">#0071e3</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#0077ed;"></div><div class="sg-swatch-info"><div class="label">accent-hover</div><div class="hex">#0077ED</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#0066cc;"></div><div class="sg-swatch-info"><div class="label">--color-link</div><div class="hex">#0066cc</div></div></div>
+            </div>
+
+            <h3 class="sg-h">Semantic Status</h3>
+            <table class="sg-table">
+                <thead><tr><th>Status</th><th>Color</th><th>Background</th><th>Text</th></tr></thead>
+                <tbody>
+                    <tr><td>Success / Active</td><td><span class="swatch" style="background:#30d158;"></span><code>#30d158</code></td><td><code>rgba(48, 209, 88, 0.10)</code></td><td><code>#248a3d</code></td></tr>
+                    <tr><td>Warning / Pending</td><td><span class="swatch" style="background:#ff9f0a;"></span><code>#ff9f0a</code></td><td><code>rgba(255, 159, 10, 0.10)</code></td><td><code>#c27400</code></td></tr>
+                    <tr><td>Error / Danger</td><td><span class="swatch" style="background:#ff3b30;"></span><code>#ff3b30</code></td><td><code>rgba(255, 59, 48, 0.10)</code></td><td><code>#d70015</code></td></tr>
+                    <tr><td>Info</td><td><span class="swatch" style="background:#0071e3;"></span><code>#0071e3</code></td><td><code>rgba(0, 113, 227, 0.08)</code></td><td><code>#0071e3</code></td></tr>
+                    <tr><td>Neutral</td><td><span class="swatch" style="background:#8e8e93;"></span><code>#8e8e93</code></td><td><code>rgba(142, 142, 147, 0.12)</code></td><td><code>#6e6e73</code></td></tr>
+                </tbody>
+            </table>
+
+            <h3 class="sg-h">Decorative Tile Colors</h3>
+            <p class="muted">For product showcases, use these full-color backgrounds.</p>
+            <div class="sg-swatches">
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#fbfbfd;border-bottom:1px solid var(--color-border);"></div><div class="sg-swatch-info"><div class="label">tile-light</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#1d1d1f;"></div><div class="sg-swatch-info"><div class="label">tile-dark</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#faf7f2;"></div><div class="sg-swatch-info"><div class="label">tile-cream</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:linear-gradient(180deg, #e8f2fb 0%, #d4e8f7 100%);"></div><div class="sg-swatch-info"><div class="label">tile-sky</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#1a1735;"></div><div class="sg-swatch-info"><div class="label">tile-plum</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#2a2a2c;"></div><div class="sg-swatch-info"><div class="label">tile-graphite</div></div></div>
+            </div>
+
+            <div class="sg-callout do">
+                <strong>Do</strong>
+                <ul>
+                    <li>Use <code>--color-bg</code> (off-white) instead of <code>#fff</code> for the page background.</li>
+                    <li>Use semantic colors only for their meaning (green = success, red = error).</li>
+                    <li>Use accent blue sparingly. One blue CTA per section, not three.</li>
+                </ul>
+            </div>
+            <div class="sg-callout dont">
+                <strong>Don't</strong>
+                <ul>
+                    <li>Don't introduce new colors. Stick to the palette.</li>
+                    <li>Don't use pure black <code>#000</code> for text — use <code>#1d1d1f</code>.</li>
+                    <li>Don't use rainbow gradients. Apple's gradients are monochromatic.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 3. TYPOGRAPHY -->
+        <section class="sg-section" id="typography">
+            <h2 class="sg-h">3. Typography</h2>
+            <p class="sg-lede">Bold, confident typography. Headlines should be larger than you think.</p>
+
+            <h3 class="sg-h">Font Stack</h3>
+            <pre><code>--font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+               'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+--font-mono: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;</code></pre>
+
+            <h3 class="sg-h">Type Scale</h3>
+            <div>
+                <div class="sg-type-row"><div class="sg-type-meta">80px / 600 / -0.03em</div><div style="font-size:64px;font-weight:600;letter-spacing:-0.03em;line-height:1.05;">Hero Display</div></div>
+                <div class="sg-type-row"><div class="sg-type-meta">56px / 600 / -0.025em</div><div style="font-size:48px;font-weight:600;letter-spacing:-0.025em;line-height:1.08;">Section Title</div></div>
+                <div class="sg-type-row"><div class="sg-type-meta">40px / 600 / -0.02em</div><div style="font-size:32px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;">Subsection</div></div>
+                <div class="sg-type-row"><div class="sg-type-meta">24px / 600 / -0.01em</div><div style="font-size:20px;font-weight:600;letter-spacing:-0.01em;">Card Title</div></div>
+                <div class="sg-type-row"><div class="sg-type-meta">14px / 600 / 0.02em</div><div style="font-size:14px;font-weight:600;letter-spacing:0.02em;text-transform:uppercase;color:var(--color-accent);">Eyebrow / Tag</div></div>
+                <div class="sg-type-row"><div class="sg-type-meta">21px / 400 / -0.015em</div><div style="font-size:21px;font-weight:400;letter-spacing:-0.015em;line-height:1.35;color:var(--color-text-secondary);">Lead paragraph for descriptions</div></div>
+                <div class="sg-type-row"><div class="sg-type-meta">15px / 400</div><div style="font-size:15px;font-weight:400;line-height:1.5;">Body text, the standard reading size</div></div>
+                <div class="sg-type-row"><div class="sg-type-meta">12px / 400</div><div style="font-size:12px;font-weight:400;color:var(--color-text-tertiary);">Small / Caption text</div></div>
+                <div class="sg-type-row"><div class="sg-type-meta">14px / 500</div><div style="font-size:14px;font-weight:500;">Button Label</div></div>
+            </div>
+
+            <h3 class="sg-h">Heading Hierarchy Example</h3>
+            <pre><code>&lt;div class="hp-eyebrow"&gt;CLOUD HOSTING&lt;/div&gt;          &lt;!-- 14px / 600 / uppercase --&gt;
+&lt;h1&gt;Engineered for speed.&lt;/h1&gt;                       &lt;!-- 56px / 600 / -0.03em --&gt;
+&lt;p class="hp-subhead"&gt;NVMe storage, global CDN...&lt;/p&gt; &lt;!-- 21px / 400 / muted --&gt;</code></pre>
+
+            <div class="sg-callout do">
+                <strong>Do</strong>
+                <ul>
+                    <li>Use <strong>negative letter-spacing</strong> on large text (≥ 24px). Apple's headlines feel tight.</li>
+                    <li>Use weight <strong>600</strong> for headings, <strong>500</strong> for buttons, <strong>400</strong> for body.</li>
+                    <li>Use eyebrows above headings to establish category.</li>
+                    <li>End headlines with periods. Apple-trademark.</li>
+                </ul>
+            </div>
+            <div class="sg-callout dont">
+                <strong>Don't</strong>
+                <ul>
+                    <li>Don't use weight 700 (too heavy for SF Pro Display).</li>
+                    <li>Don't use italic for emphasis — use weight or color instead.</li>
+                    <li>Don't underline anything except inline links on hover.</li>
+                    <li>Don't use ALL CAPS for body text — only eyebrows.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 4. SPACING -->
+        <section class="sg-section" id="spacing">
+            <h2 class="sg-h">4. Spacing &amp; Layout</h2>
+            <p class="sg-lede">Generous whitespace creates hierarchy. Use a consistent scale.</p>
+
+            <h3 class="sg-h">Container Widths</h3>
+            <table class="sg-table">
+                <thead><tr><th>Context</th><th>Max Width</th></tr></thead>
+                <tbody>
+                    <tr><td>Hero sections (centered)</td><td><code>1024px</code></td></tr>
+                    <tr><td>Body content (most sections)</td><td><code>1024px</code></td></tr>
+                    <tr><td>Wide layouts (rare)</td><td><code>1200px</code></td></tr>
+                    <tr><td>Reading content (auth, articles)</td><td><code>560px</code></td></tr>
+                    <tr><td>FAQ accordion</td><td><code>720px</code></td></tr>
+                </tbody>
+            </table>
+
+            <h3 class="sg-h">Section Vertical Padding</h3>
+            <table class="sg-table">
+                <thead><tr><th>Density</th><th>Padding</th></tr></thead>
+                <tbody>
+                    <tr><td>Tight section</td><td><code>48-60px</code></td></tr>
+                    <tr><td>Standard section</td><td><code>80px</code></td></tr>
+                    <tr><td>Spacious / Hero</td><td><code>100-120px</code></td></tr>
+                    <tr><td>Final CTA</td><td><code>110-120px</code></td></tr>
+                </tbody>
+            </table>
+            <p>Always <strong>22px</strong> on horizontal padding (works on tablet and desktop).</p>
+
+            <h3 class="sg-h">Spacing Scale</h3>
+            <div class="sg-spacing-demo">
+                <div class="sg-spacing-row"><div class="sg-spacing-label">4px</div><div class="sg-spacing-bar" style="width:4px;"></div><span style="font-size:12px;color:var(--color-text-tertiary);">Micro — icon to text gap</span></div>
+                <div class="sg-spacing-row"><div class="sg-spacing-label">8px</div><div class="sg-spacing-bar" style="width:8px;"></div><span style="font-size:12px;color:var(--color-text-tertiary);">Tight — between related items</span></div>
+                <div class="sg-spacing-row"><div class="sg-spacing-label">12px</div><div class="sg-spacing-bar" style="width:12px;"></div><span style="font-size:12px;color:var(--color-text-tertiary);">Small — compact lists</span></div>
+                <div class="sg-spacing-row"><div class="sg-spacing-label">16px</div><div class="sg-spacing-bar" style="width:16px;"></div><span style="font-size:12px;color:var(--color-text-tertiary);">Default — between elements</span></div>
+                <div class="sg-spacing-row"><div class="sg-spacing-label">24px</div><div class="sg-spacing-bar" style="width:24px;"></div><span style="font-size:12px;color:var(--color-text-tertiary);">Loose — between groups</span></div>
+                <div class="sg-spacing-row"><div class="sg-spacing-label">32px</div><div class="sg-spacing-bar" style="width:32px;"></div><span style="font-size:12px;color:var(--color-text-tertiary);">Section spacing within block</span></div>
+                <div class="sg-spacing-row"><div class="sg-spacing-label">48px</div><div class="sg-spacing-bar" style="width:48px;"></div><span style="font-size:12px;color:var(--color-text-tertiary);">Between distinct blocks</span></div>
+                <div class="sg-spacing-row"><div class="sg-spacing-label">80px</div><div class="sg-spacing-bar" style="width:80px;"></div><span style="font-size:12px;color:var(--color-text-tertiary);">Section vertical padding</span></div>
+            </div>
+
+            <h3 class="sg-h">Common Grid Patterns</h3>
+            <pre><code>/* Standard 3-column */
+display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+
+/* 2-column with gap */
+display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+
+/* Bento (mixed sizes) */
+display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+.span-2 { grid-column: span 2; }
+
+/* Auto-fit responsive */
+display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));</code></pre>
+        </section>
+
+        <!-- 5. RADIUS -->
+        <section class="sg-section" id="radius">
+            <h2 class="sg-h">5. Border Radius</h2>
+            <p class="sg-lede">Match the rounding scale to element size. Smaller elements get smaller radii.</p>
+
+            <div class="sg-radius-demo">
+                <div class="sg-radius-block" style="border-radius:8px;width:60px;height:60px;">8px</div>
+                <div class="sg-radius-block" style="border-radius:12px;">12px</div>
+                <div class="sg-radius-block" style="border-radius:18px;width:100px;height:100px;">18px</div>
+                <div class="sg-radius-block" style="border-radius:24px;width:120px;height:120px;">24px</div>
+                <div class="sg-radius-block" style="border-radius:980px;width:160px;height:48px;">pill (980px)</div>
+                <div class="sg-radius-block" style="border-radius:50%;width:60px;height:60px;">50% (avatar)</div>
+            </div>
+
+            <table class="sg-table">
+                <thead><tr><th>Token</th><th>Value</th><th>Use</th></tr></thead>
+                <tbody>
+                    <tr><td><code>--radius-sm</code></td><td>8px</td><td>Small buttons, badges, tiny cards</td></tr>
+                    <tr><td><code>--radius-md</code></td><td>12px</td><td>Default cards, inputs</td></tr>
+                    <tr><td>(custom)</td><td>14-18px</td><td>Feature cards, large content blocks</td></tr>
+                    <tr><td>(custom)</td><td>20-24px</td><td>Hero cards, section wrappers</td></tr>
+                    <tr><td><code>--radius-pill</code></td><td>980px</td><td>Buttons, pills, tags</td></tr>
+                    <tr><td>(custom)</td><td>50%</td><td>Avatars, dots, circular icons</td></tr>
+                </tbody>
+            </table>
+
+            <div class="sg-callout do">
+                <strong>Rules</strong>
+                <ul>
+                    <li>Smaller elements get smaller radii. A 32px button uses 980px (pill), a 200px card uses 18px.</li>
+                    <li>Pills (980px) are the signature Apple button shape.</li>
+                    <li>Match radii within a section. Don't mix 12px and 18px cards in the same view.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 6. SHADOWS -->
+        <section class="sg-section" id="shadows">
+            <h2 class="sg-h">6. Shadows &amp; Elevation</h2>
+            <p class="sg-lede">Apple uses very subtle shadows. Avoid harsh drop shadows.</p>
+
+            <pre><code>--shadow-card: none;                                   /* default cards: NO shadow */
+--shadow-card-hover: 0 2px 12px rgba(0,0,0,0.06);     /* gentle lift on hover */
+--shadow-dropdown: 0 4px 32px rgba(0,0,0,0.12),       /* dropdowns/modals only */
+                   0 0 1px rgba(0,0,0,0.08);
+
+/* Hero/floating elements only */
+box-shadow: 0 20px 60px rgba(0,0,0,0.08);   /* browser frame */
+box-shadow: 0 8px 32px rgba(0,0,0,0.08);    /* floating cards */
+box-shadow: 0 20px 60px rgba(48,209,88,0.3); /* tinted glow (matches element color) */</code></pre>
+
+            <div class="sg-callout do">
+                <strong>Rules</strong>
+                <ul>
+                    <li><strong>No shadow on default cards.</strong> Use a 1px border instead (<code>#e8e8ed</code>).</li>
+                    <li>Shadows only for floating elements: dropdowns, modals, hover-lift, hero mockups.</li>
+                    <li>Tinted shadows for accent elements (e.g. green shadow on green shield).</li>
+                    <li>Blur radius &gt; offset. Apple shadows are diffuse, never sharp.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 7. BUTTONS -->
+        <section class="sg-section" id="buttons">
+            <h2 class="sg-h">7. Buttons &amp; CTAs</h2>
+            <p class="sg-lede">The signature Apple button: pill-shaped, blue, prominent.</p>
+
+            <div class="sg-buttons-demo">
+                <button class="demo-btn-primary">Get started</button>
+                <button class="demo-btn-outline">Talk to Sales</button>
+                <a href="#" class="demo-btn-text">Learn more ›</a>
+            </div>
+
+            <h3 class="sg-h">Primary Button (Pill)</h3>
+            <pre><code>.btn-primary, .hp-buy-btn {
+    background: #0071e3;
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 980px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    transition: background 0.2s ease;
+}
+.btn-primary:hover { background: #0077ed; }</code></pre>
+
+            <h3 class="sg-h">Secondary (Outline Pill)</h3>
+            <pre><code>.btn-outline-pill {
+    border: 1.5px solid rgba(0,0,0,0.2);
+    color: #1d1d1f;
+    padding: 11px 28px;
+    border-radius: 980px;
+    background: none;
+}</code></pre>
+
+            <h3 class="sg-h">Tertiary (Text Link with Arrow)</h3>
+            <pre><code>&lt;a href="#" class="link-arrow"&gt;Learn more ›&lt;/a&gt;
+/* color: #0066cc; font-size: 17px; */</code></pre>
+
+            <h3 class="sg-h">Sizes</h3>
+            <table class="sg-table">
+                <thead><tr><th>Size</th><th>Padding</th><th>Font</th><th>Use</th></tr></thead>
+                <tbody>
+                    <tr><td>Small</td><td><code>6px 14px</code></td><td>13px / 500</td><td>Compact UI, table actions</td></tr>
+                    <tr><td>Default</td><td><code>10px 24px</code></td><td>14px / 500</td><td>Most CTAs</td></tr>
+                    <tr><td>Large</td><td><code>12px 28px</code></td><td>15px / 500</td><td>Hero CTAs</td></tr>
+                    <tr><td>Full</td><td><code>14px 24px</code> (100%)</td><td>15px / 500</td><td>Form submits</td></tr>
+                </tbody>
+            </table>
+
+            <p>The signature pattern: <strong>primary pill + secondary text link</strong>. Always blue button + blue text link with arrow. Never two prominent buttons side by side.</p>
+        </section>
+
+        <!-- 8. CARDS -->
+        <section class="sg-section" id="cards">
+            <h2 class="sg-h">8. Cards</h2>
+            <p class="sg-lede">White background, subtle border, no shadow. Padding should be generous.</p>
+
+            <div class="sg-card-demo">
+                <h4 style="margin:0 0 8px;font-size:18px;font-weight:600;">Card Title</h4>
+                <p style="margin:0;color:var(--color-text-secondary);font-size:14px;">Body content with comfortable line-height. Use border, not shadow, for default cards.</p>
+            </div>
+
+            <pre><code>.card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.04);
+    border-radius: 18px;
+    padding: 36px 28px;
+}</code></pre>
+
+            <h3 class="sg-h">Variants</h3>
+            <table class="sg-table">
+                <thead><tr><th>Class</th><th>Treatment</th></tr></thead>
+                <tbody>
+                    <tr><td>Default</td><td>White background, subtle border, no shadow</td></tr>
+                    <tr><td><code>.dim</code></td><td>Gray background <code>#f5f5f7</code>, no border</td></tr>
+                    <tr><td><code>.highlight</code></td><td>2px blue border (for "Most popular")</td></tr>
+                    <tr><td><code>.accent</code></td><td>Blue background, white text</td></tr>
+                    <tr><td><code>.dark</code></td><td>Dark gray <code>#1d1d1f</code>, light text</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 9. FORMS -->
+        <section class="sg-section" id="forms">
+            <h2 class="sg-h">9. Forms &amp; Inputs</h2>
+            <p class="sg-lede">Label above input. Soft focus ring. 12px border radius matches cards.</p>
+
+            <div class="sg-form-demo">
+                <label>Email Address</label>
+                <input type="email" placeholder="you@example.com">
+                <div class="hint">We'll never share your email.</div>
+            </div>
+
+            <pre><code>.form-input {
+    background: #fff;
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 15px;
+}
+.form-input:focus {
+    outline: none;
+    border-color: #0071e3;
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+}</code></pre>
+
+            <div class="sg-callout do">
+                <strong>Rules</strong>
+                <ul>
+                    <li><strong>Label above input</strong>, never beside (better for accessibility and mobile).</li>
+                    <li><strong>12px border-radius</strong> for inputs (matches default card radius).</li>
+                    <li><strong>Focus ring</strong>: 4px tinted glow + colored border. Never a thick outline.</li>
+                    <li><strong>Validation</strong>: red text + red border on error, with hint below.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 10. ICONS -->
+        <section class="sg-section" id="icons">
+            <h2 class="sg-h">10. Iconography</h2>
+            <p class="sg-lede">Inline SVG with stroke="currentColor". Use stroke icons for UI, never mix stroke + fill.</p>
+
+            <div class="sg-icon-demo">
+                <div class="sg-icon-circle ic-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+                <div class="sg-icon-circle ic-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="sg-icon-circle ic-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+                <div class="sg-icon-circle ic-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9"/></svg></div>
+                <div class="sg-icon-circle ic-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
+                <div class="sg-icon-circle ic-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg></div>
+            </div>
+
+            <h3 class="sg-h">Icon Sizes</h3>
+            <table class="sg-table">
+                <thead><tr><th>Context</th><th>Size</th><th>Stroke</th></tr></thead>
+                <tbody>
+                    <tr><td>Inline (text)</td><td>14-16px</td><td>1.6</td></tr>
+                    <tr><td>Sidebar nav</td><td>18px</td><td>2</td></tr>
+                    <tr><td>Section icons</td><td>24-28px</td><td>1.5-2</td></tr>
+                    <tr><td>Hero/feature icons</td><td>40-48px</td><td>1.5</td></tr>
+                    <tr><td>Decorative (Apple values)</td><td>48-64px</td><td>1.5</td></tr>
+                </tbody>
+            </table>
+
+            <h3 class="sg-h">Container Pattern</h3>
+            <pre><code>&lt;div class="icon-circle blue"&gt;
+    &lt;svg&gt;...&lt;/svg&gt;
+&lt;/div&gt;
+
+.icon-circle.blue { background: rgba(0,113,227,0.1); color: #0071e3; }
+/* Same pattern for green, purple, orange, red, teal */</code></pre>
+        </section>
+
+        <!-- 11. MOTION -->
+        <section class="sg-section" id="motion">
+            <h2 class="sg-h">11. Animation &amp; Motion</h2>
+            <p class="sg-lede">Subtle, fast, purposeful. Apple motion never overshoots or bounces.</p>
+
+            <pre><code>--transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
+--transition-medium: 250ms cubic-bezier(0.25, 0.1, 0.25, 1);</code></pre>
+
+            <table class="sg-table">
+                <thead><tr><th>Action</th><th>Duration</th><th>Easing</th></tr></thead>
+                <tbody>
+                    <tr><td>Hover state change</td><td>150ms</td><td>ease-out</td></tr>
+                    <tr><td>Dropdown open/close</td><td>250ms</td><td>ease-out</td></tr>
+                    <tr><td>Modal/panel slide</td><td>300-400ms</td><td>ease-out</td></tr>
+                    <tr><td>Carousel auto-advance</td><td>5000ms interval</td><td>ease-in-out</td></tr>
+                    <tr><td>Page transitions</td><td>None (avoid)</td><td>—</td></tr>
+                </tbody>
+            </table>
+
+            <div class="sg-callout do">
+                <strong>Do</strong>
+                <ul>
+                    <li><strong>Pulse/breathe</strong> for live indicators (status dots): <code>2s infinite</code>.</li>
+                    <li><strong>Subtle slide-in</strong> for dropdowns (8px translateY + opacity).</li>
+                    <li><strong>Smooth scroll</strong> for in-page anchors.</li>
+                    <li><strong>Pause on hover</strong> for auto-advancing carousels.</li>
+                </ul>
+            </div>
+            <div class="sg-callout dont">
+                <strong>Don't</strong>
+                <ul>
+                    <li>Don't use bouncy easings (cubic-bezier overshoots).</li>
+                    <li>Don't animate longer than 400ms for UI feedback.</li>
+                    <li>Don't animate page-to-page transitions.</li>
+                    <li>Don't animate everything — most state changes should be instant.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 12. RESPONSIVE -->
+        <section class="sg-section" id="responsive">
+            <h2 class="sg-h">12. Responsive Breakpoints</h2>
+            <p class="sg-lede">Mobile-first. One main breakpoint at 820px. Avoid over-engineering.</p>
+
+            <pre><code>@media (max-width: 820px) { /* tablet/mobile adjustments */ }
+@media (max-width: 480px) { /* mobile-only — rare overrides */ }</code></pre>
+
+            <table class="sg-table">
+                <thead><tr><th>Component</th><th>Mobile Adjustment</th></tr></thead>
+                <tbody>
+                    <tr><td>Hero h1</td><td>80px → 52px</td></tr>
+                    <tr><td>Hero subhead</td><td>28px → 22px</td></tr>
+                    <tr><td>3-col grid</td><td>→ 1-col</td></tr>
+                    <tr><td>2-col grid</td><td>→ 1-col</td></tr>
+                    <tr><td>Pricing grid</td><td>→ 1-col stacked</td></tr>
+                    <tr><td>Footer cols</td><td>5-col → 2-col</td></tr>
+                    <tr><td>Alternating sections</td><td>grid <code>1fr 1fr</code> → <code>1fr</code> (text always above visual)</td></tr>
+                    <tr><td>Bento grid</td><td>mixed sizes → all 1-col</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 13. DARK MODE -->
+        <section class="sg-section" id="dark">
+            <h2 class="sg-h">13. Dark Mode</h2>
+            <p class="sg-lede">Apple uses deep gray (#1c1c1e), not pure black, for dark mode backgrounds.</p>
+
+            <h3 class="sg-h">Color Mapping</h3>
+            <table class="sg-table">
+                <thead><tr><th>Light</th><th>Dark</th></tr></thead>
+                <tbody>
+                    <tr><td><code>#fbfbfd</code> (bg)</td><td><code>#000</code> or <code>#1c1c1e</code></td></tr>
+                    <tr><td><code>#ffffff</code> (surface)</td><td><code>#2c2c2e</code></td></tr>
+                    <tr><td><code>#f5f5f7</code> (surface 2)</td><td><code>#3a3a3c</code></td></tr>
+                    <tr><td><code>#1d1d1f</code> (text)</td><td><code>#f5f5f7</code></td></tr>
+                    <tr><td><code>#6e6e73</code> (secondary)</td><td><code>#a1a1a6</code></td></tr>
+                    <tr><td><code>#e8e8ed</code> (border)</td><td><code>#3a3a3c</code></td></tr>
+                </tbody>
+            </table>
+
+            <pre><code>:root {
+    --color-bg: #fbfbfd;
+    --color-text-primary: #1d1d1f;
+}
+[data-theme="dark"] {
+    --color-bg: #1c1c1e;
+    --color-text-primary: #f5f5f7;
+}
+
+/* Toggle */
+document.documentElement.setAttribute('data-theme', 'dark');</code></pre>
+
+            <div class="sg-callout do">
+                <strong>Rules</strong>
+                <ul>
+                    <li><strong>Cards lighten in dark mode</strong> (<code>#2c2c2e</code>), they don't disappear into the bg.</li>
+                    <li><strong>Borders become lighter</strong> in dark mode (<code>rgba(255,255,255,0.06)</code>).</li>
+                    <li><strong>Accent blue stays the same</strong> — it's the brand.</li>
+                    <li><strong>Test every block in both modes.</strong> Always.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 14. SECTIONS -->
+        <section class="sg-section" id="sections">
+            <h2 class="sg-h">14. Section Patterns</h2>
+            <p class="sg-lede">Stack sections with consistent vertical padding. Each section is self-contained.</p>
+
+            <h3 class="sg-h">Vertical Rhythm</h3>
+            <pre><code>&lt;section class="hp-hero"&gt;...&lt;/section&gt;          &lt;!-- 100px padding --&gt;
+&lt;section class="hp-stats-strip"&gt;...&lt;/section&gt;   &lt;!-- 56px padding --&gt;
+&lt;section class="hp-features-section"&gt;...&lt;/section&gt; &lt;!-- 80px padding --&gt;
+&lt;section class="hp-final-cta"&gt;...&lt;/section&gt;     &lt;!-- 110px padding --&gt;</code></pre>
+
+            <h3 class="sg-h">Background Alternation</h3>
+            <p>To create rhythm, alternate between:</p>
+            <ul>
+                <li><strong>White / off-white</strong> (<code>#fbfbfd</code>) — default content</li>
+                <li><strong>Light gray</strong> (<code>#f5f5f7</code>) — secondary sections (stats, trust bar)</li>
+                <li><strong>Dark</strong> (<code>#1d1d1f</code>) — hero or final CTA only</li>
+                <li><strong>Tinted gradient</strong> (sky, green, purple) — feature heroes</li>
+            </ul>
+            <p>Don't alternate every section — too noisy. Use 2-3 different backgrounds across a page.</p>
+
+            <h3 class="sg-h">Eyebrow Pattern</h3>
+            <p>Almost every section starts with a small label above the heading:</p>
+            <pre><code>&lt;div class="hp-eyebrow"&gt;CLOUD HOSTING&lt;/div&gt;
+&lt;h2&gt;Engineered for speed.&lt;/h2&gt;
+&lt;p&gt;Description...&lt;/p&gt;</code></pre>
+            <p>This is Apple's signature pattern. Establishes context before the headline.</p>
+
+            <h3 class="sg-h">Dashboard Page Pattern</h3>
+            <p>All logged-in dashboard pages share the same header anatomy. Use <code>.page-eyebrow</code> + <code>.page-title</code> + <code>.page-subtitle</code>:</p>
+
+            <div class="sg-card-demo" style="padding:28px 24px;">
+                <div class="page-eyebrow">BILLING</div>
+                <h1 class="page-title" style="margin:0;">Invoices</h1>
+                <p class="page-subtitle" style="margin:6px 0 0;">View and manage your billing history.</p>
+            </div>
+
+            <pre><code>&lt;!-- Simple (most pages) --&gt;
+&lt;div class="page-header"&gt;
+    &lt;div class="page-eyebrow"&gt;BILLING&lt;/div&gt;
+    &lt;h1 class="page-title"&gt;Invoices&lt;/h1&gt;
+    &lt;p class="page-subtitle"&gt;View and manage your billing history.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;!-- With action button (list pages) --&gt;
+&lt;div class="page-header"&gt;
+    &lt;div class="page-header-row"&gt;
+        &lt;div&gt;
+            &lt;div class="page-eyebrow"&gt;DOMAINS&lt;/div&gt;
+            &lt;h1 class="page-title"&gt;My Domains&lt;/h1&gt;
+            &lt;p class="page-subtitle"&gt;Manage your domain registrations.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;a href="#" class="btn-primary"&gt;Register New Domain&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+            <h4 class="sg-h">Category Eyebrow Labels</h4>
+            <p>Use these consistent category labels so users always know where they are:</p>
+            <table class="sg-table">
+                <thead><tr><th>Eyebrow</th><th>Pages</th></tr></thead>
+                <tbody>
+                    <tr><td><code>DASHBOARD</code></td><td>clientareahome (optional)</td></tr>
+                    <tr><td><code>SERVICES</code></td><td>clientareaproducts, clientareaproductdetails, upgrade, managessl</td></tr>
+                    <tr><td><code>DOMAINS</code></td><td>clientareadomains, clientareadomaindetails, bulkdomainmanagement, whois, domain-pricing</td></tr>
+                    <tr><td><code>BILLING</code></td><td>clientareainvoices, viewinvoice, clientareaaddfunds, masspay, account-paymentmethods, subscription-manage</td></tr>
+                    <tr><td><code>SUPPORT</code></td><td>supportticketslist, supportticketsubmit, viewticket, ticketfeedback</td></tr>
+                    <tr><td><code>ACCOUNT</code></td><td>clientareadetails, clientareasecurity, user-profile, account-user-management</td></tr>
+                </tbody>
+            </table>
+
+            <div class="sg-callout do">
+                <strong>Do</strong>
+                <ul>
+                    <li>Always use <code>.page-title</code> class on the <code>h1</code>.</li>
+                    <li>Always include <code>.page-subtitle</code> — even a one-line description orients the user.</li>
+                    <li>Put eyebrow <strong>above</strong> h1, subtitle <strong>below</strong>.</li>
+                    <li>Callouts/alerts go <strong>after</strong> the page header, <strong>before</strong> filter tabs or content cards.</li>
+                </ul>
+            </div>
+            <div class="sg-callout dont">
+                <strong>Don't</strong>
+                <ul>
+                    <li>Don't place callouts above the page header — breaks visual hierarchy.</li>
+                    <li>Don't omit the subtitle unless the page title is truly self-explanatory (rare).</li>
+                    <li>Don't introduce new eyebrow labels beyond the 6 categories above.</li>
+                    <li>Don't use <code>.page-eyebrow</code> on auth or public pages — use <code>.hp-eyebrow</code> there.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 15. COMPONENTS -->
+        <section class="sg-section" id="components">
+            <h2 class="sg-h">15. Component Library</h2>
+            <p class="sg-lede">All reusable blocks. See <a href="components.html">components.html</a> for live examples.</p>
+
+            <table class="sg-table">
+                <thead><tr><th>Component</th><th>Class</th><th>When to Use</th></tr></thead>
+                <tbody>
+                    <tr><td>Hero — Centered</td><td><code>.hp-hero</code></td><td>Default hero, search-focused pages</td></tr>
+                    <tr><td>Hero — Split</td><td><code>.hp-hero-split</code></td><td>When you have a strong product visual</td></tr>
+                    <tr><td>Hero — Dark Stats</td><td><code>.hp-hero-dark</code></td><td>Technical products (VPS, security)</td></tr>
+                    <tr><td>Hero — Gradient</td><td><code>.hp-hero-gradient</code></td><td>Premium / aspirational products</td></tr>
+                    <tr><td>Pricing — 3-col</td><td><code>.hp-pricing-section</code></td><td>Standard pricing comparison</td></tr>
+                    <tr><td>Pricing — Toggle</td><td><code>.hp-pricing-toggle-section</code></td><td>Monthly / annual pricing</td></tr>
+                    <tr><td>Pricing — Starting at</td><td><code>.hp-pricing-hero</code></td><td>Single-tier or "starting from" pricing</td></tr>
+                    <tr><td>Features — Icon Cards</td><td><code>.hp-features-section</code></td><td>6-feature overviews</td></tr>
+                    <tr><td>Features — Numbered</td><td><code>.hp-features-numbered</code></td><td>Step-by-step processes</td></tr>
+                    <tr><td>Features — Bento</td><td><code>.hp-bento-section</code></td><td>Marketing-heavy feature mix</td></tr>
+                    <tr><td>Features — Checklist</td><td><code>.hp-features-checklist</code></td><td>"What's included" lists</td></tr>
+                    <tr><td>Features — Strip Scroll</td><td><code>.hp-strip-scroll</code></td><td>Variety of features</td></tr>
+                    <tr><td>Locations — Cards</td><td><code>.hp-locations-section</code></td><td>4-8 data centers</td></tr>
+                    <tr><td>Locations — Pills</td><td><code>.hp-locations-compact</code></td><td>8+ items, compact display</td></tr>
+                    <tr><td>Locations — Map</td><td><code>.hp-locations-map-section</code></td><td>Hero-level global presence</td></tr>
+                    <tr><td>Testimonials — Hero</td><td><code>.hp-testimonial-hero</code></td><td>Single, powerful quote</td></tr>
+                    <tr><td>Testimonials — Cards</td><td><code>.hp-testimonials-grid</code></td><td>3 testimonials with carousel</td></tr>
+                    <tr><td>Testimonials — Strip</td><td><code>.hp-testimonials-scroll</code></td><td>5+ testimonials, dark backdrop</td></tr>
+                    <tr><td>FAQ — Accordion</td><td><code>.hp-faq-section</code></td><td>Long FAQ list</td></tr>
+                    <tr><td>FAQ — Card Grid</td><td><code>.hp-faq-grid</code></td><td>Quick 4-6 question overview</td></tr>
+                    <tr><td>Stats Strip</td><td><code>.hp-stats-strip</code></td><td>4 large numbers</td></tr>
+                    <tr><td>Trust Bar</td><td><code>.hp-trust-bar</code></td><td>Compact stats</td></tr>
+                    <tr><td>Logo Bar</td><td><code>.hp-logo-bar</code></td><td>Partner logos</td></tr>
+                    <tr><td>Final CTA</td><td><code>.hp-final-cta</code></td><td>Bottom-of-page call to action</td></tr>
+                    <tr><td>Split CTA</td><td><code>.hp-split-cta</code></td><td>Two paths (Get started / Talk to sales)</td></tr>
+                    <tr><td>Values</td><td><code>.hp-values-section</code></td><td>Mission/principles (iPad style)</td></tr>
+                    <tr><td>Upgrade Compare</td><td><code>.hp-upgrade-section</code></td><td>"Worth the upgrade?" metrics</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 16. APPLE-SPECIFIC -->
+        <section class="sg-section" id="apple">
+            <h2 class="sg-h">16. Apple-Specific Patterns</h2>
+            <p class="sg-lede">Signature patterns adapted from apple.com product pages.</p>
+
+            <h3 class="sg-h">"Worth the Upgrade?" Block</h3>
+            <p>Adapted from apple.com/iphone-air. Use to compare a current product against an upgrade.</p>
+            <ul>
+                <li>Centered h2 (~56px)</li>
+                <li>Subtitle (~21px, muted)</li>
+                <li>2-column grid of comparison items</li>
+                <li>Each item: large blue metric (48px / accent) + h4 + description</li>
+            </ul>
+
+            <h3 class="sg-h">"Our Values Lead the Way" Block</h3>
+            <p>Adapted from apple.com/ipad-11. Mission/values section.</p>
+            <ul>
+                <li>Left-aligned h2 (~64px, NOT centered)</li>
+                <li>3-column grid of cards on light gray background (<code>#f5f5f7</code>, <code>border-radius: 20px</code>)</li>
+                <li>Each card: large icon top-left → h3 title → paragraph → "Learn more ›"</li>
+                <li>Cards have generous padding (<code>36px 32px</code>)</li>
+            </ul>
+
+            <h3 class="sg-h">Hero Browser Mockup</h3>
+            <pre><code>&lt;div class="hp-browser-frame"&gt;
+    &lt;div class="hp-browser-bar"&gt;
+        &lt;span class="dot" style="background: #ff5f57;"&gt;&lt;/span&gt;
+        &lt;span class="dot" style="background: #febc2e;"&gt;&lt;/span&gt;
+        &lt;span class="dot" style="background: #28c840;"&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;!-- Your product UI mockup here --&gt;
+&lt;/div&gt;</code></pre>
+
+            <h3 class="sg-h">Floating Cards (Gradient Hero)</h3>
+            <pre><code>background: linear-gradient(160deg, #e8f5e9 0%, #c8e6c9 30%, #a5d6a7 100%);
+.hp-floating-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+}</code></pre>
+
+            <h3 class="sg-h">Sticky Nav with Frosted Glass</h3>
+            <pre><code>.homepage-nav {
+    position: sticky;
+    top: 0;
+    background: rgba(251,251,253,0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}</code></pre>
+
+            <h3 class="sg-h">Mega Menu (Hover Dropdown)</h3>
+            <p>Critical: dropdown wrapper must use <code>align-self: stretch</code> and the trigger <code>height: 100%</code> so there's no hover gap when moving cursor to menu.</p>
+        </section>
+
+        <!-- 17. DOS DONTS -->
+        <section class="sg-section" id="dosdonts">
+            <h2 class="sg-h">17. Do's and Don'ts</h2>
+            <p class="sg-lede">Quick reference for common decisions.</p>
+
+            <h3 class="sg-h">Voice &amp; Copy</h3>
+            <div class="sg-callout do">
+                <strong>Do</strong>
+                <ul>
+                    <li>"Get started" / "Buy now" / "Sign in" — short verbs</li>
+                    <li>Specific numbers: "99.99% uptime", "$10.17/mo", "55-second deploy"</li>
+                    <li>Lead with the benefit, not the feature</li>
+                    <li>Use sentence case for headings</li>
+                    <li>End headlines with periods</li>
+                </ul>
+            </div>
+            <div class="sg-callout dont">
+                <strong>Don't</strong>
+                <ul>
+                    <li>Never use "Solutions", "Synergize", "Empower", "Unleash"</li>
+                    <li>No exclamation points in headlines</li>
+                    <li>No "World-class", "Best-in-class", "Industry-leading"</li>
+                    <li>No question marks in headlines (rare exceptions)</li>
+                </ul>
+            </div>
+
+            <h3 class="sg-h">Layout</h3>
+            <div class="sg-callout do">
+                <strong>Do</strong>
+                <ul>
+                    <li>Generous whitespace — sections breathe at 80-120px</li>
+                    <li>Single column of focus per section</li>
+                    <li>Strong vertical rhythm — alternate dense and spacious</li>
+                    <li>eyebrow → headline → description → CTA</li>
+                </ul>
+            </div>
+            <div class="sg-callout dont">
+                <strong>Don't</strong>
+                <ul>
+                    <li>Don't pack 6 things into one section</li>
+                    <li>Don't use full-bleed images with text on top</li>
+                    <li>Don't right-align body text</li>
+                    <li>Don't use thin lines as section dividers</li>
+                </ul>
+            </div>
+
+            <h3 class="sg-h">Components</h3>
+            <div class="sg-callout do">
+                <strong>Do</strong>
+                <ul>
+                    <li>Reuse blocks from <a href="components.html">components.html</a> instead of creating new variants</li>
+                    <li>Match border radius across sibling elements</li>
+                    <li>Use existing color tokens — don't introduce new shades</li>
+                </ul>
+            </div>
+            <div class="sg-callout dont">
+                <strong>Don't</strong>
+                <ul>
+                    <li>Don't combine more than 3 different card styles in one page</li>
+                    <li>Don't use <code>&lt;table&gt;</code> for layout — use grid</li>
+                    <li>Don't nest cards inside cards more than once</li>
+                </ul>
+            </div>
+
+            <h3 class="sg-h">Quick Start: Building a New Section</h3>
+            <ol>
+                <li><strong>Pick a pattern</strong> from <a href="components.html">components.html</a>. Don't invent.</li>
+                <li><strong>Use the eyebrow → h2 → p → CTA</strong> structure.</li>
+                <li><strong>Wrap in a <code>&lt;section&gt;</code></strong> with appropriate padding (80px default).</li>
+                <li><strong>Constrain content</strong> to <code>max-width: 1024px</code> with <code>padding: 0 22px</code>.</li>
+                <li><strong>Test in dark mode</strong> — verify all colors adapt.</li>
+                <li><strong>Test at 820px</strong> — verify the responsive collapse works.</li>
+                <li><strong>Check the rhythm</strong> — does this section feel right between the section above and below?</li>
+            </ol>
+        </section>
+    </main>
+</div>
+
+<button class="dark-toggle" onclick="toggleDarkMode()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+</button>
+
+<script src="js/apple-theme.js"></script>
+<script>
+    // Active section highlighting in TOC
+    (function() {
+        const tocLinks = document.querySelectorAll('.sg-toc a[href^="#"]');
+        const sections = Array.from(tocLinks).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+
+        function update() {
+            const scrollY = window.scrollY + 120;
+            let active = sections[0];
+            for (const s of sections) {
+                if (s.offsetTop <= scrollY) active = s;
+            }
+            tocLinks.forEach(a => {
+                a.classList.toggle('active', a.getAttribute('href') === '#' + (active && active.id));
+            });
+        }
+        window.addEventListener('scroll', update, { passive: true });
+        update();
+
+        // Smooth scroll
+        tocLinks.forEach(a => {
+            a.addEventListener('click', function(e) {
+                const target = document.querySelector(a.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    })();
+</script>
+</body>
+</html>

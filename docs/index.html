@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WHMCS 9 Theme Development Documentation</title>
+  <meta name="description" content="Complete reference for building WHMCS 9 themes based on the Nexus theme architecture.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css">
+  <style>
+    :root {
+      --base-font-size: 15px;
+      --theme-color: #4e8ee9;
+      --sidebar-width: 280px;
+      --sidebar-nav-link-color--active: #4e8ee9;
+      --sidebar-nav-link-border-color--active: #4e8ee9;
+      --sidebar-nav-link-font-weight--active: bold;
+      --cover-background-color: #1a1a2e;
+      --code-font-size: 0.875em;
+      --blockquote-border-color: #4e8ee9;
+    }
+    .sidebar-nav > ul > li > a {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85em;
+      letter-spacing: 0.05em;
+      color: #888;
+    }
+    .sidebar-nav > ul > li > ul > li > a {
+      font-weight: normal;
+      text-transform: none;
+      font-size: 0.95em;
+      letter-spacing: normal;
+    }
+    .app-name-link img {
+      max-width: 40px;
+      margin-right: 10px;
+    }
+    .markdown-section table {
+      display: table;
+      width: 100%;
+    }
+    .markdown-section pre > code {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    }
+    .markdown-section h1 {
+      border-bottom: 2px solid #4e8ee9;
+      padding-bottom: 10px;
+    }
+    .tip, .warning, .attention {
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: 'WHMCS 9 Theme Docs',
+      repo: '',
+      loadSidebar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      search: {
+        maxAge: 86400000,
+        paths: 'auto',
+        placeholder: 'Search documentation...',
+        noData: 'No results found',
+        depth: 3,
+        hideOtherSidebarContent: false,
+      },
+      copyCode: {
+        buttonText: 'Copy',
+        errorText: 'Error',
+        successText: 'Copied!'
+      },
+      pagination: {
+        previousText: 'Previous',
+        nextText: 'Next',
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      tabs: {
+        persist: true,
+        sync: true,
+        theme: 'classic',
+        tabComments: true,
+        tabHeadings: true,
+      },
+      themeColor: '#4e8ee9',
+      homepage: 'README.md',
+      notFoundPage: true,
+      relativePath: false,
+    }
+  </script>
+  <!-- Docsify core -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <!-- Plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2/dist/docsify-copy-code.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js"></script>
+  <!-- Syntax highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-php.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-scss.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-smarty.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+</body>
+</html>
