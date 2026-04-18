@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Builder</title>
+    <style>
+        /* === Builder chrome (dark, independent from theme) === */
+        :root {
+            --bldr-bg: #1c1c1e;
+            --bldr-surface: #2c2c2e;
+            --bldr-surface-2: #3a3a3c;
+            --bldr-border: rgba(255,255,255,0.08);
+            --bldr-text: #f5f5f7;
+            --bldr-text-dim: #a1a1a6;
+            --bldr-accent: #0a84ff;
+            --bldr-accent-hover: #2a94ff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+            background: var(--bldr-bg); color: var(--bldr-text);
+            overflow: hidden; display: flex; letter-spacing: -0.005em;
+        }
+
+        /* Sidebar */
+        .bldr-sidebar {
+            width: 300px; background: var(--bldr-bg);
+            border-right: 1px solid var(--bldr-border);
+            display: flex; flex-direction: column; flex-shrink: 0;
+            position: relative; min-width: 240px;
+        }
+        .bldr-resize-handle {
+            position: absolute; top: 0; right: -3px; bottom: 0;
+            width: 6px; cursor: col-resize; z-index: 100;
+            background: transparent; transition: background 0.18s;
+        }
+        .bldr-resize-handle::after {
+            content: ''; position: absolute; top: 50%; left: 1px;
+            width: 4px; height: 36px; transform: translateY(-50%);
+            background: var(--bldr-border); border-radius: 2px;
+            opacity: 0; transition: opacity 0.18s;
+        }
+        .bldr-resize-handle:hover::after, .bldr-resize-handle.dragging::after { opacity: 1; }
+        .bldr-resize-handle.dragging::after { background: var(--bldr-accent); }
+        .bldr-drag-overlay {
+            position: fixed; inset: 0; z-index: 999;
+            cursor: col-resize; display: none;
+        }
+        .bldr-drag-overlay.active { display: block; }
+        .bldr-brand {
+            padding: 14px 18px; border-bottom: 1px solid var(--bldr-border);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .bldr-brand-logo { width: 22px; height: 22px; color: var(--bldr-text); flex-shrink: 0; }
+        .bldr-brand-name { font-size: 14px; font-weight: 600; }
+        .bldr-brand-count { font-size: 11px; color: var(--bldr-text-dim); margin-left: auto; }
+        .bldr-search {
+            margin: 12px 14px 6px; padding: 8px 10px; background: var(--bldr-surface);
+            border-radius: 8px; border: 1px solid var(--bldr-border);
+            display: flex; align-items: center; gap: 8px;
+            transition: border-color 0.12s;
+        }
+        .bldr-search:focus-within { border-color: var(--bldr-accent); }
+        .bldr-search svg { color: var(--bldr-text-dim); flex-shrink: 0; }
+        .bldr-search input {
+            flex: 1; background: transparent; border: 0; outline: 0;
+            color: var(--bldr-text); font: inherit; font-size: 13px;
+        }
+        .bldr-search input::placeholder { color: var(--bldr-text-dim); }
+        .bldr-view-toggle {
+            background: transparent; border: 0; padding: 4px; cursor: pointer;
+            color: var(--bldr-text-dim); border-radius: 4px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: color 0.12s, background 0.12s;
+        }
+        .bldr-view-toggle:hover { color: var(--bldr-text); background: rgba(255,255,255,0.05); }
+        .bldr-categories { flex: 1; overflow-y: auto; padding: 4px 10px 24px; }
+        .bldr-categories::-webkit-scrollbar { width: 8px; }
+        .bldr-categories::-webkit-scrollbar-thumb { background: var(--bldr-surface-2); border-radius: 4px; }
+        .bldr-category { margin-top: 12px; }
+        .bldr-category-title {
+            font-size: 11px; font-weight: 600; color: var(--bldr-text-dim);
+            text-transform: uppercase; letter-spacing: 0.06em;
+            padding: 6px 10px; user-select: none; cursor: pointer;
+            display: flex; align-items: center; gap: 6px;
+            border-radius: 6px;
+        }
+        .bldr-category-title:hover { background: var(--bldr-surface); }
+        .bldr-category-count { color: var(--bldr-text-dim); font-weight: 400; margin-left: auto; }
+        .bldr-category.collapsed .bldr-category-items { display: none; }
+        .bldr-category.collapsed .bldr-chev { transform: rotate(-90deg); }
+        .bldr-chev { width: 10px; height: 10px; transition: transform 0.15s; flex-shrink: 0; color: var(--bldr-text-dim); }
+        .bldr-item {
+            padding: 8px 10px; border-radius: 6px; font-size: 13px; color: var(--bldr-text);
+            cursor: pointer; transition: background 0.12s, color 0.12s; line-height: 1.35;
+            display: flex; align-items: center; gap: 8px;
+            outline: none;
+        }
+        .bldr-item:hover, .bldr-item:focus-visible { background: var(--bldr-surface-2); }
+        .bldr-item:focus-visible { box-shadow: inset 0 0 0 1px var(--bldr-accent); }
+        .bldr-item.hidden { display: none; }
+        .bldr-item .bldr-add-icon { color: var(--bldr-text-dim); font-weight: 400; flex-shrink: 0; font-size: 13px; line-height: 1; }
+        .bldr-item:hover .bldr-add-icon, .bldr-item:focus-visible .bldr-add-icon { color: var(--bldr-accent); }
+        .bldr-item .bldr-item-label { flex: 1; min-width: 0; }
+
+        /* Grid mode */
+        .bldr-categories.grid-mode .bldr-category-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            gap: 8px;
+            padding: 4px 0 0;
+        }
+        /* Higher specificity to keep collapse working in grid mode */
+        .bldr-categories.grid-mode .bldr-category.collapsed .bldr-category-items {
+            display: none;
+        }
+        .bldr-categories.grid-mode .bldr-item {
+            padding: 0;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            border: 1px solid var(--bldr-border);
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--bldr-surface);
+            position: relative;
+        }
+        .bldr-categories.grid-mode .bldr-item:hover,
+        .bldr-categories.grid-mode .bldr-item:focus-visible {
+            border-color: var(--bldr-accent);
+            background: var(--bldr-surface);
+        }
+        .bldr-categories.grid-mode .bldr-item .bldr-add-icon { display: none; }
+        .bldr-categories.grid-mode .bldr-item .bldr-item-label {
+            padding: 7px 9px 8px;
+            font-size: 11px;
+            line-height: 1.3;
+            color: var(--bldr-text);
+            border-top: 1px solid var(--bldr-border);
+            background: var(--bldr-bg);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .bldr-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            position: relative;
+            background: #fff;
+            overflow: hidden;
+        }
+        [data-canvas-theme="dark"] .bldr-thumb { background: #000; }
+        .bldr-thumb-frame {
+            position: absolute;
+            top: 0; left: 0;
+            width: 1200px;
+            height: 750px;
+            border: 0;
+            transform-origin: top left;
+            transform: scale(0.155);
+            pointer-events: none;
+            display: block;
+        }
+        .bldr-thumb-skeleton {
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, #2c2c2e 0%, #3a3a3c 50%, #2c2c2e 100%);
+            background-size: 200% 100%;
+            animation: bldr-skeleton 1.4s ease-in-out infinite;
+        }
+        @keyframes bldr-skeleton {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Main area + toolbar */
+        .bldr-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .bldr-toolbar {
+            height: 52px; padding: 0 16px; background: var(--bldr-bg);
+            border-bottom: 1px solid var(--bldr-border);
+            display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+        }
+        .bldr-toolbar-group { display: flex; align-items: center; gap: 6px; }
+        .bldr-toolbar-spacer { flex: 1; }
+        .bldr-toolbar-status {
+            font-size: 11px; color: var(--bldr-text-dim);
+            transition: color 0.2s;
+        }
+        .bldr-toolbar-status.saved { color: #30d158; }
+        .bldr-btn {
+            padding: 7px 13px; font-size: 12px; color: var(--bldr-text);
+            background: var(--bldr-surface); border: 1px solid var(--bldr-border);
+            border-radius: 6px; cursor: pointer; font: inherit; font-weight: 500;
+            transition: background 0.12s, border-color 0.12s, color 0.12s;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .bldr-btn:hover { background: var(--bldr-surface-2); }
+        .bldr-btn.primary { background: var(--bldr-accent); border-color: var(--bldr-accent); color: #fff; }
+        .bldr-btn.primary:hover { background: var(--bldr-accent-hover); border-color: var(--bldr-accent-hover); }
+        .bldr-btn.ghost { background: transparent; border-color: transparent; color: var(--bldr-text-dim); }
+        .bldr-btn.ghost:hover { background: var(--bldr-surface); color: var(--bldr-text); }
+
+        /* Canvas */
+        .bldr-canvas-shell {
+            flex: 1; background: #e8e9ee; overflow: hidden; position: relative;
+        }
+        [data-canvas-theme="dark"] .bldr-canvas-shell { background: #0a0a0c; }
+        #canvasFrame { width: 100%; height: 100%; border: 0; display: block; background: transparent; }
+
+        /* Modal (export) */
+        .bldr-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            display: none; align-items: center; justify-content: center; padding: 40px;
+            z-index: 1000; backdrop-filter: blur(4px);
+        }
+        .bldr-modal.open { display: flex; }
+        .bldr-modal-box {
+            background: var(--bldr-surface); border: 1px solid var(--bldr-border);
+            border-radius: 14px; max-width: 900px; width: 100%; max-height: 80vh;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+        }
+        .bldr-modal-header {
+            padding: 14px 18px; border-bottom: 1px solid var(--bldr-border);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .bldr-modal-header h3 { font-size: 14px; font-weight: 600; }
+        .bldr-modal-header-actions { margin-left: auto; display: flex; gap: 6px; }
+        .bldr-modal-body { flex: 1; overflow: auto; padding: 0; display: flex; }
+        .bldr-modal-body textarea {
+            flex: 1; min-height: 400px; resize: none;
+            background: #0c0c0e; border: 0;
+            padding: 16px; font-family: 'SF Mono', Menlo, Monaco, monospace; font-size: 11px;
+            color: #c0c3c9; outline: 0; line-height: 1.55;
+        }
+
+        /* Floating Layers panel */
+        .bldr-floater {
+            position: fixed;
+            top: 90px; right: 20px;
+            width: 280px;
+            height: 380px;
+            min-width: 220px;
+            min-height: 200px;
+            max-width: calc(100vw - 10px);
+            max-height: calc(100vh - 10px);
+            background: var(--bldr-surface);
+            border-radius: 12px;
+            border: 1px solid var(--bldr-border);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(255,255,255,0.04);
+            display: flex;
+            flex-direction: column;
+            z-index: 800;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .bldr-floater-resize { position: absolute; z-index: 3; background: transparent; transition: background 0.12s; }
+        .bldr-floater-resize:hover, .bldr-floater-resize.active { background: rgba(10,132,255,0.35); }
+        .bldr-floater-resize-e { top: 8px; right: 0; width: 6px; bottom: 14px; cursor: ew-resize; }
+        .bldr-floater-resize-s { left: 8px; bottom: 0; right: 14px; height: 6px; cursor: ns-resize; }
+        .bldr-floater-resize-se { right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; z-index: 4; }
+        .bldr-floater-resize-grip {
+            position: absolute; right: 3px; bottom: 3px;
+            width: 12px; height: 12px;
+            pointer-events: none;
+            color: var(--bldr-text-dim);
+            opacity: 0.55;
+            z-index: 5;
+        }
+        .bldr-floater:hover .bldr-floater-resize-grip { opacity: 0.9; }
+        .bldr-floater-resize-grip svg { width: 12px; height: 12px; display: block; }
+        .bldr-floater[hidden] { display: none; }
+        .bldr-floater-header {
+            padding: 8px 10px 8px 12px;
+            background: rgba(28,28,30,0.92);
+            border-bottom: 1px solid var(--bldr-border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: grab;
+            user-select: none;
+        }
+        .bldr-floater-header.dragging { cursor: grabbing; }
+        .bldr-floater-title { font-size: 12px; font-weight: 600; color: var(--bldr-text); }
+        .bldr-floater-count {
+            font-size: 10px; color: var(--bldr-text-dim);
+            padding: 1px 7px; background: var(--bldr-surface);
+            border-radius: 8px; font-weight: 500;
+        }
+        .bldr-floater-close {
+            margin-left: auto;
+            width: 22px; height: 22px;
+            border-radius: 5px;
+            background: transparent; border: 0;
+            color: var(--bldr-text-dim);
+            cursor: pointer;
+            font-size: 16px; line-height: 1;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .bldr-floater-close:hover { background: var(--bldr-surface-2); color: var(--bldr-text); }
+        .bldr-floater-body {
+            flex: 1; overflow-y: auto; padding: 6px;
+        }
+        .bldr-floater-empty {
+            padding: 28px 16px; text-align: center;
+            color: var(--bldr-text-dim); font-size: 12px; line-height: 1.5;
+        }
+        .bldr-layer {
+            padding: 7px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--bldr-text);
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer;
+            transition: background 0.12s;
+        }
+        .bldr-layer:hover { background: var(--bldr-surface-2); }
+        .bldr-layer.selected { background: rgba(10,132,255,0.18); color: #fff; }
+        .bldr-layer[draggable="true"] { cursor: grab; }
+        .bldr-layer.dragging { opacity: 0.35; cursor: grabbing; }
+        .bldr-layer.drop-above { box-shadow: inset 0 2px 0 var(--bldr-accent); }
+        .bldr-layer.drop-below { box-shadow: inset 0 -2px 0 var(--bldr-accent); }
+        .bldr-layer-grip {
+            flex-shrink: 0; color: var(--bldr-text-dim);
+            width: 10px; height: 16px; display: flex; align-items: center; justify-content: center;
+            opacity: 0.6; transition: opacity 0.12s;
+        }
+        .bldr-layer:hover .bldr-layer-grip { opacity: 1; }
+        .bldr-layer-grip svg { width: 8px; height: 12px; }
+        .bldr-layer-num {
+            font-size: 10px; color: var(--bldr-text-dim);
+            min-width: 16px; text-align: right; flex-shrink: 0;
+            font-variant-numeric: tabular-nums;
+        }
+        .bldr-layer.selected .bldr-layer-num { color: var(--bldr-accent); }
+        .bldr-layer-name {
+            flex: 1; min-width: 0;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .bldr-layer-actions { display: flex; gap: 1px; opacity: 0; transition: opacity 0.12s; flex-shrink: 0; }
+        .bldr-layer:hover .bldr-layer-actions, .bldr-layer.selected .bldr-layer-actions { opacity: 1; }
+        .bldr-layer-actions button {
+            width: 22px; height: 22px;
+            background: transparent; border: 0;
+            color: var(--bldr-text-dim); cursor: pointer;
+            border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; padding: 0;
+            font-family: inherit;
+        }
+        .bldr-layer-actions button:hover { background: rgba(255,255,255,0.1); color: var(--bldr-text); }
+        .bldr-layer-actions button svg { width: 13px; height: 13px; display: block; }
+        .bldr-layer.bldr-layer-hidden .bldr-layer-actions { opacity: 1; }
+        .bldr-layer.bldr-layer-hidden .bldr-layer-name { opacity: 0.4; text-decoration: line-through; }
+        .bldr-layer.bldr-layer-hidden .bldr-layer-num { opacity: 0.4; }
+        .bldr-layer.bldr-layer-hidden .bldr-layer-eye { color: var(--bldr-accent); }
+
+        /* Hover preview popover */
+        .bldr-preview-popover {
+            position: fixed; top: 0; left: 0;
+            width: 420px; height: 280px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-4px) scale(0.98);
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 500;
+            box-shadow: 0 18px 50px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.25);
+        }
+        .bldr-preview-popover.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .bldr-preview-popover .bldr-preview-shell {
+            width: 1200px; height: 800px;
+            transform-origin: top left;
+            transform: scale(0.35);
+            position: relative;
+        }
+        .bldr-preview-popover iframe {
+            width: 100%; height: 100%;
+            border: 0; display: block;
+            background: #fff;
+            pointer-events: none;
+        }
+        .bldr-preview-popover .bldr-preview-label {
+            position: absolute; bottom: 8px; left: 10px; right: 10px;
+            background: rgba(20,20,22,0.92); color: #f5f5f7;
+            padding: 6px 10px; border-radius: 6px;
+            font-size: 11px; font-weight: 500;
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            z-index: 10;
+        }
+
+        /* Toast for copy confirmation */
+        .bldr-toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: #1c1c1e; color: #f5f5f7; padding: 10px 18px; border-radius: 8px;
+            font-size: 13px; opacity: 0; pointer-events: none; transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.1); z-index: 2000;
+        }
+        .bldr-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+<aside class="bldr-sidebar" id="sidebar">
+    <div class="bldr-brand">
+        <svg class="bldr-brand-logo" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg>
+        <span class="bldr-brand-name">Page Builder</span>
+        <span class="bldr-brand-count" id="componentCount">—</span>
+    </div>
+    <div class="bldr-search">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Search components…" autocomplete="off" spellcheck="false">
+        <button class="bldr-view-toggle" id="btnViewToggle" title="Toggle list/grid view" aria-label="Toggle view" type="button">
+            <svg id="viewIconList" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            <svg id="viewIconGrid" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </button>
+    </div>
+    <div class="bldr-categories" id="categories">
+        <div style="padding: 20px; color: var(--bldr-text-dim); font-size: 13px; text-align: center;">Loading components…</div>
+    </div>
+    <div class="bldr-resize-handle" id="resizeHandle" title="Drag to resize · Double-click to reset"></div>
+</aside>
+<div class="bldr-drag-overlay" id="dragOverlay"></div>
+
+<main class="bldr-main">
+    <header class="bldr-toolbar">
+        <div class="bldr-toolbar-group">
+            <button class="bldr-btn ghost" id="btnClear" title="Clear canvas">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                Clear
+            </button>
+            <button class="bldr-btn" id="btnTheme" title="Toggle canvas theme">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <span id="themeLabel">Light</span>
+            </button>
+            <button class="bldr-btn" id="btnWidth" title="Toggle viewport width" data-width="desktop">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <span id="widthLabel">Desktop</span>
+            </button>
+            <button class="bldr-btn" id="btnLayers" title="Toggle Layers panel">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                Layers
+            </button>
+        </div>
+        <div class="bldr-toolbar-spacer"></div>
+        <div class="bldr-toolbar-status" id="saveStatus">Ready</div>
+        <div class="bldr-toolbar-group">
+            <button class="bldr-btn primary" id="btnExport" title="Export HTML">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export HTML
+            </button>
+        </div>
+    </header>
+    <div class="bldr-canvas-shell" id="canvasShell">
+        <iframe id="canvasFrame" title="Preview"></iframe>
+    </div>
+</main>
+
+<div class="bldr-modal" id="exportModal" role="dialog" aria-label="Exported HTML">
+    <div class="bldr-modal-box">
+        <div class="bldr-modal-header">
+            <h3>Export HTML</h3>
+            <div class="bldr-modal-header-actions">
+                <button class="bldr-btn" id="btnCopyExport">Copy</button>
+                <button class="bldr-btn primary" id="btnDownloadExport">Download .html</button>
+                <button class="bldr-btn ghost" id="btnCloseExport">Close</button>
+            </div>
+        </div>
+        <div class="bldr-modal-body">
+            <textarea id="exportTextarea" readonly spellcheck="false"></textarea>
+        </div>
+    </div>
+</div>
+
+<div class="bldr-floater" id="layersPanel" hidden>
+    <div class="bldr-floater-header" id="layersPanelHeader">
+        <span class="bldr-floater-title">Layers</span>
+        <span class="bldr-floater-count" id="layersCount">0</span>
+        <button class="bldr-floater-close" id="layersClose" title="Close" aria-label="Close">×</button>
+    </div>
+    <div class="bldr-floater-body" id="layersList">
+        <div class="bldr-floater-empty">No blocks added yet.<br>Click a component to start.</div>
+    </div>
+    <div class="bldr-floater-resize bldr-floater-resize-e" data-resize="e" title="Drag to resize width"></div>
+    <div class="bldr-floater-resize bldr-floater-resize-s" data-resize="s" title="Drag to resize height"></div>
+    <div class="bldr-floater-resize bldr-floater-resize-se" data-resize="se" title="Drag to resize"></div>
+    <span class="bldr-floater-resize-grip" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="10" y1="4" x2="4" y2="10"/><line x1="10" y1="8" x2="8" y2="10"/></svg></span>
+</div>
+
+<div class="bldr-preview-popover" id="previewPopover" aria-hidden="true">
+    <div class="bldr-preview-shell">
+        <iframe id="previewFrame" title="Component preview" tabindex="-1"></iframe>
+    </div>
+    <div class="bldr-preview-label" id="previewLabel"></div>
+</div>
+
+<div class="bldr-toast" id="toast"></div>
+
+<script>
+(function () {
+    'use strict';
+
+    const STATE_KEY = 'bldr:canvas:v1';
+    const THEME_KEY = 'bldr:theme:v1';
+    const WIDTH_KEY = 'bldr:width:v1';
+    const VIEW_KEY = 'bldr:view:v1';
+    const EXPANDED_KEY = 'bldr:expanded:v1';
+    const SIDEBAR_W_KEY = 'bldr:sidebarWidth:v1';
+    const SIDEBAR_MIN = 240;
+    const CANVAS_MIN_RESERVE = 360; // canvas always gets at least this many px
+    const SIDEBAR_DEFAULT = 300;
+    const sidebarMax = () => Math.max(SIDEBAR_MIN, window.innerWidth - CANVAS_MIN_RESERVE);
+    const LAYERS_OPEN_KEY = 'bldr:layersOpen:v1';
+    const LAYERS_POS_KEY = 'bldr:layersPos:v1';
+    const LAYERS_SIZE_KEY = 'bldr:layersSize:v1';
+
+    let canvasDoc = null;
+    let canvasBody = null;
+    let saveTimer = null;
+    let library = []; // flat ref to all loaded blocks
+    let viewMode = localStorage.getItem(VIEW_KEY) || 'list';
+    let thumbObserver = null;
+    let thumbResizeObserver = null;
+    const THUMB_DESIGN_W = 1200;
+
+    // Preview popover state
+    let previewDoc = null;
+    let previewRoot = null;
+    let hoverTimer = null;
+    let lastPreviewedId = null;
+
+    // ------- UTILS -------
+    function $(sel, root) { return (root || document).querySelector(sel); }
+    function $$(sel, root) { return Array.from((root || document).querySelectorAll(sel)); }
+    function slugify(s) { return (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+    function toast(msg) {
+        const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 1600);
+    }
+    function setStatus(msg, ok) {
+        const s = $('#saveStatus'); s.textContent = msg;
+        s.classList.toggle('saved', !!ok);
+    }
+
+    // ------- IFRAME CANVAS INIT -------
+    function canvasSrcDoc() {
+        return `<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<base href="./">
+<link rel="stylesheet" href="css/apple-theme.css">
+<style>
+body { display: block; margin: 0; }
+#canvasRoot { min-height: 100vh; }
+.bldr-drop-hint {
+    padding: 120px 20px; text-align: center; color: #86868b;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+}
+.bldr-drop-hint h2 { font-size: 28px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px; letter-spacing: -0.02em; }
+.bldr-drop-hint p { font-size: 15px; margin: 0; color: #6e6e73; }
+[data-theme="dark"] .bldr-drop-hint h2 { color: #f5f5f7; }
+[data-theme="dark"] .bldr-drop-hint p { color: #a1a1a6; }
+.bldr-block { position: relative; outline: 2px dashed transparent; outline-offset: -2px; transition: outline-color 0.12s; }
+.bldr-block:hover { outline-color: rgba(10,132,255,0.5); }
+.bldr-block.selected { outline-color: #0a84ff; }
+.bldr-block[data-bldr-hidden="1"] { opacity: 0.28; pointer-events: none; outline-color: rgba(255,149,0,0.65) !important; outline-style: solid; }
+.bldr-block[data-bldr-hidden="1"] .bldr-block-controls { display: none !important; }
+.bldr-block-controls {
+    position: absolute; top: 10px; right: 10px; z-index: 100;
+    display: none; gap: 2px; background: rgba(20,20,22,0.95); color: #fff;
+    padding: 4px; border-radius: 8px; backdrop-filter: blur(8px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.bldr-block:hover .bldr-block-controls, .bldr-block.selected .bldr-block-controls { display: flex; }
+.bldr-block-controls button {
+    background: transparent; color: #fff; border: 0;
+    width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
+    font-size: 14px; display: flex; align-items: center; justify-content: center;
+    font-family: inherit; padding: 0;
+}
+.bldr-block-controls button:hover { background: rgba(255,255,255,0.15); }
+.bldr-block-controls .sep { width: 1px; background: rgba(255,255,255,0.15); margin: 4px 2px; }
+[contenteditable="true"] { cursor: text; }
+[contenteditable="true"]:focus { outline: 2px solid #0a84ff; outline-offset: 3px; border-radius: 4px; }
+</style>
+</head>
+<body class="homepage-layout">
+<div id="canvasRoot">
+<div class="bldr-drop-hint">
+    <h2>Start building</h2>
+    <p>Click a component from the sidebar to add it here.</p>
+</div>
+</div>
+</body>
+</html>`;
+    }
+
+    function initCanvas() {
+        const frame = $('#canvasFrame');
+        frame.srcdoc = canvasSrcDoc();
+        frame.addEventListener('load', () => {
+            canvasDoc = frame.contentDocument;
+            canvasBody = canvasDoc.getElementById('canvasRoot');
+            restoreState();
+            restoreTheme();
+            setupCanvasEvents();
+            setStatus('Ready', false);
+        }, { once: false });
+    }
+
+    // ------- PREVIEW POPOVER (hover) -------
+    function previewSrcDoc() {
+        return `<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<base href="./">
+<link rel="stylesheet" href="css/apple-theme.css">
+<style>
+body { display: block; margin: 0; background: #fff; overflow: hidden; }
+[data-theme="dark"] body { background: #000; }
+#previewRoot { min-height: 100vh; }
+a { pointer-events: none; }
+</style>
+</head>
+<body class="homepage-layout">
+<div id="previewRoot"></div>
+</body>
+</html>`;
+    }
+
+    function initPreviewFrame() {
+        const frame = $('#previewFrame');
+        frame.srcdoc = previewSrcDoc();
+        frame.addEventListener('load', () => {
+            previewDoc = frame.contentDocument;
+            previewRoot = previewDoc.getElementById('previewRoot');
+            // Sync theme from canvas if available
+            const theme = canvasDoc?.documentElement.getAttribute('data-theme') || 'light';
+            previewDoc.documentElement.setAttribute('data-theme', theme);
+        }, { once: false });
+    }
+
+    function onItemHoverEnter(block, itemEl) {
+        clearTimeout(hoverTimer);
+        hoverTimer = setTimeout(() => showPreview(block, itemEl), 220);
+    }
+
+    function onItemHoverLeave() {
+        clearTimeout(hoverTimer);
+        hidePreview();
+    }
+
+    function showPreview(block, itemEl) {
+        const popover = $('#previewPopover');
+        const label = $('#previewLabel');
+        if (!previewDoc || !previewRoot) return;
+
+        // Render only if different block
+        if (lastPreviewedId !== block.id) {
+            previewRoot.innerHTML = block.templateHTML;
+            lastPreviewedId = block.id;
+        }
+        // Sync theme with current canvas theme
+        const theme = canvasDoc?.documentElement.getAttribute('data-theme') || 'light';
+        previewDoc.documentElement.setAttribute('data-theme', theme);
+
+        label.textContent = block.name;
+
+        // Position: to the right of the sidebar item by default, flip left if no room
+        const rect = itemEl.getBoundingClientRect();
+        const popW = popover.offsetWidth || 420;
+        const popH = popover.offsetHeight || 280;
+        const gap = 14;
+        let left = rect.right + gap;
+        let top = rect.top - 8;
+
+        if (left + popW > window.innerWidth - 16) {
+            left = rect.left - popW - gap;
+        }
+        if (left < 16) left = 16;
+        if (top + popH > window.innerHeight - 16) {
+            top = window.innerHeight - popH - 16;
+        }
+        if (top < 16) top = 16;
+
+        popover.style.left = left + 'px';
+        popover.style.top = top + 'px';
+        popover.classList.add('visible');
+    }
+
+    function hidePreview() {
+        $('#previewPopover').classList.remove('visible');
+    }
+
+    // ------- VIEW MODE (list / grid) -------
+    function applyViewMode(mode) {
+        viewMode = mode;
+        localStorage.setItem(VIEW_KEY, mode);
+        const cats = $('#categories');
+        cats.classList.toggle('grid-mode', mode === 'grid');
+        $('#viewIconList').style.display = mode === 'list' ? '' : 'none';
+        $('#viewIconGrid').style.display = mode === 'grid' ? '' : 'none';
+        if (mode === 'grid') {
+            initThumbObserver();
+            refreshThumbs();
+            // Also re-scale existing thumbs in case grid columns changed
+            setTimeout(refreshAllThumbScales, 0);
+        } else {
+            teardownThumbObserver();
+            // Strip existing thumbs to keep DOM clean
+            $$('.bldr-thumb', cats).forEach(t => t.remove());
+            $$('.bldr-item', cats).forEach(i => delete i.dataset.thumbRendered);
+        }
+    }
+
+    function initThumbObserver() {
+        if (thumbObserver) return;
+        // Use IntersectionObserver to defer rendering until items scroll near the viewport
+        thumbObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.dataset.thumbRendered) {
+                    renderThumb(entry.target);
+                }
+            });
+        }, { rootMargin: '600px' });
+    }
+
+    function teardownThumbObserver() {
+        if (thumbObserver) { thumbObserver.disconnect(); thumbObserver = null; }
+    }
+
+    function refreshThumbs() {
+        if (!thumbObserver) initThumbObserver();
+        const items = $$('.bldr-item').filter(i => !i.closest('.bldr-category.collapsed') && !i.dataset.thumbRendered);
+        // Observe all (will lazily render as they scroll into view)
+        items.forEach(item => thumbObserver.observe(item));
+        // Eager fallback: also render the first batch synchronously so something is visible
+        // even if IntersectionObserver is delayed (e.g. in headless browsers).
+        // Stagger to avoid blocking the main thread.
+        items.slice(0, 12).forEach((item, i) => {
+            setTimeout(() => { if (!item.dataset.thumbRendered) renderThumb(item); }, i * 30);
+        });
+    }
+
+    function thumbSrcDoc(templateHTML, theme) {
+        return `<!DOCTYPE html>
+<html lang="en" data-theme="${theme}">
+<head><meta charset="UTF-8"><base href="./">
+<link rel="stylesheet" href="css/apple-theme.css">
+<style>body{margin:0;background:#fff;overflow:hidden;}[data-theme="dark"] body{background:#000;}a,button{pointer-events:none;}</style>
+</head><body class="homepage-layout">${templateHTML}</body></html>`;
+    }
+
+    function updateThumbScale(thumb) {
+        const iframe = thumb.querySelector('.bldr-thumb-frame');
+        if (!iframe) return;
+        const w = thumb.clientWidth;
+        if (!w) return;
+        iframe.style.transform = `scale(${(w / THUMB_DESIGN_W).toFixed(4)})`;
+    }
+
+    function refreshAllThumbScales() {
+        $$('.bldr-thumb').forEach(updateThumbScale);
+    }
+
+    function ensureThumbResizeObserver() {
+        if (thumbResizeObserver || typeof ResizeObserver === 'undefined') return;
+        thumbResizeObserver = new ResizeObserver((entries) => {
+            entries.forEach(entry => updateThumbScale(entry.target));
+        });
+    }
+
+    function renderThumb(item) {
+        const id = item.dataset.blockId;
+        const block = library.find(b => b.id === id);
+        if (!block) return;
+        item.dataset.thumbRendered = 'true';
+
+        const thumb = document.createElement('div');
+        thumb.className = 'bldr-thumb';
+        thumb.innerHTML = `<div class="bldr-thumb-skeleton"></div>`;
+        item.insertBefore(thumb, item.firstChild);
+
+        const iframe = document.createElement('iframe');
+        iframe.className = 'bldr-thumb-frame';
+        iframe.tabIndex = -1;
+        iframe.setAttribute('aria-hidden', 'true');
+        iframe.srcdoc = thumbSrcDoc(block.templateHTML, currentTheme());
+        iframe.addEventListener('load', () => {
+            const skel = thumb.querySelector('.bldr-thumb-skeleton');
+            if (skel) skel.remove();
+            updateThumbScale(thumb);
+        });
+        thumb.appendChild(iframe);
+        // Set initial scale immediately and again after a tick (after layout settles)
+        updateThumbScale(thumb);
+        setTimeout(() => updateThumbScale(thumb), 0);
+        // Keep it scaled if cell size changes
+        ensureThumbResizeObserver();
+        if (thumbResizeObserver) thumbResizeObserver.observe(thumb);
+    }
+
+    function currentTheme() {
+        return canvasDoc?.documentElement.getAttribute('data-theme') || localStorage.getItem(THEME_KEY) || 'light';
+    }
+
+    function refreshThumbThemes() {
+        if (viewMode !== 'grid') return;
+        const theme = currentTheme();
+        $$('.bldr-thumb-frame').forEach(iframe => {
+            try { iframe.contentDocument?.documentElement.setAttribute('data-theme', theme); } catch {}
+        });
+    }
+
+    // ------- COMPONENT LIBRARY -------
+    async function loadComponents() {
+        const res = await fetch('components.html');
+        if (!res.ok) throw new Error('Failed to load components.html');
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const categories = [];
+
+        doc.querySelectorAll('.gallery-section').forEach(section => {
+            const catId = section.id || 'misc';
+            const catName = (section.querySelector('.gallery-section-title')?.textContent || catId).trim();
+            const blocks = [];
+
+            section.querySelectorAll('.gallery-block').forEach(block => {
+                const labelEl = block.querySelector('.gallery-block-label .name');
+                const frame = block.querySelector('.gallery-block-frame');
+                if (!labelEl || !frame) return;
+                const template = frame.firstElementChild;
+                if (!template) return;
+                blocks.push({
+                    id: slugify(labelEl.textContent),
+                    name: labelEl.textContent.trim(),
+                    templateHTML: template.outerHTML
+                });
+            });
+
+            if (blocks.length) categories.push({ id: catId, name: catName, blocks });
+        });
+
+        return categories;
+    }
+
+    function getExpandedState() {
+        try { return JSON.parse(localStorage.getItem(EXPANDED_KEY) || '{}'); }
+        catch { return {}; }
+    }
+    function saveExpandedState(state) {
+        localStorage.setItem(EXPANDED_KEY, JSON.stringify(state));
+    }
+
+    function renderSidebar(categories) {
+        const container = $('#categories'); container.innerHTML = '';
+        const expanded = getExpandedState();
+        const isFirstRender = Object.keys(expanded).length === 0;
+        let total = 0;
+        categories.forEach((cat, idx) => {
+            total += cat.blocks.length;
+            // Default: only first category expanded; otherwise honor saved state
+            const isExpanded = isFirstRender ? (idx === 0) : !!expanded[cat.id];
+            const catEl = document.createElement('div');
+            catEl.className = 'bldr-category' + (isExpanded ? '' : ' collapsed');
+            catEl.dataset.categoryId = cat.id;
+            catEl.innerHTML = `
+                <div class="bldr-category-title">
+                    <svg class="bldr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    <span>${cat.name}</span>
+                    <span class="bldr-category-count">${cat.blocks.length}</span>
+                </div>
+                <div class="bldr-category-items"></div>
+            `;
+            const itemsEl = catEl.querySelector('.bldr-category-items');
+            cat.blocks.forEach(b => {
+                const item = document.createElement('div');
+                item.className = 'bldr-item';
+                item.title = b.name;
+                item.tabIndex = 0;
+                item.dataset.blockId = b.id;
+                item.innerHTML = `<span class="bldr-add-icon">+</span><span class="bldr-item-label">${escapeHTML(b.name)}</span>`;
+                item.addEventListener('click', () => { hidePreview(); appendBlock(b); });
+                item.addEventListener('mouseenter', () => onItemHoverEnter(b, item));
+                item.addEventListener('mouseleave', onItemHoverLeave);
+                item.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hidePreview(); appendBlock(b); }
+                });
+                itemsEl.appendChild(item);
+            });
+            catEl.querySelector('.bldr-category-title').addEventListener('click', () => {
+                catEl.classList.toggle('collapsed');
+                const exp = getExpandedState();
+                exp[cat.id] = !catEl.classList.contains('collapsed');
+                saveExpandedState(exp);
+                // Re-attach observer for newly visible items
+                if (viewMode === 'grid') refreshThumbs();
+            });
+            container.appendChild(catEl);
+        });
+        if (isFirstRender) {
+            const firstCatId = categories[0]?.id;
+            if (firstCatId) saveExpandedState({ [firstCatId]: true });
+        }
+        $('#componentCount').textContent = total + ' blocks';
+    }
+
+    function escapeHTML(s) {
+        const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+    }
+
+    function filterSidebar(q) {
+        const needle = q.toLowerCase().trim();
+        $$('.bldr-item').forEach(item => {
+            const match = !needle || item.textContent.toLowerCase().includes(needle);
+            item.classList.toggle('hidden', !match);
+        });
+        $$('.bldr-category').forEach(cat => {
+            const visible = $$('.bldr-item', cat).some(i => !i.classList.contains('hidden'));
+            cat.style.display = visible ? '' : 'none';
+            if (needle) cat.classList.remove('collapsed'); // auto-expand on search
+        });
+    }
+
+    // ------- CANVAS OPERATIONS -------
+    const EDITABLE_SELECTORS = [
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'p', 'summary', 'blockquote', 'li',
+        '.hp-eyebrow', '.hp-buy-btn', '.hp-hero-sub', '.hp-subhead', '.feat-sub',
+        '.stat-num', '.stat-label', '.price', '.per', '.label', '.tier', '.desc',
+        '.quote', '.author-name', '.author-role', '.name', '.role',
+        '.loc-sub', '.hp-faq-item summary', '.faq-body', '.chip-lead',
+        '.second-link', '.col-num', '.col-link', '.announce-read', '.announce-view-all',
+        '.cta-panel h3', '.cta-panel p', '.sec-eyebrow', '.sec-lead',
+        '.vp-eyebrow', '.announce-cat', 'time'
+    ].join(',');
+
+    function makeEditable(wrapper) {
+        wrapper.querySelectorAll(EDITABLE_SELECTORS).forEach(el => {
+            if (el.closest('.bldr-block-controls')) return;
+            if (el.querySelector('svg, img')) return; // skip wrappers containing visuals
+            if (el.children.length > 0) {
+                // only make editable if it has direct text content or is a simple leaf
+                const hasDirectText = Array.from(el.childNodes).some(n => n.nodeType === 3 && n.textContent.trim());
+                if (!hasDirectText && el.children.length > 0) return;
+            }
+            el.setAttribute('contenteditable', 'true');
+            el.setAttribute('spellcheck', 'false');
+        });
+        // also: <a> texts inside the block
+        wrapper.querySelectorAll('a').forEach(a => {
+            if (a.closest('.bldr-block-controls')) return;
+            if (a.querySelector('svg, img')) return;
+            if (a.textContent.trim()) {
+                a.setAttribute('contenteditable', 'true');
+                a.setAttribute('spellcheck', 'false');
+            }
+        });
+    }
+
+    function removeDropHint() {
+        const hint = canvasBody.querySelector('.bldr-drop-hint');
+        if (hint) hint.remove();
+    }
+
+    function appendBlock(block) {
+        if (!canvasBody) return;
+        removeDropHint();
+        const wrapper = canvasDoc.createElement('div');
+        wrapper.className = 'bldr-block';
+        wrapper.dataset.blockId = block.id;
+        wrapper.innerHTML = block.templateHTML + `
+            <div class="bldr-block-controls" contenteditable="false">
+                <button title="Move up" data-act="up">↑</button>
+                <button title="Move down" data-act="down">↓</button>
+                <span class="sep"></span>
+                <button title="Duplicate" data-act="dup">⧉</button>
+                <button title="Delete" data-act="del">×</button>
+            </div>`;
+        canvasBody.appendChild(wrapper);
+        makeEditable(wrapper);
+        wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        queueSave();
+        refreshLayers();
+    }
+
+    function setupCanvasEvents() {
+        canvasDoc.addEventListener('click', (e) => {
+            const btn = e.target.closest('.bldr-block-controls button');
+            const block = e.target.closest('.bldr-block');
+
+            if (btn && block) {
+                e.preventDefault(); e.stopPropagation();
+                const act = btn.dataset.act;
+                if (act === 'del') {
+                    if (confirm('Delete this block?')) { block.remove(); ensureEmptyHint(); queueSave(); refreshLayers(); }
+                } else if (act === 'up' && block.previousElementSibling && !block.previousElementSibling.classList.contains('bldr-drop-hint')) {
+                    block.previousElementSibling.before(block); queueSave(); refreshLayers();
+                } else if (act === 'down' && block.nextElementSibling) {
+                    block.nextElementSibling.after(block); queueSave(); refreshLayers();
+                } else if (act === 'dup') {
+                    const clone = block.cloneNode(true);
+                    block.after(clone); makeEditable(clone); queueSave(); refreshLayers();
+                }
+                return;
+            }
+            // Select the clicked block
+            $$('.bldr-block', canvasBody).forEach(b => b.classList.remove('selected'));
+            if (block) block.classList.add('selected');
+            refreshLayers();
+        });
+
+        canvasDoc.addEventListener('input', queueSave);
+        canvasDoc.addEventListener('blur', queueSave, true);
+
+        // Keyboard shortcuts
+        canvasDoc.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveNow();
+                toast('Saved');
+            }
+        });
+    }
+
+    function ensureEmptyHint() {
+        if (canvasBody.children.length === 0) {
+            canvasBody.innerHTML = `<div class="bldr-drop-hint"><h2>Start building</h2><p>Click a component from the sidebar to add it here.</p></div>`;
+        }
+    }
+
+    function queueSave() {
+        clearTimeout(saveTimer);
+        setStatus('Saving…', false);
+        saveTimer = setTimeout(saveNow, 500);
+    }
+
+    function saveNow() {
+        if (!canvasBody) return;
+        try {
+            localStorage.setItem(STATE_KEY, canvasBody.innerHTML);
+            const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            setStatus('Saved ' + ts, true);
+        } catch (e) {
+            setStatus('Save failed', false);
+            console.error(e);
+        }
+    }
+
+    function restoreState() {
+        const saved = localStorage.getItem(STATE_KEY);
+        if (saved && saved.trim()) {
+            canvasBody.innerHTML = saved;
+            $$('.bldr-block', canvasBody).forEach(makeEditable);
+        }
+        refreshLayers();
+    }
+
+    function clearCanvas() {
+        if (!confirm('Clear the canvas? This cannot be undone.')) return;
+        canvasBody.innerHTML = `<div class="bldr-drop-hint"><h2>Start building</h2><p>Click a component from the sidebar to add it here.</p></div>`;
+        localStorage.removeItem(STATE_KEY);
+        setStatus('Cleared', false);
+        refreshLayers();
+    }
+
+    // ------- THEME / WIDTH -------
+    function restoreTheme() {
+        const t = localStorage.getItem(THEME_KEY) || 'light';
+        applyTheme(t);
+        const w = localStorage.getItem(WIDTH_KEY) || 'desktop';
+        applyWidth(w);
+    }
+
+    function applyTheme(theme) {
+        if (!canvasDoc) return;
+        canvasDoc.documentElement.setAttribute('data-theme', theme);
+        $('#themeLabel').textContent = theme === 'dark' ? 'Dark' : 'Light';
+        $('#canvasShell').setAttribute('data-canvas-theme', theme);
+        if (previewDoc) previewDoc.documentElement.setAttribute('data-theme', theme);
+        refreshThumbThemes();
+        localStorage.setItem(THEME_KEY, theme);
+    }
+
+    function applyWidth(w) {
+        const shell = $('#canvasShell');
+        const labels = { desktop: 'Desktop', tablet: 'Tablet', mobile: 'Mobile' };
+        const sizes = { desktop: '100%', tablet: '820px', mobile: '414px' };
+        const frame = $('#canvasFrame');
+        frame.style.maxWidth = sizes[w];
+        frame.style.margin = w === 'desktop' ? '0' : '0 auto';
+        frame.style.boxShadow = w === 'desktop' ? 'none' : '0 0 40px rgba(0,0,0,0.15)';
+        $('#widthLabel').textContent = labels[w];
+        $('#btnWidth').dataset.width = w;
+        localStorage.setItem(WIDTH_KEY, w);
+    }
+
+    // ------- EXPORT -------
+    function buildExportHTML() {
+        const cloned = canvasBody.cloneNode(true);
+        cloned.querySelectorAll('.bldr-block-controls, .bldr-drop-hint').forEach(el => el.remove());
+        cloned.querySelectorAll('.bldr-block[data-bldr-hidden="1"]').forEach(el => el.remove());
+        cloned.querySelectorAll('.bldr-block').forEach(block => {
+            const parent = block.parentNode;
+            while (block.firstChild) parent.insertBefore(block.firstChild, block);
+            block.remove();
+        });
+        cloned.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        cloned.querySelectorAll('[spellcheck]').forEach(el => el.removeAttribute('spellcheck'));
+        cloned.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+
+        const theme = canvasDoc.documentElement.getAttribute('data-theme') || 'light';
+        const body = cloned.innerHTML.trim();
+
+        return `<!DOCTYPE html>
+<html lang="en" data-theme="${theme}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Page</title>
+    <link rel="stylesheet" href="css/apple-theme.css">
+    <style>body { display: block; }</style>
+</head>
+<body class="homepage-layout">
+${body}
+<scri` + `pt src="js/apple-theme.js"></scr` + `ipt>
+</body>
+</html>
+`;
+    }
+
+    function openExport() {
+        $('#exportTextarea').value = buildExportHTML();
+        $('#exportModal').classList.add('open');
+    }
+
+    function copyExport() {
+        const ta = $('#exportTextarea'); ta.select();
+        document.execCommand('copy');
+        ta.setSelectionRange(0, 0); ta.blur();
+        toast('Copied to clipboard');
+    }
+
+    function downloadExport() {
+        const html = $('#exportTextarea').value;
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'builder-page.html';
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+        toast('Downloaded');
+    }
+
+    // ------- BOOT -------
+    // ------- SIDEBAR RESIZE -------
+    function setupSidebarResize() {
+        const sidebar = $('#sidebar');
+        const handle = $('#resizeHandle');
+        const overlay = $('#dragOverlay');
+
+        function clampWidth(w) {
+            return Math.max(SIDEBAR_MIN, Math.min(sidebarMax(), w));
+        }
+
+        // Restore saved width (clamped to current viewport)
+        const saved = parseInt(localStorage.getItem(SIDEBAR_W_KEY) || '', 10);
+        if (Number.isFinite(saved) && saved >= SIDEBAR_MIN) {
+            sidebar.style.width = clampWidth(saved) + 'px';
+        }
+
+        let dragging = false; let startX = 0; let startW = 0;
+
+        function onMove(e) {
+            if (!dragging) return;
+            sidebar.style.width = clampWidth(startW + (e.clientX - startX)) + 'px';
+            // Keep thumbs scaled live as user drags
+            if (viewMode === 'grid') refreshAllThumbScales();
+        }
+        function onUp() {
+            if (!dragging) return;
+            dragging = false;
+            handle.classList.remove('dragging');
+            overlay.classList.remove('active');
+            document.body.style.userSelect = '';
+            localStorage.setItem(SIDEBAR_W_KEY, String(sidebar.offsetWidth));
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+            if (viewMode === 'grid') {
+                refreshThumbs();
+                refreshAllThumbScales();
+            }
+        }
+
+        handle.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            dragging = true;
+            startX = e.clientX;
+            startW = sidebar.offsetWidth;
+            handle.classList.add('dragging');
+            overlay.classList.add('active');
+            document.body.style.userSelect = 'none';
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+        });
+
+        // Double-click resets to default width
+        handle.addEventListener('dblclick', () => {
+            sidebar.style.width = SIDEBAR_DEFAULT + 'px';
+            localStorage.setItem(SIDEBAR_W_KEY, String(SIDEBAR_DEFAULT));
+            if (viewMode === 'grid') refreshThumbs();
+        });
+
+        // Re-clamp on window resize (in case the saved width is now too big)
+        window.addEventListener('resize', () => {
+            const current = sidebar.offsetWidth;
+            const clamped = clampWidth(current);
+            if (clamped !== current) sidebar.style.width = clamped + 'px';
+            if (viewMode === 'grid') refreshAllThumbScales();
+        });
+    }
+
+    // ------- LAYERS PANEL (floating window) -------
+    function toggleLayersPanel(force) {
+        const panel = $('#layersPanel');
+        const wantOpen = force !== undefined ? force : panel.hidden;
+        panel.hidden = !wantOpen;
+        localStorage.setItem(LAYERS_OPEN_KEY, wantOpen ? '1' : '0');
+        $('#btnLayers').classList.toggle('primary', wantOpen);
+        if (wantOpen) refreshLayers();
+    }
+
+    function refreshLayers() {
+        const panel = $('#layersPanel');
+        if (panel.hidden || !canvasBody) return;
+        const list = $('#layersList');
+        const blocks = $$('.bldr-block', canvasBody);
+        $('#layersCount').textContent = blocks.length;
+        if (!blocks.length) {
+            list.innerHTML = '<div class="bldr-floater-empty">No blocks added yet.<br>Click a component to start.</div>';
+            return;
+        }
+        list.innerHTML = '';
+        blocks.forEach((block, i) => {
+            const id = block.dataset.blockId;
+            const meta = library.find(b => b.id === id);
+            const name = meta?.name || id || '(unknown)';
+            const hidden = block.dataset.bldrHidden === '1';
+            const layer = document.createElement('div');
+            layer.className = 'bldr-layer' + (block.classList.contains('selected') ? ' selected' : '') + (hidden ? ' bldr-layer-hidden' : '');
+            layer.dataset.idx = String(i);
+            layer.draggable = true;
+            const eyeOpen = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+            const eyeOff = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+            layer.innerHTML = `
+                <span class="bldr-layer-grip" aria-hidden="true"><svg viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="2" r="1"/><circle cx="6" cy="2" r="1"/><circle cx="2" cy="6" r="1"/><circle cx="6" cy="6" r="1"/><circle cx="2" cy="10" r="1"/><circle cx="6" cy="10" r="1"/></svg></span>
+                <span class="bldr-layer-num">${i + 1}</span>
+                <span class="bldr-layer-name" title="${escapeHTML(name)}">${escapeHTML(name)}</span>
+                <span class="bldr-layer-actions">
+                    <button class="bldr-layer-eye" data-act="toggle-vis" title="${hidden ? 'Show' : 'Hide'}" aria-label="${hidden ? 'Show' : 'Hide'}" aria-pressed="${hidden ? 'true' : 'false'}">${hidden ? eyeOff : eyeOpen}</button>
+                    <button data-act="up" title="Move up" aria-label="Move up">↑</button>
+                    <button data-act="down" title="Move down" aria-label="Move down">↓</button>
+                    <button data-act="del" title="Delete" aria-label="Delete">×</button>
+                </span>
+            `;
+            layer.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (btn) {
+                    e.stopPropagation();
+                    const act = btn.dataset.act;
+                    if (act === 'up' && block.previousElementSibling) {
+                        block.previousElementSibling.before(block);
+                    } else if (act === 'down' && block.nextElementSibling) {
+                        block.nextElementSibling.after(block);
+                    } else if (act === 'del') {
+                        if (confirm('Delete this block?')) { block.remove(); ensureEmptyHint(); }
+                    } else if (act === 'toggle-vis') {
+                        const isHidden = block.dataset.bldrHidden === '1';
+                        if (isHidden) delete block.dataset.bldrHidden;
+                        else block.dataset.bldrHidden = '1';
+                    }
+                    queueSave();
+                    refreshLayers();
+                    return;
+                }
+                // Click on row → select & scroll to block in canvas
+                $$('.bldr-block', canvasBody).forEach(b => b.classList.remove('selected'));
+                block.classList.add('selected');
+                block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                refreshLayers();
+            });
+            // Drag-and-drop reordering
+            layer.addEventListener('dragstart', (e) => {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', String(i));
+                layer.classList.add('dragging');
+            });
+            layer.addEventListener('dragend', () => {
+                layer.classList.remove('dragging');
+                $$('.bldr-layer').forEach(l => l.classList.remove('drop-above', 'drop-below'));
+            });
+            layer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                const rect = layer.getBoundingClientRect();
+                const after = (e.clientY - rect.top) > rect.height / 2;
+                $$('.bldr-layer').forEach(l => l.classList.remove('drop-above', 'drop-below'));
+                if (layer.classList.contains('dragging')) return;
+                layer.classList.toggle('drop-above', !after);
+                layer.classList.toggle('drop-below', after);
+            });
+            layer.addEventListener('dragleave', () => {
+                layer.classList.remove('drop-above', 'drop-below');
+            });
+            layer.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                const to = parseInt(layer.dataset.idx, 10);
+                if (Number.isNaN(from) || Number.isNaN(to)) return;
+                const rect = layer.getBoundingClientRect();
+                const after = (e.clientY - rect.top) > rect.height / 2;
+                moveCanvasBlock(from, to, after);
+            });
+            list.appendChild(layer);
+        });
+    }
+
+    function moveCanvasBlock(from, to, placeAfter) {
+        if (!canvasBody) return;
+        const blocks = $$('.bldr-block', canvasBody);
+        const src = blocks[from];
+        const tgt = blocks[to];
+        if (!src || !tgt || src === tgt) return;
+        if (placeAfter) tgt.after(src); else tgt.before(src);
+        queueSave();
+        refreshLayers();
+    }
+
+    function setupLayersFloater() {
+        const panel = $('#layersPanel');
+        const header = $('#layersPanelHeader');
+        // Restore position
+        try {
+            const pos = JSON.parse(localStorage.getItem(LAYERS_POS_KEY) || 'null');
+            if (pos && Number.isFinite(pos.x) && Number.isFinite(pos.y)) {
+                panel.style.left = pos.x + 'px';
+                panel.style.top = pos.y + 'px';
+                panel.style.right = 'auto';
+            }
+        } catch {}
+        // Restore size
+        try {
+            const sz = JSON.parse(localStorage.getItem(LAYERS_SIZE_KEY) || 'null');
+            if (sz && Number.isFinite(sz.w) && Number.isFinite(sz.h)) {
+                panel.style.width = sz.w + 'px';
+                panel.style.height = sz.h + 'px';
+            }
+        } catch {}
+        // Custom resize handles (E / S / SE edges)
+        $$('.bldr-floater-resize', panel).forEach(handle => {
+            handle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const dir = handle.dataset.resize;
+                const startX = e.clientX, startY = e.clientY;
+                const r = panel.getBoundingClientRect();
+                const startW = r.width, startH = r.height;
+                handle.classList.add('active');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = getComputedStyle(handle).cursor;
+                const onMove = (ev) => {
+                    const dx = ev.clientX - startX;
+                    const dy = ev.clientY - startY;
+                    const maxW = window.innerWidth - r.left - 10;
+                    const maxH = window.innerHeight - r.top - 10;
+                    if (dir.includes('e')) {
+                        panel.style.width = Math.max(220, Math.min(maxW, startW + dx)) + 'px';
+                    }
+                    if (dir.includes('s')) {
+                        panel.style.height = Math.max(200, Math.min(maxH, startH + dy)) + 'px';
+                    }
+                };
+                const onUp = () => {
+                    handle.classList.remove('active');
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                    window.removeEventListener('mousemove', onMove);
+                    window.removeEventListener('mouseup', onUp);
+                    const nr = panel.getBoundingClientRect();
+                    localStorage.setItem(LAYERS_SIZE_KEY, JSON.stringify({ w: Math.round(nr.width), h: Math.round(nr.height) }));
+                };
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
+            });
+        });
+
+        let dragging = false, sx = 0, sy = 0, sl = 0, st = 0;
+        function onMove(e) {
+            if (!dragging) return;
+            const r = panel.getBoundingClientRect();
+            const x = Math.max(0, Math.min(window.innerWidth - 60, sl + e.clientX - sx));
+            const y = Math.max(0, Math.min(window.innerHeight - 30, st + e.clientY - sy));
+            panel.style.left = x + 'px';
+            panel.style.top = y + 'px';
+            panel.style.right = 'auto';
+        }
+        function onUp() {
+            if (!dragging) return;
+            dragging = false;
+            header.classList.remove('dragging');
+            document.body.style.userSelect = '';
+            const r = panel.getBoundingClientRect();
+            localStorage.setItem(LAYERS_POS_KEY, JSON.stringify({ x: r.left, y: r.top }));
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+        }
+        header.addEventListener('mousedown', (e) => {
+            if (e.target.closest('button')) return;
+            dragging = true;
+            sx = e.clientX; sy = e.clientY;
+            const r = panel.getBoundingClientRect();
+            sl = r.left; st = r.top;
+            header.classList.add('dragging');
+            document.body.style.userSelect = 'none';
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+            e.preventDefault();
+        });
+
+        $('#layersClose').addEventListener('click', () => toggleLayersPanel(false));
+
+        // Restore open state
+        if (localStorage.getItem(LAYERS_OPEN_KEY) === '1') {
+            // Defer until canvas is ready
+            setTimeout(() => toggleLayersPanel(true), 100);
+        }
+    }
+
+    // ------- KEYBOARD NAV -------
+    function focusableItems() {
+        return $$('.bldr-item:not(.hidden)').filter(item => !item.closest('.bldr-category.collapsed'));
+    }
+
+    function moveFocus(delta) {
+        const items = focusableItems();
+        if (!items.length) return;
+        const active = document.activeElement;
+        let idx = items.indexOf(active);
+        if (idx === -1) { items[0].focus(); return; }
+        idx = Math.max(0, Math.min(items.length - 1, idx + delta));
+        items[idx].focus();
+        items[idx].scrollIntoView({ block: 'nearest' });
+    }
+
+    async function boot() {
+        setupSidebarResize();
+        setupLayersFloater();
+        initCanvas();
+        initPreviewFrame();
+        try {
+            const cats = await loadComponents();
+            // Flatten library for thumb lookup
+            library = cats.flatMap(c => c.blocks);
+            renderSidebar(cats);
+            applyViewMode(viewMode);
+        } catch (e) {
+            console.error(e);
+            $('#categories').innerHTML = '<div style="padding:20px;color:#ff453a;font-size:13px;">Failed to load components.html.<br>Serve this file from a local server.</div>';
+            $('#componentCount').textContent = 'Error';
+        }
+
+        $('#searchInput').addEventListener('input', (e) => {
+            hidePreview();
+            filterSidebar(e.target.value);
+            if (viewMode === 'grid') refreshThumbs();
+        });
+        $('#categories').addEventListener('scroll', hidePreview, { passive: true });
+        $('#btnViewToggle').addEventListener('click', () => applyViewMode(viewMode === 'list' ? 'grid' : 'list'));
+        $('#btnClear').addEventListener('click', clearCanvas);
+        $('#btnExport').addEventListener('click', openExport);
+        $('#btnCloseExport').addEventListener('click', () => $('#exportModal').classList.remove('open'));
+        $('#btnCopyExport').addEventListener('click', copyExport);
+        $('#btnDownloadExport').addEventListener('click', downloadExport);
+        $('#btnTheme').addEventListener('click', () => {
+            const cur = canvasDoc.documentElement.getAttribute('data-theme') || 'light';
+            applyTheme(cur === 'dark' ? 'light' : 'dark');
+        });
+        $('#btnWidth').addEventListener('click', () => {
+            const cur = $('#btnWidth').dataset.width;
+            const next = { desktop: 'tablet', tablet: 'mobile', mobile: 'desktop' }[cur];
+            applyWidth(next);
+        });
+        $('#btnLayers').addEventListener('click', () => toggleLayersPanel());
+        // Global keyboard
+        document.addEventListener('keydown', (e) => {
+            const inEditable = e.target?.matches?.('input, textarea, [contenteditable="true"]') || false;
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); $('#searchInput').focus(); $('#searchInput').select(); }
+            if (e.key === '/' && !inEditable) { e.preventDefault(); $('#searchInput').focus(); $('#searchInput').select(); }
+            if (e.key === 'Escape') {
+                $('#exportModal').classList.remove('open');
+                if (e.target?.matches?.('input')) e.target.blur();
+            }
+            // Arrow key navigation when focus is on sidebar items
+            if (document.activeElement?.classList.contains('bldr-item')) {
+                if (e.key === 'ArrowDown') { e.preventDefault(); moveFocus(viewMode === 'grid' ? 2 : 1); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); moveFocus(viewMode === 'grid' ? -2 : -1); }
+                else if (viewMode === 'grid' && e.key === 'ArrowRight') { e.preventDefault(); moveFocus(1); }
+                else if (viewMode === 'grid' && e.key === 'ArrowLeft') { e.preventDefault(); moveFocus(-1); }
+            }
+            // From search field, ArrowDown moves to first item
+            if (e.target === $('#searchInput') && e.key === 'ArrowDown') {
+                const first = focusableItems()[0];
+                if (first) { e.preventDefault(); first.focus(); }
+            }
+        });
+    }
+
+    boot();
+})();
+</script>
+
+</body>
+</html>
