@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote PDF - WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css">
+    <style>body { display: block; }</style>
+</head>
+<body class="auth-layout">
+    <nav class="homepage-nav">
+        <div class="homepage-nav-inner">
+            <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
+            <a href="#">WHMCS</a>
+            <div class="nav-item-dropdown">
+                        <a href="#" class="nav-dropdown-trigger">Hosting <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+                        <div class="nav-mega-menu">
+                            <div class="nav-mega-inner">
+                                <div class="nav-mega-col">
+                                    <h4>Web Hosting</h4>
+                                    <a href="cloud-hosting.html" class="nav-mega-item"><div class="name">Cloud Hosting</div><div class="tag">Fast NVMe storage, global CDN</div></a>
+                                    <a href="vps.html" class="nav-mega-item"><div class="name">VPS</div><div class="tag">Dedicated cores, full root access</div></a>
+                                    <a href="#" class="nav-mega-item"><div class="name">Dedicated Servers</div><div class="tag">Enterprise hardware, yours alone</div></a>
+                                    <a href="#" class="nav-mega-item"><div class="name">Managed WordPress</div><div class="tag">Optimized for WordPress sites</div></a>
+                                </div>
+                                <div class="nav-mega-col">
+                                    <h4>Extras</h4>
+                                    <a href="website-builder.html" class="nav-mega-item"><div class="name">Website Builder</div><div class="tag">Drag and drop, 200+ templates</div></a>
+                                    <a href="site-builder.html" class="nav-mega-item"><div class="name">Site Builder</div><div class="tag">Professional templates by industry</div></a>
+                                    <a href="email.html" class="nav-mega-item"><div class="name">Professional Email</div><div class="tag">Custom domain, 50GB mailbox</div></a>
+                                    <a href="website-backup.html" class="nav-mega-item"><div class="name">Website Backup</div><div class="tag">Daily automatic backups</div></a>
+                                </div>
+                                <div class="nav-mega-col">
+                                    <h4>Get Started</h4>
+                                    <a href="#" class="nav-mega-item"><div class="name">Compare all plans</div><div class="tag">Find the perfect fit</div></a>
+                                    <a href="#" class="nav-mega-item"><div class="name">Free Migration</div><div class="tag">We move your site for you</div></a>
+                                    <a href="#" class="nav-mega-item"><div class="name">Enterprise Hosting</div><div class="tag">Custom hosting at scale</div></a>
+                                    <a href="support-page.html" class="nav-mega-item"><div class="name">Talk to Sales</div><div class="tag">Get expert advice</div></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            <a href="domains.html">Domains</a>
+            <a href="support-page.html">Support</a>
+            <div class="nav-spacer"></div>
+            <a href="#" onclick="toggleDarkMode(); return false;" style="display:flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
+            <a href="login.html" class="nav-signin">Sign in</a>
+        </div>
+    </nav>
+
+    <div class="auth-container" style="padding: 40px 24px 80px;">
+            <div style="max-width: 780px; margin: 0 auto; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; padding: 56px 64px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                <div style="display:flex; justify-content: space-between; align-items: start; margin-bottom: 48px;">
+                    <div>
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#1d1d1f"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.08 7.13 7.16 8.84 7.14C10.13 7.12 11.34 8.01 12.14 8.01C12.94 8.01 14.41 6.93 15.95 7.11C16.59 7.14 18.37 7.36 19.53 9.06C19.43 9.12 17.2 10.42 17.22 13.11C17.25 16.33 20.05 17.37 20.09 17.38C20.06 17.47 19.61 18.98 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg>
+                            <strong style="font-size:17px;">WHMCS by Apple</strong>
+                        </div>
+                        <div style="font-size:13px; color:#6e6e73; line-height:1.6;">One Apple Park Way<br>Cupertino, CA 95014<br>sales@apple-whmcs.example</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:32px; font-weight:600; letter-spacing:-0.02em; margin-bottom: 12px;">Quote</div>
+                        <table style="font-size:13px; border-collapse:collapse;"><tbody>
+                            <tr><td style="color:#6e6e73; padding: 2px 12px 2px 0;">Quote #</td><td>Q-0412</td></tr>
+                            <tr><td style="color:#6e6e73; padding: 2px 12px 2px 0;">Issued</td><td>Apr 8, 2026</td></tr>
+                            <tr><td style="color:#6e6e73; padding: 2px 12px 2px 0;">Valid until</td><td>May 8, 2026</td></tr>
+                            <tr><td style="color:#6e6e73; padding: 2px 12px 2px 0;">Status</td><td><span style="color:#0071e3; font-weight:600;">Pending</span></td></tr>
+                        </tbody></table>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:48px; margin-bottom:40px;">
+                    <div style="flex:1;">
+                        <div style="font-size:11px; color:#86868b; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px;">Prepared for</div>
+                        <div style="font-size:15px; line-height:1.55;"><strong>Northwind Coffee Roasters</strong><br>Attn: Alex Henderson<br>2501 Mission St.<br>San Francisco, CA 94110</div>
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-size:11px; color:#86868b; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px;">Prepared by</div>
+                        <div style="font-size:15px; line-height:1.55;">Jamie Lin<br>Enterprise Sales<br>jamie.lin@apple-whmcs.example</div>
+                    </div>
+                </div>
+
+                <table style="width:100%; border-collapse: collapse; margin-bottom:32px;">
+                    <thead><tr style="border-bottom:1px solid #1d1d1f;"><th style="text-align:left; padding:12px 0; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#86868b;">Description</th><th style="text-align:right; padding:12px 0; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#86868b;">Qty</th><th style="text-align:right; padding:12px 0; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#86868b;">Rate</th><th style="text-align:right; padding:12px 0; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#86868b;">Amount</th></tr></thead>
+                    <tbody style="font-size:14px;">
+                        <tr style="border-bottom:1px solid #e8e8ed;"><td style="padding:14px 0;"><strong>Dedicated Server &mdash; Enterprise 64</strong><br><span style="color:#86868b; font-size:12px;">64 vCPU &middot; 256 GB RAM &middot; 4 TB NVMe &middot; 12-month term</span></td><td style="text-align:right;">1</td><td style="text-align:right;">$8,400.00</td><td style="text-align:right;">$8,400.00</td></tr>
+                        <tr style="border-bottom:1px solid #e8e8ed;"><td style="padding:14px 0;"><strong>Managed services add-on</strong><br><span style="color:#86868b; font-size:12px;">24&#215;7 monitoring, patching, tuning</span></td><td style="text-align:right;">12</td><td style="text-align:right;">$199.00</td><td style="text-align:right;">$2,388.00</td></tr>
+                        <tr style="border-bottom:1px solid #e8e8ed;"><td style="padding:14px 0;"><strong>Migration services</strong><br><span style="color:#86868b; font-size:12px;">One-time onboarding</span></td><td style="text-align:right;">1</td><td style="text-align:right;">$1,500.00</td><td style="text-align:right;">$1,500.00</td></tr>
+                    </tbody>
+                </table>
+
+                <div style="display:flex; justify-content: flex-end;">
+                    <table style="font-size:14px; min-width: 280px;"><tbody>
+                        <tr><td style="padding:6px 0; color:#6e6e73;">Subtotal</td><td style="text-align:right; padding:6px 0;">$12,288.00</td></tr>
+                        <tr><td style="padding:6px 0; color:#6e6e73;">Setup discount</td><td style="text-align:right; padding:6px 0; color:#30d158;">&minus;$750.00</td></tr>
+                        <tr style="border-top: 1px solid #1d1d1f; font-weight:600; font-size:17px;"><td style="padding:14px 0 6px;">Quoted total</td><td style="text-align:right; padding:14px 0 6px;">$11,538.00</td></tr>
+                    </tbody></table>
+                </div>
+
+                <div style="margin-top: 56px; padding-top: 24px; border-top: 1px solid #e8e8ed; font-size: 12px; color: #86868b; line-height:1.6;">
+                    <strong style="color:#1d1d1f;">Terms.</strong> Prices valid for 30 days. Payment due net-30 from invoice. Quote ref Q-0412. Contact jamie.lin@apple-whmcs.example for changes.
+                </div>
+            </div>
+                <div style="max-width: 780px; margin: 20px auto 0; display:flex; justify-content: space-between; align-items:center; gap:16px;">
+                    <a href="clientareainvoices.html" class="auth-link">&larr; Back</a>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-secondary" onclick="window.print()">Print</button>
+                        <button class="btn-primary">Download PDF</button>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <script src="js/apple-theme.js"></script>
+</body>
+</html>

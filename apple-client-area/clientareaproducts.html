@@ -3,126 +3,579 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Services - WHMCS by Apple</title>
+    <title>My Products &amp; Services — WHMCS by Apple</title>
     <link rel="stylesheet" href="css/apple-theme.css">
+    <link rel="stylesheet" href="css/apple-layout.css">
+    <style>
+        body { display: block; }
+
+        /* Page header */
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+
+        /* Two-column split: filters/promos sidebar + main table */
+        .svc-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+        @media (max-width: 960px) { .svc-split { grid-template-columns: 1fr; } }
+        .svc-aside { display: flex; flex-direction: column; gap: 16px; }
+        .svc-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+        /* View filter — radio list */
+        .filter-card { padding: 6px 8px 10px; }
+        .filter-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 12px 12px 6px; }
+        .filter-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: var(--radius-sm);
+            font-size: 13px; color: var(--color-text-primary);
+            cursor: pointer; transition: background var(--transition-fast);
+        }
+        .filter-item:hover { background: var(--sidebar-item-hover); }
+        .filter-item input[type="radio"] { accent-color: var(--color-accent); width: 14px; height: 14px; cursor: pointer; margin: 0; }
+        .filter-item-label { flex: 1; }
+        .filter-item-count { font-size: 12px; color: var(--color-text-tertiary); background: var(--color-surface-secondary); padding: 0 7px; border-radius: var(--radius-pill); min-width: 22px; text-align: center; line-height: 18px; }
+        .filter-item input:checked ~ .filter-item-label { font-weight: 500; color: var(--color-accent); }
+
+        /* Actions list (Place order / View addons) */
+        .actions-card { padding: 6px 8px 10px; }
+        .action-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 12px; border-radius: var(--radius-sm);
+            font-size: 13px; color: var(--color-text-primary);
+            text-decoration: none; transition: background var(--transition-fast);
+        }
+        .action-link:hover { background: var(--sidebar-item-hover); color: var(--color-accent); text-decoration: none; }
+        .action-link:hover svg { color: var(--color-accent); }
+        .action-link svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+
+        /* Promo slider styles live in css/apple-layout.css (shared across pages). */
+
+        /* Unified toolbar inside the services card header — search + filters + add new */
+        .svc-toolbar-card { padding: 0; }
+        .svc-toolbar {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 16px;
+            border-bottom: 0.5px solid var(--color-border);
+            flex-wrap: wrap;
+        }
+        .svc-search {
+            flex: 1 1 240px; min-width: 180px; max-width: 320px;
+            position: relative; display: inline-flex; align-items: center;
+        }
+        .svc-search svg {
+            position: absolute; left: 12px; width: 13px; height: 13px;
+            color: var(--color-text-tertiary); pointer-events: none;
+        }
+        .svc-search input {
+            padding: 0 14px 0 32px; height: 32px; width: 100%; margin: 0;
+            font-size: 13px; border-radius: 980px;
+            background: var(--color-surface-secondary);
+            border: 1px solid transparent;
+        }
+        .svc-search input:focus {
+            background: var(--color-surface); border-color: var(--color-accent);
+        }
+        /* Minimal filter-select styled like an Apple text-button with chevron */
+        .svc-view-select {
+            height: 32px; padding: 0 26px 0 12px; margin: 0;
+            font: inherit; font-size: 13px; font-weight: 500;
+            color: var(--color-text-primary); background: transparent;
+            border: 0; cursor: pointer;
+            appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 10px;
+            border-radius: var(--radius-pill);
+            transition: background var(--transition-fast);
+        }
+        .svc-view-select:hover { background-color: var(--color-surface-secondary); }
+        .svc-view-select:focus { outline: none; background-color: var(--color-surface-secondary); box-shadow: 0 0 0 3px var(--color-accent-light); }
+        .svc-toolbar-spacer { flex: 1 1 8px; }
+        .toggle-label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12px; color: var(--color-text-secondary); white-space: nowrap; }
+        .toggle-label strong { font-weight: 600; color: var(--color-text-primary); }
+        .toggle-switch-inline { width: 30px; height: 18px; background: var(--color-border); border-radius: 999px; position: relative; transition: background var(--transition-fast); flex-shrink: 0; }
+        .toggle-switch-inline::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform var(--transition-fast); }
+        .toggle-label input { display: none; }
+        .toggle-label input:checked + .toggle-switch-inline { background: var(--color-accent); }
+        .toggle-label input:checked + .toggle-switch-inline::after { transform: translateX(12px); }
+        .svc-toolbar .btn-primary { height: 32px; padding: 0 14px; font-size: 13px; }
+        .svc-toolbar .btn-primary svg { width: 12px; height: 12px; }
+
+        /* Services table */
+        .svc-table-card { overflow: hidden; padding: 0; }
+        .svc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .svc-table thead th {
+            font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+            text-transform: uppercase; letter-spacing: 0.05em;
+            text-align: left; padding: 14px 20px;
+            border-bottom: 0.5px solid var(--color-border);
+            background: var(--color-surface-secondary);
+            user-select: none; cursor: pointer;
+            white-space: nowrap;
+        }
+        .svc-table thead th .sort { opacity: 0.4; margin-left: 4px; }
+        .svc-table tbody tr { border-bottom: 0.5px solid var(--color-border); transition: background var(--transition-fast); }
+        .svc-table tbody tr:last-child { border-bottom: 0; }
+        .svc-table tbody tr[data-href] { cursor: pointer; }
+        .svc-table tbody tr:hover { background: var(--color-surface-secondary); }
+        .svc-table tbody tr[data-href]:hover .svc-action-btn { background: var(--color-surface); color: var(--color-accent); transform: translateX(2px); }
+        .svc-action-btn { transition: transform var(--transition-fast), background var(--transition-fast), color var(--transition-fast); }
+        .svc-table td { padding: 14px 20px; vertical-align: middle; color: var(--color-text-primary); }
+        .svc-cell-product { display: flex; align-items: center; gap: 12px; }
+        .svc-cell-ico { width: 32px; height: 32px; border-radius: 8px; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .svc-cell-ico svg { width: 16px; height: 16px; }
+        .svc-cell-product-info { min-width: 0; }
+        .svc-cell-product-name { color: var(--color-text-primary); }
+        .svc-cell-product-name strong { font-weight: 600; }
+        .svc-cell-product-domain { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+        .svc-cell-price-main { color: var(--color-text-primary); }
+        .svc-cell-price-cycle { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
+        .svc-cell-actions { width: 44px; text-align: right; }
+        .svc-action-btn { width: 28px; height: 28px; border-radius: 50%; border: 0; background: transparent; color: var(--color-text-tertiary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+        .svc-action-btn:hover { background: var(--color-surface); color: var(--color-text-primary); }
+        .svc-action-btn svg { width: 16px; height: 16px; }
+
+        /* Compact pagination — lives inside the services card as a footer */
+        .svc-paging {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 16px;
+            border-top: 0.5px solid var(--color-border);
+            font-size: 12px; color: var(--color-text-tertiary);
+        }
+        .svc-paging-count { font-weight: 400; }
+        .svc-paging-count strong { color: var(--color-text-primary); font-weight: 600; }
+        .svc-paging-spacer { flex: 1; }
+        .svc-paging-btns { display: inline-flex; gap: 2px; align-items: center; }
+        .svc-paging-btns button {
+            min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
+            background: transparent; border: 0;
+            font: inherit; font-size: 12px; color: var(--color-text-secondary);
+            cursor: pointer; transition: all var(--transition-fast);
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .svc-paging-btns button:hover:not(:disabled) { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+        .svc-paging-btns button.active {
+            background: var(--color-accent-light); color: var(--color-accent); font-weight: 600;
+        }
+        .svc-paging-btns button:disabled { opacity: 0.35; cursor: not-allowed; }
+        .svc-paging-btns button svg { width: 12px; height: 12px; }
+
+        /* Empty state (shown when data-data="empty") */
+        body[data-data="empty"] .when-full { display: none; }
+        body:not([data-data="empty"]) .when-empty { display: none; }
+        .svc-empty { padding: 48px 24px 40px; text-align: center; color: var(--color-text-secondary); }
+        .svc-empty-ico { width: 52px; height: 52px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+        .svc-empty-ico svg { width: 22px; height: 22px; }
+        .svc-empty-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+        .svc-empty-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 0 18px; }
+        .svc-empty .btn-primary { height: 32px; padding: 0 16px; font-size: 13px; }
+    </style>
 </head>
-<body>
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.08 7.13 7.16 8.84 7.14C10.13 7.12 11.34 8.01 12.14 8.01C12.94 8.01 14.41 6.93 15.95 7.11C16.59 7.14 18.37 7.36 19.53 9.06C19.43 9.12 17.2 10.42 17.22 13.11C17.25 16.33 20.05 17.37 20.09 17.38C20.06 17.47 19.61 18.98 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg></div>
-            <span class="sidebar-brand">WHMCS</span>
-        </div>
-        <div class="sidebar-search"><input type="text" class="sidebar-search-input" placeholder="Search"></div>
-        <nav class="sidebar-nav">
-            <a href="clientareahome.html" id="nav-dashboard" class="sidebar-item"><div class="sidebar-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>Dashboard</a>
-            <div class="sidebar-section-label">Services</div>
-            <a href="clientareaproducts.html" id="nav-services" class="sidebar-item"><div class="sidebar-item-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>My Services <span class="sidebar-item-badge">3</span></a>
-            <a href="clientareadomains.html" id="nav-domains" class="sidebar-item"><div class="sidebar-item-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>My Domains <span class="sidebar-item-badge">5</span></a>
-            <div class="sidebar-section-label">Billing</div>
-            <a href="clientareainvoices.html" id="nav-invoices" class="sidebar-item"><div class="sidebar-item-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>Invoices <span class="sidebar-item-badge">2</span></a>
-            <a href="account-paymentmethods.html" id="nav-payments" class="sidebar-item"><div class="sidebar-item-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>Payment Methods</a>
-            <div class="sidebar-section-label">Support</div>
-            <a href="supportticketslist.html" id="nav-tickets" class="sidebar-item"><div class="sidebar-item-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>Support Tickets <span class="sidebar-item-badge">1</span></a>
-            <a href="knowledgebase.html" id="nav-kb" class="sidebar-item"><div class="sidebar-item-icon indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>Knowledge Base</a>
-            <a href="announcements.html" id="nav-announcements" class="sidebar-item"><div class="sidebar-item-icon pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>Announcements</a>
-            <div class="sidebar-section-label">Account</div>
-            <a href="clientareadetails.html" id="nav-details" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>My Details</a>
-            <a href="clientareasecurity.html" id="nav-security" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>Security</a>
-        </nav>
-        <div class="sidebar-footer">
-            <div class="sidebar-user"><div class="sidebar-avatar">AH</div><div class="sidebar-user-info"><div class="sidebar-user-name">Alex Henderson</div><div class="sidebar-user-email">alex@example.com</div></div></div>
-        </div>
-    </aside>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="services" data-page-title="My Services">
 
-    <main class="main-content">
-        <div class="topbar">
-            <div class="topbar-breadcrumb"><span class="topbar-breadcrumb-current">My Services</span></div>
-            <div class="topbar-status"><span class="topbar-status-dot"></span>All systems normal</div>
-            <div class="topbar-spacer"></div>
-            <div class="topbar-actions">
-                <div class="notification-wrapper">
-                    <button class="topbar-btn" title="Notifications" onclick="toggleNotifications(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="topbar-notification-dot"></div></button>
-                    <div class="notification-dropdown" id="notificationDropdown">
-                        <div class="notification-dropdown-header"><span class="notification-dropdown-title">Notifications</span><button class="notification-dropdown-clear">Mark all read</button></div>
-                        <a href="viewinvoice.html" class="notification-item"><div class="notification-dot-indicator orange"></div><div class="notification-content"><div class="notification-text">Invoice #10247 is due in 2 days</div><div class="notification-time">2 hours ago</div></div></a>
-                        <a href="viewinvoice.html" class="notification-item"><div class="notification-dot-indicator orange"></div><div class="notification-content"><div class="notification-text">Invoice #10246 is due in 2 days</div><div class="notification-time">2 hours ago</div></div></a>
-                        <a href="viewticket.html" class="notification-item"><div class="notification-dot-indicator green"></div><div class="notification-content"><div class="notification-text">Ticket #TKT-4821 has been answered</div><div class="notification-time">Yesterday</div></div></a>
-                        <a href="announcements.html" class="notification-item"><div class="notification-dot-indicator blue"></div><div class="notification-content"><div class="notification-text">Scheduled maintenance on Apr 20</div><div class="notification-time">3 days ago</div></div></a>
+<!-- ═══════════ Dev preview chip ═══════════ -->
+<div data-include="partials/state-chip.html"></div>
+
+<!-- ═══════════ Rail layout ═══════════ -->
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+
+<!-- ═══════════ Sidebar layout ═══════════ -->
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<!-- ═══════════ Auth strip ═══════════ -->
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span>No Notifications</span>
+        </button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ Top-layout header ═══════════ -->
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareaproducts.html">My Services</a>
+            <div class="divider"></div>
+            <a href="store.html">Order New Services</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareadomains.html">My Domains</a>
+            <a href="cart-domain-register.html">Register a Domain</a>
+            <a href="cart-domain-transfer.html">Transfer a Domain</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareainvoices.html">My Invoices</a>
+            <a href="clientareaquotes.html">My Quotes</a>
+            <a href="account-paymentmethods.html">Payment Methods</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="supportticketslist.html">Tickets</a>
+            <a href="announcements.html">Announcements</a>
+            <a href="knowledgebase.html">Knowledgebase</a>
+            <a href="serverstatus.html">Network Status</a>
+        </div>
+    </div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <div class="notification-wrapper only-in" id="navNotifyWrap">
+        <button type="button" class="topbar-btn" title="Notifications" onclick="togglePortalNotifications(event, 'nav')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <div class="topbar-notification-dot"></div>
+        </button>
+        <div class="notification-dropdown" id="notificationDropdownNav">
+            <div class="notification-dropdown-header">
+                <span class="notification-dropdown-title">Notifications</span>
+                <button class="notification-dropdown-clear" type="button">Mark all read</button>
+            </div>
+            <a href="#" class="notification-item"><div class="notification-dot-indicator blue"></div><div class="notification-content"><div class="notification-text">You have no new notifications</div><div class="notification-time">—</div></div></a>
+        </div>
+    </div>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap">
+        <div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-dropdown-header">
+                <div class="profile-dropdown-name">Arshile Gogia</div>
+                <div class="profile-dropdown-email">arshileg@gmail.com</div>
+            </div>
+            <a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a>
+            <a href="clientareasecurity.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Security Settings</a>
+            <div class="profile-dropdown-divider"></div>
+            <div class="theme-toggle-row">
+                <span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span>
+                <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a>
+        </div>
+    </div>
+</div></nav>
+
+<!-- ═══════════ Inner topbar ═══════════ -->
+<div data-include="partials/inner-topbar.html"></div>
+
+<!-- ═══════════ Breadcrumb ═══════════ -->
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a>
+        <span class="sep">/</span>
+        <span class="current" aria-current="page">My Products &amp; Services</span>
+    </div>
+</nav>
+
+<!-- ═══════════ PAGE CONTENT ═══════════ -->
+<div class="content-area">
+    <header class="page-header">
+        <h1>My Products &amp; Services</h1>
+        <p class="page-subtitle">Manage the services on your account — filter by status, place new orders, or explore add-ons.</p>
+    </header>
+
+    <div class="svc-split">
+        <!-- ══ LEFT: filters + actions + promos ══ -->
+        <aside class="svc-aside">
+            <!-- View filter -->
+            <div class="card filter-card">
+                <div class="filter-heading">View</div>
+                <label class="filter-item">
+                    <input type="radio" name="svc-view" value="all" checked>
+                    <span class="filter-item-label">All</span>
+                    <span class="filter-item-count when-full">4</span>
+                    <span class="filter-item-count when-empty">0</span>
+                </label>
+                <label class="filter-item">
+                    <input type="radio" name="svc-view" value="active">
+                    <span class="filter-item-label">Active</span>
+                    <span class="filter-item-count when-full">3</span>
+                    <span class="filter-item-count when-empty">0</span>
+                </label>
+                <label class="filter-item">
+                    <input type="radio" name="svc-view" value="pending">
+                    <span class="filter-item-label">Pending</span>
+                    <span class="filter-item-count when-full">1</span>
+                    <span class="filter-item-count when-empty">0</span>
+                </label>
+                <label class="filter-item">
+                    <input type="radio" name="svc-view" value="suspended">
+                    <span class="filter-item-label">Suspended</span>
+                    <span class="filter-item-count">0</span>
+                </label>
+                <label class="filter-item">
+                    <input type="radio" name="svc-view" value="terminated">
+                    <span class="filter-item-label">Terminated</span>
+                    <span class="filter-item-count">0</span>
+                </label>
+                <label class="filter-item">
+                    <input type="radio" name="svc-view" value="cancelled">
+                    <span class="filter-item-label">Cancelled</span>
+                    <span class="filter-item-count">0</span>
+                </label>
+            </div>
+
+            <!-- Actions -->
+            <div class="card actions-card">
+                <div class="filter-heading">Actions</div>
+                <a href="cart.html" class="action-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                    Place a new order
+                </a>
+                <a href="#" class="action-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    View available addons
+                </a>
+            </div>
+
+            <!-- Promo slider — shared store carousel (same content on every page) -->
+            <div data-include="partials/promo-slider.html"></div>
+        </aside>
+
+        <!-- ══ RIGHT: toolbar + table + paging ══ -->
+        <div class="svc-main">
+            <!-- Services card — wraps toolbar, table, and pagination in one unified surface -->
+            <div class="card svc-table-card">
+                <!-- Unified toolbar: search · view filter · hide-inactive · Add new -->
+                <div class="svc-toolbar">
+                    <div class="svc-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="search" placeholder="Search services…" autocomplete="off">
+                    </div>
+                    <select class="svc-view-select" aria-label="View">
+                        <option value="all" selected>All</option>
+                        <option value="this-month">Renewing this month</option>
+                        <option value="overdue">Overdue</option>
+                    </select>
+                    <label class="toggle-label">
+                        <input type="checkbox">
+                        <span class="toggle-switch-inline"></span>
+                        <span>Hide inactive</span>
+                    </label>
+                    <div class="svc-toolbar-spacer"></div>
+                    <a href="cart.html" class="btn-primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add new
+                    </a>
+                </div>
+
+                <!-- Full state: table with services -->
+                <div class="when-full">
+                    <table class="svc-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Product / Service <span class="sort">↕</span></th>
+                                <th scope="col">Pricing <span class="sort">↕</span></th>
+                                <th scope="col">Next due <span class="sort">↕</span></th>
+                                <th scope="col">Status <span class="sort">↕</span></th>
+                                <th scope="col" aria-label="Actions"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-href="clientareaproductdetails.html">
+                                <td>
+                                    <div class="svc-cell-product">
+                                        <div class="svc-cell-ico">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                                        </div>
+                                        <div class="svc-cell-product-info">
+                                            <div class="svc-cell-product-name"><strong>VPS Hosting</strong> — VPS-1</div>
+                                            <div class="svc-cell-product-domain">lagomdemo.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="svc-cell-price-main">$10.99</div>
+                                    <div class="svc-cell-price-cycle">Monthly</div>
+                                </td>
+                                <td>22 Apr 2099</td>
+                                <td><span class="status-pill active">Active</span></td>
+                                <td class="svc-cell-actions">
+                                    <a href="clientareaproductdetails.html" class="svc-action-btn" aria-label="Manage">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr data-href="clientareaproductdetails.html">
+                                <td>
+                                    <div class="svc-cell-product">
+                                        <div class="svc-cell-ico">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                                        </div>
+                                        <div class="svc-cell-product-info">
+                                            <div class="svc-cell-product-name"><strong>Web Hosting</strong> — Single</div>
+                                            <div class="svc-cell-product-domain">test.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="svc-cell-price-main">$3.99</div>
+                                    <div class="svc-cell-price-cycle">Monthly</div>
+                                </td>
+                                <td>22 Apr 2099</td>
+                                <td><span class="status-pill active">Active</span></td>
+                                <td class="svc-cell-actions">
+                                    <a href="clientareaproductdetails.html" class="svc-action-btn" aria-label="Manage">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr data-href="clientareaproductdetails.html">
+                                <td>
+                                    <div class="svc-cell-product">
+                                        <div class="svc-cell-ico">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                                        </div>
+                                        <div class="svc-cell-product-info">
+                                            <div class="svc-cell-product-name"><strong>Web Hosting</strong> — Single</div>
+                                            <div class="svc-cell-product-domain">cbnnbncbnbcnbcnb.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="svc-cell-price-main">$3.99</div>
+                                    <div class="svc-cell-price-cycle">Monthly</div>
+                                </td>
+                                <td>02 Jan 2026</td>
+                                <td><span class="status-pill pending">Pending</span></td>
+                                <td class="svc-cell-actions">
+                                    <a href="clientareaproductdetails.html" class="svc-action-btn" aria-label="Manage">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr data-href="clientareaproductdetails.html">
+                                <td>
+                                    <div class="svc-cell-product">
+                                        <div class="svc-cell-ico">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                                        </div>
+                                        <div class="svc-cell-product-info">
+                                            <div class="svc-cell-product-name"><strong>Reseller Hosting</strong> — Silver</div>
+                                            <div class="svc-cell-product-domain">demo.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="svc-cell-price-main">$8.99</div>
+                                    <div class="svc-cell-price-cycle">Monthly</div>
+                                </td>
+                                <td>22 Apr 2099</td>
+                                <td><span class="status-pill active">Active</span></td>
+                                <td class="svc-cell-actions">
+                                    <a href="clientareaproductdetails.html" class="svc-action-btn" aria-label="Manage">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty state -->
+                <div class="when-empty svc-empty">
+                    <div class="svc-empty-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                    </div>
+                    <p class="svc-empty-title">No services yet</p>
+                    <p class="svc-empty-sub">You don't have any products or services on this account. Browse our catalogue to get started.</p>
+                    <a href="cart.html" class="btn-primary">Place an order</a>
+                </div>
+
+                <!-- Compact pagination inside the card -->
+                <div class="svc-paging when-full">
+                    <span class="svc-paging-count"><strong>1–4</strong> of <strong>4</strong></span>
+                    <div class="svc-paging-spacer"></div>
+                    <div class="svc-paging-btns">
+                        <button type="button" disabled aria-label="Previous page">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <button type="button" class="active" aria-current="page">1</button>
+                        <button type="button" disabled aria-label="Next page">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
                     </div>
                 </div>
-                <button class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
-                <div class="profile-dropdown-wrapper">
-                    <div class="topbar-avatar" onclick="toggleProfileDropdown(event)" title="Account">AH</div>
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <div class="profile-dropdown-header"><div class="profile-dropdown-name">Alex Henderson</div><div class="profile-dropdown-email">alex@example.com</div></div>
-                        <a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a>
-                        <a href="clientareasecurity.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Security Settings</a>
-                        <a href="#" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email History</a>
-                        <div class="profile-dropdown-divider"></div>
-                        <div class="theme-toggle-row"><span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span><div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div></div>
-                        <div class="profile-dropdown-divider"></div>
-                        <a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a>
-                    </div>
-                </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="content-area">
-            <div class="page-header">
-                <div class="page-eyebrow">SERVICES</div>
-                <h1 class="page-title">My Services</h1>
-                <p class="page-subtitle">Manage your hosting accounts and services.</p>
-            </div>
-
-            <div class="filter-tabs">
-                <button class="filter-tab active">All</button>
-                <button class="filter-tab">Active</button>
-                <button class="filter-tab">Suspended</button>
-                <button class="filter-tab">Cancelled</button>
-            </div>
-
-            <div class="card">
-                <a href="clientareaproductdetails.html" class="service-item">
-                    <div class="service-item-info">
-                        <div class="service-item-name">Business Cloud Pro</div>
-                        <div class="service-item-domain">hendersondesign.com</div>
-                    </div>
-                    <div class="service-item-meta">
-                        <span class="status-pill active">Active</span>
-                        <span class="service-item-date">May 15, 2026</span>
-                        <span class="service-item-action">Manage <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-                    </div>
-                </a>
-                <a href="clientareaproductdetails.html" class="service-item">
-                    <div class="service-item-info">
-                        <div class="service-item-name">WordPress Starter</div>
-                        <div class="service-item-domain">alexblog.net</div>
-                    </div>
-                    <div class="service-item-meta">
-                        <span class="status-pill active">Active</span>
-                        <span class="service-item-date">Jun 1, 2026</span>
-                        <span class="service-item-action">Manage <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-                    </div>
-                </a>
-                <a href="clientareaproductdetails.html" class="service-item">
-                    <div class="service-item-info">
-                        <div class="service-item-name">VPS 4GB — London</div>
-                        <div class="service-item-domain">api.hendersondesign.com</div>
-                    </div>
-                    <div class="service-item-meta">
-                        <span class="status-pill active">Active</span>
-                        <span class="service-item-date">Apr 28, 2026</span>
-                        <span class="service-item-action">Manage <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-                    </div>
-                </a>
-            </div>
-
-            <div class="page-actions">
-                <a href="#" class="btn btn-primary">Order New Service</a>
-            </div>
+<!-- ═══════════ Top-layout standard footer ═══════════ -->
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="domains.html">Domains</a></li><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="email.html">Email</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security &amp; Tools</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="website-security.html">Website Security</a></li><li><a href="website-backup.html">Website Backup</a></li><li><a href="seo-tools.html">SEO Tools</a></li><li><a href="monitoring-360.html">360 Monitoring</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li><li><a href="clientregister.html">Create an account</a></li><li><a href="#">Billing</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="support-page.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li><li><a href="serverstatus.html">Network status</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Newsroom</a></li><li><a href="#">Careers</a></li><li><a href="#">Legal</a></li></ul></div>
         </div>
-    </main>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open>
+                    <span class="flag">🇺🇸</span>
+                    <span>English</span>
+                    <span class="sep">/</span>
+                    <span>$ USD</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Legal</a><a href="#">Site Map</a></div>
+        </div>
+    </div>
+</footer>
 
-    <script src="js/apple-theme.js"></script>
+<!-- ═══════════ Inner-layout slim footer ═══════════ -->
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+
+<!-- ═══════════ Language / currency modal ═══════════ -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js"></script>
+<script src="js/apple-layout.js"></script>
+<script>
+// Row-level navigation — the whole .svc-table row is clickable to its data-href,
+// while nested <a>/<button> elements keep their own behavior.
+// Promo slider auto-init is handled globally by js/apple-layout.js (initPromoSliders).
+document.addEventListener('apple-layout:ready', function () {
+    document.querySelectorAll('.svc-table tbody tr[data-href]').forEach(function (row) {
+        row.setAttribute('tabindex', '0');
+        row.setAttribute('role', 'link');
+        row.addEventListener('click', function (e) {
+            if (e.target.closest('a, button, input, select')) return;
+            window.location.href = row.dataset.href;
+        });
+        row.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.location.href = row.dataset.href;
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>

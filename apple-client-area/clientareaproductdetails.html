@@ -3,173 +3,816 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Cloud Pro - WHMCS by Apple</title>
+    <title>Product Details — WHMCS by Apple</title>
     <link rel="stylesheet" href="css/apple-theme.css">
+    <link rel="stylesheet" href="css/apple-layout.css">
+    <style>
+        body { display: block; }
+
+        /* Page header */
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+
+        /* Two-column split: overview sidebar + main detail */
+        .pd-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+        @media (max-width: 960px) { .pd-split { grid-template-columns: 1fr; } }
+        .pd-aside { display: flex; flex-direction: column; gap: 16px; }
+        .pd-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+        /* Section heading inside sidebar cards */
+        .pd-section-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 12px 12px 6px; }
+
+        /* Sidebar items — sidebar-item token rhythm, iconified */
+        .pd-sub-card { padding: 6px 8px 10px; }
+        .pd-sub-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: var(--radius-sm);
+            font-size: 13px; color: var(--color-text-primary);
+            text-decoration: none; transition: background var(--transition-fast);
+            letter-spacing: -0.008em;
+        }
+        .pd-sub-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+        .pd-sub-item:hover svg { color: var(--color-accent); }
+        .pd-sub-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+        .pd-sub-item.active svg { color: var(--color-accent); }
+        .pd-sub-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; transition: color var(--transition-fast); }
+        .pd-sub-item.danger:hover { color: var(--color-red-text); }
+        .pd-sub-item.danger:hover svg { color: var(--color-red-text); }
+
+        /* Overdue notice */
+        .pd-notice { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--color-surface-secondary); border: 1px solid var(--color-border); }
+        .pd-notice-ico { width: 22px; height: 22px; border-radius: 50%; background: var(--color-red-bg); color: var(--color-red-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .pd-notice-ico svg { width: 12px; height: 12px; }
+        .pd-notice-text { flex: 1; font-size: 13px; color: var(--color-text-primary); line-height: 1.45; }
+        .pd-notice-text strong { font-weight: 600; }
+        .pd-notice .btn-primary { height: 30px; padding: 0 14px; font-size: 12px; flex-shrink: 0; }
+
+        /* Product summary + usage rings row */
+        .pd-summary-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: stretch; }
+        @media (max-width: 720px) { .pd-summary-row { grid-template-columns: 1fr; } }
+
+        .pd-product-card { padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; min-height: 180px; }
+        .pd-product-ico-row { display: flex; align-items: center; gap: 14px; }
+        .pd-product-ico { width: 44px; height: 44px; border-radius: 12px; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .pd-product-ico svg { width: 22px; height: 22px; }
+        .pd-product-info { min-width: 0; }
+        .pd-product-kind { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: var(--color-text-tertiary); text-transform: uppercase; }
+        .pd-product-name { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--color-text-primary); line-height: 1.15; margin-top: 2px; }
+        .pd-product-domain { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+        .pd-product-meta-row { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 8px; }
+        .pd-product-meta-row .status-pill { font-size: 11px; }
+
+        /* Usage ring card */
+        .pd-usage-card { padding: 20px; display: flex; gap: 20px; align-items: center; justify-content: center; min-width: 260px; }
+        @media (max-width: 720px) { .pd-usage-card { min-width: 0; } }
+        .pd-usage { text-align: center; }
+        .pd-usage-ring { position: relative; width: 72px; height: 72px; margin: 0 auto 8px; }
+        .pd-usage-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .pd-usage-ring circle { fill: none; stroke-width: 5; stroke-linecap: round; }
+        .pd-usage-ring .bg { stroke: var(--color-surface-secondary); }
+        .pd-usage-ring .fg { transition: stroke-dashoffset 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+        .pd-usage-ring.blue   .fg { stroke: var(--color-blue-text); }
+        .pd-usage-ring.green  .fg { stroke: var(--color-green-text); }
+        .pd-usage-ring.orange .fg { stroke: var(--color-orange-text); }
+        .pd-usage-val { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 17px; font-weight: 600; letter-spacing: -0.015em; color: var(--color-text-primary); line-height: 1; }
+        .pd-usage-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: -0.008em; }
+        .pd-usage-limit { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+
+        /* Quick shortcuts grid — reuses .ph-action aesthetic */
+        .pd-shortcuts-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 16px 20px 20px; }
+        @media (max-width: 720px) { .pd-shortcuts-grid { grid-template-columns: repeat(3, 1fr); } }
+        .pd-shortcut { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 10px; border-radius: var(--radius-md); text-decoration: none; color: var(--color-text-primary); transition: background var(--transition-fast); }
+        .pd-shortcut:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); text-decoration: none; }
+        .pd-shortcut-ico { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--color-accent-light); color: var(--color-accent); }
+        .pd-shortcut-ico svg { width: 18px; height: 18px; }
+        .pd-shortcut-label { font-size: 12px; font-weight: 500; text-align: center; line-height: 1.25; }
+
+        /* Quick create email form — inline row of input + @domain + create */
+        .pd-email-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; padding: 4px 0; }
+        @media (max-width: 640px) { .pd-email-form { grid-template-columns: 1fr; } }
+        .pd-email-form .form-group { margin-bottom: 0; }
+        .pd-email-split { display: flex; align-items: stretch; }
+        .pd-email-split input {
+            flex: 1; min-width: 0;
+            border-top-right-radius: 0; border-bottom-right-radius: 0;
+            border-right: 0;
+        }
+        .pd-email-split .pd-email-domain {
+            display: inline-flex; align-items: center;
+            padding: 0 12px;
+            background: var(--color-surface-secondary);
+            border: 1px solid var(--color-border);
+            border-left: 0;
+            border-top-right-radius: var(--radius-sm);
+            border-bottom-right-radius: var(--radius-sm);
+            font-size: 13px; color: var(--color-text-secondary);
+        }
+        .pd-email-form .btn-primary { height: 36px; align-self: end; }
+
+        /* Addons row — select + button */
+        .pd-addons-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 4px 0; }
+        @media (max-width: 640px) { .pd-addons-row { grid-template-columns: 1fr; } }
+
+        /* Billing / Domain tabs */
+        .pd-tabs { display: flex; gap: 4px; padding: 8px 12px 0; border-bottom: 0.5px solid var(--color-border); }
+        .pd-tab {
+            padding: 10px 14px; background: transparent; border: 0;
+            font: inherit; font-size: 13px; font-weight: 500;
+            color: var(--color-text-secondary); cursor: pointer;
+            border-bottom: 2px solid transparent; margin-bottom: -1px;
+            transition: color var(--transition-fast), border-color var(--transition-fast);
+        }
+        .pd-tab:hover { color: var(--color-text-primary); }
+        .pd-tab.active { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+        .pd-billing-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 24px;
+            padding: 20px 24px 24px;
+        }
+        @media (max-width: 640px) { .pd-billing-grid { grid-template-columns: repeat(2, 1fr); } }
+        .pd-billing-field-label { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+        .pd-billing-field-value { font-size: 14px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -0.008em; }
+
+        /* Empty-state helpers (reusing the data-data chip) */
+        body[data-data="empty"] .when-full { display: none; }
+        body:not([data-data="empty"]) .when-empty { display: none; }
+
+        /* Product variant picker (chip-driven) */
+        body[data-product] .product-variant { display: none; }
+        body[data-product="a"] .product-variant[data-variant="a"],
+        body[data-product="b"] .product-variant[data-variant="b"] { display: block; }
+        body[data-product] .variant-label { display: none; }
+        .variant-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); margin: 8px 0 14px; }
+        .product-variant + .product-variant { margin-top: 40px; }
+
+        /* ═══ v2 styles — top-tabs + hero (no left sidebar) ═══ */
+        .pd2-hero-card { padding: 22px 24px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+        .pd2-hero-ico { width: 56px; height: 56px; border-radius: 14px; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .pd2-hero-ico svg { width: 28px; height: 28px; }
+        .pd2-hero-info { flex: 1; min-width: 200px; }
+        .pd2-hero-kind { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: var(--color-text-tertiary); text-transform: uppercase; }
+        .pd2-hero-name { font-size: 24px; font-weight: 600; letter-spacing: -0.022em; color: var(--color-text-primary); line-height: 1.2; margin-top: 2px; }
+        .pd2-hero-domain { font-size: 13px; color: var(--color-text-secondary); margin-top: 3px; }
+        .pd2-hero-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .pd2-hero-due { font-size: 12px; color: var(--color-text-tertiary); }
+
+        /* Action bar — inline pill buttons */
+        .pd2-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 14px 16px; border-top: 0.5px solid var(--color-border); }
+        .pd2-action { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px; border-radius: var(--radius-pill); background: var(--color-surface-secondary); color: var(--color-text-primary); font-size: 13px; font-weight: 500; text-decoration: none; letter-spacing: -0.008em; transition: background var(--transition-fast), color var(--transition-fast); }
+        .pd2-action:hover { background: var(--color-surface); color: var(--color-accent); text-decoration: none; }
+        .pd2-action svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; transition: color var(--transition-fast); }
+        .pd2-action:hover svg { color: var(--color-accent); }
+        .pd2-action.danger:hover { background: var(--color-red-bg); color: var(--color-red-text); }
+        .pd2-action.danger:hover svg { color: var(--color-red-text); }
+
+        /* Tab strip (Overview · Shortcuts · Addons · Billing) — Apple Mail / macOS underline */
+        .pd2-tabs { display: flex; gap: 2px; padding: 4px 16px 0; border-bottom: 0.5px solid var(--color-border); overflow-x: auto; scrollbar-width: none; }
+        .pd2-tabs::-webkit-scrollbar { display: none; }
+        .pd2-tab { padding: 10px 14px; background: transparent; border: 0; font: inherit; font-size: 13px; font-weight: 500; color: var(--color-text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: color var(--transition-fast), border-color var(--transition-fast); }
+        .pd2-tab:hover { color: var(--color-text-primary); }
+        .pd2-tab.active { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+        .pd2-panel { display: none; padding: 20px 24px 24px; }
+        .pd2-panel.active { display: block; }
+
+        /* v2 usage row — 3 side-by-side rings (Disk · Bandwidth · Email) */
+        .pd2-usage-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        @media (max-width: 640px) { .pd2-usage-row { grid-template-columns: 1fr; } }
+        .pd2-usage-tile { background: var(--color-surface-secondary); border-radius: var(--radius-md); padding: 18px; display: flex; align-items: center; gap: 14px; }
+        .pd2-usage-tile .pd-usage-ring { width: 56px; height: 56px; margin: 0; flex-shrink: 0; }
+        .pd2-usage-tile .pd-usage-ring circle { stroke-width: 5; }
+        .pd2-usage-tile-meta { min-width: 0; }
+        .pd2-usage-tile-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: -0.008em; }
+        .pd2-usage-tile-val { font-size: 18px; font-weight: 600; letter-spacing: -0.015em; color: var(--color-text-primary); margin-top: 2px; line-height: 1; }
+        .pd2-usage-tile-limit { font-size: 11px; color: var(--color-text-tertiary); margin-top: 3px; }
+
+        /* v2 layout grid: main content + right sidebar (promo + billing summary) */
+        .pd2-split { display: grid; grid-template-columns: 1fr 260px; gap: 20px; align-items: start; }
+        @media (max-width: 960px) { .pd2-split { grid-template-columns: 1fr; } }
+    </style>
 </head>
-<body>
-    <aside class="sidebar">
-        <div class="sidebar-header"><a href="index.html" class="sidebar-home-link"><div class="sidebar-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.08 7.13 7.16 8.84 7.14C10.13 7.12 11.34 8.01 12.14 8.01C12.94 8.01 14.41 6.93 15.95 7.11C16.59 7.14 18.37 7.36 19.53 9.06C19.43 9.12 17.2 10.42 17.22 13.11C17.25 16.33 20.05 17.37 20.09 17.38C20.06 17.47 19.61 18.98 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg></div><span class="sidebar-brand">WHMCS</span></a></div>
-        <div class="sidebar-search"><input type="text" class="sidebar-search-input" placeholder="Search"></div>
-        <nav class="sidebar-nav">
-            <a href="clientareahome.html" id="nav-dashboard" class="sidebar-item"><div class="sidebar-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>Dashboard</a>
-            <div class="sidebar-section-label">Services</div>
-            <a href="clientareaproducts.html" id="nav-services" class="sidebar-item"><div class="sidebar-item-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>My Services <span class="sidebar-item-badge">3</span></a>
-            <a href="clientareadomains.html" id="nav-domains" class="sidebar-item"><div class="sidebar-item-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>My Domains <span class="sidebar-item-badge">5</span></a>
-            <div class="sidebar-section-label">Billing</div>
-            <a href="clientareainvoices.html" id="nav-invoices" class="sidebar-item"><div class="sidebar-item-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>Invoices <span class="sidebar-item-badge">2</span></a>
-            <a href="account-paymentmethods.html" id="nav-payments" class="sidebar-item"><div class="sidebar-item-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>Payment Methods</a>
-            <div class="sidebar-section-label">Support</div>
-            <a href="supportticketslist.html" id="nav-tickets" class="sidebar-item"><div class="sidebar-item-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>Support Tickets <span class="sidebar-item-badge">1</span></a>
-            <a href="knowledgebase.html" id="nav-kb" class="sidebar-item"><div class="sidebar-item-icon indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>Knowledge Base</a>
-            <a href="announcements.html" id="nav-announcements" class="sidebar-item"><div class="sidebar-item-icon pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>Announcements</a>
-            <div class="sidebar-section-label">Account</div>
-            <a href="clientareadetails.html" id="nav-details" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>My Details</a>
-            <a href="clientareasecurity.html" id="nav-security" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>Security</a>
-        </nav>
-        <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar">AH</div><div class="sidebar-user-info"><div class="sidebar-user-name">Alex Henderson</div><div class="sidebar-user-email">alex@example.com</div></div></div></div>
-    </aside>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="services" data-page-title="Product Details">
 
-    <main class="main-content">
-        <div class="topbar">
-            <div class="topbar-breadcrumb"><a href="clientareaproducts.html">My Services</a> <span class="topbar-breadcrumb-sep">/</span> <span class="topbar-breadcrumb-current">Business Cloud Pro</span></div>
-            <div class="topbar-status"><span class="topbar-status-dot"></span>All systems normal</div>
-            <div class="topbar-spacer"></div>
-            <div class="topbar-actions">
-                <div class="notification-wrapper">
-                    <button class="topbar-btn" title="Notifications" onclick="toggleNotifications(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="topbar-notification-dot"></div></button>
-                    <div class="notification-dropdown" id="notificationDropdown">
-                        <div class="notification-dropdown-header"><span class="notification-dropdown-title">Notifications</span><button class="notification-dropdown-clear">Mark all read</button></div>
-                        <a href="viewinvoice.html" class="notification-item"><div class="notification-dot-indicator orange"></div><div class="notification-content"><div class="notification-text">Invoice #10247 is due in 2 days</div><div class="notification-time">2 hours ago</div></div></a>
-                        <a href="viewinvoice.html" class="notification-item"><div class="notification-dot-indicator orange"></div><div class="notification-content"><div class="notification-text">Invoice #10246 is due in 2 days</div><div class="notification-time">2 hours ago</div></div></a>
-                        <a href="viewticket.html" class="notification-item"><div class="notification-dot-indicator green"></div><div class="notification-content"><div class="notification-text">Ticket #TKT-4821 has been answered</div><div class="notification-time">Yesterday</div></div></a>
-                        <a href="announcements.html" class="notification-item"><div class="notification-dot-indicator blue"></div><div class="notification-content"><div class="notification-text">Scheduled maintenance on Apr 20</div><div class="notification-time">3 days ago</div></div></a>
-                    </div>
-                </div>
-                <button class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
-                <div class="profile-dropdown-wrapper">
-                    <div class="topbar-avatar" onclick="toggleProfileDropdown(event)" title="Account">AH</div>
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <div class="profile-dropdown-header"><div class="profile-dropdown-name">Alex Henderson</div><div class="profile-dropdown-email">alex@example.com</div></div>
-                        <a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a>
-                        <a href="clientareasecurity.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Security Settings</a>
-                        <a href="#" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email History</a>
-                        <div class="profile-dropdown-divider"></div>
-                        <div class="theme-toggle-row"><span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span><div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div></div>
-                        <div class="profile-dropdown-divider"></div>
-                        <a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a>
-                    </div>
-                </div>
-            </div>
+<!-- ═══════════ Dev preview chip ═══════════ -->
+<div data-include="partials/state-chip.html"></div>
+
+<!-- ═══════════ Rail layout ═══════════ -->
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+
+<!-- ═══════════ Sidebar layout ═══════════ -->
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<!-- ═══════════ Auth strip ═══════════ -->
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span>No Notifications</span>
+        </button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a>
         </div>
+    </div>
+</div>
 
-        <div class="content-area">
-            <div class="page-header">
-                <div class="page-header-row">
-                    <div>
-                        <div class="page-eyebrow">SERVICES</div>
-                        <h1 class="page-title">Business Cloud Pro</h1>
-                        <p class="page-subtitle">hendersondesign.com</p>
+<!-- ═══════════ Top-layout header ═══════════ -->
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareaproducts.html">My Services</a>
+            <div class="divider"></div>
+            <a href="store.html">Order New Services</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareadomains.html">My Domains</a>
+            <a href="cart-domain-register.html">Register a Domain</a>
+            <a href="cart-domain-transfer.html">Transfer a Domain</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareainvoices.html">My Invoices</a>
+            <a href="clientareaquotes.html">My Quotes</a>
+            <a href="account-paymentmethods.html">Payment Methods</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="supportticketslist.html">Tickets</a>
+            <a href="announcements.html">Announcements</a>
+            <a href="knowledgebase.html">Knowledgebase</a>
+            <a href="serverstatus.html">Network Status</a>
+        </div>
+    </div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <div class="notification-wrapper only-in" id="navNotifyWrap">
+        <button type="button" class="topbar-btn" title="Notifications" onclick="togglePortalNotifications(event, 'nav')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <div class="topbar-notification-dot"></div>
+        </button>
+        <div class="notification-dropdown" id="notificationDropdownNav">
+            <div class="notification-dropdown-header"><span class="notification-dropdown-title">Notifications</span><button class="notification-dropdown-clear" type="button">Mark all read</button></div>
+            <a href="#" class="notification-item"><div class="notification-dot-indicator blue"></div><div class="notification-content"><div class="notification-text">You have no new notifications</div><div class="notification-time">—</div></div></a>
+        </div>
+    </div>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap">
+        <div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-dropdown-header">
+                <div class="profile-dropdown-name">Arshile Gogia</div>
+                <div class="profile-dropdown-email">arshileg@gmail.com</div>
+            </div>
+            <a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a>
+            <a href="clientareasecurity.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Security Settings</a>
+            <div class="profile-dropdown-divider"></div>
+            <div class="theme-toggle-row">
+                <span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span>
+                <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a>
+        </div>
+    </div>
+</div></nav>
+
+<!-- ═══════════ Inner topbar ═══════════ -->
+<div data-include="partials/inner-topbar.html"></div>
+
+<!-- ═══════════ Breadcrumb ═══════════ -->
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a>
+        <span class="sep">/</span>
+        <a href="clientareaproducts.html">My Services</a>
+        <span class="sep">/</span>
+        <span class="current" aria-current="page">Product Details</span>
+    </div>
+</nav>
+
+<!-- ═══════════ PAGE CONTENT ═══════════ -->
+<div class="content-area">
+    <header class="page-header">
+        <h1>Product Details</h1>
+        <p class="page-subtitle">Manage your hosting service, usage, shortcuts and addons.</p>
+    </header>
+
+    <!-- ══════════ Variant A — left-sidebar layout (original) ══════════ -->
+    <div class="product-variant" data-variant="a">
+    <p class="variant-label">Variant A — left sidebar</p>
+    <div class="pd-split">
+        <!-- ══ LEFT: Overview + Actions ══ -->
+        <aside class="pd-aside">
+            <div class="card pd-sub-card">
+                <div class="pd-section-heading">Overview</div>
+                <a href="clientareaproductdetails.html" class="pd-sub-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    Information
+                </a>
+                <a href="#addons" class="pd-sub-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Addons
+                </a>
+            </div>
+
+            <div class="card pd-sub-card">
+                <div class="pd-section-heading">Actions</div>
+                <a href="#" class="pd-sub-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    Log in to cPanel
+                </a>
+                <a href="#" class="pd-sub-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+                    Log in to Webmail
+                </a>
+                <a href="#" class="pd-sub-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    Change Password
+                </a>
+                <a href="#" class="pd-sub-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
+                    Upgrade / Downgrade
+                </a>
+                <a href="#" class="pd-sub-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4-4 4-4"/><path d="M17 7l4 4-4 4"/><line x1="3" y1="13" x2="21" y2="13"/></svg>
+                    Upgrade / Downgrade options
+                </a>
+                <a href="clientareacancelrequest.html" class="pd-sub-item danger">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                    Request cancellation
+                </a>
+            </div>
+
+            <!-- Promo slider — shared store carousel (same content on every page) -->
+            <div data-include="partials/promo-slider.html"></div>
+        </aside>
+
+        <!-- ══ RIGHT: main detail ══ -->
+        <div class="pd-main">
+            <!-- Overdue invoice notice (full state only) -->
+            <div class="pd-notice when-full">
+                <div class="pd-notice-ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div class="pd-notice-text">You have an <strong>overdue invoice</strong>. Pay now to avoid service interruption.</div>
+                <a href="viewinvoice.html" class="btn-primary">Pay invoice</a>
+            </div>
+
+            <!-- Product summary + usage rings -->
+            <div class="pd-summary-row">
+                <div class="card pd-product-card">
+                    <div class="pd-product-ico-row">
+                        <div class="pd-product-ico">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                        </div>
+                        <div class="pd-product-info">
+                            <div class="pd-product-kind">Web Hosting</div>
+                            <div class="pd-product-name">Web Hosting — Single</div>
+                            <div class="pd-product-domain">test.com</div>
+                        </div>
                     </div>
-                    <span class="status-pill active">Active</span>
+                    <div class="pd-product-meta-row">
+                        <span class="status-pill active">Active</span>
+                        <span style="font-size:12px; color:var(--color-text-tertiary);">Next due 22 Apr 2099 · $3.99/mo</span>
+                    </div>
+                </div>
+
+                <div class="card pd-usage-card">
+                    <div class="pd-usage">
+                        <div class="pd-usage-ring blue">
+                            <svg viewBox="0 0 72 72">
+                                <circle class="bg" cx="36" cy="36" r="30"/>
+                                <circle class="fg" cx="36" cy="36" r="30" data-pct="12"/>
+                            </svg>
+                            <div class="pd-usage-val"><span class="when-full">12%</span><span class="when-empty">0%</span></div>
+                        </div>
+                        <div class="pd-usage-label">Disk usage</div>
+                        <div class="pd-usage-limit"><span class="when-full">12.4 GB</span><span class="when-empty">0 GB</span> / Unlimited</div>
+                    </div>
+                    <div class="pd-usage">
+                        <div class="pd-usage-ring green">
+                            <svg viewBox="0 0 72 72">
+                                <circle class="bg" cx="36" cy="36" r="30"/>
+                                <circle class="fg" cx="36" cy="36" r="30" data-pct="4"/>
+                            </svg>
+                            <div class="pd-usage-val"><span class="when-full">4%</span><span class="when-empty">0%</span></div>
+                        </div>
+                        <div class="pd-usage-label">Bandwidth</div>
+                        <div class="pd-usage-limit"><span class="when-full">84.2 GB</span><span class="when-empty">0 GB</span> / Unlimited</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Service Information -->
-            <div class="settings-group">
-                <div class="settings-group-header"><div class="settings-group-title">Service Information</div></div>
-                <div class="settings-item">
-                    <div class="settings-item-content"><div class="settings-item-label">Plan</div></div>
-                    <div class="settings-item-action"><span class="settings-item-value">Business Cloud Pro</span></div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content"><div class="settings-item-label">Domain</div></div>
-                    <div class="settings-item-action"><span class="settings-item-value">hendersondesign.com</span></div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content"><div class="settings-item-label">Server</div></div>
-                    <div class="settings-item-action"><span class="settings-item-value">server42.hosting.apple.com</span></div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content"><div class="settings-item-label">IP Address</div></div>
-                    <div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">172.64.32.18</span></div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content"><div class="settings-item-label">Nameservers</div></div>
-                    <div class="settings-item-action"><span class="settings-item-value" style="font-size:13px;">ns1.hosting.apple.com<br>ns2.hosting.apple.com</span></div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content"><div class="settings-item-label">Registration Date</div></div>
-                    <div class="settings-item-action"><span class="settings-item-value">Jan 15, 2024</span></div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content"><div class="settings-item-label">Next Due Date</div></div>
-                    <div class="settings-item-action"><span class="settings-item-value">May 15, 2026</span></div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content"><div class="settings-item-label">Billing Cycle</div></div>
-                    <div class="settings-item-action"><span class="settings-item-value">Monthly — $29.00/mo</span></div>
-                </div>
-            </div>
-
-            <!-- Resource Usage -->
+            <!-- Quick shortcuts -->
             <div class="card">
-                <div class="card-header"><h2 class="card-title">Resource Usage</h2></div>
+                <div class="card-header"><h2 class="card-title">Quick shortcuts</h2></div>
+                <div class="pd-shortcuts-grid">
+                    <a href="#" class="pd-shortcut">
+                        <div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                        <span class="pd-shortcut-label">Email accounts</span>
+                    </a>
+                    <a href="#" class="pd-shortcut">
+                        <div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
+                        <span class="pd-shortcut-label">Forwarders</span>
+                    </a>
+                    <a href="#" class="pd-shortcut">
+                        <div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 00-4-4H4"/></svg></div>
+                        <span class="pd-shortcut-label">Autoresponders</span>
+                    </a>
+                    <a href="#" class="pd-shortcut">
+                        <div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
+                        <span class="pd-shortcut-label">File manager</span>
+                    </a>
+                    <a href="#" class="pd-shortcut">
+                        <div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></div>
+                        <span class="pd-shortcut-label">Backup</span>
+                    </a>
+                    <a href="#" class="pd-shortcut">
+                        <div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+                        <span class="pd-shortcut-label">Domains</span>
+                    </a>
+                    <a href="#" class="pd-shortcut">
+                        <div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                        <span class="pd-shortcut-label">Cron jobs</span>
+                    </a>
+                    <a href="#" class="pd-shortcut">
+                        <div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+                        <span class="pd-shortcut-label">MySQL® Databases</span>
+                    </a>
+                    <a href="#" class="pd-shortcut">
+                        <div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                        <span class="pd-shortcut-label">phpMyAdmin</span>
+                    </a>
+                    <a href="#" class="pd-shortcut">
+                        <div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><polyline points="7 14 12 9 16 13 21 8"/></svg></div>
+                        <span class="pd-shortcut-label">Awstats</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick create email account -->
+            <div class="card">
+                <div class="card-header"><h2 class="card-title">Quick create email account</h2></div>
                 <div class="card-body">
-                    <div class="usage-bar-container">
-                        <div class="usage-bar-header">
-                            <span class="usage-bar-label">Disk Space</span>
-                            <span class="usage-bar-value">12.4 GB of 100 GB</span>
+                    <form class="pd-email-form" onsubmit="event.preventDefault();">
+                        <div class="form-group">
+                            <label class="form-label" for="pd-em-addr">Email address</label>
+                            <div class="pd-email-split">
+                                <input type="text" class="form-input" id="pd-em-addr" placeholder="yourname" autocapitalize="none" autocomplete="off">
+                                <span class="pd-email-domain">@test.com</span>
+                            </div>
                         </div>
-                        <div class="usage-bar"><div class="usage-bar-fill blue" style="width: 12%;"></div></div>
-                    </div>
-                    <div class="usage-bar-container">
-                        <div class="usage-bar-header">
-                            <span class="usage-bar-label">Bandwidth</span>
-                            <span class="usage-bar-value">84.2 GB of 2 TB</span>
+                        <div class="form-group">
+                            <label class="form-label" for="pd-em-pw">Password</label>
+                            <input type="password" class="form-input" id="pd-em-pw" placeholder="Desired password" autocomplete="new-password">
                         </div>
-                        <div class="usage-bar"><div class="usage-bar-fill green" style="width: 4%;"></div></div>
-                    </div>
-                    <div class="usage-bar-container">
-                        <div class="usage-bar-header">
-                            <span class="usage-bar-label">Email Accounts</span>
-                            <span class="usage-bar-value">8 of 25</span>
-                        </div>
-                        <div class="usage-bar"><div class="usage-bar-fill orange" style="width: 32%;"></div></div>
+                        <button type="submit" class="btn-primary">Create</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Addons and extras -->
+            <div class="card" id="addons">
+                <div class="card-header"><h2 class="card-title">Addons &amp; extras</h2></div>
+                <div class="card-body">
+                    <div class="pd-addons-row">
+                        <select class="form-select" aria-label="Choose an addon">
+                            <option value="weebly" selected>Weebly Website Builder — Free</option>
+                            <option value="codeguard">CodeGuard Backup — $2.99/mo</option>
+                            <option value="sitelock">SiteLock Security — $3.99/mo</option>
+                            <option value="marketgoo">Marketgoo SEO — $5.99/mo</option>
+                        </select>
+                        <a href="cart.html" class="btn-primary">Purchase &amp; activate</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="settings-group">
-                <div class="settings-group-header"><div class="settings-group-title">Quick Actions</div></div>
-                <a href="#" class="settings-item" style="text-decoration:none;color:inherit;">
-                    <div class="settings-item-content"><div class="settings-item-label">Login to cPanel</div><div class="settings-item-sublabel">Access your hosting control panel</div></div>
-                    <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
-                </a>
-                <a href="clientareadomaindetails.html" class="settings-item" style="text-decoration:none;color:inherit;">
-                    <div class="settings-item-content"><div class="settings-item-label">Manage DNS</div><div class="settings-item-sublabel">Configure DNS records for your domain</div></div>
-                    <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
-                </a>
-                <a href="#" class="settings-item" style="text-decoration:none;color:inherit;">
-                    <div class="settings-item-content"><div class="settings-item-label">SSL Certificates</div><div class="settings-item-sublabel">Manage SSL for hendersondesign.com</div></div>
-                    <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
-                </a>
-                <a href="#" class="settings-item" style="text-decoration:none;color:inherit;">
-                    <div class="settings-item-content"><div class="settings-item-label">Backups</div><div class="settings-item-sublabel">Download or restore from backups</div></div>
-                    <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
-                </a>
-                <a href="upgrade.html" class="settings-item" style="text-decoration:none;color:inherit;">
-                    <div class="settings-item-content"><div class="settings-item-label">Upgrade/Downgrade</div><div class="settings-item-sublabel">Change your hosting plan</div></div>
-                    <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
-                </a>
-            </div>
+            <!-- Billing / Domain tabs -->
+            <div class="card">
+                <div class="pd-tabs" role="tablist">
+                    <button type="button" class="pd-tab active" data-pd-tab="billing" role="tab" aria-selected="true">Billing overview</button>
+                    <button type="button" class="pd-tab" data-pd-tab="domain" role="tab" aria-selected="false">Domain</button>
+                </div>
 
-            <div style="margin-top: 24px;">
-                <a href="clientareacancelrequest.html" class="btn-danger">Cancel Service</a>
+                <div class="pd-billing-grid" data-pd-panel="billing">
+                    <div>
+                        <div class="pd-billing-field-label">Registration date</div>
+                        <div class="pd-billing-field-value">22 Apr 2026</div>
+                    </div>
+                    <div>
+                        <div class="pd-billing-field-label">Recurring amount</div>
+                        <div class="pd-billing-field-value">$3.99</div>
+                    </div>
+                    <div>
+                        <div class="pd-billing-field-label">Next due date</div>
+                        <div class="pd-billing-field-value">22 Apr 2099</div>
+                    </div>
+                    <div>
+                        <div class="pd-billing-field-label">Billing cycle</div>
+                        <div class="pd-billing-field-value">Monthly</div>
+                    </div>
+                    <div>
+                        <div class="pd-billing-field-label">Payment method</div>
+                        <div class="pd-billing-field-value">PayPal</div>
+                    </div>
+                    <div>
+                        <div class="pd-billing-field-label">First payment</div>
+                        <div class="pd-billing-field-value">$3.99</div>
+                    </div>
+                </div>
+
+                <div class="pd-billing-grid" data-pd-panel="domain" style="display: none;">
+                    <div>
+                        <div class="pd-billing-field-label">Domain</div>
+                        <div class="pd-billing-field-value">test.com</div>
+                    </div>
+                    <div>
+                        <div class="pd-billing-field-label">Registered on</div>
+                        <div class="pd-billing-field-value">22 Apr 2026</div>
+                    </div>
+                    <div>
+                        <div class="pd-billing-field-label">Expires</div>
+                        <div class="pd-billing-field-value">22 Apr 2099</div>
+                    </div>
+                    <div>
+                        <div class="pd-billing-field-label">Auto-renew</div>
+                        <div class="pd-billing-field-value">Enabled</div>
+                    </div>
+                </div>
             </div>
         </div>
-    </main>
+    </div>
+    </div><!-- /.product-variant[data-variant="a"] -->
 
-    <script src="js/apple-theme.js"></script>
+    <!-- ══════════ Variant B — top tabs (no left sidebar) ══════════ -->
+    <div class="product-variant" data-variant="b">
+    <p class="variant-label">Variant B — top tabs</p>
+
+    <!-- Hero card: product identity + status + quick meta -->
+    <div class="card pd2-hero-card">
+        <div class="pd2-hero-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+        </div>
+        <div class="pd2-hero-info">
+            <div class="pd2-hero-kind">Web Hosting</div>
+            <div class="pd2-hero-name">Web Hosting — Single</div>
+            <div class="pd2-hero-domain">test.com</div>
+        </div>
+        <div class="pd2-hero-meta">
+            <span class="status-pill active">Active</span>
+            <span class="pd2-hero-due">Next due 22 Apr 2099 · $3.99/mo</span>
+        </div>
+    </div>
+
+    <!-- Overdue notice (full state only) -->
+    <div class="pd-notice when-full" style="margin-top: 14px;">
+        <div class="pd-notice-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="pd-notice-text">You have an <strong>overdue invoice</strong>. Pay now to avoid service interruption.</div>
+        <a href="viewinvoice.html" class="btn-primary">Pay invoice</a>
+    </div>
+
+    <!-- Main tabbed card + right sidebar -->
+    <div class="pd2-split" style="margin-top: 14px;">
+        <div>
+            <!-- Action bar — quick actions as pills -->
+            <div class="card">
+                <div class="pd2-actions" style="border-top: 0; padding-top: 14px;">
+                    <a href="#" class="pd2-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>Log in to cPanel</a>
+                    <a href="#" class="pd2-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>Webmail</a>
+                    <a href="#" class="pd2-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Change password</a>
+                    <a href="#" class="pd2-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>Upgrade / Downgrade</a>
+                    <a href="clientareacancelrequest.html" class="pd2-action danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Cancel</a>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="card" style="margin-top: 14px;">
+                <div class="pd2-tabs" role="tablist">
+                    <button type="button" class="pd2-tab active" data-pd2-tab="overview" role="tab" aria-selected="true">Overview</button>
+                    <button type="button" class="pd2-tab" data-pd2-tab="shortcuts" role="tab" aria-selected="false">Shortcuts</button>
+                    <button type="button" class="pd2-tab" data-pd2-tab="email" role="tab" aria-selected="false">Create email</button>
+                    <button type="button" class="pd2-tab" data-pd2-tab="addons" role="tab" aria-selected="false">Addons</button>
+                    <button type="button" class="pd2-tab" data-pd2-tab="billing" role="tab" aria-selected="false">Billing</button>
+                </div>
+
+                <!-- Overview panel: 3 usage rings + summary -->
+                <div class="pd2-panel active" data-pd2-panel="overview">
+                    <div class="pd2-usage-row">
+                        <div class="pd2-usage-tile">
+                            <div class="pd-usage-ring blue">
+                                <svg viewBox="0 0 72 72">
+                                    <circle class="bg" cx="36" cy="36" r="30"/>
+                                    <circle class="fg" cx="36" cy="36" r="30" data-pct="12"/>
+                                </svg>
+                                <div class="pd-usage-val"><span class="when-full">12%</span><span class="when-empty">0%</span></div>
+                            </div>
+                            <div class="pd2-usage-tile-meta">
+                                <div class="pd2-usage-tile-label">Disk usage</div>
+                                <div class="pd2-usage-tile-val"><span class="when-full">12.4 GB</span><span class="when-empty">0 GB</span></div>
+                                <div class="pd2-usage-tile-limit">of Unlimited</div>
+                            </div>
+                        </div>
+                        <div class="pd2-usage-tile">
+                            <div class="pd-usage-ring green">
+                                <svg viewBox="0 0 72 72">
+                                    <circle class="bg" cx="36" cy="36" r="30"/>
+                                    <circle class="fg" cx="36" cy="36" r="30" data-pct="4"/>
+                                </svg>
+                                <div class="pd-usage-val"><span class="when-full">4%</span><span class="when-empty">0%</span></div>
+                            </div>
+                            <div class="pd2-usage-tile-meta">
+                                <div class="pd2-usage-tile-label">Bandwidth</div>
+                                <div class="pd2-usage-tile-val"><span class="when-full">84.2 GB</span><span class="when-empty">0 GB</span></div>
+                                <div class="pd2-usage-tile-limit">of Unlimited</div>
+                            </div>
+                        </div>
+                        <div class="pd2-usage-tile">
+                            <div class="pd-usage-ring orange">
+                                <svg viewBox="0 0 72 72">
+                                    <circle class="bg" cx="36" cy="36" r="30"/>
+                                    <circle class="fg" cx="36" cy="36" r="30" data-pct="32"/>
+                                </svg>
+                                <div class="pd-usage-val"><span class="when-full">32%</span><span class="when-empty">0%</span></div>
+                            </div>
+                            <div class="pd2-usage-tile-meta">
+                                <div class="pd2-usage-tile-label">Email accounts</div>
+                                <div class="pd2-usage-tile-val"><span class="when-full">8</span><span class="when-empty">0</span></div>
+                                <div class="pd2-usage-tile-limit">of 25</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shortcuts panel -->
+                <div class="pd2-panel" data-pd2-panel="shortcuts">
+                    <div class="pd-shortcuts-grid" style="padding: 0;">
+                        <a href="#" class="pd-shortcut"><div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="pd-shortcut-label">Email accounts</span></a>
+                        <a href="#" class="pd-shortcut"><div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div><span class="pd-shortcut-label">Forwarders</span></a>
+                        <a href="#" class="pd-shortcut"><div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 00-4-4H4"/></svg></div><span class="pd-shortcut-label">Autoresponders</span></a>
+                        <a href="#" class="pd-shortcut"><div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div><span class="pd-shortcut-label">File manager</span></a>
+                        <a href="#" class="pd-shortcut"><div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></div><span class="pd-shortcut-label">Backup</span></a>
+                        <a href="#" class="pd-shortcut"><div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div><span class="pd-shortcut-label">Domains</span></a>
+                        <a href="#" class="pd-shortcut"><div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span class="pd-shortcut-label">Cron jobs</span></a>
+                        <a href="#" class="pd-shortcut"><div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div><span class="pd-shortcut-label">MySQL® Databases</span></a>
+                        <a href="#" class="pd-shortcut"><div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span class="pd-shortcut-label">phpMyAdmin</span></a>
+                        <a href="#" class="pd-shortcut"><div class="pd-shortcut-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><polyline points="7 14 12 9 16 13 21 8"/></svg></div><span class="pd-shortcut-label">Awstats</span></a>
+                    </div>
+                </div>
+
+                <!-- Create email panel -->
+                <div class="pd2-panel" data-pd2-panel="email">
+                    <form class="pd-email-form" onsubmit="event.preventDefault();">
+                        <div class="form-group">
+                            <label class="form-label" for="pd2-em-addr">Email address</label>
+                            <div class="pd-email-split">
+                                <input type="text" class="form-input" id="pd2-em-addr" placeholder="yourname" autocapitalize="none" autocomplete="off">
+                                <span class="pd-email-domain">@test.com</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="pd2-em-pw">Password</label>
+                            <input type="password" class="form-input" id="pd2-em-pw" placeholder="Desired password" autocomplete="new-password">
+                        </div>
+                        <button type="submit" class="btn-primary">Create</button>
+                    </form>
+                </div>
+
+                <!-- Addons panel -->
+                <div class="pd2-panel" data-pd2-panel="addons">
+                    <div class="pd-addons-row">
+                        <select class="form-select" aria-label="Choose an addon">
+                            <option value="weebly" selected>Weebly Website Builder — Free</option>
+                            <option value="codeguard">CodeGuard Backup — $2.99/mo</option>
+                            <option value="sitelock">SiteLock Security — $3.99/mo</option>
+                            <option value="marketgoo">Marketgoo SEO — $5.99/mo</option>
+                        </select>
+                        <a href="cart.html" class="btn-primary">Purchase &amp; activate</a>
+                    </div>
+                </div>
+
+                <!-- Billing panel -->
+                <div class="pd2-panel" data-pd2-panel="billing">
+                    <div class="pd-billing-grid" style="padding: 0;">
+                        <div><div class="pd-billing-field-label">Registration date</div><div class="pd-billing-field-value">22 Apr 2026</div></div>
+                        <div><div class="pd-billing-field-label">Recurring amount</div><div class="pd-billing-field-value">$3.99</div></div>
+                        <div><div class="pd-billing-field-label">Next due date</div><div class="pd-billing-field-value">22 Apr 2099</div></div>
+                        <div><div class="pd-billing-field-label">Billing cycle</div><div class="pd-billing-field-value">Monthly</div></div>
+                        <div><div class="pd-billing-field-label">Payment method</div><div class="pd-billing-field-value">PayPal</div></div>
+                        <div><div class="pd-billing-field-label">First payment</div><div class="pd-billing-field-value">$3.99</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right sidebar: promo slider -->
+        <aside>
+            <div data-include="partials/promo-slider.html"></div>
+        </aside>
+    </div>
+    </div><!-- /.product-variant[data-variant="b"] -->
+</div>
+
+<!-- ═══════════ Top-layout standard footer ═══════════ -->
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="domains.html">Domains</a></li><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="email.html">Email</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security &amp; Tools</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="website-security.html">Website Security</a></li><li><a href="website-backup.html">Website Backup</a></li><li><a href="seo-tools.html">SEO Tools</a></li><li><a href="monitoring-360.html">360 Monitoring</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li><li><a href="clientregister.html">Create an account</a></li><li><a href="#">Billing</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="support-page.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li><li><a href="serverstatus.html">Network status</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Newsroom</a></li><li><a href="#">Careers</a></li><li><a href="#">Legal</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open>
+                    <span class="flag">🇺🇸</span>
+                    <span>English</span>
+                    <span class="sep">/</span>
+                    <span>$ USD</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Legal</a><a href="#">Site Map</a></div>
+        </div>
+    </div>
+</footer>
+
+<!-- ═══════════ Inner-layout slim footer ═══════════ -->
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+
+<!-- ═══════════ Language / currency modal ═══════════ -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js"></script>
+<script src="js/apple-layout.js"></script>
+<script>
+document.addEventListener('apple-layout:ready', function () {
+    // Usage rings — convert data-pct on each .fg circle into stroke-dashoffset
+    // (circumference 2πr for r=30 ≈ 188.5). Retracts fully when data-data="empty".
+    var RING_C = 188.5;
+    function syncUsageRings() {
+        var empty = document.body.dataset.data === 'empty';
+        document.querySelectorAll('.pd-usage-ring .fg').forEach(function (fg) {
+            fg.style.strokeDasharray = RING_C;
+            var pct = parseFloat(fg.getAttribute('data-pct')) || 0;
+            var off = empty ? RING_C : RING_C * (1 - pct / 100);
+            fg.style.strokeDashoffset = off;
+        });
+    }
+    syncUsageRings();
+    new MutationObserver(syncUsageRings).observe(document.body, { attributes: true, attributeFilter: ['data-data'] });
+
+    // Promo slider auto-init is handled globally by js/apple-layout.js (initPromoSliders).
+
+    // v1: Billing / Domain tabs
+    document.querySelectorAll('.pd-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            var target = tab.dataset.pdTab;
+            document.querySelectorAll('.pd-tab').forEach(function (t) {
+                var on = t === tab;
+                t.classList.toggle('active', on);
+                t.setAttribute('aria-selected', on ? 'true' : 'false');
+            });
+            document.querySelectorAll('[data-pd-panel]').forEach(function (p) {
+                p.style.display = p.dataset.pdPanel === target ? '' : 'none';
+            });
+        });
+    });
+
+    // v2: Overview / Shortcuts / Email / Addons / Billing tabs
+    document.querySelectorAll('.pd2-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            var target = tab.dataset.pd2Tab;
+            document.querySelectorAll('.pd2-tab').forEach(function (t) {
+                var on = t === tab;
+                t.classList.toggle('active', on);
+                t.setAttribute('aria-selected', on ? 'true' : 'false');
+            });
+            document.querySelectorAll('[data-pd2-panel]').forEach(function (p) {
+                p.classList.toggle('active', p.dataset.pd2Panel === target);
+            });
+        });
+    });
+});
+</script>
 </body>
 </html>

@@ -3,117 +3,801 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket #TKT-4821 - WHMCS by Apple</title>
+    <title>Ticket #SUZ-129485 — Tickets — WHMCS by Apple</title>
     <link rel="stylesheet" href="css/apple-theme.css">
+    <link rel="stylesheet" href="css/apple-layout.css">
+    <style>
+        body { display: block; }
+
+        /* ── Page header w/ inline close-ticket action ── */
+        .tk-page-head {
+            display: flex; align-items: flex-start; gap: 16px;
+            margin-bottom: 24px;
+        }
+        .tk-page-head h1 {
+            font-size: 30px; font-weight: 600; letter-spacing: -0.025em;
+            color: var(--color-text-primary); margin: 0 0 6px;
+            line-height: 1.2;
+            flex: 1; min-width: 0;
+        }
+        .tk-page-head-id {
+            font-size: 12px; font-weight: 600; color: var(--color-text-tertiary);
+            text-transform: uppercase; letter-spacing: 0.06em;
+            margin: 0 0 8px;
+        }
+        .tk-close-btn {
+            flex-shrink: 0;
+            height: 32px; padding: 0 14px;
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-pill);
+            color: var(--color-text-primary);
+            font-size: 13px; font-weight: 500; letter-spacing: -0.01em;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-family: inherit;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .tk-close-btn:hover {
+            background: var(--color-red-bg);
+            border-color: transparent;
+            color: var(--color-red-text);
+        }
+        .tk-close-btn svg { width: 12px; height: 12px; }
+
+        /* ── Two-column split: main + sidebar ── */
+        .tk-view-split { display: grid; grid-template-columns: 1fr 280px; gap: 24px; align-items: start; }
+        @media (max-width: 960px) { .tk-view-split { grid-template-columns: 1fr; } }
+        .tk-view-main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+        .tk-view-aside { display: flex; flex-direction: column; gap: 16px; }
+
+        /* ── Section heading (Ticket Settings / Ticket Information) ── */
+        .tk-section-title {
+            font-size: 13px; font-weight: 600; color: var(--color-text-secondary);
+            letter-spacing: -0.005em; margin: 0 0 10px;
+        }
+
+        /* ── Conversation thread above settings ── */
+        .tk-thread-card { padding: 20px 24px; }
+        .tk-thread-card .card-header { padding: 0 0 16px; margin: 0 0 16px; border-bottom: 0.5px solid var(--color-border); }
+        .tk-thread-card .card-header h2 { font-size: 15px; font-weight: 600; letter-spacing: -0.012em; margin: 0; }
+        .tk-thread-meta {
+            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+            font-size: 12px; color: var(--color-text-tertiary);
+            margin-top: 6px;
+        }
+        .tk-thread-meta .dot { opacity: 0.45; }
+
+        /* ── Tab nav ── */
+        .tk-tabs {
+            display: flex; align-items: center; gap: 24px;
+            border-bottom: 0.5px solid var(--color-border);
+            padding: 0 24px;
+        }
+        .tk-tab {
+            position: relative;
+            padding: 14px 0;
+            background: none; border: 0;
+            font-size: 13px; font-weight: 500; letter-spacing: -0.008em;
+            color: var(--color-text-tertiary);
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex; align-items: center; gap: 7px;
+            transition: color var(--transition-fast);
+        }
+        .tk-tab:hover { color: var(--color-text-primary); }
+        .tk-tab.active { color: var(--color-accent); }
+        .tk-tab.active::after {
+            content: ""; position: absolute; left: 0; right: 0; bottom: -0.5px;
+            height: 2px; background: var(--color-accent); border-radius: 2px 2px 0 0;
+        }
+        .tk-tab-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 18px; height: 18px; padding: 0 6px;
+            border-radius: var(--radius-pill);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            font-size: 10.5px; font-weight: 600;
+            letter-spacing: 0;
+        }
+        .tk-tab.active .tk-tab-badge {
+            background: var(--color-accent-light);
+            color: var(--color-accent);
+        }
+
+        /* ── Tab panels ── */
+        .tk-tab-panel { display: none; padding: 22px 24px 24px; }
+        .tk-tab-panel.active { display: block; }
+
+        /* ── Requestor identity bar on Reply panel ── */
+        .tk-author {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px;
+            background: var(--color-surface-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+        }
+        .tk-author-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 600;
+            flex-shrink: 0;
+        }
+        html[data-palette="emerald"] .tk-author-avatar,
+        html[data-palette="emerald"] .tk-info-avatar { background: linear-gradient(135deg, #14b17d, #5ac8a3); }
+        html[data-palette="violet"]  .tk-author-avatar,
+        html[data-palette="violet"]  .tk-info-avatar { background: linear-gradient(135deg, #8c5cff, #c28cff); }
+        html[data-palette="rose"]    .tk-author-avatar,
+        html[data-palette="rose"]    .tk-info-avatar { background: linear-gradient(135deg, #ff2d6b, #ff7fa8); }
+        html[data-palette="amber"]   .tk-author-avatar,
+        html[data-palette="amber"]   .tk-info-avatar { background: linear-gradient(135deg, #f08a00, #ffb547); }
+        html[data-palette="slate"]   .tk-author-avatar,
+        html[data-palette="slate"]   .tk-info-avatar { background: linear-gradient(135deg, #64748b, #94a3b8); }
+        .tk-author-name { font-size: 13px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; }
+        .tk-author-email { font-size: 12px; color: var(--color-text-tertiary); margin-top: 1px; }
+
+        /* ── Rich-text editor shell ── */
+        .tk-editor {
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            overflow: hidden;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        .tk-editor:focus-within {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-accent-light);
+        }
+        .tk-editor-toolbar {
+            display: flex; align-items: center; gap: 2px;
+            padding: 6px 8px;
+            border-bottom: 0.5px solid var(--color-border);
+            background: var(--color-surface-tertiary);
+            flex-wrap: wrap;
+        }
+        .tk-tb-btn {
+            width: 26px; height: 26px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border: 0; background: transparent;
+            color: var(--color-text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit; font-size: 12px;
+            transition: all var(--transition-fast);
+        }
+        .tk-tb-btn:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); }
+        .tk-tb-btn.is-toggle { padding: 0 10px; width: auto; font-weight: 500; font-size: 12px; }
+        .tk-tb-btn.is-toggle.active { background: var(--color-accent-light); color: var(--color-accent); }
+        .tk-tb-btn svg { width: 13px; height: 13px; }
+        .tk-tb-btn .tb-label { font-weight: 600; }
+        .tk-tb-btn.bold { font-weight: 700; }
+        .tk-tb-btn.italic { font-style: italic; }
+        .tk-tb-sep { width: 1px; height: 16px; background: var(--color-border); margin: 0 4px; }
+        .tk-tb-spacer { flex: 1; }
+        .tk-editor-area {
+            min-height: 180px;
+            padding: 14px 16px;
+            font-size: 13px; letter-spacing: -0.008em; line-height: 1.55;
+            color: var(--color-text-primary);
+            outline: none;
+            resize: vertical;
+            border: 0;
+            width: 100%;
+            background: var(--color-surface);
+            font-family: inherit;
+        }
+        .tk-editor-area::placeholder { color: var(--color-text-quaternary); }
+        .tk-editor-foot {
+            display: flex; align-items: center; gap: 14px;
+            padding: 8px 14px;
+            border-top: 0.5px solid var(--color-border);
+            background: var(--color-surface-tertiary);
+            font-size: 11px; color: var(--color-text-tertiary);
+        }
+        .tk-editor-foot .dot { opacity: 0.5; }
+        .tk-editor-foot .is-saved { color: var(--color-green-text); }
+
+        /* ── Attachment drop zone ── */
+        .tk-drop {
+            margin-top: 14px;
+            display: flex; align-items: center; gap: 10px;
+            padding: 13px 16px;
+            border: 1px dashed var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            color: var(--color-text-tertiary);
+            font-size: 13px; letter-spacing: -0.008em;
+            transition: all var(--transition-fast);
+        }
+        .tk-drop:hover {
+            border-color: var(--color-accent);
+            background: var(--color-accent-light);
+            color: var(--color-accent);
+        }
+        .tk-drop svg { width: 14px; height: 14px; }
+        .tk-drop-hint {
+            margin-top: 8px;
+            display: flex; align-items: center; gap: 6px;
+            font-size: 11px; color: var(--color-text-quaternary);
+        }
+        .tk-drop-hint svg { width: 11px; height: 11px; }
+
+        /* ── Reply footer (Send / Cancel) ── */
+        .tk-reply-foot {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            margin-top: 18px;
+        }
+        .tk-reply-foot .btn-secondary { height: 34px; padding: 0 14px; font-size: 13px; }
+        .tk-reply-foot .btn-primary { height: 34px; padding: 0 18px; font-size: 13px; }
+
+        /* ── CC Recipients panel ── */
+        .tk-cc-empty {
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            padding: 28px 20px; gap: 10px;
+            background: var(--color-surface-secondary);
+            border-radius: var(--radius-md);
+        }
+        .tk-cc-empty-ico {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--color-surface);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--color-text-tertiary);
+        }
+        .tk-cc-empty-ico svg { width: 18px; height: 18px; }
+        .tk-cc-empty-title { font-size: 13px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; }
+        .tk-cc-empty-desc { font-size: 12px; color: var(--color-text-tertiary); max-width: 320px; }
+        .tk-cc-form { display: flex; gap: 8px; margin-top: 4px; }
+        .tk-cc-form input {
+            flex: 1; min-width: 0;
+            height: 34px; padding: 0 12px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            background: var(--color-surface);
+            font-size: 13px; letter-spacing: -0.008em;
+            font-family: inherit;
+            color: var(--color-text-primary);
+        }
+        .tk-cc-form input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+
+        /* ── Attachments list ── */
+        .tk-att-list { display: flex; flex-direction: column; gap: 8px; }
+        .tk-att-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+        }
+        .tk-att-ico {
+            width: 32px; height: 40px;
+            border-radius: 4px;
+            background: var(--color-accent-light);
+            color: var(--color-accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 700; letter-spacing: 0.03em;
+            flex-shrink: 0;
+        }
+        .tk-att-meta { min-width: 0; flex: 1; }
+        .tk-att-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -0.008em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tk-att-sub { font-size: 11px; color: var(--color-text-tertiary); margin-top: 1px; }
+        .tk-att-action {
+            flex-shrink: 0;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: transparent; border: 0;
+            color: var(--color-text-tertiary);
+            cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: all var(--transition-fast);
+        }
+        .tk-att-action:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); }
+        .tk-att-action svg { width: 13px; height: 13px; }
+
+        /* ── Ticket information sidebar ── */
+        .tk-info-card { padding: 0; }
+        .tk-info-row {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 12px 16px;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        .tk-info-row:last-child { border-bottom: 0; }
+        .tk-info-ico {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .tk-info-ico svg { width: 11px; height: 11px; }
+        .tk-info-body { min-width: 0; flex: 1; }
+        .tk-info-label {
+            font-size: 11px; font-weight: 500;
+            color: var(--color-text-tertiary);
+            letter-spacing: 0.02em;
+            margin-bottom: 3px;
+        }
+        .tk-info-value {
+            font-size: 13px; font-weight: 500;
+            color: var(--color-text-primary);
+            letter-spacing: -0.008em; line-height: 1.4;
+        }
+        .tk-info-value .status-pill { font-size: 10.5px; }
+        .tk-info-user { display: flex; align-items: center; gap: 10px; }
+        .tk-info-avatar {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 600;
+            flex-shrink: 0;
+        }
+        .tk-info-badge {
+            display: inline-flex; align-items: center;
+            padding: 1px 7px;
+            border-radius: var(--radius-pill);
+            font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: var(--color-green-bg); color: var(--color-green-text);
+            margin-left: 6px;
+            vertical-align: 1px;
+        }
+
+        /* ── Attachments inside a thread bubble ── */
+        .thread-attachments {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            margin-top: 10px;
+        }
+        .thread-att {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 8px 12px 8px 8px;
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            color: var(--color-text-primary);
+            transition: all var(--transition-fast);
+            max-width: 280px;
+            min-width: 0;
+        }
+        .thread-att:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-accent-light);
+        }
+        .thread-message.staff .thread-att {
+            background: var(--color-surface);
+        }
+        .thread-att-ico {
+            width: 32px; height: 40px;
+            border-radius: 5px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 8.5px; font-weight: 700; letter-spacing: 0.04em;
+            color: #fff;
+            flex-shrink: 0;
+            position: relative;
+        }
+        /* Folded corner on the doc icon */
+        .thread-att-ico::before {
+            content: ""; position: absolute; top: 0; right: 0;
+            border-width: 0 0 6px 6px;
+            border-style: solid;
+            border-color: transparent transparent rgba(255,255,255,0.35) transparent;
+        }
+        .thread-att-ico.pdf { background: #d70015; }
+        .thread-att-ico.zip { background: #c27400; }
+        .thread-att-ico.txt { background: #6e6e73; }
+        .thread-att-ico.doc { background: #0071e3; }
+        .thread-att-ico.img { background: #248a3d; }
+        .thread-att-meta { min-width: 0; flex: 1; }
+        .thread-att-name {
+            font-size: 12.5px; font-weight: 500;
+            color: var(--color-text-primary);
+            letter-spacing: -0.008em;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            line-height: 1.3;
+        }
+        .thread-att-sub {
+            font-size: 11px; color: var(--color-text-tertiary);
+            margin-top: 1px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .thread-att-sub .dot { opacity: 0.5; }
+        .thread-att-dl {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: transparent;
+            color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+        }
+        .thread-att:hover .thread-att-dl { background: var(--color-accent-light); color: var(--color-accent); }
+        .thread-att-dl svg { width: 13px; height: 13px; }
+
+        /* Image attachment — inline preview card */
+        .thread-att.is-image {
+            padding: 0; overflow: hidden;
+            flex-direction: column; align-items: stretch;
+            width: 240px; max-width: 100%;
+            gap: 0;
+        }
+        .thread-att-preview {
+            width: 100%; aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.9);
+            overflow: hidden;
+        }
+        .thread-att-preview::after {
+            content: ""; position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 30% 40%, rgba(255,255,255,0.25) 0%, transparent 40%),
+                radial-gradient(circle at 70% 70%, rgba(0,0,0,0.2) 0%, transparent 50%);
+        }
+        .thread-att-preview svg { width: 32px; height: 32px; position: relative; z-index: 1; opacity: 0.85; }
+        .thread-att.is-image .thread-att-body {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 10px 10px 12px;
+        }
+        .thread-att.is-image .thread-att-meta { flex: 1; min-width: 0; }
+
+        /* Priority indicator — subtle colored dot */
+        .tk-prio-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 13px; font-weight: 500; color: var(--color-text-primary);
+        }
+        .tk-prio-pill::before {
+            content: ""; width: 7px; height: 7px; border-radius: 50%;
+        }
+        .tk-prio-pill.high::before { background: var(--color-red-text); box-shadow: 0 0 0 3px var(--color-red-bg); }
+        .tk-prio-pill.medium::before { background: var(--color-orange-text); }
+        .tk-prio-pill.low::before { background: var(--color-green-text); }
+    </style>
 </head>
-<body>
-    <aside class="sidebar">
-        <div class="sidebar-header"><a href="index.html" class="sidebar-home-link"><div class="sidebar-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.08 7.13 7.16 8.84 7.14C10.13 7.12 11.34 8.01 12.14 8.01C12.94 8.01 14.41 6.93 15.95 7.11C16.59 7.14 18.37 7.36 19.53 9.06C19.43 9.12 17.2 10.42 17.22 13.11C17.25 16.33 20.05 17.37 20.09 17.38C20.06 17.47 19.61 18.98 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg></div><span class="sidebar-brand">WHMCS</span></a></div>
-        <div class="sidebar-search"><input type="text" class="sidebar-search-input" placeholder="Search"></div>
-        <nav class="sidebar-nav">
-            <a href="clientareahome.html" id="nav-dashboard" class="sidebar-item"><div class="sidebar-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>Dashboard</a>
-            <div class="sidebar-section-label">Services</div>
-            <a href="clientareaproducts.html" id="nav-services" class="sidebar-item"><div class="sidebar-item-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>My Services <span class="sidebar-item-badge">3</span></a>
-            <a href="clientareadomains.html" id="nav-domains" class="sidebar-item"><div class="sidebar-item-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>My Domains <span class="sidebar-item-badge">5</span></a>
-            <div class="sidebar-section-label">Billing</div>
-            <a href="clientareainvoices.html" id="nav-invoices" class="sidebar-item"><div class="sidebar-item-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>Invoices <span class="sidebar-item-badge">2</span></a>
-            <a href="account-paymentmethods.html" id="nav-payments" class="sidebar-item"><div class="sidebar-item-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>Payment Methods</a>
-            <div class="sidebar-section-label">Support</div>
-            <a href="supportticketslist.html" id="nav-tickets" class="sidebar-item active"><div class="sidebar-item-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>Support Tickets <span class="sidebar-item-badge">1</span></a>
-            <a href="knowledgebase.html" id="nav-kb" class="sidebar-item"><div class="sidebar-item-icon indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>Knowledge Base</a>
-            <a href="announcements.html" id="nav-announcements" class="sidebar-item"><div class="sidebar-item-icon pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>Announcements</a>
-            <div class="sidebar-section-label">Account</div>
-            <a href="clientareadetails.html" id="nav-details" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>My Details</a>
-            <a href="clientareasecurity.html" id="nav-security" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>Security</a>
-        </nav>
-        <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar">AH</div><div class="sidebar-user-info"><div class="sidebar-user-name">Alex Henderson</div><div class="sidebar-user-email">alex@example.com</div></div></div></div>
-    </aside>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="tickets" data-page-title="View Ticket">
 
-    <main class="main-content">
-        <div class="topbar">
-            <div class="topbar-breadcrumb"><a href="supportticketslist.html">Support Tickets</a> <span class="topbar-breadcrumb-sep">/</span> <span class="topbar-breadcrumb-current">Ticket #TKT-4821</span></div>
-            <div class="topbar-status"><span class="topbar-status-dot"></span>All systems normal</div>
-            <div class="topbar-spacer"></div>
-            <div class="topbar-actions">
-                <div class="notification-wrapper">
-                    <button class="topbar-btn" title="Notifications" onclick="toggleNotifications(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="topbar-notification-dot"></div></button>
-                    <div class="notification-dropdown" id="notificationDropdown">
-                        <div class="notification-dropdown-header"><span class="notification-dropdown-title">Notifications</span><button class="notification-dropdown-clear">Mark all read</button></div>
-                        <a href="viewinvoice.html" class="notification-item"><div class="notification-dot-indicator orange"></div><div class="notification-content"><div class="notification-text">Invoice #10247 is due in 2 days</div><div class="notification-time">2 hours ago</div></div></a>
-                        <a href="viewinvoice.html" class="notification-item"><div class="notification-dot-indicator orange"></div><div class="notification-content"><div class="notification-text">Invoice #10246 is due in 2 days</div><div class="notification-time">2 hours ago</div></div></a>
-                        <a href="viewticket.html" class="notification-item"><div class="notification-dot-indicator green"></div><div class="notification-content"><div class="notification-text">Ticket #TKT-4821 has been answered</div><div class="notification-time">Yesterday</div></div></a>
-                        <a href="announcements.html" class="notification-item"><div class="notification-dot-indicator blue"></div><div class="notification-content"><div class="notification-text">Scheduled maintenance on Apr 20</div><div class="notification-time">3 days ago</div></div></a>
-                    </div>
-                </div>
-                <button class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
-                <div class="profile-dropdown-wrapper">
-                    <div class="topbar-avatar" onclick="toggleProfileDropdown(event)" title="Account">AH</div>
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <div class="profile-dropdown-header"><div class="profile-dropdown-name">Alex Henderson</div><div class="profile-dropdown-email">alex@example.com</div></div>
-                        <a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a>
-                        <a href="clientareasecurity.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Security Settings</a>
-                        <a href="#" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email History</a>
-                        <div class="profile-dropdown-divider"></div>
-                        <div class="theme-toggle-row"><span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span><div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div></div>
-                        <div class="profile-dropdown-divider"></div>
-                        <a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a>
-                    </div>
-                </div>
-            </div>
+<div data-include="partials/state-chip.html"></div>
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>No Notifications</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;"><a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a></div>
+    </div>
+</div>
+
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareaproducts.html">My Services</a><a href="store.html">Order New Services</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareadomains.html">My Domains</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareainvoices.html">My Invoices</a><a href="clientareaquotes.html">My Quotes</a><a href="masspay.html">Mass Payment</a><a href="clientareaaddfunds.html">Add Funds</a><a href="account-paymentmethods.html">Payment Methods</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="supportticketslist.html">Tickets</a><a href="announcements.html">Announcements</a><a href="knowledgebase.html">Knowledgebase</a></div></div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
+</div></nav>
+
+<div data-include="partials/inner-topbar.html"></div>
+
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Portal Home</a><span class="sep">/</span>
+        <a href="clientareahome.html">Client Area</a><span class="sep">/</span>
+        <a href="supportticketslist.html">Support Tickets</a><span class="sep">/</span>
+        <span class="current" aria-current="page">View Ticket</span>
+    </div>
+</nav>
+
+<div class="content-area">
+    <header class="tk-page-head">
+        <div style="flex: 1; min-width: 0;">
+            <p class="tk-page-head-id">#SUZ-129485</p>
+            <h1>Praesent sed metus eu orci porta imperdiet et ut sapien.</h1>
         </div>
+        <button type="button" class="tk-close-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            Close Ticket
+        </button>
+    </header>
 
-        <div class="content-area">
-            <div class="page-header">
-                <div class="page-header-row">
-                    <div>
-                        <div class="page-eyebrow">SUPPORT</div>
-                        <h1 class="page-title">SSL certificate not renewing automatically</h1>
-                        <p class="page-subtitle">#TKT-4821 &middot; Technical Support &middot; Opened Apr 11, 2026</p>
-                    </div>
-                    <div class="btn-group">
-                        <span class="status-pill answered">Answered</span>
-                        <span class="status-pill pending">Medium</span>
-                    </div>
-                </div>
-            </div>
+    <div class="tk-view-split">
+        <!-- ══ MAIN ══ -->
+        <div class="tk-view-main">
 
-            <div class="card">
-                <div class="card-header"><h2 class="card-title">Conversation</h2></div>
-                <div class="card-body">
+            <!-- Conversation thread -->
+            <div>
+                <h2 class="tk-section-title">Conversation</h2>
+                <div class="card tk-thread-card">
                     <div class="thread">
                         <div class="thread-message client">
-                            <div class="thread-sender">Alex Henderson</div>
-                            <div class="thread-bubble">Hi, I noticed my SSL certificate for hendersondesign.com hasn't renewed automatically. It's set to expire on April 15. Could you look into this? The auto-renewal was enabled in my panel.</div>
-                            <div class="thread-time">Apr 11, 2026 at 2:34 PM</div>
+                            <div class="thread-sender">Petey MacGibbon</div>
+                            <div class="thread-bubble">
+                                Praesent sed metus eu orci porta imperdiet et ut sapien. Fusce vel neque sit amet lacus efficitur aliquet. Could you look into this issue on my account when you have a moment?
+                                <div class="thread-attachments">
+                                    <a href="#" class="thread-att is-image" title="screenshot.png">
+                                        <div class="thread-att-preview">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                        </div>
+                                        <div class="thread-att-body">
+                                            <div class="thread-att-meta">
+                                                <div class="thread-att-name">error-screenshot.png</div>
+                                                <div class="thread-att-sub">PNG <span class="dot">·</span> 412 KB</div>
+                                            </div>
+                                            <div class="thread-att-dl" aria-label="Download">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="thread-time">22/04/2022 at 09:25</div>
                         </div>
                         <div class="thread-message staff">
                             <div class="thread-sender">Jordan — Support Engineer</div>
-                            <div class="thread-bubble">Hi Alex, thanks for reaching out. I've checked your account and it appears the auto-renewal task encountered an error due to a DNS validation timeout. I've manually triggered the renewal and your new certificate is now active until April 2027. I've also fixed the automation issue so this shouldn't happen again.</div>
-                            <div class="thread-time">Apr 11, 2026 at 3:12 PM</div>
-                        </div>
-                        <div class="thread-message client">
-                            <div class="thread-sender">Alex Henderson</div>
-                            <div class="thread-bubble">That was incredibly fast, thank you Jordan! Everything looks good now.</div>
-                            <div class="thread-time">Apr 11, 2026 at 3:28 PM</div>
+                            <div class="thread-bubble">
+                                Hi Petey, thank you for the report. I've reviewed your account and applied the correct configuration. I've attached the diagnostic report and the raw server logs so you can verify the fix on your end.
+                                <div class="thread-attachments">
+                                    <a href="#" class="thread-att" title="diagnostic-report.pdf">
+                                        <div class="thread-att-ico pdf">PDF</div>
+                                        <div class="thread-att-meta">
+                                            <div class="thread-att-name">diagnostic-report.pdf</div>
+                                            <div class="thread-att-sub">148 KB <span class="dot">·</span> 2 pages</div>
+                                        </div>
+                                        <div class="thread-att-dl" aria-label="Download">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="thread-att" title="server-logs.zip">
+                                        <div class="thread-att-ico zip">ZIP</div>
+                                        <div class="thread-att-meta">
+                                            <div class="thread-att-name">server-logs.zip</div>
+                                            <div class="thread-att-sub">2.1 MB <span class="dot">·</span> 6 files</div>
+                                        </div>
+                                        <div class="thread-att-dl" aria-label="Download">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="thread-time">22/04/2022 at 10:04</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header"><h2 class="card-title">Reply</h2></div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <textarea class="form-textarea" placeholder="Type your reply..."></textarea>
+            <!-- Ticket Settings card with tabs -->
+            <div>
+                <h2 class="tk-section-title">Ticket Settings</h2>
+                <div class="card" style="padding: 0;">
+                    <!-- Tabs -->
+                    <div class="tk-tabs" role="tablist">
+                        <button type="button" class="tk-tab active" data-tab="reply" role="tab" aria-selected="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 00-4-4H4"/></svg>
+                            Reply
+                        </button>
+                        <button type="button" class="tk-tab" data-tab="cc" role="tab" aria-selected="false">
+                            CC Recipients
+                            <span class="tk-tab-badge">0</span>
+                        </button>
+                        <button type="button" class="tk-tab" data-tab="attachments" role="tab" aria-selected="false">
+                            Attachments
+                            <span class="tk-tab-badge">1</span>
+                        </button>
                     </div>
-                    <div class="btn-group">
-                        <button class="btn-primary">Send Reply</button>
-                        <button class="btn-secondary">Close Ticket</button>
+
+                    <!-- Reply panel -->
+                    <div class="tk-tab-panel active" data-panel="reply" role="tabpanel">
+                        <div class="tk-author">
+                            <div class="tk-author-avatar">P</div>
+                            <div>
+                                <div class="tk-author-name">Petey MacGibbon</div>
+                                <div class="tk-author-email">demo@lagom.rsstudio.net</div>
+                            </div>
+                        </div>
+
+                        <div class="tk-editor">
+                            <div class="tk-editor-toolbar">
+                                <button type="button" class="tk-tb-btn is-toggle" title="Preview">Preview</button>
+                                <span class="tk-tb-sep"></span>
+                                <button type="button" class="tk-tb-btn bold" title="Bold"><span class="tb-label">B</span></button>
+                                <button type="button" class="tk-tb-btn italic" title="Italic"><span class="tb-label">I</span></button>
+                                <button type="button" class="tk-tb-btn" title="Heading"><span class="tb-label">H</span></button>
+                                <span class="tk-tb-sep"></span>
+                                <button type="button" class="tk-tb-btn" title="Link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></button>
+                                <button type="button" class="tk-tb-btn" title="Bulleted list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+                                <button type="button" class="tk-tb-btn" title="Numbered list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+                                <button type="button" class="tk-tb-btn" title="Code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></button>
+                                <button type="button" class="tk-tb-btn" title="Quote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3-1 6-3 6-8V5H3v7h3c0 3-1 4-3 5"/><path d="M15 21c3-1 6-3 6-8V5h-6v7h3c0 3-1 4-3 5"/></svg></button>
+                                <span class="tk-tb-spacer"></span>
+                                <button type="button" class="tk-tb-btn" title="Help"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
+                            </div>
+                            <textarea class="tk-editor-area" placeholder="Write your reply…"></textarea>
+                            <div class="tk-editor-foot">
+                                <span>lines: <strong id="edLines" style="color:var(--color-text-secondary); font-weight:500;">0</strong></span>
+                                <span class="dot">·</span>
+                                <span>words: <strong id="edWords" style="color:var(--color-text-secondary); font-weight:500;">0</strong></span>
+                                <span class="dot">·</span>
+                                <span class="is-saved">saved</span>
+                            </div>
+                        </div>
+
+                        <label class="tk-drop">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                            Add Attachments…
+                            <input type="file" multiple style="display:none;">
+                        </label>
+                        <div class="tk-drop-hint">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            Allowed extensions: .jpg, .gif, .jpeg, .png, .txt, .pdf · Max file size: 64MB
+                        </div>
+
+                        <div class="tk-reply-foot">
+                            <button type="button" class="btn-primary">Send Message</button>
+                            <a href="supportticketslist.html" class="btn-secondary">Cancel</a>
+                        </div>
+                    </div>
+
+                    <!-- CC Recipients panel -->
+                    <div class="tk-tab-panel" data-panel="cc" role="tabpanel">
+                        <div class="tk-cc-empty">
+                            <div class="tk-cc-empty-ico">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+                            </div>
+                            <div>
+                                <div class="tk-cc-empty-title">No CC recipients</div>
+                                <div class="tk-cc-empty-desc">Add an email address below to keep others in the loop on this ticket.</div>
+                            </div>
+                        </div>
+                        <div class="tk-cc-form">
+                            <input type="email" placeholder="name@example.com">
+                            <button type="button" class="btn-primary" style="height:34px; padding:0 16px; font-size:13px;">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Attachments panel -->
+                    <div class="tk-tab-panel" data-panel="attachments" role="tabpanel">
+                        <div class="tk-att-list">
+                            <div class="tk-att-item">
+                                <div class="tk-att-ico">PDF</div>
+                                <div class="tk-att-meta">
+                                    <div class="tk-att-name">invoice-details.pdf</div>
+                                    <div class="tk-att-sub">148 KB · uploaded 22/04/2022</div>
+                                </div>
+                                <button type="button" class="tk-att-action" title="Download">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
-    </main>
-    <script src="js/apple-theme.js"></script>
+
+        <!-- ══ RIGHT: Ticket information ══ -->
+        <aside class="tk-view-aside">
+            <div>
+                <h2 class="tk-section-title">Ticket Information</h2>
+                <div class="card tk-info-card">
+                    <div class="tk-info-row">
+                        <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
+                        <div class="tk-info-body">
+                            <div class="tk-info-label">Status</div>
+                            <div class="tk-info-value"><span class="status-pill answered">Answered</span></div>
+                        </div>
+                    </div>
+                    <div class="tk-info-row">
+                        <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                        <div class="tk-info-body">
+                            <div class="tk-info-label">Requestor</div>
+                            <div class="tk-info-value">
+                                <div class="tk-info-user">
+                                    <div class="tk-info-avatar">P</div>
+                                    <div>
+                                        <div style="font-size:13px; font-weight:500; color:var(--color-text-primary);">Petey MacGibbon<span class="tk-info-badge">Owner</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tk-info-row">
+                        <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
+                        <div class="tk-info-body">
+                            <div class="tk-info-label">Department</div>
+                            <div class="tk-info-value">24/7 Emergency Paid Support</div>
+                        </div>
+                    </div>
+                    <div class="tk-info-row">
+                        <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                        <div class="tk-info-body">
+                            <div class="tk-info-label">Submitted</div>
+                            <div class="tk-info-value">22/04/2022 <span style="color:var(--color-text-tertiary); font-weight:400;">(09:25)</span></div>
+                        </div>
+                    </div>
+                    <div class="tk-info-row">
+                        <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                        <div class="tk-info-body">
+                            <div class="tk-info-label">Last Updated</div>
+                            <div class="tk-info-value">3 years ago</div>
+                        </div>
+                    </div>
+                    <div class="tk-info-row">
+                        <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+                        <div class="tk-info-body">
+                            <div class="tk-info-label">Priority</div>
+                            <div class="tk-info-value"><span class="tk-prio-pill medium">Medium</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="domains.html">Domains</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="knowledgebase.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Careers</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open><span class="flag">🇺🇸</span><span>English</span><span class="sep">/</span><span>$ USD</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
+        </div>
+    </div>
+</footer>
+
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js"></script>
+<script src="js/apple-layout.js"></script>
+<script>
+// Tab switching
+(function () {
+    const tabs = document.querySelectorAll('.tk-tab');
+    const panels = document.querySelectorAll('.tk-tab-panel');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.getAttribute('data-tab');
+            tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+            panels.forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+            const panel = document.querySelector('[data-panel="' + target + '"]');
+            if (panel) panel.classList.add('active');
+        });
+    });
+
+    // Live line/word counter
+    const ta = document.querySelector('.tk-editor-area');
+    const edLines = document.getElementById('edLines');
+    const edWords = document.getElementById('edWords');
+    if (ta && edLines && edWords) {
+        ta.addEventListener('input', () => {
+            const v = ta.value;
+            edLines.textContent = v.length ? v.split(/\n/).length : 0;
+            const words = v.trim().length ? v.trim().split(/\s+/).length : 0;
+            edWords.textContent = words;
+        });
+    }
+})();
+</script>
 </body>
 </html>

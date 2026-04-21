@@ -1,0 +1,149 @@
+<!-- Shared promo slider — 9 unique store pages.
+     Auto-cycles every 5.5s (driven by apple-layout.js).
+     Layout auto-adapts via CSS container queries:
+       · narrow container (sidebar 240px) → vertical stack
+       · wide container (main column 400+px) → horizontal (icon left, text right) -->
+<div class="card promo-slider" data-slider>
+    <div class="promo-slider-viewport">
+        <div class="promo-slider-track">
+
+            <!-- 1. Site Builder -->
+            <div class="promo-slide">
+                <div class="promo-slide-info">
+                    <p class="promo-slide-label">Site Builder</p>
+                </div>
+                <div class="promo-slide-visual">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                </div>
+                <div class="promo-slide-info">
+                    <p class="promo-slide-copy">Build a professional website — no code required. Free until you publish.</p>
+                    <a href="site-builder.html" class="promo-slide-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+            </div>
+
+            <!-- 2. CodeGuard / Website Backup -->
+            <div class="promo-slide">
+                <div class="promo-slide-info">
+                    <p class="promo-slide-label">Website Backup</p>
+                </div>
+                <div class="promo-slide-visual">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                </div>
+                <div class="promo-slide-info">
+                    <p class="promo-slide-copy">Daily automated backups with one-click restore. Peace of mind for your site.</p>
+                    <a href="website-backup.html" class="promo-slide-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+            </div>
+
+            <!-- 3. SiteLock / Website Security -->
+            <div class="promo-slide">
+                <div class="promo-slide-info">
+                    <p class="promo-slide-label">Website Security</p>
+                </div>
+                <div class="promo-slide-visual">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="promo-slide-info">
+                    <p class="promo-slide-copy">Stop malware, hacks and brute-force attacks before they reach your site.</p>
+                    <a href="website-security.html" class="promo-slide-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+            </div>
+
+            <!-- 4. Marketgoo / SEO Tools -->
+            <div class="promo-slide">
+                <div class="promo-slide-info">
+                    <p class="promo-slide-label">SEO Tools</p>
+                </div>
+                <div class="promo-slide-visual">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><polyline points="7 14 12 9 16 13 21 8"/></svg>
+                </div>
+                <div class="promo-slide-info">
+                    <p class="promo-slide-copy">Step-by-step SEO plan tailored to your site — grow organic traffic.</p>
+                    <a href="seo-tools.html" class="promo-slide-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+            </div>
+
+            <!-- 5. Professional Email -->
+            <div class="promo-slide">
+                <div class="promo-slide-info">
+                    <p class="promo-slide-label">Professional Email</p>
+                </div>
+                <div class="promo-slide-visual">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+                </div>
+                <div class="promo-slide-info">
+                    <p class="promo-slide-copy">Reliable, affordable email with collaboration tools for your business.</p>
+                    <a href="email.html" class="promo-slide-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+            </div>
+
+            <!-- 6. NordVPN -->
+            <div class="promo-slide">
+                <div class="promo-slide-info">
+                    <p class="promo-slide-label">NordVPN</p>
+                </div>
+                <div class="promo-slide-visual">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                </div>
+                <div class="promo-slide-info">
+                    <p class="promo-slide-copy">Private, encrypted browsing across all your devices. Fast global servers.</p>
+                    <a href="nordvpn.html" class="promo-slide-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+            </div>
+
+            <!-- 7. SocialBee -->
+            <div class="promo-slide">
+                <div class="promo-slide-info">
+                    <p class="promo-slide-label">SocialBee</p>
+                </div>
+                <div class="promo-slide-visual">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 00-9.33-5"/><path d="M6 16a6 6 0 009.33 5"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <div class="promo-slide-info">
+                    <p class="promo-slide-copy">Plan, schedule, and grow your social presence from a single dashboard.</p>
+                    <a href="socialbee.html" class="promo-slide-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+            </div>
+
+            <!-- 8. SSL Certificates -->
+            <div class="promo-slide">
+                <div class="promo-slide-info">
+                    <p class="promo-slide-label">SSL Certificates</p>
+                </div>
+                <div class="promo-slide-visual">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+                </div>
+                <div class="promo-slide-info">
+                    <p class="promo-slide-copy">Encrypt traffic, earn trust, and improve SEO with a trusted SSL certificate.</p>
+                    <a href="ssl-certificates.html" class="promo-slide-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+            </div>
+
+            <!-- 9. 360 Monitoring -->
+            <div class="promo-slide">
+                <div class="promo-slide-info">
+                    <p class="promo-slide-label">360 Monitoring</p>
+                </div>
+                <div class="promo-slide-visual">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="promo-slide-info">
+                    <p class="promo-slide-copy">Monitor uptime, performance and SSL health — get alerted the moment anything breaks.</p>
+                    <a href="monitoring-360.html" class="promo-slide-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="promo-slider-dots" role="tablist">
+        <button type="button" class="promo-slider-dot active" data-slide-to="0" aria-label="Site Builder"></button>
+        <button type="button" class="promo-slider-dot" data-slide-to="1" aria-label="Website Backup"></button>
+        <button type="button" class="promo-slider-dot" data-slide-to="2" aria-label="Website Security"></button>
+        <button type="button" class="promo-slider-dot" data-slide-to="3" aria-label="SEO Tools"></button>
+        <button type="button" class="promo-slider-dot" data-slide-to="4" aria-label="Professional Email"></button>
+        <button type="button" class="promo-slider-dot" data-slide-to="5" aria-label="NordVPN"></button>
+        <button type="button" class="promo-slider-dot" data-slide-to="6" aria-label="SocialBee"></button>
+        <button type="button" class="promo-slider-dot" data-slide-to="7" aria-label="SSL Certificates"></button>
+        <button type="button" class="promo-slider-dot" data-slide-to="8" aria-label="360 Monitoring"></button>
+    </div>
+</div>

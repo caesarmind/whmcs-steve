@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostnodes — Hosting, redesigned</title>
+    <link rel="stylesheet" href="css/apple-theme.css">
+    <style>body { display: block; }</style>
+</head>
+<body class="homepage-layout">
+
+<nav class="homepage-nav"><div class="homepage-nav-inner">
+    <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
+    <a href="#">Hostnodes</a><div class="nav-item-dropdown"><a href="#" class="nav-dropdown-trigger">Features <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-mega-menu"><div class="nav-mega-inner"><div class="nav-mega-col"><h4>Platform</h4><a href="cloud-hosting.html" class="nav-mega-item"><div class="name">Cloud Hosting</div><div class="tag">Isolated containers on Google Cloud</div></a><a href="vps.html" class="nav-mega-item"><div class="name">VPS</div><div class="tag">Full root, dedicated resources</div></a></div><div class="nav-mega-col"><h4>Tools</h4><a href="website-builder.html" class="nav-mega-item"><div class="name">Website Builder</div><div class="tag">Drag and drop, 200+ templates</div></a><a href="email.html" class="nav-mega-item"><div class="name">Professional Email</div><div class="tag">Custom domain, 50GB mailbox</div></a></div><div class="nav-mega-col"><h4>Get Started</h4><a href="support-page.html" class="nav-mega-item"><div class="name">Talk to Sales</div><div class="tag">Get expert advice</div></a></div></div></div></div><a href="#pricing">Pricing</a><a href="domains.html">Domains</a><a href="support-page.html">Support</a>
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg></a>
+    <div class="nav-lang-wrapper">
+        <a href="#" class="icon-btn" onclick="toggleLangMenu(event)" aria-label="Language and region" aria-haspopup="true" aria-expanded="false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></a>
+        <div class="nav-lang-menu" id="navLangMenu" role="menu">
+            <div class="nav-lang-menu-header">Language &amp; Region</div>
+            <a href="#" class="nav-lang-item active" role="menuitem"><span class="lang-flag">🇺🇸</span><div class="lang-info"><div class="lang-name">English</div><div class="lang-region">United States</div></div><span class="lang-check">✓</span></a>
+            <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇬🇧</span><div class="lang-info"><div class="lang-name">English</div><div class="lang-region">United Kingdom</div></div><span class="lang-check">✓</span></a>
+            <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇩🇪</span><div class="lang-info"><div class="lang-name">Deutsch</div><div class="lang-region">Deutschland</div></div><span class="lang-check">✓</span></a>
+            <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇫🇷</span><div class="lang-info"><div class="lang-name">Français</div><div class="lang-region">France</div></div><span class="lang-check">✓</span></a>
+            <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇪🇸</span><div class="lang-info"><div class="lang-name">Español</div><div class="lang-region">España</div></div><span class="lang-check">✓</span></a>
+            <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇯🇵</span><div class="lang-info"><div class="lang-name">日本語</div><div class="lang-region">日本</div></div><span class="lang-check">✓</span></a>
+            <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇰🇷</span><div class="lang-info"><div class="lang-name">한국어</div><div class="lang-region">대한민국</div></div><span class="lang-check">✓</span></a>
+            <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇨🇳</span><div class="lang-info"><div class="lang-name">简体中文</div><div class="lang-region">中国</div></div><span class="lang-check">✓</span></a>
+            <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇧🇷</span><div class="lang-info"><div class="lang-name">Português</div><div class="lang-region">Brasil</div></div><span class="lang-check">✓</span></a>
+        </div>
+    </div>
+    <a href="#" onclick="toggleDarkMode(); return false;" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
+    <a href="login.html" class="nav-signin">Sign in</a>
+</div></nav>
+
+<script>
+function toggleLangMenu(e) {
+    e.preventDefault(); e.stopPropagation();
+    const menu = document.getElementById('navLangMenu');
+    const btn = e.currentTarget;
+    const isOpen = menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded', isOpen);
+}
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('navLangMenu');
+    if (menu && !menu.contains(e.target) && !e.target.closest('.nav-lang-wrapper')) {
+        menu.classList.remove('open');
+        const btn = document.querySelector('.nav-lang-wrapper .icon-btn');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+});
+document.querySelectorAll('.nav-lang-item').forEach(function(item) {
+    item.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelectorAll('.nav-lang-item').forEach(function(el) { el.classList.remove('active'); });
+        this.classList.add('active');
+        document.getElementById('navLangMenu').classList.remove('open');
+    });
+});
+</script>
+
+<!-- 1. Hero Centered — "Hosting, redesigned" -->
+<section class="hp-hero" style="padding: 96px 22px 40px; background: transparent;">
+    <div class="hp-eyebrow">PREMIUM MANAGED HOSTING</div>
+    <h1>Hosting,<br>redesigned.</h1>
+    <p class="hp-subhead">Premium managed hosting on Google Cloud — with a free plan to get you started, and room to scale.</p>
+    <div class="hp-cta-row">
+        <a href="clientregister.html" class="hp-buy-btn">Start for free</a>
+        <a href="#how">See how it works ›</a>
+    </div>
+    <div style="display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; padding: 10px 18px; background: var(--color-surface-secondary); border-radius: 999px;">
+        <span style="color: #30d158; font-size: 15px; letter-spacing: 1px;">★★★★★</span>
+        <span style="font-size: 13px; font-weight: 500; color: var(--color-text-primary);"><strong>Trustpilot 4.9</strong> · 2,400+ reviews</span>
+    </div>
+</section>
+
+<!-- 2. Trust Stats Strip -->
+<section class="hp-stats-strip" style="padding: 48px 22px;">
+    <div class="stats-inner">
+        <div class="hp-stat"><div class="stat-num">10K+</div><div class="stat-label">Sites hosted</div></div>
+        <div class="hp-stat"><div class="stat-num">99.9%</div><div class="stat-label">Uptime SLA</div></div>
+        <div class="hp-stat"><div class="stat-num">&lt; 1s</div><div class="stat-label">Average response</div></div>
+        <div class="hp-stat"><div class="stat-num">24/7</div><div class="stat-label">Expert support</div></div>
+    </div>
+</section>
+
+<!-- 3. cPanel comparison — Duo Feature (side-by-side before/after) -->
+<section id="how" style="padding: 72px 22px 24px; text-align: center; max-width: 900px; margin: 0 auto;">
+    <div class="hp-eyebrow" style="color: var(--color-accent);">A BETTER WAY TO HOST</div>
+    <h2 style="font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin: 12px 0;">The modern alternative<br>to cPanel.</h2>
+    <p style="font-size: 17px; color: #6e6e73; max-width: 600px; margin: 0 auto;">Clean, focused, and built for the way teams actually work today.</p>
+</section>
+
+<section class="hp-duo-feature">
+    <div class="hp-duo-card">
+        <p class="duo-text"><strong>The old way.</strong> Cluttered dashboards built in 2004. Shared environments where your neighbor&rsquo;s spike of traffic becomes your 503 error. Legacy infrastructure running on hardware you can&rsquo;t see or choose.</p>
+        <div class="duo-visual duo-visual--left">
+            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #1c1c1e, #2c2c2e); border-radius: 14px; display: flex; align-items: center; justify-content: center; padding: 30px;">
+                <div style="background: #0f0f12; border-radius: 10px; padding: 14px; width: 100%; max-width: 320px; border: 1px solid #2a2a2c;">
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 10px; color: rgba(255,255,255,0.3); text-align: center;">47 menu items · 12 toolbars</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hp-duo-card">
+        <p class="duo-text"><strong>The Hostnodes way.</strong> A clean, focused panel. Fully isolated containers per site. Premium Google Cloud infrastructure with private resources you can measure. Everything is opinionated, so you can stop configuring and start shipping.</p>
+        <div class="duo-visual duo-visual--right">
+            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #0a84ff, #64d2ff); border-radius: 14px; display: flex; align-items: center; justify-content: center; padding: 30px;">
+                <div style="background: #fff; border-radius: 10px; padding: 16px; width: 100%; max-width: 260px; box-shadow: 0 12px 32px rgba(0,0,0,0.2);">
+                    <div style="display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #f5f5f7;">
+                        <div style="width: 8px; height: 8px; background: #30d158; border-radius: 50%;"></div>
+                        <span style="font-size: 11px; font-weight: 600; color: #1d1d1f;">OpenPanel</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><div style="width: 14px; height: 14px; background: rgba(0,113,227,0.1); border-radius: 4px;"></div><span style="font-size: 11px; color: #1d1d1f;">Sites</span></div>
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><div style="width: 14px; height: 14px; background: rgba(48,209,88,0.1); border-radius: 4px;"></div><span style="font-size: 11px; color: #1d1d1f;">Resources</span></div>
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><div style="width: 14px; height: 14px; background: rgba(191,90,242,0.1); border-radius: 4px;"></div><span style="font-size: 11px; color: #1d1d1f;">Backups</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. Isolation — 4-up Icon Grid -->
+<section class="hp-icon-grid" style="padding: 72px 22px 48px;">
+    <div style="grid-column: 1 / -1; text-align: center; max-width: 800px; margin: 0 auto 40px;">
+        <div class="hp-eyebrow" style="color: var(--color-accent);">ISOLATION</div>
+        <h2 style="font-size: 40px; font-weight: 600; letter-spacing: -0.02em; margin: 12px 0;">The sweet spot between<br>shared hosting and VPS.</h2>
+        <p style="font-size: 17px; color: #6e6e73;">VPS-level control. Shared hosting price.</p>
+    </div>
+    <div class="hp-icon-item">
+        <div class="icon-circle blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4.03 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/></svg></div>
+        <h4>MySQL</h4>
+        <p>Dedicated database server per user, fully isolated. No slow queries from other tenants.</p>
+    </div>
+    <div class="hp-icon-item">
+        <div class="icon-circle purple"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <h4>Isolated PHP</h4>
+        <p>Any version, per site. 7.4 through 8.3. Switch in one click without touching the CLI.</p>
+    </div>
+    <div class="hp-icon-item">
+        <div class="icon-circle red"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <h4>Redis</h4>
+        <p>Private cache instance. No resource sharing, no cold keys when the neighbor ships a big update.</p>
+    </div>
+    <div class="hp-icon-item">
+        <div class="icon-circle green"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg></div>
+        <h4>Resources</h4>
+        <p>CPU and RAM capped per container. No noisy neighbors. Your performance is your performance.</p>
+    </div>
+</section>
+
+<!-- 5. OpenPanel Dashboard — Feature Spotlight -->
+<div style="background: var(--color-surface-secondary);">
+<section class="hp-feature-spotlight" style="padding: 72px 22px;">
+    <div class="spotlight-inner" style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: center;">
+        <div>
+            <div class="hp-eyebrow" style="color: var(--color-accent);">OPENPANEL</div>
+            <h2 style="font-size: 44px; font-weight: 600; letter-spacing: -0.02em; margin: 12px 0;">A panel that feels<br>like software from 2026.</h2>
+            <p style="font-size: 17px; color: #6e6e73; line-height: 1.5;">No more clutter. Focused workflows. Real-time metrics. Everything where you&rsquo;d expect it, responsive on any screen.</p>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px;">
+                <div><div style="font-size: 28px; font-weight: 700; color: #1d1d1f;">12</div><div style="font-size: 12px; color: #86868b;">Active sites</div></div>
+                <div><div style="font-size: 28px; font-weight: 700; color: #30d158;">99.9%</div><div style="font-size: 12px; color: #86868b;">Uptime</div></div>
+                <div><div style="font-size: 28px; font-weight: 700; color: #0071e3;">14 GB</div><div style="font-size: 12px; color: #86868b;">Storage used</div></div>
+            </div>
+        </div>
+        <div>
+            <div style="background: #fff; border-radius: 18px; padding: 12px; box-shadow: 0 24px 60px rgba(0,0,0,0.10); overflow: hidden;">
+                <div style="display: flex; gap: 5px; margin-bottom: 10px; padding: 4px 8px;">
+                    <span style="width: 8px; height: 8px; background: #ff453a; border-radius: 50%;"></span>
+                    <span style="width: 8px; height: 8px; background: #ff9f0a; border-radius: 50%;"></span>
+                    <span style="width: 8px; height: 8px; background: #30d158; border-radius: 50%;"></span>
+                </div>
+                <div style="display: grid; grid-template-columns: 140px 1fr; gap: 12px; min-height: 320px;">
+                    <div style="background: #f5f5f7; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+                        <div style="padding: 8px; background: #fff; border-radius: 8px; font-size: 11px; font-weight: 600; color: #0071e3; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+                        <div style="padding: 8px; font-size: 11px; color: #1d1d1f; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>Sites</div>
+                        <div style="padding: 8px; font-size: 11px; color: #1d1d1f; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/></svg>Databases</div>
+                        <div style="padding: 8px; font-size: 11px; color: #1d1d1f; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Email</div>
+                        <div style="padding: 8px; font-size: 11px; color: #1d1d1f; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Backups</div>
+                        <div style="padding: 8px; font-size: 11px; color: #1d1d1f; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                            <div style="background: #f5f5f7; border-radius: 10px; padding: 12px;"><div style="font-size: 10px; color: #86868b;">Active sites</div><div style="font-size: 22px; font-weight: 700; color: #1d1d1f; margin-top: 2px;">12</div></div>
+                            <div style="background: #e8f8ed; border-radius: 10px; padding: 12px;"><div style="font-size: 10px; color: #1a7f37;">Uptime</div><div style="font-size: 22px; font-weight: 700; color: #1a7f37; margin-top: 2px;">99.9%</div></div>
+                            <div style="background: #eaf4ff; border-radius: 10px; padding: 12px;"><div style="font-size: 10px; color: #0071e3;">Storage</div><div style="font-size: 22px; font-weight: 700; color: #0071e3; margin-top: 2px;">14 GB</div></div>
+                        </div>
+                        <div style="background: #f5f5f7; border-radius: 12px; padding: 12px;">
+                            <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 10px;">Your sites</div>
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #fff; border-radius: 8px;"><span style="width: 6px; height: 6px; background: #30d158; border-radius: 50%;"></span><span style="font-size: 11px; color: #1d1d1f; flex: 1;">morganstudio.com</span><span style="font-size: 10px; color: #30d158; font-weight: 600;">Running</span></div>
+                                <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #fff; border-radius: 8px;"><span style="width: 6px; height: 6px; background: #30d158; border-radius: 50%;"></span><span style="font-size: 11px; color: #1d1d1f; flex: 1;">alexmorgan.io</span><span style="font-size: 10px; color: #30d158; font-weight: 600;">Running</span></div>
+                                <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #fff; border-radius: 8px;"><span style="width: 6px; height: 6px; background: #30d158; border-radius: 50%;"></span><span style="font-size: 11px; color: #1d1d1f; flex: 1;">ourstudio.design</span><span style="font-size: 10px; color: #30d158; font-weight: 600;">Running</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+
+<!-- 6. Data Centers — Locations Section -->
+<section class="hp-locations-section" style="padding: 72px 22px;">
+    <h2 style="font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 12px;">Your data, closer to home.</h2>
+    <p class="loc-sub">Both regions run on Google Cloud — premium fibre backbone, low-latency routing, 99.9% uptime SLA.</p>
+    <div class="hp-loc-grid" style="grid-template-columns: 1fr 1fr; max-width: 1000px; margin: 40px auto 0;">
+        <div class="hp-loc-card" style="padding: 32px;">
+            <div class="loc-flag" style="font-size: 42px; margin-bottom: 16px;">🇩🇪</div>
+            <h4 style="font-size: 22px;">Frankfurt, Europe</h4>
+            <p style="margin-bottom: 16px;">Coverage: Europe, Middle East, Africa</p>
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px;">
+                <div style="display: flex; align-items: center; gap: 8px;"><span style="color: #86868b;">Infrastructure ·</span><span style="color: var(--color-text-primary); font-weight: 500;">Google Cloud · europe-west3</span></div>
+                <div style="display: flex; align-items: center; gap: 8px;"><span style="color: #86868b;">Compliance ·</span><span style="color: var(--color-text-primary); font-weight: 500;">GDPR ready</span></div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;"><span style="width: 8px; height: 8px; background: #30d158; border-radius: 50%;"></span><span style="color: #30d158; font-weight: 600; font-size: 12px;">Online</span></div>
+            </div>
+        </div>
+        <div class="hp-loc-card" style="padding: 32px;">
+            <div class="loc-flag" style="font-size: 42px; margin-bottom: 16px;">🇺🇸</div>
+            <h4 style="font-size: 22px;">New York, Americas</h4>
+            <p style="margin-bottom: 16px;">Coverage: North &amp; South America</p>
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px;">
+                <div style="display: flex; align-items: center; gap: 8px;"><span style="color: #86868b;">Infrastructure ·</span><span style="color: var(--color-text-primary); font-weight: 500;">Google Cloud · us-east1</span></div>
+                <div style="display: flex; align-items: center; gap: 8px;"><span style="color: #86868b;">Compliance ·</span><span style="color: var(--color-text-primary); font-weight: 500;">SOC 2 ready</span></div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;"><span style="width: 8px; height: 8px; background: #30d158; border-radius: 50%;"></span><span style="color: #30d158; font-weight: 600; font-size: 12px;">Online</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 7. More to Love — Intel Duo (White-label + Developer Tools) -->
+<section class="hp-intel-duo">
+    <div class="hp-intel-big">
+        <div class="eyebrow">WHITE-LABEL</div>
+        <h2>Hosting that looks like your brand.</h2>
+        <p><strong>Your clients see your brand, not ours.</strong> Customize the panel with your logo, colors, and custom domain. Full white-label from day one — no developer, no design team, no additional cost.</p>
+        <a href="#" class="link">Explore white-label ›</a>
+        <div class="intel-visual" style="display: flex; align-items: center; justify-content: center; padding: 48px; min-height: 320px;">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                <div style="background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); min-width: 140px;">
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;"><div style="width: 22px; height: 22px; background: linear-gradient(135deg, #ff453a, #ff9f0a); border-radius: 6px;"></div><span style="font-size: 11px; font-weight: 600; color: #1d1d1f;">AcmeHost</span></div>
+                    <div style="height: 6px; background: #ffefec; border-radius: 3px; margin-bottom: 4px;"></div>
+                    <div style="height: 6px; background: #f5f5f7; border-radius: 3px; margin-bottom: 4px;"></div>
+                    <div style="height: 6px; background: #f5f5f7; border-radius: 3px;"></div>
+                </div>
+                <div style="background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); min-width: 140px; border: 2px solid #0071e3;">
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;"><div style="width: 22px; height: 22px; background: linear-gradient(135deg, #0071e3, #5ac8fa); border-radius: 6px;"></div><span style="font-size: 11px; font-weight: 600; color: #1d1d1f;">Hostnodes</span></div>
+                    <div style="height: 6px; background: #eaf4ff; border-radius: 3px; margin-bottom: 4px;"></div>
+                    <div style="height: 6px; background: #f5f5f7; border-radius: 3px; margin-bottom: 4px;"></div>
+                    <div style="height: 6px; background: #f5f5f7; border-radius: 3px;"></div>
+                </div>
+                <div style="background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); min-width: 140px;">
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;"><div style="width: 22px; height: 22px; background: linear-gradient(135deg, #30d158, #5cdb79); border-radius: 6px;"></div><span style="font-size: 11px; font-weight: 600; color: #1d1d1f;">StudioHost</span></div>
+                    <div style="height: 6px; background: #e8f8ed; border-radius: 3px; margin-bottom: 4px;"></div>
+                    <div style="height: 6px; background: #f5f5f7; border-radius: 3px; margin-bottom: 4px;"></div>
+                    <div style="height: 6px; background: #f5f5f7; border-radius: 3px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hp-intel-small">
+        <div class="intel-small-shot" style="background: linear-gradient(135deg, #eaf4ff, #dbeafe); display: flex; align-items: center; justify-content: center; padding: 40px;">
+            <div style="background: #fff; border-radius: 14px; padding: 20px; width: 100%; max-width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 12px;">PHP version</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <span style="padding: 6px 12px; background: #0071e3; color: #fff; border-radius: 999px; font-size: 11px; font-weight: 600;">8.3</span>
+                    <span style="padding: 6px 12px; background: #f5f5f7; color: #1d1d1f; border-radius: 999px; font-size: 11px;">8.2</span>
+                    <span style="padding: 6px 12px; background: #f5f5f7; color: #1d1d1f; border-radius: 999px; font-size: 11px;">8.1</span>
+                    <span style="padding: 6px 12px; background: #f5f5f7; color: #1d1d1f; border-radius: 999px; font-size: 11px;">8.0</span>
+                    <span style="padding: 6px 12px; background: #f5f5f7; color: #1d1d1f; border-radius: 999px; font-size: 11px;">7.4</span>
+                </div>
+                <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #f5f5f7; display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #1d1d1f;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>SSH &amp; SFTP access</div>
+                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #1d1d1f;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Redis &amp; Memcached</div>
+                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #1d1d1f;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Auto SSL via Let&rsquo;s Encrypt</div>
+                </div>
+            </div>
+        </div>
+        <div class="intel-small-content">
+            <div class="icon-badge">&lt;/&gt;</div>
+            <h3>Freedom for modern stacks.</h3>
+            <p><strong>Switch PHP versions per site</strong>, manage MySQL, configure Redis, and deploy with SSH. Full control without ever touching the command line — unless you want to.</p>
+        </div>
+    </div>
+</section>
+
+<!-- 8. Audience — Feature Columns (3-up) -->
+<section class="hp-feature-columns" style="padding: 72px 22px;">
+    <h2 style="font-size: 40px;">Made for people who build things.</h2>
+    <p class="feat-sub">Three tools, one platform, infinite ways to ship.</p>
+    <div class="hp-columns-row">
+        <div class="hp-column-item">
+            <div class="col-num">01 · Developers</div>
+            <h4>Your stack, your rules.</h4>
+            <p>Multi-version PHP, SSH, staging environments, and Git-ready workflows. Build your way, deploy your way.</p>
+            <a href="#" class="col-link">Developer docs ›</a>
+        </div>
+        <div class="hp-column-item">
+            <div class="col-num">02 · Agencies</div>
+            <h4>Clients, centralized.</h4>
+            <p>Manage every client from one panel. Isolated sites, white-label branding, effortless migrations, and true user separation.</p>
+            <a href="#" class="col-link">Agency features ›</a>
+        </div>
+        <div class="hp-column-item">
+            <div class="col-num">03 · Online businesses</div>
+            <h4>Reliable, quietly.</h4>
+            <p>Rock-solid uptime, one-click backups, and a clean panel your team can actually use. No sysadmin required.</p>
+            <a href="#" class="col-link">For business ›</a>
+        </div>
+    </div>
+</section>
+
+<!-- 9. Pricing — Segmented Bar (4 tiers) -->
+<section class="hp-pricing-segmented" id="pricing">
+    <h2 style="font-size: 44px;">Start free. Scale when ready.</h2>
+    <p class="sub">Premium hosting with a genuinely free plan — no credit card, no time limit.</p>
+    <div class="hp-segmented-bar" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="hp-seg-col">
+            <div class="tier">Free</div>
+            <div class="price">$0<span class="per">forever</span></div>
+            <div class="desc">No credit card needed</div>
+            <ul class="seg-features">
+                <li>1 website</li>
+                <li>2 GB SSD</li>
+                <li>Free SSL</li>
+                <li>1 location</li>
+            </ul>
+            <a href="clientregister.html" class="buy">Start Free</a>
+        </div>
+        <div class="hp-seg-col">
+            <div class="tier">Starter</div>
+            <div class="price">$9<span class="per">/mo</span></div>
+            <div class="desc">Personal &amp; side projects</div>
+            <ul class="seg-features">
+                <li>5 websites</li>
+                <li>10 GB SSD</li>
+                <li>Free SSL</li>
+                <li>Daily backups</li>
+            </ul>
+            <a href="clientregister.html" class="buy">Choose Starter</a>
+        </div>
+        <div class="hp-seg-col highlight">
+            <div class="tier">Pro</div>
+            <div class="price">$29<span class="per">/mo</span></div>
+            <div class="desc">Most popular for studios</div>
+            <ul class="seg-features">
+                <li>Unlimited sites</li>
+                <li>50 GB SSD</li>
+                <li>White-label</li>
+                <li>Priority support</li>
+                <li>Staging environments</li>
+            </ul>
+            <a href="clientregister.html" class="buy">Choose Pro</a>
+        </div>
+        <div class="hp-seg-col">
+            <div class="tier">Agency</div>
+            <div class="price">$79<span class="per">/mo</span></div>
+            <div class="desc">Agencies &amp; resellers</div>
+            <ul class="seg-features">
+                <li>Unlimited clients</li>
+                <li>200 GB SSD</li>
+                <li>Custom domain panel</li>
+                <li>Account manager</li>
+            </ul>
+            <a href="clientregister.html" class="buy">Choose Agency</a>
+        </div>
+    </div>
+    <p style="text-align: center; font-size: 14px; color: #6e6e73; margin-top: 32px;">Annual plans save 20%. <a href="#" style="color: var(--color-accent);">See full pricing &amp; add-ons ›</a></p>
+</section>
+
+<!-- 10. Testimonials — Star Rating Block -->
+<section class="hp-testi-reviews">
+    <div class="big-stars">★★★★★</div>
+    <div class="rating-num">4.9</div>
+    <div class="rating-of">out of 5 from 2,400+ verified Trustpilot reviews</div>
+    <div class="review-sources">
+        <div class="rev-src"><div class="stars">★★★★★</div><div class="src-name">Trustpilot</div><div class="src-count">2,400+ reviews</div></div>
+        <div class="rev-src"><div class="stars">★★★★★</div><div class="src-name">G2</div><div class="src-count">890 reviews</div></div>
+        <div class="rev-src"><div class="stars">★★★★★</div><div class="src-name">Product Hunt</div><div class="src-count">520 reviews</div></div>
+        <div class="rev-src"><div class="stars">★★★★★</div><div class="src-name">Indie Hackers</div><div class="src-count">310 reviews</div></div>
+    </div>
+</section>
+
+<!-- 11. Final CTA — Full-Bleed Immersive -->
+<section class="hp-cta-immersive">
+    <div class="inner">
+        <h2>Launch on hosting<br>that feels modern.</h2>
+        <p>Start free today — no card needed. Upgrade when you&rsquo;re ready.</p>
+        <a href="clientregister.html" class="btn">Start for free</a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="hp-footer">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-legal">
+            Premium web hosting on Google Cloud — with a genuinely free plan, isolated environments, and no cPanel clutter.<br><br>
+            Rated 4.9 on Trustpilot. Powered by OpenPanel.
+        </div>
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Product</h4><ul><li><a href="#">Features</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#">Free hosting plan</a></li><li><a href="#">About</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security &amp; Tools</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="email-services.html">Email Services</a></li><li><a href="website-security.html">Website Security</a></li><li><a href="website-backup.html">Website Backup</a></li><li><a href="seo-tools.html">SEO Tools</a></li><li><a href="xovi-now.html">XOVI Now</a></li><li><a href="monitoring-360.html">360 Monitoring</a></li><li><a href="sitelock-vpn.html">SiteLock VPN</a></li><li><a href="nordvpn.html">NordVPN</a></li><li><a href="socialbee.html">SocialBee</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Compare</h4><ul><li><a href="#">cPanel vs Hostnodes</a></li><li><a href="#">VPS vs Hostnodes</a></li><li><a href="#">Free premium hosting</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li><li><a href="clientregister.html">Create an account</a></li><li><a href="#">Billing</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="support-page.html">Knowledgebase</a></li><li><a href="#">Contact us</a></li><li><a href="#">hello@hostnodes.com</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div>&copy; 2026 Hostnodes. Powered by OpenPanel.</div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Legal</a></div>
+        </div>
+    </div>
+</footer>
+
+<script src="js/apple-theme.js"></script>
+</body>
+</html>

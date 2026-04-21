@@ -1,0 +1,55 @@
+<!-- Language + currency modal. Opened by any [data-locale-open]
+     button on the page; wired up in apple-layout.js. -->
+<div class="locale-modal" id="localeModal" role="dialog" aria-modal="true" aria-labelledby="localeModalTitle">
+    <div class="locale-modal-panel">
+        <div class="locale-modal-header">
+            <h3 id="localeModalTitle">Choose language &amp; currency</h3>
+            <button type="button" class="locale-modal-close" id="localeModalClose" aria-label="Close">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="locale-modal-body">
+            <div class="locale-modal-section-label">Language</div>
+            <div class="locale-grid" role="radiogroup" aria-label="Language">
+                <button type="button" data-lang="arabic">العربية</button>
+                <button type="button" data-lang="azerbaijani">Azerbaijani</button>
+                <button type="button" data-lang="catalan">Català</button>
+                <button type="button" data-lang="chinese">中文</button>
+                <button type="button" data-lang="croatian">Hrvatski</button>
+                <button type="button" data-lang="czech">Čeština</button>
+                <button type="button" data-lang="danish">Dansk</button>
+                <button type="button" data-lang="dutch">Nederlands</button>
+                <button type="button" data-lang="english" class="active">English</button>
+                <button type="button" data-lang="estonian">Estonian</button>
+                <button type="button" data-lang="farsi">Persian</button>
+                <button type="button" data-lang="french">Français</button>
+                <button type="button" data-lang="german">Deutsch</button>
+                <button type="button" data-lang="hebrew">עברית</button>
+                <button type="button" data-lang="hungarian">Magyar</button>
+                <button type="button" data-lang="italian">Italiano</button>
+                <button type="button" data-lang="macedonian">Macedonian</button>
+                <button type="button" data-lang="norwegian">Norwegian</button>
+                <button type="button" data-lang="portuguese-br">Português (BR)</button>
+                <button type="button" data-lang="portuguese">Português</button>
+                <button type="button" data-lang="romanian">Română</button>
+                <button type="button" data-lang="russian">Русский</button>
+                <button type="button" data-lang="spanish">Español</button>
+                <button type="button" data-lang="swedish">Svenska</button>
+                <button type="button" data-lang="turkish">Türkçe</button>
+                <button type="button" data-lang="ukrainian">Українська</button>
+            </div>
+            <div class="locale-modal-section-label">Currency</div>
+            <div class="locale-grid" role="radiogroup" aria-label="Currency">
+                <button type="button" data-currency="usd" class="active">$ USD</button>
+                <button type="button" data-currency="eur">€ EUR</button>
+                <button type="button" data-currency="gbp">£ GBP</button>
+                <button type="button" data-currency="cad">$ CAD</button>
+                <button type="button" data-currency="aud">$ AUD</button>
+                <button type="button" data-currency="jpy">¥ JPY</button>
+            </div>
+        </div>
+        <div class="locale-modal-footer">
+            <button type="button" class="apply" id="localeApply">Apply</button>
+        </div>
+    </div>
+</div>

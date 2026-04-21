@@ -71,32 +71,56 @@ Sidebar items with `getExtra('mobileSelect')` render as a `<select>` dropdown on
 | `->getAttribute('target')` | Link target (_blank, etc.) |
 | `->getExtra('mobileSelect')` | Render as select on mobile |
 
+### MenuItem Writer Methods
+
+These methods are used in hooks to modify the navigation. They support chaining (return self).
+
+| Method | Description |
+|--------|-------------|
+| `->setLabel($text)` | Set display text |
+| `->setUri($url)` | Set link URL |
+| `->setOrder($int)` | Set numeric position (defaults: 10, 20, 30...) |
+| `->setIcon($class)` | Set FontAwesome icon class |
+| `->setBadge($text)` | Set badge text |
+| `->setHidden($bool)` | Hide/show item |
+| `->setDisabled($bool)` | Disable/enable item |
+| `->setClass($class)` | Set CSS class |
+| `->setExtra($key, $value)` | Set extra data (color, btn-link, etc.) |
+| `->setAttribute($key, $value)` | Set HTML attribute |
+| `->addChild($name, $config = [])` | Add child item (returns new MenuItem, chainable) |
+| `->removeChild($name)` | Remove child by name |
+| `->getChild($name)` | Get child by name (null if not found) |
+| `->moveUp()` | Move one position up |
+| `->moveDown()` | Move one position down |
+| `->moveToFront()` | Move to first position |
+| `->moveToBack()` | Move to last position |
+
 ### Customizing Sidebars via Hooks
 
 ```php
+<?php
+use WHMCS\View\Menu\Item as MenuItem;
+
 add_hook('ClientAreaPrimarySidebar', 1, function (MenuItem $primarySidebar) {
-    // Find sidebar items
     $myAccount = $primarySidebar->getChild('My Account');
     
-    // Change label
+    // Customize existing items
     $myAccount->getChild('Billing Information')
-        ->setLabel('Payment Details');
+        ->setLabel('Payment Details')
+        ->setUri('/custom-billing')
+        ->setOrder(5);
     
-    // Change URL
-    $myAccount->getChild('Billing Information')
-        ->setUri('/custom-billing');
+    // Add new item with icon
+    $myAccount->addChild('loyalty')
+        ->setLabel('Loyalty Rewards')
+        ->setUri('/rewards')
+        ->setIcon('fas fa-gift')
+        ->setBadge('5');
     
-    // Reorder (defaults are 10, 20, 30...)
-    $myAccount->getChild('Billing Information')
-        ->setOrder(100);
+    // Remove default item
+    $myAccount->removeChild('Change Password');
     
-    // Add new item
-    $myAccount->addChild('Custom Item')
-        ->setLabel('My Custom Page')
-        ->setUri('/custom-page')
-        ->setOrder(50);
-    
-    // Remove item
-    $myAccount->removeChild('Billing Information');
+    // Mobile select rendering
+    $myAccount->setExtra('mobileSelect', true);
 });
 ```

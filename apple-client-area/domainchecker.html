@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Search — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css">
+    <style>body { display: block; }</style>
+</head>
+<body class="homepage-layout">
+
+<nav class="homepage-nav"><div class="homepage-nav-inner">
+    <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
+    <a href="#">WHMCS</a>
+    <a href="cloud-hosting.html">Hosting</a>
+    <a href="domains.html">Domains</a>
+    <a href="ssl-certificates.html">SSL</a>
+    <a href="support-page.html">Support</a>
+    <div class="nav-spacer"></div>
+    <a href="cart.html" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin">Sign in</a>
+</div></nav>
+
+<!-- Hero + Search -->
+<section class="ds-hero">
+    <div class="ds-hero-inner">
+        <h1>Search domains.</h1>
+        <p class="ds-hero-sub">Check availability across hundreds of extensions in real time.</p>
+
+        <form class="ds-search-form" onsubmit="event.preventDefault();">
+            <div class="ds-search-box">
+                <svg class="ds-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" class="ds-search-input" placeholder="yourdomain.com" value="mystartup" aria-label="Search for a domain">
+                <button type="submit" class="ds-generate-btn">Search</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Results for primary lookup -->
+<section class="ds-section">
+    <div class="ds-result-card unavailable">
+        <div class="ds-result-left">
+            <div class="ds-check-badge" style="background: var(--color-red-bg); color: var(--color-red-text);" aria-label="Unavailable">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="ds-result-info">
+                <div class="ds-result-name"><strong>mystartup.com</strong> <span class="ds-available-text" style="color: var(--color-red-text);">is not available.</span></div>
+                <div class="ds-result-meta">
+                    <span class="ds-result-note">Try one of the suggested alternatives below or transfer if you already own it.</span>
+                </div>
+            </div>
+        </div>
+        <a href="cart-domain-transfer.html" class="ds-add-btn outline">Transfer instead</a>
+    </div>
+</section>
+
+<!-- Alternative extensions -->
+<section class="ds-section">
+    <div class="ds-section-head">
+        <h2>Alternatives available.</h2>
+        <p>These extensions are free to register right now.</p>
+    </div>
+    <div class="ds-suggested-list">
+        <div class="ds-sug-row">
+            <div class="ds-sug-name">mystartup<span class="tld">.io</span> <span class="ds-sug-chip new">Popular</span></div>
+            <div class="ds-sug-actions">
+                <select class="ds-sug-term" aria-label="Registration term">
+                    <option>$44.99 / 1yr</option>
+                    <option>$84.98 / 2yr</option>
+                </select>
+                <a href="cart.html" class="ds-add-btn primary">Add to cart</a>
+            </div>
+        </div>
+        <div class="ds-sug-row">
+            <div class="ds-sug-name">mystartup<span class="tld">.co</span> <span class="ds-sug-chip sale">Sale</span></div>
+            <div class="ds-sug-actions">
+                <select class="ds-sug-term" aria-label="Registration term">
+                    <option>$19.99 / 1yr</option>
+                    <option>$34.99 / 2yr</option>
+                </select>
+                <a href="cart.html" class="ds-add-btn outline">Add to cart</a>
+            </div>
+        </div>
+        <div class="ds-sug-row">
+            <div class="ds-sug-name">mystartup<span class="tld">.app</span></div>
+            <div class="ds-sug-actions">
+                <select class="ds-sug-term" aria-label="Registration term">
+                    <option>$24.99 / 1yr</option>
+                </select>
+                <a href="cart.html" class="ds-add-btn outline">Add to cart</a>
+            </div>
+        </div>
+        <div class="ds-sug-row">
+            <div class="ds-sug-name">mystartup<span class="tld">.dev</span></div>
+            <div class="ds-sug-actions">
+                <select class="ds-sug-term" aria-label="Registration term">
+                    <option>$19.99 / 1yr</option>
+                </select>
+                <a href="cart.html" class="ds-add-btn outline">Add to cart</a>
+            </div>
+        </div>
+        <div class="ds-sug-row">
+            <div class="ds-sug-name">mystartup<span class="tld">.xyz</span> <span class="ds-sug-chip sale">Sale</span></div>
+            <div class="ds-sug-actions">
+                <select class="ds-sug-term" aria-label="Registration term">
+                    <option>$2.99 / 1yr</option>
+                </select>
+                <a href="cart.html" class="ds-add-btn outline">Add to cart</a>
+            </div>
+        </div>
+        <div class="ds-sug-row">
+            <div class="ds-sug-name">mystartup<span class="tld">.net</span></div>
+            <div class="ds-sug-actions">
+                <select class="ds-sug-term" aria-label="Registration term">
+                    <option>$14.99 / 1yr</option>
+                </select>
+                <a href="cart.html" class="ds-add-btn outline">Add to cart</a>
+            </div>
+        </div>
+        <div class="ds-sug-row">
+            <div class="ds-sug-name">mystartup<span class="tld">.org</span></div>
+            <div class="ds-sug-actions">
+                <select class="ds-sug-term" aria-label="Registration term">
+                    <option>$13.99 / 1yr</option>
+                </select>
+                <a href="cart.html" class="ds-add-btn outline">Add to cart</a>
+            </div>
+        </div>
+        <div class="ds-sug-row">
+            <div class="ds-sug-name">getmystartup<span class="tld">.com</span></div>
+            <div class="ds-sug-actions">
+                <select class="ds-sug-term" aria-label="Registration term">
+                    <option>$11.99 / 1yr</option>
+                </select>
+                <a href="cart.html" class="ds-add-btn outline">Add to cart</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="js/apple-theme.js"></script>
+</body>
+</html>

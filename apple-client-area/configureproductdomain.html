@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Options — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css">
+    <style>body { display: block; }</style>
+</head>
+<body class="homepage-layout">
+
+<nav class="homepage-nav"><div class="homepage-nav-inner">
+    <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
+    <a href="#">WHMCS</a>
+    <a href="cloud-hosting.html">Hosting</a>
+    <a href="domains.html">Domains</a>
+    <a href="ssl-certificates.html">SSL</a>
+    <a href="support-page.html">Support</a>
+    <div class="nav-spacer"></div>
+    <a href="cart.html" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin">Sign in</a>
+</div></nav>
+
+<section style="max-width: 900px; margin: 0 auto; padding: 50px 22px 80px;">
+    <div style="margin-bottom: 28px;">
+        <a href="configureproduct.html" style="font-size: 13px; color: var(--color-text-secondary); text-decoration: none;">← Back</a>
+        <h1 style="font-size: 36px; letter-spacing: -0.03em; font-weight: 600; margin: 8px 0 4px;">Domain configuration.</h1>
+        <p style="color: var(--color-text-secondary); font-size: 17px;">Manage nameservers, contact info, and add-on domain services.</p>
+    </div>
+
+    <div class="card" style="margin-bottom: 16px;">
+        <div class="card-header"><h2 class="card-title">hendersondesign.com</h2></div>
+        <div class="card-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Registration period</label>
+                    <select class="form-select">
+                        <option>1 year — $11.99</option>
+                        <option selected>2 years — $22.96</option>
+                        <option>3 years — $33.94</option>
+                        <option>5 years — $55.88</option>
+                        <option>10 years — $110.76</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Auto-renew</label>
+                    <select class="form-select">
+                        <option>Enabled — renew automatically</option>
+                        <option>Disabled — I'll manage manually</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 16px;">
+        <div class="card-header"><h2 class="card-title">Nameservers</h2></div>
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <label style="padding: 14px; border: 2px solid var(--color-accent); border-radius: 12px; cursor: pointer;">
+                    <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Use our nameservers</div>
+                    <div style="font-size: 12px; color: var(--color-text-tertiary);">ns1.whmcs-apple.net, ns2.whmcs-apple.net</div>
+                </label>
+                <label style="padding: 14px; border: 1px solid var(--color-border-card); border-radius: 12px; cursor: pointer;">
+                    <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Custom nameservers</div>
+                    <div style="font-size: 12px; color: var(--color-text-tertiary);">Enter your own DNS servers</div>
+                </label>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nameserver 1</label>
+                    <input type="text" class="form-input" value="ns1.whmcs-apple.net" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nameserver 2</label>
+                    <input type="text" class="form-input" value="ns2.whmcs-apple.net" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nameserver 3 (optional)</label>
+                    <input type="text" class="form-input" placeholder="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nameserver 4 (optional)</label>
+                    <input type="text" class="form-input" placeholder="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 16px;">
+        <div class="card-header"><h2 class="card-title">Addons for this domain</h2></div>
+        <div class="card-body">
+            <div class="settings-item">
+                <div class="settings-item-info">
+                    <div class="settings-item-label">ID Protection <span style="background: var(--color-green-bg); color: var(--color-green-text); font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; margin-left: 6px;">Free</span></div>
+                    <div class="settings-item-desc">Hide your personal info from public WHOIS</div>
+                </div>
+                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+            </div>
+            <div class="settings-item">
+                <div class="settings-item-info">
+                    <div class="settings-item-label">DNS Management</div>
+                    <div class="settings-item-desc">$4.99/yr · Advanced DNS editor with unlimited records</div>
+                </div>
+                <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+            </div>
+            <div class="settings-item">
+                <div class="settings-item-info">
+                    <div class="settings-item-label">Email Forwarding</div>
+                    <div class="settings-item-desc">$2.99/yr · Forward email from your domain to any address</div>
+                </div>
+                <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <a href="configureproduct.html" class="btn-secondary btn-lg">Back</a>
+        <a href="cart.html" class="btn-primary btn-lg">Continue to cart →</a>
+    </div>
+</section>
+
+<script src="js/apple-theme.js"></script>
+</body>
+</html>

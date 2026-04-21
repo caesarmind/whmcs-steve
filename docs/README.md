@@ -48,11 +48,30 @@ This documentation is a comprehensive, developer-focused reference for creating 
 | [Error Pages](/templates/error.md) | Error templates (Smarty and non-Smarty) |
 | [PDF Templates](/templates/pdf.md) | Invoice/quote PDF generation (PHP, not Smarty) |
 
+### API Reference
+
+| Topic | Description |
+|-------|-------------|
+| [Object API](/reference/object-api.md) | Complete WHMCS object methods (Client, Product, Pricing, MenuItem, SSL, etc.) |
+| [Complete Hook Reference](/reference/hooks.md) | All 382+ WHMCS 9 hooks grouped by category |
+| [Language Keys](/reference/language-keys.md) | 2,470+ language keys used in Nexus grouped by feature |
+| [System Output Variables](/reference/system-output.md) | What `$headoutput`/`$footeroutput` actually contain |
+
+### Starter Templates
+
+| Topic | Description |
+|-------|-------------|
+| [Minimum Theme](/starter/minimum-theme.md) | Create a working theme with just 2 files |
+| [Skeleton Files](/starter/skeleton-files.md) | Full directory structure reference |
+| [Header Template](/starter/header-template.md) | Complete `header.tpl` walkthrough + code |
+| [Footer Template](/starter/footer-template.md) | Complete `footer.tpl` walkthrough + code |
+| [Template Fallback](/starter/template-fallback.md) | How WHMCS resolves templates child→parent |
+
 ### Advanced
 
 | Topic | Description |
 |-------|-------------|
-| [Hooks Reference](/advanced/hooks.md) | Navigation, sidebar, and page variable hooks |
+| [Hooks Reference](/advanced/hooks.md) | Navigation, sidebar, and page variable hooks (quick intro) |
 | [Best Practices](/advanced/best-practices.md) | Common pitfalls, debugging, performance |
 
 ## Tech Stack

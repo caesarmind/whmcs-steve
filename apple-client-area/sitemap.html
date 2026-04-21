@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitemap - WHMCS Apple Theme (105 Pages)</title>
+    <title>Sitemap - WHMCS Apple Theme (145 Pages)</title>
     <link rel="stylesheet" href="css/apple-theme.css">
     <style>
         body { display: block; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--color-bg); color: var(--color-text-primary); margin: 0; padding: 0; }
@@ -30,6 +30,14 @@
         .badge-client { background: rgba(48,209,88,0.1); color: #248a3d; }
         .badge-store { background: rgba(255,159,10,0.1); color: #a85b00; }
         .badge-error { background: rgba(255,59,48,0.1); color: #ff3b30; }
+        .badge-dev { background: rgba(142,142,147,0.12); color: #6e6e73; }
+        .badge-missing { background: rgba(255,149,0,0.12); color: #a85b00; }
+        .badge-redesign { background: rgba(48,209,88,0.14); color: #248a3d; }
+        .sitemap-link .link-redesign { font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 4px; margin-left: 6px; background: rgba(48,209,88,0.14); color: #248a3d; letter-spacing: 0.02em; }
+        .sitemap-link.missing { opacity: 0.75; cursor: not-allowed; }
+        .sitemap-link.missing:hover { background: rgba(255,149,0,0.06); }
+        .sitemap-link.missing .link-name { text-decoration: line-through; text-decoration-color: rgba(255,149,0,0.4); }
+        .missing-note { font-size: 13px; color: var(--color-text-tertiary); margin: 4px 0 16px; line-height: 1.5; }
         .dark-toggle { position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--color-border); background: var(--color-surface); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(0,0,0,0.08); z-index: 100; }
         .dark-toggle svg { width: 18px; height: 18px; color: var(--color-text-secondary); }
     </style>
@@ -41,20 +49,65 @@
         <h1>WHMCS Apple Theme</h1>
         <p>Complete page index with direct links. Open via <code>http://localhost:3002/sitemap.html</code></p>
         <div class="sitemap-stats">
-            <div class="sitemap-stat"><div class="num">106</div><div class="label">Total Pages</div></div>
-            <div class="sitemap-stat"><div class="num">13</div><div class="label">Public Marketing</div></div>
-            <div class="sitemap-stat"><div class="num">70</div><div class="label">Client Area</div></div>
-            <div class="sitemap-stat"><div class="num">16</div><div class="label">Store</div></div>
-            <div class="sitemap-stat"><div class="num">4</div><div class="label">Error Pages</div></div>
+            <div class="sitemap-stat"><div class="num">145</div><div class="label">Built Pages</div></div>
+            <div class="sitemap-stat"><div class="num">18</div><div class="label">Public Marketing</div></div>
+            <div class="sitemap-stat"><div class="num">83</div><div class="label">Client Area</div></div>
+            <div class="sitemap-stat"><div class="num">28</div><div class="label">Store</div></div>
+            <div class="sitemap-stat"><div class="num">6</div><div class="label">Error Pages</div></div>
+            <div class="sitemap-stat"><div class="num" style="color:#30d158">15</div><div class="label">Apple Redesign v2</div></div>
+        </div>
+    </div>
+
+    <!-- Apple Redesign v2 — shared-layout pages -->
+    <div class="sitemap-section" style="padding: 20px 24px; background: linear-gradient(180deg, rgba(48,209,88,0.06), rgba(48,209,88,0.02)); border: 1px solid rgba(48,209,88,0.18); border-radius: 14px; margin-bottom: 40px;">
+        <h2 style="display: flex; align-items: center; gap: 10px;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(48,209,88,0.18); color: #248a3d;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Apple Redesign v2
+            <span style="font-size: 13px; font-weight: 500; color: #248a3d; margin-left: 4px;">15 pages on the shared layout</span>
+        </h2>
+        <div class="section-count" style="color: var(--color-text-secondary);">Shared <code>apple-layout.css</code> + partials · state-chip dev tool · palette-aware · sub-nav primitives · unified Billing &amp; Your Profile sidebars</div>
+
+        <h3 style="font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--color-text-secondary);">Billing (6)</h3>
+        <div class="sitemap-grid">
+            <a href="clientareainvoices.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">My Invoices</span><span class="link-redesign">v2</span></a>
+            <a href="viewinvoice.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">View Invoice</span><span class="link-redesign">v2</span></a>
+            <a href="clientareaquotes.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">My Quotes</span><span class="link-redesign">v2</span></a>
+            <a href="clientareaaddfunds.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">Add Funds</span><span class="link-redesign">v2</span></a>
+            <a href="account-paymentmethods.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">Payment Methods</span><span class="link-redesign">v2</span></a>
+            <a href="paymentmethodsadd.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">Add Payment Method</span><span class="link-redesign">new</span></a>
+        </div>
+
+        <h3 style="font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--color-text-secondary);">Your Profile (3)</h3>
+        <div class="sitemap-grid">
+            <a href="user-profile.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">Your Profile</span><span class="link-redesign">v2</span></a>
+            <a href="user-password.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">Change Password</span><span class="link-redesign">v2</span></a>
+            <a href="clientareasecurity.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">Security Settings</span><span class="link-redesign">v2</span></a>
+        </div>
+
+        <h3 style="font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--color-text-secondary);">Support (3)</h3>
+        <div class="sitemap-grid">
+            <a href="supportticketslist.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">My Tickets</span><span class="link-redesign">v2</span></a>
+            <a href="supportticketsubmit.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">Open Ticket</span><span class="link-redesign">v2</span></a>
+            <a href="viewticket.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">View Ticket</span><span class="link-redesign">v2</span></a>
+        </div>
+
+        <h3 style="font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--color-text-secondary);">Knowledgebase &amp; Announcements (5)</h3>
+        <div class="sitemap-grid">
+            <a href="knowledgebase.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">Knowledgebase Home</span><span class="link-redesign">v2</span></a>
+            <a href="knowledgebasecat.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">Knowledgebase Category</span><span class="link-redesign">v2</span></a>
+            <a href="knowledgebasearticle.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">Knowledgebase Article</span><span class="link-redesign">v2</span></a>
+            <a href="announcements.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">Announcements</span><span class="link-redesign">v2</span></a>
+            <a href="viewannouncement.html" class="sitemap-link"><span class="link-num">•</span><span class="link-name">View Announcement</span><span class="link-redesign">v2</span></a>
         </div>
     </div>
 
     <!-- Public / Marketing -->
     <div class="sitemap-section">
         <h2>Public / Marketing</h2>
-        <div class="section-count">13 pages</div>
+        <div class="section-count">19 pages</div>
         <div class="sitemap-grid">
             <a href="index.html" class="sitemap-link"><span class="link-num">1</span><span class="link-name">Homepage</span><span class="link-badge badge-public">Public</span></a>
+            <a href="portal-home.html" class="sitemap-link"><span class="link-num">1b</span><span class="link-name">Portal Home (WHMCS default, state-switchable)</span><span class="link-badge badge-public">Public</span></a>
             <a href="cloud-hosting.html" class="sitemap-link"><span class="link-num">2</span><span class="link-name">Cloud Hosting</span><span class="link-badge badge-public">Public</span></a>
             <a href="vps.html" class="sitemap-link"><span class="link-num">3</span><span class="link-name">VPS</span><span class="link-badge badge-public">Public</span></a>
             <a href="domains.html" class="sitemap-link"><span class="link-num">4</span><span class="link-name">Domains</span><span class="link-badge badge-public">Public</span></a>
@@ -67,6 +120,11 @@
             <a href="email-services.html" class="sitemap-link"><span class="link-num">11</span><span class="link-name">Email Services</span><span class="link-badge badge-public">Public</span></a>
             <a href="site-builder.html" class="sitemap-link"><span class="link-num">12</span><span class="link-name">Site Builder</span><span class="link-badge badge-public">Public</span></a>
             <a href="support-page.html" class="sitemap-link"><span class="link-num">13</span><span class="link-name">Support Center</span><span class="link-badge badge-public">Public</span></a>
+            <a href="sitelock-vpn.html" class="sitemap-link"><span class="link-num">14</span><span class="link-name">SiteLock VPN</span><span class="link-badge badge-public">Public</span></a>
+            <a href="nordvpn.html" class="sitemap-link"><span class="link-num">15</span><span class="link-name">NordVPN</span><span class="link-badge badge-public">Public</span></a>
+            <a href="monitoring-360.html" class="sitemap-link"><span class="link-num">16</span><span class="link-name">360 Monitoring</span><span class="link-badge badge-public">Public</span></a>
+            <a href="xovi-now.html" class="sitemap-link"><span class="link-num">17</span><span class="link-name">XOVI Now</span><span class="link-badge badge-public">Public</span></a>
+            <a href="socialbee.html" class="sitemap-link"><span class="link-num">18</span><span class="link-name">SocialBee</span><span class="link-badge badge-public">Public</span></a>
         </div>
     </div>
 
@@ -75,15 +133,15 @@
         <h2>Authentication & User</h2>
         <div class="section-count">9 pages</div>
         <div class="sitemap-grid">
-            <a href="login.html" class="sitemap-link"><span class="link-num">14</span><span class="link-name">Sign In</span><span class="link-badge badge-auth">Auth</span></a>
-            <a href="clientregister.html" class="sitemap-link"><span class="link-num">15</span><span class="link-name">Register</span><span class="link-badge badge-auth">Auth</span></a>
-            <a href="password-reset.html" class="sitemap-link"><span class="link-num">16</span><span class="link-name">Password Reset</span><span class="link-badge badge-auth">Auth</span></a>
-            <a href="password-reset-confirm.html" class="sitemap-link"><span class="link-num">17</span><span class="link-name">Set New Password</span><span class="link-badge badge-auth">Auth</span></a>
-            <a href="twofactor.html" class="sitemap-link"><span class="link-num">18</span><span class="link-name">Two-Factor Challenge</span><span class="link-badge badge-auth">Auth</span></a>
-            <a href="twofactor-backupcode.html" class="sitemap-link"><span class="link-num">19</span><span class="link-name">Backup Codes</span><span class="link-badge badge-auth">Auth</span></a>
-            <a href="user-invite-accept.html" class="sitemap-link"><span class="link-num">20</span><span class="link-name">Accept Invite</span><span class="link-badge badge-auth">Auth</span></a>
-            <a href="user-verify-email.html" class="sitemap-link"><span class="link-num">21</span><span class="link-name">Verify Email</span><span class="link-badge badge-auth">Auth</span></a>
-            <a href="user-password.html" class="sitemap-link"><span class="link-num">22</span><span class="link-name">Change Password</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="login.html" class="sitemap-link"><span class="link-num">19</span><span class="link-name">Sign In</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="clientregister.html" class="sitemap-link"><span class="link-num">20</span><span class="link-name">Register</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="password-reset.html" class="sitemap-link"><span class="link-num">21</span><span class="link-name">Password Reset</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="password-reset-confirm.html" class="sitemap-link"><span class="link-num">22</span><span class="link-name">Set New Password</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="twofactor.html" class="sitemap-link"><span class="link-num">23</span><span class="link-name">Two-Factor Challenge</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="twofactor-backupcode.html" class="sitemap-link"><span class="link-num">24</span><span class="link-name">Backup Codes</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="user-invite-accept.html" class="sitemap-link"><span class="link-num">25</span><span class="link-name">Accept Invite</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="user-verify-email.html" class="sitemap-link"><span class="link-num">26</span><span class="link-name">Verify Email</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="user-password.html" class="sitemap-link"><span class="link-num">27</span><span class="link-name">Change Password</span><span class="link-badge badge-auth">Auth</span></a>
         </div>
     </div>
 
@@ -92,17 +150,18 @@
         <h2>Dashboard</h2>
         <div class="section-count">1 page</div>
         <div class="sitemap-grid">
-            <a href="clientareahome.html" class="sitemap-link"><span class="link-num">23</span><span class="link-name">Dashboard / Home</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareahome.html" class="sitemap-link"><span class="link-num">28</span><span class="link-name">Dashboard / Home</span><span class="link-badge badge-client">Client</span></a>
         </div>
     </div>
 
     <!-- Products -->
     <div class="sitemap-section">
         <h2>Products / Services</h2>
-        <div class="section-count">2 pages</div>
+        <div class="section-count">3 pages</div>
         <div class="sitemap-grid">
-            <a href="clientareaproducts.html" class="sitemap-link"><span class="link-num">24</span><span class="link-name">My Services</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareaproductdetails.html" class="sitemap-link"><span class="link-num">25</span><span class="link-name">Service Details</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareaproducts.html" class="sitemap-link"><span class="link-num">29</span><span class="link-name">My Services</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareaproductdetails.html" class="sitemap-link"><span class="link-num">30</span><span class="link-name">Service Details</span><span class="link-badge badge-client">Client</span></a>
+            <a href="store.html" class="sitemap-link"><span class="link-num">30b</span><span class="link-name">Order New Services (catalog)</span><span class="link-badge badge-client">Client</span><span class="link-redesign">new</span></a>
         </div>
     </div>
 
@@ -111,18 +170,18 @@
         <h2>Domains</h2>
         <div class="section-count">12 pages</div>
         <div class="sitemap-grid">
-            <a href="cart-domain-register.html" class="sitemap-link"><span class="link-num">26</span><span class="link-name">Find a Domain</span><span class="link-badge badge-public">Public</span></a>
-            <a href="clientareadomains.html" class="sitemap-link"><span class="link-num">27</span><span class="link-name">My Domains</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareadomaindetails.html" class="sitemap-link"><span class="link-num">28</span><span class="link-name">Domain Details</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareadomainaddons.html" class="sitemap-link"><span class="link-num">29</span><span class="link-name">Domain Addons</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareadomaincontactinfo.html" class="sitemap-link"><span class="link-num">30</span><span class="link-name">Contact Info</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareadomaindns.html" class="sitemap-link"><span class="link-num">31</span><span class="link-name">DNS Management</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareadomainemailforwarding.html" class="sitemap-link"><span class="link-num">32</span><span class="link-name">Email Forwarding</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareadomaingetepp.html" class="sitemap-link"><span class="link-num">33</span><span class="link-name">EPP Code</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareadomainregisterns.html" class="sitemap-link"><span class="link-num">34</span><span class="link-name">Private Nameservers</span><span class="link-badge badge-client">Client</span></a>
-            <a href="bulkdomainmanagement.html" class="sitemap-link"><span class="link-num">35</span><span class="link-name">Bulk Management</span><span class="link-badge badge-client">Client</span></a>
-            <a href="domain-pricing.html" class="sitemap-link"><span class="link-num">36</span><span class="link-name">Domain Pricing</span><span class="link-badge badge-client">Client</span></a>
-            <a href="whois.html" class="sitemap-link"><span class="link-num">37</span><span class="link-name">WHOIS Lookup</span><span class="link-badge badge-client">Client</span></a>
+            <a href="cart-domain-register.html" class="sitemap-link"><span class="link-num">31</span><span class="link-name">Find a Domain</span><span class="link-badge badge-public">Public</span></a>
+            <a href="clientareadomains.html" class="sitemap-link"><span class="link-num">32</span><span class="link-name">My Domains</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareadomaindetails.html" class="sitemap-link"><span class="link-num">33</span><span class="link-name">Domain Details</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareadomainaddons.html" class="sitemap-link"><span class="link-num">34</span><span class="link-name">Domain Addons</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareadomaincontactinfo.html" class="sitemap-link"><span class="link-num">35</span><span class="link-name">Contact Info</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareadomaindns.html" class="sitemap-link"><span class="link-num">36</span><span class="link-name">DNS Management</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareadomainemailforwarding.html" class="sitemap-link"><span class="link-num">37</span><span class="link-name">Email Forwarding</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareadomaingetepp.html" class="sitemap-link"><span class="link-num">38</span><span class="link-name">EPP Code</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareadomainregisterns.html" class="sitemap-link"><span class="link-num">39</span><span class="link-name">Private Nameservers</span><span class="link-badge badge-client">Client</span></a>
+            <a href="bulkdomainmanagement.html" class="sitemap-link"><span class="link-num">40</span><span class="link-name">Bulk Management</span><span class="link-badge badge-client">Client</span></a>
+            <a href="domain-pricing.html" class="sitemap-link"><span class="link-num">41</span><span class="link-name">Domain Pricing</span><span class="link-badge badge-client">Client</span></a>
+            <a href="whois.html" class="sitemap-link"><span class="link-num">42</span><span class="link-name">WHOIS Lookup</span><span class="link-badge badge-client">Client</span></a>
         </div>
     </div>
 
@@ -131,34 +190,36 @@
         <h2>Billing & Invoices</h2>
         <div class="section-count">10 pages</div>
         <div class="sitemap-grid">
-            <a href="clientareainvoices.html" class="sitemap-link"><span class="link-num">38</span><span class="link-name">Invoices</span><span class="link-badge badge-client">Client</span></a>
-            <a href="viewinvoice.html" class="sitemap-link"><span class="link-num">39</span><span class="link-name">View Invoice</span><span class="link-badge badge-client">Client</span></a>
-            <a href="invoice-payment.html" class="sitemap-link"><span class="link-num">40</span><span class="link-name">Invoice Payment</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareaaddfunds.html" class="sitemap-link"><span class="link-num">41</span><span class="link-name">Add Funds</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareacreditcard.html" class="sitemap-link"><span class="link-num">42</span><span class="link-name">Credit Card Update</span><span class="link-badge badge-client">Client</span></a>
-            <a href="masspay.html" class="sitemap-link"><span class="link-num">43</span><span class="link-name">Mass Pay</span><span class="link-badge badge-client">Client</span></a>
-            <a href="viewbillingnote.html" class="sitemap-link"><span class="link-num">44</span><span class="link-name">Billing Note</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareaquotes.html" class="sitemap-link"><span class="link-num">45</span><span class="link-name">Quotes</span><span class="link-badge badge-client">Client</span></a>
-            <a href="viewquote.html" class="sitemap-link"><span class="link-num">46</span><span class="link-name">View Quote</span><span class="link-badge badge-client">Client</span></a>
-            <a href="subscription-manage.html" class="sitemap-link"><span class="link-num">47</span><span class="link-name">Manage Subscription</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareainvoices.html" class="sitemap-link"><span class="link-num">43</span><span class="link-name">My Invoices</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="viewinvoice.html" class="sitemap-link"><span class="link-num">44</span><span class="link-name">View Invoice</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="invoice-payment.html" class="sitemap-link"><span class="link-num">45</span><span class="link-name">Invoice Payment</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareaaddfunds.html" class="sitemap-link"><span class="link-num">46</span><span class="link-name">Add Funds</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="clientareacreditcard.html" class="sitemap-link"><span class="link-num">47</span><span class="link-name">Credit Card Update</span><span class="link-badge badge-client">Client</span></a>
+            <a href="masspay.html" class="sitemap-link"><span class="link-num">48</span><span class="link-name">Mass Pay</span><span class="link-badge badge-client">Client</span></a>
+            <a href="viewbillingnote.html" class="sitemap-link"><span class="link-num">49</span><span class="link-name">Billing Note</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareaquotes.html" class="sitemap-link"><span class="link-num">50</span><span class="link-name">My Quotes</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="viewquote.html" class="sitemap-link"><span class="link-num">51</span><span class="link-name">View Quote</span><span class="link-badge badge-client">Client</span></a>
+            <a href="subscription-manage.html" class="sitemap-link"><span class="link-num">52</span><span class="link-name">Manage Subscription</span><span class="link-badge badge-client">Client</span></a>
         </div>
     </div>
 
     <!-- Account -->
     <div class="sitemap-section">
         <h2>Account Management</h2>
-        <div class="section-count">9 pages</div>
+        <div class="section-count">11 pages · Account Details (billing/tax) + Your Profile (name/email)</div>
         <div class="sitemap-grid">
-            <a href="clientareadetails.html" class="sitemap-link"><span class="link-num">48</span><span class="link-name">My Details</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareasecurity.html" class="sitemap-link"><span class="link-num">49</span><span class="link-name">Security Settings</span><span class="link-badge badge-client">Client</span></a>
-            <a href="account-paymentmethods.html" class="sitemap-link"><span class="link-num">50</span><span class="link-name">Payment Methods</span><span class="link-badge badge-client">Client</span></a>
-            <a href="account-paymentmethods-manage.html" class="sitemap-link"><span class="link-num">51</span><span class="link-name">Manage Payment</span><span class="link-badge badge-client">Client</span></a>
-            <a href="account-paymentmethods-billing-contacts.html" class="sitemap-link"><span class="link-num">52</span><span class="link-name">Billing Contacts</span><span class="link-badge badge-client">Client</span></a>
-            <a href="account-contacts-manage.html" class="sitemap-link"><span class="link-num">53</span><span class="link-name">Contacts</span><span class="link-badge badge-client">Client</span></a>
-            <a href="account-contacts-new.html" class="sitemap-link"><span class="link-num">54</span><span class="link-name">New Contact</span><span class="link-badge badge-client">Client</span></a>
-            <a href="account-user-management.html" class="sitemap-link"><span class="link-num">55</span><span class="link-name">User Management</span><span class="link-badge badge-client">Client</span></a>
-            <a href="account-user-permissions.html" class="sitemap-link"><span class="link-num">56</span><span class="link-name">User Permissions</span><span class="link-badge badge-client">Client</span></a>
-            <a href="user-profile.html" class="sitemap-link"><span class="link-num">57</span><span class="link-name">User Profile</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareadetails.html" class="sitemap-link"><span class="link-num">53</span><span class="link-name">Account Details</span><span class="link-badge badge-client">Client</span></a>
+            <a href="user-profile.html" class="sitemap-link"><span class="link-num">54</span><span class="link-name">Your Profile</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="user-password.html" class="sitemap-link"><span class="link-num">55</span><span class="link-name">Change Password</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="clientareasecurity.html" class="sitemap-link"><span class="link-num">56</span><span class="link-name">Security Settings</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="account-paymentmethods.html" class="sitemap-link"><span class="link-num">57</span><span class="link-name">Payment Methods</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="paymentmethodsadd.html" class="sitemap-link"><span class="link-num">58</span><span class="link-name">Add Payment Method</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="account-paymentmethods-manage.html" class="sitemap-link"><span class="link-num">59</span><span class="link-name">Manage Payment</span><span class="link-badge badge-client">Client</span></a>
+            <a href="account-paymentmethods-billing-contacts.html" class="sitemap-link"><span class="link-num">60</span><span class="link-name">Billing Contacts</span><span class="link-badge badge-client">Client</span></a>
+            <a href="account-contacts-manage.html" class="sitemap-link"><span class="link-num">61</span><span class="link-name">Contacts</span><span class="link-badge badge-client">Client</span></a>
+            <a href="account-contacts-new.html" class="sitemap-link"><span class="link-num">62</span><span class="link-name">New Contact</span><span class="link-badge badge-client">Client</span></a>
+            <a href="account-user-management.html" class="sitemap-link"><span class="link-num">63</span><span class="link-name">User Management</span><span class="link-badge badge-client">Client</span></a>
+            <a href="account-user-permissions.html" class="sitemap-link"><span class="link-num">64</span><span class="link-name">User Permissions</span><span class="link-badge badge-client">Client</span></a>
         </div>
     </div>
 
@@ -167,12 +228,12 @@
         <h2>Support</h2>
         <div class="section-count">6 pages</div>
         <div class="sitemap-grid">
-            <a href="supportticketslist.html" class="sitemap-link"><span class="link-num">58</span><span class="link-name">Tickets List</span><span class="link-badge badge-client">Client</span></a>
-            <a href="supportticketsubmit.html" class="sitemap-link"><span class="link-num">59</span><span class="link-name">Submit - Step 1</span><span class="link-badge badge-client">Client</span></a>
-            <a href="supportticketsubmit-steptwo.html" class="sitemap-link"><span class="link-num">60</span><span class="link-name">Submit - Step 2</span><span class="link-badge badge-client">Client</span></a>
-            <a href="supportticketsubmit-confirm.html" class="sitemap-link"><span class="link-num">61</span><span class="link-name">Ticket Confirmed</span><span class="link-badge badge-client">Client</span></a>
-            <a href="viewticket.html" class="sitemap-link"><span class="link-num">62</span><span class="link-name">View Ticket</span><span class="link-badge badge-client">Client</span></a>
-            <a href="ticketfeedback.html" class="sitemap-link"><span class="link-num">63</span><span class="link-name">Ticket Feedback</span><span class="link-badge badge-client">Client</span></a>
+            <a href="supportticketslist.html" class="sitemap-link"><span class="link-num">65</span><span class="link-name">My Tickets</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="supportticketsubmit.html" class="sitemap-link"><span class="link-num">66</span><span class="link-name">Submit - Step 1</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="supportticketsubmit-steptwo.html" class="sitemap-link"><span class="link-num">67</span><span class="link-name">Submit - Step 2</span><span class="link-badge badge-client">Client</span></a>
+            <a href="supportticketsubmit-confirm.html" class="sitemap-link"><span class="link-num">68</span><span class="link-name">Ticket Confirmed</span><span class="link-badge badge-client">Client</span></a>
+            <a href="viewticket.html" class="sitemap-link"><span class="link-num">69</span><span class="link-name">View Ticket</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="ticketfeedback.html" class="sitemap-link"><span class="link-num">70</span><span class="link-name">Ticket Feedback</span><span class="link-badge badge-client">Client</span></a>
         </div>
     </div>
 
@@ -181,9 +242,9 @@
         <h2>Knowledge Base</h2>
         <div class="section-count">3 pages</div>
         <div class="sitemap-grid">
-            <a href="knowledgebase.html" class="sitemap-link"><span class="link-num">64</span><span class="link-name">KB Home</span><span class="link-badge badge-client">Client</span></a>
-            <a href="knowledgebasecat.html" class="sitemap-link"><span class="link-num">65</span><span class="link-name">KB Category</span><span class="link-badge badge-client">Client</span></a>
-            <a href="knowledgebasearticle.html" class="sitemap-link"><span class="link-num">66</span><span class="link-name">KB Article</span><span class="link-badge badge-client">Client</span></a>
+            <a href="knowledgebase.html" class="sitemap-link"><span class="link-num">71</span><span class="link-name">KB Home</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="knowledgebasecat.html" class="sitemap-link"><span class="link-num">72</span><span class="link-name">KB Category</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="knowledgebasearticle.html" class="sitemap-link"><span class="link-num">73</span><span class="link-name">KB Article</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
         </div>
     </div>
 
@@ -192,10 +253,10 @@
         <h2>Announcements & Emails</h2>
         <div class="section-count">4 pages</div>
         <div class="sitemap-grid">
-            <a href="announcements.html" class="sitemap-link"><span class="link-num">67</span><span class="link-name">Announcements</span><span class="link-badge badge-client">Client</span></a>
-            <a href="viewannouncement.html" class="sitemap-link"><span class="link-num">68</span><span class="link-name">View Announcement</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareaemails.html" class="sitemap-link"><span class="link-num">69</span><span class="link-name">Emails</span><span class="link-badge badge-client">Client</span></a>
-            <a href="viewemail.html" class="sitemap-link"><span class="link-num">70</span><span class="link-name">View Email</span><span class="link-badge badge-client">Client</span></a>
+            <a href="announcements.html" class="sitemap-link"><span class="link-num">74</span><span class="link-name">Announcements</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="viewannouncement.html" class="sitemap-link"><span class="link-num">75</span><span class="link-name">View Announcement</span><span class="link-badge badge-client">Client</span><span class="link-redesign">v2</span></a>
+            <a href="clientareaemails.html" class="sitemap-link"><span class="link-num">76</span><span class="link-name">Emails</span><span class="link-badge badge-client">Client</span></a>
+            <a href="viewemail.html" class="sitemap-link"><span class="link-num">77</span><span class="link-name">View Email</span><span class="link-badge badge-client">Client</span></a>
         </div>
     </div>
 
@@ -204,9 +265,9 @@
         <h2>Downloads</h2>
         <div class="section-count">3 pages</div>
         <div class="sitemap-grid">
-            <a href="downloads.html" class="sitemap-link"><span class="link-num">71</span><span class="link-name">Downloads</span><span class="link-badge badge-client">Client</span></a>
-            <a href="downloadscat.html" class="sitemap-link"><span class="link-num">72</span><span class="link-name">Download Category</span><span class="link-badge badge-client">Client</span></a>
-            <a href="downloaddenied.html" class="sitemap-link"><span class="link-num">73</span><span class="link-name">Download Denied</span><span class="link-badge badge-error">Error</span></a>
+            <a href="downloads.html" class="sitemap-link"><span class="link-num">76</span><span class="link-name">Downloads</span><span class="link-badge badge-client">Client</span></a>
+            <a href="downloadscat.html" class="sitemap-link"><span class="link-num">77</span><span class="link-name">Download Category</span><span class="link-badge badge-client">Client</span></a>
+            <a href="downloaddenied.html" class="sitemap-link"><span class="link-num">78</span><span class="link-name">Download Denied</span><span class="link-badge badge-error">Error</span></a>
         </div>
     </div>
 
@@ -215,10 +276,10 @@
         <h2>SSL Configuration</h2>
         <div class="section-count">4 pages</div>
         <div class="sitemap-grid">
-            <a href="configuressl-stepone.html" class="sitemap-link"><span class="link-num">74</span><span class="link-name">Configure - Step 1</span><span class="link-badge badge-client">Client</span></a>
-            <a href="configuressl-steptwo.html" class="sitemap-link"><span class="link-num">75</span><span class="link-name">Configure - Step 2</span><span class="link-badge badge-client">Client</span></a>
-            <a href="configuressl-complete.html" class="sitemap-link"><span class="link-num">76</span><span class="link-name">Configure - Complete</span><span class="link-badge badge-client">Client</span></a>
-            <a href="managessl.html" class="sitemap-link"><span class="link-num">77</span><span class="link-name">Manage SSL</span><span class="link-badge badge-client">Client</span></a>
+            <a href="configuressl-stepone.html" class="sitemap-link"><span class="link-num">79</span><span class="link-name">Configure - Step 1</span><span class="link-badge badge-client">Client</span></a>
+            <a href="configuressl-steptwo.html" class="sitemap-link"><span class="link-num">80</span><span class="link-name">Configure - Step 2</span><span class="link-badge badge-client">Client</span></a>
+            <a href="configuressl-complete.html" class="sitemap-link"><span class="link-num">81</span><span class="link-name">Configure - Complete</span><span class="link-badge badge-client">Client</span></a>
+            <a href="managessl.html" class="sitemap-link"><span class="link-num">82</span><span class="link-name">Manage SSL</span><span class="link-badge badge-client">Client</span></a>
         </div>
     </div>
 
@@ -227,10 +288,10 @@
         <h2>Upgrades & Cancellations</h2>
         <div class="section-count">4 pages</div>
         <div class="sitemap-grid">
-            <a href="upgrade.html" class="sitemap-link"><span class="link-num">78</span><span class="link-name">Upgrade</span><span class="link-badge badge-client">Client</span></a>
-            <a href="upgrade-configure.html" class="sitemap-link"><span class="link-num">79</span><span class="link-name">Upgrade Configure</span><span class="link-badge badge-client">Client</span></a>
-            <a href="upgradesummary.html" class="sitemap-link"><span class="link-num">80</span><span class="link-name">Upgrade Summary</span><span class="link-badge badge-client">Client</span></a>
-            <a href="clientareacancelrequest.html" class="sitemap-link"><span class="link-num">81</span><span class="link-name">Cancel Request</span><span class="link-badge badge-client">Client</span></a>
+            <a href="upgrade.html" class="sitemap-link"><span class="link-num">83</span><span class="link-name">Upgrade</span><span class="link-badge badge-client">Client</span></a>
+            <a href="upgrade-configure.html" class="sitemap-link"><span class="link-num">84</span><span class="link-name">Upgrade Configure</span><span class="link-badge badge-client">Client</span></a>
+            <a href="upgradesummary.html" class="sitemap-link"><span class="link-num">85</span><span class="link-name">Upgrade Summary</span><span class="link-badge badge-client">Client</span></a>
+            <a href="clientareacancelrequest.html" class="sitemap-link"><span class="link-num">86</span><span class="link-name">Cancel Request</span><span class="link-badge badge-client">Client</span></a>
         </div>
     </div>
 
@@ -239,11 +300,11 @@
         <h2>Affiliates, Server Status & Contact</h2>
         <div class="section-count">5 pages</div>
         <div class="sitemap-grid">
-            <a href="affiliates.html" class="sitemap-link"><span class="link-num">82</span><span class="link-name">Affiliates Dashboard</span><span class="link-badge badge-client">Client</span></a>
-            <a href="affiliatessignup.html" class="sitemap-link"><span class="link-num">83</span><span class="link-name">Affiliate Sign Up</span><span class="link-badge badge-client">Client</span></a>
-            <a href="serverstatus.html" class="sitemap-link"><span class="link-num">84</span><span class="link-name">Server Status</span><span class="link-badge badge-client">Client</span></a>
-            <a href="contact.html" class="sitemap-link"><span class="link-num">85</span><span class="link-name">Contact Us</span><span class="link-badge badge-public">Public</span></a>
-            <a href="contactaccessdenied.html" class="sitemap-link"><span class="link-num">86</span><span class="link-name">Contact Denied</span><span class="link-badge badge-error">Error</span></a>
+            <a href="affiliates.html" class="sitemap-link"><span class="link-num">87</span><span class="link-name">Affiliates Dashboard</span><span class="link-badge badge-client">Client</span></a>
+            <a href="affiliatessignup.html" class="sitemap-link"><span class="link-num">88</span><span class="link-name">Affiliate Sign Up</span><span class="link-badge badge-client">Client</span></a>
+            <a href="serverstatus.html" class="sitemap-link"><span class="link-num">89</span><span class="link-name">Server Status</span><span class="link-badge badge-client">Client</span></a>
+            <a href="contact.html" class="sitemap-link"><span class="link-num">90</span><span class="link-name">Contact Us</span><span class="link-badge badge-public">Public</span></a>
+            <a href="contactaccessdenied.html" class="sitemap-link"><span class="link-num">91</span><span class="link-name">Contact Denied</span><span class="link-badge badge-error">Error</span></a>
         </div>
     </div>
 
@@ -252,10 +313,10 @@
         <h2>Error Pages</h2>
         <div class="section-count">4 pages</div>
         <div class="sitemap-grid">
-            <a href="error/access-denied.html" class="sitemap-link"><span class="link-num">87</span><span class="link-name">Access Denied</span><span class="link-badge badge-error">Error</span></a>
-            <a href="error/banned.html" class="sitemap-link"><span class="link-num">88</span><span class="link-name">Banned</span><span class="link-badge badge-error">Error</span></a>
-            <a href="error/page-not-found.html" class="sitemap-link"><span class="link-num">89</span><span class="link-name">404 Not Found</span><span class="link-badge badge-error">Error</span></a>
-            <a href="error/rate-limit-exceeded.html" class="sitemap-link"><span class="link-num">90</span><span class="link-name">Rate Limited</span><span class="link-badge badge-error">Error</span></a>
+            <a href="error/access-denied.html" class="sitemap-link"><span class="link-num">92</span><span class="link-name">Access Denied</span><span class="link-badge badge-error">Error</span></a>
+            <a href="error/banned.html" class="sitemap-link"><span class="link-num">93</span><span class="link-name">Banned</span><span class="link-badge badge-error">Error</span></a>
+            <a href="error/page-not-found.html" class="sitemap-link"><span class="link-num">94</span><span class="link-name">404 Not Found</span><span class="link-badge badge-error">Error</span></a>
+            <a href="error/rate-limit-exceeded.html" class="sitemap-link"><span class="link-num">95</span><span class="link-name">Rate Limited</span><span class="link-badge badge-error">Error</span></a>
         </div>
     </div>
 
@@ -264,23 +325,100 @@
         <h2>Store (Logged-in)</h2>
         <div class="section-count">16 pages</div>
         <div class="sitemap-grid">
-            <a href="store/ssl.html" class="sitemap-link"><span class="link-num">91</span><span class="link-name">SSL Certificates</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/website-builder.html" class="sitemap-link"><span class="link-num">92</span><span class="link-name">Website Builder</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/website-security.html" class="sitemap-link"><span class="link-num">93</span><span class="link-name">Website Security</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/email-services.html" class="sitemap-link"><span class="link-num">94</span><span class="link-name">Email Services</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/website-backup.html" class="sitemap-link"><span class="link-num">95</span><span class="link-name">Website Backup</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/seo-tools.html" class="sitemap-link"><span class="link-num">96</span><span class="link-name">SEO Tools</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/professional-email.html" class="sitemap-link"><span class="link-num">97</span><span class="link-name">Professional Email</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/site-builder.html" class="sitemap-link"><span class="link-num">98</span><span class="link-name">Site Builder</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/order.html" class="sitemap-link"><span class="link-num">99</span><span class="link-name">Order / Configure</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/not-found.html" class="sitemap-link"><span class="link-num">100</span><span class="link-name">Product Not Found</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/nordvpn.html" class="sitemap-link"><span class="link-num">101</span><span class="link-name">VPN (NordVPN)</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/sitelockvpn.html" class="sitemap-link"><span class="link-num">102</span><span class="link-name">SiteLock VPN</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/socialbee.html" class="sitemap-link"><span class="link-num">103</span><span class="link-name">Social Media</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/threesixtymonitoring.html" class="sitemap-link"><span class="link-num">104</span><span class="link-name">360 Monitoring</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/wp-toolkit.html" class="sitemap-link"><span class="link-num">105</span><span class="link-name">WordPress Toolkit</span><span class="link-badge badge-store">Store</span></a>
-            <a href="store/ox-manage.html" class="sitemap-link"><span class="link-num">106</span><span class="link-name">OX Email Manage</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/ssl.html" class="sitemap-link"><span class="link-num">96</span><span class="link-name">SSL Certificates</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/website-builder.html" class="sitemap-link"><span class="link-num">97</span><span class="link-name">Website Builder</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/website-security.html" class="sitemap-link"><span class="link-num">98</span><span class="link-name">Website Security</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/email-services.html" class="sitemap-link"><span class="link-num">99</span><span class="link-name">Email Services</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/website-backup.html" class="sitemap-link"><span class="link-num">100</span><span class="link-name">Website Backup</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/seo-tools.html" class="sitemap-link"><span class="link-num">101</span><span class="link-name">SEO Tools</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/professional-email.html" class="sitemap-link"><span class="link-num">102</span><span class="link-name">Professional Email</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/site-builder.html" class="sitemap-link"><span class="link-num">103</span><span class="link-name">Site Builder</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/order.html" class="sitemap-link"><span class="link-num">104</span><span class="link-name">Order / Configure</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/not-found.html" class="sitemap-link"><span class="link-num">105</span><span class="link-name">Product Not Found</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/nordvpn.html" class="sitemap-link"><span class="link-num">106</span><span class="link-name">VPN (NordVPN)</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/sitelockvpn.html" class="sitemap-link"><span class="link-num">107</span><span class="link-name">SiteLock VPN</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/socialbee.html" class="sitemap-link"><span class="link-num">108</span><span class="link-name">Social Media</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/threesixtymonitoring.html" class="sitemap-link"><span class="link-num">109</span><span class="link-name">360 Monitoring</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/wp-toolkit.html" class="sitemap-link"><span class="link-num">110</span><span class="link-name">WordPress Toolkit</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/ox-manage.html" class="sitemap-link"><span class="link-num">111</span><span class="link-name">OX Email Manage</span><span class="link-badge badge-store">Store</span></a>
         </div>
+    </div>
+
+    <!-- Development & Reference -->
+    <div class="sitemap-section">
+        <h2>Development &amp; Reference</h2>
+        <div class="section-count">5 pages &middot; tooling &amp; previews</div>
+        <div class="sitemap-grid">
+            <a href="homepage.html" class="sitemap-link"><span class="link-num">112</span><span class="link-name">Homepage (Hostnodes)</span><span class="link-badge badge-dev">Dev</span></a>
+            <a href="builder.html" class="sitemap-link"><span class="link-num">113</span><span class="link-name">Page Builder</span><span class="link-badge badge-dev">Dev</span></a>
+            <a href="components.html" class="sitemap-link"><span class="link-num">114</span><span class="link-name">Component Gallery</span><span class="link-badge badge-dev">Dev</span></a>
+            <a href="styleguide.html" class="sitemap-link"><span class="link-num">115</span><span class="link-name">Style Guide</span><span class="link-badge badge-dev">Dev</span></a>
+            <a href="sitemap.html" class="sitemap-link"><span class="link-num">116</span><span class="link-name">Sitemap (this page)</span><span class="link-badge badge-dev">Dev</span></a>
+        </div>
+    </div>
+
+    <!-- Recently Added -->
+    <div class="sitemap-section">
+        <h2>Recently Built &mdash; WHMCS Parity <span style="font-size:14px;font-weight:500;color:#30d158;margin-left:8px;">&#10003; 28 done</span></h2>
+        <div class="section-count">Pages ported from Nexus to match core WHMCS template coverage</div>
+
+        <h3 style="font-size:15px;font-weight:600;margin:20px 0 8px;color:var(--color-text-secondary);">Billing &amp; Payments (3)</h3>
+        <div class="sitemap-grid">
+            <a href="3dsecure.html" class="sitemap-link"><span class="link-num">B1</span><span class="link-name">3D Secure</span><span class="link-badge badge-client">Client</span></a>
+            <a href="invoicepdf.html" class="sitemap-link"><span class="link-num">B2</span><span class="link-name">Invoice PDF</span><span class="link-badge badge-client">Client</span></a>
+            <a href="quotepdf.html" class="sitemap-link"><span class="link-num">B3</span><span class="link-name">Quote PDF</span><span class="link-badge badge-client">Client</span></a>
+        </div>
+
+        <h3 style="font-size:15px;font-weight:600;margin:20px 0 8px;color:var(--color-text-secondary);">Products &amp; Usage (2)</h3>
+        <div class="sitemap-grid">
+            <a href="clientareaproductusagebilling.html" class="sitemap-link"><span class="link-num">B4</span><span class="link-name">Product Usage Billing</span><span class="link-badge badge-client">Client</span></a>
+            <a href="usagebillingpricing.html" class="sitemap-link"><span class="link-num">B5</span><span class="link-name">Usage Billing Pricing</span><span class="link-badge badge-client">Client</span></a>
+        </div>
+
+        <h3 style="font-size:15px;font-weight:600;margin:20px 0 8px;color:var(--color-text-secondary);">Account &amp; Auth (5)</h3>
+        <div class="sitemap-grid">
+            <a href="user-security.html" class="sitemap-link"><span class="link-num">B6</span><span class="link-name">User Security</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="user-switch-account.html" class="sitemap-link"><span class="link-num">B7</span><span class="link-name">Switch Account</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="user-switch-account-forced.html" class="sitemap-link"><span class="link-num">B8</span><span class="link-name">Switch (Forced)</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="password-reset-container.html" class="sitemap-link"><span class="link-num">B9</span><span class="link-name">Password Reset Flow</span><span class="link-badge badge-auth">Auth</span></a>
+            <a href="password-reset-security-prompt.html" class="sitemap-link"><span class="link-num">B10</span><span class="link-name">Security Question</span><span class="link-badge badge-auth">Auth</span></a>
+        </div>
+
+        <h3 style="font-size:15px;font-weight:600;margin:20px 0 8px;color:var(--color-text-secondary);">Support &amp; Help (3)</h3>
+        <div class="sitemap-grid">
+            <a href="supportticketsubmit-customfields.html" class="sitemap-link"><span class="link-num">B11</span><span class="link-name">Ticket Custom Fields</span><span class="link-badge badge-client">Client</span></a>
+            <a href="supportticketsubmit-kbsuggestions.html" class="sitemap-link"><span class="link-num">B12</span><span class="link-name">Ticket KB Suggestions</span><span class="link-badge badge-client">Client</span></a>
+            <a href="markdown-guide.html" class="sitemap-link"><span class="link-num">B13</span><span class="link-name">Markdown Guide</span><span class="link-badge badge-client">Client</span></a>
+        </div>
+
+        <h3 style="font-size:15px;font-weight:600;margin:20px 0 8px;color:var(--color-text-secondary);">Navigation &amp; Errors (3)</h3>
+        <div class="sitemap-grid">
+            <a href="forwardpage.html" class="sitemap-link"><span class="link-num">B14</span><span class="link-name">Forward Page</span><span class="link-badge badge-client">Client</span></a>
+            <a href="error/internal-error.html" class="sitemap-link"><span class="link-num">B15</span><span class="link-name">Internal Error (500)</span><span class="link-badge badge-error">Error</span></a>
+            <a href="error/unknown-routepath.html" class="sitemap-link"><span class="link-num">B16</span><span class="link-name">Unknown Route</span><span class="link-badge badge-error">Error</span></a>
+        </div>
+
+        <h3 style="font-size:15px;font-weight:600;margin:20px 0 8px;color:var(--color-text-secondary);">Store Product Landings (7)</h3>
+        <div class="sitemap-grid">
+            <a href="store/codeguard.html" class="sitemap-link"><span class="link-num">B17</span><span class="link-name">CodeGuard Backup</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/marketgoo.html" class="sitemap-link"><span class="link-num">B18</span><span class="link-name">MarketGoo SEO</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/spamexperts.html" class="sitemap-link"><span class="link-num">B19</span><span class="link-name">SpamExperts</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/sitelock.html" class="sitemap-link"><span class="link-num">B20</span><span class="link-name">SiteLock</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/weebly.html" class="sitemap-link"><span class="link-num">B21</span><span class="link-name">Weebly Builder</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/xovinow.html" class="sitemap-link"><span class="link-num">B22</span><span class="link-name">XOVI Now</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/ox.html" class="sitemap-link"><span class="link-num">B23</span><span class="link-name">OX App Suite</span><span class="link-badge badge-store">Store</span></a>
+        </div>
+
+        <h3 style="font-size:15px;font-weight:600;margin:20px 0 8px;color:var(--color-text-secondary);">SSL Product Variants (5)</h3>
+        <div class="sitemap-grid">
+            <a href="store/ssl-dv.html" class="sitemap-link"><span class="link-num">B24</span><span class="link-name">SSL &mdash; DV</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/ssl-ov.html" class="sitemap-link"><span class="link-num">B25</span><span class="link-name">SSL &mdash; OV</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/ssl-ev.html" class="sitemap-link"><span class="link-num">B26</span><span class="link-name">SSL &mdash; EV</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/ssl-wildcard.html" class="sitemap-link"><span class="link-num">B27</span><span class="link-name">SSL &mdash; Wildcard</span><span class="link-badge badge-store">Store</span></a>
+            <a href="store/ssl-competitive-upgrade.html" class="sitemap-link"><span class="link-num">B28</span><span class="link-name">SSL &mdash; Switch &amp; Save</span><span class="link-badge badge-store">Store</span></a>
+        </div>
+
+        <p class="missing-note" style="margin-top:24px;"><strong>Still out of scope for a flat-HTML mockup:</strong> <code>oauth/</code> flow (7 tpl), <code>payment/</code> gateway partials (8 tpl), <code>includes/</code> shared partials (21 tpl), dynamic landing builder (<code>store/dynamic/</code>), promo upsells. These are WHMCS runtime integrations rendered inline by other pages rather than standalone screens.</p>
     </div>
 </div>
 

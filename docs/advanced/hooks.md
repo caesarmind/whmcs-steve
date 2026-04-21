@@ -1,6 +1,10 @@
-# Hooks Reference
+# Hooks Reference (Quick Introduction)
 
-### Navigation & Sidebar Hooks
+> **Looking for all 382+ hooks?** See the [Complete Hook Reference](/reference/hooks.md).
+
+This page covers the most commonly used theme hooks. For the full list across all 19 categories (Client Area, Invoices, Cart, Module, Domain, etc.), see the comprehensive reference.
+
+## Navigation & Sidebar Hooks
 
 | Hook | Purpose | Parameter |
 |------|---------|-----------|

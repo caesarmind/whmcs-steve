@@ -3,124 +3,491 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quotes - WHMCS by Apple</title>
+    <title>My Quotes — WHMCS by Apple</title>
     <link rel="stylesheet" href="css/apple-theme.css">
+    <link rel="stylesheet" href="css/apple-layout.css">
+    <style>
+        body { display: block; }
+
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+
+        /* ── 2-column split: Billing subnav + content ── */
+        .q-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+        @media (max-width: 880px) { .q-split { grid-template-columns: 1fr; } }
+
+        /* Shared sub-nav primitive */
+        .subnav-card { padding: 8px; }
+        .subnav-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }
+        .subnav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: 13px; letter-spacing: -0.008em; text-decoration: none; transition: background var(--transition-fast); }
+        .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+        .subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+        .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .subnav-item.active svg { color: var(--color-accent); }
+        .subnav-count {
+            margin-left: auto;
+            font-size: 11px; font-weight: 500;
+            padding: 1px 7px;
+            border-radius: var(--radius-pill);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+        }
+        .subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
+
+        /* ── Data-state toggle (preview chip) ── */
+        body[data-data="empty"] .when-full { display: none; }
+        body:not([data-data="empty"]) .when-empty { display: none; }
+
+        /* ── Extended status pills for quotes ── */
+        .status-pill.draft     { background: var(--color-gray-bg); color: var(--color-gray-text); }
+        .status-pill.delivered { background: var(--color-blue-bg); color: var(--color-blue-text); }
+        .status-pill.on-hold   { background: var(--color-orange-bg); color: var(--color-orange-text); }
+        .status-pill.accepted  { background: var(--color-green-bg); color: var(--color-green-text); }
+        .status-pill.lost      { background: var(--color-red-bg); color: var(--color-red-text); }
+        .status-pill.dead      { background: var(--color-gray-bg); color: var(--color-gray-text); }
+
+        /* ── Toolbar ── */
+        .q-toolbar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 0.5px solid var(--color-border); flex-wrap: wrap; }
+        .q-search { flex: 1 1 240px; min-width: 180px; max-width: 320px; position: relative; display: inline-flex; align-items: center; }
+        .q-search svg { position: absolute; left: 12px; width: 13px; height: 13px; color: var(--color-text-tertiary); pointer-events: none; }
+        .q-search input { padding: 0 14px 0 32px; height: 32px; width: 100%; margin: 0; font-size: 13px; border-radius: var(--radius-pill); background: var(--color-surface-secondary); border: 1px solid transparent; color: var(--color-text-primary); transition: all var(--transition-fast); }
+        .q-search input:focus { outline: none; background: var(--color-surface); border-color: var(--color-accent); }
+        .q-toolbar-spacer { flex: 1 1 8px; }
+
+        .q-filters { display: inline-flex; background: var(--color-surface-secondary); border-radius: var(--radius-pill); padding: 3px; gap: 0; flex-wrap: wrap; }
+        .q-filters button { border: 0; background: transparent; padding: 5px 12px; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); border-radius: var(--radius-pill); cursor: pointer; font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+        .q-filters button.active { background: var(--color-surface); color: var(--color-text-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .q-filters .q-filter-count { font-size: 10px; color: var(--color-text-tertiary); background: var(--color-surface-secondary); padding: 0 5px; border-radius: var(--radius-pill); min-width: 16px; text-align: center; line-height: 14px; }
+        .q-filters button.active .q-filter-count { background: var(--color-accent-light); color: var(--color-accent); }
+
+        /* ── Table ── */
+        .q-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .q-table thead th {
+            font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+            text-transform: uppercase; letter-spacing: 0.05em;
+            text-align: left; padding: 14px 20px;
+            border-bottom: 0.5px solid var(--color-border);
+            background: var(--color-surface-tertiary);
+        }
+        .q-table thead th:last-child { text-align: right; padding-right: 16px; }
+        .q-table tbody tr { cursor: pointer; transition: background var(--transition-fast); }
+        .q-table tbody tr:hover { background: var(--sidebar-item-hover); }
+        .q-table tbody td {
+            padding: 14px 20px;
+            border-bottom: 0.5px solid var(--color-border);
+            vertical-align: middle;
+            letter-spacing: -0.008em;
+        }
+        .q-table tbody tr:last-child td { border-bottom: 0; }
+        .q-table td.date { color: var(--color-text-secondary); font-size: 12px; }
+        .q-table td.amount { font-variant-numeric: tabular-nums; font-weight: 500; color: var(--color-text-primary); }
+        .q-table td.actions { text-align: right; padding-right: 16px; }
+        .q-id-cell { display: inline-flex; align-items: center; gap: 10px; }
+        .q-id-ico {
+            width: 30px; height: 30px; border-radius: 8px;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .q-id-ico svg { width: 13px; height: 13px; }
+        .q-id-num { font-weight: 500; color: var(--color-text-primary); }
+        .q-subject { display: block; font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; font-weight: 400; }
+
+        .q-action-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: transparent; border: 0;
+            color: var(--color-text-tertiary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .q-action-btn:hover { background: var(--color-accent-light); color: var(--color-accent); }
+        .q-action-btn svg { width: 14px; height: 14px; }
+
+        /* Sort chevrons */
+        .q-sort {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: none; border: 0; cursor: pointer;
+            color: inherit; font: inherit; letter-spacing: inherit;
+            text-transform: inherit; padding: 0;
+            font-family: inherit;
+        }
+        .q-sort-ico { position: relative; width: 10px; height: 12px; flex-shrink: 0; }
+        .q-sort-ico::before, .q-sort-ico::after {
+            content: ""; position: absolute; left: 2px;
+            border-left: 3px solid transparent; border-right: 3px solid transparent;
+            opacity: 0.3;
+        }
+        .q-sort-ico::before { top: 1px; border-bottom: 4px solid currentColor; }
+        .q-sort-ico::after  { bottom: 1px; border-top: 4px solid currentColor; }
+        .q-sort[data-dir="asc"] .q-sort-ico::before  { opacity: 1; }
+        .q-sort[data-dir="desc"] .q-sort-ico::after  { opacity: 1; }
+        .q-sort.active { color: var(--color-text-primary); }
+
+        /* Pagination */
+        .q-footer {
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            padding: 12px 20px;
+            border-top: 0.5px solid var(--color-border);
+            font-size: 12px; color: var(--color-text-tertiary);
+            background: var(--color-surface-tertiary);
+        }
+        .q-footer .spacer { flex: 1; }
+        .q-page-size { display: inline-flex; align-items: center; gap: 6px; }
+        .q-page-size select {
+            height: 26px; padding: 0 22px 0 10px;
+            border: 0.5px solid var(--color-border);
+            background: var(--color-surface);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-family: inherit;
+            color: var(--color-text-primary);
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            cursor: pointer;
+        }
+        .q-pages { display: inline-flex; gap: 2px; }
+        .q-pages button {
+            min-width: 26px; height: 26px; padding: 0 8px;
+            border: 0; background: transparent;
+            border-radius: var(--radius-sm);
+            font-size: 12px; font-weight: 500; font-family: inherit;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .q-pages button:hover:not(:disabled):not(.active) { background: var(--sidebar-item-hover); color: var(--color-text-primary); }
+        .q-pages button.active { background: var(--color-accent); color: #fff; }
+        .q-pages button:disabled { opacity: 0.35; cursor: not-allowed; }
+        .q-pages button svg { width: 11px; height: 11px; }
+
+        /* ── Empty state ── */
+        .q-empty { padding: 72px 24px 64px; text-align: center; color: var(--color-text-secondary); }
+        .q-empty-ico {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; justify-content: center;
+            margin: 0 auto 18px;
+        }
+        .q-empty-ico svg { width: 26px; height: 26px; }
+        .q-empty-title {
+            font-size: 17px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.014em;
+            margin: 0 0 8px;
+        }
+        .q-empty-desc {
+            font-size: 13px; color: var(--color-text-secondary);
+            line-height: 1.55;
+            max-width: 360px;
+            margin: 0 auto 22px;
+            letter-spacing: -0.008em;
+        }
+        .q-empty .btn-primary { height: 34px; padding: 0 18px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
+        .q-empty .btn-primary svg { width: 13px; height: 13px; }
+    </style>
 </head>
-<body>
-    <aside class="sidebar">
-        <div class="sidebar-header"><a href="index.html" class="sidebar-home-link"><div class="sidebar-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.08 7.13 7.16 8.84 7.14C10.13 7.12 11.34 8.01 12.14 8.01C12.94 8.01 14.41 6.93 15.95 7.11C16.59 7.14 18.37 7.36 19.53 9.06C19.43 9.12 17.2 10.42 17.22 13.11C17.25 16.33 20.05 17.37 20.09 17.38C20.06 17.47 19.61 18.98 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg></div><span class="sidebar-brand">WHMCS</span></a></div>
-        <div class="sidebar-search"><input type="text" class="sidebar-search-input" placeholder="Search"></div>
-        <nav class="sidebar-nav">
-            <a href="clientareahome.html" id="nav-dashboard" class="sidebar-item"><div class="sidebar-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>Dashboard</a>
-            <div class="sidebar-section-label">Services</div>
-            <a href="clientareaproducts.html" id="nav-services" class="sidebar-item"><div class="sidebar-item-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>My Services <span class="sidebar-item-badge">3</span></a>
-            <a href="clientareadomains.html" id="nav-domains" class="sidebar-item"><div class="sidebar-item-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>My Domains <span class="sidebar-item-badge">5</span></a>
-            <div class="sidebar-section-label">Billing</div>
-            <a href="clientareainvoices.html" id="nav-invoices" class="sidebar-item"><div class="sidebar-item-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>Invoices <span class="sidebar-item-badge">2</span></a>
-            <a href="account-paymentmethods.html" id="nav-payments" class="sidebar-item"><div class="sidebar-item-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>Payment Methods</a>
-            <div class="sidebar-section-label">Support</div>
-            <a href="supportticketslist.html" id="nav-tickets" class="sidebar-item"><div class="sidebar-item-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>Support Tickets <span class="sidebar-item-badge">1</span></a>
-            <a href="knowledgebase.html" id="nav-kb" class="sidebar-item"><div class="sidebar-item-icon indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>Knowledge Base</a>
-            <a href="announcements.html" id="nav-announcements" class="sidebar-item"><div class="sidebar-item-icon pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>Announcements</a>
-            <div class="sidebar-section-label">Account</div>
-            <a href="clientareadetails.html" id="nav-details" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>My Details</a>
-            <a href="clientareasecurity.html" id="nav-security" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>Security</a>
-        </nav>
-        <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar">AH</div><div class="sidebar-user-info"><div class="sidebar-user-name">Alex Henderson</div><div class="sidebar-user-email">alex@example.com</div></div></div></div>
-    </aside>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="quotes" data-page-title="My Quotes">
 
-    <main class="main-content">
-        <div class="topbar">
-            <div class="topbar-breadcrumb"><span class="topbar-breadcrumb-current">Quotes</span></div>
-            <div class="topbar-status"><span class="topbar-status-dot"></span>All systems normal</div>
-            <div class="topbar-spacer"></div>
-            <div class="topbar-actions">
-                <div class="notification-wrapper">
-                    <button class="topbar-btn" title="Notifications" onclick="toggleNotifications(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="topbar-notification-dot"></div></button>
-                    <div class="notification-dropdown" id="notificationDropdown">
-                        <div class="notification-dropdown-header"><span class="notification-dropdown-title">Notifications</span><button class="notification-dropdown-clear">Mark all read</button></div>
-                        <a href="viewinvoice.html" class="notification-item"><div class="notification-dot-indicator orange"></div><div class="notification-content"><div class="notification-text">Invoice #10247 is due in 2 days</div><div class="notification-time">2 hours ago</div></div></a>
-                        <a href="viewinvoice.html" class="notification-item"><div class="notification-dot-indicator orange"></div><div class="notification-content"><div class="notification-text">Invoice #10246 is due in 2 days</div><div class="notification-time">2 hours ago</div></div></a>
-                        <a href="viewticket.html" class="notification-item"><div class="notification-dot-indicator green"></div><div class="notification-content"><div class="notification-text">Ticket #TKT-4821 has been answered</div><div class="notification-time">Yesterday</div></div></a>
-                        <a href="announcements.html" class="notification-item"><div class="notification-dot-indicator blue"></div><div class="notification-content"><div class="notification-text">Scheduled maintenance on Apr 20</div><div class="notification-time">3 days ago</div></div></a>
-                    </div>
-                </div>
-                <button class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
-                <div class="profile-dropdown-wrapper">
-                    <div class="topbar-avatar" onclick="toggleProfileDropdown(event)" title="Account">AH</div>
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <div class="profile-dropdown-header"><div class="profile-dropdown-name">Alex Henderson</div><div class="profile-dropdown-email">alex@example.com</div></div>
-                        <a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a>
-                        <a href="clientareasecurity.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Security Settings</a>
-                        <a href="#" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email History</a>
-                        <div class="profile-dropdown-divider"></div>
-                        <div class="theme-toggle-row"><span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span><div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div></div>
-                        <div class="profile-dropdown-divider"></div>
-                        <a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a>
-                    </div>
-                </div>
+<div data-include="partials/state-chip.html"></div>
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>No Notifications</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;"><a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a></div>
+    </div>
+</div>
+
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareaproducts.html">My Services</a><a href="store.html">Order New Services</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareadomains.html">My Domains</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareainvoices.html">My Invoices</a><a href="clientareaquotes.html">My Quotes</a><a href="masspay.html">Mass Payment</a><a href="clientareaaddfunds.html">Add Funds</a><a href="account-paymentmethods.html">Payment Methods</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="supportticketslist.html">Tickets</a><a href="announcements.html">Announcements</a><a href="knowledgebase.html">Knowledgebase</a></div></div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
+</div></nav>
+
+<div data-include="partials/inner-topbar.html"></div>
+
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a><span class="sep">/</span>
+        <a href="#">Billing</a><span class="sep">/</span>
+        <span class="current" aria-current="page">My Quotes</span>
+    </div>
+</nav>
+
+<div class="content-area">
+    <header class="page-header">
+        <h1>My quotes</h1>
+        <p class="page-subtitle">Pending proposals and saved estimates from our team.</p>
+    </header>
+
+    <div class="q-split">
+        <!-- ══ LEFT: Billing sub-nav ══ -->
+        <aside>
+            <div class="card subnav-card">
+                <div class="subnav-heading">Billing</div>
+                <a href="clientareainvoices.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    My Invoices
+                    <span class="subnav-count">2</span>
+                </a>
+                <a href="clientareaquotes.html" class="subnav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+                    My Quotes
+                    <span class="subnav-count">5</span>
+                </a>
+                <a href="masspay.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+                    Mass Payment
+                </a>
+                <a href="clientareaaddfunds.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    Add Funds
+                </a>
+                <a href="account-paymentmethods.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                    Payment Methods
+                </a>
             </div>
-        </div>
+        </aside>
 
-        <div class="content-area">
-            <div class="page-header">
-                <h1 class="page-title">Quotes</h1>
-                <p class="page-subtitle">View quotes and proposals for your account.</p>
-            </div>
-
+        <!-- ══ RIGHT: quotes content ══ -->
+        <div>
             <div class="card">
-                <div class="card-body">
-                    <table class="invoice-table">
-                        <thead>
-                            <tr>
-                                <th>Quote #</th>
-                                <th>Date</th>
-                                <th>Valid Until</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="invoice-id">#QT-1042</td>
-                                <td class="invoice-date">Apr 10, 2026</td>
-                                <td class="invoice-date">Apr 24, 2026</td>
-                                <td class="invoice-amount">$149.00</td>
-                                <td><span class="status-pill pending">Delivered</span></td>
-                                <td><a href="viewquote.html" class="service-manage">View <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></td>
-                            </tr>
-                            <tr>
-                                <td class="invoice-id">#QT-1038</td>
-                                <td class="invoice-date">Mar 20, 2026</td>
-                                <td class="invoice-date">Apr 3, 2026</td>
-                                <td class="invoice-amount">$299.00</td>
-                                <td><span class="status-pill paid">Accepted</span></td>
-                                <td><a href="viewquote.html" class="service-manage">View <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></td>
-                            </tr>
-                            <tr>
-                                <td class="invoice-id">#QT-1035</td>
-                                <td class="invoice-date">Mar 5, 2026</td>
-                                <td class="invoice-date">Mar 19, 2026</td>
-                                <td class="invoice-amount">$79.00</td>
-                                <td><span class="status-pill cancelled">Expired</span></td>
-                                <td><a href="viewquote.html" class="service-manage">View <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></td>
-                            </tr>
-                            <tr>
-                                <td class="invoice-id">#QT-1029</td>
-                                <td class="invoice-date">Feb 15, 2026</td>
-                                <td class="invoice-date">Mar 1, 2026</td>
-                                <td class="invoice-amount">$199.00</td>
-                                <td><span class="status-pill paid">Accepted</span></td>
-                                <td><a href="viewquote.html" class="service-manage">View <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Toolbar (full state only) -->
+                <div class="q-toolbar when-full">
+                    <div class="q-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="search" placeholder="Search quotes…" autocomplete="off">
+                    </div>
+                    <div class="q-filters" role="tablist">
+                        <button type="button" class="active">All <span class="q-filter-count">5</span></button>
+                        <button type="button">Delivered <span class="q-filter-count">2</span></button>
+                        <button type="button">On hold <span class="q-filter-count">1</span></button>
+                        <button type="button">Accepted <span class="q-filter-count">1</span></button>
+                        <button type="button">Lost <span class="q-filter-count">1</span></button>
+                        <button type="button">Draft <span class="q-filter-count">0</span></button>
+                    </div>
+                    <div class="q-toolbar-spacer"></div>
+                </div>
+
+                <!-- Full-state: quotes table -->
+                <table class="q-table when-full">
+                    <thead>
+                        <tr>
+                            <th scope="col"><button type="button" class="q-sort active" data-sort="id" data-dir="desc">Quote <span class="q-sort-ico"></span></button></th>
+                            <th scope="col"><button type="button" class="q-sort" data-sort="date" data-dir="">Date created <span class="q-sort-ico"></span></button></th>
+                            <th scope="col"><button type="button" class="q-sort" data-sort="valid" data-dir="">Valid until <span class="q-sort-ico"></span></button></th>
+                            <th scope="col"><button type="button" class="q-sort" data-sort="amount" data-dir="">Amount <span class="q-sort-ico"></span></button></th>
+                            <th scope="col"><button type="button" class="q-sort" data-sort="status" data-dir="">Status <span class="q-sort-ico"></span></button></th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-href="viewquote.html">
+                            <td>
+                                <div class="q-id-cell">
+                                    <div class="q-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                                    <div>
+                                        <span class="q-id-num">#Q-2087</span>
+                                        <span class="q-subject">Dedicated server — 32 GB RAM · 2 TB SSD</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="date">Apr 14, 2026</td>
+                            <td class="date">May 14, 2026</td>
+                            <td class="amount">$489.00</td>
+                            <td><span class="status-pill delivered">Delivered</span></td>
+                            <td class="actions">
+                                <button type="button" class="q-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button type="button" class="q-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </td>
+                        </tr>
+                        <tr data-href="viewquote.html">
+                            <td>
+                                <div class="q-id-cell">
+                                    <div class="q-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                                    <div>
+                                        <span class="q-id-num">#Q-2081</span>
+                                        <span class="q-subject">Annual SSL wildcard renewal — hendersondesign.com</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="date">Apr 8, 2026</td>
+                            <td class="date">May 8, 2026</td>
+                            <td class="amount">$149.00</td>
+                            <td><span class="status-pill accepted">Accepted</span></td>
+                            <td class="actions">
+                                <button type="button" class="q-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button type="button" class="q-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </td>
+                        </tr>
+                        <tr data-href="viewquote.html">
+                            <td>
+                                <div class="q-id-cell">
+                                    <div class="q-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                                    <div>
+                                        <span class="q-id-num">#Q-2067</span>
+                                        <span class="q-subject">Custom WordPress migration package — 6 sites</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="date">Mar 22, 2026</td>
+                            <td class="date">Apr 22, 2026</td>
+                            <td class="amount">$1,240.00</td>
+                            <td><span class="status-pill on-hold">On hold</span></td>
+                            <td class="actions">
+                                <button type="button" class="q-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button type="button" class="q-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </td>
+                        </tr>
+                        <tr data-href="viewquote.html">
+                            <td>
+                                <div class="q-id-cell">
+                                    <div class="q-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                                    <div>
+                                        <span class="q-id-num">#Q-2054</span>
+                                        <span class="q-subject">Managed VPS — Tokyo region, 8 GB</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="date">Mar 11, 2026</td>
+                            <td class="date">Apr 11, 2026</td>
+                            <td class="amount">$79.00</td>
+                            <td><span class="status-pill delivered">Delivered</span></td>
+                            <td class="actions">
+                                <button type="button" class="q-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button type="button" class="q-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </td>
+                        </tr>
+                        <tr data-href="viewquote.html">
+                            <td>
+                                <div class="q-id-cell">
+                                    <div class="q-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                                    <div>
+                                        <span class="q-id-num">#Q-2031</span>
+                                        <span class="q-subject">Enterprise backup add-on — 500 GB</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="date">Feb 19, 2026</td>
+                            <td class="date">Mar 19, 2026</td>
+                            <td class="amount">$329.00</td>
+                            <td><span class="status-pill lost">Lost</span></td>
+                            <td class="actions">
+                                <button type="button" class="q-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button type="button" class="q-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Full-state: pagination -->
+                <div class="q-footer when-full">
+                    <div class="q-page-size">
+                        Show
+                        <select aria-label="Rows per page">
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
+                        </select>
+                        entries
+                    </div>
+                    <div class="spacer"></div>
+                    <span>Showing 1–5 of 5</span>
+                    <div class="q-pages">
+                        <button type="button" disabled aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+                        <button type="button" class="active">1</button>
+                        <button type="button" disabled aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div class="when-empty q-empty">
+                    <div class="q-empty-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="9" y1="13" x2="15" y2="13"/>
+                            <line x1="9" y1="17" x2="15" y2="17"/>
+                        </svg>
+                    </div>
+                    <h2 class="q-empty-title">No quotes saved</h2>
+                    <p class="q-empty-desc">There are currently no quotes saved under your account. To request a quote, please open a ticket and our team will prepare one for you.</p>
+                    <a href="supportticketsubmit.html" class="btn-primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Open a ticket
+                    </a>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</div>
 
-    <script src="js/apple-theme.js"></script>
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="domains.html">Domains</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="knowledgebase.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Careers</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open><span class="flag">🇺🇸</span><span>English</span><span class="sep">/</span><span>$ USD</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
+        </div>
+    </div>
+</footer>
+
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js"></script>
+<script src="js/apple-layout.js"></script>
+<script>
+// Row click navigation + sort cycle
+(function () {
+    document.querySelectorAll('.q-table tr[data-href]').forEach(tr => {
+        tr.addEventListener('click', (e) => {
+            if (e.target.closest('button, a')) return;
+            window.location.href = tr.getAttribute('data-href');
+        });
+    });
+    const sorts = document.querySelectorAll('.q-sort');
+    sorts.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const dir = btn.getAttribute('data-dir');
+            const next = dir === '' ? 'asc' : dir === 'asc' ? 'desc' : '';
+            sorts.forEach(b => { b.setAttribute('data-dir', ''); b.classList.remove('active'); });
+            btn.setAttribute('data-dir', next);
+            if (next) btn.classList.add('active');
+        });
+    });
+})();
+</script>
 </body>
 </html>

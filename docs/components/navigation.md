@@ -76,38 +76,92 @@ The navbar also includes a collapsible "More" dropdown for overflow items on sma
 | `->getFooterHtml()` | string | Footer HTML content |
 | `->getChildrenAttribute('class')` | string | Children container class |
 
+### MenuItem Writer Methods
+
+These methods are used in hooks to modify the navigation. They support chaining (return self).
+
+| Method | Description |
+|--------|-------------|
+| `->setLabel($text)` | Set display text |
+| `->setUri($url)` | Set link URL |
+| `->setOrder($int)` | Set numeric position (defaults: 10, 20, 30...) |
+| `->setIcon($class)` | Set FontAwesome icon class |
+| `->setBadge($text)` | Set badge text |
+| `->setHidden($bool)` | Hide/show item |
+| `->setDisabled($bool)` | Disable/enable item |
+| `->setClass($class)` | Set CSS class |
+| `->setExtra($key, $value)` | Set extra data (color, btn-link, etc.) |
+| `->setAttribute($key, $value)` | Set HTML attribute |
+| `->addChild($name, $config = [])` | Add child item (returns new MenuItem, chainable) |
+| `->removeChild($name)` | Remove child by name |
+| `->getChild($name)` | Get child by name (null if not found) |
+| `->moveUp()` | Move one position up |
+| `->moveDown()` | Move one position down |
+| `->moveToFront()` | Move to first position |
+| `->moveToBack()` | Move to last position |
+
 ### Customizing Navigation via Hooks
 
 ```php
 <?php
 use WHMCS\View\Menu\Item as MenuItem;
+use WHMCS\View\Menu;
 
-add_hook('ClientAreaPrimaryNavbar', 1, function (MenuItem $primaryNavbar) {
-    // Change a label
-    $primaryNavbar->getChild('Store')
-        ->setLabel('Our Products');
+add_hook('ClientAreaPrimaryNavbar', 1, function (MenuItem $menu) {
+    // Modify existing
+    $menu->getChild('Store')
+        ->setLabel('Our Products')
+        ->setUri('https://example.com/products')
+        ->setIcon('fas fa-store')
+        ->setOrder(10);
     
-    // Change URL
-    $primaryNavbar->getChild('Store')
-        ->setUri('https://example.com/products');
-    
-    // Add new item
-    $primaryNavbar->addChild('Custom Link')
+    // Add new with badge
+    $menu->addChild('resources')
         ->setLabel('Resources')
         ->setUri('/resources')
+        ->setIcon('fas fa-book')
+        ->setBadge('New')
         ->setOrder(50);
     
-    // Remove an item
-    $primaryNavbar->removeChild('Announcements');
+    // Add nested menu
+    $menu->addChild('tools')
+        ->setLabel('Tools')
+        ->setOrder(60)
+        ->addChild('calculator')
+            ->setLabel('Hosting Calculator')
+            ->setUri('/calculator');
     
     // Reorder
-    $primaryNavbar->getChild('Store')
-        ->setOrder(10);
-    // Or: ->moveUp(), ->moveDown(), ->moveToFront(), ->moveToBack()
+    $menu->getChild('Support')->moveToFront();
+    $menu->getChild('Home')->moveToBack();
     
     // Conditional based on login
-    if (!is_null(Menu::context('client'))) {
-        // Client is logged in
+    if (Menu::context('client')) {
+        $menu->addChild('vip')
+            ->setLabel('VIP Area')
+            ->setUri('/vip');
     }
+    
+    // Remove
+    $menu->removeChild('Announcements');
+    
+    // Hide without removing
+    $menu->getChild('Affiliates')->setHidden(true);
 });
+```
+
+## Menu Context
+
+Use static methods on `Menu::` for conditional logic:
+
+```php
+use WHMCS\View\Menu;
+
+// Check if client is logged in
+if (Menu::context('client')) {
+    // Client logged in - show client-only items
+}
+
+// Check other contexts
+Menu::context('admin');  // Admin logged in
 ```
