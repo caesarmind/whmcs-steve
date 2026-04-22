@@ -23,6 +23,9 @@
         layout:        'hn.layout',
         palette:       'hn.palette',
         data:          'hn.data',
+        align:         'hn.align',
+        subnav:        'hn.subnav',
+        subnavSide:    'hn.subnavSide',
         tiles:         'hn.tiles',
         form:          'hn.form',
         product:       'hn.product',
@@ -203,6 +206,69 @@
         layoutButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyLayout(this.dataset.layoutSet); });
         });
+
+        // Align (center / left — preview toggle for content horizontal alignment)
+        var alignButtons = document.querySelectorAll('.state-chip [data-align-set]');
+        function applyAlign(state) {
+            if (state !== 'left' && state !== 'center') state = 'center';
+            if (state === 'center') {
+                body.removeAttribute('data-align');
+            } else {
+                body.setAttribute('data-align', 'left');
+            }
+            alignButtons.forEach(function (b) {
+                b.classList.toggle('active', b.dataset.alignSet === state);
+            });
+            try { localStorage.setItem(KEYS.align, state); } catch (e) {}
+        }
+        var savedAlign; try { savedAlign = localStorage.getItem(KEYS.align); } catch (e) {}
+        applyAlign(params.get('align') || savedAlign || 'center');
+        alignButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () { applyAlign(this.dataset.alignSet); });
+        });
+
+        // Sub-nav (show / hide — preview toggle for in-page content sidebar)
+        var subnavButtons = document.querySelectorAll('.state-chip [data-subnav-set]');
+        function applySubnav(state) {
+            if (state !== 'off' && state !== 'on') state = 'on';
+            if (state === 'on') {
+                body.removeAttribute('data-subnav');
+            } else {
+                body.setAttribute('data-subnav', 'off');
+            }
+            subnavButtons.forEach(function (b) {
+                b.classList.toggle('active', b.dataset.subnavSet === state);
+            });
+            try { localStorage.setItem(KEYS.subnav, state); } catch (e) {}
+        }
+        var savedSubnav; try { savedSubnav = localStorage.getItem(KEYS.subnav); } catch (e) {}
+        applySubnav(params.get('subnav') || savedSubnav || 'on');
+        subnavButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () { applySubnav(this.dataset.subnavSet); });
+        });
+        // Sub-nav side (left / right — which side the content sidebar sits on)
+        var subnavSideButtons = document.querySelectorAll('.state-chip [data-subnav-side-set]');
+        function applySubnavSide(side) {
+            if (['left', 'right', 'outside', 'outside-left'].indexOf(side) === -1) side = 'right';
+            body.setAttribute('data-subnav-side', side);
+            subnavSideButtons.forEach(function (b) {
+                b.classList.toggle('active', b.dataset.subnavSideSet === side);
+            });
+            try { localStorage.setItem(KEYS.subnavSide, side); } catch (e) {}
+        }
+        var savedSubnavSide; try { savedSubnavSide = localStorage.getItem(KEYS.subnavSide); } catch (e) {}
+        applySubnavSide(params.get('subnavSide') || savedSubnavSide || 'right');
+        subnavSideButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () { applySubnavSide(this.dataset.subnavSideSet); });
+        });
+
+        // Hide the Sub-nav + Sub-nav side chips on pages that have no content sidebar.
+        if (!document.querySelector('.dom-split > aside')) {
+            var subnavGroup = subnavButtons[0] && subnavButtons[0].closest('.chip-group');
+            if (subnavGroup) subnavGroup.style.display = 'none';
+            var subnavSideGroup = subnavSideButtons[0] && subnavSideButtons[0].closest('.chip-group');
+            if (subnavSideGroup) subnavSideGroup.style.display = 'none';
+        }
 
         // Data (full / empty — preview toggle for empty-state variants)
         var dataButtons = document.querySelectorAll('.state-chip [data-data-set]');

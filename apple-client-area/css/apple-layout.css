@@ -39,6 +39,11 @@ body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
     flex: 1 0 auto;
     width: 100%;
 }
+/* Align: Left — preview chip toggle (body[data-align="left"]) */
+body[data-align="left"] .ph-main-wrap .content-area {
+    margin-left: 0;
+    margin-right: auto;
+}
 /* Footers sit as natural block children at the end of the flex column — no extra rule needed */
 /* Rail panel overlays content on hover — does NOT shift main wrap */
 body:not([data-layout="top"]) { background: var(--color-bg); }
