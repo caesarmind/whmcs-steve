@@ -210,11 +210,11 @@
         // Align (center / left — preview toggle for content horizontal alignment)
         var alignButtons = document.querySelectorAll('.state-chip [data-align-set]');
         function applyAlign(state) {
-            if (state !== 'left' && state !== 'center') state = 'center';
+            if (['left', 'center', 'content'].indexOf(state) === -1) state = 'center';
             if (state === 'center') {
                 body.removeAttribute('data-align');
             } else {
-                body.setAttribute('data-align', 'left');
+                body.setAttribute('data-align', state);
             }
             alignButtons.forEach(function (b) {
                 b.classList.toggle('active', b.dataset.alignSet === state);

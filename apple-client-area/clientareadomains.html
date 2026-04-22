@@ -56,10 +56,12 @@
         body[data-subnav-side="outside-left"] .dom-split > aside { right: calc(100% + 24px); left: auto; }
         body[data-subnav-side="outside"] .dom-split > .dom-main,
         body[data-subnav-side="outside-left"] .dom-split > .dom-main { grid-column: 1; }
-        /* When Align is Center, shift the content-area by half the aside + gap (264/2 = 132) so
-           the combined (main + aside) unit stays visually centered. */
-        body[data-subnav-side="outside"]:not([data-align="left"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
-        body[data-subnav-side="outside-left"]:not([data-align="left"]) .ph-main-wrap .content-area { transform: translateX(132px); }
+        /* Align=Center: shift content-area by half the aside + gap (264/2 = 132) so the combined
+           (main + aside) unit stays visually centered.
+           Align=Content: skip the shift — the content column centers on its own, sub-nav just
+           floats in whatever gutter is left. Align=Left: no shift either. */
+        body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+        body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
 
         /* Outside-L + Align=Left: flushing content to the left would stuff the aside behind
            the menu sidebar. Reserve 240px on the left (216 for the aside + 24 breathing gap from
