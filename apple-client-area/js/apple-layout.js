@@ -283,7 +283,7 @@
         // Plan (A/B/C/D or All — pricing package variants on the catalog page)
         var planButtons = document.querySelectorAll('.state-chip [data-plan-set]');
         function applyPlan(variant) {
-            var valid = ['all', 'a', 'b', 'c', 'd', 'e', 'f', 'g'];
+            var valid = ['all', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
             if (valid.indexOf(variant) === -1) variant = 'all';
             if (variant === 'all') body.removeAttribute('data-plan');
             else body.setAttribute('data-plan', variant);

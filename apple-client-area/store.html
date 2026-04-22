@@ -313,7 +313,8 @@
         body[data-plan="d"] .plan-variant:not(.v-d),
         body[data-plan="e"] .plan-variant:not(.v-e),
         body[data-plan="f"] .plan-variant:not(.v-f),
-        body[data-plan="g"] .plan-variant:not(.v-g) { display: none; }
+        body[data-plan="g"] .plan-variant:not(.v-g),
+        body[data-plan="h"] .plan-variant:not(.v-h) { display: none; }
 
         .st-variant-label {
             display: flex; align-items: center; gap: 10px;
@@ -769,6 +770,123 @@
         .st-matrix-card.featured .st-matrix-cta { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
         .st-matrix-card.featured .st-matrix-cta:hover { background: var(--color-accent-hover); }
 
+        /* "Available Addons" section heading inside Variant H */
+        .st-addons-heading {
+            font-size: 24px; font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--color-text-primary);
+            padding: 6px 24px 14px;
+            margin: 0;
+        }
+        .st-addon-wrap + .st-addon-wrap { padding-top: 0; }
+
+        /* Per-addon illustration tints — keeps them visually distinct without hard color */
+        .st-addon-illus.weebly    { background: linear-gradient(135deg, rgba(0,113,227,0.12) 0%, rgba(88,86,214,0.06) 100%); color: #0071e3; }
+        .st-addon-illus.codeguard { background: linear-gradient(135deg, rgba(48,209,88,0.14) 0%, rgba(48,209,88,0.04) 100%); color: var(--color-green-text); }
+        .st-addon-illus.sitelock  { background: linear-gradient(135deg, rgba(255,159,10,0.14) 0%, rgba(255,159,10,0.04) 100%); color: var(--color-orange-text); }
+        .st-addon-illus.marketgoo { background: linear-gradient(135deg, rgba(175,82,222,0.12) 0%, rgba(175,82,222,0.04) 100%); color: #8c5cff; }
+        .st-addon-illus.ox        { background: linear-gradient(135deg, rgba(0,113,227,0.12) 0%, rgba(90,200,250,0.06) 100%); color: #0071e3; }
+
+        /* ═════════════════ Variant H — Addon card with radio tiers ═════════════════
+           Full-width card with title + description + illustration, tiers below
+           as radio rows (label left, price right). Matches the WHMCS addon picker
+           pattern used for Weebly / CodeGuard / Spam filters etc. */
+        .st-addon-wrap { padding: 0 20px 24px; }
+        .st-addon {
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-lg, 14px);
+            background: var(--color-surface);
+            overflow: hidden;
+        }
+        .st-addon-head {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            gap: 22px;
+            align-items: center;
+            padding: 24px 28px;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        @media (max-width: 640px) { .st-addon-head { grid-template-columns: 1fr; } }
+        .st-addon-title {
+            font-size: 17px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.014em;
+            margin: 0 0 6px;
+        }
+        .st-addon-desc {
+            font-size: 13px; color: var(--color-text-secondary);
+            letter-spacing: -0.008em;
+            line-height: 1.55;
+            margin: 0;
+        }
+        .st-addon-desc a { color: var(--color-accent); text-decoration: none; }
+        .st-addon-desc a:hover { text-decoration: underline; }
+        .st-addon-illus {
+            display: flex; align-items: center; justify-content: center;
+            height: 100px;
+            background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-surface-secondary) 100%);
+            border-radius: var(--radius-md);
+            color: var(--color-accent);
+        }
+        .st-addon-illus svg { width: 48px; height: 48px; }
+
+        .st-addon-tier {
+            display: grid;
+            grid-template-columns: 22px 1fr auto;
+            gap: 14px;
+            align-items: center;
+            padding: 16px 28px;
+            border-bottom: 0.5px solid var(--color-border);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        .st-addon-tier:last-child { border-bottom: 0; }
+        .st-addon-tier:hover { background: var(--sidebar-item-hover); }
+        .st-addon-tier input { position: absolute; opacity: 0; pointer-events: none; }
+        .st-addon-radio {
+            width: 20px; height: 20px; border-radius: 50%;
+            border: 1.5px solid var(--color-border);
+            background: var(--color-surface);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+        }
+        .st-addon-radio::after {
+            content: ""; width: 8px; height: 8px; border-radius: 50%;
+            background: #fff;
+            transform: scale(0);
+            transition: transform var(--transition-fast);
+        }
+        .st-addon-tier:has(input:checked) .st-addon-radio {
+            border-color: var(--color-accent);
+            background: var(--color-accent);
+        }
+        .st-addon-tier:has(input:checked) .st-addon-radio::after { transform: scale(1); }
+        .st-addon-tier:has(input:checked) { background: var(--color-accent-light); }
+        .st-addon-tier-label {
+            font-size: 14px; font-weight: 500;
+            color: var(--color-text-primary);
+            letter-spacing: -0.008em;
+        }
+        .st-addon-tier-sub {
+            font-size: 12px; color: var(--color-text-tertiary);
+            margin-top: 1px; letter-spacing: -0.004em;
+        }
+        .st-addon-tier-price {
+            font-size: 13.5px; font-weight: 500;
+            color: var(--color-text-primary);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.008em;
+            text-align: right;
+            white-space: nowrap;
+        }
+        .st-addon-tier-price.muted { color: var(--color-text-tertiary); font-weight: 400; }
+        .st-addon-tier-price.free  { color: var(--color-green-text); font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; font-size: 11px; }
+        .st-addon-tier-price .period {
+            font-size: 11px; color: var(--color-text-tertiary); font-weight: 400;
+            letter-spacing: -0.004em;
+        }
+
         /* Cart summary strip (top-right of content when items in cart) */
         .st-cart-summary {
             display: inline-flex; align-items: center; gap: 10px;
@@ -810,7 +928,7 @@
     <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
     <div class="nav-spacer"></div>
     <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
-    <a href="checkout.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
     <a href="login.html" class="nav-signin only-out">Sign in</a>
     <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
 </div></nav>
@@ -964,7 +1082,7 @@
                             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Free SSL certificate</li>
                             <li class="muted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Daily backups</li>
                         </ul>
-                        <a href="store/order.html" class="st-plan-cta secondary">Select plan</a>
+                        <a href="configureproductdomain.html" class="st-plan-cta secondary">Select plan</a>
                     </div>
 
                     <!-- Professional -->
@@ -986,7 +1104,7 @@
                             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Free SSL certificate</li>
                             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Daily backups</li>
                         </ul>
-                        <a href="store/order.html" class="st-plan-cta">Select plan</a>
+                        <a href="configureproductdomain.html" class="st-plan-cta">Select plan</a>
                     </div>
 
                     <!-- Business -->
@@ -1007,7 +1125,7 @@
                             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Free SSL certificate</li>
                             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Daily backups · Priority support</li>
                         </ul>
-                        <a href="store/order.html" class="st-plan-cta secondary">Select plan</a>
+                        <a href="configureproductdomain.html" class="st-plan-cta secondary">Select plan</a>
                     </div>
                 </div>
 
@@ -1031,7 +1149,7 @@
                                 <li><strong>5 GB</strong> storage</li>
                                 <li>Free SSL</li>
                             </ul>
-                            <a href="store/order.html" class="st-plan-b-cta">Select</a>
+                            <a href="configureproductdomain.html" class="st-plan-b-cta">Select</a>
                         </div>
                         <div class="st-plan-b">
                             <div class="st-plan-b-name">Single</div>
@@ -1044,7 +1162,7 @@
                                 <li><strong>10 GB</strong> storage</li>
                                 <li>Free domain + SSL</li>
                             </ul>
-                            <a href="store/order.html" class="st-plan-b-cta">Select</a>
+                            <a href="configureproductdomain.html" class="st-plan-b-cta">Select</a>
                         </div>
                         <div class="st-plan-b featured">
                             <div class="st-plan-b-name">Professional</div>
@@ -1057,7 +1175,7 @@
                                 <li><strong>25 GB</strong> storage</li>
                                 <li>Daily backups</li>
                             </ul>
-                            <a href="store/order.html" class="st-plan-b-cta">Select</a>
+                            <a href="configureproductdomain.html" class="st-plan-b-cta">Select</a>
                         </div>
                         <div class="st-plan-b">
                             <div class="st-plan-b-name">Business</div>
@@ -1070,7 +1188,7 @@
                                 <li><strong>100 GB</strong> storage</li>
                                 <li>Priority support</li>
                             </ul>
-                            <a href="store/order.html" class="st-plan-b-cta">Select</a>
+                            <a href="configureproductdomain.html" class="st-plan-b-cta">Select</a>
                         </div>
                     </div>
                 </div><!-- /.plan-variant v-b -->
@@ -1090,7 +1208,7 @@
                                 <span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Free SSL</span>
                             </div>
                             <div class="st-row-price"><span class="currency">$</span><span class="amount">1.99</span><span class="period">/mo</span></div>
-                            <a href="store/order.html" class="st-row-cta">Select</a>
+                            <a href="configureproductdomain.html" class="st-row-cta">Select</a>
                         </div>
                         <div class="st-row">
                             <div class="st-row-name"><strong>Single</strong><span>For one active site</span></div>
@@ -1100,7 +1218,7 @@
                                 <span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Free domain + SSL</span>
                             </div>
                             <div class="st-row-price"><span class="currency">$</span><span class="amount">2.99</span><span class="period">/mo</span></div>
-                            <a href="store/order.html" class="st-row-cta">Select</a>
+                            <a href="configureproductdomain.html" class="st-row-cta">Select</a>
                         </div>
                         <div class="st-row featured">
                             <div class="st-row-name"><strong>Professional</strong><span>Growing businesses · Most popular</span></div>
@@ -1110,7 +1228,7 @@
                                 <span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Daily backups</span>
                             </div>
                             <div class="st-row-price"><span class="currency">$</span><span class="amount">4.99</span><span class="period">/mo</span></div>
-                            <a href="store/order.html" class="st-row-cta">Select</a>
+                            <a href="configureproductdomain.html" class="st-row-cta">Select</a>
                         </div>
                         <div class="st-row">
                             <div class="st-row-name"><strong>Business</strong><span>Agencies, no limits</span></div>
@@ -1120,7 +1238,7 @@
                                 <span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Priority support</span>
                             </div>
                             <div class="st-row-price"><span class="currency">$</span><span class="amount">9.99</span><span class="period">/mo</span></div>
-                            <a href="store/order.html" class="st-row-cta">Select</a>
+                            <a href="configureproductdomain.html" class="st-row-cta">Select</a>
                         </div>
                         <div class="st-row">
                             <div class="st-row-name"><strong>Enterprise</strong><span>Custom infrastructure, SLA-backed</span></div>
@@ -1130,7 +1248,7 @@
                                 <span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Named engineer</span>
                             </div>
                             <div class="st-row-price"><span class="currency">$</span><span class="amount">49</span><span class="period">/mo</span></div>
-                            <a href="store/order.html" class="st-row-cta">Contact us</a>
+                            <a href="configureproductdomain.html" class="st-row-cta">Contact us</a>
                         </div>
                     </div>
                 </div><!-- /.plan-variant v-c -->
@@ -1216,9 +1334,9 @@
                             </tr>
                             <tr>
                                 <td></td>
-                                <td><a href="store/order.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td>
-                                <td class="featured"><a href="store/order.html" class="st-plan-cta" style="height: 34px; font-size: 12.5px;">Select</a></td>
-                                <td><a href="store/order.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td>
+                                <td><a href="configureproductdomain.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td>
+                                <td class="featured"><a href="configureproductdomain.html" class="st-plan-cta" style="height: 34px; font-size: 12.5px;">Select</a></td>
+                                <td><a href="configureproductdomain.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -1237,7 +1355,7 @@
                             </div>
                             <div class="st-bento-hero-right">
                                 <div class="st-bento-hero-price"><span class="currency">$</span><span class="amount">4.99</span><span class="period">/ mo</span></div>
-                                <a href="store/order.html" class="st-bento-hero-cta">Select plan</a>
+                                <a href="configureproductdomain.html" class="st-bento-hero-cta">Select plan</a>
                             </div>
                         </div>
                         <div class="st-bento-mini">
@@ -1245,14 +1363,14 @@
                             <div class="st-bento-mini-tag">Launch your first site</div>
                             <div class="st-bento-mini-price"><span class="currency">$</span><span class="amount">2.99</span><span class="period">/mo</span></div>
                             <ul class="st-bento-mini-specs"><li><strong>1</strong> website</li><li><strong>10 GB</strong> SSD storage</li><li>Free domain + SSL</li></ul>
-                            <a href="store/order.html" class="st-bento-mini-cta">Select plan</a>
+                            <a href="configureproductdomain.html" class="st-bento-mini-cta">Select plan</a>
                         </div>
                         <div class="st-bento-mini">
                             <div class="st-bento-mini-name">Business</div>
                             <div class="st-bento-mini-tag">Agencies, no limits</div>
                             <div class="st-bento-mini-price"><span class="currency">$</span><span class="amount">9.99</span><span class="period">/mo</span></div>
                             <ul class="st-bento-mini-specs"><li><strong>Unlimited</strong> sites</li><li><strong>100 GB</strong> SSD storage</li><li>Daily backups + priority</li></ul>
-                            <a href="store/order.html" class="st-bento-mini-cta">Select plan</a>
+                            <a href="configureproductdomain.html" class="st-bento-mini-cta">Select plan</a>
                         </div>
                     </div>
                 </div>
@@ -1261,9 +1379,9 @@
                 <div class="st-variant-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="8" rx="1"/><line x1="9" y1="8" x2="9" y2="16"/><line x1="15" y1="8" x2="15" y2="16"/></svg>Variant F · segmented bar</div>
                 <div class="plan-variant v-f">
                     <div class="st-seg">
-                        <div class="st-seg-col"><div class="st-seg-name">Single</div><div class="st-seg-tag">Launch your first site</div><div class="st-seg-price"><span class="currency">$</span><span class="amount">2.99</span><span class="period">/mo</span></div><ul class="st-seg-specs"><li><strong>1</strong> website</li><li><strong>10 GB</strong> storage</li><li>Free domain</li><li>Free SSL</li></ul><a href="store/order.html" class="st-seg-cta">Select</a></div>
-                        <div class="st-seg-col featured"><div class="st-seg-name">Professional</div><div class="st-seg-tag">Growing businesses</div><div class="st-seg-price"><span class="currency">$</span><span class="amount">4.99</span><span class="period">/mo</span></div><ul class="st-seg-specs"><li><strong>10</strong> websites</li><li><strong>25 GB</strong> storage</li><li>Free domain</li><li>Daily backups</li></ul><a href="store/order.html" class="st-seg-cta">Select</a></div>
-                        <div class="st-seg-col"><div class="st-seg-name">Business</div><div class="st-seg-tag">Agencies, no limits</div><div class="st-seg-price"><span class="currency">$</span><span class="amount">9.99</span><span class="period">/mo</span></div><ul class="st-seg-specs"><li><strong>Unlimited</strong> sites</li><li><strong>100 GB</strong> storage</li><li>Priority support</li><li>Staging env</li></ul><a href="store/order.html" class="st-seg-cta">Select</a></div>
+                        <div class="st-seg-col"><div class="st-seg-name">Single</div><div class="st-seg-tag">Launch your first site</div><div class="st-seg-price"><span class="currency">$</span><span class="amount">2.99</span><span class="period">/mo</span></div><ul class="st-seg-specs"><li><strong>1</strong> website</li><li><strong>10 GB</strong> storage</li><li>Free domain</li><li>Free SSL</li></ul><a href="configureproductdomain.html" class="st-seg-cta">Select</a></div>
+                        <div class="st-seg-col featured"><div class="st-seg-name">Professional</div><div class="st-seg-tag">Growing businesses</div><div class="st-seg-price"><span class="currency">$</span><span class="amount">4.99</span><span class="period">/mo</span></div><ul class="st-seg-specs"><li><strong>10</strong> websites</li><li><strong>25 GB</strong> storage</li><li>Free domain</li><li>Daily backups</li></ul><a href="configureproductdomain.html" class="st-seg-cta">Select</a></div>
+                        <div class="st-seg-col"><div class="st-seg-name">Business</div><div class="st-seg-tag">Agencies, no limits</div><div class="st-seg-price"><span class="currency">$</span><span class="amount">9.99</span><span class="period">/mo</span></div><ul class="st-seg-specs"><li><strong>Unlimited</strong> sites</li><li><strong>100 GB</strong> storage</li><li>Priority support</li><li>Staging env</li></ul><a href="configureproductdomain.html" class="st-seg-cta">Select</a></div>
                     </div>
                 </div>
 
@@ -1271,9 +1389,115 @@
                 <div class="st-variant-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>Variant G · spec matrix</div>
                 <div class="plan-variant v-g">
                     <div class="st-matrix">
-                        <div class="st-matrix-card"><div class="st-matrix-head"><div class="st-matrix-eyebrow">Web Hosting</div><h3 class="st-matrix-name">Single</h3></div><div class="st-matrix-specs"><div class="st-matrix-row"><span class="label">Websites</span><span class="value">1</span></div><div class="st-matrix-row"><span class="label">SSD storage</span><span class="value">10 GB</span></div><div class="st-matrix-row"><span class="label">Bandwidth</span><span class="value">Unlimited</span></div><div class="st-matrix-row"><span class="label">Free domain</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Free SSL</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Daily backups</span><span class="value cross">✕</span></div><div class="st-matrix-row"><span class="label">Priority support</span><span class="value cross">✕</span></div></div><div class="st-matrix-foot"><div class="st-matrix-price"><span class="currency">$</span><span class="amount">2.99</span><span class="period">/mo</span></div><a href="store/order.html" class="st-matrix-cta">Select plan</a></div></div>
-                        <div class="st-matrix-card featured"><div class="st-matrix-head"><div class="st-matrix-eyebrow">Most popular</div><h3 class="st-matrix-name">Professional</h3></div><div class="st-matrix-specs"><div class="st-matrix-row"><span class="label">Websites</span><span class="value">10</span></div><div class="st-matrix-row"><span class="label">SSD storage</span><span class="value">25 GB</span></div><div class="st-matrix-row"><span class="label">Bandwidth</span><span class="value">Unlimited</span></div><div class="st-matrix-row"><span class="label">Free domain</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Free SSL</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Daily backups</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Priority support</span><span class="value cross">✕</span></div></div><div class="st-matrix-foot"><div class="st-matrix-price"><span class="currency">$</span><span class="amount">4.99</span><span class="period">/mo</span></div><a href="store/order.html" class="st-matrix-cta">Select plan</a></div></div>
-                        <div class="st-matrix-card"><div class="st-matrix-head"><div class="st-matrix-eyebrow">Web Hosting</div><h3 class="st-matrix-name">Business</h3></div><div class="st-matrix-specs"><div class="st-matrix-row"><span class="label">Websites</span><span class="value">Unlimited</span></div><div class="st-matrix-row"><span class="label">SSD storage</span><span class="value">100 GB</span></div><div class="st-matrix-row"><span class="label">Bandwidth</span><span class="value">Unlimited</span></div><div class="st-matrix-row"><span class="label">Free domain</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Free SSL</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Daily backups</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Priority support</span><span class="value check">✓</span></div></div><div class="st-matrix-foot"><div class="st-matrix-price"><span class="currency">$</span><span class="amount">9.99</span><span class="period">/mo</span></div><a href="store/order.html" class="st-matrix-cta">Select plan</a></div></div>
+                        <div class="st-matrix-card"><div class="st-matrix-head"><div class="st-matrix-eyebrow">Web Hosting</div><h3 class="st-matrix-name">Single</h3></div><div class="st-matrix-specs"><div class="st-matrix-row"><span class="label">Websites</span><span class="value">1</span></div><div class="st-matrix-row"><span class="label">SSD storage</span><span class="value">10 GB</span></div><div class="st-matrix-row"><span class="label">Bandwidth</span><span class="value">Unlimited</span></div><div class="st-matrix-row"><span class="label">Free domain</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Free SSL</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Daily backups</span><span class="value cross">✕</span></div><div class="st-matrix-row"><span class="label">Priority support</span><span class="value cross">✕</span></div></div><div class="st-matrix-foot"><div class="st-matrix-price"><span class="currency">$</span><span class="amount">2.99</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-matrix-cta">Select plan</a></div></div>
+                        <div class="st-matrix-card featured"><div class="st-matrix-head"><div class="st-matrix-eyebrow">Most popular</div><h3 class="st-matrix-name">Professional</h3></div><div class="st-matrix-specs"><div class="st-matrix-row"><span class="label">Websites</span><span class="value">10</span></div><div class="st-matrix-row"><span class="label">SSD storage</span><span class="value">25 GB</span></div><div class="st-matrix-row"><span class="label">Bandwidth</span><span class="value">Unlimited</span></div><div class="st-matrix-row"><span class="label">Free domain</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Free SSL</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Daily backups</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Priority support</span><span class="value cross">✕</span></div></div><div class="st-matrix-foot"><div class="st-matrix-price"><span class="currency">$</span><span class="amount">4.99</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-matrix-cta">Select plan</a></div></div>
+                        <div class="st-matrix-card"><div class="st-matrix-head"><div class="st-matrix-eyebrow">Web Hosting</div><h3 class="st-matrix-name">Business</h3></div><div class="st-matrix-specs"><div class="st-matrix-row"><span class="label">Websites</span><span class="value">Unlimited</span></div><div class="st-matrix-row"><span class="label">SSD storage</span><span class="value">100 GB</span></div><div class="st-matrix-row"><span class="label">Bandwidth</span><span class="value">Unlimited</span></div><div class="st-matrix-row"><span class="label">Free domain</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Free SSL</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Daily backups</span><span class="value check">✓</span></div><div class="st-matrix-row"><span class="label">Priority support</span><span class="value check">✓</span></div></div><div class="st-matrix-foot"><div class="st-matrix-price"><span class="currency">$</span><span class="amount">9.99</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-matrix-cta">Select plan</a></div></div>
+                    </div>
+                </div>
+
+                <!-- ═══ Variant H · Available Addons — addon cards with radio tiers ═══ -->
+                <div class="st-variant-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="7" cy="10" r="1.5"/><circle cx="7" cy="15" r="1.5"/><line x1="11" y1="10" x2="18" y2="10"/><line x1="11" y1="15" x2="18" y2="15"/></svg>Variant H · available addons</div>
+                <div class="plan-variant v-h">
+                    <h2 class="st-addons-heading">Available Addons</h2>
+
+                    <!-- ─── Powerful Website Builder (Weebly) ─── -->
+                    <div class="st-addon-wrap">
+                        <div class="st-addon">
+                            <div class="st-addon-head">
+                                <div>
+                                    <h3 class="st-addon-title">Powerful Website Builder</h3>
+                                    <p class="st-addon-desc">Add Weebly's drag-and-drop website builder to your hosting so you can create a great-looking site, store, or blog without writing code. <a href="#">Learn more…</a></p>
+                                </div>
+                                <div class="st-addon-illus weebly">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><rect x="5" y="6" width="6" height="4" rx="0.5" fill="currentColor" fill-opacity="0.15" stroke="none"/><line x1="13" y1="7" x2="19" y2="7"/><line x1="13" y1="10" x2="17" y2="10"/><line x1="5" y1="13" x2="19" y2="13"/></svg>
+                                </div>
+                            </div>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-wb"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">None</div><div class="st-addon-tier-sub">No website builder, manage your site however you like.</div></div><div class="st-addon-tier-price muted">—</div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-wb" checked><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Free</div><div class="st-addon-tier-sub">6 pages · Weebly branding · basic templates</div></div><div class="st-addon-tier-price free">Free!</div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-wb"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Starter</div><div class="st-addon-tier-sub">Unlimited pages · custom domain · ad-free</div></div><div class="st-addon-tier-price">$59.88 <span class="period">/ yr</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-wb"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Pro</div><div class="st-addon-tier-sub">Everything in Starter + e-commerce, membership, stats</div></div><div class="st-addon-tier-price">$179.88 <span class="period">/ yr</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-wb"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Business</div><div class="st-addon-tier-sub">Priority support, advanced SEO, custom code &amp; checkout</div></div><div class="st-addon-tier-price">$289.99 <span class="period">/ yr</span></div></label>
+                        </div>
+                    </div>
+
+                    <!-- ─── Website Backup (CodeGuard) ─── -->
+                    <div class="st-addon-wrap">
+                        <div class="st-addon">
+                            <div class="st-addon-head">
+                                <div>
+                                    <h3 class="st-addon-title">Website Backup &amp; Restore</h3>
+                                    <p class="st-addon-desc">CodeGuard takes daily off-site snapshots of your site and database. Restore any version with a single click — no ticket required. <a href="#">Learn more…</a></p>
+                                </div>
+                                <div class="st-addon-illus codeguard">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-9-9c2.52 0 4.82.99 6.5 2.6"/><polyline points="22 4 22 10 16 10"/><path d="M12 8v4l3 2"/></svg>
+                                </div>
+                            </div>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-cg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">None</div><div class="st-addon-tier-sub">No off-site backups — not recommended for production sites.</div></div><div class="st-addon-tier-price muted">—</div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-cg" checked><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Basic — 1 GB</div><div class="st-addon-tier-sub">Daily snapshots · 30-day history · 1-click restore</div></div><div class="st-addon-tier-price">$3.99 <span class="period">/ mo</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-cg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Premium — 5 GB</div><div class="st-addon-tier-sub">Everything in Basic + malware monitoring</div></div><div class="st-addon-tier-price">$7.99 <span class="period">/ mo</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-cg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Professional — 25 GB</div><div class="st-addon-tier-sub">90-day history · priority restore queue</div></div><div class="st-addon-tier-price">$14.99 <span class="period">/ mo</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-cg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Enterprise — 100 GB</div><div class="st-addon-tier-sub">Unlimited history · hourly snapshots on request</div></div><div class="st-addon-tier-price">$29.99 <span class="period">/ mo</span></div></label>
+                        </div>
+                    </div>
+
+                    <!-- ─── Website Security (SiteLock) ─── -->
+                    <div class="st-addon-wrap">
+                        <div class="st-addon">
+                            <div class="st-addon-head">
+                                <div>
+                                    <h3 class="st-addon-title">Website Security &amp; Malware Protection</h3>
+                                    <p class="st-addon-desc">SiteLock continuously scans your site for malware, vulnerabilities and blacklistings. Higher tiers automatically clean threats. <a href="#">Learn more…</a></p>
+                                </div>
+                                <div class="st-addon-illus sitelock">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                                </div>
+                            </div>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-sl" checked><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">None</div><div class="st-addon-tier-sub">No active scanning — use at your own risk.</div></div><div class="st-addon-tier-price muted">—</div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-sl"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">SMART</div><div class="st-addon-tier-sub">Vulnerability scanner + blacklist monitoring</div></div><div class="st-addon-tier-price">$2.99 <span class="period">/ mo</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-sl"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Find</div><div class="st-addon-tier-sub">Daily malware scans · threat alerts</div></div><div class="st-addon-tier-price">$9.99 <span class="period">/ mo</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-sl"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Find &amp; Fix</div><div class="st-addon-tier-sub">Auto-cleans detected malware + SSL insights</div></div><div class="st-addon-tier-price">$19.99 <span class="period">/ mo</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-sl"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Prevent</div><div class="st-addon-tier-sub">Web-app firewall + CDN + DDoS mitigation</div></div><div class="st-addon-tier-price">$29.99 <span class="period">/ mo</span></div></label>
+                        </div>
+                    </div>
+
+                    <!-- ─── SEO Toolkit (MarketGoo) ─── -->
+                    <div class="st-addon-wrap">
+                        <div class="st-addon">
+                            <div class="st-addon-head">
+                                <div>
+                                    <h3 class="st-addon-title">SEO Toolkit by MarketGoo</h3>
+                                    <p class="st-addon-desc">Daily rank tracking, on-page audits and actionable recommendations to grow organic traffic. <a href="#">Learn more…</a></p>
+                                </div>
+                                <div class="st-addon-illus marketgoo">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></svg>
+                                </div>
+                            </div>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-mg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">None</div><div class="st-addon-tier-sub">No SEO tracking — manage off-site if you prefer.</div></div><div class="st-addon-tier-price muted">—</div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-mg" checked><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Essentials</div><div class="st-addon-tier-sub">3 keywords · weekly audits · basic reports</div></div><div class="st-addon-tier-price free">Free!</div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-mg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Starter</div><div class="st-addon-tier-sub">25 keywords · daily audits · competitor tracking</div></div><div class="st-addon-tier-price">$3.99 <span class="period">/ mo</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-mg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Pro</div><div class="st-addon-tier-sub">100 keywords · content planning · white-label reports</div></div><div class="st-addon-tier-price">$9.99 <span class="period">/ mo</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-mg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Agency</div><div class="st-addon-tier-sub">Unlimited keywords · 10 sites · API access</div></div><div class="st-addon-tier-price">$19.99 <span class="period">/ mo</span></div></label>
+                        </div>
+                    </div>
+
+                    <!-- ─── Professional Email (OX App Suite) ─── -->
+                    <div class="st-addon-wrap">
+                        <div class="st-addon">
+                            <div class="st-addon-head">
+                                <div>
+                                    <h3 class="st-addon-title">Professional Email by OX App Suite</h3>
+                                    <p class="st-addon-desc">Ad-free branded email @yourdomain.com with calendar, contacts, video meetings and 25 GB storage per mailbox. <a href="#">Learn more…</a></p>
+                                </div>
+                                <div class="st-addon-illus ox">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+                                </div>
+                            </div>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-ox" checked><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">None</div><div class="st-addon-tier-sub">Use your existing mail provider.</div></div><div class="st-addon-tier-price muted">—</div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-ox"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">1 mailbox</div><div class="st-addon-tier-sub">25 GB · calendar · contacts</div></div><div class="st-addon-tier-price">$1.99 <span class="period">/ mo</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-ox"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">5 mailboxes</div><div class="st-addon-tier-sub">Team aliases · shared drives</div></div><div class="st-addon-tier-price">$7.99 <span class="period">/ mo</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-ox"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">10 mailboxes</div><div class="st-addon-tier-sub">Video meetings · advanced filters</div></div><div class="st-addon-tier-price">$14.99 <span class="period">/ mo</span></div></label>
+                            <label class="st-addon-tier"><input type="radio" name="st-addon-ox"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Unlimited</div><div class="st-addon-tier-sub">Unlimited mailboxes + compliance archive</div></div><div class="st-addon-tier-price">$29.99 <span class="period">/ mo</span></div></label>
+                        </div>
                     </div>
                 </div>
                 </div><!-- /[data-cat-content="web-hosting"] -->
@@ -1298,7 +1522,7 @@
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>2 TB transfer</li>
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Full root access</li>
                                 </ul>
-                                <a href="store/order.html" class="st-plan-cta secondary">Select plan</a>
+                                <a href="configureproductdomain.html" class="st-plan-cta secondary">Select plan</a>
                             </div>
                             <div class="st-plan featured">
                                 <span class="st-plan-badge">Most popular</span>
@@ -1313,7 +1537,7 @@
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>4 TB transfer</li>
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>DDoS protection included</li>
                                 </ul>
-                                <a href="store/order.html" class="st-plan-cta">Select plan</a>
+                                <a href="configureproductdomain.html" class="st-plan-cta">Select plan</a>
                             </div>
                             <div class="st-plan">
                                 <h3 class="st-plan-name">VPS 8</h3>
@@ -1327,7 +1551,7 @@
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>8 TB transfer</li>
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Priority network routing</li>
                                 </ul>
-                                <a href="store/order.html" class="st-plan-cta secondary">Select plan</a>
+                                <a href="configureproductdomain.html" class="st-plan-cta secondary">Select plan</a>
                             </div>
                         </div>
                     </div>
@@ -1337,10 +1561,10 @@
                     </div>
                     <div class="plan-variant v-b">
                         <div class="st-pricing-b">
-                            <div class="st-plan-b"><div class="st-plan-b-name">VPS 1</div><div class="st-plan-b-tag">Staging or a single small app</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">6</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>1</strong> vCPU · <strong>2 GB</strong> RAM</li><li><strong>40 GB</strong> NVMe</li><li>1 TB transfer</li></ul><a href="store/order.html" class="st-plan-b-cta">Select</a></div>
-                            <div class="st-plan-b"><div class="st-plan-b-name">VPS 2</div><div class="st-plan-b-tag">Dev + small production</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">12</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>2</strong> vCPU · <strong>4 GB</strong> RAM</li><li><strong>80 GB</strong> NVMe</li><li>2 TB transfer</li></ul><a href="store/order.html" class="st-plan-b-cta">Select</a></div>
-                            <div class="st-plan-b featured"><div class="st-plan-b-name">VPS 4</div><div class="st-plan-b-tag">Most production sites</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">24</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>4</strong> vCPU · <strong>8 GB</strong> RAM</li><li><strong>160 GB</strong> NVMe</li><li>4 TB + DDoS</li></ul><a href="store/order.html" class="st-plan-b-cta">Select</a></div>
-                            <div class="st-plan-b"><div class="st-plan-b-name">VPS 8</div><div class="st-plan-b-tag">High-traffic apps</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">48</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>8</strong> vCPU · <strong>16 GB</strong> RAM</li><li><strong>320 GB</strong> NVMe</li><li>8 TB transfer</li></ul><a href="store/order.html" class="st-plan-b-cta">Select</a></div>
+                            <div class="st-plan-b"><div class="st-plan-b-name">VPS 1</div><div class="st-plan-b-tag">Staging or a single small app</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">6</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>1</strong> vCPU · <strong>2 GB</strong> RAM</li><li><strong>40 GB</strong> NVMe</li><li>1 TB transfer</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Select</a></div>
+                            <div class="st-plan-b"><div class="st-plan-b-name">VPS 2</div><div class="st-plan-b-tag">Dev + small production</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">12</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>2</strong> vCPU · <strong>4 GB</strong> RAM</li><li><strong>80 GB</strong> NVMe</li><li>2 TB transfer</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Select</a></div>
+                            <div class="st-plan-b featured"><div class="st-plan-b-name">VPS 4</div><div class="st-plan-b-tag">Most production sites</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">24</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>4</strong> vCPU · <strong>8 GB</strong> RAM</li><li><strong>160 GB</strong> NVMe</li><li>4 TB + DDoS</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Select</a></div>
+                            <div class="st-plan-b"><div class="st-plan-b-name">VPS 8</div><div class="st-plan-b-tag">High-traffic apps</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">48</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>8</strong> vCPU · <strong>16 GB</strong> RAM</li><li><strong>320 GB</strong> NVMe</li><li>8 TB transfer</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Select</a></div>
                         </div>
                     </div>
                     <div class="st-variant-label">
@@ -1349,11 +1573,11 @@
                     </div>
                     <div class="plan-variant v-c">
                         <div class="st-rows">
-                            <div class="st-row"><div class="st-row-name"><strong>VPS 1</strong><span>Staging or a small app</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>1</strong> vCPU</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>2 GB</strong> RAM</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>40 GB</strong> NVMe</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">6</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
-                            <div class="st-row"><div class="st-row-name"><strong>VPS 2</strong><span>Dev + small production</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>2</strong> vCPU</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>4 GB</strong> RAM</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>80 GB</strong> NVMe</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">12</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
-                            <div class="st-row featured"><div class="st-row-name"><strong>VPS 4</strong><span>Most production sites · Most popular</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>4</strong> vCPU</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>8 GB</strong> RAM</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>DDoS protection</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">24</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
-                            <div class="st-row"><div class="st-row-name"><strong>VPS 8</strong><span>High-traffic apps</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>8</strong> vCPU</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>16 GB</strong> RAM</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Priority routing</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">48</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
-                            <div class="st-row"><div class="st-row-name"><strong>VPS 16</strong><span>Clusters &amp; heavy workloads</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>16</strong> vCPU</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>32 GB</strong> RAM</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Private VLAN</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">96</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>VPS 1</strong><span>Staging or a small app</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>1</strong> vCPU</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>2 GB</strong> RAM</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>40 GB</strong> NVMe</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">6</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>VPS 2</strong><span>Dev + small production</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>2</strong> vCPU</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>4 GB</strong> RAM</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>80 GB</strong> NVMe</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">12</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row featured"><div class="st-row-name"><strong>VPS 4</strong><span>Most production sites · Most popular</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>4</strong> vCPU</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>8 GB</strong> RAM</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>DDoS protection</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">24</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>VPS 8</strong><span>High-traffic apps</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>8</strong> vCPU</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>16 GB</strong> RAM</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Priority routing</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">48</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>VPS 16</strong><span>Clusters &amp; heavy workloads</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>16</strong> vCPU</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>32 GB</strong> RAM</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Private VLAN</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">96</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
                         </div>
                     </div>
                     <div class="st-variant-label">
@@ -1380,7 +1604,7 @@
                                 <tr><td>Snapshots included</td><td class="st-compare-val">1</td><td class="st-compare-val featured">5</td><td class="st-compare-val">10</td></tr>
                                 <tr><td>Private network</td><td class="st-compare-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td><td class="st-compare-x featured"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td><td class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td></tr>
                                 <tr><td>Priority routing</td><td class="st-compare-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td><td class="st-compare-x featured"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td><td class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td></tr>
-                                <tr><td></td><td><a href="store/order.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td><td class="featured"><a href="store/order.html" class="st-plan-cta" style="height: 34px; font-size: 12.5px;">Select</a></td><td><a href="store/order.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td></tr>
+                                <tr><td></td><td><a href="configureproductdomain.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td><td class="featured"><a href="configureproductdomain.html" class="st-plan-cta" style="height: 34px; font-size: 12.5px;">Select</a></td><td><a href="configureproductdomain.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1405,7 +1629,7 @@
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>2 × 1 TB</strong> NVMe RAID 1</li>
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>1 Gbps unmetered</li>
                                 </ul>
-                                <a href="store/order.html" class="st-plan-cta secondary">Select plan</a>
+                                <a href="configureproductdomain.html" class="st-plan-cta secondary">Select plan</a>
                             </div>
                             <div class="st-plan featured">
                                 <span class="st-plan-badge">Most popular</span>
@@ -1419,7 +1643,7 @@
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>2 × 2 TB</strong> NVMe RAID 1</li>
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>10 Gbps unmetered</li>
                                 </ul>
-                                <a href="store/order.html" class="st-plan-cta">Select plan</a>
+                                <a href="configureproductdomain.html" class="st-plan-cta">Select plan</a>
                             </div>
                             <div class="st-plan">
                                 <h3 class="st-plan-name">Rack-3</h3>
@@ -1432,7 +1656,7 @@
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>4 × 4 TB</strong> NVMe RAID 10</li>
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>10 Gbps + dedicated engineer</li>
                                 </ul>
-                                <a href="store/order.html" class="st-plan-cta secondary">Select plan</a>
+                                <a href="configureproductdomain.html" class="st-plan-cta secondary">Select plan</a>
                             </div>
                         </div>
                     </div>
@@ -1442,10 +1666,10 @@
                     </div>
                     <div class="plan-variant v-b">
                         <div class="st-pricing-b">
-                            <div class="st-plan-b"><div class="st-plan-b-name">Rack-1</div><div class="st-plan-b-tag">Entry-level bare metal</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">89</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li>Xeon E-2378 · <strong>8c/16t</strong></li><li><strong>32 GB</strong> ECC · 2×1 TB</li><li>1 Gbps unmetered</li></ul><a href="store/order.html" class="st-plan-b-cta">Select</a></div>
-                            <div class="st-plan-b featured"><div class="st-plan-b-name">Rack-2</div><div class="st-plan-b-tag">Production &amp; heavy DB</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">179</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li>EPYC 7443P · <strong>24c/48t</strong></li><li><strong>128 GB</strong> ECC · 2×2 TB</li><li>10 Gbps unmetered</li></ul><a href="store/order.html" class="st-plan-b-cta">Select</a></div>
-                            <div class="st-plan-b"><div class="st-plan-b-name">Rack-3</div><div class="st-plan-b-tag">Mission-critical</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">389</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li>2× EPYC 7543 · <strong>64c/128t</strong></li><li><strong>256 GB</strong> ECC · 4×4 TB</li><li>10 Gbps + engineer</li></ul><a href="store/order.html" class="st-plan-b-cta">Select</a></div>
-                            <div class="st-plan-b"><div class="st-plan-b-name">Rack-GPU</div><div class="st-plan-b-tag">AI &amp; rendering</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">899</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li>EPYC + <strong>1× A100 80 GB</strong></li><li><strong>512 GB</strong> ECC · 8 TB</li><li>Private 25 Gbps</li></ul><a href="store/order.html" class="st-plan-b-cta">Contact</a></div>
+                            <div class="st-plan-b"><div class="st-plan-b-name">Rack-1</div><div class="st-plan-b-tag">Entry-level bare metal</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">89</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li>Xeon E-2378 · <strong>8c/16t</strong></li><li><strong>32 GB</strong> ECC · 2×1 TB</li><li>1 Gbps unmetered</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Select</a></div>
+                            <div class="st-plan-b featured"><div class="st-plan-b-name">Rack-2</div><div class="st-plan-b-tag">Production &amp; heavy DB</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">179</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li>EPYC 7443P · <strong>24c/48t</strong></li><li><strong>128 GB</strong> ECC · 2×2 TB</li><li>10 Gbps unmetered</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Select</a></div>
+                            <div class="st-plan-b"><div class="st-plan-b-name">Rack-3</div><div class="st-plan-b-tag">Mission-critical</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">389</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li>2× EPYC 7543 · <strong>64c/128t</strong></li><li><strong>256 GB</strong> ECC · 4×4 TB</li><li>10 Gbps + engineer</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Select</a></div>
+                            <div class="st-plan-b"><div class="st-plan-b-name">Rack-GPU</div><div class="st-plan-b-tag">AI &amp; rendering</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">899</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li>EPYC + <strong>1× A100 80 GB</strong></li><li><strong>512 GB</strong> ECC · 8 TB</li><li>Private 25 Gbps</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Contact</a></div>
                         </div>
                     </div>
                     <div class="st-variant-label">
@@ -1454,11 +1678,11 @@
                     </div>
                     <div class="plan-variant v-c">
                         <div class="st-rows">
-                            <div class="st-row"><div class="st-row-name"><strong>Rack-1</strong><span>Entry-level bare metal</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Xeon <strong>8c/16t</strong></span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>32 GB</strong> ECC</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>1 Gbps</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">89</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
-                            <div class="st-row featured"><div class="st-row-name"><strong>Rack-2</strong><span>Production &amp; heavy DB · Most popular</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>EPYC <strong>24c/48t</strong></span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>128 GB</strong> ECC</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>10 Gbps</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">179</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
-                            <div class="st-row"><div class="st-row-name"><strong>Rack-3</strong><span>Mission-critical + engineer</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dual EPYC <strong>64c/128t</strong></span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>256 GB</strong> ECC</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>10 Gbps unmetered</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">389</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
-                            <div class="st-row"><div class="st-row-name"><strong>Rack-GPU</strong><span>AI &amp; rendering workloads</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>EPYC + <strong>A100 80 GB</strong></span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>512 GB</strong> ECC</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>25 Gbps private</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">899</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Contact</a></div>
-                            <div class="st-row"><div class="st-row-name"><strong>Rack-Cluster</strong><span>Custom infrastructure, SLA-backed</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Multi-node fabric</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Custom sizing</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>99.99% SLA</span></div><div class="st-row-price"><span class="currency">from</span><span class="amount">1,999</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Contact</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>Rack-1</strong><span>Entry-level bare metal</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Xeon <strong>8c/16t</strong></span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>32 GB</strong> ECC</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>1 Gbps</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">89</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row featured"><div class="st-row-name"><strong>Rack-2</strong><span>Production &amp; heavy DB · Most popular</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>EPYC <strong>24c/48t</strong></span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>128 GB</strong> ECC</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>10 Gbps</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">179</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>Rack-3</strong><span>Mission-critical + engineer</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dual EPYC <strong>64c/128t</strong></span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>256 GB</strong> ECC</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>10 Gbps unmetered</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">389</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>Rack-GPU</strong><span>AI &amp; rendering workloads</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>EPYC + <strong>A100 80 GB</strong></span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>512 GB</strong> ECC</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>25 Gbps private</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">899</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Contact</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>Rack-Cluster</strong><span>Custom infrastructure, SLA-backed</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Multi-node fabric</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Custom sizing</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>99.99% SLA</span></div><div class="st-row-price"><span class="currency">from</span><span class="amount">1,999</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Contact</a></div>
                         </div>
                     </div>
                     <div class="st-variant-label">
@@ -1485,7 +1709,7 @@
                                 <tr><td>Unmetered</td><td class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td><td class="st-compare-check featured"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td><td class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td></tr>
                                 <tr><td>IPMI / KVM</td><td class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td><td class="st-compare-check featured"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td><td class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td></tr>
                                 <tr><td>Dedicated engineer</td><td class="st-compare-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td><td class="st-compare-x featured"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td><td class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td></tr>
-                                <tr><td></td><td><a href="store/order.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td><td class="featured"><a href="store/order.html" class="st-plan-cta" style="height: 34px; font-size: 12.5px;">Select</a></td><td><a href="store/order.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td></tr>
+                                <tr><td></td><td><a href="configureproductdomain.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td><td class="featured"><a href="configureproductdomain.html" class="st-plan-cta" style="height: 34px; font-size: 12.5px;">Select</a></td><td><a href="configureproductdomain.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1510,7 +1734,7 @@
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Unlimited bandwidth</li>
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Free WHMCS starter licence</li>
                                 </ul>
-                                <a href="store/order.html" class="st-plan-cta secondary">Select plan</a>
+                                <a href="configureproductdomain.html" class="st-plan-cta secondary">Select plan</a>
                             </div>
                             <div class="st-plan featured">
                                 <span class="st-plan-badge">Most popular</span>
@@ -1524,7 +1748,7 @@
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Unlimited bandwidth</li>
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Free WHMCS pro licence</li>
                                 </ul>
-                                <a href="store/order.html" class="st-plan-cta">Select plan</a>
+                                <a href="configureproductdomain.html" class="st-plan-cta">Select plan</a>
                             </div>
                             <div class="st-plan">
                                 <h3 class="st-plan-name">Reseller Unlimited</h3>
@@ -1537,7 +1761,7 @@
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Unlimited bandwidth</li>
                                     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Free WHMCS enterprise licence</li>
                                 </ul>
-                                <a href="store/order.html" class="st-plan-cta secondary">Select plan</a>
+                                <a href="configureproductdomain.html" class="st-plan-cta secondary">Select plan</a>
                             </div>
                         </div>
                     </div>
@@ -1547,10 +1771,10 @@
                     </div>
                     <div class="plan-variant v-b">
                         <div class="st-pricing-b">
-                            <div class="st-plan-b"><div class="st-plan-b-name">Reseller 25</div><div class="st-plan-b-tag">Testing the waters</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">8.99</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>25</strong> cPanel accounts</li><li><strong>50 GB</strong> SSD</li><li>White-label WHM</li></ul><a href="store/order.html" class="st-plan-b-cta">Select</a></div>
-                            <div class="st-plan-b"><div class="st-plan-b-name">Reseller 50</div><div class="st-plan-b-tag">Handful of clients</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">14.99</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>50</strong> cPanel accounts</li><li><strong>100 GB</strong> SSD</li><li>WHMCS starter licence</li></ul><a href="store/order.html" class="st-plan-b-cta">Select</a></div>
-                            <div class="st-plan-b featured"><div class="st-plan-b-name">Reseller 150</div><div class="st-plan-b-tag">Scale your agency</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">29.99</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>150</strong> cPanel accounts</li><li><strong>300 GB</strong> SSD</li><li>WHMCS pro licence</li></ul><a href="store/order.html" class="st-plan-b-cta">Select</a></div>
-                            <div class="st-plan-b"><div class="st-plan-b-name">Unlimited</div><div class="st-plan-b-tag">No limits</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">59.99</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>Unlimited</strong> accounts</li><li><strong>1 TB</strong> SSD</li><li>WHMCS enterprise licence</li></ul><a href="store/order.html" class="st-plan-b-cta">Select</a></div>
+                            <div class="st-plan-b"><div class="st-plan-b-name">Reseller 25</div><div class="st-plan-b-tag">Testing the waters</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">8.99</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>25</strong> cPanel accounts</li><li><strong>50 GB</strong> SSD</li><li>White-label WHM</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Select</a></div>
+                            <div class="st-plan-b"><div class="st-plan-b-name">Reseller 50</div><div class="st-plan-b-tag">Handful of clients</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">14.99</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>50</strong> cPanel accounts</li><li><strong>100 GB</strong> SSD</li><li>WHMCS starter licence</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Select</a></div>
+                            <div class="st-plan-b featured"><div class="st-plan-b-name">Reseller 150</div><div class="st-plan-b-tag">Scale your agency</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">29.99</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>150</strong> cPanel accounts</li><li><strong>300 GB</strong> SSD</li><li>WHMCS pro licence</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Select</a></div>
+                            <div class="st-plan-b"><div class="st-plan-b-name">Unlimited</div><div class="st-plan-b-tag">No limits</div><div class="st-plan-b-price"><span class="currency">$</span><span class="amount">59.99</span><span class="period">/mo</span></div><ul class="st-plan-b-specs"><li><strong>Unlimited</strong> accounts</li><li><strong>1 TB</strong> SSD</li><li>WHMCS enterprise licence</li></ul><a href="configureproductdomain.html" class="st-plan-b-cta">Select</a></div>
                         </div>
                     </div>
                     <div class="st-variant-label">
@@ -1559,11 +1783,11 @@
                     </div>
                     <div class="plan-variant v-c">
                         <div class="st-rows">
-                            <div class="st-row"><div class="st-row-name"><strong>Reseller 25</strong><span>Testing the waters</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>25</strong> accounts</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>50 GB</strong> SSD</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>White-label</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">8.99</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
-                            <div class="st-row"><div class="st-row-name"><strong>Reseller 50</strong><span>Handful of clients</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>50</strong> accounts</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>100 GB</strong> SSD</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>WHMCS starter</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">14.99</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
-                            <div class="st-row featured"><div class="st-row-name"><strong>Reseller 150</strong><span>Scale your agency · Most popular</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>150</strong> accounts</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>300 GB</strong> SSD</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>WHMCS pro</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">29.99</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
-                            <div class="st-row"><div class="st-row-name"><strong>Reseller 300</strong><span>Established hosts</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>300</strong> accounts</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>600 GB</strong> SSD</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>WHMCS pro + API</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">44.99</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
-                            <div class="st-row"><div class="st-row-name"><strong>Unlimited</strong><span>No limits, grow as big as you need</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>Unlimited</strong> accounts</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>1 TB</strong> SSD</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>WHMCS enterprise</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">59.99</span><span class="period">/mo</span></div><a href="store/order.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>Reseller 25</strong><span>Testing the waters</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>25</strong> accounts</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>50 GB</strong> SSD</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>White-label</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">8.99</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>Reseller 50</strong><span>Handful of clients</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>50</strong> accounts</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>100 GB</strong> SSD</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>WHMCS starter</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">14.99</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row featured"><div class="st-row-name"><strong>Reseller 150</strong><span>Scale your agency · Most popular</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>150</strong> accounts</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>300 GB</strong> SSD</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>WHMCS pro</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">29.99</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>Reseller 300</strong><span>Established hosts</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>300</strong> accounts</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>600 GB</strong> SSD</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>WHMCS pro + API</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">44.99</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
+                            <div class="st-row"><div class="st-row-name"><strong>Unlimited</strong><span>No limits, grow as big as you need</span></div><div class="st-row-specs"><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>Unlimited</strong> accounts</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><strong>1 TB</strong> SSD</span><span class="st-row-spec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>WHMCS enterprise</span></div><div class="st-row-price"><span class="currency">$</span><span class="amount">59.99</span><span class="period">/mo</span></div><a href="configureproductdomain.html" class="st-row-cta">Select</a></div>
                         </div>
                     </div>
                     <div class="st-variant-label">
@@ -1590,7 +1814,7 @@
                                 <tr><td>Client billing portal</td><td class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td><td class="st-compare-check featured"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td><td class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td></tr>
                                 <tr><td>API &amp; automation</td><td class="st-compare-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td><td class="st-compare-check featured"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td><td class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td></tr>
                                 <tr><td>Priority support</td><td class="st-compare-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td><td class="st-compare-x featured"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></td><td class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></td></tr>
-                                <tr><td></td><td><a href="store/order.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td><td class="featured"><a href="store/order.html" class="st-plan-cta" style="height: 34px; font-size: 12.5px;">Select</a></td><td><a href="store/order.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td></tr>
+                                <tr><td></td><td><a href="configureproductdomain.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td><td class="featured"><a href="configureproductdomain.html" class="st-plan-cta" style="height: 34px; font-size: 12.5px;">Select</a></td><td><a href="configureproductdomain.html" class="st-plan-cta secondary" style="height: 34px; font-size: 12.5px;">Select</a></td></tr>
                             </tbody>
                         </table>
                     </div>

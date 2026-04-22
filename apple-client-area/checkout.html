@@ -3,214 +3,1000 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout — WHMCS by Apple</title>
+    <title>Checkout — Your Cart — WHMCS by Apple</title>
     <link rel="stylesheet" href="css/apple-theme.css">
-    <style>body { display: block; }</style>
-</head>
-<body class="homepage-layout">
+    <link rel="stylesheet" href="css/apple-layout.css">
+    <style>
+        body { display: block; }
 
-<nav class="homepage-nav"><div class="homepage-nav-inner">
-    <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
-    <a href="#">WHMCS</a>
-    <a href="cloud-hosting.html">Hosting</a>
-    <a href="domains.html">Domains</a>
-    <a href="ssl-certificates.html">SSL</a>
-    <a href="support-page.html">Support</a>
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+
+        /* Checkout step strip (shared with previous order-flow pages) */
+        .co-steps {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            margin-bottom: 18px;
+            font-size: 12.5px; color: var(--color-text-tertiary);
+            letter-spacing: -0.008em;
+        }
+        .co-step { display: inline-flex; align-items: center; gap: 8px; }
+        .co-step-num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 600; flex-shrink: 0;
+        }
+        .co-step.done .co-step-num { background: var(--color-green-bg); color: var(--color-green-text); }
+        .co-step.active .co-step-num { background: var(--color-accent); color: #fff; }
+        .co-step.active { color: var(--color-text-primary); font-weight: 500; }
+        .co-step-sep { color: var(--color-text-quaternary); }
+
+        /* 2-col: cart / form on left, sticky summary on right */
+        .co-split { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+        @media (max-width: 960px) { .co-split { grid-template-columns: 1fr; } }
+
+        /* Card / section common */
+        .co-section { padding: 0; }
+        .co-section-head {
+            padding: 20px 24px 16px;
+            border-bottom: 0.5px solid var(--color-border);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .co-section-title {
+            font-size: 15px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.012em;
+            margin: 0;
+            flex: 1;
+        }
+        .co-section-head-action {
+            font-size: 12.5px; font-weight: 500;
+            color: var(--color-accent);
+            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .co-section-head-action:hover { color: var(--color-accent-hover); }
+        .co-section-head-action svg { width: 11px; height: 11px; }
+        .co-section-body { padding: 18px 24px 20px; }
+
+        /* ── Cart line item ── */
+        .co-item {
+            display: grid;
+            grid-template-columns: 44px 1fr auto;
+            gap: 14px;
+            align-items: flex-start;
+            padding: 16px 0;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        .co-item:first-child { padding-top: 0; }
+        .co-item:last-child { border-bottom: 0; padding-bottom: 0; }
+        .co-item-ico {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--color-accent-light);
+            color: var(--color-accent);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .co-item-ico svg { width: 20px; height: 20px; }
+        .co-item-ico.domain { background: var(--color-green-bg); color: var(--color-green-text); }
+        .co-item-ico.addon  { background: var(--color-surface-secondary); color: var(--color-text-secondary); }
+        .co-item-meta { min-width: 0; }
+        .co-item-name {
+            font-size: 14px; font-weight: 600;
+            color: var(--color-text-primary); letter-spacing: -0.01em;
+        }
+        .co-item-sub {
+            font-size: 12px; color: var(--color-text-tertiary);
+            margin-top: 2px;
+            line-height: 1.5;
+            letter-spacing: -0.004em;
+        }
+        .co-item-specs {
+            margin-top: 6px;
+            display: flex; flex-wrap: wrap; gap: 4px 10px;
+            font-size: 11.5px;
+            color: var(--color-text-secondary);
+            letter-spacing: -0.004em;
+        }
+        .co-item-specs span { display: inline-flex; align-items: center; gap: 4px; }
+        .co-item-specs span::before { content: "·"; color: var(--color-text-quaternary); margin-right: 3px; }
+        .co-item-specs span:first-child::before { display: none; }
+        .co-item-right {
+            display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+            flex-shrink: 0;
+        }
+        .co-item-price {
+            font-size: 14px; font-weight: 600;
+            color: var(--color-text-primary);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+        }
+        .co-item-price .period { font-size: 11px; color: var(--color-text-tertiary); font-weight: 400; }
+        .co-item-price.free { color: var(--color-green-text); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+        .co-item-actions { display: inline-flex; gap: 2px; }
+        .co-item-btn {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: transparent; border: 0;
+            color: var(--color-text-tertiary);
+            cursor: pointer; font-family: inherit;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: all var(--transition-fast);
+        }
+        .co-item-btn:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); }
+        .co-item-btn.danger:hover { background: var(--color-red-bg); color: var(--color-red-text); }
+        .co-item-btn svg { width: 13px; height: 13px; }
+
+        /* ── Form ── */
+        .co-form { display: flex; flex-direction: column; gap: 18px; }
+        .co-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .co-form-grid.col3 { grid-template-columns: 1fr 1fr 1fr; }
+        @media (max-width: 640px) {
+            .co-form-grid, .co-form-grid.col3 { grid-template-columns: 1fr; }
+        }
+        .co-row { display: flex; flex-direction: column; gap: 6px; }
+        .co-label {
+            font-size: 12px; font-weight: 500;
+            color: var(--color-text-secondary);
+            letter-spacing: -0.004em;
+        }
+        .co-input, .co-select {
+            height: 38px;
+            padding: 0 14px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            font-size: 14px; letter-spacing: -0.008em;
+            color: var(--color-text-primary); font-family: inherit;
+            width: 100%;
+            transition: all var(--transition-fast);
+        }
+        .co-input:focus, .co-select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-accent-light);
+        }
+        .co-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px; cursor: pointer;
+        }
+
+        /* ── Create-account / Sign-in tabs (non-registered checkout) ── */
+        .co-auth-tabs {
+            display: flex; align-items: center; gap: 24px;
+            padding: 0 24px;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        .co-auth-tab {
+            position: relative;
+            padding: 14px 0;
+            background: transparent; border: 0;
+            font-size: 13px; font-weight: 500;
+            color: var(--color-text-tertiary);
+            cursor: pointer; font-family: inherit;
+            letter-spacing: -0.008em;
+            transition: color var(--transition-fast);
+        }
+        .co-auth-tab:hover { color: var(--color-text-primary); }
+        .co-auth-tab.active { color: var(--color-accent); font-weight: 600; }
+        .co-auth-tab.active::after {
+            content: ""; position: absolute; left: 0; right: 0; bottom: -0.5px;
+            height: 2px; background: var(--color-accent); border-radius: 2px 2px 0 0;
+        }
+        .co-auth-panel { display: none; padding: 20px 24px 20px; }
+        .co-auth-panel.is-active { display: block; }
+        .co-auth-hint {
+            font-size: 12.5px; color: var(--color-text-tertiary);
+            letter-spacing: -0.008em;
+            margin: 0 0 14px; line-height: 1.5;
+        }
+
+        /* Password strength meter */
+        .co-pw-meter {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+            margin-top: 6px;
+        }
+        .co-pw-meter-bar {
+            height: 3.5px; border-radius: 2px;
+            background: var(--color-border);
+            transition: background var(--transition-fast);
+        }
+        .co-pw-meter[data-level="1"] .co-pw-meter-bar:nth-child(-n+1) { background: var(--color-red-text); }
+        .co-pw-meter[data-level="2"] .co-pw-meter-bar:nth-child(-n+2) { background: var(--color-orange-text); }
+        .co-pw-meter[data-level="3"] .co-pw-meter-bar:nth-child(-n+3) { background: var(--color-accent); }
+        .co-pw-meter[data-level="4"] .co-pw-meter-bar { background: var(--color-green-text); }
+        .co-pw-hint {
+            font-size: 11px; color: var(--color-text-tertiary);
+            margin-top: 6px; letter-spacing: -0.004em;
+        }
+        .co-pw-hint strong { color: var(--color-text-primary); font-weight: 600; }
+        .co-pw-hint.is-ok { color: var(--color-green-text); }
+        .co-pw-hint.is-err { color: var(--color-red-text); }
+
+        /* Marketing opt-in */
+        .co-marketing {
+            display: flex; align-items: flex-start; gap: 8px;
+            font-size: 12.5px; color: var(--color-text-secondary);
+            cursor: pointer; letter-spacing: -0.008em;
+            line-height: 1.5;
+        }
+        .co-marketing input {
+            margin-top: 2px; accent-color: var(--color-accent);
+            width: 15px; height: 15px;
+        }
+
+        /* "or sign up with" divider */
+        .co-divider {
+            display: flex; align-items: center; gap: 12px;
+            margin: 18px 0 14px;
+            font-size: 10.5px; color: var(--color-text-tertiary);
+            text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .co-divider::before, .co-divider::after {
+            content: ""; flex: 1; height: 0.5px; background: var(--color-border);
+        }
+
+        /* Social sign-up buttons */
+        .co-social { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        @media (max-width: 520px) { .co-social { grid-template-columns: 1fr; } }
+        .co-social-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            height: 42px; padding: 0 16px;
+            border-radius: var(--radius-pill);
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            font-size: 13px; font-weight: 500;
+            color: var(--color-text-primary);
+            cursor: pointer; font-family: inherit;
+            letter-spacing: -0.008em;
+            transition: background var(--transition-fast);
+            text-decoration: none;
+        }
+        .co-social-btn:hover { background: var(--sidebar-item-hover); }
+        .co-social-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+        /* Sign-in panel — compact form */
+        .co-signin-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 4px;
+        }
+        .co-forgot-link {
+            font-size: 11.5px; color: var(--color-accent);
+            text-decoration: none; letter-spacing: -0.004em;
+        }
+        .co-forgot-link:hover { color: var(--color-accent-hover); }
+        .co-signin-btn {
+            height: 44px; padding: 0 20px;
+            border-radius: var(--radius-pill);
+            background: var(--color-accent); color: #fff; border: 0;
+            font-size: 13.5px; font-weight: 500;
+            cursor: pointer; font-family: inherit;
+            letter-spacing: -0.008em;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%;
+            transition: background var(--transition-fast);
+        }
+        .co-signin-btn:hover { background: var(--color-accent-hover); }
+        .co-signin-btn svg { width: 13px; height: 13px; }
+
+        /* Hide logged-in-only things when guest */
+        body[data-auth="out"] .co-section-head-action { display: none; }
+
+        /* ── Account-type toggle (Individual / Business) ── */
+        .co-account-type {
+            display: inline-flex;
+            background: var(--color-surface-secondary);
+            border-radius: var(--radius-pill);
+            padding: 3px;
+        }
+        .co-account-type label {
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            font-size: 12.5px; font-weight: 500;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            position: relative;
+            letter-spacing: -0.008em;
+            transition: all var(--transition-fast);
+        }
+        .co-account-type label input { position: absolute; opacity: 0; pointer-events: none; }
+        .co-account-type label:has(input:checked) {
+            background: var(--color-surface);
+            color: var(--color-text-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        /* ── Payment-method list (radio cards) ── */
+        .co-pay-list { display: flex; flex-direction: column; gap: 10px; }
+        .co-pay {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 16px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+        .co-pay input { position: absolute; opacity: 0; pointer-events: none; }
+        .co-pay:hover { border-color: var(--color-accent); }
+        .co-pay:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-light); }
+        .co-pay-radio {
+            width: 20px; height: 20px; border-radius: 50%;
+            border: 1.5px solid var(--color-border);
+            background: var(--color-surface);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .co-pay-radio::after {
+            content: ""; width: 8px; height: 8px; border-radius: 50%;
+            background: #fff;
+            transform: scale(0);
+            transition: transform var(--transition-fast);
+        }
+        .co-pay:has(input:checked) .co-pay-radio { border-color: var(--color-accent); background: var(--color-accent); }
+        .co-pay:has(input:checked) .co-pay-radio::after { transform: scale(1); }
+        .co-pay-logo {
+            width: 40px; height: 26px; border-radius: 4px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 700; letter-spacing: 0.04em;
+            color: #fff; flex-shrink: 0;
+        }
+        .co-pay-logo.visa   { background: #1a1f71; }
+        .co-pay-logo.mc     { background: linear-gradient(90deg, #eb001b 50%, #f79e1b 50%); color: transparent; }
+        .co-pay-logo.pp     { background: #003087; }
+        .co-pay-logo.stripe { background: #635bff; }
+        .co-pay-logo.bank   { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+        .co-pay-logo.plus   { background: var(--color-surface-secondary); color: var(--color-text-tertiary); font-size: 14px; }
+        .co-pay-meta { flex: 1; min-width: 0; }
+        .co-pay-name {
+            font-size: 13.5px; font-weight: 500;
+            color: var(--color-text-primary); letter-spacing: -0.008em;
+        }
+        .co-pay-sub { font-size: 11.5px; color: var(--color-text-tertiary); margin-top: 1px; }
+
+        /* Inline card-details form (shown when "new card" is selected) */
+        .co-new-card {
+            margin-top: 6px;
+            padding: 16px; padding-top: 18px;
+            border: 0.5px dashed var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface-tertiary);
+            display: none;
+        }
+        .co-pay.new-card:has(input:checked) ~ .co-new-card { display: block; }
+
+        /* Terms checkbox row */
+        .co-terms {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 14px 16px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            cursor: pointer;
+            font-size: 12.5px; color: var(--color-text-secondary);
+            letter-spacing: -0.008em; line-height: 1.5;
+            transition: border-color var(--transition-fast);
+        }
+        .co-terms:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-light); }
+        .co-terms input {
+            width: 18px; height: 18px; accent-color: var(--color-accent);
+            flex-shrink: 0; margin-top: 1px;
+        }
+        .co-terms a { color: var(--color-accent); text-decoration: none; }
+        .co-terms a:hover { text-decoration: underline; }
+
+        /* ══ Right: sticky order summary ══ */
+        .co-summary-card { position: sticky; top: 72px; padding: 0; }
+        .co-summary-head {
+            padding: 18px 20px 14px;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        .co-summary-head h2 {
+            font-size: 14px; font-weight: 600;
+            color: var(--color-text-primary); letter-spacing: -0.01em; margin: 0;
+        }
+        .co-summary-list { padding: 8px 20px; }
+        .co-summary-line {
+            display: flex; justify-content: space-between; align-items: baseline;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 12.5px;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.004em;
+        }
+        .co-summary-line .label { color: var(--color-text-secondary); min-width: 0; flex: 1; }
+        .co-summary-line .value { color: var(--color-text-primary); font-weight: 500; white-space: nowrap; }
+        .co-summary-line .value.muted { color: var(--color-text-tertiary); font-weight: 400; }
+        .co-summary-line .value.good  { color: var(--color-green-text); font-weight: 500; }
+        .co-summary-line.divider { border-top: 0.5px solid var(--color-border); padding-top: 12px; margin-top: 4px; }
+
+        .co-summary-total {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            border-top: 0.5px solid var(--color-border);
+            background: var(--color-surface-tertiary);
+            font-variant-numeric: tabular-nums;
+        }
+        .co-summary-total .label {
+            font-size: 14px; font-weight: 600;
+            color: var(--color-text-primary); letter-spacing: -0.01em;
+        }
+        .co-summary-total .value {
+            font-size: 24px; font-weight: 600;
+            color: var(--color-text-primary); letter-spacing: -0.025em;
+            white-space: nowrap;
+        }
+        .co-summary-cycle {
+            font-size: 11px; color: var(--color-text-tertiary);
+            padding: 10px 20px 14px;
+            letter-spacing: -0.004em;
+            margin: 0;
+        }
+
+        /* Promo code inside summary */
+        .co-promo {
+            display: flex; gap: 6px;
+            padding: 12px 20px 16px;
+            border-top: 0.5px solid var(--color-border);
+            flex-wrap: wrap;
+        }
+        .co-promo input {
+            flex: 1; min-width: 140px; height: 32px;
+            padding: 0 14px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-pill);
+            background: var(--color-surface);
+            font-size: 13px; letter-spacing: -0.008em;
+            color: var(--color-text-primary); font-family: inherit;
+        }
+        .co-promo input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+        .co-promo button {
+            height: 32px; padding: 0 14px;
+            border-radius: var(--radius-pill);
+            background: transparent;
+            border: 0.5px solid var(--color-border);
+            color: var(--color-text-primary);
+            font-size: 12.5px; font-weight: 500;
+            cursor: pointer; font-family: inherit;
+            transition: all var(--transition-fast);
+        }
+        .co-promo button:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+
+        .co-summary-footer {
+            padding: 16px 20px 18px;
+            border-top: 0.5px solid var(--color-border);
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .co-place-order {
+            height: 48px; padding: 0 20px;
+            border-radius: var(--radius-pill);
+            background: var(--color-accent); color: #fff; border: 0;
+            font-size: 15px; font-weight: 500; letter-spacing: -0.008em;
+            cursor: pointer; font-family: inherit;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            text-decoration: none;
+            transition: background var(--transition-fast);
+        }
+        .co-place-order:hover { background: var(--color-accent-hover); }
+        .co-place-order svg { width: 14px; height: 14px; }
+        .co-back-link {
+            font-size: 12.5px; color: var(--color-text-tertiary);
+            text-align: center; text-decoration: none;
+            display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+            letter-spacing: -0.004em;
+        }
+        .co-back-link:hover { color: var(--color-accent); }
+        .co-back-link svg { width: 11px; height: 11px; }
+
+        /* Trust strip below the summary */
+        .co-trust {
+            padding: 14px 20px 0;
+            display: flex; flex-direction: column; gap: 6px;
+            font-size: 11px; color: var(--color-text-tertiary);
+            letter-spacing: -0.004em;
+        }
+        .co-trust-item { display: inline-flex; align-items: center; gap: 6px; }
+        .co-trust-item svg { width: 12px; height: 12px; color: var(--color-green-text); flex-shrink: 0; }
+    </style>
+</head>
+<body class="client-area-layout" data-auth="out" data-layout="top" data-active-nav="order" data-page-title="Checkout">
+
+<div data-include="partials/state-chip.html"></div>
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>No Notifications</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;"><a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a></div>
+    </div>
+</div>
+
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareaproducts.html">My Services</a><a href="store.html">Order New Services</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareadomains.html">My Domains</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareainvoices.html">My Invoices</a><a href="clientareaquotes.html">My Quotes</a><a href="masspay.html">Mass Payment</a><a href="clientareaaddfunds.html">Add Funds</a><a href="account-paymentmethods.html">Payment Methods</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="supportticketslist.html">Tickets</a><a href="announcements.html">Announcements</a><a href="knowledgebase.html">Knowledgebase</a></div></div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
     <div class="nav-spacer"></div>
-    <a href="cart.html" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></a>
-    <a href="#" onclick="toggleDarkMode(); return false;" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
-    <a href="login.html" class="nav-signin">Sign in</a>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
 </div></nav>
 
-<section style="max-width: 1100px; margin: 0 auto; padding: 50px 22px 80px;">
-    <!-- Step indicator -->
-    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 32px; font-size: 13px; color: var(--color-text-secondary);">
-        <a href="cart.html" style="color: var(--color-text-tertiary); text-decoration: none;">1. Cart</a>
-        <span style="color: var(--color-text-tertiary);">→</span>
-        <span style="color: var(--color-text-primary); font-weight: 600;">2. Checkout</span>
+<div data-include="partials/inner-topbar.html"></div>
+
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a><span class="sep">/</span>
+        <a href="#">Services</a><span class="sep">/</span>
+        <a href="store.html">Order</a><span class="sep">/</span>
+        <span class="current" aria-current="page">Checkout</span>
+    </div>
+</nav>
+
+<div class="content-area">
+    <header class="page-header">
+        <h1>Your cart</h1>
+        <p class="page-subtitle">Review your items, enter your billing details, and pick a way to pay.</p>
+    </header>
+
+    <!-- Step strip -->
+    <div class="co-steps">
+        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Choose plan</span>
+        <span class="co-step-sep">›</span>
+        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Domain</span>
+        <span class="co-step-sep">›</span>
+        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Configure</span>
+        <span class="co-step-sep">›</span>
+        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Cart</span>
+        <span class="co-step-sep">›</span>
+        <span class="co-step active"><span class="co-step-num">5</span>Checkout</span>
     </div>
 
-    <div style="margin-bottom: 28px; text-align: center;">
-        <h1 style="font-size: 40px; letter-spacing: -0.03em; font-weight: 600; margin: 0 0 8px;">Checkout.</h1>
-        <p style="color: var(--color-text-secondary); font-size: 17px;">Almost done. Let's get your account set up.</p>
-    </div>
+    <div class="co-split">
+        <!-- ══ LEFT: cart items + billing + payment ══ -->
+        <div style="min-width: 0; display: flex; flex-direction: column; gap: 16px;">
 
-    <div style="display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start;">
-        <div>
-            <!-- Account -->
-            <div class="card" style="margin-bottom: 16px;">
-                <div class="card-header">
-                    <h2 class="card-title">1 &nbsp;Your account</h2>
+            <!-- Cart items -->
+            <div class="card co-section">
+                <div class="co-section-head">
+                    <h2 class="co-section-title">Items in your cart <span style="color: var(--color-text-tertiary); font-weight: 500; margin-left: 4px;">· 3</span></h2>
+                    <a href="store.html" class="co-section-head-action">
+                        Add another
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
                 </div>
-                <div class="card-body">
-                    <div class="btn-tab-group" style="display: flex; gap: 8px; margin-bottom: 20px;">
-                        <button class="btn-secondary active" style="flex: 1;">Create new account</button>
-                        <button class="btn-secondary" style="flex: 1;">I have an account</button>
+                <div class="co-section-body">
+
+                    <!-- Plan line -->
+                    <div class="co-item">
+                        <div class="co-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+                        <div class="co-item-meta">
+                            <div class="co-item-name">Web Hosting · Professional</div>
+                            <div class="co-item-sub">Annual · mycompany.com · US East (Virginia) · Ubuntu 22.04 LTS</div>
+                            <div class="co-item-specs">
+                                <span>10 websites</span><span>25 GB SSD</span><span>Unlimited bandwidth</span><span>Free SSL</span>
+                            </div>
+                        </div>
+                        <div class="co-item-right">
+                            <div class="co-item-price">$59.88<span class="period"> / yr</span></div>
+                            <div class="co-item-actions">
+                                <a href="configureproduct.html" class="co-item-btn" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                                <button type="button" class="co-item-btn danger" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">First name</label>
-                            <input type="text" class="form-input" placeholder="Alex">
+
+                    <!-- Domain (included) -->
+                    <div class="co-item">
+                        <div class="co-item-ico domain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+                        <div class="co-item-meta">
+                            <div class="co-item-name" style="font-family: var(--font-mono, ui-monospace, Menlo, monospace); font-size: 13.5px;">mycompany.com</div>
+                            <div class="co-item-sub">Domain registration · 1 year · WHOIS privacy included</div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Last name</label>
-                            <input type="text" class="form-input" placeholder="Henderson">
+                        <div class="co-item-right">
+                            <div class="co-item-price free">Free</div>
+                            <div class="co-item-actions">
+                                <a href="configureproductdomain.html" class="co-item-btn" title="Change"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-input" placeholder="alex@example.com">
+
+                    <!-- Addon: CodeGuard -->
+                    <div class="co-item">
+                        <div class="co-item-ico addon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-9-9c2.52 0 4.82.99 6.5 2.6"/><polyline points="22 4 22 10 16 10"/><path d="M12 8v4l3 2"/></svg></div>
+                        <div class="co-item-meta">
+                            <div class="co-item-name">CodeGuard Website Backup — Basic 1 GB</div>
+                            <div class="co-item-sub">Addon · daily off-site snapshots · 1-click restore · 30-day history</div>
+                        </div>
+                        <div class="co-item-right">
+                            <div class="co-item-price">$23.88<span class="period"> / yr</span></div>
+                            <div class="co-item-actions">
+                                <a href="configureproduct.html" class="co-item-btn" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                                <button type="button" class="co-item-btn danger" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-input" placeholder="••••••••">
+
+                </div>
+            </div>
+
+            <!-- Account (guest only) -->
+            <div class="card co-section only-out">
+                <div class="co-section-head">
+                    <h2 class="co-section-title">Your account</h2>
+                </div>
+                <div class="co-auth-tabs" role="tablist">
+                    <button type="button" class="co-auth-tab active" data-atab="create">Create an account</button>
+                    <button type="button" class="co-auth-tab" data-atab="signin">I already have one</button>
+                </div>
+
+                <!-- Create-account panel -->
+                <div class="co-auth-panel is-active" data-apanel="create">
+                    <p class="co-auth-hint">We'll use this for your invoices and to let you manage your services later. Takes 30 seconds.</p>
+                    <div class="co-form">
+                        <div class="co-row">
+                            <label class="co-label" for="acct-email">Email address</label>
+                            <input id="acct-email" type="email" class="co-input" placeholder="you@example.com" autocomplete="email">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Confirm password</label>
-                            <input type="password" class="form-input" placeholder="••••••••">
+                        <div class="co-form-grid">
+                            <div class="co-row">
+                                <label class="co-label" for="acct-pw">Password</label>
+                                <input id="acct-pw" type="password" class="co-input" placeholder="At least 8 characters" autocomplete="new-password">
+                                <div class="co-pw-meter" data-level="0" aria-hidden="true">
+                                    <span class="co-pw-meter-bar"></span>
+                                    <span class="co-pw-meter-bar"></span>
+                                    <span class="co-pw-meter-bar"></span>
+                                    <span class="co-pw-meter-bar"></span>
+                                </div>
+                                <div class="co-pw-hint">Strength: <strong id="acct-pw-label">—</strong></div>
+                            </div>
+                            <div class="co-row">
+                                <label class="co-label" for="acct-pw2">Confirm password</label>
+                                <input id="acct-pw2" type="password" class="co-input" placeholder="Repeat password" autocomplete="new-password">
+                                <div class="co-pw-hint" id="acct-pw-match">Re-enter to confirm</div>
+                            </div>
                         </div>
+                        <label class="co-marketing">
+                            <input type="checkbox">
+                            <span>Send me product updates and offers from Hostnodes. You can unsubscribe any time.</span>
+                        </label>
+                    </div>
+
+                    <div class="co-divider">or sign up with</div>
+                    <div class="co-social">
+                        <button type="button" class="co-social-btn">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg>
+                            Sign up with Apple
+                        </button>
+                        <button type="button" class="co-social-btn">
+                            <svg viewBox="0 0 24 24" fill="none"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.83z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                            Sign up with Google
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sign-in panel -->
+                <div class="co-auth-panel" data-apanel="signin">
+                    <p class="co-auth-hint">Sign in with the Hostnodes account you already have and we'll use its details for this order.</p>
+                    <div class="co-form">
+                        <div class="co-row">
+                            <label class="co-label" for="signin-email">Email address</label>
+                            <input id="signin-email" type="email" class="co-input" placeholder="you@example.com" autocomplete="email">
+                        </div>
+                        <div class="co-row">
+                            <div class="co-signin-row">
+                                <label class="co-label" for="signin-pw">Password</label>
+                                <a href="password-reset.html" class="co-forgot-link">Forgot your password?</a>
+                            </div>
+                            <input id="signin-pw" type="password" class="co-input" placeholder="Your password" autocomplete="current-password">
+                        </div>
+                        <button type="button" class="co-signin-btn">
+                            Sign in and continue
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Billing -->
-            <div class="card" style="margin-bottom: 16px;">
-                <div class="card-header"><h2 class="card-title">2 &nbsp;Billing address</h2></div>
-                <div class="card-body">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Company (optional)</label>
-                            <input type="text" class="form-input">
+            <!-- Billing details -->
+            <div class="card co-section">
+                <div class="co-section-head">
+                    <h2 class="co-section-title">Billing details</h2>
+                    <a href="clientareadetails.html" class="co-section-head-action">Use account details</a>
+                </div>
+                <div class="co-section-body">
+                    <form class="co-form" onsubmit="event.preventDefault();" autocomplete="off">
+                        <!-- Account type -->
+                        <div class="co-row">
+                            <label class="co-label">Account type</label>
+                            <div class="co-account-type">
+                                <label>Individual <input type="radio" name="co-acct" checked></label>
+                                <label>Business <input type="radio" name="co-acct"></label>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Phone</label>
-                            <input type="tel" class="form-input" placeholder="+1 (555) 123-4567">
+
+                        <div class="co-form-grid">
+                            <div class="co-row">
+                                <label class="co-label" for="co-first">First name</label>
+                                <input id="co-first" type="text" class="co-input" value="Arshile" autocomplete="given-name">
+                            </div>
+                            <div class="co-row">
+                                <label class="co-label" for="co-last">Last name</label>
+                                <input id="co-last" type="text" class="co-input" value="Gogia" autocomplete="family-name">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Address</label>
-                        <input type="text" class="form-input" placeholder="Street address">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">City</label>
-                            <input type="text" class="form-input">
+
+                        <div class="co-form-grid">
+                            <div class="co-row only-in">
+                                <label class="co-label" for="co-email">Email</label>
+                                <input id="co-email" type="email" class="co-input" value="arshileg@gmail.com" autocomplete="email">
+                            </div>
+                            <div class="co-row">
+                                <label class="co-label" for="co-phone">Phone</label>
+                                <input id="co-phone" type="tel" class="co-input" placeholder="+1 555 123 4567" autocomplete="tel">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">State / Province</label>
-                            <input type="text" class="form-input">
+
+                        <div class="co-row">
+                            <label class="co-label" for="co-street">Street address</label>
+                            <input id="co-street" type="text" class="co-input" placeholder="742 Evergreen Terrace" autocomplete="street-address">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Postal code</label>
-                            <input type="text" class="form-input">
+
+                        <div class="co-form-grid col3">
+                            <div class="co-row">
+                                <label class="co-label" for="co-city">City</label>
+                                <input id="co-city" type="text" class="co-input" placeholder="Springfield" autocomplete="address-level2">
+                            </div>
+                            <div class="co-row">
+                                <label class="co-label" for="co-zip">Postcode</label>
+                                <input id="co-zip" type="text" class="co-input" placeholder="62704" autocomplete="postal-code">
+                            </div>
+                            <div class="co-row">
+                                <label class="co-label" for="co-country">Country</label>
+                                <select id="co-country" class="co-select">
+                                    <option>United States</option>
+                                    <option>United Kingdom</option>
+                                    <option>Canada</option>
+                                    <option>Germany</option>
+                                    <option>France</option>
+                                    <option>Australia</option>
+                                    <option>Georgia</option>
+                                    <option>Other…</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Country</label>
-                        <select class="form-select">
-                            <option>United States</option>
-                            <option>United Kingdom</option>
-                            <option>Canada</option>
-                            <option>Australia</option>
-                            <option>Germany</option>
-                        </select>
-                    </div>
+                    </form>
                 </div>
             </div>
 
-            <!-- Payment -->
-            <div class="card" style="margin-bottom: 16px;">
-                <div class="card-header"><h2 class="card-title">3 &nbsp;Payment method</h2></div>
-                <div class="card-body">
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
-                        <label style="padding: 14px; border: 2px solid var(--color-accent); border-radius: 12px; cursor: pointer; text-align: center; background: var(--color-surface);">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 22px; height: 22px; margin-bottom: 6px;"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                            <div style="font-size: 13px; font-weight: 600;">Credit card</div>
+            <!-- Payment method -->
+            <div class="card co-section">
+                <div class="co-section-head">
+                    <h2 class="co-section-title">Payment method</h2>
+                    <a href="account-paymentmethods.html" class="co-section-head-action">Manage</a>
+                </div>
+                <div class="co-section-body">
+                    <div class="co-pay-list">
+                        <!-- Saved methods — only shown when logged in -->
+                        <label class="co-pay only-in">
+                            <input type="radio" name="co-pay" checked>
+                            <span class="co-pay-radio"></span>
+                            <span class="co-pay-logo visa">VISA</span>
+                            <div class="co-pay-meta">
+                                <div class="co-pay-name">Visa ending in 4242</div>
+                                <div class="co-pay-sub">Expires 08/2028 · default</div>
+                            </div>
                         </label>
-                        <label style="padding: 14px; border: 1px solid var(--color-border-card); border-radius: 12px; cursor: pointer; text-align: center;">
-                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">PayPal</div>
-                            <div style="font-size: 12px; color: var(--color-text-tertiary);">Fast checkout</div>
+                        <label class="co-pay only-in">
+                            <input type="radio" name="co-pay">
+                            <span class="co-pay-radio"></span>
+                            <span class="co-pay-logo mc">MC</span>
+                            <div class="co-pay-meta">
+                                <div class="co-pay-name">Mastercard ending in 8888</div>
+                                <div class="co-pay-sub">Expires 04/2027</div>
+                            </div>
                         </label>
-                        <label style="padding: 14px; border: 1px solid var(--color-border-card); border-radius: 12px; cursor: pointer; text-align: center;">
-                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">Bank transfer</div>
-                            <div style="font-size: 12px; color: var(--color-text-tertiary);">Wire or ACH</div>
+                        <!-- New card — default selected for guests -->
+                        <label class="co-pay new-card">
+                            <input type="radio" name="co-pay" checked>
+                            <span class="co-pay-radio"></span>
+                            <span class="co-pay-logo visa">CARD</span>
+                            <div class="co-pay-meta">
+                                <div class="co-pay-name">Credit or debit card</div>
+                                <div class="co-pay-sub">Visa · Mastercard · Amex — processed securely by Stripe.</div>
+                            </div>
                         </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Card number</label>
-                        <input type="text" class="form-input" placeholder="1234 5678 9012 3456">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Expiry</label>
-                            <input type="text" class="form-input" placeholder="MM/YY">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">CVC</label>
-                            <input type="text" class="form-input" placeholder="123">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Cardholder name</label>
-                            <input type="text" class="form-input">
+                        <label class="co-pay">
+                            <input type="radio" name="co-pay">
+                            <span class="co-pay-radio"></span>
+                            <span class="co-pay-logo pp">PP</span>
+                            <div class="co-pay-meta">
+                                <div class="co-pay-name">PayPal</div>
+                                <div class="co-pay-sub">You'll be redirected to authorise the charge.</div>
+                            </div>
+                        </label>
+                        <label class="co-pay">
+                            <input type="radio" name="co-pay">
+                            <span class="co-pay-radio"></span>
+                            <span class="co-pay-logo bank">ACH</span>
+                            <div class="co-pay-meta">
+                                <div class="co-pay-name">Bank transfer (ACH)</div>
+                                <div class="co-pay-sub">Direct debit — 1-2 business days to clear</div>
+                            </div>
+                        </label>
+                        <!-- Inline card form (revealed when "new card" is chosen) -->
+                        <div class="co-new-card">
+                            <div class="co-form">
+                                <div class="co-row">
+                                    <label class="co-label" for="co-cc">Card number</label>
+                                    <input id="co-cc" type="text" class="co-input" placeholder="1234 1234 1234 1234" inputmode="numeric" autocomplete="cc-number" style="font-variant-numeric: tabular-nums; letter-spacing: 0.04em;">
+                                </div>
+                                <div class="co-form-grid">
+                                    <div class="co-row">
+                                        <label class="co-label" for="co-exp">Expiration</label>
+                                        <input id="co-exp" type="text" class="co-input" placeholder="MM / YY" inputmode="numeric" autocomplete="cc-exp" style="font-variant-numeric: tabular-nums;">
+                                    </div>
+                                    <div class="co-row">
+                                        <label class="co-label" for="co-cvv">CVV</label>
+                                        <input id="co-cvv" type="text" class="co-input" placeholder="123" inputmode="numeric" autocomplete="cc-csc" maxlength="4" style="font-variant-numeric: tabular-nums;">
+                                    </div>
+                                </div>
+                                <div class="co-row">
+                                    <label class="co-label" for="co-ccname">Cardholder name</label>
+                                    <input id="co-ccname" type="text" class="co-input" placeholder="Name as it appears on card" autocomplete="cc-name">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Terms -->
-            <div style="padding: 0 4px;">
-                <label style="display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--color-text-secondary); cursor: pointer;">
-                    <input type="checkbox" style="margin-top: 2px;">
-                    <span>I agree to the <a href="#" style="color: var(--color-accent);">Terms of Service</a>, <a href="#" style="color: var(--color-accent);">Acceptable Use Policy</a>, and authorize recurring payments.</span>
-                </label>
-            </div>
+            <label class="co-terms">
+                <input type="checkbox">
+                <span>I have read and agree to the <a href="#">Terms of Service</a>, <a href="#">Acceptable Use Policy</a>, and our <a href="#">Privacy Policy</a>. I authorise Hostnodes to charge my selected payment method today and for any recurring renewals until I cancel.</span>
+            </label>
         </div>
 
-        <!-- Order summary -->
-        <div class="card" style="position: sticky; top: 82px;">
-            <div class="card-header"><h2 class="card-title">Order summary</h2></div>
-            <div class="card-body">
-                <div style="margin-bottom: 14px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
-                        <span style="font-weight: 500;">Cloud Hosting — Pro</span>
-                        <span>$129.99</span>
-                    </div>
-                    <div style="font-size: 12px; color: var(--color-text-tertiary);">hendersondesign.com · Annual</div>
-                </div>
-                <div style="margin-bottom: 14px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
-                        <span style="font-weight: 500;">hendersondesign.com</span>
-                        <span>$11.99</span>
-                    </div>
-                    <div style="font-size: 12px; color: var(--color-text-tertiary);">Domain registration · 1 year</div>
+        <!-- ══ RIGHT: sticky order summary ══ -->
+        <aside>
+            <div class="card co-summary-card">
+                <div class="co-summary-head"><h2>Order summary</h2></div>
+                <div class="co-summary-list">
+                    <div class="co-summary-line"><span class="label">Professional · annual</span><span class="value">$59.88</span></div>
+                    <div class="co-summary-line"><span class="label">Domain · mycompany.com</span><span class="value good">Free</span></div>
+                    <div class="co-summary-line"><span class="label">CodeGuard backups</span><span class="value">$23.88</span></div>
+                    <div class="co-summary-line"><span class="label">SSL certificate</span><span class="value good">Included</span></div>
+                    <div class="co-summary-line divider"><span class="label">Subtotal</span><span class="value">$83.76</span></div>
+                    <div class="co-summary-line"><span class="label">Setup fee</span><span class="value muted">$0.00</span></div>
+                    <div class="co-summary-line"><span class="label">Tax (estimated)</span><span class="value muted">$0.00</span></div>
                 </div>
 
-                <div class="invoice-total-row">
-                    <span>Subtotal</span>
-                    <span>$141.98</span>
-                </div>
-                <div class="invoice-total-row">
-                    <span>Tax</span>
-                    <span>$0.00</span>
-                </div>
-                <div class="invoice-total-row grand">
-                    <span>Total due today</span>
-                    <span>$141.98</span>
+                <div class="co-promo">
+                    <input type="text" placeholder="Promo code">
+                    <button type="button">Apply</button>
                 </div>
 
-                <button class="btn-primary btn-lg" style="width: 100%; margin-top: 18px; justify-content: center;">Complete order</button>
-                <a href="cart.html" style="display: block; text-align: center; margin-top: 10px; font-size: 13px; color: var(--color-text-secondary);">← Back to cart</a>
-
-                <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--color-border-card); display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--color-text-tertiary);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <span>Encrypted checkout · 30-day refund</span>
+                <div class="co-summary-total">
+                    <span class="label">Total due today</span>
+                    <span class="value">$83.76</span>
                 </div>
+                <p class="co-summary-cycle">Renews $83.76 every year. Cancel anytime — 30-day money-back guarantee.</p>
+
+                <div class="co-summary-footer">
+                    <button type="button" class="co-place-order">
+                        Place order
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    </button>
+                    <a href="cart.html" class="co-back-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        Back to cart
+                    </a>
+                </div>
+
+                <div class="co-trust">
+                    <span class="co-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>256-bit SSL &amp; PCI-DSS Level 1</span>
+                    <span class="co-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>30-day money-back guarantee</span>
+                    <span class="co-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Cancel anytime</span>
+                </div>
+                <div style="height: 16px;"></div>
             </div>
+        </aside>
+    </div>
+</div>
+
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="domains.html">Domains</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="knowledgebase.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Careers</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open><span class="flag">🇺🇸</span><span>English</span><span class="sep">/</span><span>$ USD</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
         </div>
     </div>
-</section>
+</footer>
 
-<script src="js/apple-theme.js"></script>
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
+<script>
+(function () {
+    // Account tab switcher (Create an account / Sign in)
+    document.querySelectorAll('.co-auth-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            var key = tab.getAttribute('data-atab');
+            document.querySelectorAll('.co-auth-tab').forEach(function (t) { t.classList.remove('active'); });
+            document.querySelectorAll('.co-auth-panel').forEach(function (p) { p.classList.remove('is-active'); });
+            tab.classList.add('active');
+            var panel = document.querySelector('.co-auth-panel[data-apanel="' + key + '"]');
+            if (panel) panel.classList.add('is-active');
+        });
+    });
+
+    // Password strength + match
+    var pw        = document.getElementById('acct-pw');
+    var pw2       = document.getElementById('acct-pw2');
+    var meter     = document.querySelector('.co-pw-meter');
+    var pwLabel   = document.getElementById('acct-pw-label');
+    var pwMatch   = document.getElementById('acct-pw-match');
+    var LABELS    = ['—', 'Weak', 'Fair', 'Good', 'Strong'];
+
+    function score(p) {
+        var s = 0;
+        if (p.length >= 8) s++;
+        if (p.length >= 12) s++;
+        if (/[A-Z]/.test(p) && /[a-z]/.test(p)) s++;
+        if (/[0-9]/.test(p) || /[^A-Za-z0-9]/.test(p)) s++;
+        return Math.min(s, 4);
+    }
+    function syncMatch() {
+        if (!pwMatch || !pw || !pw2) return;
+        var a = pw.value, b = pw2.value;
+        if (!b) {
+            pwMatch.textContent = 'Re-enter to confirm';
+            pwMatch.classList.remove('is-ok', 'is-err');
+        } else if (a === b) {
+            pwMatch.textContent = '✓ Passwords match';
+            pwMatch.classList.add('is-ok'); pwMatch.classList.remove('is-err');
+        } else {
+            pwMatch.textContent = 'Passwords don\u2019t match';
+            pwMatch.classList.add('is-err'); pwMatch.classList.remove('is-ok');
+        }
+    }
+    if (pw) pw.addEventListener('input', function () {
+        var s = pw.value.length ? score(pw.value) : 0;
+        if (meter) meter.setAttribute('data-level', s);
+        if (pwLabel) pwLabel.textContent = LABELS[s];
+        syncMatch();
+    });
+    if (pw2) pw2.addEventListener('input', syncMatch);
+})();
+</script>
 </body>
 </html>

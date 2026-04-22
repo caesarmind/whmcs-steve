@@ -3,210 +3,967 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configure Product — WHMCS by Apple</title>
+    <title>Configure your plan — Order — WHMCS by Apple</title>
     <link rel="stylesheet" href="css/apple-theme.css">
-    <style>body { display: block; }</style>
-</head>
-<body class="homepage-layout">
+    <link rel="stylesheet" href="css/apple-layout.css">
+    <style>
+        body { display: block; }
 
-<nav class="homepage-nav"><div class="homepage-nav-inner">
-    <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
-    <a href="#">WHMCS</a>
-    <a href="cloud-hosting.html">Hosting</a>
-    <a href="domains.html">Domains</a>
-    <a href="ssl-certificates.html">SSL</a>
-    <a href="support-page.html">Support</a>
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+
+        /* ══ Checkout step strip (shared w/ configureproductdomain) ══ */
+        .cp-steps {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            margin-bottom: 18px;
+            font-size: 12.5px; color: var(--color-text-tertiary);
+            letter-spacing: -0.008em;
+        }
+        .cp-step { display: inline-flex; align-items: center; gap: 8px; }
+        .cp-step-num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 600; flex-shrink: 0;
+        }
+        .cp-step.done .cp-step-num { background: var(--color-green-bg); color: var(--color-green-text); }
+        .cp-step.active .cp-step-num { background: var(--color-accent); color: #fff; }
+        .cp-step.active { color: var(--color-text-primary); font-weight: 500; }
+        .cp-step-sep { color: var(--color-text-quaternary); }
+
+        /* ── Main 2-col split: configure form + order summary ── */
+        .cp-split { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+        @media (max-width: 960px) { .cp-split { grid-template-columns: 1fr; } }
+
+        /* ── Section card ── */
+        .cp-section { padding: 0; }
+        .cp-section-head {
+            padding: 18px 22px 14px;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        .cp-section-title {
+            font-size: 15px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.012em;
+            margin: 0;
+        }
+        .cp-section-sub {
+            font-size: 12.5px; color: var(--color-text-tertiary);
+            margin-top: 2px;
+            letter-spacing: -0.008em;
+        }
+        .cp-section-body { padding: 18px 22px 20px; }
+
+        /* ── Selected-plan hero (first card) ── */
+        .cp-plan-hero {
+            display: flex; align-items: center; gap: 18px;
+            padding: 22px 24px;
+            flex-wrap: wrap;
+        }
+        .cp-plan-hero-ico {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: var(--color-accent-light);
+            color: var(--color-accent);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .cp-plan-hero-ico svg { width: 22px; height: 22px; }
+        .cp-plan-hero-meta { flex: 1; min-width: 200px; }
+        .cp-plan-hero-eyebrow {
+            font-size: 10.5px; font-weight: 600;
+            color: var(--color-accent);
+            text-transform: uppercase; letter-spacing: 0.06em;
+        }
+        .cp-plan-hero-name {
+            font-size: 20px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.018em;
+            margin: 2px 0 2px;
+        }
+        .cp-plan-hero-desc {
+            font-size: 13px; color: var(--color-text-tertiary);
+            letter-spacing: -0.008em;
+        }
+        .cp-plan-hero-change {
+            height: 32px; padding: 0 16px;
+            background: transparent;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-pill);
+            color: var(--color-text-secondary);
+            font-size: 12.5px; font-weight: 500;
+            cursor: pointer; font-family: inherit;
+            text-decoration: none;
+            transition: all var(--transition-fast);
+            align-self: center;
+            flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .cp-plan-hero-change:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+        /* ── Billing cycle — segmented picker ── */
+        .cp-cycle {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+        }
+        @media (max-width: 720px) { .cp-cycle { grid-template-columns: 1fr; } }
+        .cp-cycle-opt {
+            position: relative;
+            padding: 16px 16px 14px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .cp-cycle-opt input { position: absolute; opacity: 0; pointer-events: none; }
+        .cp-cycle-opt:hover { border-color: var(--color-accent); }
+        .cp-cycle-opt:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-light); }
+        .cp-cycle-save {
+            position: absolute; top: 12px; right: 12px;
+            padding: 3px 9px; border-radius: var(--radius-pill);
+            background: var(--color-green-bg); color: var(--color-green-text);
+            font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+            line-height: 1.1;
+        }
+        .cp-cycle-title {
+            font-size: 13.5px; font-weight: 600;
+            color: var(--color-text-primary); letter-spacing: -0.01em;
+        }
+        .cp-cycle-sub {
+            font-size: 11.5px; color: var(--color-text-tertiary);
+            margin-top: 2px; letter-spacing: -0.004em;
+        }
+        .cp-cycle-price {
+            display: flex; align-items: baseline; gap: 2px;
+            font-variant-numeric: tabular-nums; margin-top: 10px;
+        }
+        .cp-cycle-price .currency { font-size: 13px; color: var(--color-text-secondary); }
+        .cp-cycle-price .amount   { font-size: 22px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.02em; line-height: 1; }
+        .cp-cycle-price .period   { font-size: 12px; color: var(--color-text-tertiary); margin-left: 2px; }
+
+        /* ── Hostname + region + OS ── */
+        .cp-form { display: flex; flex-direction: column; gap: 16px; }
+        .cp-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 640px) { .cp-form-grid { grid-template-columns: 1fr; } }
+        .cp-row { display: flex; flex-direction: column; gap: 6px; }
+        .cp-label {
+            font-size: 12px; font-weight: 500;
+            color: var(--color-text-secondary);
+            letter-spacing: -0.004em;
+        }
+        .cp-input, .cp-select {
+            height: 38px;
+            padding: 0 14px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            font-size: 14px; letter-spacing: -0.008em;
+            color: var(--color-text-primary);
+            font-family: inherit;
+            width: 100%;
+            transition: all var(--transition-fast);
+        }
+        .cp-input:focus, .cp-select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-accent-light);
+        }
+        .cp-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+        .cp-hint {
+            font-size: 11.5px; color: var(--color-text-tertiary);
+            letter-spacing: -0.004em;
+            margin-top: 2px;
+        }
+
+        /* ── Region picker (3 cards) ── */
+        .cp-regions {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+        }
+        @media (max-width: 720px) { .cp-regions { grid-template-columns: 1fr; } }
+        .cp-region {
+            position: relative;
+            padding: 14px 14px 12px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .cp-region input { position: absolute; opacity: 0; pointer-events: none; }
+        .cp-region:hover { border-color: var(--color-accent); }
+        .cp-region:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-light); }
+        .cp-region-flag {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.06em;
+            flex-shrink: 0;
+        }
+        .cp-region:has(input:checked) .cp-region-flag {
+            background: var(--color-accent); color: #fff;
+        }
+        .cp-region-meta { flex: 1; min-width: 0; }
+        .cp-region-name {
+            font-size: 13px; font-weight: 600;
+            color: var(--color-text-primary); letter-spacing: -0.008em;
+        }
+        .cp-region-lat {
+            font-size: 11px; color: var(--color-text-tertiary);
+            margin-top: 2px; letter-spacing: -0.004em;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .cp-region-lat::before {
+            content: ""; width: 6px; height: 6px; border-radius: 50%;
+            background: var(--color-green-text);
+        }
+
+        /* ── Configurable options list ── */
+        .cp-opt-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 0;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        .cp-opt-row:last-child { border-bottom: 0; }
+        .cp-opt-meta { flex: 1; min-width: 0; }
+        .cp-opt-name {
+            font-size: 13.5px; font-weight: 500;
+            color: var(--color-text-primary); letter-spacing: -0.008em;
+        }
+        .cp-opt-desc {
+            font-size: 12px; color: var(--color-text-tertiary);
+            margin-top: 2px; letter-spacing: -0.004em; line-height: 1.45;
+        }
+        .cp-opt-picker {
+            height: 34px; padding: 0 32px 0 12px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            background: var(--color-surface);
+            font-size: 13px; font-variant-numeric: tabular-nums;
+            color: var(--color-text-primary); font-family: inherit;
+            appearance: none;
+            min-width: 180px;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .cp-opt-picker:focus { outline: none; border-color: var(--color-accent); }
+
+        /* Qty stepper */
+        .cp-opt-qty {
+            display: inline-flex; align-items: center;
+            border: 0.5px solid var(--color-border); border-radius: var(--radius-pill);
+            overflow: hidden; background: var(--color-surface);
+        }
+        .cp-opt-qty button {
+            width: 32px; height: 32px;
+            background: transparent; border: 0;
+            color: var(--color-text-secondary);
+            cursor: pointer; font-family: inherit; font-size: 14px;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: color var(--transition-fast);
+        }
+        .cp-opt-qty button:hover { color: var(--color-accent); }
+        .cp-opt-qty input {
+            width: 42px; text-align: center;
+            border: 0; background: transparent;
+            font: inherit; font-variant-numeric: tabular-nums;
+            font-size: 13px; font-weight: 500;
+            color: var(--color-text-primary); font-family: inherit;
+            padding: 0;
+        }
+        .cp-opt-qty input:focus { outline: none; }
+
+        /* ── Add-ons list (checkbox cards) ── */
+        .cp-addons { display: flex; flex-direction: column; gap: 10px; }
+        .cp-addon {
+            position: relative;
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 16px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .cp-addon input { position: absolute; opacity: 0; pointer-events: none; }
+        .cp-addon:hover { border-color: var(--color-accent); }
+        .cp-addon:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-light); }
+        .cp-addon-check {
+            width: 18px; height: 18px; border-radius: 5px;
+            border: 1.5px solid var(--color-border);
+            background: var(--color-surface);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; flex-shrink: 0;
+            transition: all var(--transition-fast);
+        }
+        .cp-addon:has(input:checked) .cp-addon-check {
+            background: var(--color-accent); border-color: var(--color-accent);
+        }
+        .cp-addon-check svg { width: 12px; height: 12px; opacity: 0; }
+        .cp-addon:has(input:checked) .cp-addon-check svg { opacity: 1; }
+        .cp-addon-ico {
+            width: 34px; height: 34px; border-radius: 10px;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .cp-addon-ico svg { width: 16px; height: 16px; }
+        .cp-addon-meta { flex: 1; min-width: 0; }
+        .cp-addon-name {
+            font-size: 13.5px; font-weight: 600;
+            color: var(--color-text-primary); letter-spacing: -0.008em;
+        }
+        .cp-addon-desc {
+            font-size: 12px; color: var(--color-text-tertiary);
+            margin-top: 2px; letter-spacing: -0.004em;
+        }
+        .cp-addon-price {
+            font-size: 13px; font-weight: 500;
+            color: var(--color-text-primary); flex-shrink: 0;
+            font-variant-numeric: tabular-nums; letter-spacing: -0.008em;
+            white-space: nowrap;
+        }
+        .cp-addon-price .period {
+            font-size: 11px; color: var(--color-text-tertiary); font-weight: 400;
+        }
+
+        /* ── Promo code row ── */
+        .cp-promo-row {
+            display: flex; gap: 8px; align-items: center;
+            padding: 12px 22px 16px;
+            flex-wrap: wrap;
+        }
+        .cp-promo-input {
+            flex: 1; min-width: 200px; height: 34px;
+            padding: 0 14px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-pill);
+            background: var(--color-surface);
+            font-size: 13px; letter-spacing: -0.008em;
+            color: var(--color-text-primary); font-family: inherit;
+        }
+        .cp-promo-input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+        .cp-promo-apply {
+            height: 34px; padding: 0 16px;
+            border-radius: var(--radius-pill);
+            background: transparent;
+            border: 0.5px solid var(--color-border);
+            color: var(--color-text-primary);
+            font-size: 12.5px; font-weight: 500;
+            cursor: pointer; font-family: inherit;
+            transition: all var(--transition-fast);
+        }
+        .cp-promo-apply:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+
+        /* ═════════════════ Available Addons — radio-tier cards ═════════════════ */
+        .st-addon {
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-lg, 14px);
+            background: var(--color-surface);
+            overflow: hidden;
+        }
+        .st-addon + .st-addon { margin-top: 12px; }
+        .st-addon-head {
+            display: grid; grid-template-columns: 1fr 180px; gap: 22px;
+            align-items: center;
+            padding: 22px 24px;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        @media (max-width: 640px) { .st-addon-head { grid-template-columns: 1fr; } }
+        .st-addon-title {
+            font-size: 16px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.012em;
+            margin: 0 0 6px;
+        }
+        .st-addon-desc {
+            font-size: 12.5px; color: var(--color-text-secondary);
+            letter-spacing: -0.008em;
+            line-height: 1.55;
+            margin: 0;
+        }
+        .st-addon-desc a { color: var(--color-accent); text-decoration: none; }
+        .st-addon-desc a:hover { text-decoration: underline; }
+        .st-addon-illus {
+            display: flex; align-items: center; justify-content: center;
+            height: 90px;
+            background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-surface-secondary) 100%);
+            border-radius: var(--radius-md);
+            color: var(--color-accent);
+        }
+        .st-addon-illus svg { width: 42px; height: 42px; }
+        .st-addon-illus.weebly    { background: linear-gradient(135deg, rgba(0,113,227,0.12) 0%, rgba(88,86,214,0.06) 100%); color: #0071e3; }
+        .st-addon-illus.codeguard { background: linear-gradient(135deg, rgba(48,209,88,0.14) 0%, rgba(48,209,88,0.04) 100%); color: var(--color-green-text); }
+        .st-addon-illus.sitelock  { background: linear-gradient(135deg, rgba(255,159,10,0.14) 0%, rgba(255,159,10,0.04) 100%); color: var(--color-orange-text); }
+        .st-addon-illus.marketgoo { background: linear-gradient(135deg, rgba(175,82,222,0.12) 0%, rgba(175,82,222,0.04) 100%); color: #8c5cff; }
+        .st-addon-illus.ox        { background: linear-gradient(135deg, rgba(0,113,227,0.12) 0%, rgba(90,200,250,0.06) 100%); color: #0071e3; }
+
+        .st-addon-tier {
+            display: grid;
+            grid-template-columns: 22px 1fr auto;
+            gap: 14px; align-items: center;
+            padding: 14px 24px;
+            border-bottom: 0.5px solid var(--color-border);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        .st-addon-tier:last-child { border-bottom: 0; }
+        .st-addon-tier:hover { background: var(--sidebar-item-hover); }
+        .st-addon-tier input { position: absolute; opacity: 0; pointer-events: none; }
+        .st-addon-radio {
+            width: 20px; height: 20px; border-radius: 50%;
+            border: 1.5px solid var(--color-border);
+            background: var(--color-surface);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+        }
+        .st-addon-radio::after {
+            content: ""; width: 8px; height: 8px; border-radius: 50%;
+            background: #fff;
+            transform: scale(0);
+            transition: transform var(--transition-fast);
+        }
+        .st-addon-tier:has(input:checked) .st-addon-radio {
+            border-color: var(--color-accent);
+            background: var(--color-accent);
+        }
+        .st-addon-tier:has(input:checked) .st-addon-radio::after { transform: scale(1); }
+        .st-addon-tier:has(input:checked) { background: var(--color-accent-light); }
+        .st-addon-tier-label {
+            font-size: 13.5px; font-weight: 500;
+            color: var(--color-text-primary);
+            letter-spacing: -0.008em;
+        }
+        .st-addon-tier-sub {
+            font-size: 11.5px; color: var(--color-text-tertiary);
+            margin-top: 1px; letter-spacing: -0.004em;
+        }
+        .st-addon-tier-price {
+            font-size: 13px; font-weight: 500;
+            color: var(--color-text-primary);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.008em;
+            text-align: right; white-space: nowrap;
+        }
+        .st-addon-tier-price.muted { color: var(--color-text-tertiary); font-weight: 400; }
+        .st-addon-tier-price.free  { color: var(--color-green-text); font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; font-size: 11px; }
+        .st-addon-tier-price .period {
+            font-size: 11px; color: var(--color-text-tertiary); font-weight: 400;
+            letter-spacing: -0.004em;
+        }
+
+        /* ══ Order summary (sticky right column) ══ */
+        .cp-summary-card { position: sticky; top: 72px; padding: 0; }
+        .cp-summary-head {
+            padding: 18px 20px 14px;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        .cp-summary-head h2 {
+            font-size: 14px; font-weight: 600;
+            color: var(--color-text-primary); letter-spacing: -0.01em; margin: 0;
+        }
+        .cp-summary-line-list { padding: 8px 20px; }
+        .cp-summary-line {
+            display: flex; justify-content: space-between; align-items: baseline;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 12.5px;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.004em;
+        }
+        .cp-summary-line .label { color: var(--color-text-secondary); min-width: 0; flex: 1; }
+        .cp-summary-line .value { color: var(--color-text-primary); font-weight: 500; white-space: nowrap; }
+        .cp-summary-line .value.muted { color: var(--color-text-tertiary); font-weight: 400; }
+        .cp-summary-line .value.good  { color: var(--color-green-text); font-weight: 500; }
+        .cp-summary-line.divider { border-top: 0.5px solid var(--color-border); padding-top: 12px; margin-top: 4px; }
+
+        /* "Due today" block — lives outside .cp-summary-line-list so the
+            full-bleed tinted strip aligns with the card edges cleanly
+            without negative margins or overflow. */
+        .cp-summary-total {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            border-top: 0.5px solid var(--color-border);
+            background: var(--color-surface-tertiary);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.004em;
+        }
+        .cp-summary-total .label {
+            font-size: 14px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.01em;
+        }
+        .cp-summary-total .value {
+            font-size: 22px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.022em;
+            white-space: nowrap;
+        }
+        .cp-summary-cycle {
+            font-size: 11px; color: var(--color-text-tertiary);
+            padding: 10px 20px 14px;
+            letter-spacing: -0.004em;
+            margin: 0;
+        }
+
+        .cp-summary-footer {
+            padding: 16px 20px 18px;
+            border-top: 0.5px solid var(--color-border);
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .cp-checkout-btn {
+            height: 44px; padding: 0 20px;
+            border-radius: var(--radius-pill);
+            background: var(--color-accent); color: #fff;
+            border: 0;
+            font-size: 14px; font-weight: 500;
+            letter-spacing: -0.008em;
+            cursor: pointer; font-family: inherit;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            text-decoration: none;
+            transition: background var(--transition-fast);
+        }
+        .cp-checkout-btn:hover { background: var(--color-accent-hover); }
+        .cp-back-link {
+            font-size: 12.5px; color: var(--color-text-tertiary);
+            text-align: center; text-decoration: none;
+            display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+            letter-spacing: -0.004em;
+        }
+        .cp-back-link:hover { color: var(--color-accent); }
+        .cp-back-link svg { width: 11px; height: 11px; }
+        .cp-guarantees {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 11px; color: var(--color-text-tertiary);
+            padding: 10px 20px 0;
+            letter-spacing: -0.004em;
+        }
+        .cp-guarantees svg { width: 12px; height: 12px; color: var(--color-green-text); flex-shrink: 0; }
+    </style>
+</head>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="order" data-page-title="Configure your plan">
+
+<div data-include="partials/state-chip.html"></div>
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>No Notifications</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;"><a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a></div>
+    </div>
+</div>
+
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareaproducts.html">My Services</a><a href="store.html">Order New Services</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareadomains.html">My Domains</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareainvoices.html">My Invoices</a><a href="clientareaquotes.html">My Quotes</a><a href="masspay.html">Mass Payment</a><a href="clientareaaddfunds.html">Add Funds</a><a href="account-paymentmethods.html">Payment Methods</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="supportticketslist.html">Tickets</a><a href="announcements.html">Announcements</a><a href="knowledgebase.html">Knowledgebase</a></div></div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
     <div class="nav-spacer"></div>
-    <a href="cart.html" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></a>
-    <a href="#" onclick="toggleDarkMode(); return false;" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
-    <a href="login.html" class="nav-signin">Sign in</a>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
 </div></nav>
 
-<section style="max-width: 1100px; margin: 0 auto; padding: 50px 22px 80px;">
-    <div style="margin-bottom: 28px;">
-        <a href="cloud-hosting.html" style="font-size: 13px; color: var(--color-text-secondary); text-decoration: none;">← Back to plans</a>
-        <h1 style="font-size: 36px; letter-spacing: -0.03em; font-weight: 600; margin: 8px 0 4px;">Configure your plan.</h1>
-        <p style="color: var(--color-text-secondary); font-size: 17px;">Pick your options. You're ordering <strong>Cloud Hosting — Pro Plan</strong>.</p>
+<div data-include="partials/inner-topbar.html"></div>
+
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a><span class="sep">/</span>
+        <a href="#">Services</a><span class="sep">/</span>
+        <a href="store.html">Order</a><span class="sep">/</span>
+        <span class="current" aria-current="page">Configure your plan</span>
+    </div>
+</nav>
+
+<div class="content-area">
+    <header class="page-header">
+        <h1>Configure your plan</h1>
+        <p class="page-subtitle">Pick your billing cycle, server region and any add-ons — we'll total it up on the right.</p>
+    </header>
+
+    <!-- Step strip -->
+    <div class="cp-steps">
+        <span class="cp-step done"><span class="cp-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Choose plan</span>
+        <span class="cp-step-sep">›</span>
+        <span class="cp-step done"><span class="cp-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Choose a domain</span>
+        <span class="cp-step-sep">›</span>
+        <span class="cp-step active"><span class="cp-step-num">3</span>Configure</span>
+        <span class="cp-step-sep">›</span>
+        <span class="cp-step"><span class="cp-step-num">4</span>Cart</span>
+        <span class="cp-step-sep">›</span>
+        <span class="cp-step"><span class="cp-step-num">5</span>Checkout</span>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start;">
-        <div>
+    <div class="cp-split">
+        <!-- ══ LEFT: configure form ══ -->
+        <div style="min-width: 0; display: flex; flex-direction: column; gap: 16px;">
+
+            <!-- Selected plan + domain summary -->
+            <div class="card">
+                <div class="cp-plan-hero">
+                    <div class="cp-plan-hero-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                    </div>
+                    <div class="cp-plan-hero-meta">
+                        <div class="cp-plan-hero-eyebrow">Web Hosting</div>
+                        <h2 class="cp-plan-hero-name">Professional</h2>
+                        <div class="cp-plan-hero-desc">Built for growing businesses · 10 sites · 25 GB · Free domain &amp; SSL</div>
+                    </div>
+                    <a href="store.html" class="cp-plan-hero-change">Change plan</a>
+                </div>
+                <div style="padding: 14px 24px; border-top: 0.5px solid var(--color-border); display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-tertiary); flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 12px; color: var(--color-text-tertiary); letter-spacing: -0.004em;">Domain</div>
+                        <div style="font-size: 13.5px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -0.008em; font-family: var(--font-mono, ui-monospace, Menlo, monospace);">mycompany.com <span style="margin-left: 8px; font-family: inherit; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--color-green-bg); color: var(--color-green-text); font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;">Included</span></div>
+                    </div>
+                    <a href="configureproductdomain.html" class="cp-plan-hero-change">Change</a>
+                </div>
+            </div>
+
             <!-- Billing cycle -->
-            <div class="card" style="margin-bottom: 16px;">
-                <div class="card-header"><h2 class="card-title">Billing cycle</h2></div>
-                <div class="card-body">
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                        <label style="padding: 16px; border: 1px solid var(--color-border-card); border-radius: 12px; cursor: pointer;">
-                            <div style="font-size: 13px; color: var(--color-text-tertiary); margin-bottom: 4px;">Monthly</div>
-                            <div style="font-size: 20px; font-weight: 600;">$12.99</div>
-                            <div style="font-size: 12px; color: var(--color-text-tertiary);">per month</div>
+            <div class="card cp-section">
+                <div class="cp-section-head">
+                    <h2 class="cp-section-title">Billing cycle</h2>
+                    <div class="cp-section-sub">Longer commitments = bigger discounts. You can upgrade or switch later.</div>
+                </div>
+                <div class="cp-section-body">
+                    <div class="cp-cycle" role="radiogroup" aria-label="Billing cycle">
+                        <label class="cp-cycle-opt">
+                            <input type="radio" name="cp-cycle" value="monthly">
+                            <div class="cp-cycle-title">Monthly</div>
+                            <div class="cp-cycle-sub">Billed every month</div>
+                            <div class="cp-cycle-price"><span class="currency">$</span><span class="amount">7.99</span><span class="period">/ mo</span></div>
                         </label>
-                        <label style="padding: 16px; border: 2px solid var(--color-accent); border-radius: 12px; cursor: pointer; background: var(--color-surface); position: relative;">
-                            <div style="position: absolute; top: -8px; right: 12px; background: var(--color-green-bg); color: var(--color-green-text); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px;">Save 17%</div>
-                            <div style="font-size: 13px; color: var(--color-text-tertiary); margin-bottom: 4px;">Annually</div>
-                            <div style="font-size: 20px; font-weight: 600;">$129.99</div>
-                            <div style="font-size: 12px; color: var(--color-text-tertiary);">per year</div>
+                        <label class="cp-cycle-opt">
+                            <input type="radio" name="cp-cycle" value="annual" checked>
+                            <span class="cp-cycle-save">Save 20%</span>
+                            <div class="cp-cycle-title">Annual</div>
+                            <div class="cp-cycle-sub">Billed once per year</div>
+                            <div class="cp-cycle-price"><span class="currency">$</span><span class="amount">4.99</span><span class="period">/ mo</span></div>
                         </label>
-                        <label style="padding: 16px; border: 1px solid var(--color-border-card); border-radius: 12px; cursor: pointer;">
-                            <div style="font-size: 13px; color: var(--color-text-tertiary); margin-bottom: 4px;">Biennially</div>
-                            <div style="font-size: 20px; font-weight: 600;">$239.99</div>
-                            <div style="font-size: 12px; color: var(--color-text-tertiary);">every 2 years</div>
+                        <label class="cp-cycle-opt">
+                            <input type="radio" name="cp-cycle" value="biennial">
+                            <span class="cp-cycle-save">Save 30%</span>
+                            <div class="cp-cycle-title">Biennial</div>
+                            <div class="cp-cycle-sub">Billed every 2 years</div>
+                            <div class="cp-cycle-price"><span class="currency">$</span><span class="amount">3.99</span><span class="period">/ mo</span></div>
                         </label>
                     </div>
                 </div>
             </div>
 
-            <!-- Domain -->
-            <div class="card" style="margin-bottom: 16px;">
-                <div class="card-header"><h2 class="card-title">Domain</h2></div>
-                <div class="card-body">
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
-                        <label style="padding: 14px; border: 2px solid var(--color-accent); border-radius: 12px; cursor: pointer; text-align: center;">
-                            <div style="font-weight: 600; font-size: 14px;">Register new</div>
-                            <div style="font-size: 12px; color: var(--color-text-tertiary);">From $11.99/yr</div>
+            <!-- Server region -->
+            <div class="card cp-section">
+                <div class="cp-section-head">
+                    <h2 class="cp-section-title">Server region</h2>
+                    <div class="cp-section-sub">Pick the datacenter closest to your audience for the best latency.</div>
+                </div>
+                <div class="cp-section-body">
+                    <div class="cp-regions" role="radiogroup" aria-label="Server region">
+                        <label class="cp-region">
+                            <input type="radio" name="cp-region" value="us-east" checked>
+                            <span class="cp-region-flag">US</span>
+                            <div class="cp-region-meta">
+                                <div class="cp-region-name">US East · Virginia</div>
+                                <div class="cp-region-lat">~38ms from you</div>
+                            </div>
                         </label>
-                        <label style="padding: 14px; border: 1px solid var(--color-border-card); border-radius: 12px; cursor: pointer; text-align: center;">
-                            <div style="font-weight: 600; font-size: 14px;">Transfer</div>
-                            <div style="font-size: 12px; color: var(--color-text-tertiary);">Move existing</div>
+                        <label class="cp-region">
+                            <input type="radio" name="cp-region" value="eu-west">
+                            <span class="cp-region-flag">DE</span>
+                            <div class="cp-region-meta">
+                                <div class="cp-region-name">EU West · Frankfurt</div>
+                                <div class="cp-region-lat">~114ms from you</div>
+                            </div>
                         </label>
-                        <label style="padding: 14px; border: 1px solid var(--color-border-card); border-radius: 12px; cursor: pointer; text-align: center;">
-                            <div style="font-weight: 600; font-size: 14px;">I already own</div>
-                            <div style="font-size: 12px; color: var(--color-text-tertiary);">Use nameservers</div>
+                        <label class="cp-region">
+                            <input type="radio" name="cp-region" value="ap-southeast">
+                            <span class="cp-region-flag">SG</span>
+                            <div class="cp-region-meta">
+                                <div class="cp-region-name">Asia · Singapore</div>
+                                <div class="cp-region-lat">~210ms from you</div>
+                            </div>
                         </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Domain name</label>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="text" class="form-input" placeholder="yourdomain" style="flex: 1;">
-                            <select class="form-select" style="max-width: 140px;">
-                                <option>.com</option>
-                                <option>.net</option>
-                                <option>.org</option>
-                                <option>.io</option>
-                                <option>.co</option>
-                            </select>
-                            <button class="btn-secondary">Check</button>
-                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Configurable options -->
-            <div class="card" style="margin-bottom: 16px;">
-                <div class="card-header"><h2 class="card-title">Configurable options</h2></div>
-                <div class="card-body">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Datacenter location</label>
-                            <select class="form-select">
-                                <option>USA East (New York)</option>
-                                <option>USA West (San Francisco)</option>
-                                <option>Europe (Amsterdam)</option>
-                                <option>Europe (Frankfurt)</option>
-                                <option>Asia Pacific (Singapore)</option>
+            <div class="card cp-section">
+                <div class="cp-section-head">
+                    <h2 class="cp-section-title">Configuration</h2>
+                    <div class="cp-section-sub">Pre-installed software and base resources.</div>
+                </div>
+                <div class="cp-section-body">
+                    <div class="cp-form">
+                        <div class="cp-form-grid">
+                            <div class="cp-row">
+                                <label class="cp-label" for="cp-hostname">Primary hostname</label>
+                                <input id="cp-hostname" type="text" class="cp-input" value="www.mycompany.com">
+                                <div class="cp-hint">Used for SSL issuance and auto-config.</div>
+                            </div>
+                            <div class="cp-row">
+                                <label class="cp-label" for="cp-os">Operating system</label>
+                                <select id="cp-os" class="cp-select">
+                                    <option>Ubuntu 22.04 LTS (recommended)</option>
+                                    <option>Ubuntu 24.04 LTS</option>
+                                    <option>Debian 12</option>
+                                    <option>AlmaLinux 9</option>
+                                    <option>Rocky Linux 9</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Optional paid configuration add-ons -->
+                        <div class="cp-opt-row">
+                            <div class="cp-opt-meta">
+                                <div class="cp-opt-name">Extra disk space</div>
+                                <div class="cp-opt-desc">Upgrade beyond the base 25 GB NVMe SSD storage.</div>
+                            </div>
+                            <select class="cp-opt-picker">
+                                <option>Included · 25 GB — +$0.00</option>
+                                <option>50 GB — +$2.00 / mo</option>
+                                <option>100 GB — +$5.00 / mo</option>
+                                <option>250 GB — +$12.00 / mo</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Operating system</label>
-                            <select class="form-select">
-                                <option>Ubuntu 22.04 LTS</option>
-                                <option>Debian 12</option>
-                                <option>CentOS Stream 9</option>
-                                <option>AlmaLinux 9</option>
-                            </select>
+                        <div class="cp-opt-row">
+                            <div class="cp-opt-meta">
+                                <div class="cp-opt-name">Dedicated IPv4 address</div>
+                                <div class="cp-opt-desc">Required for some legacy SSL configurations.</div>
+                            </div>
+                            <div class="cp-opt-qty">
+                                <button type="button" aria-label="Decrease">−</button>
+                                <input type="text" value="0" inputmode="numeric">
+                                <button type="button" aria-label="Increase">+</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Control panel</label>
-                            <select class="form-select">
-                                <option>cPanel (+$10.00/mo)</option>
-                                <option>Plesk (+$8.00/mo)</option>
-                                <option>DirectAdmin (+$5.00/mo)</option>
-                                <option>None</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">PHP version</label>
-                            <select class="form-select">
-                                <option>PHP 8.3 (recommended)</option>
-                                <option>PHP 8.2</option>
-                                <option>PHP 8.1</option>
-                            </select>
+                        <div class="cp-opt-row">
+                            <div class="cp-opt-meta">
+                                <div class="cp-opt-name">Additional mailboxes</div>
+                                <div class="cp-opt-desc">Add more 2 GB mailboxes beyond the first 5 included.</div>
+                            </div>
+                            <div class="cp-opt-qty">
+                                <button type="button" aria-label="Decrease">−</button>
+                                <input type="text" value="2" inputmode="numeric">
+                                <button type="button" aria-label="Increase">+</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Addons -->
-            <div class="card" style="margin-bottom: 16px;">
-                <div class="card-header"><h2 class="card-title">Addons</h2></div>
-                <div class="card-body">
-                    <div class="settings-item">
-                        <div class="settings-item-info">
-                            <div class="settings-item-label">Dedicated IPv4 address</div>
-                            <div class="settings-item-desc">$3.00/mo · Your own IP address</div>
+            <!-- Available Addons — addon cards with radio tiers -->
+            <div class="card cp-section">
+                <div class="cp-section-head">
+                    <h2 class="cp-section-title">Available Addons</h2>
+                    <div class="cp-section-sub">Pick a tier for each addon — billed alongside your plan. You can change or cancel any time.</div>
+                </div>
+                <div class="cp-section-body" style="padding: 0;">
+
+                    <!-- ─── Powerful Website Builder (Weebly) ─── -->
+                    <div class="st-addon" style="border: 0; border-top: 0.5px solid var(--color-border); border-radius: 0;">
+                        <div class="st-addon-head" style="border-bottom: 0.5px solid var(--color-border);">
+                            <div>
+                                <h3 class="st-addon-title">Powerful Website Builder</h3>
+                                <p class="st-addon-desc">Add Weebly's drag-and-drop website builder to your hosting so you can create a great-looking site, store, or blog without writing code. <a href="#">Learn more…</a></p>
+                            </div>
+                            <div class="st-addon-illus weebly">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><rect x="5" y="6" width="6" height="4" rx="0.5" fill="currentColor" fill-opacity="0.15" stroke="none"/><line x1="13" y1="7" x2="19" y2="7"/><line x1="13" y1="10" x2="17" y2="10"/><line x1="5" y1="13" x2="19" y2="13"/></svg>
+                            </div>
                         </div>
-                        <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-wb"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">None</div><div class="st-addon-tier-sub">No website builder, manage your site however you like.</div></div><div class="st-addon-tier-price muted">—</div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-wb" checked><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Free</div><div class="st-addon-tier-sub">6 pages · Weebly branding · basic templates</div></div><div class="st-addon-tier-price free">Free!</div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-wb"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Starter</div><div class="st-addon-tier-sub">Unlimited pages · custom domain · ad-free</div></div><div class="st-addon-tier-price">$59.88 <span class="period">/ yr</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-wb"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Pro</div><div class="st-addon-tier-sub">Everything in Starter + e-commerce, membership, stats</div></div><div class="st-addon-tier-price">$179.88 <span class="period">/ yr</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-wb"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Business</div><div class="st-addon-tier-sub">Priority support, advanced SEO, custom code &amp; checkout</div></div><div class="st-addon-tier-price">$289.99 <span class="period">/ yr</span></div></label>
                     </div>
-                    <div class="settings-item">
-                        <div class="settings-item-info">
-                            <div class="settings-item-label">Daily backups</div>
-                            <div class="settings-item-desc">$2.49/mo · 30-day retention</div>
+
+                    <!-- ─── Website Backup (CodeGuard) ─── -->
+                    <div class="st-addon" style="border: 0; border-top: 0.5px solid var(--color-border); border-radius: 0; margin-top: 0;">
+                        <div class="st-addon-head" style="border-bottom: 0.5px solid var(--color-border);">
+                            <div>
+                                <h3 class="st-addon-title">Website Backup &amp; Restore</h3>
+                                <p class="st-addon-desc">CodeGuard takes daily off-site snapshots of your site and database. Restore any version with a single click — no ticket required. <a href="#">Learn more…</a></p>
+                            </div>
+                            <div class="st-addon-illus codeguard">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-9-9c2.52 0 4.82.99 6.5 2.6"/><polyline points="22 4 22 10 16 10"/><path d="M12 8v4l3 2"/></svg>
+                            </div>
                         </div>
-                        <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-cg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">None</div><div class="st-addon-tier-sub">No off-site backups — not recommended for production sites.</div></div><div class="st-addon-tier-price muted">—</div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-cg" checked><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Basic — 1 GB</div><div class="st-addon-tier-sub">Daily snapshots · 30-day history · 1-click restore</div></div><div class="st-addon-tier-price">$3.99 <span class="period">/ mo</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-cg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Premium — 5 GB</div><div class="st-addon-tier-sub">Everything in Basic + malware monitoring</div></div><div class="st-addon-tier-price">$7.99 <span class="period">/ mo</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-cg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Professional — 25 GB</div><div class="st-addon-tier-sub">90-day history · priority restore queue</div></div><div class="st-addon-tier-price">$14.99 <span class="period">/ mo</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-cg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Enterprise — 100 GB</div><div class="st-addon-tier-sub">Unlimited history · hourly snapshots on request</div></div><div class="st-addon-tier-price">$29.99 <span class="period">/ mo</span></div></label>
                     </div>
-                    <div class="settings-item">
-                        <div class="settings-item-info">
-                            <div class="settings-item-label">SSL certificate</div>
-                            <div class="settings-item-desc">$9.99/yr · DV certificate</div>
+
+                    <!-- ─── Website Security (SiteLock) ─── -->
+                    <div class="st-addon" style="border: 0; border-top: 0.5px solid var(--color-border); border-radius: 0; margin-top: 0;">
+                        <div class="st-addon-head" style="border-bottom: 0.5px solid var(--color-border);">
+                            <div>
+                                <h3 class="st-addon-title">Website Security &amp; Malware Protection</h3>
+                                <p class="st-addon-desc">SiteLock continuously scans your site for malware, vulnerabilities and blacklistings. Higher tiers automatically clean threats. <a href="#">Learn more…</a></p>
+                            </div>
+                            <div class="st-addon-illus sitelock">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                            </div>
                         </div>
-                        <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-sl" checked><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">None</div><div class="st-addon-tier-sub">No active scanning — use at your own risk.</div></div><div class="st-addon-tier-price muted">—</div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-sl"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">SMART</div><div class="st-addon-tier-sub">Vulnerability scanner + blacklist monitoring</div></div><div class="st-addon-tier-price">$2.99 <span class="period">/ mo</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-sl"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Find</div><div class="st-addon-tier-sub">Daily malware scans · threat alerts</div></div><div class="st-addon-tier-price">$9.99 <span class="period">/ mo</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-sl"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Find &amp; Fix</div><div class="st-addon-tier-sub">Auto-cleans detected malware + SSL insights</div></div><div class="st-addon-tier-price">$19.99 <span class="period">/ mo</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-sl"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Prevent</div><div class="st-addon-tier-sub">Web-app firewall + CDN + DDoS mitigation</div></div><div class="st-addon-tier-price">$29.99 <span class="period">/ mo</span></div></label>
                     </div>
-                    <div class="settings-item">
-                        <div class="settings-item-info">
-                            <div class="settings-item-label">Priority support</div>
-                            <div class="settings-item-desc">$7.99/mo · 1-hour response SLA</div>
+
+                    <!-- ─── SEO Toolkit (MarketGoo) ─── -->
+                    <div class="st-addon" style="border: 0; border-top: 0.5px solid var(--color-border); border-radius: 0; margin-top: 0;">
+                        <div class="st-addon-head" style="border-bottom: 0.5px solid var(--color-border);">
+                            <div>
+                                <h3 class="st-addon-title">SEO Toolkit by MarketGoo</h3>
+                                <p class="st-addon-desc">Daily rank tracking, on-page audits and actionable recommendations to grow organic traffic. <a href="#">Learn more…</a></p>
+                            </div>
+                            <div class="st-addon-illus marketgoo">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></svg>
+                            </div>
                         </div>
-                        <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-mg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">None</div><div class="st-addon-tier-sub">No SEO tracking — manage off-site if you prefer.</div></div><div class="st-addon-tier-price muted">—</div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-mg" checked><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Essentials</div><div class="st-addon-tier-sub">3 keywords · weekly audits · basic reports</div></div><div class="st-addon-tier-price free">Free!</div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-mg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Starter</div><div class="st-addon-tier-sub">25 keywords · daily audits · competitor tracking</div></div><div class="st-addon-tier-price">$3.99 <span class="period">/ mo</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-mg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Pro</div><div class="st-addon-tier-sub">100 keywords · content planning · white-label reports</div></div><div class="st-addon-tier-price">$9.99 <span class="period">/ mo</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-mg"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Agency</div><div class="st-addon-tier-sub">Unlimited keywords · 10 sites · API access</div></div><div class="st-addon-tier-price">$19.99 <span class="period">/ mo</span></div></label>
+                    </div>
+
+                    <!-- ─── Professional Email (OX App Suite) ─── -->
+                    <div class="st-addon" style="border: 0; border-top: 0.5px solid var(--color-border); border-radius: 0; margin-top: 0;">
+                        <div class="st-addon-head" style="border-bottom: 0.5px solid var(--color-border);">
+                            <div>
+                                <h3 class="st-addon-title">Professional Email by OX App Suite</h3>
+                                <p class="st-addon-desc">Ad-free branded email @yourdomain.com with calendar, contacts, video meetings and 25 GB storage per mailbox. <a href="#">Learn more…</a></p>
+                            </div>
+                            <div class="st-addon-illus ox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+                            </div>
+                        </div>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-ox" checked><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">None</div><div class="st-addon-tier-sub">Use your existing mail provider.</div></div><div class="st-addon-tier-price muted">—</div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-ox"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">1 mailbox</div><div class="st-addon-tier-sub">25 GB · calendar · contacts</div></div><div class="st-addon-tier-price">$1.99 <span class="period">/ mo</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-ox"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">5 mailboxes</div><div class="st-addon-tier-sub">Team aliases · shared drives</div></div><div class="st-addon-tier-price">$7.99 <span class="period">/ mo</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-ox"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">10 mailboxes</div><div class="st-addon-tier-sub">Video meetings · advanced filters</div></div><div class="st-addon-tier-price">$14.99 <span class="period">/ mo</span></div></label>
+                        <label class="st-addon-tier"><input type="radio" name="cp-addon-ox"><span class="st-addon-radio"></span><div><div class="st-addon-tier-label">Unlimited</div><div class="st-addon-tier-sub">Unlimited mailboxes + compliance archive</div></div><div class="st-addon-tier-price">$29.99 <span class="period">/ mo</span></div></label>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Price summary -->
-        <div class="card" style="position: sticky; top: 82px;">
-            <div class="card-header"><h2 class="card-title">Plan summary</h2></div>
-            <div class="card-body">
-                <div style="padding-bottom: 14px; border-bottom: 1px solid var(--color-border-card); margin-bottom: 14px;">
-                    <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">Cloud Hosting — Pro</div>
-                    <div style="font-size: 12px; color: var(--color-text-tertiary);">Annual · USA East</div>
+        <!-- ══ RIGHT: sticky order summary ══ -->
+        <aside>
+            <div class="card cp-summary-card">
+                <div class="cp-summary-head">
+                    <h2>Order summary</h2>
+                </div>
+                <div class="cp-summary-line-list">
+                    <div class="cp-summary-line"><span class="label">Professional · annual</span><span class="value">$59.88</span></div>
+                    <div class="cp-summary-line"><span class="label">Domain · mycompany.com</span><span class="value good">Free</span></div>
+                    <div class="cp-summary-line"><span class="label">CodeGuard backups</span><span class="value">$23.88</span></div>
+                    <div class="cp-summary-line"><span class="label">SSL certificate</span><span class="value good">Included</span></div>
+                    <div class="cp-summary-line divider"><span class="label">Subtotal</span><span class="value">$83.76</span></div>
+                    <div class="cp-summary-line"><span class="label">Setup fee</span><span class="value muted">$0.00</span></div>
+                    <div class="cp-summary-line"><span class="label">Tax (estimated)</span><span class="value muted">$0.00</span></div>
+                </div>
+                <div class="cp-summary-total">
+                    <span class="label">Due today</span>
+                    <span class="value">$83.76</span>
+                </div>
+                <p class="cp-summary-cycle">Renews $83.76 every year. Cancel anytime — 30-day money-back guarantee.</p>
+
+                <div class="cp-promo-row">
+                    <input type="text" class="cp-promo-input" placeholder="Promo code">
+                    <button type="button" class="cp-promo-apply">Apply</button>
                 </div>
 
-                <div class="invoice-total-row" style="border: 0;">
-                    <span>Base plan</span>
-                    <span>$129.99</span>
+                <div class="cp-summary-footer">
+                    <a href="cart.html" class="cp-checkout-btn">
+                        Review cart
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
+                    <a href="configureproductdomain.html" class="cp-back-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        Back to domain
+                    </a>
                 </div>
-                <div class="invoice-total-row" style="border: 0;">
-                    <span>cPanel</span>
-                    <span>$120.00</span>
+                <div class="cp-guarantees">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Secured by 256-bit SSL · PCI-DSS Level 1
                 </div>
-                <div class="invoice-total-row" style="border: 0;">
-                    <span>Daily backups</span>
-                    <span>$29.88</span>
-                </div>
-                <div class="invoice-total-row grand">
-                    <span>Total</span>
-                    <span>$279.87/yr</span>
-                </div>
-
-                <a href="cart.html" class="btn-primary btn-lg" style="width: 100%; margin-top: 18px; justify-content: center;">Continue →</a>
-                <a href="cloud-hosting.html" style="display: block; text-align: center; margin-top: 10px; font-size: 13px; color: var(--color-text-secondary);">Change plan</a>
+                <div style="height: 14px;"></div>
             </div>
+        </aside>
+    </div>
+</div>
+
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="domains.html">Domains</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="knowledgebase.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Careers</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open><span class="flag">🇺🇸</span><span>English</span><span class="sep">/</span><span>$ USD</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
         </div>
     </div>
-</section>
+</footer>
 
-<script src="js/apple-theme.js"></script>
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
+<script>
+// Qty stepper on configurable options
+(function () {
+    document.querySelectorAll('.cp-opt-qty').forEach(function (group) {
+        var input = group.querySelector('input');
+        var dec = group.querySelector('button[aria-label="Decrease"]');
+        var inc = group.querySelector('button[aria-label="Increase"]');
+        function setVal(v) { input.value = Math.max(0, Math.min(99, v)); }
+        dec && dec.addEventListener('click', function () { setVal((parseInt(input.value, 10) || 0) - 1); });
+        inc && inc.addEventListener('click', function () { setVal((parseInt(input.value, 10) || 0) + 1); });
+    });
+})();
+</script>
 </body>
 </html>

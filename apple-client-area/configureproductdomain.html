@@ -3,125 +3,631 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Domain Options — WHMCS by Apple</title>
+    <title>Choose a Domain — Order — WHMCS by Apple</title>
     <link rel="stylesheet" href="css/apple-theme.css">
-    <style>body { display: block; }</style>
-</head>
-<body class="homepage-layout">
+    <link rel="stylesheet" href="css/apple-layout.css">
+    <style>
+        body { display: block; }
 
-<nav class="homepage-nav"><div class="homepage-nav-inner">
-    <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
-    <a href="#">WHMCS</a>
-    <a href="cloud-hosting.html">Hosting</a>
-    <a href="domains.html">Domains</a>
-    <a href="ssl-certificates.html">SSL</a>
-    <a href="support-page.html">Support</a>
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+
+        /* ── 2-column split (matches store.html) ── */
+        .dp-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+        @media (max-width: 880px) { .dp-split { grid-template-columns: 1fr; } }
+
+        /* Shared sub-nav primitive */
+        .subnav-card { padding: 8px; }
+        .subnav-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }
+        .subnav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: 13px; letter-spacing: -0.008em; text-decoration: none; transition: background var(--transition-fast); background: transparent; border: 0; width: 100%; text-align: left; font-family: inherit; cursor: pointer; }
+        .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+        .subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+        .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .subnav-item.active svg { color: var(--color-accent); }
+        .subnav-divider { height: 0.5px; background: var(--color-border); margin: 8px 12px; }
+
+        /* ── Checkout progress strip (above the card) ── */
+        .dp-steps {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            margin-bottom: 18px;
+            font-size: 12.5px; color: var(--color-text-tertiary);
+            letter-spacing: -0.008em;
+        }
+        .dp-step {
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .dp-step-num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 600;
+            flex-shrink: 0;
+        }
+        .dp-step.done .dp-step-num { background: var(--color-green-bg); color: var(--color-green-text); }
+        .dp-step.active .dp-step-num { background: var(--color-accent); color: #fff; }
+        .dp-step.active { color: var(--color-text-primary); font-weight: 500; }
+        .dp-step-sep { color: var(--color-text-quaternary); }
+
+        /* ── Option tabs (3-up radio cards) ── */
+        .dp-options {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            padding: 22px 22px 0;
+        }
+        @media (max-width: 720px) { .dp-options { grid-template-columns: 1fr; } }
+        .dp-option {
+            position: relative;
+            padding: 18px 18px 16px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .dp-option input { position: absolute; opacity: 0; pointer-events: none; }
+        .dp-option:hover { border-color: var(--color-accent); }
+        .dp-option:has(input:checked) {
+            border-color: var(--color-accent);
+            background: var(--color-accent-light);
+        }
+        .dp-option-ico {
+            width: 32px; height: 32px; border-radius: 10px;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+        .dp-option:has(input:checked) .dp-option-ico {
+            background: var(--color-accent); color: #fff;
+        }
+        .dp-option-ico svg { width: 16px; height: 16px; }
+        .dp-option-title {
+            font-size: 13px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.008em;
+        }
+        .dp-option-desc {
+            font-size: 11.5px; color: var(--color-text-tertiary);
+            line-height: 1.45;
+            letter-spacing: -0.004em;
+        }
+        .dp-option-check {
+            position: absolute; top: 14px; right: 14px;
+            width: 16px; height: 16px; border-radius: 50%;
+            border: 1.5px solid var(--color-border);
+            background: var(--color-surface);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+        }
+        .dp-option:has(input:checked) .dp-option-check {
+            background: var(--color-accent); border-color: var(--color-accent);
+        }
+        .dp-option-check svg { width: 10px; height: 10px; opacity: 0; }
+        .dp-option:has(input:checked) .dp-option-check svg { opacity: 1; }
+
+        /* ── Panel body (contents for selected option) ── */
+        .dp-panel {
+            padding: 22px 22px 24px;
+            border-top: 0.5px solid var(--color-border);
+            margin-top: 22px;
+        }
+        .dp-panel-hint {
+            font-size: 12.5px; color: var(--color-text-tertiary);
+            letter-spacing: -0.004em;
+            line-height: 1.55;
+            margin: 0 0 14px;
+            max-width: 640px;
+        }
+        .dp-panel-hint strong { color: var(--color-text-primary); font-weight: 500; }
+
+        /* Search / input row */
+        .dp-search-row {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .dp-input-wrap {
+            position: relative;
+            flex: 1; min-width: 260px;
+        }
+        .dp-input-wrap > svg {
+            position: absolute; left: 14px; top: 50%;
+            transform: translateY(-50%);
+            width: 15px; height: 15px;
+            color: var(--color-text-tertiary);
+            pointer-events: none;
+        }
+        .dp-input {
+            width: 100%; height: 46px;
+            padding: 0 16px 0 40px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-pill);
+            background: var(--color-surface);
+            font-size: 15px; letter-spacing: -0.012em;
+            color: var(--color-text-primary);
+            font-family: inherit;
+            transition: all var(--transition-fast);
+        }
+        .dp-input::placeholder { color: var(--color-text-quaternary); }
+        .dp-input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-accent-light);
+        }
+        .dp-input.no-ico { padding-left: 18px; }
+        .dp-search-cta {
+            height: 46px; padding: 0 24px;
+            border-radius: var(--radius-pill);
+            background: var(--color-accent); color: #fff;
+            border: 0;
+            font-size: 14px; font-weight: 500;
+            letter-spacing: -0.008em;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background var(--transition-fast);
+            display: inline-flex; align-items: center; gap: 6px;
+            flex-shrink: 0;
+        }
+        .dp-search-cta:hover { background: var(--color-accent-hover); }
+        .dp-search-cta svg { width: 14px; height: 14px; }
+
+        /* Example hint + Safe Search row */
+        .dp-example {
+            font-size: 12.5px; color: var(--color-text-tertiary);
+            line-height: 1.5;
+            letter-spacing: -0.004em;
+            margin-bottom: 18px;
+            max-width: 640px;
+        }
+        .dp-example code {
+            background: var(--color-surface-secondary);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+            font-size: 11.5px;
+            color: var(--color-text-secondary);
+        }
+
+        /* Safe-search toggle — Apple switch style */
+        .dp-toggle-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 0;
+            margin-top: 4px;
+            border-top: 0.5px solid var(--color-border-light, var(--color-border));
+        }
+        .dp-toggle-row-meta { flex: 1; min-width: 0; }
+        .dp-toggle-row-title {
+            font-size: 13px; font-weight: 500;
+            color: var(--color-text-primary);
+            letter-spacing: -0.008em;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .dp-toggle-row-title svg {
+            width: 12px; height: 12px;
+            color: var(--color-text-tertiary);
+            cursor: help;
+        }
+        .dp-toggle-row-sub {
+            font-size: 11.5px; color: var(--color-text-tertiary);
+            margin-top: 2px;
+            letter-spacing: -0.004em;
+        }
+        .dp-switch {
+            position: relative;
+            width: 40px; height: 24px;
+            border-radius: 999px;
+            background: var(--color-accent);
+            cursor: pointer;
+            border: 0; padding: 0;
+            flex-shrink: 0;
+            transition: background var(--transition-fast);
+        }
+        .dp-switch::after {
+            content: ""; position: absolute;
+            top: 2px; right: 2px;
+            width: 20px; height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: transform var(--transition-fast);
+        }
+        .dp-switch.off { background: var(--color-border); }
+        .dp-switch.off::after { transform: translateX(-16px); }
+
+        /* ── Error / validation states ── */
+        .dp-error {
+            display: flex; align-items: flex-start; gap: 12px;
+            margin-top: 16px; padding: 14px 16px;
+            background: var(--color-red-bg);
+            border-radius: var(--radius-md);
+            color: var(--color-red-text);
+            letter-spacing: -0.008em;
+        }
+        .dp-error svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+        .dp-error-body { flex: 1; min-width: 0; }
+        .dp-error-title {
+            font-size: 13.5px; font-weight: 600;
+            letter-spacing: -0.012em;
+            margin-bottom: 4px;
+        }
+        .dp-error-text {
+            font-size: 12.5px;
+            line-height: 1.55;
+            color: var(--color-red-text);
+            opacity: 0.85;
+            margin: 0;
+        }
+        .dp-error-text a {
+            color: var(--color-red-text);
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        /* Compact one-liner variant for short messages */
+        .dp-error.compact { align-items: center; padding: 10px 14px; }
+        .dp-error.compact .dp-error-title { margin: 0; font-weight: 500; font-size: 13px; }
+        .dp-error.compact svg { margin: 0; width: 15px; height: 15px; }
+
+        /* When parent panel has data-state="error", also mark the input as invalid */
+        .dp-panel[data-state="error"] .dp-input {
+            border-color: var(--color-red-text);
+            box-shadow: 0 0 0 3px var(--color-red-bg);
+        }
+        /* Default: errors hidden; only shown when panel opts into error state */
+        .dp-error { display: none; }
+        .dp-panel[data-state="error"] .dp-error { display: flex; }
+
+        /* Nameserver fields (option C) */
+        .dp-ns-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            margin-top: 14px;
+        }
+        @media (max-width: 560px) { .dp-ns-grid { grid-template-columns: 1fr; } }
+        .dp-ns-row { display: flex; flex-direction: column; gap: 5px; }
+        .dp-ns-label {
+            font-size: 11.5px; font-weight: 500;
+            color: var(--color-text-secondary);
+            letter-spacing: -0.004em;
+        }
+        .dp-ns-input {
+            height: 38px;
+            padding: 0 14px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            font-size: 13px; letter-spacing: -0.008em;
+            color: var(--color-text-primary);
+            font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+            transition: all var(--transition-fast);
+        }
+        .dp-ns-input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-accent-light);
+        }
+
+        /* Panel variant show/hide */
+        .dp-panel { display: none; }
+        .dp-panel.is-active { display: block; }
+
+        /* Continue footer */
+        .dp-footer {
+            display: flex; align-items: center; gap: 10px;
+            padding: 14px 22px;
+            border-top: 0.5px solid var(--color-border);
+            background: var(--color-surface-tertiary);
+            flex-wrap: wrap;
+        }
+        .dp-footer .spacer { flex: 1; }
+        .dp-footer .dp-footer-note {
+            font-size: 11.5px; color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; gap: 6px;
+            letter-spacing: -0.004em;
+        }
+        .dp-footer .dp-footer-note svg { width: 12px; height: 12px; color: var(--color-green-text); }
+        .dp-back {
+            height: 34px; padding: 0 16px;
+            border-radius: var(--radius-pill);
+            background: transparent;
+            border: 0.5px solid var(--color-border);
+            color: var(--color-text-primary);
+            font-size: 13px; font-weight: 500;
+            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 4px;
+            cursor: pointer; font-family: inherit;
+            transition: all var(--transition-fast);
+        }
+        .dp-back:hover { border-color: var(--color-accent); color: var(--color-accent); }
+        .dp-continue {
+            height: 34px; padding: 0 20px;
+            border-radius: var(--radius-pill);
+            background: var(--color-accent); color: #fff;
+            border: 0;
+            font-size: 13px; font-weight: 500;
+            cursor: pointer; font-family: inherit;
+            display: inline-flex; align-items: center; gap: 4px;
+            transition: background var(--transition-fast);
+            text-decoration: none;
+        }
+        .dp-continue:hover { background: var(--color-accent-hover); }
+    </style>
+</head>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="order" data-page-title="Choose a Domain">
+
+<div data-include="partials/state-chip.html"></div>
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>No Notifications</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;"><a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a></div>
+    </div>
+</div>
+
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareaproducts.html">My Services</a><a href="store.html">Order New Services</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareadomains.html">My Domains</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareainvoices.html">My Invoices</a><a href="clientareaquotes.html">My Quotes</a><a href="masspay.html">Mass Payment</a><a href="clientareaaddfunds.html">Add Funds</a><a href="account-paymentmethods.html">Payment Methods</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="supportticketslist.html">Tickets</a><a href="announcements.html">Announcements</a><a href="knowledgebase.html">Knowledgebase</a></div></div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
     <div class="nav-spacer"></div>
-    <a href="cart.html" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></a>
-    <a href="login.html" class="nav-signin">Sign in</a>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
 </div></nav>
 
-<section style="max-width: 900px; margin: 0 auto; padding: 50px 22px 80px;">
-    <div style="margin-bottom: 28px;">
-        <a href="configureproduct.html" style="font-size: 13px; color: var(--color-text-secondary); text-decoration: none;">← Back</a>
-        <h1 style="font-size: 36px; letter-spacing: -0.03em; font-weight: 600; margin: 8px 0 4px;">Domain configuration.</h1>
-        <p style="color: var(--color-text-secondary); font-size: 17px;">Manage nameservers, contact info, and add-on domain services.</p>
-    </div>
+<div data-include="partials/inner-topbar.html"></div>
 
-    <div class="card" style="margin-bottom: 16px;">
-        <div class="card-header"><h2 class="card-title">hendersondesign.com</h2></div>
-        <div class="card-body">
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Registration period</label>
-                    <select class="form-select">
-                        <option>1 year — $11.99</option>
-                        <option selected>2 years — $22.96</option>
-                        <option>3 years — $33.94</option>
-                        <option>5 years — $55.88</option>
-                        <option>10 years — $110.76</option>
-                    </select>
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a><span class="sep">/</span>
+        <a href="#">Services</a><span class="sep">/</span>
+        <a href="store.html">Order</a><span class="sep">/</span>
+        <span class="current" aria-current="page">Choose a domain</span>
+    </div>
+</nav>
+
+<div class="content-area">
+    <header class="page-header">
+        <h1>Choose a domain</h1>
+        <p class="page-subtitle">Register something new, bring a domain from another registrar, or point an existing one at our nameservers.</p>
+    </header>
+
+    <div class="dp-split">
+        <!-- ══ LEFT: Categories + Actions (mirrors store.html) ══ -->
+        <aside>
+            <div class="card subnav-card">
+                <div class="subnav-heading">Categories</div>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>Web Hosting</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>Reseller Hosting</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>VPS Hosting</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="2" y1="15" x2="22" y2="15"/></svg>Dedicated Servers</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>SSL Certificates</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Website Builder</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Website Security</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/><polyline points="22 6 12 13 2 6"/></svg>E-mail Services</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-9-9c2.52 0 4.82.99 6.5 2.6"/><polyline points="22 4 22 10 16 10"/></svg>Website Backup</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>SEO Tools</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2z"/><path d="M3 12v6a2 2 0 002 2h14a2 2 0 002-2v-6"/><line x1="10" y1="6" x2="14" y2="6"/></svg>Professional Email</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>Site Builder</a>
+                <a href="store.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Product Addons</a>
+            </div>
+
+            <div class="card subnav-card" style="margin-top: 12px;">
+                <div class="subnav-heading">Actions</div>
+                <a href="clientareadomains.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-9-9c2.52 0 4.82.99 6.5 2.6"/><polyline points="22 4 22 10 16 10"/></svg>Renew Domains</a>
+                <a href="cart-domain-register.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>Register a New Domain</a>
+                <a href="cart-domain-transfer.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>Transfer in a Domain</a>
+                <div class="subnav-divider"></div>
+                <a href="checkout.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>View Cart <span style="margin-left: auto; font-size: 11px; font-weight: 500; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--color-accent-light); color: var(--color-accent);">1</span></a>
+            </div>
+        </aside>
+
+        <!-- ══ RIGHT: domain picker ══ -->
+        <div style="min-width: 0;">
+            <!-- Step strip -->
+            <div class="dp-steps">
+                <span class="dp-step done"><span class="dp-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Choose plan</span>
+                <span class="dp-step-sep">›</span>
+                <span class="dp-step active"><span class="dp-step-num">2</span>Choose a domain</span>
+                <span class="dp-step-sep">›</span>
+                <span class="dp-step"><span class="dp-step-num">3</span>Configure</span>
+                <span class="dp-step-sep">›</span>
+                <span class="dp-step"><span class="dp-step-num">4</span>Checkout</span>
+            </div>
+
+            <div class="card" style="padding: 0;">
+                <!-- Option chooser -->
+                <div class="dp-options" role="radiogroup" aria-label="How you'll provide a domain">
+                    <label class="dp-option">
+                        <input type="radio" name="dp-opt" value="register" checked>
+                        <span class="dp-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                        <span class="dp-option-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span>
+                        <span class="dp-option-title">Register a new domain</span>
+                        <span class="dp-option-desc">Search and register a brand-new domain name.</span>
+                    </label>
+                    <label class="dp-option">
+                        <input type="radio" name="dp-opt" value="transfer">
+                        <span class="dp-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                        <span class="dp-option-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span>
+                        <span class="dp-option-title">Transfer from another registrar</span>
+                        <span class="dp-option-desc">Move your domain to us — includes a free year extension.</span>
+                    </label>
+                    <label class="dp-option">
+                        <input type="radio" name="dp-opt" value="existing">
+                        <span class="dp-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                        <span class="dp-option-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+                        <span class="dp-option-title">Use my existing domain</span>
+                        <span class="dp-option-desc">Keep it with your current registrar and point DNS at us.</span>
+                    </label>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Auto-renew</label>
-                    <select class="form-select">
-                        <option>Enabled — renew automatically</option>
-                        <option>Disabled — I'll manage manually</option>
-                    </select>
+
+                <!-- Panel: Register a new domain -->
+                <div class="dp-panel is-active" data-panel="register">
+                    <p class="dp-panel-hint"><strong>Search by keyword, description, or domain.</strong> Our AI-assisted search will suggest strong, brandable names based on what you type.</p>
+                    <div class="dp-search-row">
+                        <div class="dp-input-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" class="dp-input" placeholder="example.com" autocomplete="off">
+                        </div>
+                        <button type="button" class="dp-search-cta">
+                            Search
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </button>
+                    </div>
+                    <p class="dp-example">
+                        For example: <code>Fun business events</code>, <code>A comprehensive financial planning service for professionals</code>, or <code>example.com</code>.
+                    </p>
+                    <div class="dp-toggle-row">
+                        <div class="dp-toggle-row-meta">
+                            <div class="dp-toggle-row-title">Safe search <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" title="Filters adult-themed suggestions and look-alike spoof domains"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                            <div class="dp-toggle-row-sub">Filters adult-themed suggestions and look-alike spoof domains.</div>
+                        </div>
+                        <button type="button" class="dp-switch" role="switch" aria-checked="true" aria-label="Toggle safe search"></button>
+                    </div>
+                </div>
+
+                <!-- Panel: Transfer from another registrar -->
+                <div class="dp-panel" data-panel="transfer" data-state="error">
+                    <p class="dp-panel-hint"><strong>Transfer your domain from another registrar.</strong> Enter your existing domain and we'll guide you through unlock + auth-code. Most transfers add a <strong>free extra year</strong> to your registration.</p>
+                    <div class="dp-search-row">
+                        <div class="dp-input-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                            <input type="text" class="dp-input" placeholder="mycompany.com" autocomplete="off" value="thisdomaindoesnotexistsorry.com">
+                        </div>
+                        <button type="button" class="dp-search-cta">Transfer</button>
+                    </div>
+
+                    <!-- Error state: domain not eligible -->
+                    <div class="dp-error">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <div class="dp-error-body">
+                            <div class="dp-error-title">Not eligible for transfer</div>
+                            <p class="dp-error-text">The domain you entered does not appear to be registered. If the domain was registered recently, you may need to try again later. Alternatively, you can <a href="#" data-switch-to="register">perform a search to register this domain</a>.</p>
+                        </div>
+                    </div>
+
+                    <p class="dp-example">
+                        Before transferring: make sure the domain is <strong>unlocked</strong> at your current registrar, has been registered for at least <strong>60 days</strong>, and you have access to the <strong>auth / EPP code</strong>.
+                    </p>
+                </div>
+
+                <!-- Panel: Use existing domain -->
+                <div class="dp-panel" data-panel="existing" data-state="error">
+                    <p class="dp-panel-hint"><strong>I'll use my existing domain and update my nameservers.</strong> Tell us which domain you'd like to use — after checkout we'll email you the nameservers to set at your current registrar.</p>
+                    <div class="dp-search-row">
+                        <div class="dp-input-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            <input type="text" class="dp-input" placeholder="mysite.com" autocomplete="off" value="not-a-domain">
+                        </div>
+                    </div>
+
+                    <!-- Error state: invalid domain -->
+                    <div class="dp-error compact">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <div class="dp-error-body">
+                            <div class="dp-error-title">The domain you entered is not valid</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer action bar -->
+                <div class="dp-footer">
+                    <span class="dp-footer-note">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                        Your domain details stay private — WHOIS privacy included on every TLD that supports it.
+                    </span>
+                    <span class="spacer"></span>
+                    <a href="store.html" class="dp-back">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        Back
+                    </a>
+                    <a href="configureproduct.html" class="dp-continue">
+                        Continue
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="card" style="margin-bottom: 16px;">
-        <div class="card-header"><h2 class="card-title">Nameservers</h2></div>
-        <div class="card-body">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-                <label style="padding: 14px; border: 2px solid var(--color-accent); border-radius: 12px; cursor: pointer;">
-                    <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Use our nameservers</div>
-                    <div style="font-size: 12px; color: var(--color-text-tertiary);">ns1.whmcs-apple.net, ns2.whmcs-apple.net</div>
-                </label>
-                <label style="padding: 14px; border: 1px solid var(--color-border-card); border-radius: 12px; cursor: pointer;">
-                    <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Custom nameservers</div>
-                    <div style="font-size: 12px; color: var(--color-text-tertiary);">Enter your own DNS servers</div>
-                </label>
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="domains.html">Domains</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="knowledgebase.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Careers</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open><span class="flag">🇺🇸</span><span>English</span><span class="sep">/</span><span>$ USD</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Nameserver 1</label>
-                    <input type="text" class="form-input" value="ns1.whmcs-apple.net" readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Nameserver 2</label>
-                    <input type="text" class="form-input" value="ns2.whmcs-apple.net" readonly>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Nameserver 3 (optional)</label>
-                    <input type="text" class="form-input" placeholder="">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Nameserver 4 (optional)</label>
-                    <input type="text" class="form-input" placeholder="">
-                </div>
-            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
         </div>
     </div>
+</footer>
 
-    <div class="card" style="margin-bottom: 16px;">
-        <div class="card-header"><h2 class="card-title">Addons for this domain</h2></div>
-        <div class="card-body">
-            <div class="settings-item">
-                <div class="settings-item-info">
-                    <div class="settings-item-label">ID Protection <span style="background: var(--color-green-bg); color: var(--color-green-text); font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; margin-left: 6px;">Free</span></div>
-                    <div class="settings-item-desc">Hide your personal info from public WHOIS</div>
-                </div>
-                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
-            </div>
-            <div class="settings-item">
-                <div class="settings-item-info">
-                    <div class="settings-item-label">DNS Management</div>
-                    <div class="settings-item-desc">$4.99/yr · Advanced DNS editor with unlimited records</div>
-                </div>
-                <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
-            </div>
-            <div class="settings-item">
-                <div class="settings-item-info">
-                    <div class="settings-item-label">Email Forwarding</div>
-                    <div class="settings-item-desc">$2.99/yr · Forward email from your domain to any address</div>
-                </div>
-                <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
-            </div>
-        </div>
-    </div>
+<div data-include="partials/sidebar-footer.html"></div>
 
-    <div style="display: flex; gap: 10px; justify-content: flex-end;">
-        <a href="configureproduct.html" class="btn-secondary btn-lg">Back</a>
-        <a href="cart.html" class="btn-primary btn-lg">Continue to cart →</a>
-    </div>
-</section>
+</div><!-- /.ph-main-wrap -->
+<div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js"></script>
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
+<script>
+// Swap visible panel when an option radio changes
+(function () {
+    var radios = document.querySelectorAll('.dp-option input[type="radio"]');
+    var panels = document.querySelectorAll('.dp-panel');
+
+    function showPanel(key) {
+        panels.forEach(function (p) { p.classList.remove('is-active'); });
+        var target = document.querySelector('[data-panel="' + key + '"]');
+        if (target) target.classList.add('is-active');
+        var radio = document.querySelector('.dp-option input[value="' + key + '"]');
+        if (radio) radio.checked = true;
+    }
+
+    radios.forEach(function (r) {
+        r.addEventListener('change', function () { showPanel(r.value); });
+    });
+
+    // "perform a search to register" inside transfer error → switch to Register panel
+    document.querySelectorAll('[data-switch-to]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            e.preventDefault();
+            showPanel(a.getAttribute('data-switch-to'));
+        });
+    });
+
+    // Clear a panel's error state once the user starts typing a new value
+    panels.forEach(function (p) {
+        p.querySelectorAll('.dp-input').forEach(function (inp) {
+            inp.addEventListener('input', function () { p.removeAttribute('data-state'); });
+        });
+    });
+
+    // Safe-search toggle
+    var sw = document.querySelector('.dp-switch');
+    if (sw) {
+        sw.addEventListener('click', function () {
+            sw.classList.toggle('off');
+            sw.setAttribute('aria-checked', sw.classList.contains('off') ? 'false' : 'true');
+        });
+    }
+})();
+</script>
 </body>
 </html>
