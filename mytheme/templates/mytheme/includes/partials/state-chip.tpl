@@ -34,6 +34,15 @@
     </div>
 
     <div class="chip-group">
+        <span class="label">Align:</span>
+        <div class="pill-group">
+            <button type="button" data-align-set="center" class="active" title="Center the combined content + sub-nav unit">Center</button>
+            <button type="button" data-align-set="content" title="Center the content column only — ignore sub-nav for centering math">Content</button>
+            <button type="button" data-align-set="left">Left</button>
+        </div>
+    </div>
+
+    <div class="chip-group">
         <span class="label">Sub-nav:</span>
         <div class="pill-group">
             <button type="button" data-subnav-set="on" class="active">Show</button>
