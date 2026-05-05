@@ -21,25 +21,16 @@
      showPromo      — bool                 (default: true)
 *}
 
-{* Resolve variant config with fallbacks *}
-{assign var=cfg value=[]}
-{if isset($myTheme.pages.clientareahome.config)}
-    {assign var=cfg value=$myTheme.pages.clientareahome.config}
-{/if}
-{assign var=tilesVariant value=$cfg.tilesVariant|default:'a'}
-{assign var=subnavMode   value=$cfg.subnavMode|default:'right'}
-{assign var=cardLayout   value=$cfg.cardLayout|default:'inside'}
-{if isset($cfg.showAlerts)}{assign var=showAlerts value=$cfg.showAlerts}{else}{assign var=showAlerts value=true}{/if}
-{if isset($cfg.tilesEnabled)}{assign var=tilesEnabled value=$cfg.tilesEnabled}{else}{assign var=tilesEnabled value=true}{/if}
-{if isset($cfg.showPromo)}{assign var=showPromo value=$cfg.showPromo}{else}{assign var=showPromo value=true}{/if}
+<!-- DASHBOARD-V1-START -->
 
-{* Decide whether the dashboard renders empty-state markup *}
-{assign var=_pa value=$clientsstats.productsnumactive|default:0}
-{assign var=_da value=$clientsstats.numactivedomains|default:0}
-{assign var=_ui value=$clientsstats.numunpaidinvoices|default:0}
-{assign var=_at value=$clientsstats.numactivetickets|default:0}
-{assign var=totalUnits value=$_pa+$_da+$_ui+$_at}
-{if $totalUnits == 0}{assign var=dashIsEmpty value='empty'}{else}{assign var=dashIsEmpty value='full'}{/if}
+{* Resolve variant config with hard-coded defaults (no $myTheme dependency) *}
+{assign var=tilesVariant value='a'}
+{assign var=subnavMode value='right'}
+{assign var=cardLayout value='inside'}
+{assign var=showAlerts value=true}
+{assign var=tilesEnabled value=true}
+{assign var=showPromo value=true}
+{assign var=dashIsEmpty value='empty'}
 
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareahome.css?v={$myTheme.version|default:'1.0'}">
