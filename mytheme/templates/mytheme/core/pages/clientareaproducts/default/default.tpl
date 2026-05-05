@@ -47,7 +47,7 @@
 {assign var=currentFilter value=$statusFilter|default:''}
 
 {* Icon palettes — cycle by index in the loop so each card gets a different colour *}
-{$icoPalettes = ['blue', 'purple', 'green', 'orange', 'red']}
+{assign var=icoPalettes value=['blue','purple','green','orange','red']}
 
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareaproducts.css?v={$myTheme.version|default:'1.0'}">
@@ -127,9 +127,7 @@
         </div>
         {/if}
 
-        {if $showPromo && file_exists("templates/$template/includes/partials/promo-slider.tpl")}
-            {include file="`$template`/includes/partials/promo-slider.tpl"}
-        {/if}
+        {* promo-slider include removed (file_exists not supported) *}
 
     </aside>
     {/if}
@@ -156,8 +154,9 @@
         {if $viewMode != 'list' && $count_all > 0}
         <div class="svc-grid when-full" data-cols="{$gridCols|escape}">
             {foreach $products as $product}
-                {$icoClass = $icoPalettes[$product@index % 5]}
-                <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$product.id}" class="svc-card" data-search="{($product.groupname|default:'')|cat:' '|cat:($product.productname|default:$product.name)|cat:' '|cat:($product.domain|default:'')|escape}">
+                {assign var=_idx value=$product@index%5}
+                {assign var=icoClass value=$icoPalettes[$_idx]}
+                <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$product.id}" class="svc-card">
                     <div class="svc-card-top">
                         <div class="svc-card-ico {$icoClass}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
@@ -199,7 +198,8 @@
         {if $viewMode == 'list' && $count_all > 0}
         <div class="svc-list when-full">
             {foreach $products as $product}
-                {$icoClass = $icoPalettes[$product@index % 5]}
+                {assign var=_idx value=$product@index%5}
+                {assign var=icoClass value=$icoPalettes[$_idx]}
                 <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$product.id}" class="svc-list-row">
                     <div class="svc-card-ico {$icoClass}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
