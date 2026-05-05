@@ -1,0 +1,37 @@
+name: Deploy theme to cPanel
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'mytheme/modules/addons/MyTheme/**'
+      - 'mytheme/templates/mytheme/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync MyTheme addon module
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          server: cp2.de.namespace.life
+          port: 22
+          username: whymege
+          password: Akak1weretel1!
+          local_path: './mytheme/modules/addons/MyTheme/*'
+          remote_path: '/home/whymege/public_html/modules/addons/MyTheme/'
+          sftp_only: true
+
+      - name: Sync mytheme template
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          server: cp2.de.namespace.life
+          port: 22
+          username: whymege
+          password: Akak1weretel1!
+          local_path: './mytheme/templates/mytheme/*'
+          remote_path: '/home/whymege/public_html/templates/mytheme/'
+          sftp_only: true
