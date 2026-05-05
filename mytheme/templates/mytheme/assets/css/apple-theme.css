@@ -126,7 +126,7 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
 .sidebar-header { padding: 20px 16px 8px; display: flex; align-items: center; gap: 10px; }
 .sidebar-home-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
 .sidebar-home-link:hover { opacity: 0.8; }
-.sidebar-logo { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+.sidebar-logo { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--color-text-primary); }
 .sidebar-logo svg { width: 28px; height: 28px; }
 .sidebar-brand { font-size: 15px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
 .sidebar-search { padding: 8px 12px 4px; }
