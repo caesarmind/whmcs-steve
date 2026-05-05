@@ -1,15 +1,15 @@
 {* Hostnodes — Fixed 260px sidebar (rendered when body[data-layout="side"]).
    Items have data-nav so apple-layout.js can mark the active one. *}
-{$_first = ''}
-{$_last  = ''}
-{$_email = ''}
+{assign var=_first value=''}
+{assign var=_last value=''}
+{assign var=_email value=''}
 {if isset($clientsdetails) && is_array($clientsdetails)}
-    {$_first = $clientsdetails.firstname|default:''}
-    {$_last  = $clientsdetails.lastname|default:''}
-    {$_email = $clientsdetails.email|default:''}
+    {assign var=_first value=$clientsdetails.firstname|default:''}
+    {assign var=_last value=$clientsdetails.lastname|default:''}
+    {assign var=_email value=$clientsdetails.email|default:''}
 {/if}
-{$user_initials = ($_first|truncate:1:'')|upper}
-{$user_fullname = ("`$_first` `$_last`")|trim}
+{assign var=user_initials value=$_first|truncate:1:''|upper}
+{assign var=user_fullname value=$_first|cat:' '|cat:$_last}
 <aside class="sidebar only-side">
     <div class="sidebar-header">
         <a href="{$WEB_ROOT}/" class="sidebar-home-link">
