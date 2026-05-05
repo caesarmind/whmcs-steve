@@ -11,7 +11,33 @@
     {* data-layout reads from the active layout's manifest (sidebar/top/rail) *}
     {$mt_layout = $myTheme.layouts['main-menu'].vars.dataLayout|default:'side'}
     {$mt_auth = $loggedin ? 'in' : 'out'}
-    {$mt_activeNav = $myTheme.pages[$templatefile].activeNav|default:'dashboard'}
+
+    {* activeNav drives the sidebar/rail/topnav highlight. Page meta wins;
+       otherwise we map common WHMCS templatefiles to a sidebar slot. *}
+    {$mt_activeNav = $myTheme.pages[$templatefile].activeNav|default:''}
+    {if !$mt_activeNav}
+        {if $templatefile == 'clientareaproducts' || $templatefile == 'clientareaproductdetails'}
+            {$mt_activeNav = 'services'}
+        {elseif $templatefile == 'clientareadomains' || $templatefile == 'clientareadomaindetails' || $templatefile == 'clientareadomaindns' || $templatefile == 'clientareadomainregisterns' || $templatefile == 'clientareadomaincontactinfo' || $templatefile == 'clientareadomainemailforwarding' || $templatefile == 'domainchecker'}
+            {$mt_activeNav = 'domains'}
+        {elseif $templatefile == 'clientareainvoices' || $templatefile == 'viewinvoice' || $templatefile == 'invoicepdf'}
+            {$mt_activeNav = 'invoices'}
+        {elseif $templatefile == 'clientareaquotes' || $templatefile == 'viewquote'}
+            {$mt_activeNav = 'quotes'}
+        {elseif $templatefile == 'supporttickets' || $templatefile == 'supportticketslist' || $templatefile == 'supportticketsubmit' || $templatefile == 'viewticket'}
+            {$mt_activeNav = 'tickets'}
+        {elseif $templatefile == 'knowledgebase' || $templatefile == 'knowledgebasecat' || $templatefile == 'knowledgebasearticle'}
+            {$mt_activeNav = 'knowledgebase'}
+        {elseif $templatefile == 'announcements' || $templatefile == 'viewannouncement'}
+            {$mt_activeNav = 'announcements'}
+        {elseif $templatefile == 'clientareadetails' || $templatefile == 'clientareacontacts'}
+            {$mt_activeNav = 'details'}
+        {elseif $templatefile == 'clientareasecurity' || $templatefile == 'twofactor'}
+            {$mt_activeNav = 'security-account'}
+        {else}
+            {$mt_activeNav = 'dashboard'}
+        {/if}
+    {/if}
 <!DOCTYPE html>
 <html lang="{$activeLocale.languageCode|default:'en'}"
       data-theme="light"
