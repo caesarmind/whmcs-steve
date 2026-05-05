@@ -61,6 +61,14 @@
     </div>
 
     <div class="chip-group">
+        <span class="label">Services:</span>
+        <div class="pill-group">
+            <button type="button" data-svc-layout-set="inside" class="active" title="Search & pagination inside the white card (column titles outside)">Controls inside</button>
+            <button type="button" data-svc-layout-set="outside" title="Only service rows in the white card; controls float on the page">Controls outside</button>
+        </div>
+    </div>
+
+    <div class="chip-group">
         <span class="label">Tiles:</span>
         <div class="pill-group">
             <button type="button" data-tiles-set="all" class="active">All</button>
