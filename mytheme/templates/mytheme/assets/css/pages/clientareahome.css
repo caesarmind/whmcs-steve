@@ -312,6 +312,12 @@
         .ticket-row .service-info { min-width: 0; flex: 1; }
         .ticket-row .service-name { white-space: normal; line-height: 1.35; font-weight: 500; }
         .ticket-row .service-domain { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ticket-row .label,
+        .ticket-row .badge { margin-left: 6px; }
+        .status-pill.awaiting-reply,
+        .status-pill.customer-reply,
+        .status-pill.on-hold,
+        .status-pill.in-progress { background: var(--color-orange-bg); color: var(--color-orange-text); }
 
         /* Split-row collapses on tight widths to keep cards readable */
         @media (max-width: 1080px) {

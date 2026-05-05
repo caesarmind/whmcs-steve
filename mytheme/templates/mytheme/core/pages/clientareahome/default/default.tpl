@@ -30,7 +30,25 @@
 {assign var=showAlerts value=true}
 {assign var=tilesEnabled value=true}
 {assign var=showPromo value=true}
-{assign var=dashIsEmpty value='empty'}
+{assign var=hasNativeTickets value=false}
+{assign var=ticketPanel value=false}
+
+{if isset($panels)}
+    {foreach $panels as $homePanel}
+        {if $homePanel->getName() == "Recent Support Tickets"}
+            {assign var=ticketPanel value=$homePanel}
+            {if $homePanel->hasChildren()}
+                {assign var=hasNativeTickets value=true}
+            {/if}
+        {/if}
+    {/foreach}
+{/if}
+
+{if $clientsstats.productsnumactive > 0 || $clientsstats.numactivedomains > 0 || $clientsstats.numunpaidinvoices > 0 || $clientsstats.numactivetickets > 0 || (isset($dashboard.activeServices) && $dashboard.activeServices|count > 0) || (isset($dashboard.openTickets) && $dashboard.openTickets|count > 0) || $hasNativeTickets || (isset($publishedAnnouncements) && $publishedAnnouncements|count > 0)}
+    {assign var=dashIsEmpty value='full'}
+{else}
+    {assign var=dashIsEmpty value='empty'}
+{/if}
 
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareahome.css?v={$myTheme.version|default:'1.0'}">
@@ -356,7 +374,29 @@
                         {$LANG.opennewticket|default:'Open New Ticket'} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     </a>
                 </div>
-                {if isset($dashboard.openTickets) && $dashboard.openTickets|count > 0}
+                {if $hasNativeTickets}
+                <div class="card-body when-full" style="padding: 4px 24px 12px;">
+                    {foreach $ticketPanel->getChildren() as $ticketItem}
+                        {if $ticketItem->getUri()}
+                            <a menuItemName="{$ticketItem->getName()}" href="{$ticketItem->getUri()}" class="service-item ticket-row{if $ticketItem->getClass()} {$ticketItem->getClass()}{/if}{if $ticketItem->isCurrent()} active{/if}"{if $ticketItem->getAttribute('dataToggleTab')} data-toggle="tab"{/if}{if $ticketItem->getAttribute('target')} target="{$ticketItem->getAttribute('target')}"{/if} id="{$ticketItem->getId()}">
+                        {else}
+                            <div menuItemName="{$ticketItem->getName()}" class="service-item ticket-row{if $ticketItem->getClass()} {$ticketItem->getClass()}{/if}" id="{$ticketItem->getId()}">
+                        {/if}
+                                <div class="service-info">
+                                    <div class="service-name">{$ticketItem->getLabel()}</div>
+                                    {if $ticketItem->hasBadge()}<div class="service-domain">{$ticketItem->getBadge()}</div>{/if}
+                                </div>
+                                {if $ticketItem->getUri()}
+                                    <span class="service-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                                {/if}
+                        {if $ticketItem->getUri()}
+                            </a>
+                        {else}
+                            </div>
+                        {/if}
+                    {/foreach}
+                </div>
+                {elseif isset($dashboard.openTickets) && $dashboard.openTickets|count > 0}
                 <div class="card-body when-full" style="padding: 4px 24px 12px;">
                     {foreach $dashboard.openTickets as $tkt}
                         <a href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape}{if $tkt.c}&c={$tkt.c|escape}{/if}" class="service-item ticket-row">
@@ -364,7 +404,7 @@
                                 <div class="service-name">{$tkt.subject|escape}</div>
                                 <div class="service-domain">#{$tkt.tid|escape}{if $tkt.lastreply} · {$LANG.updated|default:'Updated'} {$tkt.lastreply|escape}{elseif $tkt.date} · {$LANG.opened|default:'Opened'} {$tkt.date|escape}{/if}</div>
                             </div>
-                            <span class="status-pill {$tkt.status|lower|default:'open'}">{$tkt.status|escape|default:'Open'}</span>
+                            <span class="status-pill {$tkt.status|lower|replace:' ':'-'|replace:'_':'-'|default:'open'}">{$tkt.status|escape|default:'Open'}</span>
                         </a>
                     {/foreach}
                 </div>

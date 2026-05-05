@@ -154,21 +154,32 @@ final class Hooks
         try {
             $response = localAPI('GetTickets', [
                 'clientid'  => $clientId,
-                'limitnum'  => 5,
-                'status'    => 'Awaiting Reply,Open,Customer-Reply,On Hold,In Progress',
+                'limitnum'  => 25,
+                'orderby'   => 'lastreply',
+                'order'     => 'desc',
             ]);
             if (($response['result'] ?? '') !== 'success') return [];
 
             $tickets = [];
             foreach (($response['tickets']['ticket'] ?? []) as $tkt) {
+                $status = (string)($tkt['status'] ?? '');
+                if (strcasecmp($status, 'Closed') === 0) continue;
+
+                $dateRaw = (string)($tkt['date'] ?? '');
+                $dateTimestamp = $dateRaw !== '' ? strtotime($dateRaw) : false;
+                $lastReplyRaw = (string)($tkt['lastreply'] ?? '');
+                $lastReplyTimestamp = $lastReplyRaw !== '' ? strtotime($lastReplyRaw) : false;
+
                 $tickets[] = [
                     'tid'      => (string)($tkt['tid'] ?? ''),
                     'c'        => (string)($tkt['c'] ?? ''),
                     'subject'  => (string)($tkt['subject'] ?? ''),
-                    'status'   => (string)($tkt['status'] ?? ''),
+                    'status'   => $status,
                     'priority' => (string)($tkt['priority'] ?? 'Medium'),
-                    'date'     => !empty($tkt['date']) ? date('M j, Y', strtotime((string)$tkt['date'])) : '',
+                    'date'     => $dateTimestamp ? date('M j, Y', $dateTimestamp) : $dateRaw,
+                    'lastreply' => $lastReplyTimestamp ? date('M j, Y', $lastReplyTimestamp) : $lastReplyRaw,
                 ];
+                if (count($tickets) >= 5) break;
             }
             return $tickets;
         } catch (\Throwable) {
