@@ -27,28 +27,9 @@ body[data-layout="top"] .only-inner { display: none !important; }
 body[data-layout="side"] .ph-main-wrap { margin-left: 260px; }
 body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
 
-/* Visually extend topbar/footer to viewport edges by pulling them with
-   a negative margin-left equal to the ph-main-wrap offset. The sidebar
-   then visually overlaps the left portion (z-index 100), but the topbar
-   z-index is bumped to 200 so it sits above the sidebar. */
-body[data-layout="side"] .ph-side-topbar {
-    margin-left: -260px;
-    padding-left: 260px;
-    position: sticky; top: 0; z-index: 200;
-}
-body[data-layout="rail"] .ph-side-topbar {
-    margin-left: -80px;
-    padding-left: 80px;
-    position: sticky; top: 0; z-index: 200;
-}
-body[data-layout="side"] .ph-side-footer {
-    margin-left: -260px;
-    padding-left: 260px;
-}
-body[data-layout="rail"] .ph-side-footer {
-    margin-left: -80px;
-    padding-left: 80px;
-}
+/* Topbar/footer stay within .ph-main-wrap (right of the sidebar/rail).
+   Earlier negative-margin trick was reverted because it covered the
+   sidebar header — sidebar should own its full-height left column. */
 /* Flex column so footers stick to the bottom of the viewport on short pages */
 .ph-main-wrap {
     display: flex;
