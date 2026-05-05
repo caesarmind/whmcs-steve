@@ -8,40 +8,51 @@
 {if file_exists("templates/$template/overwrites/header.tpl")}
     {include file="`$template`/overwrites/header.tpl"}
 {else}
-    {* data-layout reads from the active layout's manifest (sidebar/top/rail) *}
-    {$mt_layout = $myTheme.layouts['main-menu'].vars.dataLayout|default:'side'}
+    {* data-layout reads from the active layout's manifest (sidebar/top/rail).
+       Defensive — falls back to 'side' if the hook hasn't populated myTheme. *}
+    {$mt_layout = 'side'}
+    {if isset($myTheme.layouts) && isset($myTheme.layouts['main-menu']) && isset($myTheme.layouts['main-menu']['vars']['dataLayout'])}
+        {$mt_layout = $myTheme.layouts['main-menu']['vars']['dataLayout']}
+    {/if}
     {$mt_auth = $loggedin ? 'in' : 'out'}
 
-    {* activeNav drives the sidebar/rail/topnav highlight. Page meta wins;
-       otherwise we map common WHMCS templatefiles to a sidebar slot. *}
-    {$mt_activeNav = $myTheme.pages[$templatefile].activeNav|default:''}
-    {if !$mt_activeNav}
-        {if $templatefile == 'clientareaproducts' || $templatefile == 'clientareaproductdetails'}
-            {$mt_activeNav = 'services'}
-        {elseif $templatefile == 'clientareadomains' || $templatefile == 'clientareadomaindetails' || $templatefile == 'clientareadomaindns' || $templatefile == 'clientareadomainregisterns' || $templatefile == 'clientareadomaincontactinfo' || $templatefile == 'clientareadomainemailforwarding' || $templatefile == 'domainchecker'}
-            {$mt_activeNav = 'domains'}
-        {elseif $templatefile == 'clientareainvoices' || $templatefile == 'viewinvoice' || $templatefile == 'invoicepdf'}
-            {$mt_activeNav = 'invoices'}
-        {elseif $templatefile == 'clientareaquotes' || $templatefile == 'viewquote'}
-            {$mt_activeNav = 'quotes'}
-        {elseif $templatefile == 'supporttickets' || $templatefile == 'supportticketslist' || $templatefile == 'supportticketsubmit' || $templatefile == 'viewticket'}
-            {$mt_activeNav = 'tickets'}
-        {elseif $templatefile == 'knowledgebase' || $templatefile == 'knowledgebasecat' || $templatefile == 'knowledgebasearticle'}
-            {$mt_activeNav = 'knowledgebase'}
-        {elseif $templatefile == 'announcements' || $templatefile == 'viewannouncement'}
-            {$mt_activeNav = 'announcements'}
-        {elseif $templatefile == 'clientareadetails' || $templatefile == 'clientareacontacts'}
-            {$mt_activeNav = 'details'}
-        {elseif $templatefile == 'clientareasecurity' || $templatefile == 'twofactor'}
-            {$mt_activeNav = 'security-account'}
-        {else}
-            {$mt_activeNav = 'dashboard'}
-        {/if}
+    {* activeNav drives the sidebar/rail/topnav highlight. Map common WHMCS
+       templatefiles to a sidebar slot. Defensive default + no chained lookups
+       on potentially-undefined intermediates. *}
+    {$_tf = $templatefile|default:''}
+    {$mt_activeNav = 'dashboard'}
+    {if $_tf == 'clientareaproducts' || $_tf == 'clientareaproductdetails'}
+        {$mt_activeNav = 'services'}
+    {elseif $_tf == 'clientareadomains' || $_tf == 'clientareadomaindetails' || $_tf == 'clientareadomaindns' || $_tf == 'clientareadomainregisterns' || $_tf == 'clientareadomaincontactinfo' || $_tf == 'clientareadomainemailforwarding' || $_tf == 'domainchecker'}
+        {$mt_activeNav = 'domains'}
+    {elseif $_tf == 'clientareainvoices' || $_tf == 'viewinvoice' || $_tf == 'invoicepdf'}
+        {$mt_activeNav = 'invoices'}
+    {elseif $_tf == 'clientareaquotes' || $_tf == 'viewquote'}
+        {$mt_activeNav = 'quotes'}
+    {elseif $_tf == 'supporttickets' || $_tf == 'supportticketslist' || $_tf == 'supportticketsubmit' || $_tf == 'viewticket'}
+        {$mt_activeNav = 'tickets'}
+    {elseif $_tf == 'knowledgebase' || $_tf == 'knowledgebasecat' || $_tf == 'knowledgebasearticle'}
+        {$mt_activeNav = 'knowledgebase'}
+    {elseif $_tf == 'announcements' || $_tf == 'viewannouncement'}
+        {$mt_activeNav = 'announcements'}
+    {elseif $_tf == 'clientareadetails' || $_tf == 'clientareacontacts'}
+        {$mt_activeNav = 'details'}
+    {elseif $_tf == 'clientareasecurity' || $_tf == 'twofactor'}
+        {$mt_activeNav = 'security-account'}
+    {elseif $_tf == 'login' || $_tf == 'register' || $_tf == 'pwreset'}
+        {$mt_activeNav = ''}
+    {/if}
+    {* RTL detection — defensive against missing manifest / language *}
+    {$_lang = $language|default:''}
+    {$_rtlList = $myTheme.manifest.rtlLanguages|default:[]}
+    {$_isRtl = false}
+    {if $_lang && $_rtlList && is_array($_rtlList)}
+        {if in_array($_lang, $_rtlList)}{$_isRtl = true}{/if}
     {/if}
 <!DOCTYPE html>
 <html lang="{$activeLocale.languageCode|default:'en'}"
       data-theme="light"
-      {if in_array($language, $myTheme.manifest.rtlLanguages|default:[])}dir="rtl"{/if}>
+      {if $_isRtl}dir="rtl"{/if}>
 <head>
     <meta charset="{$charset|default:'utf-8'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
