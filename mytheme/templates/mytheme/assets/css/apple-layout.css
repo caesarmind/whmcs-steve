@@ -735,9 +735,10 @@ body[data-layout="side"] .ph-section:last-of-type { padding-bottom: 48px; }
    fetch. Hide them until loaded to avoid a layout flash. */
 [data-include]:not([data-loaded]) { display: none; }
 
-/* ── Data-state toggle (driven by preview chip / Smarty) ───────────── */
-/* Pages mark their full-data and empty-data variants with
-   .when-full / .when-empty. Default = show empty state (when body
-   has no data-data attr or is "empty"); only hide it when explicitly "full". */
-body:not([data-data="full"]) .when-full   { display: none !important; }
-body[data-data="full"]       .when-empty { display: none !important; }
+/* ── .when-full / .when-empty are now rendered conditionally by Smarty's
+   {if}/{else} — only one variant exists in the DOM at a time, so we no
+   longer need a CSS toggle. Rule kept commented for the preview chip in
+   the apple-client-area static HTML mockups (where both variants coexist).
+   body[data-data="empty"] .when-full  { display: none !important; }
+   body:not([data-data="empty"]) .when-empty { display: none !important; }
+*/
