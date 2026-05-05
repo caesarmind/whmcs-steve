@@ -28,6 +28,36 @@
 
         <div class="nav-spacer"></div>
 
+        {if $loggedin}
+            <div class="notification-wrapper only-in" id="navNotifyWrap">
+                <button type="button" class="topbar-btn" title="{$LANG.notifications|default:'Notifications'}" onclick="togglePortalNotifications && togglePortalNotifications(event, 'nav')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    {if isset($publishedAnnouncements) && $publishedAnnouncements|count > 0}<div class="topbar-notification-dot"></div>{/if}
+                </button>
+                <div class="notification-dropdown" id="notificationDropdownNav">
+                    <div class="notification-dropdown-header">
+                        <span class="notification-dropdown-title">{$LANG.notifications|default:'Notifications'}</span>
+                    </div>
+                    {if isset($publishedAnnouncements) && $publishedAnnouncements|count > 0}
+                        {foreach $publishedAnnouncements as $ann}
+                            <a href="{$WEB_ROOT}/announcements.php?id={$ann.id}" class="notification-item">
+                                <div class="notification-dot-indicator blue"></div>
+                                <div class="notification-content">
+                                    <div class="notification-text">{$ann.title|escape}</div>
+                                    <div class="notification-time">{$ann.date|escape}</div>
+                                </div>
+                            </a>
+                            {if $ann@iteration >= 5}{break}{/if}
+                        {/foreach}
+                    {else}
+                        <div class="notification-item" style="justify-content:center;color:var(--color-text-tertiary);font-size:13px;">
+                            {$LANG.nonotifications|default:'No notifications'}
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        {/if}
+
         <a href="{$WEB_ROOT}/cart.php" class="topbar-btn" title="{$LANG.cartTitle|default:'Cart'}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
         </a>
