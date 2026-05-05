@@ -315,7 +315,7 @@
                     {$LANG.viewall|default:'View All'} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
             </div>
-            {if $dashboard.activeServices && $dashboard.activeServices|count > 0}
+            {if isset($dashboard.activeServices) && $dashboard.activeServices|count > 0}
             <div class="card-body when-full" style="padding: 4px 24px 12px;">
                 {foreach $dashboard.activeServices as $svc}
                     <a href="{$svc.manageUrl|default:"`$WEB_ROOT`/clientarea.php?action=productdetails&id=`$svc.id`"}" class="service-item">
@@ -356,7 +356,7 @@
                         {$LANG.opennewticket|default:'Open New Ticket'} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     </a>
                 </div>
-                {if $dashboard.openTickets && $dashboard.openTickets|count > 0}
+                {if isset($dashboard.openTickets) && $dashboard.openTickets|count > 0}
                 <div class="card-body when-full" style="padding: 4px 24px 12px;">
                     {foreach $dashboard.openTickets as $tkt}
                         <a href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape}{if $tkt.c}&c={$tkt.c|escape}{/if}" class="service-item ticket-row">
@@ -406,7 +406,7 @@
                     {$LANG.viewall|default:'View All'} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
             </div>
-            {if $publishedAnnouncements && $publishedAnnouncements|count > 0}
+            {if isset($publishedAnnouncements) && $publishedAnnouncements|count > 0}
             <div class="card-body when-full">
                 <div class="news-list">
                     {foreach $publishedAnnouncements as $ann}

@@ -17,7 +17,16 @@
 {else}
     {assign var=mt_auth value='out'}
 {/if}
-{assign var=mt_layout value='side'}
+
+{* Layout selection: ?layout=top|side|rail switches via URL. Default = side. *}
+{if isset($smarty.get.layout) && ($smarty.get.layout == 'top' || $smarty.get.layout == 'side' || $smarty.get.layout == 'rail')}
+    {assign var=mt_layout value=$smarty.get.layout}
+{elseif isset($smarty.cookies.mt_layout) && ($smarty.cookies.mt_layout == 'top' || $smarty.cookies.mt_layout == 'side' || $smarty.cookies.mt_layout == 'rail')}
+    {assign var=mt_layout value=$smarty.cookies.mt_layout}
+{else}
+    {assign var=mt_layout value='side'}
+{/if}
+
 {assign var=mt_activeNav value=''}
 {assign var=_tf value=$templatefile|default:''}
 {if $_tf == 'clientareahome'}
