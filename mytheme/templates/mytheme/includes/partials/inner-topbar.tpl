@@ -1,5 +1,9 @@
 {* Topbar shown on sidebar + rail layouts (hidden on top-nav). *}
-{$user_initials = ($clientsdetails.firstname|default:''|truncate:1:'')|upper}
+{$_first = ''}
+{if isset($clientsdetails) && is_array($clientsdetails)}
+    {$_first = $clientsdetails.firstname|default:''}
+{/if}
+{$user_initials = ($_first|truncate:1:'')|upper}
 <div class="ph-side-topbar only-inner">
     <div class="ph-side-topbar-inner">
         <div class="ph-side-crumbs">

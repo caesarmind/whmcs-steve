@@ -1,5 +1,9 @@
 {* Hostnodes — top navigation (rendered when body[data-layout="top"]). *}
-{$user_initials = ($clientsdetails.firstname|default:''|truncate:1:'')|upper}
+{$_first = ''}
+{if isset($clientsdetails) && is_array($clientsdetails)}
+    {$_first = $clientsdetails.firstname|default:''}
+{/if}
+{$user_initials = ($_first|truncate:1:'')|upper}
 <nav class="homepage-nav only-top">
     <div class="homepage-nav-inner">
         <a href="{$WEB_ROOT}/" class="nav-logo text-logo">{$companyname|escape}</a>

@@ -10,7 +10,10 @@
      showAnnouncements — bool    (default: true)
 *}
 
-{$cfg = $myTheme.pages.homepage.config|default:[]}
+{$cfg = []}
+{if isset($myTheme) && isset($myTheme.pages) && isset($myTheme.pages.homepage) && isset($myTheme.pages.homepage.config)}
+    {$cfg = $myTheme.pages.homepage.config}
+{/if}
 {$heroTitle         = $cfg.heroTitle|default:''}
 {$heroSubtitle      = $cfg.heroSubtitle|default:'Manage your services, domains and billing in one place.'}
 {$showQuickLinks    = ($cfg.showQuickLinks ?? true) ? true : false}
