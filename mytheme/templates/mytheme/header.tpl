@@ -9,8 +9,9 @@
     {include file="`$template`/overwrites/header.tpl"}
 {else}
 <!DOCTYPE html>
-<!-- mytheme header v4 -->
-<html lang="{$activeLocale.languageCode|default:'en'}" data-theme="light">
+<!-- mytheme header v6 -->
+<html lang="{$activeLocale.languageCode|default:'en'}" data-theme="light"
+      data-header-sentinel="v6">
 <head>
     <meta charset="{$charset|default:'utf-8'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
