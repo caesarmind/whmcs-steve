@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Backup - WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css">
+    <style>body { display: block; }</style>
+</head>
+<body class="homepage-layout">
+
+<nav class="homepage-nav"><div class="homepage-nav-inner">
+    <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
+    <a href="#">WHMCS</a><a href="cloud-hosting.html">Cloud Hosting</a><a href="vps.html">VPS</a><a href="domains.html">Domains</a><a href="ssl-certificates.html">SSL</a><a href="support-page.html">Support</a>
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg></a>
+    <a href="#" onclick="toggleDarkMode(); return false;" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
+    <a href="login.html" class="nav-signin">Sign in</a>
+</div></nav>
+
+<!-- 1. Hero Split -->
+<section class="hp-hero-split">
+    <div class="hp-split-text">
+        <div class="hp-eyebrow">WEBSITE BACKUP</div>
+        <h1>Never lose<br>a file again.</h1>
+        <p>Automatic daily backups with one-click restore. Your entire site — files, databases, emails — safely stored and versioned.</p>
+        <div class="hp-cta-row">
+            <a href="clientregister.html" class="hp-buy-btn">Get started</a>
+            <a href="#pricing">See plans ›</a>
+        </div>
+    </div>
+    <div class="hp-split-visual">
+        <div class="hp-browser-frame">
+            <div class="hp-browser-bar">
+                <span class="dot" style="background: #ff5f57;"></span>
+                <span class="dot" style="background: #febc2e;"></span>
+                <span class="dot" style="background: #28c840;"></span>
+            </div>
+            <div class="hp-dash-shot" style="padding: 20px;">
+                <!-- Status header -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #1d1d1f;">Backup Dashboard</div>
+                    <div style="display: flex; gap: 6px; align-items: center; font-size: 11px; color: #6e6e73;">
+                        <span style="width: 6px; height: 6px; background: #30d158; border-radius: 50%; display: inline-block;"></span>
+                        All backups healthy
+                    </div>
+                </div>
+                <!-- Last backup status -->
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 11px; font-weight: 600; color: #166534;">Last backup: Today 3:00 AM</div>
+                        <div style="font-size: 10px; color: #6e6e73; margin-top: 2px;">Full snapshot - 2.4 GB - Completed</div>
+                    </div>
+                    <div style="background: #0071e3; color: #fff; font-size: 10px; font-weight: 500; padding: 5px 12px; border-radius: 20px; cursor: pointer;">Restore</div>
+                </div>
+                <!-- File tree -->
+                <div style="font-size: 11px; color: #1d1d1f; margin-bottom: 14px;">
+                    <div style="padding: 5px 0; display: flex; align-items: center; gap: 6px;">
+                        <span style="color: #0071e3;">&#9660;</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                        <span style="font-weight: 500;">public_html/</span>
+                        <span style="color: #86868b; margin-left: auto; font-size: 10px;">1.8 GB</span>
+                    </div>
+                    <div style="padding: 4px 0 4px 28px; display: flex; align-items: center; gap: 6px;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                        <span>index.html</span>
+                        <span style="color: #86868b; margin-left: auto; font-size: 10px;">24 KB</span>
+                    </div>
+                    <div style="padding: 4px 0 4px 28px; display: flex; align-items: center; gap: 6px;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                        <span>wp-config.php</span>
+                        <span style="color: #86868b; margin-left: auto; font-size: 10px;">3 KB</span>
+                    </div>
+                    <div style="padding: 5px 0; display: flex; align-items: center; gap: 6px;">
+                        <span style="color: #af52de;">&#9654;</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#af52de" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                        <span style="font-weight: 500;">databases/</span>
+                        <span style="color: #86868b; margin-left: auto; font-size: 10px;">420 MB</span>
+                    </div>
+                    <div style="padding: 5px 0; display: flex; align-items: center; gap: 6px;">
+                        <span style="color: #ff9f0a;">&#9654;</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        <span style="font-weight: 500;">email/</span>
+                        <span style="color: #86868b; margin-left: auto; font-size: 10px;">180 MB</span>
+                    </div>
+                </div>
+                <!-- Version history -->
+                <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">Version History</div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #f5f5f7; border-radius: 8px; font-size: 10px;">
+                        <span style="color: #1d1d1f; font-weight: 500;">Today, 3:00 AM</span>
+                        <span style="color: #30d158;">&#10003; Latest</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #f5f5f7; border-radius: 8px; font-size: 10px;">
+                        <span style="color: #86868b;">Yesterday, 3:00 AM</span>
+                        <span style="color: #86868b;">2.3 GB</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #f5f5f7; border-radius: 8px; font-size: 10px;">
+                        <span style="color: #86868b;">Apr 11, 3:00 AM</span>
+                        <span style="color: #86868b;">2.3 GB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. Stats Strip -->
+<section class="hp-stats-strip">
+    <div class="stats-inner">
+        <div class="stat-item">
+            <div class="stat-num">Daily</div>
+            <div class="stat-label">Automatic backups</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">1-click</div>
+            <div class="stat-label">Restore</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">30 days</div>
+            <div class="stat-label">Retention</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Automated</div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. Icon Grid -->
+<div class="hp-icon-grid">
+    <div class="hp-icon-item">
+        <div class="icon-circle blue">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <h4>Daily Backups</h4>
+        <p>Your site backed up every single day, automatically.</p>
+    </div>
+    <div class="hp-icon-item">
+        <div class="icon-circle green">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        </div>
+        <h4>One-Click Restore</h4>
+        <p>Roll back to any point in time with a single click.</p>
+    </div>
+    <div class="hp-icon-item">
+        <div class="icon-circle purple">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <h4>File Monitoring</h4>
+        <p>Get alerted when files change unexpectedly.</p>
+    </div>
+    <div class="hp-icon-item">
+        <div class="icon-circle orange">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </div>
+        <h4>Database Backup</h4>
+        <p>MySQL and PostgreSQL databases included.</p>
+    </div>
+    <div class="hp-icon-item">
+        <div class="icon-circle teal">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <h4>Email Backup</h4>
+        <p>Mailboxes and email data preserved.</p>
+    </div>
+    <div class="hp-icon-item">
+        <div class="icon-circle red">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h4>Version History</h4>
+        <p>Browse and compare up to 30 days of snapshots.</p>
+    </div>
+</div>
+
+<!-- 4. Pricing Cards -->
+<section class="hp-pricing-section" id="pricing">
+    <h2>Protect your site<br>for less.</h2>
+    <p class="sub">All plans include daily backups and one-click restore.</p>
+
+    <div class="hp-pricing-grid">
+        <div class="hp-price-card dim">
+            <div class="label">Basic</div>
+            <h3>For a single site</h3>
+            <span class="price">$2.99</span><span class="per">/mo</span>
+            <ul>
+                <li>1 GB storage</li>
+                <li>1 website</li>
+                <li>Daily backups</li>
+                <li>7-day retention</li>
+                <li>Email alerts</li>
+            </ul>
+            <a class="buy" href="clientregister.html">Select Basic</a>
+        </div>
+
+        <div class="hp-price-card highlight">
+            <div class="label" style="color: #0071e3;">Pro - Most popular</div>
+            <h3>For growing businesses</h3>
+            <span class="price">$6.99</span><span class="per">/mo</span>
+            <ul>
+                <li>5 GB storage</li>
+                <li>5 websites</li>
+                <li>Daily backups</li>
+                <li>30-day retention</li>
+                <li>File monitoring</li>
+                <li>Priority restore</li>
+            </ul>
+            <a class="buy" href="clientregister.html">Select Pro</a>
+        </div>
+
+        <div class="hp-price-card dim">
+            <div class="label">Business</div>
+            <h3>For agencies &amp; teams</h3>
+            <span class="price">$14.99</span><span class="per">/mo</span>
+            <ul>
+                <li>25 GB storage</li>
+                <li>Unlimited websites</li>
+                <li>Daily backups</li>
+                <li>90-day retention</li>
+                <li>File monitoring</li>
+                <li>Database backup</li>
+                <li>Phone support</li>
+            </ul>
+            <a class="buy" href="clientregister.html">Select Business</a>
+        </div>
+    </div>
+
+    <div class="hp-compare-link"><a href="#">Compare all Backup plans ›</a></div>
+</section>
+
+<!-- 5. Alternating Sections -->
+<section class="hp-alternating">
+
+    <!-- Row 1: How It Works -->
+    <div class="hp-alt-row">
+        <div class="hp-alt-text">
+            <div class="hp-eyebrow" style="color: #0071e3;">HOW IT WORKS</div>
+            <h2>Set it and forget it.</h2>
+            <p>Once connected, your site is backed up automatically every single day. No scripts to run, no cron jobs to configure. We snapshot your files, databases, and email at the same time each night so nothing is ever out of sync.</p>
+        </div>
+        <div class="hp-alt-visual">
+            <div class="visual-box">
+                <div style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <span style="font-size: 13px; font-weight: 600; color: #1d1d1f;">Weekly Backup Timeline</span>
+                        <span style="font-size: 11px; color: #86868b;">April 7 - 13</span>
+                    </div>
+                    <!-- Timeline dots -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 0 4px; margin-bottom: 10px; height: 100px;">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                            <span style="font-size: 9px; color: #86868b;">2.1 GB</span>
+                            <div style="width: 32px; background: linear-gradient(180deg, #34c759, #30d158); border-radius: 6px; height: 60px;"></div>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span style="font-size: 9px; color: #86868b;">Mon</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                            <span style="font-size: 9px; color: #86868b;">2.1 GB</span>
+                            <div style="width: 32px; background: linear-gradient(180deg, #34c759, #30d158); border-radius: 6px; height: 62px;"></div>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span style="font-size: 9px; color: #86868b;">Tue</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                            <span style="font-size: 9px; color: #86868b;">2.2 GB</span>
+                            <div style="width: 32px; background: linear-gradient(180deg, #34c759, #30d158); border-radius: 6px; height: 65px;"></div>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span style="font-size: 9px; color: #86868b;">Wed</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                            <span style="font-size: 9px; color: #86868b;">2.2 GB</span>
+                            <div style="width: 32px; background: linear-gradient(180deg, #34c759, #30d158); border-radius: 6px; height: 66px;"></div>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span style="font-size: 9px; color: #86868b;">Thu</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                            <span style="font-size: 9px; color: #86868b;">2.3 GB</span>
+                            <div style="width: 32px; background: linear-gradient(180deg, #34c759, #30d158); border-radius: 6px; height: 70px;"></div>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span style="font-size: 9px; color: #86868b;">Fri</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                            <span style="font-size: 9px; color: #86868b;">2.3 GB</span>
+                            <div style="width: 32px; background: linear-gradient(180deg, #34c759, #30d158); border-radius: 6px; height: 72px;"></div>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span style="font-size: 9px; color: #86868b;">Sat</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                            <span style="font-size: 9px; color: #86868b;">2.4 GB</span>
+                            <div style="width: 32px; background: linear-gradient(180deg, #0071e3, #2997ff); border-radius: 6px; height: 75px;"></div>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span style="font-size: 9px; font-weight: 600; color: #1d1d1f;">Sun</span>
+                        </div>
+                    </div>
+                    <!-- Summary row -->
+                    <div style="background: #fff; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-top: 12px;">
+                        <div style="font-size: 11px; color: #1d1d1f; font-weight: 500;">7 of 7 backups successful</div>
+                        <div style="font-size: 10px; color: #30d158; font-weight: 600;">100%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Restore (reverse) -->
+    <div class="hp-alt-row reverse">
+        <div class="hp-alt-text">
+            <div class="hp-eyebrow" style="color: #30d158;">RESTORE</div>
+            <h2>Restore in seconds.</h2>
+            <p>Pick any date from your backup history, preview the snapshot, and restore with a single click. Whether it is a single file or your entire site, you will be back online before your visitors notice a thing.</p>
+        </div>
+        <div class="hp-alt-visual">
+            <div class="visual-box dark">
+                <div style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <span style="font-size: 13px; font-weight: 600; color: #f5f5f7;">Select Restore Point</span>
+                        <span style="font-size: 11px; color: #86868b;">April 2026</span>
+                    </div>
+                    <!-- Calendar grid -->
+                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 18px;">
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Mon</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Tue</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Wed</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Thu</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Fri</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Sat</div>
+                        <div style="font-size: 9px; color: #86868b; text-align: center; padding: 4px;">Sun</div>
+                        <!-- Week 1 -->
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #48484a;"></div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #48484a;"></div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">1</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">2</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">3</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">4</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">5</div>
+                        <!-- Week 2 -->
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">6</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">7</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">8</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">9</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: #0071e3; border-radius: 6px; color: #fff; font-weight: 600;">10</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">11</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">12</div>
+                        <!-- Week 3 -->
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; background: rgba(48,209,88,0.15); border-radius: 6px; color: #f5f5f7;">13</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #48484a;">14</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #48484a;">15</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #48484a;">16</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #48484a;">17</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #48484a;">18</div>
+                        <div style="text-align: center; padding: 6px 4px; font-size: 11px; color: #48484a;">19</div>
+                    </div>
+                    <!-- Selected backup info -->
+                    <div style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 12px; font-weight: 600; color: #f5f5f7;">Apr 10, 2026 - 3:00 AM</div>
+                            <div style="font-size: 10px; color: #86868b; margin-top: 2px;">Full snapshot - 2.3 GB - Files, DB, Email</div>
+                        </div>
+                        <div style="background: #30d158; color: #fff; font-size: 11px; font-weight: 600; padding: 7px 18px; border-radius: 20px; cursor: pointer;">Restore</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<section class="hp-locations-visual">
+    <h2>Stored securely.</h2>
+    <p class="loc-sub">Backups encrypted and replicated across geographically redundant data centers.</p>
+    <div class="hp-world-map" style="height: 250px; position: relative; margin-bottom: 40px;">
+        <svg viewBox="0 0 1000 500" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+            <path d="M150,120 Q200,100 250,110 L280,130 Q300,150 290,180 L260,200 Q240,220 200,210 L170,190 Q140,160 150,120Z" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)"/>
+            <path d="M420,80 Q500,60 580,80 L620,100 Q650,130 640,170 L600,200 Q560,230 500,220 L450,200 Q420,170 430,130Z" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)"/>
+            <path d="M680,100 Q750,80 830,100 L880,140 Q920,180 900,230 L850,270 Q800,300 730,280 L680,240 Q650,190 680,100Z" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)"/>
+            <!-- Primary storage -->
+            <circle cx="200" cy="150" r="8" fill="#0071e3"><animate attributeName="r" values="8;11;8" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="200" cy="150" r="16" fill="none" stroke="#0071e3" stroke-width="1" opacity="0.3"><animate attributeName="r" values="16;24;16" dur="3s" repeatCount="indefinite"/></circle>
+            <text x="200" y="180" fill="#f5f5f7" font-size="12" text-anchor="middle" font-weight="600" font-family="-apple-system,sans-serif">Primary</text>
+            <text x="200" y="195" fill="#a1a1a6" font-size="10" text-anchor="middle" font-family="-apple-system,sans-serif">US East</text>
+            <!-- Replica 1 -->
+            <circle cx="260" cy="155" r="6" fill="#30d158"><animate attributeName="r" values="6;9;6" dur="3s" repeatCount="indefinite" begin="1s"/></circle>
+            <text x="310" y="165" fill="#a1a1a6" font-size="10" text-anchor="middle" font-family="-apple-system,sans-serif">US West</text>
+            <!-- Replica 2 -->
+            <circle cx="500" cy="130" r="6" fill="#30d158"><animate attributeName="r" values="6;9;6" dur="3s" repeatCount="indefinite" begin="2s"/></circle>
+            <text x="500" y="160" fill="#a1a1a6" font-size="10" text-anchor="middle" font-family="-apple-system,sans-serif">EU West</text>
+            <!-- Connection lines -->
+            <line x1="208" y1="150" x2="254" y2="155" stroke="#0071e3" stroke-width="1" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="208" y1="150" x2="494" y2="130" stroke="#0071e3" stroke-width="1" stroke-dasharray="4 4" opacity="0.4"/>
+        </svg>
+    </div>
+    <div class="loc-stats-row">
+        <div class="loc-stat"><div class="num">3x</div><div class="label">Redundancy</div></div>
+        <div class="loc-stat"><div class="num">AES-256</div><div class="label">Encryption</div></div>
+        <div class="loc-stat"><div class="num">TLS 1.3</div><div class="label">In transit</div></div>
+        <div class="loc-stat"><div class="num">99.999%</div><div class="label">Durability</div></div>
+    </div>
+</section>
+
+<section class="hp-features-numbered">
+    <h2>How backup works.</h2>
+    <div class="hp-numbered-list">
+        <div class="hp-numbered-item"><div class="num">01</div><div><h4>Connect your site</h4><p>Enter your website URL and hosting credentials. Our system connects securely via SFTP or cPanel API — setup takes under 2 minutes.</p></div></div>
+        <div class="hp-numbered-item"><div class="num">02</div><div><h4>We back up everything</h4><p>Files, databases, emails, and configurations are captured daily. Every backup is a full snapshot, not just incremental changes, ensuring complete restore capability.</p></div></div>
+        <div class="hp-numbered-item"><div class="num">03</div><div><h4>Monitor for changes</h4><p>Our file monitoring system tracks every change to your site. Get instant alerts if files are modified unexpectedly — a key early indicator of compromise.</p></div></div>
+        <div class="hp-numbered-item"><div class="num">04</div><div><h4>Restore anytime</h4><p>Pick any backup point from your retention period and restore with one click. Restore the full site or individual files and databases selectively.</p></div></div>
+    </div>
+</section>
+
+<section class="hp-testimonials-scroll">
+    <h2>Peace of mind.</h2>
+    <div class="hp-testimonials-strip">
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Our site got hacked and the backup service saved us. One click and we were restored to yesterday's version. The file monitoring alert tipped us off immediately.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=tomnguyen') center/cover;">TN</div><div><div class="author-name">Tom Nguyen</div><div class="author-role">Store Owner, FreshGoods</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">I accidentally deleted my entire WordPress uploads folder. Panicked for about 10 seconds before remembering I had CodeGuard. Restored everything in 2 minutes.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=emmamoore') center/cover;">EM</div><div><div class="author-name">Emma Moore</div><div class="author-role">Content Creator</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Managing backups for 20+ client sites used to be a nightmare. Now it's completely automated and I get alerts if anything changes. Set it and forget it.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=rajkumar') center/cover;">RK</div><div><div class="author-name">Raj Kumar</div><div class="author-role">Agency Developer</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">The selective restore feature is brilliant. I only needed to recover one database table and I could do exactly that without touching anything else.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=laurasantos') center/cover;">LS</div><div><div class="author-name">Laura Santos</div><div class="author-role">WordPress Developer</div></div></div></div>
+        <!-- Duplicated slides for infinite scroll -->
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Our site got hacked and the backup service saved us. One click and we were restored to yesterday's version. The file monitoring alert tipped us off immediately.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=tomnguyen') center/cover;">TN</div><div><div class="author-name">Tom Nguyen</div><div class="author-role">Store Owner, FreshGoods</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">I accidentally deleted my entire WordPress uploads folder. Panicked for about 10 seconds before remembering I had CodeGuard. Restored everything in 2 minutes.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=emmamoore') center/cover;">EM</div><div><div class="author-name">Emma Moore</div><div class="author-role">Content Creator</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Managing backups for 20+ client sites used to be a nightmare. Now it's completely automated and I get alerts if anything changes. Set it and forget it.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=rajkumar') center/cover;">RK</div><div><div class="author-name">Raj Kumar</div><div class="author-role">Agency Developer</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">The selective restore feature is brilliant. I only needed to recover one database table and I could do exactly that without touching anything else.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=laurasantos') center/cover;">LS</div><div><div class="author-name">Laura Santos</div><div class="author-role">WordPress Developer</div></div></div></div>
+    </div>
+    <div class="carousel-scroll-nav"><button class="carousel-arrow prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><button class="carousel-arrow next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button></div>
+</section>
+
+<section class="hp-faq-section">
+    <h2>Backup FAQ.</h2>
+    <p class="faq-sub">Common questions about our backup service.</p>
+    <details class="hp-faq-item"><summary>What gets backed up?</summary><div class="faq-body">Everything — all website files, MySQL/PostgreSQL databases, email accounts, and server configurations. Each backup is a complete snapshot of your entire site.</div></details>
+    <details class="hp-faq-item"><summary>How long are backups retained?</summary><div class="faq-body">Retention depends on your plan: Basic keeps 7 days, Pro keeps 30 days, and Business keeps 90 days of daily backup history.</div></details>
+    <details class="hp-faq-item"><summary>Can I restore individual files?</summary><div class="faq-body">Yes! You can restore the entire site or browse individual files and databases within any backup. Selective restore lets you recover just what you need.</div></details>
+    <details class="hp-faq-item"><summary>Does it work with any host?</summary><div class="faq-body">Our backup service works with any hosting provider that supports SFTP, SSH, or cPanel. It's completely platform-agnostic and works alongside your existing setup.</div></details>
+    <details class="hp-faq-item"><summary>Is my backup data encrypted?</summary><div class="faq-body">Absolutely. All backups are encrypted in transit (TLS 1.3) and at rest (AES-256). Your data is stored in geographically redundant facilities for maximum safety.</div></details>
+</section>
+
+<!-- 6. Dark CTA -->
+<section class="hp-final-cta">
+    <h2>Accidents happen.<br>Backups save you.</h2>
+    <p>Start protecting your site today.</p>
+    <div>
+        <a href="clientregister.html" class="btn">Get Backup</a>
+        <a href="#pricing" class="second-link">Compare plans ›</a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="hp-footer">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-legal">
+            1. WHMCS is a service of Apple Inc. Pricing shown in USD. Tax not included. Plans renew at standard rates after introductory period. Free domain applies to first year only.<br><br>
+            2. 30-day money-back guarantee applies to hosting plans only. Domain registrations and one-time services are non-refundable. See our Terms of Service for full details.<br><br>
+            To access and use all WHMCS features, please ensure your browser, software, and systems are up to date.
+        </div>
+
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col">
+                <h4>Shop &amp; Learn</h4>
+                <ul>
+                    <li><a href="cloud-hosting.html">Cloud Hosting</a></li>
+                    <li><a href="vps.html">VPS</a></li>
+                    <li><a href="domains.html">Domains</a></li>
+                    <li><a href="ssl-certificates.html">SSL Certificates</a></li>
+                    <li><a href="email.html">Email</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Store</h4>
+                <ul>
+                    <li><a href="website-builder.html">Website Builder</a></li>
+                    <li><a href="site-builder.html">Site Builder</a></li>
+                    <li><a href="website-security.html">Website Security</a></li>
+                    <li><a href="website-backup.html">Website Backup</a></li>
+                    <li><a href="email-services.html">Email Services</a></li>
+                    <li><a href="email.html">Professional Email</a></li>
+                    <li><a href="seo-tools.html">SEO Tools</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="login.html">Sign in</a></li>
+                    <li><a href="clientregister.html">Create an account</a></li>
+                    <li><a href="#">Billing</a></li>
+                    <li><a href="#">Refer a friend</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="support-page.html">Knowledgebase</a></li>
+                    <li><a href="support-page.html">Contact us</a></li>
+                    <li><a href="#">Network status</a></li>
+                    <li><a href="#">Community</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>About WHMCS</h4>
+                <ul>
+                    <li><a href="#">Newsroom</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Legal</a></li>
+                    <li><a href="#">Environment</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="hp-footer-bottom">
+            <div>Copyright &copy; 2026 Apple Inc. All rights reserved.</div>
+            <div class="hp-footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+                <a href="#">Sales Policy</a>
+                <a href="#">Legal</a>
+                <a href="#">Site Map</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="js/apple-theme.js"></script>
+</body>
+</html>

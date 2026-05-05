@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Limit - WHMCS by Apple</title>
+    <link rel="stylesheet" href="../css/apple-theme.css">
+    <style>body { display: block; }</style>
+</head>
+<body class="auth-layout">
+    <nav class="homepage-nav">
+        <div class="homepage-nav-inner">
+            <a href="../index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
+            <a href="#">WHMCS</a>
+            <a href="../cloud-hosting.html">Cloud Hosting</a>
+            <a href="../vps.html">VPS</a>
+            <a href="../domains.html">Domains</a>
+            <a href="../support-page.html">Support</a>
+            <div class="nav-spacer"></div>
+            <a href="#" onclick="toggleDarkMode(); return false;" style="display:flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
+            <a href="../login.html" class="nav-signin">Sign in</a>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card" style="text-align:center;">
+            <div style="margin-bottom:24px;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <h1 class="auth-title">Slow down</h1>
+            <p class="auth-subtitle">You've made too many requests. Please wait a moment before trying again.</p>
+            <div style="margin-top:28px; display:flex; flex-direction:column; gap:12px; align-items:center;">
+                <a href="javascript:location.reload();" class="btn btn-primary btn-lg" style="width:100%;">Try Again</a>
+                <p style="font-size:13px; color:var(--text-tertiary); margin-top:8px;">This limit resets automatically in 60 seconds.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/apple-theme.js"></script>
+</body>
+</html>

@@ -307,13 +307,15 @@
         /* .service-item from apple-theme.css handles the base row; add a .service-manage slot */
         .service-manage { flex-shrink: 0; }
         .service-manage .btn-secondary { height: 30px; padding: 0 14px; font-size: 12px; }
+        .native-home-row .label,
+        .native-home-row .badge { margin-left: 6px; }
+        .service-row .service-name { white-space: normal; line-height: 1.35; }
+        .service-row .service-domain { color: var(--color-text-tertiary); }
         /* Compact ticket variant — wrap-safe title, single-line meta */
         .ticket-row { gap: 10px; }
         .ticket-row .service-info { min-width: 0; flex: 1; }
         .ticket-row .service-name { white-space: normal; line-height: 1.35; font-weight: 500; }
         .ticket-row .service-domain { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ticket-row .label,
-        .ticket-row .badge { margin-left: 6px; }
         .status-pill.awaiting-reply,
         .status-pill.customer-reply,
         .status-pill.on-hold,

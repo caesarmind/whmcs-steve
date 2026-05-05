@@ -1,0 +1,10 @@
+# Hostnodes Apple Theme Configuration File
+
+name: "Hostnodes Apple"
+description: "Cupertino-inspired Apple/macOS client area theme for WHMCS 9 by Hostnodes"
+author: "Hostnodes"
+properties:
+  serverSidePagination: false
+provides:
+  jquery: 1.12.4
+  fontawesome: 5.10.1

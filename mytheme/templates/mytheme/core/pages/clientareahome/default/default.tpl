@@ -30,21 +30,35 @@
 {assign var=showAlerts value=true}
 {assign var=tilesEnabled value=true}
 {assign var=showPromo value=true}
+{assign var=hasNativeServices value=false}
+{assign var=servicePanel value=false}
 {assign var=hasNativeTickets value=false}
 {assign var=ticketPanel value=false}
+{assign var=hasNativeNews value=false}
+{assign var=newsPanel value=false}
 
 {if isset($panels)}
     {foreach $panels as $homePanel}
-        {if $homePanel->getName() == "Recent Support Tickets"}
+        {if $homePanel->getName() == "Active Products/Services"}
+            {assign var=servicePanel value=$homePanel}
+            {if $homePanel->hasChildren()}
+                {assign var=hasNativeServices value=true}
+            {/if}
+        {elseif $homePanel->getName() == "Recent Support Tickets"}
             {assign var=ticketPanel value=$homePanel}
             {if $homePanel->hasChildren()}
                 {assign var=hasNativeTickets value=true}
+            {/if}
+        {elseif $homePanel->getName() == "Recent News"}
+            {assign var=newsPanel value=$homePanel}
+            {if $homePanel->hasChildren()}
+                {assign var=hasNativeNews value=true}
             {/if}
         {/if}
     {/foreach}
 {/if}
 
-{if $clientsstats.productsnumactive > 0 || $clientsstats.numactivedomains > 0 || $clientsstats.numunpaidinvoices > 0 || $clientsstats.numactivetickets > 0 || (isset($dashboard.activeServices) && $dashboard.activeServices|count > 0) || (isset($dashboard.openTickets) && $dashboard.openTickets|count > 0) || $hasNativeTickets || (isset($publishedAnnouncements) && $publishedAnnouncements|count > 0)}
+{if $clientsstats.productsnumactive > 0 || $clientsstats.numactivedomains > 0 || $clientsstats.numunpaidinvoices > 0 || $clientsstats.numactivetickets > 0 || $hasNativeServices || $hasNativeTickets || $hasNativeNews || (isset($dashboard.activeServices) && $dashboard.activeServices|count > 0) || (isset($dashboard.openTickets) && $dashboard.openTickets|count > 0) || (isset($publishedAnnouncements) && $publishedAnnouncements|count > 0)}
     {assign var=dashIsEmpty value='full'}
 {else}
     {assign var=dashIsEmpty value='empty'}
@@ -333,15 +347,41 @@
                     {$LANG.viewall|default:'View All'} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
             </div>
-            {if isset($dashboard.activeServices) && $dashboard.activeServices|count > 0}
-            <div class="card-body when-full" style="padding: 4px 24px 12px;">
+            {if $hasNativeServices}
+            <div class="card-body" style="padding: 4px 24px 12px;">
+                {foreach $servicePanel->getChildren() as $serviceItem}
+                    {if $serviceItem->getUri()}
+                        <a menuItemName="{$serviceItem->getName()}" href="{$serviceItem->getUri()}" class="service-item native-home-row service-row{if $serviceItem->getClass()} {$serviceItem->getClass()}{/if}{if $serviceItem->isCurrent()} active{/if}"{if $serviceItem->getAttribute('dataToggleTab')} data-toggle="tab"{/if}{if $serviceItem->getAttribute('target')} target="{$serviceItem->getAttribute('target')}"{/if} id="{$serviceItem->getId()}">
+                    {else}
+                        <div menuItemName="{$serviceItem->getName()}" class="service-item native-home-row service-row{if $serviceItem->getClass()} {$serviceItem->getClass()}{/if}" id="{$serviceItem->getId()}">
+                    {/if}
+                            <div class="service-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                            </div>
+                            <div class="service-info">
+                                <div class="service-name">{$serviceItem->getLabel()}</div>
+                                {if $serviceItem->hasBadge()}<div class="service-domain">{$serviceItem->getBadge()}</div>{/if}
+                            </div>
+                            {if $serviceItem->getUri()}
+                                <span class="service-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                            {/if}
+                    {if $serviceItem->getUri()}
+                        </a>
+                    {else}
+                        </div>
+                    {/if}
+                {/foreach}
+            </div>
+            {elseif isset($dashboard.activeServices) && $dashboard.activeServices|count > 0}
+            <div class="card-body" style="padding: 4px 24px 12px;">
                 {foreach $dashboard.activeServices as $svc}
+                    {assign var=svcTitle value=$svc.groupname|default:$svc.product|default:$svc.name|default:'Service'}
                     <a href="{$svc.manageUrl|default:"`$WEB_ROOT`/clientarea.php?action=productdetails&id=`$svc.id`"}" class="service-item">
                         <div class="service-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
                         </div>
                         <div class="service-info">
-                            <div class="service-name"><strong>{$svc.groupname|default:$svc.product|escape}</strong>{if $svc.name} — {$svc.name|escape}{/if}</div>
+                            <div class="service-name"><strong>{$svcTitle|escape}</strong>{if $svc.name && $svc.name != $svcTitle} — {$svc.name|escape}{/if}</div>
                             {if $svc.domain}<div class="service-domain">{$svc.domain|escape}</div>{/if}
                         </div>
                         <div class="service-meta">
@@ -352,7 +392,7 @@
                 {/foreach}
             </div>
             {else}
-            <div class="card-body when-empty">
+            <div class="card-body">
                 <div class="empty-state">
                     <div class="empty-ico">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
@@ -375,7 +415,7 @@
                     </a>
                 </div>
                 {if $hasNativeTickets}
-                <div class="card-body when-full" style="padding: 4px 24px 12px;">
+                <div class="card-body" style="padding: 4px 24px 12px;">
                     {foreach $ticketPanel->getChildren() as $ticketItem}
                         {if $ticketItem->getUri()}
                             <a menuItemName="{$ticketItem->getName()}" href="{$ticketItem->getUri()}" class="service-item ticket-row{if $ticketItem->getClass()} {$ticketItem->getClass()}{/if}{if $ticketItem->isCurrent()} active{/if}"{if $ticketItem->getAttribute('dataToggleTab')} data-toggle="tab"{/if}{if $ticketItem->getAttribute('target')} target="{$ticketItem->getAttribute('target')}"{/if} id="{$ticketItem->getId()}">
@@ -397,7 +437,7 @@
                     {/foreach}
                 </div>
                 {elseif isset($dashboard.openTickets) && $dashboard.openTickets|count > 0}
-                <div class="card-body when-full" style="padding: 4px 24px 12px;">
+                <div class="card-body" style="padding: 4px 24px 12px;">
                     {foreach $dashboard.openTickets as $tkt}
                         <a href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape}{if $tkt.c}&c={$tkt.c|escape}{/if}" class="service-item ticket-row">
                             <div class="service-info">
@@ -409,7 +449,7 @@
                     {/foreach}
                 </div>
                 {else}
-                <div class="card-body when-empty">
+                <div class="card-body">
                     <div class="empty-state">
                         <div class="empty-ico">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
@@ -446,8 +486,27 @@
                     {$LANG.viewall|default:'View All'} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
             </div>
-            {if isset($publishedAnnouncements) && $publishedAnnouncements|count > 0}
-            <div class="card-body when-full">
+            {if $hasNativeNews}
+            <div class="card-body">
+                <div class="news-list">
+                    {foreach $newsPanel->getChildren() as $newsItem}
+                        {if $newsItem->getUri()}
+                            <a menuItemName="{$newsItem->getName()}" href="{$newsItem->getUri()}" class="news-row native-home-row{if $newsItem->getClass()} {$newsItem->getClass()}{/if}{if $newsItem->isCurrent()} active{/if}"{if $newsItem->getAttribute('dataToggleTab')} data-toggle="tab"{/if}{if $newsItem->getAttribute('target')} target="{$newsItem->getAttribute('target')}"{/if} id="{$newsItem->getId()}">
+                        {else}
+                            <div menuItemName="{$newsItem->getName()}" class="news-row native-home-row{if $newsItem->getClass()} {$newsItem->getClass()}{/if}" id="{$newsItem->getId()}">
+                        {/if}
+                                <div class="news-title">{$newsItem->getLabel()}</div>
+                                {if $newsItem->hasBadge()}<div class="news-date">{$newsItem->getBadge()}</div>{/if}
+                        {if $newsItem->getUri()}
+                            </a>
+                        {else}
+                            </div>
+                        {/if}
+                    {/foreach}
+                </div>
+            </div>
+            {elseif isset($publishedAnnouncements) && $publishedAnnouncements|count > 0}
+            <div class="card-body">
                 <div class="news-list">
                     {foreach $publishedAnnouncements as $ann}
                         <a href="{$WEB_ROOT}/announcements.php?id={$ann.id}" class="news-row">
@@ -459,7 +518,7 @@
                 </div>
             </div>
             {else}
-            <div class="card-body when-empty">
+            <div class="card-body">
                 <div class="empty-state">
                     <div class="empty-ico">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>

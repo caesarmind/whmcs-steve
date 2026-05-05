@@ -1,0 +1,59 @@
+// =========================================================================
+// Hostnodes Apple — Theme Stylesheet Entry
+// Compiles to css/theme.css (and css/theme.min.css).
+//
+// Import order matters:
+//   1. Tokens      — design variables
+//   2. Structure   — layout, sidebar, topbar, nav
+//   3. Primitives  — buttons, forms, callouts, status-pills
+//   4. Components  — cards, tiles, tables, services, filter-tabs, etc.
+//   5. Page        — auth, invoice, kb
+//   6. Theming     — dark-mode overrides (last, highest specificity)
+// =========================================================================
+
+// --- Tokens -----------------------------------------------------------------
+@import "variables";
+
+// --- Full theme (temporary consolidated partial) ----------------------------
+// TODO(phase-F): split _theme.scss into the structural/component partials below.
+// While those files exist as stubs today, the actual rules still live in
+// _theme.scss so the compiled output stays visually identical to the apple
+// reference. Each stub below documents its scope so the split is mechanical
+// (copy sections out of _theme.scss into the partial, re-import here).
+@import "theme";
+
+// --- Structure (stubs — not yet populated) ----------------------------------
+// @import "global";
+// @import "layout";
+// @import "sidebar";
+// @import "topbar";
+// @import "homepage-nav";
+// @import "profile-dropdown";
+// @import "content-area";
+
+// --- Primitives (stubs) -----------------------------------------------------
+// @import "buttons";
+// @import "forms";
+// @import "callouts";
+// @import "status-pills";
+
+// --- Components (stubs) -----------------------------------------------------
+// @import "cards";
+// @import "tiles";
+// @import "tables";
+// @import "services";
+// @import "filter-tabs";
+// @import "pagination";
+// @import "usage-bars";
+// @import "conversation";
+// @import "quick-actions";
+// @import "tickets";
+// @import "announcements";
+// @import "kb";
+
+// --- Page-specific (stubs) --------------------------------------------------
+// @import "auth";
+// @import "invoice";
+
+// --- Theming (stub) ---------------------------------------------------------
+// @import "dark-mode";

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPS - WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css">
+    <style>body { display: block; }</style>
+</head>
+<body class="homepage-layout">
+
+<nav class="homepage-nav">
+    <div class="homepage-nav-inner">
+        <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
+        <a href="#">WHMCS</a>
+        <a href="cloud-hosting.html">Cloud Hosting</a>
+        <a href="vps.html">VPS</a>
+        <a href="domains.html">Domains</a>
+        <a href="ssl-certificates.html">SSL</a>
+        <a href="support-page.html">Support</a>
+        <div class="nav-spacer"></div>
+        <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+        <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg></a>
+        <a href="#" onclick="toggleDarkMode(); return false;" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
+        <a href="login.html" class="nav-signin">Sign in</a>
+    </div>
+</nav>
+
+<!-- 1. Hero Dark Stats -->
+<section class="hp-hero-dark">
+    <h1>VPS.<br>Raw power, refined.</h1>
+    <p class="hp-hero-sub">Dedicated cores. Your choice of OS. Full root access.</p>
+    <div class="hp-hero-stats">
+        <div class="hp-hero-stat">
+            <div class="stat-num">8</div>
+            <div class="stat-label">vCPU cores</div>
+        </div>
+        <div class="hp-hero-stat">
+            <div class="stat-num">32 GB</div>
+            <div class="stat-label">RAM</div>
+        </div>
+        <div class="hp-hero-stat">
+            <div class="stat-num">1 TB</div>
+            <div class="stat-label">NVMe SSD</div>
+        </div>
+        <div class="hp-hero-stat">
+            <div class="stat-num">10 Gbps</div>
+            <div class="stat-label">Network</div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. Horizontal Scroll Cards -->
+<section class="hp-strip-section">
+    <div class="hp-strip-header">
+        <h2>Everything a server should be.</h2>
+    </div>
+    <div class="hp-strip-scroll">
+
+        <!-- Card a: gold / FULL CONTROL -->
+        <div class="hp-strip-card a">
+            <div class="tag">FULL CONTROL</div>
+            <h3>Full root access with your choice of Linux distro.</h3>
+            <p>Ubuntu, Debian, CentOS, Fedora, Arch — pick your stack and own every byte.</p>
+            <div class="strip-visual">
+                <div style="background: rgba(0,0,0,0.25); border-radius: 10px; padding: 16px 18px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.7; width: 100%; max-width: 280px;">
+                    <div><span style="color: #30d158;">root@vps</span><span style="color: #a1a1a6;">:</span><span style="color: #5ac8fa;">~</span><span style="color: #a1a1a6;">$</span> <span style="color: #f5f5f7;">apt update</span></div>
+                    <div style="color: #a1a1a6;">Hit:1 http://archive.ubuntu.com</div>
+                    <div><span style="color: #30d158;">root@vps</span><span style="color: #a1a1a6;">:</span><span style="color: #5ac8fa;">~</span><span style="color: #a1a1a6;">$</span> <span style="color: #f5f5f7;">nginx -v</span></div>
+                    <div style="color: #a1a1a6;">nginx/1.27.0</div>
+                    <div><span style="color: #30d158;">root@vps</span><span style="color: #a1a1a6;">:</span><span style="color: #5ac8fa;">~</span><span style="color: #a1a1a6;">$</span> <span style="color: #f5f5f7; opacity: 0.5;">_</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card b: dark / INSTANT DEPLOY -->
+        <div class="hp-strip-card b">
+            <div class="tag">INSTANT DEPLOY</div>
+            <h3>Spin up a server in under 55 seconds.</h3>
+            <p>From click to SSH. Bare metal speed, cloud convenience.</p>
+            <div class="strip-visual">
+                <div style="position: relative; width: 120px; height: 120px;">
+                    <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                        <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.1)" stroke-width="8"/>
+                        <circle cx="60" cy="60" r="50" stroke="#2997ff" stroke-width="8" stroke-linecap="round" stroke-dasharray="280 314" transform="rotate(-90 60 60)"/>
+                    </svg>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center;">
+                        <div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em;">55</div>
+                        <div style="font-size: 11px; opacity: 0.6; margin-top: -2px;">seconds</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card c: green / SNAPSHOT BACKUPS -->
+        <div class="hp-strip-card c">
+            <div class="tag">SNAPSHOT BACKUPS</div>
+            <h3>One-click snapshots. Restore anytime.</h3>
+            <p>Create a point-in-time image of your server and roll back in seconds.</p>
+            <div class="strip-visual">
+                <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 220px;">
+                    <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.15); padding: 10px 14px; border-radius: 10px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                        <div>
+                            <div style="font-size: 12px; font-weight: 600;">snap-20260413-01</div>
+                            <div style="font-size: 10px; opacity: 0.6;">2.4 GB &middot; 12 min ago</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.15); padding: 10px 14px; border-radius: 10px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <div>
+                            <div style="font-size: 12px; font-weight: 600;">snap-20260412-03</div>
+                            <div style="font-size: 10px; opacity: 0.6;">2.4 GB &middot; 1 day ago</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.15); padding: 10px 14px; border-radius: 10px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <div>
+                            <div style="font-size: 12px; font-weight: 600;">snap-20260410-02</div>
+                            <div style="font-size: 10px; opacity: 0.6;">2.3 GB &middot; 3 days ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card d: red / DDOS PROTECTION -->
+        <div class="hp-strip-card d">
+            <div class="tag">DDOS PROTECTION</div>
+            <h3>Enterprise-grade DDoS mitigation included.</h3>
+            <p>Multi-layered filtering at the network edge. Always on, zero config.</p>
+            <div class="strip-visual">
+                <div style="position: relative; width: 100px; height: 120px;">
+                    <svg width="100" height="120" viewBox="0 0 100 120" fill="none">
+                        <path d="M50 8 L92 28 L92 60 C92 88 50 112 50 112 C50 112 8 88 8 60 L8 28 Z" fill="rgba(255,59,48,0.15)" stroke="#ff3b30" stroke-width="2.5"/>
+                        <path d="M36 60 L46 70 L66 50" stroke="#ff3b30" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card e: purple / SCALING -->
+        <div class="hp-strip-card e">
+            <div class="tag">SCALING</div>
+            <h3>Resize CPU, RAM, and storage with zero downtime.</h3>
+            <p>Slide to scale. Your server stays live through every upgrade.</p>
+            <div class="strip-visual">
+                <div style="width: 100%; max-width: 220px; display: flex; flex-direction: column; gap: 14px;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px;"><span style="font-weight: 600;">CPU</span><span style="opacity: 0.6;">4 / 8 vCPU</span></div>
+                        <div style="background: rgba(255,255,255,0.12); height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="width: 50%; height: 100%; background: linear-gradient(90deg, #bf96ff, #af82ff); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px;"><span style="font-weight: 600;">RAM</span><span style="opacity: 0.6;">16 / 32 GB</span></div>
+                        <div style="background: rgba(255,255,255,0.12); height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="width: 50%; height: 100%; background: linear-gradient(90deg, #bf96ff, #af82ff); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px;"><span style="font-weight: 600;">Storage</span><span style="opacity: 0.6;">320 / 640 GB</span></div>
+                        <div style="background: rgba(255,255,255,0.12); height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="width: 50%; height: 100%; background: linear-gradient(90deg, #bf96ff, #af82ff); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- 3. Comparison Table -->
+<section class="hp-compare-section">
+    <h2>Choose your configuration.</h2>
+    <table class="hp-compare-table">
+        <thead>
+            <tr>
+                <th>Feature</th>
+                <th>Starter</th>
+                <th>Growth</th>
+                <th class="highlight">Pro</th>
+                <th>Enterprise</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>vCPUs</td>
+                <td>1</td>
+                <td>2</td>
+                <td>4</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td>RAM</td>
+                <td>1 GB</td>
+                <td>4 GB</td>
+                <td>8 GB</td>
+                <td>32 GB</td>
+            </tr>
+            <tr>
+                <td>Storage</td>
+                <td>25 GB</td>
+                <td>80 GB</td>
+                <td>160 GB</td>
+                <td>640 GB</td>
+            </tr>
+            <tr>
+                <td>Bandwidth</td>
+                <td>1 TB</td>
+                <td>3 TB</td>
+                <td>5 TB</td>
+                <td>10 TB</td>
+            </tr>
+            <tr>
+                <td>Dedicated IP</td>
+                <td>1</td>
+                <td>1</td>
+                <td>2</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>Price</td>
+                <td><strong>$5.99</strong>/mo</td>
+                <td><strong>$19.99</strong>/mo</td>
+                <td><strong style="color: var(--color-accent);">$39.99</strong>/mo</td>
+                <td><strong>$89.99</strong>/mo</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td><a href="clientregister.html" class="secondary">Select</a></td>
+                <td><a href="clientregister.html" class="secondary">Select</a></td>
+                <td><a href="clientregister.html" class="primary">Select</a></td>
+                <td><a href="clientregister.html" class="secondary">Select</a></td>
+            </tr>
+        </tfoot>
+    </table>
+</section>
+
+<!-- 4. Alternating Sections -->
+<div class="hp-alternating">
+
+    <!-- Row 1: Deploy in 55 seconds -->
+    <div class="hp-alt-row">
+        <div class="hp-alt-text">
+            <div class="hp-eyebrow">INSTANT PROVISIONING</div>
+            <h3>Deploy in 55 seconds.</h3>
+            <p>Select your OS, choose a data center, and hit deploy. Your server is live before you finish your coffee. Full SSH access, pre-configured firewall, and monitoring from the first second.</p>
+        </div>
+        <div class="hp-alt-visual">
+            <div class="visual-box dark">
+                <div style="width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.8;">
+                    <div style="color: #a1a1a6; margin-bottom: 8px;">$ whmcs deploy --os ubuntu-24 --region us-east</div>
+                    <div style="color: #a1a1a6;">
+                        <span style="color: #30d158;">&#10003;</span> Image pulled &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #6e6e73;">3s</span>
+                    </div>
+                    <div style="color: #a1a1a6;">
+                        <span style="color: #30d158;">&#10003;</span> Network configured &nbsp;<span style="color: #6e6e73;">8s</span>
+                    </div>
+                    <div style="color: #a1a1a6;">
+                        <span style="color: #30d158;">&#10003;</span> Storage mounted &nbsp;&nbsp;&nbsp;<span style="color: #6e6e73;">14s</span>
+                    </div>
+                    <div style="color: #a1a1a6;">
+                        <span style="color: #30d158;">&#10003;</span> Firewall applied &nbsp;&nbsp;<span style="color: #6e6e73;">18s</span>
+                    </div>
+                    <div style="color: #a1a1a6;">
+                        <span style="color: #30d158;">&#10003;</span> SSH keys injected &nbsp;<span style="color: #6e6e73;">22s</span>
+                    </div>
+                    <div style="color: #a1a1a6;">
+                        <span style="color: #30d158;">&#10003;</span> Server live &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #6e6e73;">28s</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <span style="color: #30d158; font-weight: 600;">Ready.</span>
+                        <span style="color: #a1a1a6;"> ssh root@198.51.100.42</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Scale without downtime -->
+    <div class="hp-alt-row reverse">
+        <div class="hp-alt-text">
+            <div class="hp-eyebrow">LIVE SCALING</div>
+            <h3>Scale without downtime.</h3>
+            <p>Need more power? Resize CPU, RAM, and storage on the fly. Your server stays online through every upgrade. No migrations, no restarts, no interruptions.</p>
+        </div>
+        <div class="hp-alt-visual">
+            <div class="visual-box" style="background: #f5f5f7; flex-direction: column; gap: 20px;">
+                <div style="width: 100%; max-width: 300px;">
+                    <!-- CPU gauge -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 600; color: #1d1d1f;">CPU</span>
+                            <span style="font-size: 24px; font-weight: 600; color: #0071e3; letter-spacing: -0.02em;">4 <span style="font-size: 13px; font-weight: 400; color: #6e6e73;">vCPU</span></span>
+                        </div>
+                        <div style="background: #e8e8ed; height: 10px; border-radius: 5px; overflow: hidden;">
+                            <div style="width: 50%; height: 100%; background: linear-gradient(90deg, #0071e3, #2997ff); border-radius: 5px; position: relative;">
+                                <div style="position: absolute; right: -6px; top: -3px; width: 16px; height: 16px; background: #fff; border: 2px solid #0071e3; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.15);"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #a1a1a6; margin-top: 4px;"><span>1</span><span>2</span><span>4</span><span>8</span></div>
+                    </div>
+                    <!-- RAM gauge -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 600; color: #1d1d1f;">RAM</span>
+                            <span style="font-size: 24px; font-weight: 600; color: #30d158; letter-spacing: -0.02em;">16 <span style="font-size: 13px; font-weight: 400; color: #6e6e73;">GB</span></span>
+                        </div>
+                        <div style="background: #e8e8ed; height: 10px; border-radius: 5px; overflow: hidden;">
+                            <div style="width: 50%; height: 100%; background: linear-gradient(90deg, #28a745, #30d158); border-radius: 5px; position: relative;">
+                                <div style="position: absolute; right: -6px; top: -3px; width: 16px; height: 16px; background: #fff; border: 2px solid #30d158; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.15);"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #a1a1a6; margin-top: 4px;"><span>1</span><span>4</span><span>16</span><span>32</span></div>
+                    </div>
+                    <!-- Storage gauge -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 600; color: #1d1d1f;">Storage</span>
+                            <span style="font-size: 24px; font-weight: 600; color: #ff9f0a; letter-spacing: -0.02em;">320 <span style="font-size: 13px; font-weight: 400; color: #6e6e73;">GB</span></span>
+                        </div>
+                        <div style="background: #e8e8ed; height: 10px; border-radius: 5px; overflow: hidden;">
+                            <div style="width: 50%; height: 100%; background: linear-gradient(90deg, #e68a00, #ff9f0a); border-radius: 5px; position: relative;">
+                                <div style="position: absolute; right: -6px; top: -3px; width: 16px; height: 16px; background: #fff; border: 2px solid #ff9f0a; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.15);"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #a1a1a6; margin-top: 4px;"><span>25</span><span>80</span><span>320</span><span>640</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 5. Trust Bar -->
+<section class="hp-trust-bar">
+    <div class="trust-inner">
+        <div class="hp-hero-stat">
+            <div class="stat-num" style="font-size: 48px; color: #1d1d1f;">55s</div>
+            <div class="stat-label">deploy time</div>
+        </div>
+        <div class="hp-hero-stat">
+            <div class="stat-num" style="font-size: 48px; color: #1d1d1f;">99.99%</div>
+            <div class="stat-label">SLA</div>
+        </div>
+        <div class="hp-hero-stat">
+            <div class="stat-num" style="font-size: 48px; color: #1d1d1f;">10 Gbps</div>
+            <div class="stat-label">network</div>
+        </div>
+        <div class="hp-hero-stat">
+            <div class="stat-num" style="font-size: 48px; color: #1d1d1f;">24/7</div>
+            <div class="stat-label">monitoring</div>
+        </div>
+    </div>
+</section>
+
+<section class="hp-upgrade-section">
+    <h2>Worth the upgrade?</h2>
+    <p class="upgrade-sub">See why customers switch from shared hosting to VPS.</p>
+    <div class="hp-upgrade-grid">
+        <div class="hp-upgrade-item"><div class="upgrade-metric">4x</div><h4>More CPU power</h4><p>Dedicated vCPU cores vs shared resources means consistent, predictable performance under any load.</p></div>
+        <div class="hp-upgrade-item"><div class="upgrade-metric">10x</div><h4>Faster I/O</h4><p>NVMe SSD with dedicated IOPS eliminates the noisy neighbor problem of shared disk.</p></div>
+        <div class="hp-upgrade-item"><div class="upgrade-metric">100%</div><h4>Root access</h4><p>Full control over your server environment. Install anything, configure everything, own your stack.</p></div>
+        <div class="hp-upgrade-item"><div class="upgrade-metric">99.99%</div><h4>Uptime SLA</h4><p>Enterprise-grade availability backed by financial credits. Shared hosting can't match this guarantee.</p></div>
+        <div class="hp-upgrade-item"><div class="upgrade-metric">55s</div><h4>Instant deploy</h4><p>From click to SSH in under a minute. No waiting for provisioning tickets or manual setup.</p></div>
+        <div class="hp-upgrade-item"><div class="upgrade-metric">24/7</div><h4>Expert support</h4><p>Server engineers available around the clock. Not general support — actual sysadmins who speak your language.</p></div>
+    </div>
+</section>
+
+<section class="hp-features-checklist">
+    <h2>Everything you need.</h2>
+    <p class="feat-sub">Every VPS includes these features at no extra cost.</p>
+    <div class="hp-checklist-grid">
+        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Full Root Access</h4><p>Complete control via SSH with sudo privileges.</p></div></div>
+        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Choice of OS</h4><p>Ubuntu, Debian, CentOS, Fedora, Arch, or custom ISO.</p></div></div>
+        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Dedicated IPv4 + IPv6</h4><p>Static IP addresses included with every server.</p></div></div>
+        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>DDoS Protection</h4><p>Enterprise-grade mitigation up to 1 Tbps included.</p></div></div>
+        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Snapshot Backups</h4><p>On-demand snapshots with automatic weekly backups.</p></div></div>
+        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>99.99% Uptime SLA</h4><p>Guaranteed availability backed by financial credits.</p></div></div>
+        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>API Access</h4><p>Full REST API for provisioning and management.</p></div></div>
+        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>24/7 Monitoring</h4><p>Real-time health checks and instant alerts.</p></div></div>
+    </div>
+</section>
+
+<section class="hp-locations-dark">
+    <h2>Deploy anywhere.</h2>
+    <p class="loc-sub">Choose your data center at deployment. Migrate between regions anytime.</p>
+    <div class="hp-loc-grid">
+        <div class="hp-loc-card"><div class="loc-flag">🇺🇸</div><h4>New York</h4><p>US East · 1ms</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇺🇸</div><h4>San Francisco</h4><p>US West · 12ms</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇳🇱</div><h4>Amsterdam</h4><p>Europe · 18ms</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇩🇪</div><h4>Frankfurt</h4><p>Europe · 20ms</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇸🇬</div><h4>Singapore</h4><p>Asia · 45ms</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇯🇵</div><h4>Tokyo</h4><p>Asia · 48ms</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇮🇳</div><h4>Mumbai</h4><p>India · 52ms</p></div>
+        <div class="hp-loc-card"><div class="loc-flag">🇦🇺</div><h4>Sydney</h4><p>Oceania · 65ms</p></div>
+    </div>
+</section>
+
+<section class="hp-testimonials-scroll">
+    <h2>Trusted by developers.</h2>
+    <div class="hp-testimonials-strip">
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Deploy times are incredible. I went from click to SSH in under a minute. The control panel is clean and the API is well-documented.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=jameskim') center/cover;">JK</div><div><div class="author-name">James Kim</div><div class="author-role">DevOps Engineer, Stackflow</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Switched from AWS for our staging servers. Same performance, half the cost, and the support team actually responds in minutes, not days.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=sarahlee') center/cover;">SL</div><div><div class="author-name">Sarah Lee</div><div class="author-role">CTO, Brightpath Labs</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">We run 12 VPS instances for our microservices architecture. Scaling is seamless — just slide the resource bars and it's done. No downtime.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=danielpark') center/cover;">DP</div><div><div class="author-name">Daniel Park</div><div class="author-role">Backend Lead, Vercel Clone</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">The snapshot feature saved us during a botched deployment. One click and we were back to a working state in seconds. Worth every penny.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=anamartinez') center/cover;">AM</div><div><div class="author-name">Ana Martinez</div><div class="author-role">Freelance Developer</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Deploy times are incredible. I went from click to SSH in under a minute. The control panel is clean and the API is well-documented.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=jameskim') center/cover;">JK</div><div><div class="author-name">James Kim</div><div class="author-role">DevOps Engineer, Stackflow</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">Switched from AWS for our staging servers. Same performance, half the cost, and the support team actually responds in minutes, not days.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=sarahlee') center/cover;">SL</div><div><div class="author-name">Sarah Lee</div><div class="author-role">CTO, Brightpath Labs</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">We run 12 VPS instances for our microservices architecture. Scaling is seamless — just slide the resource bars and it's done. No downtime.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=danielpark') center/cover;">DP</div><div><div class="author-name">Daniel Park</div><div class="author-role">Backend Lead, Vercel Clone</div></div></div></div>
+        <div class="hp-testi-slide"><div class="stars">★★★★★</div><div class="quote">The snapshot feature saved us during a botched deployment. One click and we were back to a working state in seconds. Worth every penny.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=anamartinez') center/cover;">AM</div><div><div class="author-name">Ana Martinez</div><div class="author-role">Freelance Developer</div></div></div></div>
+    </div>
+    <div class="carousel-scroll-nav"><button class="carousel-arrow prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><button class="carousel-arrow next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button></div>
+</section>
+
+<section class="hp-faq-grid">
+    <h2>Common questions.</h2>
+    <div class="faq-grid-inner">
+        <div class="hp-faq-card"><h4>What OS can I run?</h4><p>Choose from Ubuntu, Debian, CentOS, Fedora, Arch Linux, or bring your own ISO. All major distributions are available with one-click deployment.</p></div>
+        <div class="hp-faq-card"><h4>Do I get root access?</h4><p>Yes, every VPS comes with full root access via SSH. You have complete control over your server environment, packages, and configuration.</p></div>
+        <div class="hp-faq-card"><h4>Can I scale resources?</h4><p>Resize CPU, RAM, and storage at any time with zero downtime. Changes apply instantly and billing adjusts automatically.</p></div>
+        <div class="hp-faq-card"><h4>Is there DDoS protection?</h4><p>Enterprise-grade DDoS mitigation is included with every VPS at no extra cost. We handle attacks up to 1 Tbps automatically.</p></div>
+        <div class="hp-faq-card"><h4>How fast is provisioning?</h4><p>New VPS instances deploy in under 55 seconds. Your server is online and ready for SSH access almost immediately.</p></div>
+        <div class="hp-faq-card"><h4>What about backups?</h4><p>Create on-demand snapshots with one click. Automatic weekly backups are included, and you can restore to any snapshot instantly.</p></div>
+    </div>
+</section>
+
+<!-- 6. Split CTA -->
+<div class="hp-split-cta-wrapper">
+    <div class="hp-split-cta">
+        <div class="cta-panel dark">
+            <h3>Spin up a VPS.</h3>
+            <p>Deploy in under a minute.</p>
+            <a href="clientregister.html" class="btn-primary-pill">Configure</a>
+        </div>
+        <div class="cta-panel light">
+            <h3>Need a managed solution?</h3>
+            <p>Our team handles everything.</p>
+            <a href="support-page.html" class="btn-outline-pill">Talk to Sales</a>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="hp-footer">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-legal">
+            1. WHMCS is a service of Apple Inc. Pricing shown in USD. Tax not included. Plans renew at standard rates after introductory period. Free domain applies to first year only.<br><br>
+            2. 30-day money-back guarantee applies to hosting plans only. Domain registrations and one-time services are non-refundable. See our Terms of Service for full details.<br><br>
+            To access and use all WHMCS features, please ensure your browser, software, and systems are up to date.
+        </div>
+
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col">
+                <h4>Shop &amp; Learn</h4>
+                <ul>
+                    <li><a href="#">Cloud Hosting</a></li>
+                    <li><a href="#">VPS</a></li>
+                    <li><a href="#">Dedicated Servers</a></li>
+                    <li><a href="#">Domains</a></li>
+                    <li><a href="#">SSL Certificates</a></li>
+                    <li><a href="#">Email</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Store</h4>
+                <ul>
+                    <li><a href="website-builder.html">Website Builder</a></li>
+                    <li><a href="site-builder.html">Site Builder</a></li>
+                    <li><a href="website-security.html">Website Security</a></li>
+                    <li><a href="website-backup.html">Website Backup</a></li>
+                    <li><a href="email-services.html">Email Services</a></li>
+                    <li><a href="email.html">Professional Email</a></li>
+                    <li><a href="seo-tools.html">SEO Tools</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="login.html">Sign in</a></li>
+                    <li><a href="clientregister.html">Create an account</a></li>
+                    <li><a href="#">Billing</a></li>
+                    <li><a href="#">Refer a friend</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Knowledgebase</a></li>
+                    <li><a href="#">Contact us</a></li>
+                    <li><a href="#">Network status</a></li>
+                    <li><a href="#">Community</a></li>
+                </ul>
+            </div>
+            <div class="hp-footer-col">
+                <h4>About WHMCS</h4>
+                <ul>
+                    <li><a href="#">Newsroom</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Legal</a></li>
+                    <li><a href="#">Environment</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="hp-footer-bottom">
+            <div>Copyright &copy; 2026 Apple Inc. All rights reserved.</div>
+            <div class="hp-footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+                <a href="#">Sales Policy</a>
+                <a href="#">Legal</a>
+                <a href="#">Site Map</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="js/apple-theme.js"></script>
+</body>
+</html>
