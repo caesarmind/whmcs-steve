@@ -52,16 +52,13 @@
 
 {$headeroutput}
 
-{* Inner-topbar — full viewport width on side/rail layouts (rendered before
-   sidebar/rail so it can span across them via CSS). *}
-{include file="`$template`/includes/partials/inner-topbar.tpl"}
-
 {include file="`$template`/includes/partials/rail.tpl"}
 {include file="`$template`/includes/partials/sidebar.tpl"}
 
 <div class="ph-main-wrap">
 
     {include file="`$template`/includes/partials/topnav.tpl"}
+    {include file="`$template`/includes/partials/inner-topbar.tpl"}
 
     <nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
         <div class="ph-breadcrumb-inner">

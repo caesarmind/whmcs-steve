@@ -27,23 +27,27 @@ body[data-layout="top"] .only-inner { display: none !important; }
 body[data-layout="side"] .ph-main-wrap { margin-left: 260px; }
 body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
 
-/* Full-width topbar/footer that spans across the sidebar/rail.
-   Topbar is rendered before sidebar/rail in the DOM and gets a higher
-   z-index than them; sidebar/rail get top: 44px so they tuck below it. */
-body[data-layout="side"] .ph-side-topbar,
+/* Visually extend topbar/footer to viewport edges by pulling them with
+   a negative margin-left equal to the ph-main-wrap offset. The sidebar
+   then visually overlaps the left portion (z-index 100), but the topbar
+   z-index is bumped to 200 so it sits above the sidebar. */
+body[data-layout="side"] .ph-side-topbar {
+    margin-left: -260px;
+    padding-left: 260px;
+    position: sticky; top: 0; z-index: 200;
+}
 body[data-layout="rail"] .ph-side-topbar {
-    position: sticky;
-    top: 0;
-    z-index: 200;
+    margin-left: -80px;
+    padding-left: 80px;
+    position: sticky; top: 0; z-index: 200;
 }
-body[data-layout="side"] .sidebar,
-body[data-layout="rail"] .ph-rail {
-    top: 44px;
+body[data-layout="side"] .ph-side-footer {
+    margin-left: -260px;
+    padding-left: 260px;
 }
-body[data-layout="side"] .ph-side-footer,
 body[data-layout="rail"] .ph-side-footer {
-    margin-left: 0;
-    width: 100%;
+    margin-left: -80px;
+    padding-left: 80px;
 }
 /* Flex column so footers stick to the bottom of the viewport on short pages */
 .ph-main-wrap {

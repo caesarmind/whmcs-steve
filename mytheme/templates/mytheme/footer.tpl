@@ -45,11 +45,10 @@
         </div>
     </footer>
 
+    {* Slim footer — sidebar + rail *}
+    {include file="`$template`/includes/partials/sidebar-footer.tpl"}
 
 </div>{* /.ph-main-wrap *}
-
-    {* Slim footer — sidebar + rail (full viewport width) *}
-    {include file="`$template`/includes/partials/sidebar-footer.tpl"}
 
 {$footeroutput}
 
