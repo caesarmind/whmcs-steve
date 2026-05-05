@@ -417,17 +417,18 @@
                 {if $hasNativeTickets}
                 <div class="card-body" style="padding: 4px 24px 12px;">
                     {foreach $ticketPanel->getChildren() as $ticketItem}
+                        {assign var=_tStatus value=$ticketItem->getBadge()|default:''}
+                        {assign var=_tStatusCls value=$_tStatus|lower|replace:' ':'-'|replace:'_':'-'}
                         {if $ticketItem->getUri()}
-                            <a menuItemName="{$ticketItem->getName()}" href="{$ticketItem->getUri()}" class="service-item ticket-row{if $ticketItem->getClass()} {$ticketItem->getClass()}{/if}{if $ticketItem->isCurrent()} active{/if}"{if $ticketItem->getAttribute('dataToggleTab')} data-toggle="tab"{/if}{if $ticketItem->getAttribute('target')} target="{$ticketItem->getAttribute('target')}"{/if} id="{$ticketItem->getId()}">
+                            <a menuItemName="{$ticketItem->getName()}" href="{$ticketItem->getUri()}" class="service-item ticket-row{if $ticketItem->getClass()} {$ticketItem->getClass()}{/if}{if $ticketItem->isCurrent()} active{/if}" id="{$ticketItem->getId()}">
                         {else}
                             <div menuItemName="{$ticketItem->getName()}" class="service-item ticket-row{if $ticketItem->getClass()} {$ticketItem->getClass()}{/if}" id="{$ticketItem->getId()}">
                         {/if}
                                 <div class="service-info">
                                     <div class="service-name">{$ticketItem->getLabel()}</div>
-                                    {if $ticketItem->hasBadge()}<div class="service-domain">{$ticketItem->getBadge()}</div>{/if}
                                 </div>
-                                {if $ticketItem->getUri()}
-                                    <span class="service-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                                {if $_tStatus}
+                                    <span class="status-pill {$_tStatusCls|escape}">{$_tStatus|escape}</span>
                                 {/if}
                         {if $ticketItem->getUri()}
                             </a>
