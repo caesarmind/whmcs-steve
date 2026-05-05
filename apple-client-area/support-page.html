@@ -3,463 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support - WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
-    <style>body { display: block; }</style>
-</head>
-<body class="homepage-layout">
+    <title>Support — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
+    <style>
+        body { display: block; }
+        .page-header { margin-bottom: 24px; }
+        .page-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 8px; }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+        .page-subtitle { font-size: 15px; color: var(--color-text-secondary); margin: 0; line-height: 1.5; }
 
-<nav class="homepage-nav"><div class="homepage-nav-inner">
-    <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
-    <a href="#">WHMCS</a><div class="nav-item-dropdown"> <a href="#" class="nav-dropdown-trigger">Hosting <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a> <div class="nav-mega-menu"> <div class="nav-mega-inner"> <div class="nav-mega-col"> <h4>Web Hosting</h4> <a href="cloud-hosting.html" class="nav-mega-item"><div class="name">Cloud Hosting</div><div class="tag">Fast NVMe storage, global CDN</div></a> <a href="vps.html" class="nav-mega-item"><div class="name">VPS</div><div class="tag">Dedicated cores, full root access</div></a> <a href="#" class="nav-mega-item"><div class="name">Dedicated Servers</div><div class="tag">Enterprise hardware, yours alone</div></a> <a href="#" class="nav-mega-item"><div class="name">Managed WordPress</div><div class="tag">Optimized for WordPress sites</div></a> </div> <div class="nav-mega-col"> <h4>Extras</h4> <a href="website-builder.html" class="nav-mega-item"><div class="name">Website Builder</div><div class="tag">Drag and drop, 200+ templates</div></a> <a href="site-builder.html" class="nav-mega-item"><div class="name">Site Builder</div><div class="tag">Professional templates by industry</div></a> <a href="email.html" class="nav-mega-item"><div class="name">Professional Email</div><div class="tag">Custom domain, 50GB mailbox</div></a> <a href="website-backup.html" class="nav-mega-item"><div class="name">Website Backup</div><div class="tag">Daily automatic backups</div></a> </div> <div class="nav-mega-col"> <h4>Get Started</h4> <a href="#" class="nav-mega-item"><div class="name">Compare all plans</div><div class="tag">Find the perfect fit</div></a> <a href="#" class="nav-mega-item"><div class="name">Free Migration</div><div class="tag">We move your site for you</div></a> <a href="#" class="nav-mega-item"><div class="name">Enterprise Hosting</div><div class="tag">Custom hosting at scale</div></a> <a href="support-page.html" class="nav-mega-item"><div class="name">Talk to Sales</div><div class="tag">Get expert advice</div></a> </div> </div> </div></div><a href="domains.html">Domains</a><a href="ssl-certificates.html">SSL</a><a href="support-page.html">Support</a>
+        /* KB search */
+        .sp-kb-search { display: flex; gap: 8px; align-items: center; max-width: 600px; margin: 0 0 28px; }
+        .sp-kb-search-field { flex: 1; display: flex; align-items: center; background: var(--color-surface-secondary); border: 1px solid var(--color-border); border-radius: 12px; padding: 12px 16px; gap: 10px; }
+        .sp-kb-search-field svg { color: var(--color-text-tertiary); flex-shrink: 0; }
+        .sp-kb-search-field span { font-size: 14px; color: var(--color-text-tertiary); }
+        .sp-kb-search-btn { background: var(--color-accent); color: #fff; font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 12px; cursor: default; white-space: nowrap; }
+
+        /* Channel grid */
+        .sp-channels { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
+        .sp-channel { background: var(--color-surface); border: 1px solid var(--color-border-card); border-radius: var(--radius-lg); padding: 22px 20px; text-align: center; transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); cursor: pointer; }
+        .sp-channel:hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); }
+        .sp-channel-ico { width: 52px; height: 52px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+        .sp-channel-ico.blue { background: var(--color-blue-bg); color: var(--color-blue-text); }
+        .sp-channel-ico.green { background: var(--color-green-bg); color: var(--color-green-text); }
+        .sp-channel-ico.purple { background: var(--color-purple-bg, rgba(175, 82, 222, 0.12)); color: var(--color-purple-text, #af52de); }
+        .sp-channel-ico.orange { background: var(--color-orange-bg, rgba(255, 159, 10, 0.12)); color: var(--color-orange-text, #ff9f0a); }
+        .sp-channel-ico.cyan { background: rgba(90, 200, 250, 0.12); color: #5ac8fa; }
+        .sp-channel-ico.red { background: var(--color-red-bg); color: var(--color-red-text); }
+        .sp-channel h4 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: var(--color-text-primary); margin: 0 0 4px; }
+        .sp-channel p { font-size: 13px; color: var(--color-text-secondary); margin: 0; line-height: 1.45; }
+
+        /* Stats strip */
+        .sp-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; padding: 24px; background: var(--color-surface-secondary); border: 1px solid var(--color-border-card); border-radius: var(--radius-lg); margin-bottom: 32px; }
+        .sp-stat-num { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: var(--color-text-primary); }
+        .sp-stat-label { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+
+        /* Section heading */
+        .sp-section-head { margin: 8px 0 16px; }
+        .sp-section-head h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--color-text-primary); margin: 0; }
+
+        /* Topics list */
+        .sp-topics { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+        .sp-topic-card { background: var(--color-surface); border: 1px solid var(--color-border-card); border-radius: var(--radius-lg); padding: 20px; transition: background var(--transition-fast), box-shadow var(--transition-fast); }
+        .sp-topic-card:hover { box-shadow: var(--shadow-card-hover); }
+        .sp-topic-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent); margin-bottom: 8px; }
+        .sp-topic-card h3 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; color: var(--color-text-primary); margin: 0 0 6px; line-height: 1.35; }
+        .sp-topic-card p { font-size: 13px; color: var(--color-text-secondary); margin: 0; line-height: 1.5; }
+
+        /* What's included */
+        .sp-checklist { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 32px; }
+        .sp-check-item { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; background: var(--color-surface); border: 1px solid var(--color-border-card); border-radius: var(--radius-md); }
+        .sp-check-ico { width: 22px; height: 22px; border-radius: 50%; background: var(--color-green-bg); color: var(--color-green-text); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+        .sp-check-item h4 { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: var(--color-text-primary); margin: 0 0 2px; }
+        .sp-check-item p { font-size: 13px; color: var(--color-text-secondary); margin: 0; line-height: 1.4; }
+
+        /* FAQ grid */
+        .sp-faq { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 32px; }
+        .sp-faq-card { background: var(--color-surface); border: 1px solid var(--color-border-card); border-radius: var(--radius-md); padding: 18px 20px; }
+        .sp-faq-card h4 { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: var(--color-text-primary); margin: 0 0 6px; }
+        .sp-faq-card p { font-size: 13px; color: var(--color-text-secondary); margin: 0; line-height: 1.5; }
+
+        /* Split CTA */
+        .sp-cta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px; }
+        @media (max-width: 720px) { .sp-cta { grid-template-columns: 1fr; } }
+        .sp-cta-panel { background: var(--color-surface); border: 1px solid var(--color-border-card); border-radius: var(--radius-lg); padding: 24px; text-align: center; }
+        .sp-cta-panel.dark { background: var(--color-text-primary); color: var(--color-bg); border-color: var(--color-text-primary); }
+        .sp-cta-panel.dark h3 { color: var(--color-bg); }
+        .sp-cta-panel.dark p { color: rgba(255,255,255,0.7); }
+        .sp-cta-panel h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 6px; }
+        .sp-cta-panel p { font-size: 13px; color: var(--color-text-secondary); margin: 0 0 14px; line-height: 1.4; }
+    </style>
+</head>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="tickets" data-page-title="Support">
+
+<div data-include="partials/state-chip.html"></div>
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>No Notifications</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;"><a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a></div>
+    </div>
+</div>
+
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareaproducts.html">My Services</a><a href="store.html">Order New Services</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareadomains.html">My Domains</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="supportticketslist.html">Tickets</a><a href="announcements.html">Announcements</a><a href="knowledgebase.html">Knowledgebase</a></div></div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
     <div class="nav-spacer"></div>
-    <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
-    <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg></a>
-    <a href="#" onclick="toggleDarkMode(); return false;" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
-    <a href="login.html" class="nav-signin">Sign in</a>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
 </div></nav>
 
-<!-- 1. Hero Centered -->
-<section class="hp-hero">
-    <div class="hp-eyebrow">SUPPORT</div>
-    <h1>How can we help?</h1>
-    <p class="hp-subhead">Get answers, talk to our team, or browse our knowledge base.</p>
+<div data-include="partials/inner-topbar.html"></div>
 
-    <!-- KB search bar mockup -->
-    <div style="max-width: 600px; margin: 32px auto 0; display: flex; gap: 8px; align-items: center;">
-        <div style="flex: 1; display: flex; align-items: center; background: var(--card-bg, #f5f5f7); border: 1px solid var(--border, #d2d2d7); border-radius: 12px; padding: 12px 16px; gap: 10px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-            <span style="font-size: 14px; color: #86868b;">Search for articles, guides, and more...</span>
-        </div>
-        <div style="background: #0071e3; color: #fff; font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 12px; cursor: default; white-space: nowrap;">Search</div>
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a><span class="sep">/</span>
+        <span class="current" aria-current="page">Support</span>
     </div>
-</section>
+</nav>
 
-<!-- 2. Icon Grid -->
-<div class="hp-icon-grid">
-    <div class="hp-icon-item">
-        <div class="icon-circle blue">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+<div class="content-area">
+    <header class="page-header">
+        <p class="page-eyebrow">Support</p>
+        <h1>Support</h1>
+        <p class="page-subtitle">Browse the knowledge base, open a ticket, or check announcements</p>
+    </header>
+
+    <div class="when-full">
+        <!-- KB search -->
+        <div class="sp-kb-search">
+            <div class="sp-kb-search-field">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                <span>Search for articles, guides, and more…</span>
+            </div>
+            <div class="sp-kb-search-btn">Search</div>
         </div>
-        <h4>Knowledge Base</h4>
-        <p>Browse 500+ articles and guides</p>
+
+        <!-- Channel grid -->
+        <div class="sp-channels">
+            <a href="knowledgebase.html" class="sp-channel" style="text-decoration:none;">
+                <div class="sp-channel-ico blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+                <h4>Knowledge Base</h4>
+                <p>Browse 500+ articles and guides</p>
+            </a>
+            <a href="supportticketsubmit.html" class="sp-channel" style="text-decoration:none;">
+                <div class="sp-channel-ico green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                <h4>Submit a Ticket</h4>
+                <p>Get help from our support team</p>
+            </a>
+            <a href="#" class="sp-channel" style="text-decoration:none;">
+                <div class="sp-channel-ico purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div>
+                <h4>Live Chat</h4>
+                <p>Chat with an engineer now</p>
+            </a>
+            <a href="#" class="sp-channel" style="text-decoration:none;">
+                <div class="sp-channel-ico orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div>
+                <h4>Phone Support</h4>
+                <p>Call us 24/7 at 1-800-WHMCS</p>
+            </a>
+            <a href="serverstatus.html" class="sp-channel" style="text-decoration:none;">
+                <div class="sp-channel-ico cyan"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div>
+                <h4>Status Page</h4>
+                <p>Check real-time system status</p>
+            </a>
+            <a href="#" class="sp-channel" style="text-decoration:none;">
+                <div class="sp-channel-ico red"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+                <h4>Community Forum</h4>
+                <p>Connect with other customers</p>
+            </a>
+        </div>
+
+        <!-- Stats strip -->
+        <div class="sp-stats">
+            <div><div class="sp-stat-num">15 min</div><div class="sp-stat-label">Avg response time</div></div>
+            <div><div class="sp-stat-num">98%</div><div class="sp-stat-label">Customer satisfaction</div></div>
+            <div><div class="sp-stat-num">24/7/365</div><div class="sp-stat-label">Availability</div></div>
+            <div><div class="sp-stat-num">500+</div><div class="sp-stat-label">KB articles</div></div>
+        </div>
+
+        <!-- Popular topics -->
+        <div class="sp-section-head"><h2>Popular help topics</h2></div>
+        <div class="sp-topics">
+            <a href="knowledgebase.html" class="sp-topic-card" style="text-decoration:none;">
+                <div class="sp-topic-tag">Getting Started</div>
+                <h3>Set up your account, configure your first service, and get online fast.</h3>
+                <p>Everything you need to go from zero to live in minutes.</p>
+            </a>
+            <a href="knowledgebase.html" class="sp-topic-card" style="text-decoration:none;">
+                <div class="sp-topic-tag">Domain Setup</div>
+                <h3>Register, transfer, and manage DNS records for your domains.</h3>
+                <p>Full control over nameservers, A records, CNAMEs, and more.</p>
+            </a>
+            <a href="knowledgebase.html" class="sp-topic-card" style="text-decoration:none;">
+                <div class="sp-topic-tag">Email Config</div>
+                <h3>Configure email clients, set up forwarding, and manage mailboxes.</h3>
+                <p>IMAP, SMTP, POP3 settings and troubleshooting guides.</p>
+            </a>
+            <a href="knowledgebase.html" class="sp-topic-card" style="text-decoration:none;">
+                <div class="sp-topic-tag">SSL Install</div>
+                <h3>Generate CSR, install certificates, and troubleshoot HTTPS issues.</h3>
+                <p>Step-by-step guides for every SSL type.</p>
+            </a>
+            <a href="knowledgebase.html" class="sp-topic-card" style="text-decoration:none;">
+                <div class="sp-topic-tag">Billing &amp; Payments</div>
+                <h3>Manage invoices, update payment methods, and view transaction history.</h3>
+                <p>Full visibility into every charge and credit.</p>
+            </a>
+        </div>
+
+        <!-- What's included -->
+        <div class="sp-section-head"><h2>What's included</h2></div>
+        <div class="sp-checklist">
+            <div class="sp-check-item"><div class="sp-check-ico">✓</div><div><h4>24/7 Ticket Support</h4><p>Submit tickets anytime, average response in 15 minutes.</p></div></div>
+            <div class="sp-check-item"><div class="sp-check-ico">✓</div><div><h4>Knowledge Base</h4><p>500+ articles, guides, and video tutorials.</p></div></div>
+            <div class="sp-check-item"><div class="sp-check-ico">✓</div><div><h4>Free Migrations</h4><p>We move your site from any host at no charge.</p></div></div>
+            <div class="sp-check-item"><div class="sp-check-ico">✓</div><div><h4>Community Forum</h4><p>Connect with thousands of other customers.</p></div></div>
+            <div class="sp-check-item"><div class="sp-check-ico">✓</div><div><h4>Live Chat (Pro+)</h4><p>Instant messaging with support engineers.</p></div></div>
+            <div class="sp-check-item"><div class="sp-check-ico">✓</div><div><h4>Phone Support (Biz+)</h4><p>Direct line with zero hold time.</p></div></div>
+        </div>
+
+        <!-- Support FAQ -->
+        <div class="sp-section-head"><h2>Support FAQ</h2></div>
+        <div class="sp-faq">
+            <div class="sp-faq-card"><h4>What are your support hours?</h4><p>We're available 24 hours a day, 7 days a week, 365 days a year. Our global support team ensures someone is always ready to help, regardless of timezone.</p></div>
+            <div class="sp-faq-card"><h4>How fast will I get a response?</h4><p>Our average response time is 15 minutes for ticket submissions. Live chat connects you instantly. Phone support has zero hold time during normal hours.</p></div>
+            <div class="sp-faq-card"><h4>What's included in support?</h4><p>All customers receive ticket support, knowledge base access, and community forum access. Pro plans add live chat and phone support with priority queue.</p></div>
+            <div class="sp-faq-card"><h4>Can you help with migrations?</h4><p>Absolutely! Our migration team handles everything — websites, databases, emails, DNS records. Just provide your old host credentials and we'll do the rest for free.</p></div>
+            <div class="sp-faq-card"><h4>Do you offer managed services?</h4><p>Yes. Our managed hosting plans include server administration, security patching, performance tuning, and proactive monitoring.</p></div>
+            <div class="sp-faq-card"><h4>Is there a service level agreement?</h4><p>Business and Enterprise plans include a 99.99% uptime SLA with financial credits. All plans are backed by our 30-day money-back guarantee.</p></div>
+        </div>
+
+        <!-- Split CTA -->
+        <div class="sp-cta">
+            <div class="sp-cta-panel dark">
+                <h3>Open a ticket</h3>
+                <p>Our team typically responds within 15 minutes.</p>
+                <a href="supportticketsubmit.html" class="btn-primary">Submit Ticket</a>
+            </div>
+            <div class="sp-cta-panel">
+                <h3>Call us directly</h3>
+                <p>Available 24/7, 365 days a year.</p>
+                <a href="#" class="btn-secondary">1-800-WHMCS</a>
+            </div>
+        </div>
     </div>
-    <div class="hp-icon-item">
-        <div class="icon-circle" style="background: rgba(52, 199, 89, 0.12); color: #34c759;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+
+    <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </div>
-        <h4>Submit a Ticket</h4>
-        <p>Get help from our support team</p>
-    </div>
-    <div class="hp-icon-item">
-        <div class="icon-circle" style="background: rgba(175, 82, 222, 0.12); color: #af52de;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-        </div>
-        <h4>Live Chat</h4>
-        <p>Chat with an engineer now</p>
-    </div>
-    <div class="hp-icon-item">
-        <div class="icon-circle" style="background: rgba(255, 159, 10, 0.12); color: #ff9f0a;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
-        </div>
-        <h4>Phone Support</h4>
-        <p>Call us 24/7 at 1-800-WHMCS</p>
-    </div>
-    <div class="hp-icon-item">
-        <div class="icon-circle" style="background: rgba(90, 200, 250, 0.12); color: #5ac8fa;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-        </div>
-        <h4>Status Page</h4>
-        <p>Check real-time system status</p>
-    </div>
-    <div class="hp-icon-item">
-        <div class="icon-circle" style="background: rgba(255, 69, 58, 0.12); color: #ff453a;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        </div>
-        <h4>Community Forum</h4>
-        <p>Connect with other customers</p>
+        <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">Support unavailable</p>
+        <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">Support is currently offline. Please check back later or email us.</p>
+        <a href="supportticketsubmit.html" class="btn-primary">Try email</a>
     </div>
 </div>
 
-<!-- 3. Stats Strip -->
-<section class="hp-stats-strip">
-    <div class="stats-inner">
-        <div class="stat-item">
-            <div class="stat-num">15 min</div>
-            <div class="stat-label">Avg response time</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-num">98%</div>
-            <div class="stat-label">Customer satisfaction</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-num">24/7/365</div>
-            <div class="stat-label">Availability</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-num">500+</div>
-            <div class="stat-label">KB articles</div>
-        </div>
-    </div>
-</section>
+<div data-include="partials/sidebar-footer.html"></div>
 
-<!-- 4. Horizontal Scroll Cards -->
-<section class="hp-strip-section">
-    <div class="hp-strip-header">
-        <h2>Popular help topics.</h2>
-    </div>
-    <div class="hp-strip-scroll">
+</div><!-- /.ph-main-wrap -->
+<div data-include="partials/locale-modal.html"></div>
 
-        <!-- Card a: gold / GETTING STARTED -->
-        <div class="hp-strip-card a">
-            <div class="tag">GETTING STARTED</div>
-            <h3>Set up your account, configure your first service, and get online fast.</h3>
-            <p>Everything you need to go from zero to live in minutes.</p>
-            <div class="strip-visual">
-                <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 240px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;">1</div>
-                        <span style="font-size: 13px; opacity: 0.8;">Create your account</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;">2</div>
-                        <span style="font-size: 13px; opacity: 0.8;">Pick a hosting plan</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;">3</div>
-                        <span style="font-size: 13px; opacity: 0.8;">Go live</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card b: dark / DOMAIN SETUP -->
-        <div class="hp-strip-card b">
-            <div class="tag">DOMAIN SETUP</div>
-            <h3>Register, transfer, and manage DNS records for your domains.</h3>
-            <p>Full control over nameservers, A records, CNAMEs, and more.</p>
-            <div class="strip-visual">
-                <div style="background: rgba(255,255,255,0.08); border-radius: 10px; padding: 14px 16px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; line-height: 1.8; width: 100%; max-width: 260px;">
-                    <div style="color: #86868b;">; DNS Records</div>
-                    <div><span style="color: #5ac8fa;">A</span> &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #f5f5f7;">@ &nbsp; 192.168.1.1</span></div>
-                    <div><span style="color: #30d158;">CNAME</span> <span style="color: #f5f5f7;">www &nbsp; @</span></div>
-                    <div><span style="color: #ff9f0a;">MX</span> &nbsp;&nbsp;&nbsp;<span style="color: #f5f5f7;">@ &nbsp; mail.example.com</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card c: green / EMAIL CONFIG -->
-        <div class="hp-strip-card c">
-            <div class="tag">EMAIL CONFIG</div>
-            <h3>Configure email clients, set up forwarding, and manage mailboxes.</h3>
-            <p>IMAP, SMTP, POP3 settings and troubleshooting guides.</p>
-            <div class="strip-visual">
-                <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 240px;">
-                    <div style="background: rgba(0,0,0,0.15); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                        <span style="font-size: 12px;">IMAP: mail.example.com:993</span>
-                    </div>
-                    <div style="background: rgba(0,0,0,0.15); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                        <span style="font-size: 12px;">SMTP: mail.example.com:465</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card d: red / SSL INSTALL -->
-        <div class="hp-strip-card d">
-            <div class="tag">SSL INSTALL</div>
-            <h3>Generate CSR, install certificates, and troubleshoot HTTPS issues.</h3>
-            <p>Step-by-step guides for every SSL type.</p>
-            <div class="strip-visual">
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                    <div style="font-size: 12px; opacity: 0.7; text-align: center;">HTTPS secured</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card e: purple / BILLING & PAYMENTS -->
-        <div class="hp-strip-card e">
-            <div class="tag">BILLING &amp; PAYMENTS</div>
-            <h3>Manage invoices, update payment methods, and view transaction history.</h3>
-            <p>Full visibility into every charge and credit.</p>
-            <div class="strip-visual">
-                <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 220px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px;">
-                        <span style="font-size: 12px;">INV-2026-0412</span>
-                        <span style="font-size: 11px; color: #30d158; font-weight: 500;">Paid</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px;">
-                        <span style="font-size: 12px;">INV-2026-0389</span>
-                        <span style="font-size: 11px; color: #30d158; font-weight: 500;">Paid</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px;">
-                        <span style="font-size: 12px;">INV-2026-0355</span>
-                        <span style="font-size: 11px; color: #ff9f0a; font-weight: 500;">Pending</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</section>
-
-<!-- 5. Alternating Sections -->
-<section class="hp-alternating">
-
-    <!-- Row 1: Real Humans -->
-    <div class="hp-alt-row">
-        <div class="hp-alt-text">
-            <div class="hp-eyebrow" style="color: #0071e3;">REAL HUMANS</div>
-            <h2>Real humans, real fast.</h2>
-            <p>Our support team is staffed by engineers who know the platform inside and out. No bots, no scripts, no runaround. Average first reply in 15 minutes, any time of day or night.</p>
-        </div>
-        <div class="hp-alt-visual">
-            <div class="visual-box" style="padding: 24px;">
-                <div style="width: 100%; max-width: 320px;">
-                    <!-- Chat conversation mockup -->
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border, #e8e8ed);">
-                        <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ffd60a, #ff9f0a); display: flex; align-items: center; justify-content: center; color: #1d1d1f; font-weight: 600; font-size: 14px; flex-shrink: 0;">J</div>
-                        <div>
-                            <div style="font-size: 13px; font-weight: 600; color: var(--text-primary, #1d1d1f);">Jordan</div>
-                            <div style="font-size: 11px; color: #86868b;">Senior Support Engineer</div>
-                        </div>
-                        <div style="margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: #30d158;"></div>
-                    </div>
-
-                    <!-- Agent message -->
-                    <div style="margin-bottom: 12px;">
-                        <div style="background: var(--card-bg, #f5f5f7); padding: 10px 14px; border-radius: 14px 14px 14px 4px; font-size: 13px; line-height: 1.5; color: var(--text-primary, #1d1d1f); max-width: 85%;">Hey there! How can I help you today?</div>
-                        <div style="font-size: 10px; color: #86868b; margin-top: 4px; padding-left: 4px;">2:04 PM</div>
-                    </div>
-
-                    <!-- User message -->
-                    <div style="margin-bottom: 12px; display: flex; flex-direction: column; align-items: flex-end;">
-                        <div style="background: #0071e3; color: #fff; padding: 10px 14px; border-radius: 14px 14px 4px 14px; font-size: 13px; line-height: 1.5; max-width: 85%;">My SSL certificate isn't showing on my domain. Can you help?</div>
-                        <div style="font-size: 10px; color: #86868b; margin-top: 4px; padding-right: 4px;">2:05 PM</div>
-                    </div>
-
-                    <!-- Agent reply -->
-                    <div style="margin-bottom: 0;">
-                        <div style="background: var(--card-bg, #f5f5f7); padding: 10px 14px; border-radius: 14px 14px 14px 4px; font-size: 13px; line-height: 1.5; color: var(--text-primary, #1d1d1f); max-width: 85%;">Absolutely! I can see the issue. Your certificate is installed but the DNS propagation hasn't completed. Give me one moment to force a refresh.</div>
-                        <div style="font-size: 10px; color: #86868b; margin-top: 4px; padding-left: 4px;">2:06 PM</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Row 2: Ticket Tracking (reverse) -->
-    <div class="hp-alt-row reverse">
-        <div class="hp-alt-text">
-            <div class="hp-eyebrow" style="color: #af52de;">TICKET TRACKING</div>
-            <h2>Track every request.</h2>
-            <p>Every support interaction is logged with full history, status updates, and resolution notes. You always know where things stand, from submission to resolution.</p>
-        </div>
-        <div class="hp-alt-visual">
-            <div class="visual-box" style="padding: 24px;">
-                <div style="width: 100%; max-width: 320px;">
-                    <!-- Ticket header -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <div>
-                            <div style="font-size: 13px; font-weight: 600; color: var(--text-primary, #1d1d1f);">Ticket #4821</div>
-                            <div style="font-size: 11px; color: #86868b;">SSL Certificate Issue</div>
-                        </div>
-                        <div style="background: rgba(52, 199, 89, 0.12); color: #34c759; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px;">Resolved</div>
-                    </div>
-
-                    <!-- Timeline -->
-                    <div style="position: relative; padding-left: 24px;">
-                        <!-- Vertical line -->
-                        <div style="position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: var(--border, #e8e8ed);"></div>
-
-                        <!-- Step 1 -->
-                        <div style="position: relative; margin-bottom: 20px;">
-                            <div style="position: absolute; left: -24px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #0071e3; border: 2px solid #fff; box-shadow: 0 0 0 2px #0071e3;"></div>
-                            <div style="font-size: 12px; font-weight: 600; color: var(--text-primary, #1d1d1f);">Ticket Created</div>
-                            <div style="font-size: 11px; color: #86868b; margin-top: 2px;">Apr 12, 2:04 PM - by you</div>
-                        </div>
-
-                        <!-- Step 2 -->
-                        <div style="position: relative; margin-bottom: 20px;">
-                            <div style="position: absolute; left: -24px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #ff9f0a; border: 2px solid #fff; box-shadow: 0 0 0 2px #ff9f0a;"></div>
-                            <div style="font-size: 12px; font-weight: 600; color: var(--text-primary, #1d1d1f);">Assigned to Jordan</div>
-                            <div style="font-size: 11px; color: #86868b; margin-top: 2px;">Apr 12, 2:06 PM - auto-routed</div>
-                        </div>
-
-                        <!-- Step 3 -->
-                        <div style="position: relative; margin-bottom: 20px;">
-                            <div style="position: absolute; left: -24px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #af52de; border: 2px solid #fff; box-shadow: 0 0 0 2px #af52de;"></div>
-                            <div style="font-size: 12px; font-weight: 600; color: var(--text-primary, #1d1d1f);">Reply Sent</div>
-                            <div style="font-size: 11px; color: #86868b; margin-top: 2px;">Apr 12, 2:08 PM - DNS refresh initiated</div>
-                        </div>
-
-                        <!-- Step 4 -->
-                        <div style="position: relative;">
-                            <div style="position: absolute; left: -24px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #34c759; border: 2px solid #fff; box-shadow: 0 0 0 2px #34c759;"></div>
-                            <div style="font-size: 12px; font-weight: 600; color: var(--text-primary, #1d1d1f);">Resolved</div>
-                            <div style="font-size: 11px; color: #86868b; margin-top: 2px;">Apr 12, 2:19 PM - SSL active and verified</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</section>
-
-<section class="hp-values-section">
-    <h2>Our values lead the way.</h2>
-    <div class="hp-values-grid">
-        <div class="hp-value-item">
-            <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-            <h3>Respect your time.</h3>
-            <p>15-minute average response. No hold music, no ticket runaround. We fix problems fast because your time matters.</p>
-            <a href="#" class="value-link">Our response guarantee ›</a>
-        </div>
-        <div class="hp-value-item">
-            <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
-            <h3>Genuinely care.</h3>
-            <p>Our team celebrates when your site succeeds. We're not just closing tickets — we're invested in your growth.</p>
-            <a href="#" class="value-link">Read customer stories ›</a>
-        </div>
-        <div class="hp-value-item">
-            <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
-            <h3>Share knowledge.</h3>
-            <p>500+ articles, video guides, and tutorials — all free. We believe informed customers build better sites.</p>
-            <a href="#" class="value-link">Browse knowledge base ›</a>
-        </div>
-    </div>
-</section>
-
-<section class="hp-features-checklist">
-    <h2>What's included.</h2>
-    <p class="feat-sub">Every customer gets access to our full support ecosystem.</p>
-    <div class="hp-checklist-grid">
-        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>24/7 Ticket Support</h4><p>Submit tickets anytime, average response in 15 minutes.</p></div></div>
-        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Knowledge Base</h4><p>500+ articles, guides, and video tutorials.</p></div></div>
-        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Free Migrations</h4><p>We move your site from any host at no charge.</p></div></div>
-        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Community Forum</h4><p>Connect with thousands of other customers.</p></div></div>
-        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Live Chat (Pro+)</h4><p>Instant messaging with support engineers.</p></div></div>
-        <div class="hp-check-item"><div class="check-icon">✓</div><div class="check-text"><h4>Phone Support (Biz+)</h4><p>Direct line with zero hold time.</p></div></div>
-    </div>
-</section>
-
-<section class="hp-testimonials-grid">
-    <h2>Our customers say it best.</h2>
-    <div class="hp-testimonial-cards">
-        <div class="hp-testimonial-card"><div class="stars">★★★★★</div><div class="quote">Submitted a ticket at 2 AM on a Sunday and got a detailed, helpful response in 8 minutes. I've never experienced support this fast at any host.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=sophieflores') center/cover;">SF</div><div><div class="author-name">Sophie Flores</div><div class="author-role">Blogger, TravelWithSophie</div></div></div></div>
-        <div class="hp-testimonial-card"><div class="stars">★★★★★</div><div class="quote">The migration team moved 4 WordPress sites overnight without a single minute of downtime. They even fixed a few bugs they found along the way.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=chrishuang') center/cover;">CH</div><div><div class="author-name">Chris Huang</div><div class="author-role">Agency Owner, Pixelworks</div></div></div></div>
-        <div class="hp-testimonial-card"><div class="stars">★★★★★</div><div class="quote">The knowledge base articles are actually useful — well-written with screenshots. I've solved most of my questions without even needing to contact support.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=rachelgreen') center/cover;">RG</div><div><div class="author-name">Rachel Green</div><div class="author-role">Small Business Owner</div></div></div></div>
-    </div>
-    <div class="carousel-nav"><button class="carousel-arrow prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><div class="carousel-dots"><button class="carousel-dot active"></button><button class="carousel-dot"></button><button class="carousel-dot"></button></div><button class="carousel-arrow next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button></div>
-</section>
-
-<section class="hp-faq-grid">
-    <h2>Support FAQ.</h2>
-    <div class="faq-grid-inner">
-        <div class="hp-faq-card"><h4>What are your support hours?</h4><p>We're available 24 hours a day, 7 days a week, 365 days a year. Our global support team ensures someone is always ready to help, regardless of timezone.</p></div>
-        <div class="hp-faq-card"><h4>How fast will I get a response?</h4><p>Our average response time is 15 minutes for ticket submissions. Live chat connects you instantly. Phone support has zero hold time during normal hours.</p></div>
-        <div class="hp-faq-card"><h4>What's included in support?</h4><p>All customers receive ticket support, knowledge base access, and community forum access. Pro plans add live chat and phone support with priority queue.</p></div>
-        <div class="hp-faq-card"><h4>Can you help with migrations?</h4><p>Absolutely! Our migration team handles everything — websites, databases, emails, DNS records. Just provide your old host credentials and we'll do the rest for free.</p></div>
-        <div class="hp-faq-card"><h4>Do you offer managed services?</h4><p>Yes. Our managed hosting plans include server administration, security patching, performance tuning, and proactive monitoring. Focus on your business, not your server.</p></div>
-        <div class="hp-faq-card"><h4>Is there a service level agreement?</h4><p>Business and Enterprise plans include a 99.99% uptime SLA with financial credits. All plans are backed by our 30-day money-back guarantee.</p></div>
-    </div>
-</section>
-
-<!-- 6. Split CTA -->
-<div class="hp-split-cta-wrapper">
-    <div class="hp-split-cta">
-        <div class="cta-panel dark">
-            <h3>Open a ticket</h3>
-            <p>Our team typically responds within 15 minutes.</p>
-            <a href="supportticketsubmit.html" class="btn-primary-pill">Submit Ticket</a>
-        </div>
-        <div class="cta-panel light">
-            <h3>Call us directly</h3>
-            <p>Available 24/7, 365 days a year.</p>
-            <a href="#" class="btn-outline-pill">1-800-WHMCS</a>
-        </div>
-    </div>
-</div>
-
-<!-- Footer -->
-<footer class="hp-footer">
-    <div class="hp-footer-inner">
-        <div class="hp-footer-legal">
-            1. WHMCS is a service of Apple Inc. Pricing shown in USD. Tax not included. Plans renew at standard rates after introductory period. Free domain applies to first year only.<br><br>
-            2. 30-day money-back guarantee applies to hosting plans only. Domain registrations and one-time services are non-refundable. See our Terms of Service for full details.<br><br>
-            To access and use all WHMCS features, please ensure your browser, software, and systems are up to date.
-        </div>
-
-        <div class="hp-footer-cols">
-            <div class="hp-footer-col">
-                <h4>Shop &amp; Learn</h4>
-                <ul>
-                    <li><a href="cloud-hosting.html">Cloud Hosting</a></li>
-                    <li><a href="vps.html">VPS</a></li>
-                    <li><a href="#">Dedicated Servers</a></li>
-                    <li><a href="domains.html">Domains</a></li>
-                    <li><a href="ssl-certificates.html">SSL Certificates</a></li>
-                    <li><a href="#">Email</a></li>
-                </ul>
-            </div>
-            <div class="hp-footer-col">
-                <h4>Store</h4>
-                <ul>
-                    <li><a href="website-builder.html">Website Builder</a></li>
-                    <li><a href="site-builder.html">Site Builder</a></li>
-                    <li><a href="website-security.html">Website Security</a></li>
-                    <li><a href="website-backup.html">Website Backup</a></li>
-                    <li><a href="email-services.html">Email Services</a></li>
-                    <li><a href="email.html">Professional Email</a></li>
-                    <li><a href="seo-tools.html">SEO Tools</a></li>
-                </ul>
-            </div>
-            <div class="hp-footer-col">
-                <h4>Account</h4>
-                <ul>
-                    <li><a href="login.html">Sign in</a></li>
-                    <li><a href="clientregister.html">Create an account</a></li>
-                    <li><a href="#">Billing</a></li>
-                    <li><a href="#">Refer a friend</a></li>
-                </ul>
-            </div>
-            <div class="hp-footer-col">
-                <h4>Support</h4>
-                <ul>
-                    <li><a href="#">Knowledgebase</a></li>
-                    <li><a href="#">Contact us</a></li>
-                    <li><a href="#">Network status</a></li>
-                    <li><a href="#">Community</a></li>
-                </ul>
-            </div>
-            <div class="hp-footer-col">
-                <h4>About WHMCS</h4>
-                <ul>
-                    <li><a href="#">Newsroom</a></li>
-                    <li><a href="#">Careers</a></li>
-                    <li><a href="#">Legal</a></li>
-                    <li><a href="#">Environment</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="hp-footer-bottom">
-            <div>Copyright &copy; 2026 Apple Inc. All rights reserved.</div>
-            <div class="hp-footer-bottom-links">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Use</a>
-                <a href="#">Sales Policy</a>
-                <a href="#">Legal</a>
-                <a href="#">Site Map</a>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<script src="js/apple-theme.js"></script>
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
 </body>
 </html>

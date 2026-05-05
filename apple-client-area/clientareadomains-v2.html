@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Domains (v2) — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
+    <style>
+        body { display: block; }
+
+        /* Page header — same copy as original (page-eyebrow + title + subtitle + CTA) */
+        .page-header { margin-bottom: 24px; }
+        .page-header .page-eyebrow {
+            font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+            text-transform: uppercase; letter-spacing: 0.06em;
+            margin: 0 0 6px;
+        }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+        .page-header .page-subtitle {
+            font-size: 14px; color: var(--color-text-secondary);
+            letter-spacing: -0.008em; line-height: 1.5;
+            margin: 0; max-width: 620px;
+        }
+        .page-header-row {
+            display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .page-header-row .btn-primary {
+            height: 36px; padding: 0 18px; font-size: 13px; flex-shrink: 0;
+        }
+
+        /* 2-col split: Domains sub-nav + main */
+        .dom-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+        @media (max-width: 880px) { .dom-split { grid-template-columns: 1fr; } }
+        .dom-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+        /* Sub-nav card (same primitive as invoices v2) */
+        .subnav-card { padding: 8px; }
+        .subnav-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }
+        .subnav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: 13px; letter-spacing: -0.008em; text-decoration: none; transition: background var(--transition-fast); }
+        .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+        .subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+        .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .subnav-item.active svg { color: var(--color-accent); }
+        .subnav-count {
+            margin-left: auto;
+            font-size: 11px; font-weight: 500;
+            padding: 1px 7px;
+            border-radius: var(--radius-pill);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+        }
+        .subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
+
+        /* Filter tabs — kept identical to original (uses .filter-tabs + .filter-tab from apple-theme.css) */
+
+        /* Tighten the card padding so the .domain-list grid (from apple-theme.css) lines up
+           with its margin:0 -16px negative-margin pattern. */
+        .dom-main .card .card-body { padding: 14px 16px 4px; }
+    </style>
+</head>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="domains" data-page-title="My Domains">
+
+<div data-include="partials/state-chip.html"></div>
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>No Notifications</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;"><a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a></div>
+    </div>
+</div>
+
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareaproducts.html">My Services</a><a href="store.html">Order New Services</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareadomains.html">My Domains</a><a href="cart-domain-register.html">Register a Domain</a><a href="cart-domain-transfer.html">Transfer a Domain</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareainvoices.html">My Invoices</a><a href="clientareaquotes.html">My Quotes</a><a href="masspay.html">Mass Payment</a><a href="clientareaaddfunds.html">Add Funds</a><a href="account-paymentmethods.html">Payment Methods</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="supportticketslist.html">Tickets</a><a href="announcements.html">Announcements</a><a href="knowledgebase.html">Knowledgebase</a></div></div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
+</div></nav>
+
+<div data-include="partials/inner-topbar.html"></div>
+
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a><span class="sep">/</span>
+        <span class="current" aria-current="page">My Domains</span>
+    </div>
+</nav>
+
+<div class="content-area">
+    <header class="page-header">
+        <div class="page-header-row">
+            <div style="flex: 1; min-width: 0;">
+                <p class="page-eyebrow">Domains</p>
+                <h1>My Domains</h1>
+                <p class="page-subtitle">Manage your domain registrations and DNS.</p>
+            </div>
+            <a href="cart-domain-register.html" class="btn-primary">Register New Domain</a>
+        </div>
+    </header>
+
+    <div class="when-full"><div class="dom-split">
+        <!-- ══ LEFT: Domains sub-nav ══ -->
+        <aside>
+            <div class="card subnav-card">
+                <div class="subnav-heading">Domains</div>
+                <a href="clientareadomains.html" class="subnav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                    My Domains
+                    <span class="subnav-count">5</span>
+                </a>
+                <a href="cart-domain-register.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    Register a Domain
+                </a>
+                <a href="cart-domain-transfer.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+                    Transfer a Domain
+                </a>
+                <a href="bulkdomainmanagement.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    Bulk Management
+                </a>
+                <a href="domain-pricing.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                    Domain Pricing
+                </a>
+                <a href="whois.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    WHOIS Lookup
+                </a>
+            </div>
+        </aside>
+
+        <!-- ══ RIGHT: filter tabs + original domain-list table (identical to original) ══ -->
+        <div class="dom-main">
+            <div class="filter-tabs">
+                <button class="filter-tab active">All</button>
+                <button class="filter-tab">Active</button>
+                <button class="filter-tab">Expiring Soon</button>
+                <button class="filter-tab">Transferred Away</button>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="domain-list">
+                        <div class="domain-list-header">
+                            <div>Domain</div>
+                            <div>Registered</div>
+                            <div>Expires</div>
+                            <div>Status</div>
+                            <div>Auto-Renew</div>
+                            <div></div>
+                        </div>
+                        <a href="clientareadomaindetails.html" class="domain-row">
+                            <div class="domain-name">hendersondesign.com</div>
+                            <div class="domain-date">Mar 12, 2022</div>
+                            <div class="domain-date">Mar 12, 2027</div>
+                            <div><span class="status-pill active">Active</span></div>
+                            <div><div class="toggle-switch active" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('active')"></div></div>
+                            <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                        </a>
+                        <a href="clientareadomaindetails.html" class="domain-row">
+                            <div class="domain-name">alexblog.net</div>
+                            <div class="domain-date">Jun 5, 2023</div>
+                            <div class="domain-date">Jun 5, 2026</div>
+                            <div><span class="status-pill active">Active</span></div>
+                            <div><div class="toggle-switch active" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('active')"></div></div>
+                            <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                        </a>
+                        <a href="clientareadomaindetails.html" class="domain-row">
+                            <div class="domain-name">henderson.io</div>
+                            <div class="domain-date">Sep 1, 2024</div>
+                            <div class="domain-date">Sep 1, 2025</div>
+                            <div><span class="status-pill pending">Expiring Soon</span></div>
+                            <div><div class="toggle-switch" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('active')"></div></div>
+                            <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                        </a>
+                        <a href="clientareadomaindetails.html" class="domain-row">
+                            <div class="domain-name">morganstudio.design</div>
+                            <div class="domain-date">Jan 20, 2025</div>
+                            <div class="domain-date">Jan 20, 2026</div>
+                            <div><span class="status-pill active">Active</span></div>
+                            <div><div class="toggle-switch active" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('active')"></div></div>
+                            <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                        </a>
+                        <a href="clientareadomaindetails.html" class="domain-row">
+                            <div class="domain-name">ourstudio.co</div>
+                            <div class="domain-date">Nov 15, 2024</div>
+                            <div class="domain-date">Nov 15, 2025</div>
+                            <div><span class="status-pill active">Active</span></div>
+                            <div><div class="toggle-switch active" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('active')"></div></div>
+                            <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div></div>
+
+    <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+        </div>
+        <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">No domains yet</p>
+        <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">You haven't registered or transferred any domains. Search for one to get started.</p>
+        <a href="domainchecker.html" class="btn-primary">Register a domain</a>
+    </div>
+</div>
+
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="domains.html">Domains</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="knowledgebase.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Careers</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open><span class="flag">🇺🇸</span><span>English</span><span class="sep">/</span><span>$ USD</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
+        </div>
+    </div>
+</footer>
+
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
+</body>
+</html>

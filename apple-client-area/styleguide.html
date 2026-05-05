@@ -3,33 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Style Guide - WHMCS Apple Theme</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
+    <title>Style Guide — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
     <style>
-        body { display: block; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--color-bg); color: var(--color-text-primary); margin: 0; padding: 0; }
+        body { display: block; }
 
-        /* Layout */
-        .sg-layout { display: grid; grid-template-columns: 260px 1fr; max-width: 1320px; margin: 0 auto; min-height: 100vh; }
-        .sg-sidebar { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 32px 24px; border-right: 1px solid var(--color-border); background: var(--color-surface-secondary); }
-        .sg-main { padding: 56px 56px 120px; max-width: 880px; }
+        /* Page header */
+        .page-header { margin: 8px 0 32px; }
+        .page-header .eyebrow {
+            font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+            text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 10px;
+        }
+        .page-header h1 {
+            font-size: 40px; font-weight: 600; letter-spacing: -0.028em;
+            color: var(--color-text-primary); margin: 0 0 8px;
+            line-height: 1.1;
+        }
+        .page-header .page-subtitle {
+            font-size: 15px; color: var(--color-text-secondary);
+            letter-spacing: -0.01em; line-height: 1.45;
+            margin: 0; max-width: 560px;
+        }
 
-        /* Sidebar */
-        .sg-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--color-border); }
-        .sg-brand svg { width: 22px; height: 22px; color: var(--color-text-primary); }
-        .sg-brand .name { font-size: 14px; font-weight: 600; color: var(--color-text-primary); }
-        .sg-brand .sub { font-size: 11px; color: var(--color-text-tertiary); margin-top: 1px; }
-        .sg-toc-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-tertiary); margin: 24px 0 10px; }
+        /* TOC card (replaces sticky sidebar) */
+        .sg-toc-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 14px; padding: 22px; margin-bottom: 40px; }
+        .sg-toc-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px 24px; }
+        .sg-toc-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); margin: 0 0 8px; }
         .sg-toc { list-style: none; padding: 0; margin: 0; }
-        .sg-toc a { display: block; padding: 7px 12px; font-size: 13px; color: var(--color-text-secondary); text-decoration: none; border-radius: 6px; transition: all 0.15s; }
-        .sg-toc a:hover { background: var(--color-surface); color: var(--color-text-primary); }
+        .sg-toc a { display: block; padding: 5px 8px; font-size: 13px; color: var(--color-text-secondary); text-decoration: none; border-radius: 6px; transition: all 0.15s; }
+        .sg-toc a:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
         .sg-toc a.active { background: var(--color-accent-light); color: var(--color-accent); font-weight: 500; }
-
-        /* Headers */
-        .sg-hero { padding: 0 0 48px; border-bottom: 1px solid var(--color-border); margin-bottom: 56px; }
-        .sg-hero h1 { font-size: 56px; font-weight: 600; letter-spacing: -0.025em; margin: 0 0 12px; line-height: 1.05; }
-        .sg-hero p { font-size: 19px; color: var(--color-text-secondary); margin: 0; line-height: 1.4; }
-        .sg-hero .meta { display: flex; gap: 16px; margin-top: 24px; font-size: 13px; color: var(--color-text-tertiary); }
-        .sg-hero .meta a { color: var(--color-link); text-decoration: none; }
+        .sg-main { max-width: 880px; }
 
         h2.sg-h { font-size: 36px; font-weight: 600; letter-spacing: -0.02em; margin: 80px 0 8px; padding-top: 12px; }
         h2.sg-h:first-of-type { margin-top: 0; }
@@ -91,14 +96,6 @@
         /* Card demo */
         .sg-card-demo { background: var(--color-surface); border: 1px solid var(--color-border-card); border-radius: 18px; padding: 24px; margin: 16px 0; }
 
-        /* Top bar */
-        .sg-topbar { position: sticky; top: 0; background: rgba(251,251,253,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border); padding: 12px 22px; display: flex; align-items: center; justify-content: space-between; z-index: 50; grid-column: 1 / -1; }
-        .sg-topbar .links a { font-size: 13px; color: var(--color-link); text-decoration: none; margin-left: 16px; }
-        [data-theme="dark"] .sg-topbar { background: rgba(28,28,30,0.85); }
-
-        .dark-toggle { position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--color-border); background: var(--color-surface); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(0,0,0,0.08); z-index: 100; }
-        .dark-toggle svg { width: 18px; height: 18px; color: var(--color-text-secondary); }
-
         /* Spacing demo */
         .sg-spacing-demo { display: flex; flex-direction: column; gap: 8px; margin: 16px 0 24px; }
         .sg-spacing-row { display: flex; align-items: center; gap: 16px; }
@@ -129,76 +126,184 @@
 
         /* Section anchor scroll offset */
         .sg-section { scroll-margin-top: 80px; }
-
-        @media (max-width: 900px) {
-            .sg-layout { grid-template-columns: 1fr; }
-            .sg-sidebar { position: relative; height: auto; max-height: 240px; }
-            .sg-main { padding: 32px 22px 80px; }
-            .sg-hero h1 { font-size: 40px; }
-        }
     </style>
 </head>
-<body>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="" data-page-title="Style Guide">
 
-<div class="sg-layout">
-    <!-- SIDEBAR -->
-    <aside class="sg-sidebar">
-        <div class="sg-brand">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.08 7.13 7.16 8.84 7.14C10.13 7.12 11.34 8.01 12.14 8.01C12.94 8.01 14.41 6.93 15.95 7.11C16.59 7.14 18.37 7.36 19.53 9.06C19.43 9.12 17.2 10.42 17.22 13.11C17.25 16.33 20.05 17.37 20.09 17.38C20.06 17.47 19.61 18.98 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg>
+<!-- Dev preview chip -->
+<div data-include="partials/state-chip.html"></div>
+
+<!-- Rail + Sidebar layouts -->
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<!-- Auth strip -->
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span>No Notifications</span>
+        </button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a>
+        </div>
+    </div>
+</div>
+
+<!-- Top-layout header -->
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareaproducts.html">My Services</a>
+            <div class="divider"></div>
+            <a href="store.html">Order New Services</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareadomains.html">My Domains</a>
+            <a href="cart-domain-register.html">Register a Domain</a>
+            <a href="cart-domain-transfer.html">Transfer a Domain</a>
+            <a href="bulkdomainmanagement.html">Bulk Management</a>
+            <a href="domain-pricing.html">Domain Pricing</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareainvoices.html">My Invoices</a>
+            <a href="clientareaquotes.html">My Quotes</a>
+            <a href="masspay.html">Mass Payment</a>
+            <a href="clientareaaddfunds.html">Add Funds</a>
+            <a href="account-paymentmethods.html">Payment Methods</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="supportticketslist.html">My tickets</a>
+            <a href="announcements.html">Announcements</a>
+            <a href="knowledgebase.html">Knowledgebase</a>
+            <a href="downloads.html">Downloads</a>
+            <a href="serverstatus.html">Network status</a>
+            <a href="supportticketsubmit.html">Open ticket</a>
+        </div>
+    </div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <div class="notification-wrapper only-in" id="navNotifyWrap">
+        <button type="button" class="topbar-btn" title="Notifications" onclick="togglePortalNotifications(event, 'nav')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <div class="topbar-notification-dot"></div>
+        </button>
+        <div class="notification-dropdown" id="notificationDropdownNav">
+            <div class="notification-dropdown-header">
+                <span class="notification-dropdown-title">Notifications</span>
+                <button class="notification-dropdown-clear" type="button">Mark all read</button>
+            </div>
+            <a href="clientareadomaindetails.html" class="notification-item"><div class="notification-dot-indicator orange"></div><div class="notification-content"><div class="notification-text">henderson.io expires in 12 days</div><div class="notification-time">Today</div></div></a>
+            <a href="clientareadomaindetails.html" class="notification-item"><div class="notification-dot-indicator blue"></div><div class="notification-content"><div class="notification-text">DNS propagated for alexblog.net</div><div class="notification-time">2 hours ago</div></div></a>
+        </div>
+    </div>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap">
+        <div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-dropdown-header">
+                <div class="profile-dropdown-name">Arshile Gogia</div>
+                <div class="profile-dropdown-email">arshileg@gmail.com</div>
+            </div>
+            <a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a>
+            <a href="clientareasecurity.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Security Settings</a>
+            <div class="profile-dropdown-divider"></div>
+            <div class="theme-toggle-row">
+                <span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span>
+                <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a>
+        </div>
+    </div>
+</div></nav>
+
+<!-- Inner topbar (icon rail + sidebar layouts) -->
+<div data-include="partials/inner-topbar.html"></div>
+
+<!-- Breadcrumb -->
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a><span class="sep">/</span>
+        <span>Tools</span><span class="sep">/</span>
+        <span class="current" aria-current="page">Style Guide</span>
+    </div>
+</nav>
+
+<!-- PAGE CONTENT -->
+<div class="content-area">
+    <header class="page-header">
+        <div class="eyebrow">TOOLS</div>
+        <h1>Style Guide</h1>
+        <p class="page-subtitle">Typography, color, spacing, and other design tokens</p>
+    </header>
+
+    <div class="when-full">
+    <div class="sg-toc-card">
+        <div class="sg-toc-card-grid">
             <div>
-                <div class="name">Style Guide</div>
-                <div class="sub">WHMCS Apple Theme</div>
+                <div class="sg-toc-title">Foundations</div>
+                <ul class="sg-toc">
+                    <li><a href="#philosophy">1. Design Philosophy</a></li>
+                    <li><a href="#color">2. Color System</a></li>
+                    <li><a href="#typography">3. Typography</a></li>
+                    <li><a href="#spacing">4. Spacing &amp; Layout</a></li>
+                    <li><a href="#radius">5. Border Radius</a></li>
+                    <li><a href="#shadows">6. Shadows &amp; Elevation</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="sg-toc-title">Elements</div>
+                <ul class="sg-toc">
+                    <li><a href="#buttons">7. Buttons &amp; CTAs</a></li>
+                    <li><a href="#cards">8. Cards</a></li>
+                    <li><a href="#forms">9. Forms &amp; Inputs</a></li>
+                    <li><a href="#icons">10. Iconography</a></li>
+                    <li><a href="#motion">11. Animation &amp; Motion</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="sg-toc-title">Patterns</div>
+                <ul class="sg-toc">
+                    <li><a href="#responsive">12. Responsive</a></li>
+                    <li><a href="#dark">13. Dark Mode</a></li>
+                    <li><a href="#sections">14. Section Patterns</a></li>
+                    <li><a href="#components">15. Component Library</a></li>
+                    <li><a href="#apple">16. Apple-Specific</a></li>
+                    <li><a href="#dosdonts">17. Do's &amp; Don'ts</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="sg-toc-title">Resources</div>
+                <ul class="sg-toc">
+                    <li><a href="components.html">Component Gallery &rarr;</a></li>
+                    <li><a href="sitemap.html">Sitemap &rarr;</a></li>
+                    <li><a href="index.html">Homepage &rarr;</a></li>
+                </ul>
             </div>
         </div>
+    </div>
 
-        <div class="sg-toc-title">Foundations</div>
-        <ul class="sg-toc">
-            <li><a href="#philosophy">1. Design Philosophy</a></li>
-            <li><a href="#color">2. Color System</a></li>
-            <li><a href="#typography">3. Typography</a></li>
-            <li><a href="#spacing">4. Spacing &amp; Layout</a></li>
-            <li><a href="#radius">5. Border Radius</a></li>
-            <li><a href="#shadows">6. Shadows &amp; Elevation</a></li>
-        </ul>
-
-        <div class="sg-toc-title">Elements</div>
-        <ul class="sg-toc">
-            <li><a href="#buttons">7. Buttons &amp; CTAs</a></li>
-            <li><a href="#cards">8. Cards</a></li>
-            <li><a href="#forms">9. Forms &amp; Inputs</a></li>
-            <li><a href="#icons">10. Iconography</a></li>
-            <li><a href="#motion">11. Animation &amp; Motion</a></li>
-        </ul>
-
-        <div class="sg-toc-title">Patterns</div>
-        <ul class="sg-toc">
-            <li><a href="#responsive">12. Responsive</a></li>
-            <li><a href="#dark">13. Dark Mode</a></li>
-            <li><a href="#sections">14. Section Patterns</a></li>
-            <li><a href="#components">15. Component Library</a></li>
-            <li><a href="#apple">16. Apple-Specific</a></li>
-            <li><a href="#dosdonts">17. Do's &amp; Don'ts</a></li>
-        </ul>
-
-        <div class="sg-toc-title">Resources</div>
-        <ul class="sg-toc">
-            <li><a href="components.html">Component Gallery →</a></li>
-            <li><a href="sitemap.html">Sitemap →</a></li>
-            <li><a href="index.html">Homepage →</a></li>
-        </ul>
-    </aside>
-
-    <!-- MAIN -->
     <main class="sg-main">
-        <header class="sg-hero">
-            <h1>Style Guide</h1>
-            <p>A comprehensive design system replicating Apple.com standards. Use this as the source of truth when creating new components or pages.</p>
-            <div class="meta">
-                <span>Last updated: 2026-04-14</span>
-                <span>·</span>
-                <a href="components.html">View Component Gallery →</a>
-            </div>
-        </header>
 
         <!-- 1. PHILOSOPHY -->
         <section class="sg-section" id="philosophy">
@@ -1009,13 +1114,28 @@ document.documentElement.setAttribute('data-theme', 'dark');</code></pre>
             </ol>
         </section>
     </main>
+    </div><!-- /.when-full -->
+
+    <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+        </div>
+        <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">Style guide offline</p>
+        <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">The style guide is being updated.</p>
+        <a href="components.html" class="btn-primary">Components</a>
+    </div>
 </div>
 
-<button class="dark-toggle" onclick="toggleDarkMode()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-</button>
+<!-- Inner-layout slim footer -->
+<div data-include="partials/sidebar-footer.html"></div>
 
-<script src="js/apple-theme.js"></script>
+</div><!-- /.ph-main-wrap -->
+
+<!-- Language / currency modal -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
 <script>
     // Active section highlighting in TOC
     (function() {

@@ -4,19 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
-    <link rel="stylesheet" href="css/apple-layout.css">
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
     <style>
         body { display: block; }
 
         /* ─── Dashboard page heading (Apple) ─── */
         .dash-heading { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 24px; }
 
-        /* ─── Two-column split layout (structural only) ─── */
-        .dash-split { display: grid; grid-template-columns: 260px 1fr; gap: 24px; align-items: start; }
+        /* ─── Two-column split layout — main left, aside right (matches services pattern) ─── */
+        .dash-split { display: grid; grid-template-columns: 1fr 260px; gap: 24px; align-items: start; }
         @media (max-width: 960px) { .dash-split { grid-template-columns: 1fr; } }
         .dash-info-col { display: flex; flex-direction: column; gap: 16px; }
         .dash-main-col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+
+        /* Sub-nav toggle off — hide aside, collapse to single column */
+        body[data-subnav="off"] .dash-split { grid-template-columns: 1fr; }
+        body[data-subnav="off"] .dash-split > aside { display: none; }
+        /* Sub-nav side — left: flip columns, main goes on right */
+        body[data-subnav-side="left"] .dash-split { grid-template-columns: 260px 1fr; }
+        body[data-subnav-side="left"] .dash-split > aside { grid-column: 1; grid-row: 1; }
+        body[data-subnav-side="left"] .dash-split > .dash-main-col { grid-column: 2; grid-row: 1; }
+        /* Sub-nav side — outside: float the aside in the outer gutter (right or left), outside the content column */
+        body[data-subnav-side="outside"] .dash-split,
+        body[data-subnav-side="outside-left"] .dash-split { grid-template-columns: 1fr; position: relative; }
+        body[data-subnav-side="outside"] .dash-split > aside,
+        body[data-subnav-side="outside-left"] .dash-split > aside {
+            position: absolute; top: 0; width: 260px;
+        }
+        body[data-subnav-side="outside"] .dash-split > aside { left: calc(100% + 24px); }
+        body[data-subnav-side="outside-left"] .dash-split > aside { right: calc(100% + 24px); left: auto; }
+        body[data-subnav-side="outside"] .dash-split > .dash-main-col,
+        body[data-subnav-side="outside-left"] .dash-split > .dash-main-col { grid-column: 1; }
+        /* Horizontal shift to visually re-center the content when aside floats outside */
+        body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-142px); }
+        body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(142px); }
+        body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 260px; }
+        /* Narrow viewports: fall back to inside column */
+        @media (max-width: 1200px) {
+            body[data-subnav-side="outside"] .dash-split { grid-template-columns: 1fr 260px; gap: 24px; position: static; }
+            body[data-subnav-side="outside-left"] .dash-split { grid-template-columns: 260px 1fr; gap: 24px; position: static; }
+            body[data-subnav-side="outside"] .dash-split > aside,
+            body[data-subnav-side="outside-left"] .dash-split > aside { position: static; width: auto; right: auto; left: auto; }
+            body[data-subnav-side="outside-left"] .dash-split > aside { grid-column: 1; grid-row: 1; }
+            body[data-subnav-side="outside-left"] .dash-split > .dash-main-col { grid-column: 2; grid-row: 1; }
+            body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area,
+            body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: none; }
+        }
+
+        /* ─── Sub-nav card (account overview jumps) ─── */
+        .subnav-card { padding: 8px; }
+        .subnav-heading {
+            font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+            text-transform: uppercase; color: var(--color-text-tertiary);
+            padding: 10px 12px 8px;
+        }
+        .subnav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: 8px;
+            font-size: 13px; color: var(--color-text-primary);
+            text-decoration: none;
+            transition: background var(--transition-fast);
+        }
+        .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+        .subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+        .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .subnav-item.active svg { color: var(--color-accent); }
+        .subnav-count {
+            margin-left: auto;
+            background: var(--color-surface-secondary); color: var(--color-text-tertiary);
+            padding: 1px 7px; border-radius: var(--radius-pill);
+            font-size: 11px; font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+        .subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
+
+        /* ─── Controls inside / outside toggle (mirrors services pattern for the dashboard cards) ─── */
+        /* Inside (default): each .card has its full shell — header and body share the same white surface. */
+        /* Outside: the .card shell strips down; only .card-body keeps the white surface and rounded edges,
+                    so each header floats above its card on the page background. */
+        body[data-svc-layout="outside"] .dash-main-col > .card,
+        body[data-svc-layout="outside"] .dash-main-col .split-row > .card {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            overflow: visible;
+        }
+        body[data-svc-layout="outside"] .dash-main-col .card > .card-header {
+            padding: 2px 4px 10px;
+        }
+        body[data-svc-layout="outside"] .dash-main-col .card > .card-body {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 16px 24px 20px;
+        }
+        /* Sentinel element to let apple-layout.js reveal the Services chip-group on this page */
+        .svc-table-card { display: none !important; }
 
         /* ─── User card (reuses .card + .sidebar-avatar primitives) ─── */
         .user-card-body { padding: 20px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
@@ -479,67 +563,12 @@
 
 <!-- ═══════════ PAGE CONTENT ═══════════ -->
 <div class="content-area">
+    <!-- Sentinel: enables the state-chip Services: Controls inside/outside pill on this page -->
+    <div class="svc-table-card" aria-hidden="true"></div>
     <h1 class="dash-heading">My Dashboard</h1>
 
     <div class="dash-split">
-        <!-- ══ LEFT: Info column ══ -->
-        <aside class="dash-info-col">
-            <!-- User card (plain .card + existing .sidebar-avatar gradient) -->
-            <div class="card">
-                <div class="user-card-body">
-                    <div class="sidebar-avatar">A</div>
-                    <h2 class="user-account">Hostnodes</h2>
-                    <div class="user-contact">Arshile Gogia</div>
-                    <address class="user-addr">
-                        D.Aghmashenebeli 43<br>
-                        Tbilisi, Qartli, 1900044963<br>
-                        Georgia
-                    </address>
-                    <div class="user-btns">
-                        <a href="clientareadetails.html" class="btn-primary">Update</a>
-                        <a href="login.html" class="btn-secondary">Logout</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Contacts (collapsible .card) -->
-            <div class="card" data-info-group="contacts">
-                <div class="card-toggle">
-                    <h3>Contacts</h3>
-                    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="card-toggle-body">
-                    <p class="info-empty">No Contacts Found</p>
-                    <a href="account-contacts-new.html" class="btn-secondary">New Contact…</a>
-                </div>
-            </div>
-
-            <!-- Shortcuts (collapsible .card) -->
-            <div class="card" data-info-group="shortcuts">
-                <div class="card-toggle">
-                    <h3>Shortcuts</h3>
-                    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="card-toggle-body">
-                    <div class="shortcut-list">
-                        <a href="cart.html" class="shortcut-row">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-                            Order New Services
-                        </a>
-                        <a href="cart-domain-register.html" class="shortcut-row">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                            Register a New Domain
-                        </a>
-                        <a href="login.html" class="shortcut-row">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                            Logout
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- ══ RIGHT: Main column ══ -->
+        <!-- ══ LEFT (default): Main column ══ -->
         <div class="dash-main-col">
             <!-- Inline notices (subtle, Apple-style) — only when data exists -->
             <div class="notices-group when-full">
@@ -913,6 +942,45 @@
                 </div>
             </div>
         </div>
+
+        <!-- ══ RIGHT (default): Account sub-nav aside ══ -->
+        <aside>
+            <div class="card subnav-card">
+                <div class="subnav-heading">Account</div>
+                <a href="clientareahome.html" class="subnav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    Dashboard
+                </a>
+                <a href="clientareaproducts.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                    My Services
+                    <span class="subnav-count when-full">3</span>
+                    <span class="subnav-count when-empty">0</span>
+                </a>
+                <a href="clientareadomains.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                    My Domains
+                    <span class="subnav-count when-full">2</span>
+                    <span class="subnav-count when-empty">0</span>
+                </a>
+                <a href="clientareainvoices.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    Invoices
+                    <span class="subnav-count when-full">3</span>
+                    <span class="subnav-count when-empty">0</span>
+                </a>
+                <a href="supportticketslist.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    Support Tickets
+                    <span class="subnav-count when-full">1</span>
+                    <span class="subnav-count when-empty">0</span>
+                </a>
+                <a href="clientareadetails.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    My Details
+                </a>
+            </div>
+        </aside>
     </div>
 </div>
 
@@ -950,8 +1018,8 @@
 <!-- ═══════════ Language / currency modal ═══════════ -->
 <div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js"></script>
-<script src="js/apple-layout.js"></script>
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
 <script>
 // Page-specific interactions for the Dashboard
 document.addEventListener('apple-layout:ready', function () {

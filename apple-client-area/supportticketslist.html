@@ -4,144 +4,334 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Support Tickets — WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
-    <link rel="stylesheet" href="css/apple-layout.css">
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
     <style>
         body { display: block; }
 
-        .page-header { margin-bottom: 24px; }
-        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+        /* Page header — Apple list-page pattern: single-word title + subtitle + text-link CTA */
+        .page-header { margin: 8px 0 32px; }
+        .page-header h1 {
+            font-size: 40px; font-weight: 600; letter-spacing: -0.028em;
+            color: var(--color-text-primary); margin: 0 0 8px;
+            line-height: 1.1;
+        }
+        .page-header .page-subtitle {
+            font-size: 15px; color: var(--color-text-secondary);
+            letter-spacing: -0.01em; line-height: 1.45;
+            margin: 0; max-width: 560px;
+        }
+        .page-header-row {
+            display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .page-header-action {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 14px; font-weight: 500; letter-spacing: -0.008em;
+            color: var(--color-accent); text-decoration: none;
+            flex-shrink: 0; white-space: nowrap;
+            transition: color var(--transition-fast);
+        }
+        .page-header-action:hover { color: var(--color-accent); text-decoration: none; }
+        .page-header-action:hover .chev { transform: translateX(2px); }
+        .page-header-action .chev { width: 12px; height: 12px; transition: transform var(--transition-fast); }
 
-        .tk-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+        /* 2-col split — main left, sub-nav right */
+        .tk-split { display: grid; grid-template-columns: 1fr 240px; gap: 24px; align-items: start; }
         @media (max-width: 880px) { .tk-split { grid-template-columns: 1fr; } }
+        .tk-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+        .tk-main > .tk-banner { margin-bottom: 6px; }
+        .tk-main > .filter-tabs { margin-bottom: 8px; margin-top: 4px; }
 
-        /* Shared sub-nav */
+        /* Sub-nav toggle off */
+        body[data-subnav="off"] .tk-split { grid-template-columns: 1fr; }
+        body[data-subnav="off"] .tk-split > aside { display: none; }
+        /* Sub-nav side — put aside on the left */
+        body[data-subnav-side="left"] .tk-split { grid-template-columns: 240px 1fr; }
+        body[data-subnav-side="left"] .tk-split > aside { grid-column: 1; grid-row: 1; }
+        body[data-subnav-side="left"] .tk-split > .tk-main { grid-column: 2; grid-row: 1; }
+        /* Sub-nav side — float aside in outer gutter */
+        body[data-subnav-side="outside"] .tk-split,
+        body[data-subnav-side="outside-left"] .tk-split { grid-template-columns: 1fr; position: relative; }
+        body[data-subnav-side="outside"] .tk-split > aside,
+        body[data-subnav-side="outside-left"] .tk-split > aside {
+            position: absolute;
+            top: 0;
+            width: 240px;
+        }
+        body[data-subnav-side="outside"] .tk-split > aside { left: calc(100% + 24px); }
+        body[data-subnav-side="outside-left"] .tk-split > aside { right: calc(100% + 24px); left: auto; }
+        body[data-subnav-side="outside"] .tk-split > .tk-main,
+        body[data-subnav-side="outside-left"] .tk-split > .tk-main { grid-column: 1; }
+        body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+        body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
+        body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 240px; }
+        @media (max-width: 1100px) {
+            body[data-subnav-side="outside"] .tk-split { grid-template-columns: 1fr 240px; gap: 24px; position: static; }
+            body[data-subnav-side="outside-left"] .tk-split { grid-template-columns: 240px 1fr; gap: 24px; position: static; }
+            body[data-subnav-side="outside"] .tk-split > aside,
+            body[data-subnav-side="outside-left"] .tk-split > aside { position: static; width: auto; right: auto; left: auto; }
+            body[data-subnav-side="outside-left"] .tk-split > aside { grid-column: 1; grid-row: 1; }
+            body[data-subnav-side="outside-left"] .tk-split > .tk-main { grid-column: 2; grid-row: 1; }
+        }
+
+        /* Shared sub-nav primitive */
         .subnav-card { padding: 8px; }
-        .subnav-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }
-        .subnav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: 13px; letter-spacing: -0.008em; text-decoration: none; transition: background var(--transition-fast); }
+        .subnav-heading {
+            font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+            text-transform: uppercase; letter-spacing: 0.06em;
+            padding: 10px 12px 8px;
+        }
+        .subnav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: var(--radius-sm);
+            color: var(--color-text-primary); font-size: 13px; letter-spacing: -0.008em;
+            text-decoration: none; transition: background var(--transition-fast);
+        }
         .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
         .subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
         .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
         .subnav-item.active svg { color: var(--color-accent); }
+        .subnav-count {
+            margin-left: auto;
+            font-size: 11px; font-weight: 500;
+            padding: 1px 7px;
+            border-radius: var(--radius-pill);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+        }
+        .subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
 
-        /* Unified toolbar inside the tickets card */
-        .tk-toolbar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 0.5px solid var(--color-border); flex-wrap: wrap; }
-        .tk-search { flex: 1 1 240px; min-width: 180px; max-width: 320px; position: relative; display: inline-flex; align-items: center; }
-        .tk-search svg { position: absolute; left: 12px; width: 13px; height: 13px; color: var(--color-text-tertiary); pointer-events: none; }
-        .tk-search input { padding: 0 14px 0 32px; height: 32px; width: 100%; margin: 0; font-size: 13px; border-radius: var(--radius-pill); background: var(--color-surface-secondary); border: 1px solid transparent; color: var(--color-text-primary); transition: all var(--transition-fast); }
-        .tk-search input:focus { outline: none; background: var(--color-surface); border-color: var(--color-accent); }
-        .tk-toolbar-spacer { flex: 1 1 8px; }
-        .tk-toolbar .btn-primary { height: 32px; padding: 0 14px; font-size: 13px; }
-        .tk-toolbar .btn-primary svg { width: 12px; height: 12px; }
+        /* Muted status banner — reply waiting */
+        .tk-banner {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
+            font-size: 13px; letter-spacing: -0.008em;
+        }
+        .tk-banner .tk-banner-ico {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--color-accent-light); color: var(--color-accent);
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .tk-banner .tk-banner-ico svg { width: 13px; height: 13px; }
+        .tk-banner strong { color: var(--color-text-primary); font-weight: 600; }
+        .tk-banner .spacer { flex: 1; }
+        .tk-banner .btn-secondary { height: 28px; padding: 0 12px; font-size: 12px; }
 
-        /* Filter pills (status) — reuses .ph-domain-tabs primitive in a new context */
-        .tk-filters { display: inline-flex; background: var(--color-surface-secondary); border-radius: var(--radius-pill); padding: 3px; gap: 0; }
-        .tk-filters button { border: 0; background: transparent; padding: 5px 12px; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); border-radius: var(--radius-pill); cursor: pointer; font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
-        .tk-filters button.active { background: var(--color-surface); color: var(--color-text-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-        .tk-filters .tk-filter-count { font-size: 10px; color: var(--color-text-tertiary); background: var(--color-surface-secondary); padding: 0 5px; border-radius: var(--radius-pill); min-width: 16px; text-align: center; line-height: 14px; }
-        .tk-filters button.active .tk-filter-count { background: var(--color-accent-light); color: var(--color-accent); }
+        /* Row layout — Subject left, other columns clustered on the right
+           (margin-left: auto on the 2nd child pushes everything after it to the right edge). */
+        .tk-list { display: flex; flex-direction: column; }
+        .tk-row {
+            display: flex; align-items: center; gap: 20px;
+            padding: 16px 20px;
+            transition: background var(--transition-fast);
+            border-bottom: none;
+            color: var(--color-text-primary);
+            font-size: 13px;
+            letter-spacing: -0.008em;
+        }
+        .tk-row[data-href] { cursor: pointer; }
+        .tk-row:hover { background: var(--color-surface-secondary); }
+        .tk-row > :nth-child(1) { flex: 0 1 auto; min-width: 0; max-width: 180px; }
+        .tk-row > :nth-child(2) { margin-left: auto; flex: 0 0 120px; }
+        .tk-row > :nth-child(3) { flex: 0 0 100px; }
+        .tk-row > :nth-child(4) { flex: 0 0 130px; }
 
-        /* Tickets table — sortable column headers */
-        .tk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .tk-table thead th {
+        /* Floating column titles — mirror the row flex layout so titles align with values below */
+        .tk-table-head-row {
+            display: flex; align-items: center; gap: 20px;
+            padding: 2px 20px;
             font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
             text-transform: uppercase; letter-spacing: 0.05em;
-            text-align: left; padding: 14px 20px;
-            border-bottom: 0.5px solid var(--color-border);
-            background: var(--color-surface-secondary);
-            user-select: none; white-space: nowrap;
         }
+        .tk-table-head-row > :nth-child(1) { flex: 0 1 auto; min-width: 0; max-width: 180px; text-align: left; }
+        .tk-table-head-row > :nth-child(2) { margin-left: auto; flex: 0 0 120px; text-align: left; }
+        .tk-table-head-row > :nth-child(3) { flex: 0 0 100px; text-align: left; }
+        .tk-table-head-row > :nth-child(4) { flex: 0 0 130px; text-align: left; }
+
+        /* Sort chevrons — matched to invoices/services */
         .tk-sort {
             display: inline-flex; align-items: center; gap: 6px;
-            background: transparent; border: 0; padding: 0;
-            font: inherit; font-size: 11px; font-weight: 600;
-            color: var(--color-text-tertiary);
-            text-transform: uppercase; letter-spacing: 0.05em;
-            cursor: pointer;
-            transition: color var(--transition-fast);
+            background: none; border: 0; cursor: pointer;
+            color: inherit; font: inherit; letter-spacing: inherit;
+            text-transform: inherit; padding: 0;
+            font-family: inherit;
         }
-        .tk-sort:hover { color: var(--color-text-primary); }
-        .tk-sort.active { color: var(--color-accent); }
-        .tk-sort-ico { position: relative; width: 10px; height: 12px; display: inline-block; flex-shrink: 0; }
+        .tk-sort-ico { position: relative; width: 10px; height: 12px; flex-shrink: 0; }
         .tk-sort-ico::before, .tk-sort-ico::after {
-            content: ""; position: absolute; left: 1px;
-            width: 0; height: 0;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            opacity: 0.4;
-            transition: opacity var(--transition-fast), border-color var(--transition-fast);
+            content: ""; position: absolute; left: 2px;
+            border-left: 3px solid transparent; border-right: 3px solid transparent;
+            opacity: 0.3;
         }
-        .tk-sort-ico::before { top: 0; border-bottom: 4px solid currentColor; }
-        .tk-sort-ico::after  { bottom: 0; border-top: 4px solid currentColor; }
+        .tk-sort-ico::before { top: 1px; border-bottom: 4px solid currentColor; }
+        .tk-sort-ico::after  { bottom: 1px; border-top: 4px solid currentColor; }
         .tk-sort[data-dir="asc"] .tk-sort-ico::before  { opacity: 1; }
-        .tk-sort[data-dir="asc"] .tk-sort-ico::after   { opacity: 0.2; }
-        .tk-sort[data-dir="desc"] .tk-sort-ico::before { opacity: 0.2; }
         .tk-sort[data-dir="desc"] .tk-sort-ico::after  { opacity: 1; }
+        .tk-sort.active { color: var(--color-text-primary); }
 
-        /* Table body rows */
-        .tk-table tbody tr { border-bottom: 0.5px solid var(--color-border); transition: background var(--transition-fast); cursor: pointer; }
-        .tk-table tbody tr:last-child { border-bottom: 0; }
-        .tk-table tbody tr:hover { background: var(--color-surface-secondary); }
-        .tk-table td { padding: 14px 20px; vertical-align: middle; color: var(--color-text-primary); }
-
-        /* Subject cell — ticket ID link + subject line + optional priority dot */
-        .tk-subject-cell { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .tk-subject-ico { width: 32px; height: 32px; border-radius: 8px; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .tk-subject-ico svg { width: 16px; height: 16px; }
-        .tk-subject-info { min-width: 0; }
+        /* Subject cell — ID + title (icon removed) */
+        .tk-subject-cell { min-width: 0; }
         .tk-subject-id { font-size: 12px; font-weight: 500; color: var(--color-accent); letter-spacing: -0.003em; }
-        .tk-subject-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -0.008em; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 320px; }
+        .tk-subject-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -0.008em; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 420px; }
 
         /* Last updated cell */
-        .tk-updated-date { color: var(--color-text-primary); font-size: 13px; }
+        .tk-updated-date { color: var(--color-text-primary); font-size: 13px; font-variant-numeric: tabular-nums; }
         .tk-updated-time { color: var(--color-text-tertiary); font-size: 11px; margin-top: 2px; }
 
-        /* Priority dot inline — same subtle pattern (only for high/medium) */
+        /* Priority dot inline */
         .tk-prio-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; vertical-align: middle; margin-right: 6px; flex-shrink: 0; }
         .tk-prio-dot.high { background: var(--color-red-text); box-shadow: 0 0 0 3px var(--color-red-bg); }
         .tk-prio-dot.medium { background: var(--color-text-tertiary); }
 
         /* Status pill extensions — on-hold + in-progress (not in apple-theme.css) */
-        .status-pill.on-hold { background: rgba(255, 159, 10, 0.16); color: #f08a00; }
-        .status-pill.in-progress { background: rgba(0, 122, 255, 0.14); color: var(--color-accent); }
+        .status-pill.on-hold { background: var(--color-orange-bg); color: var(--color-orange-text); }
+        .status-pill.in-progress { background: var(--color-blue-bg); color: var(--color-blue-text); }
 
-        /* Pagination footer (same rhythm as products page) */
-        .tk-paging { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-top: 0.5px solid var(--color-border); font-size: 12px; color: var(--color-text-tertiary); flex-wrap: wrap; }
-        .tk-paging-left { display: inline-flex; align-items: center; gap: 8px; }
-        .tk-paging-select {
-            height: 28px; padding: 0 24px 0 10px; margin: 0;
-            font: inherit; font-size: 12px; font-weight: 500;
-            color: var(--color-text-primary); background: transparent;
-            border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+        /* Let the kebab dropdown escape the card */
+        .tk-main .card { overflow: visible; }
+
+        /* Kebab (three-dot) menu — mirrors invoices/domains/services */
+        .tk-menu-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+        .tk-menu-btn {
+            width: 28px; height: 28px;
+            border: 0; background: transparent;
+            border-radius: 50%;
+            color: var(--color-text-tertiary);
             cursor: pointer;
-            appearance: none; -webkit-appearance: none; -moz-appearance: none;
-            background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 8px center; background-size: 9px;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: background var(--transition-fast), color var(--transition-fast);
         }
-        .tk-paging-select:hover { background-color: var(--color-surface-secondary); }
-        .tk-paging-spacer { flex: 1; }
-        .tk-paging-btns { display: inline-flex; gap: 2px; align-items: center; }
-        .tk-paging-btns button {
-            min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
-            background: transparent; border: 0;
-            font: inherit; font-size: 12px; color: var(--color-text-secondary);
-            cursor: pointer; transition: all var(--transition-fast);
+        .tk-menu-btn:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+        .tk-menu-btn svg { width: 14px; height: 14px; }
+        .tk-menu-wrap.open .tk-menu-btn { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+        .tk-menu {
+            position: absolute;
+            top: calc(100% + 6px); right: 0;
+            min-width: 220px;
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
+            padding: 6px;
+            z-index: 20;
+            display: none;
+            text-align: left;
+        }
+        .tk-menu-wrap.open .tk-menu { display: block; }
+        .tk-menu-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: var(--radius-sm);
+            font-size: 13px; letter-spacing: -0.008em;
+            color: var(--color-text-primary);
+            text-decoration: none;
+            transition: background var(--transition-fast);
+            white-space: nowrap;
+        }
+        .tk-menu-item:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); text-decoration: none; }
+        .tk-menu-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .tk-menu-item:hover svg { color: var(--color-accent); }
+
+        /* Pagination footer — Apple-faithful: transparent, borderless, no filled accent pill */
+        .tk-footer {
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            padding: 12px 20px;
+            font-size: 12px; color: var(--color-text-tertiary);
+        }
+        .tk-footer .spacer { flex: 1; }
+        .tk-page-size { display: inline-flex; align-items: center; gap: 6px; }
+        .tk-page-size select {
+            height: 26px; padding: 0 22px 0 8px;
+            border: 0; background: transparent;
+            border-radius: var(--radius-sm);
+            font-size: 12px; font-family: inherit; font-weight: 500;
+            color: var(--color-text-primary);
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 6px center;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        .tk-page-size select:hover { background-color: var(--color-surface-secondary); }
+        .tk-page-size select:focus { outline: none; background-color: var(--color-surface-secondary); box-shadow: 0 0 0 3px var(--color-accent-light); }
+        .tk-pages { display: inline-flex; gap: 2px; align-items: center; }
+        .tk-pages button {
+            min-width: 26px; height: 26px; padding: 0 8px;
+            border: 0; background: transparent;
+            border-radius: var(--radius-sm);
+            font-size: 12px; font-weight: 500; font-family: inherit;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
             display: inline-flex; align-items: center; justify-content: center;
         }
-        .tk-paging-btns button:hover:not(:disabled) { background: var(--color-surface-secondary); color: var(--color-text-primary); }
-        .tk-paging-btns button.active { background: var(--color-accent-light); color: var(--color-accent); font-weight: 600; }
-        .tk-paging-btns button:disabled { opacity: 0.35; cursor: not-allowed; }
-        .tk-paging-btns button svg { width: 12px; height: 12px; }
-        .tk-paging-btns .ellipsis { min-width: 20px; color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; }
+        .tk-pages button:hover:not(:disabled):not(.active) { color: var(--color-accent); }
+        .tk-pages button.active { color: var(--color-accent); font-weight: 600; }
+        .tk-pages button:disabled { opacity: 0.25; cursor: default; }
+        .tk-pages button svg { width: 11px; height: 11px; }
+        .tk-pages .ellipsis { min-width: 20px; color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; }
+
+        /* ── Tickets stack ────────────────────────────────────────
+           Default ("Controls inside"): unified card — rows + pager share the surface.
+           "Controls outside": stack transparent; only the rows card keeps its surface. ─── */
+        .tk-stack {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            overflow: visible;
+            margin-bottom: 24px;
+        }
+        .tk-stack .tk-list .tk-row:first-child { border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); }
+        .tk-stack .tk-list .tk-row:last-child  { border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); }
+        .tk-stack > .tk-table-head-row { padding: 10px 20px 6px; margin: 0; }
+        .tk-stack > .tk-table-card {
+            background: transparent; border: 0; box-shadow: none; border-radius: 0; margin: 0; overflow: visible;
+        }
+        .tk-stack > .tk-footer { margin: 0; padding: 10px 20px 14px; }
+
+        /* Controls outside — stack transparent, rows card keeps surface */
+        body[data-svc-layout="outside"] .tk-stack {
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        body[data-svc-layout="outside"] .tk-stack > .tk-table-head-row {
+            padding: 2px 20px;
+        }
+        body[data-svc-layout="outside"] .tk-stack > .tk-table-card {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            overflow: visible;
+            margin: 0;
+        }
+        body[data-svc-layout="outside"] .tk-stack > .tk-footer {
+            padding: 12px 4px;
+        }
 
         /* Empty state */
         body[data-data="empty"] .when-full { display: none; }
         body:not([data-data="empty"]) .when-empty { display: none; }
-        .tk-empty { padding: 56px 24px 48px; text-align: center; color: var(--color-text-secondary); }
-        .tk-empty-ico { width: 52px; height: 52px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+        .tk-empty { padding: 48px 24px 40px; text-align: center; color: var(--color-text-secondary); }
+        .tk-empty-ico {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px;
+        }
         .tk-empty-ico svg { width: 22px; height: 22px; }
         .tk-empty-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.01em; }
-        .tk-empty-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 0 18px; max-width: 340px; line-height: 1.45; margin-left: auto; margin-right: auto; }
+        .tk-empty-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 auto 18px; max-width: 340px; line-height: 1.45; }
         .tk-empty .btn-primary { height: 32px; padding: 0 16px; font-size: 13px; }
     </style>
 </head>
@@ -188,161 +378,53 @@
 
 <div class="content-area">
     <header class="page-header">
-        <h1>My support tickets</h1>
-        <p class="page-subtitle">Open conversations with our team — filter by status, search, or start a new ticket.</p>
+        <div class="page-header-row">
+            <div style="flex: 1; min-width: 0;">
+                <h1>Tickets</h1>
+                <p class="page-subtitle">Open conversations with our team — filter by status or start a new ticket.</p>
+            </div>
+            <a href="supportticketsubmit.html" class="page-header-action">
+                Open a ticket
+                <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+        </div>
     </header>
 
     <div class="tk-split">
-        <!-- ══ LEFT: Support sub-nav ══ -->
-        <aside>
-            <div class="card subnav-card">
-                <div class="subnav-heading">Support</div>
-                <a href="supportticketslist.html" class="subnav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>My support tickets</a>
-                <a href="announcements.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Announcements</a>
-                <a href="knowledgebase.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>Knowledgebase</a>
-                <a href="downloads.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Downloads</a>
-                <a href="serverstatus.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/></svg>Network status</a>
-                <a href="supportticketsubmit.html" class="subnav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Open ticket</a>
+        <!-- ══ LEFT: main content ══ -->
+        <div class="tk-main">
+            <!-- Muted status banner -->
+            <div class="tk-banner when-full">
+                <span class="tk-banner-ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                </span>
+                <span><strong>1 ticket</strong> has a new reply from our team.</span>
+                <span class="spacer"></span>
+                <a href="viewticket.html" class="btn-secondary">View replies</a>
             </div>
-        </aside>
 
-        <!-- ══ RIGHT: tickets card ══ -->
-        <div>
-            <div class="card">
-                <!-- Unified toolbar -->
-                <div class="tk-toolbar">
-                    <div class="tk-search">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <input type="search" placeholder="Search tickets…" autocomplete="off">
-                    </div>
-                    <div class="tk-filters" role="tablist">
-                        <button type="button" class="active">All <span class="tk-filter-count">7</span></button>
-                        <button type="button">Open <span class="tk-filter-count">2</span></button>
-                        <button type="button">Answered <span class="tk-filter-count">1</span></button>
-                        <button type="button">Customer-reply <span class="tk-filter-count">1</span></button>
-                        <button type="button">Closed <span class="tk-filter-count">3</span></button>
-                    </div>
-                    <div class="tk-toolbar-spacer"></div>
-                    <a href="supportticketsubmit.html" class="btn-primary">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        New ticket
-                    </a>
-                </div>
+            <!-- Filter tabs — pill-group, outside the card -->
+            <div class="filter-tabs when-full">
+                <button class="filter-tab active">All</button>
+                <button class="filter-tab">Open</button>
+                <button class="filter-tab">Answered</button>
+                <button class="filter-tab">Customer-reply</button>
+                <button class="filter-tab">Closed</button>
+            </div>
 
-                <!-- Full state: tickets table with sortable headers -->
-                <div class="when-full">
-                    <table class="tk-table">
-                        <thead>
-                            <tr>
-                                <th scope="col"><button type="button" class="tk-sort active" data-sort="subject" data-dir="asc">Subject <span class="tk-sort-ico"></span></button></th>
-                                <th scope="col"><button type="button" class="tk-sort" data-sort="department" data-dir="">Department <span class="tk-sort-ico"></span></button></th>
-                                <th scope="col"><button type="button" class="tk-sort" data-sort="status" data-dir="">Status <span class="tk-sort-ico"></span></button></th>
-                                <th scope="col"><button type="button" class="tk-sort" data-sort="updated" data-dir="">Last updated <span class="tk-sort-ico"></span></button></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr data-href="viewticket.html">
-                                <td>
-                                    <div class="tk-subject-cell">
-                                        <div class="tk-subject-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></div>
-                                        <div class="tk-subject-info">
-                                            <div class="tk-subject-id">#TKT-4835</div>
-                                            <div class="tk-subject-title"><span class="tk-prio-dot high"></span>Server returning 502 errors intermittently</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Technical Support</td>
-                                <td><span class="status-pill open">Open</span></td>
-                                <td><div class="tk-updated-date">12 Apr 2026</div><div class="tk-updated-time">Updated 2h ago</div></td>
-                            </tr>
-                            <tr data-href="viewticket.html">
-                                <td>
-                                    <div class="tk-subject-cell">
-                                        <div class="tk-subject-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></div>
-                                        <div class="tk-subject-info">
-                                            <div class="tk-subject-id">#TKT-4821</div>
-                                            <div class="tk-subject-title"><span class="tk-prio-dot medium"></span>SSL certificate not renewing automatically</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Technical Support</td>
-                                <td><span class="status-pill answered">Answered</span></td>
-                                <td><div class="tk-updated-date">11 Apr 2026</div><div class="tk-updated-time">Yesterday</div></td>
-                            </tr>
-                            <tr data-href="viewticket.html">
-                                <td>
-                                    <div class="tk-subject-cell">
-                                        <div class="tk-subject-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></div>
-                                        <div class="tk-subject-info">
-                                            <div class="tk-subject-id">#TKT-4790</div>
-                                            <div class="tk-subject-title"><span class="tk-prio-dot medium"></span>Need help setting up DNS for new domain</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Technical Support</td>
-                                <td><span class="status-pill customer-reply">Customer-reply</span></td>
-                                <td><div class="tk-updated-date">8 Apr 2026</div><div class="tk-updated-time">5 days ago</div></td>
-                            </tr>
-                            <tr data-href="viewticket.html">
-                                <td>
-                                    <div class="tk-subject-cell">
-                                        <div class="tk-subject-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></div>
-                                        <div class="tk-subject-info">
-                                            <div class="tk-subject-id">#TKT-4782</div>
-                                            <div class="tk-subject-title"><span class="tk-prio-dot high"></span>Upgrade VPS plan to 8GB RAM tier</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Sales &amp; Upgrades</td>
-                                <td><span class="status-pill in-progress">In progress</span></td>
-                                <td><div class="tk-updated-date">7 Apr 2026</div><div class="tk-updated-time">6 days ago</div></td>
-                            </tr>
-                            <tr data-href="viewticket.html">
-                                <td>
-                                    <div class="tk-subject-cell">
-                                        <div class="tk-subject-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></div>
-                                        <div class="tk-subject-info">
-                                            <div class="tk-subject-id">#TKT-4799</div>
-                                            <div class="tk-subject-title">How to set up email forwarding</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Technical Support</td>
-                                <td><span class="status-pill on-hold">On hold</span></td>
-                                <td><div class="tk-updated-date">5 Apr 2026</div><div class="tk-updated-time">1 week ago</div></td>
-                            </tr>
-                            <tr data-href="viewticket.html">
-                                <td>
-                                    <div class="tk-subject-cell">
-                                        <div class="tk-subject-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></div>
-                                        <div class="tk-subject-info">
-                                            <div class="tk-subject-id">#TKT-4756</div>
-                                            <div class="tk-subject-title"><span class="tk-prio-dot medium"></span>Increase PHP memory limit on shared hosting</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Technical Support</td>
-                                <td><span class="status-pill closed">Closed</span></td>
-                                <td><div class="tk-updated-date">2 Apr 2026</div><div class="tk-updated-time">11 days ago</div></td>
-                            </tr>
-                            <tr data-href="viewticket.html">
-                                <td>
-                                    <div class="tk-subject-cell">
-                                        <div class="tk-subject-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></div>
-                                        <div class="tk-subject-info">
-                                            <div class="tk-subject-id">#TKT-4702</div>
-                                            <div class="tk-subject-title">Request invoice for Q1 2026</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Billing</td>
-                                <td><span class="status-pill closed">Closed</span></td>
-                                <td><div class="tk-updated-date">28 Mar 2026</div><div class="tk-updated-time">16 days ago</div></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Tickets stack: "inside" = unified card; "outside" = card + floating head/pager -->
+            <div class="tk-stack">
 
+            <!-- Column titles — floats outside in "outside" mode, part of the card in "inside" -->
+            <div class="tk-table-head-row when-full">
+                <div><button type="button" class="tk-sort active" data-sort="subject" data-dir="asc">Subject <span class="tk-sort-ico"></span></button></div>
+                <div><button type="button" class="tk-sort" data-sort="department" data-dir="">Department <span class="tk-sort-ico"></span></button></div>
+                <div><button type="button" class="tk-sort" data-sort="status" data-dir="">Status <span class="tk-sort-ico"></span></button></div>
+                <div><button type="button" class="tk-sort" data-sort="updated" data-dir="">Last updated <span class="tk-sort-ico"></span></button></div>
+            </div>
+
+            <!-- Rows card — only this keeps a surface in "outside" mode -->
+            <div class="card tk-table-card">
                 <!-- Empty state -->
                 <div class="when-empty tk-empty">
                     <div class="tk-empty-ico">
@@ -353,36 +435,144 @@
                     <a href="supportticketsubmit.html" class="btn-primary">Open a ticket</a>
                 </div>
 
-                <!-- Pagination -->
-                <div class="tk-paging when-full">
-                    <div class="tk-paging-left">
-                        <span>Show</span>
-                        <select class="tk-paging-select" aria-label="Entries per page">
-                            <option selected>10</option>
-                            <option>25</option>
-                            <option>50</option>
-                            <option>100</option>
-                        </select>
-                        <span>entries</span>
-                    </div>
-                    <div class="tk-paging-spacer"></div>
-                    <span>1–7 of 7</span>
-                    <div class="tk-paging-btns">
-                        <button type="button" disabled aria-label="Previous page">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                        </button>
-                        <button type="button" class="active" aria-current="page">1</button>
-                        <button type="button">2</button>
-                        <button type="button">3</button>
-                        <span class="ellipsis">…</span>
-                        <button type="button">8</button>
-                        <button type="button" aria-label="Next page">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                        </button>
-                    </div>
+                <!-- Full state: ticket rows -->
+                <div class="tk-list when-full">
+                            <div class="tk-row" data-href="viewticket.html">
+                                <div>
+                                    <div class="tk-subject-cell">
+                                            <div class="tk-subject-id">#TKT-4835</div>
+                                            <div class="tk-subject-title"><span class="tk-prio-dot high"></span>Server returning 502 errors intermittently</div>
+                                    </div>
+                                </div>
+                                <div>Technical Support</div>
+                                <div><span class="status-pill open">Open</span></div>
+                                <div><div class="tk-updated-date">12 Apr 2026</div><div class="tk-updated-time">Updated 2h ago</div></div>
+                            </div>
+                            <div class="tk-row" data-href="viewticket.html">
+                                <div>
+                                    <div class="tk-subject-cell">
+                                            <div class="tk-subject-id">#TKT-4821</div>
+                                            <div class="tk-subject-title"><span class="tk-prio-dot medium"></span>SSL certificate not renewing automatically</div>
+                                    </div>
+                                </div>
+                                <div>Technical Support</div>
+                                <div><span class="status-pill answered">Answered</span></div>
+                                <div><div class="tk-updated-date">11 Apr 2026</div><div class="tk-updated-time">Yesterday</div></div>
+                            </div>
+                            <div class="tk-row" data-href="viewticket.html">
+                                <div>
+                                    <div class="tk-subject-cell">
+                                            <div class="tk-subject-id">#TKT-4790</div>
+                                            <div class="tk-subject-title"><span class="tk-prio-dot medium"></span>Need help setting up DNS for new domain</div>
+                                    </div>
+                                </div>
+                                <div>Technical Support</div>
+                                <div><span class="status-pill customer-reply">Customer-reply</span></div>
+                                <div><div class="tk-updated-date">8 Apr 2026</div><div class="tk-updated-time">5 days ago</div></div>
+                            </div>
+                            <div class="tk-row" data-href="viewticket.html">
+                                <div>
+                                    <div class="tk-subject-cell">
+                                            <div class="tk-subject-id">#TKT-4782</div>
+                                            <div class="tk-subject-title"><span class="tk-prio-dot high"></span>Upgrade VPS plan to 8GB RAM tier</div>
+                                    </div>
+                                </div>
+                                <div>Sales &amp; Upgrades</div>
+                                <div><span class="status-pill in-progress">In progress</span></div>
+                                <div><div class="tk-updated-date">7 Apr 2026</div><div class="tk-updated-time">6 days ago</div></div>
+                            </div>
+                            <div class="tk-row" data-href="viewticket.html">
+                                <div>
+                                    <div class="tk-subject-cell">
+                                            <div class="tk-subject-id">#TKT-4799</div>
+                                            <div class="tk-subject-title">How to set up email forwarding</div>
+                                    </div>
+                                </div>
+                                <div>Technical Support</div>
+                                <div><span class="status-pill on-hold">On hold</span></div>
+                                <div><div class="tk-updated-date">5 Apr 2026</div><div class="tk-updated-time">1 week ago</div></div>
+                            </div>
+                            <div class="tk-row" data-href="viewticket.html">
+                                <div>
+                                    <div class="tk-subject-cell">
+                                            <div class="tk-subject-id">#TKT-4756</div>
+                                            <div class="tk-subject-title"><span class="tk-prio-dot medium"></span>Increase PHP memory limit on shared hosting</div>
+                                    </div>
+                                </div>
+                                <div>Technical Support</div>
+                                <div><span class="status-pill closed">Closed</span></div>
+                                <div><div class="tk-updated-date">2 Apr 2026</div><div class="tk-updated-time">11 days ago</div></div>
+                            </div>
+                            <div class="tk-row" data-href="viewticket.html">
+                                <div>
+                                    <div class="tk-subject-cell">
+                                            <div class="tk-subject-id">#TKT-4702</div>
+                                            <div class="tk-subject-title">Request invoice for Q1 2026</div>
+                                    </div>
+                                </div>
+                                <div>Billing</div>
+                                <div><span class="status-pill closed">Closed</span></div>
+                                <div><div class="tk-updated-date">28 Mar 2026</div><div class="tk-updated-time">16 days ago</div></div>
+                            </div>
                 </div>
             </div>
+
+            <!-- Pagination footer — floats outside in "outside" mode, part of the card in "inside" -->
+            <div class="tk-footer when-full">
+                <div class="tk-page-size">
+                    Show
+                    <select aria-label="Rows per page">
+                        <option selected>10</option>
+                        <option>25</option>
+                        <option>50</option>
+                        <option>100</option>
+                    </select>
+                    entries
+                </div>
+                <div class="spacer"></div>
+                <span>Showing 1–7 of 7</span>
+                <div class="tk-pages">
+                    <button type="button" disabled aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+                    <button type="button" class="active">1</button>
+                    <button type="button" disabled aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                </div>
+            </div>
+
+            </div><!-- /.tk-stack -->
         </div>
+
+        <!-- ══ RIGHT: Support sub-nav ══ -->
+        <aside>
+            <div class="card subnav-card">
+                <div class="subnav-heading">Support</div>
+                <a href="supportticketslist.html" class="subnav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    My tickets
+                    <span class="subnav-count when-full">7</span>
+                    <span class="subnav-count when-empty">0</span>
+                </a>
+                <a href="supportticketsubmit.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Open a ticket
+                </a>
+                <a href="announcements.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    Announcements
+                </a>
+                <a href="knowledgebase.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+                    Knowledgebase
+                </a>
+                <a href="downloads.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Downloads
+                </a>
+                <a href="serverstatus.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/></svg>
+                    Network status
+                </a>
+            </div>
+        </aside>
     </div>
 </div>
 
@@ -410,25 +600,15 @@
 </div><!-- /.ph-main-wrap -->
 <div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js"></script>
-<script src="js/apple-layout.js"></script>
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
 <script>
 document.addEventListener('apple-layout:ready', function () {
-    // Filter pills — visual toggle.
-    document.querySelectorAll('.tk-filters button').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            document.querySelectorAll('.tk-filters button').forEach(function (b) { b.classList.remove('active'); });
-            btn.classList.add('active');
-        });
-    });
-
-    // Sortable column headers — click cycles: none → asc → desc → none.
-    // Only one column can be active-sorted at a time.
+    // Sortable column headers — cycles none → asc → desc → none
     document.querySelectorAll('.tk-sort').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var currentDir = btn.dataset.dir || '';
             var nextDir = currentDir === '' ? 'asc' : currentDir === 'asc' ? 'desc' : '';
-            // Clear every other sort button
             document.querySelectorAll('.tk-sort').forEach(function (b) {
                 if (b !== btn) {
                     b.dataset.dir = '';
@@ -440,8 +620,8 @@ document.addEventListener('apple-layout:ready', function () {
         });
     });
 
-    // Row-level click — whole row navigates to the ticket, except when clicking nested interactive elements.
-    document.querySelectorAll('.tk-table tbody tr[data-href]').forEach(function (row) {
+    // Row-level click — whole row navigates to the ticket
+    document.querySelectorAll('.tk-row[data-href]').forEach(function (row) {
         row.setAttribute('tabindex', '0');
         row.setAttribute('role', 'link');
         row.addEventListener('click', function (e) {
@@ -455,6 +635,39 @@ document.addEventListener('apple-layout:ready', function () {
             }
         });
     });
+});
+
+// Kebab menu toggle per row
+function toggleTkMenu(btn, e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    var wrap = btn.closest('.tk-menu-wrap');
+    var wasOpen = wrap.classList.contains('open');
+    document.querySelectorAll('.tk-menu-wrap.open').forEach(function (w) {
+        w.classList.remove('open');
+        var b = w.querySelector('.tk-menu-btn');
+        if (b) b.setAttribute('aria-expanded', 'false');
+    });
+    if (!wasOpen) {
+        wrap.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+    }
+}
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.tk-menu-wrap')) return;
+    document.querySelectorAll('.tk-menu-wrap.open').forEach(function (w) {
+        w.classList.remove('open');
+        var b = w.querySelector('.tk-menu-btn');
+        if (b) b.setAttribute('aria-expanded', 'false');
+    });
+});
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.tk-menu-wrap.open').forEach(function (w) {
+            w.classList.remove('open');
+            var b = w.querySelector('.tk-menu-btn');
+            if (b) b.setAttribute('aria-expanded', 'false');
+        });
+    }
 });
 </script>
 </body>

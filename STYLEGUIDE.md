@@ -744,6 +744,192 @@ Use these consistent category labels so users always know where they are:
 - Don't introduce new eyebrow labels beyond the 6 categories above — consistency matters.
 - Don't apply `.page-eyebrow` on auth pages or public-facing pages (use `.hp-eyebrow` there).
 
+### List Page Pattern
+
+Pages that show a table/list of items (`clientareadomains`, `clientareaproducts`, `clientareainvoices`, etc.) share a common anatomy. Reuse it so list pages across the portal feel like one system.
+
+> **List-page headers are the exception to the Dashboard Page Pattern.** They skip the uppercase category eyebrow and swap the filled-pill CTA for a subtle accent-blue **text link** with a chevron. The title is one word (noun) at 40px / -0.028em, not "My …". Everywhere else in the portal keeps the eyebrow + filled-pill pattern from §14 Dashboard Page Pattern.
+
+```html
+<div class="content-area">
+    <!-- Page header — no uppercase eyebrow; text-link CTA instead of filled pill -->
+    <header class="page-header">
+        <div class="page-header-row">
+            <div>
+                <h1>Domains</h1>
+                <p class="page-subtitle">Manage your registrations, renewals, and DNS.</p>
+            </div>
+            <a href="cart-domain-register.html" class="page-header-action">
+                Register a domain
+                <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+        </div>
+    </header>
+
+    <!-- 2-col split: main column + content sub-nav -->
+    <div class="dom-split"><!-- or .svc-split, .inv-split — prefix per page -->
+        <div class="dom-main">
+            <!-- 1. Status / renewal banner (only when-full) -->
+            <div class="dom-banner when-full">…</div>
+
+            <!-- 2. Filter tabs — pill-group, OUTSIDE the card -->
+            <div class="filter-tabs when-full">
+                <button class="filter-tab active">All</button>
+                <button class="filter-tab">Active</button>
+                …
+            </div>
+
+            <!-- 3. Card wraps table + pagination footer -->
+            <div class="card">
+                <div class="when-full">
+                    <!-- Optional toolbar: search + secondary controls -->
+                    <!-- Table or .domain-list grid -->
+                    <!-- Pagination footer (see below) -->
+                </div>
+                <div class="when-empty dom-empty">…</div>
+            </div>
+        </div>
+
+        <!-- Content sub-nav (right by default; chip can move it) -->
+        <aside>
+            <div class="card subnav-card">
+                <div class="subnav-heading">Domains</div>
+                <a href="…" class="subnav-item active">
+                    <svg>…</svg>
+                    My Domains
+                    <span class="subnav-count when-full">5</span>
+                    <span class="subnav-count when-empty">0</span>
+                </a>
+                <a href="…" class="subnav-item">…</a>
+            </div>
+        </aside>
+    </div>
+</div>
+```
+
+#### Required primitives
+
+| Primitive | Purpose |
+|---|---|
+| `.page-header` with `.page-header-row` | Single-word title (40px / -0.028em) + subtitle + text-link CTA. **No uppercase eyebrow** on list pages. |
+| `.page-header-action` | Secondary CTA: 14px accent-blue text + `svg.chev`. Nudges right on hover. Replaces `.btn-primary` as the header action on list pages. |
+| `<div class="…-split">` | 2-col grid — defaults to `1fr 240px` (main left, sub-nav right) |
+| `.subnav-card` | Content sub-nav: `.subnav-heading` + `.subnav-item` list, with `.subnav-count` counts that swap via `.when-full` / `.when-empty` |
+| `<div class="…-banner when-full">` | Informational banner (expiring soon, overdue invoices, renewals due) — muted surface, tinted icon well, subtle text, pill secondary CTA. Never loud/colored alert blocks. |
+| `.filter-tabs` (pill-group) | Status filters sit **outside** the card as pills, not as radio lists in a side panel. |
+| `.card > .when-full / .when-empty` | The content card wraps both states. Empty state uses the 52px tinted icon-well + 15px title + 13px sub + pill CTAs recipe from §14. |
+| `.…-menu-wrap` (kebab) | Per-row `⋯` button with a floating Apple-style dropdown of row actions. See pattern below. |
+| Apple-faithful pagination footer | See pattern below. |
+
+#### Pagination footer (Apple-faithful)
+
+Transparent, borderless, typographic — not a tertiary-surface DataTables bar.
+
+```html
+<div class="dom-footer when-full">
+    <div class="dom-page-size">
+        Show
+        <select><option>10</option><option>25</option><option>50</option></select>
+        entries
+    </div>
+    <div class="spacer"></div>
+    <span>Showing 1–5 of 5</span>
+    <div class="dom-pages">
+        <button disabled>‹</button>
+        <button class="active">1</button>
+        <button disabled>›</button>
+    </div>
+</div>
+```
+
+Key properties:
+- `background: transparent`, no `border-top`.
+- `<select>`: `border: 0; background: transparent;` — hover reveals a subtle `--color-surface-secondary` fill. No box around it in the resting state.
+- Page buttons: `border: 0; background: transparent;` — active + hover use `color: var(--color-accent)`, not a filled accent pill. Disabled = `opacity: 0.25`.
+- Tabular-nums on counts.
+
+#### Divider lines and column-header surface
+
+Drop the hairline between rows, the hairline under the column header, and the tinted `surface-secondary` strip behind the column header. The card is the container; whitespace and hover do the rest:
+
+```css
+/* Rows + column header: no separating lines */
+.dom-main .domain-row,
+.dom-main .domain-list-header { border-bottom: none; }
+
+/* Column headers sit on the card surface, not on a tinted strip */
+.svc-table thead th { background: transparent; border-bottom: none; }
+```
+
+#### Per-row kebab (⋯) action menu
+
+Use a three-dot button in the last cell of each row for row-level actions — not a chevron link, and not a row of inline icons. One button, one dropdown.
+
+```html
+<div class="dom-menu-wrap" onclick="event.stopPropagation();">
+    <button type="button" class="dom-menu-btn" aria-haspopup="true" aria-expanded="false"
+            onclick="toggleDomMenu(this, event)">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="5" cy="12" r="2"/>
+            <circle cx="12" cy="12" r="2"/>
+            <circle cx="19" cy="12" r="2"/>
+        </svg>
+    </button>
+    <div class="dom-menu" role="menu">
+        <a href="…" class="dom-menu-item" role="menuitem">
+            <svg>…</svg> Manage Domain
+        </a>
+        <!-- etc -->
+    </div>
+</div>
+```
+
+Key properties:
+- **Button**: 28×28 circle, transparent by default, `surface-secondary` on hover + when open. Three dots at 14px, tertiary color.
+- **Dropdown**: absolute under the button, 220px min-width, `surface` background, `0.5px` border, `8px 32px` shadow, `var(--radius-md)` corners, `z-index: 20`.
+- **Items**: 13px, 14px icons (tertiary → accent on hover), `surface-secondary` hover row.
+- **Row container must allow overflow**. The card has `overflow: hidden` by default — override it on the list's card so the menu isn't clipped:
+  ```css
+  .dom-main .card,
+  .svc-main .card { overflow: visible; }
+  ```
+- **Whole-row click still works**. Because `<a>` can't nest `<a>`, list rows use `<div class="domain-row" data-href="…">` (or existing `<tr data-href>`) with a JS click handler that bails out if the click target is inside `.…-menu-wrap`, a `<button>`, or an `<a>`.
+- **Menu behavior**: only one menu open at a time; closes on outside click and on `Escape`.
+
+#### Chip-driven layout (dev preview only)
+
+The `partials/state-chip.html` preview chip + `apple-layout.js` drive several body attributes that this pattern responds to:
+
+| Attribute | Values | Effect |
+|---|---|---|
+| `data-align` | (unset) / `content` / `left` | `unset` = center combined (main + aside); `content` = center main only, aside floats in remaining gutter; `left` = flush left |
+| `data-subnav` | (unset) / `off` | `off` hides the aside and collapses `.…-split` to 1 column |
+| `data-subnav-side` | `right` (default) / `left` / `outside` / `outside-left` | `right`/`left` = inside grid column; `outside`/`outside-left` = aside floats in the outer gutter (falls back to inside column below 1100px viewport) |
+
+These chips are dev-only. CSS rules live on each list page under `body[data-subnav-side="…"] .…-split { … }` — copy the block from `clientareadomains.html` or `clientareaproducts.html` when adding a new list page and swap the prefix.
+
+#### List Page Rules
+
+✅ **Do**
+- Use the refined header: no uppercase eyebrow, single-word title, `.page-header-action` text link instead of a filled pill.
+- Wrap the full state in `.when-full` and ship an Apple-style empty card in `.when-empty` — state-chip toggles between them.
+- Put filter tabs as a pill-group above the card, not as a radio list in a side panel.
+- Keep the sub-nav counts in sync with the data state (`.subnav-count.when-full` shows the real count; `.subnav-count.when-empty` shows `0`).
+- Use the transparent pagination footer — no surface-tertiary strip, no filled accent page-button.
+- Let column headers sit on the card surface — no `surface-secondary` tinted strip, no underline.
+- Use one per-row `⋯` kebab dropdown for row actions, not a row of inline icons or a chevron link.
+- Override `.…-main .card { overflow: visible }` on list pages so the kebab dropdown isn't clipped by the card's rounded corners.
+- Center action/toggle columns (`text-align: center; justify-self: center;` on `:nth-child(N)`).
+
+❌ **Don't**
+- Don't reuse the Dashboard Page Pattern's `.page-eyebrow` + `.btn-primary` on list pages — they feel SaaS-y. List pages are typographic.
+- Don't put the filter controls in a left side-panel card with radio buttons — that was the older pattern; we've replaced it with pill-group tabs for visual consistency across list pages.
+- Don't use the legacy `svc-paging` / `inv-pages`-with-fill styling from older v2 pages — the current standard is borderless and transparent.
+- Don't ship divider hairlines between rows — the card is the container, hover + spacing do the work.
+- Don't use a tinted `surface-secondary` background behind `<thead>` — the header is part of the same visual plane as the rows.
+- Don't nest `<a>` inside `<a>`. If a row is clickable and needs a kebab menu, the row must be a `<div>` (or `<tr>`) with `data-href` + a JS click handler.
+- Don't wire the chip options into server-rendered templates. They're preview-only.
+
 ---
 
 ## 15. Component Library

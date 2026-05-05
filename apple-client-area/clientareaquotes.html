@@ -4,17 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Quotes — WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
-    <link rel="stylesheet" href="css/apple-layout.css">
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
     <style>
         body { display: block; }
 
-        .page-header { margin-bottom: 24px; }
-        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+        /* ── Page header — match invoices: bigger H1, subtitle, optional action on right ── */
+        .page-header h1 {
+            font-size: 40px; font-weight: 600; letter-spacing: -0.028em;
+            color: var(--color-text-primary); margin: 0 0 8px;
+            line-height: 1.1;
+        }
+        .page-header .page-subtitle {
+            font-size: 15px; color: var(--color-text-secondary);
+            letter-spacing: -0.01em; line-height: 1.45;
+            margin: 0; max-width: 560px;
+        }
+        .page-header-row {
+            display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .page-header-action {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 14px; font-weight: 500; letter-spacing: -0.008em;
+            color: var(--color-accent); text-decoration: none;
+            flex-shrink: 0; white-space: nowrap;
+            transition: color var(--transition-fast);
+        }
+        .page-header-action:hover { color: var(--color-accent); text-decoration: none; }
+        .page-header-action:hover .chev { transform: translateX(2px); }
+        .page-header-action .chev { width: 12px; height: 12px; transition: transform var(--transition-fast); }
 
-        /* ── 2-column split: Billing subnav + content ── */
-        .q-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+        /* ── 2-column split: main left, sub-nav right ── */
+        .q-split { display: grid; grid-template-columns: 1fr 240px; gap: 24px; align-items: start; }
         @media (max-width: 880px) { .q-split { grid-template-columns: 1fr; } }
+        .q-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+        /* Sub-nav toggle off — hide aside, collapse to single column */
+        body[data-subnav="off"] .q-split { grid-template-columns: 1fr; }
+        body[data-subnav="off"] .q-split > aside { display: none; }
+        /* Sub-nav side — put aside on the left */
+        body[data-subnav-side="left"] .q-split { grid-template-columns: 240px 1fr; }
+        body[data-subnav-side="left"] .q-split > aside { grid-column: 1; grid-row: 1; }
+        body[data-subnav-side="left"] .q-split > .q-main { grid-column: 2; grid-row: 1; }
+        /* Sub-nav side — float aside in outer gutter */
+        body[data-subnav-side="outside"] .q-split,
+        body[data-subnav-side="outside-left"] .q-split { grid-template-columns: 1fr; position: relative; }
+        body[data-subnav-side="outside"] .q-split > aside,
+        body[data-subnav-side="outside-left"] .q-split > aside {
+            position: absolute;
+            top: 0;
+            width: 240px;
+        }
+        body[data-subnav-side="outside"] .q-split > aside { left: calc(100% + 24px); }
+        body[data-subnav-side="outside-left"] .q-split > aside { right: calc(100% + 24px); left: auto; }
+        body[data-subnav-side="outside"] .q-split > .q-main,
+        body[data-subnav-side="outside-left"] .q-split > .q-main { grid-column: 1; }
+        body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+        body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
+        body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 240px; }
+        @media (max-width: 1100px) {
+            body[data-subnav-side="outside"] .q-split { grid-template-columns: 1fr 240px; gap: 24px; position: static; }
+            body[data-subnav-side="outside-left"] .q-split { grid-template-columns: 240px 1fr; gap: 24px; position: static; }
+            body[data-subnav-side="outside"] .q-split > aside,
+            body[data-subnav-side="outside-left"] .q-split > aside { position: static; width: auto; right: auto; left: auto; }
+            body[data-subnav-side="outside-left"] .q-split > aside { grid-column: 1; grid-row: 1; }
+            body[data-subnav-side="outside-left"] .q-split > .q-main { grid-column: 2; grid-row: 1; }
+        }
+
+        /* Sentinel — invisible marker so the state-chip Services pill stays available */
+        .svc-table-card { display: none !important; }
+
+        /* Controls outside — strip the wrapper card chrome from .card children of .q-main */
+        body[data-svc-layout="outside"] .q-main > .card {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+        }
+        body[data-svc-layout="outside"] .q-main .card > .card-header { padding: 2px 4px 10px; }
+        body[data-svc-layout="outside"] .q-main .card > .card-body {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 16px 24px 20px;
+        }
 
         /* Shared sub-nav primitive */
         .subnav-card { padding: 8px; }
@@ -46,42 +119,68 @@
         .status-pill.lost      { background: var(--color-red-bg); color: var(--color-red-text); }
         .status-pill.dead      { background: var(--color-gray-bg); color: var(--color-gray-text); }
 
-        /* ── Toolbar ── */
-        .q-toolbar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 0.5px solid var(--color-border); flex-wrap: wrap; }
-        .q-search { flex: 1 1 240px; min-width: 180px; max-width: 320px; position: relative; display: inline-flex; align-items: center; }
-        .q-search svg { position: absolute; left: 12px; width: 13px; height: 13px; color: var(--color-text-tertiary); pointer-events: none; }
-        .q-search input { padding: 0 14px 0 32px; height: 32px; width: 100%; margin: 0; font-size: 13px; border-radius: var(--radius-pill); background: var(--color-surface-secondary); border: 1px solid transparent; color: var(--color-text-primary); transition: all var(--transition-fast); }
-        .q-search input:focus { outline: none; background: var(--color-surface); border-color: var(--color-accent); }
-        .q-toolbar-spacer { flex: 1 1 8px; }
+        /* ── Muted status banner — never loud; tinted icon well conveys urgency ── */
+        .q-banner {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
+            font-size: 13px; letter-spacing: -0.008em;
+        }
+        .q-banner .q-banner-ico {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--color-accent-light); color: var(--color-accent);
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .q-banner .q-banner-ico svg { width: 13px; height: 13px; }
+        .q-banner strong { color: var(--color-text-primary); font-weight: 600; }
+        .q-banner .spacer { flex: 1; }
+        .q-banner .btn-secondary { height: 28px; padding: 0 12px; font-size: 12px; }
 
-        .q-filters { display: inline-flex; background: var(--color-surface-secondary); border-radius: var(--radius-pill); padding: 3px; gap: 0; flex-wrap: wrap; }
-        .q-filters button { border: 0; background: transparent; padding: 5px 12px; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); border-radius: var(--radius-pill); cursor: pointer; font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
-        .q-filters button.active { background: var(--color-surface); color: var(--color-text-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-        .q-filters .q-filter-count { font-size: 10px; color: var(--color-text-tertiary); background: var(--color-surface-secondary); padding: 0 5px; border-radius: var(--radius-pill); min-width: 16px; text-align: center; line-height: 14px; }
-        .q-filters button.active .q-filter-count { background: var(--color-accent-light); color: var(--color-accent); }
+        /* ── Table — no tinted thead background, no row dividers ── */
+        .q-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+        /* Explicit column widths so the floating head row above the card lines up with tbody cells */
+        .q-table col.q-col-quote   { width: auto; }
+        .q-table col.q-col-date    { width: 120px; }
+        .q-table col.q-col-valid   { width: 120px; }
+        .q-table col.q-col-amount  { width: 110px; }
+        .q-table col.q-col-status  { width: 120px; }
+        .q-table col.q-col-actions { width: 56px; }
+        /* Hide the in-table thead — column titles are rendered as a standalone row above the card */
+        .q-table thead { display: none; }
+        .q-table tbody tr { transition: background var(--transition-fast); }
+        .q-table tbody tr[data-href] { cursor: pointer; }
+        .q-table tbody tr:hover { background: var(--color-surface-secondary); }
+        .q-table tbody td {
+            padding: 16px 20px;
+            vertical-align: middle;
+            color: var(--color-text-primary);
+            letter-spacing: -0.008em;
+            border-bottom: none;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .q-table td.amount { font-variant-numeric: tabular-nums; font-weight: 500; color: var(--color-text-primary); }
+        .q-table td.date { color: var(--color-text-secondary); font-size: 12px; font-variant-numeric: tabular-nums; }
+        .q-table td.actions { text-align: center; padding: 16px 12px; position: relative; }
 
-        /* ── Table ── */
-        .q-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .q-table thead th {
+        /* ── Floating column titles — sit OUTSIDE the white card on the page surface (services pattern) ── */
+        .q-table-head-row {
+            display: flex; align-items: center;
+            padding: 2px 0;
             font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
             text-transform: uppercase; letter-spacing: 0.05em;
-            text-align: left; padding: 14px 20px;
-            border-bottom: 0.5px solid var(--color-border);
-            background: var(--color-surface-tertiary);
         }
-        .q-table thead th:last-child { text-align: right; padding-right: 16px; }
-        .q-table tbody tr { cursor: pointer; transition: background var(--transition-fast); }
-        .q-table tbody tr:hover { background: var(--sidebar-item-hover); }
-        .q-table tbody td {
-            padding: 14px 20px;
-            border-bottom: 0.5px solid var(--color-border);
-            vertical-align: middle;
-            letter-spacing: -0.008em;
-        }
-        .q-table tbody tr:last-child td { border-bottom: 0; }
-        .q-table td.date { color: var(--color-text-secondary); font-size: 12px; }
-        .q-table td.amount { font-variant-numeric: tabular-nums; font-weight: 500; color: var(--color-text-primary); }
-        .q-table td.actions { text-align: right; padding-right: 16px; }
+        .q-table-head-row .hl-cell { padding: 0 20px; }
+        .q-table-head-row .hl-quote   { flex: 1 1 auto; min-width: 0; text-align: left; }
+        .q-table-head-row .hl-date    { width: 120px; text-align: left; }
+        .q-table-head-row .hl-valid   { width: 120px; text-align: left; }
+        .q-table-head-row .hl-amount  { width: 110px; text-align: left; }
+        .q-table-head-row .hl-status  { width: 120px; text-align: left; }
+        .q-table-head-row .hl-actions { width: 56px; padding: 0; }
+
+        /* Quote id cell */
         .q-id-cell { display: inline-flex; align-items: center; gap: 10px; }
         .q-id-ico {
             width: 30px; height: 30px; border-radius: 8px;
@@ -93,17 +192,6 @@
         .q-id-ico svg { width: 13px; height: 13px; }
         .q-id-num { font-weight: 500; color: var(--color-text-primary); }
         .q-subject { display: block; font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; font-weight: 400; }
-
-        .q-action-btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 28px; height: 28px; border-radius: 50%;
-            background: transparent; border: 0;
-            color: var(--color-text-tertiary);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-        .q-action-btn:hover { background: var(--color-accent-light); color: var(--color-accent); }
-        .q-action-btn svg { width: 14px; height: 14px; }
 
         /* Sort chevrons */
         .q-sort {
@@ -125,31 +213,74 @@
         .q-sort[data-dir="desc"] .q-sort-ico::after  { opacity: 1; }
         .q-sort.active { color: var(--color-text-primary); }
 
-        /* Pagination */
+        /* Let the kebab dropdown escape the card */
+        .q-main .card { overflow: visible; }
+
+        /* Kebab (three-dot) menu — mirrors invoices pattern */
+        .q-menu-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+        .q-menu-btn {
+            width: 28px; height: 28px;
+            border: 0; background: transparent;
+            border-radius: 50%;
+            color: var(--color-text-tertiary);
+            cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: background var(--transition-fast), color var(--transition-fast);
+        }
+        .q-menu-btn:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+        .q-menu-btn svg { width: 14px; height: 14px; }
+        .q-menu-wrap.open .q-menu-btn { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+        .q-menu {
+            position: absolute;
+            top: calc(100% + 6px); right: 0;
+            min-width: 220px;
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
+            padding: 6px;
+            z-index: 20;
+            display: none;
+            text-align: left;
+        }
+        .q-menu-wrap.open .q-menu { display: block; }
+        .q-menu-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: var(--radius-sm);
+            font-size: 13px; letter-spacing: -0.008em;
+            color: var(--color-text-primary);
+            text-decoration: none;
+            transition: background var(--transition-fast);
+            white-space: nowrap;
+        }
+        .q-menu-item:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); text-decoration: none; }
+        .q-menu-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .q-menu-item:hover svg { color: var(--color-accent); }
+
+        /* ── Pagination footer — Apple-faithful: transparent, borderless, no filled accent pill ── */
         .q-footer {
             display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
             padding: 12px 20px;
-            border-top: 0.5px solid var(--color-border);
             font-size: 12px; color: var(--color-text-tertiary);
-            background: var(--color-surface-tertiary);
         }
         .q-footer .spacer { flex: 1; }
         .q-page-size { display: inline-flex; align-items: center; gap: 6px; }
         .q-page-size select {
-            height: 26px; padding: 0 22px 0 10px;
-            border: 0.5px solid var(--color-border);
-            background: var(--color-surface);
+            height: 26px; padding: 0 22px 0 8px;
+            border: 0; background: transparent;
             border-radius: var(--radius-sm);
-            font-size: 12px;
-            font-family: inherit;
+            font-size: 12px; font-family: inherit; font-weight: 500;
             color: var(--color-text-primary);
             appearance: none;
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
             background-repeat: no-repeat;
-            background-position: right 8px center;
+            background-position: right 6px center;
             cursor: pointer;
+            transition: background var(--transition-fast);
         }
-        .q-pages { display: inline-flex; gap: 2px; }
+        .q-page-size select:hover { background-color: var(--color-surface-secondary); }
+        .q-page-size select:focus { outline: none; background-color: var(--color-surface-secondary); box-shadow: 0 0 0 3px var(--color-accent-light); }
+        .q-pages { display: inline-flex; gap: 2px; align-items: center; }
         .q-pages button {
             min-width: 26px; height: 26px; padding: 0 8px;
             border: 0; background: transparent;
@@ -160,36 +291,73 @@
             transition: all var(--transition-fast);
             display: inline-flex; align-items: center; justify-content: center;
         }
-        .q-pages button:hover:not(:disabled):not(.active) { background: var(--sidebar-item-hover); color: var(--color-text-primary); }
-        .q-pages button.active { background: var(--color-accent); color: #fff; }
-        .q-pages button:disabled { opacity: 0.35; cursor: not-allowed; }
+        .q-pages button:hover:not(:disabled):not(.active) { color: var(--color-accent); }
+        .q-pages button.active { color: var(--color-accent); font-weight: 600; }
+        .q-pages button:disabled { opacity: 0.25; cursor: default; }
         .q-pages button svg { width: 11px; height: 11px; }
 
-        /* ── Empty state ── */
-        .q-empty { padding: 72px 24px 64px; text-align: center; color: var(--color-text-secondary); }
+        /* ── Quotes stack ──────────────────────────────────────────
+           Default ("Controls inside"): unified card — head row, rows, pager share the surface.
+           "Controls outside": stack transparent; only the table card keeps its surface. ─── */
+        .q-main > .filter-tabs { margin-bottom: 8px; margin-top: 4px; }
+        .q-main { gap: 8px; }
+        .q-stack {
+            background: var(--color-surface);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-card);
+            overflow: visible;
+            margin-bottom: 24px;
+        }
+        .q-stack .q-table tbody tr:first-child td:first-child { border-top-left-radius: var(--radius-md); }
+        .q-stack .q-table tbody tr:first-child td:last-child  { border-top-right-radius: var(--radius-md); }
+        .q-stack .q-table tbody tr:last-child  td:first-child { border-bottom-left-radius: var(--radius-md); }
+        .q-stack .q-table tbody tr:last-child  td:last-child  { border-bottom-right-radius: var(--radius-md); }
+        .q-stack > .q-table-head-row { padding: 10px 0 6px; margin: 0; }
+        .q-stack > .q-table-card {
+            background: transparent; border: 0; box-shadow: none; border-radius: 0; margin: 0; overflow: visible;
+        }
+        .q-stack > .q-footer { margin: 0; padding: 10px 20px 14px; }
+
+        /* Controls outside — stack transparent, table card keeps surface */
+        body[data-svc-layout="outside"] .q-stack {
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        body[data-svc-layout="outside"] .q-stack > .q-table-head-row {
+            padding: 2px 0;
+        }
+        body[data-svc-layout="outside"] .q-stack > .q-table-card {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            overflow: visible;
+            margin: 0;
+        }
+        body[data-svc-layout="outside"] .q-stack > .q-footer {
+            padding: 12px 4px;
+        }
+
+        /* ── Empty state — Apple-quiet, smaller than the rebuilt one ── */
+        .q-empty { padding: 48px 24px 40px; text-align: center; color: var(--color-text-secondary); }
         .q-empty-ico {
-            width: 64px; height: 64px; border-radius: 50%;
+            width: 52px; height: 52px; border-radius: 50%;
             background: var(--color-surface-secondary);
             color: var(--color-text-tertiary);
             display: inline-flex; align-items: center; justify-content: center;
-            margin: 0 auto 18px;
+            margin: 0 auto 14px;
         }
-        .q-empty-ico svg { width: 26px; height: 26px; }
-        .q-empty-title {
-            font-size: 17px; font-weight: 600;
-            color: var(--color-text-primary);
-            letter-spacing: -0.014em;
-            margin: 0 0 8px;
-        }
-        .q-empty-desc {
-            font-size: 13px; color: var(--color-text-secondary);
-            line-height: 1.55;
-            max-width: 360px;
-            margin: 0 auto 22px;
-            letter-spacing: -0.008em;
-        }
-        .q-empty .btn-primary { height: 34px; padding: 0 18px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
-        .q-empty .btn-primary svg { width: 13px; height: 13px; }
+        .q-empty-ico svg { width: 22px; height: 22px; }
+        .q-empty-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.01em; }
+        .q-empty-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 auto 18px; max-width: 340px; line-height: 1.45; }
+        .q-empty .btn-primary,
+        .q-empty .btn-secondary { height: 32px; padding: 0 16px; font-size: 13px; }
     </style>
 </head>
 <body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="quotes" data-page-title="My Quotes">
@@ -235,72 +403,79 @@
 
 <div class="content-area">
     <header class="page-header">
-        <h1>My quotes</h1>
-        <p class="page-subtitle">Pending proposals and saved estimates from our team.</p>
+        <div class="page-header-row">
+            <div style="flex: 1; min-width: 0;">
+                <h1>Quotes</h1>
+                <p class="page-subtitle">Pending proposals and saved estimates from our team.</p>
+            </div>
+            <a href="supportticketsubmit.html" class="page-header-action when-full">
+                Request a quote
+                <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+        </div>
     </header>
 
     <div class="q-split">
-        <!-- ══ LEFT: Billing sub-nav ══ -->
-        <aside>
-            <div class="card subnav-card">
-                <div class="subnav-heading">Billing</div>
-                <a href="clientareainvoices.html" class="subnav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                    My Invoices
-                    <span class="subnav-count">2</span>
-                </a>
-                <a href="clientareaquotes.html" class="subnav-item active">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-                    My Quotes
-                    <span class="subnav-count">5</span>
-                </a>
-                <a href="masspay.html" class="subnav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
-                    Mass Payment
-                </a>
-                <a href="clientareaaddfunds.html" class="subnav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                    Add Funds
-                </a>
-                <a href="account-paymentmethods.html" class="subnav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                    Payment Methods
-                </a>
-            </div>
-        </aside>
+        <!-- ══ LEFT: quotes content ══ -->
+        <div class="q-main">
+            <!-- Sentinel for state-chip Services pill detection -->
+            <div class="svc-table-card" aria-hidden="true"></div>
 
-        <!-- ══ RIGHT: quotes content ══ -->
-        <div>
-            <div class="card">
-                <!-- Toolbar (full state only) -->
-                <div class="q-toolbar when-full">
-                    <div class="q-search">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <input type="search" placeholder="Search quotes…" autocomplete="off">
+            <!-- Muted status banner -->
+            <div class="q-banner when-full">
+                <span class="q-banner-ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </span>
+                <span><strong>2 quotes pending review</strong> · 1 expiring within 7 days.</span>
+                <span class="spacer"></span>
+                <a href="#" class="btn-secondary">View pending</a>
+            </div>
+
+            <!-- Filter tabs — pill-group, outside the card -->
+            <div class="filter-tabs when-full">
+                <button class="filter-tab active">All</button>
+                <button class="filter-tab">Delivered</button>
+                <button class="filter-tab">On hold</button>
+                <button class="filter-tab">Accepted</button>
+                <button class="filter-tab">Lost</button>
+                <button class="filter-tab">Draft</button>
+            </div>
+
+            <!-- Quotes stack: "inside" = unified card; "outside" = card + floating head row + floating pager -->
+            <div class="q-stack">
+
+            <!-- Floating column titles — sit OUTSIDE the white table card on the page surface -->
+            <div class="q-table-head-row when-full">
+                <div class="hl-cell hl-quote"><button type="button" class="q-sort active" data-sort="id" data-dir="desc">Quote <span class="q-sort-ico"></span></button></div>
+                <div class="hl-cell hl-date"><button type="button" class="q-sort" data-sort="date" data-dir="">Date <span class="q-sort-ico"></span></button></div>
+                <div class="hl-cell hl-valid"><button type="button" class="q-sort" data-sort="valid" data-dir="">Valid until <span class="q-sort-ico"></span></button></div>
+                <div class="hl-cell hl-amount"><button type="button" class="q-sort" data-sort="amount" data-dir="">Amount <span class="q-sort-ico"></span></button></div>
+                <div class="hl-cell hl-status"><button type="button" class="q-sort" data-sort="status" data-dir="">Status <span class="q-sort-ico"></span></button></div>
+                <div class="hl-cell hl-actions" aria-hidden="true"></div>
+            </div>
+
+            <!-- Rows card — only this keeps a surface in "outside" mode -->
+            <div class="card q-table-card">
+                <!-- Empty state -->
+                <div class="when-empty q-empty">
+                    <div class="q-empty-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
                     </div>
-                    <div class="q-filters" role="tablist">
-                        <button type="button" class="active">All <span class="q-filter-count">5</span></button>
-                        <button type="button">Delivered <span class="q-filter-count">2</span></button>
-                        <button type="button">On hold <span class="q-filter-count">1</span></button>
-                        <button type="button">Accepted <span class="q-filter-count">1</span></button>
-                        <button type="button">Lost <span class="q-filter-count">1</span></button>
-                        <button type="button">Draft <span class="q-filter-count">0</span></button>
-                    </div>
-                    <div class="q-toolbar-spacer"></div>
+                    <p class="q-empty-title">No quotes yet</p>
+                    <p class="q-empty-sub">When our team prepares a proposal for you, it'll show up here. Need one? Open a ticket and we'll get back to you.</p>
+                    <a href="supportticketsubmit.html" class="btn-secondary">Open a ticket</a>
                 </div>
 
-                <!-- Full-state: quotes table -->
+                <!-- Table -->
                 <table class="q-table when-full">
-                    <thead>
-                        <tr>
-                            <th scope="col"><button type="button" class="q-sort active" data-sort="id" data-dir="desc">Quote <span class="q-sort-ico"></span></button></th>
-                            <th scope="col"><button type="button" class="q-sort" data-sort="date" data-dir="">Date created <span class="q-sort-ico"></span></button></th>
-                            <th scope="col"><button type="button" class="q-sort" data-sort="valid" data-dir="">Valid until <span class="q-sort-ico"></span></button></th>
-                            <th scope="col"><button type="button" class="q-sort" data-sort="amount" data-dir="">Amount <span class="q-sort-ico"></span></button></th>
-                            <th scope="col"><button type="button" class="q-sort" data-sort="status" data-dir="">Status <span class="q-sort-ico"></span></button></th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                    </thead>
+                    <colgroup>
+                        <col class="q-col-quote">
+                        <col class="q-col-date">
+                        <col class="q-col-valid">
+                        <col class="q-col-amount">
+                        <col class="q-col-status">
+                        <col class="q-col-actions">
+                    </colgroup>
                     <tbody>
                         <tr data-href="viewquote.html">
                             <td>
@@ -317,8 +492,25 @@
                             <td class="amount">$489.00</td>
                             <td><span class="status-pill delivered">Delivered</span></td>
                             <td class="actions">
-                                <button type="button" class="q-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-                                <button type="button" class="q-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                                <div class="q-menu-wrap" onclick="event.stopPropagation();">
+                                    <button type="button" class="q-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleQMenu(this, event)">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                    </button>
+                                    <div class="q-menu" role="menu">
+                                        <a href="viewquote.html" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            View Quote
+                                        </a>
+                                        <a href="#" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                            Download PDF
+                                        </a>
+                                        <a href="viewquote.html" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                            Accept Quote
+                                        </a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         <tr data-href="viewquote.html">
@@ -336,8 +528,25 @@
                             <td class="amount">$149.00</td>
                             <td><span class="status-pill accepted">Accepted</span></td>
                             <td class="actions">
-                                <button type="button" class="q-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-                                <button type="button" class="q-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                                <div class="q-menu-wrap" onclick="event.stopPropagation();">
+                                    <button type="button" class="q-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleQMenu(this, event)">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                    </button>
+                                    <div class="q-menu" role="menu">
+                                        <a href="viewquote.html" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            View Quote
+                                        </a>
+                                        <a href="#" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                            Download PDF
+                                        </a>
+                                        <a href="masspayquotes.html" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                                            Pay Quote
+                                        </a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         <tr data-href="viewquote.html">
@@ -355,8 +564,21 @@
                             <td class="amount">$1,240.00</td>
                             <td><span class="status-pill on-hold">On hold</span></td>
                             <td class="actions">
-                                <button type="button" class="q-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-                                <button type="button" class="q-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                                <div class="q-menu-wrap" onclick="event.stopPropagation();">
+                                    <button type="button" class="q-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleQMenu(this, event)">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                    </button>
+                                    <div class="q-menu" role="menu">
+                                        <a href="viewquote.html" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            View Quote
+                                        </a>
+                                        <a href="#" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                            Download PDF
+                                        </a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         <tr data-href="viewquote.html">
@@ -374,8 +596,25 @@
                             <td class="amount">$79.00</td>
                             <td><span class="status-pill delivered">Delivered</span></td>
                             <td class="actions">
-                                <button type="button" class="q-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-                                <button type="button" class="q-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                                <div class="q-menu-wrap" onclick="event.stopPropagation();">
+                                    <button type="button" class="q-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleQMenu(this, event)">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                    </button>
+                                    <div class="q-menu" role="menu">
+                                        <a href="viewquote.html" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            View Quote
+                                        </a>
+                                        <a href="#" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                            Download PDF
+                                        </a>
+                                        <a href="viewquote.html" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                            Accept Quote
+                                        </a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         <tr data-href="viewquote.html">
@@ -393,52 +632,78 @@
                             <td class="amount">$329.00</td>
                             <td><span class="status-pill lost">Lost</span></td>
                             <td class="actions">
-                                <button type="button" class="q-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-                                <button type="button" class="q-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                                <div class="q-menu-wrap" onclick="event.stopPropagation();">
+                                    <button type="button" class="q-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleQMenu(this, event)">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                    </button>
+                                    <div class="q-menu" role="menu">
+                                        <a href="viewquote.html" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            View Quote
+                                        </a>
+                                        <a href="#" class="q-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                            Download PDF
+                                        </a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
 
-                <!-- Full-state: pagination -->
-                <div class="q-footer when-full">
-                    <div class="q-page-size">
-                        Show
-                        <select aria-label="Rows per page">
-                            <option>10</option>
-                            <option>25</option>
-                            <option>50</option>
-                        </select>
-                        entries
-                    </div>
-                    <div class="spacer"></div>
-                    <span>Showing 1–5 of 5</span>
-                    <div class="q-pages">
-                        <button type="button" disabled aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-                        <button type="button" class="active">1</button>
-                        <button type="button" disabled aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-                    </div>
+            <!-- Footer / pagination — floats outside in "outside" mode, part of the card in "inside" -->
+            <div class="q-footer when-full">
+                <div class="q-page-size">
+                    Show
+                    <select aria-label="Rows per page">
+                        <option>10</option>
+                        <option>25</option>
+                        <option>50</option>
+                    </select>
+                    entries
                 </div>
-
-                <!-- Empty state -->
-                <div class="when-empty q-empty">
-                    <div class="q-empty-ico">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="9" y1="13" x2="15" y2="13"/>
-                            <line x1="9" y1="17" x2="15" y2="17"/>
-                        </svg>
-                    </div>
-                    <h2 class="q-empty-title">No quotes saved</h2>
-                    <p class="q-empty-desc">There are currently no quotes saved under your account. To request a quote, please open a ticket and our team will prepare one for you.</p>
-                    <a href="supportticketsubmit.html" class="btn-primary">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Open a ticket
-                    </a>
+                <div class="spacer"></div>
+                <span>Showing 1–5 of 5</span>
+                <div class="q-pages">
+                    <button type="button" disabled aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+                    <button type="button" class="active">1</button>
+                    <button type="button" disabled aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
                 </div>
             </div>
+
+            </div><!-- /.q-stack -->
         </div>
+
+        <!-- ══ RIGHT: Billing sub-nav ══ -->
+        <aside>
+            <div class="card subnav-card">
+                <div class="subnav-heading">Billing</div>
+                <a href="clientareainvoices.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    My Invoices
+                    <span class="subnav-count when-full">6</span>
+                    <span class="subnav-count when-empty">0</span>
+                </a>
+                <a href="clientareaquotes.html" class="subnav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+                    My Quotes
+                </a>
+                <a href="masspay.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+                    Mass Payment
+                </a>
+                <a href="clientareaaddfunds.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    Add Funds
+                </a>
+                <a href="account-paymentmethods.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                    Payment Methods
+                </a>
+            </div>
+        </aside>
     </div>
 </div>
 
@@ -466,23 +731,59 @@
 </div><!-- /.ph-main-wrap -->
 <div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js"></script>
-<script src="js/apple-layout.js"></script>
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
 <script>
 // Row click navigation + sort cycle
-(function () {
-    document.querySelectorAll('.q-table tr[data-href]').forEach(tr => {
-        tr.addEventListener('click', (e) => {
-            if (e.target.closest('button, a')) return;
-            window.location.href = tr.getAttribute('data-href');
-        });
+// Row click navigates to the quote, but ignore clicks inside the kebab menu
+document.querySelectorAll('.q-table tr[data-href]').forEach(function (tr) {
+    tr.addEventListener('click', function (e) {
+        if (e.target.closest('a, button, input, select, .q-menu-wrap')) return;
+        window.location.href = tr.getAttribute('data-href');
     });
-    const sorts = document.querySelectorAll('.q-sort');
-    sorts.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const dir = btn.getAttribute('data-dir');
-            const next = dir === '' ? 'asc' : dir === 'asc' ? 'desc' : '';
-            sorts.forEach(b => { b.setAttribute('data-dir', ''); b.classList.remove('active'); });
+});
+
+// Kebab menu toggle per row
+function toggleQMenu(btn, e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    var wrap = btn.closest('.q-menu-wrap');
+    var wasOpen = wrap.classList.contains('open');
+    document.querySelectorAll('.q-menu-wrap.open').forEach(function (w) {
+        w.classList.remove('open');
+        var b = w.querySelector('.q-menu-btn');
+        if (b) b.setAttribute('aria-expanded', 'false');
+    });
+    if (!wasOpen) {
+        wrap.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+    }
+}
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.q-menu-wrap')) return;
+    document.querySelectorAll('.q-menu-wrap.open').forEach(function (w) {
+        w.classList.remove('open');
+        var b = w.querySelector('.q-menu-btn');
+        if (b) b.setAttribute('aria-expanded', 'false');
+    });
+});
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.q-menu-wrap.open').forEach(function (w) {
+            w.classList.remove('open');
+            var b = w.querySelector('.q-menu-btn');
+            if (b) b.setAttribute('aria-expanded', 'false');
+        });
+    }
+});
+
+// Sort cycle — none → asc → desc → none
+(function () {
+    var sorts = document.querySelectorAll('.q-sort');
+    sorts.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var dir = btn.getAttribute('data-dir');
+            var next = dir === '' ? 'asc' : dir === 'asc' ? 'desc' : '';
+            sorts.forEach(function (b) { b.setAttribute('data-dir', ''); b.classList.remove('active'); });
             btn.setAttribute('data-dir', next);
             if (next) btn.classList.add('active');
         });

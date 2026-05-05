@@ -4,30 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Domains — WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
-    <link rel="stylesheet" href="css/apple-layout.css">
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
     <style>
         body { display: block; }
 
-        /* Page header */
-        .page-header { margin-bottom: 24px; }
-        .page-header .page-eyebrow {
-            font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
-            text-transform: uppercase; letter-spacing: 0.06em;
-            margin: 0 0 6px;
+        /* Page header — Apple-leaning: bigger, tighter title, no uppercase eyebrow, subtle CTA */
+        .page-header { margin: 8px 0 32px; }
+        .page-header h1 {
+            font-size: 40px; font-weight: 600; letter-spacing: -0.028em;
+            color: var(--color-text-primary); margin: 0 0 8px;
+            line-height: 1.1;
         }
-        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
         .page-header .page-subtitle {
-            font-size: 14px; color: var(--color-text-secondary);
-            letter-spacing: -0.008em; line-height: 1.5;
-            margin: 0; max-width: 620px;
+            font-size: 15px; color: var(--color-text-secondary);
+            letter-spacing: -0.01em; line-height: 1.45;
+            margin: 0; max-width: 560px;
         }
         .page-header-row {
-            display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;
+            display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
             justify-content: space-between;
         }
-        .page-header-row .btn-primary {
-            height: 36px; padding: 0 18px; font-size: 13px; flex-shrink: 0;
+        /* Secondary "text link" CTA — Apple-style accent-blue text with chevron, no filled pill */
+        .page-header-action {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 14px; font-weight: 500; letter-spacing: -0.008em;
+            color: var(--color-accent); text-decoration: none;
+            flex-shrink: 0; white-space: nowrap;
+            transition: color var(--transition-fast);
+        }
+        .page-header-action:hover { color: var(--color-accent); text-decoration: none; }
+        .page-header-action:hover .chev { transform: translateX(2px); }
+        .page-header-action .chev {
+            width: 12px; height: 12px; transition: transform var(--transition-fast);
         }
 
         /* 2-col split — main on the left, content sidebar on the right */
@@ -131,34 +140,154 @@
 
         /* Drop the divider line between domain rows and under the column header */
         .dom-main .domain-row { border-bottom: none; }
-        .dom-main .domain-list-header { border-bottom: none; }
 
-        /* Pagination footer */
+        /* Center the Auto-Renew column (5th child) — both the header label and the toggle */
+        .dom-main .dom-list-head-row > :nth-child(5),
+        .dom-main .domain-row > :nth-child(5) {
+            text-align: center;
+            justify-self: center;
+        }
+
+        /* Widen the last grid column so the kebab menu button + its dropdown has room */
+        .dom-main .dom-list-head-row,
+        .dom-main .domain-row { grid-template-columns: 1.4fr 110px 110px 110px 90px 32px; }
+        .dom-main .domain-row:hover .service-chevron { transform: none; color: inherit; }
+
+        /* Let the kebab dropdown escape the card — the card has overflow: hidden by default. */
+        .dom-main .card { overflow: visible; }
+
+        /* ── Floating column titles (outside the card on the page surface in "outside" mode,
+             part of the unified stack card in "inside" mode) ─────────────────── */
+        .dom-list-head-row {
+            display: grid;
+            gap: 16px;
+            padding: 10px 24px 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── Domains stack ────────────────────────────────────────────────
+           Default ("Controls inside"): the stack is one unified white card —
+           column titles, rows, and pager all share the same surface.
+           "Controls outside": the stack is transparent; only the rows card keeps
+           its surface, and column titles + pager float on the page. ─────── */
+        .dom-stack {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            overflow: visible;
+        }
+        .dom-stack > .dom-list-card {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            border-radius: 0;
+            margin: 0;
+            overflow: visible;
+        }
+        /* Tighten card-body spacing so the head-row sits close to the first row in inside mode */
+        .dom-stack > .dom-list-card .card-body { padding-top: 0; }
+        .dom-stack > .dom-footer {
+            padding: 10px 24px 14px;
+            border-top: 0;
+            margin: 0;
+        }
+
+        /* Controls outside: strip the stack's own card styling and give it back
+           to the rows card only. Column titles + pager float on the page. */
+        body[data-svc-layout="outside"] .dom-stack {
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        body[data-svc-layout="outside"] .dom-stack > .dom-list-head-row {
+            padding: 2px 24px;
+        }
+        body[data-svc-layout="outside"] .dom-stack > .dom-list-card {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            overflow: visible;
+            margin: 0;
+        }
+        body[data-svc-layout="outside"] .dom-stack > .dom-list-card .card-body { padding-top: 16px; }
+        body[data-svc-layout="outside"] .dom-stack > .dom-footer {
+            padding: 12px 4px;
+            border-top: 0;
+        }
+
+        /* Kebab (three-dot) menu */
+        .dom-menu-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+        .dom-menu-btn {
+            width: 28px; height: 28px;
+            border: 0; background: transparent;
+            border-radius: 50%;
+            color: var(--color-text-tertiary);
+            cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: background var(--transition-fast), color var(--transition-fast);
+        }
+        .dom-menu-btn:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+        .dom-menu-btn svg { width: 14px; height: 14px; }
+        .dom-menu-wrap.open .dom-menu-btn { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+
+        .dom-menu {
+            position: absolute;
+            top: calc(100% + 6px); right: 0;
+            min-width: 220px;
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
+            padding: 6px;
+            z-index: 20;
+            display: none;
+        }
+        .dom-menu-wrap.open .dom-menu { display: block; }
+        .dom-menu-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: var(--radius-sm);
+            font-size: 13px; letter-spacing: -0.008em;
+            color: var(--color-text-primary);
+            text-decoration: none;
+            transition: background var(--transition-fast);
+            white-space: nowrap;
+        }
+        .dom-menu-item:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); text-decoration: none; }
+        .dom-menu-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .dom-menu-item:hover svg { color: var(--color-accent); }
+
+        /* Pagination footer — transparent, borderless, Apple-faithful */
         .dom-footer {
             display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
             padding: 12px 20px;
-            border-top: 0.5px solid var(--color-border);
             font-size: 12px; color: var(--color-text-tertiary);
-            background: var(--color-surface-tertiary);
-            border-bottom-left-radius: var(--radius-md);
-            border-bottom-right-radius: var(--radius-md);
         }
         .dom-footer .spacer { flex: 1; }
         .dom-page-size { display: inline-flex; align-items: center; gap: 6px; }
         .dom-page-size select {
-            height: 26px; padding: 0 22px 0 10px;
-            border: 0.5px solid var(--color-border);
-            background: var(--color-surface);
+            height: 26px; padding: 0 22px 0 8px;
+            border: 0; background: transparent;
             border-radius: var(--radius-sm);
-            font-size: 12px; font-family: inherit;
+            font-size: 12px; font-family: inherit; font-weight: 500;
             color: var(--color-text-primary);
             appearance: none;
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
             background-repeat: no-repeat;
-            background-position: right 8px center;
+            background-position: right 6px center;
             cursor: pointer;
+            transition: background var(--transition-fast);
         }
-        .dom-pages { display: inline-flex; gap: 2px; }
+        .dom-page-size select:hover { background-color: var(--color-surface-secondary); }
+        .dom-page-size select:focus { outline: none; background-color: var(--color-surface-secondary); box-shadow: 0 0 0 3px var(--color-accent-light); }
+        .dom-pages { display: inline-flex; gap: 2px; align-items: center; }
         .dom-pages button {
             min-width: 26px; height: 26px; padding: 0 8px;
             border: 0; background: transparent;
@@ -169,9 +298,9 @@
             transition: all var(--transition-fast);
             display: inline-flex; align-items: center; justify-content: center;
         }
-        .dom-pages button:hover:not(:disabled):not(.active) { background: var(--sidebar-item-hover); color: var(--color-text-primary); }
-        .dom-pages button.active { background: var(--color-accent); color: #fff; }
-        .dom-pages button:disabled { opacity: 0.35; cursor: not-allowed; }
+        .dom-pages button:hover:not(:disabled):not(.active) { color: var(--color-accent); }
+        .dom-pages button.active { color: var(--color-accent); font-weight: 600; }
+        .dom-pages button:disabled { opacity: 0.25; cursor: default; }
         .dom-pages button svg { width: 11px; height: 11px; }
 
         /* Empty state — toggled via body[data-data="empty"] */
@@ -326,11 +455,13 @@
     <header class="page-header">
         <div class="page-header-row">
             <div style="flex: 1; min-width: 0;">
-                <p class="page-eyebrow">Domains</p>
-                <h1>My Domains</h1>
-                <p class="page-subtitle">Manage your domain registrations, renewals, and DNS.</p>
+                <h1>Domains</h1>
+                <p class="page-subtitle">Manage your registrations, renewals, and DNS.</p>
             </div>
-            <a href="cart-domain-register.html" class="btn-primary">Register New Domain</a>
+            <a href="cart-domain-register.html" class="page-header-action">
+                Register a domain
+                <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
         </div>
     </header>
 
@@ -354,79 +485,195 @@
                 <button class="filter-tab">Transferred Away</button>
             </div>
 
-            <div class="card">
+            <!-- Domains stack: in "inside" mode it renders as one unified white card;
+                 in "outside" mode each child (titles, card, pager) floats on the page. -->
+            <div class="dom-stack">
+
+            <!-- Column titles — floats outside in "outside" mode, part of the card in "inside" -->
+            <div class="dom-list-head-row when-full">
+                <div>Domain</div>
+                <div>Registered</div>
+                <div>Expires</div>
+                <div>Status</div>
+                <div>Auto-Renew</div>
+                <div></div>
+            </div>
+
+            <div class="card dom-list-card">
                 <!-- Full state: domain list -->
                 <div class="when-full">
                     <div class="card-body">
                         <div class="domain-list">
-                            <div class="domain-list-header">
-                                <div>Domain</div>
-                                <div>Registered</div>
-                                <div>Expires</div>
-                                <div>Status</div>
-                                <div>Auto-Renew</div>
-                                <div></div>
-                            </div>
-                            <a href="clientareadomaindetails.html" class="domain-row">
+                            <div class="domain-row" data-href="clientareadomaindetails.html" role="link" tabindex="0">
                                 <div class="domain-name">hendersondesign.com</div>
                                 <div class="domain-date">Mar 12, 2022</div>
                                 <div class="domain-date">Mar 12, 2027</div>
                                 <div><span class="status-pill active">Active</span></div>
                                 <div><div class="toggle-switch active" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('active')"></div></div>
-                                <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-                            </a>
-                            <a href="clientareadomaindetails.html" class="domain-row">
+                                <div class="dom-menu-wrap" onclick="event.preventDefault(); event.stopPropagation();">
+                                    <button type="button" class="dom-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleDomMenu(this)">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                    </button>
+                                    <div class="dom-menu" role="menu">
+                                        <a href="clientareadomaindetails.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                            Manage Domain
+                                        </a>
+                                        <a href="clientareadomainregisterns.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="8" rx="1"/><rect x="2" y="13" width="20" height="8" rx="1"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/></svg>
+                                            Manage Nameservers
+                                        </a>
+                                        <a href="clientareadomaincontactinfo.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            Edit Contact Information
+                                        </a>
+                                        <a href="#" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/></svg>
+                                            Auto Renewal Status
+                                        </a>
+                                        <a href="#" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                                            Renew
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="domain-row" data-href="clientareadomaindetails.html" role="link" tabindex="0">
                                 <div class="domain-name">alexblog.net</div>
                                 <div class="domain-date">Jun 5, 2023</div>
                                 <div class="domain-date">Jun 5, 2026</div>
                                 <div><span class="status-pill active">Active</span></div>
                                 <div><div class="toggle-switch active" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('active')"></div></div>
-                                <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-                            </a>
-                            <a href="clientareadomaindetails.html" class="domain-row">
+                                <div class="dom-menu-wrap" onclick="event.preventDefault(); event.stopPropagation();">
+                                    <button type="button" class="dom-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleDomMenu(this)">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                    </button>
+                                    <div class="dom-menu" role="menu">
+                                        <a href="clientareadomaindetails.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                            Manage Domain
+                                        </a>
+                                        <a href="clientareadomainregisterns.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="8" rx="1"/><rect x="2" y="13" width="20" height="8" rx="1"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/></svg>
+                                            Manage Nameservers
+                                        </a>
+                                        <a href="clientareadomaincontactinfo.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            Edit Contact Information
+                                        </a>
+                                        <a href="#" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/></svg>
+                                            Auto Renewal Status
+                                        </a>
+                                        <a href="#" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                                            Renew
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="domain-row" data-href="clientareadomaindetails.html" role="link" tabindex="0">
                                 <div class="domain-name">henderson.io</div>
                                 <div class="domain-date">Sep 1, 2024</div>
                                 <div class="domain-date">Sep 1, 2025</div>
                                 <div><span class="status-pill pending">Expiring Soon</span></div>
                                 <div><div class="toggle-switch" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('active')"></div></div>
-                                <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-                            </a>
-                            <a href="clientareadomaindetails.html" class="domain-row">
+                                <div class="dom-menu-wrap" onclick="event.preventDefault(); event.stopPropagation();">
+                                    <button type="button" class="dom-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleDomMenu(this)">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                    </button>
+                                    <div class="dom-menu" role="menu">
+                                        <a href="clientareadomaindetails.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                            Manage Domain
+                                        </a>
+                                        <a href="clientareadomainregisterns.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="8" rx="1"/><rect x="2" y="13" width="20" height="8" rx="1"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/></svg>
+                                            Manage Nameservers
+                                        </a>
+                                        <a href="clientareadomaincontactinfo.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            Edit Contact Information
+                                        </a>
+                                        <a href="#" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/></svg>
+                                            Auto Renewal Status
+                                        </a>
+                                        <a href="#" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                                            Renew
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="domain-row" data-href="clientareadomaindetails.html" role="link" tabindex="0">
                                 <div class="domain-name">morganstudio.design</div>
                                 <div class="domain-date">Jan 20, 2025</div>
                                 <div class="domain-date">Jan 20, 2026</div>
                                 <div><span class="status-pill active">Active</span></div>
                                 <div><div class="toggle-switch active" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('active')"></div></div>
-                                <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-                            </a>
-                            <a href="clientareadomaindetails.html" class="domain-row">
+                                <div class="dom-menu-wrap" onclick="event.preventDefault(); event.stopPropagation();">
+                                    <button type="button" class="dom-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleDomMenu(this)">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                    </button>
+                                    <div class="dom-menu" role="menu">
+                                        <a href="clientareadomaindetails.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                            Manage Domain
+                                        </a>
+                                        <a href="clientareadomainregisterns.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="8" rx="1"/><rect x="2" y="13" width="20" height="8" rx="1"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/></svg>
+                                            Manage Nameservers
+                                        </a>
+                                        <a href="clientareadomaincontactinfo.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            Edit Contact Information
+                                        </a>
+                                        <a href="#" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/></svg>
+                                            Auto Renewal Status
+                                        </a>
+                                        <a href="#" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                                            Renew
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="domain-row" data-href="clientareadomaindetails.html" role="link" tabindex="0">
                                 <div class="domain-name">ourstudio.co</div>
                                 <div class="domain-date">Nov 15, 2024</div>
                                 <div class="domain-date">Nov 15, 2025</div>
                                 <div><span class="status-pill active">Active</span></div>
                                 <div><div class="toggle-switch active" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('active')"></div></div>
-                                <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Pagination footer -->
-                    <div class="dom-footer">
-                        <div class="dom-page-size">
-                            Show
-                            <select aria-label="Rows per page">
-                                <option>10</option>
-                                <option>25</option>
-                                <option>50</option>
-                            </select>
-                            entries
-                        </div>
-                        <div class="spacer"></div>
-                        <span>Showing 1–5 of 5</span>
-                        <div class="dom-pages">
-                            <button type="button" disabled aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-                            <button type="button" class="active">1</button>
-                            <button type="button" disabled aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                                <div class="dom-menu-wrap" onclick="event.preventDefault(); event.stopPropagation();">
+                                    <button type="button" class="dom-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleDomMenu(this)">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                    </button>
+                                    <div class="dom-menu" role="menu">
+                                        <a href="clientareadomaindetails.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                            Manage Domain
+                                        </a>
+                                        <a href="clientareadomainregisterns.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="8" rx="1"/><rect x="2" y="13" width="20" height="8" rx="1"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/></svg>
+                                            Manage Nameservers
+                                        </a>
+                                        <a href="clientareadomaincontactinfo.html" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            Edit Contact Information
+                                        </a>
+                                        <a href="#" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/></svg>
+                                            Auto Renewal Status
+                                        </a>
+                                        <a href="#" class="dom-menu-item" role="menuitem">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                                            Renew
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -450,6 +697,28 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Pagination footer — floats outside in "outside" mode, part of the card in "inside" -->
+            <div class="dom-footer when-full">
+                <div class="dom-page-size">
+                    Show
+                    <select aria-label="Rows per page">
+                        <option>10</option>
+                        <option>25</option>
+                        <option>50</option>
+                    </select>
+                    entries
+                </div>
+                <div class="spacer"></div>
+                <span>Showing 1–5 of 5</span>
+                <div class="dom-pages">
+                    <button type="button" disabled aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+                    <button type="button" class="active">1</button>
+                    <button type="button" disabled aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                </div>
+            </div>
+
+            </div><!-- /.dom-stack -->
         </div>
 
         <!-- ══ RIGHT: Domains sub-nav ══ -->
@@ -521,7 +790,58 @@
 <!-- Language / currency modal -->
 <div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js"></script>
-<script src="js/apple-layout.js"></script>
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
+<script>
+    // Kebab menu toggle for each domain row
+    // Whole-row click → details page (div row + menu inside, since <a> can't nest <a>)
+    document.querySelectorAll('.domain-row[data-href]').forEach(function (row) {
+        row.addEventListener('click', function (e) {
+            if (e.target.closest('.dom-menu-wrap, .toggle-switch, button, a')) return;
+            window.location.href = row.dataset.href;
+        });
+        row.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.location.href = row.dataset.href;
+            }
+        });
+    });
+
+    // Kebab menu toggle for each domain row
+    function toggleDomMenu(btn) {
+        event.preventDefault();
+        event.stopPropagation();
+        var wrap = btn.closest('.dom-menu-wrap');
+        var wasOpen = wrap.classList.contains('open');
+        document.querySelectorAll('.dom-menu-wrap.open').forEach(function (w) {
+            w.classList.remove('open');
+            var b = w.querySelector('.dom-menu-btn');
+            if (b) b.setAttribute('aria-expanded', 'false');
+        });
+        if (!wasOpen) {
+            wrap.classList.add('open');
+            btn.setAttribute('aria-expanded', 'true');
+        }
+    }
+    // Click outside / Escape closes any open menu
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('.dom-menu-wrap')) return;
+        document.querySelectorAll('.dom-menu-wrap.open').forEach(function (w) {
+            w.classList.remove('open');
+            var b = w.querySelector('.dom-menu-btn');
+            if (b) b.setAttribute('aria-expanded', 'false');
+        });
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.dom-menu-wrap.open').forEach(function (w) {
+                w.classList.remove('open');
+                var b = w.querySelector('.dom-menu-btn');
+                if (b) b.setAttribute('aria-expanded', 'false');
+            });
+        }
+    });
+</script>
 </body>
 </html>

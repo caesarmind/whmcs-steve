@@ -1,10 +1,11 @@
 <?php
 return [
     'displayName'    => 'Top Navigation',
-    'description'    => 'Horizontal navbar at the top, content fills below.',
+    'description'    => 'Horizontal navbar at the top, full-width content below.',
     'preview'        => 'thumb.png',
-    'order'          => 1,
+    'order'          => 2,
     'variables'      => [
+        'dataLayout'     => 'top',
         'bodyClass'      => 'layout-top',
         'sidebarPresent' => false,
     ],

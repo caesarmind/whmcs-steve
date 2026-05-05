@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
+    <style>
+        body { display: block; }
+
+        /* ─── Hero: time-aware greeting + single primary action ─── */
+        .dash-hero {
+            display: flex; align-items: flex-end; justify-content: space-between;
+            gap: 24px; margin: 0 0 32px; flex-wrap: wrap;
+        }
+        .dash-hero-copy { min-width: 0; }
+        .dash-greeting {
+            font-size: 44px; font-weight: 600; letter-spacing: -0.03em;
+            color: var(--color-text-primary); margin: 0 0 6px; line-height: 1.05;
+        }
+        .dash-sub {
+            font-size: 17px; letter-spacing: -0.01em;
+            color: var(--color-text-secondary); margin: 0;
+        }
+        .dash-sub strong { color: var(--color-text-primary); font-weight: 500; }
+        .dash-hero-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .dash-hero .btn-primary { height: 40px; padding: 0 20px; font-size: 14px; }
+        .dash-hero .btn-secondary { height: 40px; padding: 0 18px; font-size: 14px; }
+        @media (max-width: 720px) { .dash-greeting { font-size: 32px; } }
+
+        /* ─── Notices: compact, Apple-subtle ─── */
+        .notices-group { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+        .notice { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--color-surface-secondary); border: 1px solid var(--color-border); font-size: 13px; color: var(--color-text-primary); }
+        .notice-ico { width: 22px; height: 22px; border-radius: 50%; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .notice-ico svg { width: 12px; height: 12px; }
+        .notice-text { flex: 1; line-height: 1.45; color: var(--color-text-secondary); }
+        .notice-text strong { color: var(--color-text-primary); font-weight: 600; }
+        .notice-dismiss { width: 32px; height: 32px; border-radius: 50%; border: 0; background: transparent; color: var(--color-text-tertiary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .notice-dismiss:hover { background: var(--color-surface); color: var(--color-text-primary); }
+        .notice-dismiss svg { width: 12px; height: 12px; }
+
+        /* ─── Section headers — 2-level hierarchy ─── */
+        .sec-head {
+            display: flex; align-items: baseline; justify-content: space-between;
+            margin: 0 0 14px; gap: 16px;
+        }
+        .sec-title {
+            font-size: 22px; font-weight: 600; letter-spacing: -0.02em;
+            color: var(--color-text-primary); margin: 0;
+        }
+        .sec-head.minor { margin-bottom: 10px; }
+        .sec-head.minor .sec-title { font-size: 17px; letter-spacing: -0.012em; }
+        .sec-action {
+            font-size: 13px; color: var(--color-link); text-decoration: none;
+            display: inline-flex; align-items: center; gap: 3px;
+        }
+        .sec-action:hover { text-decoration: underline; }
+        .sec-action svg { width: 11px; height: 11px; }
+
+        /* ─── Unified card shell — all cards inherit .card (radius, border, shadow) ─── */
+        /* Resource cards — clickable row-cards, Apple System Settings feel */
+        .res-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .res-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-card);
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            transition: background var(--transition-fast);
+            text-decoration: none; color: inherit;
+            display: grid;
+            grid-template-columns: 40px minmax(0, 1fr) minmax(0, 280px) auto;
+            gap: 18px; align-items: center;
+        }
+        @media (max-width: 880px) {
+            .res-card { grid-template-columns: 40px minmax(0,1fr); gap: 14px; }
+            .res-usage { grid-column: 1 / -1; margin-top: 4px; }
+            .res-action { grid-column: 1 / -1; justify-content: flex-end; margin-top: 8px; padding-top: 12px; border-top: 0.5px solid var(--color-border); }
+        }
+        .res-card:hover { background: var(--color-surface-secondary); color: inherit; text-decoration: none; }
+        .res-ico {
+            width: 40px; height: 40px; border-radius: var(--radius-sm);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .res-ico svg { width: 18px; height: 18px; }
+
+        .res-main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+        .res-head {
+            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+            font-size: 15px; font-weight: 600; letter-spacing: -0.012em;
+            color: var(--color-text-primary);
+        }
+        .res-head .status-pill { font-size: 10px; padding: 1px 7px; }
+        .res-sub {
+            font-size: 13px; color: var(--color-text-secondary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .res-meta {
+            font-size: 12px; color: var(--color-text-tertiary);
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            margin-top: 2px;
+            font-variant-numeric: tabular-nums;
+        }
+        .res-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--color-text-quaternary); }
+
+        .res-usage { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+        .res-usage-row { display: flex; flex-direction: column; gap: 4px; }
+        .res-usage-head { display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+        .res-usage-head strong { color: var(--color-text-primary); font-weight: 500; }
+        .res-usage-bar { height: 4px; background: var(--color-surface-secondary); border-radius: 2px; overflow: hidden; }
+        .res-usage-fill { height: 100%; border-radius: 2px; }
+        .res-usage-fill.blue   { background: var(--color-accent); }
+        .res-usage-fill.green  { background: var(--color-green); }
+        .res-usage-fill.orange { background: var(--color-orange); }
+        .res-usage-fill.red    { background: var(--color-red); }
+
+        .res-action { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .res-action .btn-secondary { height: 30px; padding: 0 14px; font-size: 12px; }
+        .res-action .chev {
+            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; color: var(--color-text-tertiary);
+            transition: color var(--transition-fast), transform var(--transition-fast);
+        }
+        .res-card:hover .res-action .chev { color: var(--color-accent); transform: translateX(2px); }
+
+        /* ─── Domain row (compact list inside a card) ─── */
+        .dom-list { display: flex; flex-direction: column; }
+        .dom-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 20px;
+            border-bottom: 0.5px solid var(--color-border);
+            text-decoration: none; color: inherit;
+            transition: background var(--transition-fast);
+        }
+        .dom-row:last-child { border-bottom: 0; }
+        .dom-row:hover { background: var(--color-surface-secondary); color: inherit; text-decoration: none; }
+        .dom-ico {
+            width: 34px; height: 34px; border-radius: 8px;
+            background: rgba(48, 209, 88, 0.10); color: var(--color-green-text);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .dom-ico svg { width: 16px; height: 16px; }
+        .dom-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+        .dom-name {
+            font-size: 14px; font-weight: 500; letter-spacing: -0.008em;
+            color: var(--color-text-primary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .dom-meta { font-size: 12px; color: var(--color-text-tertiary); display: flex; align-items: center; gap: 8px; }
+        .dom-meta .dot { width: 2.5px; height: 2.5px; border-radius: 50%; background: var(--color-text-quaternary); }
+        .dom-exp { font-size: 12px; color: var(--color-text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .dom-exp.warn { color: var(--color-orange-text); font-weight: 500; }
+        .dom-chev { width: 14px; height: 14px; color: var(--color-text-quaternary); flex-shrink: 0; transition: color var(--transition-fast), transform var(--transition-fast); }
+        .dom-row:hover .dom-chev { color: var(--color-accent); transform: translateX(2px); }
+
+        /* ─── Announcement rows — title + date, Apple News feel ─── */
+        .ann-list { display: flex; flex-direction: column; }
+        .ann-row {
+            display: flex; align-items: baseline; justify-content: space-between;
+            gap: 16px;
+            padding: 13px 0;
+            border-bottom: 0.5px solid var(--color-border);
+            text-decoration: none; color: inherit;
+        }
+        .ann-row:last-child { border-bottom: 0; }
+        .ann-row:hover { color: inherit; text-decoration: none; }
+        .ann-row:hover .ann-title { color: var(--color-accent); }
+        .ann-title {
+            font-size: 14px; font-weight: 500;
+            color: var(--color-text-primary); letter-spacing: -0.008em;
+            line-height: 1.4;
+            transition: color var(--transition-fast);
+        }
+        .ann-date {
+            font-size: 12px; color: var(--color-text-tertiary);
+            white-space: nowrap; font-variant-numeric: tabular-nums; flex-shrink: 0;
+        }
+
+        /* ─── Ticket mini-row (right column of split) ─── */
+        .tik-list { display: flex; flex-direction: column; }
+        .tik-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 0;
+            border-bottom: 0.5px solid var(--color-border);
+            text-decoration: none; color: inherit;
+        }
+        .tik-row:last-child { border-bottom: 0; }
+        .tik-row:hover { color: inherit; text-decoration: none; }
+        .tik-row:hover .tik-subj { color: var(--color-accent); }
+        .tik-main { flex: 1; min-width: 0; }
+        .tik-subj { font-size: 13px; color: var(--color-text-primary); font-weight: 500; letter-spacing: -0.005em; line-height: 1.35; }
+        .tik-id { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; font-variant-numeric: tabular-nums; }
+        .tik-status { flex-shrink: 0; }
+
+        /* ─── Quick actions — compact row of monochrome tiles ─── */
+        .qd-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        @media (max-width: 880px) { .qd-grid { grid-template-columns: repeat(2, 1fr); } }
+        .qd-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-card);
+            border-radius: var(--radius-lg);
+            padding: 14px 16px;
+            text-decoration: none; color: inherit;
+            display: flex; align-items: center; gap: 12px;
+            transition: background var(--transition-fast);
+        }
+        .qd-card:hover { background: var(--color-surface-secondary); color: inherit; text-decoration: none; }
+        .qd-ico {
+            width: 32px; height: 32px; border-radius: var(--radius-sm);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .qd-card:hover .qd-ico { background: var(--color-surface); }
+        .qd-ico svg { width: 16px; height: 16px; }
+        .qd-text { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
+        .qd-title {
+            font-size: 13px; font-weight: 500; letter-spacing: -0.008em;
+            color: var(--color-text-primary);
+        }
+        .qd-sub { font-size: 11px; color: var(--color-text-tertiary); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* ─── Split row helper ─── */
+        .dash-split-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; }
+        @media (max-width: 960px) { .dash-split-row { grid-template-columns: 1fr; } }
+
+        /* ─── Empty-state toggle wiring ─── */
+        body[data-data="empty"] .when-full { display: none !important; }
+        body:not([data-data="empty"]) .when-empty { display: none !important; }
+
+        /* ─── Inline empty state inside cards ─── */
+        .inline-empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 36px 24px 28px; color: var(--color-text-secondary); }
+        .inline-empty-ico { width: 52px; height: 52px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+        .inline-empty-ico svg { width: 22px; height: 22px; }
+        .inline-empty-title { font-size: 15px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.012em; }
+        .inline-empty-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 0 16px; max-width: 340px; line-height: 1.5; }
+        .inline-empty .btn-primary,
+        .inline-empty .btn-secondary { height: 32px; padding: 0 16px; font-size: 13px; }
+
+        /* ─── Sub-section stacking — extra breathing between primary sections ─── */
+        .dash-main-col { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
+        /* Tighter gap between the split-row and the eyebrow actions below it */
+        .dash-main-col .quick-block { margin-top: -12px; }
+        .dash-main-col .notices-group { margin-top: -20px; }
+    </style>
+</head>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="dashboard" data-page-title="Dashboard">
+
+<!-- ═══════════ Dev preview chip — auth / layout / palette ═══════════ -->
+<div data-include="partials/state-chip.html"></div>
+
+<!-- ═══════════ Rail layout — icon rail + flyout panels ═══════════ -->
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+
+<!-- ═══════════ Sidebar layout — fixed 260px rail ═══════════ -->
+<div data-include="partials/sidebar.html"></div>
+
+<!-- ═══════════ MAIN WRAP (shifts right when layout=side|rail) ═══════════ -->
+<div class="ph-main-wrap">
+
+<!-- ═══════════ Auth strip — logged-in + top-layout only ═══════════ -->
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span>No Notifications</span>
+        </button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ Top-layout standard header ═══════════ -->
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+
+    <div class="nav-simple-dropdown only-out">
+        <a href="#" class="nav-simple-trigger">Store <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="#">Browse All</a>
+            <div class="divider"></div>
+            <a href="socialbee.html">SocialBee</a>
+            <a href="ssl-certificates.html">SSL Certificates</a>
+            <a href="email-services.html">E-mail Services</a>
+            <a href="website-builder.html">Website Builder</a>
+            <div class="divider"></div>
+            <a href="cart-domain-register.html">Register a New Domain</a>
+            <a href="cart-domain-transfer.html">Transfer Domains to Us</a>
+        </div>
+    </div>
+    <a href="announcements.html" class="only-out">Announcements</a>
+    <a href="knowledgebase.html" class="only-out">Knowledgebase</a>
+    <a href="serverstatus.html" class="only-out">Network Status</a>
+    <a href="contact.html" class="only-out">Contact Us</a>
+
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareaproducts.html">My Services</a>
+            <div class="divider"></div>
+            <a href="store.html">Order New Services</a>
+            <a href="#">View Available Addons</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareadomains.html">My Domains</a>
+            <div class="divider"></div>
+            <a href="#">Renew Domains</a>
+            <a href="cart-domain-register.html">Register a New Domain</a>
+            <a href="cart-domain-transfer.html">Transfer a Domain to Us</a>
+            <div class="divider"></div>
+            <a href="domainchecker.html">Domain Search</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Website &amp; Security <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="socialbee.html">SocialBee</a>
+            <a href="ssl-certificates.html">SSL Certificates</a>
+            <a href="monitoring-360.html">Site &amp; Server Monitoring</a>
+            <a href="nordvpn.html">VPN</a>
+            <a href="email-services.html">E-mail Services</a>
+            <a href="website-backup.html">Website Backup</a>
+            <a href="website-security.html">Website Security</a>
+            <a href="website-builder.html">Website Builder</a>
+            <div class="divider"></div>
+            <a href="managessl.html">Manage SSL Certificates</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareainvoices.html">My Invoices</a>
+            <a href="clientareaquotes.html">My Quotes</a>
+            <div class="divider"></div>
+            <a href="account-paymentmethods.html">Payment Methods</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="supportticketslist.html">Tickets</a>
+            <a href="announcements.html">Announcements</a>
+            <a href="knowledgebase.html">Knowledgebase</a>
+            <a href="downloads.html">Downloads</a>
+            <a href="serverstatus.html">Network Status</a>
+        </div>
+    </div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+
+    <div class="notification-wrapper only-in" id="navNotifyWrap">
+        <button type="button" class="topbar-btn" title="Notifications" onclick="togglePortalNotifications(event, 'nav')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <div class="topbar-notification-dot"></div>
+        </button>
+        <div class="notification-dropdown" id="notificationDropdownNav">
+            <div class="notification-dropdown-header">
+                <span class="notification-dropdown-title">Notifications</span>
+                <button class="notification-dropdown-clear" type="button">Mark all read</button>
+            </div>
+            <a href="viewinvoice.html" class="notification-item">
+                <div class="notification-dot-indicator orange"></div>
+                <div class="notification-content">
+                    <div class="notification-text">Invoice #10247 is due in 2 days</div>
+                    <div class="notification-time">2 hours ago</div>
+                </div>
+            </a>
+            <a href="viewticket.html" class="notification-item">
+                <div class="notification-dot-indicator green"></div>
+                <div class="notification-content">
+                    <div class="notification-text">Ticket #TKT-4821 has been answered</div>
+                    <div class="notification-time">Yesterday</div>
+                </div>
+            </a>
+            <a href="announcements.html" class="notification-item">
+                <div class="notification-dot-indicator blue"></div>
+                <div class="notification-content">
+                    <div class="notification-text">Scheduled maintenance on Apr 20</div>
+                    <div class="notification-time">3 days ago</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <a href="#" onclick="toggleDarkMode(); return false;" class="topbar-btn only-out" title="Toggle theme" style="margin-right:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap">
+        <div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-dropdown-header">
+                <div class="profile-dropdown-name">Arshile Gogia</div>
+                <div class="profile-dropdown-email">arshileg@gmail.com</div>
+            </div>
+            <a href="clientareadetails.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                My Details
+            </a>
+            <a href="clientareasecurity.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                Security Settings
+            </a>
+            <a href="clientareaemails.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Email History
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <div class="theme-toggle-row">
+                <span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span>
+                <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="login.html" class="profile-dropdown-item danger">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sign Out
+            </a>
+        </div>
+    </div>
+</div></nav>
+
+<!-- ═══════════ Inner-layout topbar (sidebar + rail) ═══════════ -->
+<div data-include="partials/inner-topbar.html"></div>
+
+<!-- ═══════════ Breadcrumb — top-layout only ═══════════ -->
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="index.html">Portal Home</a>
+        <span class="sep">/</span>
+        <span class="current" aria-current="page">Client Area</span>
+    </div>
+</nav>
+
+<!-- ═══════════ PAGE CONTENT ═══════════ -->
+<div class="content-area">
+
+    <!-- ── HERO: greeting + primary action ───────────────────── -->
+    <div class="dash-hero">
+        <div class="dash-hero-copy">
+            <h1 class="dash-greeting" id="dashGreeting">Welcome back, Arshile.</h1>
+            <p class="dash-sub when-full">You have <strong>3 active services</strong>, <strong>2 domains</strong>, and <strong>3 invoices due</strong>.</p>
+            <p class="dash-sub when-empty">Let's get you set up. Deploy your first service to get started.</p>
+        </div>
+        <div class="dash-hero-actions">
+            <a href="store.html" class="btn-primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Deploy
+            </a>
+        </div>
+    </div>
+
+    <div class="dash-main-col">
+
+        <!-- ── NOTICES ───────────────────────────────────────────── -->
+        <div class="notices-group when-full">
+            <div class="notice">
+                <div class="notice-ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div class="notice-text"><strong>1 domain</strong> expires in the next 45 days. <a href="clientareadomains.html">Renew</a> to keep it active.</div>
+                <button class="notice-dismiss" aria-label="Dismiss" data-dismiss>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="notice">
+                <div class="notice-ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="notice-text"><strong>Scheduled maintenance</strong> on Apr 28 · London DC. <a href="announcements.html">Details</a>.</div>
+                <button class="notice-dismiss" aria-label="Dismiss" data-dismiss>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- ── SERVICES — rich resource cards ────────────────────── -->
+        <div class="services-block">
+            <div class="sec-head">
+                <h2 class="sec-title">Your services</h2>
+                <a href="clientareaproducts.html" class="sec-action when-full">View all
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+            </div>
+
+            <div class="res-grid when-full">
+                <a href="clientareaproductdetails.html" class="res-card">
+                    <div class="res-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                    </div>
+                    <div class="res-main">
+                        <div class="res-head">VPS-1 <span class="status-pill active">Active</span></div>
+                        <div class="res-sub">lagomdemo.com</div>
+                        <div class="res-meta"><span>128.199.42.17</span><span class="dot"></span><span>NYC-1</span><span class="dot"></span><span>Renews Jun 12</span></div>
+                    </div>
+                    <div class="res-usage">
+                        <div class="res-usage-row">
+                            <div class="res-usage-head"><span>Bandwidth</span><span><strong>6.8</strong> / 10 TB</span></div>
+                            <div class="res-usage-bar"><div class="res-usage-fill blue" style="width: 68%;"></div></div>
+                        </div>
+                        <div class="res-usage-row">
+                            <div class="res-usage-head"><span>Disk</span><span><strong>32</strong> / 100 GB</span></div>
+                            <div class="res-usage-bar"><div class="res-usage-fill green" style="width: 32%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="res-action">
+                        <span class="btn-secondary">Manage</span>
+                        <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                    </div>
+                </a>
+
+                <a href="clientareaproductdetails.html" class="res-card">
+                    <div class="res-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                    </div>
+                    <div class="res-main">
+                        <div class="res-head">Reseller Silver <span class="status-pill active">Active</span></div>
+                        <div class="res-sub">demo.com</div>
+                        <div class="res-meta"><span>12 cPanel accounts</span><span class="dot"></span><span>London</span><span class="dot"></span><span>Renews Sep 03</span></div>
+                    </div>
+                    <div class="res-usage">
+                        <div class="res-usage-row">
+                            <div class="res-usage-head"><span>Accounts</span><span><strong>12</strong> / 50</span></div>
+                            <div class="res-usage-bar"><div class="res-usage-fill green" style="width: 24%;"></div></div>
+                        </div>
+                        <div class="res-usage-row">
+                            <div class="res-usage-head"><span>Storage</span><span><strong>48</strong> / 200 GB</span></div>
+                            <div class="res-usage-bar"><div class="res-usage-fill blue" style="width: 24%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="res-action">
+                        <span class="btn-secondary">Manage</span>
+                        <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                    </div>
+                </a>
+
+                <a href="clientareaproductdetails.html" class="res-card">
+                    <div class="res-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                    </div>
+                    <div class="res-main">
+                        <div class="res-head">Web Hosting — Single <span class="status-pill active">Active</span></div>
+                        <div class="res-sub">test.com</div>
+                        <div class="res-meta"><span>Unlimited traffic</span><span class="dot"></span><span>Frankfurt</span><span class="dot"></span><span>Renews Apr 28</span></div>
+                    </div>
+                    <div class="res-usage">
+                        <div class="res-usage-row">
+                            <div class="res-usage-head"><span>Storage</span><span><strong>4.2</strong> / 20 GB</span></div>
+                            <div class="res-usage-bar"><div class="res-usage-fill blue" style="width: 21%;"></div></div>
+                        </div>
+                        <div class="res-usage-row">
+                            <div class="res-usage-head"><span>Email accounts</span><span><strong>3</strong> / 10</span></div>
+                            <div class="res-usage-bar"><div class="res-usage-fill orange" style="width: 30%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="res-action">
+                        <span class="btn-secondary">Manage</span>
+                        <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="card when-empty" style="margin-bottom: 0;">
+                <div class="inline-empty">
+                    <div class="inline-empty-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                    </div>
+                    <h3 class="inline-empty-title">Deploy your first service</h3>
+                    <p class="inline-empty-sub">Pick from VPS, reseller, web hosting, or dedicated servers. You'll be up and running in minutes.</p>
+                    <a href="store.html" class="btn-primary">Browse store</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── DOMAINS ───────────────────────────────────────────── -->
+        <div class="domains-block">
+            <div class="sec-head">
+                <h2 class="sec-title">Your domains</h2>
+                <a href="clientareadomains.html" class="sec-action when-full">View all
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+            </div>
+
+            <div class="card when-full" style="margin-bottom: 0;">
+                <div class="dom-list">
+                    <a href="clientareadomaindetails.html" class="dom-row">
+                        <div class="dom-ico">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                        </div>
+                        <div class="dom-main">
+                            <div class="dom-name">lagomdemo.com</div>
+                            <div class="dom-meta"><span>Registered</span><span class="dot"></span><span>Auto-renew on</span></div>
+                        </div>
+                        <span class="dom-exp warn">Expires in 38 days</span>
+                        <svg class="dom-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
+                    <a href="clientareadomaindetails.html" class="dom-row">
+                        <div class="dom-ico">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                        </div>
+                        <div class="dom-main">
+                            <div class="dom-name">demo.com</div>
+                            <div class="dom-meta"><span>Registered</span><span class="dot"></span><span>Auto-renew on</span></div>
+                        </div>
+                        <span class="dom-exp">Renews Jan 14, 2027</span>
+                        <svg class="dom-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="card when-empty" style="margin-bottom: 0;">
+                <div class="inline-empty">
+                    <div class="inline-empty-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                    </div>
+                    <h3 class="inline-empty-title">Claim a domain</h3>
+                    <p class="inline-empty-sub">A good name sets the tone. Search for something that fits.</p>
+                    <a href="cart-domain-register.html" class="btn-primary">Find a domain</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SPLIT: Activity + Tickets ─────────────────────────── -->
+        <div class="dash-split-row">
+            <!-- Announcements -->
+            <div>
+                <div class="sec-head minor">
+                    <h2 class="sec-title">Announcements</h2>
+                    <a href="announcements.html" class="sec-action">View all
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
+                </div>
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-body when-full" style="padding: 4px 20px 12px;">
+                        <div class="ann-list">
+                            <a href="viewannouncement.html" class="ann-row">
+                                <div class="ann-title">Scheduled Network Upgrade — London DC</div>
+                                <div class="ann-date">Apr 10, 2026</div>
+                            </a>
+                            <a href="viewannouncement.html" class="ann-row">
+                                <div class="ann-title">Hostnodes launches Dynamic Cloud Server</div>
+                                <div class="ann-date">Mar 22, 2026</div>
+                            </a>
+                            <a href="viewannouncement.html" class="ann-row">
+                                <div class="ann-title">New range of Premium Dedicated Servers available</div>
+                                <div class="ann-date">Feb 14, 2026</div>
+                            </a>
+                            <a href="viewannouncement.html" class="ann-row">
+                                <div class="ann-title">DDoS protection upgraded across all regions</div>
+                                <div class="ann-date">Jan 28, 2026</div>
+                            </a>
+                            <a href="viewannouncement.html" class="ann-row">
+                                <div class="ann-title">Free SSL now included with every hosting plan</div>
+                                <div class="ann-date">Jan 09, 2026</div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body when-empty">
+                        <div class="inline-empty">
+                            <div class="inline-empty-ico">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                            </div>
+                            <h3 class="inline-empty-title">No announcements</h3>
+                            <p class="inline-empty-sub">Product updates and network notices will appear here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Open tickets -->
+            <div>
+                <div class="sec-head minor">
+                    <h2 class="sec-title">Support</h2>
+                    <a href="supportticketsubmit.html" class="sec-action">New ticket
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </a>
+                </div>
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-body when-full" style="padding: 4px 20px 12px;">
+                        <div class="tik-list">
+                            <a href="viewticket.html" class="tik-row">
+                                <div class="tik-main">
+                                    <div class="tik-subj">SSL certificate not renewing automatically</div>
+                                    <div class="tik-id">#TKT-4821 · Apr 11</div>
+                                </div>
+                                <span class="tik-status"><span class="status-pill answered">Answered</span></span>
+                            </a>
+                            <a href="viewticket.html" class="tik-row">
+                                <div class="tik-main">
+                                    <div class="tik-subj">Need help setting up DNS for new domain</div>
+                                    <div class="tik-id">#TKT-4790 · Apr 8</div>
+                                </div>
+                                <span class="tik-status"><span class="status-pill pending">Pending</span></span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body when-empty">
+                        <div class="inline-empty">
+                            <div class="inline-empty-ico">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                            </div>
+                            <h3 class="inline-empty-title">No open tickets</h3>
+                            <p class="inline-empty-sub">We're here when you need us — 24/7 support.</p>
+                            <a href="supportticketsubmit.html" class="btn-primary">Open a ticket</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── QUICK ACTIONS — compact monochrome tiles ─────────── -->
+        <div class="quick-block">
+            <div class="sec-head minor">
+                <h2 class="sec-title">Quick actions</h2>
+            </div>
+            <div class="qd-grid">
+                <a href="store.html" class="qd-card">
+                    <div class="qd-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div>
+                    <div class="qd-text">
+                        <div class="qd-title">New VPS</div>
+                        <div class="qd-sub">15 global regions</div>
+                    </div>
+                </a>
+                <a href="cart-domain-register.html" class="qd-card">
+                    <div class="qd-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+                    <div class="qd-text">
+                        <div class="qd-title">Register domain</div>
+                        <div class="qd-sub">From $9.99/yr</div>
+                    </div>
+                </a>
+                <a href="ssl-certificates.html" class="qd-card">
+                    <div class="qd-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+                    <div class="qd-text">
+                        <div class="qd-title">Add SSL</div>
+                        <div class="qd-sub">Secure your sites</div>
+                    </div>
+                </a>
+                <a href="clientareaaddfunds.html" class="qd-card">
+                    <div class="qd-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                    <div class="qd-text">
+                        <div class="qd-title">Add funds</div>
+                        <div class="qd-sub">Prepay your account</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </div><!-- /.dash-main-col -->
+</div><!-- /.content-area -->
+
+<!-- ═══════════ Top-layout standard footer ═══════════ -->
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="#">Dedicated Servers</a></li><li><a href="domains.html">Domains</a></li><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="email.html">Email</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security &amp; Tools</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="website-security.html">Website Security</a></li><li><a href="website-backup.html">Website Backup</a></li><li><a href="seo-tools.html">SEO Tools</a></li><li><a href="monitoring-360.html">360 Monitoring</a></li><li><a href="nordvpn.html">NordVPN</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li><li><a href="clientregister.html">Create an account</a></li><li><a href="#">Billing</a></li><li><a href="#">Refer a friend</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="support-page.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li><li><a href="serverstatus.html">Network status</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Newsroom</a></li><li><a href="#">Careers</a></li><li><a href="#">Legal</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open>
+                    <span class="flag">🇺🇸</span>
+                    <span>English</span>
+                    <span class="sep">/</span>
+                    <span>$ USD</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Legal</a><a href="#">Site Map</a></div>
+        </div>
+    </div>
+</footer>
+
+<!-- ═══════════ Inner-layout slim footer (sidebar + rail) ═══════════ -->
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+
+<!-- ═══════════ Language / currency modal ═══════════ -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
+<script>
+document.addEventListener('apple-layout:ready', function () {
+    // Time-aware greeting — morning / afternoon / evening / night
+    var el = document.getElementById('dashGreeting');
+    if (el) {
+        var h = new Date().getHours();
+        var phase = h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+        el.textContent = phase + ', Arshile.';
+    }
+
+    // Dismissable notices
+    document.querySelectorAll('[data-dismiss]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var target = btn.closest('.notice, [data-promo-card]');
+            if (target) target.style.display = 'none';
+        });
+    });
+});
+</script>
+</body>
+</html>

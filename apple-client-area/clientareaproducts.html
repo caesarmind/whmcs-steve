@@ -4,56 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Products &amp; Services — WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
-    <link rel="stylesheet" href="css/apple-layout.css">
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
     <style>
         body { display: block; }
 
-        /* Page header */
-        .page-header { margin-bottom: 24px; }
-        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+        /* Page header — Apple-leaning: bigger, tighter title, no uppercase eyebrow, subtle CTA */
+        .page-header { margin: 8px 0 32px; }
+        .page-header h1 {
+            font-size: 40px; font-weight: 600; letter-spacing: -0.028em;
+            color: var(--color-text-primary); margin: 0 0 8px;
+            line-height: 1.1;
+        }
+        .page-header .page-subtitle {
+            font-size: 15px; color: var(--color-text-secondary);
+            letter-spacing: -0.01em; line-height: 1.45;
+            margin: 0; max-width: 560px;
+        }
+        .page-header-row {
+            display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .page-header-action {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 14px; font-weight: 500; letter-spacing: -0.008em;
+            color: var(--color-accent); text-decoration: none;
+            flex-shrink: 0; white-space: nowrap;
+            transition: color var(--transition-fast);
+        }
+        .page-header-action:hover { color: var(--color-accent); text-decoration: none; }
+        .page-header-action:hover .chev { transform: translateX(2px); }
+        .page-header-action .chev { width: 12px; height: 12px; transition: transform var(--transition-fast); }
 
-        /* Two-column split: filters/promos sidebar + main table */
-        .svc-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
-        @media (max-width: 960px) { .svc-split { grid-template-columns: 1fr; } }
-        .svc-aside { display: flex; flex-direction: column; gap: 16px; }
+        /* 2-col split — main on the left, content sidebar on the right */
+        .svc-split { display: grid; grid-template-columns: 1fr 240px; gap: 24px; align-items: start; }
+        @media (max-width: 880px) { .svc-split { grid-template-columns: 1fr; } }
         .svc-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 
-        /* View filter — radio list */
-        .filter-card { padding: 6px 8px 10px; }
-        .filter-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 12px 12px 6px; }
-        .filter-item {
+        /* Sub-nav toggle off — hide aside, collapse to single column */
+        body[data-subnav="off"] .svc-split { grid-template-columns: 1fr; }
+        body[data-subnav="off"] .svc-split > aside { display: none; }
+        /* Sub-nav side — put aside on the left instead of the right */
+        body[data-subnav-side="left"] .svc-split { grid-template-columns: 240px 1fr; }
+        body[data-subnav-side="left"] .svc-split > aside { grid-column: 1; grid-row: 1; }
+        body[data-subnav-side="left"] .svc-split > .svc-main { grid-column: 2; grid-row: 1; }
+        /* Sub-nav side — float the aside in the outer gutter (right or left), outside the content column. */
+        body[data-subnav-side="outside"] .svc-split,
+        body[data-subnav-side="outside-left"] .svc-split { grid-template-columns: 1fr; position: relative; }
+        body[data-subnav-side="outside"] .svc-split > aside,
+        body[data-subnav-side="outside-left"] .svc-split > aside {
+            position: absolute;
+            top: 0;
+            width: 240px;
+        }
+        body[data-subnav-side="outside"] .svc-split > aside { left: calc(100% + 24px); }
+        body[data-subnav-side="outside-left"] .svc-split > aside { right: calc(100% + 24px); left: auto; }
+        body[data-subnav-side="outside"] .svc-split > .svc-main,
+        body[data-subnav-side="outside-left"] .svc-split > .svc-main { grid-column: 1; }
+        /* Align=Center: shift content-area by half the aside + gap (264/2 = 132) so combined unit stays centered.
+           Align=Content and Align=Left skip the shift. */
+        body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+        body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
+        /* Outside-L + Align=Left: reserve 240px on the left so the aside lands past the menu sidebar. */
+        body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 240px; }
+        /* Very narrow viewports: fall back to inside column. */
+        @media (max-width: 1100px) {
+            body[data-subnav-side="outside"] .svc-split { grid-template-columns: 1fr 240px; gap: 24px; position: static; }
+            body[data-subnav-side="outside-left"] .svc-split { grid-template-columns: 240px 1fr; gap: 24px; position: static; }
+            body[data-subnav-side="outside"] .svc-split > aside,
+            body[data-subnav-side="outside-left"] .svc-split > aside { position: static; width: auto; right: auto; left: auto; }
+            body[data-subnav-side="outside-left"] .svc-split > aside { grid-column: 1; grid-row: 1; }
+            body[data-subnav-side="outside-left"] .svc-split > .svc-main { grid-column: 2; grid-row: 1; }
+        }
+
+        /* Sub-nav card */
+        .subnav-card { padding: 8px; }
+        .subnav-heading {
+            font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+            text-transform: uppercase; letter-spacing: 0.06em;
+            padding: 10px 12px 8px;
+        }
+        .subnav-item {
             display: flex; align-items: center; gap: 10px;
             padding: 8px 12px; border-radius: var(--radius-sm);
-            font-size: 13px; color: var(--color-text-primary);
-            cursor: pointer; transition: background var(--transition-fast);
-        }
-        .filter-item:hover { background: var(--sidebar-item-hover); }
-        .filter-item input[type="radio"] { accent-color: var(--color-accent); width: 14px; height: 14px; cursor: pointer; margin: 0; }
-        .filter-item-label { flex: 1; }
-        .filter-item-count { font-size: 12px; color: var(--color-text-tertiary); background: var(--color-surface-secondary); padding: 0 7px; border-radius: var(--radius-pill); min-width: 22px; text-align: center; line-height: 18px; }
-        .filter-item input:checked ~ .filter-item-label { font-weight: 500; color: var(--color-accent); }
-
-        /* Actions list (Place order / View addons) */
-        .actions-card { padding: 6px 8px 10px; }
-        .action-link {
-            display: flex; align-items: center; gap: 10px;
-            padding: 9px 12px; border-radius: var(--radius-sm);
-            font-size: 13px; color: var(--color-text-primary);
+            color: var(--color-text-primary); font-size: 13px; letter-spacing: -0.008em;
             text-decoration: none; transition: background var(--transition-fast);
         }
-        .action-link:hover { background: var(--sidebar-item-hover); color: var(--color-accent); text-decoration: none; }
-        .action-link:hover svg { color: var(--color-accent); }
-        .action-link svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+        .subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+        .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .subnav-item.active svg { color: var(--color-accent); }
+        .subnav-count {
+            margin-left: auto;
+            font-size: 11px; font-weight: 500;
+            padding: 1px 7px;
+            border-radius: var(--radius-pill);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+        }
+        .subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
 
-        /* Promo slider styles live in css/apple-layout.css (shared across pages). */
+        /* Status / renewal banner */
+        .svc-banner {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
+            font-size: 13px; letter-spacing: -0.008em;
+        }
+        .svc-banner .svc-banner-ico {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--color-accent-light); color: var(--color-accent);
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .svc-banner .svc-banner-ico svg { width: 13px; height: 13px; }
+        .svc-banner strong { color: var(--color-text-primary); font-weight: 600; }
+        .svc-banner .spacer { flex: 1; }
+        .svc-banner .btn-secondary { height: 28px; padding: 0 12px; font-size: 12px; }
 
         /* Unified toolbar inside the services card header — search + filters + add new */
         .svc-toolbar-card { padding: 0; }
         .svc-toolbar {
             display: flex; align-items: center; gap: 10px;
             padding: 12px 16px;
-            border-bottom: 0.5px solid var(--color-border);
             flex-wrap: wrap;
         }
         .svc-search {
@@ -100,64 +175,270 @@
         .svc-toolbar .btn-primary { height: 32px; padding: 0 14px; font-size: 13px; }
         .svc-toolbar .btn-primary svg { width: 12px; height: 12px; }
 
-        /* Services table */
+        /* Services table — simplified variation: product+domain · filled status pill · date · "Manage ›" link */
         .svc-table-card { overflow: hidden; padding: 0; }
         .svc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
         .svc-table thead th {
             font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
             text-transform: uppercase; letter-spacing: 0.05em;
-            text-align: left; padding: 14px 20px;
-            border-bottom: 0.5px solid var(--color-border);
-            background: var(--color-surface-secondary);
-            user-select: none; cursor: pointer;
+            padding: 10px 20px;
+            background: transparent;
+            user-select: none;
             white-space: nowrap;
         }
-        .svc-table thead th .sort { opacity: 0.4; margin-left: 4px; }
-        .svc-table tbody tr { border-bottom: 0.5px solid var(--color-border); transition: background var(--transition-fast); }
-        .svc-table tbody tr:last-child { border-bottom: 0; }
+        /* Explicit column widths so the floating header row aligns with the tbody cells */
+        .svc-table { table-layout: fixed; }
+        .svc-table col.svc-col-product  { width: auto; }
+        .svc-table col.svc-col-pricing  { width: 130px; }
+        .svc-table col.svc-col-due      { width: 130px; }
+        .svc-table col.svc-col-status   { width: 120px; }
+        .svc-table col.svc-col-actions  { width: 72px; }
+        /* Hide the in-table thead — we render titles as a standalone row above the card */
+        .svc-table thead { display: none; }
+
+        /* Floating column titles that sit OUTSIDE the card, on the page surface.
+           Same widths as the tbody columns so each label aligns with its data below. */
+        .svc-table-head-row {
+            display: flex; align-items: center;
+            padding: 2px 0;
+            font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        /* Zero out theme-default margins that were stacking on top of svc-main's flex gap,
+           so the gap between filter tabs, head row, card, and pager is a clean 8px. */
+        .svc-main > .filter-tabs   { margin-bottom: 16px; margin-top: 12px; }
+        .svc-main > .svc-table-card { margin-bottom: 0; }
+        .svc-main { gap: 8px; }
+        .svc-table-head-row .hl-name    { flex: 1 1 auto; min-width: 0; text-align: left; }
+        .svc-table-head-row .hl-pricing { width: 130px; text-align: left; }
+        .svc-table-head-row .hl-due     { width: 130px; text-align: left; }
+        .svc-table-head-row .hl-status  { width: 120px; text-align: left; }
+        .svc-table-head-row .hl-actions { width: 72px; }
+        .svc-table-head-row .hl-cell    { padding: 0 20px; }
+        .svc-table-head-row .hl-cell .sort { opacity: 0.4; margin-left: 4px; }
+        /* Sort chevrons */
+        .svc-sort {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: none; border: 0; cursor: pointer;
+            color: inherit; font: inherit; letter-spacing: inherit;
+            text-transform: inherit; padding: 0;
+            font-family: inherit;
+        }
+        .svc-sort-ico { position: relative; width: 10px; height: 12px; flex-shrink: 0; }
+        .svc-sort-ico::before, .svc-sort-ico::after {
+            content: ""; position: absolute; left: 2px;
+            border-left: 3px solid transparent; border-right: 3px solid transparent;
+            opacity: 0.3;
+        }
+        .svc-sort-ico::before { top: 1px; border-bottom: 4px solid currentColor; }
+        .svc-sort-ico::after  { bottom: 1px; border-top: 4px solid currentColor; }
+        .svc-sort[data-dir="asc"] .svc-sort-ico::before  { opacity: 1; }
+        .svc-sort[data-dir="desc"] .svc-sort-ico::after  { opacity: 1; }
+        .svc-sort.active { color: var(--color-text-primary); }
+        .svc-table tbody tr { transition: background var(--transition-fast); }
         .svc-table tbody tr[data-href] { cursor: pointer; }
         .svc-table tbody tr:hover { background: var(--color-surface-secondary); }
-        .svc-table tbody tr[data-href]:hover .svc-action-btn { background: var(--color-surface); color: var(--color-accent); transform: translateX(2px); }
-        .svc-action-btn { transition: transform var(--transition-fast), background var(--transition-fast), color var(--transition-fast); }
-        .svc-table td { padding: 14px 20px; vertical-align: middle; color: var(--color-text-primary); }
-        .svc-cell-product { display: flex; align-items: center; gap: 12px; }
-        .svc-cell-ico { width: 32px; height: 32px; border-radius: 8px; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .svc-cell-ico svg { width: 16px; height: 16px; }
-        .svc-cell-product-info { min-width: 0; }
-        .svc-cell-product-name { color: var(--color-text-primary); }
-        .svc-cell-product-name strong { font-weight: 600; }
-        .svc-cell-product-domain { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
-        .svc-cell-price-main { color: var(--color-text-primary); }
-        .svc-cell-price-cycle { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
-        .svc-cell-actions { width: 44px; text-align: right; }
-        .svc-action-btn { width: 28px; height: 28px; border-radius: 50%; border: 0; background: transparent; color: var(--color-text-tertiary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-        .svc-action-btn:hover { background: var(--color-surface); color: var(--color-text-primary); }
-        .svc-action-btn svg { width: 16px; height: 16px; }
+        .svc-table td { padding: 16px 20px; vertical-align: middle; color: var(--color-text-primary); }
 
-        /* Compact pagination — lives inside the services card as a footer */
-        .svc-paging {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 16px;
-            border-top: 0.5px solid var(--color-border);
+        /* Product cell — bold name + gray subtitle, no icon */
+        .svc-cell-product-info { min-width: 0; line-height: 1.35; }
+        .svc-cell-product-name {
+            font-size: 14px; font-weight: 500; color: var(--color-text-primary);
+            letter-spacing: -0.008em;
+        }
+        .svc-cell-product-name strong { font-weight: 500; }
+        .svc-cell-product-domain {
+            font-size: 13px; color: var(--color-text-tertiary);
+            margin-top: 3px;
+        }
+
+        /* Column alignment */
+        .svc-cell-status { text-align: center; }
+        .svc-cell-date   { text-align: center; color: var(--color-text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .svc-cell-action { text-align: right; white-space: nowrap; }
+
+        /* Filled status pill — stronger green, like DigitalOcean */
+        .svc-table .status-pill {
+            padding: 4px 14px;
+            font-size: 12px; font-weight: 600;
+            letter-spacing: 0.01em;
+            border-radius: var(--radius-pill);
+            display: inline-flex; align-items: center;
+        }
+        .svc-table .status-pill.active    { background: var(--color-green-bg);  color: var(--color-green-text); }
+        .svc-table .status-pill.pending   { background: var(--color-orange-bg); color: var(--color-orange-text); }
+        .svc-table .status-pill.suspended,
+        .svc-table .status-pill.overdue   { background: var(--color-red-bg);    color: var(--color-red-text); }
+        .svc-table .status-pill.cancelled,
+        .svc-table .status-pill.terminated{ background: var(--color-gray-bg);   color: var(--color-gray-text); }
+
+        /* "Manage ›" accent-blue text link (replaces kebab in this variation) */
+        .svc-manage-link {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 13px; font-weight: 500; letter-spacing: -0.008em;
+            color: var(--color-accent); text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        .svc-manage-link:hover { color: var(--color-accent); text-decoration: none; }
+        .svc-manage-link:hover .chev { transform: translateX(2px); }
+        .svc-manage-link .chev { width: 11px; height: 11px; transition: transform var(--transition-fast); }
+        .svc-cell-actions { width: 56px; text-align: center; position: relative; }
+
+        /* Let the kebab dropdown escape the card */
+        .svc-main .card { overflow: visible; }
+
+        /* Kebab (three-dot) menu */
+        .svc-menu-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+        .svc-menu-btn {
+            width: 28px; height: 28px;
+            border: 0; background: transparent;
+            border-radius: 50%;
+            color: var(--color-text-tertiary);
+            cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: background var(--transition-fast), color var(--transition-fast);
+        }
+        .svc-menu-btn:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+        .svc-menu-btn svg { width: 14px; height: 14px; }
+        .svc-menu-wrap.open .svc-menu-btn { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+
+        .svc-menu {
+            position: absolute;
+            top: calc(100% + 6px); right: 0;
+            min-width: 220px;
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
+            padding: 6px;
+            z-index: 20;
+            display: none;
+            text-align: left;
+        }
+        .svc-menu-wrap.open .svc-menu { display: block; }
+        .svc-menu-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: var(--radius-sm);
+            font-size: 13px; letter-spacing: -0.008em;
+            color: var(--color-text-primary);
+            text-decoration: none;
+            transition: background var(--transition-fast);
+            white-space: nowrap;
+        }
+        .svc-menu-item:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); text-decoration: none; }
+        .svc-menu-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .svc-menu-item:hover svg { color: var(--color-accent); }
+
+        /* Pagination footer — transparent, borderless, Apple-faithful */
+        .svc-footer {
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            padding: 12px 20px;
             font-size: 12px; color: var(--color-text-tertiary);
         }
-        .svc-paging-count { font-weight: 400; }
-        .svc-paging-count strong { color: var(--color-text-primary); font-weight: 600; }
-        .svc-paging-spacer { flex: 1; }
-        .svc-paging-btns { display: inline-flex; gap: 2px; align-items: center; }
-        .svc-paging-btns button {
-            min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
-            background: transparent; border: 0;
-            font: inherit; font-size: 12px; color: var(--color-text-secondary);
-            cursor: pointer; transition: all var(--transition-fast);
+        .svc-footer .spacer { flex: 1; }
+        .svc-page-size { display: inline-flex; align-items: center; gap: 6px; }
+        .svc-page-size select {
+            height: 26px; padding: 0 22px 0 8px;
+            border: 0; background: transparent;
+            border-radius: var(--radius-sm);
+            font-size: 12px; font-family: inherit; font-weight: 500;
+            color: var(--color-text-primary);
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 6px center;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        .svc-page-size select:hover { background-color: var(--color-surface-secondary); }
+        .svc-page-size select:focus { outline: none; background-color: var(--color-surface-secondary); box-shadow: 0 0 0 3px var(--color-accent-light); }
+        .svc-pages { display: inline-flex; gap: 2px; align-items: center; }
+        .svc-pages button {
+            min-width: 26px; height: 26px; padding: 0 8px;
+            border: 0; background: transparent;
+            border-radius: var(--radius-sm);
+            font-size: 12px; font-weight: 500; font-family: inherit;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
             display: inline-flex; align-items: center; justify-content: center;
         }
-        .svc-paging-btns button:hover:not(:disabled) { background: var(--color-surface-secondary); color: var(--color-text-primary); }
-        .svc-paging-btns button.active {
-            background: var(--color-accent-light); color: var(--color-accent); font-weight: 600;
+        .svc-pages button:hover:not(:disabled):not(.active) { color: var(--color-accent); }
+        .svc-pages button.active { color: var(--color-accent); font-weight: 600; }
+        .svc-pages button:disabled { opacity: 0.25; cursor: default; }
+        .svc-pages button svg { width: 11px; height: 11px; }
+
+        /* Drop divider lines between table rows and under the column header */
+        .svc-main .svc-table tbody tr { border-bottom: none; }
+        .svc-main .svc-table thead th { border-bottom: none; }
+
+        /* Center the Actions column (last column) */
+        .svc-main .svc-table thead th:last-child,
+        .svc-main .svc-table tbody td:last-child { text-align: center; }
+
+        /* ── Services layout = "outside": pull toolbar + footer out of the card visually.
+             Only the table (service rows) keeps the card surface; search + pagination float
+             on the page background above/below it, matching the bare-list reference. ── */
+        body[data-svc-layout="outside"] .svc-table-card {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            overflow: visible;
         }
-        .svc-paging-btns button:disabled { opacity: 0.35; cursor: not-allowed; }
-        .svc-paging-btns button svg { width: 12px; height: 12px; }
+        body[data-svc-layout="outside"] .svc-table-card .when-full > .svc-table {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        /* ── Services stack ─────────────────────────────────────────────
+           Default ("Controls inside"): the stack is one unified white card —
+           column titles, toolbar, rows, and pager all share the same surface.
+           "Controls outside": the stack is transparent; only the rows card keeps
+           its surface, and the rest floats on the page. ──────────────── */
+        .svc-stack {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            /* overflow: visible so the row kebab dropdowns aren't clipped by the card. */
+            overflow: visible;
+        }
+        /* Clip row hover backgrounds to the stack's rounded corners visually by rounding
+           the first/last row cells, since we no longer rely on overflow: hidden. */
+        .svc-stack .svc-table tbody tr:first-child td:first-child { border-top-left-radius: var(--radius-md); }
+        .svc-stack .svc-table tbody tr:first-child td:last-child  { border-top-right-radius: var(--radius-md); }
+        .svc-stack .svc-table tbody tr:last-child  td:first-child { border-bottom-left-radius: var(--radius-md); }
+        .svc-stack .svc-table tbody tr:last-child  td:last-child  { border-bottom-right-radius: var(--radius-md); }
+        .svc-stack > .svc-table-head-row { padding: 10px 0 6px; margin: 0; }
+        .svc-stack > .svc-table-card {
+            background: transparent; border: 0; border-radius: 0; box-shadow: none; margin: 0;
+        }
+        .svc-stack > .svc-footer {
+            padding: 10px 20px 14px;
+            border-top: 0;
+            margin: 0;
+        }
+
+        /* Controls outside: strip the stack's own card styling and give it back
+           to the rows card only. Column titles + pager float on the page. */
+        body[data-svc-layout="outside"] .svc-stack {
+            background: transparent; border: 0; border-radius: 0; overflow: visible;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        body[data-svc-layout="outside"] .svc-stack > .svc-table-head-row {
+            padding: 2px 0;
+        }
+        body[data-svc-layout="outside"] .svc-stack > .svc-table-card {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            overflow: visible;
+        }
+        body[data-svc-layout="outside"] .svc-stack > .svc-footer {
+            padding: 12px 4px;
+            border-top: 0;
+        }
+        /* Drop the kebab-menu overflow helper too, so the flat cards stay self-contained */
 
         /* Empty state (shown when data-data="empty") */
         body[data-data="empty"] .when-full { display: none; }
@@ -289,202 +570,226 @@
 <!-- ═══════════ PAGE CONTENT ═══════════ -->
 <div class="content-area">
     <header class="page-header">
-        <h1>My Products &amp; Services</h1>
-        <p class="page-subtitle">Manage the services on your account — filter by status, place new orders, or explore add-ons.</p>
+        <div class="page-header-row">
+            <div style="flex: 1; min-width: 0;">
+                <h1>Services</h1>
+                <p class="page-subtitle">Manage your active services, upgrades, and add-ons.</p>
+            </div>
+            <a href="store.html" class="page-header-action">
+                Order a service
+                <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+        </div>
     </header>
 
     <div class="svc-split">
-        <!-- ══ LEFT: filters + actions + promos ══ -->
-        <aside class="svc-aside">
-            <!-- View filter -->
-            <div class="card filter-card">
-                <div class="filter-heading">View</div>
-                <label class="filter-item">
-                    <input type="radio" name="svc-view" value="all" checked>
-                    <span class="filter-item-label">All</span>
-                    <span class="filter-item-count when-full">4</span>
-                    <span class="filter-item-count when-empty">0</span>
-                </label>
-                <label class="filter-item">
-                    <input type="radio" name="svc-view" value="active">
-                    <span class="filter-item-label">Active</span>
-                    <span class="filter-item-count when-full">3</span>
-                    <span class="filter-item-count when-empty">0</span>
-                </label>
-                <label class="filter-item">
-                    <input type="radio" name="svc-view" value="pending">
-                    <span class="filter-item-label">Pending</span>
-                    <span class="filter-item-count when-full">1</span>
-                    <span class="filter-item-count when-empty">0</span>
-                </label>
-                <label class="filter-item">
-                    <input type="radio" name="svc-view" value="suspended">
-                    <span class="filter-item-label">Suspended</span>
-                    <span class="filter-item-count">0</span>
-                </label>
-                <label class="filter-item">
-                    <input type="radio" name="svc-view" value="terminated">
-                    <span class="filter-item-label">Terminated</span>
-                    <span class="filter-item-count">0</span>
-                </label>
-                <label class="filter-item">
-                    <input type="radio" name="svc-view" value="cancelled">
-                    <span class="filter-item-label">Cancelled</span>
-                    <span class="filter-item-count">0</span>
-                </label>
-            </div>
-
-            <!-- Actions -->
-            <div class="card actions-card">
-                <div class="filter-heading">Actions</div>
-                <a href="cart.html" class="action-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-                    Place a new order
-                </a>
-                <a href="#" class="action-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    View available addons
-                </a>
-            </div>
-
-            <!-- Promo slider — shared store carousel (same content on every page) -->
-            <div data-include="partials/promo-slider.html"></div>
-        </aside>
-
-        <!-- ══ RIGHT: toolbar + table + paging ══ -->
+        <!-- ══ LEFT: banner + tabs + table + paging ══ -->
         <div class="svc-main">
-            <!-- Services card — wraps toolbar, table, and pagination in one unified surface -->
+            <!-- Renewal banner -->
+            <div class="svc-banner when-full">
+                <span class="svc-banner-ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </span>
+                <span><strong>2 services</strong> are renewing in the next 30 days.</span>
+                <span class="spacer"></span>
+                <a href="#" class="btn-secondary">View renewals</a>
+            </div>
+
+            <!-- Filter tabs (pill-group, outside the card) -->
+            <div class="filter-tabs when-full">
+                <button class="filter-tab active">All</button>
+                <button class="filter-tab">Active</button>
+                <button class="filter-tab">Pending</button>
+                <button class="filter-tab">Suspended</button>
+                <button class="filter-tab">Terminated</button>
+                <button class="filter-tab">Cancelled</button>
+            </div>
+            <!-- Services stack: in "inside" mode it renders as one unified white card;
+                 in "outside" mode each child (titles, card, pager) floats on the page. -->
+            <div class="svc-stack">
+
+            <!-- Column titles (floating outside in "outside" mode, part of the card in "inside") -->
+            <div class="svc-table-head-row when-full">
+                <div class="hl-cell hl-name"><button type="button" class="svc-sort" data-sort="name" data-dir="">Name <span class="svc-sort-ico"></span></button></div>
+                <div class="hl-cell hl-pricing"><button type="button" class="svc-sort" data-sort="price" data-dir="">Pricing <span class="svc-sort-ico"></span></button></div>
+                <div class="hl-cell hl-due"><button type="button" class="svc-sort" data-sort="due" data-dir="">Next due <span class="svc-sort-ico"></span></button></div>
+                <div class="hl-cell hl-status"><button type="button" class="svc-sort" data-sort="status" data-dir="">Status <span class="svc-sort-ico"></span></button></div>
+                <div class="hl-cell hl-actions"></div>
+            </div>
+
+            <!-- Services card — wraps the table -->
             <div class="card svc-table-card">
-                <!-- Unified toolbar: search · view filter · hide-inactive · Add new -->
-                <div class="svc-toolbar">
-                    <div class="svc-search">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <input type="search" placeholder="Search services…" autocomplete="off">
-                    </div>
-                    <select class="svc-view-select" aria-label="View">
-                        <option value="all" selected>All</option>
-                        <option value="this-month">Renewing this month</option>
-                        <option value="overdue">Overdue</option>
-                    </select>
-                    <label class="toggle-label">
-                        <input type="checkbox">
-                        <span class="toggle-switch-inline"></span>
-                        <span>Hide inactive</span>
-                    </label>
-                    <div class="svc-toolbar-spacer"></div>
-                    <a href="cart.html" class="btn-primary">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Add new
-                    </a>
-                </div>
 
                 <!-- Full state: table with services -->
                 <div class="when-full">
                     <table class="svc-table">
+                        <colgroup>
+                            <col class="svc-col-product">
+                            <col class="svc-col-pricing">
+                            <col class="svc-col-due">
+                            <col class="svc-col-status">
+                            <col class="svc-col-actions">
+                        </colgroup>
                         <thead>
                             <tr>
-                                <th scope="col">Product / Service <span class="sort">↕</span></th>
-                                <th scope="col">Pricing <span class="sort">↕</span></th>
-                                <th scope="col">Next due <span class="sort">↕</span></th>
-                                <th scope="col">Status <span class="sort">↕</span></th>
+                                <th scope="col"><button type="button" class="svc-sort" data-sort="product" data-dir="">Product / Service <span class="svc-sort-ico"></span></button></th>
+                                <th scope="col"><button type="button" class="svc-sort" data-sort="price" data-dir="">Pricing <span class="svc-sort-ico"></span></button></th>
+                                <th scope="col"><button type="button" class="svc-sort" data-sort="due" data-dir="">Next due <span class="svc-sort-ico"></span></button></th>
+                                <th scope="col"><button type="button" class="svc-sort" data-sort="status" data-dir="">Status <span class="svc-sort-ico"></span></button></th>
                                 <th scope="col" aria-label="Actions"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr data-href="clientareaproductdetails.html">
                                 <td>
-                                    <div class="svc-cell-product">
-                                        <div class="svc-cell-ico">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-                                        </div>
-                                        <div class="svc-cell-product-info">
-                                            <div class="svc-cell-product-name"><strong>VPS Hosting</strong> — VPS-1</div>
-                                            <div class="svc-cell-product-domain">lagomdemo.com</div>
-                                        </div>
+                                    <div class="svc-cell-product-info">
+                                        <div class="svc-cell-product-name">VPS Hosting — VPS-1</div>
+                                        <div class="svc-cell-product-domain">lagomdemo.com</div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="svc-cell-price-main">$10.99</div>
-                                    <div class="svc-cell-price-cycle">Monthly</div>
+                                    <div class="svc-cell-price-main">$10.99<span class="cycle">/mo</span></div>
                                 </td>
                                 <td>22 Apr 2099</td>
                                 <td><span class="status-pill active">Active</span></td>
                                 <td class="svc-cell-actions">
-                                    <a href="clientareaproductdetails.html" class="svc-action-btn" aria-label="Manage">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                                    </a>
+                                    <div class="svc-menu-wrap" onclick="event.stopPropagation();">
+                                        <button type="button" class="svc-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleSvcMenu(this, event)">
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                        </button>
+                                        <div class="svc-menu" role="menu">
+                                            <a href="clientareaproductdetails.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                                Manage Product
+                                            </a>
+                                            <a href="upgrade.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
+                                                Upgrade / Downgrade
+                                            </a>
+                                            <a href="clientareadomainaddons.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                                View Addons
+                                            </a>
+                                            <a href="clientareacancelrequest.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                                                Request Cancellation
+                                            </a>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             <tr data-href="clientareaproductdetails.html">
                                 <td>
-                                    <div class="svc-cell-product">
-                                        <div class="svc-cell-ico">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
-                                        </div>
-                                        <div class="svc-cell-product-info">
-                                            <div class="svc-cell-product-name"><strong>Web Hosting</strong> — Single</div>
-                                            <div class="svc-cell-product-domain">test.com</div>
-                                        </div>
+                                    <div class="svc-cell-product-info">
+                                        <div class="svc-cell-product-name">Web Hosting — Single</div>
+                                        <div class="svc-cell-product-domain">test.com</div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="svc-cell-price-main">$3.99</div>
-                                    <div class="svc-cell-price-cycle">Monthly</div>
+                                    <div class="svc-cell-price-main">$3.99<span class="cycle">/mo</span></div>
                                 </td>
                                 <td>22 Apr 2099</td>
                                 <td><span class="status-pill active">Active</span></td>
                                 <td class="svc-cell-actions">
-                                    <a href="clientareaproductdetails.html" class="svc-action-btn" aria-label="Manage">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                                    </a>
+                                    <div class="svc-menu-wrap" onclick="event.stopPropagation();">
+                                        <button type="button" class="svc-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleSvcMenu(this, event)">
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                        </button>
+                                        <div class="svc-menu" role="menu">
+                                            <a href="clientareaproductdetails.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                                Manage Product
+                                            </a>
+                                            <a href="upgrade.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
+                                                Upgrade / Downgrade
+                                            </a>
+                                            <a href="clientareadomainaddons.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                                View Addons
+                                            </a>
+                                            <a href="clientareacancelrequest.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                                                Request Cancellation
+                                            </a>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             <tr data-href="clientareaproductdetails.html">
                                 <td>
-                                    <div class="svc-cell-product">
-                                        <div class="svc-cell-ico">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
-                                        </div>
-                                        <div class="svc-cell-product-info">
-                                            <div class="svc-cell-product-name"><strong>Web Hosting</strong> — Single</div>
-                                            <div class="svc-cell-product-domain">cbnnbncbnbcnbcnb.com</div>
-                                        </div>
+                                    <div class="svc-cell-product-info">
+                                        <div class="svc-cell-product-name">Web Hosting — Single</div>
+                                        <div class="svc-cell-product-domain">cbnnbncbnbcnbcnb.com</div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="svc-cell-price-main">$3.99</div>
-                                    <div class="svc-cell-price-cycle">Monthly</div>
+                                    <div class="svc-cell-price-main">$3.99<span class="cycle">/mo</span></div>
                                 </td>
                                 <td>02 Jan 2026</td>
                                 <td><span class="status-pill pending">Pending</span></td>
                                 <td class="svc-cell-actions">
-                                    <a href="clientareaproductdetails.html" class="svc-action-btn" aria-label="Manage">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                                    </a>
+                                    <div class="svc-menu-wrap" onclick="event.stopPropagation();">
+                                        <button type="button" class="svc-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleSvcMenu(this, event)">
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                        </button>
+                                        <div class="svc-menu" role="menu">
+                                            <a href="clientareaproductdetails.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                                Manage Product
+                                            </a>
+                                            <a href="upgrade.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
+                                                Upgrade / Downgrade
+                                            </a>
+                                            <a href="clientareadomainaddons.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                                View Addons
+                                            </a>
+                                            <a href="clientareacancelrequest.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                                                Request Cancellation
+                                            </a>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             <tr data-href="clientareaproductdetails.html">
                                 <td>
-                                    <div class="svc-cell-product">
-                                        <div class="svc-cell-ico">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-                                        </div>
-                                        <div class="svc-cell-product-info">
-                                            <div class="svc-cell-product-name"><strong>Reseller Hosting</strong> — Silver</div>
-                                            <div class="svc-cell-product-domain">demo.com</div>
-                                        </div>
+                                    <div class="svc-cell-product-info">
+                                        <div class="svc-cell-product-name">Reseller Hosting — Silver</div>
+                                        <div class="svc-cell-product-domain">demo.com</div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="svc-cell-price-main">$8.99</div>
-                                    <div class="svc-cell-price-cycle">Monthly</div>
+                                    <div class="svc-cell-price-main">$8.99<span class="cycle">/mo</span></div>
                                 </td>
                                 <td>22 Apr 2099</td>
                                 <td><span class="status-pill active">Active</span></td>
                                 <td class="svc-cell-actions">
-                                    <a href="clientareaproductdetails.html" class="svc-action-btn" aria-label="Manage">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                                    </a>
+                                    <div class="svc-menu-wrap" onclick="event.stopPropagation();">
+                                        <button type="button" class="svc-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleSvcMenu(this, event)">
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                        </button>
+                                        <div class="svc-menu" role="menu">
+                                            <a href="clientareaproductdetails.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                                Manage Product
+                                            </a>
+                                            <a href="upgrade.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
+                                                Upgrade / Downgrade
+                                            </a>
+                                            <a href="clientareadomainaddons.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                                View Addons
+                                            </a>
+                                            <a href="clientareacancelrequest.html" class="svc-menu-item" role="menuitem">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                                                Request Cancellation
+                                            </a>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -501,22 +806,55 @@
                     <a href="cart.html" class="btn-primary">Place an order</a>
                 </div>
 
-                <!-- Compact pagination inside the card -->
-                <div class="svc-paging when-full">
-                    <span class="svc-paging-count"><strong>1–4</strong> of <strong>4</strong></span>
-                    <div class="svc-paging-spacer"></div>
-                    <div class="svc-paging-btns">
-                        <button type="button" disabled aria-label="Previous page">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                        </button>
-                        <button type="button" class="active" aria-current="page">1</button>
-                        <button type="button" disabled aria-label="Next page">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                        </button>
-                    </div>
+            </div>
+
+            <!-- Pagination footer — floats outside in "outside" mode, part of the card in "inside" -->
+            <div class="svc-footer when-full">
+                <div class="svc-page-size">
+                    Show
+                    <select aria-label="Rows per page">
+                        <option>10</option>
+                        <option>25</option>
+                        <option>50</option>
+                    </select>
+                    entries
+                </div>
+                <div class="spacer"></div>
+                <span>Showing 1–4 of 4</span>
+                <div class="svc-pages">
+                    <button type="button" disabled aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+                    <button type="button" class="active">1</button>
+                    <button type="button" disabled aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
                 </div>
             </div>
+
+            </div><!-- /.svc-stack -->
         </div>
+
+        <!-- ══ RIGHT: Services sub-nav ══ -->
+        <aside>
+            <div class="card subnav-card">
+                <div class="subnav-heading">Services</div>
+                <a href="clientareaproducts.html" class="subnav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                    My Services
+                    <span class="subnav-count when-full">4</span>
+                    <span class="subnav-count when-empty">0</span>
+                </a>
+                <a href="store.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                    Order New Services
+                </a>
+                <a href="#" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    View Available Addons
+                </a>
+                <a href="upgrade.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
+                    Upgrade / Downgrade
+                </a>
+            </div>
+        </aside>
     </div>
 </div>
 
@@ -554,8 +892,8 @@
 <!-- ═══════════ Language / currency modal ═══════════ -->
 <div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js"></script>
-<script src="js/apple-layout.js"></script>
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
 <script>
 // Row-level navigation — the whole .svc-table row is clickable to its data-href,
 // while nested <a>/<button> elements keep their own behavior.
@@ -565,7 +903,7 @@ document.addEventListener('apple-layout:ready', function () {
         row.setAttribute('tabindex', '0');
         row.setAttribute('role', 'link');
         row.addEventListener('click', function (e) {
-            if (e.target.closest('a, button, input, select')) return;
+            if (e.target.closest('a, button, input, select, .svc-menu-wrap')) return;
             window.location.href = row.dataset.href;
         });
         row.addEventListener('keydown', function (e) {
@@ -576,6 +914,54 @@ document.addEventListener('apple-layout:ready', function () {
         });
     });
 });
+
+// Kebab menu toggle for each service row
+function toggleSvcMenu(btn, e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    var wrap = btn.closest('.svc-menu-wrap');
+    var wasOpen = wrap.classList.contains('open');
+    document.querySelectorAll('.svc-menu-wrap.open').forEach(function (w) {
+        w.classList.remove('open');
+        var b = w.querySelector('.svc-menu-btn');
+        if (b) b.setAttribute('aria-expanded', 'false');
+    });
+    if (!wasOpen) {
+        wrap.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+    }
+}
+// Click outside / Escape closes any open menu
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.svc-menu-wrap')) return;
+    document.querySelectorAll('.svc-menu-wrap.open').forEach(function (w) {
+        w.classList.remove('open');
+        var b = w.querySelector('.svc-menu-btn');
+        if (b) b.setAttribute('aria-expanded', 'false');
+    });
+});
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.svc-menu-wrap.open').forEach(function (w) {
+            w.classList.remove('open');
+            var b = w.querySelector('.svc-menu-btn');
+            if (b) b.setAttribute('aria-expanded', 'false');
+        });
+    }
+});
+
+// Sort cycle — click a header to toggle none → asc → desc → none
+(function () {
+    var sorts = document.querySelectorAll('.svc-sort');
+    sorts.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var dir = btn.getAttribute('data-dir');
+            var next = dir === '' ? 'asc' : dir === 'asc' ? 'desc' : '';
+            sorts.forEach(function (b) { b.setAttribute('data-dir', ''); b.classList.remove('active'); });
+            btn.setAttribute('data-dir', next);
+            if (next) btn.classList.add('active');
+        });
+    });
+})();
 </script>
 </body>
 </html>

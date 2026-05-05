@@ -1,0 +1,353 @@
+        body { display: block; }
+
+        /* ─── Dashboard page heading (Apple) ─── */
+        .dash-heading { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 24px; }
+
+        /* ─── Two-column split layout — main left, aside right (matches services pattern) ─── */
+        .dash-split { display: grid; grid-template-columns: 1fr 260px; gap: 24px; align-items: start; }
+        @media (max-width: 960px) { .dash-split { grid-template-columns: 1fr; } }
+        .dash-info-col { display: flex; flex-direction: column; gap: 16px; }
+        .dash-main-col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+
+        /* Sub-nav toggle off — hide aside, collapse to single column */
+        body[data-subnav="off"] .dash-split { grid-template-columns: 1fr; }
+        body[data-subnav="off"] .dash-split > aside { display: none; }
+        /* Sub-nav side — left: flip columns, main goes on right */
+        body[data-subnav-side="left"] .dash-split { grid-template-columns: 260px 1fr; }
+        body[data-subnav-side="left"] .dash-split > aside { grid-column: 1; grid-row: 1; }
+        body[data-subnav-side="left"] .dash-split > .dash-main-col { grid-column: 2; grid-row: 1; }
+        /* Sub-nav side — outside: float the aside in the outer gutter (right or left), outside the content column */
+        body[data-subnav-side="outside"] .dash-split,
+        body[data-subnav-side="outside-left"] .dash-split { grid-template-columns: 1fr; position: relative; }
+        body[data-subnav-side="outside"] .dash-split > aside,
+        body[data-subnav-side="outside-left"] .dash-split > aside {
+            position: absolute; top: 0; width: 260px;
+        }
+        body[data-subnav-side="outside"] .dash-split > aside { left: calc(100% + 24px); }
+        body[data-subnav-side="outside-left"] .dash-split > aside { right: calc(100% + 24px); left: auto; }
+        body[data-subnav-side="outside"] .dash-split > .dash-main-col,
+        body[data-subnav-side="outside-left"] .dash-split > .dash-main-col { grid-column: 1; }
+        /* Horizontal shift to visually re-center the content when aside floats outside */
+        body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-142px); }
+        body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(142px); }
+        body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 260px; }
+        /* Narrow viewports: fall back to inside column */
+        @media (max-width: 1200px) {
+            body[data-subnav-side="outside"] .dash-split { grid-template-columns: 1fr 260px; gap: 24px; position: static; }
+            body[data-subnav-side="outside-left"] .dash-split { grid-template-columns: 260px 1fr; gap: 24px; position: static; }
+            body[data-subnav-side="outside"] .dash-split > aside,
+            body[data-subnav-side="outside-left"] .dash-split > aside { position: static; width: auto; right: auto; left: auto; }
+            body[data-subnav-side="outside-left"] .dash-split > aside { grid-column: 1; grid-row: 1; }
+            body[data-subnav-side="outside-left"] .dash-split > .dash-main-col { grid-column: 2; grid-row: 1; }
+            body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area,
+            body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: none; }
+        }
+
+        /* ─── Sub-nav card (account overview jumps) ─── */
+        .subnav-card { padding: 8px; }
+        .subnav-heading {
+            font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+            text-transform: uppercase; color: var(--color-text-tertiary);
+            padding: 10px 12px 8px;
+        }
+        .subnav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: 8px;
+            font-size: 13px; color: var(--color-text-primary);
+            text-decoration: none;
+            transition: background var(--transition-fast);
+        }
+        .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+        .subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+        .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .subnav-item.active svg { color: var(--color-accent); }
+        .subnav-count {
+            margin-left: auto;
+            background: var(--color-surface-secondary); color: var(--color-text-tertiary);
+            padding: 1px 7px; border-radius: var(--radius-pill);
+            font-size: 11px; font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+        .subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
+
+        /* ─── Controls inside / outside toggle (mirrors services pattern for the dashboard cards) ─── */
+        /* Inside (default): each .card has its full shell — header and body share the same white surface. */
+        /* Outside: the .card shell strips down; only .card-body keeps the white surface and rounded edges,
+                    so each header floats above its card on the page background. */
+        body[data-svc-layout="outside"] .dash-main-col > .card,
+        body[data-svc-layout="outside"] .dash-main-col .split-row > .card {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            overflow: visible;
+        }
+        body[data-svc-layout="outside"] .dash-main-col .card > .card-header {
+            padding: 2px 4px 10px;
+        }
+        body[data-svc-layout="outside"] .dash-main-col .card > .card-body {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 16px 24px 20px;
+        }
+        /* Sentinel element to let apple-layout.js reveal the Services chip-group on this page */
+        .svc-table-card { display: none !important; }
+
+        /* ─── User card (reuses .card + .sidebar-avatar primitives) ─── */
+        .user-card-body { padding: 20px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+        .user-card-body .sidebar-avatar { width: 52px; height: 52px; font-size: 22px; margin-bottom: 14px; }
+        .user-account { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; color: var(--color-text-primary); margin: 0; }
+        .user-contact { font-size: 13px; color: var(--color-text-secondary); margin: 2px 0 12px; }
+        .user-addr { font-size: 12px; line-height: 1.55; color: var(--color-text-tertiary); margin: 0 0 18px; font-style: normal; }
+        .user-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+        .user-btns .btn-primary,
+        .user-btns .btn-secondary { height: 30px; padding: 0 14px; font-size: 13px; }
+
+        /* ─── Collapsible info cards (uses .card; collapsing is a layout feature not a visual one) ─── */
+        .card-toggle { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; user-select: none; }
+        .card-toggle h3 { font-size: 14px; font-weight: 600; letter-spacing: -0.008em; color: var(--color-text-primary); margin: 0; }
+        .card-toggle .chev { width: 14px; height: 14px; color: var(--color-text-tertiary); transition: transform var(--transition-fast); }
+        .card.collapsed .card-toggle .chev { transform: rotate(-90deg); }
+        .card-toggle-body { padding: 0 20px 18px; font-size: 13px; color: var(--color-text-secondary); }
+        .card.collapsed .card-toggle-body { display: none; }
+        .info-empty { color: var(--color-text-tertiary); font-size: 13px; margin: 0 0 12px; }
+
+        /* ─── Shortcut row (mirrors .sidebar-item token values) ─── */
+        .shortcut-list { display: flex; flex-direction: column; }
+        .shortcut-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin: 0 -10px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: 13px; text-decoration: none; transition: background var(--transition-fast); }
+        .shortcut-row:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+        .shortcut-row svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+
+        /* ─── Inline notice (Apple-subtle: surface-secondary + accent-tinted icon) ─── */
+        .notice { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--color-surface-secondary); border: 1px solid var(--color-border); font-size: 13px; color: var(--color-text-primary); }
+        .notice-ico { width: 22px; height: 22px; border-radius: 50%; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .notice-ico svg { width: 12px; height: 12px; }
+        .notice-text { flex: 1; line-height: 1.45; color: var(--color-text-secondary); }
+        .notice-text strong { color: var(--color-text-primary); font-weight: 600; }
+        .notice-dismiss { width: 28px; height: 28px; border-radius: 50%; border: 0; background: transparent; color: var(--color-text-tertiary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .notice-dismiss:hover { background: var(--color-surface); color: var(--color-text-primary); }
+        .notice-dismiss svg { width: 12px; height: 12px; }
+
+        /* Promo slider styles live in css/apple-layout.css (shared across pages). */
+
+        /* ─── Tiles row — Variant A (existing .tile primitive, vertical) ─── */
+        .tiles-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        @media (max-width: 880px) { .tiles-row { grid-template-columns: repeat(2, 1fr); } }
+
+        /* ─── Tiles row — Variant B (horizontal: icon on left, value + label on right) ─── */
+        .tiles-row-b { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        @media (max-width: 880px) { .tiles-row-b { grid-template-columns: repeat(2, 1fr); } }
+        .tile-h {
+            background: var(--color-surface-secondary);
+            border-radius: var(--radius-lg);
+            padding: 14px 16px;
+            border: 1px solid var(--color-border-card);
+            transition: all var(--transition-medium);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .tile-h:hover { box-shadow: var(--shadow-card-hover); transform: translateY(-1px); color: inherit; text-decoration: none; }
+        .tile-h .tile-icon { margin: 0; flex-shrink: 0; }
+        .tile-h-info { display: flex; flex-direction: column; min-width: 0; }
+        .tile-h-value { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; line-height: 1; color: var(--color-text-primary); }
+        .tile-h-label { font-size: 11px; color: var(--color-text-secondary); margin-top: 3px; font-weight: 400; }
+
+        /* ─── Tiles row — Variant C (tinted card with ghost icon, iOS-widget feel) ─── */
+        .tiles-row-c { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        @media (max-width: 880px) { .tiles-row-c { grid-template-columns: repeat(2, 1fr); } }
+        .tile-c {
+            position: relative;
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            border: 0;
+            min-height: 102px;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            text-decoration: none; color: inherit;
+            overflow: hidden;
+            transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+        }
+        .tile-c:hover { transform: translateY(-1px); box-shadow: var(--shadow-card-hover); color: inherit; text-decoration: none; }
+        .tile-c.blue   { background: var(--color-blue-bg); }
+        .tile-c.green  { background: var(--color-green-bg); }
+        .tile-c.red    { background: var(--color-red-bg); }
+        .tile-c.orange { background: var(--color-orange-bg); }
+        .tile-c-value { font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1; }
+        .tile-c.blue   .tile-c-value { color: var(--color-blue-text); }
+        .tile-c.green  .tile-c-value { color: var(--color-green-text); }
+        .tile-c.red    .tile-c-value { color: var(--color-red-text); }
+        .tile-c.orange .tile-c-value { color: var(--color-orange-text); }
+        .tile-c-label { font-size: 12px; font-weight: 500; margin-top: 6px; color: var(--color-text-primary); }
+        .tile-c-ghost {
+            position: absolute; top: 14px; right: 14px;
+            pointer-events: none; opacity: 0.22;
+        }
+        .tile-c-ghost svg { width: 34px; height: 34px; }
+        .tile-c.blue   .tile-c-ghost { color: var(--color-blue-text); }
+        .tile-c.green  .tile-c-ghost { color: var(--color-green-text); }
+        .tile-c.red    .tile-c-ghost { color: var(--color-red-text); }
+        .tile-c.orange .tile-c-ghost { color: var(--color-orange-text); }
+        /* Empty state dims the value */
+        body[data-data="empty"] .tile-c.red .tile-c-value,
+        body[data-data="empty"] .tile-c.orange .tile-c-value { color: var(--color-text-tertiary); }
+
+        /* ─── Tiles — Variant D (single card, stacked rows — Apple Settings feel) ─── */
+        .tile-d-card { background: var(--color-surface); border: 1px solid var(--color-border-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); }
+        .tile-d-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 20px;
+            border-bottom: 0.5px solid var(--color-border);
+            text-decoration: none; color: inherit;
+            transition: background var(--transition-fast);
+        }
+        .tile-d-row:last-child { border-bottom: 0; }
+        .tile-d-row:hover { background: var(--color-surface-secondary); color: inherit; text-decoration: none; }
+        .tile-d-ico { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .tile-d-ico svg { width: 16px; height: 16px; }
+        .tile-d-ico.blue   { background: var(--color-blue-bg);   color: var(--color-blue-text); }
+        .tile-d-ico.green  { background: var(--color-green-bg);  color: var(--color-green-text); }
+        .tile-d-ico.red    { background: var(--color-red-bg);    color: var(--color-red-text); }
+        .tile-d-ico.orange { background: var(--color-orange-bg); color: var(--color-orange-text); }
+        .tile-d-label { flex: 1; font-size: 14px; color: var(--color-text-primary); letter-spacing: -0.008em; }
+        .tile-d-value { font-size: 20px; font-weight: 600; letter-spacing: -0.015em; color: var(--color-text-primary); line-height: 1; }
+        .tile-d-row.alert .tile-d-value { color: var(--color-red-text); }
+        .tile-d-chev { width: 14px; height: 14px; color: var(--color-text-tertiary); transition: transform var(--transition-fast), color var(--transition-fast); flex-shrink: 0; }
+        .tile-d-row:hover .tile-d-chev { color: var(--color-accent); transform: translateX(2px); }
+        /* Empty state: dim alert colors, keep ghost icons neutral */
+        body[data-data="empty"] .tile-d-row.alert .tile-d-value,
+        body[data-data="empty"] .tile-d-value { color: var(--color-text-tertiary); }
+        body[data-data="empty"] .tile-d-ico.red,
+        body[data-data="empty"] .tile-d-ico.orange { background: var(--color-surface-secondary); color: var(--color-text-tertiary); }
+
+        /* ─── Tiles — Variant F (horizontal sibling of D — one card, 4 cells side-by-side) ─── */
+        .tile-f-card { background: var(--color-surface); border: 1px solid var(--color-border-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); display: flex; }
+        @media (max-width: 720px) { .tile-f-card { flex-wrap: wrap; } }
+        .tile-f-cell {
+            flex: 1 1 0;
+            min-width: 0;
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 18px;
+            border-right: 0.5px solid var(--color-border);
+            text-decoration: none; color: inherit;
+            transition: background var(--transition-fast);
+        }
+        .tile-f-cell:last-child { border-right: 0; }
+        .tile-f-cell:hover { background: var(--color-surface-secondary); color: inherit; text-decoration: none; }
+        @media (max-width: 720px) {
+            .tile-f-cell { flex: 1 1 50%; border-right: 0; border-bottom: 0.5px solid var(--color-border); }
+            .tile-f-cell:nth-child(odd) { border-right: 0.5px solid var(--color-border); }
+            .tile-f-cell:nth-last-child(-n+2) { border-bottom: 0; }
+        }
+        .tile-f-ico { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .tile-f-ico svg { width: 16px; height: 16px; }
+        .tile-f-ico.blue   { background: var(--color-blue-bg);   color: var(--color-blue-text); }
+        .tile-f-ico.green  { background: var(--color-green-bg);  color: var(--color-green-text); }
+        .tile-f-ico.red    { background: var(--color-red-bg);    color: var(--color-red-text); }
+        .tile-f-ico.orange { background: var(--color-orange-bg); color: var(--color-orange-text); }
+        .tile-f-text { display: flex; flex-direction: column; min-width: 0; }
+        .tile-f-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tile-f-value { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; color: var(--color-text-primary); line-height: 1; margin-top: 4px; }
+        .tile-f-cell.alert .tile-f-value { color: var(--color-red-text); }
+        body[data-data="empty"] .tile-f-value,
+        body[data-data="empty"] .tile-f-cell.alert .tile-f-value { color: var(--color-text-tertiary); }
+        body[data-data="empty"] .tile-f-ico.red,
+        body[data-data="empty"] .tile-f-ico.orange { background: var(--color-surface-secondary); color: var(--color-text-tertiary); }
+
+        /* ─── Tiles — Variant E (progress ring, Apple Fitness-inspired) ─── */
+        .tiles-row-e { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        @media (max-width: 880px) { .tiles-row-e { grid-template-columns: repeat(2, 1fr); } }
+        .tile-e {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-card);
+            border-radius: var(--radius-lg);
+            padding: 18px 16px 16px;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            text-decoration: none; color: inherit;
+            box-shadow: var(--shadow-card);
+            transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+        }
+        .tile-e:hover { transform: translateY(-1px); box-shadow: var(--shadow-card-hover); color: inherit; text-decoration: none; }
+        .tile-e-ring { position: relative; width: 64px; height: 64px; }
+        .tile-e-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .tile-e-ring circle { fill: none; stroke-width: 4; stroke-linecap: round; }
+        .tile-e-ring .bg { stroke: var(--color-surface-secondary); }
+        .tile-e-ring .fg {
+            transition: stroke-dashoffset 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            stroke-dasharray: 170;
+            stroke-dashoffset: 0;
+        }
+        .tile-e.blue   .tile-e-ring .fg { stroke: var(--color-blue-text); }
+        .tile-e.green  .tile-e-ring .fg { stroke: var(--color-green-text); }
+        .tile-e.red    .tile-e-ring .fg { stroke: var(--color-red-text); }
+        .tile-e.orange .tile-e-ring .fg { stroke: var(--color-orange-text); }
+        .tile-e-value {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 22px; font-weight: 600; letter-spacing: -0.015em;
+            color: var(--color-text-primary); line-height: 1;
+        }
+        .tile-e-label { font-size: 12px; color: var(--color-text-secondary); font-weight: 500; letter-spacing: -0.008em; }
+        /* Empty state: ring fully retracts + value fades */
+        body[data-data="empty"] .tile-e-value { color: var(--color-text-tertiary); }
+
+        /* Variant labels (dev/preview helper) */
+        .variant-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); margin: 0 0 8px; }
+        /* When a specific tile variant is picked via the options chip, hide the others + their labels */
+        body[data-tiles] .tile-variant { display: none; }
+        body[data-tiles="a"] .tile-variant[data-variant="a"],
+        body[data-tiles="b"] .tile-variant[data-variant="b"],
+        body[data-tiles="c"] .tile-variant[data-variant="c"],
+        body[data-tiles="d"] .tile-variant[data-variant="d"],
+        body[data-tiles="e"] .tile-variant[data-variant="e"],
+        body[data-tiles="f"] .tile-variant[data-variant="f"] { display: block; }
+        body[data-tiles] .variant-label { display: none; }
+
+        /* ─── Service rows with Manage button ─── */
+        /* .service-item from apple-theme.css handles the base row; add a .service-manage slot */
+        .service-manage { flex-shrink: 0; }
+        .service-manage .btn-secondary { height: 30px; padding: 0 14px; font-size: 12px; }
+        /* Compact ticket variant — wrap-safe title, single-line meta */
+        .ticket-row { gap: 10px; }
+        .ticket-row .service-info { min-width: 0; flex: 1; }
+        .ticket-row .service-name { white-space: normal; line-height: 1.35; font-weight: 500; }
+        .ticket-row .service-domain { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Split-row collapses on tight widths to keep cards readable */
+        @media (max-width: 1080px) {
+            .dash-main-col .split-row { grid-template-columns: 1fr; }
+        }
+
+        /* ─── Register-domain mini form — 2 action buttons, no Search CTA ─── */
+        .rd-form { display: flex; flex-direction: column; gap: 12px; padding: 4px 0 4px; }
+        .rd-input { padding: 10px 14px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; background: var(--color-surface); color: var(--color-text-primary); }
+        .rd-input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+        .rd-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .rd-actions .btn-primary,
+        .rd-actions .btn-secondary { height: 36px; padding: 0 16px; font-size: 13px; width: 100%; }
+
+        /* ─── Empty-state variants (toggled via body[data-data="empty"] from state-chip) ─── */
+        body[data-data="empty"] .when-full { display: none !important; }
+        body:not([data-data="empty"]) .when-empty { display: none !important; }
+        .notices-group { display: flex; flex-direction: column; gap: 12px; }
+        .empty-state { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 32px 24px 24px; color: var(--color-text-secondary); }
+        .empty-state .empty-ico { width: 44px; height: 44px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+        .empty-state .empty-ico svg { width: 20px; height: 20px; }
+        .empty-state-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.01em; }
+        .empty-state-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 0 16px; max-width: 320px; line-height: 1.45; }
+        .empty-state .btn-primary,
+        .empty-state .btn-secondary { height: 32px; padding: 0 16px; font-size: 13px; }
+        /* When empty, zero out tile values + dim alert colors */
+        body[data-data="empty"] .tile-value { color: var(--color-text-tertiary); }
+        body[data-data="empty"] .tile-icon.red,
+        body[data-data="empty"] .tile-icon.orange { background: var(--color-surface-secondary); color: var(--color-text-tertiary); }
+
+        /* ─── Announcement rows (simple list) ─── */
+        .news-list { display: flex; flex-direction: column; }
+        .news-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 0.5px solid var(--color-border); text-decoration: none; color: inherit; }
+        .news-row:last-child { border-bottom: 0; }
+        .news-row:hover { color: var(--color-accent); text-decoration: none; }
+        .news-row:hover .news-title { color: var(--color-accent); }
+        .news-title { font-size: 14px; color: var(--color-text-primary); letter-spacing: -0.008em; }
+        .news-date { font-size: 12px; color: var(--color-text-tertiary); white-space: nowrap; }
+    </style>

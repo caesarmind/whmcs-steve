@@ -3,163 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bulk Domain Management - WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
+    <title>Bulk Domain Management — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
+    <style>
+        body { display: block; }
+
+        /* Page header — eyebrow + title + subtitle */
+        .page-header { margin-bottom: 24px; }
+        .page-header .page-eyebrow {
+            font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+            text-transform: uppercase; letter-spacing: 0.06em;
+            margin: 0 0 6px;
+        }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+        .page-header .page-subtitle {
+            font-size: 14px; color: var(--color-text-secondary);
+            letter-spacing: -0.008em; line-height: 1.5;
+            margin: 0; max-width: 620px;
+        }
+
+        /* Group cards */
+        .bdm-group {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 14px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .bdm-group-header {
+            padding: 14px 22px;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        .bdm-group-title {
+            font-size: 14px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        /* Domain rows */
+        .bdm-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 22px;
+            border-bottom: 0.5px solid var(--color-border);
+            transition: background var(--transition-fast);
+        }
+        .bdm-row:last-child { border-bottom: 0; }
+        .bdm-row:hover { background: var(--sidebar-item-hover); }
+        .bdm-row-check {
+            width: 18px; height: 18px;
+            accent-color: var(--color-accent);
+            flex-shrink: 0; cursor: pointer;
+        }
+        .bdm-row-info { flex: 1; min-width: 0; }
+        .bdm-row-name {
+            font-size: 14px; font-weight: 500;
+            color: var(--color-text-primary);
+            letter-spacing: -0.008em;
+            font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+        }
+        .bdm-row-sub {
+            font-size: 12px; color: var(--color-text-tertiary);
+            margin-top: 2px; letter-spacing: -0.004em;
+        }
+        .bdm-status-pill {
+            font-size: 11px; font-weight: 600;
+            padding: 4px 10px; border-radius: var(--radius-pill);
+            letter-spacing: -0.004em;
+            flex-shrink: 0;
+        }
+        .bdm-status-pill.active {
+            background: var(--color-green-bg); color: var(--color-green-text);
+        }
+        .bdm-status-pill.expired {
+            background: var(--color-red-bg); color: var(--color-red-text);
+        }
+
+        /* Action bar */
+        .bdm-actions {
+            display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px;
+        }
+        .bdm-actions .btn-primary,
+        .bdm-actions .btn-secondary {
+            height: 38px; padding: 0 18px; font-size: 13px;
+        }
+
+        /* Results panel inner empty (no domain selected yet) */
+        .bdm-results-body { padding: 22px; }
+        .bdm-results-empty {
+            text-align: center; padding: 32px 16px;
+        }
+        .bdm-results-empty-ico {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 12px;
+        }
+        .bdm-results-empty-ico svg { width: 18px; height: 18px; }
+        .bdm-results-empty-title {
+            font-size: 14px; font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 4px; letter-spacing: -0.008em;
+        }
+        .bdm-results-empty-text {
+            font-size: 12.5px; color: var(--color-text-tertiary);
+            letter-spacing: -0.004em;
+        }
+    </style>
 </head>
-<body>
-    <aside class="sidebar">
-        <div class="sidebar-header"><a href="index.html" class="sidebar-home-link"><div class="sidebar-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.08 7.13 7.16 8.84 7.14C10.13 7.12 11.34 8.01 12.14 8.01C12.94 8.01 14.41 6.93 15.95 7.11C16.59 7.14 18.37 7.36 19.53 9.06C19.43 9.12 17.2 10.42 17.22 13.11C17.25 16.33 20.05 17.37 20.09 17.38C20.06 17.47 19.61 18.98 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg></div><span class="sidebar-brand">WHMCS</span></a></div>
-        <div class="sidebar-search"><input type="text" class="sidebar-search-input" placeholder="Search"></div>
-        <nav class="sidebar-nav">
-            <a href="clientareahome.html" id="nav-dashboard" class="sidebar-item"><div class="sidebar-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>Dashboard</a>
-            <div class="sidebar-section-label">Services</div>
-            <a href="clientareaproducts.html" id="nav-services" class="sidebar-item"><div class="sidebar-item-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>My Services <span class="sidebar-item-badge">3</span></a>
-            <a href="clientareadomains.html" id="nav-domains" class="sidebar-item active"><div class="sidebar-item-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>My Domains <span class="sidebar-item-badge">5</span></a>
-            <div class="sidebar-section-label">Billing</div>
-            <a href="clientareainvoices.html" id="nav-invoices" class="sidebar-item"><div class="sidebar-item-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>Invoices <span class="sidebar-item-badge">2</span></a>
-            <a href="account-paymentmethods.html" id="nav-payments" class="sidebar-item"><div class="sidebar-item-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>Payment Methods</a>
-            <div class="sidebar-section-label">Support</div>
-            <a href="supportticketslist.html" id="nav-tickets" class="sidebar-item"><div class="sidebar-item-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>Support Tickets <span class="sidebar-item-badge">1</span></a>
-            <a href="knowledgebase.html" id="nav-kb" class="sidebar-item"><div class="sidebar-item-icon indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>Knowledge Base</a>
-            <a href="announcements.html" id="nav-announcements" class="sidebar-item"><div class="sidebar-item-icon pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>Announcements</a>
-            <div class="sidebar-section-label">Account</div>
-            <a href="clientareadetails.html" id="nav-details" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>My Details</a>
-            <a href="clientareasecurity.html" id="nav-security" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>Security</a>
-        </nav>
-        <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar">AH</div><div class="sidebar-user-info"><div class="sidebar-user-name">Alex Henderson</div><div class="sidebar-user-email">alex@example.com</div></div></div></div>
-    </aside>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="domains" data-page-title="Bulk Domain Management">
 
-    <main class="main-content">
-        <div class="topbar">
-            <div class="topbar-breadcrumb"><a href="clientareadomains.html">My Domains</a> <span class="topbar-breadcrumb-sep">/</span> <span class="topbar-breadcrumb-current">Bulk Management</span></div>
-            <div class="topbar-status"><span class="topbar-status-dot"></span>All systems normal</div>
-            <div class="topbar-spacer"></div>
-            <div class="topbar-actions">
-                <div class="notification-wrapper">
-                    <button class="topbar-btn" title="Notifications" onclick="toggleNotifications(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="topbar-notification-dot"></div></button>
-                    <div class="notification-dropdown" id="notificationDropdown">
-                        <div class="notification-dropdown-header"><span class="notification-dropdown-title">Notifications</span><button class="notification-dropdown-clear">Mark all read</button></div>
-                        <a href="viewinvoice.html" class="notification-item"><div class="notification-dot-indicator orange"></div><div class="notification-content"><div class="notification-text">Invoice #10247 is due in 2 days</div><div class="notification-time">2 hours ago</div></div></a>
-                        <a href="viewinvoice.html" class="notification-item"><div class="notification-dot-indicator orange"></div><div class="notification-content"><div class="notification-text">Invoice #10246 is due in 2 days</div><div class="notification-time">2 hours ago</div></div></a>
-                        <a href="viewticket.html" class="notification-item"><div class="notification-dot-indicator green"></div><div class="notification-content"><div class="notification-text">Ticket #TKT-4821 has been answered</div><div class="notification-time">Yesterday</div></div></a>
-                        <a href="announcements.html" class="notification-item"><div class="notification-dot-indicator blue"></div><div class="notification-content"><div class="notification-text">Scheduled maintenance on Apr 20</div><div class="notification-time">3 days ago</div></div></a>
-                    </div>
+<div data-include="partials/state-chip.html"></div>
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>No Notifications</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;"><a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a></div>
+    </div>
+</div>
+
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareaproducts.html">My Services</a><a href="store.html">Order New Services</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareadomains.html">My Domains</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareainvoices.html">My Invoices</a><a href="clientareaquotes.html">My Quotes</a><a href="masspay.html">Mass Payment</a><a href="clientareaaddfunds.html">Add Funds</a><a href="account-paymentmethods.html">Payment Methods</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="supportticketslist.html">Tickets</a><a href="announcements.html">Announcements</a><a href="knowledgebase.html">Knowledgebase</a></div></div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
+</div></nav>
+
+<div data-include="partials/inner-topbar.html"></div>
+
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a><span class="sep">/</span>
+        <a href="clientareadomains.html">Domains</a><span class="sep">/</span>
+        <span class="current" aria-current="page">Bulk Management</span>
+    </div>
+</nav>
+
+<div class="content-area">
+    <header class="page-header">
+        <p class="page-eyebrow">DOMAINS</p>
+        <h1>Bulk Management</h1>
+        <p class="page-subtitle">Apply changes to many domains at once</p>
+    </header>
+
+    <div class="when-full">
+        <!-- Select Domains -->
+        <div class="bdm-group">
+            <div class="bdm-group-header">
+                <div class="bdm-group-title">Select Domains</div>
+            </div>
+            <div class="bdm-row">
+                <input type="checkbox" class="bdm-row-check" checked>
+                <div class="bdm-row-info">
+                    <div class="bdm-row-name">hendersondesign.com</div>
+                    <div class="bdm-row-sub">Expires Dec 15, 2026</div>
                 </div>
-                <button class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
-                <div class="profile-dropdown-wrapper">
-                    <div class="topbar-avatar" onclick="toggleProfileDropdown(event)" title="Account">AH</div>
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <div class="profile-dropdown-header"><div class="profile-dropdown-name">Alex Henderson</div><div class="profile-dropdown-email">alex@example.com</div></div>
-                        <a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a>
-                        <a href="clientareasecurity.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Security Settings</a>
-                        <a href="clientareaemails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email History</a>
-                        <div class="profile-dropdown-divider"></div>
-                        <div class="theme-toggle-row"><span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span><div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div></div>
-                        <div class="profile-dropdown-divider"></div>
-                        <a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a>
-                    </div>
+                <span class="bdm-status-pill active">Active</span>
+            </div>
+            <div class="bdm-row">
+                <input type="checkbox" class="bdm-row-check" checked>
+                <div class="bdm-row-info">
+                    <div class="bdm-row-name">alexhenderson.io</div>
+                    <div class="bdm-row-sub">Expires Mar 22, 2027</div>
                 </div>
+                <span class="bdm-status-pill active">Active</span>
+            </div>
+            <div class="bdm-row">
+                <input type="checkbox" class="bdm-row-check">
+                <div class="bdm-row-info">
+                    <div class="bdm-row-name">hendersonstudio.net</div>
+                    <div class="bdm-row-sub">Expires Jul 8, 2026</div>
+                </div>
+                <span class="bdm-status-pill active">Active</span>
+            </div>
+            <div class="bdm-row">
+                <input type="checkbox" class="bdm-row-check">
+                <div class="bdm-row-info">
+                    <div class="bdm-row-name">myportfolio.dev</div>
+                    <div class="bdm-row-sub">Expires Nov 1, 2026</div>
+                </div>
+                <span class="bdm-status-pill active">Active</span>
+            </div>
+            <div class="bdm-row">
+                <input type="checkbox" class="bdm-row-check">
+                <div class="bdm-row-info">
+                    <div class="bdm-row-name">designtools.store</div>
+                    <div class="bdm-row-sub">Expired Feb 28, 2026</div>
+                </div>
+                <span class="bdm-status-pill expired">Expired</span>
             </div>
         </div>
 
-        <div class="content-area">
-            <div class="page-header">
-                <div class="page-header-row">
-                    <div>
-                        <h1 class="page-title">Bulk Domain Management</h1>
-                        <p class="page-subtitle">Manage multiple domains at once</p>
-                    </div>
-                </div>
-            </div>
+        <!-- Bulk action buttons -->
+        <div class="bdm-actions">
+            <button class="btn-secondary">Change Nameservers</button>
+            <button class="btn-secondary">Toggle Auto-Renew</button>
+            <button class="btn-secondary">Toggle Lock</button>
+            <button class="btn-primary">Renew Selected</button>
+        </div>
 
-            <div class="settings-group">
-                <div class="settings-group-header">
-                    <div class="settings-group-title">Select Domains</div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content" style="display: flex; align-items: center; gap: 12px;">
-                        <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--accent-color);">
-                        <div>
-                            <div class="settings-item-label">hendersondesign.com</div>
-                            <div class="settings-item-sublabel">Expires Dec 15, 2026</div>
-                        </div>
-                    </div>
-                    <div class="settings-item-action">
-                        <span class="status-pill active">Active</span>
-                    </div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content" style="display: flex; align-items: center; gap: 12px;">
-                        <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--accent-color);">
-                        <div>
-                            <div class="settings-item-label">alexhenderson.io</div>
-                            <div class="settings-item-sublabel">Expires Mar 22, 2027</div>
-                        </div>
-                    </div>
-                    <div class="settings-item-action">
-                        <span class="status-pill active">Active</span>
-                    </div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content" style="display: flex; align-items: center; gap: 12px;">
-                        <input type="checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-color);">
-                        <div>
-                            <div class="settings-item-label">hendersonstudio.net</div>
-                            <div class="settings-item-sublabel">Expires Jul 8, 2026</div>
-                        </div>
-                    </div>
-                    <div class="settings-item-action">
-                        <span class="status-pill active">Active</span>
-                    </div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content" style="display: flex; align-items: center; gap: 12px;">
-                        <input type="checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-color);">
-                        <div>
-                            <div class="settings-item-label">myportfolio.dev</div>
-                            <div class="settings-item-sublabel">Expires Nov 1, 2026</div>
-                        </div>
-                    </div>
-                    <div class="settings-item-action">
-                        <span class="status-pill active">Active</span>
-                    </div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content" style="display: flex; align-items: center; gap: 12px;">
-                        <input type="checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-color);">
-                        <div>
-                            <div class="settings-item-label">designtools.store</div>
-                            <div class="settings-item-sublabel">Expired Feb 28, 2026</div>
-                        </div>
-                    </div>
-                    <div class="settings-item-action">
-                        <span class="status-pill" style="background: rgba(255, 59, 48, 0.1); color: var(--red);">Expired</span>
-                    </div>
-                </div>
+        <!-- Bulk Action Results -->
+        <div class="bdm-group">
+            <div class="bdm-group-header">
+                <div class="bdm-group-title">Bulk Action Results</div>
             </div>
-
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px;">
-                <button class="btn-secondary">Change Nameservers</button>
-                <button class="btn-secondary">Toggle Auto-Renew</button>
-                <button class="btn-secondary">Toggle Lock</button>
-                <button class="btn-primary">Renew Selected</button>
-            </div>
-
-            <div class="settings-group">
-                <div class="settings-group-header">
-                    <div class="settings-group-title">Bulk Action Results</div>
-                </div>
-                <div class="card-body">
-                    <div class="empty-state">
-                        <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-                        <div class="empty-state-title">No results yet</div>
-                        <div class="empty-state-text">Select domains and an action above to begin.</div>
+            <div class="bdm-results-body">
+                <div class="bdm-results-empty">
+                    <div class="bdm-results-empty-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                     </div>
+                    <div class="bdm-results-empty-title">No results yet</div>
+                    <div class="bdm-results-empty-text">Select domains and an action above to begin.</div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <script src="js/apple-theme.js"></script>
+    <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        </div>
+        <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">No domains selected</p>
+        <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">Select two or more domains to use bulk actions.</p>
+        <a href="clientareadomains.html" class="btn-primary">Pick domains</a>
+    </div>
+</div>
+
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
 </body>
 </html>

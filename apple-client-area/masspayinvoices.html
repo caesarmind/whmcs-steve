@@ -3,151 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mass Pay Invoices - WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
+    <title>Mass Pay Invoices — Billing — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
+    <style>
+        body { display: block; }
+
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+
+        /* ── 2-column split: main left, sub-nav right ── */
+        .mpi-split { display: grid; grid-template-columns: 1fr 240px; gap: 24px; align-items: start; }
+        @media (max-width: 880px) { .mpi-split { grid-template-columns: 1fr; } }
+        .mpi-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+        /* Sub-nav toggle off — hide aside, collapse to single column */
+        body[data-subnav="off"] .mpi-split { grid-template-columns: 1fr; }
+        body[data-subnav="off"] .mpi-split > aside { display: none; }
+        /* Sub-nav side — put aside on the left */
+        body[data-subnav-side="left"] .mpi-split { grid-template-columns: 240px 1fr; }
+        body[data-subnav-side="left"] .mpi-split > aside { grid-column: 1; grid-row: 1; }
+        body[data-subnav-side="left"] .mpi-split > .mpi-main { grid-column: 2; grid-row: 1; }
+        /* Sub-nav side — float aside in outer gutter */
+        body[data-subnav-side="outside"] .mpi-split,
+        body[data-subnav-side="outside-left"] .mpi-split { grid-template-columns: 1fr; position: relative; }
+        body[data-subnav-side="outside"] .mpi-split > aside,
+        body[data-subnav-side="outside-left"] .mpi-split > aside {
+            position: absolute;
+            top: 0;
+            width: 240px;
+        }
+        body[data-subnav-side="outside"] .mpi-split > aside { left: calc(100% + 24px); }
+        body[data-subnav-side="outside-left"] .mpi-split > aside { right: calc(100% + 24px); left: auto; }
+        body[data-subnav-side="outside"] .mpi-split > .mpi-main,
+        body[data-subnav-side="outside-left"] .mpi-split > .mpi-main { grid-column: 1; }
+        body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+        body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
+        body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 240px; }
+        @media (max-width: 1100px) {
+            body[data-subnav-side="outside"] .mpi-split { grid-template-columns: 1fr 240px; gap: 24px; position: static; }
+            body[data-subnav-side="outside-left"] .mpi-split { grid-template-columns: 240px 1fr; gap: 24px; position: static; }
+            body[data-subnav-side="outside"] .mpi-split > aside,
+            body[data-subnav-side="outside-left"] .mpi-split > aside { position: static; width: auto; right: auto; left: auto; }
+            body[data-subnav-side="outside-left"] .mpi-split > aside { grid-column: 1; grid-row: 1; }
+            body[data-subnav-side="outside-left"] .mpi-split > .mpi-main { grid-column: 2; grid-row: 1; }
+        }
+
+        /* Sentinel — invisible marker so the state-chip Services pill stays available */
+        .svc-table-card { display: none !important; }
+
+        /* Controls outside — strip the wrapper card chrome from .card children of .mpi-main */
+        body[data-svc-layout="outside"] .mpi-main > .card {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+        }
+        body[data-svc-layout="outside"] .mpi-main .card > .card-header { padding: 2px 4px 10px; }
+        body[data-svc-layout="outside"] .mpi-main .card > .card-body {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 16px 24px 20px;
+        }
+
+        /* Shared sub-nav primitive */
+        .subnav-card { padding: 8px; }
+        .subnav-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }
+        .subnav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: 13px; letter-spacing: -0.008em; text-decoration: none; transition: background var(--transition-fast); }
+        .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+        .subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+        .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .subnav-item.active svg { color: var(--color-accent); }
+        .subnav-count {
+            margin-left: auto; font-size: 11px; font-weight: 500;
+            padding: 1px 7px; border-radius: var(--radius-pill);
+            background: var(--color-surface-secondary); color: var(--color-text-tertiary);
+        }
+        .subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
+
+        /* Intro callout */
+        .mpi-intro {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
+            font-size: 13px; letter-spacing: -0.008em;
+        }
+        .mpi-intro .mpi-intro-ico {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--color-accent-light); color: var(--color-accent);
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .mpi-intro .mpi-intro-ico svg { width: 13px; height: 13px; }
+        .mpi-intro strong { color: var(--color-text-primary); font-weight: 600; }
+
+        /* Card header bar */
+        .mpi-list-card .card-header {
+            padding: 14px 22px;
+            border-bottom: 0.5px solid var(--color-border);
+            display: flex; align-items: center; gap: 16px;
+        }
+        .mpi-list-card .card-header h2 {
+            font-size: 14px; font-weight: 600; letter-spacing: -0.008em; margin: 0;
+            flex: 1;
+        }
+        .mpi-select-all {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 12.5px; color: var(--color-text-secondary);
+            letter-spacing: -0.008em;
+            cursor: pointer;
+            user-select: none;
+        }
+        .mpi-select-all input { accent-color: var(--color-accent); width: 14px; height: 14px; }
+
+        /* Invoice list */
+        .mpi-list { display: flex; flex-direction: column; }
+        .mpi-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 22px;
+            border-bottom: 0.5px solid var(--color-border);
+            transition: background var(--transition-fast);
+            cursor: pointer;
+        }
+        .mpi-row:last-child { border-bottom: 0; }
+        .mpi-row:hover { background: var(--color-surface-secondary); }
+        .mpi-row input[type="checkbox"] { accent-color: var(--color-accent); width: 16px; height: 16px; flex-shrink: 0; }
+        .mpi-row-id {
+            font-size: 13.5px; font-weight: 500;
+            color: var(--color-text-primary);
+            letter-spacing: -0.008em;
+            font-variant-numeric: tabular-nums;
+            flex-shrink: 0; min-width: 92px;
+        }
+        .mpi-row-meta {
+            flex: 1; min-width: 0;
+            display: flex; gap: 14px; align-items: center;
+            font-size: 12px; color: var(--color-text-tertiary);
+            letter-spacing: -0.008em;
+            font-variant-numeric: tabular-nums;
+            flex-wrap: wrap;
+        }
+        .mpi-row-meta .due-label { color: var(--color-text-tertiary); }
+        .mpi-row-amount {
+            font-size: 14px; font-weight: 600;
+            color: var(--color-text-primary);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.01em;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* Summary card */
+        .mpi-summary-card { padding: 0; }
+        .mpi-summary-card .card-header {
+            padding: 14px 22px;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        .mpi-summary-card .card-header h2 {
+            font-size: 14px; font-weight: 600; letter-spacing: -0.008em; margin: 0;
+        }
+        .mpi-summary-body { padding: 18px 22px; }
+        .mpi-summary-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 5px 0;
+            font-size: 13px; letter-spacing: -0.008em;
+            font-variant-numeric: tabular-nums;
+            color: var(--color-text-secondary);
+        }
+        .mpi-summary-row.grand {
+            padding-top: 12px; margin-top: 6px;
+            border-top: 0.5px solid var(--color-border);
+            font-size: 15px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.014em;
+        }
+        .mpi-method {
+            margin-top: 18px;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .mpi-method label {
+            font-size: 12px; font-weight: 500;
+            color: var(--color-text-secondary);
+            letter-spacing: -0.004em;
+        }
+        .mpi-method select {
+            height: 38px;
+            padding: 0 36px 0 14px;
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            font-size: 14px; letter-spacing: -0.008em;
+            color: var(--color-text-primary);
+            font-family: inherit;
+            width: 100%;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            cursor: pointer;
+        }
+        .mpi-actions {
+            margin-top: 18px;
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .mpi-actions .btn-primary { flex: 1; min-width: 180px; height: 40px; font-size: 14px; font-weight: 500; }
+        .mpi-actions .btn-secondary { height: 40px; padding: 0 18px; font-size: 13px; }
+
+        /* Empty state */
+        body[data-data="empty"] .when-full { display: none; }
+        body:not([data-data="empty"]) .when-empty { display: none; }
+        .mpi-empty { padding: 64px 24px 56px; text-align: center; }
+        .mpi-empty-ico {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .mpi-empty-ico svg { width: 24px; height: 24px; }
+        .mpi-empty-title { font-size: 16px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.012em; margin: 0 0 6px; }
+        .mpi-empty-sub { font-size: 13px; color: var(--color-text-tertiary); max-width: 360px; margin: 0 auto 0; line-height: 1.5; }
+    </style>
 </head>
-<body>
-    <aside class="sidebar">
-        <div class="sidebar-header"><a href="index.html" class="sidebar-home-link"><div class="sidebar-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.08 7.13 7.16 8.84 7.14C10.13 7.12 11.34 8.01 12.14 8.01C12.94 8.01 14.41 6.93 15.95 7.11C16.59 7.14 18.37 7.36 19.53 9.06C19.43 9.12 17.2 10.42 17.22 13.11C17.25 16.33 20.05 17.37 20.09 17.38C20.06 17.47 19.61 18.98 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg></div><span class="sidebar-brand">WHMCS</span></a></div>
-        <div class="sidebar-search"><input type="text" class="sidebar-search-input" placeholder="Search"></div>
-        <nav class="sidebar-nav">
-            <a href="clientareahome.html" class="sidebar-item"><div class="sidebar-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>Dashboard</a>
-            <div class="sidebar-section-label">Services</div>
-            <a href="clientareaproducts.html" class="sidebar-item"><div class="sidebar-item-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>My Services <span class="sidebar-item-badge">3</span></a>
-            <a href="clientareadomains.html" class="sidebar-item"><div class="sidebar-item-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>My Domains <span class="sidebar-item-badge">5</span></a>
-            <div class="sidebar-section-label">Billing</div>
-            <a href="clientareainvoices.html" class="sidebar-item active"><div class="sidebar-item-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>Invoices <span class="sidebar-item-badge">2</span></a>
-            <a href="account-paymentmethods.html" class="sidebar-item"><div class="sidebar-item-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>Payment Methods</a>
-            <div class="sidebar-section-label">Support</div>
-            <a href="supportticketslist.html" class="sidebar-item"><div class="sidebar-item-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>Support Tickets <span class="sidebar-item-badge">1</span></a>
-            <a href="knowledgebase.html" class="sidebar-item"><div class="sidebar-item-icon indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>Knowledge Base</a>
-            <a href="announcements.html" class="sidebar-item"><div class="sidebar-item-icon pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>Announcements</a>
-            <div class="sidebar-section-label">Account</div>
-            <a href="clientareadetails.html" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>My Details</a>
-            <a href="clientareasecurity.html" class="sidebar-item"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>Security</a>
-        </nav>
-        <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar">AH</div><div class="sidebar-user-info"><div class="sidebar-user-name">Alex Henderson</div><div class="sidebar-user-email">alex@example.com</div></div></div></div>
-    </aside>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="invoices" data-page-title="Mass Pay Invoices">
 
-    <main class="main-content">
-        <div class="topbar">
-            <div class="topbar-breadcrumb"><a href="clientareainvoices.html" class="topbar-breadcrumb-link">Invoices</a><span class="topbar-breadcrumb-sep">/</span><span class="topbar-breadcrumb-current">Mass Pay</span></div>
-            <div class="topbar-status"><span class="topbar-status-dot"></span>All systems normal</div>
-            <div class="topbar-spacer"></div>
-            <div class="topbar-actions">
-                <button class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
-                <div class="topbar-avatar">AH</div>
-            </div>
-        </div>
+<div data-include="partials/state-chip.html"></div>
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+<div data-include="partials/sidebar.html"></div>
 
-        <div class="content-area">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Pay multiple invoices</h1>
-                    <p class="page-subtitle">Select invoices to pay together in one transaction.</p>
+<div class="ph-main-wrap">
+
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>No Notifications</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;"><a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a></div>
+    </div>
+</div>
+
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareaproducts.html">My Services</a><a href="store.html">Order New Services</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareadomains.html">My Domains</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareainvoices.html">My Invoices</a><a href="clientareaquotes.html">My Quotes</a><a href="masspay.html">Mass Payment</a><a href="clientareaaddfunds.html">Add Funds</a><a href="account-paymentmethods.html">Payment Methods</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="supportticketslist.html">Tickets</a><a href="announcements.html">Announcements</a><a href="knowledgebase.html">Knowledgebase</a></div></div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
+</div></nav>
+
+<div data-include="partials/inner-topbar.html"></div>
+
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a><span class="sep">/</span>
+        <a href="#">Billing</a><span class="sep">/</span>
+        <a href="masspay.html">Mass Payment</a><span class="sep">/</span>
+        <span class="current" aria-current="page">Invoices</span>
+    </div>
+</nav>
+
+<div class="content-area">
+    <header class="page-header">
+        <h1>Pay multiple invoices</h1>
+        <p class="page-subtitle">Select unpaid invoices to pay together in one transaction.</p>
+    </header>
+
+    <div class="mpi-split">
+        <!-- ══ LEFT: content ══ -->
+        <div class="mpi-main">
+            <!-- Sentinel for state-chip Services pill detection -->
+            <div class="svc-table-card" aria-hidden="true"></div>
+
+            <!-- Full state -->
+            <div class="when-full" style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="mpi-intro">
+                    <span class="mpi-intro-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    </span>
+                    <span>Review the invoices below, then choose a payment method to pay them all at once.</span>
                 </div>
-            </div>
 
-            <div class="callout info">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                Review the invoices below, then choose a payment method to pay them all at once.
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Unpaid invoices</h2>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <label style="font-size: 13px; color: var(--color-text-secondary); display: flex; gap: 6px; align-items: center;">
-                            <input type="checkbox" id="selectAllMp" checked> Select all
+                <div class="card mpi-list-card">
+                    <div class="card-header">
+                        <h2>Unpaid invoices</h2>
+                        <label class="mpi-select-all">
+                            <input type="checkbox" id="selectAllMp" checked>
+                            <span>Select all</span>
+                        </label>
+                    </div>
+                    <div class="mpi-list">
+                        <label class="mpi-row">
+                            <input type="checkbox" checked>
+                            <span class="mpi-row-id">#10247</span>
+                            <span class="mpi-row-meta">
+                                <span>Apr 2, 2026</span>
+                                <span class="due-label">Due Apr 16, 2026</span>
+                                <span class="status-pill unpaid">Unpaid</span>
+                            </span>
+                            <span class="mpi-row-amount">$129.99</span>
+                        </label>
+                        <label class="mpi-row">
+                            <input type="checkbox" checked>
+                            <span class="mpi-row-id">#10246</span>
+                            <span class="mpi-row-meta">
+                                <span>Apr 2, 2026</span>
+                                <span class="due-label">Due Apr 16, 2026</span>
+                                <span class="status-pill unpaid">Unpaid</span>
+                            </span>
+                            <span class="mpi-row-amount">$11.99</span>
+                        </label>
+                        <label class="mpi-row">
+                            <input type="checkbox" checked>
+                            <span class="mpi-row-id">#10238</span>
+                            <span class="mpi-row-meta">
+                                <span>Mar 15, 2026</span>
+                                <span class="due-label">Due Mar 29, 2026</span>
+                                <span class="status-pill overdue">Overdue</span>
+                            </span>
+                            <span class="mpi-row-amount">$49.99</span>
+                        </label>
+                        <label class="mpi-row">
+                            <input type="checkbox">
+                            <span class="mpi-row-id">#10225</span>
+                            <span class="mpi-row-meta">
+                                <span>Mar 1, 2026</span>
+                                <span class="due-label">Due Mar 15, 2026</span>
+                                <span class="status-pill overdue">Overdue</span>
+                            </span>
+                            <span class="mpi-row-amount">$9.99</span>
                         </label>
                     </div>
                 </div>
-                <div class="card-body" style="padding: 0;">
-                    <table class="invoice-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 40px;"></th>
-                                <th>Invoice</th>
-                                <th>Issued</th>
-                                <th>Due</th>
-                                <th>Status</th>
-                                <th style="text-align: right;">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="checkbox" checked></td>
-                                <td><a href="viewinvoice.html" style="font-weight: 600; color: var(--color-accent);">#INV-10247</a></td>
-                                <td>Apr 02, 2026</td>
-                                <td>Apr 16, 2026</td>
-                                <td><span class="status-pill unpaid">Due</span></td>
-                                <td style="text-align: right; font-weight: 600;">$129.99</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox" checked></td>
-                                <td><a href="viewinvoice.html" style="font-weight: 600; color: var(--color-accent);">#INV-10246</a></td>
-                                <td>Apr 02, 2026</td>
-                                <td>Apr 16, 2026</td>
-                                <td><span class="status-pill unpaid">Due</span></td>
-                                <td style="text-align: right; font-weight: 600;">$11.99</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox" checked></td>
-                                <td><a href="viewinvoice.html" style="font-weight: 600; color: var(--color-accent);">#INV-10238</a></td>
-                                <td>Mar 15, 2026</td>
-                                <td>Mar 29, 2026</td>
-                                <td><span class="status-pill overdue">Overdue</span></td>
-                                <td style="text-align: right; font-weight: 600;">$49.99</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td><a href="viewinvoice.html" style="font-weight: 600; color: var(--color-accent);">#INV-10225</a></td>
-                                <td>Mar 01, 2026</td>
-                                <td>Mar 15, 2026</td>
-                                <td><span class="status-pill overdue">Overdue</span></td>
-                                <td style="text-align: right; font-weight: 600;">$9.99</td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+                <div class="card mpi-summary-card">
+                    <div class="card-header"><h2>Payment summary</h2></div>
+                    <div class="mpi-summary-body">
+                        <div class="mpi-summary-row"><span>3 invoices selected</span><span>$191.97</span></div>
+                        <div class="mpi-summary-row"><span>Credits applied</span><span>−$0.00</span></div>
+                        <div class="mpi-summary-row grand"><span>Total due</span><span>$191.97</span></div>
+
+                        <div class="mpi-method">
+                            <label for="mpi-method">Payment method</label>
+                            <select id="mpi-method">
+                                <option>Visa ending in 4242</option>
+                                <option>Mastercard ending in 8854</option>
+                                <option>PayPal — arshileg@gmail.com</option>
+                                <option>Bank transfer</option>
+                                <option>Account credit</option>
+                            </select>
+                        </div>
+
+                        <div class="mpi-actions">
+                            <a href="clientareainvoices.html" class="btn-secondary">Cancel</a>
+                            <button type="button" class="btn-primary">Pay $191.97 now</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header"><h2 class="card-title">Payment summary</h2></div>
-                <div class="card-body">
-                    <div class="invoice-total-row" style="border: 0;">
-                        <span>3 invoices selected</span>
-                        <span>$191.97</span>
+            <!-- Empty state -->
+            <div class="when-empty">
+                <div class="card mpi-empty">
+                    <div class="mpi-empty-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                     </div>
-                    <div class="invoice-total-row" style="border: 0;">
-                        <span>Credits applied</span>
-                        <span>-$0.00</span>
-                    </div>
-                    <div class="invoice-total-row grand">
-                        <span>Total due</span>
-                        <span>$191.97</span>
-                    </div>
-
-                    <div class="form-group" style="margin-top: 20px;">
-                        <label class="form-label">Payment method</label>
-                        <select class="form-select">
-                            <option>Visa ending •••• 4242</option>
-                            <option>Mastercard ending •••• 8854</option>
-                            <option>PayPal — alex@example.com</option>
-                            <option>Bank transfer</option>
-                            <option>Account credit</option>
-                        </select>
-                    </div>
-
-                    <div style="display: flex; gap: 10px; margin-top: 16px;">
-                        <a href="clientareainvoices.html" class="btn-secondary">Cancel</a>
-                        <button class="btn-primary" style="flex: 1;">Pay $191.97 now</button>
-                    </div>
+                    <h2 class="mpi-empty-title">All caught up</h2>
+                    <p class="mpi-empty-sub">There are no unpaid invoices on your account right now. New invoices will appear here when they're issued.</p>
                 </div>
             </div>
         </div>
-    </main>
 
-    <script src="js/apple-theme.js"></script>
+        <!-- ══ RIGHT: Billing sub-nav ══ -->
+        <aside>
+            <div class="card subnav-card">
+                <div class="subnav-heading">Billing</div>
+                <a href="clientareainvoices.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    My Invoices
+                    <span class="subnav-count when-full">6</span>
+                    <span class="subnav-count when-empty">0</span>
+                </a>
+                <a href="clientareaquotes.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+                    My Quotes
+                </a>
+                <a href="masspay.html" class="subnav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+                    Mass Payment
+                </a>
+                <a href="clientareaaddfunds.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    Add Funds
+                </a>
+                <a href="account-paymentmethods.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                    Payment Methods
+                </a>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="domains.html">Domains</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="knowledgebase.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Careers</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open><span class="flag">🇺🇸</span><span>English</span><span class="sep">/</span><span>$ USD</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
+        </div>
+    </div>
+</footer>
+
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
 </body>
 </html>

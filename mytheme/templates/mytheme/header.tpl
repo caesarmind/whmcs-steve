@@ -1,9 +1,17 @@
-{* Hostnodes — page header (client-side theme).
-   Buyer escape hatch first, then standard sidebar layout dispatch. *}
+{* Hostnodes — page header.
+   Renders the html shell + body data-attributes that the apple-layout system uses
+   to switch between top / side / rail layouts. All 3 partials are emitted; CSS
+   shows only the one matching body[data-layout].
+
+   Buyer override: drop a custom header.tpl into templates/<slug>/overwrites/. *}
 
 {if file_exists("templates/$template/overwrites/header.tpl")}
     {include file="`$template`/overwrites/header.tpl"}
 {else}
+    {* data-layout reads from the active layout's manifest (sidebar/top/rail) *}
+    {$mt_layout = $myTheme.layouts['main-menu'].vars.dataLayout|default:'side'}
+    {$mt_auth = $loggedin ? 'in' : 'out'}
+    {$mt_activeNav = $myTheme.pages[$templatefile].activeNav|default:'dashboard'}
 <!DOCTYPE html>
 <html lang="{$activeLocale.languageCode|default:'en'}"
       data-theme="light"
@@ -14,17 +22,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{if $pagetitle}{$pagetitle} — {/if}{$companyname|escape}</title>
     {if $tagline}<meta name="description" content="{$tagline|escape}">{/if}
-    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/theme.css?v={$myTheme.version|default:'1.0'}">
+    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v={$myTheme.version|default:'1.0'}">
+    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-layout.css?v={$myTheme.version|default:'1.0'}">
     {$headoutput}
 </head>
-<body class="page-{$templatefile|default:'unknown'}{if $loggedin} is-authenticated{/if}{if $myTheme.layouts['main-menu'].vars.bodyClass} {$myTheme.layouts['main-menu'].vars.bodyClass}{/if}">
+<body class="client-area-layout"
+      data-auth="{$mt_auth}"
+      data-layout="{$mt_layout}"
+      data-active-nav="{$mt_activeNav|escape}"
+      data-page-title="{$pagetitle|escape|default:'Page'}">
 
 {$headeroutput}
 
-{* Layout dispatch — by default renders the sidebar layout (set in admin) *}
-{if $myTheme.layouts['main-menu'].mediumPath && file_exists("templates/`$myTheme.layouts['main-menu'].mediumPath`")}
-    {include file="`$myTheme.layouts['main-menu'].mediumPath`"}
-{else}
-    {include file="`$template`/core/layouts/main-menu/sidebar/default.tpl"}
-{/if}
+{* All 3 layout partials emit their markup; CSS shows only the active one. *}
+{include file="`$template`/includes/partials/rail.tpl"}
+{include file="`$template`/includes/partials/sidebar.tpl"}
+
+<div class="ph-main-wrap">
+
+    {* Top-layout topnav (only-top) *}
+    {include file="`$template`/includes/partials/topnav.tpl"}
+
+    {* Inner topbar (sidebar + rail layouts) *}
+    {include file="`$template`/includes/partials/inner-topbar.tpl"}
+
+    {* Top-layout breadcrumb *}
+    <nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+        <div class="ph-breadcrumb-inner">
+            <a href="{$WEB_ROOT}/">{$LANG.home|default:'Home'}</a>
+            <span class="sep">/</span>
+            <span class="current" aria-current="page">{$pagetitle|escape|default:'Page'}</span>
+        </div>
+    </nav>
+
+    <div class="content-area">
 {/if}

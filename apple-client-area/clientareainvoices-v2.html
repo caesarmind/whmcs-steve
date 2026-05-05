@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Invoices (v2) — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
+    <style>
+        body { display: block; }
+
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+
+        /* ── 2-column split: Billing subnav + invoices content ── */
+        .inv-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+        @media (max-width: 880px) { .inv-split { grid-template-columns: 1fr; } }
+
+        /* Shared sub-nav primitive (aligned with Support sub-nav) */
+        .subnav-card { padding: 8px; }
+        .subnav-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }
+        .subnav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: 13px; letter-spacing: -0.008em; text-decoration: none; transition: background var(--transition-fast); }
+        .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+        .subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+        .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+        .subnav-item.active svg { color: var(--color-accent); }
+        .subnav-count {
+            margin-left: auto;
+            font-size: 11px; font-weight: 500;
+            padding: 1px 7px;
+            border-radius: var(--radius-pill);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+        }
+        .subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
+
+        /* ── Unified toolbar inside the invoices card ── */
+        .inv-toolbar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 0.5px solid var(--color-border); flex-wrap: wrap; }
+        .inv-search { flex: 1 1 240px; min-width: 180px; max-width: 320px; position: relative; display: inline-flex; align-items: center; }
+        .inv-search svg { position: absolute; left: 12px; width: 13px; height: 13px; color: var(--color-text-tertiary); pointer-events: none; }
+        .inv-search input { padding: 0 14px 0 32px; height: 32px; width: 100%; margin: 0; font-size: 13px; border-radius: var(--radius-pill); background: var(--color-surface-secondary); border: 1px solid transparent; color: var(--color-text-primary); transition: all var(--transition-fast); }
+        .inv-search input:focus { outline: none; background: var(--color-surface); border-color: var(--color-accent); }
+        .inv-toolbar-spacer { flex: 1 1 8px; }
+
+        .inv-filters { display: inline-flex; background: var(--color-surface-secondary); border-radius: var(--radius-pill); padding: 3px; gap: 0; }
+        .inv-filters button { border: 0; background: transparent; padding: 5px 12px; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); border-radius: var(--radius-pill); cursor: pointer; font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+        .inv-filters button.active { background: var(--color-surface); color: var(--color-text-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .inv-filters .inv-filter-count { font-size: 10px; color: var(--color-text-tertiary); background: var(--color-surface-secondary); padding: 0 5px; border-radius: var(--radius-pill); min-width: 16px; text-align: center; line-height: 14px; }
+        .inv-filters button.active .inv-filter-count { background: var(--color-accent-light); color: var(--color-accent); }
+
+        /* ── Table with sortable column headers ── */
+        .inv-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .inv-table thead th {
+            font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+            text-transform: uppercase; letter-spacing: 0.05em;
+            text-align: left; padding: 14px 20px;
+            border-bottom: 0.5px solid var(--color-border);
+            background: var(--color-surface-tertiary);
+        }
+        .inv-table thead th:last-child { text-align: right; padding-right: 24px; }
+        .inv-table tbody tr {
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        .inv-table tbody tr:hover { background: var(--sidebar-item-hover); }
+        .inv-table tbody td {
+            padding: 14px 20px;
+            border-bottom: 0.5px solid var(--color-border);
+            vertical-align: middle;
+            letter-spacing: -0.008em;
+        }
+        .inv-table tbody tr:last-child td { border-bottom: 0; }
+        .inv-table td.amount { font-variant-numeric: tabular-nums; font-weight: 500; color: var(--color-text-primary); }
+        .inv-table td.amount.due { color: var(--color-red-text); }
+        .inv-table td.date { color: var(--color-text-secondary); font-size: 12px; }
+        .inv-table td.actions { text-align: right; padding-right: 16px; }
+        .inv-action-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: transparent; border: 0;
+            color: var(--color-text-tertiary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .inv-action-btn:hover { background: var(--color-accent-light); color: var(--color-accent); }
+        .inv-action-btn svg { width: 14px; height: 14px; }
+        .inv-id-cell { display: inline-flex; align-items: center; gap: 10px; }
+        .inv-id-ico {
+            width: 30px; height: 30px; border-radius: 8px;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .inv-id-ico svg { width: 13px; height: 13px; }
+        .inv-id-num { font-weight: 500; color: var(--color-text-primary); }
+
+        /* Sort chevrons */
+        .inv-sort {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: none; border: 0; cursor: pointer;
+            color: inherit; font: inherit; letter-spacing: inherit;
+            text-transform: inherit; padding: 0;
+            font-family: inherit;
+        }
+        .inv-sort-ico { position: relative; width: 10px; height: 12px; flex-shrink: 0; }
+        .inv-sort-ico::before, .inv-sort-ico::after {
+            content: ""; position: absolute; left: 2px;
+            border-left: 3px solid transparent; border-right: 3px solid transparent;
+            opacity: 0.3;
+        }
+        .inv-sort-ico::before { top: 1px; border-bottom: 4px solid currentColor; }
+        .inv-sort-ico::after  { bottom: 1px; border-top: 4px solid currentColor; }
+        .inv-sort[data-dir="asc"] .inv-sort-ico::before  { opacity: 1; }
+        .inv-sort[data-dir="desc"] .inv-sort-ico::after  { opacity: 1; }
+        .inv-sort.active { color: var(--color-text-primary); }
+
+        /* Pagination */
+        .inv-footer {
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            padding: 12px 20px;
+            border-top: 0.5px solid var(--color-border);
+            font-size: 12px; color: var(--color-text-tertiary);
+            background: var(--color-surface-tertiary);
+        }
+        .inv-footer .spacer { flex: 1; }
+        .inv-page-size {
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .inv-page-size select {
+            height: 26px; padding: 0 22px 0 10px;
+            border: 0.5px solid var(--color-border);
+            background: var(--color-surface);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-family: inherit;
+            color: var(--color-text-primary);
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            cursor: pointer;
+        }
+        .inv-pages { display: inline-flex; gap: 2px; }
+        .inv-pages button {
+            min-width: 26px; height: 26px; padding: 0 8px;
+            border: 0; background: transparent;
+            border-radius: var(--radius-sm);
+            font-size: 12px; font-weight: 500; font-family: inherit;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .inv-pages button:hover:not(:disabled):not(.active) { background: var(--sidebar-item-hover); color: var(--color-text-primary); }
+        .inv-pages button.active { background: var(--color-accent); color: #fff; }
+        .inv-pages button:disabled { opacity: 0.35; cursor: not-allowed; }
+        .inv-pages button svg { width: 11px; height: 11px; }
+
+        /* Empty state — toggled via body[data-data="empty"] */
+        body[data-data="empty"] .when-full { display: none; }
+        body:not([data-data="empty"]) .when-empty { display: none; }
+        .inv-empty { padding: 56px 24px 48px; text-align: center; color: var(--color-text-secondary); }
+        .inv-empty-ico {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: inline-flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px;
+        }
+        .inv-empty-ico svg { width: 22px; height: 22px; }
+        .inv-empty-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.01em; }
+        .inv-empty-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 auto 18px; max-width: 340px; line-height: 1.45; }
+        .inv-empty .btn-secondary { height: 32px; padding: 0 16px; font-size: 13px; }
+
+        /* Overdue banner */
+        .inv-banner {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            border-radius: var(--radius-md);
+            background: var(--color-red-bg);
+            color: var(--color-red-text);
+            font-size: 13px; letter-spacing: -0.008em;
+        }
+        .inv-banner svg { width: 15px; height: 15px; flex-shrink: 0; }
+        .inv-banner .spacer { flex: 1; }
+        .inv-banner .btn-primary {
+            height: 28px; padding: 0 12px; font-size: 12px;
+            background: var(--color-red-text); color: #fff;
+        }
+        .inv-banner .btn-primary:hover { background: #b50012; }
+    </style>
+</head>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="invoices" data-page-title="My Invoices">
+
+<div data-include="partials/state-chip.html"></div>
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+<div data-include="partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>No Notifications</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;"><a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a></div>
+    </div>
+</div>
+
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareaproducts.html">My Services</a><a href="store.html">Order New Services</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareadomains.html">My Domains</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="clientareainvoices.html">My Invoices</a><a href="clientareaquotes.html">My Quotes</a><a href="masspay.html">Mass Payment</a><a href="clientareaaddfunds.html">Add Funds</a><a href="account-paymentmethods.html">Payment Methods</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="supportticketslist.html">Tickets</a><a href="announcements.html">Announcements</a><a href="knowledgebase.html">Knowledgebase</a></div></div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
+</div></nav>
+
+<div data-include="partials/inner-topbar.html"></div>
+
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="clientareahome.html">Dashboard</a><span class="sep">/</span>
+        <a href="#">Billing</a><span class="sep">/</span>
+        <span class="current" aria-current="page">My Invoices</span>
+    </div>
+</nav>
+
+<div class="content-area">
+    <header class="page-header">
+        <h1>My invoices</h1>
+        <p class="page-subtitle">Your billing history — pay unpaid invoices, download PDFs, and review past payments.</p>
+    </header>
+
+    <div class="inv-split">
+        <!-- ══ LEFT: Billing sub-nav ══ -->
+        <aside>
+            <div class="card subnav-card">
+                <div class="subnav-heading">Billing</div>
+                <a href="clientareainvoices.html" class="subnav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    My Invoices
+                    <span class="subnav-count">2</span>
+                </a>
+                <a href="clientareaquotes.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+                    My Quotes
+                </a>
+                <a href="masspay.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+                    Mass Payment
+                </a>
+                <a href="clientareaaddfunds.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    Add Funds
+                </a>
+                <a href="account-paymentmethods.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                    Payment Methods
+                </a>
+            </div>
+        </aside>
+
+        <!-- ══ RIGHT: invoices content ══ -->
+        <div>
+            <!-- Overdue alert -->
+            <div class="inv-banner when-full">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>You have <strong>2 unpaid invoices</strong> totalling <strong>$49.00</strong>.</span>
+                <span class="spacer"></span>
+                <a href="masspayinvoices.html" class="btn-primary">Pay now</a>
+            </div>
+
+            <!-- Invoices card -->
+            <div class="card">
+                <!-- Empty state -->
+                <div class="when-empty inv-empty">
+                    <div class="inv-empty-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    </div>
+                    <p class="inv-empty-title">No invoices yet</p>
+                    <p class="inv-empty-sub">When you purchase a service or a new billing cycle begins, your invoices will appear here.</p>
+                    <a href="cart.html" class="btn-secondary">Browse services</a>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="inv-toolbar when-full">
+                    <div class="inv-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="search" placeholder="Search invoices…" autocomplete="off">
+                    </div>
+                    <div class="inv-filters" role="tablist">
+                        <button type="button" class="active">All <span class="inv-filter-count">6</span></button>
+                        <button type="button">Unpaid <span class="inv-filter-count">2</span></button>
+                        <button type="button">Paid <span class="inv-filter-count">4</span></button>
+                        <button type="button">Cancelled <span class="inv-filter-count">0</span></button>
+                    </div>
+                    <div class="inv-toolbar-spacer"></div>
+                </div>
+
+                <!-- Table -->
+                <table class="inv-table when-full">
+                    <thead>
+                        <tr>
+                            <th scope="col"><button type="button" class="inv-sort active" data-sort="id" data-dir="desc">Invoice <span class="inv-sort-ico"></span></button></th>
+                            <th scope="col"><button type="button" class="inv-sort" data-sort="date" data-dir="">Date <span class="inv-sort-ico"></span></button></th>
+                            <th scope="col"><button type="button" class="inv-sort" data-sort="due" data-dir="">Due date <span class="inv-sort-ico"></span></button></th>
+                            <th scope="col"><button type="button" class="inv-sort" data-sort="amount" data-dir="">Amount <span class="inv-sort-ico"></span></button></th>
+                            <th scope="col"><button type="button" class="inv-sort" data-sort="status" data-dir="">Status <span class="inv-sort-ico"></span></button></th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-href="viewinvoice.html">
+                            <td>
+                                <div class="inv-id-cell">
+                                    <div class="inv-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                                    <span class="inv-id-num">#10247</span>
+                                </div>
+                            </td>
+                            <td class="date">Apr 1, 2026</td>
+                            <td class="date">Apr 15, 2026</td>
+                            <td class="amount due">$29.00</td>
+                            <td><span class="status-pill unpaid">Unpaid</span></td>
+                            <td class="actions">
+                                <button type="button" class="inv-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button type="button" class="inv-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </td>
+                        </tr>
+                        <tr data-href="viewinvoice.html">
+                            <td>
+                                <div class="inv-id-cell">
+                                    <div class="inv-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                                    <span class="inv-id-num">#10246</span>
+                                </div>
+                            </td>
+                            <td class="date">Apr 1, 2026</td>
+                            <td class="date">Apr 15, 2026</td>
+                            <td class="amount due">$20.00</td>
+                            <td><span class="status-pill unpaid">Unpaid</span></td>
+                            <td class="actions">
+                                <button type="button" class="inv-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button type="button" class="inv-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </td>
+                        </tr>
+                        <tr data-href="viewinvoice.html">
+                            <td>
+                                <div class="inv-id-cell">
+                                    <div class="inv-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                                    <span class="inv-id-num">#10189</span>
+                                </div>
+                            </td>
+                            <td class="date">Mar 1, 2026</td>
+                            <td class="date">Mar 15, 2026</td>
+                            <td class="amount">$29.00</td>
+                            <td><span class="status-pill paid">Paid</span></td>
+                            <td class="actions">
+                                <button type="button" class="inv-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button type="button" class="inv-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </td>
+                        </tr>
+                        <tr data-href="viewinvoice.html">
+                            <td>
+                                <div class="inv-id-cell">
+                                    <div class="inv-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                                    <span class="inv-id-num">#10134</span>
+                                </div>
+                            </td>
+                            <td class="date">Feb 1, 2026</td>
+                            <td class="date">Feb 15, 2026</td>
+                            <td class="amount">$49.00</td>
+                            <td><span class="status-pill paid">Paid</span></td>
+                            <td class="actions">
+                                <button type="button" class="inv-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button type="button" class="inv-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </td>
+                        </tr>
+                        <tr data-href="viewinvoice.html">
+                            <td>
+                                <div class="inv-id-cell">
+                                    <div class="inv-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                                    <span class="inv-id-num">#10098</span>
+                                </div>
+                            </td>
+                            <td class="date">Jan 1, 2026</td>
+                            <td class="date">Jan 15, 2026</td>
+                            <td class="amount">$29.00</td>
+                            <td><span class="status-pill paid">Paid</span></td>
+                            <td class="actions">
+                                <button type="button" class="inv-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button type="button" class="inv-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </td>
+                        </tr>
+                        <tr data-href="viewinvoice.html">
+                            <td>
+                                <div class="inv-id-cell">
+                                    <div class="inv-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                                    <span class="inv-id-num">#10045</span>
+                                </div>
+                            </td>
+                            <td class="date">Dec 1, 2025</td>
+                            <td class="date">Dec 15, 2025</td>
+                            <td class="amount">$29.00</td>
+                            <td><span class="status-pill paid">Paid</span></td>
+                            <td class="actions">
+                                <button type="button" class="inv-action-btn" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                                <button type="button" class="inv-action-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Footer / pagination -->
+                <div class="inv-footer when-full">
+                    <div class="inv-page-size">
+                        Show
+                        <select aria-label="Rows per page">
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
+                        </select>
+                        entries
+                    </div>
+                    <div class="spacer"></div>
+                    <span>Showing 1–6 of 6</span>
+                    <div class="inv-pages">
+                        <button type="button" disabled aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+                        <button type="button" class="active">1</button>
+                        <button type="button" disabled aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="domains.html">Domains</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="knowledgebase.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Careers</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open><span class="flag">🇺🇸</span><span>English</span><span class="sep">/</span><span>$ USD</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
+        </div>
+    </div>
+</footer>
+
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
+<script>
+// Row click navigation + sort cycle
+(function () {
+    document.querySelectorAll('.inv-table tr[data-href]').forEach(tr => {
+        tr.addEventListener('click', (e) => {
+            if (e.target.closest('button, a')) return;
+            window.location.href = tr.getAttribute('data-href');
+        });
+    });
+    const sorts = document.querySelectorAll('.inv-sort');
+    sorts.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const dir = btn.getAttribute('data-dir');
+            const next = dir === '' ? 'asc' : dir === 'asc' ? 'desc' : '';
+            sorts.forEach(b => { b.setAttribute('data-dir', ''); b.classList.remove('active'); });
+            btn.setAttribute('data-dir', next);
+            if (next) btn.classList.add('active');
+        });
+    });
+})();
+</script>
+</body>
+</html>

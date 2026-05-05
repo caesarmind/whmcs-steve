@@ -1,10 +1,11 @@
 <?php
 return [
-    'displayName'    => 'Sidebar Navigation',
-    'description'    => 'Vertical nav on the left, content to the right.',
+    'displayName'    => 'Sidebar',
+    'description'    => 'Fixed 260px sidebar on the left, content shifts right.',
     'preview'        => 'thumb.png',
-    'order'          => 2,
+    'order'          => 1,
     'variables'      => [
+        'dataLayout'     => 'side',
         'bodyClass'      => 'layout-sidebar',
         'sidebarPresent' => true,
     ],

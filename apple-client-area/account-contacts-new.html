@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacts — WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
-    <link rel="stylesheet" href="css/apple-layout.css">
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
     <style>
         body { display: block; }
 
@@ -200,7 +200,7 @@
         <p class="page-subtitle">Add additional people with access or preferences on your account.</p>
     </header>
 
-    <div class="acct-split">
+    <div class="when-full"><div class="acct-split">
         <!-- ══ LEFT: Account sub-nav ══ -->
         <aside class="card subnav-card">
             <div class="subnav-heading">Account</div>
@@ -375,6 +375,17 @@
                 </form>
             </div>
         </div>
+    </div></div>
+
+    <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+        </div>
+        <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">Account locked</p>
+        <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">Your account is suspended. Contact support to add new contacts.</p>
+        <a href="supportticketsubmit.html" class="btn-primary">Contact support</a>
     </div>
 </div>
 
@@ -386,7 +397,7 @@
 <!-- ═══════════ Language / currency modal ═══════════ -->
 <div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js"></script>
-<script src="js/apple-layout.js"></script>
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
 </body>
 </html>

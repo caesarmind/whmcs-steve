@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Details — WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
-    <link rel="stylesheet" href="css/apple-layout.css">
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
     <style>
         body { display: block; }
 
@@ -180,7 +180,7 @@
         <p class="page-subtitle">Your personal information, billing address and email preferences.</p>
     </header>
 
-    <div class="acct-split">
+    <div class="when-full"><div class="acct-split">
         <!-- ══ LEFT: Account sub-nav ══ -->
         <aside class="card subnav-card">
             <div class="subnav-heading">Account</div>
@@ -375,6 +375,17 @@
                 <button type="submit" class="btn-primary">Save changes</button>
             </div>
         </form>
+    </div></div>
+
+    <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><path d="M20 21v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+        </div>
+        <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">Profile not yet set up</p>
+        <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">Complete your account profile to keep your billing and contact info up to date.</p>
+        <a href="clientareadetails.html" class="btn-primary">Set up profile</a>
     </div>
 </div>
 
@@ -412,7 +423,7 @@
 <!-- ═══════════ Language / currency modal ═══════════ -->
 <div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js"></script>
-<script src="js/apple-layout.js"></script>
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
 </body>
 </html>

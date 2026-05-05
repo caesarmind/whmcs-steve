@@ -1,6 +1,8 @@
-# Build artifacts
+# Build artifacts (compiled from SCSS — except the apple-* shipped sources)
 templates/mytheme/assets/css/*.css
 templates/mytheme/assets/css/*.css.map
+!templates/mytheme/assets/css/apple-theme.css
+!templates/mytheme/assets/css/apple-layout.css
 templates/mytheme/assets/js/dist/
 templates/mytheme/core/styles/*/style.css
 

@@ -4,17 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Funds — Billing — WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css">
-    <link rel="stylesheet" href="css/apple-layout.css">
+    <link rel="stylesheet" href="css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="css/apple-layout.css?v=2">
     <style>
         body { display: block; }
 
         .page-header { margin-bottom: 24px; }
         .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
 
-        /* ── 2-column split: Billing subnav + content ── */
-        .af-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+        /* ── 2-column split: main left, sub-nav right ── */
+        .af-split { display: grid; grid-template-columns: 1fr 240px; gap: 24px; align-items: start; }
         @media (max-width: 880px) { .af-split { grid-template-columns: 1fr; } }
+        .af-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+        /* Sub-nav toggle off — hide aside, collapse to single column */
+        body[data-subnav="off"] .af-split { grid-template-columns: 1fr; }
+        body[data-subnav="off"] .af-split > aside { display: none; }
+        /* Sub-nav side — put aside on the left */
+        body[data-subnav-side="left"] .af-split { grid-template-columns: 240px 1fr; }
+        body[data-subnav-side="left"] .af-split > aside { grid-column: 1; grid-row: 1; }
+        body[data-subnav-side="left"] .af-split > .af-main { grid-column: 2; grid-row: 1; }
+        /* Sub-nav side — float aside in outer gutter */
+        body[data-subnav-side="outside"] .af-split,
+        body[data-subnav-side="outside-left"] .af-split { grid-template-columns: 1fr; position: relative; }
+        body[data-subnav-side="outside"] .af-split > aside,
+        body[data-subnav-side="outside-left"] .af-split > aside {
+            position: absolute;
+            top: 0;
+            width: 240px;
+        }
+        body[data-subnav-side="outside"] .af-split > aside { left: calc(100% + 24px); }
+        body[data-subnav-side="outside-left"] .af-split > aside { right: calc(100% + 24px); left: auto; }
+        body[data-subnav-side="outside"] .af-split > .af-main,
+        body[data-subnav-side="outside-left"] .af-split > .af-main { grid-column: 1; }
+        body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+        body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
+        body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 240px; }
+        @media (max-width: 1100px) {
+            body[data-subnav-side="outside"] .af-split { grid-template-columns: 1fr 240px; gap: 24px; position: static; }
+            body[data-subnav-side="outside-left"] .af-split { grid-template-columns: 240px 1fr; gap: 24px; position: static; }
+            body[data-subnav-side="outside"] .af-split > aside,
+            body[data-subnav-side="outside-left"] .af-split > aside { position: static; width: auto; right: auto; left: auto; }
+            body[data-subnav-side="outside-left"] .af-split > aside { grid-column: 1; grid-row: 1; }
+            body[data-subnav-side="outside-left"] .af-split > .af-main { grid-column: 2; grid-row: 1; }
+        }
+
+        /* Sentinel — invisible marker so the state-chip Services pill stays available */
+        .svc-table-card { display: none !important; }
+
+        /* Controls outside — strip the wrapper card chrome from .card children of .af-main */
+        body[data-svc-layout="outside"] .af-main > .card {
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+        }
+        body[data-svc-layout="outside"] .af-main .card > .card-header { padding: 2px 4px 10px; }
+        body[data-svc-layout="outside"] .af-main .card > .card-body {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 16px 24px 20px;
+        }
 
         /* Shared sub-nav primitive */
         .subnav-card { padding: 8px; }
@@ -79,17 +129,24 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* Non-refundable notice */
+        /* Non-refundable notice — muted surface + small tinted icon well */
         .af-notice {
-            display: flex; align-items: center; gap: 8px;
-            padding: 10px 14px;
-            margin-top: 14px;
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px 10px 10px;
+            margin-top: 12px;
             border-radius: var(--radius-md);
-            background: var(--color-orange-bg);
-            color: var(--color-orange-text);
+            background: var(--color-surface-secondary);
+            color: var(--color-text-secondary);
             font-size: 12.5px; letter-spacing: -0.008em;
         }
-        .af-notice svg { width: 14px; height: 14px; flex-shrink: 0; }
+        .af-notice .af-notice-icon {
+            width: 22px; height: 22px; flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-sm);
+            background: var(--color-accent-light);
+            color: var(--color-accent);
+        }
+        .af-notice .af-notice-icon svg { width: 13px; height: 13px; }
 
         /* Intro card */
         .af-intro { padding: 18px 24px; }
@@ -101,13 +158,12 @@
 
         /* Form card */
         .af-form-card .card-header {
-            padding: 16px 24px;
-            border-bottom: 0.5px solid var(--color-border);
+            padding: 18px 24px 8px;
         }
         .af-form-card .card-header h2 {
             font-size: 14px; font-weight: 600; letter-spacing: -0.008em; margin: 0;
         }
-        .af-form { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 18px; }
+        .af-form { padding: 12px 24px 24px; display: flex; flex-direction: column; gap: 18px; }
         .af-form-row { display: flex; flex-direction: column; gap: 6px; }
         .af-form-label {
             font-size: 12px; font-weight: 500;
@@ -154,23 +210,23 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* Preset amount chips */
+        /* Preset amount chips — bg-tinted (no border), Apple Photos / Reminders pattern */
         .af-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
         .af-preset {
             height: 28px; padding: 0 14px;
-            border: 0.5px solid var(--color-border);
+            border: 0;
             border-radius: var(--radius-pill);
-            background: var(--color-surface);
+            background: var(--color-surface-secondary);
             color: var(--color-text-secondary);
             font-size: 12px; font-weight: 500;
             letter-spacing: -0.008em;
             cursor: pointer;
             font-family: inherit;
             font-variant-numeric: tabular-nums;
-            transition: all var(--transition-fast);
+            transition: background var(--transition-fast), color var(--transition-fast);
         }
-        .af-preset:hover { border-color: var(--color-accent); color: var(--color-accent); }
-        .af-preset.active { background: var(--color-accent-light); border-color: transparent; color: var(--color-accent); }
+        .af-preset:hover { background: var(--color-surface); color: var(--color-text-primary); }
+        .af-preset.active { background: var(--color-accent-light); color: var(--color-accent); }
 
         /* Summary bar above submit */
         .af-summary {
@@ -205,7 +261,7 @@
         }
         .af-method-logo {
             width: 32px; height: 22px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             display: inline-flex; align-items: center; justify-content: center;
             font-size: 8.5px; font-weight: 700; letter-spacing: 0.04em;
             flex-shrink: 0;
@@ -263,37 +319,10 @@
     </header>
 
     <div class="af-split">
-        <!-- ══ LEFT: Billing sub-nav ══ -->
-        <aside>
-            <div class="card subnav-card">
-                <div class="subnav-heading">Billing</div>
-                <a href="clientareainvoices.html" class="subnav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                    My Invoices
-                    <span class="subnav-count">2</span>
-                </a>
-                <a href="clientareaquotes.html" class="subnav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-                    My Quotes
-                    <span class="subnav-count">5</span>
-                </a>
-                <a href="masspay.html" class="subnav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
-                    Mass Payment
-                </a>
-                <a href="clientareaaddfunds.html" class="subnav-item active">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                    Add Funds
-                </a>
-                <a href="account-paymentmethods.html" class="subnav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                    Payment Methods
-                </a>
-            </div>
-        </aside>
-
-        <!-- ══ RIGHT: content ══ -->
-        <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
+        <!-- ══ LEFT: content ══ -->
+        <div class="af-main">
+            <!-- Sentinel for state-chip Services pill detection -->
+            <div class="svc-table-card" aria-hidden="true"></div>
 
             <!-- Credit balance + deposit rules -->
             <div class="card af-balance-card">
@@ -322,8 +351,8 @@
             <div class="card af-intro">
                 <p>Add funds to your account with us to avoid lots of small transactions and to automatically take care of any new invoices that are generated.</p>
                 <div class="af-notice">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    All deposits are non-refundable.
+                    <span class="af-notice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+                    <span>All deposits are non-refundable.</span>
                 </div>
             </div>
 
@@ -385,6 +414,35 @@
                 </form>
             </div>
         </div>
+
+        <!-- ══ RIGHT: Billing sub-nav ══ -->
+        <aside>
+            <div class="card subnav-card">
+                <div class="subnav-heading">Billing</div>
+                <a href="clientareainvoices.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    My Invoices
+                    <span class="subnav-count when-full">6</span>
+                    <span class="subnav-count when-empty">0</span>
+                </a>
+                <a href="clientareaquotes.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+                    My Quotes
+                </a>
+                <a href="masspay.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+                    Mass Payment
+                </a>
+                <a href="clientareaaddfunds.html" class="subnav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    Add Funds
+                </a>
+                <a href="account-paymentmethods.html" class="subnav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                    Payment Methods
+                </a>
+            </div>
+        </aside>
     </div>
 </div>
 
@@ -412,8 +470,8 @@
 </div><!-- /.ph-main-wrap -->
 <div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js"></script>
-<script src="js/apple-layout.js"></script>
+<script src="js/apple-theme.js?v=2"></script>
+<script src="js/apple-layout.js?v=2"></script>
 <script>
 // Preset amount chips + live summary
 (function () {
