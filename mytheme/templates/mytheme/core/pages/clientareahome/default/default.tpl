@@ -22,17 +22,24 @@
 *}
 
 {* Resolve variant config with fallbacks *}
-{$cfg = $myTheme.pages.clientareahome.config|default:[]}
-{$tilesVariant = $cfg.tilesVariant|default:'a'}
-{$subnavMode   = $cfg.subnavMode|default:'right'}
-{$cardLayout   = $cfg.cardLayout|default:'inside'}
-{$showAlerts   = ($cfg.showAlerts ?? true) ? true : false}
-{$tilesEnabled = ($cfg.tilesEnabled ?? true) ? true : false}
-{$showPromo    = ($cfg.showPromo ?? true) ? true : false}
+{assign var=cfg value=[]}
+{if isset($myTheme.pages.clientareahome.config)}
+    {assign var=cfg value=$myTheme.pages.clientareahome.config}
+{/if}
+{assign var=tilesVariant value=$cfg.tilesVariant|default:'a'}
+{assign var=subnavMode   value=$cfg.subnavMode|default:'right'}
+{assign var=cardLayout   value=$cfg.cardLayout|default:'inside'}
+{if isset($cfg.showAlerts)}{assign var=showAlerts value=$cfg.showAlerts}{else}{assign var=showAlerts value=true}{/if}
+{if isset($cfg.tilesEnabled)}{assign var=tilesEnabled value=$cfg.tilesEnabled}{else}{assign var=tilesEnabled value=true}{/if}
+{if isset($cfg.showPromo)}{assign var=showPromo value=$cfg.showPromo}{else}{assign var=showPromo value=true}{/if}
 
 {* Decide whether the dashboard renders empty-state markup *}
-{$totalUnits = ($clientsstats.productsnumactive|default:0) + ($clientsstats.numactivedomains|default:0) + ($clientsstats.numunpaidinvoices|default:0) + ($clientsstats.numactivetickets|default:0)}
-{$dashIsEmpty = ($totalUnits == 0) ? 'empty' : 'full'}
+{assign var=_pa value=$clientsstats.productsnumactive|default:0}
+{assign var=_da value=$clientsstats.numactivedomains|default:0}
+{assign var=_ui value=$clientsstats.numunpaidinvoices|default:0}
+{assign var=_at value=$clientsstats.numactivetickets|default:0}
+{assign var=totalUnits value=$_pa+$_da+$_ui+$_at}
+{if $totalUnits == 0}{assign var=dashIsEmpty value='empty'}{else}{assign var=dashIsEmpty value='full'}{/if}
 
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareahome.css?v={$myTheme.version|default:'1.0'}">
@@ -43,7 +50,11 @@
     var b = document.body;
     if (!b) return;
     b.setAttribute('data-tiles',         '{$tilesVariant|escape:'javascript'}');
-    b.setAttribute('data-subnav',        '{($subnavMode == "off") ? "off" : "on"}');
+    {if $subnavMode == 'off'}
+    b.setAttribute('data-subnav',        'off');
+    {else}
+    b.setAttribute('data-subnav',        'on');
+    {/if}
     {if $subnavMode != 'off' && $subnavMode != 'right'}
     b.setAttribute('data-subnav-side',   '{$subnavMode|escape:'javascript'}');
     {/if}
@@ -72,7 +83,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 </div>
                 <div class="notice-text">
-                    {$nUnpaid = $clientsstats.numoverdueinvoices|default:$clientsstats.numunpaidinvoices|default:0}
+                    {if $clientsstats.numoverdueinvoices}{assign var=nUnpaid value=$clientsstats.numoverdueinvoices}{elseif $clientsstats.numunpaidinvoices}{assign var=nUnpaid value=$clientsstats.numunpaidinvoices}{else}{assign var=nUnpaid value=0}{/if}
                     {$LANG.youhave|default:'You have'} <strong>{$nUnpaid} {if $nUnpaid == 1}{$LANG.invoiceoverdue|default:'overdue invoice'}{else}{$LANG.invoicesoverdue|default:'overdue invoices'}{/if}</strong>{if $clientsstats.unpaidinvoicesamount} {$LANG.totalingdue|default:'with a total of'} <strong>{$clientsstats.unpaidinvoicesamount}</strong> {$LANG.dueamount|default:'due'}{/if}.
                     <a href="{$WEB_ROOT}/clientarea.php?action=invoices">{$LANG.makepayment|default:'Pay now'}</a>.
                 </div>
@@ -109,9 +120,6 @@
         </div>
 
         {* ─── Promo slider (optional) ─── *}
-        {if $showPromo && file_exists("templates/$template/includes/partials/promo-slider.tpl")}
-            {include file="`$template`/includes/partials/promo-slider.tpl"}
-        {/if}
 
         {* ═══ TILES ═══ *}
         {if $tilesEnabled}
