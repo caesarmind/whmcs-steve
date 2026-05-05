@@ -1,17 +1,8 @@
-{* Hostnodes — page header.
-   Renders the html shell + body data-attributes that the apple-layout system uses
-   to switch between top / side / rail layouts. All 3 partials are emitted; CSS
-   shows only the one matching body[data-layout].
-
-   Buyer override: drop a custom header.tpl into templates/<slug>/overwrites/. *}
-
-{if file_exists("templates/$template/overwrites/header.tpl")}
-    {include file="`$template`/overwrites/header.tpl"}
-{else}
+{* Hostnodes — page header. *}
 <!DOCTYPE html>
-<!-- mytheme header v6 -->
+<!-- mytheme header v7 -->
 <html lang="{$activeLocale.languageCode|default:'en'}" data-theme="light"
-      data-header-sentinel="v6">
+      data-header-sentinel="v7">
 <head>
     <meta charset="{$charset|default:'utf-8'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -68,4 +59,3 @@
     </nav>
 
     <div class="content-area">
-{/if}
