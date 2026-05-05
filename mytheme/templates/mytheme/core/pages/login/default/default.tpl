@@ -15,14 +15,10 @@
      showForgotLink  — bool   (default: true)
 *}
 
-{$cfg = []}
-{if isset($myTheme) && isset($myTheme.pages) && isset($myTheme.pages.login) && isset($myTheme.pages.login.config)}
-    {$cfg = $myTheme.pages.login.config}
-{/if}
-{$showEyebrow    = ($cfg.showEyebrow ?? true) ? true : false}
-{$allowRemember  = ($cfg.allowRemember ?? true) ? true : false}
-{$showCreateLink = ($cfg.showCreateLink ?? true) ? true : false}
-{$showForgotLink = ($cfg.showForgotLink ?? true) ? true : false}
+{assign var=showEyebrow value=true}
+{assign var=allowRemember value=true}
+{assign var=showCreateLink value=true}
+{assign var=showForgotLink value=true}
 
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/login.css?v={$myTheme.version|default:'1.0'}">
 

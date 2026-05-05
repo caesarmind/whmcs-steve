@@ -16,36 +16,35 @@
      showPromo     — bool                      (default: false)
 *}
 
-{* Resolve variant config with fallbacks *}
-{$cfg = $myTheme.pages.clientareaproducts.config|default:[]}
-{$viewMode    = $cfg.viewMode|default:'grid'}
-{$gridCols    = $cfg.gridCols|default:'3'}
-{$showFilters = ($cfg.showFilters ?? true) ? true : false}
-{$showActions = ($cfg.showActions ?? true) ? true : false}
-{$showSearch  = ($cfg.showSearch ?? true) ? true : false}
-{$showPromo   = ($cfg.showPromo ?? false) ? true : false}
+{assign var=viewMode value='grid'}
+{assign var=gridCols value='3'}
+{assign var=showFilters value=true}
+{assign var=showActions value=true}
+{assign var=showSearch value=true}
+{assign var=showPromo value=false}
 
-{* Compute status counts by walking $products once (guarded for missing var) *}
-{$products = $products|default:[]}
-{$count_all       = $products|count}
-{$count_active    = 0}
-{$count_pending   = 0}
-{$count_suspended = 0}
-{$count_terminated= 0}
-{$count_cancelled = 0}
-{$count_fraud     = 0}
-{foreach $products as $_p}
-    {if $_p.status == 'Active'}{$count_active = $count_active + 1}
-    {elseif $_p.status == 'Pending'}{$count_pending = $count_pending + 1}
-    {elseif $_p.status == 'Suspended'}{$count_suspended = $count_suspended + 1}
-    {elseif $_p.status == 'Terminated'}{$count_terminated = $count_terminated + 1}
-    {elseif $_p.status == 'Cancelled'}{$count_cancelled = $count_cancelled + 1}
-    {elseif $_p.status == 'Fraud'}{$count_fraud = $count_fraud + 1}
-    {/if}
-{/foreach}
+{assign var=count_all value=0}
+{assign var=count_active value=0}
+{assign var=count_pending value=0}
+{assign var=count_suspended value=0}
+{assign var=count_terminated value=0}
+{assign var=count_cancelled value=0}
+{assign var=count_fraud value=0}
+{if isset($products) && $products}
+    {assign var=count_all value=$products|count}
+    {foreach $products as $_p}
+        {if $_p.status == 'Active'}{assign var=count_active value=$count_active+1}
+        {elseif $_p.status == 'Pending'}{assign var=count_pending value=$count_pending+1}
+        {elseif $_p.status == 'Suspended'}{assign var=count_suspended value=$count_suspended+1}
+        {elseif $_p.status == 'Terminated'}{assign var=count_terminated value=$count_terminated+1}
+        {elseif $_p.status == 'Cancelled'}{assign var=count_cancelled value=$count_cancelled+1}
+        {elseif $_p.status == 'Fraud'}{assign var=count_fraud value=$count_fraud+1}
+        {/if}
+    {/foreach}
+{/if}
 
-{$dashIsEmpty = ($count_all == 0) ? 'empty' : 'full'}
-{$currentFilter = $statusFilter|default:''}
+{if $count_all == 0}{assign var=dashIsEmpty value='empty'}{else}{assign var=dashIsEmpty value='full'}{/if}
+{assign var=currentFilter value=$statusFilter|default:''}
 
 {* Icon palettes — cycle by index in the loop so each card gets a different colour *}
 {$icoPalettes = ['blue', 'purple', 'green', 'orange', 'red']}
@@ -58,7 +57,11 @@
 (function () {
     var b = document.body;
     if (!b) return;
-    b.setAttribute('data-svc-filters', '{($showFilters) ? "on" : "off"}');
+    {if $showFilters}
+    b.setAttribute('data-svc-filters', 'on');
+    {else}
+    b.setAttribute('data-svc-filters', 'off');
+    {/if}
     b.setAttribute('data-data',        '{$dashIsEmpty}');
 })();
 </script>

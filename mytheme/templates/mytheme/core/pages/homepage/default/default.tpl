@@ -10,18 +10,10 @@
      showAnnouncements — bool    (default: true)
 *}
 
-{$cfg = []}
-{if isset($myTheme) && isset($myTheme.pages) && isset($myTheme.pages.homepage) && isset($myTheme.pages.homepage.config)}
-    {$cfg = $myTheme.pages.homepage.config}
-{/if}
-{$heroTitle         = $cfg.heroTitle|default:''}
-{$heroSubtitle      = $cfg.heroSubtitle|default:'Manage your services, domains and billing in one place.'}
-{$showQuickLinks    = ($cfg.showQuickLinks ?? true) ? true : false}
-{$showAnnouncements = ($cfg.showAnnouncements ?? true) ? true : false}
-
-{if !$heroTitle}
-    {$heroTitle = $companyname}
-{/if}
+{assign var=heroTitle value=$companyname}
+{assign var=heroSubtitle value='Manage your services, domains and billing in one place.'}
+{assign var=showQuickLinks value=true}
+{assign var=showAnnouncements value=true}
 
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/homepage.css?v={$myTheme.version|default:'1.0'}">
 
