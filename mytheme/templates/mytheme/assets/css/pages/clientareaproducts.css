@@ -1,64 +1,131 @@
 /* ──────────────────────────────────────────────────────────────────────
-   clientareaproducts.css — extracted from apple-client-area/clientareaproducts-v2.html
+   clientareaproducts.css — extracted from apple-client-area/clientareaproducts.html
    Loaded by core/pages/clientareaproducts/default/default.tpl
    ────────────────────────────────────────────────────────────────────── */
 
-/* Page header */
-.page-header { margin-bottom: 24px; }
-.page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
-.page-header .page-subtitle {
-    font-size: 14px; color: var(--color-text-secondary);
-    letter-spacing: -0.008em; line-height: 1.5;
-    margin: 0; max-width: 620px;
-}
+body { display: block; }
 
-/* 2-col split: filters sidebar + main */
-.svc-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
-@media (max-width: 960px) { .svc-split { grid-template-columns: 1fr; } }
-.svc-aside { display: flex; flex-direction: column; gap: 16px; }
+/* Page header — Apple-leaning: bigger, tighter title, no uppercase eyebrow, subtle CTA */
+.page-header { margin: 8px 0 32px; }
+.page-header h1 {
+    font-size: 40px; font-weight: 600; letter-spacing: -0.028em;
+    color: var(--color-text-primary); margin: 0 0 8px;
+    line-height: 1.1;
+}
+.page-header .page-subtitle {
+    font-size: 15px; color: var(--color-text-secondary);
+    letter-spacing: -0.01em; line-height: 1.45;
+    margin: 0; max-width: 560px;
+}
+.page-header-row {
+    display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    justify-content: space-between;
+}
+.page-header-action {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 14px; font-weight: 500; letter-spacing: -0.008em;
+    color: var(--color-accent); text-decoration: none;
+    flex-shrink: 0; white-space: nowrap;
+    transition: color var(--transition-fast);
+}
+.page-header-action:hover { color: var(--color-accent); text-decoration: none; }
+.page-header-action:hover .chev { transform: translateX(2px); }
+.page-header-action .chev { width: 12px; height: 12px; transition: transform var(--transition-fast); }
+
+/* 2-col split — main on the left, content sidebar on the right */
+.svc-split { display: grid; grid-template-columns: 1fr 240px; gap: 24px; align-items: start; }
+@media (max-width: 880px) { .svc-split { grid-template-columns: 1fr; } }
 .svc-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 
-/* Hide filter aside if admin disables it */
-body[data-svc-filters="off"] .svc-split { grid-template-columns: 1fr; }
-body[data-svc-filters="off"] .svc-aside { display: none; }
+/* Sub-nav toggle off — hide aside, collapse to single column */
+body[data-subnav="off"] .svc-split { grid-template-columns: 1fr; }
+body[data-subnav="off"] .svc-split > aside { display: none; }
+/* Sub-nav side — put aside on the left instead of the right */
+body[data-subnav-side="left"] .svc-split { grid-template-columns: 240px 1fr; }
+body[data-subnav-side="left"] .svc-split > aside { grid-column: 1; grid-row: 1; }
+body[data-subnav-side="left"] .svc-split > .svc-main { grid-column: 2; grid-row: 1; }
+/* Sub-nav side — float the aside in the outer gutter (right or left), outside the content column. */
+body[data-subnav-side="outside"] .svc-split,
+body[data-subnav-side="outside-left"] .svc-split { grid-template-columns: 1fr; position: relative; }
+body[data-subnav-side="outside"] .svc-split > aside,
+body[data-subnav-side="outside-left"] .svc-split > aside {
+    position: absolute;
+    top: 0;
+    width: 240px;
+}
+body[data-subnav-side="outside"] .svc-split > aside { left: calc(100% + 24px); }
+body[data-subnav-side="outside-left"] .svc-split > aside { right: calc(100% + 24px); left: auto; }
+body[data-subnav-side="outside"] .svc-split > .svc-main,
+body[data-subnav-side="outside-left"] .svc-split > .svc-main { grid-column: 1; }
+/* Align=Center: shift content-area by half the aside + gap (264/2 = 132) so combined unit stays centered.
+   Align=Content and Align=Left skip the shift. */
+body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
+/* Outside-L + Align=Left: reserve 240px on the left so the aside lands past the menu sidebar. */
+body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 240px; }
+/* Very narrow viewports: fall back to inside column. */
+@media (max-width: 1100px) {
+    body[data-subnav-side="outside"] .svc-split { grid-template-columns: 1fr 240px; gap: 24px; position: static; }
+    body[data-subnav-side="outside-left"] .svc-split { grid-template-columns: 240px 1fr; gap: 24px; position: static; }
+    body[data-subnav-side="outside"] .svc-split > aside,
+    body[data-subnav-side="outside-left"] .svc-split > aside { position: static; width: auto; right: auto; left: auto; }
+    body[data-subnav-side="outside-left"] .svc-split > aside { grid-column: 1; grid-row: 1; }
+    body[data-subnav-side="outside-left"] .svc-split > .svc-main { grid-column: 2; grid-row: 1; }
+}
 
-/* View filter */
-.filter-card { padding: 6px 8px 10px; }
-.filter-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 12px 12px 6px; }
-.filter-item {
+/* Sub-nav card */
+.subnav-card { padding: 8px; }
+.subnav-heading {
+    font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 10px 12px 8px;
+}
+.subnav-item {
     display: flex; align-items: center; gap: 10px;
     padding: 8px 12px; border-radius: var(--radius-sm);
-    font-size: 13px; color: var(--color-text-primary);
-    cursor: pointer; text-decoration: none;
-    transition: background var(--transition-fast);
-}
-.filter-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
-.filter-item.active { background: var(--sidebar-item-active); }
-.filter-item input[type="radio"] { accent-color: var(--color-accent); width: 14px; height: 14px; cursor: pointer; margin: 0; }
-.filter-item-label { flex: 1; }
-.filter-item.active .filter-item-label { font-weight: 500; color: var(--color-accent); }
-.filter-item-count { font-size: 12px; color: var(--color-text-tertiary); background: var(--color-surface-secondary); padding: 0 7px; border-radius: var(--radius-pill); min-width: 22px; text-align: center; line-height: 18px; }
-.filter-item.active .filter-item-count { background: var(--color-accent-light); color: var(--color-accent); }
-
-/* Actions list */
-.actions-card { padding: 6px 8px 10px; }
-.action-link {
-    display: flex; align-items: center; gap: 10px;
-    padding: 9px 12px; border-radius: var(--radius-sm);
-    font-size: 13px; color: var(--color-text-primary);
+    color: var(--color-text-primary); font-size: 13px; letter-spacing: -0.008em;
     text-decoration: none; transition: background var(--transition-fast);
 }
-.action-link:hover { background: var(--sidebar-item-hover); color: var(--color-accent); text-decoration: none; }
-.action-link:hover svg { color: var(--color-accent); }
-.action-link svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+.subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+.subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+.subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+.subnav-item.active svg { color: var(--color-accent); }
+.subnav-count {
+    margin-left: auto;
+    font-size: 11px; font-weight: 500;
+    padding: 1px 7px;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-secondary);
+    color: var(--color-text-tertiary);
+}
+.subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
 
-/* Toolbar */
-.svc-toolbar {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+/* Status / renewal banner */
+.svc-banner {
+    display: flex; align-items: center; gap: 10px;
     padding: 12px 16px;
-    background: var(--color-surface);
-    border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-secondary);
+    color: var(--color-text-secondary);
+    font-size: 13px; letter-spacing: -0.008em;
+}
+.svc-banner .svc-banner-ico {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--color-accent-light); color: var(--color-accent);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.svc-banner .svc-banner-ico svg { width: 13px; height: 13px; }
+.svc-banner strong { color: var(--color-text-primary); font-weight: 600; }
+.svc-banner .spacer { flex: 1; }
+.svc-banner .btn-secondary { height: 28px; padding: 0 12px; font-size: 12px; }
+
+/* Unified toolbar inside the services card header — search + filters + add new */
+.svc-toolbar-card { padding: 0; }
+.svc-toolbar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    flex-wrap: wrap;
 }
 .svc-search {
     flex: 1 1 240px; min-width: 180px; max-width: 320px;
@@ -73,13 +140,11 @@ body[data-svc-filters="off"] .svc-aside { display: none; }
     font-size: 13px; border-radius: 980px;
     background: var(--color-surface-secondary);
     border: 1px solid transparent;
-    color: var(--color-text-primary);
-    transition: all var(--transition-fast);
 }
 .svc-search input:focus {
-    outline: none;
     background: var(--color-surface); border-color: var(--color-accent);
 }
+/* Minimal filter-select styled like an Apple text-button with chevron */
 .svc-view-select {
     height: 32px; padding: 0 26px 0 12px; margin: 0;
     font: inherit; font-size: 13px; font-weight: 500;
@@ -96,7 +161,6 @@ body[data-svc-filters="off"] .svc-aside { display: none; }
 .svc-view-select:hover { background-color: var(--color-surface-secondary); }
 .svc-view-select:focus { outline: none; background-color: var(--color-surface-secondary); box-shadow: 0 0 0 3px var(--color-accent-light); }
 .svc-toolbar-spacer { flex: 1 1 8px; }
-
 .toggle-label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12px; color: var(--color-text-secondary); white-space: nowrap; }
 .toggle-label strong { font-weight: 600; color: var(--color-text-primary); }
 .toggle-switch-inline { width: 30px; height: 18px; background: var(--color-border); border-radius: 999px; position: relative; transition: background var(--transition-fast); flex-shrink: 0; }
@@ -107,175 +171,275 @@ body[data-svc-filters="off"] .svc-aside { display: none; }
 .svc-toolbar .btn-primary { height: 32px; padding: 0 14px; font-size: 13px; }
 .svc-toolbar .btn-primary svg { width: 12px; height: 12px; }
 
-/* ─── Service card grid ─── */
-.svc-grid {
-    display: grid; gap: 14px;
-    grid-template-columns: repeat(3, 1fr);
+/* Services table — simplified variation: product+domain · filled status pill · date · "Manage ›" link */
+.svc-table-card { overflow: hidden; padding: 0; }
+.svc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.svc-table thead th {
+    font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 10px 20px;
+    background: transparent;
+    user-select: none;
+    white-space: nowrap;
 }
-.svc-grid[data-cols="2"] { grid-template-columns: repeat(2, 1fr); }
-.svc-grid[data-cols="3"] { grid-template-columns: repeat(3, 1fr); }
-.svc-grid[data-cols="4"] { grid-template-columns: repeat(4, 1fr); }
-@media (max-width: 1140px) { .svc-grid, .svc-grid[data-cols] { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 640px)  { .svc-grid, .svc-grid[data-cols] { grid-template-columns: 1fr; } }
+/* Explicit column widths so the floating header row aligns with the tbody cells */
+.svc-table { table-layout: fixed; }
+.svc-table col.svc-col-product  { width: auto; }
+.svc-table col.svc-col-pricing  { width: 130px; }
+.svc-table col.svc-col-due      { width: 130px; }
+.svc-table col.svc-col-status   { width: 120px; }
+.svc-table col.svc-col-actions  { width: 72px; }
+/* Hide the in-table thead — we render titles as a standalone row above the card */
+.svc-table thead { display: none; }
 
-.svc-card {
-    display: flex; flex-direction: column;
+/* Floating column titles that sit OUTSIDE the card, on the page surface.
+   Same widths as the tbody columns so each label aligns with its data below. */
+.svc-table-head-row {
+    display: flex; align-items: center;
+    padding: 2px 0;
+    font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.05em;
+}
+/* Zero out theme-default margins that were stacking on top of svc-main's flex gap,
+   so the gap between filter tabs, head row, card, and pager is a clean 8px. */
+.svc-main > .filter-tabs   { margin-bottom: 16px; margin-top: 12px; }
+.svc-main > .svc-table-card { margin-bottom: 0; }
+.svc-main { gap: 8px; }
+.svc-table-head-row .hl-name    { flex: 1 1 auto; min-width: 0; text-align: left; }
+.svc-table-head-row .hl-pricing { width: 130px; text-align: left; }
+.svc-table-head-row .hl-due     { width: 130px; text-align: left; }
+.svc-table-head-row .hl-status  { width: 120px; text-align: left; }
+.svc-table-head-row .hl-actions { width: 72px; }
+.svc-table-head-row .hl-cell    { padding: 0 20px; }
+.svc-table-head-row .hl-cell .sort { opacity: 0.4; margin-left: 4px; }
+/* Sort chevrons */
+.svc-sort {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: none; border: 0; cursor: pointer;
+    color: inherit; font: inherit; letter-spacing: inherit;
+    text-transform: inherit; padding: 0;
+    font-family: inherit;
+}
+.svc-sort-ico { position: relative; width: 10px; height: 12px; flex-shrink: 0; }
+.svc-sort-ico::before, .svc-sort-ico::after {
+    content: ""; position: absolute; left: 2px;
+    border-left: 3px solid transparent; border-right: 3px solid transparent;
+    opacity: 0.3;
+}
+.svc-sort-ico::before { top: 1px; border-bottom: 4px solid currentColor; }
+.svc-sort-ico::after  { bottom: 1px; border-top: 4px solid currentColor; }
+.svc-sort[data-dir="asc"] .svc-sort-ico::before  { opacity: 1; }
+.svc-sort[data-dir="desc"] .svc-sort-ico::after  { opacity: 1; }
+.svc-sort.active { color: var(--color-text-primary); }
+.svc-table tbody tr { transition: background var(--transition-fast); }
+.svc-table tbody tr[data-href] { cursor: pointer; }
+.svc-table tbody tr:hover { background: var(--color-surface-secondary); }
+.svc-table td { padding: 16px 20px; vertical-align: middle; color: var(--color-text-primary); }
+
+/* Product cell — bold name + gray subtitle, no icon */
+.svc-cell-product-info { min-width: 0; line-height: 1.35; }
+.svc-cell-product-name {
+    font-size: 14px; font-weight: 500; color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+}
+.svc-cell-product-name strong { font-weight: 500; }
+.svc-cell-product-domain {
+    font-size: 13px; color: var(--color-text-tertiary);
+    margin-top: 3px;
+}
+
+/* Column alignment */
+.svc-cell-status { text-align: center; }
+.svc-cell-date   { text-align: center; color: var(--color-text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.svc-cell-action { text-align: right; white-space: nowrap; }
+
+/* Filled status pill — stronger green, like DigitalOcean */
+.svc-table .status-pill {
+    padding: 4px 14px;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.01em;
+    border-radius: var(--radius-pill);
+    display: inline-flex; align-items: center;
+}
+.svc-table .status-pill.active    { background: var(--color-green-bg);  color: var(--color-green-text); }
+.svc-table .status-pill.pending   { background: var(--color-orange-bg); color: var(--color-orange-text); }
+.svc-table .status-pill.suspended,
+.svc-table .status-pill.overdue   { background: var(--color-red-bg);    color: var(--color-red-text); }
+.svc-table .status-pill.cancelled,
+.svc-table .status-pill.terminated{ background: var(--color-gray-bg);   color: var(--color-gray-text); }
+
+/* "Manage ›" accent-blue text link (replaces kebab in this variation) */
+.svc-manage-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 13px; font-weight: 500; letter-spacing: -0.008em;
+    color: var(--color-accent); text-decoration: none;
+    transition: color var(--transition-fast);
+}
+.svc-manage-link:hover { color: var(--color-accent); text-decoration: none; }
+.svc-manage-link:hover .chev { transform: translateX(2px); }
+.svc-manage-link .chev { width: 11px; height: 11px; transition: transform var(--transition-fast); }
+.svc-cell-actions { width: 56px; text-align: center; position: relative; }
+
+/* Let the kebab dropdown escape the card */
+.svc-main .card { overflow: visible; }
+
+/* Kebab (three-dot) menu */
+.svc-menu-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+.svc-menu-btn {
+    width: 28px; height: 28px;
+    border: 0; background: transparent;
+    border-radius: 50%;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+.svc-menu-btn:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+.svc-menu-btn svg { width: 14px; height: 14px; }
+.svc-menu-wrap.open .svc-menu-btn { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+
+.svc-menu {
+    position: absolute;
+    top: calc(100% + 6px); right: 0;
+    min-width: 220px;
     background: var(--color-surface);
     border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    text-decoration: none; color: inherit;
-    transition: all var(--transition-medium);
-    min-height: 172px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
+    padding: 6px;
+    z-index: 20;
+    display: none;
+    text-align: left;
 }
-.svc-card:hover {
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    transform: translateY(-2px);
-    color: inherit; text-decoration: none;
-}
-.svc-card-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
-.svc-card-ico {
-    width: 44px; height: 44px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-}
-.svc-card-ico svg { width: 22px; height: 22px; }
-.svc-card-ico.blue   { background: var(--color-blue-bg);   color: var(--color-blue-text); }
-.svc-card-ico.green  { background: var(--color-green-bg);  color: var(--color-green-text); }
-.svc-card-ico.orange { background: var(--color-orange-bg); color: var(--color-orange-text); }
-.svc-card-ico.red    { background: var(--color-red-bg);    color: var(--color-red-text); }
-.svc-card-ico.purple { background: rgba(175, 82, 222, 0.10); color: #8e44ad; }
-.svc-card-ico.gray   { background: var(--color-surface-secondary); color: var(--color-text-tertiary); }
-
-.svc-card-head { flex: 1; min-width: 0; }
-.svc-card-name {
-    font-size: 15px; font-weight: 600;
+.svc-menu-wrap.open .svc-menu { display: block; }
+.svc-menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: var(--radius-sm);
+    font-size: 13px; letter-spacing: -0.008em;
     color: var(--color-text-primary);
-    letter-spacing: -0.012em; line-height: 1.25;
-    margin: 0 0 3px;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    text-decoration: none;
+    transition: background var(--transition-fast);
+    white-space: nowrap;
 }
-.svc-card-name .tier {
-    font-weight: 400;
-    color: var(--color-text-tertiary);
+.svc-menu-item:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); text-decoration: none; }
+.svc-menu-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+.svc-menu-item:hover svg { color: var(--color-accent); }
+
+/* Pagination footer — transparent, borderless, Apple-faithful */
+.svc-footer {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 12px 20px;
+    font-size: 12px; color: var(--color-text-tertiary);
 }
-.svc-card-domain {
-    font-size: 13px; color: var(--color-text-secondary);
-    letter-spacing: -0.004em;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+.svc-footer .spacer { flex: 1; }
+.svc-page-size { display: inline-flex; align-items: center; gap: 6px; }
+.svc-page-size select {
+    height: 26px; padding: 0 22px 0 8px;
+    border: 0; background: transparent;
+    border-radius: var(--radius-sm);
+    font-size: 12px; font-family: inherit; font-weight: 500;
+    color: var(--color-text-primary);
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+.svc-page-size select:hover { background-color: var(--color-surface-secondary); }
+.svc-page-size select:focus { outline: none; background-color: var(--color-surface-secondary); box-shadow: 0 0 0 3px var(--color-accent-light); }
+.svc-pages { display: inline-flex; gap: 2px; align-items: center; }
+.svc-pages button {
+    min-width: 26px; height: 26px; padding: 0 8px;
+    border: 0; background: transparent;
+    border-radius: var(--radius-sm);
+    font-size: 12px; font-weight: 500; font-family: inherit;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.svc-pages button:hover:not(:disabled):not(.active) { color: var(--color-accent); }
+.svc-pages button.active { color: var(--color-accent); font-weight: 600; }
+.svc-pages button:disabled { opacity: 0.25; cursor: default; }
+.svc-pages button svg { width: 11px; height: 11px; }
+
+/* Drop divider lines between table rows and under the column header */
+.svc-main .svc-table tbody tr { border-bottom: none; }
+.svc-main .svc-table thead th { border-bottom: none; }
+
+/* Center the Actions column (last column) */
+.svc-main .svc-table thead th:last-child,
+.svc-main .svc-table tbody td:last-child { text-align: center; }
+
+/* ── Services layout = "outside": pull toolbar + footer out of the card visually.
+     Only the table (service rows) keeps the card surface; search + pagination float
+     on the page background above/below it, matching the bare-list reference. ── */
+body[data-svc-layout="outside"] .svc-table-card {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    overflow: visible;
+}
+body[data-svc-layout="outside"] .svc-table-card .when-full > .svc-table {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+/* ── Services stack ─────────────────────────────────────────────
+   Default ("Controls inside"): the stack is one unified white card —
+   column titles, toolbar, rows, and pager all share the same surface.
+   "Controls outside": the stack is transparent; only the rows card keeps
+   its surface, and the rest floats on the page. ──────────────── */
+.svc-stack {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    /* overflow: visible so the row kebab dropdowns aren't clipped by the card. */
+    overflow: visible;
+}
+/* Clip row hover backgrounds to the stack's rounded corners visually by rounding
+   the first/last row cells, since we no longer rely on overflow: hidden. */
+.svc-stack .svc-table tbody tr:first-child td:first-child { border-top-left-radius: var(--radius-md); }
+.svc-stack .svc-table tbody tr:first-child td:last-child  { border-top-right-radius: var(--radius-md); }
+.svc-stack .svc-table tbody tr:last-child  td:first-child { border-bottom-left-radius: var(--radius-md); }
+.svc-stack .svc-table tbody tr:last-child  td:last-child  { border-bottom-right-radius: var(--radius-md); }
+.svc-stack > .svc-table-head-row { padding: 10px 0 6px; margin: 0; }
+.svc-stack > .svc-table-card {
+    background: transparent; border: 0; border-radius: 0; box-shadow: none; margin: 0;
+}
+.svc-stack > .svc-footer {
+    padding: 10px 20px 14px;
+    border-top: 0;
     margin: 0;
 }
 
-.svc-card-meta {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px;
-    padding-top: 14px;
-    border-top: 0.5px solid var(--color-border);
-    margin-bottom: 12px;
+/* Controls outside: strip the stack's own card styling and give it back
+   to the rows card only. Column titles + pager float on the page. */
+body[data-svc-layout="outside"] .svc-stack {
+    background: transparent; border: 0; border-radius: 0; overflow: visible;
+    display: flex; flex-direction: column; gap: 8px;
 }
-.svc-card-meta-block { min-width: 0; }
-.svc-card-meta-label {
-    font-size: 10.5px; font-weight: 500;
-    color: var(--color-text-tertiary);
-    text-transform: uppercase; letter-spacing: 0.04em;
-    margin-bottom: 3px;
+body[data-svc-layout="outside"] .svc-stack > .svc-table-head-row {
+    padding: 2px 0;
 }
-.svc-card-meta-value {
-    font-size: 14px; font-weight: 500;
-    color: var(--color-text-primary);
-    letter-spacing: -0.008em;
-    font-variant-numeric: tabular-nums;
-}
-.svc-card-meta-value .cycle {
-    display: block; font-size: 11px; font-weight: 400;
-    color: var(--color-text-tertiary);
-    margin-top: 1px; letter-spacing: 0;
-}
-.svc-card-meta-value.right { text-align: right; }
-
-.svc-card-foot {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: auto;
-}
-.svc-card-manage {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 13px; font-weight: 500;
-    color: var(--color-accent);
-    letter-spacing: -0.008em;
-}
-.svc-card-manage svg { width: 12px; height: 12px; transition: transform var(--transition-fast); }
-.svc-card:hover .svc-card-manage svg { transform: translateX(2px); }
-
-/* ─── List view (admin opt-in) ─── */
-.svc-list {
+body[data-svc-layout="outside"] .svc-stack > .svc-table-card {
     background: var(--color-surface);
     border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
+    border-radius: var(--radius-md);
+    overflow: visible;
 }
-.svc-list-row {
-    display: flex; align-items: center; gap: 14px;
-    padding: 14px 20px;
-    border-bottom: 0.5px solid var(--color-border);
-    text-decoration: none; color: inherit;
-    transition: background var(--transition-fast);
+body[data-svc-layout="outside"] .svc-stack > .svc-footer {
+    padding: 12px 4px;
+    border-top: 0;
 }
-.svc-list-row:last-child { border-bottom: 0; }
-.svc-list-row:hover { background: var(--color-surface-secondary); color: inherit; text-decoration: none; }
-.svc-list-row .svc-card-ico { width: 36px; height: 36px; border-radius: 10px; }
-.svc-list-row .svc-card-ico svg { width: 18px; height: 18px; }
-.svc-list-row .svc-list-info { flex: 1; min-width: 0; }
-.svc-list-row .svc-list-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 2px; letter-spacing: -0.008em; }
-.svc-list-row .svc-list-domain { font-size: 12.5px; color: var(--color-text-tertiary); margin: 0; }
-.svc-list-row .svc-list-due { font-size: 13px; color: var(--color-text-secondary); white-space: nowrap; min-width: 100px; text-align: right; font-variant-numeric: tabular-nums; }
-.svc-list-row .svc-list-status { min-width: 80px; }
-.svc-list-row .svc-list-chev { width: 14px; height: 14px; color: var(--color-text-tertiary); transition: transform var(--transition-fast); flex-shrink: 0; }
-.svc-list-row:hover .svc-list-chev { color: var(--color-accent); transform: translateX(2px); }
+/* Drop the kebab-menu overflow helper too, so the flat cards stay self-contained */
 
-/* Pagination */
-.svc-paging {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 16px;
-    background: var(--color-surface);
-    border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    font-size: 12px; color: var(--color-text-tertiary);
-}
-.svc-paging-count strong { color: var(--color-text-primary); font-weight: 600; }
-.svc-paging-spacer { flex: 1; }
-.svc-paging-btns { display: inline-flex; gap: 2px; align-items: center; }
-.svc-paging-btns a,
-.svc-paging-btns button {
-    min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
-    background: transparent; border: 0;
-    font: inherit; font-size: 12px; color: var(--color-text-secondary);
-    cursor: pointer; transition: all var(--transition-fast);
-    display: inline-flex; align-items: center; justify-content: center;
-    text-decoration: none;
-}
-.svc-paging-btns a:hover,
-.svc-paging-btns button:hover:not(:disabled) { background: var(--color-surface-secondary); color: var(--color-text-primary); text-decoration: none; }
-.svc-paging-btns a.active,
-.svc-paging-btns button.active { background: var(--color-accent-light); color: var(--color-accent); font-weight: 600; }
-.svc-paging-btns a.disabled,
-.svc-paging-btns button:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
-.svc-paging-btns svg { width: 12px; height: 12px; }
-
-/* Empty state */
-/* .when-full/.when-empty toggle removed — Smarty if/else picks one */
-.svc-empty {
-    padding: 60px 24px 56px; text-align: center;
-    background: var(--color-surface);
-    border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg);
-}
-.svc-empty-ico {
-    width: 60px; height: 60px; border-radius: 16px;
-    background: var(--color-accent-light); color: var(--color-accent);
-    display: inline-flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px;
-}
-.svc-empty-ico svg { width: 26px; height: 26px; }
-.svc-empty-title { font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 5px; letter-spacing: -0.014em; }
-.svc-empty-sub { font-size: 13.5px; color: var(--color-text-tertiary); margin: 0 auto 20px; max-width: 380px; line-height: 1.5; }
-.svc-empty .btn-primary { height: 36px; padding: 0 18px; font-size: 13px; }
+/* Empty state (rendered by Smarty if/else — no .when-full/.when-empty CSS toggle) */
+.svc-empty { padding: 48px 24px 40px; text-align: center; color: var(--color-text-secondary); }
+.svc-empty-ico { width: 52px; height: 52px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.svc-empty-ico svg { width: 22px; height: 22px; }
+.svc-empty-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+.svc-empty-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 0 18px; }
+.svc-empty .btn-primary { height: 32px; padding: 0 16px; font-size: 13px; }
