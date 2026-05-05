@@ -1,0 +1,31 @@
+# Build artifacts
+templates/mytheme/assets/css/*.css
+templates/mytheme/assets/css/*.css.map
+templates/mytheme/assets/js/dist/
+templates/mytheme/core/styles/*/style.css
+
+# Generated
+modules/addons/MyTheme/src/Helpers/IntegrityHashes.php
+
+# Distribution
+dist/
+*.zip
+
+# Dependencies
+node_modules/
+
+# Local development
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Encoded output (don't commit encoded versions)
+**/encoded/

@@ -1,0 +1,15 @@
+[
+  "modules/addons/MyTheme/src/Template/License.php",
+  "modules/addons/MyTheme/src/Template/LicenseHelper.php",
+  "modules/addons/MyTheme/src/Template/LicenseState.php",
+  "modules/addons/MyTheme/src/Template/Template.php",
+  "modules/addons/MyTheme/src/Helpers/AddonHelper.php",
+  "modules/addons/MyTheme/src/Helpers/ThemeManifest.php",
+  "modules/addons/MyTheme/src/Service/Hooks.php",
+  "modules/addons/MyTheme/src/Models/Configuration.php",
+  "modules/addons/MyTheme/src/Models/Settings.php",
+  "modules/addons/MyTheme/MyTheme.php",
+  "modules/addons/MyTheme/hooks.php",
+  "modules/addons/MyTheme/adminHooks.php",
+  "modules/addons/MyTheme/autoload.php"
+]

@@ -1,0 +1,24 @@
+{
+  "name": "mytheme-whmcs-starter",
+  "version": "1.0.0",
+  "description": "WHMCS commercial client theme — starter scaffold",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:css && npm run build:js && npm run build:integrity",
+    "build:css": "node scripts/build-css.mjs",
+    "build:js": "node scripts/build-js.mjs",
+    "build:integrity": "node scripts/inject-integrity-hashes.mjs",
+    "watch": "node scripts/build-css.mjs --watch & node scripts/build-js.mjs --watch",
+    "package": "npm run build && node scripts/package.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "sass": "^1.81.0",
+    "postcss": "^8.4.49",
+    "cssnano": "^7.0.6",
+    "autoprefixer": "^10.4.20"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

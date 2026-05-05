@@ -1,0 +1,122 @@
+// MyTheme — component styles.
+// Buttons, cards, alerts, forms, tables. Add yours here.
+
+@use "variables" as *;
+
+// === Buttons ===
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-2 $spacing-4;
+    border-radius: $radius-md;
+    font-family: $font-family-base;
+    font-weight: $font-weight-medium;
+    font-size: $font-size-base;
+    line-height: $line-height-tight;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color .15s, border-color .15s, color .15s;
+
+    &-primary {
+        background: $color-primary;
+        color: #fff;
+        &:hover { background: darken($color-primary, 8%); }
+    }
+
+    &-secondary {
+        background: $color-secondary;
+        color: #fff;
+        &:hover { background: darken($color-secondary, 8%); }
+    }
+
+    &-sm { padding: $spacing-1 $spacing-3; font-size: $font-size-sm; }
+    &-lg { padding: $spacing-3 $spacing-5; font-size: $font-size-lg; }
+}
+
+// === Cards ===
+.card, .panel {
+    background: $color-bg-light;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    box-shadow: $shadow-sm;
+    overflow: hidden;
+
+    &-header, .panel-header {
+        padding: $spacing-4;
+        border-bottom: 1px solid $color-border;
+        font-weight: $font-weight-medium;
+    }
+    &-body, .panel-body { padding: $spacing-4; }
+    &-footer, .panel-footer {
+        padding: $spacing-3 $spacing-4;
+        border-top: 1px solid $color-border;
+        background: $color-bg-muted;
+    }
+}
+
+// === Alerts ===
+.alert {
+    padding: $spacing-3 $spacing-4;
+    border-radius: $radius-md;
+    border: 1px solid transparent;
+    margin-bottom: $spacing-4;
+
+    &-success { background: lighten($color-success, 50%); border-color: $color-success; color: darken($color-success, 15%); }
+    &-warning { background: lighten($color-warning, 50%); border-color: $color-warning; color: darken($color-warning, 15%); }
+    &-danger  { background: lighten($color-danger, 50%);  border-color: $color-danger;  color: darken($color-danger, 15%); }
+    &-info    { background: lighten($color-primary, 50%); border-color: $color-primary; color: darken($color-primary, 15%); }
+}
+
+// === Tiles (dashboard counters) ===
+.dashboard-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: $spacing-4; margin-bottom: $spacing-6; }
+
+.tile {
+    background: $color-bg-light;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: $spacing-5;
+    text-align: center;
+    transition: box-shadow .15s, transform .15s;
+
+    &-stat  { font-size: 32px; font-weight: $font-weight-bold; color: $color-primary; }
+    &-title { font-size: $font-size-sm; color: $color-text-muted; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    &:hover { box-shadow: $shadow-md; transform: translateY(-2px); }
+}
+
+// === Layout ===
+.app-nav--top {
+    background: $color-bg-light;
+    border-bottom: 1px solid $color-border;
+    padding: $spacing-3 0;
+
+    .container {
+        display: flex;
+        align-items: center;
+        gap: $spacing-5;
+    }
+}
+
+.app-nav--sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 240px;
+    background: $color-bg-light;
+    border-right: 1px solid $color-border;
+    padding: $spacing-5 $spacing-4;
+}
+
+.layout-sidebar .app-content { margin-left: 240px; padding: $spacing-5; }
+
+.page-main { padding: $spacing-5 0; min-height: 60vh; }
+
+// === Footer ===
+.app-footer {
+    border-top: 1px solid $color-border;
+    padding: $spacing-5 0;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    text-align: center;
+}
