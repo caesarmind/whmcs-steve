@@ -15,6 +15,7 @@ declare(strict_types=1);
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use MyTheme\Helpers\AddonHelper;
+use MyTheme\Models\Configuration;
 use MyTheme\Service\Hooks as HookService;
 
 // ============================================================================
@@ -26,6 +27,8 @@ add_hook('ClientAreaPage', 1, function ($vars) {
         return null;
     }
 
+    $activeTemplate = AddonHelper::getActiveTemplateName();
+
     if (isset($_SESSION['Template']) && in_array($_SESSION['Template'], $disabled, true)) {
         unset($_SESSION['Template']);
     }
@@ -33,6 +36,23 @@ add_hook('ClientAreaPage', 1, function ($vars) {
         unset($_SESSION['OrderFormTemplate']);
     }
     if (isset($_GET['systpl']) && in_array($_GET['systpl'], $disabled, true)) {
+        http_response_code(403);
+        exit('Template license is not active');
+    }
+
+    if (in_array($activeTemplate, $disabled, true)) {
+        if (Configuration::getValue('Template') === $activeTemplate) {
+            Configuration::setValue('Template', 'six');
+        }
+        if (Configuration::getValue('OrderFormTemplate') === $activeTemplate) {
+            Configuration::setValue('OrderFormTemplate', 'standard_cart');
+        }
+
+        if (!headers_sent() && !AddonHelper::isCli()) {
+            header('Location: ' . ($_SERVER['REQUEST_URI'] ?? '/'), true, 302);
+            exit;
+        }
+
         http_response_code(403);
         exit('Template license is not active');
     }

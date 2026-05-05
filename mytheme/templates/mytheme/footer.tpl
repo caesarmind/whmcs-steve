@@ -2,7 +2,11 @@
    Closes content-area + ph-main-wrap, renders site footer (top-layout) and slim
    footer (sidebar/rail), then loads the apple-theme.js + apple-layout.js. *}
 
-{if file_exists("templates/$template/overwrites/footer.tpl")}
+{if empty($myTheme.license.canRender)}
+    </div>
+</body>
+</html>
+{elseif file_exists("templates/$template/overwrites/footer.tpl")}
     {include file="`$template`/overwrites/footer.tpl"}
 {else}
     </div>{* /.content-area *}

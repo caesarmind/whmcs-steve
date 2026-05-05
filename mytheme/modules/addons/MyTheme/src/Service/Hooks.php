@@ -54,6 +54,10 @@ final class Hooks
                     'footer'    => $this->resolveActiveLayout($template, 'footer'),
                 ],
                 'pages'         => $this->resolveCurrentPage($vars, $template),
+                'license'       => [
+                    'canRender' => true,
+                    'devMode'   => $template->license()->isDevMode(),
+                ],
                 'addonSettings' => Settings::all(),
             ],
             'rslang' => $this->loadLanguage($template, $vars['language'] ?? 'english'),

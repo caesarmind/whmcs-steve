@@ -21,6 +21,27 @@
    wins on initial render.
    ════════════════════════════════════════════════════════════════════════ *}
 
+{if empty($myTheme.license.canRender)}
+<!DOCTYPE html>
+<html lang="{$activeLocale.languageCode|default:'en'}">
+<head>
+    <meta charset="{$charset|default:'utf-8'}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme License Required</title>
+    <style>
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f7; color: #1d1d1f; }
+        .mt-license-required { min-height: 100vh; display: grid; place-items: center; padding: 32px; box-sizing: border-box; }
+        .mt-license-required-card { width: min(100%, 520px); padding: 32px; border-radius: 24px; background: #fff; box-shadow: 0 24px 80px rgba(0,0,0,.12); text-align: center; }
+        .mt-license-required-card h1 { margin: 0 0 10px; font-size: 26px; line-height: 1.2; }
+        .mt-license-required-card p { margin: 0; color: #6e6e73; line-height: 1.55; }
+    </style>
+</head>
+<body class="mt-license-blocked">
+    {include file="`$template`/error/license-required.tpl"}
+    <div hidden aria-hidden="true">
+{else}
+
 {* auth state *}
 {if $loggedin}{assign var=mt_auth value='in'}{else}{assign var=mt_auth value='out'}{/if}
 
@@ -184,3 +205,4 @@
     </nav>
 
     <div class="content-area">
+{/if}

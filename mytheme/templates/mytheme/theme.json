@@ -16,21 +16,36 @@
   "provides": {
     "styles": ["default", "dark"],
     "layouts": {
-      "main-menu": ["top", "sidebar"],
+      "main-menu": ["top", "sidebar", "rail"],
       "footer": ["default"]
     },
     "pages": [
-      "clientareahome",
-      "login",
-      "homepage",
+      "announcements",
       "clientareadetails",
+      "clientareadomains",
+      "clientareahome",
       "clientareainvoices",
       "clientareaproducts",
-      "clientareadomains",
-      "contact"
+      "homepage",
+      "login",
+      "supporttickets",
+      "viewinvoice",
+      "viewticket"
     ],
     "extensions": [],
     "widgets": []
+  },
+
+  "commercial": {
+    "licenseRequired": true,
+    "addonRequired": "MyTheme",
+    "renderGuard": "$myTheme.license.canRender",
+    "encodedFiles": ["core/mytheme.php"]
+  },
+
+  "admin": {
+    "managedAreas": ["branding", "styles", "layouts", "pages", "menu", "sidebar", "dashboard", "extensions"],
+    "nativeFirst": true
   },
 
   "deps": {

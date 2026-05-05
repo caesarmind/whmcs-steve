@@ -2,6 +2,8 @@
 
 The theme calls back to a license server you operate. This document explains what to set up.
 
+For commercial distribution, licensing is load-bearing: the template must not render normal pages unless the addon is active and the license layer exposes `$myTheme.license.canRender`.
+
 ## Architecture
 
 ```
@@ -30,6 +32,8 @@ returns: {status, expires, allowed_domains, features, nonce_echo, signed_at, sig
         ▼
 theme renders normally OR falls back to "six" template
 ```
+
+There is also a template-level guard in `templates/mytheme/header.tpl`. If the addon is missing or `$myTheme.license.canRender` is not present, the theme renders only a license-required screen. This prevents the plain template folder from being useful without the encoded addon.
 
 ## What you need to set up
 
@@ -121,6 +125,23 @@ A reference Node implementation is sketched in `docs/license-server-reference.md
 | `Unknown` / `Invalid` | Start 30-day grace; deactivate after |
 
 Codified in `src/Template/LicenseState.php` (the enum, not stringly-typed like Lagom).
+
+For a stricter subscription product, change `LicenseState::shouldRender()` so only `Active` returns `true`. For a lifetime-use product with renewable support, keeping `Expired` renderable is acceptable because the license still exists, but support/updates can be denied by the license server.
+
+## Production hardening checklist
+
+- Set `templates/mytheme/core/mytheme.php` `dev_mode` to `false`.
+- Replace the placeholder RSA public key in `License.php`.
+- Replace `License::$licenseServerUrl` with the real licensing endpoint.
+- Generate a unique per-template `secret_key`.
+- Encode `modules/addons/MyTheme/src`, protected helpers, and `templates/mytheme/core/mytheme.php`.
+- Regenerate integrity hashes after all production edits.
+- Verify the template does not render in these cases:
+        - addon disabled;
+        - addon active but license key empty;
+        - invalid domain;
+        - invalid server signature;
+        - cancelled/banned license.
 
 ## Local cache
 

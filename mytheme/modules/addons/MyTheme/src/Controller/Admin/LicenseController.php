@@ -5,14 +5,15 @@ namespace MyTheme\Controller\Admin;
 
 use MyTheme\Controller\AbstractController;
 use MyTheme\Helpers\AddonHelper;
+use MyTheme\Template\Template;
 
 final class LicenseController extends AbstractController
 {
     public function indexAction(): string
     {
-        $template = AddonHelper::getTemplate();
+        $template = $this->resolveTemplate();
         if ($template === null) {
-            return $this->view('error', ['error' => 'No active template']);
+            return $this->view('error', ['error' => 'No MyTheme template found']);
         }
 
         $license = $template->license();
@@ -34,5 +35,25 @@ final class LicenseController extends AbstractController
             'devMode'  => $devMode,
             'key'      => $license->getLicenseKey(),
         ]);
+    }
+
+    private function resolveTemplate(): ?Template
+    {
+        $requested = (string)($_GET['templateName'] ?? '');
+        if ($requested !== '') {
+            try {
+                return new Template($requested);
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+
+        $active = AddonHelper::getTemplate();
+        if ($active !== null) {
+            return $active;
+        }
+
+        $templates = Template::getAll();
+        return $templates !== [] ? reset($templates) : null;
     }
 }

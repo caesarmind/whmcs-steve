@@ -19,9 +19,9 @@ MyTheme-WHMCS-Starter/
 │   ├── src/
 │   │   ├── Template/{Template,License,LicenseHelper}.php
 │   │   ├── Helpers/{AddonHelper,ThemeManifest,Configuration}.php
-│   │   ├── Service/{Hooks,HookDispatcher}.php
+│   │   ├── Service/{Hooks,HookDispatcher,AjaxService}.php
 │   │   ├── Models/{Configuration,Settings}.php
-│   │   ├── Controller/Admin/{MainController,TemplatesController,StylesController,LayoutsController,LicenseController}.php
+│   │   ├── Controller/Admin/{MainController,StylesController,LayoutsController,PagesController,MenuController,...}.php
 │   │   └── View/ViewHelper.php
 │   ├── config/app.php
 │   ├── resources/migrations/Initial.php
@@ -29,7 +29,7 @@ MyTheme-WHMCS-Starter/
 └── templates/mytheme/                               ← the visual layer (mostly plain)
     ├── theme.json                                   ← MANIFEST (not filesystem scan)
     ├── core/mytheme.php                             ← per-template encoded config (secret_key)
-    ├── *.tpl                                        ← WHMCS-named entry points (Smarty {extends})
+    ├── *.tpl                                        ← WHMCS-named entry points (tiny {include} dispatchers)
     ├── core/{styles,layouts,pages,extensions,lang,api,hooks,config}/
     ├── includes/{common,menu,sidebar,tables}/
     ├── error/  oauth/  payment/{bank,card}/  modules/servers/
@@ -46,9 +46,9 @@ MyTheme-WHMCS-Starter/
 - `theme.json` manifest replacing filesystem-scan discovery
 - Build pipeline: SCSS → CSS, JS bundling, integrity-hash codegen
 - One default style + one dark style (manifest only)
-- Two layouts (top-nav, sidebar) — manifest only
-- One sample page variant (`clientareahome/default`) using Smarty `{extends}`
-- Admin UI scaffold for switching styles + layouts
+- Three main-menu layouts (top-nav, sidebar, rail) + one footer layout
+- One sample page variant (`clientareahome/default`) using native WHMCS panels first
+- Admin UI scaffold for styles, layouts, pages, menu, branding, extensions, tools, templates, and license
 
 **You build:**
 - Visual design (the SCSS for components, your fonts, your icons)
@@ -61,7 +61,7 @@ MyTheme-WHMCS-Starter/
 
 | Pattern | Typical | This starter |
 |---|---|---|
-| Page dispatch | `{if file_exists($var)}{include}{else}<300 lines>{/if}` per WHMCS root tpl | Smarty `{extends "core/pages/<page>/base.tpl"}` + `{block name="content"}` |
+| Page dispatch | `{if file_exists($var)}{include}{else}<300 lines>{/if}` per WHMCS root tpl | Tiny WHMCS-named `{include}` dispatcher into `core/pages/<page>/<variant>/<variant>.tpl` |
 | Variant discovery | Filesystem scan with `Symfony\Finder` on each request | `theme.json` manifest, parsed once, cached |
 | Local license cache | `md5(serialize(...))` MAC | `hash_hmac('sha256', json_encode(...), $secret)` with `hash_equals` |
 | License callback TLS | `CURLOPT_SSL_VERIFY*` disabled | Verified, with optional cert pinning |
@@ -106,7 +106,9 @@ mv templates/aurora/core/mytheme.php templates/aurora/core/aurora.php
 1. Read [BUILD.md](BUILD.md) for the build pipeline
 2. Read [LICENSING-SETUP.md](LICENSING-SETUP.md) for setting up a license server (separate project)
 3. Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design rationale
-4. Read [docs/EXTENDING.md](docs/EXTENDING.md) to understand how to add styles, layouts, page variants
+4. Read [docs/HYBRID-STRUCTURE.md](docs/HYBRID-STRUCTURE.md) for the addon-managed WHMCS-native target structure
+5. Read [docs/TEMPLATE-STRUCTURE.md](docs/TEMPLATE-STRUCTURE.md) for the `templates/mytheme` commercial visual-layer structure
+6. Read [docs/EXTENDING.md](docs/EXTENDING.md) to understand how to add styles, layouts, page variants
 
 ## License
 

@@ -415,17 +415,35 @@
                     </a>
                 </div>
                 {if $hasNativeTickets}
-                <div class="card-body" style="padding: 4px 24px 12px;">
+                <div class="card-body ticket-list-body">
                     {foreach $ticketPanel->getChildren() as $ticketItem}
-                        {assign var=_tStatus value=$ticketItem->getBadge()|default:''}
+                        {assign var=_tStatus value=''}
+                        {if $ticketItem->hasBadge()}{assign var=_tStatus value=$ticketItem->getBadge()}{/if}
                         {assign var=_tStatusCls value=$_tStatus|lower|replace:' ':'-'|replace:'_':'-'}
+                        {assign var=_tName value=$ticketItem->getName()}
+                        {assign var=_tLabel value=$ticketItem->getLabel()}
+                        {assign var=_tId value=$ticketItem->getExtra('tid')}
+                        {if !$_tId}{assign var=_tId value=$ticketItem->getExtra('ticketId')}{/if}
+                        {if !$_tId}{assign var=_tId value=$ticketItem->getExtra('ticketid')}{/if}
+                        {assign var=_tDate value=$ticketItem->getExtra('lastreply')}
+                        {if !$_tDate}{assign var=_tDate value=$ticketItem->getExtra('lastReply')}{/if}
+                        {if !$_tDate}{assign var=_tDate value=$ticketItem->getExtra('date')}{/if}
+                        {assign var=_tMeta value=''}
+                        {if $_tId}
+                            {assign var=_tMeta value="#"|cat:$_tId}
+                        {elseif $_tName && $_tName != $_tLabel}
+                            {assign var=_tMeta value="#"|cat:$_tName}
+                        {/if}
                         {if $ticketItem->getUri()}
                             <a menuItemName="{$ticketItem->getName()}" href="{$ticketItem->getUri()}" class="service-item ticket-row{if $ticketItem->getClass()} {$ticketItem->getClass()}{/if}{if $ticketItem->isCurrent()} active{/if}" id="{$ticketItem->getId()}">
                         {else}
                             <div menuItemName="{$ticketItem->getName()}" class="service-item ticket-row{if $ticketItem->getClass()} {$ticketItem->getClass()}{/if}" id="{$ticketItem->getId()}">
                         {/if}
                                 <div class="service-info">
-                                    <div class="service-name">{$ticketItem->getLabel()}</div>
+                                    <div class="service-name">{$_tLabel}</div>
+                                    {if $_tMeta || $_tDate}
+                                        <div class="service-domain">{if $_tMeta}{$_tMeta|escape}{/if}{if $_tMeta && $_tDate} · {/if}{if $_tDate}{$LANG.updated|default:'Updated'} {$_tDate|escape}{/if}</div>
+                                    {/if}
                                 </div>
                                 {if $_tStatus}
                                     <span class="status-pill {$_tStatusCls|escape}">{$_tStatus|escape}</span>
@@ -438,7 +456,7 @@
                     {/foreach}
                 </div>
                 {elseif isset($dashboard.openTickets) && $dashboard.openTickets|count > 0}
-                <div class="card-body" style="padding: 4px 24px 12px;">
+                <div class="card-body ticket-list-body">
                     {foreach $dashboard.openTickets as $tkt}
                         <a href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape}{if $tkt.c}&c={$tkt.c|escape}{/if}" class="service-item ticket-row">
                             <div class="service-info">

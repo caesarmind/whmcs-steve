@@ -2,6 +2,8 @@
 
 > **Target stack**: WHMCS 9.0+, PHP 8.1+, Smarty 4 (`\Smarty\Smarty` namespace) or Smarty 3 (`\Smarty`), ionCube 13+. The codebase uses `readonly` properties, backed enums, named arguments, `match` expressions, and `never` return types.
 
+For the addon-managed, WHMCS-native target structure, see [HYBRID-STRUCTURE.md](HYBRID-STRUCTURE.md).
+
 ## Two-piece product
 
 ```
@@ -10,9 +12,9 @@ templates/mytheme/        ← visual layer (mostly plain)
 ```
 
 - The **addon** holds business logic: license check, hooks dispatch, admin UI, DB models.
-- The **template** holds presentation: Smarty tpls, SCSS sources, assets, per-variant manifests.
+- The **template** holds presentation: Smarty tpls, SCSS sources, assets, per-variant manifests, and a template-level license guard.
 
-Either piece is useless without the other. WHMCS picks the template by name from `tblconfiguration.Template`. The addon validates the license, populates the `$myTheme` Smarty super-array, and force-resets the template to `six` if licensing fails.
+Either piece is useless without the other. WHMCS picks the template by name from `tblconfiguration.Template`. The addon validates the license, populates the `$myTheme` Smarty super-array, exposes `$myTheme.license.canRender`, and force-resets the template to `six` if licensing fails. If the addon is missing entirely, the template-level guard renders only the license-required screen.
 
 ## Discovery model
 
@@ -22,7 +24,7 @@ Either piece is useless without the other. WHMCS picks the template by name from
 {
   "provides": {
     "styles": ["default", "dark"],
-    "layouts": { "main-menu": ["top", "sidebar"], "footer": ["default"] },
+        "layouts": { "main-menu": ["top", "sidebar", "rail"], "footer": ["default"] },
     "pages": ["clientareahome", "login", ...],
     "extensions": []
   }
@@ -31,7 +33,7 @@ Either piece is useless without the other. WHMCS picks the template by name from
 
 The engine reads it once at construction and caches in-process. Adding a new style is: (1) drop the directory, (2) add its name to the manifest, (3) bump version. The Configuration cache is invalidated automatically on version change.
 
-## Dispatch model — Smarty 3 inheritance pattern
+## Dispatch model — tiny include dispatcher
 
 Lagom's pattern: `{if file_exists(...)}{include}{else}<300 lines of inline default>{/if}` inside every WHMCS-named root tpl.
 
@@ -131,6 +133,8 @@ Considered. The simpler `{include}` dispatch is preferred because:
 `{extends}` is the right tool when variants share large structure with small overrides. Most WHMCS pages don't — each is mostly different markup.
 
 ## What's deliberately NOT in the v1 starter
+
+The hybrid structure document describes the target product direction. The starter intentionally keeps the first release smaller:
 
 - Per-vendor `store/<name>/` integrations (do these as separate addons)
 - Multi-display CMS routing

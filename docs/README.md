@@ -48,6 +48,12 @@ This documentation is a comprehensive, developer-focused reference for creating 
 | [Error Pages](/templates/error.md) | Error templates (Smarty and non-Smarty) |
 | [PDF Templates](/templates/pdf.md) | Invoice/quote PDF generation (PHP, not Smarty) |
 
+### External Theme Analysis
+
+| Topic | Description |
+|-------|-------------|
+| [Lagom Analysis](/lagom/README.md) | Lagom 2.3.0-b1 structure, systems, strengths/weaknesses, and WHMCS 9-native alternatives |
+
 ### API Reference
 
 | Topic | Description |

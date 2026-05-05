@@ -28,6 +28,14 @@
   - [Cart Theme (nexus_cart)](/templates/cart.md)
   - [PDF Templates](/templates/pdf.md)
 
+- Lagom Analysis
+  - [Overview](/lagom/README.md)
+  - [Structure Review](/lagom/structure.md)
+  - [Systems Review](/lagom/systems.md)
+  - [Strengths & Weaknesses](/lagom/strengths-weaknesses.md)
+  - [WHMCS 9 Native Alternatives](/lagom/whmcs9-native-alternatives.md)
+  - [Migration Checklist](/lagom/migration-checklist.md)
+
 - API Reference
   - [Object API](/reference/object-api.md)
   - [Complete Hook Reference](/reference/hooks.md)
