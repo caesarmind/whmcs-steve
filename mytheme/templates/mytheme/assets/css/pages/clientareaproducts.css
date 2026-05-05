@@ -262,8 +262,7 @@ body[data-svc-filters="off"] .svc-aside { display: none; }
 .svc-paging-btns svg { width: 12px; height: 12px; }
 
 /* Empty state */
-body[data-data="empty"] .when-full { display: none; }
-body:not([data-data="empty"]) .when-empty { display: none; }
+/* .when-full/.when-empty toggle removed — Smarty if/else picks one */
 .svc-empty {
     padding: 60px 24px 56px; text-align: center;
     background: var(--color-surface);

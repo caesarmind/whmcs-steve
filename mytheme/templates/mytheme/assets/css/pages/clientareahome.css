@@ -334,9 +334,7 @@
         .rd-actions .btn-primary,
         .rd-actions .btn-secondary { height: 36px; padding: 0 16px; font-size: 13px; width: 100%; }
 
-        /* ─── Empty-state variants (toggled via body[data-data="empty"] from state-chip) ─── */
-        body[data-data="empty"] .when-full { display: none !important; }
-        body:not([data-data="empty"]) .when-empty { display: none !important; }
+        /* .when-full/.when-empty toggle removed — Smarty if/else picks one */
         .notices-group { display: flex; flex-direction: column; gap: 12px; }
         .empty-state { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 32px 24px 24px; color: var(--color-text-secondary); }
         .empty-state .empty-ico { width: 44px; height: 44px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
