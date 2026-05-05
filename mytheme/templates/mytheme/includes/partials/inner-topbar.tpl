@@ -14,7 +14,7 @@
         <div class="ph-side-crumbs">
             <a href="{$WEB_ROOT}/">{$LANG.home|default:'Home'}</a>
             <span class="sep">›</span>
-            <span class="current" aria-current="page" data-current-page>{$pagetitle|default:'Page'}</span>
+            <span class="current" aria-current="page" data-current-page>{$mt_pageLabel|default:$pagetitle|default:'Page'}</span>
         </div>
         <div class="ph-side-topbar-actions">
             {if $loggedin}

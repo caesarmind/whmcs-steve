@@ -29,19 +29,34 @@
 {/if}
 
 {assign var=mt_activeNav value=''}
+{assign var=mt_pageLabel value=$pagetitle}
 {assign var=_tf value=$templatefile|default:''}
 {if $_tf == 'clientareahome'}
     {assign var=mt_activeNav value='dashboard'}
-{elseif $_tf == 'clientareaproducts' || $_tf == 'clientareaproductdetails'}
+    {assign var=mt_pageLabel value='Dashboard'}
+{elseif $_tf == 'clientareaproducts'}
+    {assign var=mt_activeNav value='services'}
+    {assign var=mt_pageLabel value='My Products & Services'}
+{elseif $_tf == 'clientareaproductdetails'}
     {assign var=mt_activeNav value='services'}
 {elseif $_tf == 'clientareadomains'}
     {assign var=mt_activeNav value='domains'}
-{elseif $_tf == 'clientareainvoices' || $_tf == 'viewinvoice'}
+    {assign var=mt_pageLabel value='My Domains'}
+{elseif $_tf == 'clientareainvoices'}
     {assign var=mt_activeNav value='invoices'}
-{elseif $_tf == 'supporttickets' || $_tf == 'supportticketslist' || $_tf == 'viewticket'}
+    {assign var=mt_pageLabel value='My Invoices'}
+{elseif $_tf == 'viewinvoice'}
+    {assign var=mt_activeNav value='invoices'}
+{elseif $_tf == 'supporttickets' || $_tf == 'supportticketslist'}
+    {assign var=mt_activeNav value='tickets'}
+    {assign var=mt_pageLabel value='Support Tickets'}
+{elseif $_tf == 'viewticket'}
     {assign var=mt_activeNav value='tickets'}
 {elseif $_tf == 'clientareadetails'}
     {assign var=mt_activeNav value='details'}
+    {assign var=mt_pageLabel value='My Details'}
+{elseif $_tf == 'announcements'}
+    {assign var=mt_pageLabel value='Announcements'}
 {/if}
 
 <body class="client-area-layout"
@@ -67,7 +82,7 @@
         <div class="ph-breadcrumb-inner">
             <a href="{$WEB_ROOT}/">{$LANG.home|default:'Home'}</a>
             <span class="sep">/</span>
-            <span class="current" aria-current="page">{$pagetitle|escape|default:'Page'}</span>
+            <span class="current" aria-current="page">{$mt_pageLabel|escape|default:'Page'}</span>
         </div>
     </nav>
 
