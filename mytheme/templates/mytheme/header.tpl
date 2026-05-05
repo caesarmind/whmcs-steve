@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<!-- mytheme header v9 -->
-<html lang="{$activeLocale.languageCode|default:'en'}" data-theme="light" data-header-sentinel="v9">
+<!-- mytheme header v10 -->
+<html lang="{$activeLocale.languageCode|default:'en'}" data-theme="light" data-header-sentinel="v10">
 <head>
     <meta charset="{$charset|default:'utf-8'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -18,13 +18,14 @@
     {assign var=mt_auth value='out'}
 {/if}
 
-{* Layout selection: ?layout=top|side|rail switches via URL. Default = side. *}
-{if isset($smarty.get.layout) && ($smarty.get.layout == 'top' || $smarty.get.layout == 'side' || $smarty.get.layout == 'rail')}
-    {assign var=mt_layout value=$smarty.get.layout}
-{elseif isset($smarty.cookies.mt_layout) && ($smarty.cookies.mt_layout == 'top' || $smarty.cookies.mt_layout == 'side' || $smarty.cookies.mt_layout == 'rail')}
-    {assign var=mt_layout value=$smarty.cookies.mt_layout}
-{else}
-    {assign var=mt_layout value='side'}
+{* Layout selection: ?layout=top|side|rail via URL. Default = side. *}
+{assign var=mt_layout value='side'}
+{if isset($smarty.get.layout)}
+    {assign var=_lq value=$smarty.get.layout}
+    {if $_lq == 'top'}{assign var=mt_layout value='top'}
+    {elseif $_lq == 'rail'}{assign var=mt_layout value='rail'}
+    {elseif $_lq == 'side'}{assign var=mt_layout value='side'}
+    {/if}
 {/if}
 
 {assign var=mt_activeNav value=''}
