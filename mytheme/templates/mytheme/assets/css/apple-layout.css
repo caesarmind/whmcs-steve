@@ -735,8 +735,9 @@ body[data-layout="side"] .ph-section:last-of-type { padding-bottom: 48px; }
    fetch. Hide them until loaded to avoid a layout flash. */
 [data-include]:not([data-loaded]) { display: none; }
 
-/* ── Data-state toggle (driven by preview chip) ───────────── */
+/* ── Data-state toggle (driven by preview chip / Smarty) ───────────── */
 /* Pages mark their full-data and empty-data variants with
-   .when-full / .when-empty. The chip flips body[data-data]. */
-body[data-data="empty"] .when-full { display: none !important; }
-body:not([data-data="empty"]) .when-empty { display: none !important; }
+   .when-full / .when-empty. Default = show empty state (when body
+   has no data-data attr or is "empty"); only hide it when explicitly "full". */
+body:not([data-data="full"]) .when-full   { display: none !important; }
+body[data-data="full"]       .when-empty { display: none !important; }
