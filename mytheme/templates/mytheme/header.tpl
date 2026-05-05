@@ -9,6 +9,7 @@
     {include file="`$template`/overwrites/header.tpl"}
 {else}
 <!DOCTYPE html>
+<!-- mytheme header v4 -->
 <html lang="{$activeLocale.languageCode|default:'en'}" data-theme="light">
 <head>
     <meta charset="{$charset|default:'utf-8'}">
@@ -21,37 +22,19 @@
     {$headoutput}
 </head>
 
-{* ── Resolve body data-attrs with isset() guards. Anything that can't be
-      resolved falls back to a safe default. ── *}
-{$mt_layout = 'side'}
-{if isset($myTheme) && isset($myTheme.layouts) && isset($myTheme.layouts['main-menu']) && isset($myTheme.layouts['main-menu']['vars']) && isset($myTheme.layouts['main-menu']['vars']['dataLayout'])}
-    {$mt_layout = $myTheme.layouts['main-menu']['vars']['dataLayout']}
-{/if}
-
+{* Body data-attrs — keep this DEAD simple. No $myTheme chains here.
+   Layout/activeNav lookups can be added back once we confirm header
+   renders end-to-end on the server. *}
 {$mt_auth = $loggedin ? 'in' : 'out'}
-
+{$mt_layout = 'side'}
+{$mt_activeNav = ''}
 {$_tf = $templatefile|default:''}
-{$mt_activeNav = 'dashboard'}
-{if $_tf == 'clientareaproducts' || $_tf == 'clientareaproductdetails'}
-    {$mt_activeNav = 'services'}
-{elseif $_tf == 'clientareadomains' || $_tf == 'clientareadomaindetails' || $_tf == 'clientareadomaindns' || $_tf == 'clientareadomainregisterns' || $_tf == 'clientareadomaincontactinfo' || $_tf == 'clientareadomainemailforwarding' || $_tf == 'domainchecker'}
-    {$mt_activeNav = 'domains'}
-{elseif $_tf == 'clientareainvoices' || $_tf == 'viewinvoice' || $_tf == 'invoicepdf'}
-    {$mt_activeNav = 'invoices'}
-{elseif $_tf == 'clientareaquotes' || $_tf == 'viewquote'}
-    {$mt_activeNav = 'quotes'}
-{elseif $_tf == 'supporttickets' || $_tf == 'supportticketslist' || $_tf == 'supportticketsubmit' || $_tf == 'viewticket'}
-    {$mt_activeNav = 'tickets'}
-{elseif $_tf == 'knowledgebase' || $_tf == 'knowledgebasecat' || $_tf == 'knowledgebasearticle'}
-    {$mt_activeNav = 'knowledgebase'}
-{elseif $_tf == 'announcements' || $_tf == 'viewannouncement'}
-    {$mt_activeNav = 'announcements'}
-{elseif $_tf == 'clientareadetails' || $_tf == 'clientareacontacts'}
-    {$mt_activeNav = 'details'}
-{elseif $_tf == 'clientareasecurity' || $_tf == 'twofactor'}
-    {$mt_activeNav = 'security-account'}
-{elseif $_tf == 'login' || $_tf == 'register' || $_tf == 'pwreset'}
-    {$mt_activeNav = ''}
+{if $_tf == 'clientareahome'}{$mt_activeNav = 'dashboard'}
+{elseif $_tf == 'clientareaproducts' || $_tf == 'clientareaproductdetails'}{$mt_activeNav = 'services'}
+{elseif $_tf == 'clientareadomains'}{$mt_activeNav = 'domains'}
+{elseif $_tf == 'clientareainvoices' || $_tf == 'viewinvoice'}{$mt_activeNav = 'invoices'}
+{elseif $_tf == 'supporttickets' || $_tf == 'supportticketslist' || $_tf == 'viewticket'}{$mt_activeNav = 'tickets'}
+{elseif $_tf == 'clientareadetails'}{$mt_activeNav = 'details'}
 {/if}
 
 <body class="client-area-layout"
