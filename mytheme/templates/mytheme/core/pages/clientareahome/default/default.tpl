@@ -420,7 +420,6 @@
                         {assign var=_tStatus value=''}
                         {if $ticketItem->hasBadge()}{assign var=_tStatus value=$ticketItem->getBadge()}{/if}
                         {assign var=_tStatusCls value=$_tStatus|lower|replace:' ':'-'|replace:'_':'-'}
-                        {assign var=_tName value=$ticketItem->getName()}
                         {assign var=_tLabel value=$ticketItem->getLabel()}
                         {assign var=_tId value=$ticketItem->getExtra('tid')}
                         {if !$_tId}{assign var=_tId value=$ticketItem->getExtra('ticketId')}{/if}
@@ -431,8 +430,6 @@
                         {assign var=_tMeta value=''}
                         {if $_tId}
                             {assign var=_tMeta value="#"|cat:$_tId}
-                        {elseif $_tName && $_tName != $_tLabel}
-                            {assign var=_tMeta value="#"|cat:$_tName}
                         {/if}
                         {if $ticketItem->getUri()}
                             <a menuItemName="{$ticketItem->getName()}" href="{$ticketItem->getUri()}" class="service-item ticket-row{if $ticketItem->getClass()} {$ticketItem->getClass()}{/if}{if $ticketItem->isCurrent()} active{/if}" id="{$ticketItem->getId()}">

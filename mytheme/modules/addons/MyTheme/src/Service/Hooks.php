@@ -76,7 +76,7 @@ final class Hooks
 
     private function clientAreaHomepagePanels(mixed $panels, Template $template): void
     {
-        // Iteration handled in tpl rather than PHP — keeps logic visible.
+        $this->normalizeRecentTicketPanel($panels);
     }
 
     /**
@@ -192,6 +192,119 @@ final class Hooks
     }
 
     // ---------------------------------------------------------------- helpers
+
+    private function normalizeRecentTicketPanel(mixed $panels): void
+    {
+        $ticketPanel = $this->findPanel($panels, 'Recent Support Tickets');
+        if ($ticketPanel === null || !method_exists($ticketPanel, 'hasChildren') || !$ticketPanel->hasChildren()) {
+            return;
+        }
+
+        foreach ($ticketPanel->getChildren() as $ticketItem) {
+            if (!method_exists($ticketItem, 'getLabel') || !method_exists($ticketItem, 'setLabel')) {
+                continue;
+            }
+
+            $currentBadge = method_exists($ticketItem, 'hasBadge') && $ticketItem->hasBadge()
+                ? (string)$ticketItem->getBadge()
+                : '';
+            $normalized = $this->parseTicketPanelLabel((string)$ticketItem->getLabel(), $currentBadge);
+
+            if ($normalized['subject'] !== '') {
+                $ticketItem->setLabel($normalized['subject']);
+            }
+            if ($normalized['status'] !== '' && method_exists($ticketItem, 'setBadge')) {
+                $ticketItem->setBadge($normalized['status']);
+            }
+            if ($normalized['tid'] !== '' && method_exists($ticketItem, 'setExtra')) {
+                $ticketItem->setExtra('tid', $normalized['tid']);
+            }
+            if ($normalized['lastreply'] !== '' && method_exists($ticketItem, 'setExtra')) {
+                $ticketItem->setExtra('lastreply', $normalized['lastreply']);
+            }
+        }
+    }
+
+    private function findPanel(mixed $panels, string $name): mixed
+    {
+        if (method_exists($panels, 'getChild')) {
+            $child = $panels->getChild($name);
+            if ($child !== null) {
+                return $child;
+            }
+        }
+
+        if (!method_exists($panels, 'getChildren')) {
+            return null;
+        }
+
+        foreach ($panels->getChildren() as $panel) {
+            $panelName = method_exists($panel, 'getName') ? (string)$panel->getName() : '';
+            $panelLabel = method_exists($panel, 'getLabel') ? trim(strip_tags((string)$panel->getLabel())) : '';
+            if ($panelName === $name || $panelLabel === $name) {
+                return $panel;
+            }
+        }
+
+        return null;
+    }
+
+    /** @return array{subject: string, tid: string, lastreply: string, status: string} */
+    private function parseTicketPanelLabel(string $label, string $currentBadge): array
+    {
+        $withBreaks = preg_replace('/<br\s*\/?>/i', "\n", $label) ?? $label;
+        $text = preg_replace('/<[^>]+>/', ' ', $withBreaks) ?? $withBreaks;
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = preg_replace('/[ \t]+/', ' ', $text) ?? $text;
+        $text = preg_replace('/\s*\n\s*/', "\n", trim($text)) ?? trim($text);
+
+        $lines = array_values(array_filter(array_map('trim', preg_split('/\R+/', $text) ?: [])));
+        $firstLine = $lines[0] ?? $text;
+        $lastReply = '';
+        foreach ($lines as $line) {
+            if (preg_match('/^Last\s+Updated:\s*(.+)$/i', $line, $matches)) {
+                $lastReply = trim($matches[1]);
+                break;
+            }
+        }
+
+        $status = trim($currentBadge);
+        $knownStatuses = [
+            'Awaiting Reply',
+            'Customer Reply',
+            'Customer-Reply',
+            'In Progress',
+            'On Hold',
+            'Answered',
+            'Pending',
+            'Closed',
+            'Open',
+        ];
+
+        foreach ($knownStatuses as $knownStatus) {
+            if (preg_match('/\b' . preg_quote($knownStatus, '/') . '\b\s*$/i', $firstLine)) {
+                if ($status === '') {
+                    $status = str_replace('-', ' ', $knownStatus);
+                }
+                $firstLine = trim((string)preg_replace('/\b' . preg_quote($knownStatus, '/') . '\b\s*$/i', '', $firstLine));
+                break;
+            }
+        }
+
+        $ticketId = '';
+        $subject = $firstLine;
+        if (preg_match('/^(#?[A-Z0-9]+-\d+)\s+-\s+(.+)$/i', $firstLine, $matches)) {
+            $ticketId = ltrim($matches[1], '#');
+            $subject = trim($matches[2]);
+        }
+
+        return [
+            'subject'   => $subject,
+            'tid'       => $ticketId,
+            'lastreply' => $lastReply,
+            'status'    => $status,
+        ];
+    }
 
     private function extensionOutput(Template $template, array $vars, string $slot): ?string
     {
