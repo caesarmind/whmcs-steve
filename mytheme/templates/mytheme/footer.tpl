@@ -36,7 +36,7 @@
                 </div>
             </div>
             <div class="hp-footer-bottom">
-                <span>&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$LANG.allrightsreserved|default:'All rights reserved.'}</span>
+                <span>&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$LANG.allrightsreserved|default:'All rights reserved.'} <strong style="color:#ff3b30;font-weight:700;">[DEPLOY-CHECK-V5]</strong></span>
                 <div class="hp-footer-bottom-links">
                     <a href="#">{$LANG.privacypolicy|default:'Privacy Policy'}</a>
                     <a href="#">{$LANG.tos|default:'Terms of Use'}</a>
