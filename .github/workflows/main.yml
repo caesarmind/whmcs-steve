@@ -23,7 +23,7 @@ jobs:
           username: whymege
           ssh_private_key: ${{ secrets.CPANEL }}
           local_path: './mytheme/modules/addons/MyTheme/*'
-          remote_path: '/home/whymege/public_html/modules/addons/MyTheme/'
+          remote_path: 'bill.hostnodes.com/modules/addons/MyTheme/'
           sftp_only: true
 
       - name: Sync mytheme template
@@ -34,5 +34,5 @@ jobs:
           username: whymege
           ssh_private_key: ${{ secrets.CPANEL }}
           local_path: './mytheme/templates/mytheme/*'
-          remote_path: '/home/whymege/public_html/templates/mytheme/'
+          remote_path: 'bill.hostnodes.com/templates/mytheme/'
           sftp_only: true
