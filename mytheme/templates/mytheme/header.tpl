@@ -52,6 +52,9 @@
 
 {$headeroutput}
 
+{* Dev preview chip — render on ?preview=1 or for admins *}
+{include file="`$template`/includes/partials/state-chip.tpl"}
+
 {include file="`$template`/includes/partials/rail.tpl"}
 {include file="`$template`/includes/partials/sidebar.tpl"}
 
