@@ -45,15 +45,6 @@
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareaproducts.css?v={$myTheme.version|default:'1.0'}">
 
-{* DIAGNOSTIC — confirms which data source populated the list. *}
-<!-- MYTHEME-DIAG-START
-  products      isset={if isset($products)}yes{else}no{/if}  count={if isset($products)}{$products|@count}{else}-{/if}
-  mtProducts    isset={if isset($mtProducts)}yes{else}no{/if}  count={if isset($mtProducts)}{$mtProducts|@count}{else}-{/if}
-  svcList       count={$svcList|@count}
-  clientsstats.productsnumactive = {if isset($clientsstats.productsnumactive)}{$clientsstats.productsnumactive}{else}-{/if}
-  templatefile  = {$templatefile|default:'-'}
-  statusFilter  isset={if isset($statusFilter)}yes ({$statusFilter}){else}no{/if}
-MYTHEME-DIAG-END -->
 
 {* Hand layout signals to body for CSS toggles *}
 <script>
