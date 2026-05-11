@@ -55,10 +55,10 @@
         {if isset($kbarticles) && $kbarticles|@count > 0}
         <div class="card subnav-card">
             <div class="subnav-heading">{$LANG.knowledgebasepop|default:'Most popular'}</div>
-            {foreach $kbarticles as $art@idx}
-            {if $idx < 5}
+            {foreach $kbarticles as $art}
+            {if $art@iteration <= 5}
             <a href="{$WEB_ROOT}/knowledgebase.php?action=displayarticle&id={$art.id}" class="pop-row">
-                <span class="pop-rank">{$idx+1}</span>
+                <span class="pop-rank">{$art@iteration}</span>
                 <div class="pop-row-info">
                     <div class="pop-row-title">{$art.title|escape}</div>
                     {if isset($art.views)}<div class="pop-row-meta">{$art.views|escape} {$LANG.views|default:'views'}</div>{/if}
