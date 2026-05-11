@@ -114,6 +114,22 @@ if (AddonHelper::isActive()) {
         return HookService::instance()->dispatch('ClientAreaPageProductsServices', $vars);
     });
 
+    // Same belt-and-braces fallback for tickets / invoices / domains —
+    // exposes $mtTickets / $mtInvoices / $mtDomains so each list page
+    // renders even when WHMCS doesn't propagate its native variable to
+    // our included variant tpl.
+    add_hook('ClientAreaPageSupportTickets', 1, function ($vars) {
+        return HookService::instance()->dispatch('ClientAreaPageSupportTickets', $vars);
+    });
+
+    add_hook('ClientAreaPageInvoices', 1, function ($vars) {
+        return HookService::instance()->dispatch('ClientAreaPageInvoices', $vars);
+    });
+
+    add_hook('ClientAreaPageDomains', 1, function ($vars) {
+        return HookService::instance()->dispatch('ClientAreaPageDomains', $vars);
+    });
+
     // AJAX dispatch (front-side)
     if (isset($_POST['mtAction'])) {
         \MyTheme\Service\AjaxService::handle($_POST['mtAction'], $_POST);

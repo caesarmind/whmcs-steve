@@ -145,6 +145,138 @@ final class Hooks
         return ['mtProducts' => $list];
     }
 
+    /** Tickets list — populates $mtTickets on /supporttickets.php. */
+    private function clientAreaPageSupportTickets(array $vars, Template $template): array
+    {
+        $clientId = (int)($_SESSION['uid'] ?? 0);
+        if ($clientId === 0) return [];
+        return ['mtTickets' => $this->fetchAllTickets($clientId)];
+    }
+
+    /** Invoices list — populates $mtInvoices on /clientarea.php?action=invoices. */
+    private function clientAreaPageInvoices(array $vars, Template $template): array
+    {
+        $clientId = (int)($_SESSION['uid'] ?? 0);
+        if ($clientId === 0) return [];
+        return ['mtInvoices' => $this->fetchAllInvoices($clientId)];
+    }
+
+    /** Domains list — populates $mtDomains on /clientarea.php?action=domains. */
+    private function clientAreaPageDomains(array $vars, Template $template): array
+    {
+        $clientId = (int)($_SESSION['uid'] ?? 0);
+        if ($clientId === 0) return [];
+        return ['mtDomains' => $this->fetchAllDomains($clientId)];
+    }
+
+    private function fetchAllTickets(int $clientId): array
+    {
+        try {
+            $response = localAPI('GetTickets', [
+                'clientid' => $clientId,
+                'limitnum' => 100,
+            ]);
+            if (($response['result'] ?? '') !== 'success') return [];
+            $out = [];
+            foreach (($response['tickets']['ticket'] ?? []) as $t) {
+                $status      = (string)($t['status'] ?? 'Open');
+                $statusClass = strtolower(str_replace([' ', '_'], '-', $status));
+                $out[] = [
+                    'id'         => (int)($t['id'] ?? 0),
+                    'tid'        => (string)($t['tid'] ?? ''),
+                    'c'          => (string)($t['c'] ?? ''),
+                    'subject'    => (string)($t['subject'] ?? ''),
+                    'department' => (string)($t['deptname'] ?? $t['department'] ?? ''),
+                    'priority'   => (string)($t['priority'] ?? $t['urgency'] ?? 'Medium'),
+                    'status'     => $status,
+                    'statusClass'=> $statusClass,
+                    'statusclass'=> $statusClass,
+                    'unread'     => !empty($t['unread']),
+                    'lastreply'  => !empty($t['lastreply']) && $t['lastreply'] !== '0000-00-00 00:00:00'
+                        ? date('M j, Y', strtotime((string)$t['lastreply']))
+                        : '',
+                    'date'       => !empty($t['date']) ? date('M j, Y', strtotime((string)$t['date'])) : '',
+                ];
+            }
+            return $out;
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    private function fetchAllInvoices(int $clientId): array
+    {
+        try {
+            $response = localAPI('GetInvoices', [
+                'userid'   => $clientId,
+                'limitnum' => 100,
+                'orderby'  => 'date',
+                'order'    => 'desc',
+            ]);
+            if (($response['result'] ?? '') !== 'success') return [];
+            $out = [];
+            foreach (($response['invoices']['invoice'] ?? []) as $inv) {
+                $status = strip_tags((string)($inv['status'] ?? 'Unpaid'));
+                $out[] = [
+                    'id'          => (int)($inv['id'] ?? 0),
+                    'invoicenum'  => (string)($inv['invoicenum'] ?? $inv['id'] ?? ''),
+                    'invoiceid'   => (int)($inv['id'] ?? 0),
+                    'datecreated' => !empty($inv['date']) && $inv['date'] !== '0000-00-00'
+                        ? date('M j, Y', strtotime((string)$inv['date']))
+                        : '',
+                    'duedate'     => !empty($inv['duedate']) && $inv['duedate'] !== '0000-00-00'
+                        ? date('M j, Y', strtotime((string)$inv['duedate']))
+                        : '',
+                    'datepaid'    => !empty($inv['datepaid']) && $inv['datepaid'] !== '0000-00-00 00:00:00'
+                        ? date('M j, Y', strtotime((string)$inv['datepaid']))
+                        : '',
+                    'total'       => (string)($inv['total'] ?? ''),
+                    'status'      => $status,
+                    'statusLower' => strtolower($status),
+                ];
+            }
+            return $out;
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    private function fetchAllDomains(int $clientId): array
+    {
+        try {
+            $response = localAPI('GetClientsDomains', [
+                'clientid' => $clientId,
+                'limitnum' => 100,
+            ]);
+            if (($response['result'] ?? '') !== 'success') return [];
+            $out = [];
+            foreach (($response['domains']['domain'] ?? []) as $d) {
+                $status = (string)($d['status'] ?? 'Active');
+                $out[] = [
+                    'id'         => (int)($d['id'] ?? 0),
+                    'domain'     => (string)($d['domainname'] ?? ''),
+                    'domainname' => (string)($d['domainname'] ?? ''),
+                    'regdate'    => !empty($d['regdate']) && $d['regdate'] !== '0000-00-00'
+                        ? date('M j, Y', strtotime((string)$d['regdate']))
+                        : '',
+                    'nextduedate'=> !empty($d['nextduedate']) && $d['nextduedate'] !== '0000-00-00'
+                        ? date('M j, Y', strtotime((string)$d['nextduedate']))
+                        : '',
+                    'expirydate' => !empty($d['expirydate']) && $d['expirydate'] !== '0000-00-00'
+                        ? date('M j, Y', strtotime((string)$d['expirydate']))
+                        : '',
+                    'status'     => $status,
+                    'statusLower'=> strtolower($status),
+                    'autorenew'  => !empty($d['donotrenew']) ? false : true,
+                    'registrar'  => (string)($d['registrar'] ?? ''),
+                ];
+            }
+            return $out;
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
     /** Full product list (all statuses) shaped for clientareaproducts.tpl. */
     private function fetchAllProducts(int $clientId): array
     {

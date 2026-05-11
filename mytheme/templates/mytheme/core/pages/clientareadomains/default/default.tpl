@@ -8,24 +8,30 @@
      $numdomains       — total domain count
 *}
 
-{* Resolve totals + empty/full state *}
-{if isset($domains) && $domains|count > 0}
+{* Prefer WHMCS-native $domains; fall back to $mtDomains populated by
+   Hooks::clientAreaPageDomains via localAPI when WHMCS doesn't expose
+   $domains in our included tpl scope. *}
+{if isset($domains) && $domains|@count > 0}
+    {assign var=domList value=$domains}
+{elseif isset($mtDomains) && $mtDomains|@count > 0}
+    {assign var=domList value=$mtDomains}
+{else}
+    {assign var=domList value=[]}
+{/if}
+{assign var=domCount value=$domList|@count}
+{if $domCount > 0}
     {assign var=dashIsEmpty value='full'}
-    {assign var=domCount value=$domains|count}
 {else}
     {assign var=dashIsEmpty value='empty'}
-    {assign var=domCount value=0}
 {/if}
 
 {* Count expiring soon (next 30 days bucket) — naive: rely on status flag if supplied *}
 {assign var=expiringCount value=0}
-{if isset($domains) && $domains|count > 0}
-    {foreach $domains as $_d}
-        {if isset($_d.status) && ($_d.status == 'Expiring Soon' || $_d.status == 'Expired')}
-            {assign var=expiringCount value=$expiringCount+1}
-        {/if}
-    {/foreach}
-{/if}
+{foreach $domList as $_d}
+    {if isset($_d.status) && ($_d.status == 'Expiring Soon' || $_d.status == 'Expired')}
+        {assign var=expiringCount value=$expiringCount+1}
+    {/if}
+{/foreach}
 
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareadomains.css?v={$myTheme.version|default:'1.0'}">
@@ -94,11 +100,11 @@
 
             <div class="card dom-list-card">
 
-                {if isset($domains) && $domains|count > 0}
+                {if $domCount > 0}
                 <div class="when-full">
                     <div class="card-body">
                         <div class="domain-list">
-                            {foreach $domains as $d}
+                            {foreach $domList as $d}
                             {assign var=statusLower value=$d.status|lower}
                             <div class="domain-row" data-href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}" role="link" tabindex="0">
                                 <div class="domain-name">{$d.domain|escape}</div>

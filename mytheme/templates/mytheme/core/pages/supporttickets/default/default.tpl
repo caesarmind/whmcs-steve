@@ -6,13 +6,34 @@
      $openOnly      — bool — when true, only open tickets are shown
 *}
 
-{if isset($tickets) && $tickets|count > 0}
+{* Prefer WHMCS-native $tickets; fall back to $mtTickets populated by
+   Hooks::clientAreaPageSupportTickets via localAPI when WHMCS doesn't
+   propagate $tickets into our included tpl scope. *}
+{if isset($tickets) && $tickets|@count > 0}
+    {assign var=tkList value=$tickets}
+{elseif isset($mtTickets) && $mtTickets|@count > 0}
+    {assign var=tkList value=$mtTickets}
+{else}
+    {assign var=tkList value=[]}
+{/if}
+{assign var=tkCount value=$tkList|@count}
+{if $tkCount > 0}
     {assign var=dashIsEmpty value='full'}
-    {assign var=tkCount value=$tickets|count}
 {else}
     {assign var=dashIsEmpty value='empty'}
-    {assign var=tkCount value=0}
 {/if}
+{assign var=tkUnreadCount value=0}
+{assign var=tkUnreadTid value=''}
+{assign var=tkUnreadC value=''}
+{foreach $tkList as $tkt}
+    {if !empty($tkt.unread)}
+        {assign var=tkUnreadCount value=$tkUnreadCount+1}
+        {if !$tkUnreadTid}
+            {assign var=tkUnreadTid value=$tkt.tid}
+            {assign var=tkUnreadC value=$tkt.c|default:''}
+        {/if}
+    {/if}
+{/foreach}
 
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/supporttickets.css?v={$myTheme.version|default:'1.0'}">
@@ -45,9 +66,23 @@
 <div class="tk-split">
     <div class="tk-main">
 
+        {if $tkUnreadCount > 0}
+        <div class="tk-banner when-full">
+            <span class="tk-banner-ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </span>
+            <span><strong>{$tkUnreadCount} {if $tkUnreadCount == 1}{$LANG.ticket|default:'ticket'}{else}{$LANG.tickets|default:'tickets'}{/if}</strong> {$LANG.ticketnewreply|default:'has a new reply from our team.'}</span>
+            <span class="spacer"></span>
+            {if $tkUnreadTid}<a href="{$WEB_ROOT}/viewticket.php?tid={$tkUnreadTid|escape}{if $tkUnreadC}&c={$tkUnreadC|escape}{/if}" class="btn-secondary">{$LANG.viewreplies|default:'View replies'}</a>{/if}
+        </div>
+        {/if}
+
         <div class="filter-tabs when-full">
-            <a href="{$WEB_ROOT}/supporttickets.php" class="filter-tab{if !$openOnly} active{/if}">{$LANG.all|default:'All'}</a>
-            <a href="{$WEB_ROOT}/supporttickets.php?openonly=true" class="filter-tab{if $openOnly} active{/if}">{$LANG.supportticketsstatusopen|default:'Open'}</a>
+            <button type="button" class="filter-tab active" data-ticket-filter="all">{$LANG.all|default:'All'}</button>
+            <button type="button" class="filter-tab" data-ticket-filter="open">{$LANG.supportticketsstatusopen|default:'Open'}</button>
+            <button type="button" class="filter-tab" data-ticket-filter="answered">{$LANG.supportticketsstatusanswered|default:'Answered'}</button>
+            <button type="button" class="filter-tab" data-ticket-filter="customer-reply">{$LANG.supportticketsstatuscustomerreply|default:'Customer-reply'}</button>
+            <button type="button" class="filter-tab" data-ticket-filter="closed">{$LANG.supportticketsstatusclosed|default:'Closed'}</button>
         </div>
 
         <div class="tk-stack">
@@ -71,20 +106,22 @@
                     <a href="{$WEB_ROOT}/submitticket.php" class="btn-primary">{$LANG.opennewticket|default:'Open a ticket'}</a>
                 </div>
 
-                {if isset($tickets) && $tickets|count > 0}
+                {if $tkCount > 0}
                 <div class="tk-list when-full">
-                    {foreach $tickets as $tkt}
-                    {assign var=tktStatusClass value=$tkt.statusclass|default:$tkt.status|lower|replace:' ':'-'}
+                    {foreach $tkList as $tkt}
+                    {assign var=tktStatusClass value=$tkt.statusClass|default:$tkt.statusclass|default:$tkt.status|lower|replace:' ':'-'|replace:'_':'-'}
+                    {assign var=tktPriority value=$tkt.priority|default:$tkt.urgency|default:''|lower|replace:' ':'-'}
                     <div class="tk-row" data-href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape}{if isset($tkt.c) && $tkt.c}&c={$tkt.c|escape}{/if}">
                         <div>
                             <div class="tk-subject-cell">
                                 <div class="tk-subject-id">#{$tkt.tid|escape}</div>
-                                <div class="tk-subject-title">{$tkt.subject|escape}</div>
+                                <div class="tk-subject-title">{if $tktPriority == 'high' || $tktPriority == 'medium'}<span class="tk-prio-dot {$tktPriority}"></span>{/if}{$tkt.subject|escape}</div>
                             </div>
                         </div>
                         <div>{$tkt.department|default:''|escape}</div>
-                        <div><span class="status-pill {$tktStatusClass}">{$tkt.status|escape}</span></div>
+                        <div><span class="status-pill {$tktStatusClass}"{if !empty($tkt.statusColor)} style="background-color:{$tkt.statusColor|escape};color:#fff"{/if}>{$tkt.status|strip_tags|escape}</span></div>
                         <div>
+                            {if !empty($tkt.normalisedLastReply)}<span class="sr-only">{$tkt.normalisedLastReply|escape}</span>{/if}
                             <div class="tk-updated-date">{$tkt.lastreply|default:''|escape}</div>
                         </div>
                     </div>
@@ -148,3 +185,58 @@
         </div>
     </aside>
 </div>{* /.tk-split *}
+
+<script>
+(function () {
+    function ready(fn) {
+        if (document.readyState !== 'loading') fn();
+        else document.addEventListener('DOMContentLoaded', fn);
+    }
+
+    ready(function () {
+        document.querySelectorAll('.tk-row[data-href]').forEach(function (row) {
+            row.setAttribute('tabindex', '0');
+            row.setAttribute('role', 'link');
+            row.addEventListener('click', function (e) {
+                if (e.target.closest('a, button, input, select')) return;
+                window.location.href = row.dataset.href;
+            });
+            row.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    window.location.href = row.dataset.href;
+                }
+            });
+        });
+
+        document.querySelectorAll('[data-ticket-filter]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var filter = btn.dataset.ticketFilter || 'all';
+                document.querySelectorAll('[data-ticket-filter]').forEach(function (tab) {
+                    tab.classList.toggle('active', tab === btn);
+                });
+                document.querySelectorAll('.tk-row').forEach(function (row) {
+                    var statusEl = row.querySelector('.status-pill');
+                    var status = statusEl ? statusEl.textContent.toLowerCase().replace(/\s+/g, '-') : '';
+                    row.hidden = filter !== 'all' && status !== filter;
+                });
+            });
+        });
+
+        document.querySelectorAll('.tk-sort').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var currentDir = btn.dataset.dir || '';
+                var nextDir = currentDir === '' ? 'asc' : currentDir === 'asc' ? 'desc' : '';
+                document.querySelectorAll('.tk-sort').forEach(function (other) {
+                    if (other !== btn) {
+                        other.dataset.dir = '';
+                        other.classList.remove('active');
+                    }
+                });
+                btn.dataset.dir = nextDir;
+                btn.classList.toggle('active', nextDir !== '');
+            });
+        });
+    });
+})();
+</script>

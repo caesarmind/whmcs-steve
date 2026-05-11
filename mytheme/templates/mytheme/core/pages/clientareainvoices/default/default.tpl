@@ -9,27 +9,34 @@
      $numinvoices      — total invoice count
 *}
 
-{* Resolve totals + empty/full state *}
-{if isset($invoices) && $invoices|count > 0}
+{* Prefer WHMCS-native $invoices; fall back to $mtInvoices populated by
+   Hooks::clientAreaPageInvoices via localAPI when WHMCS doesn't expose
+   $invoices in our included tpl scope. *}
+{if isset($invoices) && $invoices|@count > 0}
+    {assign var=invList value=$invoices}
+{elseif isset($mtInvoices) && $mtInvoices|@count > 0}
+    {assign var=invList value=$mtInvoices}
+{else}
+    {assign var=invList value=[]}
+{/if}
+{assign var=invCount value=$invList|@count}
+{if $invCount > 0}
     {assign var=dashIsEmpty value='full'}
-    {assign var=invCount value=$invoices|count}
 {else}
     {assign var=dashIsEmpty value='empty'}
-    {assign var=invCount value=0}
 {/if}
 
 {assign var=currentFilter value=$statusFilter|default:''}
 
-{* Tally unpaid amount *}
+{* Tally unpaid count. Use strip_tags because WHMCS sometimes returns
+   $invoice.status wrapped in <span class="textred">...</span> markup. *}
 {assign var=unpaidCount value=0}
-{assign var=unpaidTotal value=0}
-{if isset($invoices) && $invoices|count > 0}
-    {foreach $invoices as $_i}
-        {if isset($_i.status) && ($_i.status == 'Unpaid' || $_i.status == 'Overdue')}
-            {assign var=unpaidCount value=$unpaidCount+1}
-        {/if}
-    {/foreach}
-{/if}
+{foreach $invList as $_i}
+    {assign var=_st value=$_i.status|strip_tags}
+    {if $_st == 'Unpaid' || $_st == 'Overdue'}
+        {assign var=unpaidCount value=$unpaidCount+1}
+    {/if}
+{/foreach}
 
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareainvoices.css?v={$myTheme.version|default:'1.0'}">
@@ -105,7 +112,7 @@
                     <a href="{$WEB_ROOT}/cart.php" class="btn-secondary">{$LANG.browseservices|default:'Browse services'}</a>
                 </div>
 
-                {if isset($invoices) && $invoices|count > 0}
+                {if $invCount > 0}
                 <table class="inv-table when-full">
                     <colgroup>
                         <col class="inv-col-invoice">
@@ -116,8 +123,11 @@
                         <col class="inv-col-actions">
                     </colgroup>
                     <tbody>
-                        {foreach $invoices as $inv}
-                        {assign var=invStatusLower value=$inv.status|lower}
+                        {foreach $invList as $inv}
+                        {* WHMCS returns $inv.status wrapped in <span class="textred">...</span>
+                           when overdue — strip tags before using anywhere. *}
+                        {assign var=invStatus value=$inv.status|strip_tags}
+                        {assign var=invStatusLower value=$invStatus|lower}
                         {if isset($inv.invoicenum) && $inv.invoicenum}{assign var=invDisplayNum value=$inv.invoicenum}{else}{assign var=invDisplayNum value=$inv.id}{/if}
                         <tr data-href="{$WEB_ROOT}/viewinvoice.php?id={$inv.id}">
                             <td>
@@ -129,7 +139,7 @@
                             <td class="date">{$inv.datecreated|escape}</td>
                             <td class="date">{$inv.duedate|escape}</td>
                             <td class="amount{if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'} due{/if}">{$inv.total|escape}</td>
-                            <td><span class="status-pill {$invStatusLower}">{$inv.status|escape}</span></td>
+                            <td><span class="status-pill {$invStatusLower}">{$invStatus|escape}</span></td>
                             <td class="actions">
                                 <div class="inv-menu-wrap" onclick="event.stopPropagation();">
                                     <button type="button" class="inv-menu-btn" aria-label="{$LANG.actions|default:'Actions'}" aria-haspopup="true" aria-expanded="false" onclick="toggleInvMenu(this, event)">
