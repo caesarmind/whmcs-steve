@@ -185,6 +185,8 @@ add_hook('ClientAreaPage<X>', 1, function ($vars) {
 | `$myTheme.layouts['main-menu']` | `$myTheme.layouts.main-menu` (hyphen parsed as subtraction) |
 | Strip-tags before using a value as a CSS class | Pipe a value through `\|lower\|escape` straight into an HTML attribute when WHMCS may wrap it in `<span>` |
 | Wrap nested `$myTheme.x.y` access in `isset()` chain | Rely on `\|default:''` to catch failures — it doesn't fire if the chain blows up first |
+| `{foreach $list as $row}{if $row@iteration <= 5}` | `{foreach $list as $row@idx}{if $idx < 5}` — Smarty doesn't accept custom iterator names; this is a silent compile failure that empties the content-area. Use `@iteration` (1-based) or `@index` (0-based) on the loop var itself |
+| Wrap inline `<script>` and `<style>` bodies in `{literal}…{/literal}` | Leave `{` from JS object literals or CSS selectors exposed — Smarty parses them as directives and bails mid-template |
 
 ---
 
@@ -616,7 +618,10 @@ Before pushing, run through:
 
 - [ ] All five files exist on disk (dispatcher, page.php, default.tpl, pageoption.php, page CSS)
 - [ ] `git status` shows all five files staged or already tracked (gitignore traps caught domains/invoices CSS — verify with `git ls-files | grep <page>`)
+- [ ] **Dispatcher is named after the WHMCS templatefile, not the URL slug**: `/supporttickets.php` → `supportticketslist.tpl`, `/announcements.php?id=X` → `viewannouncement.tpl`, etc. If unsure, add a temporary `<!-- tpl: {$templatefile} -->` to `header.tpl` and `curl` the live page after deploy. Trap: building `<urlslug>.tpl` instead of `<templatefile>.tpl` produces an HTTP 200 with an empty `.content-area` because WHMCS can't find a matching tpl.
 - [ ] Smarty assignments use `{assign}`, not `{$x = y}`
+- [ ] `{foreach}` loops use the iterator's built-in `@iteration` / `@index` properties — no `{foreach $x as $y@custom}` (invalid syntax, silent compile failure that empties the content-area)
+- [ ] Inline `<script>` (and `<style>` if it contains `{...}`) bodies are wrapped in `{literal}…{/literal}` so Smarty doesn't parse JS curly braces
 - [ ] No bare `$myTheme.layouts['…']` chain — always `isset()`-guarded
 - [ ] No `$x|lower|escape` straight into a class attr when `$x` may contain HTML (e.g. WHMCS invoice statuses)
 - [ ] If both `when-empty` and `when-full` markup coexist, the universal CSS toggle in `apple-layout.css` is **uncommented**
@@ -696,6 +701,13 @@ Visual checks (real browser):
 - **GitHub Action deploys files but doesn't clear `templates_c/`** → manual cPanel wipe needed after every push that changes `.tpl` files.
 - **Browser caches CSS aggressively** → bump the `?v=` query string in page tpls when changing CSS, or hard-refresh / use incognito to verify.
 - **Top-level dispatcher checks `file_exists` against `"templates/$path"`** → that path is **relative to WHMCS root**, not the tpl's location. Don't refactor it to absolute.
+- **Custom foreach iterator names `{foreach $x as $y@idx}` are invalid Smarty** → Smarty doesn't let you rename the iterator properties; trying to do so is a silent compile failure. Use the loop variable's properties directly: `{foreach $x as $y}{if $y@iteration <= 5}…` for 1-based count, or `$y@index` for 0-based. Same trap can appear with `$y@n` / `$y@i` / any custom suffix. Got bit by this in `knowledgebase/default/default.tpl` (commit `7859422`) — the whole content-area rendered empty because Smarty 4 won't compile the template at all.
+- **URL path ≠ WHMCS templatefile** → `/supporttickets.php` is routed through templatefile `supportticketslist`, not `supporttickets`. `/announcements.php?id=X` uses `viewannouncement`, not `announcements`. The dispatcher tpl you need is named after the **templatefile**, not the URL slug. Verification: `view-source:` the live page and look at `data-page-title` in the body tag — that's the WHMCS pageTitle, which usually maps closely to the templatefile. Or add `<!-- tpl: {$templatefile} -->` to header.tpl temporarily. Got bit by this in commit `02e5101` — `supportticketslist.tpl` + `core/pages/supportticketslist/` were never committed, so the live server had no dispatcher for the page and the content-area rendered empty.
+- **Empty `.content-area` on view-source = silent Smarty compile failure OR missing dispatcher** → page renders HTTP 200, header + sidebar + footer all paint correctly, but `<div class="content-area">` contains only whitespace. Two top causes:
+  1. Smarty parse error in the page's `default.tpl` (invalid syntax, unbalanced tags, modifier-on-wrong-type). Smarty 4 in production mode swallows the error and emits nothing for that include.
+  2. WHMCS's templatefile doesn't resolve to any tpl on disk (either the dispatcher file is missing, or it's untracked in git so never deployed via the SFTP action).
+
+  Debug flow: (a) `view-source:`, locate `.content-area`, confirm it's empty. (b) Search for the template's class hooks in the source — if they're entirely absent, the include never ran. (c) `git ls-files | grep <page>` on local repo to confirm everything is tracked. (d) `curl -sI https://bill.hostnodes.com/templates/mytheme/<page>.tpl` to confirm the file is on the live server. (e) If on-disk but still empty, suspect Smarty syntax — `php -l` won't catch this; eyeball the tpl for `$x@custom` iterators, unbalanced `{if}`/`{/if}`, or modifier chains where one step doesn't accept the previous step's output type.
 
 ---
 
