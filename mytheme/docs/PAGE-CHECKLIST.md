@@ -705,31 +705,54 @@ Visual checks (real browser):
 
 ---
 
-## 9. Pages status (live as of `231ba2f`)
+## 9. Pages status (live as of `b42bfe7`)
 
-| Page | Dispatcher | page.php | default.tpl | pageoption | CSS | Hook | Status |
-|---|---|---|---|---|---|---|---|
-| `clientareahome` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **Live** |
-| `clientareaproducts` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **Live** |
-| `clientareadomains` | ✅ | ? | ✅ | ? | ✅ (just added) | ✅ | **Live** |
-| `clientareainvoices` | ✅ | ? | ✅ | ? | ✅ (just added) | ✅ | **Live** |
-| `supporttickets` | ✅ | ? | ✅ | ? | ✅ (just added) | ✅ | Awaiting `templates_c/` clear |
-| `supportticketslist` | ✅ | ? | ✅ (forwarder) | ? | uses supporttickets | — | Same as above |
-| `viewinvoice` | ✅ | ? | ✅ | ? | ❌ **missing** | ❌ | Renders without per-page CSS |
-| `viewticket` | ✅ | ? | ✅ | ? | ❌ missing | ❌ | Not yet checked |
-| `clientareadetails` | ✅ | ? | ✅ | ? | ❌ missing | ❌ | Not yet checked |
-| `login` | ✅ | ✅ | ✅ | ✅ | ✅ | — | **Live** |
-| `homepage` | ✅ | ✅ | ✅ | ✅ | ✅ | — | **Live** |
-| `announcements` | ✅ | ? | ✅ | ? | ❌ missing | — | Not yet checked |
-| `clientareaproductdetails` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | TODO |
-| `clientareadomaindetails` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | TODO |
-| `clientareaquotes` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | TODO |
-| `clientareasecurity` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | TODO |
-| `clientareacancelrequest` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | TODO |
-| `submitticket` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | TODO |
-| `register` (clientregister) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | TODO |
-| `pwreset` (password-reset) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | TODO |
-| `cart.php` (order form) | — | — | — | — | — | — | Out of scope (different system) |
+**60 WHMCS pages covered.** Every page has the 5-file skeleton (dispatcher + page.php + default.tpl + pageoption.php + page CSS) and passes `scripts/check-pages.sh files lint` locally. Polish level varies — list below.
+
+### Full content (real WHMCS variables wired, polished UI)
+
+| Group | Pages |
+|---|---|
+| Core client area | clientareahome, clientareaproducts, clientareadomains, clientareainvoices, clientareaquotes, clientareadetails, clientareasecurity |
+| Support | supporttickets (+ supportticketslist forwarder), supportticketsubmit, viewticket |
+| Billing | viewinvoice (full CSS adapted from mockup), clientareaaddfunds, invoice-payment, account-paymentmethods, masspay |
+| Content | announcements, viewannouncement, knowledgebase, knowledgebasecat, knowledgebasearticle |
+| Auth | login, homepage, clientregister, pwreset (+ password-reset-{container,email-prompt,security-prompt,change-prompt} forwarders), two-factor-challenge, two-factor-new-backup-code, user-verify-email, user-invite-accept |
+| Account | contact, clientareaproductdetails |
+
+Localapi `mt*` fallback hooks registered: `ClientAreaPageProductsServices`, `ClientAreaPageDomains`, `ClientAreaPageInvoices`, `ClientAreaPageQuotes`, `ClientAreaPageSupportTickets`, `ClientAreaPageHome`.
+
+### Scaffolded (5-file skeleton in place, WHMCS variable wiring pending)
+
+These pages render a real H1 + page-prefixed div + working CSS link so they exist functionally and pass `scripts/check-pages.sh files lint`. Each needs follow-up to layer in real WHMCS variable rendering. Listed by group to make backlog work easy to batch:
+
+| Group | Pages |
+|---|---|
+| Domain ops | clientareadomaindetails, clientareadomaindns, clientareadomainemailforwarding, clientareadomainregisterns, clientareadomaingetepp, clientareadomainaddons, clientareadomaincontactinfo, bulkdomainmanagement, domain-pricing |
+| Billing detail | viewquote, clientareacancelrequest, subscription-manage, usagebillingpricing, account-paymentmethods-manage, account-paymentmethods-billing-contacts |
+| Upgrade flow | upgrade, upgrade-configure, upgradesummary |
+| Account contacts / users | account-contacts-manage, account-contacts-new, account-user-management, account-user-permissions |
+| Account misc | clientareaemails, viewemail |
+| SSL | configuressl-stepone, configuressl-steptwo, configuressl-complete, managessl |
+| Ticket submit variants | supportticketsubmit-customfields, supportticketsubmit-kbsuggestions, supportticketsubmit-confirm |
+| Public info | serverstatus, downloads, downloadscat |
+| Utility / error | access-denied, banned, 3dsecure, markdown-guide, downloaddenied, ticketfeedback |
+
+### Out of scope
+
+| Page | Reason |
+|---|---|
+| `cart.php` (order form) | Different theme system — order-form templates live in a separate directory hierarchy outside `templates/mytheme/`. |
+
+### Workflow for filling in a scaffolded page
+
+1. Pick page from the "Scaffolded" list.
+2. Identify the matching pattern from §1 (P1 list / P2 detail / P3 wizard / P4 form / P5 static) and the reference page in §1's pattern matrix.
+3. Copy reference page's `default.tpl` structure, swap class prefix.
+4. Wire WHMCS variables — verify variable names via the cross-check methods in §10 ("Gating on a WHMCS variable that doesn't exist").
+5. Adapt CSS from the matching `apple-client-area/<page>.html` mockup style block (strip `body { display: block }` per §6 rule 5, scope `data-subnav-side="outside"` rules per §6c).
+6. Run `bash scripts/check-pages.sh files lint <page>` locally — must pass.
+7. Commit, push, wipe `templates_c/`, run `bash scripts/check-pages.sh live assets <page>`.
 
 ---
 
