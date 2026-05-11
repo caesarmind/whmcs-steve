@@ -133,60 +133,41 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .tk-main .filter-tabs { flex-wrap: wrap; }
 .tk-main .filter-tab { white-space: nowrap; }
 
-/* Row layout */
-.tk-list { display: flex; flex-direction: column; }
-.tk-row {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 16px 20px;
-    transition: background var(--transition-fast);
-    border-bottom: none;
-    color: var(--color-text-primary);
+/* Table layout (DataTables-compatible — see PAGE-CHECKLIST §6f) */
+.tk-table {
+    width: 100%;
+    border-collapse: collapse;
     font-size: 13px;
-    letter-spacing: -0.008em;
+    table-layout: fixed;
 }
-.tk-row[data-href] { cursor: pointer; }
-.tk-row:hover { background: var(--color-surface-secondary); }
-.tk-row > :nth-child(1) { flex: 0 1 auto; min-width: 0; max-width: 180px; }
-.tk-row > :nth-child(2) { margin-left: auto; flex: 0 0 120px; }
-.tk-row > :nth-child(3) { flex: 0 0 100px; }
-.tk-row > :nth-child(4) { flex: 0 0 130px; }
-.tk-row[hidden] { display: none !important; }
-
-.tk-table-head-row {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 2px 20px;
+.tk-table col.tk-col-subject    { width: auto; }
+.tk-table col.tk-col-department { width: 160px; }
+.tk-table col.tk-col-status     { width: 130px; }
+.tk-table col.tk-col-updated    { width: 140px; }
+.tk-table thead th {
+    padding: 10px 20px 6px;
     font-size: 11px;
     font-weight: 600;
     color: var(--color-text-tertiary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-}
-.tk-table-head-row > :nth-child(1) { flex: 0 1 auto; min-width: 0; max-width: 180px; text-align: left; }
-.tk-table-head-row > :nth-child(2) { margin-left: auto; flex: 0 0 120px; text-align: left; }
-.tk-table-head-row > :nth-child(3) { flex: 0 0 100px; text-align: left; }
-.tk-table-head-row > :nth-child(4) { flex: 0 0 130px; text-align: left; }
-
-.tk-sort {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: none;
+    text-align: left;
+    background: transparent;
     border: 0;
     cursor: pointer;
-    color: inherit;
-    font: inherit;
-    letter-spacing: inherit;
-    text-transform: inherit;
-    padding: 0;
-    font-family: inherit;
+    user-select: none;
+    white-space: nowrap;
 }
-.tk-sort-ico { position: relative; width: 10px; height: 12px; flex-shrink: 0; }
-.tk-sort-ico::before,
-.tk-sort-ico::after {
+.tk-table thead th .tk-sort-ico {
+    display: inline-block;
+    position: relative;
+    width: 10px;
+    height: 12px;
+    vertical-align: middle;
+    margin-left: 4px;
+}
+.tk-table thead th .tk-sort-ico::before,
+.tk-table thead th .tk-sort-ico::after {
     content: "";
     position: absolute;
     left: 2px;
@@ -194,11 +175,28 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
     border-right: 3px solid transparent;
     opacity: 0.3;
 }
-.tk-sort-ico::before { top: 1px; border-bottom: 4px solid currentColor; }
-.tk-sort-ico::after { bottom: 1px; border-top: 4px solid currentColor; }
-.tk-sort[data-dir="asc"] .tk-sort-ico::before { opacity: 1; }
-.tk-sort[data-dir="desc"] .tk-sort-ico::after { opacity: 1; }
-.tk-sort.active { color: var(--color-text-primary); }
+.tk-table thead th .tk-sort-ico::before { top: 1px; border-bottom: 4px solid currentColor; }
+.tk-table thead th .tk-sort-ico::after  { bottom: 1px; border-top: 4px solid currentColor; }
+/* DataTables sort-state classes — active column lights up its arrow */
+.tk-table thead th.sorting_asc, .tk-table thead th.sorting_desc { color: var(--color-text-primary); }
+.tk-table thead th.sorting_asc  .tk-sort-ico::before { opacity: 1; }
+.tk-table thead th.sorting_desc .tk-sort-ico::after  { opacity: 1; }
+.tk-table tbody tr {
+    transition: background var(--transition-fast);
+    color: var(--color-text-primary);
+    font-size: 13px;
+    letter-spacing: -0.008em;
+}
+.tk-table tbody tr[data-href] { cursor: pointer; }
+.tk-table tbody tr:hover { background: var(--color-surface-secondary); }
+.tk-table tbody tr[hidden] { display: none !important; }
+.tk-table tbody td {
+    padding: 16px 20px;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
 .tk-subject-cell { min-width: 0; }
 .tk-subject-id { font-size: 12px; font-weight: 500; color: var(--color-accent); letter-spacing: -0.003em; }
@@ -233,9 +231,10 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
     overflow: visible;
     margin-bottom: 24px;
 }
-.tk-stack .tk-list .tk-row:first-child { border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); }
-.tk-stack .tk-list .tk-row:last-child { border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); }
-.tk-stack > .tk-table-head-row { padding: 10px 20px 6px; margin: 0; }
+.tk-stack .tk-table tbody tr:first-child td:first-child { border-top-left-radius: var(--radius-md); }
+.tk-stack .tk-table tbody tr:first-child td:last-child  { border-top-right-radius: var(--radius-md); }
+.tk-stack .tk-table tbody tr:last-child  td:first-child { border-bottom-left-radius: var(--radius-md); }
+.tk-stack .tk-table tbody tr:last-child  td:last-child  { border-bottom-right-radius: var(--radius-md); }
 .tk-stack > .tk-table-card { background: transparent; border: 0; box-shadow: none; border-radius: 0; margin: 0; overflow: visible; }
 .tk-stack > .tk-footer { margin: 0; padding: 10px 20px 14px; }
 
@@ -249,7 +248,6 @@ body[data-svc-layout="outside"] .tk-stack {
     gap: 8px;
     margin-bottom: 24px;
 }
-body[data-svc-layout="outside"] .tk-stack > .tk-table-head-row { padding: 2px 20px; }
 body[data-svc-layout="outside"] .tk-stack > .tk-table-card {
     background: var(--color-surface);
     border: 0.5px solid var(--color-border);
@@ -364,12 +362,18 @@ body:not([data-data="empty"]) .when-empty { display: none; }
     .tk-main .filter-tabs { width: 100%; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; -ms-overflow-style: none; }
     .tk-main .filter-tabs::-webkit-scrollbar { display: none; }
     .tk-main .filter-tab { flex: 0 0 auto; }
-    .tk-table-head-row { display: none; }
-    .tk-row { display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; padding: 16px; }
-    .tk-row > :nth-child(1) { grid-column: 1 / -1; max-width: none; }
-    .tk-row > :nth-child(2) { margin-left: 0; flex: none; color: var(--color-text-secondary); }
-    .tk-row > :nth-child(3) { flex: none; justify-self: end; }
-    .tk-row > :nth-child(4) { grid-column: 1 / -1; flex: none; color: var(--color-text-tertiary); }
+    .tk-table thead,
+    .tk-table colgroup { display: none; }
+    .tk-table,
+    .tk-table tbody,
+    .tk-table tr,
+    .tk-table td { display: block; width: 100%; }
+    .tk-table tbody tr { display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; padding: 16px; }
+    .tk-table tbody td { padding: 0; white-space: normal; overflow: visible; text-overflow: clip; }
+    .tk-table tbody td:nth-child(1) { grid-column: 1 / -1; max-width: none; }
+    .tk-table tbody td:nth-child(2) { color: var(--color-text-secondary); }
+    .tk-table tbody td:nth-child(3) { justify-self: end; }
+    .tk-table tbody td:nth-child(4) { grid-column: 1 / -1; color: var(--color-text-tertiary); }
     .tk-subject-title { max-width: none; white-space: normal; line-height: 1.35; }
     .tk-stack > .tk-footer { padding: 12px 16px 16px; }
     .tk-footer .spacer { display: none; }

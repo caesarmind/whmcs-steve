@@ -189,6 +189,7 @@ final class Hooks
             foreach (($response['tickets']['ticket'] ?? []) as $t) {
                 $status      = (string)($t['status'] ?? 'Open');
                 $statusClass = strtolower(str_replace([' ', '_'], '-', $status));
+                $lastReplyRaw = (string)($t['lastreply'] ?? '');
                 $out[] = [
                     'id'         => (int)($t['id'] ?? 0),
                     'tid'        => (string)($t['tid'] ?? ''),
@@ -200,12 +201,33 @@ final class Hooks
                     'statusClass'=> $statusClass,
                     'statusclass'=> $statusClass,
                     'unread'     => !empty($t['unread']),
-                    'lastreply'  => !empty($t['lastreply']) && $t['lastreply'] !== '0000-00-00 00:00:00'
-                        ? date('M j, Y', strtotime((string)$t['lastreply']))
+                    'lastreply'  => !empty($lastReplyRaw) && $lastReplyRaw !== '0000-00-00 00:00:00'
+                        ? date('M j, Y', strtotime($lastReplyRaw))
                         : '',
                     'date'       => !empty($t['date']) ? date('M j, Y', strtotime((string)$t['date'])) : '',
+                    // Raw sort value for DataTables data-order attribute. ISO-ish so
+                    // localeCompare() in JS sorts chronologically.
+                    '_sort_lastreply_raw' => $lastReplyRaw,
                 ];
             }
+
+            // URL-driven sort — mirrors fetchAllInvoices for initial render + no-JS fallback.
+            $orderby = (string)($_GET['orderby'] ?? 'updated');
+            $sort    = strtoupper((string)($_GET['sort'] ?? 'DESC'));
+            if (!in_array($sort, ['ASC', 'DESC'], true)) {
+                $sort = 'DESC';
+            }
+            $cmp = match ($orderby) {
+                'subject'    => fn($a, $b) => strcasecmp($a['subject'], $b['subject']),
+                'department' => fn($a, $b) => strcasecmp($a['department'], $b['department']),
+                'status'     => fn($a, $b) => strcasecmp($a['status'], $b['status']),
+                default      => fn($a, $b) => strcmp($a['_sort_lastreply_raw'], $b['_sort_lastreply_raw']),
+            };
+            usort($out, $cmp);
+            if ($sort === 'DESC') {
+                $out = array_reverse($out);
+            }
+
             return $out;
         } catch (\Throwable) {
             return [];

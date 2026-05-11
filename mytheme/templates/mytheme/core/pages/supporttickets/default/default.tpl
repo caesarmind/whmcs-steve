@@ -37,6 +37,10 @@
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/supporttickets.css?v={$myTheme.version|default:'1.0'}">
 
+{* Lagom-style instant sort: jQuery 3.x + DataTables 1.x for client-side reorder. *}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
+
 <script>
 (function () {
     var b = document.body;
@@ -84,14 +88,19 @@
             <button type="button" class="filter-tab" data-ticket-filter="closed">{$LANG.supportticketsstatusclosed|default:'Closed'}</button>
         </div>
 
-        <div class="tk-stack">
+        {* Sort: DataTables.js handles instant client-side sort on header click.
+           Server returns rows pre-sorted per URL ?orderby=KEY&sort=ASC|DESC via
+           Hooks::fetchAllTickets for initial render + no-JS fallback. *}
+        {assign var=sortKey value=$smarty.get.orderby|default:'updated'}
+        {assign var=sortDir value=$smarty.get.sort|default:'DESC'}
+        {if $sortDir != 'ASC' && $sortDir != 'DESC'}{assign var=sortDir value='DESC'}{/if}
+        {if $sortKey == 'department'}{assign var=sortColIdx value=1}
+        {elseif $sortKey == 'status'}{assign var=sortColIdx value=2}
+        {elseif $sortKey == 'updated'}{assign var=sortColIdx value=3}
+        {else}{assign var=sortColIdx value=0}
+        {/if}
 
-            <div class="tk-table-head-row when-full">
-                <div><button type="button" class="tk-sort active" data-sort="subject" data-dir="asc">{$LANG.supportticketssubject|default:'Subject'} <span class="tk-sort-ico"></span></button></div>
-                <div><button type="button" class="tk-sort" data-sort="department" data-dir="">{$LANG.supportticketsdepartment|default:'Department'} <span class="tk-sort-ico"></span></button></div>
-                <div><button type="button" class="tk-sort" data-sort="status" data-dir="">{$LANG.supportticketsstatus|default:'Status'} <span class="tk-sort-ico"></span></button></div>
-                <div><button type="button" class="tk-sort" data-sort="updated" data-dir="">{$LANG.supportticketslastupdated|default:'Last updated'} <span class="tk-sort-ico"></span></button></div>
-            </div>
+        <div class="tk-stack">
 
             <div class="card tk-table-card">
 
@@ -106,26 +115,47 @@
                 </div>
 
                 {if $tkCount > 0}
-                <div class="tk-list when-full">
-                    {foreach $tkList as $tkt}
-                    {assign var=tktStatusClass value=$tkt.statusClass|default:$tkt.statusclass|default:$tkt.status|lower|replace:' ':'-'|replace:'_':'-'}
-                    {assign var=tktPriority value=$tkt.priority|default:$tkt.urgency|default:''|lower|replace:' ':'-'}
-                    <div class="tk-row" data-href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape}{if isset($tkt.c) && $tkt.c}&c={$tkt.c|escape}{/if}">
-                        <div>
-                            <div class="tk-subject-cell">
-                                <div class="tk-subject-id">#{$tkt.tid|escape}</div>
-                                <div class="tk-subject-title">{if $tktPriority == 'high' || $tktPriority == 'medium'}<span class="tk-prio-dot {$tktPriority}"></span>{/if}{$tkt.subject|escape}</div>
-                            </div>
-                        </div>
-                        <div>{$tkt.department|default:''|escape}</div>
-                        <div><span class="status-pill {$tktStatusClass}"{if !empty($tkt.statusColor)} style="background-color:{$tkt.statusColor|escape};color:#fff"{/if}>{$tkt.status|strip_tags|escape}</span></div>
-                        <div>
-                            {if !empty($tkt.normalisedLastReply)}<span class="sr-only">{$tkt.normalisedLastReply|escape}</span>{/if}
-                            <div class="tk-updated-date">{$tkt.lastreply|default:''|escape}</div>
-                        </div>
-                    </div>
-                    {/foreach}
-                </div>
+                <table class="tk-table when-full" id="tkTable">
+                    <colgroup>
+                        <col class="tk-col-subject">
+                        <col class="tk-col-department">
+                        <col class="tk-col-status">
+                        <col class="tk-col-updated">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="hl-subject">{$LANG.supportticketssubject|default:'Subject'} <span class="tk-sort-ico"></span></th>
+                            <th class="hl-department">{$LANG.supportticketsdepartment|default:'Department'} <span class="tk-sort-ico"></span></th>
+                            <th class="hl-status">{$LANG.supportticketsstatus|default:'Status'} <span class="tk-sort-ico"></span></th>
+                            <th class="hl-updated">{$LANG.supportticketslastupdated|default:'Last updated'} <span class="tk-sort-ico"></span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {foreach $tkList as $tkt}
+                        {assign var=tktStatusClass value=$tkt.statusClass|default:$tkt.statusclass|default:$tkt.status|lower|replace:' ':'-'|replace:'_':'-'}
+                        {assign var=tktPriority value=$tkt.priority|default:$tkt.urgency|default:''|lower|replace:' ':'-'}
+                        {assign var=tktStatusLower value=$tkt.status|strip_tags|lower}
+                        {* Raw sort values — DataTables reads data-order for sort comparisons.
+                           _sort_lastreply_raw comes from Hooks::fetchAllTickets; fall back to
+                           the display string if a non-hook source populates the list. *}
+                        {assign var=sortLastReply value=$tkt._sort_lastreply_raw|default:$tkt.normalisedLastReply|default:$tkt.lastreply|default:''}
+                        <tr data-href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape}{if isset($tkt.c) && $tkt.c}&c={$tkt.c|escape}{/if}" data-status="{$tktStatusLower|escape:'html'}">
+                            <td data-order="{$tkt.subject|escape:'html'}">
+                                <div class="tk-subject-cell">
+                                    <div class="tk-subject-id">#{$tkt.tid|escape}</div>
+                                    <div class="tk-subject-title">{if $tktPriority == 'high' || $tktPriority == 'medium'}<span class="tk-prio-dot {$tktPriority}"></span>{/if}{$tkt.subject|escape}</div>
+                                </div>
+                            </td>
+                            <td data-order="{$tkt.department|default:''|escape:'html'}">{$tkt.department|default:''|escape}</td>
+                            <td data-order="{$tktStatusLower|escape:'html'}"><span class="status-pill {$tktStatusClass}"{if !empty($tkt.statusColor)} style="background-color:{$tkt.statusColor|escape};color:#fff"{/if}>{$tkt.status|strip_tags|escape}</span></td>
+                            <td data-order="{$sortLastReply|escape:'html'}">
+                                {if !empty($tkt.normalisedLastReply)}<span class="sr-only">{$tkt.normalisedLastReply|escape}</span>{/if}
+                                <div class="tk-updated-date">{$tkt.lastreply|default:''|escape}</div>
+                            </td>
+                        </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
                 {/if}
             </div>
 
@@ -186,56 +216,72 @@
 </div>{* /.tk-split *}
 
 <script>
-(function () {
-    function ready(fn) {
-        if (document.readyState !== 'loading') fn();
-        else document.addEventListener('DOMContentLoaded', fn);
-    }
-
-    ready(function () {
-        document.querySelectorAll('.tk-row[data-href]').forEach(function (row) {
-            row.setAttribute('tabindex', '0');
-            row.setAttribute('role', 'link');
-            row.addEventListener('click', function (e) {
-                if (e.target.closest('a, button, input, select')) return;
+{literal}
+// Row navigation — click a row to go to viewticket
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.tk-table tbody tr[data-href]').forEach(function (row) {
+        row.setAttribute('tabindex', '0');
+        row.setAttribute('role', 'link');
+        row.addEventListener('click', function (e) {
+            if (e.target.closest('a, button, input, select')) return;
+            window.location.href = row.dataset.href;
+        });
+        row.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
                 window.location.href = row.dataset.href;
-            });
-            row.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    window.location.href = row.dataset.href;
-                }
-            });
+            }
         });
+    });
 
-        document.querySelectorAll('[data-ticket-filter]').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var filter = btn.dataset.ticketFilter || 'all';
-                document.querySelectorAll('[data-ticket-filter]').forEach(function (tab) {
-                    tab.classList.toggle('active', tab === btn);
-                });
-                document.querySelectorAll('.tk-row').forEach(function (row) {
-                    var statusEl = row.querySelector('.status-pill');
-                    var status = statusEl ? statusEl.textContent.toLowerCase().replace(/\s+/g, '-') : '';
-                    row.hidden = filter !== 'all' && status !== filter;
-                });
+    // Status filter — hide rows whose data-status doesn't match the active tab.
+    // DataTables keeps the rows in DOM but [hidden] CSS rule removes them visually.
+    document.querySelectorAll('[data-ticket-filter]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var filter = btn.dataset.ticketFilter || 'all';
+            document.querySelectorAll('[data-ticket-filter]').forEach(function (tab) {
+                tab.classList.toggle('active', tab === btn);
             });
-        });
-
-        document.querySelectorAll('.tk-sort').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var currentDir = btn.dataset.dir || '';
-                var nextDir = currentDir === '' ? 'asc' : currentDir === 'asc' ? 'desc' : '';
-                document.querySelectorAll('.tk-sort').forEach(function (other) {
-                    if (other !== btn) {
-                        other.dataset.dir = '';
-                        other.classList.remove('active');
-                    }
-                });
-                btn.dataset.dir = nextDir;
-                btn.classList.toggle('active', nextDir !== '');
+            document.querySelectorAll('.tk-table tbody tr').forEach(function (row) {
+                var status = (row.getAttribute('data-status') || '').toLowerCase().replace(/\s+/g, '-');
+                row.hidden = filter !== 'all' && status !== filter;
             });
         });
     });
-})();
+});
+{/literal}
+
+// DataTables init — Lagom-style instant sort (no page reload).
+{literal}
+if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
+    jQuery(function ($) {
+        var $tbl = $('#tkTable');
+        if (!$tbl.length) return;
+        var table = $tbl.DataTable({
+            paging:    false,
+            searching: false,
+            info:      false,
+            autoWidth: false,
+            ordering:  true,
+{/literal}
+            order:     [[{$sortColIdx}, '{$sortDir|lower}']],
+{literal}
+        });
+        var keyByCol = { 0: 'subject', 1: 'department', 2: 'status', 3: 'updated' };
+        table.on('order.dt', function () {
+            var ord = table.order();
+            if (!ord || !ord.length) return;
+            var key = keyByCol[ord[0][0]];
+            var dir = (ord[0][1] || 'asc').toUpperCase();
+            if (!key) return;
+            try {
+                var url = new URL(window.location.href);
+                url.searchParams.set('orderby', key);
+                url.searchParams.set('sort', dir);
+                window.history.replaceState({}, '', url.toString());
+            } catch (err) {}
+        });
+    });
+}
+{/literal}
 </script>
