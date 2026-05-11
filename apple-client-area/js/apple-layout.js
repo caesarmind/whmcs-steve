@@ -243,7 +243,7 @@
             try { localStorage.setItem(KEYS.subnav, state); } catch (e) {}
         }
         var savedSubnav; try { savedSubnav = localStorage.getItem(KEYS.subnav); } catch (e) {}
-        applySubnav(params.get('subnav') || savedSubnav || 'on');
+        applySubnav(params.get('subnav') || savedSubnav || body.dataset.subnav || 'on');
         subnavButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applySubnav(this.dataset.subnavSet); });
         });
@@ -314,7 +314,9 @@
             try { localStorage.setItem(KEYS.data, state); } catch (e) {}
         }
         var savedData; try { savedData = localStorage.getItem(KEYS.data); } catch (e) {}
-        applyData(params.get('data') || savedData || 'full');
+        // Respect the page tpl's inline-script-set body[data-data]
+        var existingData = body.hasAttribute('data-data') ? body.dataset.data : null;
+        applyData(params.get('data') || savedData || existingData || 'full');
         dataButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyData(this.dataset.dataSet); });
         });
@@ -472,6 +474,63 @@
                 if (wrap && !wrap.contains(e.target)) dd.classList.remove('open');
             });
         });
+    }
+
+    // ── Mobile sidebar drawer (≤900px, side/rail) ──────────
+    // Wires the hamburger button(s) in the inner-topbar to toggle
+    // body.nav-open. ESC, backdrop click, link click, and resize
+    // back to desktop all close the drawer.
+    function initNavDrawer() {
+        var body = document.body;
+        var MQ = window.matchMedia('(max-width: 900px)');
+
+        // Inject backdrop once
+        var backdrop = document.querySelector('.ph-nav-backdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.className = 'ph-nav-backdrop';
+            backdrop.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(backdrop);
+        }
+
+        function open() {
+            if (body.dataset.layout === 'top') return;
+            body.classList.add('nav-open');
+            document.querySelectorAll('[data-nav-toggle]').forEach(function (b) {
+                b.setAttribute('aria-expanded', 'true');
+            });
+        }
+        function close() {
+            body.classList.remove('nav-open');
+            document.querySelectorAll('[data-nav-toggle]').forEach(function (b) {
+                b.setAttribute('aria-expanded', 'false');
+            });
+        }
+        function toggle() {
+            if (body.classList.contains('nav-open')) close(); else open();
+        }
+
+        document.querySelectorAll('[data-nav-toggle]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) { e.stopPropagation(); toggle(); });
+        });
+
+        backdrop.addEventListener('click', close);
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && body.classList.contains('nav-open')) close();
+        });
+
+        // Close after navigating via a sidebar link (only on mobile)
+        document.querySelectorAll('.sidebar a, .ph-rail-item').forEach(function (a) {
+            a.addEventListener('click', function () {
+                if (MQ.matches) close();
+            });
+        });
+
+        // If we resize back into desktop, drop the drawer state
+        function syncMQ() { if (!MQ.matches) close(); }
+        if (MQ.addEventListener) MQ.addEventListener('change', syncMQ);
+        else MQ.addListener(syncMQ);
     }
 
     // ── Sidebar collapsible groups ─────────────────────────
@@ -663,12 +722,18 @@
     // ── Bootstrap ──────────────────────────────────────────
     function boot() {
         var params = new URLSearchParams(window.location.search);
+        var previewState = (params.get('preview') || '').toLowerCase();
+        if (['0', 'off', 'false', 'hide', 'none'].indexOf(previewState) !== -1 || params.get('screenshot') === '1') {
+            document.body.setAttribute('data-preview', 'off');
+            document.body.classList.add('screenshot');
+        }
         return loadPartials().then(function () {
             var chip = document.querySelector('.state-chip');
             if (chip) initChipDrag(chip);
             initStateToggles(params);
             initDropdowns();
             initSidebarGroups();
+            initNavDrawer();
             initRail();
             initPromoSliders();
             initLocaleModal();
