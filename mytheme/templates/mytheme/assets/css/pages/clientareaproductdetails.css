@@ -12,6 +12,31 @@
 body[data-subnav="off"] .pd-split { grid-template-columns: 1fr; }
 body[data-subnav="off"] .pd-split > .pd-aside { display: none; }
 
+/* Banner alerts (pending cancellation, unpaid invoice) */
+.pd-alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin: 0 0 16px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    letter-spacing: -0.008em;
+    line-height: 1.5;
+}
+.pd-alert svg { width: 16px; height: 16px; flex-shrink: 0; }
+.pd-alert > div { flex: 1; min-width: 0; }
+.pd-alert-warn  { background: var(--color-orange-bg); color: var(--color-orange-text); }
+.pd-alert-error { background: var(--color-red-bg);    color: var(--color-red-text); }
+.pd-alert-cta {
+    flex-shrink: 0;
+    height: 30px;
+    padding: 0 14px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+}
+
 .pd-tabs { display: flex; align-items: center; gap: 24px; border-bottom: 0.5px solid var(--color-border); padding: 0 24px; flex-wrap: wrap; }
 .pd-tab { position: relative; padding: 14px 0; background: none; border: 0; font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); cursor: pointer; font-family: inherit; transition: color var(--transition-fast); }
 .pd-tab:hover { color: var(--color-text-primary); }
