@@ -351,68 +351,68 @@ body[data-svc-layout="outside"] .inv-stack > .inv-table-card {
 
 **Pages that already have it**: clientareahome, clientareaproducts, clientareadomains, clientareainvoices, supporttickets. Any new list page must include the same rules.
 
-## 6f. Sortable column headers must actually sort the rows
+## 6f. Sortable column headers — use URL-based sort (WHMCS native pattern)
 
-When a column header has a `data-sort="key"` button, clicking it must:
-1. Cycle the visual direction indicator (asc → desc → asc, or none → asc → desc → none)
-2. **Actually reorder the rows** in the DOM via JS — not just toggle a CSS class
+Column headers must be `<a>` tags (not `<button>`) that link back to the same page with `?orderby=KEY&sort=ASC|DESC` query params. This is what native WHMCS expects, and it gives you:
+- Sort state in the URL (bookmarkable, survives refresh)
+- Works without JavaScript
+- Server-side sort handles the full record set, not just rendered page
 
-Type-aware comparators per column:
-- `id` / numeric IDs → integer compare after stripping non-digit chars (e.g. `#42` → 42)
-- `date` / dates → `Date.parse()` after normalizing `DD/MM/YYYY` to ISO `YYYY-MM-DD`
-- `amount` / money → `parseFloat` after stripping currency symbols and codes
-- `status` / `name` / strings → `localeCompare`
+**Page tpl pattern:**
 
-Boilerplate that goes at the bottom of the page tpl (substitute `inv` for invoices, `svc` for services, etc.):
+```smarty
+{assign var=sortKey value=$smarty.get.orderby|default:'id'}
+{assign var=sortDir value=$smarty.get.sort|default:'DESC'}
+{if $sortDir != 'ASC' && $sortDir != 'DESC'}{assign var=sortDir value='DESC'}{/if}
+{assign var=filterQS value=''}
+{if $currentFilter}{assign var=filterQS value="&status=`$currentFilter`"}{/if}
+{assign var=sortBase value="`$WEB_ROOT`/clientarea.php?action=invoices"}
 
-```javascript
-(function () {
-    var sorts = document.querySelectorAll('.inv-sort');
-    var tbody = document.querySelector('.inv-table tbody');
-    if (!sorts.length || !tbody) return;
-    var pickers = {
-        id:     row => parseInt((row.querySelector('.inv-id-num')?.textContent || '').replace(/[^0-9]/g, ''), 10) || 0,
-        date:   row => Date.parse(normaliseDate(row.querySelector('td.date')?.textContent)) || 0,
-        amount: row => parseFloat((row.querySelector('td.amount')?.textContent || '').replace(/[^0-9.\-]/g, '')) || 0,
-        status: row => (row.querySelector('.status-pill')?.textContent || '').trim().toLowerCase(),
-    };
-    function normaliseDate(s) {
-        s = (s || '').trim();
-        var m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-        return m ? m[3] + '-' + m[2].padStart(2,'0') + '-' + m[1].padStart(2,'0') : s;
-    }
-    sorts.forEach(btn => btn.addEventListener('click', () => {
-        var dir = (btn.dataset.dir === 'asc') ? 'desc' : 'asc';
-        sorts.forEach(b => { b.dataset.dir = ''; b.classList.remove('active'); });
-        btn.dataset.dir = dir; btn.classList.add('active');
-        var pick = pickers[btn.dataset.sort];
-        if (!pick) return;
-        Array.from(tbody.querySelectorAll('tr'))
-            .sort((a,b) => {
-                var va = pick(a), vb = pick(b);
-                return typeof va === 'string'
-                    ? (dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va))
-                    : (dir === 'asc' ? va - vb : vb - va);
-            })
-            .forEach(r => tbody.appendChild(r));
-    }));
-})();
+{assign var=nextId value=($sortKey == 'id' && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
+<a href="{$sortBase}&orderby=id&sort={$nextId}{$filterQS}"
+   class="inv-sort{if $sortKey == 'id'} active{/if}"
+   data-dir="{if $sortKey == 'id'}{$sortDir|lower}{/if}">
+    {$LANG.invoicenum|default:'Invoice'} <span class="inv-sort-ico"></span>
+</a>
 ```
 
-**Verification** (DevTools console):
+Repeat per column with its own `$nextX` flip variable.
 
-```javascript
-(() => {
-  var first = () => document.querySelector('.inv-table tbody tr')?.dataset?.href;
-  var before = first();
-  document.querySelector('.inv-sort[data-sort="id"]').click();   // sort asc
-  var asc = first();
-  document.querySelector('.inv-sort[data-sort="id"]').click();   // sort desc
-  var desc = first();
-  return { before, asc, desc, rowsReordered: before !== asc || asc !== desc };
-})()
-// rowsReordered must be true. If it stays false, the click handler isn't reordering DOM.
+**Hook-side sort** in `Hooks.php::fetchAll<X>()`:
+
+```php
+$orderby = (string)($_GET['orderby'] ?? 'id');
+$sort    = strtoupper((string)($_GET['sort'] ?? 'DESC'));
+if (!in_array($sort, ['ASC', 'DESC'], true)) { $sort = 'DESC'; }
+
+$cmp = match ($orderby) {
+    'date'   => fn($a, $b) => strcmp($a['_sort_date_raw'], $b['_sort_date_raw']),
+    'amount' => fn($a, $b) => $a['_sort_amount'] <=> $b['_sort_amount'],
+    'status' => fn($a, $b) => strcasecmp($a['status'], $b['status']),
+    default  => fn($a, $b) => $a['id'] <=> $b['id'],
+};
+usort($out, $cmp);
+if ($sort === 'DESC') { $out = array_reverse($out); }
 ```
+
+Keep raw values alongside the formatted display strings — `'_sort_date_raw' => $inv['date']` (YYYY-MM-DD), `'_sort_amount' => (float)preg_replace('/[^0-9.\-]/', '', $inv['total'])` — so the formatted "Apr 11, 2026" / "$20.00 USD" don't have to be re-parsed at sort time.
+
+**Verification:**
+
+```bash
+# Two clicks against the same column should flip the URL between ASC and DESC.
+# Sample with curl after login:
+curl -s -b cookies.txt "https://bill.hostnodes.com/clientarea.php?action=invoices&orderby=date&sort=ASC" \
+  | grep -oE 'sort=ASC|sort=DESC' | head -1
+# Should return "sort=DESC" because the active column's link flips to the OPPOSITE
+# direction (so clicking it once more flips back to ASC).
+```
+
+**Why NOT client-side JS sort:**
+- With small result sets (single-row tables), JS sort produces no visible change → looks broken
+- localStorage / URL state out of sync after navigation
+- Hidden rows beyond pagination aren't sorted
+- WHMCS users expect URL-based sort from native theme parity
 
 ## 6d. `.ph-main-wrap` must fill body width — content-area centering depends on it
 
