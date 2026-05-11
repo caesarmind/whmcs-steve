@@ -41,6 +41,10 @@
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareainvoices.css?v={$myTheme.version|default:'1.0'}">
 
+{* Lagom-style instant sort: jQuery 3.x + DataTables 1.x for client-side reorder. *}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
+
 <script>
 (function () {
     var b = document.body;
@@ -89,33 +93,22 @@
             <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Cancelled" class="filter-tab{if $currentFilter == 'Cancelled'} active{/if}">{$LANG.invoicecancelled|default:'Cancelled'}</a>
         </div>
 
-        {* URL-based sort (matches WHMCS native pattern). Reads ?orderby=KEY&sort=ASC|DESC
-           from query string, builds a toggle link that flips ASC↔DESC for the active
-           column and starts at ASC for any other column. Server-side sort in
-           Hooks::fetchAllInvoices reads the same params. *}
+        {* Sort: DataTables.js handles instant client-side sort on header click (matches
+           Lagom). Server returns rows pre-sorted per URL ?orderby=KEY&sort=ASC|DESC
+           via Hooks::fetchAllInvoices, so initial render is correct + no-JS fallback works.
+           DataTables init below reads the same URL params and applies them on load. *}
         {assign var=sortKey value=$smarty.get.orderby|default:'id'}
         {assign var=sortDir value=$smarty.get.sort|default:'DESC'}
         {if $sortDir != 'ASC' && $sortDir != 'DESC'}{assign var=sortDir value='DESC'}{/if}
-        {assign var=filterQS value=''}
-        {if $currentFilter}{assign var=filterQS value="&status=`$currentFilter`"}{/if}
-        {assign var=sortBase value="`$WEB_ROOT`/clientarea.php?action=invoices"}
+        {* Map sortKey → column index for DataTables order() call. *}
+        {if $sortKey == 'date'}{assign var=sortColIdx value=1}
+        {elseif $sortKey == 'due'}{assign var=sortColIdx value=2}
+        {elseif $sortKey == 'amount'}{assign var=sortColIdx value=3}
+        {elseif $sortKey == 'status'}{assign var=sortColIdx value=4}
+        {else}{assign var=sortColIdx value=0}
+        {/if}
 
         <div class="inv-stack">
-
-            <div class="inv-table-head-row when-full">
-                {assign var=nextId     value=($sortKey == 'id'     && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
-                {assign var=nextDate   value=($sortKey == 'date'   && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
-                {assign var=nextDue    value=($sortKey == 'due'    && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
-                {assign var=nextAmount value=($sortKey == 'amount' && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
-                {assign var=nextStatus value=($sortKey == 'status' && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
-
-                <div class="hl-cell hl-invoice"><a href="{$sortBase}&orderby=id&sort={$nextId}{$filterQS}" class="inv-sort{if $sortKey == 'id'} active{/if}" data-dir="{if $sortKey == 'id'}{$sortDir|lower}{/if}">{$LANG.invoicenum|default:'Invoice'} <span class="inv-sort-ico"></span></a></div>
-                <div class="hl-cell hl-date"><a href="{$sortBase}&orderby=date&sort={$nextDate}{$filterQS}" class="inv-sort{if $sortKey == 'date'} active{/if}" data-dir="{if $sortKey == 'date'}{$sortDir|lower}{/if}">{$LANG.invoicedatecreated|default:'Date'} <span class="inv-sort-ico"></span></a></div>
-                <div class="hl-cell hl-due"><a href="{$sortBase}&orderby=due&sort={$nextDue}{$filterQS}" class="inv-sort{if $sortKey == 'due'} active{/if}" data-dir="{if $sortKey == 'due'}{$sortDir|lower}{/if}">{$LANG.invoicedatedue|default:'Due date'} <span class="inv-sort-ico"></span></a></div>
-                <div class="hl-cell hl-amount"><a href="{$sortBase}&orderby=amount&sort={$nextAmount}{$filterQS}" class="inv-sort{if $sortKey == 'amount'} active{/if}" data-dir="{if $sortKey == 'amount'}{$sortDir|lower}{/if}">{$LANG.amount|default:'Amount'} <span class="inv-sort-ico"></span></a></div>
-                <div class="hl-cell hl-status"><a href="{$sortBase}&orderby=status&sort={$nextStatus}{$filterQS}" class="inv-sort{if $sortKey == 'status'} active{/if}" data-dir="{if $sortKey == 'status'}{$sortDir|lower}{/if}">{$LANG.invoicesstatus|default:'Status'} <span class="inv-sort-ico"></span></a></div>
-                <div class="hl-cell hl-actions" aria-hidden="true"></div>
-            </div>
 
             <div class="card inv-table-card">
 
@@ -130,7 +123,7 @@
                 </div>
 
                 {if $invCount > 0}
-                <table class="inv-table when-full">
+                <table class="inv-table when-full" id="invTable">
                     <colgroup>
                         <col class="inv-col-invoice">
                         <col class="inv-col-date">
@@ -139,6 +132,16 @@
                         <col class="inv-col-status">
                         <col class="inv-col-actions">
                     </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="hl-invoice">{$LANG.invoicenum|default:'Invoice'} <span class="inv-sort-ico"></span></th>
+                            <th class="hl-date">{$LANG.invoicedatecreated|default:'Date'} <span class="inv-sort-ico"></span></th>
+                            <th class="hl-due">{$LANG.invoicedatedue|default:'Due date'} <span class="inv-sort-ico"></span></th>
+                            <th class="hl-amount">{$LANG.amount|default:'Amount'} <span class="inv-sort-ico"></span></th>
+                            <th class="hl-status">{$LANG.invoicesstatus|default:'Status'} <span class="inv-sort-ico"></span></th>
+                            <th class="hl-actions" data-orderable="false" aria-hidden="true"></th>
+                        </tr>
+                    </thead>
                     <tbody>
                         {foreach $invList as $inv}
                         {* WHMCS returns $inv.status wrapped in <span class="textred">...</span>
@@ -146,17 +149,24 @@
                         {assign var=invStatus value=$inv.status|strip_tags}
                         {assign var=invStatusLower value=$invStatus|lower}
                         {if isset($inv.invoicenum) && $inv.invoicenum}{assign var=invDisplayNum value=$inv.invoicenum}{else}{assign var=invDisplayNum value=$inv.id}{/if}
+                        {* Raw sort values for DataTables — each <td data-order="..."> carries
+                           the value used for sort comparisons, separate from the formatted
+                           display. _sort_*_raw / _sort_amount come from Hooks::fetchAllInvoices;
+                           fall back to display values if a different data source omits them. *}
+                        {assign var=sortDateRaw value=$inv._sort_date_raw|default:$inv.datecreated|default:''}
+                        {assign var=sortDueRaw  value=$inv._sort_due_raw|default:$inv.duedate|default:''}
+                        {assign var=sortAmount  value=$inv._sort_amount|default:0}
                         <tr data-href="{$WEB_ROOT}/viewinvoice.php?id={$inv.id}">
-                            <td>
+                            <td data-order="{$inv.id}">
                                 <div class="inv-id-cell">
                                     <div class="inv-id-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
                                     <span class="inv-id-num">#{$invDisplayNum|escape}</span>
                                 </div>
                             </td>
-                            <td class="date">{$inv.datecreated|escape}</td>
-                            <td class="date">{$inv.duedate|escape}</td>
-                            <td class="amount{if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'} due{/if}">{$inv.total|escape}</td>
-                            <td><span class="status-pill {$invStatusLower}">{$invStatus|escape}</span></td>
+                            <td class="date" data-order="{$sortDateRaw|escape:'html'}">{$inv.datecreated|escape}</td>
+                            <td class="date" data-order="{$sortDueRaw|escape:'html'}">{$inv.duedate|escape}</td>
+                            <td class="amount{if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'} due{/if}" data-order="{$sortAmount}">{$inv.total|escape}</td>
+                            <td data-order="{$invStatusLower|escape:'html'}"><span class="status-pill {$invStatusLower}">{$invStatus|escape}</span></td>
                             <td class="actions">
                                 <div class="inv-menu-wrap" onclick="event.stopPropagation();">
                                     <button type="button" class="inv-menu-btn" aria-label="{$LANG.actions|default:'Actions'}" aria-haspopup="true" aria-expanded="false" onclick="toggleInvMenu(this, event)">
@@ -294,8 +304,45 @@ document.addEventListener('keydown', function (e) {
     });
 });
 
-// Column sort is now URL-based (matches WHMCS native pattern) — clicking a
-// header is a normal <a> link that reloads the page with ?orderby=…&sort=ASC|DESC.
-// Server-side sort happens in Hooks::fetchAllInvoices. No JS needed here.
+{/literal}
+
+// DataTables init — Lagom-style instant sort (no page reload, no custom JS engine).
+// Initial sort column + direction come from the server-side URL params so the
+// active-column indicator matches the data on first paint.
+{literal}
+if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
+    jQuery(function ($) {
+        var $tbl = $('#invTable');
+        if (!$tbl.length) return;
+        var table = $tbl.DataTable({
+            paging:    false,
+            searching: false,
+            info:      false,
+            autoWidth: false,
+            ordering:  true,
+{/literal}
+            order:     [[{$sortColIdx}, '{$sortDir|lower}']],
+{literal}
+            columnDefs: [
+                { orderable: false, targets: -1 }
+            ]
+        });
+        // Map column index → URL param key so we can sync ?orderby=… after each sort.
+        var keyByCol = { 0: 'id', 1: 'date', 2: 'due', 3: 'amount', 4: 'status' };
+        table.on('order.dt', function () {
+            var ord = table.order();
+            if (!ord || !ord.length) return;
+            var key = keyByCol[ord[0][0]];
+            var dir = (ord[0][1] || 'asc').toUpperCase();
+            if (!key) return;
+            try {
+                var url = new URL(window.location.href);
+                url.searchParams.set('orderby', key);
+                url.searchParams.set('sort', dir);
+                window.history.replaceState({}, '', url.toString());
+            } catch (err) { /* old browsers — ignore */ }
+        });
+    });
+}
 {/literal}
 </script>

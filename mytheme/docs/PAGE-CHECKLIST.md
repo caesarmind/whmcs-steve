@@ -351,34 +351,162 @@ body[data-svc-layout="outside"] .inv-stack > .inv-table-card {
 
 **Pages that already have it**: clientareahome, clientareaproducts, clientareadomains, clientareainvoices, supporttickets. Any new list page must include the same rules.
 
-## 6f. Sortable column headers — use URL-based sort (WHMCS native pattern)
+## 6f. Sortable column headers — Lagom-style DataTables.js instant sort
 
-Column headers must be `<a>` tags (not `<button>`) that link back to the same page with `?orderby=KEY&sort=ASC|DESC` query params. This is what native WHMCS expects, and it gives you:
-- Sort state in the URL (bookmarkable, survives refresh)
-- Works without JavaScript
-- Server-side sort handles the full record set, not just rendered page
+Matches the Lagom theme exactly: jQuery + DataTables 1.x for instant client-side reorder on header click (no page reload). Server-side sort in `Hooks.php` honors the same `?orderby=…&sort=…` URL params so first render + no-JS fallback work, and DataTables's initial `order()` call mirrors the URL state so the active-column arrow points the right way on load.
 
-**Page tpl pattern:**
+**Four required pieces:**
+
+### 1. Load jQuery + DataTables on the page
+
+Near the top of the page tpl (after the page-specific CSS link):
+
+```smarty
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
+```
+
+CDN is fine for now; switch to local copies in `assets/js/vendor/` for a fully self-hosted build. Skip the DataTables CSS bundle — our own page CSS supplies the sort indicators (see piece 4).
+
+### 2. Table structure: `<thead>` inside `<table>`, `data-order` on each `<td>`
+
+DataTables requires a real `<thead>`. The previous external `<div class="inv-table-head-row">` is gone — `<th>` cells live in the table now. Each sortable `<td>` carries `data-order` with the raw sort value (DataTables uses this instead of the formatted display string).
+
+```smarty
+<table class="inv-table when-full" id="invTable">
+    <colgroup>
+        <col class="inv-col-invoice">
+        <col class="inv-col-date">
+        ...
+    </colgroup>
+    <thead>
+        <tr>
+            <th class="hl-invoice">{$LANG.invoicenum|default:'Invoice'} <span class="inv-sort-ico"></span></th>
+            <th class="hl-date">{$LANG.invoicedatecreated|default:'Date'} <span class="inv-sort-ico"></span></th>
+            <th class="hl-due">{$LANG.invoicedatedue|default:'Due date'} <span class="inv-sort-ico"></span></th>
+            <th class="hl-amount">{$LANG.amount|default:'Amount'} <span class="inv-sort-ico"></span></th>
+            <th class="hl-status">{$LANG.invoicesstatus|default:'Status'} <span class="inv-sort-ico"></span></th>
+            <th class="hl-actions" data-orderable="false" aria-hidden="true"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {foreach $invList as $inv}
+        {assign var=sortDateRaw value=$inv._sort_date_raw|default:$inv.datecreated|default:''}
+        {assign var=sortDueRaw  value=$inv._sort_due_raw|default:$inv.duedate|default:''}
+        {assign var=sortAmount  value=$inv._sort_amount|default:0}
+        <tr data-href="{$WEB_ROOT}/viewinvoice.php?id={$inv.id}">
+            <td data-order="{$inv.id}">...invoice number display...</td>
+            <td class="date" data-order="{$sortDateRaw|escape:'html'}">{$inv.datecreated|escape}</td>
+            <td class="date" data-order="{$sortDueRaw|escape:'html'}">{$inv.duedate|escape}</td>
+            <td class="amount" data-order="{$sortAmount}">{$inv.total|escape}</td>
+            <td data-order="{$invStatusLower|escape:'html'}"><span class="status-pill {$invStatusLower}">{$invStatus|escape}</span></td>
+            <td class="actions">...kebab menu...</td>
+        </tr>
+        {/foreach}
+    </tbody>
+</table>
+```
+
+`data-orderable="false"` on the actions `<th>` tells DataTables not to attach a sort handler there.
+
+### 3. DataTables init — map URL → column index for initial order, sync URL on every reorder
+
+The script block sits at the bottom of the tpl. Smarty must interpolate the column index + direction OUTSIDE `{literal}` blocks; everything else (object literals, function bodies) lives INSIDE `{literal}` so curly braces don't fight Smarty:
 
 ```smarty
 {assign var=sortKey value=$smarty.get.orderby|default:'id'}
 {assign var=sortDir value=$smarty.get.sort|default:'DESC'}
 {if $sortDir != 'ASC' && $sortDir != 'DESC'}{assign var=sortDir value='DESC'}{/if}
-{assign var=filterQS value=''}
-{if $currentFilter}{assign var=filterQS value="&status=`$currentFilter`"}{/if}
-{assign var=sortBase value="`$WEB_ROOT`/clientarea.php?action=invoices"}
+{if $sortKey == 'date'}{assign var=sortColIdx value=1}
+{elseif $sortKey == 'due'}{assign var=sortColIdx value=2}
+{elseif $sortKey == 'amount'}{assign var=sortColIdx value=3}
+{elseif $sortKey == 'status'}{assign var=sortColIdx value=4}
+{else}{assign var=sortColIdx value=0}
+{/if}
 
-{assign var=nextId value=($sortKey == 'id' && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
-<a href="{$sortBase}&orderby=id&sort={$nextId}{$filterQS}"
-   class="inv-sort{if $sortKey == 'id'} active{/if}"
-   data-dir="{if $sortKey == 'id'}{$sortDir|lower}{/if}">
-    {$LANG.invoicenum|default:'Invoice'} <span class="inv-sort-ico"></span>
-</a>
+<script>
+{literal}
+if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
+    jQuery(function ($) {
+        var $tbl = $('#invTable');
+        if (!$tbl.length) return;
+        var table = $tbl.DataTable({
+            paging:    false,
+            searching: false,
+            info:      false,
+            autoWidth: false,
+            ordering:  true,
+{/literal}
+            order:     [[{$sortColIdx}, '{$sortDir|lower}']],
+{literal}
+            columnDefs: [{ orderable: false, targets: -1 }]
+        });
+        var keyByCol = { 0: 'id', 1: 'date', 2: 'due', 3: 'amount', 4: 'status' };
+        table.on('order.dt', function () {
+            var ord = table.order();
+            if (!ord || !ord.length) return;
+            var key = keyByCol[ord[0][0]];
+            var dir = (ord[0][1] || 'asc').toUpperCase();
+            if (!key) return;
+            try {
+                var url = new URL(window.location.href);
+                url.searchParams.set('orderby', key);
+                url.searchParams.set('sort', dir);
+                window.history.replaceState({}, '', url.toString());
+            } catch (err) {}
+        });
+    });
+}
+{/literal}
+</script>
 ```
 
-Repeat per column with its own `$nextX` flip variable.
+Critical: `paging:false, searching:false, info:false` keeps our custom pager/filter visible — DataTables ONLY handles sort. `autoWidth:false` prevents it from overriding our `<colgroup>` widths with inline styles.
 
-**Hook-side sort** in `Hooks.php::fetchAll<X>()`:
+### 4. CSS — own the sort indicator, hide DataTables defaults
+
+We skip the DataTables CSS bundle, so DataTables only adds the state classes (`.sorting`, `.sorting_asc`, `.sorting_desc`) to `<th>` — we paint the arrows ourselves on the `<span class="inv-sort-ico">` that lives inside each `<th>`:
+
+```css
+.inv-table thead th {
+    padding: 10px 20px 6px;
+    font-size: 11px; font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    text-align: left; background: transparent; border: 0;
+    cursor: pointer; user-select: none; white-space: nowrap;
+}
+.inv-table thead th.hl-actions { cursor: default; }
+.inv-table thead th .inv-sort-ico {
+    display: inline-block; position: relative;
+    width: 10px; height: 12px; vertical-align: middle; margin-left: 4px;
+}
+.inv-table thead th .inv-sort-ico::before,
+.inv-table thead th .inv-sort-ico::after {
+    content: ""; position: absolute; left: 2px;
+    border-left: 3px solid transparent; border-right: 3px solid transparent;
+    opacity: 0.3;
+}
+.inv-table thead th .inv-sort-ico::before { top: 1px; border-bottom: 4px solid currentColor; }
+.inv-table thead th .inv-sort-ico::after  { bottom: 1px; border-top: 4px solid currentColor; }
+/* DataTables sort-state — active column lights up its arrow */
+.inv-table thead th.sorting_asc, .inv-table thead th.sorting_desc { color: var(--color-text-primary); }
+.inv-table thead th.sorting_asc  .inv-sort-ico::before { opacity: 1; }
+.inv-table thead th.sorting_desc .inv-sort-ico::after  { opacity: 1; }
+```
+
+Mobile reset must hide `.inv-table thead` (not the old `.inv-table-head-row`):
+
+```css
+@media (max-width: 720px) {
+    .inv-table thead,
+    .inv-table colgroup { display: none; }
+}
+```
+
+### Hook-side sort (initial render + no-JS fallback)
+
+`Hooks.php::fetchAll<X>()` honors `?orderby=…&sort=…` so the first paint is already correctly ordered before DataTables runs. Keep raw `_sort_*` fields on each row — `<td data-order>` reads them.
 
 ```php
 $orderby = (string)($_GET['orderby'] ?? 'id');
@@ -395,24 +523,44 @@ usort($out, $cmp);
 if ($sort === 'DESC') { $out = array_reverse($out); }
 ```
 
-Keep raw values alongside the formatted display strings — `'_sort_date_raw' => $inv['date']` (YYYY-MM-DD), `'_sort_amount' => (float)preg_replace('/[^0-9.\-]/', '', $inv['total'])` — so the formatted "Apr 11, 2026" / "$20.00 USD" don't have to be re-parsed at sort time.
+### Verification
 
-**Verification:**
+**Console test** — paste after clicking the Date header twice:
 
-```bash
-# Two clicks against the same column should flip the URL between ASC and DESC.
-# Sample with curl after login:
-curl -s -b cookies.txt "https://bill.hostnodes.com/clientarea.php?action=invoices&orderby=date&sort=ASC" \
-  | grep -oE 'sort=ASC|sort=DESC' | head -1
-# Should return "sort=DESC" because the active column's link flips to the OPPOSITE
-# direction (so clicking it once more flips back to ASC).
+```javascript
+(() => {
+  var table = jQuery('#invTable').DataTable();
+  // Sort by amount ascending
+  table.order([3, 'asc']).draw();
+  var ord1 = table.order();
+  // Then desc
+  table.order([3, 'desc']).draw();
+  var ord2 = table.order();
+  var firstAmount = jQuery('#invTable tbody tr').first().find('td.amount').attr('data-order');
+  return {
+    asc:  ord1[0][0] === 3 && ord1[0][1] === 'asc',
+    desc: ord2[0][0] === 3 && ord2[0][1] === 'desc',
+    urlOrderby: new URL(location.href).searchParams.get('orderby'),
+    firstRowSortValue: firstAmount,
+  };
+})()
+// asc + desc must be true. urlOrderby must equal "amount".
 ```
 
-**Why NOT client-side JS sort:**
-- With small result sets (single-row tables), JS sort produces no visible change → looks broken
-- localStorage / URL state out of sync after navigation
-- Hidden rows beyond pagination aren't sorted
-- WHMCS users expect URL-based sort from native theme parity
+**Initial-render fallback test** (server-side sort, no JS):
+```bash
+curl -s -b cookies.txt "https://bill.hostnodes.com/clientarea.php?action=invoices&orderby=amount&sort=ASC" \
+  | grep -oE 'data-order="[0-9.]+"' | head -3
+# First row's data-order must be the smallest amount in the result set.
+```
+
+### Gotchas seen along the way
+
+- **Vanilla JS sort engine looked correct but didn't match Lagom UX** — first attempt was a custom ~30 line vanilla JS engine, replaced when the user wanted exact Lagom parity (DataTables).
+- **URL-based sort (page reload) feels broken** — single-row tables show no visible change on click; the user reported "only Invoice column works." Don't do this for list pages.
+- **DataTables `autoWidth: true` (default)** overrides `<colgroup>` widths with inline styles — `autoWidth: false` is required to keep our column proportions.
+- **`{literal}` mishandling** — Smarty eats DataTables's object-literal config (`{ paging: false, ... }`) unless it's inside `{literal}`. Split the script: literal for JS, plain Smarty only for the `{$sortColIdx}` and `{$sortDir|lower}` interpolations. See §10 gotcha about JS object literals.
+- **DataTables CSS bundle conflicts** — pulling `jquery.dataTables.min.css` adds its own sort indicators on top of our `.inv-sort-ico` spans. Skip the CSS bundle; let DataTables only manage the state classes (`.sorting_asc`/`.sorting_desc`) and paint indicators ourselves.
 
 ## 6d. `.ph-main-wrap` must fill body width — content-area centering depends on it
 
