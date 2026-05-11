@@ -314,9 +314,9 @@
             try { localStorage.setItem(KEYS.data, state); } catch (e) {}
         }
         var savedData; try { savedData = localStorage.getItem(KEYS.data); } catch (e) {}
-        // Respect the page tpl's inline-script-set body[data-data]
+        // Page reality wins over saved chip preference (URL param > body > localStorage)
         var existingData = body.hasAttribute('data-data') ? body.dataset.data : null;
-        applyData(params.get('data') || savedData || existingData || 'full');
+        applyData(params.get('data') || existingData || savedData || 'full');
         dataButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyData(this.dataset.dataSet); });
         });

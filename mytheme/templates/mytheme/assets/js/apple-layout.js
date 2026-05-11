@@ -314,13 +314,14 @@
             try { localStorage.setItem(KEYS.data, state); } catch (e) {}
         }
         var savedData; try { savedData = localStorage.getItem(KEYS.data); } catch (e) {}
-        // Respect the page tpl's inline-script-set body[data-data]
-        // (set per-page based on real WHMCS counts) when no URL param
-        // or localStorage preference exists. Otherwise the preview-chip
-        // default of 'full' would clobber the empty-state on pages
-        // where the user genuinely has 0 records.
+        // Priority: explicit URL param > page reality > saved chip preference > default.
+        // The page tpl's inline script sets body[data-data] based on actual WHMCS
+        // record counts. That reality wins over a saved chip toggle — otherwise a
+        // user who once clicked "Full" on a populated page would see filter tabs +
+        // pagination + zero rows on a page where they genuinely have no data,
+        // instead of the empty-state message.
         var existingData = body.hasAttribute('data-data') ? body.dataset.data : null;
-        applyData(params.get('data') || savedData || existingData || 'full');
+        applyData(params.get('data') || existingData || savedData || 'full');
         dataButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyData(this.dataset.dataSet); });
         });
