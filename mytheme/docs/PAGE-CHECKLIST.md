@@ -305,6 +305,52 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 
 The same scoping must be applied to **mockup HTML inline `<style>` blocks** in `apple-client-area/<page>.html` (they have their own copies of these rules — that's why the localhost preview can break differently from the live theme).
 
+## 6d. `.ph-main-wrap` must fill body width — content-area centering depends on it
+
+**Symptom of the bug:** in top-nav layout, content gets pinned to the left edge of the viewport instead of being centered. Reported as "alignment doesn't work" or "content not on full length."
+
+**Root cause:** when sidebar / rail are `position: fixed`, they're removed from `body`'s flex flow. `.ph-main-wrap` becomes `body`'s only flex child. Without `flex: 1`, it shrinks to its content's natural width — which is `.content-area`'s `max-width: 1120px`. With `.ph-main-wrap` only 1120px wide, `.content-area`'s `margin: auto` has no remaining space to absorb, so margins collapse to 0 and content sticks to column 0.
+
+**Required rule** in `apple-layout.css` and the mockup `apple-client-area/css/apple-layout.css`:
+
+```css
+.ph-main-wrap {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    flex: 1;        /* fill body's flex row remaining space */
+    min-width: 0;   /* allow shrinking past content if needed */
+}
+```
+
+**Verification** — paste into DevTools console on any page in top-nav layout. All three should hold:
+
+```javascript
+(() => {
+  const w = document.querySelector('.ph-main-wrap').getBoundingClientRect();
+  const c = document.querySelector('.content-area').getBoundingClientRect();
+  const bw = document.body.clientWidth;
+  return {
+    wrap_fills_body:     Math.abs(w.width - bw) < 20,   // ≈ true
+    content_inside_wrap: c.left >= w.left && c.right <= w.right,
+    content_centered:    Math.abs(c.left - (bw - c.right)) < 5  // auto-margin centers
+  };
+})()
+// All three must be true. If `wrap_fills_body: false` → .ph-main-wrap shrunk to content.
+//                          If `content_centered: false` → margin auto isn't centering.
+```
+
+**Curl-based remote check** (no browser needed):
+
+```bash
+curl -s https://bill.hostnodes.com/templates/mytheme/assets/css/apple-layout.css \
+  | grep -A 8 '^\.ph-main-wrap {' \
+  | grep -E 'flex: 1|min-width: 0'
+# Both lines must appear. If either is missing, the bug is back.
+```
+
+When adding a new page CSS file, **never** override `body { display: flex }` or `.ph-main-wrap`'s flex sizing. Refer to PAGE-CHECKLIST §6 rule 5 (no `body { display: block }`) for the related trap.
+
 ---
 
 ## 7. Pre-deploy verification (local)
@@ -388,6 +434,7 @@ Visual checks (real browser):
 - **Both `when-empty` and `when-full` markup coexisting** → relies on `apple-layout.css` toggle rules; keep them active, never comment out.
 - **`body { display: block; }` leak in page CSS** → kills the body's `display: flex` chain that holds sidebar + main-wrap, most visibly breaking **top-nav layout** since the sticky `.homepage-nav` needs intact flex. Strip this from every page CSS (was in 5 files: clientareahome, clientareaproducts, clientareadomains, clientareainvoices, supporttickets).
 - **`[data-subnav-side="outside"]` content-area transforms unscoped** → in top layout there's no sidebar to offset against, so `translateX(-132px)` shoves content off-center. Always include `:not([data-layout="top"])` in the selector.
+- **`.ph-main-wrap` missing `flex: 1`** → in top layout (sidebar/rail are fixed-positioned, removed from flex flow) the wrap shrinks to its content's max-width (1120px), leaving `.content-area`'s `margin: auto` no space to absorb, so content sticks to column 0 of the viewport. Required rules: `flex: 1; min-width: 0;` on `.ph-main-wrap`. See §6d.
 - **GitHub Action deploys files but doesn't clear `templates_c/`** → manual cPanel wipe needed after every push that changes `.tpl` files.
 - **Browser caches CSS aggressively** → bump the `?v=` query string in page tpls when changing CSS, or hard-refresh / use incognito to verify.
 - **Top-level dispatcher checks `file_exists` against `"templates/$path"`** → that path is **relative to WHMCS root**, not the tpl's location. Don't refactor it to absolute.
