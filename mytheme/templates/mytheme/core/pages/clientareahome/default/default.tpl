@@ -42,17 +42,26 @@
         {if $homePanel->getName() == "Active Products/Services"}
             {assign var=servicePanel value=$homePanel}
             {if $homePanel->hasChildren()}
-                {assign var=hasNativeServices value=true}
+                {* Only treat as native if at least one child has a real label —
+                   WHMCS sometimes registers placeholder children with empty data,
+                   which would render as an icon-only row. *}
+                {foreach $homePanel->getChildren() as $_chk}
+                    {if $_chk->getLabel()}{assign var=hasNativeServices value=true}{break}{/if}
+                {/foreach}
             {/if}
         {elseif $homePanel->getName() == "Recent Support Tickets"}
             {assign var=ticketPanel value=$homePanel}
             {if $homePanel->hasChildren()}
-                {assign var=hasNativeTickets value=true}
+                {foreach $homePanel->getChildren() as $_chk}
+                    {if $_chk->getLabel()}{assign var=hasNativeTickets value=true}{break}{/if}
+                {/foreach}
             {/if}
         {elseif $homePanel->getName() == "Recent News"}
             {assign var=newsPanel value=$homePanel}
             {if $homePanel->hasChildren()}
-                {assign var=hasNativeNews value=true}
+                {foreach $homePanel->getChildren() as $_chk}
+                    {if $_chk->getLabel()}{assign var=hasNativeNews value=true}{break}{/if}
+                {/foreach}
             {/if}
         {/if}
     {/foreach}
@@ -350,6 +359,7 @@
             {if $hasNativeServices}
             <div class="card-body" style="padding: 4px 24px 12px;">
                 {foreach $servicePanel->getChildren() as $serviceItem}
+                    {if !$serviceItem->getLabel()}{continue}{/if}
                     {if $serviceItem->getUri()}
                         <a menuItemName="{$serviceItem->getName()}" href="{$serviceItem->getUri()}" class="service-item native-home-row service-row{if $serviceItem->getClass()} {$serviceItem->getClass()}{/if}{if $serviceItem->isCurrent()} active{/if}"{if $serviceItem->getAttribute('dataToggleTab')} data-toggle="tab"{/if}{if $serviceItem->getAttribute('target')} target="{$serviceItem->getAttribute('target')}"{/if} id="{$serviceItem->getId()}">
                     {else}
@@ -417,6 +427,7 @@
                 {if $hasNativeTickets}
                 <div class="card-body ticket-list-body">
                     {foreach $ticketPanel->getChildren() as $ticketItem}
+                        {if !$ticketItem->getLabel()}{continue}{/if}
                         {assign var=_tStatus value=''}
                         {if $ticketItem->hasBadge()}{assign var=_tStatus value=$ticketItem->getBadge()}{/if}
                         {assign var=_tStatusCls value=$_tStatus|lower|replace:' ':'-'|replace:'_':'-'}
@@ -506,6 +517,7 @@
             <div class="card-body">
                 <div class="news-list">
                     {foreach $newsPanel->getChildren() as $newsItem}
+                        {if !$newsItem->getLabel()}{continue}{/if}
                         {if $newsItem->getUri()}
                             <a menuItemName="{$newsItem->getName()}" href="{$newsItem->getUri()}" class="news-row native-home-row{if $newsItem->getClass()} {$newsItem->getClass()}{/if}{if $newsItem->isCurrent()} active{/if}"{if $newsItem->getAttribute('dataToggleTab')} data-toggle="tab"{/if}{if $newsItem->getAttribute('target')} target="{$newsItem->getAttribute('target')}"{/if} id="{$newsItem->getId()}">
                         {else}
