@@ -97,7 +97,7 @@
                         <p class="announcement-excerpt">{$ann.text|strip_tags|truncate:240:"…"}</p>
                         {/if}
                         <div class="announcement-footer">
-                            <div class="announcement-date">{$ann.date|escape}</div>
+                            <div class="announcement-date">{if isset($carbon) && isset($ann.timestamp) && $ann.timestamp}{$carbon->createFromTimestamp($ann.timestamp)->format('F j, Y')}{else}{$ann.date|default:''|strip_tags|escape}{/if}</div>
                             <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
                         </div>
                     </a>

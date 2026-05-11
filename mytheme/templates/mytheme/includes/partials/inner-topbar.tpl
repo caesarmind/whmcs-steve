@@ -11,6 +11,9 @@
 {assign var=user_fullname value=$_first|cat:' '|cat:$_last}
 <div class="ph-side-topbar only-inner">
     <div class="ph-side-topbar-inner">
+        <button type="button" class="ph-side-iconbtn ph-mobile-toggle" aria-label="{$LANG.menu|default:'Open navigation'}" aria-controls="appSidebar" aria-expanded="false" data-nav-toggle>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
         <div class="ph-side-crumbs">
             <a href="{$WEB_ROOT}/">{$LANG.home|default:'Home'}</a>
             <span class="sep">›</span>
@@ -33,7 +36,7 @@
                                     <div class="notification-dot-indicator blue"></div>
                                     <div class="notification-content">
                                         <div class="notification-text">{$ann.title|escape}</div>
-                                        <div class="notification-time">{$ann.date|escape}</div>
+                                        <div class="notification-time">{if isset($carbon) && isset($ann.timestamp) && $ann.timestamp}{$carbon->createFromTimestamp($ann.timestamp)->format('F j, Y')}{else}{$ann.date|default:''|strip_tags|escape}{/if}</div>
                                     </div>
                                 </a>
                                 {if $ann@iteration >= 5}{break}{/if}

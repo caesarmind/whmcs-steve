@@ -539,7 +539,7 @@
                     {foreach $publishedAnnouncements as $ann}
                         <a href="{$WEB_ROOT}/announcements.php?id={$ann.id}" class="news-row">
                             <div class="news-title">{$ann.title|escape}</div>
-                            <div class="news-date">{$ann.date|escape}</div>
+                            <div class="news-date">{if isset($carbon) && isset($ann.timestamp) && $ann.timestamp}{$carbon->createFromTimestamp($ann.timestamp)->format('F j, Y')}{else}{$ann.date|default:''|strip_tags|escape}{/if}</div>
                         </a>
                         {if $ann@iteration >= 5}{break}{/if}
                     {/foreach}

@@ -44,7 +44,7 @@
                                 <div class="notification-dot-indicator blue"></div>
                                 <div class="notification-content">
                                     <div class="notification-text">{$ann.title|escape}</div>
-                                    <div class="notification-time">{$ann.date|escape}</div>
+                                    <div class="notification-time">{if isset($carbon) && isset($ann.timestamp) && $ann.timestamp}{$carbon->createFromTimestamp($ann.timestamp)->format('F j, Y')}{else}{$ann.date|default:''|strip_tags|escape}{/if}</div>
                                 </div>
                             </a>
                             {if $ann@iteration >= 5}{break}{/if}
