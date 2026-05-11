@@ -226,6 +226,7 @@
 </div>{* /.inv-split *}
 
 <script>
+{literal}
 // Row navigation — clicking a row goes to viewinvoice
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.inv-table tbody tr[data-href]').forEach(function (row) {
@@ -329,4 +330,5 @@ document.addEventListener('keydown', function (e) {
         });
     });
 })();
+{/literal}
 </script>
