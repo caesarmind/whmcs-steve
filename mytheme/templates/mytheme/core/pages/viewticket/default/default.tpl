@@ -49,6 +49,7 @@
     </div>
     {if $tktStatusLower != 'closed'}
     <form method="post" action="{$WEB_ROOT}/viewticket.php?tid={$tid|escape}{if isset($c) && $c}&c={$c|escape}{/if}" style="display:inline;">
+        <input type="hidden" name="token" value="{$token|default:''|escape}">
         <input type="hidden" name="action" value="close">
         <button type="submit" class="tk-close-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
@@ -166,6 +167,7 @@
                     </div>
 
                     <form method="post" action="{$WEB_ROOT}/viewticket.php?tid={$tid|escape}{if isset($c) && $c}&c={$c|escape}{/if}" enctype="multipart/form-data">
+                        <input type="hidden" name="token" value="{$token|default:''|escape}">
                         <input type="hidden" name="action" value="reply">
                         <div class="tk-editor">
                             <textarea class="tk-editor-area" name="message" placeholder="{$LANG.writeyourreply|default:'Write your reply…'}" required></textarea>

@@ -1,14 +1,17 @@
 {* Hostnodes — View Invoice (Apple-style).
 
-   WHMCS standard variables expected:
+   WHMCS exposes invoice variables as TOP-LEVEL (no $invoicedata wrapper,
+   $invoiceitems not $lineitems — verified against Nexus):
+
      $invoiceid, $invoicenum, $status, $datecreated, $datedue, $datepaid
-     $invoicedata        — array: total, subtotal, tax, tax2, credit,
-                           taxrate, taxrate2, notes
-     $lineitems          — array of line items: description, amount
-     $transactions       — payment transactions
-     $companyname
+     $total, $subtotal, $credit, $totalcredit
+     $tax, $taxrate, $taxname, $tax2, $taxrate2, $taxname2, $notes
+     $invoiceitems       — each: description, amount
+     $transactions       — array of payment transactions
+     $companyname, $payto
      $clientsdetails     — firstname, lastname, address1, etc.
-     $paymentmethods     — available payment methods
+     $paymentmethods     — available gateways
+     $token              — CSRF token, required on all POST forms
 *}
 
 {if !isset($invoiceid) || !$invoiceid}
@@ -56,7 +59,7 @@
             <div class="inv-head">
                 <div class="inv-head-block">
                     <div class="label">{if $invStatusLower == 'paid'}{$LANG.invoicestotal|default:'Total'}{else}{$LANG.amountdue|default:'Amount due'}{/if}</div>
-                    <div class="value big{if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'} due{/if}">{if isset($invoicedata.total)}{$invoicedata.total|escape}{/if}</div>
+                    <div class="value big{if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'} due{/if}">{if isset($total)}{$total|escape}{/if}</div>
                 </div>
                 <div class="inv-head-block">
                     <div class="label">{$LANG.invoicedatedue|default:'Due date'}</div>
@@ -104,8 +107,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {if isset($lineitems) && $lineitems|@count > 0}
-                        {foreach $lineitems as $item}
+                    {if isset($invoiceitems) && $invoiceitems|@count > 0}
+                        {foreach $invoiceitems as $item}
                         <tr>
                             <td class="desc">{$item.description|escape}</td>
                             <td class="amount">{$item.amount|escape}</td>
@@ -116,19 +119,19 @@
             </table>
 
             <div class="inv-totals">
-                {if isset($invoicedata.subtotal)}
-                <div class="inv-total-row muted"><span>{$LANG.invoicessubtotal|default:'Subtotal'}</span><span>{$invoicedata.subtotal|escape}</span></div>
+                {if isset($subtotal)}
+                <div class="inv-total-row muted"><span>{$LANG.invoicessubtotal|default:'Subtotal'}</span><span>{$subtotal|escape}</span></div>
                 {/if}
-                {if isset($invoicedata.taxrate) && $invoicedata.taxrate}
-                <div class="inv-total-row muted"><span>{$LANG.invoicestax|default:'Tax'} ({$invoicedata.taxrate|escape}%)</span><span>{$invoicedata.tax|escape}</span></div>
+                {if isset($taxrate) && $taxrate}
+                <div class="inv-total-row muted"><span>{$LANG.invoicestax|default:'Tax'} ({$taxrate|escape}%)</span><span>{$tax|escape}</span></div>
                 {/if}
-                {if isset($invoicedata.taxrate2) && $invoicedata.taxrate2}
-                <div class="inv-total-row muted"><span>{$LANG.invoicestax|default:'Tax'} 2 ({$invoicedata.taxrate2|escape}%)</span><span>{$invoicedata.tax2|escape}</span></div>
+                {if isset($taxrate2) && $taxrate2}
+                <div class="inv-total-row muted"><span>{$LANG.invoicestax|default:'Tax'} 2 ({$taxrate2|escape}%)</span><span>{$tax2|escape}</span></div>
                 {/if}
-                {if isset($invoicedata.credit) && $invoicedata.credit}
-                <div class="inv-total-row muted"><span>{$LANG.invoicescredit|default:'Credit applied'}</span><span>−{$invoicedata.credit|escape}</span></div>
+                {if isset($credit) && $credit}
+                <div class="inv-total-row muted"><span>{$LANG.invoicescredit|default:'Credit applied'}</span><span>−{$credit|escape}</span></div>
                 {/if}
-                <div class="inv-total-row grand"><span>{if $invStatusLower == 'paid'}{$LANG.invoicestotal|default:'Total'}{else}{$LANG.totaldue|default:'Total due'}{/if}</span><span class="amt">{if isset($invoicedata.total)}{$invoicedata.total|escape}{/if}</span></div>
+                <div class="inv-total-row grand"><span>{if $invStatusLower == 'paid'}{$LANG.invoicestotal|default:'Total'}{else}{$LANG.totaldue|default:'Total due'}{/if}</span><span class="amt">{if isset($total)}{$total|escape}{/if}</span></div>
             </div>
         </div>
 
@@ -166,6 +169,7 @@
         <div class="card inv-lines-card">
             <div class="card-header"><h2>{$LANG.invoicemakepayment|default:'Make a payment'}</h2></div>
             <form method="post" action="{$WEB_ROOT}/viewinvoice.php?id={$invoiceid}">
+                <input type="hidden" name="token" value="{$token|default:''|escape}">
                 <input type="hidden" name="paynow" value="true">
                 <div class="inv-pay">
                     <div class="inv-pay-method-list">
@@ -181,7 +185,7 @@
                             {/foreach}
                         {/if}
                     </div>
-                    <button type="submit" class="btn-primary inv-pay-btn">{$LANG.invoicepay|default:'Pay'} {if isset($invoicedata.total)}{$invoicedata.total|escape}{/if}</button>
+                    <button type="submit" class="btn-primary inv-pay-btn">{$LANG.invoicepay|default:'Pay'} {if isset($total)}{$total|escape}{/if}</button>
                 </div>
             </form>
         </div>
@@ -198,7 +202,7 @@
             </div>
             <div class="inv-aside-summary-row">
                 <div class="inv-aside-summary-label">{if $invStatusLower == 'paid'}{$LANG.invoicestotal|default:'Total'}{else}{$LANG.amountdue|default:'Amount due'}{/if}</div>
-                <div class="inv-aside-summary-value{if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'} due{/if}">{if isset($invoicedata.total)}{$invoicedata.total|escape}{/if}</div>
+                <div class="inv-aside-summary-value{if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'} due{/if}">{if isset($total)}{$total|escape}{/if}</div>
             </div>
             <div class="inv-aside-summary-row">
                 <div class="inv-aside-summary-label">{$LANG.invoicedatedue|default:'Due date'}</div>

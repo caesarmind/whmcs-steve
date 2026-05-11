@@ -1,142 +1,165 @@
 {* Hostnodes — Service Details (Apple-style).
 
-   WHMCS standard variables on /clientarea.php?action=productdetails&id=X:
-     $service           — service object (id, productname, groupname, domain,
-                          status, statusClass, billingcycle, registrationdate,
-                          nextduedate, firstpaymentamount, recurringamount,
-                          paymentmethod, dedicatedip, assignedips, ns1, ns2,
-                          serverhostname, serverip, diskusage, disklimit,
-                          bwusage, bwlimit, suspendreason, ...)
-     $product           — alternative name for the same object
-     $clientsdetails    — client info
-     $upgradesAvailable — bool, upgrade options exist
-     $cancellationrequested — bool
-     $loginbutton       — control panel login URL
+   WHMCS exposes the service variables as TOP-LEVEL (not as a $service or
+   $product object). Verified against Nexus and Lagom — these are the
+   canonical names; do NOT nest them or assume an object wrapper:
+
+     $product, $groupname, $domain, $type     — name + grouping
+     $status, $rawstatus                       — display + lowercased
+     $regdate, $nextduedate                    — formatted dates
+     $firstpaymentamount, $recurringamount    — money strings
+     $billingcycle, $paymentmethodname        — billing meta
+     $dedicatedip, $assignedips                — IP info
+     $ns1, $ns2                                — nameservers
+     $serverhostname, $serverip                — server info
+     $diskusage, $disklimit, $bwusage, $bwlimit — usage stats
+     $username, $password                      — control panel creds
+     $loginButton                              — pre-rendered login URL
+     $pendingcancellation                      — bool, cancellation pending
+     $upgrades                                 — array of available upgrade IDs
 *}
 
-{assign var=svc value=$service|default:$product}
-{assign var=svcStatus value=$svc.status|default:''}
-{assign var=svcStatusClass value=$svc.statusClass|default:$svc.statusClass|default:$svcStatus|lower}
+{assign var=svcStatusText  value=$status|default:''|strip_tags}
+{assign var=svcStatusLower value=$rawstatus|default:$svcStatusText|lower|replace:' ':'-'}
 
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareaproductdetails.css?v={$myTheme.version|default:'1.0'}">
 
 <header class="page-header">
     <div class="page-header-row">
         <div style="flex:1; min-width:0;">
-            <p class="page-eyebrow">{$svc.groupname|default:''|escape}</p>
-            <h1>{$svc.productname|default:$svc.name|escape}</h1>
-            {if !empty($svc.domain)}<p class="page-subtitle">{$svc.domain|escape}</p>{/if}
+            <p class="page-eyebrow">{$groupname|default:''|escape}</p>
+            <h1>{$product|default:'Service'|escape}</h1>
+            {if !empty($domain)}<p class="page-subtitle">{$domain|escape}</p>{/if}
         </div>
-        <span class="status-pill {$svcStatusClass|escape}">{$svcStatus|strip_tags|escape}</span>
+        <span class="status-pill {$svcStatusLower|escape}">{$svcStatusText|escape}</span>
     </div>
 </header>
+
+{if isset($pendingcancellation) && $pendingcancellation}
+<div class="pd-alert pd-alert-warn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    {$LANG.cancellationrequestedexplanation|default:'Cancellation has been requested for this service.'}
+</div>
+{/if}
+
+{if isset($unpaidInvoice) && $unpaidInvoice}
+<div class="pd-alert pd-alert-error">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div>{$unpaidInvoiceMessage|default:'This service has an unpaid invoice.'}</div>
+    <a href="{$WEB_ROOT}/viewinvoice.php?id={$unpaidInvoice|escape}" class="btn-primary pd-alert-cta">{$LANG.payinvoice|default:'Pay invoice'}</a>
+</div>
+{/if}
 
 <div class="pd-split">
     <div class="pd-main">
 
-        {* Tab nav *}
         <div class="card" style="padding:0;">
             <div class="pd-tabs" role="tablist">
                 <button type="button" class="pd-tab active" data-pd-tab="overview">{$LANG.overview|default:'Overview'}</button>
-                {if !empty($svc.username)}<button type="button" class="pd-tab" data-pd-tab="login">{$LANG.loginsection|default:'Login info'}</button>{/if}
-                {if !empty($upgradesAvailable)}<button type="button" class="pd-tab" data-pd-tab="upgrade">{$LANG.upgrade|default:'Upgrade'}</button>{/if}
-                {if !$cancellationrequested}<button type="button" class="pd-tab" data-pd-tab="cancel">{$LANG.requestcancellation|default:'Cancel service'}</button>{/if}
+                {if !empty($username)}<button type="button" class="pd-tab" data-pd-tab="login">{$LANG.loginsection|default:'Login info'}</button>{/if}
+                {if isset($upgrades) && $upgrades|@count > 0}<button type="button" class="pd-tab" data-pd-tab="upgrade">{$LANG.upgrade|default:'Upgrade'}</button>{/if}
+                {if (!isset($pendingcancellation) || !$pendingcancellation) && $svcStatusLower == 'active'}<button type="button" class="pd-tab" data-pd-tab="cancel">{$LANG.requestcancellation|default:'Cancel service'}</button>{/if}
             </div>
 
             <div class="pd-tab-panel active" data-pd-panel="overview">
                 <div class="pd-info-grid">
+                    {if !empty($firstpaymentamount)}
                     <div class="pd-info-row">
                         <span class="pd-info-label">{$LANG.firstpaymentamount|default:'First payment'}</span>
-                        <span class="pd-info-value">{$svc.firstpaymentamount|default:''|escape}</span>
+                        <span class="pd-info-value">{$firstpaymentamount|escape}</span>
                     </div>
+                    {/if}
+                    {if !empty($recurringamount)}
                     <div class="pd-info-row">
                         <span class="pd-info-label">{$LANG.recurringamount|default:'Recurring'}</span>
-                        <span class="pd-info-value">{$svc.recurringamount|default:''|escape} / {$svc.billingcycle|default:''|escape}</span>
+                        <span class="pd-info-value">{$recurringamount|escape}{if !empty($billingcycle)} / {$billingcycle|escape}{/if}</span>
                     </div>
+                    {/if}
+                    {if !empty($regdate)}
                     <div class="pd-info-row">
                         <span class="pd-info-label">{$LANG.registrationdate|default:'Registration date'}</span>
-                        <span class="pd-info-value">{$svc.regdate|default:$svc.registrationdate|default:''|escape}</span>
+                        <span class="pd-info-value">{$regdate|escape}</span>
                     </div>
+                    {/if}
+                    {if !empty($nextduedate)}
                     <div class="pd-info-row">
                         <span class="pd-info-label">{$LANG.invoicedatedue|default:'Next due date'}</span>
-                        <span class="pd-info-value">{$svc.nextduedate|default:''|escape}</span>
+                        <span class="pd-info-value">{$nextduedate|escape}</span>
                     </div>
-                    {if !empty($svc.paymentmethodname)}
+                    {/if}
+                    {if !empty($paymentmethodname)}
                     <div class="pd-info-row">
                         <span class="pd-info-label">{$LANG.paymentmethod|default:'Payment method'}</span>
-                        <span class="pd-info-value">{$svc.paymentmethodname|escape}</span>
+                        <span class="pd-info-value">{$paymentmethodname|escape}</span>
                     </div>
                     {/if}
-                    {if !empty($svc.dedicatedip)}
+                    {if !empty($dedicatedip)}
                     <div class="pd-info-row">
                         <span class="pd-info-label">{$LANG.dedicatedip|default:'Dedicated IP'}</span>
-                        <span class="pd-info-value pd-mono">{$svc.dedicatedip|escape}</span>
+                        <span class="pd-info-value pd-mono">{$dedicatedip|escape}</span>
                     </div>
                     {/if}
-                    {if !empty($svc.serverhostname)}
+                    {if !empty($serverhostname)}
                     <div class="pd-info-row">
                         <span class="pd-info-label">{$LANG.serverhostname|default:'Server hostname'}</span>
-                        <span class="pd-info-value pd-mono">{$svc.serverhostname|escape}</span>
+                        <span class="pd-info-value pd-mono">{$serverhostname|escape}</span>
                     </div>
                     {/if}
-                    {if !empty($svc.ns1) || !empty($svc.ns2)}
+                    {if !empty($ns1) || !empty($ns2)}
                     <div class="pd-info-row">
                         <span class="pd-info-label">{$LANG.nameservers|default:'Nameservers'}</span>
-                        <span class="pd-info-value pd-mono">{$svc.ns1|default:''|escape}{if !empty($svc.ns2)}<br>{$svc.ns2|escape}{/if}</span>
+                        <span class="pd-info-value pd-mono">{$ns1|default:''|escape}{if !empty($ns2)}<br>{$ns2|escape}{/if}</span>
                     </div>
                     {/if}
                 </div>
 
-                {if isset($svc.diskusage) && isset($svc.disklimit) && $svc.disklimit}
+                {if !empty($disklimit) && !empty($diskusage)}
                 <div class="pd-usage">
                     <h3 class="pd-usage-title">{$LANG.usagestats|default:'Usage'}</h3>
                     <div class="pd-meter">
-                        <div class="pd-meter-label">{$LANG.diskspace|default:'Disk space'}: {$svc.diskusage|escape} / {$svc.disklimit|escape}</div>
-                        <div class="pd-meter-bar"><div class="pd-meter-fill" style="width:{if $svc.disklimit > 0}{math equation="(usage / limit) * 100" usage=$svc.diskusage limit=$svc.disklimit}{else}0{/if}%"></div></div>
+                        <div class="pd-meter-label">{$LANG.diskspace|default:'Disk space'}: {$diskusage|escape} / {$disklimit|escape}</div>
+                        <div class="pd-meter-bar"><div class="pd-meter-fill" style="width:50%"></div></div>
                     </div>
-                    {if isset($svc.bwusage) && isset($svc.bwlimit) && $svc.bwlimit}
+                    {if !empty($bwlimit) && !empty($bwusage)}
                     <div class="pd-meter">
-                        <div class="pd-meter-label">{$LANG.bandwidth|default:'Bandwidth'}: {$svc.bwusage|escape} / {$svc.bwlimit|escape}</div>
-                        <div class="pd-meter-bar"><div class="pd-meter-fill" style="width:{if $svc.bwlimit > 0}{math equation="(usage / limit) * 100" usage=$svc.bwusage limit=$svc.bwlimit}{else}0{/if}%"></div></div>
+                        <div class="pd-meter-label">{$LANG.bandwidth|default:'Bandwidth'}: {$bwusage|escape} / {$bwlimit|escape}</div>
+                        <div class="pd-meter-bar"><div class="pd-meter-fill" style="width:50%"></div></div>
                     </div>
                     {/if}
                 </div>
                 {/if}
             </div>
 
-            {if !empty($svc.username)}
+            {if !empty($username)}
             <div class="pd-tab-panel" data-pd-panel="login">
                 <div class="pd-credential-row">
                     <span class="pd-cred-label">{$LANG.username|default:'Username'}</span>
-                    <span class="pd-cred-value pd-mono">{$svc.username|escape}</span>
+                    <span class="pd-cred-value pd-mono">{$username|escape}</span>
                 </div>
-                {if !empty($svc.password)}
+                {if !empty($password)}
                 <div class="pd-credential-row">
                     <span class="pd-cred-label">{$LANG.password|default:'Password'}</span>
                     <span class="pd-cred-value pd-mono" data-pd-secret>••••••••</span>
-                    <button type="button" class="pd-cred-toggle" data-pd-reveal="{$svc.password|escape}">{$LANG.show|default:'Show'}</button>
+                    <button type="button" class="pd-cred-toggle" data-pd-reveal="{$password|escape}">{$LANG.show|default:'Show'}</button>
                 </div>
                 {/if}
-                {if !empty($loginbutton) || !empty($svc.loginurl)}
-                <a href="{$loginbutton|default:$svc.loginurl|default:'#'|escape}" target="_blank" class="btn-primary pd-login-btn">
-                    {$LANG.cpanellogin|default:'Login to control panel'}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                </a>
+                {if !empty($loginButton)}
+                <div class="pd-login-row">{$loginButton}</div>
                 {/if}
             </div>
             {/if}
 
-            {if !empty($upgradesAvailable)}
+            {if isset($upgrades) && $upgrades|@count > 0}
             <div class="pd-tab-panel" data-pd-panel="upgrade">
                 <p class="pd-section-text">{$LANG.upgradeavailable|default:'You can upgrade or downgrade this service to a different plan.'}</p>
-                <a href="{$WEB_ROOT}/upgrade.php?type=package&id={$svc.id|escape}" class="btn-primary">{$LANG.viewupgradeoptions|default:'View upgrade options'}</a>
+                <a href="{$WEB_ROOT}/upgrade.php?type=package&id={$id|default:0|escape}" class="btn-primary">{$LANG.viewupgradeoptions|default:'View upgrade options'}</a>
             </div>
             {/if}
 
-            {if !$cancellationrequested}
+            {if (!isset($pendingcancellation) || !$pendingcancellation) && $svcStatusLower == 'active'}
             <div class="pd-tab-panel" data-pd-panel="cancel">
                 <p class="pd-section-text">{$LANG.cancellationsub|default:'Request immediate or end-of-billing-cycle cancellation. This action is reviewed by our team before being processed.'}</p>
-                <a href="{$WEB_ROOT}/clientarea.php?action=cancel&id={$svc.id|escape}" class="btn-secondary pd-cancel-btn">{$LANG.requestcancellation|default:'Request cancellation'}</a>
+                <a href="{$WEB_ROOT}/clientarea.php?action=cancel&id={$id|default:0|escape}" class="btn-secondary pd-cancel-btn">{$LANG.requestcancellation|default:'Request cancellation'}</a>
             </div>
             {/if}
         </div>
@@ -149,8 +172,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 {$LANG.backtoservices|default:'Back to services'}
             </a>
-            {if !empty($svc.id)}
-            <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$svc.id|escape}&modop=custom&a=Renew" class="subnav-item">
+            {if !empty($id)}
+            <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|escape}&modop=custom&a=Renew" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
                 {$LANG.renew|default:'Renew now'}
             </a>
