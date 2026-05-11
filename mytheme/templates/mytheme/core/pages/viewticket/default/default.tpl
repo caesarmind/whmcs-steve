@@ -1,17 +1,26 @@
 {* Hostnodes — View Support Ticket (Apple-style).
 
-   WHMCS standard variables expected:
-     $ticketid, $tid, $c, $subject, $status, $priority, $department, $service,
+   WHMCS standard variables on viewticket.php:
+     $tid, $c, $subject, $status, $priority, $department, $service,
      $lastreply, $date
-     $replies      — array of replies, each: name, requestor_type, date,
-                     message, attachments, attachments_removed, useremail,
-                     userid
-     $attachments  — ticket-level attachments
-     $clientsdetails  — for the author bar (firstname, lastname, email)
+     $invalidTicketId  — bool; true when the ticket isn't accessible
+     $closedticket     — bool; true if the ticket is closed
+     $replies          — array of replies (name, requestor_type, date,
+                         message, attachments, attachments_removed,
+                         useremail, userid)
+     $attachments      — ticket-level attachments
+     $clientsdetails   — author bar (firstname, lastname, email)
 *}
 
-{if isset($ticketid) && $ticketid}
-    {assign var=dashIsEmpty value='full'}
+{* Trap: earlier version of this tpl gated on $ticketid which WHMCS doesn't
+   set — page always rendered "Ticket not available". Gate on $tid existing
+   AND $invalidTicketId not being truthy. *}
+{if !isset($invalidTicketId) || !$invalidTicketId}
+    {if (isset($tid) && $tid) || (isset($replies) && $replies|@count > 0)}
+        {assign var=dashIsEmpty value='full'}
+    {else}
+        {assign var=dashIsEmpty value='empty'}
+    {/if}
 {else}
     {assign var=dashIsEmpty value='empty'}
 {/if}

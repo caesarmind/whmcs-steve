@@ -1,13 +1,25 @@
 {* Hostnodes — View single announcement (Apple-style).
 
-   WHMCS standard variables expected:
-     $announcement_id     — current announcement id
-     $announcement_date   — formatted date
-     $announcement_title  — title
-     $announcement_text   — body (HTML — already sanitized server-side)
+   WHMCS standard variables on announcements.php?id=X:
+     $id         — announcement id
+     $title      — announcement title
+     $text       — body HTML (already sanitized server-side)
+     $timestamp  — unix timestamp; we format via |date_format
+     $date       — fallback pre-formatted date string (some WHMCS versions)
+     $author     — optional author name
 *}
 
-{if isset($announcement_title) && $announcement_title}
+{* Trap: earlier version of this tpl used $announcement_title / $announcement_text,
+   which WHMCS does NOT expose — page always rendered "Announcement not found".
+   See PAGE-CHECKLIST §6f and §10 columnDefs gotcha for the pattern. *}
+{assign var=annTitle value=$title|default:''}
+{assign var=annText  value=$text|default:''}
+{assign var=annDate  value=$date|default:''}
+{if !$annDate && isset($timestamp) && $timestamp}
+    {assign var=annDate value=$timestamp|date_format:"%B %e, %Y"}
+{/if}
+
+{if $annTitle}
     {assign var=dashIsEmpty value='full'}
 {else}
     {assign var=dashIsEmpty value='empty'}
@@ -67,15 +79,14 @@
     <div class="ann-main when-full">
         <article class="card">
             <header class="article-head">
-                <h1 class="article-title">{$announcement_title|escape}</h1>
+                <h1 class="article-title">{$annTitle|escape}</h1>
                 <div class="article-meta">
-                    {if isset($announcement_date) && $announcement_date}
-                    <span>{$announcement_date|escape}</span>
-                    {/if}
+                    {if $annDate}<span>{$annDate|escape}</span>{/if}
+                    {if isset($author) && $author}<span class="dot">·</span><span>{$author|escape}</span>{/if}
                 </div>
             </header>
             <div class="article-body">
-                {$announcement_text}
+                {$annText}
             </div>
             <footer class="article-foot">
                 <a href="{$WEB_ROOT}/announcements.php" class="btn-secondary">
