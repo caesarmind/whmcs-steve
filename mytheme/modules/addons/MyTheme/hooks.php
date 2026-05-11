@@ -130,6 +130,10 @@ if (AddonHelper::isActive()) {
         return HookService::instance()->dispatch('ClientAreaPageDomains', $vars);
     });
 
+    add_hook('ClientAreaPageQuotes', 1, function ($vars) {
+        return HookService::instance()->dispatch('ClientAreaPageQuotes', $vars);
+    });
+
     // AJAX dispatch (front-side)
     if (isset($_POST['mtAction'])) {
         \MyTheme\Service\AjaxService::handle($_POST['mtAction'], $_POST);

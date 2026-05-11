@@ -169,6 +169,14 @@ final class Hooks
         return ['mtDomains' => $this->fetchAllDomains($clientId)];
     }
 
+    /** Quotes list — populates $mtQuotes on /clientarea.php?action=quotes. */
+    private function clientAreaPageQuotes(array $vars, Template $template): array
+    {
+        $clientId = (int)($_SESSION['uid'] ?? 0);
+        if ($clientId === 0) return [];
+        return ['mtQuotes' => $this->fetchAllQuotes($clientId)];
+    }
+
     private function fetchAllTickets(int $clientId): array
     {
         try {
@@ -258,6 +266,69 @@ final class Hooks
             usort($out, $cmp);
             if ($sort === 'DESC') {
                 $out = array_reverse($out);
+            }
+
+            return $out;
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    private function fetchAllQuotes(int $clientId): array
+    {
+        try {
+            $response = localAPI('GetQuotes', [
+                'userid'   => $clientId,
+                'limitnum' => 100,
+            ]);
+            if (($response['result'] ?? '') !== 'success') return [];
+            $out = [];
+            foreach (($response['quotes']['quote'] ?? []) as $q) {
+                $stage = strip_tags((string)($q['stage'] ?? 'Draft'));
+                $out[] = [
+                    'id'             => (int)($q['id'] ?? 0),
+                    'subject'        => (string)($q['subject'] ?? ''),
+                    'datecreated'    => !empty($q['datecreated']) && $q['datecreated'] !== '0000-00-00'
+                        ? date('M j, Y', strtotime((string)$q['datecreated']))
+                        : '',
+                    'validuntil'     => !empty($q['validuntil']) && $q['validuntil'] !== '0000-00-00'
+                        ? date('M j, Y', strtotime((string)$q['validuntil']))
+                        : '',
+                    'total'          => (string)($q['total'] ?? ''),
+                    'stage'          => $stage,
+                    'stageLower'     => strtolower(str_replace([' ', '_'], '-', $stage)),
+                    // Raw sort values for DataTables data-order attributes.
+                    '_sort_date_raw'  => (string)($q['datecreated'] ?? ''),
+                    '_sort_valid_raw' => (string)($q['validuntil'] ?? ''),
+                    '_sort_amount'    => (float)preg_replace('/[^0-9.\-]/', '', (string)($q['total'] ?? '0')),
+                ];
+            }
+
+            // URL-driven sort — mirrors fetchAllInvoices.
+            $orderby = (string)($_GET['orderby'] ?? 'id');
+            $sort    = strtoupper((string)($_GET['sort'] ?? 'DESC'));
+            if (!in_array($sort, ['ASC', 'DESC'], true)) {
+                $sort = 'DESC';
+            }
+            $cmp = match ($orderby) {
+                'date'   => fn($a, $b) => strcmp($a['_sort_date_raw'], $b['_sort_date_raw']),
+                'valid'  => fn($a, $b) => strcmp($a['_sort_valid_raw'], $b['_sort_valid_raw']),
+                'amount' => fn($a, $b) => $a['_sort_amount'] <=> $b['_sort_amount'],
+                'status' => fn($a, $b) => strcasecmp($a['stage'], $b['stage']),
+                default  => fn($a, $b) => $a['id'] <=> $b['id'],
+            };
+            usort($out, $cmp);
+            if ($sort === 'DESC') {
+                $out = array_reverse($out);
+            }
+
+            // Optional stage filter — ?stage=Draft|Delivered|Accepted|Lost|Dead|On Hold
+            $stageFilter = (string)($_GET['stage'] ?? '');
+            if ($stageFilter !== '') {
+                $out = array_values(array_filter(
+                    $out,
+                    fn($row) => strcasecmp($row['stage'], $stageFilter) === 0
+                ));
             }
 
             return $out;
