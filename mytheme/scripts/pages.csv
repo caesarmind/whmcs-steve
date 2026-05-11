@@ -18,3 +18,15 @@ knowledgebasecat,/knowledgebase.php?action=displaycat&catid=1,kb
 knowledgebasearticle,/knowledgebase.php?action=displayarticle&id=1,kb
 login,/clientarea.php,login
 homepage,/index.php,hp
+contact,/contact.php,ct
+clientregister,/register,cr
+pwreset,/pwreset.php,pw
+clientareaproductdetails,/clientarea.php?action=productdetails&id=1,pd
+clientareaaddfunds,/clientarea.php?action=addfunds,af
+account-paymentmethods,/clientarea.php?action=paymentmethods,pm
+invoice-payment,/viewinvoice.php?id=1&paynow=true,ip
+masspay,/clientarea.php?action=masspay&all=true,mp
+user-verify-email,/clientarea.php?action=verify-email,uve
+user-invite-accept,/user-invite-accept,uia
+two-factor-challenge,/login,tfac
+two-factor-new-backup-code,/clientarea.php?action=twofactor&sub=backup,tfabc

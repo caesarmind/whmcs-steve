@@ -1,0 +1,22 @@
+.ip-wrap { display: flex; justify-content: center; padding: 32px 16px 48px; }
+.ip-card { max-width: 480px; width: 100%; padding: 36px 36px 32px; }
+.ip-title { font-size: 24px; font-weight: 600; letter-spacing: -0.018em; color: var(--color-text-primary); margin: 0 0 6px; }
+.ip-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 0 22px; }
+.ip-error { padding: 12px 14px; margin: 0 0 18px; background: var(--color-red-bg); color: var(--color-red-text); border-radius: var(--radius-sm); font-size: 13px; }
+.ip-summary { padding: 16px 18px; margin: 0 0 22px; background: var(--color-surface-secondary); border-radius: var(--radius-md); }
+.ip-summary-row { display: flex; justify-content: space-between; align-items: center; }
+.ip-summary-label { font-size: 13px; color: var(--color-text-secondary); }
+.ip-summary-value { font-size: 20px; font-weight: 600; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
+.ip-amount { color: var(--color-red-text); }
+.ip-form { display: flex; flex-direction: column; gap: 16px; }
+.ip-form .form-group { display: flex; flex-direction: column; gap: 8px; }
+.ip-form .form-label { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+.ip-methods { display: flex; flex-direction: column; gap: 8px; }
+.ip-method { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: all var(--transition-fast); }
+.ip-method:hover { border-color: var(--color-accent); }
+.ip-method:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-light); }
+.ip-method input { accent-color: var(--color-accent); }
+.ip-method-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.ip-submit { width: 100%; height: 44px; font-size: 14px; font-weight: 500; }
+.ip-cancel { width: 100%; height: 40px; font-size: 13px; margin-top: 8px; display: flex; align-items: center; justify-content: center; }
+@media (max-width: 600px) { .ip-card { padding: 28px 24px 24px; } .ip-title { font-size: 20px; } }

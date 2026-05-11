@@ -1,0 +1,37 @@
+
+.page-header { margin: 8px 0 24px; }
+.page-header h1 { font-size: 40px; font-weight: 600; letter-spacing: -0.028em; color: var(--color-text-primary); margin: 0 0 8px; line-height: 1.1; }
+.page-header .page-subtitle { font-size: 15px; color: var(--color-text-secondary); margin: 0; }
+
+.mp-wrap { max-width: 720px; }
+.mp-error { padding: 12px 14px; margin: 0 0 18px; background: var(--color-red-bg); color: var(--color-red-text); border-radius: var(--radius-sm); font-size: 13px; }
+.mp-form { display: flex; flex-direction: column; gap: 16px; }
+.mp-table-card { padding: 0; overflow: hidden; }
+.mp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.mp-table thead th { padding: 12px 16px; font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; text-align: left; border-bottom: 0.5px solid var(--color-border); background: var(--color-surface-secondary); }
+.mp-table tbody td { padding: 14px 16px; border-bottom: 0.5px solid var(--color-border); color: var(--color-text-primary); }
+.mp-table tbody tr:last-child td { border-bottom: 0; }
+.mp-col-check { width: 32px; }
+.mp-col-amount { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+.mp-col-invoice { font-weight: 500; }
+.mp-col-due { color: var(--color-text-secondary); font-size: 12px; font-variant-numeric: tabular-nums; }
+.mp-table input[type="checkbox"] { accent-color: var(--color-accent); width: 16px; height: 16px; cursor: pointer; }
+.mp-summary { padding: 14px 18px; background: var(--color-accent-light); border-radius: var(--radius-md); }
+.mp-summary-row { display: flex; justify-content: space-between; align-items: center; }
+.mp-summary-label { font-size: 14px; font-weight: 500; color: var(--color-accent); }
+.mp-summary-value { font-size: 20px; font-weight: 600; color: var(--color-accent); font-variant-numeric: tabular-nums; }
+.mp-pay-card { }
+.mp-pay-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 12px; }
+.mp-methods { display: flex; flex-direction: column; gap: 8px; }
+.mp-method { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: all var(--transition-fast); }
+.mp-method:hover { border-color: var(--color-accent); }
+.mp-method:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-light); }
+.mp-method input { accent-color: var(--color-accent); }
+.mp-method-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.mp-submit { width: 100%; height: 44px; font-size: 14px; font-weight: 500; }
+.mp-empty { padding: 56px 24px 48px; text-align: center; color: var(--color-text-secondary); background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: var(--radius-md); }
+.mp-empty-ico { width: 52px; height: 52px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.mp-empty-ico svg { width: 22px; height: 22px; }
+.mp-empty-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+.mp-empty-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 auto 18px; max-width: 340px; line-height: 1.45; }
+@media (max-width: 600px) { .mp-table thead { display: none; } .mp-table tbody tr { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; padding: 12px 16px; } .mp-table tbody td { padding: 0; border-bottom: none; } .mp-col-check { grid-row: 1 / 3; align-self: center; } .mp-col-amount { text-align: right; align-self: center; grid-row: 1 / 3; } .mp-col-due { grid-column: 2; } }
