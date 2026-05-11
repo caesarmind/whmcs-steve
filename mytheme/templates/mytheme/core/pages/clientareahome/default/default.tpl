@@ -67,7 +67,7 @@
     {/foreach}
 {/if}
 
-{if $clientsstats.productsnumactive > 0 || $clientsstats.numactivedomains > 0 || $clientsstats.numunpaidinvoices > 0 || $clientsstats.numactivetickets > 0 || $hasNativeServices || $hasNativeTickets || $hasNativeNews || (isset($dashboard.activeServices) && $dashboard.activeServices|count > 0) || (isset($dashboard.openTickets) && $dashboard.openTickets|count > 0) || (isset($publishedAnnouncements) && $publishedAnnouncements|count > 0)}
+{if $clientsstats.productsnumactive > 0 || $clientsstats.numactivedomains > 0 || $clientsstats.numunpaidinvoices > 0 || $clientsstats.numactivetickets > 0 || $hasNativeServices || $hasNativeTickets || $hasNativeNews || (isset($dashboard.activeServices) && $dashboard.activeServices|@count > 0) || (isset($dashboard.openTickets) && $dashboard.openTickets|@count > 0) || (isset($publishedAnnouncements) && $publishedAnnouncements|@count > 0)}
     {assign var=dashIsEmpty value='full'}
 {else}
     {assign var=dashIsEmpty value='empty'}
@@ -382,7 +382,7 @@
                     {/if}
                 {/foreach}
             </div>
-            {elseif isset($dashboard.activeServices) && $dashboard.activeServices|count > 0}
+            {elseif isset($dashboard.activeServices) && $dashboard.activeServices|@count > 0}
             <div class="card-body" style="padding: 4px 24px 12px;">
                 {foreach $dashboard.activeServices as $svc}
                     {assign var=svcTitle value=$svc.groupname|default:$svc.product|default:$svc.name|default:'Service'}
@@ -463,7 +463,7 @@
                         {/if}
                     {/foreach}
                 </div>
-                {elseif isset($dashboard.openTickets) && $dashboard.openTickets|count > 0}
+                {elseif isset($dashboard.openTickets) && $dashboard.openTickets|@count > 0}
                 <div class="card-body ticket-list-body">
                     {foreach $dashboard.openTickets as $tkt}
                         <a href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape}{if $tkt.c}&c={$tkt.c|escape}{/if}" class="service-item ticket-row">
@@ -533,7 +533,7 @@
                     {/foreach}
                 </div>
             </div>
-            {elseif isset($publishedAnnouncements) && $publishedAnnouncements|count > 0}
+            {elseif isset($publishedAnnouncements) && $publishedAnnouncements|@count > 0}
             <div class="card-body">
                 <div class="news-list">
                     {foreach $publishedAnnouncements as $ann}

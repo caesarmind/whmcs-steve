@@ -7,9 +7,9 @@
      $numannouncements — total count (optional)
 *}
 
-{if isset($announcements) && $announcements|count > 0}
+{if isset($announcements) && $announcements|@count > 0}
     {assign var=dashIsEmpty value='full'}
-    {assign var=annCount value=$announcements|count}
+    {assign var=annCount value=$announcements|@count}
 {else}
     {assign var=dashIsEmpty value='empty'}
     {assign var=annCount value=0}
@@ -86,7 +86,7 @@
             </div>
         </div>
 
-        {if isset($announcements) && $announcements|count > 0}
+        {if isset($announcements) && $announcements|@count > 0}
         <div class="when-full">
             {foreach $announcements as $ann}
             <div class="card">

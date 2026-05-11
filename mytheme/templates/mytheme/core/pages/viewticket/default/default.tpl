@@ -97,7 +97,7 @@
                     {/if}
 
                     {* Follow-up replies. Use |@count for Collection-safe length
-                       (plain |count silently returns 0 on Laravel Collections). *}
+                       (the plain count modifier silently returns 0 on Laravel Collections). *}
                     {if isset($replies) && $replies|@count > 0}
                         {foreach $replies as $reply}
                         {if isset($reply.requestor_type) && $reply.requestor_type == 'admin'}

@@ -104,7 +104,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {if isset($lineitems) && $lineitems|count > 0}
+                    {if isset($lineitems) && $lineitems|@count > 0}
                         {foreach $lineitems as $item}
                         <tr>
                             <td class="desc">{$item.description|escape}</td>
@@ -135,7 +135,7 @@
         {* Transactions (history) *}
         <div class="card inv-lines-card">
             <div class="card-header"><h2>{$LANG.invoicestransactions|default:'Transactions'}</h2></div>
-            {if isset($transactions) && $transactions|count > 0}
+            {if isset($transactions) && $transactions|@count > 0}
             <table class="inv-lines">
                 <thead>
                     <tr>
@@ -169,7 +169,7 @@
                 <input type="hidden" name="paynow" value="true">
                 <div class="inv-pay">
                     <div class="inv-pay-method-list">
-                        {if isset($paymentmethods) && $paymentmethods|count > 0}
+                        {if isset($paymentmethods) && $paymentmethods|@count > 0}
                             {foreach $paymentmethods as $pm}
                             <label class="inv-pay-method">
                                 <input type="radio" name="paymentmethod" value="{$pm.module|default:''|escape}"{if $pm@first} checked{/if}>

@@ -87,7 +87,7 @@
                         <input type="tel" class="form-input" id="ad-phone" name="phonenumber" value="{$clientsdetails.phonenumber|default:''|escape}" autocomplete="tel">
                     </div>
                 </div>
-                {if isset($languages) && $languages|count > 0}
+                {if isset($languages) && $languages|@count > 0}
                 <div class="form-group">
                     <label class="form-label" for="ad-lang">{$LANG.clientarealanguage|default:'Language'}</label>
                     <select class="form-select" id="ad-lang" name="language">
@@ -128,7 +128,7 @@
                     <div class="form-group">
                         <label class="form-label" for="ad-country">{$LANG.clientareacountry|default:'Country'}</label>
                         <select class="form-select" id="ad-country" name="country" autocomplete="country">
-                            {if isset($countries) && $countries|count > 0}
+                            {if isset($countries) && $countries|@count > 0}
                                 {foreach $countries as $code => $name}
                                 <option value="{$code|escape}"{if isset($clientsdetails.country) && $clientsdetails.country == $code} selected{/if}>{$name|escape}</option>
                                 {/foreach}

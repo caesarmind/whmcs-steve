@@ -92,7 +92,7 @@
             <button type="submit" class="btn-primary btn-lg btn-full">{$LANG.loginbutton|default:'Sign In'}</button>
         </form>
 
-        {if $ssoProviders|default:false && $ssoProviders|count > 0}
+        {if $ssoProviders|default:false && $ssoProviders|@count > 0}
             <div class="auth-divider">{$LANG.orcontinuewith|default:'or continue with'}</div>
             <div class="auth-sso-row">
                 {foreach $ssoProviders as $provider}
