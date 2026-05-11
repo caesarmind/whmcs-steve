@@ -266,6 +266,11 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
 {/literal}
             order:     [[{$sortColIdx}, '{$sortDir|lower}']],
 {literal}
+            // Force string type on every column — auto-detection picks "num" or
+            // "date" when the first row's data-order value looks numeric/date,
+            // which silently breaks alphabetic sort on text columns (subject).
+            // ISO date strings still sort chronologically under string-asc.
+            columnDefs: [{ type: 'string', targets: '_all' }],
         });
         var keyByCol = { 0: 'subject', 1: 'department', 2: 'status', 3: 'updated' };
         table.on('order.dt', function () {

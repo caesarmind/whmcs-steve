@@ -441,7 +441,14 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
 {/literal}
             order:     [[{$sortColIdx}, '{$sortDir|lower}']],
 {literal}
-            columnDefs: [{ orderable: false, targets: -1 }]
+            columnDefs: [
+                { orderable: false, targets: -1 },
+                // Force types per column — DataTables auto-detection samples the
+                // first row's data-order value and can pick wrong types, silently
+                // breaking sort. See "Column type rules" below.
+                { type: 'num',    targets: [0, 3] },          // id, amount
+                { type: 'string', targets: [1, 2, 4] }        // date, due, status
+            ]
         });
         var keyByCol = { 0: 'id', 1: 'date', 2: 'due', 3: 'amount', 4: 'status' };
         table.on('order.dt', function () {
@@ -464,6 +471,45 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
 ```
 
 Critical: `paging:false, searching:false, info:false` keeps our custom pager/filter visible — DataTables ONLY handles sort. `autoWidth:false` prevents it from overriding our `<colgroup>` widths with inline styles.
+
+### Column type rules (the bug that bit us)
+
+**Always set `columnDefs` types explicitly — never rely on auto-detection.** DataTables samples the first row's `data-order` value to pick a sort type. With ambiguous data ("2024" could be a number or a year, "5.99" could be a float or a version) it picks the wrong type and the column either sorts in an unexpected order or doesn't sort at all. We hit this on supporttickets: the Subject column wouldn't sort alphabetically because DataTables guessed the wrong type from the first row.
+
+Pick types from this matrix:
+
+| Column content | `data-order` value | `type` |
+|---|---|---|
+| Plain text (subject, name, department) | the raw text | `'string'` |
+| Status / category (lowercased class name) | `unpaid`, `delivered`, `on-hold` | `'string'` |
+| ID (integer primary key) | `42`, `1083` | `'num'` |
+| Money / amount | `19.99`, `1234.50` (raw float, no `$`) | `'num'` |
+| Date — formatted | `Apr 11, 2026` — DON'T sort on this | always pair with raw date |
+| Date — raw (ISO or `YYYY-MM-DD HH:MM:SS`) | `2026-04-11` or `2026-04-11 14:23:55` | `'string'` (lex order = chron order) |
+| Date — UNIX timestamp | `1744387200` | `'num'` |
+| Boolean (on/off, true/false) | `1` / `0` or `yes` / `no` | `'string'` (consistent across rows) |
+
+**Verification — open DevTools console and inspect the detected type:**
+```javascript
+var t = jQuery('#invTable').DataTable();
+t.columns().every(function () {
+    console.log('Col', this.index(), 'type:', t.column(this.index()).type());
+});
+// Each line must show the type you configured. If "num" shows up for a
+// text column or "html" shows anywhere, the auto-detect picked wrong.
+```
+
+**The actual sort behavior test** — paste in console after the page loads:
+```javascript
+var t = jQuery('#invTable').DataTable();
+t.order([0, 'asc']).draw();  // sort by first column ascending
+var first = jQuery('#invTable tbody tr').first().find('td').first().text().trim();
+t.order([0, 'desc']).draw();
+var first2 = jQuery('#invTable tbody tr').first().find('td').first().text().trim();
+console.log({ asc: first, desc: first2, changed: first !== first2 });
+// "changed: true" means sort worked. "changed: false" means the column
+// is sorting incorrectly OR isn't sortable (orderable: false).
+```
 
 ### 4. CSS — own the sort indicator, hide DataTables defaults
 
@@ -619,6 +665,7 @@ Before pushing, run through:
 - [ ] All five files exist on disk (dispatcher, page.php, default.tpl, pageoption.php, page CSS)
 - [ ] `git status` shows all five files staged or already tracked (gitignore traps caught domains/invoices CSS — verify with `git ls-files | grep <page>`)
 - [ ] **Dispatcher is named after the WHMCS templatefile, not the URL slug**: `/supporttickets.php` → `supportticketslist.tpl`, `/announcements.php?id=X` → `viewannouncement.tpl`, etc. If unsure, add a temporary `<!-- tpl: {$templatefile} -->` to `header.tpl` and `curl` the live page after deploy. Trap: building `<urlslug>.tpl` instead of `<templatefile>.tpl` produces an HTTP 200 with an empty `.content-area` because WHMCS can't find a matching tpl.
+- [ ] **Every sortable DataTables column has an explicit `columnDefs` type** — never rely on auto-detection. See §6f "Column type rules" matrix. Quick test: paste the verification snippet from §6f into DevTools and confirm every column reports the type you configured.
 - [ ] Smarty assignments use `{assign}`, not `{$x = y}`
 - [ ] `{foreach}` loops use the iterator's built-in `@iteration` / `@index` properties — no `{foreach $x as $y@custom}` (invalid syntax, silent compile failure that empties the content-area)
 - [ ] Inline `<script>` (and `<style>` if it contains `{...}`) bodies are wrapped in `{literal}…{/literal}` so Smarty doesn't parse JS curly braces
@@ -702,6 +749,7 @@ Visual checks (real browser):
 - **Browser caches CSS aggressively** → bump the `?v=` query string in page tpls when changing CSS, or hard-refresh / use incognito to verify.
 - **Top-level dispatcher checks `file_exists` against `"templates/$path"`** → that path is **relative to WHMCS root**, not the tpl's location. Don't refactor it to absolute.
 - **Custom foreach iterator names `{foreach $x as $y@idx}` are invalid Smarty** → Smarty doesn't let you rename the iterator properties; trying to do so is a silent compile failure. Use the loop variable's properties directly: `{foreach $x as $y}{if $y@iteration <= 5}…` for 1-based count, or `$y@index` for 0-based. Same trap can appear with `$y@n` / `$y@i` / any custom suffix. Got bit by this in `knowledgebase/default/default.tpl` (commit `7859422`) — the whole content-area rendered empty because Smarty 4 won't compile the template at all.
+- **DataTables column type auto-detection picks wrong** → a sortable column appears to do nothing on click, or sorts in an unexpected order. Cause: DataTables samples the first row's `data-order` value and guesses "num", "date", "html", "string"; ambiguous data ("5.99", "2024", a lowercased status name) gets typed wrong. Fix: always set `columnDefs: [{ type: 'string', targets: [...text cols...] }, { type: 'num', targets: [...numeric cols...] }]`. Got bit on supporttickets where the Subject column wouldn't sort alphabetically (commit `2ffdc1c` fixed it). See §6f "Column type rules" for the per-column-content type matrix.
 - **URL path ≠ WHMCS templatefile** → `/supporttickets.php` is routed through templatefile `supportticketslist`, not `supporttickets`. `/announcements.php?id=X` uses `viewannouncement`, not `announcements`. The dispatcher tpl you need is named after the **templatefile**, not the URL slug. Verification: `view-source:` the live page and look at `data-page-title` in the body tag — that's the WHMCS pageTitle, which usually maps closely to the templatefile. Or add `<!-- tpl: {$templatefile} -->` to header.tpl temporarily. Got bit by this in commit `02e5101` — `supportticketslist.tpl` + `core/pages/supportticketslist/` were never committed, so the live server had no dispatcher for the page and the content-area rendered empty.
 - **Empty `.content-area` on view-source = silent Smarty compile failure OR missing dispatcher** → page renders HTTP 200, header + sidebar + footer all paint correctly, but `<div class="content-area">` contains only whitespace. Two top causes:
   1. Smarty parse error in the page's `default.tpl` (invalid syntax, unbalanced tags, modifier-on-wrong-type). Smarty 4 in production mode swallows the error and emits nothing for that include.
