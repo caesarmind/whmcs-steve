@@ -5,6 +5,12 @@
                       status, statusclass
      $openOnly      — bool — when true, only open tickets are shown
 *}
+<!-- TKT-TPL-LOADED templatefile={$templatefile|default:'-'}
+     tickets_isset={if isset($tickets)}1{else}0{/if}
+     tickets_count={if isset($tickets)}{$tickets|@count}{else}-{/if}
+     mtTickets_isset={if isset($mtTickets)}1{else}0{/if}
+     mtTickets_count={if isset($mtTickets)}{$mtTickets|@count}{else}-{/if}
+-->
 
 {* Prefer WHMCS-native $tickets; fall back to $mtTickets populated by
    Hooks::clientAreaPageSupportTickets via localAPI when WHMCS doesn't
