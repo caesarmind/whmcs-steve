@@ -44,6 +44,15 @@ body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area {
     margin-left: 0;
     margin-right: auto;
 }
+
+/* Defensive centering in top layout — content-area always centers
+   horizontally when there's no sidebar to anchor against. */
+body[data-layout="top"] .ph-main-wrap .content-area {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    transform: none !important;
+}
+
 /* Footers sit as natural block children at the end of the flex column — no extra rule needed */
 /* Rail panel overlays content on hover — does NOT shift main wrap */
 body:not([data-layout="top"]) { background: var(--color-bg); }
