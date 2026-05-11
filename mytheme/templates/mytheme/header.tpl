@@ -1,22 +1,172 @@
-{* Hostnodes — page header.
-   Renders the html shell + body data-attributes that the apple-layout system uses
-   to switch between top / side / rail layouts. All 3 partials are emitted; CSS
-   shows only the one matching body[data-layout].
+{* ════════════════════════════════════════════════════════════════════════
+   Hostnodes — page header.
 
-   Layout selection is admin-driven:
-     Admin → MyTheme → Layouts → main-menu → pick sidebar | top | rail
-     → saved to mytheme_settings as "mytheme_active_layout_main-menu"
-     → Hooks::resolveActiveLayout reads the layout.php manifest
-     → exposes $myTheme.layouts['main-menu'].vars.dataLayout = side|top|rail
+   ALL Smarty assignments live above the DOCTYPE so $mt_palette etc. are
+   available when the <html> tag renders.
 
-   Buyer override: drop a custom header.tpl into templates/<slug>/overwrites/. *}
+   URL params (every chip toggle is reachable via the address bar):
+     ?layout=top|side|rail
+     ?align=center|content|left
+     ?subnav=on|off
+     ?subnavside=left|right|outside-left|outside
+     ?svclayout=inside|outside
+     ?data=full|empty
+     ?tiles=all|a|b|c|d|e|f
+     ?form=all|a|b|c
+     ?plan=all|a|b|c|d|e|f|g|h
+     ?product=all|a|b|c
+     ?palette=blue|emerald|violet|rose|amber|slate
+   These set body data-* attributes (palette sets html data-palette).
+   The chip JS still drives runtime toggling + localStorage; URL value
+   wins on initial render.
+   ════════════════════════════════════════════════════════════════════════ *}
 
-{if file_exists("templates/$template/overwrites/header.tpl")}
-    {include file="`$template`/overwrites/header.tpl"}
-{else}
+{if empty($myTheme.license.canRender)}
 <!DOCTYPE html>
-<!-- mytheme header v7 -->
-<html lang="{$activeLocale.languageCode|default:'en'}" data-theme="light">
+<html lang="{$activeLocale.languageCode|default:'en'}">
+<head>
+    <meta charset="{$charset|default:'utf-8'}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme License Required</title>
+    <style>
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f7; color: #1d1d1f; }
+        .mt-license-required { min-height: 100vh; display: grid; place-items: center; padding: 32px; box-sizing: border-box; }
+        .mt-license-required-card { width: min(100%, 520px); padding: 32px; border-radius: 24px; background: #fff; box-shadow: 0 24px 80px rgba(0,0,0,.12); text-align: center; }
+        .mt-license-required-card h1 { margin: 0 0 10px; font-size: 26px; line-height: 1.2; }
+        .mt-license-required-card p { margin: 0; color: #6e6e73; line-height: 1.55; }
+    </style>
+</head>
+<body class="mt-license-blocked">
+    {include file="`$template`/error/license-required.tpl"}
+    <div hidden aria-hidden="true">
+{else}
+
+{* auth state *}
+{if $loggedin}{assign var=mt_auth value='in'}{else}{assign var=mt_auth value='out'}{/if}
+
+{* layout *}
+{assign var=mt_layout value='side'}
+{if isset($smarty.get.layout)}
+    {assign var=_q value=$smarty.get.layout}
+    {if $_q == 'top'}{assign var=mt_layout value='top'}
+    {elseif $_q == 'rail'}{assign var=mt_layout value='rail'}
+    {elseif $_q == 'side'}{assign var=mt_layout value='side'}
+    {/if}
+{/if}
+
+{* align *}
+{assign var=mt_align value=''}
+{if isset($smarty.get.align)}
+    {assign var=_q value=$smarty.get.align}
+    {if $_q == 'center' || $_q == 'content' || $_q == 'left'}{assign var=mt_align value=$_q}{/if}
+{/if}
+
+{* subnav (on/off) *}
+{assign var=mt_subnav value=''}
+{if isset($smarty.get.subnav)}
+    {assign var=_q value=$smarty.get.subnav}
+    {if $_q == 'on' || $_q == 'off'}{assign var=mt_subnav value=$_q}{/if}
+{/if}
+
+{* subnav side *}
+{assign var=mt_subnavSide value=''}
+{if isset($smarty.get.subnavside)}
+    {assign var=_q value=$smarty.get.subnavside}
+    {if $_q == 'left' || $_q == 'right' || $_q == 'outside' || $_q == 'outside-left'}
+        {assign var=mt_subnavSide value=$_q}
+    {/if}
+{/if}
+
+{* services layout (inside/outside) *}
+{assign var=mt_svcLayout value=''}
+{if isset($smarty.get.svclayout)}
+    {assign var=_q value=$smarty.get.svclayout}
+    {if $_q == 'inside' || $_q == 'outside'}{assign var=mt_svcLayout value=$_q}{/if}
+{/if}
+
+{* data state *}
+{assign var=mt_data value=''}
+{if isset($smarty.get.data)}
+    {assign var=_q value=$smarty.get.data}
+    {if $_q == 'full' || $_q == 'empty'}{assign var=mt_data value=$_q}{/if}
+{/if}
+
+{* tiles *}
+{assign var=mt_tiles value=''}
+{if isset($smarty.get.tiles)}
+    {assign var=_q value=$smarty.get.tiles}
+    {if $_q == 'all' || $_q == 'a' || $_q == 'b' || $_q == 'c' || $_q == 'd' || $_q == 'e' || $_q == 'f'}
+        {assign var=mt_tiles value=$_q}
+    {/if}
+{/if}
+
+{* form *}
+{assign var=mt_form value=''}
+{if isset($smarty.get.form)}
+    {assign var=_q value=$smarty.get.form}
+    {if $_q == 'all' || $_q == 'a' || $_q == 'b' || $_q == 'c'}{assign var=mt_form value=$_q}{/if}
+{/if}
+
+{* plan *}
+{assign var=mt_plan value=''}
+{if isset($smarty.get.plan)}
+    {assign var=_q value=$smarty.get.plan}
+    {if $_q == 'all' || $_q == 'a' || $_q == 'b' || $_q == 'c' || $_q == 'd' || $_q == 'e' || $_q == 'f' || $_q == 'g' || $_q == 'h'}
+        {assign var=mt_plan value=$_q}
+    {/if}
+{/if}
+
+{* product *}
+{assign var=mt_product value=''}
+{if isset($smarty.get.product)}
+    {assign var=_q value=$smarty.get.product}
+    {if $_q == 'all' || $_q == 'a' || $_q == 'b' || $_q == 'c'}{assign var=mt_product value=$_q}{/if}
+{/if}
+
+{* palette (sets <html data-palette>) *}
+{assign var=mt_palette value=''}
+{if isset($smarty.get.palette)}
+    {assign var=_q value=$smarty.get.palette}
+    {if $_q == 'blue' || $_q == 'emerald' || $_q == 'violet' || $_q == 'rose' || $_q == 'amber' || $_q == 'slate'}
+        {assign var=mt_palette value=$_q}
+    {/if}
+{/if}
+
+{* active nav + page label per WHMCS templatefile *}
+{assign var=mt_activeNav value=''}
+{assign var=mt_pageLabel value=$pagetitle}
+{assign var=_tf value=$templatefile|default:''}
+{if $_tf == 'clientareahome'}
+    {assign var=mt_activeNav value='dashboard'}
+    {assign var=mt_pageLabel value='Dashboard'}
+{elseif $_tf == 'clientareaproducts'}
+    {assign var=mt_activeNav value='services'}
+    {assign var=mt_pageLabel value='My Products & Services'}
+{elseif $_tf == 'clientareaproductdetails'}
+    {assign var=mt_activeNav value='services'}
+{elseif $_tf == 'clientareadomains'}
+    {assign var=mt_activeNav value='domains'}
+    {assign var=mt_pageLabel value='My Domains'}
+{elseif $_tf == 'clientareainvoices'}
+    {assign var=mt_activeNav value='invoices'}
+    {assign var=mt_pageLabel value='My Invoices'}
+{elseif $_tf == 'viewinvoice'}
+    {assign var=mt_activeNav value='invoices'}
+{elseif $_tf == 'supporttickets' || $_tf == 'supportticketslist'}
+    {assign var=mt_activeNav value='tickets'}
+    {assign var=mt_pageLabel value='Support Tickets'}
+{elseif $_tf == 'viewticket'}
+    {assign var=mt_activeNav value='tickets'}
+{elseif $_tf == 'clientareadetails'}
+    {assign var=mt_activeNav value='details'}
+    {assign var=mt_pageLabel value='My Details'}
+{elseif $_tf == 'announcements'}
+    {assign var=mt_pageLabel value='Announcements'}
+{/if}
+<!DOCTYPE html>
+<!-- mytheme header v11 -->
+<html lang="{$activeLocale.languageCode|default:'en'}" data-theme="light" data-header-sentinel="v11"{if $mt_palette} data-palette="{$mt_palette|escape}"{/if}>
 <head>
     <meta charset="{$charset|default:'utf-8'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -27,73 +177,30 @@
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-layout.css?v=1.0">
     {$headoutput}
 </head>
-
-{* ── Resolve the active layout from admin settings.
-      Hook populates $myTheme.layouts['main-menu'].vars.dataLayout based on
-      whichever layout the admin picked (sidebar → 'side', top → 'top',
-      rail → 'rail'). Falls back to 'side' if myTheme isn't populated. ── *}
-{assign var=mt_layout value='side'}
-{if isset($myTheme) && isset($myTheme.layouts) && isset($myTheme.layouts['main-menu'])}
-    {if isset($myTheme.layouts['main-menu'].vars) && isset($myTheme.layouts['main-menu'].vars.dataLayout)}
-        {assign var=mt_layout value=$myTheme.layouts['main-menu'].vars.dataLayout}
-    {/if}
-{/if}
-
-{assign var=mt_auth value='out'}
-{if $loggedin}{assign var=mt_auth value='in'}{/if}
-
-{* activeNav drives the sidebar/rail/topnav highlight. Map common WHMCS
-   templatefiles to a sidebar slot. *}
-{assign var=_tf value=$templatefile|default:''}
-{assign var=mt_activeNav value='dashboard'}
-{if $_tf == 'clientareaproducts' || $_tf == 'clientareaproductdetails'}
-    {assign var=mt_activeNav value='services'}
-{elseif $_tf == 'clientareadomains' || $_tf == 'clientareadomaindetails' || $_tf == 'clientareadomaindns' || $_tf == 'clientareadomainregisterns' || $_tf == 'clientareadomaincontactinfo' || $_tf == 'clientareadomainemailforwarding' || $_tf == 'domainchecker'}
-    {assign var=mt_activeNav value='domains'}
-{elseif $_tf == 'clientareainvoices' || $_tf == 'viewinvoice' || $_tf == 'invoicepdf'}
-    {assign var=mt_activeNav value='invoices'}
-{elseif $_tf == 'clientareaquotes' || $_tf == 'viewquote'}
-    {assign var=mt_activeNav value='quotes'}
-{elseif $_tf == 'supporttickets' || $_tf == 'supportticketslist' || $_tf == 'supportticketsubmit' || $_tf == 'viewticket'}
-    {assign var=mt_activeNav value='tickets'}
-{elseif $_tf == 'knowledgebase' || $_tf == 'knowledgebasecat' || $_tf == 'knowledgebasearticle'}
-    {assign var=mt_activeNav value='knowledgebase'}
-{elseif $_tf == 'announcements' || $_tf == 'viewannouncement'}
-    {assign var=mt_activeNav value='announcements'}
-{elseif $_tf == 'clientareadetails' || $_tf == 'clientareacontacts'}
-    {assign var=mt_activeNav value='details'}
-{elseif $_tf == 'clientareasecurity' || $_tf == 'twofactor'}
-    {assign var=mt_activeNav value='security-account'}
-{elseif $_tf == 'login' || $_tf == 'register' || $_tf == 'pwreset'}
-    {assign var=mt_activeNav value=''}
-{/if}
-
 <body class="client-area-layout"
       data-auth="{$mt_auth}"
       data-layout="{$mt_layout}"
       data-active-nav="{$mt_activeNav|escape}"
-      data-page-title="{$pagetitle|escape|default:'Page'}">
+      data-page-title="{$pagetitle|escape|default:'Page'}"{if $mt_align} data-align="{$mt_align|escape}"{/if}{if $mt_subnav} data-subnav="{$mt_subnav|escape}"{/if}{if $mt_subnavSide} data-subnav-side="{$mt_subnavSide|escape}"{/if}{if $mt_svcLayout} data-svc-layout="{$mt_svcLayout|escape}"{/if}{if $mt_data} data-data="{$mt_data|escape}"{/if}{if $mt_tiles} data-tiles="{$mt_tiles|escape}"{/if}{if $mt_form} data-form="{$mt_form|escape}"{/if}{if $mt_plan} data-plan="{$mt_plan|escape}"{/if}{if $mt_product} data-product="{$mt_product|escape}"{/if}>
 
 {$headeroutput}
 
-{* All 3 layout partials emit their markup; CSS shows only the active one. *}
+{* Dev preview chip — render on ?preview=1 or for admins *}
+{include file="`$template`/includes/partials/state-chip.tpl"}
+
 {include file="`$template`/includes/partials/rail.tpl"}
 {include file="`$template`/includes/partials/sidebar.tpl"}
 
 <div class="ph-main-wrap">
 
-    {* Top-layout topnav (only-top) *}
     {include file="`$template`/includes/partials/topnav.tpl"}
-
-    {* Inner topbar (sidebar + rail layouts) *}
     {include file="`$template`/includes/partials/inner-topbar.tpl"}
 
-    {* Top-layout breadcrumb *}
     <nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
         <div class="ph-breadcrumb-inner">
             <a href="{$WEB_ROOT}/">{$LANG.home|default:'Home'}</a>
             <span class="sep">/</span>
-            <span class="current" aria-current="page">{$pagetitle|escape|default:'Page'}</span>
+            <span class="current" aria-current="page">{$mt_pageLabel|escape|default:'Page'}</span>
         </div>
     </nav>
 
