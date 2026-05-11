@@ -48,14 +48,15 @@
         <h1>{$subject|escape}</h1>
     </div>
     {if $tktStatusLower != 'closed'}
-    <form method="post" action="{$WEB_ROOT}/viewticket.php?tid={$tid|escape}{if isset($c) && $c}&c={$c|escape}{/if}" style="display:inline;">
-        <input type="hidden" name="token" value="{$token|default:''|escape}">
-        <input type="hidden" name="action" value="close">
-        <button type="submit" class="tk-close-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-            {$LANG.supportticketsclose|default:'Close Ticket'}
-        </button>
-    </form>
+    {* WHMCS expects closeticket=true as a URL parameter on a simple GET
+       (verified against Nexus). Not a POST with name="action" value="close" —
+       that path triggers "An invalid request was made". *}
+    <a href="{$WEB_ROOT}/viewticket.php?tid={$tid|escape}{if isset($c) && $c}&c={$c|escape}{/if}&closeticket=true"
+       class="tk-close-btn"
+       onclick="return confirm('{$LANG.confirmcloseticket|default:'Close this ticket?'}');">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        {$LANG.supportticketsclose|default:'Close Ticket'}
+    </a>
     {/if}
 </header>
 
@@ -166,11 +167,13 @@
                         </div>
                     </div>
 
-                    <form method="post" action="{$WEB_ROOT}/viewticket.php?tid={$tid|escape}{if isset($c) && $c}&c={$c|escape}{/if}" enctype="multipart/form-data">
+                    {* WHMCS expects postreply=true as a URL parameter (verified against
+                       Nexus and Lagom). Not a POST with name="action" value="reply" —
+                       that path triggers "An invalid request was made". *}
+                    <form method="post" action="{$WEB_ROOT}/viewticket.php?tid={$tid|escape}{if isset($c) && $c}&c={$c|escape}{/if}&postreply=true" enctype="multipart/form-data">
                         <input type="hidden" name="token" value="{$token|default:''|escape}">
-                        <input type="hidden" name="action" value="reply">
                         <div class="tk-editor">
-                            <textarea class="tk-editor-area" name="message" placeholder="{$LANG.writeyourreply|default:'Write your reply…'}" required></textarea>
+                            <textarea class="tk-editor-area" name="replymessage" placeholder="{$LANG.writeyourreply|default:'Write your reply…'}" required></textarea>
                         </div>
 
                         <label class="tk-drop">
@@ -184,7 +187,7 @@
                         </div>
 
                         <div class="tk-reply-foot">
-                            <button type="submit" class="btn-primary">{$LANG.sendmessage|default:'Send Message'}</button>
+                            <button type="submit" name="save" value="1" class="btn-primary">{$LANG.sendmessage|default:'Send Message'}</button>
                             <a href="{$WEB_ROOT}/supporttickets.php" class="btn-secondary">{$LANG.cancel|default:'Cancel'}</a>
                         </div>
                     </form>
