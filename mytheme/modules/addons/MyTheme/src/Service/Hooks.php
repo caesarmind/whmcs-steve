@@ -218,23 +218,48 @@ final class Hooks
             foreach (($response['invoices']['invoice'] ?? []) as $inv) {
                 $status = strip_tags((string)($inv['status'] ?? 'Unpaid'));
                 $out[] = [
-                    'id'          => (int)($inv['id'] ?? 0),
-                    'invoicenum'  => (string)($inv['invoicenum'] ?? $inv['id'] ?? ''),
-                    'invoiceid'   => (int)($inv['id'] ?? 0),
-                    'datecreated' => !empty($inv['date']) && $inv['date'] !== '0000-00-00'
+                    'id'             => (int)($inv['id'] ?? 0),
+                    'invoicenum'     => (string)($inv['invoicenum'] ?? $inv['id'] ?? ''),
+                    'invoiceid'      => (int)($inv['id'] ?? 0),
+                    'datecreated'    => !empty($inv['date']) && $inv['date'] !== '0000-00-00'
                         ? date('M j, Y', strtotime((string)$inv['date']))
                         : '',
-                    'duedate'     => !empty($inv['duedate']) && $inv['duedate'] !== '0000-00-00'
+                    'duedate'        => !empty($inv['duedate']) && $inv['duedate'] !== '0000-00-00'
                         ? date('M j, Y', strtotime((string)$inv['duedate']))
                         : '',
-                    'datepaid'    => !empty($inv['datepaid']) && $inv['datepaid'] !== '0000-00-00 00:00:00'
+                    'datepaid'       => !empty($inv['datepaid']) && $inv['datepaid'] !== '0000-00-00 00:00:00'
                         ? date('M j, Y', strtotime((string)$inv['datepaid']))
                         : '',
-                    'total'       => (string)($inv['total'] ?? ''),
-                    'status'      => $status,
-                    'statusLower' => strtolower($status),
+                    'total'          => (string)($inv['total'] ?? ''),
+                    'status'         => $status,
+                    'statusLower'    => strtolower($status),
+                    // Raw values kept for sorting (the display values above are
+                    // formatted strings that don't compare meaningfully).
+                    '_sort_date_raw' => (string)($inv['date'] ?? ''),
+                    '_sort_due_raw'  => (string)($inv['duedate'] ?? ''),
+                    '_sort_amount'   => (float)preg_replace('/[^0-9.\-]/', '', (string)($inv['total'] ?? '0')),
                 ];
             }
+
+            // URL-driven sort: /clientarea.php?action=invoices&orderby=KEY&sort=ASC|DESC
+            // Honor only known keys + directions; bail to default otherwise.
+            $orderby = (string)($_GET['orderby'] ?? 'id');
+            $sort    = strtoupper((string)($_GET['sort'] ?? 'DESC'));
+            if (!in_array($sort, ['ASC', 'DESC'], true)) {
+                $sort = 'DESC';
+            }
+            $cmp = match ($orderby) {
+                'date'   => fn($a, $b) => strcmp($a['_sort_date_raw'], $b['_sort_date_raw']),
+                'due'    => fn($a, $b) => strcmp($a['_sort_due_raw'], $b['_sort_due_raw']),
+                'amount' => fn($a, $b) => $a['_sort_amount'] <=> $b['_sort_amount'],
+                'status' => fn($a, $b) => strcasecmp($a['status'], $b['status']),
+                default  => fn($a, $b) => $a['id'] <=> $b['id'],   // 'id'
+            };
+            usort($out, $cmp);
+            if ($sort === 'DESC') {
+                $out = array_reverse($out);
+            }
+
             return $out;
         } catch (\Throwable) {
             return [];

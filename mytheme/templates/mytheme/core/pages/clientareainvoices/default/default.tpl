@@ -89,14 +89,31 @@
             <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Cancelled" class="filter-tab{if $currentFilter == 'Cancelled'} active{/if}">{$LANG.invoicecancelled|default:'Cancelled'}</a>
         </div>
 
+        {* URL-based sort (matches WHMCS native pattern). Reads ?orderby=KEY&sort=ASC|DESC
+           from query string, builds a toggle link that flips ASC↔DESC for the active
+           column and starts at ASC for any other column. Server-side sort in
+           Hooks::fetchAllInvoices reads the same params. *}
+        {assign var=sortKey value=$smarty.get.orderby|default:'id'}
+        {assign var=sortDir value=$smarty.get.sort|default:'DESC'}
+        {if $sortDir != 'ASC' && $sortDir != 'DESC'}{assign var=sortDir value='DESC'}{/if}
+        {assign var=filterQS value=''}
+        {if $currentFilter}{assign var=filterQS value="&status=`$currentFilter`"}{/if}
+        {assign var=sortBase value="`$WEB_ROOT`/clientarea.php?action=invoices"}
+
         <div class="inv-stack">
 
             <div class="inv-table-head-row when-full">
-                <div class="hl-cell hl-invoice"><button type="button" class="inv-sort active" data-sort="id" data-dir="desc">{$LANG.invoicenum|default:'Invoice'} <span class="inv-sort-ico"></span></button></div>
-                <div class="hl-cell hl-date"><button type="button" class="inv-sort" data-sort="date" data-dir="">{$LANG.invoicedatecreated|default:'Date'} <span class="inv-sort-ico"></span></button></div>
-                <div class="hl-cell hl-due"><button type="button" class="inv-sort" data-sort="due" data-dir="">{$LANG.invoicedatedue|default:'Due date'} <span class="inv-sort-ico"></span></button></div>
-                <div class="hl-cell hl-amount"><button type="button" class="inv-sort" data-sort="amount" data-dir="">{$LANG.amount|default:'Amount'} <span class="inv-sort-ico"></span></button></div>
-                <div class="hl-cell hl-status"><button type="button" class="inv-sort" data-sort="status" data-dir="">{$LANG.invoicesstatus|default:'Status'} <span class="inv-sort-ico"></span></button></div>
+                {assign var=nextId     value=($sortKey == 'id'     && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
+                {assign var=nextDate   value=($sortKey == 'date'   && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
+                {assign var=nextDue    value=($sortKey == 'due'    && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
+                {assign var=nextAmount value=($sortKey == 'amount' && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
+                {assign var=nextStatus value=($sortKey == 'status' && $sortDir == 'ASC') ? 'DESC' : 'ASC'}
+
+                <div class="hl-cell hl-invoice"><a href="{$sortBase}&orderby=id&sort={$nextId}{$filterQS}" class="inv-sort{if $sortKey == 'id'} active{/if}" data-dir="{if $sortKey == 'id'}{$sortDir|lower}{/if}">{$LANG.invoicenum|default:'Invoice'} <span class="inv-sort-ico"></span></a></div>
+                <div class="hl-cell hl-date"><a href="{$sortBase}&orderby=date&sort={$nextDate}{$filterQS}" class="inv-sort{if $sortKey == 'date'} active{/if}" data-dir="{if $sortKey == 'date'}{$sortDir|lower}{/if}">{$LANG.invoicedatecreated|default:'Date'} <span class="inv-sort-ico"></span></a></div>
+                <div class="hl-cell hl-due"><a href="{$sortBase}&orderby=due&sort={$nextDue}{$filterQS}" class="inv-sort{if $sortKey == 'due'} active{/if}" data-dir="{if $sortKey == 'due'}{$sortDir|lower}{/if}">{$LANG.invoicedatedue|default:'Due date'} <span class="inv-sort-ico"></span></a></div>
+                <div class="hl-cell hl-amount"><a href="{$sortBase}&orderby=amount&sort={$nextAmount}{$filterQS}" class="inv-sort{if $sortKey == 'amount'} active{/if}" data-dir="{if $sortKey == 'amount'}{$sortDir|lower}{/if}">{$LANG.amount|default:'Amount'} <span class="inv-sort-ico"></span></a></div>
+                <div class="hl-cell hl-status"><a href="{$sortBase}&orderby=status&sort={$nextStatus}{$filterQS}" class="inv-sort{if $sortKey == 'status'} active{/if}" data-dir="{if $sortKey == 'status'}{$sortDir|lower}{/if}">{$LANG.invoicesstatus|default:'Status'} <span class="inv-sort-ico"></span></a></div>
                 <div class="hl-cell hl-actions" aria-hidden="true"></div>
             </div>
 
@@ -277,58 +294,8 @@ document.addEventListener('keydown', function (e) {
     });
 });
 
-// Column sort — click a header to cycle asc → desc → asc and actually reorder rows.
-// Comparators are per-column type-aware: id is integer, date/due are dates,
-// amount strips currency symbols, status falls back to alphabetical.
-(function () {
-    var sorts = document.querySelectorAll('.inv-table-head-row .inv-sort, .inv-table thead .inv-sort');
-    if (!sorts.length) return;
-    var tbody = document.querySelector('.inv-table tbody');
-    if (!tbody) return;
-
-    // Map sort-key → (row → comparable value)
-    var pickers = {
-        id:     function (row) { var t = row.querySelector('.inv-id-num')?.textContent || ''; return parseInt(t.replace(/[^0-9]/g, ''), 10) || 0; },
-        date:   function (row) { return Date.parse(parseLocaleDate(row.querySelector('td.date')?.textContent)) || 0; },
-        due:    function (row) {
-            var cells = row.querySelectorAll('td.date');
-            return Date.parse(parseLocaleDate(cells[1]?.textContent)) || 0;
-        },
-        amount: function (row) { var t = row.querySelector('td.amount')?.textContent || ''; return parseFloat(t.replace(/[^0-9.\-]/g, '')) || 0; },
-        status: function (row) { return (row.querySelector('.status-pill')?.textContent || '').trim().toLowerCase(); }
-    };
-
-    // Accept "DD/MM/YYYY" or native ISO — return something Date.parse handles.
-    function parseLocaleDate(str) {
-        str = (str || '').trim();
-        if (!str || str === '-' || str === '—') return '';
-        var m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-        if (m) return m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0');
-        return str;
-    }
-
-    function sortRows(key, dir) {
-        var pick = pickers[key];
-        if (!pick) return;
-        var rows = Array.from(tbody.querySelectorAll('tr'));
-        rows.sort(function (a, b) {
-            var va = pick(a), vb = pick(b);
-            if (typeof va === 'string') return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
-            return dir === 'asc' ? va - vb : vb - va;
-        });
-        rows.forEach(function (r) { tbody.appendChild(r); });
-    }
-
-    sorts.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            var cur = btn.getAttribute('data-dir') || '';
-            var next = cur === 'asc' ? 'desc' : 'asc';
-            sorts.forEach(function (b) { b.setAttribute('data-dir', ''); b.classList.remove('active'); });
-            btn.setAttribute('data-dir', next);
-            btn.classList.add('active');
-            sortRows(btn.dataset.sort, next);
-        });
-    });
-})();
+// Column sort is now URL-based (matches WHMCS native pattern) — clicking a
+// header is a normal <a> link that reloads the page with ?orderby=…&sort=ASC|DESC.
+// Server-side sort happens in Hooks::fetchAllInvoices. No JS needed here.
 {/literal}
 </script>
