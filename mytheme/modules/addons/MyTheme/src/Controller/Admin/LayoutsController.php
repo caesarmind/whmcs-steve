@@ -22,11 +22,8 @@ final class LayoutsController extends AbstractController
             $kind = 'main-menu';
         }
 
-        // POST = save then redirect (Post-Redirect-Get) so refresh doesn't re-submit
-        // and so the user lands on a clean ?action=layouts URL.
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['layout'])) {
-            $this->saveAction($template, $kind);
-            $this->redirect($this->buildSelfUrl($kind, saved: true));
+            return $this->saveAction($template, $kind);
         }
 
         $available = $template->getLayouts($kind);
@@ -49,33 +46,15 @@ final class LayoutsController extends AbstractController
             'layouts'  => $list,
             'kind'     => $kind,
             'template' => $template->getName(),
-            'saved'    => isset($_GET['saved']) && $_GET['saved'] === '1',
         ]);
     }
 
-    private function saveAction($template, string $kind): void
+    private function saveAction($template, string $kind): string
     {
         $layout = (string)$_POST['layout'];
         if (in_array($layout, $template->getLayouts($kind), true)) {
             Settings::setValue($template->getName() . '_active_layout_' . $kind, $layout);
         }
-    }
-
-    /**
-     * Build an absolute URL back to the current admin page.
-     * We use absolute paths to avoid relative-URL pitfalls in WHMCS's
-     * custom-admin-path setup (e.g. /<random>/addonmodules.php).
-     */
-    private function buildSelfUrl(string $kind, bool $saved = false): string
-    {
-        // $_SERVER['PHP_SELF'] resolves to the running script — typically
-        // /<custom-admin-path>/addonmodules.php in a WHMCS install.
-        $script = (string)($_SERVER['PHP_SELF'] ?? '/admin/addonmodules.php');
-        $qs = http_build_query([
-            'module' => 'MyTheme',
-            'action' => 'layouts',
-            'kind'   => $kind,
-        ] + ($saved ? ['saved' => '1'] : []));
-        return $script . '?' . $qs;
+        return $this->indexAction();
     }
 }

@@ -20,13 +20,7 @@
         <span class="mt-section-count">{$layouts|count}</span>
     </header>
 
-    {if $saved|default:false}
-        <div class="mt-banner mt-banner-success" role="status" style="margin:8px 0 0;padding:10px 14px;border-radius:8px;background:rgba(52,199,89,0.10);color:#248a3d;font-size:13px;">
-            Layout saved. <a href="{$WEB_ROOT|default:''}/clientarea.php" target="_blank" style="color:inherit;text-decoration:underline;">Preview on client area →</a>
-        </div>
-    {/if}
-
-    <form method="post" action="{$viewHelper->url('layouts', ['kind' => $kind])}" class="mt-section-body">
+    <form method="post" action="" class="mt-section-body">
         <div class="mt-grid">
             {foreach $layouts as $layout}
                 <label class="mt-card {if $layout.isActive}is-active{/if}">
