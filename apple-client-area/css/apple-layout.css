@@ -31,6 +31,12 @@ body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    /* Fill the body's flex row remaining space. Without flex:1 the wrap
+       shrinks to its content's natural width (capped at .content-area's
+       1120px max-width), and .content-area's auto margins have no
+       remaining space to center — content sticks to the left edge. */
+    flex: 1;
+    min-width: 0;
 }
 /* Content-area centers horizontally and takes up the remaining vertical space */
 .ph-main-wrap .content-area {
