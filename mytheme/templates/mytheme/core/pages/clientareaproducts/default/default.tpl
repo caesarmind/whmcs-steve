@@ -34,6 +34,17 @@
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareaproducts.css?v={$myTheme.version|default:'1.0'}">
 
+{* DIAGNOSTIC — temporary, remove once we identify the right WHMCS variable name. *}
+<!-- MYTHEME-DIAG-START
+  products      isset={if isset($products)}yes{else}no{/if}  count={if isset($products)}{$products|@count}{else}-{/if}
+  services      isset={if isset($services)}yes{else}no{/if}  count={if isset($services)}{$services|@count}{else}-{/if}
+  productsObj   isset={if isset($productsObj)}yes{else}no{/if}
+  client_products isset={if isset($client_products)}yes{else}no{/if}
+  clientsstats.productsnumactive = {if isset($clientsstats.productsnumactive)}{$clientsstats.productsnumactive}{else}-{/if}
+  templatefile  = {$templatefile|default:'-'}
+  statusFilter  isset={if isset($statusFilter)}yes ({$statusFilter}){else}no{/if}
+MYTHEME-DIAG-END -->
+
 {* Hand layout signals to body for CSS toggles *}
 <script>
 (function () {
