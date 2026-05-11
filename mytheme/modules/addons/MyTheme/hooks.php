@@ -108,6 +108,12 @@ if (AddonHelper::isActive()) {
         return HookService::instance()->dispatch('ClientAreaPageHome', $vars);
     });
 
+    // Populate $mtProducts on the My Services page so the tpl can fall back
+    // to it when WHMCS's native $products variable isn't available in scope.
+    add_hook('ClientAreaPageProductsServices', 1, function ($vars) {
+        return HookService::instance()->dispatch('ClientAreaPageProductsServices', $vars);
+    });
+
     // AJAX dispatch (front-side)
     if (isset($_POST['mtAction'])) {
         \MyTheme\Service\AjaxService::handle($_POST['mtAction'], $_POST);

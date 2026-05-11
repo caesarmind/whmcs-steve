@@ -15,9 +15,20 @@
 {assign var=count_terminated value=0}
 {assign var=count_cancelled value=0}
 {assign var=count_fraud value=0}
-{if isset($products) && $products}
-    {assign var=count_all value=$products|count}
-    {foreach $products as $_p}
+
+{* Prefer native $products from WHMCS; fall back to $mtProducts populated
+   by Hooks::clientAreaPageProductsServices via localAPI. *}
+{if isset($products) && $products|@count > 0}
+    {assign var=svcList value=$products}
+{elseif isset($mtProducts) && $mtProducts|@count > 0}
+    {assign var=svcList value=$mtProducts}
+{else}
+    {assign var=svcList value=[]}
+{/if}
+
+{if $svcList|@count > 0}
+    {assign var=count_all value=$svcList|@count}
+    {foreach $svcList as $_p}
         {if $_p.status == 'Active'}{assign var=count_active value=$count_active+1}
         {elseif $_p.status == 'Pending'}{assign var=count_pending value=$count_pending+1}
         {elseif $_p.status == 'Suspended'}{assign var=count_suspended value=$count_suspended+1}
@@ -34,12 +45,11 @@
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareaproducts.css?v={$myTheme.version|default:'1.0'}">
 
-{* DIAGNOSTIC — temporary, remove once we identify the right WHMCS variable name. *}
+{* DIAGNOSTIC — confirms which data source populated the list. *}
 <!-- MYTHEME-DIAG-START
   products      isset={if isset($products)}yes{else}no{/if}  count={if isset($products)}{$products|@count}{else}-{/if}
-  services      isset={if isset($services)}yes{else}no{/if}  count={if isset($services)}{$services|@count}{else}-{/if}
-  productsObj   isset={if isset($productsObj)}yes{else}no{/if}
-  client_products isset={if isset($client_products)}yes{else}no{/if}
+  mtProducts    isset={if isset($mtProducts)}yes{else}no{/if}  count={if isset($mtProducts)}{$mtProducts|@count}{else}-{/if}
+  svcList       count={$svcList|@count}
   clientsstats.productsnumactive = {if isset($clientsstats.productsnumactive)}{$clientsstats.productsnumactive}{else}-{/if}
   templatefile  = {$templatefile|default:'-'}
   statusFilter  isset={if isset($statusFilter)}yes ({$statusFilter}){else}no{/if}
@@ -129,7 +139,7 @@ MYTHEME-DIAG-END -->
                             </tr>
                         </thead>
                         <tbody>
-                            {foreach $products as $product}
+                            {foreach $svcList as $product}
                             <tr data-href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$product.id}">
                                 <td>
                                     <div class="svc-cell-product-info">

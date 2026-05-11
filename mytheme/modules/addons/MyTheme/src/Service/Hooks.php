@@ -127,6 +127,68 @@ final class Hooks
         }
     }
 
+    /**
+     * Populate $products on /clientarea.php?action=services when WHMCS's
+     * native variable isn't available or is empty. Mirrors the standard
+     * keys the legacy clientareaproducts.tpl expects: id, productname,
+     * groupname, name, domain, firstpaymentamount, recurringamount,
+     * billingcycle, paymentmethod, paymentmethodname, nextduedate, status,
+     * statusClass.
+     */
+    private function clientAreaPageProductsServices(array $vars, Template $template): array
+    {
+        $clientId = (int)($_SESSION['uid'] ?? 0);
+        if ($clientId === 0) {
+            return [];
+        }
+        $list = $this->fetchAllProducts($clientId);
+        return ['mtProducts' => $list];
+    }
+
+    /** Full product list (all statuses) shaped for clientareaproducts.tpl. */
+    private function fetchAllProducts(int $clientId): array
+    {
+        try {
+            $response = localAPI('GetClientsProducts', [
+                'clientid' => $clientId,
+                'stats'    => false,
+            ]);
+            if (($response['result'] ?? '') !== 'success') return [];
+
+            $out = [];
+            foreach (($response['products']['product'] ?? []) as $p) {
+                $status = (string)($p['status'] ?? 'Active');
+                $statusClass = match ($status) {
+                    'Active'                                  => 'active',
+                    'Pending'                                 => 'pending',
+                    'Suspended'                               => 'suspended',
+                    'Terminated', 'Cancelled', 'Fraud'        => 'terminated',
+                    default                                   => 'active',
+                };
+                $out[] = [
+                    'id'                 => (int)($p['id'] ?? 0),
+                    'productname'        => (string)($p['name'] ?? ''),
+                    'groupname'          => (string)($p['groupname'] ?? 'Service'),
+                    'name'               => (string)($p['name'] ?? ''),
+                    'domain'             => (string)($p['domain'] ?? ''),
+                    'firstpaymentamount' => (string)($p['firstpaymentamount'] ?? ''),
+                    'recurringamount'    => (string)($p['recurringamount'] ?? ''),
+                    'billingcycle'       => (string)($p['billingcycle'] ?? ''),
+                    'paymentmethod'      => (string)($p['paymentmethod'] ?? ''),
+                    'paymentmethodname'  => (string)($p['paymentmethodname'] ?? ''),
+                    'nextduedate'        => !empty($p['nextduedate']) && $p['nextduedate'] !== '0000-00-00'
+                        ? date('M j, Y', strtotime((string)$p['nextduedate']))
+                        : '',
+                    'status'             => $status,
+                    'statusClass'        => $statusClass,
+                ];
+            }
+            return $out;
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
     private function fetchRecentInvoices(int $clientId): array
     {
         try {
