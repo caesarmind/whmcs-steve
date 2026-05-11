@@ -61,7 +61,7 @@ body[data-subnav-side="outside-left"] .svc-split > .svc-main { grid-column: 1; }
 body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
 body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
 /* Outside-L + Align=Left: reserve 240px on the left so the aside lands past the menu sidebar. */
-body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 240px; }
+body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area { margin-left: 240px; }
 /* Very narrow viewports: fall back to inside column. */
 @media (max-width: 1100px) {
     body[data-subnav-side="outside"] .svc-split { grid-template-columns: 1fr 240px; gap: 24px; position: static; }

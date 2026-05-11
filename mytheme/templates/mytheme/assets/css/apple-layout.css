@@ -43,8 +43,12 @@ body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
     flex: 1 0 auto;
     width: 100%;
 }
-/* Align: Left — preview chip toggle (body[data-align="left"]) */
-body[data-align="left"] .ph-main-wrap .content-area {
+/* Align: Left — preview chip toggle (body[data-align="left"]).
+   Only meaningful in sidebar/rail layouts where there's a fixed-width
+   sidebar to anchor against. In top layout the page-nav is sticky and
+   .ph-main-wrap is already full-width, so alignment has nothing to do —
+   any align value is a no-op. */
+body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area {
     margin-left: 0;
     margin-right: auto;
 }

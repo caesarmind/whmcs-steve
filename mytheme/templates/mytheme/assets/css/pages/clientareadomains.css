@@ -50,7 +50,7 @@ body[data-subnav-side="outside"] .dom-split > .dom-main,
 body[data-subnav-side="outside-left"] .dom-split > .dom-main { grid-column: 1; }
 body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
 body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
-body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 240px; }
+body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area { margin-left: 240px; }
 
 .subnav-card { padding: 8px; }
 .subnav-heading {

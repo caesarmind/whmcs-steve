@@ -29,7 +29,7 @@
         /* Horizontal shift to visually re-center the content when aside floats outside */
         body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-142px); }
         body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(142px); }
-        body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 260px; }
+        body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area { margin-left: 260px; }
         /* Narrow viewports: fall back to inside column */
         @media (max-width: 1200px) {
             body[data-subnav-side="outside"] .dash-split { grid-template-columns: 1fr 260px; gap: 24px; position: static; }

@@ -274,6 +274,37 @@ When you switch via the preview chip OR via URL param:
 - [ ] Sticky elements (`.homepage-nav`, `.ph-side-topbar`) stay at the top without overlapping content
 - [ ] Page-specific CSS doesn't set `body { display: block }` (would break flex container)
 
+## 6c. Align + sub-nav-side toggles must be no-ops in top layout
+
+The `Align: center/content/left` chip option and `Sub-nav side: outside/outside-L` options were designed to position content **relative to a sidebar**. In top-nav layout there is no sidebar — those toggles have nothing to anchor against, and any effect they have on content positioning is a bug.
+
+**All CSS rules that read `data-align` or `data-subnav-side` must include `:not([data-layout="top"])` in their selector.**
+
+Verification — switch to top layout, then click every Align and Sub-nav-side button. Content position should never change. Quick programmatic test:
+
+```javascript
+['center','content','left'].forEach(a => {
+  document.body.dataset.layout = 'top';
+  a==='center' ? document.body.removeAttribute('data-align') : document.body.setAttribute('data-align', a);
+  console.log(a, document.querySelector('.content-area').getBoundingClientRect().left);
+});
+// All three numbers must be identical
+```
+
+Required scoping patterns:
+
+```css
+/* core in apple-layout.css */
+body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area { margin-left: 0; margin-right: auto; }
+
+/* in every page CSS that uses subnav-side */
+body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
+body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area { margin-left: 240px; }
+```
+
+The same scoping must be applied to **mockup HTML inline `<style>` blocks** in `apple-client-area/<page>.html` (they have their own copies of these rules — that's why the localhost preview can break differently from the live theme).
+
 ---
 
 ## 7. Pre-deploy verification (local)

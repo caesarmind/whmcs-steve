@@ -63,9 +63,9 @@
         body[data-subnav-side="outside-left"] .tk-split > aside { right: calc(100% + 24px); left: auto; }
         body[data-subnav-side="outside"] .tk-split > .tk-main,
         body[data-subnav-side="outside-left"] .tk-split > .tk-main { grid-column: 1; }
-        body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
-        body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
-        body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 240px; }
+        body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+        body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
+        body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area { margin-left: 240px; }
         @media (max-width: 1100px) {
             body[data-subnav-side="outside"] .tk-split { grid-template-columns: 1fr 240px; gap: 24px; position: static; }
             body[data-subnav-side="outside-left"] .tk-split { grid-template-columns: 240px 1fr; gap: 24px; position: static; }
@@ -333,6 +333,46 @@
         .tk-empty-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.01em; }
         .tk-empty-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 auto 18px; max-width: 340px; line-height: 1.45; }
         .tk-empty .btn-primary { height: 32px; padding: 0 16px; font-size: 13px; }
+
+        @media (max-width: 880px) {
+            .tk-split,
+            body[data-subnav-side="left"] .tk-split,
+            body[data-subnav-side="outside"] .tk-split,
+            body[data-subnav-side="outside-left"] .tk-split { grid-template-columns: 1fr; }
+            body[data-subnav-side="left"] .tk-split > aside,
+            body[data-subnav-side="outside-left"] .tk-split > aside,
+            body[data-subnav-side="left"] .tk-split > .tk-main,
+            body[data-subnav-side="outside-left"] .tk-split > .tk-main { grid-column: auto; grid-row: auto; }
+            .page-header h1 { font-size: 34px; }
+        }
+
+        @media (max-width: 720px) {
+            .page-header { margin-bottom: 24px; }
+            .page-header-row { align-items: flex-start; }
+            .tk-banner { align-items: flex-start; flex-wrap: wrap; }
+            .tk-banner .spacer { display: none; }
+            .tk-banner .btn-secondary { margin-left: 36px; }
+            .tk-main .filter-tabs { width: 100%; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; -ms-overflow-style: none; }
+            .tk-main .filter-tabs::-webkit-scrollbar { display: none; }
+            .tk-main .filter-tab { flex: 0 0 auto; }
+            .tk-table-head-row { display: none; }
+            .tk-row { display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; padding: 16px; }
+            .tk-row > :nth-child(1) { grid-column: 1 / -1; max-width: none; }
+            .tk-row > :nth-child(2) { margin-left: 0; flex: none; color: var(--color-text-secondary); }
+            .tk-row > :nth-child(3) { flex: none; justify-self: end; }
+            .tk-row > :nth-child(4) { grid-column: 1 / -1; flex: none; color: var(--color-text-tertiary); }
+            .tk-subject-title { max-width: none; white-space: normal; line-height: 1.35; }
+            .tk-stack > .tk-footer { padding: 12px 16px 16px; }
+            .tk-footer .spacer { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            .page-header h1 { font-size: 30px; }
+            .page-header-action { width: 100%; }
+            .tk-banner .btn-secondary { margin-left: 0; }
+            .tk-footer { align-items: flex-start; flex-direction: column; }
+            .tk-pages { align-self: flex-end; }
+        }
     </style>
 </head>
 <body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="tickets" data-page-title="My Support Tickets">

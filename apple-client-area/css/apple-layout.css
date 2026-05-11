@@ -40,7 +40,7 @@ body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
     width: 100%;
 }
 /* Align: Left — preview chip toggle (body[data-align="left"]) */
-body[data-align="left"] .ph-main-wrap .content-area {
+body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area {
     margin-left: 0;
     margin-right: auto;
 }
@@ -115,6 +115,8 @@ body:not([data-layout="top"]) { background: var(--color-bg); }
 .state-chip .swatch-group button[data-palette="rose"]    { color: #ff2d6b; }
 .state-chip .swatch-group button[data-palette="amber"]   { color: #f08a00; }
 .state-chip .swatch-group button[data-palette="slate"]   { color: #64748b; }
+body[data-preview="off"] .state-chip,
+body.screenshot .state-chip { display: none !important; }
 
 /* ── Palette overrides ────────────────────────────────────── */
 /* Each data-palette on <html> swaps the accent token chain so
@@ -207,6 +209,8 @@ html[data-palette="slate"]   .sidebar-avatar { background: linear-gradient(135de
     font-size: 10px; font-weight: 600;
     border: 1px solid #fde68a;
 }
+body[data-preview="off"] .ph-auth-strip .masq-chip,
+body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 [data-theme="dark"] .ph-auth-strip .masq-chip {
     background: #3a2f0a; color: #fbbf24; border-color: #54430a;
 }
@@ -740,3 +744,133 @@ body[data-layout="side"] .ph-section:last-of-type { padding-bottom: 48px; }
    .when-full / .when-empty. The chip flips body[data-data]. */
 body[data-data="empty"] .when-full { display: none !important; }
 body:not([data-data="empty"]) .when-empty { display: none !important; }
+
+/* ── Responsive sidebar drawer (≤900px, side layout) ──────── */
+/* On narrow viewports the fixed 260px sidebar would crowd content,
+   so we convert it to a slide-in drawer. The hamburger toggle lives
+   in the inner-topbar (`.ph-mobile-toggle`); JS flips `body.nav-open`
+   to slide the sidebar in and reveal the backdrop. The inner-topbar
+   stays as the only nav chrome — no homepage-nav fallback needed. */
+
+/* Backdrop overlay — sits between content and drawer when open */
+.ph-nav-backdrop {
+    position: fixed; inset: 0; z-index: 99;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
+
+/* Hamburger toggle — only visible on side/rail at narrow widths */
+.ph-mobile-toggle { display: none; }
+
+@media (max-width: 900px) {
+    /* Reset main content offset — drawer overlays, doesn't push */
+    body[data-layout="side"] .ph-main-wrap,
+    body[data-layout="rail"] .ph-main-wrap { margin-left: 0; }
+
+    /* Sidebar becomes a slide-in drawer (overrides the legacy
+       `.sidebar { display: none }` rule at ≤768px from apple-theme.css) */
+    body[data-layout="side"] .sidebar {
+        display: flex !important;
+        width: 280px;
+        max-width: 85vw;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        z-index: 110;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+    }
+    body[data-layout="side"].nav-open .sidebar { transform: translateX(0); }
+
+    /* Rail also slides in as a drawer (panel hidden — rail items are
+       self-contained on touch) */
+    body[data-layout="rail"] .ph-rail {
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        z-index: 110;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+    }
+    body[data-layout="rail"].nav-open .ph-rail { transform: translateX(0); }
+    body[data-layout="rail"] .ph-rail-panel { display: none !important; }
+
+    /* Show hamburger toggle — only when in side/rail layout */
+    body:not([data-layout="top"]) .ph-mobile-toggle { display: inline-flex; }
+
+    /* Lock body scroll while drawer is open */
+    body.nav-open { overflow: hidden; }
+
+    /* The inner-topbar IS the nav chrome on side/rail mobile —
+       suppress the top-layout fallback so we don't double up. */
+    body[data-layout="side"] .only-top,
+    body[data-layout="rail"] .only-top { display: none !important; }
+}
+
+[data-theme="dark"] .ph-nav-backdrop { background: rgba(0, 0, 0, 0.55); }
+
+/* When the left sidebar is showing on a narrow desktop, the right context
+   aside (.X-split's 240/260px column) crowds main content so much that
+   tables collide with the rail. Force the X-split grid to single column
+   so the aside stacks below main — matches what each page already does
+   at <=880px in its own scoped CSS. Capped at 1099 because above that
+   sidebar + aside + table all fit comfortably. */
+@media (min-width: 901px) and (max-width: 1099px) {
+    body[data-layout="side"] [class$="-split"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Top layout still falls back to top-nav chrome at narrow widths
+   (it has no sidebar to drawer-ify). */
+@media (max-width: 900px) {
+    body[data-layout="top"] .only-top.homepage-nav { display: flex !important; }
+    body[data-layout="top"] .only-top.ph-breadcrumb,
+    body[data-layout="top"] .only-top.ph-auth-strip { display: block !important; }
+    body[data-layout="top"] .only-top.hp-footer { display: block !important; }
+}
+
+@media (max-width: 768px) {
+    .homepage-nav { padding: 0 14px; }
+    .homepage-nav-inner {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        gap: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .homepage-nav-inner::-webkit-scrollbar { display: none; }
+    .homepage-nav .nav-logo.text-logo { flex: 0 0 auto; }
+    .homepage-nav .nav-spacer { flex: 1 0 12px; min-width: 12px; }
+    .homepage-nav-inner .nav-simple-dropdown { flex: 0 0 auto; }
+    .homepage-nav-inner > a,
+    .homepage-nav-inner .nav-simple-trigger { flex: 0 0 auto; }
+    .ph-breadcrumb { padding: 10px 16px; }
+    .ph-breadcrumb-inner {
+        max-width: none;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .ph-breadcrumb-inner::-webkit-scrollbar { display: none; }
+    .ph-side-topbar-inner { padding: 10px 16px; }
+    .ph-side-crumbs { min-width: 0; overflow-x: auto; white-space: nowrap; }
+    .profile-dropdown,
+    .notification-dropdown { max-width: calc(100vw - 24px); }
+}
+
+@media (max-width: 640px) {
+    .homepage-nav-inner .nav-simple-dropdown,
+    .homepage-nav-inner > a.only-in:not(.nav-logo):not(.topbar-btn):not(.icon-btn) {
+        display: none !important;
+    }
+    .homepage-nav-inner { overflow: visible; }
+}
+
+@media (max-width: 420px) {
+    .homepage-nav .icon-btn { display: none; }
+}
