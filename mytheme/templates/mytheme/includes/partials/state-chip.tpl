@@ -1,15 +1,11 @@
 {* Hostnodes — Dev preview chip (layout / palette / data toggles).
    Floating, draggable. Wired by apple-layout.js (state persists to
-   localStorage). When the MyTheme admin module is wired, gate this
-   on a "dev mode" setting. For now, render only when ?preview=1 is
-   in the URL OR the visitor is logged in as a WHMCS admin. *}
+   localStorage). Always rendered during development so toggles work
+   on every page. Use ?preview=0 to hide explicitly. *}
 
-{assign var=_showChip value=false}
-{if isset($smarty.get.preview) && $smarty.get.preview == '1'}
-    {assign var=_showChip value=true}
-{/if}
-{if isset($adminLoggedIn) && $adminLoggedIn}
-    {assign var=_showChip value=true}
+{assign var=_showChip value=true}
+{if isset($smarty.get.preview) && $smarty.get.preview == '0'}
+    {assign var=_showChip value=false}
 {/if}
 
 {if $_showChip}
