@@ -24,7 +24,11 @@
 {else}
     {assign var=dashIsEmpty value='empty'}
 {/if}
-{assign var=tktStatusLower value=$status|default:''|lower|replace:' ':'-'}
+{* WHMCS wraps $status in <span style="color:#XXX">Status</span> markup.
+   Strip the HTML before piping into a class attribute (per §10 trap)
+   AND before using as visible text. *}
+{assign var=tktStatusText value=$status|default:''|strip_tags}
+{assign var=tktStatusLower value=$tktStatusText|lower|replace:' ':'-'}
 {assign var=tktPriorityLower value=$priority|default:''|lower}
 
 {* Page-specific stylesheet *}
@@ -198,7 +202,7 @@
                     <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
                     <div class="tk-info-body">
                         <div class="tk-info-label">{$LANG.supportticketsstatus|default:'Status'}</div>
-                        <div class="tk-info-value"><span class="status-pill {$tktStatusLower}">{$status|escape}</span></div>
+                        <div class="tk-info-value"><span class="status-pill {$tktStatusLower}">{$tktStatusText|escape}</span></div>
                     </div>
                 </div>
                 {if isset($clientsdetails)}

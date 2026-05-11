@@ -9,14 +9,21 @@
      $author     — optional author name
 *}
 
-{* Trap: earlier version of this tpl used $announcement_title / $announcement_text,
+{* Trap 1: earlier version of this tpl used $announcement_title / $announcement_text,
    which WHMCS does NOT expose — page always rendered "Announcement not found".
-   See PAGE-CHECKLIST §6f and §10 columnDefs gotcha for the pattern. *}
+   See PAGE-CHECKLIST §10 ("Gating on a WHMCS variable that doesn't exist").
+
+   Trap 2: |date_format:"%B %e, %Y" produces garbage like "AprApr/SatSat/2026202620262026"
+   on PHP 8.1+ because strftime is deprecated and Smarty 4's date_format misinterprets
+   the %-style codes. The WHMCS-canonical way is to use the $carbon helper which both
+   Nexus and Lagom rely on, with PHP date() format codes (no % prefix). *}
 {assign var=annTitle value=$title|default:''}
 {assign var=annText  value=$text|default:''}
-{assign var=annDate  value=$date|default:''}
-{if !$annDate && isset($timestamp) && $timestamp}
-    {assign var=annDate value=$timestamp|date_format:"%B %e, %Y"}
+{assign var=annDate  value=''}
+{if isset($carbon) && isset($timestamp) && $timestamp}
+    {assign var=annDate value=$carbon->createFromTimestamp($timestamp)->format('F j, Y')}
+{elseif isset($date) && $date}
+    {assign var=annDate value=$date|strip_tags}
 {/if}
 
 {if $annTitle}
