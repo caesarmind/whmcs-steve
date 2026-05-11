@@ -147,7 +147,12 @@
                                     </div>
                                 </td>
                                 <td>{$product.nextduedate|default:'—'|escape}</td>
-                                <td><span class="status-pill {$product.statusClass|default:$product.status|lower|escape}">{$product.status|escape|default:'Active'}</span></td>
+                                {* WHMCS may wrap $product.status in <span class="textred">…</span>
+                                   for some statuses — strip_tags before piping into a class attr
+                                   or display, otherwise we end up with nested broken HTML. *}
+                                {assign var=svcStatus value=$product.status|strip_tags|default:'Active'}
+                                {assign var=svcStatusClass value=$product.statusClass|default:$svcStatus|lower}
+                                <td><span class="status-pill {$svcStatusClass|escape}">{$svcStatus|escape}</span></td>
                                 <td class="svc-cell-actions">
                                     <div class="svc-menu-wrap" onclick="event.stopPropagation();">
                                         <button type="button" class="svc-menu-btn" aria-label="Actions" aria-haspopup="true" aria-expanded="false" onclick="toggleSvcMenu(this, event)">

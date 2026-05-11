@@ -1,4 +1,3 @@
-body { display: block; }
 
 /* Page header — Apple list-page pattern */
 .page-header { margin: 8px 0 32px; }
@@ -61,8 +60,8 @@ body[data-subnav-side="outside"] .tk-split > aside { left: calc(100% + 24px); }
 body[data-subnav-side="outside-left"] .tk-split > aside { right: calc(100% + 24px); left: auto; }
 body[data-subnav-side="outside"] .tk-split > .tk-main,
 body[data-subnav-side="outside-left"] .tk-split > .tk-main { grid-column: 1; }
-body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
-body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
+body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
 body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 240px; }
 
 /* Shared sub-nav primitive */
@@ -340,8 +339,8 @@ body:not([data-data="empty"]) .when-empty { display: none; }
     body[data-subnav-side="outside-left"] .tk-split > aside { position: static; width: auto; right: auto; left: auto; }
     body[data-subnav-side="outside-left"] .tk-split > aside { grid-column: 1; grid-row: 1; }
     body[data-subnav-side="outside-left"] .tk-split > .tk-main { grid-column: 2; grid-row: 1; }
-    body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area,
-    body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: none; }
+    body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area,
+    body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: none; }
 }
 
 @media (max-width: 880px) {

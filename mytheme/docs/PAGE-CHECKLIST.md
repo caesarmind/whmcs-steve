@@ -249,7 +249,30 @@ Every page CSS must:
    - Tickets: `.tk-*`
 3. Honor the universal toggles via `body[data-data]`, `body[data-svc-layout]`, etc. — don't comment them out as "Smarty handles it"
 4. Use design tokens from `apple-theme.css` (`--color-surface`, `--color-accent`, `--radius-lg`, `--transition-fast`, etc.) — not raw hex values
-5. Strip `body { display: block; }` from the head — that was only for the standalone mockup and breaks the layout grid in the WHMCS theme
+5. **NEVER include `body { display: block; }`** — that's mockup leftover. The real theme's `apple-theme.css` sets `body { display: flex; min-height: 100vh; }` to hold sidebar + main-wrap as flex children; overriding it to `block` collapses the entire layout (especially visible when switching to **top nav** because the sticky `.homepage-nav` needs the flex chain intact)
+6. **Scope `body[data-subnav-side="outside"]` / `[outside-left"]` content-area transforms to non-top layouts** — they shift the content column horizontally to make room for a floated sub-nav, but in top layout there's no sidebar to offset against, so the shift pushes content off-center. Required pattern:
+   ```css
+   body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+   ```
+
+## 6b. Layout-switching verification — the THREE layouts must all work
+
+For every page, **test all three values of `body[data-layout]`**:
+
+| URL | Expected |
+|---|---|
+| `?layout=side` (default) | Fixed 260px sidebar visible on left, content shifted right with `margin-left: 260px` |
+| `?layout=top` | `.homepage-nav` sticky at top, sidebar + rail hidden, content full-width centered |
+| `?layout=rail` | 80px icon rail visible on left, content shifted right with `margin-left: 80px` |
+
+When you switch via the preview chip OR via URL param:
+
+- [ ] Sidebar (only-side), rail (only-rail), topnav (only-top), inner-topbar (only-inner) all toggle to the correct visibility
+- [ ] `.ph-main-wrap` margin-left adapts (260px / 80px / 0)
+- [ ] `.content-area` doesn't shift via `translateX` unless `data-subnav-side="outside"` is set AND we're not in top layout
+- [ ] Page-specific layout (`.dash-split`, `.svc-split`, `.inv-split`, `.tk-split`, `.dom-split`) keeps its grid columns intact in all three layouts
+- [ ] Sticky elements (`.homepage-nav`, `.ph-side-topbar`) stay at the top without overlapping content
+- [ ] Page-specific CSS doesn't set `body { display: block }` (would break flex container)
 
 ---
 
@@ -328,10 +351,12 @@ Visual checks (real browser):
 
 - **CSS file untracked in git** → 404 on server → unstyled markup. Solution: `git ls-files` to verify, always.
 - **WHMCS Smarty doesn't propagate `$products`/`$tickets`/etc. into our included tpl scope** → use the localAPI fallback hook.
-- **WHMCS sends invoice status as `<span class="textred">Unpaid</span>`** → always `strip_tags()` (PHP-side) or `|strip_tags` (Smarty-side) before piping into a class.
+- **WHMCS sends invoice (and sometimes product) status as `<span class="textred">Unpaid</span>`** → always `strip_tags()` (PHP-side) or `|strip_tags` (Smarty-side) before piping into a class. Same trap appeared on `clientareaproducts/default/default.tpl` line 150 — fixed by assigning a stripped value first.
 - **`{$var = value}` inline assignment fails silently in WHMCS Smarty 4** → use `{assign var=var value=value}`.
 - **Chained property access on potentially-missing `$myTheme.x.y.z`** → wrap in `isset()` chain before access, or short-circuit assigns won't fire.
 - **Both `when-empty` and `when-full` markup coexisting** → relies on `apple-layout.css` toggle rules; keep them active, never comment out.
+- **`body { display: block; }` leak in page CSS** → kills the body's `display: flex` chain that holds sidebar + main-wrap, most visibly breaking **top-nav layout** since the sticky `.homepage-nav` needs intact flex. Strip this from every page CSS (was in 5 files: clientareahome, clientareaproducts, clientareadomains, clientareainvoices, supporttickets).
+- **`[data-subnav-side="outside"]` content-area transforms unscoped** → in top layout there's no sidebar to offset against, so `translateX(-132px)` shoves content off-center. Always include `:not([data-layout="top"])` in the selector.
 - **GitHub Action deploys files but doesn't clear `templates_c/`** → manual cPanel wipe needed after every push that changes `.tpl` files.
 - **Browser caches CSS aggressively** → bump the `?v=` query string in page tpls when changing CSS, or hard-refresh / use incognito to verify.
 - **Top-level dispatcher checks `file_exists` against `"templates/$path"`** → that path is **relative to WHMCS root**, not the tpl's location. Don't refactor it to absolute.

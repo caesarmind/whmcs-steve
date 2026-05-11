@@ -3,7 +3,6 @@
    Loaded by core/pages/clientareaproducts/default/default.tpl
    ────────────────────────────────────────────────────────────────────── */
 
-body { display: block; }
 
 /* Page header — Apple-leaning: bigger, tighter title, no uppercase eyebrow, subtle CTA */
 .page-header { margin: 8px 0 32px; }
@@ -59,8 +58,8 @@ body[data-subnav-side="outside"] .svc-split > .svc-main,
 body[data-subnav-side="outside-left"] .svc-split > .svc-main { grid-column: 1; }
 /* Align=Center: shift content-area by half the aside + gap (264/2 = 132) so combined unit stays centered.
    Align=Content and Align=Left skip the shift. */
-body[data-subnav-side="outside"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
-body[data-subnav-side="outside-left"]:not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
+body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
+body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
 /* Outside-L + Align=Left: reserve 240px on the left so the aside lands past the menu sidebar. */
 body[data-subnav-side="outside-left"][data-align="left"] .ph-main-wrap .content-area { margin-left: 240px; }
 /* Very narrow viewports: fall back to inside column. */
