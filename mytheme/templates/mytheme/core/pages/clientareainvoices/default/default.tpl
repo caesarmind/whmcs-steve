@@ -224,3 +224,109 @@
         </div>
     </aside>
 </div>{* /.inv-split *}
+
+<script>
+// Row navigation — clicking a row goes to viewinvoice
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.inv-table tbody tr[data-href]').forEach(function (row) {
+        row.setAttribute('tabindex', '0');
+        row.setAttribute('role', 'link');
+        row.addEventListener('click', function (e) {
+            if (e.target.closest('a, button, input, select, .inv-menu-wrap')) return;
+            window.location.href = row.dataset.href;
+        });
+        row.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.location.href = row.dataset.href;
+            }
+        });
+    });
+});
+
+// Kebab menu — open/close per row, close on outside-click / Escape
+function toggleInvMenu(btn, e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    var wrap = btn.closest('.inv-menu-wrap');
+    var wasOpen = wrap.classList.contains('open');
+    document.querySelectorAll('.inv-menu-wrap.open').forEach(function (w) {
+        w.classList.remove('open');
+        var b = w.querySelector('.inv-menu-btn');
+        if (b) b.setAttribute('aria-expanded', 'false');
+    });
+    if (!wasOpen) {
+        wrap.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+    }
+}
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.inv-menu-wrap')) return;
+    document.querySelectorAll('.inv-menu-wrap.open').forEach(function (w) {
+        w.classList.remove('open');
+        var b = w.querySelector('.inv-menu-btn');
+        if (b) b.setAttribute('aria-expanded', 'false');
+    });
+});
+document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.inv-menu-wrap.open').forEach(function (w) {
+        w.classList.remove('open');
+        var b = w.querySelector('.inv-menu-btn');
+        if (b) b.setAttribute('aria-expanded', 'false');
+    });
+});
+
+// Column sort — click a header to cycle asc → desc → asc and actually reorder rows.
+// Comparators are per-column type-aware: id is integer, date/due are dates,
+// amount strips currency symbols, status falls back to alphabetical.
+(function () {
+    var sorts = document.querySelectorAll('.inv-table-head-row .inv-sort, .inv-table thead .inv-sort');
+    if (!sorts.length) return;
+    var tbody = document.querySelector('.inv-table tbody');
+    if (!tbody) return;
+
+    // Map sort-key → (row → comparable value)
+    var pickers = {
+        id:     function (row) { var t = row.querySelector('.inv-id-num')?.textContent || ''; return parseInt(t.replace(/[^0-9]/g, ''), 10) || 0; },
+        date:   function (row) { return Date.parse(parseLocaleDate(row.querySelector('td.date')?.textContent)) || 0; },
+        due:    function (row) {
+            var cells = row.querySelectorAll('td.date');
+            return Date.parse(parseLocaleDate(cells[1]?.textContent)) || 0;
+        },
+        amount: function (row) { var t = row.querySelector('td.amount')?.textContent || ''; return parseFloat(t.replace(/[^0-9.\-]/g, '')) || 0; },
+        status: function (row) { return (row.querySelector('.status-pill')?.textContent || '').trim().toLowerCase(); }
+    };
+
+    // Accept "DD/MM/YYYY" or native ISO — return something Date.parse handles.
+    function parseLocaleDate(str) {
+        str = (str || '').trim();
+        if (!str || str === '-' || str === '—') return '';
+        var m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (m) return m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0');
+        return str;
+    }
+
+    function sortRows(key, dir) {
+        var pick = pickers[key];
+        if (!pick) return;
+        var rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort(function (a, b) {
+            var va = pick(a), vb = pick(b);
+            if (typeof va === 'string') return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+            return dir === 'asc' ? va - vb : vb - va;
+        });
+        rows.forEach(function (r) { tbody.appendChild(r); });
+    }
+
+    sorts.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var cur = btn.getAttribute('data-dir') || '';
+            var next = cur === 'asc' ? 'desc' : 'asc';
+            sorts.forEach(function (b) { b.setAttribute('data-dir', ''); b.classList.remove('active'); });
+            btn.setAttribute('data-dir', next);
+            btn.classList.add('active');
+            sortRows(btn.dataset.sort, next);
+        });
+    });
+})();
+</script>

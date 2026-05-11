@@ -305,6 +305,115 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 
 The same scoping must be applied to **mockup HTML inline `<style>` blocks** in `apple-client-area/<page>.html` (they have their own copies of these rules — that's why the localhost preview can break differently from the live theme).
 
+## 6e. Page CSS must implement the "Controls inside / outside" chip toggle
+
+The preview chip's `Services: Controls inside | Controls outside` option sets `body[data-svc-layout="inside|outside"]`. Every list page (invoices, services, domains, tickets, dashboard) must define a CSS rule set for `body[data-svc-layout="outside"]` so the chip toggle visibly does something:
+
+- **Default ("inside")**: the `.<prefix>-stack` is a single white card — column titles, table/rows, and pager all share the same surface.
+- **Outside**: `.<prefix>-stack` becomes transparent (no border, no background, no shadow). Only the inner `.<prefix>-table-card` keeps its surface; the head row + footer float on the page background above/below it.
+
+Required selectors per page CSS (substitute `inv` for invoices, `svc` for services, `dom` for domains, `tk` for tickets):
+
+```css
+/* Default — stack is one unified card */
+.inv-stack {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: visible;
+}
+.inv-stack > .inv-table-card { background: transparent; border: 0; border-radius: 0; box-shadow: none; margin: 0; }
+
+/* Outside — stack strips down, only the rows card keeps the surface */
+body[data-svc-layout="outside"] .inv-stack {
+    background: transparent; border: 0; border-radius: 0;
+    display: flex; flex-direction: column; gap: 8px;
+}
+body[data-svc-layout="outside"] .inv-stack > .inv-table-card {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+```
+
+**Verification — paste in DevTools console:**
+
+```javascript
+(() => {
+  document.body.setAttribute('data-svc-layout', 'inside');
+  const insideCard = getComputedStyle(document.querySelector('.inv-stack')).background;
+  document.body.setAttribute('data-svc-layout', 'outside');
+  const outsideCard = getComputedStyle(document.querySelector('.inv-stack')).background;
+  return { inside: insideCard, outside: outsideCard, changed: insideCard !== outsideCard };
+})()
+// changed must be true. If it returns false, the page CSS doesn't honor data-svc-layout.
+```
+
+**Pages that already have it**: clientareahome, clientareaproducts, clientareadomains, clientareainvoices, supporttickets. Any new list page must include the same rules.
+
+## 6f. Sortable column headers must actually sort the rows
+
+When a column header has a `data-sort="key"` button, clicking it must:
+1. Cycle the visual direction indicator (asc → desc → asc, or none → asc → desc → none)
+2. **Actually reorder the rows** in the DOM via JS — not just toggle a CSS class
+
+Type-aware comparators per column:
+- `id` / numeric IDs → integer compare after stripping non-digit chars (e.g. `#42` → 42)
+- `date` / dates → `Date.parse()` after normalizing `DD/MM/YYYY` to ISO `YYYY-MM-DD`
+- `amount` / money → `parseFloat` after stripping currency symbols and codes
+- `status` / `name` / strings → `localeCompare`
+
+Boilerplate that goes at the bottom of the page tpl (substitute `inv` for invoices, `svc` for services, etc.):
+
+```javascript
+(function () {
+    var sorts = document.querySelectorAll('.inv-sort');
+    var tbody = document.querySelector('.inv-table tbody');
+    if (!sorts.length || !tbody) return;
+    var pickers = {
+        id:     row => parseInt((row.querySelector('.inv-id-num')?.textContent || '').replace(/[^0-9]/g, ''), 10) || 0,
+        date:   row => Date.parse(normaliseDate(row.querySelector('td.date')?.textContent)) || 0,
+        amount: row => parseFloat((row.querySelector('td.amount')?.textContent || '').replace(/[^0-9.\-]/g, '')) || 0,
+        status: row => (row.querySelector('.status-pill')?.textContent || '').trim().toLowerCase(),
+    };
+    function normaliseDate(s) {
+        s = (s || '').trim();
+        var m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        return m ? m[3] + '-' + m[2].padStart(2,'0') + '-' + m[1].padStart(2,'0') : s;
+    }
+    sorts.forEach(btn => btn.addEventListener('click', () => {
+        var dir = (btn.dataset.dir === 'asc') ? 'desc' : 'asc';
+        sorts.forEach(b => { b.dataset.dir = ''; b.classList.remove('active'); });
+        btn.dataset.dir = dir; btn.classList.add('active');
+        var pick = pickers[btn.dataset.sort];
+        if (!pick) return;
+        Array.from(tbody.querySelectorAll('tr'))
+            .sort((a,b) => {
+                var va = pick(a), vb = pick(b);
+                return typeof va === 'string'
+                    ? (dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va))
+                    : (dir === 'asc' ? va - vb : vb - va);
+            })
+            .forEach(r => tbody.appendChild(r));
+    }));
+})();
+```
+
+**Verification** (DevTools console):
+
+```javascript
+(() => {
+  var first = () => document.querySelector('.inv-table tbody tr')?.dataset?.href;
+  var before = first();
+  document.querySelector('.inv-sort[data-sort="id"]').click();   // sort asc
+  var asc = first();
+  document.querySelector('.inv-sort[data-sort="id"]').click();   // sort desc
+  var desc = first();
+  return { before, asc, desc, rowsReordered: before !== asc || asc !== desc };
+})()
+// rowsReordered must be true. If it stays false, the click handler isn't reordering DOM.
+```
+
 ## 6d. `.ph-main-wrap` must fill body width — content-area centering depends on it
 
 **Symptom of the bug:** in top-nav layout, content gets pinned to the left edge of the viewport instead of being centered. Reported as "alignment doesn't work" or "content not on full length."

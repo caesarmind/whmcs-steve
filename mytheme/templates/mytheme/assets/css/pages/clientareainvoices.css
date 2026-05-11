@@ -116,6 +116,38 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .inv-main > .filter-tabs { margin-bottom: 8px; margin-top: 4px; flex-wrap: wrap; }
 .inv-main .filter-tab { white-space: nowrap; }
 
+/* ── Controls-inside / Controls-outside (preview chip toggle) ───────
+   Default ("inside"): the .inv-stack is one unified white card —
+   column titles, table, and pager share the same surface.
+   "Outside": .inv-stack is transparent; only the table card keeps its
+   surface and the rest (head row + footer) floats on the page bg. */
+.inv-stack {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: visible;
+}
+.inv-stack .inv-table tbody tr:first-child td:first-child { border-top-left-radius: var(--radius-md); }
+.inv-stack .inv-table tbody tr:first-child td:last-child  { border-top-right-radius: var(--radius-md); }
+.inv-stack .inv-table tbody tr:last-child  td:first-child { border-bottom-left-radius: var(--radius-md); }
+.inv-stack .inv-table tbody tr:last-child  td:last-child  { border-bottom-right-radius: var(--radius-md); }
+.inv-stack > .inv-table-head-row { padding: 10px 0 6px; margin: 0; }
+.inv-stack > .inv-table-card { background: transparent; border: 0; border-radius: 0; box-shadow: none; margin: 0; }
+.inv-stack > .inv-footer { padding: 10px 20px 14px; border-top: 0; margin: 0; }
+
+body[data-svc-layout="outside"] .inv-stack {
+    background: transparent; border: 0; border-radius: 0; overflow: visible;
+    display: flex; flex-direction: column; gap: 8px;
+}
+body[data-svc-layout="outside"] .inv-stack > .inv-table-head-row { padding: 2px 0; }
+body[data-svc-layout="outside"] .inv-stack > .inv-table-card {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: visible;
+}
+body[data-svc-layout="outside"] .inv-stack > .inv-footer { padding: 12px 4px; border-top: 0; }
+
 .inv-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
 .inv-table col.inv-col-invoice { width: auto; }
 .inv-table col.inv-col-date { width: 120px; }
