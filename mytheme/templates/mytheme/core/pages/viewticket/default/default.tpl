@@ -59,12 +59,46 @@
     {* ══ MAIN ══ *}
     <div class="tk-view-main">
 
-        {* Conversation thread *}
+        {* Conversation thread — initial ticket message + every reply.
+           WHMCS keeps the original post in $message (separate from $replies),
+           so we render it as the first client bubble before iterating replies. *}
         <div>
             <h2 class="tk-section-title">{$LANG.conversation|default:'Conversation'}</h2>
             <div class="card tk-thread-card">
                 <div class="thread">
-                    {if isset($replies) && $replies|count > 0}
+                    {* Initial ticket post — author = the requester (clientsdetails or $name). *}
+                    {if isset($message) && $message}
+                    {assign var=openerName value=$name|default:''}
+                    {if !$openerName && isset($clientsdetails.firstname)}
+                        {assign var=openerName value="`$clientsdetails.firstname` `$clientsdetails.lastname`"}
+                    {/if}
+                    <div class="thread-message client">
+                        <div class="thread-sender">{$openerName|default:'Client'|escape}</div>
+                        <div class="thread-bubble">
+                            {$message}
+                            {if isset($attachments) && $attachments|@count > 0}
+                            <div class="thread-attachments">
+                                {foreach $attachments as $att}
+                                <a href="{$WEB_ROOT}/dl.php?type=at&id={$ticketid|default:$tid|escape}&i={$att@index}" class="thread-att">
+                                    <div class="thread-att-ico">{$att|default:''|substr:-3|upper|escape}</div>
+                                    <div class="thread-att-meta">
+                                        <div class="thread-att-name">{$att|escape}</div>
+                                    </div>
+                                    <div class="thread-att-dl" aria-label="{$LANG.download|default:'Download'}">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    </div>
+                                </a>
+                                {/foreach}
+                            </div>
+                            {/if}
+                        </div>
+                        <div class="thread-time">{$date|default:''|escape}</div>
+                    </div>
+                    {/if}
+
+                    {* Follow-up replies. Use |@count for Collection-safe length
+                       (plain |count silently returns 0 on Laravel Collections). *}
+                    {if isset($replies) && $replies|@count > 0}
                         {foreach $replies as $reply}
                         {if isset($reply.requestor_type) && $reply.requestor_type == 'admin'}
                             {assign var=msgClass value='staff'}
@@ -75,7 +109,7 @@
                             <div class="thread-sender">{$reply.name|default:''|escape}</div>
                             <div class="thread-bubble">
                                 {$reply.message}
-                                {if isset($reply.attachments) && $reply.attachments|count > 0}
+                                {if isset($reply.attachments) && $reply.attachments|@count > 0}
                                 <div class="thread-attachments">
                                     {foreach $reply.attachments as $att}
                                     <a href="{$WEB_ROOT}/dl.php?type=ar&id={$reply.id|default:0}&i={$att@index}" class="thread-att">
@@ -94,6 +128,13 @@
                             <div class="thread-time">{$reply.date|default:''|escape}</div>
                         </div>
                         {/foreach}
+                    {/if}
+
+                    {* Fallback empty-thread state — initial message gating in the
+                       page header should already prevent this, but cover the edge
+                       where the gate passes but neither $message nor $replies is set. *}
+                    {if (!isset($message) || !$message) && (!isset($replies) || $replies|@count == 0)}
+                    <div class="thread-empty">{$LANG.noticketreplies|default:'No conversation yet — be the first to reply.'}</div>
                     {/if}
                 </div>
             </div>

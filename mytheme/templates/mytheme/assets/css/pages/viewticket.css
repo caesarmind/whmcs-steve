@@ -84,6 +84,13 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 
 /* Conversation thread card */
 .tk-thread-card { padding: 20px 24px; }
+.thread-empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--color-text-tertiary);
+    font-size: 13px;
+    line-height: 1.55;
+}
 
 /* Tab nav */
 .tk-tabs {
