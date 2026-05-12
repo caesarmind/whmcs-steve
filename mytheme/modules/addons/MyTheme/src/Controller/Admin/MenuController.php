@@ -330,7 +330,7 @@ final class MenuController extends AbstractController
      */
     private function persistItems(int $menuId, array $payload, array $deletedIds = []): void
     {
-        $log = ['menu_id' => $menuId, 'payload_count' => count($payload), 'deleted_ids' => $deletedIds, 'created' => [], 'updated' => [], 'skipped' => [], 'errors' => []];
+        $log = ['menu_id' => $menuId, 'payload_count' => count($payload), 'deleted_ids' => $deletedIds, 'created' => [], 'updated' => [], 'skipped' => [], 'preserved' => [], 'errors' => []];
 
         // Delete explicitly-marked items first.
         if (!empty($deletedIds)) {
@@ -382,11 +382,27 @@ final class MenuController extends AbstractController
                     ]);
                     $log['created'][] = ['idx' => $i, 'new_id' => $item->id, 'type' => $type];
                 } else {
+                    // SAFETY GUARD — if the incoming label/config is empty but
+                    // the existing one has data, REFUSE to overwrite. This is
+                    // the last line of defense against a JS bug that sends
+                    // empty data for items the user never edited. Caused the
+                    // 39-item wipe incident where label/config was nuked for
+                    // every item even though they only edited a few.
                     $item->position    = $position;
                     $item->item_type   = $type;
-                    $item->label_json  = json_encode($label,  JSON_FORCE_OBJECT);
-                    $item->config_json = json_encode($config, JSON_FORCE_OBJECT);
                     $item->active      = $active;
+
+                    if ($this->isMeaningfulLabel($label) || $this->isEmptyLabel($item->label_json)) {
+                        $item->label_json = json_encode($label, JSON_FORCE_OBJECT);
+                    } else {
+                        $log['preserved'][] = ['id' => $item->id, 'field' => 'label_json', 'reason' => 'incoming_empty_existing_has_data'];
+                    }
+                    if ($this->isMeaningfulConfig($config) || $this->isEmptyConfig($item->config_json)) {
+                        $item->config_json = json_encode($config, JSON_FORCE_OBJECT);
+                    } else {
+                        $log['preserved'][] = ['id' => $item->id, 'field' => 'config_json', 'reason' => 'incoming_empty_existing_has_data'];
+                    }
+
                     $item->save();
                     $log['updated'][] = ['idx' => $i, 'id' => $item->id, 'type' => $type];
                 }
@@ -415,6 +431,80 @@ final class MenuController extends AbstractController
 
         // No implicit sweep — items absent from payload remain in DB.
         error_log('[MyTheme persistItems] ' . json_encode($log, JSON_UNESCAPED_SLASHES));
+    }
+
+    /**
+     * Label is "meaningful" if it has either a non-empty whmcs key or at
+     * least one non-empty custom translation. Empty {whmcs:'', custom:{}}
+     * is NOT meaningful — that's the JS regen empty default.
+     */
+    private function isMeaningfulLabel(array $label): bool
+    {
+        if (!empty($label['whmcs'])) {
+            return true;
+        }
+        $custom = $label['custom'] ?? [];
+        if (!is_array($custom)) {
+            return false;
+        }
+        foreach ($custom as $val) {
+            if (is_string($val) && $val !== '') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Config is "meaningful" if it has at least one non-empty value. Empty
+     * {} or all-empty-strings is NOT meaningful.
+     */
+    private function isMeaningfulConfig(array $config): bool
+    {
+        foreach ($config as $val) {
+            if (is_string($val) && $val !== '') {
+                return true;
+            }
+            if (is_array($val) && !empty($val)) {
+                return true;
+            }
+            if (is_bool($val) && $val) {
+                return true;
+            }
+            if (is_numeric($val) && $val != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * The stored label_json is "empty" if decoding it gives the empty
+     * default — meaning the row never had real data, so we allow overwriting
+     * with the (also empty) incoming value.
+     */
+    private function isEmptyLabel(?string $json): bool
+    {
+        if ($json === null || $json === '') {
+            return true;
+        }
+        $d = json_decode($json, true);
+        if (!is_array($d)) {
+            return true;
+        }
+        return !$this->isMeaningfulLabel($d);
+    }
+
+    private function isEmptyConfig(?string $json): bool
+    {
+        if ($json === null || $json === '') {
+            return true;
+        }
+        $d = json_decode($json, true);
+        if (!is_array($d)) {
+            return true;
+        }
+        return !$this->isMeaningfulConfig($d);
     }
 
     /**
