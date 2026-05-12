@@ -125,10 +125,28 @@ final class MenuController extends AbstractController
 
         // Items — POSTed as a JSON-encoded flat list with parent_id+position.
         // This is simpler than Lagom's nested-array reconstruction.
-        $payload = json_decode((string)($_POST['items_json'] ?? '[]'), true);
+        $raw     = (string)($_POST['items_json'] ?? '[]');
+        $payload = json_decode($raw, true);
         if (!is_array($payload)) {
             $payload = [];
         }
+
+        // SAFETY: never mass-delete on empty payload. If the JS tree-serializer
+        // breaks and submits "[]" while the DB still has items, persistItems
+        // would compute "delete all" and wipe the menu. That's almost never
+        // what the admin wanted. Bail out with a flash message and ask them
+        // to use the explicit "Re-seed presets" or "Delete menu" actions
+        // if they really meant to clear everything.
+        $existingCount = MenuItem::where('menu_id', $menu->id)->count();
+        if (empty($payload) && $existingCount > 0) {
+            // Log to server error_log so we can debug what the JS sent
+            error_log('MyTheme menu save: refusing to wipe ' . $existingCount
+                . ' items because items_json was empty. menu_id=' . $menu->id
+                . ' raw=' . substr($raw, 0, 200));
+            $this->redirect('?module=MyTheme&action=menu&sub=edit&id='
+                . $menu->id . '&flash=empty-payload-rejected');
+        }
+
         $this->persistItems($menu->id, $payload);
 
         $this->redirect('?module=MyTheme&action=menu&sub=edit&id=' . $menu->id . '&flash=saved');

@@ -109,6 +109,16 @@ if (AddonHelper::isActive()) {
     // their result into $GLOBALS for the whmcs_default item type to pick up.
     add_hook('ClientAreaPrimaryNavbar', 100, function (WHMCS\View\Menu\Item $primaryNavbar) {
         try {
+            // Self-heal: if the menu tables don't exist yet (admin upgraded
+            // MyTheme without going through _upgrade), migrate + seed now.
+            // Migrator tracks executed migrations so this is idempotent and
+            // costs ~1 ms on subsequent requests.
+            if (!\WHMCS\Database\Capsule::schema()->hasTable('mytheme_menus')) {
+                $addonRoot = __DIR__;
+                (new MyTheme\Database\Migrator($addonRoot))->migrate();
+                (new MyTheme\Menu\Seeder())->run();
+            }
+
             $audience = MyTheme\Menu\Audience::current();
             $menu     = MyTheme\Models\Menu::pick('main', $audience);
             if ($menu === null) {

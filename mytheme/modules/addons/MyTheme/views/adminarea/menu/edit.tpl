@@ -11,6 +11,13 @@
         </a>
         <div style="flex:1"></div>
         {if $flash == 'saved'}<span class="mt-flash mt-flash-success">Saved</span>{/if}
+        {if $flash == 'empty-payload-rejected'}
+            <span class="mt-flash mt-flash-warn">
+                Save refused — the browser sent zero items so we didn't wipe your menu.
+                <a href="?module=MyTheme&action=menu&sub=seed" style="text-decoration:underline">Re-seed presets</a>
+                if you want the defaults back.
+            </span>
+        {/if}
         <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
     </div>
 
@@ -31,33 +38,48 @@
             </header>
 
             <div class="mt-menu-tree" id="mtMenuTree" data-tree-root>
-                {* Recursive macro: render each tree node *}
-                {function name=renderNode}
-                    {assign var=itm value=$node.item}
-                    <li class="mt-menu-item" data-id="{$itm->id}" data-type="{$itm->item_type|escape}" data-active="{if $itm->active}1{else}0{/if}" data-label="{$itm->label_json|escape}" data-config="{$itm->config_json|escape}">
-                        <div class="mt-menu-item-row">
-                            <span class="mt-menu-handle" title="Drag to reorder">
-                                <svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="10" cy="12" r="1" fill="currentColor"/></svg>
-                            </span>
-                            <span class="mt-menu-type-badge mt-type-{$itm->item_type|escape}">{$itemTypes[$itm->item_type]['label']|default:$itm->item_type|escape}</span>
-                            <span class="mt-menu-name" data-role="label">{$itm->resolvedLabel()|escape}</span>
-                            {if !$itm->active}<span class="mt-badge mt-badge-neutral">hidden</span>{/if}
-                            <span class="mt-menu-actions">
-                                <button type="button" class="mt-icon-btn" data-action="edit-item" title="Edit"><svg viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
-                                <button type="button" class="mt-icon-btn" data-action="delete-item" title="Delete"><svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3.5 4l1 10h7l1-10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
-                            </span>
-                        </div>
-                        <ul class="mt-menu-children" data-children>
-                            {foreach $node.children as $childNode}
-                                {renderNode node=$childNode}
-                            {/foreach}
-                        </ul>
-                    </li>
-                {/function}
-
+                {* Two explicit levels of nesting — avoids fragile Smarty {function} recursion
+                   which can silently render nothing on some WHMCS Smarty configurations and
+                   then trip the persistItems mass-delete safety net on Save. 2 levels covers
+                   every realistic menu shape; deeper trees would need a switch to
+                   {include}-based recursion. *}
                 <ul class="mt-menu-list" data-children>
                     {foreach $tree as $node}
-                        {renderNode node=$node}
+                        {assign var=itm value=$node.item}
+                        <li class="mt-menu-item" data-id="{$itm->id}" data-type="{$itm->item_type|escape}" data-active="{if $itm->active}1{else}0{/if}" data-label="{$itm->label_json|escape}" data-config="{$itm->config_json|escape}">
+                            <div class="mt-menu-item-row">
+                                <span class="mt-menu-handle" title="Drag to reorder">
+                                    <svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="10" cy="12" r="1" fill="currentColor"/></svg>
+                                </span>
+                                <span class="mt-menu-type-badge mt-type-{$itm->item_type|escape}">{$itemTypes[$itm->item_type]['label']|default:$itm->item_type|escape}</span>
+                                <span class="mt-menu-name" data-role="label">{$itm->resolvedLabel()|escape}</span>
+                                {if !$itm->active}<span class="mt-badge mt-badge-neutral">hidden</span>{/if}
+                                <span class="mt-menu-actions">
+                                    <button type="button" class="mt-icon-btn" data-action="edit-item" title="Edit"><svg viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
+                                    <button type="button" class="mt-icon-btn" data-action="delete-item" title="Delete"><svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3.5 4l1 10h7l1-10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                </span>
+                            </div>
+                            <ul class="mt-menu-children" data-children>
+                                {foreach $node.children as $childNode}
+                                    {assign var=childItm value=$childNode.item}
+                                    <li class="mt-menu-item" data-id="{$childItm->id}" data-type="{$childItm->item_type|escape}" data-active="{if $childItm->active}1{else}0{/if}" data-label="{$childItm->label_json|escape}" data-config="{$childItm->config_json|escape}">
+                                        <div class="mt-menu-item-row">
+                                            <span class="mt-menu-handle">
+                                                <svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="10" cy="12" r="1" fill="currentColor"/></svg>
+                                            </span>
+                                            <span class="mt-menu-type-badge mt-type-{$childItm->item_type|escape}">{$itemTypes[$childItm->item_type]['label']|default:$childItm->item_type|escape}</span>
+                                            <span class="mt-menu-name" data-role="label">{$childItm->resolvedLabel()|escape}</span>
+                                            {if !$childItm->active}<span class="mt-badge mt-badge-neutral">hidden</span>{/if}
+                                            <span class="mt-menu-actions">
+                                                <button type="button" class="mt-icon-btn" data-action="edit-item">Edit</button>
+                                                <button type="button" class="mt-icon-btn" data-action="delete-item">×</button>
+                                            </span>
+                                        </div>
+                                        <ul class="mt-menu-children" data-children></ul>
+                                    </li>
+                                {/foreach}
+                            </ul>
+                        </li>
                     {/foreach}
                 </ul>
 
@@ -473,6 +495,20 @@
                 active: it.active,
             };
         });
+        // SAFETY: if state.items is empty (DOM ingest never ran or errored),
+        // refuse to submit and ask the admin to reload — the controller
+        // would have refused anyway, but failing fast in the browser is
+        // better UX than a round-trip + flash-message redirect.
+        if (payload.length === 0) {
+            var existing = document.querySelectorAll('li.mt-menu-item').length;
+            if (existing > 0) {
+                e.preventDefault();
+                alert('Refusing to save: the browser didn’t pick up any items from the tree. Reload the page and try again.');
+                console.error('[MyTheme menu] empty payload while DOM still has', existing, 'items — submit blocked');
+                return;
+            }
+        }
+        console.log('[MyTheme menu] submitting', payload.length, 'items');
         document.getElementById('menuItemsJson').value = JSON.stringify(payload);
     });
 

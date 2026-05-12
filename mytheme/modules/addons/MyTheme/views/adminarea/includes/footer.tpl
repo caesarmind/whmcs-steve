@@ -247,6 +247,8 @@
 .mt-divider { border: 0; border-top: 1px solid var(--mt-border); margin: 6px 0; }
 .mt-flash { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; margin-right: 8px; }
 .mt-flash-success { background: rgba(40, 167, 69, 0.15); color: #1e7e34; }
+.mt-flash-warn    { background: rgba(255, 159,  10, 0.15); color: #b35900; max-width: 600px; font-size: 12px; line-height: 1.4; padding: 6px 12px; border-radius: 6px; }
+.mt-flash-warn a  { color: inherit; font-weight: 600; }
 
 .mt-empty { text-align: center; padding: 40px 20px; color: var(--mt-text-2); }
 .mt-empty-icon { width: 40px; height: 40px; margin: 0 auto 12px; color: var(--mt-text-3); }
