@@ -104,6 +104,58 @@ if (AddonHelper::isActive()) {
         return HookService::instance()->dispatch('ClientAreaHomepagePanels', $panels);
     });
 
+    // Primary navbar — pull active Menu from DB and repopulate. Priority 100
+    // so WHMCS's own default-item registrations have all run first; we stash
+    // their result into $GLOBALS for the whmcs_default item type to pick up.
+    add_hook('ClientAreaPrimaryNavbar', 100, function (WHMCS\View\Menu\Item $primaryNavbar) {
+        try {
+            $audience = MyTheme\Menu\Audience::current();
+            $menu     = MyTheme\Models\Menu::pick('main', $audience);
+            if ($menu === null) {
+                return; // no custom menu — leave WHMCS's default alone
+            }
+            // Capture native children before we clear them, so whmcs_default can pass through
+            $native = [];
+            foreach ($primaryNavbar->getChildren() as $name => $child) {
+                $native[$name] = $child;
+            }
+            $GLOBALS['__mytheme_native_navbar_children'] = $native;
+
+            foreach (array_keys($native) as $name) {
+                $primaryNavbar->removeChild($name);
+            }
+            MyTheme\Menu\TreeRenderer::populate($primaryNavbar, $menu);
+        } catch (\Throwable $e) {
+            // Don't blow up the page if the menu system fails. Log and let the
+            // default WHMCS navbar render.
+            if (class_exists('\\WHMCS\\Module\\Addon\\Logger')) {
+                logActivity('MyTheme menu render failed: ' . $e->getMessage());
+            }
+        }
+    });
+
+    // Secondary navbar — same pattern (location = secondary). If no menu, leave alone.
+    add_hook('ClientAreaSecondaryNavbar', 100, function (WHMCS\View\Menu\Item $secondaryNavbar) {
+        try {
+            $audience = MyTheme\Menu\Audience::current();
+            $menu     = MyTheme\Models\Menu::pick('secondary', $audience);
+            if ($menu === null) return;
+            $native = [];
+            foreach ($secondaryNavbar->getChildren() as $name => $child) {
+                $native[$name] = $child;
+            }
+            $GLOBALS['__mytheme_native_navbar_children'] = $native;
+            foreach (array_keys($native) as $name) {
+                $secondaryNavbar->removeChild($name);
+            }
+            MyTheme\Menu\TreeRenderer::populate($secondaryNavbar, $menu);
+        } catch (\Throwable $e) {
+            if (function_exists('logActivity')) {
+                logActivity('MyTheme secondary menu render failed: ' . $e->getMessage());
+            }
+        }
+    });
+
     add_hook('ClientAreaPageHome', 1, function ($vars) {
         return HookService::instance()->dispatch('ClientAreaPageHome', $vars);
     });

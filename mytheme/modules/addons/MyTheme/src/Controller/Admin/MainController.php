@@ -37,7 +37,18 @@ final class MainController extends AbstractController
     public function layoutsAction(): string    { return (new LayoutsController())->indexAction(); }
     public function pagesAction(): string      { return (new PagesController())->indexAction(); }
     public function editPageAction(): string   { return (new PagesController())->editAction(); }
-    public function menuAction(): string       { return (new MenuController())->indexAction(); }
+    public function menuAction(): string
+    {
+        $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');
+        $ctl = new MenuController();
+        return match ($sub) {
+            'edit'   => $ctl->editAction(),
+            'save'   => $ctl->saveAction(),
+            'delete' => $ctl->deleteAction(),
+            'seed'   => $ctl->seedAction(),
+            default  => $ctl->indexAction(),
+        };
+    }
     public function editMenuAction(): string   { return (new MenuController())->editAction(); }
     public function brandingAction(): string   { return (new BrandingController())->indexAction(); }
     public function extensionsAction(): string { return (new ExtensionsController())->indexAction(); }

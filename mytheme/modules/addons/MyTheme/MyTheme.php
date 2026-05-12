@@ -53,6 +53,11 @@ function MyTheme_activate()
     try {
         $migrator = new MyTheme\Database\Migrator(__DIR__);
         $migrator->migrate();
+
+        // Seed the 4 preset menus on first activation. The seeder skips any
+        // preset whose (name, location) already exists, so re-activation
+        // doesn't clobber admin customisations.
+        (new MyTheme\Menu\Seeder())->run();
     } catch (\Throwable $e) {
         return [
             'status'      => 'error',
@@ -82,6 +87,9 @@ function MyTheme_upgrade($vars)
 {
     $migrator = new MyTheme\Database\Migrator(__DIR__);
     $migrator->migrate();
+    // Belt and braces: seed presets if they were never installed (e.g. upgrading
+    // from a version that predates the menu manager). Idempotent.
+    (new MyTheme\Menu\Seeder())->run();
 }
 
 function MyTheme_output($vars)
