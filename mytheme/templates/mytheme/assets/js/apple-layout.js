@@ -549,6 +549,11 @@
             if (saved.indexOf(id) !== -1) group.classList.add('open');
             var toggle = group.querySelector('.sidebar-group-toggle');
             if (!toggle) return;
+            // Skip if the inline script in sidebar.tpl already attached a
+            // handler. Without this guard we'd attach a second toggle and
+            // both fire per click — net result: no change.
+            if (toggle.dataset.mtBound === '1') return;
+            toggle.dataset.mtBound = '1';
             toggle.addEventListener('click', function () {
                 group.classList.toggle('open');
                 var openNow = Array.prototype.slice.call(
