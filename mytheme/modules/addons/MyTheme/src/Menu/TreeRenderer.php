@@ -193,6 +193,7 @@ final class TreeRenderer
             $child->setAttribute('data-mt-type', ItemTypes::LOGIN_BUTTON);
             if (($config['position_side'] ?? '') === 'right') {
                 $child->addClass('mt-menu-side-right');
+                $child->setAttribute('data-mt-side', 'right');
             }
             $child->setOrder((int)$node->position);
         }
@@ -271,12 +272,15 @@ final class TreeRenderer
         }
         if (($config['position_side'] ?? '') === 'right') {
             $item->addClass('mt-menu-side-right');
+            $item->setAttribute('data-mt-side', 'right');
+        } elseif (($config['position_side'] ?? '') === 'left') {
+            $item->setAttribute('data-mt-side', 'left');
         }
         $item->setOrder((int)$node->position);
 
         // Expose the menu-manager item-type to Smarty partials so they can
         // branch on it (header vs divider vs link vs dropdown_parent etc.)
-        // without inspecting CSS-class lists.
+        // without inspecting CSS-class lists (Item has no hasClass() method).
         $item->setAttribute('data-mt-type', $node->item_type);
 
         // Auto-cycle a palette colour from a fixed list, override-able via

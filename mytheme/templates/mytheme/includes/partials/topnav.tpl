@@ -17,7 +17,7 @@
 {function name=mtTopnavItem item=null}
     {assign var=mtType value=$item->getAttribute('data-mt-type')|default:'whmcs_page'}
     {assign var=sideRight value=''}
-    {if $item->hasClass('mt-menu-side-right')}{assign var=sideRight value=' nav-item-right'}{/if}
+    {if $item->getAttribute('data-mt-side') == 'right'}{assign var=sideRight value=' nav-item-right'}{/if}
     {if $mtType == 'header'}
         {* Headers are sidebar-only — collapse to a plain disabled span on top-nav *}
         <span class="nav-section{$sideRight}">{$item->getLabel()|escape}</span>
