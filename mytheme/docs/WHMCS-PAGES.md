@@ -46,13 +46,13 @@ All four `password-reset-*` dispatchers forward to a single shared `pwreset/defa
 
 | Templatefile | URL | Status | Notes |
 |---|---|---|---|
-| `clientareadomaindetails` | `/clientarea.php?action=domaindetails&id=X` | ⚠️ | Single domain — tabs for nameservers / addons / contact info etc. |
-| `clientareadomaindns` | `/clientarea.php?action=domaindns&id=X` | ⚠️ | DNS record editor (A / AAAA / MX / TXT / CNAME) |
-| `clientareadomainemailforwarding` | `/clientarea.php?action=emailforwarding&id=X` | ⚠️ | Email-forwarding rules per domain |
-| `clientareadomainregisterns` | `/clientarea.php?action=registerns&id=X` | ⚠️ | Register custom nameservers at registrar |
-| `clientareadomaingetepp` | `/clientarea.php?action=getepp&id=X` | ⚠️ | Retrieve domain auth code |
-| `clientareadomainaddons` | `/clientarea.php?action=domainaddons&id=X` | ⚠️ | WHOIS privacy / ID protection toggles |
-| `clientareadomaincontactinfo` | `/clientarea.php?action=contactinfo&id=X` | ⚠️ | Registrant / admin / tech / billing contact editor |
+| `clientareadomaindetails` | `/clientarea.php?action=domaindetails&id=X` | ✅ | Single domain — overview/autorenew/nameservers/reglock/addons tabs |
+| `clientareadomaindns` | `/clientarea.php?action=domaindns&id=X` | ✅ | DNS record editor (A / AAAA / MX / TXT / CNAME) |
+| `clientareadomainemailforwarding` | `/clientarea.php?action=emailforwarding&id=X` | ✅ | Email-forwarding rules per domain |
+| `clientareadomainregisterns` | `/clientarea.php?action=registerns&id=X` | ✅ | Register / modify / delete glue records |
+| `clientareadomaingetepp` | `/clientarea.php?action=getepp&id=X` | ✅ | Retrieve domain auth code (with copy button) |
+| `clientareadomainaddons` | `/clientarea.php?action=domainaddons&id=X` | ✅ | ID-protect / DNS / email-fwd buy & disable confirmation |
+| `clientareadomaincontactinfo` | `/clientarea.php?action=contactinfo&id=X` | ✅ | Registrant / admin / tech / billing contact editor |
 | `bulkdomainmanagement` | `/clientarea.php?action=bulkdomainmanagement` | ⚠️ | Apply NS / auto-renew / lock changes to many domains |
 | `domain-pricing` | `/cart.php?a=add&domain=register` | ⚠️ | Public TLD pricing table |
 
@@ -169,8 +169,8 @@ All four `password-reset-*` dispatchers forward to a single shared `pwreset/defa
 
 ## Coverage summary
 
-- **Full (real content):** 35 pages — every Smarty-renderable WHMCS client-area page that this theme targets
-- **Scaffold (skeleton, real content pending):** 31 pages — render structurally and pass the lint, but the WHMCS variable wiring is still placeholder
+- **Full (real content):** 42 pages — every Smarty-renderable WHMCS client-area page that this theme targets
+- **Scaffold (skeleton, real content pending):** 24 pages — render structurally and pass the lint, but the WHMCS variable wiring is still placeholder
 - **Out of scope:** 2 PDF templates (`invoicepdf`, `quotepdf`) — these are TCPDF renders under `templates/pdf/`, not Smarty; they live in a different theming surface
 - **Missing:** 0 — the theme covers every targeted client-area page
 

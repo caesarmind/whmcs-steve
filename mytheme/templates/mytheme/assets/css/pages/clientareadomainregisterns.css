@@ -1,19 +1,59 @@
-/* Register Nameservers — page CSS */
-
 .page-header { margin: 8px 0 24px; }
-.page-header h1 {
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: -0.028em;
-    color: var(--color-text-primary);
-    margin: 0 0 8px;
-    line-height: 1.1;
+.page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.026em; color: var(--color-text-primary); margin: 0 0 6px; line-height: 1.15; }
+.page-header .page-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 8px; }
+.page-header .page-subtitle { font-size: 14px; color: var(--color-text-secondary); margin: 6px 0 0; max-width: 560px; }
+
+.rns-split { display: grid; grid-template-columns: 1fr 240px; gap: 24px; align-items: start; }
+.rns-main { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.rns-aside { display: flex; flex-direction: column; gap: 16px; }
+body[data-subnav="off"] .rns-split { grid-template-columns: 1fr; }
+body[data-subnav="off"] .rns-split > .rns-aside { display: none; }
+body[data-subnav-side="left"] .rns-split { grid-template-columns: 240px 1fr; }
+body[data-subnav-side="left"] .rns-split > .rns-aside { grid-column: 1; grid-row: 1; }
+body[data-subnav-side="left"] .rns-split > .rns-main { grid-column: 2; grid-row: 1; }
+
+.rns-alert { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin: 0 0 16px; border-radius: var(--radius-md); font-size: 13px; line-height: 1.5; }
+.rns-alert svg { width: 16px; height: 16px; flex-shrink: 0; }
+.rns-alert-warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
+
+.rns-card { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+.rns-card-danger { border-color: var(--color-red-bg); }
+.rns-section-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 4px; }
+
+.rns-row { display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: center; }
+.rns-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); }
+.rns-input {
+    height: 36px; padding: 0 12px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    font-size: 13px; color: var(--color-text-primary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    width: 100%;
+    transition: all var(--transition-fast);
 }
+.rns-input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+
+.rns-input-suffix { display: flex; align-items: center; gap: 8px; }
+.rns-input-suffix .rns-input { flex: 1; }
+.rns-suffix { font-size: 13px; color: var(--color-text-tertiary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
+
+.rns-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.rns-actions .btn-primary, .rns-actions .btn-secondary { height: 36px; padding: 0 18px; font-size: 13px; }
+.rns-danger-btn { color: var(--color-red-text); border-color: var(--color-red-text); }
+.rns-danger-btn:hover { background: var(--color-red-text); color: #fff; }
+
+.subnav-card { padding: 8px; }
+.subnav-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }
+.subnav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: 13px; text-decoration: none; transition: background var(--transition-fast); }
+.subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+.subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+.subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); }
+.subnav-item.active svg { color: var(--color-accent); }
 
 @media (max-width: 880px) {
-    .page-header h1 { font-size: 34px; }
-}
-
-@media (max-width: 480px) {
-    .page-header h1 { font-size: 30px; }
+    .rns-split { grid-template-columns: 1fr; }
+    .page-header h1 { font-size: 28px; }
+    .rns-row { grid-template-columns: 1fr; gap: 6px; }
+    .rns-input-suffix { flex-wrap: wrap; }
 }
