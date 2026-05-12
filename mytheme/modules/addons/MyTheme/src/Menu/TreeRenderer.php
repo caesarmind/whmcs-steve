@@ -30,7 +30,17 @@ final class TreeRenderer
         $layout   = self::currentLayout();
 
         foreach ($menu->topLevelItems() as $node) {
-            self::renderNode($parent, $node, $audience, $layout);
+            try {
+                self::renderNode($parent, $node, $audience, $layout);
+            } catch (\Throwable $e) {
+                // One broken item must never kill the rest of the menu.
+                error_log(sprintf(
+                    'MyTheme TreeRenderer: skipped item id=%d type=%s — %s',
+                    $node->id,
+                    $node->item_type,
+                    $e->getMessage()
+                ));
+            }
         }
     }
 
@@ -264,41 +274,41 @@ final class TreeRenderer
     private static function applyVisuals(Item $item, MenuItem $node): void
     {
         $config = $node->config();
+        // Each setter is wrapped in its own try/catch because WHMCS\View\Menu\Item
+        // is strict about expected formats and can throw on certain inputs. A
+        // bad visual hint must not abort the whole item, let alone the menu.
         if (!empty($config['icon'])) {
-            $item->setIcon((string)$config['icon']);
+            try { $item->setIcon((string)$config['icon']); } catch (\Throwable $e) { /* tolerate */ }
         }
         if (!empty($config['css_class'])) {
-            $item->addClass((string)$config['css_class']);
+            try { $item->addClass((string)$config['css_class']); } catch (\Throwable $e) {}
         }
         if (($config['position_side'] ?? '') === 'right') {
-            $item->addClass('mt-menu-side-right');
-            $item->setAttribute('data-mt-side', 'right');
+            try { $item->addClass('mt-menu-side-right'); } catch (\Throwable $e) {}
+            try { $item->setAttribute('data-mt-side', 'right'); } catch (\Throwable $e) {}
         } elseif (($config['position_side'] ?? '') === 'left') {
-            $item->setAttribute('data-mt-side', 'left');
+            try { $item->setAttribute('data-mt-side', 'left'); } catch (\Throwable $e) {}
         }
-        $item->setOrder((int)$node->position);
+        try { $item->setOrder((int)$node->position); } catch (\Throwable $e) {}
 
         // Expose the menu-manager item-type to Smarty partials so they can
         // branch on it (header vs divider vs link vs dropdown_parent etc.)
         // without inspecting CSS-class lists (Item has no hasClass() method).
-        $item->setAttribute('data-mt-type', $node->item_type);
+        try { $item->setAttribute('data-mt-type', $node->item_type); } catch (\Throwable $e) {}
 
         // Auto-cycle a palette colour from a fixed list, override-able via
-        // config.color. Partials use this as a CSS class suffix:
-        //   data-mt-color="blue"  →  .sidebar-item-icon.blue
+        // config.color. Partials use this as a CSS class suffix.
         $palette = ['blue','purple','teal','green','orange','red','pink','indigo','gray'];
         $color = (string)($config['color'] ?? '');
         if ($color === '') {
-            // Stable per-item: hash node id into the palette
-            $color = $palette[$node->id % count($palette)];
+            $color = $palette[((int)$node->id) % count($palette)];
         }
-        $item->setAttribute('data-mt-color', $color);
+        try { $item->setAttribute('data-mt-color', $color); } catch (\Throwable $e) {}
 
         // Optional badge source — partials can read this and look up the
         // count from $clientsstats (set globally on every client-area page).
-        // Supported values: services, unpaid_invoices, open_tickets, domains
         if (!empty($config['badge_source'])) {
-            $item->setAttribute('data-mt-badge-source', (string)$config['badge_source']);
+            try { $item->setAttribute('data-mt-badge-source', (string)$config['badge_source']); } catch (\Throwable $e) {}
         }
     }
 
@@ -333,27 +343,62 @@ final class TreeRenderer
         if ($page === '') {
             return '';
         }
-        if (function_exists('routePath')) {
-            try {
-                return (string)routePath($page);
-            } catch (\Throwable $e) {
-                // unknown route — fall through
-            }
+
+        // If the admin entered a raw URL ("clientarea.php?action=...", "/foo",
+        // "https://example.com"), use it verbatim.
+        if (str_starts_with($page, '/')
+            || str_starts_with($page, 'http://')
+            || str_starts_with($page, 'https://')
+            || str_contains($page, '.php')
+            || str_contains($page, '?')) {
+            return $page;
         }
-        // Conservative fallback for common pages
+
+        // Known WHMCS templatefile → direct URL. This table wins over routePath()
+        // because routePath() expects WHMCS *route* names, not templatefile
+        // names. Calling routePath('clientareahome') returns the literal string
+        // "/index.php/route-not-defined", which then renders as a broken link.
         $fallback = [
             'clientareahome'     => 'clientarea.php',
             'clientareaproducts' => 'clientarea.php?action=services',
             'clientareadomains'  => 'clientarea.php?action=domains',
             'clientareainvoices' => 'clientarea.php?action=invoices',
+            'clientareadetails'  => 'clientarea.php?action=details',
+            'clientareaquotes'   => 'clientarea.php?action=quotes',
+            'clientareasecurity' => 'clientarea.php?action=security',
             'supporttickets'     => 'supporttickets.php',
+            'submitticket'       => 'submitticket.php',
             'knowledgebase'      => 'knowledgebase.php',
             'announcements'      => 'announcements.php',
+            'downloads'          => 'downloads.php',
+            'networkstatus'      => 'serverstatus.php',
+            'serverstatus'       => 'serverstatus.php',
             'contact'            => 'contact.php',
             'cart'               => 'cart.php',
             'login'              => 'login.php',
             'register'           => 'register.php',
+            'logout'             => 'logout.php',
         ];
-        return $fallback[$page] ?? ('index.php?rp=/store/' . $page);
+        if (isset($fallback[$page])) {
+            return $fallback[$page];
+        }
+
+        // Last resort: try routePath() for things like 'account-users',
+        // 'user-profile', etc. that ARE registered as named routes. If the
+        // result is the literal "route-not-defined" sentinel WHMCS returns
+        // for unknown route names, fall back to a safe '#'.
+        if (function_exists('routePath')) {
+            try {
+                $resolved = (string)routePath($page);
+                if ($resolved !== '' && !str_contains($resolved, 'route-not-defined')) {
+                    return $resolved;
+                }
+            } catch (\Throwable $e) {
+                // fall through
+            }
+        }
+
+        // Unknown — don't return a broken link; let the renderer drop it.
+        return '';
     }
 }
