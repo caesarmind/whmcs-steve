@@ -45,7 +45,11 @@
 <div class="um-split">
     <div class="um-main">
 
-        {include file="`$template`/includes/flashmessage.tpl"}
+        {if $message = get_flash_message()}
+            <div class="um-alert um-alert-{if $message.type == 'error'}error{elseif $message.type == 'success'}success{elseif $message.type == 'warning'}warn{else}info{/if}">
+                {$message.text}
+            </div>
+        {/if}
 
         {if $usCount > 0}
         <div class="when-full um-list">
@@ -68,7 +72,7 @@
                         </div>
                         <div class="um-row-sub">
                             {$user->email|default:''|escape}
-                            {if method_exists($user, 'hasTwoFactorAuthEnabled') && $user->hasTwoFactorAuthEnabled()}
+                            {if $user->hasTwoFactorAuthEnabled()}
                                 <span class="um-2fa" title="{$LANG.twoFactor.enabled|default:'Two-factor enabled'}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                                 </span>
