@@ -12,9 +12,9 @@
      $formdata     — pre-filled invite-form data (e.g. $formdata.inviteemail)
      $token        — CSRF token
 
-   Do NOT use $user->isOwner — v9 makes that a relationship method that
-   needs an argument; reading it as a property throws ArgumentCountError.
-   Always use $user->pivot->owner instead.
+   Do NOT read isOwner as a property — v9 makes that a relationship method
+   that needs an argument; the property read triggers ArgumentCountError.
+   Always use the v9 pivot field $user->pivot->owner instead.
 *}
 
 {assign var=usCount value=0}

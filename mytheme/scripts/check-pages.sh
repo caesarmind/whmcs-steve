@@ -134,6 +134,79 @@ cmd_lint() {
             [[ -f "$tpl" ]] && pass "$page · tpl · valid foreach iterators"
         fi
 
+        # Smarty {if method_exists/property_exists/function_exists/class_exists(...)} (§10 v8/v9 trap)
+        # — PHP introspection functions aren't in Smarty's whitelist; the {if} fails at render
+        #   silently, dropping the rest of the template. Call the method directly instead.
+        if [[ -f "$tpl" ]] && grep -nE '\{if[^}]*\b(method_exists|property_exists|function_exists|class_exists)\(' "$tpl" >/dev/null 2>&1; then
+            fail "$page · tpl uses {if X_exists(\$obj,'fn')} — PHP introspection not in Smarty whitelist; call the method directly like Nexus does"
+            grep -nE '\{if[^}]*\b(method_exists|property_exists|function_exists|class_exists)\(' "$tpl" | head -2 | sed 's/^/      /'
+        else
+            [[ -f "$tpl" ]] && pass "$page · tpl · no method_exists / property_exists / function_exists in if-expression"
+        fi
+
+        # Include of a non-existent partial — most commonly flashmessage.tpl which Nexus has
+        # but our theme doesn't. The Smarty include silently produces no output and may drop
+        # the rest of the template, leaving content-area blank.
+        if [[ -f "$tpl" ]]; then
+            local inc_paths
+            inc_paths=$(grep -oE '\{include[^}]*file="[^"]+"' "$tpl" 2>/dev/null | grep -oE 'file="[^"]+"' | sed -E 's/^file="//; s/"$//' | grep -v '^[`{$]') || true
+            for ip in $inc_paths; do
+                # Skip dynamic paths (containing template-var expressions like `$template`)
+                [[ "$ip" == *'`'* ]] && continue
+                [[ "$ip" == *'$'* ]] && continue
+                # Resolve relative to templates/mytheme/
+                local abs_inc="$THEME_ROOT/templates/mytheme/$ip"
+                if [[ ! -f "$abs_inc" ]]; then
+                    fail "$page · tpl includes missing partial '$ip' (Smarty drops the rest of the template silently)"
+                fi
+            done
+        fi
+
+        # $user->isOwner / $u.isOwner — v8 property, in v9 it's a method with required arg
+        # → triggers ArgumentCountError. Use $user->pivot->owner instead.
+        # Skip matches inside {* ... *} comment blocks (multi-line aware).
+        if [[ -f "$tpl" ]]; then
+            local isowner_hits
+            isowner_hits=$(awk '
+                BEGIN { in_c = 0 }
+                {
+                    line = $0
+                    # Trim chunks that lie inside multi-line comments
+                    while (1) {
+                        if (in_c) {
+                            p = index(line, "*}")
+                            if (p) { line = substr(line, p + 2); in_c = 0 } else { line = ""; break }
+                        }
+                        p = index(line, "{*")
+                        if (p) {
+                            head = substr(line, 1, p - 1)
+                            tail = substr(line, p + 2)
+                            q = index(tail, "*}")
+                            if (q) { line = head substr(tail, q + 2) } else { line = head; in_c = 1; break }
+                        } else { break }
+                    }
+                    if (line ~ /\$[a-zA-Z_]+(->|\.)isOwner($|[^a-zA-Z_])/) print NR ":" $0
+                }
+            ' "$tpl")
+            if [[ -n "$isowner_hits" ]]; then
+                fail "$page · tpl reads \$x->isOwner — v8 property; v9 requires \$x->pivot->owner (else ArgumentCountError, see §10 v8/v9 trap)"
+                echo "$isowner_hits" | head -2 | sed 's/^/      /'
+            else
+                pass "$page · tpl · no v8 \$user->isOwner reads (uses v9 \$user->pivot->owner)"
+            fi
+        fi
+
+        # Hardcoded account-level / user-level URLs that should use routePath() — both
+        # /clientarea.php?action={users,paymentmethods,contacts,switchaccount,changepw,security}
+        # and /account/X|/user/X literals. routePath('account-users') etc. picks the right form
+        # for whatever WHMCS version + URL-mode is configured.
+        if [[ -f "$tpl" ]] && grep -nE '\$WEB_ROOT}/clientarea\.php\?action=(users|paymentmethods|contacts|switchaccount|changepw)\b|"/account/(users|paymentmethods|contacts)"|"/user/(profile|security|password|accounts)"' "$tpl" >/dev/null 2>&1; then
+            fail "$page · tpl hardcodes an account-/user-level URL — use {routePath('account-users')}/('account-paymentmethods')/('account-contacts')/('user-profile')/('user-security')/('user-password')/('user-accounts') so WHMCS picks the right URL form"
+            grep -nE '\$WEB_ROOT}/clientarea\.php\?action=(users|paymentmethods|contacts|switchaccount|changepw)\b|"/account/(users|paymentmethods|contacts)"|"/user/(profile|security|password|accounts)"' "$tpl" | head -3 | sed 's/^/      /'
+        else
+            [[ -f "$tpl" ]] && pass "$page · tpl · no hardcoded account-/user-level URLs (uses routePath)"
+        fi
+
         # Dispatcher: $myTheme.pages.<hyphenated-name>.fullPath in templates/mytheme/<page>.tpl
         # — Smarty parses dot-notation with hyphens as SUBTRACTION, silently produces empty
         #   content-area. Must use bracket form: $myTheme.pages['hyphenated-name'].fullPath.

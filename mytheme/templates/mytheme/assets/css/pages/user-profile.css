@@ -20,6 +20,17 @@ body[data-subnav="off"] .up-split > aside { display: none; }
 .up-alert svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; }
 .up-alert-success { background: var(--color-green-bg); color: var(--color-green-text); }
 .up-alert-error   { background: var(--color-red-bg); color: var(--color-red-text); }
+.up-alert-warn    { background: var(--color-orange-bg); color: var(--color-orange-text); }
+.up-alert-info    { background: var(--color-accent-light); color: var(--color-accent); }
+
+.up-card .card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.up-verify-tag { display: inline-flex; align-items: center; gap: 6px; }
+.up-tag { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.up-tag-ok   { background: var(--color-green-bg); color: var(--color-green-text); }
+.up-tag-warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
+
+.up-actions { display: flex; gap: 8px; padding: 14px 22px; border-top: 0.5px solid var(--color-border); justify-content: flex-end; }
+.up-actions .btn-primary, .up-actions .btn-secondary { height: 38px; padding: 0 20px; font-size: 13.5px; }
 
 .up-card { padding: 0; }
 .up-card .card-header { padding: 16px 22px; border-bottom: 0.5px solid var(--color-border); }
