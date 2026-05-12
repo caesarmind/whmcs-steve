@@ -269,10 +269,18 @@
     // deletedIds tracks DB ids the admin removed via the × button. They're
     // submitted in deleted_ids_json. The controller ONLY deletes ids in this
     // list — no implicit sweep based on payload absence.
-    var state = { items: [], deletedIds: [], nextTemp: 1 };
+    //
+    // `pristine` starts true and stays true until the admin actually edits
+    // something (add / delete / drag / drawer field input / icon pick). On
+    // submit, if pristine, we LEAVE the server-rendered <input> form-array
+    // fields untouched and let the browser submit them natively. This avoids
+    // the JS regen path entirely, which is the place where a JSON round-trip
+    // bug could corrupt label / config on a no-op save.
+    var state = { items: [], deletedIds: [], nextTemp: 1, pristine: true };
     var selectedTempId = null;
 
     function uid(){ return 'new_' + (state.nextTemp++); }
+    function markDirty(){ state.pristine = false; }
 
     // Build state from the DOM that Smarty rendered
     function ingestFromDom(){
@@ -344,6 +352,11 @@
         if (draggingEl){ draggingEl.classList.remove('is-dragging'); draggingEl = null; }
         document.querySelectorAll('.is-drag-over').forEach(function(el){ el.classList.remove('is-drag-over'); });
         syncStateFromDom();
+        // Conservative: any dragend marks dirty even if user dropped the
+        // item back where it came from. Cheap false-positive vs missing a
+        // real reorder. The regen will produce identical JSON anyway if
+        // nothing actually moved.
+        markDirty();
     });
     document.addEventListener('dragover', function(e){
         var ul = e.target.closest('ul[data-children]');
@@ -423,6 +436,7 @@
         appendRowToRoot(entry);
         syncStateFromDom();
         updateCount();
+        markDirty();
     });
 
     // Close 'on' helper region (kept here to mirror the original layout)
@@ -476,6 +490,7 @@
             state.items = state.items.filter(function(it){ return !toRemove.has(it.tempId); });
             li.remove();
             updateCount();
+            markDirty();
             return;
         }
         var edit = e.target.closest('[data-action=edit-item], .mt-menu-name');
@@ -565,6 +580,7 @@
         if (!entry.config) entry.config = {};
         if (name) entry.config.icon = name; else delete entry.config.icon;
         syncIconPickerFromEntry(entry);
+        markDirty();
         document.getElementById('drawerIconPanel').hidden = true;
     });
     // Close panel when clicking outside
@@ -595,6 +611,7 @@
         } else {
             writePath(entry, path, el.value);
         }
+        markDirty();
         // Reflect label changes in the tree row
         var li = document.querySelector('li[data-temp="' + selectedTempId + '"]');
         if (li){
@@ -657,6 +674,19 @@
     // safety net (which would silently drop the admin's changes).
     // ──────────────────────────────────────────────────────────────────────
     on('menuForm', 'submit', function(e){
+        // PRISTINE FAST PATH — if the admin made zero edits, leave the
+        // server-rendered form-array inputs (#mtItemsFields) and the empty
+        // legacy JSON inputs exactly as they are. The browser submits
+        // items[N][label_json] etc. straight from the DB rendering, which is
+        // guaranteed-correct. Skipping the JS regen here is what fixes the
+        // "open + save without changes wipes everything" bug — the regen
+        // was destructive and any subtle round-trip quirk in state.items
+        // would propagate into the DB.
+        if (state.pristine && state.deletedIds.length === 0) {
+            console.log('[MyTheme menu] submit (pristine) — skipping JS regen, server inputs submit as-is');
+            return;
+        }
+
         try { syncStateFromDom(); } catch (err) { console.error('[MyTheme menu] syncStateFromDom failed', err); }
 
         var payload;
@@ -752,7 +782,7 @@
         deletedInput.value = deletedJson;
         // Verbose dump for diagnosing "new items not saved" / "items deleted"
         // bugs. Each item shows id (null for new), type, label, parent_id, position.
-        console.group('[MyTheme menu] submit');
+        console.group('[MyTheme menu] submit (dirty)');
         console.log('Total items in state:', state.items.length);
         console.log('Payload size (chars):', itemsJson.length);
         console.log('Deletions:', state.deletedIds);
