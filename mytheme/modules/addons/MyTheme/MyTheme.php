@@ -20,7 +20,21 @@ if (!defined('WHMCS')) {
 
 // Bootstrap: License first (so it can run integrity check before anything else loads),
 // then the autoloader.
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Helpers' . DIRECTORY_SEPARATOR . 'IntegrityHashes.php';
+//
+// IntegrityHashes.php is a BUILD-TIME generated artifact (.gitignore'd) — it
+// only exists in distribution builds where `npm run build:integrity` has run.
+// In a source-tree checkout (which is what the GH Action deploys) it's
+// absent, so we load a no-op fallback that declares the same class with a
+// dummy verifyOrDie. Three downstream classes (License / LicenseHelper /
+// Template) call verifyOrDie from their constructors and would fatal with
+// 'class not found' otherwise.
+$_mtIntegrity = __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Helpers' . DIRECTORY_SEPARATOR . 'IntegrityHashes.php';
+if (file_exists($_mtIntegrity)) {
+    require_once $_mtIntegrity;
+} else {
+    require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Helpers' . DIRECTORY_SEPARATOR . 'IntegrityHashes.fallback.php';
+}
+unset($_mtIntegrity);
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . 'License.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'autoload.php';
 
