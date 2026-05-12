@@ -134,6 +134,19 @@ cmd_lint() {
             [[ -f "$tpl" ]] && pass "$page · tpl · valid foreach iterators"
         fi
 
+        # Dispatcher: $myTheme.pages.<hyphenated-name>.fullPath in templates/mytheme/<page>.tpl
+        # — Smarty parses dot-notation with hyphens as SUBTRACTION, silently produces empty
+        #   content-area. Must use bracket form: $myTheme.pages['hyphenated-name'].fullPath.
+        if [[ "$page" == *-* ]]; then
+            local dispatcher="$THEME_ROOT/templates/mytheme/${page}.tpl"
+            if [[ -f "$dispatcher" ]] && grep -nE '\$myTheme\.pages\.[a-zA-Z0-9_-]+-[a-zA-Z0-9_-]+\.fullPath' "$dispatcher" >/dev/null 2>&1; then
+                fail "$page · dispatcher uses \$myTheme.pages.${page}.fullPath (Smarty parses hyphens as subtraction; use \$myTheme.pages['${page}'].fullPath)"
+                grep -nE '\$myTheme\.pages\.[a-zA-Z0-9_-]+-[a-zA-Z0-9_-]+\.fullPath' "$dispatcher" | head -2 | sed 's/^/      /'
+            else
+                [[ -f "$dispatcher" ]] && pass "$page · dispatcher · hyphenated page key uses bracket notation"
+            fi
+        fi
+
         # CSS: body { display: block } (§6 rule 5 — breaks flex layout chain)
         if [[ -f "$css" ]] && grep -nE 'body\s*\{[^}]*display:\s*block' "$css" >/dev/null 2>&1; then
             fail "$page · css sets body { display: block } (breaks flex chain, §6 rule 5)"
