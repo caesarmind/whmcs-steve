@@ -74,8 +74,18 @@ final class Presets
     }
 
     /**
-     * Full WHMCS-default client primary nav, matching Lagom's preset shape:
-     *   Home · Services▾ · Domains▾ · Billing▾ · Support▾ · Affiliates · Open Ticket (right)
+     * Full WHMCS-default client primary nav, matching Lagom's preset shape
+     * AND matching the apple-client-area mockup's section labels:
+     *   Header(Home) · Home
+     *   Header(Services) · Services▾
+     *   Header(Domains) · Domains▾
+     *   Header(Billing) · Billing▾
+     *   Header(Support) · Support▾
+     *   Header(Account) · Affiliates · Open Ticket (right)
+     *
+     * Headers render as the uppercase section dividers
+     * (.sidebar-section-label / .nav-section). Admins can rearrange or
+     * delete them via the menu builder — they're just regular items.
      */
     private static function clientWhmcsDefaults(): array
     {
@@ -85,9 +95,11 @@ final class Presets
             'audience' => 'client',
             'active'   => false,
             'items'    => [
+                ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Home'), 'config' => []],
                 ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navhome', 'Home'),
                  'config' => ['url' => 'clientarea.php', 'icon' => 'home']],
 
+                ['type' => ItemTypes::HEADER, 'label' => self::label('navservices', 'Services'), 'config' => []],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navservices', 'Services'),
                  'config' => ['icon' => 'server'],
@@ -103,6 +115,7 @@ final class Presets
                      'config' => ['url' => 'cart.php?gid=addons', 'icon' => 'puzzle']],
                  ]],
 
+                ['type' => ItemTypes::HEADER, 'label' => self::label('navdomains', 'Domains'), 'config' => []],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navdomains', 'Domains'),
                  'config' => ['icon' => 'globe'],
@@ -125,6 +138,7 @@ final class Presets
                      'config' => ['url' => 'clientarea.php?action=ssl', 'icon' => 'lock']],
                  ]],
 
+                ['type' => ItemTypes::HEADER, 'label' => self::label('billingtab', 'Billing'), 'config' => []],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('billingtab', 'Billing'),
                  'config' => ['icon' => 'credit-card'],
@@ -142,6 +156,7 @@ final class Presets
                      'config' => ['url' => 'clientarea.php?action=addfunds', 'icon' => 'plus-circle']],
                  ]],
 
+                ['type' => ItemTypes::HEADER, 'label' => self::label('navsupport', 'Support'), 'config' => []],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navsupport', 'Support'),
                  'config' => ['icon' => 'life-buoy'],
@@ -160,6 +175,7 @@ final class Presets
                      'config' => ['url' => 'submitticket.php', 'icon' => 'plus']],
                  ]],
 
+                ['type' => ItemTypes::HEADER, 'label' => self::label('accounttab', 'Account'), 'config' => []],
                 ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('affiliatesnav', 'Affiliates'),
                  'config' => ['url' => 'affiliates.php', 'icon' => 'star']],
 
@@ -238,12 +254,14 @@ final class Presets
             'audience' => 'guest',
             'active'   => false,
             'items'    => [
+                ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Shop'), 'config' => []],
                 ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navhome', 'Home'),
                  'config' => ['url' => '/', 'icon' => 'home']],
 
                 ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('orderproducts', 'Browse Products'),
                  'config' => ['url' => 'cart.php', 'icon' => 'shop']],
 
+                ['type' => ItemTypes::HEADER, 'label' => self::label('navdomains', 'Domains'), 'config' => []],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navdomains', 'Domains'),
                  'config' => ['icon' => 'globe'],
@@ -257,6 +275,7 @@ final class Presets
                      'config' => ['url' => 'cart.php?a=add&domain=register', 'icon' => 'tag']],
                  ]],
 
+                ['type' => ItemTypes::HEADER, 'label' => self::label('navsupport', 'Information'), 'config' => []],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navsupport', 'Support'),
                  'config' => ['icon' => 'life-buoy'],

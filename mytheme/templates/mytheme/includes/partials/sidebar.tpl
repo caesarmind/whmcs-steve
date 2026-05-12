@@ -145,14 +145,24 @@
 
 <script>{literal}
 (function(){
-    // Toggle .sidebar-group.open on click of .sidebar-group-toggle. Matches
-    // the apple-client-area mockup behavior. Open one at a time? — no, the
-    // mockup allows multiple opens; we keep that.
-    document.addEventListener('click', function(e){
-        var btn = e.target.closest('.sidebar-group-toggle');
-        if (!btn) return;
-        var group = btn.closest('.sidebar-group');
-        if (group) group.classList.toggle('open');
-    });
+    // Direct-bind to each .sidebar-group-toggle (idempotent via dataset.mtBound).
+    // apple-layout.js's initSidebarGroups() does the same thing once at boot,
+    // but if anything in its promise chain rejects this still works. Runs as
+    // soon as the script tag is parsed — sidebar markup is already in the DOM.
+    function bind() {
+        var toggles = document.querySelectorAll('.sidebar-group-toggle');
+        toggles.forEach(function(btn){
+            if (btn.dataset.mtBound === '1') return;
+            btn.dataset.mtBound = '1';
+            btn.addEventListener('click', function(e){
+                e.preventDefault();
+                var group = btn.closest('.sidebar-group');
+                if (group) group.classList.toggle('open');
+            });
+        });
+    }
+    bind();
+    // Rebind after apple-layout boots in case partials were injected after parse
+    document.addEventListener('apple-layout:ready', bind);
 })();
 {/literal}</script>
