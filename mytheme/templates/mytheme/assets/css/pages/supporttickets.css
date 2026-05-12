@@ -143,7 +143,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .tk-table col.tk-col-subject    { width: auto; }
 .tk-table col.tk-col-department { width: 160px; }
 .tk-table col.tk-col-status     { width: 130px; }
-.tk-table col.tk-col-updated    { width: 140px; }
+.tk-table col.tk-col-updated    { width: 180px; }
 .tk-table thead th {
     padding: 10px 20px 6px;
     font-size: 11px;
@@ -256,6 +256,27 @@ body[data-svc-layout="outside"] .tk-stack > .tk-table-card {
     margin: 0;
 }
 body[data-svc-layout="outside"] .tk-stack > .tk-footer { padding: 12px 4px; }
+
+/* Controls outside — column titles float on the page bg above the rows card.
+   The <thead> remains inside the <table> for DataTables to work, but we make
+   it visually separate by giving it no surface, no border, and we restore
+   the rows card to a single rounded surface starting at the first <tr>. */
+body[data-svc-layout="outside"] .tk-table-card { padding: 0; overflow: visible; }
+body[data-svc-layout="outside"] .tk-table { background: transparent; }
+body[data-svc-layout="outside"] .tk-table thead { background: transparent; }
+body[data-svc-layout="outside"] .tk-table thead th {
+    background: transparent;
+    padding: 4px 20px 8px;
+    border-bottom: 0;
+}
+body[data-svc-layout="outside"] .tk-table tbody {
+    background: var(--color-surface);
+    display: table-row-group;
+}
+body[data-svc-layout="outside"] .tk-table tbody tr:first-child td:first-child { border-top-left-radius: var(--radius-md); }
+body[data-svc-layout="outside"] .tk-table tbody tr:first-child td:last-child  { border-top-right-radius: var(--radius-md); }
+body[data-svc-layout="outside"] .tk-table tbody tr:last-child  td:first-child { border-bottom-left-radius: var(--radius-md); }
+body[data-svc-layout="outside"] .tk-table tbody tr:last-child  td:last-child  { border-bottom-right-radius: var(--radius-md); }
 
 .tk-footer {
     display: flex;
