@@ -59,6 +59,16 @@ html[data-palette="slate"]   .um-row-avatar { background: linear-gradient(135deg
 .um-tag-invited  { background: var(--color-orange-bg); color: var(--color-orange-text); }
 .um-tag-disabled { background: var(--color-red-bg); color: var(--color-red-text); }
 
+.um-row-meta-extra { font-size: 11.5px; color: var(--color-text-tertiary); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.um-2fa { display: inline-flex; align-items: center; margin-left: 6px; color: var(--color-green-text); vertical-align: middle; }
+.um-2fa svg { width: 12px; height: 12px; }
+.um-row-owner { background: var(--color-accent-light); border-color: var(--color-accent); }
+.um-row-owner .um-row-avatar { box-shadow: 0 0 0 2px var(--color-accent); }
+.um-row-invite { background: var(--color-surface-secondary); }
+.um-row-avatar-pending { background: var(--color-surface) !important; color: var(--color-text-tertiary); border: 0.5px dashed var(--color-border); }
+.um-row-avatar-pending svg { width: 18px; height: 18px; }
+.um-section-label { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 16px 4px 4px; }
+
 .um-row-actions { display: flex; gap: 6px; }
 .um-row-btn {
     height: 28px; padding: 0 12px;
@@ -73,6 +83,36 @@ html[data-palette="slate"]   .um-row-avatar { background: linear-gradient(135deg
 }
 .um-row-btn:hover { color: var(--color-text-primary); border-color: var(--color-text-secondary); text-decoration: none; }
 .um-row-btn-danger:hover { color: var(--color-red-text); border-color: var(--color-red-text); }
+.um-row-btn-disabled { opacity: 0.45; pointer-events: none; cursor: default; }
+
+/* Invite form */
+.um-invite { margin-top: 20px; padding: 22px 24px; }
+.um-invite-header { margin-bottom: 14px; }
+.um-invite-title { font-size: 15px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 4px; }
+.um-invite-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0; line-height: 1.5; max-width: 520px; }
+.um-invite-form { display: flex; flex-direction: column; gap: 14px; }
+.um-form-row { display: flex; flex-direction: column; gap: 6px; }
+.um-label { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.04em; }
+.um-input {
+    height: 38px; padding: 0 14px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    font-size: 14px; color: var(--color-text-primary);
+    font-family: inherit; width: 100%;
+    max-width: 380px;
+    transition: all var(--transition-fast);
+}
+.um-input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+.um-radio { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--color-text-primary); cursor: pointer; padding: 4px 0; }
+.um-radio input { accent-color: var(--color-accent); width: 14px; height: 14px; }
+.um-perms { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; background: var(--color-surface-secondary); border-radius: var(--radius-md); margin-top: 4px; }
+.um-perm { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--color-text-primary); cursor: pointer; }
+.um-perm input { accent-color: var(--color-accent); width: 14px; height: 14px; margin-top: 2px; flex-shrink: 0; }
+.um-perm strong { display: block; font-weight: 500; }
+.um-perm-desc { display: block; font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
+.um-form-actions { margin-top: 6px; }
+.um-form-actions .btn-primary { height: 38px; padding: 0 20px; font-size: 13.5px; }
 
 .um-empty { padding: 56px 24px 48px; text-align: center; color: var(--color-text-secondary); background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: var(--radius-md); }
 .um-empty-ico { width: 52px; height: 52px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
