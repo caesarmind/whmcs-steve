@@ -278,7 +278,11 @@ final class TreeRenderer
         // is strict about expected formats and can throw on certain inputs. A
         // bad visual hint must not abort the whole item, let alone the menu.
         if (!empty($config['icon'])) {
+            // setIcon() strips non-FontAwesome inputs in some WHMCS builds,
+            // so we ALSO stash the raw name on a data attribute the partials
+            // can read via getAttribute('data-mt-icon').
             try { $item->setIcon((string)$config['icon']); } catch (\Throwable $e) { /* tolerate */ }
+            try { $item->setAttribute('data-mt-icon', (string)$config['icon']); } catch (\Throwable $e) {}
         }
         if (!empty($config['css_class'])) {
             try { $item->addClass((string)$config['css_class']); } catch (\Throwable $e) {}

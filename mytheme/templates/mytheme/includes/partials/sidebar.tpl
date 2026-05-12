@@ -35,7 +35,10 @@
 {function name=mtSidebarItem item=null}
     {assign var=mtType  value=$item->getAttribute('data-mt-type')|default:'whmcs_page'}
     {assign var=mtColor value=$item->getAttribute('data-mt-color')|default:'gray'}
-    {assign var=mtIconName value=$item->getIcon()|default:''}
+    {* Prefer our own data-mt-icon attribute because WHMCS\View\Menu\Item::setIcon()
+       silently strips non-FontAwesome strings, so $item->getIcon() returns '' for
+       our named icons. *}
+    {assign var=mtIconName value=$item->getAttribute('data-mt-icon')|default:$item->getIcon()|default:''}
     {assign var=mtBadgeKey value=$item->getAttribute('data-mt-badge-source')|default:''}
     {assign var=mtBadge value=''}
     {if $mtBadgeKey == 'services'}{assign var=mtBadge value=$clientsstats.productsnumactive|default:''}
@@ -49,20 +52,27 @@
     {elseif $mtType == 'divider'}
         <hr class="sidebar-divider">
     {elseif $mtType == 'dropdown_parent' || ($mtType == 'account_dropdown' && $item->getChildren())}
-        <details class="sidebar-dropdown" data-mt-id="{$item->getName()|escape}">
-            <summary class="sidebar-item sidebar-item-dropdown">
+        {* Matches the apple-client-area mockup pattern — .sidebar-group with
+           a <button> toggle and <div> items. JS toggles .open on click. *}
+        <div class="sidebar-group" data-group="{$item->getName()|escape}">
+            <button type="button" class="sidebar-group-toggle">
                 <div class="sidebar-item-icon {$mtColor|escape}">{mtSidebarIcon iconName=$mtIconName}</div>
-                <span class="sidebar-item-label">{$item->getLabel()|escape}</span>
-                <span class="sidebar-item-chevron">
-                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
-                </span>
-            </summary>
-            <div class="sidebar-children">
+                <span class="group-label">{$item->getLabel()|escape}</span>
+                <svg class="group-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+            </button>
+            <div class="sidebar-group-items">
                 {foreach $item->getChildren() as $child}
-                    {mtSidebarItem item=$child}
+                    {assign var=childType value=$child->getAttribute('data-mt-type')|default:'whmcs_page'}
+                    {if $childType == 'divider'}
+                        <hr class="sidebar-group-divider">
+                    {elseif $childType == 'header'}
+                        <div class="sidebar-group-section">{$child->getLabel()|escape}</div>
+                    {else}
+                        <a href="{$child->getUri()|escape}">{$child->getLabel()|escape}</a>
+                    {/if}
                 {/foreach}
             </div>
-        </details>
+        </div>
     {elseif $mtType == 'login_button'}
         <a href="{$item->getUri()|escape}" class="sidebar-item sidebar-item-login">
             <div class="sidebar-item-icon blue">{mtSidebarIcon iconName=($mtIconName|default:'transfer')}</div>
@@ -132,3 +142,17 @@
         {/if}
     </div>
 </aside>
+
+<script>{literal}
+(function(){
+    // Toggle .sidebar-group.open on click of .sidebar-group-toggle. Matches
+    // the apple-client-area mockup behavior. Open one at a time? — no, the
+    // mockup allows multiple opens; we keep that.
+    document.addEventListener('click', function(e){
+        var btn = e.target.closest('.sidebar-group-toggle');
+        if (!btn) return;
+        var group = btn.closest('.sidebar-group');
+        if (group) group.classList.toggle('open');
+    });
+})();
+{/literal}</script>

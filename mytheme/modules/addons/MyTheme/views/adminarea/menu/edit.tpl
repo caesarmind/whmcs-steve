@@ -226,6 +226,10 @@
     </div>
 </form>
 
+{* Icon registry as JSON — placed BEFORE the IIFE so the iconMap() lazy
+   lookup can read its textContent immediately. *}
+<script id="mtIconRegistry" type="application/json">{$iconsJson nofilter}</script>
+
 <script>{literal}
 (function(){
     // ──────────────────────────────────────────────────────────────────────
@@ -463,11 +467,20 @@
     // ──────────────────────────────────────────────────────────────────────
     // Icon picker (grid)
     // ──────────────────────────────────────────────────────────────────────
-    var ICON_MAP = JSON.parse(document.getElementById('mtIconRegistry').textContent || '{}');
+    // Lazy-read the registry so it works regardless of script ordering
+    // (the JSON tag may live below this script).
+    var _iconMap = null;
+    function iconMap(){
+        if (_iconMap) return _iconMap;
+        var el = document.getElementById('mtIconRegistry');
+        try { _iconMap = JSON.parse((el && el.textContent) || '{}'); } catch(e){ _iconMap = {}; }
+        return _iconMap;
+    }
     function iconSvgFor(name){
         if (!name) return '';
-        if (ICON_MAP[name]) {
-            return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + ICON_MAP[name] + '</svg>';
+        var map = iconMap();
+        if (map[name]) {
+            return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + map[name] + '</svg>';
         }
         return '<i class="' + name.replace(/"/g, '&quot;') + '"></i>';
     }
@@ -598,9 +611,5 @@
     ingestFromDom();
 })();
 {/literal}</script>
-
-{* Icon registry as JSON for the picker JS to read. Kept in a script tag
-   (rather than inline JS) so escaping is straightforward. *}
-<script id="mtIconRegistry" type="application/json">{$iconsJson nofilter}</script>
 
 {include file="includes/footer.tpl"}

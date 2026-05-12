@@ -24,7 +24,7 @@
 
 {function name=mtTopnavItem item=null}
     {assign var=mtType value=$item->getAttribute('data-mt-type')|default:'whmcs_page'}
-    {assign var=mtIconName value=$item->getIcon()|default:''}
+    {assign var=mtIconName value=$item->getAttribute('data-mt-icon')|default:$item->getIcon()|default:''}
     {assign var=sideRight value=''}
     {if $item->getAttribute('data-mt-side') == 'right'}{assign var=sideRight value=' nav-item-right'}{/if}
     {if $mtType == 'header'}
@@ -43,7 +43,7 @@
                 <div class="nav-dropdown-menu">
                     {foreach $item->getChildren() as $child}
                         {assign var=childType value=$child->getAttribute('data-mt-type')|default:'whmcs_page'}
-                        {assign var=childIcon value=$child->getIcon()|default:''}
+                        {assign var=childIcon value=$child->getAttribute('data-mt-icon')|default:$child->getIcon()|default:''}
                         {if $childType == 'divider'}
                             <div class="nav-dropdown-divider"></div>
                         {elseif $childType == 'header'}
