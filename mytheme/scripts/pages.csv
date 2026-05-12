@@ -70,3 +70,7 @@ banned,/banned,
 markdown-guide,/markdown-guide,
 downloaddenied,/downloads.php?denied=true,
 ticketfeedback,/ticketfeedback.php?tid=1,
+user-profile,/account/profile,up
+user-security,/account/security,sec
+user-switch-account,/clientarea.php?action=switchaccount,sw
+user-password,/clientarea.php?action=changepw,cp

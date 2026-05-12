@@ -61,10 +61,10 @@ All four `password-reset-*` dispatchers forward to a single shared `pwreset/defa
 | Templatefile | URL | Status | Notes |
 |---|---|---|---|
 | `viewinvoice` | `/viewinvoice.php?id=X` | ✅ | Single invoice — line items, totals, transactions, pay-now |
-| `invoicepdf` | `/viewinvoice.php?id=X&pdf=true` | ❌ | PDF rendering — WHMCS handles this internally; usually no theme override needed |
+| `invoicepdf` | `/viewinvoice.php?id=X&pdf=true` | — | PDF render via TCPDF, not a Smarty template — lives in `templates/pdf/` if customisation is ever needed. Out of scope for the client-area theme. |
 | `invoice-payment` | `/viewinvoice.php?id=X` (with `?paynow=true`) | ✅ | Standalone payment screen (gateway selection) |
 | `viewquote` | `/viewquote.php?id=X` | ⚠️ | Single quote — line items, accept/decline |
-| `quotepdf` | `/viewquote.php?id=X&pdf=true` | ❌ | Same situation as invoicepdf |
+| `quotepdf` | `/viewquote.php?id=X&pdf=true` | — | Same situation as invoicepdf — TCPDF render under `templates/pdf/`, out of scope for the client-area theme. |
 | `clientareaaddfunds` | `/clientarea.php?action=addfunds` | ✅ | Top-up account credit with preset chips + live summary |
 | `masspay` | `/clientarea.php?action=masspay&all=true` | ✅ | Bulk-pay unpaid invoices |
 | `clientareacancelrequest` | `/clientarea.php?action=cancel&id=X` | ⚠️ | Cancellation reason + timing form |
@@ -123,11 +123,11 @@ All four `password-reset-*` dispatchers forward to a single shared `pwreset/defa
 | `account-paymentmethods-billing-contacts` | `/clientarea.php?action=paymentmethods&sub=contacts` | ⚠️ | Billing-contact addresses for stored methods |
 | `clientareaemails` | `/clientarea.php?action=emails` | ⚠️ | Sent-to-client email log |
 | `viewemail` | `/clientarea.php?action=emails&id=X` | ⚠️ | Single email view |
-| `user-profile` | `/account/profile` | ❌ | User-level profile (name, language, locale) |
+| `user-profile` | `/account/profile` | ✅ | User-level profile form: name + email + language. Smaller than `clientareadetails` (which is account-level / billing address). |
 | `user-password` | `/clientarea.php?action=changepw` | ✅ | Change password (alias `changepassword.tpl`, `changepw.tpl`) |
-| `user-security` | `/clientarea.php?action=security` (alt route) | ❌ | User-level security (may merge with `clientareasecurity`) |
+| `user-security` | `/account/security` | ✅ | Forwarder to `clientareasecurity` — WHMCS 9 split user-level vs account-level security, but the controls are identical (2FA + login alerts + sessions). One design, two dispatchers. |
 | `clientareasecurity` | `/clientarea.php?action=security` | ✅ | Account-level 2FA + login alerts + active sessions |
-| `user-switch-account` | `/clientarea.php?action=switchaccount` | ❌ | Multi-account switcher (the URL the profile dropdown points at) |
+| `user-switch-account` | `/clientarea.php?action=switchaccount` | ✅ | Multi-account switcher — avatar + name + email per account, "Switch to" pill, current row highlighted. Empty state when only one account is on the login. |
 
 ## 10. SSL
 
@@ -169,11 +169,12 @@ All four `password-reset-*` dispatchers forward to a single shared `pwreset/defa
 
 ## Coverage summary
 
-- **Full (real content):** 32 pages (45% of the targeted set)
-- **Scaffold (skeleton, real content pending):** 31 pages (44%)
-- **Missing:** 5 pages (`invoicepdf`, `quotepdf`, `user-profile`, `user-security`, `user-switch-account`) — most are either WHMCS-internal (PDFs) or may already work via fallback dispatchers
+- **Full (real content):** 35 pages — every Smarty-renderable WHMCS client-area page that this theme targets
+- **Scaffold (skeleton, real content pending):** 31 pages — render structurally and pass the lint, but the WHMCS variable wiring is still placeholder
+- **Out of scope:** 2 PDF templates (`invoicepdf`, `quotepdf`) — these are TCPDF renders under `templates/pdf/`, not Smarty; they live in a different theming surface
+- **Missing:** 0 — the theme covers every targeted client-area page
 
-Total: **68 pages tracked**, plus ~14 alias / step-variant dispatchers that forward to shared tpls.
+Total: **66 client-area pages tracked + 2 PDFs out of scope**, plus ~14 alias / step-variant dispatchers that forward to shared tpls.
 
 ## When something doesn't work
 
