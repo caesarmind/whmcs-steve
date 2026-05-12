@@ -1,3 +1,41 @@
+# name: Deploy theme to cPanel
+
+# on:
+#   push:
+#     branches: [main]
+#     paths:
+#       - 'mytheme/modules/addons/MyTheme/**'
+#       - 'mytheme/templates/mytheme/**'
+#       - '.github/workflows/deploy.yml'
+#   workflow_dispatch:
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+
+#       - name: Sync MyTheme addon module
+#         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+#         with:
+#           server: cp2.de.namespace.life
+#           port: 22
+#           username: whymege
+#           ssh_private_key: ${{ secrets.CPANEL }}
+#           local_path: './mytheme/modules/addons/MyTheme/*'
+#           remote_path: 'bill.hostnodes.com/modules/addons/MyTheme/'
+#           sftp_only: true
+
+#       - name: Sync mytheme template
+#         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+#         with:
+#           server: cp2.de.namespace.life
+#           port: 22
+#           username: whymege
+#           ssh_private_key: ${{ secrets.CPANEL }}
+#           local_path: './mytheme/templates/mytheme/*'
+#           remote_path: 'bill.hostnodes.com/templates/mytheme/'
+#           sftp_only: true
 name: Deploy theme to cPanel
 
 on:
@@ -15,24 +53,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Sync MyTheme addon module
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      - name: Sync MyTheme addon module (rsync)
+        uses: easingthemes/ssh-deploy@v5.1.0
         with:
-          server: cp2.de.namespace.life
-          port: 22
-          username: whymege
-          ssh_private_key: ${{ secrets.CPANEL }}
-          local_path: './mytheme/modules/addons/MyTheme/*'
-          remote_path: 'bill.hostnodes.com/modules/addons/MyTheme/'
-          sftp_only: true
+          SSH_PRIVATE_KEY: ${{ secrets.CPANEL }}
+          REMOTE_HOST: cp2.de.namespace.life
+          REMOTE_USER: whymege
+          REMOTE_PORT: 22
+          SOURCE: 'mytheme/modules/addons/MyTheme/'
+          TARGET: '/home/whymege/bill.hostnodes.com/modules/addons/MyTheme/'
+          ARGS: '-rltvz --delete'
 
-      - name: Sync mytheme template
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      - name: Sync mytheme template (rsync)
+        uses: easingthemes/ssh-deploy@v5.1.0
         with:
-          server: cp2.de.namespace.life
-          port: 22
-          username: whymege
-          ssh_private_key: ${{ secrets.CPANEL }}
-          local_path: './mytheme/templates/mytheme/*'
-          remote_path: 'bill.hostnodes.com/templates/mytheme/'
-          sftp_only: true
+          SSH_PRIVATE_KEY: ${{ secrets.CPANEL }}
+          REMOTE_HOST: cp2.de.namespace.life
+          REMOTE_USER: whymege
+          REMOTE_PORT: 22
+          SOURCE: 'mytheme/templates/mytheme/'
+          TARGET: '/home/whymege/bill.hostnodes.com/templates/mytheme/'
+          ARGS: '-rltvz --delete'
