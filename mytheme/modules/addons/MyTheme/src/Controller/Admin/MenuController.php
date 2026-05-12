@@ -119,35 +119,47 @@ final class MenuController extends AbstractController
         // Top-level menu fields
         $menu->name     = trim((string)($_POST['name'] ?? $menu->name));
         $menu->audience = (string)($_POST['audience'] ?? $menu->audience);
-        $menu->active   = !empty($_POST['active']);
+        $newActive      = !empty($_POST['active']);
+
+        // Mutual exclusion (Lagom-equivalent): only one menu can be active
+        // per (location, audience). Activating this one deactivates any
+        // peers — admin doesn't have to remember to flip the old one off.
+        if ($newActive && (!$menu->active || $menu->audience !== ($_POST['audience'] ?? $menu->audience))) {
+            Menu::where('location', $menu->location)
+                ->where('audience', $menu->audience)
+                ->where('id', '!=', $menu->id)
+                ->update(['active' => false]);
+        }
+
+        $menu->active = $newActive;
         $menu->changed_by_user = true;
         $menu->save();
 
         // Items — POSTed as a JSON-encoded flat list with parent_id+position.
-        // This is simpler than Lagom's nested-array reconstruction.
-        $raw     = (string)($_POST['items_json'] ?? '[]');
-        $payload = json_decode($raw, true);
-        if (!is_array($payload)) {
-            $payload = [];
-        }
+        // Separately, deleted_ids_json holds DB ids the admin explicitly
+        // removed via the × button. persistItems ONLY deletes ids in that
+        // list — no implicit sweep based on "absent from payload".
+        $raw      = (string)($_POST['items_json'] ?? '[]');
+        $delRaw   = (string)($_POST['deleted_ids_json'] ?? '[]');
+        $payload  = json_decode($raw, true);
+        $deleted  = json_decode($delRaw, true);
+        if (!is_array($payload)) $payload = [];
+        if (!is_array($deleted)) $deleted = [];
 
-        // SAFETY: never mass-delete on empty payload. If the JS tree-serializer
-        // breaks and submits "[]" while the DB still has items, persistItems
-        // would compute "delete all" and wipe the menu. That's almost never
-        // what the admin wanted. Bail out with a flash message and ask them
-        // to use the explicit "Re-seed presets" or "Delete menu" actions
-        // if they really meant to clear everything.
+        // SAFETY: if the JS hadn't run (e.g. tree wasn't ingested) and we'd
+        // somehow get an empty payload with no explicit deletions while the
+        // DB still has items, ignore the items section entirely. The admin's
+        // settings (name/audience/active) still save.
         $existingCount = MenuItem::where('menu_id', $menu->id)->count();
-        if (empty($payload) && $existingCount > 0) {
-            // Log to server error_log so we can debug what the JS sent
-            error_log('MyTheme menu save: refusing to wipe ' . $existingCount
-                . ' items because items_json was empty. menu_id=' . $menu->id
+        if (empty($payload) && empty($deleted) && $existingCount > 0) {
+            error_log('MyTheme menu save: skipping items section because both '
+                . 'items_json and deleted_ids_json were empty. menu_id=' . $menu->id
                 . ' raw=' . substr($raw, 0, 200));
             $this->redirect('?module=MyTheme&action=menu&sub=edit&id='
-                . $menu->id . '&flash=empty-payload-rejected');
+                . $menu->id . '&flash=settings-only');
         }
 
-        $this->persistItems($menu->id, $payload);
+        $this->persistItems($menu->id, $payload, array_map('intval', $deleted));
 
         $this->redirect('?module=MyTheme&action=menu&sub=edit&id=' . $menu->id . '&flash=saved');
     }
@@ -192,33 +204,56 @@ final class MenuController extends AbstractController
     }
 
     /**
-     * Rewrites the menu's items to match $payload — a flat list of:
-     *   ['id'?, 'parent_id'?, 'item_type', 'label', 'config', 'active']
-     * Existing items with matching ids are updated; new ids ("new_X") are
-     * created; items present in DB but absent from payload are deleted.
+     * Apply changes to a menu's items.
+     *
+     * $payload: flat list of items the admin wants to keep / create / update.
+     *   Each entry: ['id'?, 'parent_id'?, 'item_type', 'label', 'config',
+     *                'active', 'position']
+     *
+     *   - id present + numeric → update existing item (id matches DB row)
+     *   - id missing/null      → create new item
+     *   - parent_id is either:
+     *       null                       → top-level
+     *       a numeric DB id            → child of that DB item
+     *       a "new_X" temp string      → child of a sibling new item (resolved
+     *                                    after first pass mints DB ids)
+     *
+     * $deletedIds: explicit list of DB ids to delete. CRITICAL — this is the
+     * ONLY way items get deleted. The old "anything absent from payload gets
+     * swept" behaviour was removed because a JS bug could wipe an entire menu.
      */
-    private function persistItems(int $menuId, array $payload): void
+    private function persistItems(int $menuId, array $payload, array $deletedIds = []): void
     {
-        $existingIds = MenuItem::where('menu_id', $menuId)->pluck('id')->all();
-        $keepIds     = [];
-        $idMap       = []; // payload-local id → DB id (for parent resolution on new items)
+        // Delete explicitly-marked items first (and their cascading children
+        // via the parent_id FK from the Menus migration, BUT we don't have a
+        // parent_id FK on items — that's a self-reference we omitted. So
+        // recursively collect descendants here).
+        if (!empty($deletedIds)) {
+            $allToDelete = $this->collectDescendants($menuId, $deletedIds);
+            MenuItem::where('menu_id', $menuId)
+                ->whereIn('id', $allToDelete)
+                ->delete();
+        }
 
-        // Two-pass: first create/update without parent (to mint DB ids),
-        // then set parent_id once all ids are known.
+        $idMap = []; // payload-local key → DB id (for parent resolution)
         $byKey = [];
+
+        // Pass 1 — create/update each row, capture the resulting DB id
         foreach ($payload as $i => $row) {
-            $key      = (string)($row['id'] ?? ('new_' . $i));
-            $type     = (string)($row['item_type'] ?? '');
+            $type = (string)($row['item_type'] ?? '');
             if (!ItemTypes::exists($type)) {
                 continue;
             }
+            $key      = isset($row['id']) && is_numeric($row['id'])
+                        ? (string)(int)$row['id']
+                        : 'new_' . $i;
             $label    = is_array($row['label']  ?? null) ? $row['label']  : ['whmcs' => '', 'custom' => []];
             $config   = is_array($row['config'] ?? null) ? $row['config'] : [];
             $position = (int)($row['position'] ?? $i);
             $active   = !empty($row['active'] ?? true);
 
             $dbId = is_numeric($key) ? (int)$key : null;
-            $item = $dbId !== null ? MenuItem::find($dbId) : null;
+            $item = $dbId !== null ? MenuItem::where('menu_id', $menuId)->where('id', $dbId)->first() : null;
 
             if ($item === null) {
                 $item = MenuItem::create([
@@ -238,27 +273,45 @@ final class MenuController extends AbstractController
                 $item->active      = $active;
                 $item->save();
             }
-            $keepIds[]    = $item->id;
-            $idMap[$key]  = $item->id;
-            $byKey[$key]  = ['item' => $item, 'parent_key' => $row['parent_id'] ?? null];
+            $idMap[$key] = $item->id;
+            $byKey[$key] = ['item' => $item, 'parent_key' => $row['parent_id'] ?? null];
         }
 
-        // Second pass — wire parent_id now that every node has a DB id
+        // Pass 2 — wire parent_id now that every node has a DB id
         foreach ($byKey as $entry) {
             $parentKey = $entry['parent_key'];
             if ($parentKey === null || $parentKey === '' || $parentKey === 0) {
                 $entry['item']->parent_id = null;
             } else {
+                // Parent might be referenced by either DB id (int) or temp key ("new_X")
                 $resolved = $idMap[(string)$parentKey] ?? null;
                 $entry['item']->parent_id = $resolved;
             }
             $entry['item']->save();
         }
 
-        // Sweep — anything in DB but not in payload gets dropped
-        $toDelete = array_diff($existingIds, $keepIds);
-        if (!empty($toDelete)) {
-            MenuItem::whereIn('id', $toDelete)->delete();
+        // No implicit sweep — items absent from payload remain in DB. The
+        // admin can remove them via the × button which adds them to
+        // deleted_ids_json.
+    }
+
+    /**
+     * Given a set of root ids, collect all descendant ids in the same menu.
+     * Used to enforce parent→child cascade for explicit deletes.
+     */
+    private function collectDescendants(int $menuId, array $rootIds): array
+    {
+        $all = array_map('intval', $rootIds);
+        $frontier = $all;
+        while (!empty($frontier)) {
+            $childIds = MenuItem::where('menu_id', $menuId)
+                ->whereIn('parent_id', $frontier)
+                ->pluck('id')->all();
+            $childIds = array_diff($childIds, $all);
+            if (empty($childIds)) break;
+            $all = array_merge($all, $childIds);
+            $frontier = $childIds;
         }
+        return $all;
     }
 }

@@ -16,10 +16,13 @@
     <header class="mt-section-header">
         <h2 class="mt-section-title">{if $tab == 'footer'}Footer Menu{elseif $tab == 'secondary'}Secondary Menu{else}Main Menu{/if}</h2>
         <div class="mt-section-tools">
-            <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=MyTheme&action=menu&sub=seed">Re-seed presets</a>
+            <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=MyTheme&action=menu&sub=seed" title="Re-seed any missing preset items (won't overwrite existing items)">Re-seed presets</a>
             <button class="mt-btn mt-btn-primary mt-btn-sm" disabled title="Coming next">+ New menu</button>
         </div>
     </header>
+    <p class="mt-section-note">
+        Only one menu can be active per audience — activating a new <em>Client</em> menu automatically deactivates the previous Client menu, and the same for <em>Guest</em>. The other audience is unaffected.
+    </p>
 
     {if !$menus}
         <div class="mt-empty">

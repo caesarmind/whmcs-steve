@@ -3,6 +3,7 @@
 <form id="menuForm" method="post" action="?module=MyTheme&action=menu&sub=save">
     <input type="hidden" name="id" value="{$menu->id|escape}">
     <input type="hidden" name="items_json" id="menuItemsJson" value="">
+    <input type="hidden" name="deleted_ids_json" id="menuDeletedIdsJson" value="[]">
 
     <div class="mt-toolbar">
         <a class="mt-back" href="?module=MyTheme&action=menu&tab={$menu->location|escape}">
@@ -11,6 +12,12 @@
         </a>
         <div style="flex:1"></div>
         {if $flash == 'saved'}<span class="mt-flash mt-flash-success">Saved</span>{/if}
+        {if $flash == 'settings-only'}
+            <span class="mt-flash mt-flash-warn">
+                Saved the menu settings only — the browser sent no items so the existing items were left intact.
+                If something seems off, hit reload and try again.
+            </span>
+        {/if}
         {if $flash == 'empty-payload-rejected'}
             <span class="mt-flash mt-flash-warn">
                 Save refused — the browser sent zero items so we didn't wipe your menu.
@@ -207,7 +214,10 @@
     // Each entry: { tempId, id|null, parent_id|null, position, item_type,
     //               label:{whmcs,custom}, config:{...}, active }
     // ──────────────────────────────────────────────────────────────────────
-    var state = { items: [], nextTemp: 1 };
+    // deletedIds tracks DB ids the admin removed via the × button. They're
+    // submitted in deleted_ids_json. The controller ONLY deletes ids in this
+    // list — no implicit sweep based on payload absence.
+    var state = { items: [], deletedIds: [], nextTemp: 1 };
     var selectedTempId = null;
 
     function uid(){ return 'new_' + (state.nextTemp++); }
@@ -367,7 +377,7 @@
             if (!li) return;
             if (!confirm('Delete this item and any children?')) return;
             var tempId = li.getAttribute('data-temp');
-            // Remove from state (and descendants)
+            // Collect this row + descendants by tempId
             var toRemove = new Set([tempId]);
             var changed = true;
             while (changed){
@@ -378,6 +388,12 @@
                     }
                 });
             }
+            // Record DB ids of removed rows (skip new items — they were never persisted)
+            state.items.forEach(function(it){
+                if (toRemove.has(it.tempId) && it.id != null) {
+                    if (state.deletedIds.indexOf(it.id) < 0) state.deletedIds.push(it.id);
+                }
+            });
             state.items = state.items.filter(function(it){ return !toRemove.has(it.tempId); });
             li.remove();
             updateCount();
@@ -495,11 +511,10 @@
                 active: it.active,
             };
         });
-        // SAFETY: if state.items is empty (DOM ingest never ran or errored),
-        // refuse to submit and ask the admin to reload — the controller
-        // would have refused anyway, but failing fast in the browser is
-        // better UX than a round-trip + flash-message redirect.
-        if (payload.length === 0) {
+        // SAFETY: if state.items is empty AND there's still tree DOM, the
+        // ingest never happened. Bail and ask the admin to reload — better
+        // UX than a round-trip + flash-message redirect.
+        if (payload.length === 0 && state.deletedIds.length === 0) {
             var existing = document.querySelectorAll('li.mt-menu-item').length;
             if (existing > 0) {
                 e.preventDefault();
@@ -508,8 +523,9 @@
                 return;
             }
         }
-        console.log('[MyTheme menu] submitting', payload.length, 'items');
+        console.log('[MyTheme menu] submitting', payload.length, 'items,', state.deletedIds.length, 'deletions');
         document.getElementById('menuItemsJson').value = JSON.stringify(payload);
+        document.getElementById('menuDeletedIdsJson').value = JSON.stringify(state.deletedIds);
     });
 
     refreshDraggable();

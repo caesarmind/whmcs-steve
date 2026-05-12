@@ -12,8 +12,13 @@ use MyTheme\Models\MenuItem;
  * activate step — e.g. an admin running migrations directly).
  *
  * Seeding rules:
- *   - If a menu with the same name + location already exists, SKIP. Never
- *     overwrite a user's customisation.
+ *   - If a menu with the same (name, location) exists AND has items, SKIP.
+ *     The admin may have customised the items; never overwrite them.
+ *   - If a menu with the same (name, location) exists but has NO items
+ *     (e.g. they were accidentally wiped by an earlier save bug), top up
+ *     the items section from the preset definition. Menu-level fields
+ *     (active, audience) are left as-is in this case.
+ *   - If no menu with the (name, location) exists, create it fresh.
  *   - Items are inserted in tree order so parent_id can reference IDs that
  *     already exist.
  */
@@ -23,18 +28,26 @@ final class Seeder
     {
         $seeded = 0;
         foreach (Presets::all() as $preset) {
-            if (!$force && $this->presetExists($preset['name'], $preset['location'])) {
+            $existing = $this->existingMenu($preset['name'], $preset['location']);
+            if ($existing === null) {
+                $this->seedOne($preset);
+                $seeded++;
                 continue;
             }
-            $this->seedOne($preset);
-            $seeded++;
+            // Menu exists. Re-seed items only if it's empty (recover from
+            // wipe) or if $force is set.
+            $itemCount = $existing->items()->count();
+            if ($force || $itemCount === 0) {
+                $this->seedItems($existing->id, $preset['items'] ?? [], null);
+                $seeded++;
+            }
         }
         return $seeded;
     }
 
-    private function presetExists(string $name, string $location): bool
+    private function existingMenu(string $name, string $location): ?Menu
     {
-        return Menu::where('name', $name)->where('location', $location)->exists();
+        return Menu::where('name', $name)->where('location', $location)->first();
     }
 
     private function seedOne(array $preset): void

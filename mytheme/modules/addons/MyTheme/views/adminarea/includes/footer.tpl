@@ -249,6 +249,8 @@
 .mt-flash-success { background: rgba(40, 167, 69, 0.15); color: #1e7e34; }
 .mt-flash-warn    { background: rgba(255, 159,  10, 0.15); color: #b35900; max-width: 600px; font-size: 12px; line-height: 1.4; padding: 6px 12px; border-radius: 6px; }
 .mt-flash-warn a  { color: inherit; font-weight: 600; }
+.mt-section-note  { font-size: 12px; color: var(--mt-text-2); padding: 0 14px 8px; margin: 0; line-height: 1.5; }
+.mt-section-note em { font-style: normal; font-weight: 600; color: var(--mt-text); }
 
 .mt-empty { text-align: center; padding: 40px 20px; color: var(--mt-text-2); }
 .mt-empty-icon { width: 40px; height: 40px; margin: 0 auto 12px; color: var(--mt-text-3); }
