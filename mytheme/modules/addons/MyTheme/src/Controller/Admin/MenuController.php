@@ -152,16 +152,66 @@ final class MenuController extends AbstractController
         $menu->changed_by_user = true;
         $menu->save();
 
-        // Items — POSTed as a JSON-encoded flat list with parent_id+position.
-        // Separately, deleted_ids_json holds DB ids the admin explicitly
-        // removed via the × button. persistItems ONLY deletes ids in that
-        // list — no implicit sweep based on "absent from payload".
-        $raw      = (string)($_POST['items_json'] ?? '[]');
-        $delRaw   = (string)($_POST['deleted_ids_json'] ?? '[]');
-        $payload  = json_decode($raw, true);
-        $deleted  = json_decode($delRaw, true);
-        if (!is_array($payload)) $payload = [];
+        // Items — read from EITHER form-array fields (items[N][...]) OR the
+        // legacy JSON hidden input. Form-array is preferred because the
+        // browser serializes it natively — no JS required, no encoding/size
+        // pitfalls. JSON path stays as a fallback so we don't regress while
+        // the JS migration lands.
+        $raw    = (string)($_POST['items_json'] ?? '[]');
+        $delRaw = (string)($_POST['deleted_ids_json'] ?? '[]');
+
+        $arrayItems = is_array($_POST['items'] ?? null) ? $_POST['items'] : null;
+        if ($arrayItems !== null) {
+            $payload = array_values($arrayItems); // PHP form-array → indexed
+        } else {
+            $payload = json_decode($raw, true);
+            if (!is_array($payload)) $payload = [];
+        }
+
+        $deleted = is_array($_POST['deleted_ids'] ?? null)
+            ? array_values($_POST['deleted_ids'])
+            : json_decode($delRaw, true);
         if (!is_array($deleted)) $deleted = [];
+
+        // Normalize form-array rows into the shape persistItems expects.
+        // Form-array path sends label_json/config_json as strings + active
+        // as "0"/"1" string. JSON path sends them as decoded structures.
+        // After this loop the row is uniform regardless of source.
+        foreach ($payload as $i => &$row) {
+            if (!is_array($row)) continue;
+            if (isset($row['label_json']) && !isset($row['label'])) {
+                $d = json_decode((string)$row['label_json'], true);
+                $row['label'] = is_array($d) ? $d : ['whmcs' => '', 'custom' => []];
+            }
+            if (isset($row['config_json']) && !isset($row['config'])) {
+                $d = json_decode((string)$row['config_json'], true);
+                $row['config'] = is_array($d) ? $d : [];
+            }
+            // Explicit string check — !empty('0') is true in PHP which would
+            // flip a deactivated item back to active.
+            if (isset($row['active'])) {
+                $row['active'] = ($row['active'] === '1' || $row['active'] === 1 || $row['active'] === true);
+            }
+            // Empty-string parent_id (form-array top-level) → null sentinel
+            if (isset($row['parent_id']) && $row['parent_id'] === '') {
+                $row['parent_id'] = null;
+            }
+            // Empty-string id (form-array new item) → null sentinel
+            if (isset($row['id']) && $row['id'] === '') {
+                $row['id'] = null;
+            }
+        }
+        unset($row);
+
+        // Diagnostic: log the POST shape so we can prove what arrived.
+        error_log(sprintf(
+            '[MyTheme saveAction] menu_id=%d source=%s items_count=%d post_keys=%s items_json_len=%d',
+            $menu->id,
+            $arrayItems !== null ? 'form-array' : 'json',
+            count($payload),
+            implode(',', array_keys($_POST)),
+            strlen($raw)
+        ));
 
         // SAFETY: if the JS hadn't run (e.g. tree wasn't ingested) and we'd
         // somehow get an empty payload with no explicit deletions while the

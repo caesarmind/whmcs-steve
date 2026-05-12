@@ -2,6 +2,35 @@
 
 <form id="menuForm" method="post" action="?module=MyTheme&action=menu&sub=save">
     <input type="hidden" name="id" value="{$menu->id|escape}">
+
+    {* Resilient form-array fields — one input per (item, property). The
+       browser serializes these natively into $_POST['items'] so the save
+       works even if JS is broken / disabled. JS still maintains state.items
+       for the UX, and at submit time it REPLACES this entire <div> with a
+       fresh set of inputs matching state.items. *}
+    <div id="mtItemsFields">
+        {function name=mtItemFields idx=0 item=null parentIdx=''}
+            <input type="hidden" name="items[{$idx}][id]"           value="{$item->id|escape}">
+            <input type="hidden" name="items[{$idx}][item_type]"    value="{$item->item_type|escape}">
+            <input type="hidden" name="items[{$idx}][parent_id]"    value="{if $parentIdx !== ''}{$parentIdx|escape}{/if}">
+            <input type="hidden" name="items[{$idx}][position]"     value="{$item->position|escape}">
+            <input type="hidden" name="items[{$idx}][label_json]"   value="{$item->label_json|escape}">
+            <input type="hidden" name="items[{$idx}][config_json]"  value="{$item->config_json|escape}">
+            <input type="hidden" name="items[{$idx}][active]"       value="{if $item->active}1{else}0{/if}">
+        {/function}
+        {assign var=mtIdx value=0}
+        {foreach $tree as $node}
+            {mtItemFields idx=$mtIdx item=$node.item parentIdx=''}
+            {assign var=mtParentIdx value=$mtIdx}
+            {assign var=mtIdx value=$mtIdx+1}
+            {foreach $node.children as $child}
+                {mtItemFields idx=$mtIdx item=$child.item parentIdx=$mtParentIdx}
+                {assign var=mtIdx value=$mtIdx+1}
+            {/foreach}
+        {/foreach}
+    </div>
+
+    {* Legacy JSON inputs — kept so the old JS path still works as a fallback. *}
     <input type="hidden" name="items_json" id="menuItemsJson" value="">
     <input type="hidden" name="deleted_ids_json" id="menuDeletedIdsJson" value="[]">
 
@@ -626,14 +655,47 @@
                 return;
             }
         }
+        // Regenerate form-array inputs from state.items. The browser will
+        // serialize these natively into $_POST['items']. JSON legacy path
+        // is also set as a fallback below.
+        var fields = document.getElementById('mtItemsFields');
+        if (fields) {
+            fields.innerHTML = '';  // wipe server-rendered inputs
+            var tempIdToIdx = {};
+            payload.forEach(function(it, i){ tempIdToIdx[state.items[i] && state.items[i].tempId] = i; });
+            payload.forEach(function(it, i){
+                function addField(name, value) {
+                    var inp = document.createElement('input');
+                    inp.type = 'hidden';
+                    inp.name = 'items[' + i + '][' + name + ']';
+                    inp.value = value == null ? '' : String(value);
+                    fields.appendChild(inp);
+                }
+                addField('id',           it.id == null ? '' : it.id);
+                addField('item_type',    it.item_type || '');
+                addField('parent_id',    it.parent_id == null ? '' : it.parent_id);
+                addField('position',     it.position == null ? i : it.position);
+                addField('label_json',   JSON.stringify(it.label  || {whmcs:'', custom:{}}));
+                addField('config_json',  JSON.stringify(it.config || {}));
+                addField('active',       it.active ? '1' : '0');
+            });
+            // Deleted ids → form-array
+            state.deletedIds.forEach(function(id, i){
+                var inp = document.createElement('input');
+                inp.type = 'hidden';
+                inp.name = 'deleted_ids[' + i + ']';
+                inp.value = String(id);
+                fields.appendChild(inp);
+            });
+        }
+
+        // Legacy JSON inputs — kept as a backup so a broken form-array
+        // doesn't kill the submit.
         var itemsJson = JSON.stringify(payload);
         var deletedJson = JSON.stringify(state.deletedIds);
         var itemsInput = document.getElementById('menuItemsJson');
         var deletedInput = document.getElementById('menuDeletedIdsJson');
         if (!itemsInput) {
-            // Defensive: if the hidden input went missing somehow, inject one
-            // so the server still receives the payload instead of an empty
-            // items_json triggering the safety net.
             itemsInput = document.createElement('input');
             itemsInput.type = 'hidden';
             itemsInput.name = 'items_json';
