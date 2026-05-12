@@ -2,7 +2,12 @@
    Closes content-area + ph-main-wrap, renders site footer (top-layout) and slim
    footer (sidebar/rail), then loads the apple-theme.js + apple-layout.js. *}
 
-{if empty($myTheme.license.canRender)}
+{* Match the gate switch in header.tpl. When the gate is disabled (or the
+   addon is active and has set canRender=true), fall through to the normal
+   footer. *}
+{assign var=mtLicenseGateEnabled value=false}
+
+{if $mtLicenseGateEnabled && empty($myTheme.license.canRender)}
     </div>
 </body>
 </html>

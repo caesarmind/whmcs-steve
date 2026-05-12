@@ -21,7 +21,14 @@
    wins on initial render.
    ════════════════════════════════════════════════════════════════════════ *}
 
-{if empty($myTheme.license.canRender)}
+{* ────────────────────────────────────────────────────────────────────────
+   LICENSE GATE — set to true once the theme is ready for commercial release.
+   When false, the gate never renders and the theme is usable without the
+   MyTheme addon being active. The check below ALSO bypasses when the addon
+   IS active and dev_mode is on (in which case canRender is set to true). *}
+{assign var=mtLicenseGateEnabled value=false}
+
+{if $mtLicenseGateEnabled && empty($myTheme.license.canRender)}
 <!DOCTYPE html>
 <html lang="{$activeLocale.languageCode|default:'en'}">
 <head>
