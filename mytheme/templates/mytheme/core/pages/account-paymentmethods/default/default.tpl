@@ -89,11 +89,11 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 {$LANG.accountdetails|default:'Account Details'}
             </a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=paymentmethods" class="subnav-item active">
+            <a href="{routePath('account-paymentmethods')}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
                 {$LANG.paymentmethods|default:'Payment Methods'}
             </a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=contacts" class="subnav-item">
+            <a href="{routePath('account-contacts')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                 {$LANG.contacts|default:'Contacts'}
             </a>

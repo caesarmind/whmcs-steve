@@ -93,7 +93,7 @@
             <div class="sidebar-item-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
             {$LANG.navquotes|default:'Quotes'}
         </a>
-        <a href="{$WEB_ROOT}/clientarea.php?action=paymentmethods" class="sidebar-item only-in" data-nav="payment-methods">
+        <a href="{routePath('account-paymentmethods')}" class="sidebar-item only-in" data-nav="payment-methods">
             <div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 010-4h14v4"/><path d="M3 5v14a2 2 0 002 2h16v-5"/><path d="M18 12a2 2 0 000 4h4v-4Z"/></svg></div>
             {$LANG.paymentMethods.title|default:'Payment Methods'}
         </a>
