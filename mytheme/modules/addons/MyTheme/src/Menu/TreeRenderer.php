@@ -24,10 +24,24 @@ use WHMCS\View\Menu\Item;
  */
 final class TreeRenderer
 {
+    /**
+     * Monotonically increasing counter for setOrder(). The previous version
+     * used $node->position, which is per-parent (every level resets to 0,1,2…)
+     * — that confused WHMCS's getChildren() sort and put all-position-0 items
+     * (headers, first sibling at each level) ahead of higher-position items.
+     * Using a single global counter that grows in the natural rendering order
+     * keeps insertion order intact across the whole tree.
+     */
+    private static int $orderCounter = 0;
+
     public static function populate(Item $parent, Menu $menu): void
     {
         $audience = $menu->audience === Audience::ALL ? Audience::current() : $menu->audience;
         $layout   = self::currentLayout();
+
+        // Reset per-render so two menus on the same page (primary + secondary)
+        // each start from zero.
+        self::$orderCounter = 0;
 
         foreach ($menu->topLevelItems() as $node) {
             try {
@@ -164,10 +178,17 @@ final class TreeRenderer
     {
         $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), '#');
         if ($child !== null) {
-            $child->addClass('mt-menu-header');
-            $child->setDisabled(true);
+            // Set data-mt-type FIRST so the sidebar template's getAttribute()
+            // lookup never returns null no matter what side-effects later
+            // mutations have. (Previously $child->setDisabled(true) was here
+            // and appeared to bucket disabled items together in
+            // getChildren() — the frontend rendered all headers first, then
+            // all non-headers. setDisabled isn't needed for us anyway: our
+            // sidebar.tpl branches on data-mt-type and emits the right
+            // markup whether or not WHMCS considers the item "disabled".)
             $child->setAttribute('data-mt-type', ItemTypes::HEADER);
-            $child->setOrder((int)$node->position);
+            $child->addClass('mt-menu-header');
+            $child->setOrder(self::$orderCounter++);
         }
     }
 
@@ -175,10 +196,9 @@ final class TreeRenderer
     {
         $child = self::addChildSafe($parent, self::keyFor($node), '', '#');
         if ($child !== null) {
-            $child->addClass('mt-menu-divider');
-            $child->setDisabled(true);
             $child->setAttribute('data-mt-type', ItemTypes::DIVIDER);
-            $child->setOrder((int)$node->position);
+            $child->addClass('mt-menu-divider');
+            $child->setOrder(self::$orderCounter++);
         }
     }
 
@@ -186,10 +206,10 @@ final class TreeRenderer
     {
         $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), '#');
         if ($child !== null) {
+            $child->setAttribute('data-mt-type', $node->item_type);
             $child->addClass('mt-menu-switcher mt-menu-switcher-' . $flavor);
             $child->setAttribute('data-switcher', $flavor);
-            $child->setAttribute('data-mt-type', $node->item_type);
-            $child->setOrder((int)$node->position);
+            $child->setOrder(self::$orderCounter++);
         }
     }
 
@@ -199,13 +219,13 @@ final class TreeRenderer
         if ($child !== null) {
             $config = $node->config();
             $style  = (string)($config['style'] ?? 'primary');
-            $child->addClass('mt-menu-login mt-menu-login-' . $style);
             $child->setAttribute('data-mt-type', ItemTypes::LOGIN_BUTTON);
+            $child->addClass('mt-menu-login mt-menu-login-' . $style);
             if (($config['position_side'] ?? '') === 'right') {
                 $child->addClass('mt-menu-side-right');
                 $child->setAttribute('data-mt-side', 'right');
             }
-            $child->setOrder((int)$node->position);
+            $child->setOrder(self::$orderCounter++);
         }
     }
 
@@ -274,6 +294,13 @@ final class TreeRenderer
     private static function applyVisuals(Item $item, MenuItem $node): void
     {
         $config = $node->config();
+        // Expose the menu-manager item-type to Smarty partials FIRST so the
+        // template's getAttribute('data-mt-type') branch never falls through
+        // to the default-whmcs_page case. (Other setters can throw or have
+        // side effects — if any of them clears attributes, set this one up
+        // front so subsequent calls overwrite less critical fields.)
+        try { $item->setAttribute('data-mt-type', $node->item_type); } catch (\Throwable $e) {}
+
         // Each setter is wrapped in its own try/catch because WHMCS\View\Menu\Item
         // is strict about expected formats and can throw on certain inputs. A
         // bad visual hint must not abort the whole item, let alone the menu.
@@ -293,12 +320,9 @@ final class TreeRenderer
         } elseif (($config['position_side'] ?? '') === 'left') {
             try { $item->setAttribute('data-mt-side', 'left'); } catch (\Throwable $e) {}
         }
-        try { $item->setOrder((int)$node->position); } catch (\Throwable $e) {}
-
-        // Expose the menu-manager item-type to Smarty partials so they can
-        // branch on it (header vs divider vs link vs dropdown_parent etc.)
-        // without inspecting CSS-class lists (Item has no hasClass() method).
-        try { $item->setAttribute('data-mt-type', $node->item_type); } catch (\Throwable $e) {}
+        // Use a global counter, not $node->position, so insertion order is
+        // preserved across the whole tree (positions reset per-parent).
+        try { $item->setOrder(self::$orderCounter++); } catch (\Throwable $e) {}
 
         // Auto-cycle a palette colour from a fixed list, override-able via
         // config.color. Partials use this as a CSS class suffix.

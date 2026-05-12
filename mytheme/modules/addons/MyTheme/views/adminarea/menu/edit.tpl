@@ -746,11 +746,29 @@
                     inp.value = value == null ? '' : String(value);
                     fields.appendChild(inp);
                 }
+                // Defensive default — for brand-new items (id == null), if
+                // the label round-trip somehow dropped the english key, fill
+                // in a placeholder from the type so the server doesn't store
+                // an empty/invisible row.
+                var labelOut = deepObjectify(it.label || {whmcs:'', custom:{}});
+                if (it.id == null) {
+                    if (!labelOut || typeof labelOut !== 'object') labelOut = {whmcs:'', custom:{}};
+                    if (!labelOut.custom || typeof labelOut.custom !== 'object') labelOut.custom = {};
+                    var hasAnyLabel = (labelOut.whmcs && labelOut.whmcs !== '');
+                    if (!hasAnyLabel) {
+                        Object.keys(labelOut.custom).forEach(function(k){
+                            if (labelOut.custom[k] && labelOut.custom[k] !== '') hasAnyLabel = true;
+                        });
+                    }
+                    if (!hasAnyLabel) {
+                        labelOut.custom.english = 'New ' + (it.item_type || 'item');
+                    }
+                }
                 addField('id',           it.id == null ? '' : it.id);
                 addField('item_type',    it.item_type || '');
                 addField('parent_id',    it.parent_id == null ? '' : it.parent_id);
                 addField('position',     it.position == null ? i : it.position);
-                addField('label_json',   JSON.stringify(deepObjectify(it.label  || {whmcs:'', custom:{}})));
+                addField('label_json',   JSON.stringify(labelOut));
                 addField('config_json',  JSON.stringify(deepObjectify(it.config || {})));
                 addField('active',       it.active ? '1' : '0');
             });

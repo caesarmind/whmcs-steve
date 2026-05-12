@@ -33,7 +33,22 @@
 {/function}
 
 {function name=mtSidebarItem item=null}
-    {assign var=mtType  value=$item->getAttribute('data-mt-type')|default:'whmcs_page'}
+    {assign var=mtType  value=$item->getAttribute('data-mt-type')|default:''}
+    {* Defensive fallback — if WHMCS\View\Menu\Item silently dropped the
+       data-mt-type attribute (e.g. setDisabled side-effects on some WHMCS
+       builds), reconstruct the type from the CSS classes that renderer also
+       sets. Headers and dividers are the cases we've actually seen this
+       happen on. *}
+    {if !$mtType}
+        {assign var=_mtCls value=$item->getAttribute('class')|default:''}
+        {if $_mtCls && strpos($_mtCls, 'mt-menu-header') !== false}
+            {assign var=mtType value='header'}
+        {elseif $_mtCls && strpos($_mtCls, 'mt-menu-divider') !== false}
+            {assign var=mtType value='divider'}
+        {else}
+            {assign var=mtType value='whmcs_page'}
+        {/if}
+    {/if}
     {assign var=mtColor value=$item->getAttribute('data-mt-color')|default:'gray'}
     {* Prefer our own data-mt-icon attribute because WHMCS\View\Menu\Item::setIcon()
        silently strips non-FontAwesome strings, so $item->getIcon() returns '' for
@@ -48,7 +63,10 @@
     {/if}
 
     {if $mtType == 'header'}
-        <div class="sidebar-section-label">{$item->getLabel()|escape}</div>
+        {* Skip headers with no visible label — they'd render as empty
+           visual noise. Admins can delete or fill in a label via the menu
+           builder. *}
+        {if $item->getLabel()}<div class="sidebar-section-label">{$item->getLabel()|escape}</div>{/if}
     {elseif $mtType == 'divider'}
         <hr class="sidebar-divider">
     {elseif $mtType == 'dropdown_parent' || ($mtType == 'account_dropdown' && $item->getChildren())}

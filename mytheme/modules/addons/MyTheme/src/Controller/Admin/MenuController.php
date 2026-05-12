@@ -366,6 +366,17 @@ final class MenuController extends AbstractController
 
             try {
                 if ($item === null) {
+                    // Defensive default — if the browser sent an empty label
+                    // for a brand-new item, give it a placeholder based on
+                    // type so admins can see and edit it rather than getting
+                    // an invisible row. The JS adds a default like
+                    // "New header" before submit, but if anything in the
+                    // round-trip drops it, this is the safety net.
+                    if (!$this->isMeaningfulLabel($label)) {
+                        $typeLabel = ItemTypes::meta($type)['label'] ?? $type;
+                        $label = ['whmcs' => '', 'custom' => ['english' => 'New ' . strtolower($typeLabel)]];
+                        $log['defaulted_label'][] = ['idx' => $i, 'type' => $type, 'fallback' => $label['custom']['english']];
+                    }
                     $item = MenuItem::create([
                         'menu_id'     => $menuId,
                         'parent_id'   => null,
@@ -380,7 +391,7 @@ final class MenuController extends AbstractController
                         'config_json' => json_encode($config, JSON_FORCE_OBJECT),
                         'active'      => $active,
                     ]);
-                    $log['created'][] = ['idx' => $i, 'new_id' => $item->id, 'type' => $type];
+                    $log['created'][] = ['idx' => $i, 'new_id' => $item->id, 'type' => $type, 'label_in' => $label];
                 } else {
                     // SAFETY GUARD — if the incoming label/config is empty but
                     // the existing one has data, REFUSE to overwrite. This is
