@@ -31,7 +31,7 @@ function MyTheme_config()
         'description' => 'Manages MyTheme client-area templates. <a href="https://your-domain.com/" target="_blank">Learn more</a>',
         'author'      => '<a href="https://your-domain.com" target="_blank">Your Studio</a>',
         'language'    => 'english',
-        'version'     => '1.0.0',
+        'version'     => '1.1.0',
         'fields'      => [
             'dbrollback' => [
                 'FriendlyName' => 'Database Clear',

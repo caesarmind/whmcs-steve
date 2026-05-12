@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace MyTheme\Controller\Admin;
 
 use MyTheme\Controller\AbstractController;
+use MyTheme\Database\Migrator;
 use MyTheme\Menu\ItemTypes;
 use MyTheme\Menu\Seeder;
 use MyTheme\Models\Menu;
 use MyTheme\Models\MenuItem;
+use WHMCS\Database\Capsule;
 
 /**
  * Admin: list, edit, save, delete menus + items.
@@ -24,6 +26,34 @@ use MyTheme\Models\MenuItem;
  */
 final class MenuController extends AbstractController
 {
+    public function __construct(array $params = [])
+    {
+        parent::__construct($params);
+        $this->ensureMenuTables();
+    }
+
+    /**
+     * Self-heal: if the menu tables don't exist (because the admin upgraded
+     * MyTheme without going through _upgrade, which WHMCS doesn't reliably
+     * fire on file-replace deploys), run migrations + seeder now. Idempotent.
+     */
+    private function ensureMenuTables(): void
+    {
+        try {
+            if (Capsule::schema()->hasTable('mytheme_menus')) {
+                return;
+            }
+            // Addon root = three dirs up from this file (src/Controller/Admin → addon root)
+            $addonRoot = dirname(__DIR__, 3);
+            (new Migrator($addonRoot))->migrate();
+            (new Seeder())->run();
+        } catch (\Throwable $e) {
+            // Don't blow up the admin page if self-heal fails — let the
+            // subsequent action() surface a meaningful error.
+            error_log('MyTheme menu self-heal failed: ' . $e->getMessage());
+        }
+    }
+
     public function indexAction(): string
     {
         $tab = (string)($_GET['tab'] ?? 'main');
