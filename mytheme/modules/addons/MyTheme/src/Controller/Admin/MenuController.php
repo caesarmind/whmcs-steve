@@ -209,6 +209,39 @@ final class MenuController extends AbstractController
     }
 
     /**
+     * Diagnostic — dumps the live state of a menu as JSON. Open in a tab
+     * after a save attempt to see exactly what's in the DB. Doesn't auth-
+     * gate further than the rest of the addon (admin-only via WHMCS).
+     */
+    public function diagnoseAction(): string
+    {
+        $id = (int)($_GET['id'] ?? 0);
+        $menu = Menu::find($id);
+        header('Content-Type: application/json');
+        if ($menu === null) {
+            echo json_encode(['error' => 'menu not found', 'id' => $id]);
+            exit;
+        }
+        $items = MenuItem::where('menu_id', $menu->id)
+            ->orderBy('parent_id')->orderBy('position')->get()
+            ->map(fn (MenuItem $i) => [
+                'id' => $i->id, 'parent_id' => $i->parent_id, 'position' => $i->position,
+                'item_type' => $i->item_type, 'active' => (bool)$i->active,
+                'label' => $i->label(), 'config' => $i->config(),
+            ])->all();
+        echo json_encode([
+            'menu' => [
+                'id' => $menu->id, 'name' => $menu->name, 'location' => $menu->location,
+                'audience' => $menu->audience, 'active' => (bool)$menu->active,
+                'changed_by_user' => (bool)$menu->changed_by_user, 'version' => $menu->version,
+            ],
+            'items_count' => count($items),
+            'items' => $items,
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    /**
      * Given a keyed collection of MenuItems, build a nested array:
      *   [['item' => MenuItem, 'children' => [['item' => …, 'children' => […]]]]
      */
@@ -247,75 +280,86 @@ final class MenuController extends AbstractController
      */
     private function persistItems(int $menuId, array $payload, array $deletedIds = []): void
     {
-        // Delete explicitly-marked items first (and their cascading children
-        // via the parent_id FK from the Menus migration, BUT we don't have a
-        // parent_id FK on items — that's a self-reference we omitted. So
-        // recursively collect descendants here).
+        $log = ['menu_id' => $menuId, 'payload_count' => count($payload), 'deleted_ids' => $deletedIds, 'created' => [], 'updated' => [], 'skipped' => [], 'errors' => []];
+
+        // Delete explicitly-marked items first.
         if (!empty($deletedIds)) {
             $allToDelete = $this->collectDescendants($menuId, $deletedIds);
+            $log['cascade_delete'] = $allToDelete;
             MenuItem::where('menu_id', $menuId)
                 ->whereIn('id', $allToDelete)
                 ->delete();
         }
 
-        $idMap = []; // payload-local key → DB id (for parent resolution)
+        $idMap = [];
         $byKey = [];
 
         // Pass 1 — create/update each row, capture the resulting DB id
         foreach ($payload as $i => $row) {
             $type = (string)($row['item_type'] ?? '');
             if (!ItemTypes::exists($type)) {
+                $log['skipped'][] = ['idx' => $i, 'reason' => 'unknown_type', 'type' => $type, 'id' => $row['id'] ?? null];
                 continue;
             }
-            $key      = isset($row['id']) && is_numeric($row['id'])
+            // PHP's isset() returns false for null, so id:null in payload
+            // correctly falls through to the 'new_X' branch.
+            $key      = (isset($row['id']) && is_numeric($row['id']))
                         ? (string)(int)$row['id']
                         : 'new_' . $i;
             $label    = is_array($row['label']  ?? null) ? $row['label']  : ['whmcs' => '', 'custom' => []];
             $config   = is_array($row['config'] ?? null) ? $row['config'] : [];
             $position = (int)($row['position'] ?? $i);
-            $active   = !empty($row['active'] ?? true);
+            $active   = array_key_exists('active', $row) ? !empty($row['active']) : true;
 
             $dbId = is_numeric($key) ? (int)$key : null;
             $item = $dbId !== null ? MenuItem::where('menu_id', $menuId)->where('id', $dbId)->first() : null;
 
-            if ($item === null) {
-                $item = MenuItem::create([
-                    'menu_id'     => $menuId,
-                    'parent_id'   => null,
-                    'position'    => $position,
-                    'item_type'   => $type,
-                    'label_json'  => json_encode($label),
-                    'config_json' => json_encode($config),
-                    'active'      => $active,
-                ]);
-            } else {
-                $item->position    = $position;
-                $item->item_type   = $type;
-                $item->label_json  = json_encode($label);
-                $item->config_json = json_encode($config);
-                $item->active      = $active;
-                $item->save();
+            try {
+                if ($item === null) {
+                    $item = MenuItem::create([
+                        'menu_id'     => $menuId,
+                        'parent_id'   => null,
+                        'position'    => $position,
+                        'item_type'   => $type,
+                        'label_json'  => json_encode($label),
+                        'config_json' => json_encode($config),
+                        'active'      => $active,
+                    ]);
+                    $log['created'][] = ['idx' => $i, 'new_id' => $item->id, 'type' => $type];
+                } else {
+                    $item->position    = $position;
+                    $item->item_type   = $type;
+                    $item->label_json  = json_encode($label);
+                    $item->config_json = json_encode($config);
+                    $item->active      = $active;
+                    $item->save();
+                    $log['updated'][] = ['idx' => $i, 'id' => $item->id, 'type' => $type];
+                }
+                $idMap[$key] = $item->id;
+                $byKey[$key] = ['item' => $item, 'parent_key' => $row['parent_id'] ?? null];
+            } catch (\Throwable $e) {
+                $log['errors'][] = ['idx' => $i, 'pass' => 1, 'msg' => $e->getMessage()];
             }
-            $idMap[$key] = $item->id;
-            $byKey[$key] = ['item' => $item, 'parent_key' => $row['parent_id'] ?? null];
         }
 
         // Pass 2 — wire parent_id now that every node has a DB id
         foreach ($byKey as $entry) {
-            $parentKey = $entry['parent_key'];
-            if ($parentKey === null || $parentKey === '' || $parentKey === 0) {
-                $entry['item']->parent_id = null;
-            } else {
-                // Parent might be referenced by either DB id (int) or temp key ("new_X")
-                $resolved = $idMap[(string)$parentKey] ?? null;
-                $entry['item']->parent_id = $resolved;
+            try {
+                $parentKey = $entry['parent_key'];
+                if ($parentKey === null || $parentKey === '' || $parentKey === 0) {
+                    $entry['item']->parent_id = null;
+                } else {
+                    $resolved = $idMap[(string)$parentKey] ?? null;
+                    $entry['item']->parent_id = $resolved;
+                }
+                $entry['item']->save();
+            } catch (\Throwable $e) {
+                $log['errors'][] = ['id' => $entry['item']->id ?? '?', 'pass' => 2, 'msg' => $e->getMessage()];
             }
-            $entry['item']->save();
         }
 
-        // No implicit sweep — items absent from payload remain in DB. The
-        // admin can remove them via the × button which adds them to
-        // deleted_ids_json.
+        // No implicit sweep — items absent from payload remain in DB.
+        error_log('[MyTheme persistItems] ' . json_encode($log, JSON_UNESCAPED_SLASHES));
     }
 
     /**

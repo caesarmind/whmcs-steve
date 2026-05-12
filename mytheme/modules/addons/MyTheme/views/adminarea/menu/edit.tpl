@@ -570,26 +570,36 @@
     }
 
     // ──────────────────────────────────────────────────────────────────────
-    // Serialize on submit
+    // Serialize on submit. Wrapped in try/catch so a JSON.stringify error
+    // can't leave items_json empty and trigger the server-side "skip items"
+    // safety net (which would silently drop the admin's changes).
     // ──────────────────────────────────────────────────────────────────────
     document.getElementById('menuForm').addEventListener('submit', function(e){
-        syncStateFromDom();
-        // Convert tempId → null for new items so the controller knows
-        var payload = state.items.map(function(it){
-            return {
-                id: it.id,
-                parent_id: (function(){
-                    if (it.parent_id == null) return null;
-                    var p = state.items.find(function(x){ return x.tempId === it.parent_id; });
-                    return p ? (p.id || it.parent_id) : null;
-                })(),
-                position: it.position,
-                item_type: it.item_type,
-                label: it.label,
-                config: it.config,
-                active: it.active,
-            };
-        });
+        try { syncStateFromDom(); } catch (err) { console.error('[MyTheme menu] syncStateFromDom failed', err); }
+
+        var payload;
+        try {
+            payload = state.items.map(function(it){
+                return {
+                    id: it.id,
+                    parent_id: (function(){
+                        if (it.parent_id == null) return null;
+                        var p = state.items.find(function(x){ return x.tempId === it.parent_id; });
+                        return p ? (p.id || it.parent_id) : null;
+                    })(),
+                    position: it.position,
+                    item_type: it.item_type,
+                    label: it.label,
+                    config: it.config,
+                    active: it.active,
+                };
+            });
+        } catch (err) {
+            console.error('[MyTheme menu] payload build failed — submit blocked', err);
+            e.preventDefault();
+            alert('Could not build the save payload — open the browser console for details.');
+            return;
+        }
         // SAFETY: if state.items is empty AND there's still tree DOM, the
         // ingest never happened. Bail and ask the admin to reload — better
         // UX than a round-trip + flash-message redirect.
@@ -602,9 +612,28 @@
                 return;
             }
         }
-        console.log('[MyTheme menu] submitting', payload.length, 'items,', state.deletedIds.length, 'deletions');
-        document.getElementById('menuItemsJson').value = JSON.stringify(payload);
-        document.getElementById('menuDeletedIdsJson').value = JSON.stringify(state.deletedIds);
+        var itemsJson = JSON.stringify(payload);
+        var deletedJson = JSON.stringify(state.deletedIds);
+        document.getElementById('menuItemsJson').value = itemsJson;
+        document.getElementById('menuDeletedIdsJson').value = deletedJson;
+        // Verbose dump for diagnosing "new items not saved" / "items deleted"
+        // bugs. Each item shows id (null for new), type, label, parent_id, position.
+        console.group('[MyTheme menu] submit');
+        console.log('Total items in state:', state.items.length);
+        console.log('Payload size (chars):', itemsJson.length);
+        console.log('Deletions:', state.deletedIds);
+        console.table(payload.map(function(p, i){
+            return {
+                idx: i,
+                id: p.id == null ? 'NEW' : p.id,
+                type: p.item_type,
+                label: (p.label && p.label.custom && p.label.custom.english) || (p.label && p.label.whmcs) || '(no label)',
+                parent: p.parent_id == null ? 'top' : p.parent_id,
+                pos: p.position,
+                active: p.active,
+            };
+        }));
+        console.groupEnd();
     });
 
     refreshDraggable();

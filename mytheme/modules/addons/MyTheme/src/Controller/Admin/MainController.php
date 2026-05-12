@@ -47,6 +47,7 @@ final class MainController extends AbstractController
             'delete'         => $ctl->deleteAction(),
             'seed'           => $ctl->seedAction(),
             'reset-defaults' => $ctl->resetDefaultsAction(),
+            'diagnose'       => $ctl->diagnoseAction(),
             default          => $ctl->indexAction(),
         };
     }
