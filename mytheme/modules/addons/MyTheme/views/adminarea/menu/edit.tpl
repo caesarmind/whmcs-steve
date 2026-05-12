@@ -293,6 +293,19 @@
                 var label, config;
                 try { label  = JSON.parse(labelRaw);  } catch(e){ label  = {whmcs:'', custom:{english: li.querySelector('[data-role=label]').textContent.trim()}}; }
                 try { config = JSON.parse(configRaw); } catch(e){ config = {}; }
+                // If a previous round-trip stored an empty object as "[]"
+                // (PHP/JSON array-as-object quirk), the parse returns an
+                // array. Force back to a plain object so drawer edits don't
+                // get discarded by JSON.stringify.
+                if (Array.isArray(label) || typeof label !== 'object' || label === null) {
+                    label = {whmcs:'', custom:{}};
+                }
+                if (Array.isArray(label.custom)) {
+                    label.custom = {};
+                }
+                if (Array.isArray(config) || typeof config !== 'object' || config === null) {
+                    config = {};
+                }
                 state.items.push({
                     tempId: tempId,
                     id: dbId ? Number(dbId) : null,
@@ -606,10 +619,36 @@
         var p = path.split('.');
         var cur = obj;
         for (var i = 0; i < p.length - 1; i++){
-            if (cur[p[i]] == null || typeof cur[p[i]] !== 'object') cur[p[i]] = {};
+            // Replace null OR ARRAY parents — setting a string-keyed
+            // property on a JS array gets silently dropped by
+            // JSON.stringify (arrays serialize only their indexed items).
+            // This was the root cause of "save empties all label/config
+            // fields": after a previous round-trip, label.custom or config
+            // would come back as an empty array `[]` instead of `{}`.
+            if (cur[p[i]] == null || typeof cur[p[i]] !== 'object' || Array.isArray(cur[p[i]])) {
+                cur[p[i]] = {};
+            }
             cur = cur[p[i]];
         }
         cur[p[p.length - 1]] = value;
+    }
+
+    // Recursively convert empty arrays → empty objects so JSON.stringify
+    // produces "{}" not "[]" — keeping the structure stable across the
+    // PHP↔JSON round-trip (PHP json_decode of "{}" is `[]`, and json_encode
+    // of `[]` is "[]" not "{}", breaking the next decode cycle).
+    function deepObjectify(v){
+        if (v === null || v === undefined) return {};
+        if (Array.isArray(v)) {
+            if (v.length === 0) return {};
+            // Genuine indexed arrays — we don't expect these in label/config,
+            // but pass them through just in case.
+            return v.map(deepObjectify);
+        }
+        if (typeof v !== 'object') return v;
+        var out = {};
+        Object.keys(v).forEach(function(k){ out[k] = deepObjectify(v[k]); });
+        return out;
     }
 
     // ──────────────────────────────────────────────────────────────────────
@@ -675,8 +714,8 @@
                 addField('item_type',    it.item_type || '');
                 addField('parent_id',    it.parent_id == null ? '' : it.parent_id);
                 addField('position',     it.position == null ? i : it.position);
-                addField('label_json',   JSON.stringify(it.label  || {whmcs:'', custom:{}}));
-                addField('config_json',  JSON.stringify(it.config || {}));
+                addField('label_json',   JSON.stringify(deepObjectify(it.label  || {whmcs:'', custom:{}})));
+                addField('config_json',  JSON.stringify(deepObjectify(it.config || {})));
                 addField('active',       it.active ? '1' : '0');
             });
             // Deleted ids → form-array

@@ -371,16 +371,21 @@ final class MenuController extends AbstractController
                         'parent_id'   => null,
                         'position'    => $position,
                         'item_type'   => $type,
-                        'label_json'  => json_encode($label),
-                        'config_json' => json_encode($config),
+                        // JSON_FORCE_OBJECT ensures empty PHP arrays encode as
+                        // "{}" (object) instead of "[]" (array). Otherwise the
+                        // JS↔PHP round-trip corrupts label.custom into an
+                        // array, and subsequent drawer edits to .english
+                        // get silently dropped by JSON.stringify.
+                        'label_json'  => json_encode($label,  JSON_FORCE_OBJECT),
+                        'config_json' => json_encode($config, JSON_FORCE_OBJECT),
                         'active'      => $active,
                     ]);
                     $log['created'][] = ['idx' => $i, 'new_id' => $item->id, 'type' => $type];
                 } else {
                     $item->position    = $position;
                     $item->item_type   = $type;
-                    $item->label_json  = json_encode($label);
-                    $item->config_json = json_encode($config);
+                    $item->label_json  = json_encode($label,  JSON_FORCE_OBJECT);
+                    $item->config_json = json_encode($config, JSON_FORCE_OBJECT);
                     $item->active      = $active;
                     $item->save();
                     $log['updated'][] = ['idx' => $i, 'id' => $item->id, 'type' => $type];
