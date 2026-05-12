@@ -73,6 +73,10 @@ final class Presets
         ];
     }
 
+    /**
+     * Full WHMCS-default client primary nav, matching Lagom's preset shape:
+     *   Home · Services▾ · Domains▾ · Billing▾ · Support▾ · Affiliates · Open Ticket (right)
+     */
     private static function clientWhmcsDefaults(): array
     {
         return [
@@ -81,7 +85,86 @@ final class Presets
             'audience' => 'client',
             'active'   => false,
             'items'    => [
-                ['type' => ItemTypes::WHMCS_DEFAULT, 'label' => self::label('', 'WHMCS Default Navigation'), 'config' => []],
+                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navhome', 'Home'),
+                 'config' => ['url' => 'clientarea.php', 'icon' => 'home']],
+
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('navservices', 'Services'),
+                 'config' => ['icon' => 'server'],
+                 'children' => [
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navservices', 'My Services'),
+                     'config' => ['url' => 'clientarea.php?action=services', 'icon' => 'server']],
+                    ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domainrenewals', 'Renew Services'),
+                     'config' => ['url' => 'cart.php?gid=renewals', 'icon' => 'refresh']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('ordernew', 'Order New Services'),
+                     'config' => ['url' => 'cart.php', 'icon' => 'cart']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('orderaddons', 'View Available Addons'),
+                     'config' => ['url' => 'cart.php?gid=addons', 'icon' => 'puzzle']],
+                 ]],
+
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('navdomains', 'Domains'),
+                 'config' => ['icon' => 'globe'],
+                 'children' => [
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navdomains', 'My Domains'),
+                     'config' => ['url' => 'clientarea.php?action=domains', 'icon' => 'globe']],
+                    ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domainrenewals', 'Domain Renewals'),
+                     'config' => ['url' => 'cart.php?a=add&domain=renewal', 'icon' => 'refresh']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domainregister', 'Register a New Domain'),
+                     'config' => ['url' => 'cart.php?a=add&domain=register', 'icon' => 'plus']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domaintransfer', 'Transfer Domains to Us'),
+                     'config' => ['url' => 'cart.php?a=add&domain=transfer', 'icon' => 'transfer']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'Website & Security'),
+                     'config' => ['url' => 'cart.php?gid=websitesecurity', 'icon' => 'shield']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'MarketConnect Products'),
+                     'config' => ['url' => 'cart.php?gid=marketconnect', 'icon' => 'package']],
+                    ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'Manage SSL Certificates'),
+                     'config' => ['url' => 'clientarea.php?action=ssl', 'icon' => 'lock']],
+                 ]],
+
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('billingtab', 'Billing'),
+                 'config' => ['icon' => 'credit-card'],
+                 'children' => [
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navinvoices', 'My Invoices'),
+                     'config' => ['url' => 'clientarea.php?action=invoices', 'icon' => 'invoice']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navquotes', 'My Quotes'),
+                     'config' => ['url' => 'clientarea.php?action=quotes', 'icon' => 'quote']],
+                    ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('masspayment', 'Mass Payment'),
+                     'config' => ['url' => 'clientarea.php?action=masspay&all=true', 'icon' => 'wallet']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('paymentmethods', 'Payment Methods'),
+                     'config' => ['url' => 'clientarea.php?action=paymentmethods', 'icon' => 'credit-card']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('addfunds', 'Add Funds'),
+                     'config' => ['url' => 'clientarea.php?action=addfunds', 'icon' => 'plus-circle']],
+                 ]],
+
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('navsupport', 'Support'),
+                 'config' => ['icon' => 'life-buoy'],
+                 'children' => [
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navtickets', 'Tickets'),
+                     'config' => ['url' => 'supporttickets.php', 'icon' => 'support']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('announcementstitle', 'Announcements'),
+                     'config' => ['url' => 'announcements.php', 'icon' => 'megaphone']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('knowledgebase', 'Knowledgebase'),
+                     'config' => ['url' => 'knowledgebase.php', 'icon' => 'book']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('downloadstitle', 'Downloads'),
+                     'config' => ['url' => 'downloads.php', 'icon' => 'download']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('networkstatus', 'Network Status'),
+                     'config' => ['url' => 'serverstatus.php', 'icon' => 'status']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('opennewticket', 'Open Ticket'),
+                     'config' => ['url' => 'submitticket.php', 'icon' => 'plus']],
+                 ]],
+
+                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('affiliatesnav', 'Affiliates'),
+                 'config' => ['url' => 'affiliates.php', 'icon' => 'star']],
+
+                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('opennewticket', 'Open Ticket'),
+                 'config' => ['url' => 'submitticket.php', 'icon' => 'plus', 'position_side' => 'right']],
             ],
         ];
     }
@@ -143,6 +226,10 @@ final class Presets
         ];
     }
 
+    /**
+     * Full WHMCS-default guest primary nav — the items WHMCS itself surfaces
+     * for unauthenticated visitors plus the standard Login / Register / Language CTAs.
+     */
     private static function guestWhmcsDefaults(): array
     {
         return [
@@ -151,7 +238,45 @@ final class Presets
             'audience' => 'guest',
             'active'   => false,
             'items'    => [
-                ['type' => ItemTypes::WHMCS_DEFAULT, 'label' => self::label('', 'WHMCS Default Navigation'), 'config' => []],
+                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navhome', 'Home'),
+                 'config' => ['url' => '/', 'icon' => 'home']],
+
+                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('orderproducts', 'Browse Products'),
+                 'config' => ['url' => 'cart.php', 'icon' => 'shop']],
+
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('navdomains', 'Domains'),
+                 'config' => ['icon' => 'globe'],
+                 'children' => [
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domainregister', 'Register a Domain'),
+                     'config' => ['url' => 'cart.php?a=add&domain=register', 'icon' => 'plus']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domaintransfer', 'Transfer Domain'),
+                     'config' => ['url' => 'cart.php?a=add&domain=transfer', 'icon' => 'transfer']],
+                    ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'Domain Pricing'),
+                     'config' => ['url' => 'cart.php?a=add&domain=register', 'icon' => 'tag']],
+                 ]],
+
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('navsupport', 'Support'),
+                 'config' => ['icon' => 'life-buoy'],
+                 'children' => [
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('contactus', 'Contact Us'),
+                     'config' => ['url' => 'contact.php', 'icon' => 'envelope']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('networkstatus', 'Network Status'),
+                     'config' => ['url' => 'serverstatus.php', 'icon' => 'status']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('knowledgebase', 'Knowledgebase'),
+                     'config' => ['url' => 'knowledgebase.php', 'icon' => 'book']],
+                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('announcementstitle', 'Announcements'),
+                     'config' => ['url' => 'announcements.php', 'icon' => 'megaphone']],
+                 ]],
+
+                ['type' => ItemTypes::LOGIN_BUTTON, 'label' => self::label('login', 'Login'),
+                 'config' => ['position_side' => 'right', 'style' => 'primary', 'icon' => 'transfer']],
+                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('register', 'Register'),
+                 'config' => ['url' => 'register.php', 'position_side' => 'right', 'icon' => 'user']],
+                ['type' => ItemTypes::LANGUAGE, 'label' => self::label('chooselanguage', 'Language'),
+                 'config' => ['position_side' => 'right', 'icon' => 'globe']],
             ],
         ];
     }

@@ -251,6 +251,22 @@
 .mt-flash-warn a  { color: inherit; font-weight: 600; }
 .mt-section-note  { font-size: 12px; color: var(--mt-text-2); padding: 0 14px 8px; margin: 0; line-height: 1.5; }
 .mt-section-note em { font-style: normal; font-weight: 600; color: var(--mt-text); }
+
+/* Icon picker (admin drawer) */
+.mt-icon-picker-wrap { position: relative; }
+.mt-icon-picker-trigger { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px; background: var(--mt-surface); border: 1px solid var(--mt-input-border); border-radius: var(--mt-radius-sm); font: inherit; color: var(--mt-text); cursor: pointer; }
+.mt-icon-picker-trigger:hover { border-color: var(--mt-primary); }
+.mt-icon-picker-preview { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; color: var(--mt-text); }
+.mt-icon-picker-preview svg { width: 18px; height: 18px; }
+.mt-icon-picker-name { flex: 1; text-align: left; font-size: 13px; color: var(--mt-text-2); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.mt-icon-picker-caret { color: var(--mt-text-3); font-size: 10px; }
+.mt-icon-picker-panel { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-sm); box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 8px; max-height: 280px; overflow-y: auto; }
+.mt-icon-picker-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.mt-icon-tile { width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 1px solid transparent; border-radius: var(--mt-radius-sm); color: var(--mt-text); cursor: pointer; transition: background .12s, border-color .12s; }
+.mt-icon-tile:hover { background: var(--mt-primary-tint); border-color: var(--mt-primary); }
+.mt-icon-tile.is-active { background: var(--mt-primary-tint); border-color: var(--mt-primary); }
+.mt-icon-tile svg { width: 18px; height: 18px; }
+.mt-icon-tile-clear { color: var(--mt-text-3); font-size: 14px; }
 .mt-diag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px; }
 .mt-diag-card { padding: 14px 16px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-sm); }
 .mt-diag-card.is-warn { background: rgba(255, 159, 10, 0.08); border-color: rgba(255, 159, 10, 0.3); }

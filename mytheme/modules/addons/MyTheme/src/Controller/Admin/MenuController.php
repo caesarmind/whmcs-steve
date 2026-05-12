@@ -116,10 +116,12 @@ final class MenuController extends AbstractController
         $tree     = $this->buildTree($allItems);
 
         return $this->view('menu/edit', [
-            'menu'      => $menu,
-            'tree'      => $tree,
-            'itemTypes' => ItemTypes::all(),
-            'flash'     => $_GET['flash'] ?? '',
+            'menu'         => $menu,
+            'tree'         => $tree,
+            'itemTypes'    => ItemTypes::all(),
+            'icons'        => \MyTheme\Menu\Icons::pickerList(),
+            'iconsJson'    => json_encode(\MyTheme\Menu\Icons::all()),
+            'flash'        => $_GET['flash'] ?? '',
         ]);
     }
 
@@ -198,6 +200,12 @@ final class MenuController extends AbstractController
     {
         $seeded = (new Seeder())->run();
         $this->redirect('?module=MyTheme&action=menu&flash=seeded-' . $seeded);
+    }
+
+    public function resetDefaultsAction(): string
+    {
+        $reset = (new Seeder())->resetWhmcsDefaults();
+        $this->redirect('?module=MyTheme&action=menu&flash=reset-defaults-' . $reset);
     }
 
     /**

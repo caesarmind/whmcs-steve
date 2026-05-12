@@ -163,8 +163,27 @@
                 </div>
 
                 <div class="mt-field">
-                    <label class="mt-field-label" for="drawerIcon">Icon (CSS class or name)</label>
-                    <input id="drawerIcon" class="mt-input" type="text" placeholder="home, server, …" data-drawer-field="config.icon">
+                    <label class="mt-field-label" for="drawerIcon">Icon</label>
+                    <div class="mt-icon-picker-wrap">
+                        <button type="button" class="mt-icon-picker-trigger" id="drawerIconBtn">
+                            <span class="mt-icon-picker-preview" id="drawerIconPreview"></span>
+                            <span class="mt-icon-picker-name" id="drawerIconName">(none)</span>
+                            <span class="mt-icon-picker-caret">▾</span>
+                        </button>
+                        <input type="hidden" id="drawerIcon" data-drawer-field="config.icon" value="">
+                        <div class="mt-icon-picker-panel" id="drawerIconPanel" hidden>
+                            <div class="mt-icon-picker-grid">
+                                <button type="button" class="mt-icon-tile" data-icon-name="" title="No icon">
+                                    <span class="mt-icon-tile-clear">✕</span>
+                                </button>
+                                {foreach $icons as $ico}
+                                    <button type="button" class="mt-icon-tile" data-icon-name="{$ico.name|escape}" title="{$ico.name|escape}">
+                                        {$ico.svg nofilter}
+                                    </button>
+                                {/foreach}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-field">
@@ -437,7 +456,54 @@
                 el.value = v == null ? '' : v;
             }
         });
+        // Reflect icon picker preview when drawer opens
+        syncIconPickerFromEntry(entry);
     }
+
+    // ──────────────────────────────────────────────────────────────────────
+    // Icon picker (grid)
+    // ──────────────────────────────────────────────────────────────────────
+    var ICON_MAP = JSON.parse(document.getElementById('mtIconRegistry').textContent || '{}');
+    function iconSvgFor(name){
+        if (!name) return '';
+        if (ICON_MAP[name]) {
+            return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + ICON_MAP[name] + '</svg>';
+        }
+        return '<i class="' + name.replace(/"/g, '&quot;') + '"></i>';
+    }
+    function syncIconPickerFromEntry(entry){
+        var name = (entry && entry.config && entry.config.icon) || '';
+        document.getElementById('drawerIcon').value = name;
+        document.getElementById('drawerIconPreview').innerHTML = iconSvgFor(name) || '<span class="mt-icon-tile-clear">∅</span>';
+        document.getElementById('drawerIconName').textContent = name || '(none)';
+        // Highlight active tile in the panel
+        document.querySelectorAll('#drawerIconPanel .mt-icon-tile').forEach(function(t){
+            t.classList.toggle('is-active', t.getAttribute('data-icon-name') === name);
+        });
+    }
+    document.getElementById('drawerIconBtn').addEventListener('click', function(e){
+        e.preventDefault();
+        var panel = document.getElementById('drawerIconPanel');
+        panel.hidden = !panel.hidden;
+    });
+    document.addEventListener('click', function(e){
+        var tile = e.target.closest('#drawerIconPanel .mt-icon-tile');
+        if (!tile) return;
+        var name = tile.getAttribute('data-icon-name') || '';
+        if (selectedTempId === null) return;
+        var entry = state.items.find(function(it){ return it.tempId === selectedTempId; });
+        if (!entry) return;
+        if (!entry.config) entry.config = {};
+        if (name) entry.config.icon = name; else delete entry.config.icon;
+        syncIconPickerFromEntry(entry);
+        document.getElementById('drawerIconPanel').hidden = true;
+    });
+    // Close panel when clicking outside
+    document.addEventListener('click', function(e){
+        if (e.target.closest('.mt-icon-picker-wrap')) return;
+        var panel = document.getElementById('drawerIconPanel');
+        if (panel) panel.hidden = true;
+    });
 
     document.addEventListener('input', function(e){
         var el = e.target.closest('[data-drawer-field]');
@@ -532,5 +598,9 @@
     ingestFromDom();
 })();
 {/literal}</script>
+
+{* Icon registry as JSON for the picker JS to read. Kept in a script tag
+   (rather than inline JS) so escaping is straightforward. *}
+<script id="mtIconRegistry" type="application/json">{$iconsJson nofilter}</script>
 
 {include file="includes/footer.tpl"}

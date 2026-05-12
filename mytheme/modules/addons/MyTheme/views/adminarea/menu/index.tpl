@@ -16,6 +16,8 @@
     <div class="mt-alert mt-alert-info">Re-seed finished — every preset was already complete, nothing to add.</div>
 {elseif $flashMsg|substr:0:7 == 'seeded-'}
     <div class="mt-alert mt-alert-info">Re-seeded {$flashMsg|replace:'seeded-':''|escape} preset(s).</div>
+{elseif $flashMsg|substr:0:16 == 'reset-defaults-'}
+    <div class="mt-alert mt-alert-info">Reset {$flashMsg|replace:'reset-defaults-':''|escape} WHMCS Defaults preset(s) to factory items.</div>
 {/if}
 
 {* Runtime diagnostic — what the frontend will actually render for each
@@ -51,6 +53,7 @@
         <h2 class="mt-section-title">{if $tab == 'footer'}Footer Menu{elseif $tab == 'secondary'}Secondary Menu{else}Main Menu{/if}</h2>
         <div class="mt-section-tools">
             <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=MyTheme&action=menu&sub=seed" title="Re-seed any missing preset items (won't overwrite existing items)">Re-seed presets</a>
+            <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=MyTheme&action=menu&sub=reset-defaults" title="Wipe and rebuild the WHMCS Defaults menus to match the latest preset" onclick="return confirm('Reset the WHMCS Defaults menus? Custom menus are unaffected.');">Reset WHMCS Defaults</a>
             <button class="mt-btn mt-btn-primary mt-btn-sm" disabled title="Coming next">+ New menu</button>
         </div>
     </header>

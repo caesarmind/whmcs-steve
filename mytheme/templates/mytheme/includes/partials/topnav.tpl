@@ -14,8 +14,17 @@
 {assign var=user_initials value=$_first|truncate:1:''|upper}
 {assign var=user_fullname value=$_first|cat:' '|cat:$_last}
 
+{function name=mtTopnavIcon iconName=''}
+    {if $iconName && isset($mtIcons[$iconName])}
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{$mtIcons[$iconName] nofilter}</svg>
+    {elseif $iconName}
+        <i class="{$iconName|escape}"></i>
+    {/if}
+{/function}
+
 {function name=mtTopnavItem item=null}
     {assign var=mtType value=$item->getAttribute('data-mt-type')|default:'whmcs_page'}
+    {assign var=mtIconName value=$item->getIcon()|default:''}
     {assign var=sideRight value=''}
     {if $item->getAttribute('data-mt-side') == 'right'}{assign var=sideRight value=' nav-item-right'}{/if}
     {if $mtType == 'header'}
@@ -25,30 +34,42 @@
         <span class="nav-divider{$sideRight}"></span>
     {elseif $mtType == 'dropdown_parent'}
         <div class="nav-dropdown-wrap{$sideRight}">
-            <a href="#" class="nav-dropdown-toggle">{$item->getLabel()|escape}
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
+            <a href="#" class="nav-dropdown-toggle">
+                {if $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
+                {$item->getLabel()|escape}
+                <svg class="nav-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
             </a>
             {if $item->getChildren()}
                 <div class="nav-dropdown-menu">
                     {foreach $item->getChildren() as $child}
                         {assign var=childType value=$child->getAttribute('data-mt-type')|default:'whmcs_page'}
+                        {assign var=childIcon value=$child->getIcon()|default:''}
                         {if $childType == 'divider'}
                             <div class="nav-dropdown-divider"></div>
                         {elseif $childType == 'header'}
                             <div class="nav-dropdown-section">{$child->getLabel()|escape}</div>
                         {else}
-                            <a href="{$child->getUri()|escape}" class="nav-dropdown-item">{$child->getLabel()|escape}</a>
+                            <a href="{$child->getUri()|escape}" class="nav-dropdown-item">
+                                {if $childIcon}<span class="nav-dropdown-item-icon">{mtTopnavIcon iconName=$childIcon}</span>{/if}
+                                {$child->getLabel()|escape}
+                            </a>
                         {/if}
                     {/foreach}
                 </div>
             {/if}
         </div>
     {elseif $mtType == 'login_button'}
-        <a href="{$item->getUri()|escape}" class="nav-cta{$sideRight}">{$item->getLabel()|escape}</a>
+        <a href="{$item->getUri()|escape}" class="nav-cta{$sideRight}">
+            {if $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
+            {$item->getLabel()|escape}
+        </a>
     {elseif $mtType == 'language' || $mtType == 'currency'}
         <a href="#" class="nav-switcher{$sideRight}" data-switcher="{$mtType|escape}">{$item->getLabel()|escape}</a>
     {else}
-        <a href="{$item->getUri()|escape}" class="nav-item{$sideRight}">{$item->getLabel()|escape}</a>
+        <a href="{$item->getUri()|escape}" class="nav-item{$sideRight}">
+            {if $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
+            {$item->getLabel()|escape}
+        </a>
     {/if}
 {/function}
 

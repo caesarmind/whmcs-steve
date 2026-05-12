@@ -70,6 +70,33 @@ final class Seeder
         return Menu::where('name', $name)->where('location', $location)->first();
     }
 
+    /**
+     * Hard-reset the two "WHMCS Defaults" preset menus to their preset
+     * definitions — delete existing items and re-seed. Useful when the
+     * default item list shipped in a code update and admins want it.
+     * User-customised menus (the non-defaults ones) are untouched.
+     */
+    public function resetWhmcsDefaults(): int
+    {
+        $count = 0;
+        foreach (Presets::all() as $preset) {
+            if (!str_contains((string)$preset['name'], 'WHMCS Defaults')) {
+                continue;
+            }
+            $existing = $this->existingMenu($preset['name'], $preset['location']);
+            if ($existing === null) {
+                $this->seedOne($preset);
+                $count++;
+                continue;
+            }
+            // Wipe items + re-seed from preset
+            MenuItem::where('menu_id', $existing->id)->delete();
+            $this->seedItems($existing->id, $preset['items'] ?? [], null);
+            $count++;
+        }
+        return $count;
+    }
+
     private function seedOne(array $preset): void
     {
         $menu = Menu::create([

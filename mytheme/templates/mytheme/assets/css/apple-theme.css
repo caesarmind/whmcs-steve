@@ -2990,11 +2990,37 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 
 /* Sidebar: extras for menu-manager item types */
 .sidebar-divider { border: 0; border-top: 1px solid var(--color-border); margin: 8px 12px; }
-.sidebar-children { display: flex; flex-direction: column; gap: 2px; padding-left: 22px; margin: 2px 0 6px; border-left: 1px dashed var(--color-border); margin-left: 22px; }
-.sidebar-item-dropdown { cursor: pointer; }
+
+/* Real dropdown UX via <details>/<summary> — collapsed by default, click to expand */
+.sidebar-dropdown { display: block; }
+.sidebar-dropdown > summary { list-style: none; cursor: pointer; }
+.sidebar-dropdown > summary::-webkit-details-marker { display: none; }
+.sidebar-dropdown > summary.sidebar-item { display: flex; align-items: center; gap: 12px; }
+.sidebar-dropdown > summary .sidebar-item-label { flex: 1; }
+.sidebar-dropdown > summary .sidebar-item-chevron { display: inline-flex; align-items: center; color: var(--color-text-tertiary); transition: transform .15s ease; }
+.sidebar-dropdown > summary .sidebar-item-chevron svg { width: 12px; height: 12px; }
+.sidebar-dropdown[open] > summary .sidebar-item-chevron { transform: rotate(180deg); }
+.sidebar-dropdown[open] > summary { background: var(--sidebar-item-hover); }
+.sidebar-children {
+    display: flex; flex-direction: column; gap: 2px;
+    margin: 4px 0 8px 36px;
+    padding-left: 12px;
+    border-left: 1px dashed var(--color-border);
+}
+.sidebar-children .sidebar-item { padding: 7px 10px; font-size: 13px; }
+.sidebar-children .sidebar-item .sidebar-item-icon { width: 18px; height: 18px; }
+.sidebar-children .sidebar-item .sidebar-item-icon svg { width: 10px; height: 10px; }
+
 .sidebar-item-switcher { cursor: pointer; }
 .sidebar-item-login { background: var(--color-accent-light); }
 .sidebar-item-login .sidebar-item-icon { background: var(--color-accent); color: #fff; }
+
+/* Topnav item icons */
+.homepage-nav .nav-item-icon { display: inline-flex; align-items: center; margin-right: 6px; color: currentColor; opacity: 0.75; }
+.homepage-nav .nav-item-icon svg { width: 14px; height: 14px; }
+.homepage-nav .nav-dropdown-item-icon { display: inline-flex; align-items: center; margin-right: 8px; color: var(--color-text-tertiary); }
+.homepage-nav .nav-dropdown-item-icon svg { width: 12px; height: 12px; }
+.homepage-nav .nav-chevron { width: 10px; height: 10px; margin-left: 2px; opacity: 0.6; }
 
 /* Topnav: items driven by $primaryNavbar */
 .homepage-nav .nav-item { color: var(--color-text-primary); opacity: 0.85; font-size: 12px; text-decoration: none; transition: opacity 0.15s; padding: 0; }

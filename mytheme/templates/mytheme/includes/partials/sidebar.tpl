@@ -18,9 +18,24 @@
 {assign var=user_initials value=$_first|truncate:1:''|upper}
 {assign var=user_fullname value=$_first|cat:' '|cat:$_last}
 
+{* Renders one menu item to the sidebar. Recursion handled via {include} so it
+   doesn't depend on Smarty {function} (which has rendered nothing on some
+   WHMCS Smarty configs). Helper for the icon lookup is inline. *}
+{function name=mtSidebarIcon iconName=''}
+    {if $iconName && isset($mtIcons[$iconName])}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{$mtIcons[$iconName] nofilter}</svg>
+    {elseif $iconName}
+        {* Unknown name — treat as a CSS class (Font Awesome / similar) *}
+        <i class="{$iconName|escape}"></i>
+    {else}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/></svg>
+    {/if}
+{/function}
+
 {function name=mtSidebarItem item=null}
     {assign var=mtType  value=$item->getAttribute('data-mt-type')|default:'whmcs_page'}
     {assign var=mtColor value=$item->getAttribute('data-mt-color')|default:'gray'}
+    {assign var=mtIconName value=$item->getIcon()|default:''}
     {assign var=mtBadgeKey value=$item->getAttribute('data-mt-badge-source')|default:''}
     {assign var=mtBadge value=''}
     {if $mtBadgeKey == 'services'}{assign var=mtBadge value=$clientsstats.productsnumactive|default:''}
@@ -33,32 +48,35 @@
         <div class="sidebar-section-label">{$item->getLabel()|escape}</div>
     {elseif $mtType == 'divider'}
         <hr class="sidebar-divider">
-    {elseif $mtType == 'dropdown_parent'}
-        <a href="#" class="sidebar-item sidebar-item-dropdown" data-mt-id="{$item->getName()|escape}">
-            <div class="sidebar-item-icon {$mtColor|escape}">{if $item->getIcon()}<i class="{$item->getIcon()|escape}"></i>{else}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>{/if}</div>
-            {$item->getLabel()|escape}
-        </a>
-        {if $item->getChildren()}
+    {elseif $mtType == 'dropdown_parent' || ($mtType == 'account_dropdown' && $item->getChildren())}
+        <details class="sidebar-dropdown" data-mt-id="{$item->getName()|escape}">
+            <summary class="sidebar-item sidebar-item-dropdown">
+                <div class="sidebar-item-icon {$mtColor|escape}">{mtSidebarIcon iconName=$mtIconName}</div>
+                <span class="sidebar-item-label">{$item->getLabel()|escape}</span>
+                <span class="sidebar-item-chevron">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
+                </span>
+            </summary>
             <div class="sidebar-children">
                 {foreach $item->getChildren() as $child}
                     {mtSidebarItem item=$child}
                 {/foreach}
             </div>
-        {/if}
+        </details>
     {elseif $mtType == 'login_button'}
         <a href="{$item->getUri()|escape}" class="sidebar-item sidebar-item-login">
-            <div class="sidebar-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></div>
+            <div class="sidebar-item-icon blue">{mtSidebarIcon iconName=($mtIconName|default:'transfer')}</div>
             {$item->getLabel()|escape}
         </a>
     {elseif $mtType == 'language' || $mtType == 'currency'}
         <a href="#" class="sidebar-item sidebar-item-switcher" data-switcher="{$mtType|escape}">
-            <div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+            <div class="sidebar-item-icon gray">{mtSidebarIcon iconName=($mtIconName|default:'globe')}</div>
             {$item->getLabel()|escape}
         </a>
     {else}
-        {* whmcs_page, custom_link, account_dropdown, whmcs_default — all rendered as plain items *}
+        {* whmcs_page, custom_link, account_dropdown (no children), whmcs_default *}
         <a href="{$item->getUri()|escape}" class="sidebar-item" data-nav="{$item->getName()|escape}">
-            <div class="sidebar-item-icon {$mtColor|escape}">{if $item->getIcon()}<i class="{$item->getIcon()|escape}"></i>{else}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/></svg>{/if}</div>
+            <div class="sidebar-item-icon {$mtColor|escape}">{mtSidebarIcon iconName=$mtIconName}</div>
             {$item->getLabel()|escape}
             {if $mtBadge}<span class="sidebar-item-badge">{$mtBadge|escape}</span>{/if}
         </a>

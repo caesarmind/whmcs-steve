@@ -92,6 +92,13 @@ if (AddonHelper::isActive()) {
         return HookService::instance()->dispatch('ClientAreaPage', $vars);
     });
 
+    // Expose the menu icon registry to Smarty as $mtIcons (map of name → SVG
+    // path data). sidebar.tpl / topnav.tpl look up {$mtIcons[$name]} when
+    // rendering a menu item whose config.icon is a known registry name.
+    add_hook('ClientAreaPage', 2, function ($vars) {
+        return ['mtIcons' => MyTheme\Menu\Icons::all()];
+    });
+
     add_hook('ClientAreaHeadOutput', 1, function ($vars) {
         return HookService::instance()->dispatch('ClientAreaHeadOutput', $vars);
     });

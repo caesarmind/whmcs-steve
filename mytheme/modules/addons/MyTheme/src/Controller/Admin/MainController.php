@@ -42,11 +42,12 @@ final class MainController extends AbstractController
         $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');
         $ctl = new MenuController();
         return match ($sub) {
-            'edit'   => $ctl->editAction(),
-            'save'   => $ctl->saveAction(),
-            'delete' => $ctl->deleteAction(),
-            'seed'   => $ctl->seedAction(),
-            default  => $ctl->indexAction(),
+            'edit'           => $ctl->editAction(),
+            'save'           => $ctl->saveAction(),
+            'delete'         => $ctl->deleteAction(),
+            'seed'           => $ctl->seedAction(),
+            'reset-defaults' => $ctl->resetDefaultsAction(),
+            default          => $ctl->indexAction(),
         };
     }
     public function editMenuAction(): string   { return (new MenuController())->editAction(); }
