@@ -81,9 +81,24 @@ final class MenuController extends AbstractController
             ])
             ->all();
 
+        // Diagnostic: what *would* render right now for each audience? Surfaces
+        // empty-menu / no-active-menu states so the admin can spot why the
+        // frontend looks wrong without having to log out + log in.
+        $diag = [];
+        foreach (['client', 'guest'] as $aud) {
+            $picked = Menu::pick($tab, $aud);
+            $diag[$aud] = [
+                'picked_id'      => $picked->id ?? null,
+                'picked_name'    => $picked->name ?? null,
+                'picked_items'   => $picked ? $picked->topLevelItems()->count() : 0,
+            ];
+        }
+
         return $this->view('menu/index', [
-            'menus' => $menus,
-            'tab'   => $tab,
+            'menus'    => $menus,
+            'tab'      => $tab,
+            'diag'     => $diag,
+            'flashMsg' => $_GET['flash'] ?? '',
         ]);
     }
 

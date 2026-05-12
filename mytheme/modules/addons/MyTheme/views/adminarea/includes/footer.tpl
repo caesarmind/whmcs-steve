@@ -251,6 +251,15 @@
 .mt-flash-warn a  { color: inherit; font-weight: 600; }
 .mt-section-note  { font-size: 12px; color: var(--mt-text-2); padding: 0 14px 8px; margin: 0; line-height: 1.5; }
 .mt-section-note em { font-style: normal; font-weight: 600; color: var(--mt-text); }
+.mt-diag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px; }
+.mt-diag-card { padding: 14px 16px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-sm); }
+.mt-diag-card.is-warn { background: rgba(255, 159, 10, 0.08); border-color: rgba(255, 159, 10, 0.3); }
+.mt-diag-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--mt-text-3); margin-bottom: 6px; }
+.mt-diag-title { font-size: 14px; font-weight: 600; color: var(--mt-text); margin-bottom: 4px; }
+.mt-diag-title em { font-style: normal; color: var(--mt-text-3); font-weight: 400; }
+.mt-diag-meta { font-size: 12px; color: var(--mt-text-2); line-height: 1.5; }
+.mt-diag-meta a { color: var(--mt-primary); text-decoration: underline; }
+@media (max-width: 880px) { .mt-diag-grid { grid-template-columns: 1fr; } }
 
 .mt-empty { text-align: center; padding: 40px 20px; color: var(--mt-text-2); }
 .mt-empty-icon { width: 40px; height: 40px; margin: 0 auto 12px; color: var(--mt-text-3); }

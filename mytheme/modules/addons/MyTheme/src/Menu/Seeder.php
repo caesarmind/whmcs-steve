@@ -35,10 +35,30 @@ final class Seeder
                 continue;
             }
             // Menu exists. Re-seed items only if it's empty (recover from
-            // wipe) or if $force is set.
+            // a wipe) or if $force is set.
             $itemCount = $existing->items()->count();
             if ($force || $itemCount === 0) {
                 $this->seedItems($existing->id, $preset['items'] ?? [], null);
+
+                // For empty-menu recovery: also restore the preset's
+                // intended active state. If the admin's "Save" bug
+                // deactivated the menu when it wiped the items, this
+                // brings the state back to factory defaults. If the
+                // active state was already correct (e.g. admin truly
+                // wanted it off), the preset's matching value applies.
+                if ($itemCount === 0) {
+                    $existing->active = !empty($preset['active']);
+                    $existing->changed_by_user = false;
+                    $existing->save();
+
+                    // Enforce mutual exclusion just like saveAction does
+                    if ($existing->active) {
+                        Menu::where('location', $existing->location)
+                            ->where('audience', $existing->audience)
+                            ->where('id', '!=', $existing->id)
+                            ->update(['active' => false]);
+                    }
+                }
                 $seeded++;
             }
         }
