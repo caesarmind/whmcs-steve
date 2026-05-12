@@ -6,13 +6,20 @@
     {* Resilient form-array fields — one input per (item, property). The
        browser serializes these natively into $_POST['items'] so the save
        works even if JS is broken / disabled. JS still maintains state.items
-       for the UX, and at submit time it REPLACES this entire <div> with a
-       fresh set of inputs matching state.items. *}
+       for the UX, and at submit time (if dirty) it REPLACES this entire
+       <div> with a fresh set of inputs matching state.items.
+
+       IMPORTANT: `parentIdx` must be the parent's DB id, NOT its form-array
+       index. The server's persistItems() resolves parent_id by looking up
+       the value in $idMap, which is keyed by DB id (string) or 'new_X' for
+       new items. Sending the form-array index instead made $idMap[index]
+       always miss → parent_id silently became null → on no-op save, every
+       child item got flattened to top-level. *}
     <div id="mtItemsFields">
-        {function name=mtItemFields idx=0 item=null parentIdx=''}
+        {function name=mtItemFields idx=0 item=null parentDbId=''}
             <input type="hidden" name="items[{$idx}][id]"           value="{$item->id|escape}">
             <input type="hidden" name="items[{$idx}][item_type]"    value="{$item->item_type|escape}">
-            <input type="hidden" name="items[{$idx}][parent_id]"    value="{if $parentIdx !== ''}{$parentIdx|escape}{/if}">
+            <input type="hidden" name="items[{$idx}][parent_id]"    value="{$parentDbId|escape}">
             <input type="hidden" name="items[{$idx}][position]"     value="{$item->position|escape}">
             <input type="hidden" name="items[{$idx}][label_json]"   value="{$item->label_json|escape}">
             <input type="hidden" name="items[{$idx}][config_json]"  value="{$item->config_json|escape}">
@@ -20,11 +27,10 @@
         {/function}
         {assign var=mtIdx value=0}
         {foreach $tree as $node}
-            {mtItemFields idx=$mtIdx item=$node.item parentIdx=''}
-            {assign var=mtParentIdx value=$mtIdx}
+            {mtItemFields idx=$mtIdx item=$node.item parentDbId=''}
             {assign var=mtIdx value=$mtIdx+1}
             {foreach $node.children as $child}
-                {mtItemFields idx=$mtIdx item=$child.item parentIdx=$mtParentIdx}
+                {mtItemFields idx=$mtIdx item=$child.item parentDbId=$node.item->id}
                 {assign var=mtIdx value=$mtIdx+1}
             {/foreach}
         {/foreach}
