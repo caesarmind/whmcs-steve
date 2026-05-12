@@ -354,11 +354,23 @@
         if (root) walk(root, null);
     }
 
+    // Helper: null-safe addEventListener. Without this, a missing DOM id
+    // anywhere in the IIFE throws and aborts the rest of the script —
+    // INCLUDING the form-submit handler far below, which then never
+    // attaches and the form submits with the initial empty items_json
+    // (triggering the server's settings-only safety net).
+    function on(id, evt, fn) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener(evt, fn);
+        else console.warn('[MyTheme menu] #' + id + ' not found — skipping ' + evt);
+    }
+
     // ──────────────────────────────────────────────────────────────────────
     // Add / Delete
     // ──────────────────────────────────────────────────────────────────────
-    document.getElementById('mtAddBtn').addEventListener('click', function(){
-        var type = document.getElementById('mtAddType').value;
+    on('mtAddBtn', 'click', function(){
+        var typeEl = document.getElementById('mtAddType');
+        var type = typeEl ? typeEl.value : 'custom_link';
         var tempId = uid();
         var entry = {
             tempId: tempId, id: null, parent_id: null,
@@ -370,6 +382,8 @@
         syncStateFromDom();
         updateCount();
     });
+
+    // Close 'on' helper region (kept here to mirror the original layout)
 
     function appendRowToRoot(entry){
         var root = document.querySelector('[data-tree-root] ul.mt-menu-list[data-children]');
@@ -494,10 +508,10 @@
             t.classList.toggle('is-active', t.getAttribute('data-icon-name') === name);
         });
     }
-    document.getElementById('drawerIconBtn').addEventListener('click', function(e){
+    on('drawerIconBtn', 'click', function(e){
         e.preventDefault();
         var panel = document.getElementById('drawerIconPanel');
-        panel.hidden = !panel.hidden;
+        if (panel) panel.hidden = !panel.hidden;
     });
     document.addEventListener('click', function(e){
         var tile = e.target.closest('#drawerIconPanel .mt-icon-tile');
@@ -574,7 +588,7 @@
     // can't leave items_json empty and trigger the server-side "skip items"
     // safety net (which would silently drop the admin's changes).
     // ──────────────────────────────────────────────────────────────────────
-    document.getElementById('menuForm').addEventListener('submit', function(e){
+    on('menuForm', 'submit', function(e){
         try { syncStateFromDom(); } catch (err) { console.error('[MyTheme menu] syncStateFromDom failed', err); }
 
         var payload;
@@ -614,8 +628,27 @@
         }
         var itemsJson = JSON.stringify(payload);
         var deletedJson = JSON.stringify(state.deletedIds);
-        document.getElementById('menuItemsJson').value = itemsJson;
-        document.getElementById('menuDeletedIdsJson').value = deletedJson;
+        var itemsInput = document.getElementById('menuItemsJson');
+        var deletedInput = document.getElementById('menuDeletedIdsJson');
+        if (!itemsInput) {
+            // Defensive: if the hidden input went missing somehow, inject one
+            // so the server still receives the payload instead of an empty
+            // items_json triggering the safety net.
+            itemsInput = document.createElement('input');
+            itemsInput.type = 'hidden';
+            itemsInput.name = 'items_json';
+            itemsInput.id = 'menuItemsJson';
+            this.appendChild(itemsInput);
+        }
+        if (!deletedInput) {
+            deletedInput = document.createElement('input');
+            deletedInput.type = 'hidden';
+            deletedInput.name = 'deleted_ids_json';
+            deletedInput.id = 'menuDeletedIdsJson';
+            this.appendChild(deletedInput);
+        }
+        itemsInput.value = itemsJson;
+        deletedInput.value = deletedJson;
         // Verbose dump for diagnosing "new items not saved" / "items deleted"
         // bugs. Each item shows id (null for new), type, label, parent_id, position.
         console.group('[MyTheme menu] submit');
