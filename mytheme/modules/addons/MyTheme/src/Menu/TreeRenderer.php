@@ -156,6 +156,8 @@ final class TreeRenderer
         if ($child !== null) {
             $child->addClass('mt-menu-header');
             $child->setDisabled(true);
+            $child->setAttribute('data-mt-type', ItemTypes::HEADER);
+            $child->setOrder((int)$node->position);
         }
     }
 
@@ -165,6 +167,8 @@ final class TreeRenderer
         if ($child !== null) {
             $child->addClass('mt-menu-divider');
             $child->setDisabled(true);
+            $child->setAttribute('data-mt-type', ItemTypes::DIVIDER);
+            $child->setOrder((int)$node->position);
         }
     }
 
@@ -174,6 +178,8 @@ final class TreeRenderer
         if ($child !== null) {
             $child->addClass('mt-menu-switcher mt-menu-switcher-' . $flavor);
             $child->setAttribute('data-switcher', $flavor);
+            $child->setAttribute('data-mt-type', $node->item_type);
+            $child->setOrder((int)$node->position);
         }
     }
 
@@ -184,6 +190,11 @@ final class TreeRenderer
             $config = $node->config();
             $style  = (string)($config['style'] ?? 'primary');
             $child->addClass('mt-menu-login mt-menu-login-' . $style);
+            $child->setAttribute('data-mt-type', ItemTypes::LOGIN_BUTTON);
+            if (($config['position_side'] ?? '') === 'right') {
+                $child->addClass('mt-menu-side-right');
+            }
+            $child->setOrder((int)$node->position);
         }
     }
 
@@ -262,6 +273,29 @@ final class TreeRenderer
             $item->addClass('mt-menu-side-right');
         }
         $item->setOrder((int)$node->position);
+
+        // Expose the menu-manager item-type to Smarty partials so they can
+        // branch on it (header vs divider vs link vs dropdown_parent etc.)
+        // without inspecting CSS-class lists.
+        $item->setAttribute('data-mt-type', $node->item_type);
+
+        // Auto-cycle a palette colour from a fixed list, override-able via
+        // config.color. Partials use this as a CSS class suffix:
+        //   data-mt-color="blue"  →  .sidebar-item-icon.blue
+        $palette = ['blue','purple','teal','green','orange','red','pink','indigo','gray'];
+        $color = (string)($config['color'] ?? '');
+        if ($color === '') {
+            // Stable per-item: hash node id into the palette
+            $color = $palette[$node->id % count($palette)];
+        }
+        $item->setAttribute('data-mt-color', $color);
+
+        // Optional badge source — partials can read this and look up the
+        // count from $clientsstats (set globally on every client-area page).
+        // Supported values: services, unpaid_invoices, open_tickets, domains
+        if (!empty($config['badge_source'])) {
+            $item->setAttribute('data-mt-badge-source', (string)$config['badge_source']);
+        }
     }
 
     /**

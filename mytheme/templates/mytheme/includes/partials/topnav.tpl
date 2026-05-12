@@ -1,4 +1,8 @@
-{* Hostnodes — top navigation (rendered when body[data-layout="top"]). *}
+{* Hostnodes — top navigation (rendered when body[data-layout="top"]).
+   The link list is admin-driven via the MyTheme menu-manager —
+   $primaryNavbar is populated by the ClientAreaPrimaryNavbar hook. The
+   logo on the left + utility buttons on the right (cart, notifications,
+   profile) stay hardcoded as layout chrome. *}
 {assign var=_first value=''}
 {assign var=_last value=''}
 {assign var=_email value=''}
@@ -9,22 +13,58 @@
 {/if}
 {assign var=user_initials value=$_first|truncate:1:''|upper}
 {assign var=user_fullname value=$_first|cat:' '|cat:$_last}
+
+{function name=mtTopnavItem item=null}
+    {assign var=mtType value=$item->getAttribute('data-mt-type')|default:'whmcs_page'}
+    {assign var=sideRight value=''}
+    {if $item->hasClass('mt-menu-side-right')}{assign var=sideRight value=' nav-item-right'}{/if}
+    {if $mtType == 'header'}
+        {* Headers are sidebar-only — collapse to a plain disabled span on top-nav *}
+        <span class="nav-section{$sideRight}">{$item->getLabel()|escape}</span>
+    {elseif $mtType == 'divider'}
+        <span class="nav-divider{$sideRight}"></span>
+    {elseif $mtType == 'dropdown_parent'}
+        <div class="nav-dropdown-wrap{$sideRight}">
+            <a href="#" class="nav-dropdown-toggle">{$item->getLabel()|escape}
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
+            </a>
+            {if $item->getChildren()}
+                <div class="nav-dropdown-menu">
+                    {foreach $item->getChildren() as $child}
+                        {assign var=childType value=$child->getAttribute('data-mt-type')|default:'whmcs_page'}
+                        {if $childType == 'divider'}
+                            <div class="nav-dropdown-divider"></div>
+                        {elseif $childType == 'header'}
+                            <div class="nav-dropdown-section">{$child->getLabel()|escape}</div>
+                        {else}
+                            <a href="{$child->getUri()|escape}" class="nav-dropdown-item">{$child->getLabel()|escape}</a>
+                        {/if}
+                    {/foreach}
+                </div>
+            {/if}
+        </div>
+    {elseif $mtType == 'login_button'}
+        <a href="{$item->getUri()|escape}" class="nav-cta{$sideRight}">{$item->getLabel()|escape}</a>
+    {elseif $mtType == 'language' || $mtType == 'currency'}
+        <a href="#" class="nav-switcher{$sideRight}" data-switcher="{$mtType|escape}">{$item->getLabel()|escape}</a>
+    {else}
+        <a href="{$item->getUri()|escape}" class="nav-item{$sideRight}">{$item->getLabel()|escape}</a>
+    {/if}
+{/function}
+
 <nav class="homepage-nav only-top">
     <div class="homepage-nav-inner">
         <a href="{$WEB_ROOT}/" class="nav-logo text-logo">{$companyname|escape}</a>
 
-        {* Logged-out *}
-        <a href="{$WEB_ROOT}/cart.php" class="only-out">{$LANG.shop|default:'Store'}</a>
-        <a href="{$WEB_ROOT}/announcements.php" class="only-out">{$LANG.announcementstitle|default:'Announcements'}</a>
-        <a href="{$WEB_ROOT}/knowledgebase.php" class="only-out">{$LANG.knowledgebasetitle|default:'Knowledgebase'}</a>
-        <a href="{$WEB_ROOT}/serverstatus.php" class="only-out">{$LANG.networkstatus|default:'Network Status'}</a>
-        <a href="{$WEB_ROOT}/contact.php" class="only-out">{$LANG.contactus|default:'Contact Us'}</a>
-
-        {* Logged-in *}
-        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="only-in">{$LANG.navservices|default:'Services'}</a>
-        <a href="{$WEB_ROOT}/clientarea.php?action=domains" class="only-in">{$LANG.navdomains|default:'Domains'}</a>
-        <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="only-in">{$LANG.navinvoices|default:'Billing'}</a>
-        <a href="{$WEB_ROOT}/supporttickets.php" class="only-in">{$LANG.supporttickets|default:'Support'}</a>
+        {if isset($primaryNavbar) && $primaryNavbar->getChildren()}
+            {foreach $primaryNavbar->getChildren() as $item}
+                {mtTopnavItem item=$item}
+            {/foreach}
+        {else}
+            {* Fallback when the menu manager hasn't been configured *}
+            <a href="{$WEB_ROOT}/" class="nav-item">{$LANG.home|default:'Home'}</a>
+            {if $loggedin}<a href="{$WEB_ROOT}/clientarea.php" class="nav-item">{$LANG.clientareanavhome|default:'Dashboard'}</a>{/if}
+        {/if}
 
         <div class="nav-spacer"></div>
 
