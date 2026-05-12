@@ -100,7 +100,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 14a4 4 0 100-8 4 4 0 000 8z"/><path d="M19.5 19a8 8 0 00-15 0"/></svg>
                         {$LANG.yourprofile|default:'Your Profile'}
                     </a>
-                    <a href="{$WEB_ROOT}/user/switchaccount" class="profile-dropdown-item">
+                    <a href="{$WEB_ROOT}/clientarea.php?action=switchaccount" class="profile-dropdown-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
                         {$LANG.switchaccount|default:'Switch Account'}
                     </a>
