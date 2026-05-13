@@ -393,29 +393,32 @@ final class MenuController extends AbstractController
                     ]);
                     $log['created'][] = ['idx' => $i, 'new_id' => $item->id, 'type' => $type, 'label_in' => $label];
                 } else {
-                    // SAFETY GUARD — if the incoming label/config is empty but
-                    // the existing one has data, REFUSE to overwrite. This is
-                    // the last line of defense against a JS bug that sends
-                    // empty data for items the user never edited. Caused the
-                    // 39-item wipe incident where label/config was nuked for
-                    // every item even though they only edited a few.
+                    // Always write — the JS pristine flag prevents
+                    // no-op saves from regenerating form fields, so any
+                    // incoming payload at this point reflects a real user
+                    // edit. A guard that "preserves" data when the
+                    // incoming looks empty was blocking legitimate edits
+                    // (user typed "Home2", guard checked whether something
+                    // looked empty, and the save silently no-op'd).
+                    $oldLabel  = $item->label_json;
+                    $oldConfig = $item->config_json;
+
                     $item->position    = $position;
                     $item->item_type   = $type;
                     $item->active      = $active;
-
-                    if ($this->isMeaningfulLabel($label) || $this->isEmptyLabel($item->label_json)) {
-                        $item->label_json = json_encode($label, JSON_FORCE_OBJECT);
-                    } else {
-                        $log['preserved'][] = ['id' => $item->id, 'field' => 'label_json', 'reason' => 'incoming_empty_existing_has_data'];
-                    }
-                    if ($this->isMeaningfulConfig($config) || $this->isEmptyConfig($item->config_json)) {
-                        $item->config_json = json_encode($config, JSON_FORCE_OBJECT);
-                    } else {
-                        $log['preserved'][] = ['id' => $item->id, 'field' => 'config_json', 'reason' => 'incoming_empty_existing_has_data'];
-                    }
-
+                    $item->label_json  = json_encode($label,  JSON_FORCE_OBJECT);
+                    $item->config_json = json_encode($config, JSON_FORCE_OBJECT);
                     $item->save();
-                    $log['updated'][] = ['idx' => $i, 'id' => $item->id, 'type' => $type];
+
+                    $log['updated'][] = [
+                        'idx'        => $i,
+                        'id'         => $item->id,
+                        'type'       => $type,
+                        'old_label'  => $oldLabel,
+                        'new_label'  => $item->label_json,
+                        'old_config' => $oldConfig,
+                        'new_config' => $item->config_json,
+                    ];
                 }
                 $idMap[$key] = $item->id;
                 $byKey[$key] = ['item' => $item, 'parent_key' => $row['parent_id'] ?? null];
