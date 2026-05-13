@@ -60,7 +60,15 @@ final class MainController extends AbstractController
         };
     }
     public function editMenuAction(): string   { return (new MenuController())->editAction(); }
-    public function brandingAction(): string   { return (new BrandingController())->indexAction(); }
+    public function brandingAction(): string
+    {
+        $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');
+        $ctl = new BrandingController();
+        return match ($sub) {
+            'remove' => $ctl->removeAction(),
+            default  => $ctl->indexAction(),
+        };
+    }
     public function extensionsAction(): string { return (new ExtensionsController())->indexAction(); }
     public function toolsAction(): string      { return (new ToolsController())->indexAction(); }
     public function templatesAction(): string  { return (new TemplatesController())->indexAction(); }

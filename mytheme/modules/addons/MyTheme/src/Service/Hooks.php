@@ -5,6 +5,7 @@ namespace MyTheme\Service;
 
 use MyTheme\Helpers\AddonHelper;
 use MyTheme\Helpers\ThemeManifest;
+use MyTheme\Helpers\Uploader;
 use MyTheme\Models\Settings;
 use MyTheme\Template\Template;
 
@@ -77,6 +78,8 @@ final class Hooks
             }
         }
 
+        $branding = $this->resolveBranding();
+
         return [
             'myTheme' => [
                 'name'          => $template->getName(),
@@ -90,8 +93,62 @@ final class Hooks
                     'devMode'   => $template->license()->isDevMode(),
                 ],
                 'addonSettings' => Settings::all(),
+                'branding'      => $branding,
             ],
             'rslang' => $this->loadLanguage($template, $vars['language'] ?? 'english'),
+            // Convenience root alias — templates that just want "the logo"
+            // can read $mtLogo directly without walking $myTheme.branding.
+            // Resolves to the light-surface logo (best default for the
+            // legacy WHMCS $logo variable that some included tpls expect).
+            'mtLogo'    => $branding['logo']['light'] ?? '',
+            'mtFavicon' => $branding['favicon'] ?? '',
+        ];
+    }
+
+    /**
+     * Build the $myTheme.branding payload — resolved web URLs, ready for
+     * the template to drop into <img src="..."> / <link rel="icon"> without
+     * any further work.
+     *
+     * @return array{
+     *   logo:    array{light:string, dark:string},
+     *   square:  array{light:string, dark:string},
+     *   favicon: string,
+     *   has:     array{anyLogo:bool, anySquare:bool, favicon:bool},
+     * }
+     */
+    private function resolveBranding(): array
+    {
+        $uploader = new Uploader();
+        $resolve  = static function (Uploader $u, string $key): string {
+            $stored = $u->normalizeStored((string)Settings::getValue($key, ''));
+            return $stored === '' ? '' : $u->webUrlFor($stored);
+        };
+
+        $logoLight       = $resolve($uploader, 'logo_light');
+        $logoDark        = $resolve($uploader, 'logo_dark');
+        $logoSquareLight = $resolve($uploader, 'logo_square_light');
+        $logoSquareDark  = $resolve($uploader, 'logo_square_dark');
+        $favicon         = $resolve($uploader, 'favicon');
+
+        return [
+            'logo' => [
+                // Each variant falls back to the other so a single upload
+                // works on both surfaces — admin doesn't have to upload
+                // both to get a usable result.
+                'light' => $logoLight !== '' ? $logoLight : $logoDark,
+                'dark'  => $logoDark  !== '' ? $logoDark  : $logoLight,
+            ],
+            'square' => [
+                'light' => $logoSquareLight !== '' ? $logoSquareLight : $logoSquareDark,
+                'dark'  => $logoSquareDark  !== '' ? $logoSquareDark  : $logoSquareLight,
+            ],
+            'favicon' => $favicon,
+            'has' => [
+                'anyLogo'   => $logoLight !== '' || $logoDark !== '',
+                'anySquare' => $logoSquareLight !== '' || $logoSquareDark !== '',
+                'favicon'   => $favicon !== '',
+            ],
         ];
     }
 

@@ -129,6 +129,10 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
 .sidebar-logo { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--color-text-primary); }
 .sidebar-logo svg { width: 28px; height: 28px; }
 .sidebar-brand { font-size: 15px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
+.sidebar-brand-logo { max-height: 28px; max-width: 160px; object-fit: contain; display: block; }
+.homepage-nav .nav-logo.img-logo { padding: 0; }
+.homepage-nav .nav-logo.img-logo img { max-height: 28px; max-width: 180px; object-fit: contain; display: block; }
+.brand-logo img { max-height: 32px; max-width: 200px; object-fit: contain; display: block; }
 .sidebar-search { padding: 8px 12px 4px; }
 .sidebar-search-input {
     width: 100%; height: 32px;

@@ -75,7 +75,17 @@
 
 <nav class="homepage-nav only-top">
     <div class="homepage-nav-inner">
-        <a href="{$WEB_ROOT}/" class="nav-logo text-logo">{$companyname|escape}</a>
+        {* Admin Branding tab: prefer uploaded logo over the company-name
+           fallback. Light variant is the default; the dark URL ships as a
+           data-attribute so theme JS can swap it on data-theme="dark". *}
+        {if !empty($myTheme.branding.logo.light)}
+            <a href="{$WEB_ROOT}/" class="nav-logo img-logo">
+                <img src="{$myTheme.branding.logo.light|escape}" alt="{$companyname|escape}"
+                     {if !empty($myTheme.branding.logo.dark) && $myTheme.branding.logo.dark != $myTheme.branding.logo.light}data-logo-dark="{$myTheme.branding.logo.dark|escape}"{/if}>
+            </a>
+        {else}
+            <a href="{$WEB_ROOT}/" class="nav-logo text-logo">{$companyname|escape}</a>
+        {/if}
 
         {if isset($primaryNavbar) && $primaryNavbar->getChildren()}
             {foreach $primaryNavbar->getChildren() as $item}

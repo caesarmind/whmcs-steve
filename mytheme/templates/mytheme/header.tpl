@@ -197,6 +197,18 @@
         <meta property="og:image" content="{$mt_pageEntry.seo.social_image|escape}">
         <meta name="twitter:card" content="summary_large_image">
     {/if}
+    {* Admin-uploaded favicon (from Branding tab). When absent the browser
+       falls back to its default; we deliberately do NOT emit a stale
+       /favicon.ico reference because most installs don't ship one. *}
+    {if !empty($myTheme.branding.favicon)}
+        <link rel="icon" href="{$myTheme.branding.favicon|escape}">
+        <link rel="shortcut icon" href="{$myTheme.branding.favicon|escape}">
+        {* Square logo (light) doubles as apple-touch-icon when set —
+           mobile bookmarks pick this up over the favicon. *}
+        {if !empty($myTheme.branding.square.light)}
+            <link rel="apple-touch-icon" href="{$myTheme.branding.square.light|escape}">
+        {/if}
+    {/if}
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v=1.0">
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-layout.css?v=1.0">
     {$headoutput}

@@ -94,7 +94,16 @@
 <aside class="sidebar only-side">
     <div class="sidebar-header">
         <a href="{$WEB_ROOT}/" class="sidebar-home-link">
-            <span class="sidebar-brand">{$companyname|escape}</span>
+            {* The sidebar is a light surface. Prefer the square logo for
+               this slot (better proportions in a vertical layout); fall
+               back to the full logo, then to text. *}
+            {if !empty($myTheme.branding.square.light)}
+                <img src="{$myTheme.branding.square.light|escape}" alt="{$companyname|escape}" class="sidebar-brand-logo">
+            {elseif !empty($myTheme.branding.logo.light)}
+                <img src="{$myTheme.branding.logo.light|escape}" alt="{$companyname|escape}" class="sidebar-brand-logo">
+            {else}
+                <span class="sidebar-brand">{$companyname|escape}</span>
+            {/if}
         </a>
     </div>
     <div class="sidebar-search">

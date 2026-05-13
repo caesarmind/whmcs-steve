@@ -86,6 +86,20 @@ function MyTheme_activate()
                     . $tpl->getName() . ': ' . $e->getMessage());
             }
         }
+
+        // Prime the branding upload directory + drop the security
+        // .htaccess sidecar before the admin's first upload. Failure here
+        // isn't fatal — the Uploader self-heals lazily on first use — but
+        // doing it at activation surfaces filesystem permission issues
+        // immediately rather than at upload time.
+        try {
+            if (!(new MyTheme\Helpers\Uploader())->prepareStorage()) {
+                error_log('MyTheme: branding storage dir not writable. '
+                    . 'Check filesystem permissions on templates/mytheme/assets/img/branding/');
+            }
+        } catch (\Throwable $e) {
+            error_log('MyTheme: branding storage prep failed: ' . $e->getMessage());
+        }
     } catch (\Throwable $e) {
         return [
             'status'      => 'error',
@@ -139,6 +153,16 @@ function MyTheme_upgrade($vars)
             error_log('MyTheme: pages discovery rebuild failed for '
                 . $tpl->getName() . ': ' . $e->getMessage());
         }
+    }
+
+    // Re-prime the branding upload directory. Newly-shipped upgrades may
+    // tighten the .htaccess rules; the Uploader will rewrite the file
+    // only if it doesn't already exist (idempotent), so existing buyer
+    // customisations to the sidecar are preserved.
+    try {
+        (new MyTheme\Helpers\Uploader())->prepareStorage();
+    } catch (\Throwable $e) {
+        error_log('MyTheme upgrade: branding storage prep failed: ' . $e->getMessage());
     }
 }
 
