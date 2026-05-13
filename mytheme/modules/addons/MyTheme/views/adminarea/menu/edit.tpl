@@ -219,8 +219,16 @@
                                     <div class="mt-page-picker-group" data-page-group="{$g|escape}">
                                         <div class="mt-page-picker-group-label">{$g|escape}</div>
                                         {foreach $rows as $p}
-                                            <button type="button" class="mt-page-picker-tile" data-page-name="{$p.name|escape}" data-page-label="{$p.display_name|escape}" data-page-group="{$g|escape}" data-page-haystack="{$p.name|lower|escape} {$p.display_name|lower|escape} {$g|lower|escape}">
-                                                <span class="mt-page-picker-tile-name">{$p.display_name|escape}</span>
+                                            <button type="button" class="mt-page-picker-tile"
+                                                    data-page-name="{$p.name|escape}"
+                                                    data-page-label="{$p.display_name|escape}"
+                                                    data-page-group="{$g|escape}"
+                                                    data-page-lang-key="{$p.whmcs_lang_key|default:''|escape}"
+                                                    data-page-default-label="{$p.whmcs_default_label|default:''|escape}"
+                                                    data-page-haystack="{$p.name|lower|escape} {$p.display_name|lower|escape} {$g|lower|escape}">
+                                                <span class="mt-page-picker-tile-name">
+                                                    {$p.display_name|escape}{if $p.whmcs_lang_key} <span class="mt-page-picker-default-pill" title="WHMCS default menu destination — picking auto-fills label">WHMCS default</span>{/if}
+                                                </span>
                                                 <span class="mt-page-picker-tile-meta">{$p.name|escape}</span>
                                             </button>
                                         {/foreach}
@@ -315,6 +323,9 @@
 <style>
 /* WHMCS-page picker — reuses .mt-icon-picker-wrap shell, adds list-specific bits. */
 .mt-page-picker-panel { max-height: 360px; padding: 0; display: flex; flex-direction: column; overflow: hidden; }
+/* The native [hidden] attribute sets display:none, but the rule above forces
+   display:flex, which would defeat it. Restore [hidden]'s effect explicitly. */
+.mt-page-picker-panel[hidden] { display: none !important; }
 .mt-page-picker-search-wrap { padding: 8px; border-bottom: 1px solid var(--mt-border); flex-shrink: 0; }
 .mt-page-picker-search-wrap .mt-input { padding: 6px 10px; font-size: 13px; }
 .mt-page-picker-list { padding: 4px 6px 8px; overflow-y: auto; flex: 1; }
@@ -329,6 +340,7 @@
 .mt-page-picker-empty { padding: 14px; text-align: center; color: var(--mt-text-3); font-size: 12px; }
 .mt-page-picker-current { flex: 1; text-align: left; font-size: 13px; color: var(--mt-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mt-page-picker-current.is-placeholder { color: var(--mt-text-3); }
+.mt-page-picker-default-pill { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--mt-primary-tint); color: var(--mt-primary); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; vertical-align: middle; }
 </style>
 
 {* Icon registry as JSON — placed BEFORE the IIFE so the iconMap() lazy
@@ -742,7 +754,41 @@
         var entry = state.items.find(function(it){ return it.tempId === selectedTempId; });
         if (!entry) return;
         if (!entry.config) entry.config = {};
-        entry.config.page = tile.getAttribute('data-page-name') || '';
+        var pageName     = tile.getAttribute('data-page-name')          || '';
+        var langKey      = tile.getAttribute('data-page-lang-key')      || '';
+        var defaultLabel = tile.getAttribute('data-page-default-label') || '';
+        entry.config.page = pageName;
+
+        // Auto-fill WHMCS-style labels when this page has a known mapping.
+        // label.whmcs gets overwritten unconditionally (admin picked a new page
+        // → use its standard lang key). label.custom.english only gets filled
+        // when it's empty or still the "New <type>" scaffold so admin edits
+        // aren't clobbered.
+        if (!entry.label || typeof entry.label !== 'object') entry.label = {whmcs:'', custom:{}};
+        if (!entry.label.custom || typeof entry.label.custom !== 'object') entry.label.custom = {};
+        if (langKey) {
+            entry.label.whmcs = langKey;
+            var currentEn = entry.label.custom.english || '';
+            if (!currentEn || /^New\s/i.test(currentEn)) {
+                entry.label.custom.english = defaultLabel;
+            }
+        }
+
+        // Sync drawer field values so the admin sees the auto-fill take effect.
+        var langInput = document.getElementById('drawerLabelWhmcs');
+        if (langInput) langInput.value = entry.label.whmcs || '';
+        var enInput = document.getElementById('drawerLabelEn');
+        if (enInput) enInput.value = entry.label.custom.english || '';
+
+        // Reflect the new label in the tree row.
+        var li = document.querySelector('li[data-temp="' + selectedTempId + '"]');
+        if (li) {
+            var labelEl = li.querySelector('[data-role=label]');
+            if (labelEl) {
+                labelEl.textContent = entry.label.custom.english || entry.label.whmcs || '(no label)';
+            }
+        }
+
         syncPagePickerFromEntry(entry);
         markDirty();
         var panel = document.getElementById('drawerPagePickerPanel');

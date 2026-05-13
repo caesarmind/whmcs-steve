@@ -8,6 +8,7 @@ use MyTheme\Database\Migrator;
 use MyTheme\Helpers\AddonHelper;
 use MyTheme\Menu\ItemTypes;
 use MyTheme\Menu\Seeder;
+use MyTheme\Menu\WhmcsDefaults;
 use MyTheme\Models\Menu;
 use MyTheme\Models\MenuItem;
 use MyTheme\Template\PagesCache;
@@ -128,11 +129,16 @@ final class MenuController extends AbstractController
 
         // Power the WHMCS-page picker drawer in the item editor. Grouped + sorted
         // by Pages-tab order so the menu builder mirrors the admin Pages layout.
+        // Each entry is enriched with WhmcsDefaults so the picker can auto-fill
+        // label.whmcs + label.custom.english when admin picks a well-known page.
         $pagesByGroup = [];
         $template = AddonHelper::getTemplate();
         if ($template !== null) {
             PagesCache::ensure($template); // self-heal on first use after activation
             foreach ($template->getAllPageMeta() as $meta) {
+                $defaults = WhmcsDefaults::lookup($meta['name']);
+                $meta['whmcs_lang_key']      = $defaults['lang_key']      ?? '';
+                $meta['whmcs_default_label'] = $defaults['default_label'] ?? '';
                 $pagesByGroup[$meta['group']][] = $meta;
             }
             foreach ($pagesByGroup as &$bucket) {
