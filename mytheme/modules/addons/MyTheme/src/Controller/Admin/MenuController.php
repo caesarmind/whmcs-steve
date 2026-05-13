@@ -206,6 +206,24 @@ final class MenuController extends AbstractController
             implode(',', array_keys($_POST)),
             strlen($raw)
         ));
+        // Verbose: log the resolved label for each item AS RECEIVED, so we
+        // can diff against what's in the DB after persistItems runs.
+        foreach ($payload as $i => $r) {
+            if (!is_array($r)) continue;
+            $lbl = $r['label'] ?? null;
+            $eng = is_array($lbl) && isset($lbl['custom']['english']) ? $lbl['custom']['english'] : '∅';
+            $whm = is_array($lbl) && isset($lbl['whmcs']) ? $lbl['whmcs'] : '∅';
+            error_log(sprintf(
+                '[MyTheme saveAction payload[%d]] id=%s type=%s parent=%s pos=%s whmcs="%s" english="%s"',
+                $i,
+                $r['id'] ?? 'NULL',
+                $r['item_type'] ?? '?',
+                $r['parent_id'] ?? 'NULL',
+                $r['position'] ?? '?',
+                $whm,
+                $eng
+            ));
+        }
 
         // SAFETY: if the JS hadn't run (e.g. tree wasn't ingested) and we'd
         // get an empty payload while the DB still has items, REFUSE to wipe.
