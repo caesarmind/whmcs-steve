@@ -1,6 +1,7 @@
 {* Hostnodes — page footer.
-   Closes content-area + ph-main-wrap, renders site footer (top-layout) and slim
-   footer (sidebar/rail), then loads the apple-theme.js + apple-layout.js. *}
+   Closes content-area + ph-main-wrap, dispatches to the admin-picked
+   footer layout (core/layouts/footer/<name>/default.tpl), then loads the
+   apple-theme.js + apple-layout.js. *}
 
 {* Match the gate switch in header.tpl. When the gate is disabled (or the
    addon is active and has set canRender=true), fall through to the normal
@@ -16,78 +17,24 @@
 {else}
     </div>{* /.content-area *}
 
-    {* Site footer — top-layout only.
+    {* Footer layout dispatch — admin picks one of `core/layouts/footer/*`
+       in Addons → MyTheme → Layouts → Footer:
 
-       Columns come from the admin-configured Footer Menu when the addon is
-       active and a footer-location menu is seeded ($mtFooterItems is built
-       by hooks.php → TreeRenderer::buildFlatList). Each top-level
-       dropdown_parent becomes one column; its children are the column's
-       links. Other top-level types (header/divider/stray links) degrade
-       gracefully.
+         default   → slim copyright row (no menu) — Lagom-style "Default".
+         extended  → multi-column site map driven by the Footer Menu
+                     ($mtFooterItems) — Lagom-style "Extended".
 
-       If no footer menu is configured (fresh install before the seeder
-       runs, or admin deactivated every footer preset), we keep a minimal
-       hardcoded fallback so the footer never renders blank. *}
-    <footer class="hp-footer only-top">
-        <div class="hp-footer-inner">
-            <div class="hp-footer-cols">
-            {if isset($mtFooterItems) && $mtFooterItems}
-                {foreach $mtFooterItems as $col}
-                    {if $col.type == 'dropdown_parent' && $col.children}
-                        <div class="hp-footer-col">
-                            <h4>{$col.label|escape}</h4>
-                            <ul>
-                                {foreach $col.children as $link}
-                                    {if $link.type == 'divider' || $link.type == 'header'}{continue}{/if}
-                                    <li><a href="{$link.uri|escape}"{if $link.target} target="{$link.target|escape}"{/if}>{$link.label|escape}</a></li>
-                                {/foreach}
-                            </ul>
-                        </div>
-                    {elseif $col.type != 'divider' && $col.type != 'header'}
-                        {* Stray top-level link — promote to a single-link column *}
-                        <div class="hp-footer-col">
-                            <h4><a href="{$col.uri|escape}"{if $col.target} target="{$col.target|escape}"{/if}>{$col.label|escape}</a></h4>
-                        </div>
-                    {/if}
-                {/foreach}
-            {else}
-                <div class="hp-footer-col">
-                    <h4>{$LANG.shop|default:'Shop'}</h4>
-                    <ul>
-                        <li><a href="{$WEB_ROOT}/cart.php">{$LANG.orderproducts|default:'Browse Products'}</a></li>
-                        <li><a href="{$WEB_ROOT}/cart.php?a=add&domain=register">{$LANG.registerdomain|default:'Register Domain'}</a></li>
-                    </ul>
-                </div>
-                <div class="hp-footer-col">
-                    <h4>{$LANG.accounttab|default:'Account'}</h4>
-                    <ul>
-                        <li><a href="{$WEB_ROOT}/login.php">{$LANG.login|default:'Sign in'}</a></li>
-                        <li><a href="{$WEB_ROOT}/register.php">{$LANG.createaccount|default:'Create account'}</a></li>
-                        <li><a href="{$WEB_ROOT}/clientarea.php?action=invoices">{$LANG.invoicestab|default:'Billing'}</a></li>
-                    </ul>
-                </div>
-                <div class="hp-footer-col">
-                    <h4>{$LANG.supporttickets|default:'Support'}</h4>
-                    <ul>
-                        <li><a href="{$WEB_ROOT}/knowledgebase.php">{$LANG.knowledgebasetitle|default:'Knowledgebase'}</a></li>
-                        <li><a href="{$WEB_ROOT}/contact.php">{$LANG.contactus|default:'Contact us'}</a></li>
-                        <li><a href="{$WEB_ROOT}/serverstatus.php">{$LANG.networkstatus|default:'Network status'}</a></li>
-                    </ul>
-                </div>
-            {/if}
-            </div>
-            <div class="hp-footer-bottom">
-                <span>&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$LANG.allrightsreserved|default:'All rights reserved.'} <strong style="color:#ff3b30;font-weight:700;">[DEPLOY-CHECK-V6]</strong></span>
-                <div class="hp-footer-bottom-links">
-                    <a href="#">{$LANG.privacypolicy|default:'Privacy Policy'}</a>
-                    <a href="#">{$LANG.tos|default:'Terms of Use'}</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    {* Slim footer — sidebar + rail *}
-    {include file="`$template`/includes/partials/sidebar-footer.tpl"}
+       Hooks.php::resolveActiveLayout reads the admin's choice from
+       Settings and exposes it as $myTheme.layouts.footer.name. The
+       per-page Pages-tab override (Hooks.php::clientAreaPage) has
+       already been applied to $myTheme.layouts.footer by the time we
+       get here, so we just include the picked layout. *}
+    {assign var=mtFooterLayoutName value=$myTheme.layouts.footer.name|default:'default'}
+    {if file_exists("templates/`$template`/core/layouts/footer/`$mtFooterLayoutName`/default.tpl")}
+        {include file="`$template`/core/layouts/footer/`$mtFooterLayoutName`/default.tpl"}
+    {else}
+        {include file="`$template`/core/layouts/footer/default/default.tpl"}
+    {/if}
 
 </div>{* /.ph-main-wrap *}
 
