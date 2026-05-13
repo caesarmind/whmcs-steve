@@ -667,16 +667,32 @@ final class Hooks
 
     private function resolveActiveLayout(Template $template, string $kind): array
     {
-        // Default per kind — `main-menu` defaults to `sidebar` (the Hostnodes
-        // default), `footer` defaults to `extended` so the Lagom-style multi-
-        // column footer with menu items renders out of the box. Admins who
-        // want the slim copyright-only footer pick `default` in the Layouts
-        // tab — the setting then overrides this default.
+        // Lagom-style per-audience pointers. The admin Layouts manager
+        // writes one row per (kind, audience): guest-audience visitors
+        // get one layout, logged-in clients get another. Fallback chain:
+        //   1. per-audience key  mytheme_active_layout_<kind>_<aud>
+        //   2. legacy single key mytheme_active_layout_<kind>
+        //      (backwards-compat for installs migrated from the
+        //      pre-dual-pointer Settings shape)
+        //   3. default-by-kind (`main-menu`→`sidebar`, `footer`→`extended`)
+        //
+        // Keep this default-by-kind table in sync with
+        // LayoutsController::DEFAULT_BY_KIND — otherwise the admin's
+        // "Active" badge will disagree with the live render.
         $defaultByKind = ['main-menu' => 'sidebar', 'footer' => 'extended'];
-        $active = (string)Settings::getValue(
-            $template->getName() . '_active_layout_' . $kind,
-            $defaultByKind[$kind] ?? 'default'
-        );
+        $default       = $defaultByKind[$kind] ?? 'default';
+
+        $audience    = \MyTheme\Menu\Audience::current();
+        $audienceKey = $audience === \MyTheme\Menu\Audience::CLIENT ? 'client' : 'guest';
+
+        $newKey = $template->getName() . '_active_layout_' . $kind . '_' . $audienceKey;
+        $active = (string)Settings::getValue($newKey, '');
+
+        if ($active === '') {
+            $legacyKey = $template->getName() . '_active_layout_' . $kind;
+            $active    = (string)Settings::getValue($legacyKey, $default);
+        }
+
         return $this->buildLayoutMeta($template, $kind, $active);
     }
 

@@ -4,6 +4,7 @@
     <h1 class="mt-page-title">Layouts</h1>
     <p class="mt-page-subtitle">
         Pick the navigation and footer arrangement for <strong>{$template|escape}</strong>.
+        Each layout has two independent activations &mdash; one for guests (unauthenticated visitors) and one for existing clients (logged in).
     </p>
 </header>
 
@@ -20,33 +21,56 @@
         <span class="mt-section-count">{$layouts|count}</span>
     </header>
 
-    <form method="post" action="" class="mt-section-body">
-        <div class="mt-grid">
-            {foreach $layouts as $layout}
-                <label class="mt-card {if $layout.isActive}is-active{/if}">
-                    {* onclick (not onchange) so clicking the already-active card
-                       still submits — onchange only fires when the radio's
-                       value changes, which is broken if the admin's default
-                       ever drifts from the front-end resolver's default. *}
-                    <input type="radio" name="layout" value="{$layout.name|escape}"
-                           {if $layout.isActive}checked{/if}
-                           onclick="this.form.submit()">
-                    <div class="mt-card-thumb">{$layout.displayName|escape|truncate:1:""}</div>
-                    <div class="mt-card-body">
-                        <h3 class="mt-card-title">{$layout.displayName|escape}</h3>
-                        <p class="mt-card-meta">Layout variant</p>
-                    </div>
-                    <div class="mt-card-footer">
-                        {if $layout.isActive}
-                            <span class="mt-badge mt-badge-success">Active</span>
-                        {else}
-                            <span class="mt-badge mt-badge-primary">Click to activate</span>
-                        {/if}
-                    </div>
-                </label>
-            {/foreach}
-        </div>
-    </form>
+    {* Lagom-style per-row activation. Each (layout, audience) cell is its
+       own <form><button> — clicking is unambiguously a server round-trip,
+       so the "click did nothing" failure mode of an onchange-driven radio
+       can't happen here. The button's name+value get POSTed because only
+       the clicked submit button's name=value pair is included. *}
+    <div class="mt-table-wrap">
+        <table class="mt-table">
+            <thead>
+                <tr>
+                    <th>Layout</th>
+                    <th>Guest client</th>
+                    <th>Existing client</th>
+                </tr>
+            </thead>
+            <tbody>
+                {foreach $layouts as $layout}
+                    <tr>
+                        <td class="mt-table-name">
+                            <strong>{$layout.displayName|escape}</strong>
+                            {if $layout.description}
+                                <div class="mt-table-muted">{$layout.description|escape}</div>
+                            {/if}
+                        </td>
+                        <td>
+                            {if $layout.isActiveGuest}
+                                <span class="mt-badge mt-badge-success">Active</span>
+                            {else}
+                                <form method="post" action="" style="display:inline">
+                                    <input type="hidden" name="layout"   value="{$layout.name|escape}">
+                                    <input type="hidden" name="audience" value="guest">
+                                    <button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Activate for Guest</button>
+                                </form>
+                            {/if}
+                        </td>
+                        <td>
+                            {if $layout.isActiveClient}
+                                <span class="mt-badge mt-badge-success">Active</span>
+                            {else}
+                                <form method="post" action="" style="display:inline">
+                                    <input type="hidden" name="layout"   value="{$layout.name|escape}">
+                                    <input type="hidden" name="audience" value="client">
+                                    <button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Activate for Existing</button>
+                                </form>
+                            {/if}
+                        </td>
+                    </tr>
+                {/foreach}
+            </tbody>
+        </table>
+    </div>
 </section>
 
 {include file="includes/footer.tpl"}
