@@ -261,7 +261,11 @@
     }
 
     function tileFor(field) {
-        return form.querySelector('.mt-branding-tile[data-field="' + cssEscape(field) + '"]');
+        // Query document, not the form. HTML5 forbids nested forms, and any
+        // future template change that re-introduces one would silently close
+        // the outer form and strand later tiles outside it -- form-scoped
+        // queries would miss them. document-scoped is robust to that.
+        return document.querySelector('.mt-branding-tile[data-field="' + cssEscape(field) + '"]');
     }
 
     // CSS.escape polyfill (only used for our hex field names, but defensive).
@@ -504,9 +508,17 @@
         }
     }
 
-    // Initial bind across every tile in the form.
+    // Initial bind across every tile. document-scoped (not form-scoped):
+    // until just now _tile.tpl emitted a nested <form> for the no-JS Remove
+    // fallback, which browsers respond to by silently closing the outer
+    // form at the inner <form> opening tag. That stranded the square-logo
+    // and favicon tiles outside the outer form, so a form-scoped query
+    // missed them entirely and their change handlers never bound -- the
+    // tiles looked dead even though the file picker would open. We've
+    // removed the nested form, but document-scoping the lookup defends
+    // against the same shape of bug if anything similar regresses.
     Array.prototype.forEach.call(
-        form.querySelectorAll('.mt-branding-tile'),
+        document.querySelectorAll('.mt-branding-tile'),
         bindTile
     );
 })();

@@ -29,17 +29,15 @@
             <img src="{$row.url|escape}" alt="{$row.label|escape}">
             <div class="mt-branding-overlay">
                 <label class="mt-btn mt-btn-secondary mt-btn-sm" for="upload-{$row.field|escape}" style="cursor:pointer">Replace</label>
-                {* Form-based fallback for no-JS. JS intercepts the click and
-                   does an AJAX remove instead; preventDefault() blocks the
-                   form submit. *}
-                <form method="post"
-                      action="?module=MyTheme&action=branding&sub=remove"
-                      class="mt-branding-remove-form"
-                      style="display:inline"
-                      onsubmit="return confirm('Remove the {$row.label|escape} file?');">
-                    <input type="hidden" name="field" value="{$row.field|escape}">
-                    <button type="submit" class="mt-btn mt-btn-danger mt-btn-sm" data-remove="{$row.field|escape}">Remove</button>
-                </form>
+                {* CANNOT wrap this in a <form> -- the outer page already has
+                   one and HTML5 forbids nested forms. Browsers respond by
+                   silently closing the outer form at the inner <form> opening
+                   tag, which strands every tile AFTER this one outside the
+                   outer form and breaks form.querySelectorAll() lookups.
+                   JS click handler on [data-remove] does the AJAX remove. *}
+                <button type="button"
+                        class="mt-btn mt-btn-danger mt-btn-sm"
+                        data-remove="{$row.field|escape}">Remove</button>
             </div>
         </div>
         {* Hidden file input for the Replace flow -- pairs with the
