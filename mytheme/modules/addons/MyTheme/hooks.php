@@ -181,6 +181,15 @@ if (AddonHelper::isActive()) {
             if (!\WHMCS\Database\Capsule::schema()->hasTable('mytheme_menus')) {
                 return null;
             }
+            // Self-heal: the main-menu seed runs only when the whole menus
+            // table is empty (see MenuController::indexAction). Existing
+            // installs that already had main-menu rows when the footer
+            // preset shipped never get the footer seeded automatically.
+            // Top up here once, idempotent — the Seeder skips menus whose
+            // (name, location) already exists.
+            if (MyTheme\Models\Menu::where('location', 'footer')->count() === 0) {
+                (new MyTheme\Menu\Seeder())->run();
+            }
             $audience = MyTheme\Menu\Audience::current();
             $menu     = MyTheme\Models\Menu::pick('footer', $audience);
             if ($menu === null) return null;

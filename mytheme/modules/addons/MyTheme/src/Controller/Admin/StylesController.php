@@ -73,6 +73,8 @@ final class StylesController extends AbstractController
         if (in_array($style, $template->getStyles(), true)) {
             Settings::setValue($template->getName() . '_active_style', $style);
         }
-        return $this->indexAction();
+        // PRG — see LayoutsController::saveAction for why we don't
+        // re-enter indexAction() directly.
+        $this->redirect('?module=MyTheme&action=styles');
     }
 }

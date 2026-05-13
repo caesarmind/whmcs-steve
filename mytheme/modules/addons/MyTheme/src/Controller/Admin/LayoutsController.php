@@ -55,6 +55,10 @@ final class LayoutsController extends AbstractController
         if (in_array($layout, $template->getLayouts($kind), true)) {
             Settings::setValue($template->getName() . '_active_layout_' . $kind, $layout);
         }
-        return $this->indexAction();
+        // PRG — calling indexAction() directly here would re-enter the
+        // POST branch (REQUEST_METHOD is still POST) and recurse until PHP
+        // bails out, which WHMCS surfaces as a 404. Redirect instead so
+        // the next request is a clean GET.
+        $this->redirect('?module=MyTheme&action=layouts&kind=' . urlencode($kind));
     }
 }
