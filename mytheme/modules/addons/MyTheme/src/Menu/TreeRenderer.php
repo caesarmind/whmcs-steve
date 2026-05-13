@@ -217,19 +217,16 @@ final class TreeRenderer
 
     private static function renderHeader(Item $parent, MenuItem $node): void
     {
+        // addChildSafe assigns order via the addChild array AND setOrder()
+        // (Lagom-style). Don't call setOrder again here — that would
+        // double-bump the counter and shift subsequent siblings.
         $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), '#');
         if ($child !== null) {
             // Set data-mt-type FIRST so the sidebar template's getAttribute()
             // lookup never returns null no matter what side-effects later
-            // mutations have. (Previously $child->setDisabled(true) was here
-            // and appeared to bucket disabled items together in
-            // getChildren() — the frontend rendered all headers first, then
-            // all non-headers. setDisabled isn't needed for us anyway: our
-            // sidebar.tpl branches on data-mt-type and emits the right
-            // markup whether or not WHMCS considers the item "disabled".)
+            // mutations have.
             $child->setAttribute('data-mt-type', ItemTypes::HEADER);
             $child->addClass('mt-menu-header');
-            $child->setOrder(self::$orderCounter++);
         }
     }
 
@@ -239,18 +236,17 @@ final class TreeRenderer
         if ($child !== null) {
             $child->setAttribute('data-mt-type', ItemTypes::DIVIDER);
             $child->addClass('mt-menu-divider');
-            $child->setOrder(self::$orderCounter++);
         }
     }
 
     private static function renderSwitcher(Item $parent, MenuItem $node, string $flavor): void
     {
+        // addChildSafe handles order assignment.
         $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), '#');
         if ($child !== null) {
             $child->setAttribute('data-mt-type', $node->item_type);
             $child->addClass('mt-menu-switcher mt-menu-switcher-' . $flavor);
             $child->setAttribute('data-switcher', $flavor);
-            $child->setOrder(self::$orderCounter++);
         }
     }
 
@@ -266,7 +262,6 @@ final class TreeRenderer
                 $child->addClass('mt-menu-side-right');
                 $child->setAttribute('data-mt-side', 'right');
             }
-            $child->setOrder(self::$orderCounter++);
         }
     }
 
@@ -361,9 +356,9 @@ final class TreeRenderer
         } elseif (($config['position_side'] ?? '') === 'left') {
             try { $item->setAttribute('data-mt-side', 'left'); } catch (\Throwable $e) {}
         }
-        // Use a global counter, not $node->position, so insertion order is
-        // preserved across the whole tree (positions reset per-parent).
-        try { $item->setOrder(self::$orderCounter++); } catch (\Throwable $e) {}
+        // Order is already set in addChildSafe (Lagom-style: passed in
+        // addChild array AND via setOrder fluent chain). Don't increment
+        // again here — that would double-bump and break sibling order.
 
         // Auto-cycle a palette colour from a fixed list, override-able via
         // config.color. Partials use this as a CSS class suffix.
@@ -384,15 +379,27 @@ final class TreeRenderer
     /**
      * Add a child to a WHMCS Menu Item, guarding against duplicate names
      * (which throws a fatal in WHMCS v8/v9 native menu code).
+     *
+     * Pass `order` inside the addChild() array AND via setOrder() on the
+     * returned child — Lagom (commercial WHMCS theme) does it this way, and
+     * empirically it sticks better than setOrder() alone on some WHMCS
+     * builds. We use the global $orderCounter so order grows monotonically
+     * in render sequence regardless of per-parent positions.
      */
     private static function addChildSafe(Item $parent, string $name, string $label, string $uri): ?Item
     {
         try {
+            $order = self::$orderCounter++;
             $parent->addChild($name, [
                 'label' => $label,
                 'uri'   => $uri,
+                'order' => $order,
             ]);
-            return $parent->getChild($name);
+            $child = $parent->getChild($name);
+            if ($child !== null) {
+                try { $child->setOrder($order); } catch (\Throwable $e) {}
+            }
+            return $child;
         } catch (\Throwable $e) {
             return null;
         }
