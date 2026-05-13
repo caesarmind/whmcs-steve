@@ -27,7 +27,15 @@ final class LayoutsController extends AbstractController
         }
 
         $available = $template->getLayouts($kind);
-        $current   = Settings::getValue($template->getName() . '_active_layout_' . $kind, 'default');
+        // Keep this default-by-kind table in sync with Hooks::resolveActiveLayout —
+        // otherwise the "Active" badge in admin lies about what the front-end
+        // actually renders, and clicking the falsely-active card is a no-op
+        // (the radio is already checked, so onchange never fires).
+        $defaultByKind = ['main-menu' => 'sidebar', 'footer' => 'extended'];
+        $current   = Settings::getValue(
+            $template->getName() . '_active_layout_' . $kind,
+            $defaultByKind[$kind] ?? 'default'
+        );
 
         $list = [];
         foreach ($available as $name) {

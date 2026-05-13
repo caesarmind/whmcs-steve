@@ -30,7 +30,6 @@
        already been applied to $myTheme.layouts.footer by the time we
        get here, so we just include the picked layout. *}
     {assign var=mtFooterLayoutName value=$myTheme.layouts.footer.name|default:'extended'}
-    <!-- mytheme footer dispatch: picked={$mtFooterLayoutName|escape} setting={$myTheme.addonSettings.mytheme_active_layout_footer|default:'unset'|escape} -->
     {if file_exists("templates/`$template`/core/layouts/footer/`$mtFooterLayoutName`/default.tpl")}
         {include file="`$template`/core/layouts/footer/`$mtFooterLayoutName`/default.tpl"}
     {else}

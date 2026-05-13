@@ -24,9 +24,13 @@
         <div class="mt-grid">
             {foreach $layouts as $layout}
                 <label class="mt-card {if $layout.isActive}is-active{/if}">
+                    {* onclick (not onchange) so clicking the already-active card
+                       still submits — onchange only fires when the radio's
+                       value changes, which is broken if the admin's default
+                       ever drifts from the front-end resolver's default. *}
                     <input type="radio" name="layout" value="{$layout.name|escape}"
                            {if $layout.isActive}checked{/if}
-                           onchange="this.form.submit()">
+                           onclick="this.form.submit()">
                     <div class="mt-card-thumb">{$layout.displayName|escape|truncate:1:""}</div>
                     <div class="mt-card-body">
                         <h3 class="mt-card-title">{$layout.displayName|escape}</h3>
