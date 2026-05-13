@@ -49,8 +49,7 @@ final class LayoutsController extends AbstractController
             $kind = 'main-menu';
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST'
-            && isset($_POST['layout'], $_POST['audience'])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['layout'])) {
             return $this->saveAction($template, $kind);
         }
 
@@ -101,9 +100,10 @@ final class LayoutsController extends AbstractController
     private function saveAction($template, string $kind): string
     {
         $layout   = (string)$_POST['layout'];
-        $audience = (string)$_POST['audience'];
-        $accepted = in_array($layout, $template->getLayouts($kind), true)
-                 && in_array($audience, self::AUDIENCES, true);
+        $audience = (string)($_POST['audience'] ?? '');
+
+        $validLayout   = in_array($layout, $template->getLayouts($kind), true);
+        $validAudience = in_array($audience, self::AUDIENCES, true);
 
         // Sentinel writes — let the front-end diagnostic comment confirm
         // the click reached PHP, what was POSTed, and whether the
@@ -111,13 +111,30 @@ final class LayoutsController extends AbstractController
         Settings::setValue('mytheme_layout_save_attempts',
             (int)Settings::getValue('mytheme_layout_save_attempts', 0) + 1);
         Settings::setValue('mytheme_layout_save_last_kind',     $kind);
-        Settings::setValue('mytheme_layout_save_last_audience', $audience);
+        Settings::setValue('mytheme_layout_save_last_audience', $audience !== '' ? $audience : '(none)');
         Settings::setValue('mytheme_layout_save_last_value',    $layout);
-        Settings::setValue('mytheme_layout_save_last_accepted', $accepted ? '1' : '0');
+        Settings::setValue('mytheme_layout_save_last_accepted', ($validLayout ? '1' : '0'));
 
-        if ($accepted) {
-            $key = $template->getName() . '_active_layout_' . $kind . '_' . $audience;
-            Settings::setValue($key, $layout);
+        if ($validLayout) {
+            if ($validAudience) {
+                // New per-audience flow.
+                $key = $template->getName() . '_active_layout_' . $kind . '_' . $audience;
+                Settings::setValue($key, $layout);
+            } else {
+                // Legacy single-pointer flow — fires when the admin still
+                // has the old radio-only UI cached in their browser. We
+                // also mirror to BOTH per-audience keys so the new
+                // resolver path picks the choice up immediately without
+                // needing the legacy fallback to kick in. Buyers who
+                // later switch one audience via the new UI overwrite
+                // just that audience's pointer.
+                $legacyKey = $template->getName() . '_active_layout_' . $kind;
+                Settings::setValue($legacyKey, $layout);
+                foreach (self::AUDIENCES as $aud) {
+                    $perAud = $template->getName() . '_active_layout_' . $kind . '_' . $aud;
+                    Settings::setValue($perAud, $layout);
+                }
+            }
         }
 
         // PRG redirect — calling indexAction() directly would re-enter
