@@ -9,51 +9,55 @@ on:
       - '.github/workflows/main.yml'
   workflow_dispatch:
 
-# Uses lftp `mirror --only-newer` over SFTP (incremental — only uploads files
-# whose mtime is newer than the server copy). Works on cPanel hosts that don't
-# expose rsync. ${{ secrets.CPANEL }} = the ed25519 private key authorized in
-# cPanel → Security → SSH Access → Manage SSH Keys.
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
       REMOTE_HOST: cp2.de.namespace.life
       REMOTE_USER: whymege
-      REMOTE_PORT: 22
+      REMOTE_PORT: '22'
+      REMOTE_BASE: /home/whymege/bill.hostnodes.com
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history — need both SHAs to diff
 
-      - name: Install lftp & prepare SSH key
+      - name: Setup SSH
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq lftp openssh-client
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           printf '%s\n' "${{ secrets.CPANEL }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -p "$REMOTE_PORT" -t ed25519 "$REMOTE_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Sync MyTheme addon module
+      - name: Compute diff & deploy only changed files (archive + extract)
         run: |
-          lftp -u "$REMOTE_USER," -p "$REMOTE_PORT" "sftp://$REMOTE_HOST" <<'EOF'
-            set sftp:connect-program "ssh -a -x -i /home/runner/.ssh/id_ed25519"
-            set sftp:auto-confirm yes
-            mirror --reverse --only-newer --delete --verbose --parallel=4 \
-                   --exclude-glob .git/** \
-                   mytheme/modules/addons/MyTheme/ \
-                   /home/whymege/bill.hostnodes.com/modules/addons/MyTheme/
-            bye
-          EOF
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            BEFORE="$AFTER~1"
+          fi
+          echo "Diff range: $BEFORE..$AFTER"
 
-      - name: Sync mytheme template
-        run: |
-          lftp -u "$REMOTE_USER," -p "$REMOTE_PORT" "sftp://$REMOTE_HOST" <<'EOF'
-            set sftp:connect-program "ssh -a -x -i /home/runner/.ssh/id_ed25519"
-            set sftp:auto-confirm yes
-            mirror --reverse --only-newer --delete --verbose --parallel=4 \
-                   --exclude-glob .git/** \
-                   mytheme/templates/mytheme/ \
-                   /home/whymege/bill.hostnodes.com/templates/mytheme/
-            bye
-          EOF
+          CHANGED=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'mytheme/**' | grep -v '/\.' || true)
+          DELETED=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'mytheme/**' | grep -v '/\.' || true)
+
+          SSH="ssh -i $HOME/.ssh/id_ed25519 -p $REMOTE_PORT -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST"
+
+          if [ -n "$CHANGED" ]; then
+            echo "=== Uploading changed files ==="
+            echo "$CHANGED"
+            # Bundle changed files into one gzipped tar stream, strip mytheme/ prefix,
+            # pipe over a single SSH connection, extract on the server.
+            echo "$CHANGED" | tar czf - --files-from=- --transform='s|^mytheme/||' \
+              | $SSH "tar xzpf - -C $REMOTE_BASE && echo '✅ Upload complete'"
+          else
+            echo "No files to upload."
+          fi
+
+          if [ -n "$DELETED" ]; then
+            echo "=== Deleting removed files ==="
+            echo "$DELETED"
+            DEL_CMDS=$(echo "$DELETED" | sed "s|^mytheme/|rm -f '$REMOTE_BASE/|; s|$|'|")
+            echo "$DEL_CMDS" | $SSH "bash -s"
+          fi
