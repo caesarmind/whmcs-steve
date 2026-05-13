@@ -46,6 +46,12 @@
         </a>
         <div style="flex:1"></div>
         {if $flash == 'saved'}<span class="mt-flash mt-flash-success">Saved</span>{/if}
+        {if $flash == 'saved-with-truncation-warning'}
+            <span class="mt-flash mt-flash-warn">
+                Saved — but the form-array was truncated mid-submit. The items_json fallback caught it,
+                so your data is safe, but you should ask your host to raise <code>max_input_vars</code>.
+            </span>
+        {/if}
         {if $flash == 'empty-payload-rejected'}
             <span class="mt-flash mt-flash-warn">
                 Save refused — the browser sent zero items so we didn't wipe your menu.
@@ -55,6 +61,21 @@
         {/if}
         <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
     </div>
+
+    {* PROACTIVE WARNING — show a banner if the current item count looks
+       like it might exceed PHP's max_input_vars on this host. We have a
+       JSON-fallback safety net so saves still succeed, but the admin
+       should know their host is at the limit. *}
+    {if $inputVarsWarning}
+        <div class="mt-flash mt-flash-warn" style="margin: 12px 0; padding: 12px 16px; display: block;">
+            <strong>Heads up:</strong> this menu has {$itemCount} items, which will submit roughly
+            {$estimatedVars} form fields per save. Your host's <code>max_input_vars</code> is
+            <code>{$maxInputVars}</code>. If saves start losing label / URL data, ask your host to raise
+            <code>max_input_vars</code> in <code>php.ini</code> to <code>2000</code> or higher.
+            (We have an items_json fallback that catches truncation, so saves still work — this is a
+            heads-up, not an error.)
+        </div>
+    {/if}
 
     <header class="mt-page-header">
         <h1 class="mt-page-title">

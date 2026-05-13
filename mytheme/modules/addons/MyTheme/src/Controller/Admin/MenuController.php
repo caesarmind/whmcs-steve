@@ -115,13 +115,26 @@ final class MenuController extends AbstractController
         $allItems = $menu->items()->orderBy('parent_id')->orderBy('position')->get()->keyBy('id');
         $tree     = $this->buildTree($allItems);
 
+        // Predict whether a save with the current item count will exceed
+        // PHP's max_input_vars limit. Each item submits 7 form-array fields
+        // (id, item_type, parent_id, position, label_json, config_json,
+        // active) plus the menu-level fields. Lagom uses a similar check.
+        $itemCount        = $allItems->count();
+        $estimatedVars    = ($itemCount * 7) + 10; // 10 for menu-level fields + safety margin
+        $maxInputVars     = (int)(ini_get('max_input_vars') ?: 1000);
+        $inputVarsWarning = ($estimatedVars > ($maxInputVars - 50));
+
         return $this->view('menu/edit', [
-            'menu'         => $menu,
-            'tree'         => $tree,
-            'itemTypes'    => ItemTypes::all(),
-            'icons'        => \MyTheme\Menu\Icons::pickerList(),
-            'iconsJson'    => json_encode(\MyTheme\Menu\Icons::all()),
-            'flash'        => $_GET['flash'] ?? '',
+            'menu'             => $menu,
+            'tree'             => $tree,
+            'itemTypes'        => ItemTypes::all(),
+            'icons'            => \MyTheme\Menu\Icons::pickerList(),
+            'iconsJson'        => json_encode(\MyTheme\Menu\Icons::all()),
+            'flash'            => $_GET['flash'] ?? '',
+            'itemCount'        => $itemCount,
+            'estimatedVars'    => $estimatedVars,
+            'maxInputVars'     => $maxInputVars,
+            'inputVarsWarning' => $inputVarsWarning,
         ]);
     }
 
@@ -274,7 +287,13 @@ final class MenuController extends AbstractController
 
         $this->persistItems($menu->id, $payload);
 
-        $this->redirect('?module=MyTheme&action=menu&sub=edit&id=' . $menu->id . '&flash=saved');
+        // If we had to fall back from form-array to items_json because of
+        // max_input_vars truncation, surface that as a warning so the admin
+        // knows their host is at the limit and can request an increase.
+        $flash = strpos($usedSource, 'fallback') !== false
+            ? 'saved-with-truncation-warning'
+            : 'saved';
+        $this->redirect('?module=MyTheme&action=menu&sub=edit&id=' . $menu->id . '&flash=' . $flash);
     }
 
     public function deleteAction(): string
