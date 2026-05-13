@@ -1,3 +1,5 @@
-{* WHMCS routes /pwreset through this templatefile name. Forward to the
-   shared pwreset/default/default.tpl which branches on $templatefile. *}
-{include file="`$template`/core/pages/pwreset/default/default.tpl"}
+{if isset($myTheme.pages['password-reset-container'].fullPath) && $myTheme.pages['password-reset-container'].fullPath && file_exists("templates/`$myTheme.pages['password-reset-container'].fullPath`")}
+	{include file="`$myTheme.pages['password-reset-container'].fullPath`"}
+{else}
+	{include file="`$template`/core/pages/password-reset-container/default/default.tpl"}
+{/if}
