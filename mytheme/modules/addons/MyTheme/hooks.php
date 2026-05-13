@@ -49,35 +49,24 @@ use MyTheme\Service\Hooks as HookService;
 // hooks.php IS reliably auto-loaded for every request, so moving the
 // intercept here guarantees it fires. The admin-auth gate below means
 // non-admin requests can't reach the upload endpoint by URL guessing.
+// ADMINAREA is defined by /admin/addonmodules.php BEFORE init.php is
+// included. init.php then does the admin auth check and exit()s with a
+// login redirect if the user isn't authenticated -- BEFORE reaching
+// the hooks loader. So if this code is executing AND ADMINAREA is
+// defined, the user is already verified by WHMCS. No need to repeat
+// the session check ourselves (and observed: $_SESSION['adminid'] and
+// \WHMCS\Authentication\CurrentUser::isAuthenticatedAdmin() both
+// returned empty/false at this lifecycle point on a real WHMCS 9
+// install, because the canonical admin-session shape varies across
+// versions and init phases).
 if (
-    $_SERVER['REQUEST_METHOD'] === 'POST'
+    defined('ADMINAREA')
+    && $_SERVER['REQUEST_METHOD'] === 'POST'
     && ($_GET['module'] ?? '') === 'MyTheme'
     && ($_GET['action'] ?? '') === 'branding'
     && in_array($_GET['sub'] ?? '', ['upload-ajax', 'remove-ajax'], true)
 ) {
     try {
-        // Defence in depth — admin gate even though the only way to reach
-        // this URL is through the admin area in normal use.
-        //
-        // hooks.php loads earlier than adminHooks.php in the WHMCS request
-        // lifecycle, and \WHMCS\Authentication\CurrentUser isn't reliably
-        // initialised here (observed: isAuthenticatedAdmin() returned
-        // false for an actively-logged-in admin). $_SESSION['adminid'] is
-        // WHMCS's canonical session marker and is populated as soon as
-        // session_start() runs — which WHMCS does before hooks load —
-        // so it's the right primitive to check this early.
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            @session_start();
-        }
-        $_mtAdminId = (int)($_SESSION['adminid'] ?? 0);
-        if ($_mtAdminId <= 0) {
-            while (ob_get_level() > 0) { @ob_end_clean(); }
-            http_response_code(403);
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode(['ok' => false, 'error' => 'Not authenticated.']);
-            exit;
-        }
-
         $_mtBrandingCtl = new \MyTheme\Controller\Admin\BrandingController();
         if ($_GET['sub'] === 'upload-ajax') {
             $_mtBrandingCtl->uploadAjaxAction();   // never returns
