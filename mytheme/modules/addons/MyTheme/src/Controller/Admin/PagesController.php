@@ -6,6 +6,7 @@ namespace MyTheme\Controller\Admin;
 use MyTheme\Controller\AbstractController;
 use MyTheme\Helpers\AddonHelper;
 use MyTheme\Models\Settings;
+use MyTheme\Template\PagesCache;
 use MyTheme\Template\Template;
 
 /**
@@ -33,6 +34,13 @@ final class PagesController extends AbstractController
         if ($template === null) {
             return $this->view('error', ['error' => 'No active template']);
         }
+
+        // Self-heal: build the discovery cache on the first admin visit
+        // when activation hasn't populated it yet (e.g. addon was already
+        // active before pages discovery existed). Idempotent + admin-only,
+        // so this honors the "no runtime filesystem scans" rule for the
+        // client-area path while still surfacing every page in the editor.
+        PagesCache::ensure($template);
 
         $rows = [];
         $allGroups = [];

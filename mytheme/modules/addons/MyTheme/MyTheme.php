@@ -72,6 +72,20 @@ function MyTheme_activate()
         // preset whose (name, location) already exists, so re-activation
         // doesn't clobber admin customisations.
         (new MyTheme\Menu\Seeder())->run();
+
+        // Build the pages-discovery cache for every installed template.
+        // The Pages admin tab reads this on every visit; without it the
+        // tab would surface only the pages explicitly declared in
+        // theme.json's provides.pages. Filesystem scan happens here at
+        // activation time — never during a client-area request.
+        foreach (MyTheme\Template\Template::getAll() as $tpl) {
+            try {
+                MyTheme\Template\PagesCache::rebuild($tpl);
+            } catch (\Throwable $e) {
+                error_log('MyTheme: pages discovery rebuild failed for '
+                    . $tpl->getName() . ': ' . $e->getMessage());
+            }
+        }
     } catch (\Throwable $e) {
         return [
             'status'      => 'error',
@@ -104,6 +118,17 @@ function MyTheme_upgrade($vars)
     // Belt and braces: seed presets if they were never installed (e.g. upgrading
     // from a version that predates the menu manager). Idempotent.
     (new MyTheme\Menu\Seeder())->run();
+
+    // Refresh pages discovery so any new core/pages/ directories shipped
+    // with the upgrade are picked up without the buyer touching anything.
+    foreach (MyTheme\Template\Template::getAll() as $tpl) {
+        try {
+            MyTheme\Template\PagesCache::rebuild($tpl);
+        } catch (\Throwable $e) {
+            error_log('MyTheme: pages discovery rebuild failed for '
+                . $tpl->getName() . ': ' . $e->getMessage());
+        }
+    }
 }
 
 function MyTheme_output($vars)

@@ -30,6 +30,13 @@
         </div>
         <div class="mt-row">
             <div>
+                <div class="mt-row-label">Rebuild pages discovery</div>
+                <div class="mt-row-help">Re-scan <code>core/pages/</code> for new page directories so the Pages tab surfaces them. Runs automatically on activation and theme version bump.</div>
+            </div>
+            <button type="submit" name="tool" value="rebuild_pages_cache" class="mt-btn mt-btn-secondary">Rebuild</button>
+        </div>
+        <div class="mt-row">
+            <div>
                 <div class="mt-row-label">Refresh license</div>
                 <div class="mt-row-help">Force a callback to the license server now.</div>
             </div>

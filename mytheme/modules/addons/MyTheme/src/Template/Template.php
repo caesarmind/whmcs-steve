@@ -114,10 +114,30 @@ final class Template
         return $this->manifest['provides']['layouts'][$kind] ?? [];
     }
 
-    /** @return list<string> */
+    /**
+     * Union of declared (theme.json `provides.pages`) and discovered pages.
+     *
+     * Declared list — what the theme author committed — comes first to preserve
+     * authorial intent. Discovered list — built by `PagesCache` at activation
+     * and on admin action — appends any `core/pages/*` directory the author
+     * hadn't explicitly declared. Dedupe is by name; same dir declared and
+     * discovered stays in its declared position.
+     *
+     * @return list<string>
+     */
     public function getPages(): array
     {
-        return $this->manifest['provides']['pages'] ?? [];
+        $declared   = $this->manifest['provides']['pages'] ?? [];
+        $discovered = PagesCache::read($this) ?? [];
+
+        $seen = [];
+        $out  = [];
+        foreach ([...$declared, ...$discovered] as $name) {
+            if (!is_string($name) || $name === '' || isset($seen[$name])) continue;
+            $seen[$name] = true;
+            $out[] = $name;
+        }
+        return $out;
     }
 
     /**
