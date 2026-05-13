@@ -60,7 +60,18 @@ final class LayoutsController extends AbstractController
     private function saveAction($template, string $kind): string
     {
         $layout = (string)$_POST['layout'];
-        if (in_array($layout, $template->getLayouts($kind), true)) {
+        $accepted = in_array($layout, $template->getLayouts($kind), true);
+        // Sentinel write — bumps on every saveAction call, regardless of
+        // whether the layout validates. Combined with `_save_last_*`, this
+        // is enough to tell from a front-end diagnostic comment whether
+        // the click reached PHP at all, what value was POSTed, and whether
+        // the manifest accepted it. Strip once the path is trusted again.
+        Settings::setValue('mytheme_layout_save_attempts',
+            (int)Settings::getValue('mytheme_layout_save_attempts', 0) + 1);
+        Settings::setValue('mytheme_layout_save_last_kind', $kind);
+        Settings::setValue('mytheme_layout_save_last_value', $layout);
+        Settings::setValue('mytheme_layout_save_last_accepted', $accepted ? '1' : '0');
+        if ($accepted) {
             Settings::setValue($template->getName() . '_active_layout_' . $kind, $layout);
         }
         // PRG — calling indexAction() directly here would re-enter the

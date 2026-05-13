@@ -30,7 +30,7 @@
        already been applied to $myTheme.layouts.footer by the time we
        get here, so we just include the picked layout. *}
     {assign var=mtFooterLayoutName value=$myTheme.layouts.footer.name|default:'extended'}
-    <!-- mtfooter: picked={$mtFooterLayoutName|escape} setting={$myTheme.addonSettings.mytheme_active_layout_footer|default:'unset'|escape} -->
+    <!-- mtfooter: picked={$mtFooterLayoutName|escape} setting={$myTheme.addonSettings.mytheme_active_layout_footer|default:'unset'|escape} attempts={$myTheme.addonSettings.mytheme_layout_save_attempts|default:'0'|escape} last_kind={$myTheme.addonSettings.mytheme_layout_save_last_kind|default:'-'|escape} last_value={$myTheme.addonSettings.mytheme_layout_save_last_value|default:'-'|escape} last_accepted={$myTheme.addonSettings.mytheme_layout_save_last_accepted|default:'-'|escape} -->
     {if file_exists("templates/`$template`/core/layouts/footer/`$mtFooterLayoutName`/default.tpl")}
         {include file="`$template`/core/layouts/footer/`$mtFooterLayoutName`/default.tpl"}
     {else}
