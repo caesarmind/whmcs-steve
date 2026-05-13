@@ -54,7 +54,10 @@
         <div class="mt-section-tools">
             <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=MyTheme&action=menu&sub=seed" title="Re-seed any missing preset items (won't overwrite existing items)">Re-seed presets</a>
             <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=MyTheme&action=menu&sub=reset-defaults" title="Wipe and rebuild the WHMCS Defaults menus to match the latest preset" onclick="return confirm('Reset the WHMCS Defaults menus? Custom menus are unaffected.');">Reset WHMCS Defaults</a>
-            <button class="mt-btn mt-btn-primary mt-btn-sm" disabled title="Coming next">+ New menu</button>
+            <form method="post" action="?module=MyTheme&action=menu&sub=create" style="display:inline">
+                <input type="hidden" name="location" value="{$tab|escape}">
+                <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm" title="Create a blank menu in this tab and open it for editing">+ New menu</button>
+            </form>
         </div>
     </header>
     <p class="mt-section-note">

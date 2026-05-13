@@ -46,6 +46,7 @@
         </a>
         <div style="flex:1"></div>
         {if $flash == 'saved'}<span class="mt-flash mt-flash-success">Saved</span>{/if}
+        {if $flash == 'created'}<span class="mt-flash mt-flash-success">Menu created — set the name, display rule, and status, then add items.</span>{/if}
         {if $flash == 'empty-payload-rejected'}
             <span class="mt-flash mt-flash-warn">
                 Save refused — the browser sent zero items so we didn't wipe your menu.
@@ -106,6 +107,18 @@
             </header>
 
             <div class="mt-menu-tree" id="mtMenuTree" data-tree-root>
+                {* Lagom-style empty state — only visible until the admin
+                   adds the first item. The .mt-menu-list <ul> below also
+                   renders (empty) so the JS drag-drop wiring still finds
+                   its container; CSS hides the empty state once a child
+                   exists. *}
+                {if empty($tree)}
+                    <div class="mt-empty mt-menu-empty" data-empty-state>
+                        <p><strong>No Menu Items Created</strong></p>
+                        <p class="mt-table-muted">Use the picker below to start adding new menu items.</p>
+                    </div>
+                {/if}
+
                 {* Two explicit levels of nesting — avoids fragile Smarty {function} recursion
                    which can silently render nothing on some WHMCS Smarty configurations and
                    then trip the persistItems mass-delete safety net on Save. 2 levels covers
@@ -167,10 +180,10 @@
             <header class="mt-section-header"><h2 class="mt-section-title">Menu Settings</h2></header>
 
             <div class="mt-field">
-                <label class="mt-field-label" for="menu-audience">Audience</label>
+                <label class="mt-field-label" for="menu-audience">Display Rule</label>
                 <select id="menu-audience" class="mt-select" name="audience">
-                    <option value="client" {if $menu->audience == 'client'}selected{/if}>Client (logged-in)</option>
-                    <option value="guest"  {if $menu->audience == 'guest'}selected{/if}>Guest (logged-out)</option>
+                    <option value="client" {if $menu->audience == 'client'}selected{/if}>Existing Client</option>
+                    <option value="guest"  {if $menu->audience == 'guest'}selected{/if}>Guest Client</option>
                     <option value="all"    {if $menu->audience == 'all'}selected{/if}>All visitors</option>
                 </select>
                 <div class="mt-field-help">Decides for which audience this menu renders.</div>
@@ -548,6 +561,13 @@
             '</div>' +
             '<ul class="mt-menu-children" data-children></ul>';
         root.appendChild(li);
+        // Hide the Lagom-style "No Menu Items Created" empty state once
+        // the admin has added the first item. Server-side render guards
+        // it via {if empty($tree)} for fresh menus; client-side we just
+        // remove the placeholder on first add so the layout doesn't show
+        // both the empty message AND the new item.
+        var emptyState = document.querySelector('[data-empty-state]');
+        if (emptyState) emptyState.remove();
     }
 
     document.addEventListener('click', function(e){

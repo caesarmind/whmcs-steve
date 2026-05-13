@@ -373,6 +373,33 @@ final class MenuController extends AbstractController
         $this->redirect('?module=MyTheme&action=menu&flash=seeded-' . $seeded);
     }
 
+    /**
+     * Lagom-style "+ New menu" entry point. Creates a blank menu in the
+     * current tab's location with sensible defaults and redirects to the
+     * editor so the admin can name it, set the audience / status, and
+     * start adding items. Active=false by default — admin opts in via
+     * the Status toggle when ready, which mutual-exclusion-deactivates
+     * any other menu in the same (location, audience) pair.
+     */
+    public function createAction(): string
+    {
+        $location = (string)($_POST['location'] ?? $_GET['tab'] ?? 'main');
+        if (!in_array($location, ['main', 'secondary', 'footer'], true)) {
+            $location = 'main';
+        }
+
+        $menu = Menu::create([
+            'name'            => 'New menu',
+            'location'        => $location,
+            'audience'        => 'client',
+            'active'          => false,
+            'version'         => '1.0',
+            'changed_by_user' => true,
+        ]);
+
+        $this->redirect('?module=MyTheme&action=menu&sub=edit&id=' . $menu->id . '&flash=created');
+    }
+
     public function resetDefaultsAction(): string
     {
         $reset = (new Seeder())->resetWhmcsDefaults();
