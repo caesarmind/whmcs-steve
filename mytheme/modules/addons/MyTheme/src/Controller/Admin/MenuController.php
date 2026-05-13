@@ -208,37 +208,6 @@ final class MenuController extends AbstractController
             if (!is_array($payload)) $payload = [];
         }
 
-        // ========= MAXIMUM DIAGNOSTIC DUMP =========
-        // The user keeps reporting empty labels in the DB even though their
-        // browser console shows the right values in state. Either the
-        // form-array is arriving truncated (max_input_vars), or items_json
-        // is somehow getting stripped, or there's something between PHP
-        // receiving \$_POST and persistItems running that nukes the data.
-        // Log EVERYTHING so we can see at exactly which layer it breaks.
-        error_log('=== [MyTheme saveAction] DIAGNOSTIC DUMP ===');
-        error_log('max_input_vars: ' . (ini_get('max_input_vars') ?: 'unknown'));
-        error_log('post_max_size:  ' . (ini_get('post_max_size') ?: 'unknown'));
-        error_log('Raw _POST top-level keys: ' . implode(',', array_keys($_POST)));
-        error_log('Raw _POST[items] is_array: ' . (is_array($_POST['items'] ?? null) ? 'yes' : 'no'));
-        if (is_array($_POST['items'] ?? null)) {
-            error_log('Raw _POST[items] count: ' . count($_POST['items']));
-            error_log('Raw _POST[items] keys (first 5): ' . implode(',', array_slice(array_keys($_POST['items']), 0, 5)));
-            // First two items, every sub-key
-            foreach (array_slice($_POST['items'], 0, 2, true) as $k => $r) {
-                if (is_array($r)) {
-                    error_log("Raw _POST[items][$k] sub-keys: " . implode(',', array_keys($r)));
-                    error_log("Raw _POST[items][$k][label_json]: " . (string)($r['label_json'] ?? '<MISSING>'));
-                    error_log("Raw _POST[items][$k][config_json]: " . (string)($r['config_json'] ?? '<MISSING>'));
-                } else {
-                    error_log("Raw _POST[items][$k] is not array: " . var_export($r, true));
-                }
-            }
-        }
-        error_log('items_json length: ' . strlen($raw));
-        error_log('items_json (first 500 chars): ' . substr($raw, 0, 500));
-        error_log('Resolved source: ' . $usedSource);
-        error_log('Resolved payload count: ' . count($payload));
-        // ========= END DIAGNOSTIC DUMP =========
 
         // Normalize form-array rows into the shape persistItems expects.
         // Form-array path sends label_json/config_json as strings + active
@@ -290,25 +259,6 @@ final class MenuController extends AbstractController
             strlen($raw),
             ini_get('max_input_vars') ?: 'unknown'
         ));
-        // Verbose: log the resolved label for each item AS RECEIVED, so we
-        // can diff against what's in the DB after persistItems runs.
-        foreach ($payload as $i => $r) {
-            if (!is_array($r)) continue;
-            $lbl = $r['label'] ?? null;
-            $eng = is_array($lbl) && isset($lbl['custom']['english']) ? $lbl['custom']['english'] : '∅';
-            $whm = is_array($lbl) && isset($lbl['whmcs']) ? $lbl['whmcs'] : '∅';
-            error_log(sprintf(
-                '[MyTheme saveAction payload[%d]] id=%s type=%s parent=%s pos=%s whmcs="%s" english="%s"',
-                $i,
-                $r['id'] ?? 'NULL',
-                $r['item_type'] ?? '?',
-                $r['parent_id'] ?? 'NULL',
-                $r['position'] ?? '?',
-                $whm,
-                $eng
-            ));
-        }
-
         // SAFETY: if the JS hadn't run (e.g. tree wasn't ingested) and we'd
         // get an empty payload while the DB still has items, REFUSE to wipe.
         // With delete-all-then-recreate, an empty payload would otherwise
