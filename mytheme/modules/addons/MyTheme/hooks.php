@@ -142,11 +142,6 @@ if (AddonHelper::isActive()) {
                 $primaryNavbar->removeChild($name);
             }
             MyTheme\Menu\TreeRenderer::populate($primaryNavbar, $menu);
-            // Stash the ordered flat list in a global so the next
-            // ClientAreaPage hook (priority lower than this 100) can expose
-            // it to Smarty as $mtSidebarItems. We can't directly return
-            // template vars from a Navbar hook.
-            $GLOBALS['__mytheme_sidebar_items'] = MyTheme\Menu\TreeRenderer::orderedTopLevel();
         } catch (\Throwable $e) {
             // Don't blow up the page if the menu system fails. Log and let the
             // default WHMCS navbar render.
@@ -156,13 +151,25 @@ if (AddonHelper::isActive()) {
         }
     });
 
-    // Surface the ordered top-level list to Smarty. Runs at priority 3 —
-    // AFTER the ClientAreaPrimaryNavbar hook above (which fires earlier in
-    // the page lifecycle and populates $GLOBALS) and AFTER the icon registry
-    // hook at priority 2, but before the priority 1 / -1 dispatch hooks.
+    // Surface the menu as a flat ordered list to Smarty. We build this
+    // INDEPENDENTLY of WHMCS's $primaryNavbar (which is populated by
+    // ClientAreaPrimaryNavbar hooks that fire LATER in the page lifecycle,
+    // after ClientAreaPage hooks). Building it here means $mtSidebarItems is
+    // ready when the template renders — no race condition.
     add_hook('ClientAreaPage', 3, function ($vars) {
-        $items = $GLOBALS['__mytheme_sidebar_items'] ?? null;
-        return is_array($items) ? ['mtSidebarItems' => $items] : null;
+        try {
+            if (!\WHMCS\Database\Capsule::schema()->hasTable('mytheme_menus')) {
+                return null;
+            }
+            $audience = MyTheme\Menu\Audience::current();
+            $menu     = MyTheme\Models\Menu::pick('main', $audience);
+            if ($menu === null) return null;
+            $items = MyTheme\Menu\TreeRenderer::buildFlatList($menu);
+            return ['mtSidebarItems' => $items];
+        } catch (\Throwable $e) {
+            error_log('MyTheme buildFlatList failed: ' . $e->getMessage());
+            return null;
+        }
     });
 
     // Secondary navbar — same pattern (location = secondary). If no menu, leave alone.

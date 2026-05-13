@@ -99,6 +99,124 @@ final class TreeRenderer
         return self::$orderedTopLevel;
     }
 
+    /**
+     * Build a flat ordered list of menu items as plain PHP arrays — NO
+     * dependency on WHMCS\View\Menu\Item. Each entry has every field the
+     * sidebar/topnav template needs:
+     *
+     *   [
+     *     'type'           => 'header'|'custom_link'|'dropdown_parent'|...,
+     *     'name'           => 'mt-<id>',
+     *     'label'          => 'Home',
+     *     'uri'            => '/clientarea.php',
+     *     'icon'           => 'home',
+     *     'color'          => 'blue',
+     *     'side'           => 'right'|'',
+     *     'css_class'      => '',
+     *     'badge_source'   => '',
+     *     'dropdown_style' => 'default'|'mega'|'',
+     *     'children'       => [ ... same shape, for dropdowns ],
+     *   ]
+     *
+     * Called from the ClientAreaPage hook (not the navbar hook) so the data
+     * is ready BEFORE template render, regardless of hook order.
+     */
+    public static function buildFlatList(Menu $menu): array
+    {
+        $audience = $menu->audience === Audience::ALL ? Audience::current() : $menu->audience;
+        $layout   = self::currentLayout();
+        $out = [];
+        foreach ($menu->topLevelItems() as $node) {
+            try {
+                $entry = self::nodeToArray($node, $audience, $layout);
+                if ($entry !== null) {
+                    $out[] = $entry;
+                }
+            } catch (\Throwable $e) {
+                error_log(sprintf(
+                    'MyTheme buildFlatList: skipped item id=%d type=%s — %s',
+                    $node->id, $node->item_type, $e->getMessage()
+                ));
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Convert a single MenuItem (with descendants) into the plain-array
+     * shape buildFlatList returns. Returns null if the item should be
+     * filtered out (inactive, wrong audience, wrong layout, ...).
+     */
+    private static function nodeToArray(MenuItem $node, string $audience, string $layout): ?array
+    {
+        if (!$node->active) return null;
+        $config = $node->config();
+
+        $nodeAudience = (string)($config['audience'] ?? Audience::ALL);
+        if (!self::audienceAllows($nodeAudience, $audience)) return null;
+
+        $layouts = (array)($config['theme_layouts'] ?? []);
+        if (!empty($layouts) && !in_array($layout, $layouts, true)) return null;
+
+        $meta = ItemTypes::meta($node->item_type);
+        if (!empty($meta['guest_only']) && $audience !== Audience::GUEST) return null;
+        if (!empty($meta['client_only']) && $audience !== Audience::CLIENT) return null;
+
+        // Skip whmcs_default — that's a passthrough item type that only
+        // makes sense in the WHMCS Item tree, not in our flat list.
+        if ($node->item_type === ItemTypes::WHMCS_DEFAULT) return null;
+
+        $uri = '#';
+        if ($node->item_type === ItemTypes::WHMCS_PAGE) {
+            $uri = self::resolvePageUrl((string)($config['page'] ?? ''));
+            if ($uri === '') return null;
+        } elseif ($node->item_type === ItemTypes::CUSTOM_LINK) {
+            $uri = (string)($config['url'] ?? '#');
+        } elseif ($node->item_type === ItemTypes::LOGIN_BUTTON) {
+            $uri = function_exists('routePath') ? (string)routePath('login') : 'login.php';
+        }
+
+        // Auto-cycle palette colour by item id (override-able via config.color)
+        $palette = ['blue','purple','teal','green','orange','red','pink','indigo','gray'];
+        $color   = (string)($config['color'] ?? '');
+        if ($color === '') {
+            $color = $palette[((int)$node->id) % count($palette)];
+        }
+
+        $children = [];
+        if ($node->item_type === ItemTypes::DROPDOWN_PARENT
+            || $node->item_type === ItemTypes::ACCOUNT_DROPDOWN) {
+            foreach ($node->children as $childNode) {
+                try {
+                    $childEntry = self::nodeToArray($childNode, $audience, $layout);
+                    if ($childEntry !== null) {
+                        $children[] = $childEntry;
+                    }
+                } catch (\Throwable $e) {
+                    error_log(sprintf(
+                        'MyTheme buildFlatList: skipped child id=%d — %s',
+                        $childNode->id, $e->getMessage()
+                    ));
+                }
+            }
+        }
+
+        return [
+            'type'           => $node->item_type,
+            'name'           => 'mt-' . $node->id,
+            'label'          => $node->resolvedLabel(),
+            'uri'            => $uri,
+            'icon'           => (string)($config['icon'] ?? ''),
+            'color'          => $color,
+            'side'           => ($config['position_side'] ?? '') === 'right' ? 'right' : '',
+            'css_class'      => (string)($config['css_class'] ?? ''),
+            'badge_source'   => (string)($config['badge_source'] ?? ''),
+            'dropdown_style' => (string)($config['dropdown_style'] ?? ''),
+            'target'         => ($config['target'] ?? '') === '_blank' ? '_blank' : '',
+            'children'       => $children,
+        ];
+    }
+
     private static function renderNode(Item $parent, MenuItem $node, string $audience, string $layout): void
     {
         if (!$node->active) {

@@ -32,29 +32,15 @@
     {/if}
 {/function}
 
+{* Renders one entry from the $mtSidebarItems plain-array list (built by
+   TreeRenderer::buildFlatList). Each entry has: type, name, label, uri,
+   icon, color, side, css_class, badge_source, dropdown_style, target,
+   children. *}
 {function name=mtSidebarItem item=null}
-    {assign var=mtType  value=$item->getAttribute('data-mt-type')|default:''}
-    {* Defensive fallback — if WHMCS\View\Menu\Item silently dropped the
-       data-mt-type attribute (e.g. setDisabled side-effects on some WHMCS
-       builds), reconstruct the type from the CSS classes that renderer also
-       sets. Headers and dividers are the cases we've actually seen this
-       happen on. *}
-    {if !$mtType}
-        {assign var=_mtCls value=$item->getAttribute('class')|default:''}
-        {if $_mtCls && strpos($_mtCls, 'mt-menu-header') !== false}
-            {assign var=mtType value='header'}
-        {elseif $_mtCls && strpos($_mtCls, 'mt-menu-divider') !== false}
-            {assign var=mtType value='divider'}
-        {else}
-            {assign var=mtType value='whmcs_page'}
-        {/if}
-    {/if}
-    {assign var=mtColor value=$item->getAttribute('data-mt-color')|default:'gray'}
-    {* Prefer our own data-mt-icon attribute because WHMCS\View\Menu\Item::setIcon()
-       silently strips non-FontAwesome strings, so $item->getIcon() returns '' for
-       our named icons. *}
-    {assign var=mtIconName value=$item->getAttribute('data-mt-icon')|default:$item->getIcon()|default:''}
-    {assign var=mtBadgeKey value=$item->getAttribute('data-mt-badge-source')|default:''}
+    {assign var=mtType   value=$item.type|default:'whmcs_page'}
+    {assign var=mtColor  value=$item.color|default:'gray'}
+    {assign var=mtIconName value=$item.icon|default:''}
+    {assign var=mtBadgeKey value=$item.badge_source|default:''}
     {assign var=mtBadge value=''}
     {if $mtBadgeKey == 'services'}{assign var=mtBadge value=$clientsstats.productsnumactive|default:''}
     {elseif $mtBadgeKey == 'unpaid_invoices'}{assign var=mtBadge value=$clientsstats.numunpaidinvoices|default:''}
@@ -63,49 +49,43 @@
     {/if}
 
     {if $mtType == 'header'}
-        {* Skip headers with no visible label — they'd render as empty
-           visual noise. Admins can delete or fill in a label via the menu
-           builder. *}
-        {if $item->getLabel()}<div class="sidebar-section-label">{$item->getLabel()|escape}</div>{/if}
+        {if $item.label}<div class="sidebar-section-label">{$item.label|escape}</div>{/if}
     {elseif $mtType == 'divider'}
         <hr class="sidebar-divider">
-    {elseif $mtType == 'dropdown_parent' || ($mtType == 'account_dropdown' && $item->getChildren())}
-        {* Matches the apple-client-area mockup pattern — .sidebar-group with
-           a <button> toggle and <div> items. JS toggles .open on click. *}
-        <div class="sidebar-group" data-group="{$item->getName()|escape}">
+    {elseif $mtType == 'dropdown_parent' || ($mtType == 'account_dropdown' && $item.children)}
+        <div class="sidebar-group" data-group="{$item.name|escape}">
             <button type="button" class="sidebar-group-toggle">
                 <div class="sidebar-item-icon {$mtColor|escape}">{mtSidebarIcon iconName=$mtIconName}</div>
-                <span class="group-label">{$item->getLabel()|escape}</span>
+                <span class="group-label">{$item.label|escape}</span>
                 <svg class="group-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
             </button>
             <div class="sidebar-group-items">
-                {foreach $item->getChildren() as $child}
-                    {assign var=childType value=$child->getAttribute('data-mt-type')|default:'whmcs_page'}
-                    {if $childType == 'divider'}
+                {foreach $item.children as $child}
+                    {if $child.type == 'divider'}
                         <hr class="sidebar-group-divider">
-                    {elseif $childType == 'header'}
-                        <div class="sidebar-group-section">{$child->getLabel()|escape}</div>
+                    {elseif $child.type == 'header'}
+                        <div class="sidebar-group-section">{$child.label|escape}</div>
                     {else}
-                        <a href="{$child->getUri()|escape}">{$child->getLabel()|escape}</a>
+                        <a href="{$child.uri|escape}">{$child.label|escape}</a>
                     {/if}
                 {/foreach}
             </div>
         </div>
     {elseif $mtType == 'login_button'}
-        <a href="{$item->getUri()|escape}" class="sidebar-item sidebar-item-login">
+        <a href="{$item.uri|escape}" class="sidebar-item sidebar-item-login">
             <div class="sidebar-item-icon blue">{mtSidebarIcon iconName=($mtIconName|default:'transfer')}</div>
-            {$item->getLabel()|escape}
+            {$item.label|escape}
         </a>
     {elseif $mtType == 'language' || $mtType == 'currency'}
         <a href="#" class="sidebar-item sidebar-item-switcher" data-switcher="{$mtType|escape}">
             <div class="sidebar-item-icon gray">{mtSidebarIcon iconName=($mtIconName|default:'globe')}</div>
-            {$item->getLabel()|escape}
+            {$item.label|escape}
         </a>
     {else}
-        {* whmcs_page, custom_link, account_dropdown (no children), whmcs_default *}
-        <a href="{$item->getUri()|escape}" class="sidebar-item" data-nav="{$item->getName()|escape}">
+        {* whmcs_page, custom_link, account_dropdown (no children) *}
+        <a href="{$item.uri|escape}" class="sidebar-item" data-nav="{$item.name|escape}"{if $item.target} target="{$item.target|escape}"{/if}>
             <div class="sidebar-item-icon {$mtColor|escape}">{mtSidebarIcon iconName=$mtIconName}</div>
-            {$item->getLabel()|escape}
+            {$item.label|escape}
             {if $mtBadge}<span class="sidebar-item-badge">{$mtBadge|escape}</span>{/if}
         </a>
     {/if}
