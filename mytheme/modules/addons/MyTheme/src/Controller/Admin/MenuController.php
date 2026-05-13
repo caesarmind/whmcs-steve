@@ -154,14 +154,46 @@ final class MenuController extends AbstractController
 
         // Items — read from EITHER form-array fields (items[N][...]) OR the
         // legacy JSON hidden input. Form-array is preferred because the
-        // browser serializes it natively — no JS required, no encoding/size
-        // pitfalls. JSON path stays as a fallback so we don't regress while
-        // the JS migration lands.
+        // browser serializes it natively, but it's at the mercy of PHP's
+        // max_input_vars setting — at ~40 items × 7 fields per item = 280
+        // input vars per save, which exceeds some hosts' limits and
+        // SILENTLY truncates the array (PHP drops trailing keys without
+        // raising an error).
+        //
+        // Belt-and-braces: if form-array EXISTS but EVERY row is missing
+        // label_json, treat that as a truncation event and fall through to
+        // the items_json JSON payload (which is one input var regardless
+        // of item count, so it survives max_input_vars).
         $raw = (string)($_POST['items_json'] ?? '[]');
 
         $arrayItems = is_array($_POST['items'] ?? null) ? $_POST['items'] : null;
+        $usedSource = 'json';
         if ($arrayItems !== null) {
-            $payload = array_values($arrayItems); // PHP form-array → indexed
+            // Sanity check: does at least one row have label_json populated?
+            $haveLabelJson = false;
+            foreach ($arrayItems as $r) {
+                if (is_array($r) && !empty($r['label_json'])) {
+                    $haveLabelJson = true;
+                    break;
+                }
+            }
+            if ($haveLabelJson) {
+                $payload = array_values($arrayItems);
+                $usedSource = 'form-array';
+            } else {
+                // Form-array present but stripped of label_json — almost
+                // certainly max_input_vars truncation. Fall back to JSON.
+                error_log(sprintf(
+                    '[MyTheme saveAction] form-array had %d items but zero label_json fields. '
+                    . 'Likely max_input_vars truncation (limit=%s, post_count=%d). Falling back to items_json.',
+                    count($arrayItems),
+                    ini_get('max_input_vars') ?: 'unknown',
+                    is_array($_POST) ? count($_POST, COUNT_RECURSIVE) : -1
+                ));
+                $payload = json_decode($raw, true);
+                if (!is_array($payload)) $payload = [];
+                $usedSource = 'json (fallback from truncated form-array)';
+            }
         } else {
             $payload = json_decode($raw, true);
             if (!is_array($payload)) $payload = [];
@@ -199,12 +231,13 @@ final class MenuController extends AbstractController
 
         // Diagnostic: log the POST shape so we can prove what arrived.
         error_log(sprintf(
-            '[MyTheme saveAction] menu_id=%d source=%s items_count=%d post_keys=%s items_json_len=%d',
+            '[MyTheme saveAction] menu_id=%d source=%s items_count=%d post_keys=%s items_json_len=%d max_input_vars=%s',
             $menu->id,
-            $arrayItems !== null ? 'form-array' : 'json',
+            $usedSource,
             count($payload),
             implode(',', array_keys($_POST)),
-            strlen($raw)
+            strlen($raw),
+            ini_get('max_input_vars') ?: 'unknown'
         ));
         // Verbose: log the resolved label for each item AS RECEIVED, so we
         // can diff against what's in the DB after persistItems runs.
