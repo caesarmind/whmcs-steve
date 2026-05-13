@@ -73,6 +73,7 @@ final class WhmcsDefaults
             // templates/nexus/store/<slug>/ directory naming so WHMCS routes
             // /store/<slug> straight to our index.tpl dispatcher.
             'store-sitelock'             => ['lang_key' => '', 'default_label' => 'Website Security',          'url' => 'store/sitelock'],
+            'store-sitelockvpn'          => ['lang_key' => '', 'default_label' => 'SiteLock VPN',              'url' => 'store/sitelockvpn'],
             'store-socialbee'            => ['lang_key' => '', 'default_label' => 'SocialBee',                 'url' => 'store/socialbee'],
             'store-ssl'                  => ['lang_key' => '', 'default_label' => 'SSL Certificates',          'url' => 'store/ssl'],
             'store-threesixtymonitoring' => ['lang_key' => '', 'default_label' => 'Site & Server Monitoring', 'url' => 'store/threesixtymonitoring'],
