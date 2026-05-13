@@ -1,10 +1,10 @@
 {*
     One branding slot. Renders one of two static states:
 
-      empty  → dashed upload tile
-      filled → image preview with hover overlay (Replace / Remove)
+      empty  -> dashed upload tile
+      filled -> image preview with hover overlay (Replace / Remove)
 
-    A third state — uploading — is composed at runtime by the JS in
+    A third state -- uploading -- is composed at runtime by the JS in
     index.tpl (it injects an overlay with spinner + progress bar; no
     server-side rendering needed).
 
@@ -15,7 +15,7 @@
     Inputs:
       $row.field, $row.label, $row.help, $row.accept, $row.maxHuman,
       $row.stored, $row.url, $row.error
-      $dark — boolean, dark surface theming for this tile
+      $dark -- boolean, dark surface theming for this tile
 *}
 <div class="mt-branding-tile"
      data-field="{$row.field|escape}"
@@ -42,7 +42,7 @@
                 </form>
             </div>
         </div>
-        {* Hidden file input for the Replace flow — pairs with the
+        {* Hidden file input for the Replace flow -- pairs with the
            overlay's Replace label via the matching id/for. JS auto-
            submits this on change; form-submit fallback for no-JS. *}
         <input id="upload-{$row.field|escape}" type="file" name="{$row.field|escape}"
@@ -54,7 +54,7 @@
                 <path d="M20 6v22M11 15l9-9 9 9M6 28v3a3 3 0 003 3h22a3 3 0 003-3v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <div class="mt-upload-text">Click to upload</div>
-            <div class="mt-upload-hint">{$row.help|escape} · max {$row.maxHuman}</div>
+            <div class="mt-upload-hint">{$row.help|escape} - max {$row.maxHuman}</div>
             <input id="upload-{$row.field|escape}" type="file" name="{$row.field|escape}"
                    accept="{$row.accept|escape}" hidden data-upload="{$row.field|escape}">
         </label>

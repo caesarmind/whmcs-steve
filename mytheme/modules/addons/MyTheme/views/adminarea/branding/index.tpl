@@ -3,10 +3,10 @@
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
     <h1 class="mt-page-title">Branding</h1>
-    <p class="mt-page-subtitle">Upload your logo and favicon. Each file is saved the moment you pick it — no Save needed.</p>
+    <p class="mt-page-subtitle">Upload your logo and favicon. Each file is saved the moment you pick it -- no Save needed.</p>
 </header>
 
-{* Server-rendered flash banner — only shows when the page is reached via
+{* Server-rendered flash banner -- only shows when the page is reached via
    the form-based fallback path (JS disabled). The AJAX path updates inline
    per-tile and doesn't redirect, so these banners never appear under JS. *}
 {if $flash == 'saved'}
@@ -14,14 +14,14 @@
 {elseif $flash == 'removed'}
     <div class="mt-alert mt-alert-success"><strong>Removed.</strong> The file is gone and the slot is empty.</div>
 {elseif $flash == 'partial'}
-    <div class="mt-alert mt-alert-warning"><strong>Partially saved.</strong> Some files were rejected — see the inline errors below.</div>
+    <div class="mt-alert mt-alert-warning"><strong>Partially saved.</strong> Some files were rejected -- see the inline errors below.</div>
 {elseif $flash == 'errors'}
-    <div class="mt-alert mt-alert-danger"><strong>Nothing saved.</strong> Every uploaded file was rejected — see the inline errors below.</div>
+    <div class="mt-alert mt-alert-danger"><strong>Nothing saved.</strong> Every uploaded file was rejected -- see the inline errors below.</div>
 {elseif $flash == 'invalid-field'}
     <div class="mt-alert mt-alert-danger"><strong>Invalid request.</strong> Unknown branding field.</div>
 {/if}
 
-{* Top-of-page status line — populated by the JS after each AJAX upload /
+{* Top-of-page status line -- populated by the JS after each AJAX upload /
    remove. Stays empty under no-JS (the form-based banners above cover that
    case). aria-live so screen readers announce changes. *}
 <div class="mt-branding-status" id="mt-branding-status" aria-live="polite" role="status"></div>
@@ -49,7 +49,7 @@
 {/foreach}
 
     {* The Save button is only useful for no-JS fallback. JS hides it via
-       the .is-ajax class added on load — under JS, every pick auto-uploads. *}
+       the .is-ajax class added on load -- under JS, every pick auto-uploads. *}
     <div class="mt-branding-save-row" style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
         <button type="submit" class="mt-btn mt-btn-primary">Save changes</button>
     </div>
@@ -59,7 +59,7 @@
    blocks unless wrapped in {literal}. Auto-literal handling is brittle
    (works for `{` followed by whitespace but chokes on JS object
    literals, regex char classes containing `$`, CSS keyframe ranges,
-   etc.) — wrapping bypasses Smarty entirely for the inline assets. *}
+   etc.) -- wrapping bypasses Smarty entirely for the inline assets. *}
 {literal}
 <style>
 /* Branding-specific add-ons. Reuse mt-upload from footer.tpl; only the
@@ -133,7 +133,7 @@
 /* ---------------- Loading state (injected by JS) ---------------- */
 /* Covers the upload area (label OR preview) while an AJAX upload is
    in flight. Positioned absolute so we don't disturb the tile's flex
-   layout — the caption + error below stay where they are. */
+   layout -- the caption + error below stay where they are. */
 .mt-tile-loading {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -198,11 +198,11 @@
     transition: width 0.12s linear;
 }
 
-/* When the form has .is-ajax (set by JS on load), hide the Save row —
+/* When the form has .is-ajax (set by JS on load), hide the Save row --
    uploads commit immediately. The Save row is the no-JS fallback. */
 .mt-branding-form.is-ajax .mt-branding-save-row { display: none !important; }
 
-/* Top-of-page status banner — populated by JS after each operation. */
+/* Top-of-page status banner -- populated by JS after each operation. */
 .mt-branding-status:empty { display: none; }
 .mt-branding-status {
     padding: 10px 14px;
@@ -230,7 +230,7 @@
 
     var form = document.getElementById('mt-branding-form');
     if (!form || !window.FormData || !window.XMLHttpRequest) {
-        // No fetch/FormData/XHR (very old browser) — fall back to the
+        // No fetch/FormData/XHR (very old browser) -- fall back to the
         // form-based path: admin picks files, clicks Save changes.
         return;
     }
@@ -239,7 +239,7 @@
     var REMOVE_URL = '?module=MyTheme&action=branding&sub=remove-ajax';
     var STATUS     = document.getElementById('mt-branding-status');
 
-    // Mark the form as AJAX-active — CSS hides the Save button.
+    // Mark the form as AJAX-active -- CSS hides the Save button.
     form.classList.add('is-ajax');
 
     // ---- helpers ----
@@ -303,7 +303,7 @@
             '<div class="mt-tile-loading-text"></div>' +
             '<div class="mt-tile-progress"><div class="mt-tile-progress-bar"></div></div>';
         overlay.querySelector('.mt-tile-loading-text').textContent =
-            filename ? 'Uploading ' + filename + '…' : 'Working…';
+            filename ? 'Uploading ' + filename + '...' : 'Working...';
         tile.appendChild(overlay);
     }
 
@@ -357,7 +357,7 @@
                     '<path d="M20 6v22M11 15l9-9 9 9M6 28v3a3 3 0 003 3h22a3 3 0 003-3v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
                 '</svg>' +
                 '<div class="mt-upload-text">Click to upload</div>' +
-                '<div class="mt-upload-hint">' + escapeHtml(help) + ' · max ' + escapeHtml(maxHuman) + '</div>' +
+                '<div class="mt-upload-hint">' + escapeHtml(help) + ' - max ' + escapeHtml(maxHuman) + '</div>' +
                 '<input id="upload-' + escapeHtml(field) + '" type="file" name="' + escapeHtml(field) + '" accept="' + escapeHtml(accept) + '" hidden data-upload="' + escapeHtml(field) + '">' +
             '</label>' +
             '<div class="mt-upload-caption">' + escapeHtml(label) + '</div>';
@@ -401,22 +401,22 @@
             try { res = JSON.parse(xhr.responseText); }
             catch (e) {
                 setTileError(tile, 'Server returned a non-JSON response (HTTP ' + xhr.status + ').');
-                setStatus('Upload failed — see the inline error.', 'error');
+                setStatus('Upload failed -- see the inline error.', 'error');
                 return;
             }
             if (!res || !res.ok) {
                 setTileError(tile, (res && res.error) || 'Upload failed.');
-                setStatus('Upload failed — see the inline error.', 'error');
+                setStatus('Upload failed -- see the inline error.', 'error');
                 return;
             }
             renderFilled(tile, res);
-            setStatus('Saved “' + (res.label || field) + '”.', 'success');
+            setStatus('Saved "' + (res.label || field) + '".', 'success');
         };
 
         xhr.onerror = function () {
             clearLoading(tile);
-            setTileError(tile, 'Network error — please retry.');
-            setStatus('Upload failed — network error.', 'error');
+            setTileError(tile, 'Network error -- please retry.');
+            setStatus('Upload failed -- network error.', 'error');
         };
 
         xhr.send(data);
@@ -440,21 +440,21 @@
             try { res = JSON.parse(xhr.responseText); }
             catch (e) {
                 setTileError(tile, 'Server returned a non-JSON response (HTTP ' + xhr.status + ').');
-                setStatus('Remove failed — see the inline error.', 'error');
+                setStatus('Remove failed -- see the inline error.', 'error');
                 return;
             }
             if (!res || !res.ok) {
                 setTileError(tile, (res && res.error) || 'Remove failed.');
-                setStatus('Remove failed — see the inline error.', 'error');
+                setStatus('Remove failed -- see the inline error.', 'error');
                 return;
             }
             renderEmpty(tile);
-            setStatus('Removed “' + (tile.getAttribute('data-label') || field) + '”.', 'success');
+            setStatus('Removed "' + (tile.getAttribute('data-label') || field) + '".', 'success');
         };
         xhr.onerror = function () {
             clearLoading(tile);
-            setTileError(tile, 'Network error — please retry.');
-            setStatus('Remove failed — network error.', 'error');
+            setTileError(tile, 'Network error -- please retry.');
+            setStatus('Remove failed -- network error.', 'error');
         };
         xhr.send(data);
     }
@@ -462,13 +462,13 @@
     // ---- event binding ----
 
     function bindTile(tile) {
-        // File input change → AJAX upload.
+        // File input change -> AJAX upload.
         var input = tile.querySelector('input[type="file"][data-upload]');
         if (input && !input.hasAttribute('data-bound')) {
             input.setAttribute('data-bound', '1');
             input.addEventListener('change', function () { doUpload(input); });
         }
-        // Remove button click → confirm → AJAX remove.
+        // Remove button click -> confirm -> AJAX remove.
         // We intercept the click (not the form submit) so we can keep the
         // <form> for no-JS fallback. preventDefault stops the submit.
         var btn = tile.querySelector('[data-remove]');
