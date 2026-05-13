@@ -11,6 +11,7 @@ use MyTheme\Menu\Seeder;
 use MyTheme\Menu\WhmcsDefaults;
 use MyTheme\Models\Menu;
 use MyTheme\Models\MenuItem;
+use MyTheme\Models\Settings;
 use MyTheme\Template\PagesCache;
 use WHMCS\Database\Capsule;
 
@@ -33,6 +34,31 @@ final class MenuController extends AbstractController
     {
         parent::__construct($params);
         $this->ensureMenuTables();
+        $this->ensureMenuPagesMigration();
+    }
+
+    /**
+     * One-shot migration: convert existing custom_link items whose URL maps to
+     * a known WhmcsDefaults entry → whmcs_page. Gated by a Settings marker so
+     * it only runs once after the addon upgrade. Buyers (and admins) can
+     * re-run explicitly from the Tools tab.
+     */
+    private function ensureMenuPagesMigration(): void
+    {
+        $key     = 'mytheme_menu_migration_version';
+        $current = (string)Settings::getValue($key, '0');
+        $target  = '1';
+        if ($current === $target) return;
+
+        try {
+            $count = (new Seeder())->migrateCustomLinksToWhmcsPages();
+            Settings::setValue($key, $target);
+            if ($count > 0) {
+                error_log("MyTheme menu: auto-migrated {$count} custom_link items to whmcs_page");
+            }
+        } catch (\Throwable $e) {
+            error_log('MyTheme menu page migration failed: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -37,6 +37,13 @@
         </div>
         <div class="mt-row">
             <div>
+                <div class="mt-row-label">Convert custom links to WHMCS pages</div>
+                <div class="mt-row-help">Walk every menu and re-type <code>custom_link</code> items whose URL matches a known WHMCS page (Home, My Services, Tickets, etc.) → <code>whmcs_page</code>. Cart deeplinks and external URLs are skipped. Safe to re-run.</div>
+            </div>
+            <button type="submit" name="tool" value="migrate_menu_pages" class="mt-btn mt-btn-secondary">Convert</button>
+        </div>
+        <div class="mt-row">
+            <div>
                 <div class="mt-row-label">Refresh license</div>
                 <div class="mt-row-help">Force a callback to the license server now.</div>
             </div>

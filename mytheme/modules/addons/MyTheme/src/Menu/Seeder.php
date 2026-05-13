@@ -71,6 +71,54 @@ final class Seeder
     }
 
     /**
+     * Convert every `custom_link` menu item whose `config.url` matches a known
+     * WHMCS page URL → `whmcs_page` item with `config.page` set to the
+     * corresponding templatefile name. Idempotent + safe to re-run:
+     *
+     *   - Only matches items with an exact URL match against WhmcsDefaults.
+     *   - Items pointing to cart deeplinks, external scripts, or unknown
+     *     URLs stay as custom_link.
+     *   - Already-whmcs_page items are skipped (the query filters by type).
+     *
+     * Used at upgrade time (MyTheme_upgrade) and from the admin Tools tab.
+     * Returns the number of items converted.
+     */
+    public function migrateCustomLinksToWhmcsPages(): int
+    {
+        // Build url → templatefile lookup. First-wins for URLs shared by
+        // alias templatefiles (e.g. supportticketslist + supporttickets both
+        // resolve to supporttickets.php).
+        $urlToPage = [];
+        foreach (WhmcsDefaults::all() as $page => $defaults) {
+            $url = (string)($defaults['url'] ?? '');
+            if ($url === '' || $url === '/') continue;
+            if (!isset($urlToPage[$url])) {
+                $urlToPage[$url] = $page;
+            }
+        }
+
+        $migrated = 0;
+        $items = MenuItem::where('item_type', 'custom_link')->get();
+        foreach ($items as $item) {
+            $config = $item->config();
+            if (!is_array($config)) $config = [];
+            $url = trim((string)($config['url'] ?? ''));
+            if ($url === '' || !isset($urlToPage[$url])) continue;
+
+            // Convert: swap url for page, retype.
+            $page = $urlToPage[$url];
+            unset($config['url']);
+            $config['page'] = $page;
+
+            $item->item_type   = 'whmcs_page';
+            $item->config_json = json_encode($config, JSON_FORCE_OBJECT);
+            $item->save();
+            $migrated++;
+        }
+        return $migrated;
+    }
+
+    /**
      * Hard-reset the two "WHMCS Defaults" preset menus to their preset
      * definitions — delete existing items and re-seed. Useful when the
      * default item list shipped in a code update and admins want it.

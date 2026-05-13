@@ -5,6 +5,7 @@ namespace MyTheme\Controller\Admin;
 
 use MyTheme\Controller\AbstractController;
 use MyTheme\Helpers\AddonHelper;
+use MyTheme\Menu\Seeder as MenuSeeder;
 use MyTheme\Models\Settings;
 use MyTheme\Template\PagesCache;
 
@@ -26,6 +27,7 @@ final class ToolsController extends AbstractController
             'clear_template_cache'  => $this->clearTemplateCache(),
             'refresh_menu_cache'    => $this->refreshMenuCache(),
             'rebuild_pages_cache'   => $this->rebuildPagesCache(),
+            'migrate_menu_pages'    => $this->migrateMenuPages(),
             'refresh_license'       => $this->refreshLicense(),
             'generate_htaccess'     => $this->generateHtaccess(),
             default                 => 'Unknown tool',
@@ -40,6 +42,14 @@ final class ToolsController extends AbstractController
         }
         $pages = PagesCache::rebuild($template);
         return 'Pages discovery rebuilt — ' . count($pages) . ' pages found.';
+    }
+
+    private function migrateMenuPages(): string
+    {
+        $count = (new MenuSeeder())->migrateCustomLinksToWhmcsPages();
+        return $count === 0
+            ? 'No custom_link items matched a known WHMCS page — nothing to do.'
+            : "Converted {$count} custom_link items to whmcs_page.";
     }
 
     private function clearTemplateCache(): string
