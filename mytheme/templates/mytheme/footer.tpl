@@ -16,10 +16,41 @@
 {else}
     </div>{* /.content-area *}
 
-    {* Site footer — top-layout only *}
+    {* Site footer — top-layout only.
+
+       Columns come from the admin-configured Footer Menu when the addon is
+       active and a footer-location menu is seeded ($mtFooterItems is built
+       by hooks.php → TreeRenderer::buildFlatList). Each top-level
+       dropdown_parent becomes one column; its children are the column's
+       links. Other top-level types (header/divider/stray links) degrade
+       gracefully.
+
+       If no footer menu is configured (fresh install before the seeder
+       runs, or admin deactivated every footer preset), we keep a minimal
+       hardcoded fallback so the footer never renders blank. *}
     <footer class="hp-footer only-top">
         <div class="hp-footer-inner">
             <div class="hp-footer-cols">
+            {if isset($mtFooterItems) && $mtFooterItems}
+                {foreach $mtFooterItems as $col}
+                    {if $col.type == 'dropdown_parent' && $col.children}
+                        <div class="hp-footer-col">
+                            <h4>{$col.label|escape}</h4>
+                            <ul>
+                                {foreach $col.children as $link}
+                                    {if $link.type == 'divider' || $link.type == 'header'}{continue}{/if}
+                                    <li><a href="{$link.uri|escape}"{if $link.target} target="{$link.target|escape}"{/if}>{$link.label|escape}</a></li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                    {elseif $col.type != 'divider' && $col.type != 'header'}
+                        {* Stray top-level link — promote to a single-link column *}
+                        <div class="hp-footer-col">
+                            <h4><a href="{$col.uri|escape}"{if $col.target} target="{$col.target|escape}"{/if}>{$col.label|escape}</a></h4>
+                        </div>
+                    {/if}
+                {/foreach}
+            {else}
                 <div class="hp-footer-col">
                     <h4>{$LANG.shop|default:'Shop'}</h4>
                     <ul>
@@ -43,6 +74,7 @@
                         <li><a href="{$WEB_ROOT}/serverstatus.php">{$LANG.networkstatus|default:'Network status'}</a></li>
                     </ul>
                 </div>
+            {/if}
             </div>
             <div class="hp-footer-bottom">
                 <span>&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$LANG.allrightsreserved|default:'All rights reserved.'} <strong style="color:#ff3b30;font-weight:700;">[DEPLOY-CHECK-V6]</strong></span>

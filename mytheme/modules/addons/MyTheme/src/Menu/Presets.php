@@ -39,6 +39,7 @@ final class Presets
             self::clientWhmcsDefaults(),
             self::guestMain(),
             self::guestWhmcsDefaults(),
+            self::footerDefaults(),
         ];
     }
 
@@ -294,6 +295,107 @@ final class Presets
                  'config' => ['page' => 'clientregister', 'position_side' => 'right', 'icon' => 'user']],
                 ['type' => ItemTypes::LANGUAGE, 'label' => self::label('chooselanguage', 'Language'),
                  'config' => ['position_side' => 'right', 'icon' => 'globe']],
+            ],
+        ];
+    }
+
+    /**
+     * Footer menu — pre-seeded from the apple-client-area sitelock-vpn
+     * homepage-style landing footer (5 columns of links). Audience is 'all'
+     * because the footer renders for both logged-in clients and guests.
+     *
+     * Columns are dropdown_parent items (label = column title, children =
+     * the links). HEADER doesn't accept children, and the footer renderer
+     * walks the same tree shape as the sidebar — DROPDOWN_PARENT is the
+     * only built-in container that maps cleanly to "column with items".
+     *
+     * Link targets prefer whmcs_page when the linked page maps to a known
+     * templatefile (so URLs flow through WhmcsDefaults and stay consistent
+     * with the rest of the menu system). Items the WHMCS install doesn't
+     * own — Newsroom, Careers, Legal, Community — stay as custom_link with
+     * a placeholder href so admins can wire them up in the builder.
+     */
+    private static function footerDefaults(): array
+    {
+        return [
+            'name'     => 'Footer Menu',
+            'location' => 'footer',
+            'audience' => 'all',
+            'active'   => true,
+            'items'    => [
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('', 'Shop & Learn'),
+                 'config' => [],
+                 'children' => [
+                    self::customLink('', 'Cloud Hosting',     'cart.php?gid=shared'),
+                    self::customLink('', 'VPS',               'cart.php?gid=vps'),
+                    self::customLink('', 'Dedicated Servers', 'cart.php?gid=dedicated'),
+                    self::customLink('', 'Domains',           'cart.php?a=add&domain=register'),
+                    self::whmcsPage('store-ssl'),
+                    self::customLink('', 'Email',             'cart.php?gid=email'),
+                 ]],
+
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('', 'Security & Tools'),
+                 'config' => [],
+                 'children' => [
+                    self::whmcsPage('store-ssl'),
+                    ['type' => ItemTypes::WHMCS_PAGE,
+                     'label' => self::label('', 'Email Services'),
+                     'config' => ['page' => 'store-spamexperts']],
+                    self::whmcsPage('store-sitelock'),
+                    self::whmcsPage('store-codeguard'),
+                    self::whmcsPage('store-marketgoo'),
+                    self::customLink('', 'XOVI Now', '#'),
+                    ['type' => ItemTypes::WHMCS_PAGE,
+                     'label' => self::label('', '360 Monitoring'),
+                     'config' => ['page' => 'store-threesixtymonitoring']],
+                    self::whmcsPage('store-sitelockvpn'),
+                    ['type' => ItemTypes::WHMCS_PAGE,
+                     'label' => self::label('', 'NordVPN'),
+                     'config' => ['page' => 'store-nordvpn']],
+                    self::whmcsPage('store-socialbee'),
+                 ]],
+
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('accounttab', 'Account'),
+                 'config' => [],
+                 'children' => [
+                    ['type' => ItemTypes::WHMCS_PAGE,
+                     'label' => self::label('login', 'Sign in'),
+                     'config' => ['page' => 'login']],
+                    ['type' => ItemTypes::WHMCS_PAGE,
+                     'label' => self::label('createaccount', 'Create an account'),
+                     'config' => ['page' => 'clientregister']],
+                    ['type' => ItemTypes::WHMCS_PAGE,
+                     'label' => self::label('billingtab', 'Billing'),
+                     'config' => ['page' => 'clientareainvoices']],
+                    self::customLink('', 'Refer a friend', 'affiliates.php'),
+                 ]],
+
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('navsupport', 'Support'),
+                 'config' => [],
+                 'children' => [
+                    self::whmcsPage('knowledgebase'),
+                    ['type' => ItemTypes::WHMCS_PAGE,
+                     'label' => self::label('contactus', 'Contact us'),
+                     'config' => ['page' => 'contact']],
+                    ['type' => ItemTypes::WHMCS_PAGE,
+                     'label' => self::label('networkstatus', 'Network status'),
+                     'config' => ['page' => 'serverstatus']],
+                    self::customLink('', 'Community', '#'),
+                 ]],
+
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('', 'About WHMCS'),
+                 'config' => [],
+                 'children' => [
+                    self::customLink('', 'Newsroom',    '#'),
+                    self::customLink('', 'Careers',     '#'),
+                    self::customLink('', 'Legal',       '#'),
+                    self::customLink('', 'Environment', '#'),
+                 ]],
             ],
         ];
     }

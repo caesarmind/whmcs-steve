@@ -172,6 +172,26 @@ if (AddonHelper::isActive()) {
         }
     });
 
+    // Footer menu — same pattern as the sidebar, but for location=footer.
+    // Surfaces $mtFooterItems so footer.tpl renders the admin-driven column
+    // layout. Audience falls back to 'all' inside Menu::pick when no
+    // audience-specific footer is configured.
+    add_hook('ClientAreaPage', 3, function ($vars) {
+        try {
+            if (!\WHMCS\Database\Capsule::schema()->hasTable('mytheme_menus')) {
+                return null;
+            }
+            $audience = MyTheme\Menu\Audience::current();
+            $menu     = MyTheme\Models\Menu::pick('footer', $audience);
+            if ($menu === null) return null;
+            $items = MyTheme\Menu\TreeRenderer::buildFlatList($menu);
+            return ['mtFooterItems' => $items];
+        } catch (\Throwable $e) {
+            error_log('MyTheme footer buildFlatList failed: ' . $e->getMessage());
+            return null;
+        }
+    });
+
     // Secondary navbar — same pattern (location = secondary). If no menu, leave alone.
     add_hook('ClientAreaSecondaryNavbar', 100, function (WHMCS\View\Menu\Item $secondaryNavbar) {
         try {
