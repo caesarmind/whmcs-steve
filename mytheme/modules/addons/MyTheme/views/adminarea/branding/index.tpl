@@ -242,6 +242,16 @@
     // Mark the form as AJAX-active -- CSS hides the Save button.
     form.classList.add('is-ajax');
 
+    // WHMCS auto-injects a hidden <input name="token" value="..."> into
+    // every server-rendered POST <form>. Grab the first one we can find
+    // and piggyback it on every AJAX POST so WHMCS's CSRF middleware
+    // doesn't reject the request. The token rotates per session but is
+    // stable across this page load.
+    function getCsrfToken() {
+        var t = document.querySelector('input[name="token"]');
+        return t ? t.value : '';
+    }
+
     // ---- helpers ----
 
     function escapeHtml(s) {
@@ -323,17 +333,24 @@
         var accept   = tile.getAttribute('data-accept');
         var isDark   = tile.getAttribute('data-variant') === 'dark';
 
-        // Build the filled state. Mirrors _tile.tpl's filled branch so
-        // a subsequent page reload renders the same DOM the JS just built.
+        // Build the filled state. NB: we deliberately do NOT emit a form
+        // tag from JS here. WHMCS's admin output filter regex-scans the
+        // response for opening POST forms and auto-injects a hidden CSRF
+        // token field right after the opening tag -- even when the form
+        // text happens to live inside a JS string literal or a JS
+        // comment (the regex is content-blind). The injection lands
+        // inside our quote-delimited string, breaking it across two
+        // physical lines, and the JS parser throws "Invalid or
+        // unexpected token". Using a plain button[data-remove] with a JS
+        // click handler avoids the regex match entirely. The server-
+        // rendered _tile.tpl still has the form for no-JS fallback
+        // (that one gets the token legitimately and submits normally).
         tile.innerHTML =
             '<div class="mt-branding-current' + (isDark ? ' is-dark' : '') + '">' +
                 '<img src="' + escapeHtml(payload.url) + '" alt="' + escapeHtml(label) + '">' +
                 '<div class="mt-branding-overlay">' +
                     '<label class="mt-btn mt-btn-secondary mt-btn-sm" for="upload-' + escapeHtml(field) + '" style="cursor:pointer">Replace</label>' +
-                    '<form method="post" action="?module=MyTheme&action=branding&sub=remove" class="mt-branding-remove-form" style="display:inline">' +
-                        '<input type="hidden" name="field" value="' + escapeHtml(field) + '">' +
-                        '<button type="submit" class="mt-btn mt-btn-danger mt-btn-sm" data-remove="' + escapeHtml(field) + '">Remove</button>' +
-                    '</form>' +
+                    '<button type="button" class="mt-btn mt-btn-danger mt-btn-sm" data-remove="' + escapeHtml(field) + '">Remove</button>' +
                 '</div>' +
             '</div>' +
             '<input id="upload-' + escapeHtml(field) + '" type="file" name="' + escapeHtml(field) + '" accept="' + escapeHtml(accept) + '" hidden data-upload="' + escapeHtml(field) + '">' +
@@ -380,6 +397,7 @@
         var data = new FormData();
         data.append('field', field);
         data.append('file',  file);
+        data.append('token', getCsrfToken());
 
         var xhr = new XMLHttpRequest();
         xhr.open('POST', UPLOAD_URL, true);
@@ -431,6 +449,7 @@
 
         var data = new FormData();
         data.append('field', field);
+        data.append('token', getCsrfToken());
 
         var xhr = new XMLHttpRequest();
         xhr.open('POST', REMOVE_URL, true);
