@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace MyTheme\Menu;
 
 /**
- * Preset menu definitions — the 4 menus Lagom ships with, matched name-for-name
- * so muscle memory transfers when admins move from Lagom.
+ * Preset menu definitions — the 4 menus shipped with MyTheme. Matched
+ * name-for-name with Lagom's presets so muscle memory transfers when admins
+ * move from Lagom.
  *
  * Storage shape per preset:
  *   name       — display name in the admin builder
@@ -16,10 +17,18 @@ namespace MyTheme\Menu;
  *                [type=>..., label=>['whmcs'=>..., 'custom'=>[...]],
  *                 config=>[...], children=>[...]]
  *
- * The two "WHMCS Defaults" presets contain ONE item: a whmcs_default
- * passthrough that surfaces whatever WHMCS's own primary navbar renders.
- * That's why they don't need a long item list to maintain — they auto-track
- * the WHMCS-shipped navigation.
+ * TYPE SELECTION POLICY
+ *   - whmcs_page  — when the URL maps to a real WHMCS client-area templatefile
+ *                   (Home → clientareahome, Tickets → supportticketslist, etc.).
+ *                   The URL is resolved at render time via WhmcsDefaults so a
+ *                   single edit there propagates to every preset.
+ *   - custom_link — order-form / cart deeplinks (cart.php?a=add&domain=…),
+ *                   external URLs (logout.php, affiliates.php), and group-
+ *                   specific cart filters (cart.php?gid=shared). These do
+ *                   NOT route through a client-area templatefile so they
+ *                   can't be whmcs_page.
+ *   - dropdown_parent — pure container that groups children under a label.
+ *   - header / divider / login_button / language / account_dropdown — special types.
  */
 final class Presets
 {
@@ -38,36 +47,58 @@ final class Presets
         return ['whmcs' => $whmcsKey, 'custom' => ['english' => $english]];
     }
 
+    /**
+     * Shorthand for a whmcs_page item — picks the lang_key + default_label
+     * from WhmcsDefaults so the preset stays consistent with the picker
+     * and the URL resolver.
+     */
+    private static function whmcsPage(string $templatefile, ?string $iconOverride = null): array
+    {
+        $d = WhmcsDefaults::lookup($templatefile)
+            ?? ['lang_key' => '', 'default_label' => ucwords(str_replace(['-', '_'], ' ', $templatefile))];
+        $config = ['page' => $templatefile];
+        if ($iconOverride !== null) {
+            $config['icon'] = $iconOverride;
+        }
+        return [
+            'type'   => ItemTypes::WHMCS_PAGE,
+            'label'  => self::label($d['lang_key'], $d['default_label']),
+            'config' => $config,
+        ];
+    }
+
+    /** Shorthand for a custom_link item — cart deeplinks, external URLs, etc. */
+    private static function customLink(string $langKey, string $english, string $url, ?string $icon = null, ?string $positionSide = null): array
+    {
+        $config = ['url' => $url];
+        if ($icon !== null) $config['icon'] = $icon;
+        if ($positionSide !== null) $config['position_side'] = $positionSide;
+        return [
+            'type'   => ItemTypes::CUSTOM_LINK,
+            'label'  => self::label($langKey, $english),
+            'config' => $config,
+        ];
+    }
+
     private static function clientMain(): array
     {
-        // Use direct URLs everywhere — templatefile-style names like
-        // "clientareahome" aren't valid routePath() names in WHMCS 9, so
-        // routePath() returns the literal "/index.php/route-not-defined"
-        // which makes every menu link broken.
         return [
             'name'     => 'Client Main Menu',
             'location' => 'main',
             'audience' => 'client',
             'active'   => true,
             'items'    => [
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navhome',  'Home'),
-                 'config' => ['url' => 'clientarea.php']],
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navservices', 'Services'),
-                 'config' => ['url' => 'clientarea.php?action=services']],
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navdomains',  'Domains'),
-                 'config' => ['url' => 'clientarea.php?action=domains']],
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navbilling',  'Billing'),
-                 'config' => ['url' => 'clientarea.php?action=invoices']],
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navsupport',  'Support'),
-                 'config' => ['url' => 'supporttickets.php']],
+                self::whmcsPage('clientareahome'),
+                self::whmcsPage('clientareaproducts'),
+                self::whmcsPage('clientareadomains'),
+                self::whmcsPage('clientareainvoices'),
+                self::whmcsPage('supportticketslist'),
                 ['type' => ItemTypes::ACCOUNT_DROPDOWN,
                  'label' => self::label('accounttab', 'Account'),
                  'config' => ['position_side' => 'right'],
                  'children' => [
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('accountdetails', 'Account Details'),
-                     'config' => ['url' => 'clientarea.php?action=details']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('logout', 'Logout'),
-                     'config' => ['url' => 'logout.php']],
+                    self::whmcsPage('clientareadetails'),
+                    self::customLink('logout', 'Logout', 'logout.php'),
                  ]],
             ],
         ];
@@ -96,23 +127,20 @@ final class Presets
             'active'   => false,
             'items'    => [
                 ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Home'), 'config' => []],
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navhome', 'Home'),
-                 'config' => ['url' => 'clientarea.php', 'icon' => 'home']],
+                self::whmcsPage('clientareahome', 'home'),
 
                 ['type' => ItemTypes::HEADER, 'label' => self::label('navservices', 'Services'), 'config' => []],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navservices', 'Services'),
                  'config' => ['icon' => 'server'],
                  'children' => [
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navservices', 'My Services'),
-                     'config' => ['url' => 'clientarea.php?action=services', 'icon' => 'server']],
+                    self::whmcsPage('clientareaproducts', 'server'),
                     ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domainrenewals', 'Renew Services'),
-                     'config' => ['url' => 'cart.php?gid=renewals', 'icon' => 'refresh']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('ordernew', 'Order New Services'),
-                     'config' => ['url' => 'cart.php', 'icon' => 'cart']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('orderaddons', 'View Available Addons'),
-                     'config' => ['url' => 'cart.php?gid=addons', 'icon' => 'puzzle']],
+                    // Order-form deeplinks — these are NOT client-area templatefiles, so they
+                    // stay custom_link. WHMCS routes them through the order-form theme.
+                    self::customLink('domainrenewals', 'Renew Services',   'cart.php?gid=renewals',  'refresh'),
+                    self::customLink('ordernew',       'Order New Services','cart.php',              'cart'),
+                    self::customLink('orderaddons',    'View Available Addons','cart.php?gid=addons','puzzle'),
                  ]],
 
                 ['type' => ItemTypes::HEADER, 'label' => self::label('navdomains', 'Domains'), 'config' => []],
@@ -120,22 +148,16 @@ final class Presets
                  'label' => self::label('navdomains', 'Domains'),
                  'config' => ['icon' => 'globe'],
                  'children' => [
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navdomains', 'My Domains'),
-                     'config' => ['url' => 'clientarea.php?action=domains', 'icon' => 'globe']],
+                    self::whmcsPage('clientareadomains', 'globe'),
                     ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domainrenewals', 'Domain Renewals'),
-                     'config' => ['url' => 'cart.php?a=add&domain=renewal', 'icon' => 'refresh']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domainregister', 'Register a New Domain'),
-                     'config' => ['url' => 'cart.php?a=add&domain=register', 'icon' => 'plus']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domaintransfer', 'Transfer Domains to Us'),
-                     'config' => ['url' => 'cart.php?a=add&domain=transfer', 'icon' => 'transfer']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'Website & Security'),
-                     'config' => ['url' => 'cart.php?gid=websitesecurity', 'icon' => 'shield']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'MarketConnect Products'),
-                     'config' => ['url' => 'cart.php?gid=marketconnect', 'icon' => 'package']],
+                    // Cart deeplinks — order-form routes, stay custom_link.
+                    self::customLink('domainrenewals', 'Domain Renewals',          'cart.php?a=add&domain=renewal',  'refresh'),
+                    self::customLink('domainregister', 'Register a New Domain',    'cart.php?a=add&domain=register', 'plus'),
+                    self::customLink('domaintransfer', 'Transfer Domains to Us',   'cart.php?a=add&domain=transfer', 'transfer'),
+                    self::customLink('',               'Website & Security',       'cart.php?gid=websitesecurity',   'shield'),
+                    self::customLink('',               'MarketConnect Products',   'cart.php?gid=marketconnect',     'package'),
                     ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'Manage SSL Certificates'),
-                     'config' => ['url' => 'clientarea.php?action=ssl', 'icon' => 'lock']],
+                    self::whmcsPage('managessl', 'lock'),
                  ]],
 
                 ['type' => ItemTypes::HEADER, 'label' => self::label('billingtab', 'Billing'), 'config' => []],
@@ -143,17 +165,14 @@ final class Presets
                  'label' => self::label('billingtab', 'Billing'),
                  'config' => ['icon' => 'credit-card'],
                  'children' => [
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navinvoices', 'My Invoices'),
-                     'config' => ['url' => 'clientarea.php?action=invoices', 'icon' => 'invoice']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navquotes', 'My Quotes'),
-                     'config' => ['url' => 'clientarea.php?action=quotes', 'icon' => 'quote']],
+                    self::whmcsPage('clientareainvoices', 'invoice'),
+                    self::whmcsPage('clientareaquotes',   'quote'),
                     ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('masspayment', 'Mass Payment'),
-                     'config' => ['url' => 'clientarea.php?action=masspay&all=true', 'icon' => 'wallet']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('paymentmethods', 'Payment Methods'),
-                     'config' => ['url' => 'clientarea.php?action=paymentmethods', 'icon' => 'credit-card']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('addfunds', 'Add Funds'),
-                     'config' => ['url' => 'clientarea.php?action=addfunds', 'icon' => 'plus-circle']],
+                    // Mass Payment with &all=true is a specific entrypoint, not the canonical
+                    // WhmcsDefaults URL. Keep as custom_link to preserve the param.
+                    self::customLink('masspayment', 'Mass Payment', 'clientarea.php?action=masspay&all=true', 'wallet'),
+                    self::whmcsPage('account-paymentmethods', 'credit-card'),
+                    self::whmcsPage('clientareaaddfunds', 'plus-circle'),
                  ]],
 
                 ['type' => ItemTypes::HEADER, 'label' => self::label('navsupport', 'Support'), 'config' => []],
@@ -161,26 +180,22 @@ final class Presets
                  'label' => self::label('navsupport', 'Support'),
                  'config' => ['icon' => 'life-buoy'],
                  'children' => [
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navtickets', 'Tickets'),
-                     'config' => ['url' => 'supporttickets.php', 'icon' => 'support']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('announcementstitle', 'Announcements'),
-                     'config' => ['url' => 'announcements.php', 'icon' => 'megaphone']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('knowledgebase', 'Knowledgebase'),
-                     'config' => ['url' => 'knowledgebase.php', 'icon' => 'book']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('downloadstitle', 'Downloads'),
-                     'config' => ['url' => 'downloads.php', 'icon' => 'download']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('networkstatus', 'Network Status'),
-                     'config' => ['url' => 'serverstatus.php', 'icon' => 'status']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('opennewticket', 'Open Ticket'),
-                     'config' => ['url' => 'submitticket.php', 'icon' => 'plus']],
+                    self::whmcsPage('supportticketslist', 'support'),
+                    self::whmcsPage('announcements',      'megaphone'),
+                    self::whmcsPage('knowledgebase',      'book'),
+                    self::whmcsPage('downloads',          'download'),
+                    self::whmcsPage('serverstatus',       'status'),
+                    self::whmcsPage('supportticketsubmit','plus'),
                  ]],
 
                 ['type' => ItemTypes::HEADER, 'label' => self::label('accounttab', 'Account'), 'config' => []],
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('affiliatesnav', 'Affiliates'),
-                 'config' => ['url' => 'affiliates.php', 'icon' => 'star']],
+                // Affiliates isn't in our page scope — stays custom_link.
+                self::customLink('affiliatesnav', 'Affiliates', 'affiliates.php', 'star'),
 
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('opennewticket', 'Open Ticket'),
-                 'config' => ['url' => 'submitticket.php', 'icon' => 'plus', 'position_side' => 'right']],
+                // Right-rail CTA — re-uses the supportticketsubmit page.
+                ['type' => ItemTypes::WHMCS_PAGE,
+                 'label' => self::label('opennewticket', 'Open Ticket'),
+                 'config' => ['page' => 'supportticketsubmit', 'icon' => 'plus', 'position_side' => 'right']],
             ],
         ];
     }
@@ -193,49 +208,41 @@ final class Presets
             'audience' => 'guest',
             'active'   => true,
             'items'    => [
-                ['type' => ItemTypes::CUSTOM_LINK,    'label' => self::label('', 'Home'),
-                 'config' => ['url' => '/', 'icon' => 'home']],
+                self::customLink('', 'Home', '/', 'home'),
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navhostingproducts', 'Hosting'),
                  'config' => ['dropdown_style' => 'default'],
                  'children' => [
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'Shared Hosting'),
-                     'config' => ['url' => 'cart.php?gid=shared']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'VPS'),
-                     'config' => ['url' => 'cart.php?gid=vps']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'Dedicated'),
-                     'config' => ['url' => 'cart.php?gid=dedicated']],
+                    // Group-specific cart filters — custom_link.
+                    self::customLink('', 'Shared Hosting', 'cart.php?gid=shared'),
+                    self::customLink('', 'VPS',            'cart.php?gid=vps'),
+                    self::customLink('', 'Dedicated',      'cart.php?gid=dedicated'),
                  ]],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navdomains', 'Domains'),
                  'config' => [],
                  'children' => [
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domainregister', 'Register a New Domain'),
-                     'config' => ['url' => 'cart.php?a=add&domain=register']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domaintransfer', 'Transfer Domains to Us'),
-                     'config' => ['url' => 'cart.php?a=add&domain=transfer']],
+                    self::customLink('domainregister', 'Register a New Domain',  'cart.php?a=add&domain=register'),
+                    self::customLink('domaintransfer', 'Transfer Domains to Us', 'cart.php?a=add&domain=transfer'),
                     ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'Domain Pricing'),
-                     'config' => ['url' => 'domainchecker.php']],
+                    // /domainchecker.php isn't a client-area templatefile.
+                    self::customLink('', 'Domain Pricing', 'domainchecker.php'),
                  ]],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navsupport', 'Support'),
                  'config' => [],
                  'children' => [
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('contact', 'Contact Us'),
-                     'config' => ['url' => 'contact.php']],
+                    self::whmcsPage('contact'),
                     ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('networkissues', 'Network Status'),
-                     'config' => ['url' => 'serverstatus.php']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('knowledgebase', 'Knowledgebase'),
-                     'config' => ['url' => 'knowledgebase.php']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('announcementstitle', 'Announcements'),
-                     'config' => ['url' => 'announcements.php']],
+                    self::whmcsPage('serverstatus'),
+                    self::whmcsPage('knowledgebase'),
+                    self::whmcsPage('announcements'),
                  ]],
                 ['type' => ItemTypes::LOGIN_BUTTON, 'label' => self::label('login', 'Login'),
                  'config' => ['position_side' => 'right', 'style' => 'primary']],
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('register', 'Register'),
-                 'config' => ['url' => 'register.php', 'position_side' => 'right']],
+                ['type' => ItemTypes::WHMCS_PAGE,
+                 'label' => self::label('register', 'Register'),
+                 'config' => ['page' => 'clientregister', 'position_side' => 'right']],
                 ['type' => ItemTypes::LANGUAGE, 'label' => self::label('chooselanguage', 'Language'),
                  'config' => ['position_side' => 'right']],
             ],
@@ -255,24 +262,18 @@ final class Presets
             'active'   => false,
             'items'    => [
                 ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Shop'), 'config' => []],
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('navhome', 'Home'),
-                 'config' => ['url' => '/', 'icon' => 'home']],
-
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('orderproducts', 'Browse Products'),
-                 'config' => ['url' => 'cart.php', 'icon' => 'shop']],
+                self::customLink('navhome', 'Home', '/', 'home'),
+                self::customLink('orderproducts', 'Browse Products', 'cart.php', 'shop'),
 
                 ['type' => ItemTypes::HEADER, 'label' => self::label('navdomains', 'Domains'), 'config' => []],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navdomains', 'Domains'),
                  'config' => ['icon' => 'globe'],
                  'children' => [
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domainregister', 'Register a Domain'),
-                     'config' => ['url' => 'cart.php?a=add&domain=register', 'icon' => 'plus']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('domaintransfer', 'Transfer Domain'),
-                     'config' => ['url' => 'cart.php?a=add&domain=transfer', 'icon' => 'transfer']],
+                    self::customLink('domainregister', 'Register a Domain',     'cart.php?a=add&domain=register', 'plus'),
+                    self::customLink('domaintransfer', 'Transfer Domain',       'cart.php?a=add&domain=transfer', 'transfer'),
                     ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('', 'Domain Pricing'),
-                     'config' => ['url' => 'cart.php?a=add&domain=register', 'icon' => 'tag']],
+                    self::customLink('', 'Domain Pricing', 'cart.php?a=add&domain=register', 'tag'),
                  ]],
 
                 ['type' => ItemTypes::HEADER, 'label' => self::label('navsupport', 'Information'), 'config' => []],
@@ -280,20 +281,17 @@ final class Presets
                  'label' => self::label('navsupport', 'Support'),
                  'config' => ['icon' => 'life-buoy'],
                  'children' => [
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('contactus', 'Contact Us'),
-                     'config' => ['url' => 'contact.php', 'icon' => 'envelope']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('networkstatus', 'Network Status'),
-                     'config' => ['url' => 'serverstatus.php', 'icon' => 'status']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('knowledgebase', 'Knowledgebase'),
-                     'config' => ['url' => 'knowledgebase.php', 'icon' => 'book']],
-                    ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('announcementstitle', 'Announcements'),
-                     'config' => ['url' => 'announcements.php', 'icon' => 'megaphone']],
+                    self::whmcsPage('contact',       'envelope'),
+                    self::whmcsPage('serverstatus',  'status'),
+                    self::whmcsPage('knowledgebase', 'book'),
+                    self::whmcsPage('announcements', 'megaphone'),
                  ]],
 
                 ['type' => ItemTypes::LOGIN_BUTTON, 'label' => self::label('login', 'Login'),
                  'config' => ['position_side' => 'right', 'style' => 'primary', 'icon' => 'transfer']],
-                ['type' => ItemTypes::CUSTOM_LINK, 'label' => self::label('register', 'Register'),
-                 'config' => ['url' => 'register.php', 'position_side' => 'right', 'icon' => 'user']],
+                ['type' => ItemTypes::WHMCS_PAGE,
+                 'label' => self::label('register', 'Register'),
+                 'config' => ['page' => 'clientregister', 'position_side' => 'right', 'icon' => 'user']],
                 ['type' => ItemTypes::LANGUAGE, 'label' => self::label('chooselanguage', 'Language'),
                  'config' => ['position_side' => 'right', 'icon' => 'globe']],
             ],

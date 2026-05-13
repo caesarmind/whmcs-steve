@@ -548,39 +548,20 @@ final class TreeRenderer
             return $page;
         }
 
-        // Known WHMCS templatefile → direct URL. This table wins over routePath()
-        // because routePath() expects WHMCS *route* names, not templatefile
-        // names. Calling routePath('clientareahome') returns the literal string
-        // "/index.php/route-not-defined", which then renders as a broken link.
-        $fallback = [
-            'clientareahome'     => 'clientarea.php',
-            'clientareaproducts' => 'clientarea.php?action=services',
-            'clientareadomains'  => 'clientarea.php?action=domains',
-            'clientareainvoices' => 'clientarea.php?action=invoices',
-            'clientareadetails'  => 'clientarea.php?action=details',
-            'clientareaquotes'   => 'clientarea.php?action=quotes',
-            'clientareasecurity' => 'clientarea.php?action=security',
-            'supporttickets'     => 'supporttickets.php',
-            'submitticket'       => 'submitticket.php',
-            'knowledgebase'      => 'knowledgebase.php',
-            'announcements'      => 'announcements.php',
-            'downloads'          => 'downloads.php',
-            'networkstatus'      => 'serverstatus.php',
-            'serverstatus'       => 'serverstatus.php',
-            'contact'            => 'contact.php',
-            'cart'               => 'cart.php',
-            'login'              => 'login.php',
-            'register'           => 'register.php',
-            'logout'             => 'logout.php',
-        ];
-        if (isset($fallback[$page])) {
-            return $fallback[$page];
+        // First: the WhmcsDefaults table — single source of truth for the
+        // standard templatefile → URL mapping. This wins over routePath()
+        // because WHMCS's routePath() expects *route* names, not templatefile
+        // names. Calling routePath('clientareahome') returns the literal
+        // "/index.php/route-not-defined" which renders as a broken link.
+        $defaults = WhmcsDefaults::lookup($page);
+        if ($defaults !== null && !empty($defaults['url'])) {
+            return $defaults['url'];
         }
 
-        // Last resort: try routePath() for things like 'account-users',
-        // 'user-profile', etc. that ARE registered as named routes. If the
-        // result is the literal "route-not-defined" sentinel WHMCS returns
-        // for unknown route names, fall back to a safe '#'.
+        // Last resort: try routePath() for templatefiles outside WhmcsDefaults
+        // that happen to be registered as named routes (e.g. 'account-users',
+        // 'user-profile'). If it returns the route-not-defined sentinel, drop
+        // through to the empty-string return so the renderer skips the item.
         if (function_exists('routePath')) {
             try {
                 $resolved = (string)routePath($page);

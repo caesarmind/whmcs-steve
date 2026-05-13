@@ -4,72 +4,77 @@ declare(strict_types=1);
 namespace MyTheme\Menu;
 
 /**
- * Static map of WHMCS templatefile → standard menu lang key + default label.
+ * Single source of truth mapping a WHMCS templatefile to:
+ *   - lang_key      — WHMCS lang/english.php nav* key for the label
+ *   - default_label — English fallback label when no lang key is set
+ *   - url           — the actual URL WHMCS routes that templatefile through
  *
- * Used by the menu builder's page picker to auto-populate label.whmcs (the
- * WHMCS lang-key reference) and label.custom.english (the fallback when the
- * lang key resolves to nothing) when an admin picks one of WHMCS's well-known
- * navbar destinations. Pages outside this list still appear in the picker;
- * they just don't get an auto-label.
+ * Used by:
+ *   - Menu builder page picker → auto-fill label.whmcs + label.custom.english
+ *     when admin picks a well-known page
+ *   - TreeRenderer::resolvePageUrl → render-time URL resolution for
+ *     whmcs_page menu items (replaces the old hardcoded fallback table)
+ *   - Presets → seeded WHMCS Defaults menu uses whmcs_page type with
+ *     these names instead of custom_link + raw URL
  *
  * Lang keys are stable across WHMCS 7 → 9 — sourced from
- * lang/english.php's `nav*` entries.
+ * lang/english.php's nav* entries.
  */
 final class WhmcsDefaults
 {
     /**
-     * @return array<string, array{lang_key:string, default_label:string}>
+     * @return array<string, array{lang_key:string, default_label:string, url:string}>
      */
     public static function all(): array
     {
         return [
             // Core client area
-            'clientareahome'       => ['lang_key' => 'navhome',           'default_label' => 'Home'],
-            'clientareaproducts'   => ['lang_key' => 'navservices',       'default_label' => 'My Services'],
-            'clientareadomains'    => ['lang_key' => 'navdomains',        'default_label' => 'My Domains'],
-            'clientareainvoices'   => ['lang_key' => 'navinvoices',       'default_label' => 'My Invoices'],
-            'clientareaquotes'     => ['lang_key' => 'navquotes',         'default_label' => 'Quotes'],
-            'clientareadetails'    => ['lang_key' => 'navmyaccount',      'default_label' => 'My Details'],
-            'clientareasecurity'   => ['lang_key' => 'navsecurity',       'default_label' => 'Security Settings'],
-            'clientareaemails'     => ['lang_key' => 'navemails',         'default_label' => 'Email History'],
-            'clientareaaddfunds'   => ['lang_key' => 'navaddfunds',       'default_label' => 'Add Funds'],
+            'clientareahome'       => ['lang_key' => 'navhome',           'default_label' => 'Home',              'url' => 'clientarea.php'],
+            'clientareaproducts'   => ['lang_key' => 'navservices',       'default_label' => 'My Services',       'url' => 'clientarea.php?action=services'],
+            'clientareadomains'    => ['lang_key' => 'navdomains',        'default_label' => 'My Domains',        'url' => 'clientarea.php?action=domains'],
+            'clientareainvoices'   => ['lang_key' => 'navinvoices',       'default_label' => 'My Invoices',       'url' => 'clientarea.php?action=invoices'],
+            'clientareaquotes'     => ['lang_key' => 'navquotes',         'default_label' => 'Quotes',            'url' => 'clientarea.php?action=quotes'],
+            'clientareadetails'    => ['lang_key' => 'navmyaccount',      'default_label' => 'My Details',        'url' => 'clientarea.php?action=details'],
+            'clientareasecurity'   => ['lang_key' => 'navsecurity',       'default_label' => 'Security Settings', 'url' => 'clientarea.php?action=security'],
+            'clientareaemails'     => ['lang_key' => 'navemails',         'default_label' => 'Email History',     'url' => 'clientarea.php?action=emails'],
+            'clientareaaddfunds'   => ['lang_key' => 'navaddfunds',       'default_label' => 'Add Funds',         'url' => 'clientarea.php?action=addfunds'],
+            'masspay'              => ['lang_key' => 'navmasspay',        'default_label' => 'Mass Payment',      'url' => 'clientarea.php?action=masspay'],
+            'managessl'            => ['lang_key' => '',                  'default_label' => 'Manage SSL Certificates', 'url' => 'clientarea.php?action=ssl'],
 
             // Support
-            'supportticketslist'   => ['lang_key' => 'navtickets',        'default_label' => 'Tickets'],
-            'supporttickets'       => ['lang_key' => 'navtickets',        'default_label' => 'Tickets'],
-            'supportticketsubmit'  => ['lang_key' => 'navsubmitticket',   'default_label' => 'Open Ticket'],
-            'submitticket'         => ['lang_key' => 'navsubmitticket',   'default_label' => 'Open Ticket'],
-            'announcements'        => ['lang_key' => 'navannouncements',  'default_label' => 'Announcements'],
-            'knowledgebase'        => ['lang_key' => 'navknowledgebase',  'default_label' => 'Knowledgebase'],
-            'downloads'            => ['lang_key' => 'navdownloads',      'default_label' => 'Downloads'],
-            'serverstatus'         => ['lang_key' => 'navnetworkissues', 'default_label' => 'Network Status'],
+            'supportticketslist'   => ['lang_key' => 'navtickets',        'default_label' => 'Tickets',           'url' => 'supporttickets.php'],
+            'supporttickets'       => ['lang_key' => 'navtickets',        'default_label' => 'Tickets',           'url' => 'supporttickets.php'],
+            'supportticketsubmit'  => ['lang_key' => 'navsubmitticket',   'default_label' => 'Open Ticket',       'url' => 'submitticket.php'],
+            'submitticket'         => ['lang_key' => 'navsubmitticket',   'default_label' => 'Open Ticket',       'url' => 'submitticket.php'],
+            'announcements'        => ['lang_key' => 'navannouncements',  'default_label' => 'Announcements',     'url' => 'announcements.php'],
+            'knowledgebase'        => ['lang_key' => 'navknowledgebase',  'default_label' => 'Knowledgebase',     'url' => 'knowledgebase.php'],
+            'downloads'            => ['lang_key' => 'navdownloads',      'default_label' => 'Downloads',         'url' => 'downloads.php'],
+            'serverstatus'         => ['lang_key' => 'navnetworkissues', 'default_label' => 'Network Status',     'url' => 'serverstatus.php'],
 
             // Public
-            'contact'              => ['lang_key' => 'navcontact',        'default_label' => 'Contact Us'],
-            'homepage'             => ['lang_key' => 'navhomepage',      'default_label' => 'Home'],
+            'contact'              => ['lang_key' => 'navcontact',        'default_label' => 'Contact Us',        'url' => 'contact.php'],
+            'homepage'             => ['lang_key' => 'navhomepage',      'default_label' => 'Home',               'url' => '/'],
 
             // Authentication
-            'login'                => ['lang_key' => 'navlogin',          'default_label' => 'Login'],
-            'clientregister'       => ['lang_key' => 'navregister',       'default_label' => 'Register'],
+            'login'                => ['lang_key' => 'navlogin',          'default_label' => 'Login',             'url' => 'login.php'],
+            'clientregister'       => ['lang_key' => 'navregister',       'default_label' => 'Register',          'url' => 'register.php'],
 
-            // Account / profile
-            'user-password'        => ['lang_key' => 'navchangepassword', 'default_label' => 'Change Password'],
-            'changepassword'       => ['lang_key' => 'navchangepassword', 'default_label' => 'Change Password'],
-            'changepw'             => ['lang_key' => 'navchangepassword', 'default_label' => 'Change Password'],
-            'account-contacts-manage' => ['lang_key' => 'navcontacts',    'default_label' => 'Contacts'],
-            'clientareacontacts'   => ['lang_key' => 'navcontacts',       'default_label' => 'Contacts'],
-            'account-user-management' => ['lang_key' => 'navusers',       'default_label' => 'Users'],
-            'clientareausers'      => ['lang_key' => 'navusers',          'default_label' => 'Users'],
-
-            // Billing
-            'masspay'              => ['lang_key' => 'navmasspay',        'default_label' => 'Mass Payment'],
+            // Account / profile (canonical + legacy URL aliases)
+            'user-password'           => ['lang_key' => 'navchangepassword', 'default_label' => 'Change Password', 'url' => 'clientarea.php?action=changepw'],
+            'changepassword'          => ['lang_key' => 'navchangepassword', 'default_label' => 'Change Password', 'url' => 'clientarea.php?action=changepw'],
+            'changepw'                => ['lang_key' => 'navchangepassword', 'default_label' => 'Change Password', 'url' => 'clientarea.php?action=changepw'],
+            'account-contacts-manage' => ['lang_key' => 'navcontacts',       'default_label' => 'Contacts',        'url' => 'clientarea.php?action=contacts'],
+            'clientareacontacts'      => ['lang_key' => 'navcontacts',       'default_label' => 'Contacts',        'url' => 'clientarea.php?action=contacts'],
+            'account-user-management' => ['lang_key' => 'navusers',          'default_label' => 'Users',           'url' => 'clientarea.php?action=users'],
+            'clientareausers'         => ['lang_key' => 'navusers',          'default_label' => 'Users',           'url' => 'clientarea.php?action=users'],
+            'account-paymentmethods'  => ['lang_key' => 'navpaymentmethods', 'default_label' => 'Payment Methods', 'url' => 'clientarea.php?action=paymentmethods'],
         ];
     }
 
     /**
      * Look up the defaults for a templatefile.
      *
-     * @return array{lang_key:string, default_label:string}|null
+     * @return array{lang_key:string, default_label:string, url:string}|null
      */
     public static function lookup(string $page): ?array
     {
