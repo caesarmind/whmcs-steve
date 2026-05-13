@@ -171,7 +171,7 @@ final class MenuController extends AbstractController
                 usort($bucket, fn ($a, $b) => strcmp($a['display_name'], $b['display_name']));
             }
             unset($bucket);
-            $groupOrder = ['Public' => 1, 'Authentication' => 2, 'Client Area' => 3, 'Account' => 4, 'Billing' => 5, 'Support' => 6];
+            $groupOrder = ['Public' => 1, 'Authentication' => 2, 'Client Area' => 3, 'Account' => 4, 'Billing' => 5, 'Support' => 6, 'Shop' => 7];
             uksort($pagesByGroup, function ($a, $b) use ($groupOrder) {
                 $oa = $groupOrder[$a] ?? 99;
                 $ob = $groupOrder[$b] ?? 99;

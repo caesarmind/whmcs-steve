@@ -68,6 +68,23 @@ final class WhmcsDefaults
             'account-user-management' => ['lang_key' => 'navusers',          'default_label' => 'Users',           'url' => 'clientarea.php?action=users'],
             'clientareausers'         => ['lang_key' => 'navusers',          'default_label' => 'Users',           'url' => 'clientarea.php?action=users'],
             'account-paymentmethods'  => ['lang_key' => 'navpaymentmethods', 'default_label' => 'Payment Methods', 'url' => 'clientarea.php?action=paymentmethods'],
+
+            // Shop / MarketConnect landing pages. Slugs match Nexus's
+            // templates/nexus/store/<slug>/ directory naming so WHMCS routes
+            // /store/<slug> straight to our index.tpl dispatcher.
+            'store-sitelock'             => ['lang_key' => '', 'default_label' => 'Website Security',          'url' => 'store/sitelock'],
+            'store-socialbee'            => ['lang_key' => '', 'default_label' => 'SocialBee',                 'url' => 'store/socialbee'],
+            'store-ssl'                  => ['lang_key' => '', 'default_label' => 'SSL Certificates',          'url' => 'store/ssl'],
+            'store-threesixtymonitoring' => ['lang_key' => '', 'default_label' => 'Site & Server Monitoring', 'url' => 'store/threesixtymonitoring'],
+            'store-nordvpn'              => ['lang_key' => '', 'default_label' => 'VPN',                       'url' => 'store/nordvpn'],
+            'store-spamexperts'          => ['lang_key' => '', 'default_label' => 'E-mail Services',           'url' => 'store/spamexperts'],
+            'store-ox'                   => ['lang_key' => '', 'default_label' => 'Professional Email',        'url' => 'store/ox'],
+            'store-sitebuilder'          => ['lang_key' => '', 'default_label' => 'Site Builder',              'url' => 'store/sitebuilder'],
+            'store-marketgoo'            => ['lang_key' => '', 'default_label' => 'SEO Tools',                 'url' => 'store/marketgoo'],
+            'store-codeguard'            => ['lang_key' => '', 'default_label' => 'Website Backup',            'url' => 'store/codeguard'],
+            'store-weebly'               => ['lang_key' => '', 'default_label' => 'Website Builder',           'url' => 'store/weebly'],
+            'store-order'                => ['lang_key' => '', 'default_label' => 'Order summary',             'url' => 'store/order'],
+            'store-not-found'            => ['lang_key' => '', 'default_label' => 'Store page not found',      'url' => 'store/not-found'],
         ];
     }
 

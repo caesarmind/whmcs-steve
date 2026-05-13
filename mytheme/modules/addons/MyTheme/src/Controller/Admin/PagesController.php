@@ -276,6 +276,7 @@ final class PagesController extends AbstractController
             'Account'        => 4,
             'Billing'        => 5,
             'Support'        => 6,
+            'Shop'           => 7,
             default          => 99,
         };
     }

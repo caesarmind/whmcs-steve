@@ -713,6 +713,20 @@ final class Hooks
             return [];
         }
 
+        // Normalize Nexus-style store templatefile paths to our flat naming
+        // convention. WHMCS routes /store/<slug> through a templatefile like
+        // 'store/<slug>/index' (or 'store/<slug>/<sub>' for sub-products such
+        // as ssl/dv, ssl/ev). Our discovery + admin Pages tab keep them as
+        // 'store-<slug>' or 'store-<slug>-<sub>' so they slot into the flat
+        // core/pages/ scheme alongside every other page.
+        if (preg_match('#^store/([^/]+)(?:/(\w+))?$#', $page, $m)) {
+            $slug = $m[1];
+            $sub  = $m[2] ?? '';
+            $page = ($sub !== '' && $sub !== 'index')
+                ? 'store-' . $slug . '-' . $sub
+                : 'store-' . $slug;
+        }
+
         $pageMeta = $template->getPageMeta($page);
         $variant  = (string)Settings::getValue(
             $template->getName() . '_page_variant_' . $page,
@@ -729,27 +743,35 @@ final class Hooks
         }
         $seoDefaults = is_array($pageMeta['seoDefaults'] ?? null) ? $pageMeta['seoDefaults'] : [];
 
-        return [
-            $page => [
-                'meta'       => $pageMeta,
-                'variant'    => $variant,
-                'fullPath'   => $fullPath,
-                'indexing'   => (string)($stored['indexing']   ?? $seoDefaults['indexing'] ?? 'inherit'),
-                'visibility' => (string)($stored['visibility'] ?? 'public'),
-                'seo' => [
-                    'title'        => (string)($stored['seo']['title']        ?? $seoDefaults['title']        ?? ''),
-                    'description'  => (string)($stored['seo']['description']  ?? $seoDefaults['description']  ?? ''),
-                    'social_image' => (string)($stored['seo']['social_image'] ?? ''),
-                ],
-                'options' => is_array($stored['options'] ?? null) ? $stored['options'] : [],
-                'layout_overrides' => [
-                    'main-menu' => isset($stored['layout_overrides']['main-menu']) && is_string($stored['layout_overrides']['main-menu'])
-                        ? $stored['layout_overrides']['main-menu'] : null,
-                    'footer'    => isset($stored['layout_overrides']['footer']) && is_string($stored['layout_overrides']['footer'])
-                        ? $stored['layout_overrides']['footer'] : null,
-                ],
+        $entry = [
+            'meta'       => $pageMeta,
+            'variant'    => $variant,
+            'fullPath'   => $fullPath,
+            'indexing'   => (string)($stored['indexing']   ?? $seoDefaults['indexing'] ?? 'inherit'),
+            'visibility' => (string)($stored['visibility'] ?? 'public'),
+            'seo' => [
+                'title'        => (string)($stored['seo']['title']        ?? $seoDefaults['title']        ?? ''),
+                'description'  => (string)($stored['seo']['description']  ?? $seoDefaults['description']  ?? ''),
+                'social_image' => (string)($stored['seo']['social_image'] ?? ''),
+            ],
+            'options' => is_array($stored['options'] ?? null) ? $stored['options'] : [],
+            'layout_overrides' => [
+                'main-menu' => isset($stored['layout_overrides']['main-menu']) && is_string($stored['layout_overrides']['main-menu'])
+                    ? $stored['layout_overrides']['main-menu'] : null,
+                'footer'    => isset($stored['layout_overrides']['footer']) && is_string($stored['layout_overrides']['footer'])
+                    ? $stored['layout_overrides']['footer'] : null,
             ],
         ];
+
+        // Expose under the normalized key (admin Pages tab, dispatcher hardcoded keys)
+        // AND under the original templatefile when WHMCS used a Nexus-style nested
+        // path — so header.tpl's $myTheme.pages[$templatefile] SEO lookup still works.
+        $original = (string)($vars['templatefile'] ?? '');
+        $out = [$page => $entry];
+        if ($original !== '' && $original !== $page) {
+            $out[$original] = $entry;
+        }
+        return $out;
     }
 
     private function loadLanguage(Template $template, string $lang): array
