@@ -205,6 +205,38 @@ final class MenuController extends AbstractController
             if (!is_array($payload)) $payload = [];
         }
 
+        // ========= MAXIMUM DIAGNOSTIC DUMP =========
+        // The user keeps reporting empty labels in the DB even though their
+        // browser console shows the right values in state. Either the
+        // form-array is arriving truncated (max_input_vars), or items_json
+        // is somehow getting stripped, or there's something between PHP
+        // receiving \$_POST and persistItems running that nukes the data.
+        // Log EVERYTHING so we can see at exactly which layer it breaks.
+        error_log('=== [MyTheme saveAction] DIAGNOSTIC DUMP ===');
+        error_log('max_input_vars: ' . (ini_get('max_input_vars') ?: 'unknown'));
+        error_log('post_max_size:  ' . (ini_get('post_max_size') ?: 'unknown'));
+        error_log('Raw _POST top-level keys: ' . implode(',', array_keys($_POST)));
+        error_log('Raw _POST[items] is_array: ' . (is_array($_POST['items'] ?? null) ? 'yes' : 'no'));
+        if (is_array($_POST['items'] ?? null)) {
+            error_log('Raw _POST[items] count: ' . count($_POST['items']));
+            error_log('Raw _POST[items] keys (first 5): ' . implode(',', array_slice(array_keys($_POST['items']), 0, 5)));
+            // First two items, every sub-key
+            foreach (array_slice($_POST['items'], 0, 2, true) as $k => $r) {
+                if (is_array($r)) {
+                    error_log("Raw _POST[items][$k] sub-keys: " . implode(',', array_keys($r)));
+                    error_log("Raw _POST[items][$k][label_json]: " . (string)($r['label_json'] ?? '<MISSING>'));
+                    error_log("Raw _POST[items][$k][config_json]: " . (string)($r['config_json'] ?? '<MISSING>'));
+                } else {
+                    error_log("Raw _POST[items][$k] is not array: " . var_export($r, true));
+                }
+            }
+        }
+        error_log('items_json length: ' . strlen($raw));
+        error_log('items_json (first 500 chars): ' . substr($raw, 0, 500));
+        error_log('Resolved source: ' . $usedSource);
+        error_log('Resolved payload count: ' . count($payload));
+        // ========= END DIAGNOSTIC DUMP =========
+
         // Normalize form-array rows into the shape persistItems expects.
         // Form-array path sends label_json/config_json as strings + active
         // as "0"/"1" string. JSON path sends them as decoded structures.
