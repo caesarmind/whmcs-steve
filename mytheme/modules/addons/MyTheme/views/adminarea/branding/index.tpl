@@ -55,6 +55,12 @@
     </div>
 </form>
 
+{* Smarty 4 (WHMCS 9) still parses `{ ... }` inside <style>/<script>
+   blocks unless wrapped in {literal}. Auto-literal handling is brittle
+   (works for `{` followed by whitespace but chokes on JS object
+   literals, regex char classes containing `$`, CSS keyframe ranges,
+   etc.) — wrapping bypasses Smarty entirely for the inline assets. *}
+{literal}
 <style>
 /* Branding-specific add-ons. Reuse mt-upload from footer.tpl; only the
    preview + remove + dark-tile + error + loading states live here. */
@@ -486,5 +492,6 @@
     );
 })();
 </script>
+{/literal}
 
 {include file="includes/footer.tpl"}
