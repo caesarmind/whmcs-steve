@@ -146,6 +146,31 @@ final class MenuController extends AbstractController
             return $this->view('menu/error', ['error' => 'Menu not found.']);
         }
 
+        // LAGOM-STYLE GUARDRAIL — hard-fail the save if PHP's max_input_vars
+        // is close to being exceeded. Without this guard, PHP silently
+        // truncates the form-array mid-submit (drops trailing keys without
+        // raising an error), and items lose their label / URL data on save.
+        //
+        // Lagom does this check at the very top of their saveAction. We
+        // follow the same pattern: count terminal input vars across
+        // $_REQUEST + $_COOKIE, refuse the save if we're within 100 of the
+        // host limit, and tell the admin to raise `max_input_vars` in
+        // php.ini. No half-saved data, no silent corruption — just a clear
+        // "your host config needs raising" message.
+        $maxInputVars  = (int)(ini_get('max_input_vars') ?: 1000);
+        $terminalCount = $this->countTerminals([$_REQUEST, $_COOKIE]);
+        if ($maxInputVars - 100 < $terminalCount) {
+            error_log(sprintf(
+                '[MyTheme saveAction] REFUSED save — max_input_vars too low. '
+                . 'limit=%d, terminal_count=%d, menu_id=%d',
+                $maxInputVars, $terminalCount, $menu->id
+            ));
+            $this->redirect(sprintf(
+                '?module=MyTheme&action=menu&sub=edit&id=%d&flash=max-input-vars-exceeded&limit=%d&count=%d',
+                $menu->id, $maxInputVars, $terminalCount
+            ));
+        }
+
         // Top-level menu fields
         $menu->name     = trim((string)($_POST['name'] ?? $menu->name));
         $menu->audience = (string)($_POST['audience'] ?? $menu->audience);
@@ -165,48 +190,16 @@ final class MenuController extends AbstractController
         $menu->changed_by_user = true;
         $menu->save();
 
-        // Items — read from EITHER form-array fields (items[N][...]) OR the
-        // legacy JSON hidden input. Form-array is preferred because the
-        // browser serializes it natively, but it's at the mercy of PHP's
-        // max_input_vars setting — at ~40 items × 7 fields per item = 280
-        // input vars per save, which exceeds some hosts' limits and
-        // SILENTLY truncates the array (PHP drops trailing keys without
-        // raising an error).
-        //
-        // Belt-and-braces: if form-array EXISTS but EVERY row is missing
-        // label_json, treat that as a truncation event and fall through to
-        // the items_json JSON payload (which is one input var regardless
-        // of item count, so it survives max_input_vars).
-        $raw = (string)($_POST['items_json'] ?? '[]');
-
-        $arrayItems = is_array($_POST['items'] ?? null) ? $_POST['items'] : null;
-        $usedSource = 'json';
+        // Items — read from form-array (items[N][...]). The legacy items_json
+        // hidden input is only used if the form-array is completely absent
+        // (JS-disabled scenario). With the max_input_vars guard above, we
+        // know the form-array won't be truncated mid-submit.
+        $raw         = (string)($_POST['items_json'] ?? '[]');
+        $arrayItems  = is_array($_POST['items'] ?? null) ? $_POST['items'] : null;
+        $usedSource  = 'json';
         if ($arrayItems !== null) {
-            // Sanity check: does at least one row have label_json populated?
-            $haveLabelJson = false;
-            foreach ($arrayItems as $r) {
-                if (is_array($r) && !empty($r['label_json'])) {
-                    $haveLabelJson = true;
-                    break;
-                }
-            }
-            if ($haveLabelJson) {
-                $payload = array_values($arrayItems);
-                $usedSource = 'form-array';
-            } else {
-                // Form-array present but stripped of label_json — almost
-                // certainly max_input_vars truncation. Fall back to JSON.
-                error_log(sprintf(
-                    '[MyTheme saveAction] form-array had %d items but zero label_json fields. '
-                    . 'Likely max_input_vars truncation (limit=%s, post_count=%d). Falling back to items_json.',
-                    count($arrayItems),
-                    ini_get('max_input_vars') ?: 'unknown',
-                    is_array($_POST) ? count($_POST, COUNT_RECURSIVE) : -1
-                ));
-                $payload = json_decode($raw, true);
-                if (!is_array($payload)) $payload = [];
-                $usedSource = 'json (fallback from truncated form-array)';
-            }
+            $payload    = array_values($arrayItems);
+            $usedSource = 'form-array';
         } else {
             $payload = json_decode($raw, true);
             if (!is_array($payload)) $payload = [];
@@ -287,13 +280,25 @@ final class MenuController extends AbstractController
 
         $this->persistItems($menu->id, $payload);
 
-        // If we had to fall back from form-array to items_json because of
-        // max_input_vars truncation, surface that as a warning so the admin
-        // knows their host is at the limit and can request an increase.
-        $flash = strpos($usedSource, 'fallback') !== false
-            ? 'saved-with-truncation-warning'
-            : 'saved';
-        $this->redirect('?module=MyTheme&action=menu&sub=edit&id=' . $menu->id . '&flash=' . $flash);
+        $this->redirect('?module=MyTheme&action=menu&sub=edit&id=' . $menu->id . '&flash=saved');
+    }
+
+    /**
+     * Recursively count terminal (non-array) values in a nested array.
+     * Used to estimate the PHP input-var count against max_input_vars.
+     * Matches Lagom's count_terminals implementation.
+     */
+    private function countTerminals(array $a): int
+    {
+        $count = 0;
+        foreach ($a as $val) {
+            if (is_array($val)) {
+                $count += $this->countTerminals($val);
+            } else {
+                $count++;
+            }
+        }
+        return $count;
     }
 
     public function deleteAction(): string

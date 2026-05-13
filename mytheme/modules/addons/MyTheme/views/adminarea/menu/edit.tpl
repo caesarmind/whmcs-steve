@@ -46,12 +46,6 @@
         </a>
         <div style="flex:1"></div>
         {if $flash == 'saved'}<span class="mt-flash mt-flash-success">Saved</span>{/if}
-        {if $flash == 'saved-with-truncation-warning'}
-            <span class="mt-flash mt-flash-warn">
-                Saved — but the form-array was truncated mid-submit. The items_json fallback caught it,
-                so your data is safe, but you should ask your host to raise <code>max_input_vars</code>.
-            </span>
-        {/if}
         {if $flash == 'empty-payload-rejected'}
             <span class="mt-flash mt-flash-warn">
                 Save refused — the browser sent zero items so we didn't wipe your menu.
@@ -62,18 +56,36 @@
         <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
     </div>
 
-    {* PROACTIVE WARNING — show a banner if the current item count looks
-       like it might exceed PHP's max_input_vars on this host. We have a
-       JSON-fallback safety net so saves still succeed, but the admin
-       should know their host is at the limit. *}
+    {* HARD-FAIL BANNER — shown when saveAction refused to save because
+       max_input_vars on this host is too low. The save was NOT processed;
+       the admin must raise the host limit. *}
+    {if $flash == 'max-input-vars-exceeded'}
+        <div class="mt-flash mt-flash-warn" style="margin: 12px 0; padding: 16px 20px; display: block; border-left: 4px solid #d97706;">
+            <strong style="display: block; margin-bottom: 6px; font-size: 14px;">Save refused — PHP max_input_vars too low</strong>
+            <p style="margin: 0 0 8px;">
+                Your host's PHP <code>max_input_vars</code> setting is
+                <strong>{$smarty.get.limit|escape|default:'?'}</strong>, but this menu would submit
+                <strong>{$smarty.get.count|escape|default:'?'}</strong> form fields. PHP would
+                silently truncate the request mid-save and your label / URL data would be lost.
+            </p>
+            <p style="margin: 0 0 6px;"><strong>Fix:</strong> ask your host to raise
+                <code>max_input_vars</code> in <code>php.ini</code> to <code>2000</code> or higher.
+                On cPanel: <em>Software → Select PHP Version → Options → max_input_vars</em>.
+            </p>
+            <p style="margin: 0; font-size: 12px; opacity: .75;">
+                Nothing was saved on this attempt — your menu is unchanged. Try again after raising the limit.
+            </p>
+        </div>
+    {/if}
+
+    {* PROACTIVE BANNER — same situation, but warning BEFORE save instead of
+       after. Shown on every page render when the limit is at risk. *}
     {if $inputVarsWarning}
-        <div class="mt-flash mt-flash-warn" style="margin: 12px 0; padding: 12px 16px; display: block;">
-            <strong>Heads up:</strong> this menu has {$itemCount} items, which will submit roughly
-            {$estimatedVars} form fields per save. Your host's <code>max_input_vars</code> is
-            <code>{$maxInputVars}</code>. If saves start losing label / URL data, ask your host to raise
-            <code>max_input_vars</code> in <code>php.ini</code> to <code>2000</code> or higher.
-            (We have an items_json fallback that catches truncation, so saves still work — this is a
-            heads-up, not an error.)
+        <div class="mt-flash mt-flash-warn" style="margin: 12px 0; padding: 12px 16px; display: block; border-left: 4px solid #d97706;">
+            <strong>Heads up:</strong> this menu has {$itemCount} items (~{$estimatedVars} form fields per save),
+            and your host's <code>max_input_vars</code> is only <code>{$maxInputVars}</code>. Saving WILL
+            fail — ask your host to raise <code>max_input_vars</code> in <code>php.ini</code> to
+            <code>2000</code> or higher. On cPanel: <em>Software → Select PHP Version → Options → max_input_vars</em>.
         </div>
     {/if}
 
