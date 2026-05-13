@@ -39,6 +39,19 @@ final class LayoutsController extends AbstractController
 
     public function indexAction(): string
     {
+        // Sentinel — bump every time the Layouts controller is hit at all
+        // (GET load or POST submit). Lets the front-end diagnostic distinguish
+        // "code path never reached" (hits=0) from "reached but POST guard
+        // failed" (hits>0, attempts=0).
+        Settings::setValue('mytheme_layout_index_hits',
+            (int)Settings::getValue('mytheme_layout_index_hits', 0) + 1);
+        Settings::setValue('mytheme_layout_index_last_method',
+            (string)($_SERVER['REQUEST_METHOD'] ?? 'NONE'));
+        Settings::setValue('mytheme_layout_index_last_post_keys',
+            $_SERVER['REQUEST_METHOD'] === 'POST'
+                ? implode(',', array_keys($_POST))
+                : '(GET)');
+
         $template = AddonHelper::getTemplate();
         if ($template === null) {
             return $this->view('error', ['error' => 'No active template']);
