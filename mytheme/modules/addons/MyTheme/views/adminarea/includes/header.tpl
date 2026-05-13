@@ -8,8 +8,6 @@
     {$mt_nav = 'info'}
 {elseif $mt_action == 'editStyle'}
     {$mt_nav = 'styles'}
-{elseif $mt_action == 'editPage'}
-    {$mt_nav = 'pages'}
 {elseif $mt_action == 'editMenu'}
     {$mt_nav = 'menu'}
 {/if}

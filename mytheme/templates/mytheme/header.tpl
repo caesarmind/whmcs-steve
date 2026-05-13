@@ -178,8 +178,25 @@
     <meta charset="{$charset|default:'utf-8'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{if $pagetitle}{$pagetitle} — {/if}{$companyname|escape}</title>
-    {if $tagline}<meta name="description" content="{$tagline|escape}">{/if}
+    {* Admin-configured SEO (from the Pages tab) layers on top of WHMCS defaults.
+       $myTheme.pages[<templatefile>] is populated by Hooks::resolveCurrentPage. *}
+    {assign var=mt_pageEntry value=null}
+    {if isset($myTheme.pages) && isset($myTheme.pages[$templatefile])}
+        {assign var=mt_pageEntry value=$myTheme.pages[$templatefile]}
+    {/if}
+    <title>{if $mt_pageEntry && !empty($mt_pageEntry.seo.title)}{$mt_pageEntry.seo.title|escape}{else}{if $pagetitle}{$pagetitle} — {/if}{$companyname|escape}{/if}</title>
+    {if $mt_pageEntry && !empty($mt_pageEntry.seo.description)}
+        <meta name="description" content="{$mt_pageEntry.seo.description|escape}">
+    {elseif $tagline}
+        <meta name="description" content="{$tagline|escape}">
+    {/if}
+    {if $mt_pageEntry && $mt_pageEntry.indexing == 'disallow'}
+        <meta name="robots" content="noindex, nofollow">
+    {/if}
+    {if $mt_pageEntry && !empty($mt_pageEntry.seo.social_image)}
+        <meta property="og:image" content="{$mt_pageEntry.seo.social_image|escape}">
+        <meta name="twitter:card" content="summary_large_image">
+    {/if}
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v=1.0">
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-layout.css?v=1.0">
     {$headoutput}

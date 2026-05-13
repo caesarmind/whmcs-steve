@@ -15,8 +15,7 @@ use MyTheme\Controller\AbstractController;
  *   ?action=styles           → style picker
  *   ?action=editStyle        → style editor (color groups, typography, etc.)
  *   ?action=layouts          → layout picker
- *   ?action=pages            → pages list
- *   ?action=editPage         → page editor (variant, SEO, custom layout)
+ *   ?action=pages            → pages list (default sub=index, ?sub=edit, ?sub=save)
  *   ?action=menu             → menu list
  *   ?action=editMenu         → menu editor (drag-drop tree)
  *   ?action=branding         → logo / favicon uploads
@@ -35,8 +34,16 @@ final class MainController extends AbstractController
     public function stylesAction(): string     { return (new StylesController())->indexAction(); }
     public function editStyleAction(): string  { return (new StylesController())->editAction(); }
     public function layoutsAction(): string    { return (new LayoutsController())->indexAction(); }
-    public function pagesAction(): string      { return (new PagesController())->indexAction(); }
-    public function editPageAction(): string   { return (new PagesController())->editAction(); }
+    public function pagesAction(): string
+    {
+        $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');
+        $ctl = new PagesController();
+        return match ($sub) {
+            'edit' => $ctl->editAction(),
+            'save' => $ctl->saveAction(),
+            default => $ctl->indexAction(),
+        };
+    }
     public function menuAction(): string
     {
         $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');

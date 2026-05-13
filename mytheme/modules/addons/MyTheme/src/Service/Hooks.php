@@ -43,17 +43,35 @@ final class Hooks
     /** Runs LAST among ClientAreaPage hooks (priority -1). Assembles $myTheme. */
     private function clientAreaPage(array $vars, Template $template): array
     {
+        $pages    = $this->resolveCurrentPage($vars, $template);
+        $layouts  = [
+            'main-menu' => $this->resolveActiveLayout($template, 'main-menu'),
+            'footer'    => $this->resolveActiveLayout($template, 'footer'),
+        ];
+
+        // Per-page layout override (set in admin Pages editor). When a page
+        // pins a specific main-menu or footer layout, swap the global pick
+        // before exposing $myTheme.layouts to Smarty — templates don't have
+        // to know about overrides; they just see the effective layout.
+        $currentPage = (string)($vars['templatefile'] ?? '');
+        if ($currentPage !== '' && isset($pages[$currentPage]['layout_overrides'])) {
+            foreach (['main-menu', 'footer'] as $kind) {
+                $override = $pages[$currentPage]['layout_overrides'][$kind] ?? null;
+                if (is_string($override) && $override !== ''
+                    && in_array($override, $template->getLayouts($kind), true)) {
+                    $layouts[$kind] = $this->buildLayoutMeta($template, $kind, $override);
+                }
+            }
+        }
+
         return [
             'myTheme' => [
                 'name'          => $template->getName(),
                 'version'       => $template->getVersion(),
                 'manifest'      => $template->getManifest(),
                 'styles'        => $this->resolveActiveStyle($template),
-                'layouts'       => [
-                    'main-menu' => $this->resolveActiveLayout($template, 'main-menu'),
-                    'footer'    => $this->resolveActiveLayout($template, 'footer'),
-                ],
-                'pages'         => $this->resolveCurrentPage($vars, $template),
+                'layouts'       => $layouts,
+                'pages'         => $pages,
                 'license'       => [
                     'canRender' => true,
                     'devMode'   => $template->license()->isDevMode(),
@@ -655,17 +673,39 @@ final class Hooks
             $template->getName() . '_active_layout_' . $kind,
             $defaultByKind[$kind] ?? 'default'
         );
-        $metaPath = $template->getFullPath() . "/core/layouts/{$kind}/{$active}/layout.php";
+        return $this->buildLayoutMeta($template, $kind, $active);
+    }
+
+    /** Build a layout metadata struct for a known $name. Shared between the
+     *  global resolver and the per-page override path. */
+    private function buildLayoutMeta(Template $template, string $kind, string $name): array
+    {
+        $metaPath = $template->getFullPath() . "/core/layouts/{$kind}/{$name}/layout.php";
         $meta     = ThemeManifest::loadVariantMeta($metaPath);
         return [
-            'name'       => $active,
+            'name'       => $name,
             'meta'       => $meta,
             'vars'       => $meta['variables'] ?? [],
-            'mediumPath' => "{$template->getName()}/core/layouts/{$kind}/{$active}/default.tpl",
+            'mediumPath' => "{$template->getName()}/core/layouts/{$kind}/{$name}/default.tpl",
         ];
     }
 
-    /** @return array<string, array{meta: array, variant: string, fullPath: ?string}> */
+    /**
+     * Resolve the active variant + per-page overrides for the current request.
+     *
+     * Returned shape (keyed by templatefile, so root tpls can read e.g.
+     * $myTheme.pages.login.fullPath):
+     *   [
+     *     'meta'             => array,    // from core/pages/<page>/page.php
+     *     'variant'          => string,   // active variant name
+     *     'fullPath'         => ?string,  // include path for root-tpl dispatch
+     *     'seo'              => ['title','description','social_image'],
+     *     'options'          => array<string,mixed>,
+     *     'indexing'         => 'allow'|'disallow'|'inherit',
+     *     'visibility'       => 'public'|'auth'|'disabled',
+     *     'layout_overrides' => ['main-menu'=>?string,'footer'=>?string],
+     *   ]
+     */
     private function resolveCurrentPage(array $vars, Template $template): array
     {
         $page = (string)($vars['templatefile'] ?? '');
@@ -673,20 +713,42 @@ final class Hooks
             return [];
         }
 
-        $pageMeta = ThemeManifest::loadVariantMeta(
-            $template->getFullPath() . "/core/pages/{$page}/page.php"
-        );
-        $variant = (string)Settings::getValue(
+        $pageMeta = $template->getPageMeta($page);
+        $variant  = (string)Settings::getValue(
             $template->getName() . '_page_variant_' . $page,
-            'default'
+            (string)($pageMeta['defaultVariant'] ?? 'default')
         );
         $variantTpl = $template->getFullPath() . "/core/pages/{$page}/{$variant}/{$variant}.tpl";
         $fullPath   = file_exists($variantTpl)
             ? "{$template->getName()}/core/pages/{$page}/{$variant}/{$variant}.tpl"
             : null;
 
+        $stored = Settings::getValue($template->getName() . '_page_options_' . $page, null);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+        $seoDefaults = is_array($pageMeta['seoDefaults'] ?? null) ? $pageMeta['seoDefaults'] : [];
+
         return [
-            $page => ['meta' => $pageMeta, 'variant' => $variant, 'fullPath' => $fullPath],
+            $page => [
+                'meta'       => $pageMeta,
+                'variant'    => $variant,
+                'fullPath'   => $fullPath,
+                'indexing'   => (string)($stored['indexing']   ?? $seoDefaults['indexing'] ?? 'inherit'),
+                'visibility' => (string)($stored['visibility'] ?? 'public'),
+                'seo' => [
+                    'title'        => (string)($stored['seo']['title']        ?? $seoDefaults['title']        ?? ''),
+                    'description'  => (string)($stored['seo']['description']  ?? $seoDefaults['description']  ?? ''),
+                    'social_image' => (string)($stored['seo']['social_image'] ?? ''),
+                ],
+                'options' => is_array($stored['options'] ?? null) ? $stored['options'] : [],
+                'layout_overrides' => [
+                    'main-menu' => isset($stored['layout_overrides']['main-menu']) && is_string($stored['layout_overrides']['main-menu'])
+                        ? $stored['layout_overrides']['main-menu'] : null,
+                    'footer'    => isset($stored['layout_overrides']['footer']) && is_string($stored['layout_overrides']['footer'])
+                        ? $stored['layout_overrides']['footer'] : null,
+                ],
+            ],
         ];
     }
 

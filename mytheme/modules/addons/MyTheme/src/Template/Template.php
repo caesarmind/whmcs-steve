@@ -120,6 +120,74 @@ final class Template
         return $this->manifest['provides']['pages'] ?? [];
     }
 
+    /**
+     * Load core/pages/<page>/page.php (author contract).
+     *
+     * Recognised fields:
+     *   display_name      string  — human name shown in admin lists
+     *   group             string  — Public|Authentication|Client Area|Account|Billing|Support
+     *   type              string  — public|client-portal|system|cms
+     *   description       string  — one-line description
+     *   listDisplay       bool    — whether to surface in admin listings
+     *   defaultVariant    string  — variant when admin hasn't picked one (default: 'default')
+     *   supportedOptions  array   — keyed map of option specs the editor renders:
+     *                                  ['full_page' => ['type'=>'bool','label'=>'Full Page',
+     *                                                   'help'=>'…','default'=>false]]
+     *   seoDefaults       array   — ['indexing'=>'allow','title'=>'','description'=>'']
+     *
+     * Returns [] when the file is missing — the controller fills the defaults.
+     */
+    public function getPageMeta(string $page): array
+    {
+        return \MyTheme\Helpers\ThemeManifest::loadVariantMeta(
+            $this->fullPath . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR
+            . 'pages' . DIRECTORY_SEPARATOR . $page . DIRECTORY_SEPARATOR . 'page.php'
+        );
+    }
+
+    /**
+     * Discover variants for a page from the filesystem.
+     *
+     * A "variant" is any subdirectory of core/pages/<page>/ that contains a
+     * matching <variant>/<variant>.tpl. The optional <variant>.php sibling
+     * supplies a display label (`name` key) and any other variant metadata.
+     *
+     * @return list<array{name:string,label:string,description:string}>
+     */
+    public function getPageVariants(string $page): array
+    {
+        $pageDir = $this->fullPath . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR
+            . 'pages' . DIRECTORY_SEPARATOR . $page;
+        if (!is_dir($pageDir)) {
+            return [];
+        }
+
+        $variants = [];
+        foreach (scandir($pageDir) ?: [] as $entry) {
+            if ($entry === '.' || $entry === '..') continue;
+            $variantDir = $pageDir . DIRECTORY_SEPARATOR . $entry;
+            if (!is_dir($variantDir)) continue;
+            if (!file_exists($variantDir . DIRECTORY_SEPARATOR . $entry . '.tpl')) continue;
+
+            $variantMeta = \MyTheme\Helpers\ThemeManifest::loadVariantMeta(
+                $variantDir . DIRECTORY_SEPARATOR . $entry . '.php'
+            );
+            $variants[] = [
+                'name'        => $entry,
+                'label'       => (string)($variantMeta['name'] ?? ucfirst(str_replace(['-', '_'], ' ', $entry))),
+                'description' => (string)($variantMeta['description'] ?? ''),
+            ];
+        }
+
+        // Surface 'default' first when present, then alphabetical.
+        usort($variants, function ($a, $b) {
+            if ($a['name'] === 'default') return -1;
+            if ($b['name'] === 'default') return 1;
+            return strcmp($a['name'], $b['name']);
+        });
+        return $variants;
+    }
+
     /** @return list<string> */
     public function getExtensions(): array
     {
