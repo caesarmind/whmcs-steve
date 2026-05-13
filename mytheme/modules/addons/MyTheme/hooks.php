@@ -12,6 +12,27 @@ declare(strict_types=1);
  *   priority -1  → MyTheme variable assembly (runs LAST, sees all other hooks' output)
  */
 
+// Load the IntegrityHashes class BEFORE the PSR-4 autoloader is registered.
+// In source-tree installs (no build:integrity run yet) the real file is
+// absent and only IntegrityHashes.fallback.php exists — but the autoloader
+// maps MyTheme\Helpers\IntegrityHashes → src/Helpers/IntegrityHashes.php,
+// not the .fallback.php variant, so it can't lazy-load the stub. License,
+// LicenseHelper, and Template all call IntegrityHashes::verifyOrDie() from
+// their constructors — without this explicit require, every Template
+// instantiation in a hook context fatals with "Class … not found", which
+// makes the whole $myTheme payload silently disappear from the front-end.
+// MyTheme.php (admin entry point) already does this; we need the same in
+// hooks.php because WHMCS loads hooks.php directly, not via MyTheme.php.
+$_mtIntegrity = __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR
+              . 'Helpers' . DIRECTORY_SEPARATOR . 'IntegrityHashes.php';
+if (file_exists($_mtIntegrity)) {
+    require_once $_mtIntegrity;
+} else {
+    require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR
+               . 'Helpers' . DIRECTORY_SEPARATOR . 'IntegrityHashes.fallback.php';
+}
+unset($_mtIntegrity);
+
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use MyTheme\Helpers\AddonHelper;
