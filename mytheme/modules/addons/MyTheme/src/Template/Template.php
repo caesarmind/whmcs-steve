@@ -208,6 +208,28 @@ final class Template
         return $variants;
     }
 
+    /**
+     * Bulk-load page metadata for the discovery set. Used by the menu builder's
+     * "Choose a WHMCS page" picker so it can render a grouped, searchable list
+     * with display names instead of raw templatefile slugs.
+     *
+     * @return array<string, array{name:string,display_name:string,group:string,description:string}>
+     */
+    public function getAllPageMeta(): array
+    {
+        $out = [];
+        foreach ($this->getPages() as $name) {
+            $meta = $this->getPageMeta($name);
+            $out[$name] = [
+                'name'         => $name,
+                'display_name' => (string)($meta['display_name'] ?? ucwords(str_replace(['-', '_'], ' ', $name))),
+                'group'        => (string)($meta['group'] ?? 'Other'),
+                'description'  => (string)($meta['description'] ?? ''),
+            ];
+        }
+        return $out;
+    }
+
     /** @return list<string> */
     public function getExtensions(): array
     {

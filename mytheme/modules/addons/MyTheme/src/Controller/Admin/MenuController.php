@@ -5,10 +5,12 @@ namespace MyTheme\Controller\Admin;
 
 use MyTheme\Controller\AbstractController;
 use MyTheme\Database\Migrator;
+use MyTheme\Helpers\AddonHelper;
 use MyTheme\Menu\ItemTypes;
 use MyTheme\Menu\Seeder;
 use MyTheme\Models\Menu;
 use MyTheme\Models\MenuItem;
+use MyTheme\Template\PagesCache;
 use WHMCS\Database\Capsule;
 
 /**
@@ -124,12 +126,34 @@ final class MenuController extends AbstractController
         $maxInputVars     = (int)(ini_get('max_input_vars') ?: 1000);
         $inputVarsWarning = ($estimatedVars > ($maxInputVars - 50));
 
+        // Power the WHMCS-page picker drawer in the item editor. Grouped + sorted
+        // by Pages-tab order so the menu builder mirrors the admin Pages layout.
+        $pagesByGroup = [];
+        $template = AddonHelper::getTemplate();
+        if ($template !== null) {
+            PagesCache::ensure($template); // self-heal on first use after activation
+            foreach ($template->getAllPageMeta() as $meta) {
+                $pagesByGroup[$meta['group']][] = $meta;
+            }
+            foreach ($pagesByGroup as &$bucket) {
+                usort($bucket, fn ($a, $b) => strcmp($a['display_name'], $b['display_name']));
+            }
+            unset($bucket);
+            $groupOrder = ['Public' => 1, 'Authentication' => 2, 'Client Area' => 3, 'Account' => 4, 'Billing' => 5, 'Support' => 6];
+            uksort($pagesByGroup, function ($a, $b) use ($groupOrder) {
+                $oa = $groupOrder[$a] ?? 99;
+                $ob = $groupOrder[$b] ?? 99;
+                return $oa === $ob ? strcmp($a, $b) : $oa <=> $ob;
+            });
+        }
+
         return $this->view('menu/edit', [
             'menu'             => $menu,
             'tree'             => $tree,
             'itemTypes'        => ItemTypes::all(),
             'icons'            => \MyTheme\Menu\Icons::pickerList(),
             'iconsJson'        => json_encode(\MyTheme\Menu\Icons::all()),
+            'pagesByGroup'     => $pagesByGroup,
             'flash'            => $_GET['flash'] ?? '',
             'itemCount'        => $itemCount,
             'estimatedVars'    => $estimatedVars,

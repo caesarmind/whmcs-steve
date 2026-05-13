@@ -203,8 +203,33 @@
                 </div>
 
                 <div class="mt-field" data-drawer-show-when="whmcs_page">
-                    <label class="mt-field-label" for="drawerPage">WHMCS Page</label>
-                    <input id="drawerPage" class="mt-input" type="text" placeholder="e.g. clientareahome" data-drawer-field="config.page">
+                    <label class="mt-field-label">WHMCS page</label>
+                    <div class="mt-icon-picker-wrap">
+                        <button type="button" class="mt-icon-picker-trigger" id="drawerPagePickerBtn">
+                            <span class="mt-page-picker-current" id="drawerPagePickerLabel">— Choose a page —</span>
+                            <span class="mt-icon-picker-caret">▾</span>
+                        </button>
+                        <input type="hidden" id="drawerPage" data-drawer-field="config.page" value="">
+                        <div class="mt-icon-picker-panel mt-page-picker-panel" id="drawerPagePickerPanel" hidden>
+                            <div class="mt-page-picker-search-wrap">
+                                <input id="drawerPagePickerSearch" type="search" class="mt-input" placeholder="Search pages…" autocomplete="off">
+                            </div>
+                            <div class="mt-page-picker-list" id="drawerPagePickerList">
+                                {foreach $pagesByGroup as $g => $rows}
+                                    <div class="mt-page-picker-group" data-page-group="{$g|escape}">
+                                        <div class="mt-page-picker-group-label">{$g|escape}</div>
+                                        {foreach $rows as $p}
+                                            <button type="button" class="mt-page-picker-tile" data-page-name="{$p.name|escape}" data-page-label="{$p.display_name|escape}" data-page-group="{$g|escape}" data-page-haystack="{$p.name|lower|escape} {$p.display_name|lower|escape} {$g|lower|escape}">
+                                                <span class="mt-page-picker-tile-name">{$p.display_name|escape}</span>
+                                                <span class="mt-page-picker-tile-meta">{$p.name|escape}</span>
+                                            </button>
+                                        {/foreach}
+                                    </div>
+                                {/foreach}
+                            </div>
+                            <div class="mt-page-picker-empty" hidden>No pages match.</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-field" data-drawer-show-when="custom_link">
                     <label class="mt-field-label" for="drawerUrl">URL</label>
@@ -286,6 +311,25 @@
         </section>
     </div>
 </form>
+
+<style>
+/* WHMCS-page picker — reuses .mt-icon-picker-wrap shell, adds list-specific bits. */
+.mt-page-picker-panel { max-height: 360px; padding: 0; display: flex; flex-direction: column; overflow: hidden; }
+.mt-page-picker-search-wrap { padding: 8px; border-bottom: 1px solid var(--mt-border); flex-shrink: 0; }
+.mt-page-picker-search-wrap .mt-input { padding: 6px 10px; font-size: 13px; }
+.mt-page-picker-list { padding: 4px 6px 8px; overflow-y: auto; flex: 1; }
+.mt-page-picker-group { margin-top: 8px; }
+.mt-page-picker-group:first-child { margin-top: 2px; }
+.mt-page-picker-group-label { font-size: 10px; font-weight: 600; color: var(--mt-text-3); text-transform: uppercase; letter-spacing: 0.04em; padding: 6px 10px 2px; }
+.mt-page-picker-tile { display: flex; flex-direction: column; align-items: flex-start; width: 100%; gap: 1px; padding: 6px 10px; margin: 1px 0; border: 1px solid transparent; border-radius: 6px; background: transparent; font: inherit; color: var(--mt-text); cursor: pointer; text-align: left; }
+.mt-page-picker-tile:hover { background: var(--mt-surface-2); }
+.mt-page-picker-tile.is-active { background: var(--mt-primary-tint); border-color: rgba(0,113,227,0.18); }
+.mt-page-picker-tile-name { font-size: 13px; font-weight: 500; line-height: 1.3; }
+.mt-page-picker-tile-meta { font-size: 11px; color: var(--mt-text-3); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.mt-page-picker-empty { padding: 14px; text-align: center; color: var(--mt-text-3); font-size: 12px; }
+.mt-page-picker-current { flex: 1; text-align: left; font-size: 13px; color: var(--mt-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mt-page-picker-current.is-placeholder { color: var(--mt-text-3); }
+</style>
 
 {* Icon registry as JSON — placed BEFORE the IIFE so the iconMap() lazy
    lookup can read its textContent immediately. *}
@@ -558,8 +602,9 @@
                 el.value = v == null ? '' : v;
             }
         });
-        // Reflect icon picker preview when drawer opens
+        // Reflect picker UIs when drawer opens
         syncIconPickerFromEntry(entry);
+        syncPagePickerFromEntry(entry);
     }
 
     // ──────────────────────────────────────────────────────────────────────
@@ -594,6 +639,9 @@
     }
     on('drawerIconBtn', 'click', function(e){
         e.preventDefault();
+        // Close sibling page picker so only one popover is open at a time.
+        var pagePanel = document.getElementById('drawerPagePickerPanel');
+        if (pagePanel) pagePanel.hidden = true;
         var panel = document.getElementById('drawerIconPanel');
         if (panel) panel.hidden = !panel.hidden;
     });
@@ -614,6 +662,90 @@
     document.addEventListener('click', function(e){
         if (e.target.closest('.mt-icon-picker-wrap')) return;
         var panel = document.getElementById('drawerIconPanel');
+        if (panel) panel.hidden = true;
+        var pagePanel = document.getElementById('drawerPagePickerPanel');
+        if (pagePanel) pagePanel.hidden = true;
+    });
+
+    // ──────────────────────────────────────────────────────────────────────
+    // WHMCS-page picker (grouped, searchable). Mirrors the icon picker shape
+    // but renders a searchable list grouped by Pages-tab category. Click a
+    // tile → writes `config.page` on the current item, closes the panel,
+    // marks dirty so the save regen path picks it up.
+    // ──────────────────────────────────────────────────────────────────────
+    function syncPagePickerFromEntry(entry){
+        var labelEl = document.getElementById('drawerPagePickerLabel');
+        var hidden  = document.getElementById('drawerPage');
+        if (!labelEl || !hidden) return;
+        var current = (entry && entry.config && entry.config.page) || '';
+        hidden.value = current;
+        if (!current) {
+            labelEl.textContent = '— Choose a page —';
+            labelEl.classList.add('is-placeholder');
+        } else {
+            var tile = document.querySelector('#drawerPagePickerList .mt-page-picker-tile[data-page-name="' + current.replace(/"/g, '\\"') + '"]');
+            if (tile) {
+                labelEl.textContent = tile.getAttribute('data-page-label') + ' · ' + tile.getAttribute('data-page-group');
+                labelEl.classList.remove('is-placeholder');
+            } else {
+                labelEl.textContent = current + ' (unknown templatefile)';
+                labelEl.classList.remove('is-placeholder');
+            }
+        }
+        document.querySelectorAll('#drawerPagePickerList .mt-page-picker-tile').forEach(function(t){
+            t.classList.toggle('is-active', t.getAttribute('data-page-name') === current);
+        });
+    }
+
+    on('drawerPagePickerBtn', 'click', function(e){
+        e.preventDefault();
+        var iconPanel = document.getElementById('drawerIconPanel');
+        if (iconPanel) iconPanel.hidden = true;
+        var panel = document.getElementById('drawerPagePickerPanel');
+        if (!panel) return;
+        panel.hidden = !panel.hidden;
+        if (!panel.hidden) {
+            var s = document.getElementById('drawerPagePickerSearch');
+            if (s) { s.value = ''; filterPagePicker(''); setTimeout(function(){ s.focus(); }, 0); }
+        }
+    });
+
+    function filterPagePicker(query){
+        var q = (query || '').toLowerCase().trim();
+        var tiles = document.querySelectorAll('#drawerPagePickerList .mt-page-picker-tile');
+        var groups = document.querySelectorAll('#drawerPagePickerList .mt-page-picker-group');
+        var visibleCount = 0;
+        Array.prototype.forEach.call(tiles, function(tile){
+            var hay = tile.getAttribute('data-page-haystack') || '';
+            var match = !q || hay.indexOf(q) >= 0;
+            tile.style.display = match ? '' : 'none';
+            if (match) visibleCount++;
+        });
+        Array.prototype.forEach.call(groups, function(g){
+            var any = g.querySelector('.mt-page-picker-tile:not([style*="display: none"])');
+            g.style.display = any ? '' : 'none';
+        });
+        var empty = document.querySelector('#drawerPagePickerPanel .mt-page-picker-empty');
+        if (empty) empty.hidden = visibleCount > 0;
+    }
+
+    document.addEventListener('input', function(e){
+        if (e.target && e.target.id === 'drawerPagePickerSearch') {
+            filterPagePicker(e.target.value);
+        }
+    });
+
+    document.addEventListener('click', function(e){
+        var tile = e.target.closest('#drawerPagePickerList .mt-page-picker-tile');
+        if (!tile) return;
+        if (selectedTempId === null) return;
+        var entry = state.items.find(function(it){ return it.tempId === selectedTempId; });
+        if (!entry) return;
+        if (!entry.config) entry.config = {};
+        entry.config.page = tile.getAttribute('data-page-name') || '';
+        syncPagePickerFromEntry(entry);
+        markDirty();
+        var panel = document.getElementById('drawerPagePickerPanel');
         if (panel) panel.hidden = true;
     });
 
