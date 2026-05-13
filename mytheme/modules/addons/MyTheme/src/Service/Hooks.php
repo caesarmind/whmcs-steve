@@ -27,7 +27,20 @@ final class Hooks
     public function dispatch(string $hookName, mixed $hookArg): mixed
     {
         $template = AddonHelper::getTemplate();
-        if ($template === null || !$template->canActivate()) {
+        // Don't gate the dispatch on canActivate(). The theme renders
+        // the license-required error screen via the template-level
+        // $mtLicenseGateEnabled flag in header.tpl / footer.tpl — that's
+        // the right place to enforce licensing UX, not the data-assembly
+        // hook. Suppressing the entire $myTheme payload here means a
+        // licence-fail install loses layout dispatch, addon settings,
+        // and pages metadata even when the gate flag is off, so the
+        // public site renders with stale defaults and the admin's
+        // Layouts choices have no effect on output.
+        //
+        // The clientAreaPage method still receives $template so it can
+        // skip license-sensitive enrichment if we ever need to; for
+        // now everything in $myTheme is license-neutral metadata.
+        if ($template === null) {
             return null;
         }
 
