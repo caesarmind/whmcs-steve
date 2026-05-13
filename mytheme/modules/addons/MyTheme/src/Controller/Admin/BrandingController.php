@@ -140,7 +140,7 @@ final class BrandingController extends AbstractController
             $this->redirect('?module=MyTheme&action=branding');
         }
 
-        return $this->render();
+        return $this->renderIndex();
     }
 
     /**
@@ -242,7 +242,15 @@ final class BrandingController extends AbstractController
 
     // ----------------------------------------------------------------- internals
 
-    private function render(): string
+    /**
+     * NB: must NOT be named render() — AbstractController declares a static
+     * render() factory method, and PHP 8 fatals on static→instance signature
+     * mismatch. Sibling controllers (Settings/Menu/etc.) inline this kind
+     * of view-prep instead of extracting; we extract because the method is
+     * shared between indexAction (POST→redirect, GET→render) and any
+     * future GET-only callers.
+     */
+    private function renderIndex(): string
     {
         $this->startSession();
         $flash  = (string)($_SESSION[self::FLASH_KEY]  ?? '');
