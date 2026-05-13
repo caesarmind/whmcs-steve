@@ -194,7 +194,10 @@ final class MenuController extends AbstractController
         // hidden input is only used if the form-array is completely absent
         // (JS-disabled scenario). With the max_input_vars guard above, we
         // know the form-array won't be truncated mid-submit.
-        $raw         = (string)($_POST['items_json'] ?? '[]');
+        //
+        // WHMCS 9 htmlspecialchars-encodes every POST value, including
+        // items_json. Decode before json_decode for the fallback path too.
+        $raw         = htmlspecialchars_decode((string)($_POST['items_json'] ?? '[]'), ENT_QUOTES);
         $arrayItems  = is_array($_POST['items'] ?? null) ? $_POST['items'] : null;
         $usedSource  = 'json';
         if ($arrayItems !== null) {
@@ -241,14 +244,24 @@ final class MenuController extends AbstractController
         // Form-array path sends label_json/config_json as strings + active
         // as "0"/"1" string. JSON path sends them as decoded structures.
         // After this loop the row is uniform regardless of source.
+        //
+        // CRITICAL: WHMCS 9's admin request handler runs htmlspecialchars()
+        // on all incoming POST values before user code sees them. So our
+        // form-array JSON strings arrive as &quot;-encoded, and json_decode
+        // returns null on those — the entire save then silently writes
+        // empty labels/configs to the DB. Lagom hit the same wall and
+        // decodes via htmlspecialchars_decode() before json_decode. Same
+        // fix here for both label_json and config_json.
         foreach ($payload as $i => &$row) {
             if (!is_array($row)) continue;
             if (isset($row['label_json']) && !isset($row['label'])) {
-                $d = json_decode((string)$row['label_json'], true);
+                $jsonStr = htmlspecialchars_decode((string)$row['label_json'], ENT_QUOTES);
+                $d = json_decode($jsonStr, true);
                 $row['label'] = is_array($d) ? $d : ['whmcs' => '', 'custom' => []];
             }
             if (isset($row['config_json']) && !isset($row['config'])) {
-                $d = json_decode((string)$row['config_json'], true);
+                $jsonStr = htmlspecialchars_decode((string)$row['config_json'], ENT_QUOTES);
+                $d = json_decode($jsonStr, true);
                 $row['config'] = is_array($d) ? $d : [];
             }
             // Explicit string check — !empty('0') is true in PHP which would
