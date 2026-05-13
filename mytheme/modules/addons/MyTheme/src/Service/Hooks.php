@@ -732,10 +732,24 @@ final class Hooks
             $template->getName() . '_page_variant_' . $page,
             (string)($pageMeta['defaultVariant'] ?? 'default')
         );
-        $variantTpl = $template->getFullPath() . "/core/pages/{$page}/{$variant}/{$variant}.tpl";
-        $fullPath   = file_exists($variantTpl)
-            ? "{$template->getName()}/core/pages/{$page}/{$variant}/{$variant}.tpl"
-            : null;
+
+        // Overwrites escape hatch — Lagom-style buyer override. If a customer
+        // dropped core/pages/<page>/overwrites/overwrites.tpl in their theme,
+        // that wins over BOTH the admin-selected variant and the default. Lets
+        // buyers fully replace a page's body without forking the vendor file,
+        // safe across theme updates. Lagom uses the same pattern at
+        // templates/lagom2/<page>/overwrites/index.tpl; we keep it inside
+        // core/pages/ so it lives next to the variants it overrides.
+        $overwritesTpl = $template->getFullPath() . "/core/pages/{$page}/overwrites/overwrites.tpl";
+        if (file_exists($overwritesTpl)) {
+            $fullPath = "{$template->getName()}/core/pages/{$page}/overwrites/overwrites.tpl";
+            $variant  = 'overwrites'; // surface in $myTheme.pages so admin can see it
+        } else {
+            $variantTpl = $template->getFullPath() . "/core/pages/{$page}/{$variant}/{$variant}.tpl";
+            $fullPath   = file_exists($variantTpl)
+                ? "{$template->getName()}/core/pages/{$page}/{$variant}/{$variant}.tpl"
+                : null;
+        }
 
         $stored = Settings::getValue($template->getName() . '_page_options_' . $page, null);
         if (!is_array($stored)) {

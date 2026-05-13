@@ -185,6 +185,11 @@ final class Template
         $variants = [];
         foreach (scandir($pageDir) ?: [] as $entry) {
             if ($entry === '.' || $entry === '..') continue;
+            // Skip the buyer overwrites file (Lagom-style escape hatch). When
+            // present, Hooks::resolveCurrentPage uses it regardless of variant
+            // selection, so showing it in the admin grid would mislead — admins
+            // would think they're choosing between overwrites and other variants.
+            if ($entry === 'overwrites') continue;
             $variantDir = $pageDir . DIRECTORY_SEPARATOR . $entry;
             if (!is_dir($variantDir)) continue;
             if (!file_exists($variantDir . DIRECTORY_SEPARATOR . $entry . '.tpl')) continue;
