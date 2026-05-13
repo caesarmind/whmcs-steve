@@ -1,7 +1,7 @@
 {include file="includes/header.tpl"}
 
 <div class="mt-toolbar">
-    <a class="mt-back" href="?module=MyTheme&action=pages&tab={$pageGroup|escape:'url'}">
+    <a class="mt-back" href="?module=MyTheme&action=pages#tab={$pageGroup|escape:'url'}">
         <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Back to Pages
     </a>

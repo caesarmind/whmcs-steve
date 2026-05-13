@@ -75,20 +75,25 @@ final class PagesController extends AbstractController
             return $oa === $ob ? strcmp($a, $b) : $oa <=> $ob;
         });
 
-        $tab = (string)($_GET['tab'] ?? '');
-        if ($tab === '' || !in_array($tab, $groups, true)) {
-            $tab = $groups[0] ?? '';
+        // Bucket rows by group and sort each bucket alphabetically by label.
+        // Tab switching is now client-side (no server-side filtering) so every
+        // bucket is rendered once and shown/hidden by the inline script.
+        $pagesByGroup = array_fill_keys($groups, []);
+        foreach ($rows as $r) {
+            $g = (string)($r['group'] ?? 'Other');
+            if (!isset($pagesByGroup[$g])) $pagesByGroup[$g] = [];
+            $pagesByGroup[$g][] = $r;
         }
-
-        $filtered = array_values(array_filter($rows, fn ($r) => $r['group'] === $tab));
-        usort($filtered, fn ($a, $b) => strcmp($a['label'], $b['label']));
+        foreach ($pagesByGroup as &$bucket) {
+            usort($bucket, fn ($a, $b) => strcmp($a['label'], $b['label']));
+        }
+        unset($bucket);
 
         return $this->view('pages/index', [
-            'pages'    => $filtered,
-            'groups'   => $groups,
-            'tab'      => $tab,
-            'totalCount' => count($rows),
-            'flashMsg' => (string)($_GET['flash'] ?? ''),
+            'groups'       => $groups,
+            'pagesByGroup' => $pagesByGroup,
+            'totalCount'   => count($rows),
+            'flashMsg'     => (string)($_GET['flash'] ?? ''),
         ]);
     }
 
