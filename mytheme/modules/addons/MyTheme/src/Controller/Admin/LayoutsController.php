@@ -39,19 +39,6 @@ final class LayoutsController extends AbstractController
 
     public function indexAction(): string
     {
-        // Sentinel — bump every time the Layouts controller is hit at all
-        // (GET load or POST submit). Lets the front-end diagnostic distinguish
-        // "code path never reached" (hits=0) from "reached but POST guard
-        // failed" (hits>0, attempts=0).
-        Settings::setValue('mytheme_layout_index_hits',
-            (int)Settings::getValue('mytheme_layout_index_hits', 0) + 1);
-        Settings::setValue('mytheme_layout_index_last_method',
-            (string)($_SERVER['REQUEST_METHOD'] ?? 'NONE'));
-        Settings::setValue('mytheme_layout_index_last_post_keys',
-            $_SERVER['REQUEST_METHOD'] === 'POST'
-                ? implode(',', array_keys($_POST))
-                : '(GET)');
-
         $template = AddonHelper::getTemplate();
         if ($template === null) {
             return $this->view('error', ['error' => 'No active template']);
@@ -118,16 +105,6 @@ final class LayoutsController extends AbstractController
         $validLayout   = in_array($layout, $template->getLayouts($kind), true);
         $validAudience = in_array($audience, self::AUDIENCES, true);
 
-        // Sentinel writes — let the front-end diagnostic comment confirm
-        // the click reached PHP, what was POSTed, and whether the
-        // manifest accepted it. Strip once the path is trusted.
-        Settings::setValue('mytheme_layout_save_attempts',
-            (int)Settings::getValue('mytheme_layout_save_attempts', 0) + 1);
-        Settings::setValue('mytheme_layout_save_last_kind',     $kind);
-        Settings::setValue('mytheme_layout_save_last_audience', $audience !== '' ? $audience : '(none)');
-        Settings::setValue('mytheme_layout_save_last_value',    $layout);
-        Settings::setValue('mytheme_layout_save_last_accepted', ($validLayout ? '1' : '0'));
-
         if ($validLayout) {
             if ($validAudience) {
                 // New per-audience flow.
@@ -135,12 +112,12 @@ final class LayoutsController extends AbstractController
                 Settings::setValue($key, $layout);
             } else {
                 // Legacy single-pointer flow — fires when the admin still
-                // has the old radio-only UI cached in their browser. We
-                // also mirror to BOTH per-audience keys so the new
-                // resolver path picks the choice up immediately without
-                // needing the legacy fallback to kick in. Buyers who
-                // later switch one audience via the new UI overwrite
-                // just that audience's pointer.
+                // has the old radio-only UI cached in their browser. Also
+                // mirror to both per-audience keys so the new resolver
+                // path picks the choice up immediately without needing
+                // the legacy fallback to kick in. Buyers who later switch
+                // one audience via the new UI overwrite just that
+                // audience's pointer.
                 $legacyKey = $template->getName() . '_active_layout_' . $kind;
                 Settings::setValue($legacyKey, $layout);
                 foreach (self::AUDIENCES as $aud) {
