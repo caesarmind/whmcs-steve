@@ -48,21 +48,60 @@ echo "[1] AddonHelper::isActive(): "
 $activeName = AddonHelper::getActiveTemplateName();
 echo "[2] AddonHelper::getActiveTemplateName(): '" . $activeName . "'\n";
 
-// ─── 3. Template object ───────────────────────────────────────────────
+// ─── 3. Template object (bypassing the try-catch in getTemplate()) ───
+echo "[3] Direct instantiation of Template('mytheme'):\n";
 $template = null;
 try {
-    $template = AddonHelper::getTemplate();
-    if ($template === null) {
-        echo "[3] AddonHelper::getTemplate(): NULL"
-           . " (Template constructor threw and was swallowed)\n";
-    } else {
-        echo "[3] AddonHelper::getTemplate(): Template(slug='"
-           . $template->getName() . "', version='"
-           . $template->getVersion() . "')\n";
-    }
+    $template = new \MyTheme\Template\Template($activeName);
+    echo "    OK: Template(slug='" . $template->getName()
+       . "', version='" . $template->getVersion() . "')\n";
 } catch (\Throwable $e) {
-    echo "[3] EXCEPTION getting template: " . $e->getMessage()
-       . " (" . $e->getFile() . ':' . $e->getLine() . ")\n";
+    echo "    EXCEPTION: " . get_class($e) . "\n";
+    echo "    Message:   " . $e->getMessage() . "\n";
+    echo "    Where:     " . $e->getFile() . ':' . $e->getLine() . "\n";
+    echo "    Trace:\n";
+    foreach (explode("\n", $e->getTraceAsString()) as $line) {
+        echo "      " . $line . "\n";
+    }
+}
+
+// ─── 3b. Probe each constructor check independently ──────────────────
+echo "\n[3b] Template constructor preconditions:\n";
+$templatesRoot = $whmcsRoot . '/templates';
+$fullPath      = $templatesRoot . '/' . $activeName;
+echo "    templates root exists:        " . (is_dir($templatesRoot) ? 'YES' : 'NO') . " ($templatesRoot)\n";
+echo "    template dir exists:          " . (is_dir($fullPath) ? 'YES' : 'NO') . " ($fullPath)\n";
+$coreConfigPath = $fullPath . '/core/' . $activeName . '.php';
+echo "    core/<slug>.php exists:       " . (file_exists($coreConfigPath) ? 'YES' : 'NO') . " ($coreConfigPath)\n";
+$themeJsonPath = $fullPath . '/theme.json';
+echo "    theme.json exists:            " . (file_exists($themeJsonPath) ? 'YES' : 'NO') . " ($themeJsonPath)\n";
+if (file_exists($coreConfigPath)) {
+    try {
+        $cc = require $coreConfigPath;
+        echo "    core config require OK:       array with keys: "
+           . implode(', ', array_keys((array)$cc)) . "\n";
+        echo "    secret_key non-empty:         " . (!empty($cc['secret_key']) ? 'YES' : 'NO') . "\n";
+        echo "    dev_mode:                     " . (!empty($cc['dev_mode']) ? 'true' : 'false') . "\n";
+    } catch (\Throwable $e) {
+        echo "    core config require THREW:    " . $e->getMessage() . "\n";
+    }
+}
+
+// ─── 3c. IntegrityHashes status ──────────────────────────────────────
+echo "\n[3c] IntegrityHashes file selection:\n";
+$realIntegrity = __DIR__ . '/src/Helpers/IntegrityHashes.php';
+$fallbackIntegrity = __DIR__ . '/src/Helpers/IntegrityHashes.fallback.php';
+echo "    real file exists:             " . (file_exists($realIntegrity) ? 'YES' : 'NO') . " ($realIntegrity)\n";
+echo "    fallback file exists:         " . (file_exists($fallbackIntegrity) ? 'YES' : 'NO') . " ($fallbackIntegrity)\n";
+if (class_exists('\\MyTheme\\Helpers\\IntegrityHashes')) {
+    try {
+        $rc = new \ReflectionClass('\\MyTheme\\Helpers\\IntegrityHashes');
+        echo "    loaded class from:            " . $rc->getFileName() . "\n";
+    } catch (\Throwable $e) {
+        echo "    reflection failed:            " . $e->getMessage() . "\n";
+    }
+} else {
+    echo "    class IntegrityHashes:        NOT LOADED\n";
 }
 
 // ─── 4. canActivate() ─────────────────────────────────────────────────
