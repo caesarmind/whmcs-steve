@@ -157,8 +157,7 @@ final class MenuController extends AbstractController
         // browser serializes it natively — no JS required, no encoding/size
         // pitfalls. JSON path stays as a fallback so we don't regress while
         // the JS migration lands.
-        $raw    = (string)($_POST['items_json'] ?? '[]');
-        $delRaw = (string)($_POST['deleted_ids_json'] ?? '[]');
+        $raw = (string)($_POST['items_json'] ?? '[]');
 
         $arrayItems = is_array($_POST['items'] ?? null) ? $_POST['items'] : null;
         if ($arrayItems !== null) {
@@ -167,11 +166,6 @@ final class MenuController extends AbstractController
             $payload = json_decode($raw, true);
             if (!is_array($payload)) $payload = [];
         }
-
-        $deleted = is_array($_POST['deleted_ids'] ?? null)
-            ? array_values($_POST['deleted_ids'])
-            : json_decode($delRaw, true);
-        if (!is_array($deleted)) $deleted = [];
 
         // Normalize form-array rows into the shape persistItems expects.
         // Form-array path sends label_json/config_json as strings + active
@@ -214,19 +208,20 @@ final class MenuController extends AbstractController
         ));
 
         // SAFETY: if the JS hadn't run (e.g. tree wasn't ingested) and we'd
-        // somehow get an empty payload with no explicit deletions while the
-        // DB still has items, ignore the items section entirely. The admin's
-        // settings (name/audience/active) still save.
+        // get an empty payload while the DB still has items, REFUSE to wipe.
+        // With delete-all-then-recreate, an empty payload would otherwise
+        // nuke the entire menu. The admin's settings (name/audience/active)
+        // still save above; only the items section is skipped.
         $existingCount = MenuItem::where('menu_id', $menu->id)->count();
-        if (empty($payload) && empty($deleted) && $existingCount > 0) {
-            error_log('MyTheme menu save: skipping items section because both '
-                . 'items_json and deleted_ids_json were empty. menu_id=' . $menu->id
+        if (empty($payload) && $existingCount > 0) {
+            error_log('MyTheme menu save: refused to wipe menu items because '
+                . 'payload was empty. menu_id=' . $menu->id
                 . ' raw=' . substr($raw, 0, 200));
             $this->redirect('?module=MyTheme&action=menu&sub=edit&id='
-                . $menu->id . '&flash=settings-only');
+                . $menu->id . '&flash=empty-payload-rejected');
         }
 
-        $this->persistItems($menu->id, $payload, array_map('intval', $deleted));
+        $this->persistItems($menu->id, $payload);
 
         $this->redirect('?module=MyTheme&action=menu&sub=edit&id=' . $menu->id . '&flash=saved');
     }
@@ -310,49 +305,60 @@ final class MenuController extends AbstractController
     }
 
     /**
-     * Apply changes to a menu's items.
+     * Apply the payload as the complete new state of the menu's items.
      *
-     * $payload: flat list of items the admin wants to keep / create / update.
+     * Lagom-style delete-all-then-recreate — every save is a full state
+     * replacement. We previously used update-in-place, which required
+     * tracking which items were edited, which were new, which were
+     * deleted (via deletedIds), plus guard logic to refuse empty
+     * overwrites. That accumulated complexity caused the "edit didn't
+     * persist" bug (Home2 → Home), among others.
+     *
+     * With delete-all the only path is "create from payload" — IDs
+     * change every save, but nothing in this codebase references items
+     * by stable id (frontend uses mt-{id} purely as a CSS hook,
+     * regenerated each render). The saveAction's "empty payload =
+     * refuse to save items" check is the only safety net needed.
+     *
+     * $payload: flat list of items the admin wants the menu to contain.
      *   Each entry: ['id'?, 'parent_id'?, 'item_type', 'label', 'config',
      *                'active', 'position']
-     *
-     *   - id present + numeric → update existing item (id matches DB row)
-     *   - id missing/null      → create new item
-     *   - parent_id is either:
-     *       null                       → top-level
-     *       a numeric DB id            → child of that DB item
-     *       a "new_X" temp string      → child of a sibling new item (resolved
-     *                                    after first pass mints DB ids)
-     *
-     * $deletedIds: explicit list of DB ids to delete. CRITICAL — this is the
-     * ONLY way items get deleted. The old "anything absent from payload gets
-     * swept" behaviour was removed because a JS bug could wipe an entire menu.
+     *   - id present + numeric → key for parent_id resolution (DB id
+     *                            from the previous save; the new row
+     *                            will get a fresh auto-increment id)
+     *   - id missing/null      → brand-new entry; key is 'new_X'
+     *   - parent_id is null    → top-level
+     *   - parent_id numeric    → was a child of that pre-save DB id;
+     *                            we resolve to the matching new id
+     *   - parent_id 'new_X'    → child of a sibling new item (resolved
+     *                            after pass 1 mints fresh ids)
      */
-    private function persistItems(int $menuId, array $payload, array $deletedIds = []): void
+    private function persistItems(int $menuId, array $payload): void
     {
-        $log = ['menu_id' => $menuId, 'payload_count' => count($payload), 'deleted_ids' => $deletedIds, 'created' => [], 'updated' => [], 'skipped' => [], 'preserved' => [], 'errors' => []];
+        $log = [
+            'menu_id'       => $menuId,
+            'payload_count' => count($payload),
+            'created'       => [],
+            'skipped'       => [],
+            'errors'        => [],
+        ];
 
-        // Delete explicitly-marked items first.
-        if (!empty($deletedIds)) {
-            $allToDelete = $this->collectDescendants($menuId, $deletedIds);
-            $log['cascade_delete'] = $allToDelete;
-            MenuItem::where('menu_id', $menuId)
-                ->whereIn('id', $allToDelete)
-                ->delete();
-        }
+        // Delete all existing items for this menu. FK ON DELETE CASCADE
+        // in the schema would handle descendants if they were in a
+        // separate table — they're not (single mytheme_menu_items table),
+        // so this WHERE menu_id wipes the entire menu's items in one go.
+        MenuItem::where('menu_id', $menuId)->delete();
 
-        $idMap = [];
-        $byKey = [];
+        $idMap = [];   // old key → new DB id (for parent_id resolution)
+        $byKey = [];   // new-row reference keyed by old key
 
-        // Pass 1 — create/update each row, capture the resulting DB id
+        // Pass 1 — create each item with parent_id=NULL initially.
         foreach ($payload as $i => $row) {
             $type = (string)($row['item_type'] ?? '');
             if (!ItemTypes::exists($type)) {
-                $log['skipped'][] = ['idx' => $i, 'reason' => 'unknown_type', 'type' => $type, 'id' => $row['id'] ?? null];
+                $log['skipped'][] = ['idx' => $i, 'reason' => 'unknown_type', 'type' => $type];
                 continue;
             }
-            // PHP's isset() returns false for null, so id:null in payload
-            // correctly falls through to the 'new_X' branch.
             $key      = (isset($row['id']) && is_numeric($row['id']))
                         ? (string)(int)$row['id']
                         : 'new_' . $i;
@@ -361,77 +367,42 @@ final class MenuController extends AbstractController
             $position = (int)($row['position'] ?? $i);
             $active   = array_key_exists('active', $row) ? !empty($row['active']) : true;
 
-            $dbId = is_numeric($key) ? (int)$key : null;
-            $item = $dbId !== null ? MenuItem::where('menu_id', $menuId)->where('id', $dbId)->first() : null;
+            // Defensive default: a brand-new item with no meaningful
+            // label gets a "New <type>" placeholder so admins see
+            // something editable rather than an invisible row.
+            if (!is_numeric($row['id'] ?? null) && !$this->isMeaningfulLabel($label)) {
+                $typeLabel = ItemTypes::meta($type)['label'] ?? $type;
+                $label = ['whmcs' => '', 'custom' => ['english' => 'New ' . strtolower($typeLabel)]];
+            }
 
             try {
-                if ($item === null) {
-                    // Defensive default — if the browser sent an empty label
-                    // for a brand-new item, give it a placeholder based on
-                    // type so admins can see and edit it rather than getting
-                    // an invisible row. The JS adds a default like
-                    // "New header" before submit, but if anything in the
-                    // round-trip drops it, this is the safety net.
-                    if (!$this->isMeaningfulLabel($label)) {
-                        $typeLabel = ItemTypes::meta($type)['label'] ?? $type;
-                        $label = ['whmcs' => '', 'custom' => ['english' => 'New ' . strtolower($typeLabel)]];
-                        $log['defaulted_label'][] = ['idx' => $i, 'type' => $type, 'fallback' => $label['custom']['english']];
-                    }
-                    $item = MenuItem::create([
-                        'menu_id'     => $menuId,
-                        'parent_id'   => null,
-                        'position'    => $position,
-                        'item_type'   => $type,
-                        // JSON_FORCE_OBJECT ensures empty PHP arrays encode as
-                        // "{}" (object) instead of "[]" (array). Otherwise the
-                        // JS↔PHP round-trip corrupts label.custom into an
-                        // array, and subsequent drawer edits to .english
-                        // get silently dropped by JSON.stringify.
-                        'label_json'  => json_encode($label,  JSON_FORCE_OBJECT),
-                        'config_json' => json_encode($config, JSON_FORCE_OBJECT),
-                        'active'      => $active,
-                    ]);
-                    $log['created'][] = ['idx' => $i, 'new_id' => $item->id, 'type' => $type, 'label_in' => $label];
-                } else {
-                    // Always write — the JS pristine flag prevents
-                    // no-op saves from regenerating form fields, so any
-                    // incoming payload at this point reflects a real user
-                    // edit. A guard that "preserves" data when the
-                    // incoming looks empty was blocking legitimate edits
-                    // (user typed "Home2", guard checked whether something
-                    // looked empty, and the save silently no-op'd).
-                    $oldLabel  = $item->label_json;
-                    $oldConfig = $item->config_json;
-
-                    $item->position    = $position;
-                    $item->item_type   = $type;
-                    $item->active      = $active;
-                    $item->label_json  = json_encode($label,  JSON_FORCE_OBJECT);
-                    $item->config_json = json_encode($config, JSON_FORCE_OBJECT);
-                    $item->save();
-
-                    $log['updated'][] = [
-                        'idx'        => $i,
-                        'id'         => $item->id,
-                        'type'       => $type,
-                        'old_label'  => $oldLabel,
-                        'new_label'  => $item->label_json,
-                        'old_config' => $oldConfig,
-                        'new_config' => $item->config_json,
-                    ];
-                }
+                $item = MenuItem::create([
+                    'menu_id'     => $menuId,
+                    'parent_id'   => null,
+                    'position'    => $position,
+                    'item_type'   => $type,
+                    // JSON_FORCE_OBJECT ensures empty PHP arrays encode as
+                    // "{}" (object) instead of "[]" (array). Otherwise the
+                    // JS↔PHP round-trip corrupts label.custom into an
+                    // array, and subsequent drawer edits to .english
+                    // get silently dropped by JSON.stringify.
+                    'label_json'  => json_encode($label,  JSON_FORCE_OBJECT),
+                    'config_json' => json_encode($config, JSON_FORCE_OBJECT),
+                    'active'      => $active,
+                ]);
                 $idMap[$key] = $item->id;
                 $byKey[$key] = ['item' => $item, 'parent_key' => $row['parent_id'] ?? null];
+                $log['created'][] = ['idx' => $i, 'key' => $key, 'new_id' => $item->id, 'type' => $type];
             } catch (\Throwable $e) {
                 $log['errors'][] = ['idx' => $i, 'pass' => 1, 'msg' => $e->getMessage()];
             }
         }
 
-        // Pass 2 — wire parent_id now that every node has a DB id
+        // Pass 2 — wire parent_id using the old-key → new-id map.
         foreach ($byKey as $entry) {
             try {
                 $parentKey = $entry['parent_key'];
-                if ($parentKey === null || $parentKey === '' || $parentKey === 0) {
+                if ($parentKey === null || $parentKey === '' || $parentKey === 0 || $parentKey === '0') {
                     $entry['item']->parent_id = null;
                 } else {
                     $resolved = $idMap[(string)$parentKey] ?? null;
@@ -443,14 +414,14 @@ final class MenuController extends AbstractController
             }
         }
 
-        // No implicit sweep — items absent from payload remain in DB.
         error_log('[MyTheme persistItems] ' . json_encode($log, JSON_UNESCAPED_SLASHES));
     }
 
     /**
      * Label is "meaningful" if it has either a non-empty whmcs key or at
-     * least one non-empty custom translation. Empty {whmcs:'', custom:{}}
-     * is NOT meaningful — that's the JS regen empty default.
+     * least one non-empty custom translation. Used only to decide whether
+     * to apply the "New <type>" placeholder to a brand-new item that
+     * arrived without a label.
      */
     private function isMeaningfulLabel(array $label): bool
     {
@@ -467,77 +438,5 @@ final class MenuController extends AbstractController
             }
         }
         return false;
-    }
-
-    /**
-     * Config is "meaningful" if it has at least one non-empty value. Empty
-     * {} or all-empty-strings is NOT meaningful.
-     */
-    private function isMeaningfulConfig(array $config): bool
-    {
-        foreach ($config as $val) {
-            if (is_string($val) && $val !== '') {
-                return true;
-            }
-            if (is_array($val) && !empty($val)) {
-                return true;
-            }
-            if (is_bool($val) && $val) {
-                return true;
-            }
-            if (is_numeric($val) && $val != 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * The stored label_json is "empty" if decoding it gives the empty
-     * default — meaning the row never had real data, so we allow overwriting
-     * with the (also empty) incoming value.
-     */
-    private function isEmptyLabel(?string $json): bool
-    {
-        if ($json === null || $json === '') {
-            return true;
-        }
-        $d = json_decode($json, true);
-        if (!is_array($d)) {
-            return true;
-        }
-        return !$this->isMeaningfulLabel($d);
-    }
-
-    private function isEmptyConfig(?string $json): bool
-    {
-        if ($json === null || $json === '') {
-            return true;
-        }
-        $d = json_decode($json, true);
-        if (!is_array($d)) {
-            return true;
-        }
-        return !$this->isMeaningfulConfig($d);
-    }
-
-    /**
-     * Given a set of root ids, collect all descendant ids in the same menu.
-     * Used to enforce parent→child cascade for explicit deletes.
-     */
-    private function collectDescendants(int $menuId, array $rootIds): array
-    {
-        $all = array_map('intval', $rootIds);
-        $frontier = $all;
-        while (!empty($frontier)) {
-            $childIds = MenuItem::where('menu_id', $menuId)
-                ->whereIn('parent_id', $frontier)
-                ->pluck('id')->all();
-            $childIds = array_diff($childIds, $all);
-            if (empty($childIds)) break;
-            $all = array_merge($all, $childIds);
-            $frontier = $childIds;
-        }
-        return $all;
     }
 }

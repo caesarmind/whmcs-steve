@@ -36,9 +36,8 @@
         {/foreach}
     </div>
 
-    {* Legacy JSON inputs — kept so the old JS path still works as a fallback. *}
+    {* Legacy JSON fallback — used only if form-array regen fails. *}
     <input type="hidden" name="items_json" id="menuItemsJson" value="">
-    <input type="hidden" name="deleted_ids_json" id="menuDeletedIdsJson" value="[]">
 
     <div class="mt-toolbar">
         <a class="mt-back" href="?module=MyTheme&action=menu&tab={$menu->location|escape}">
@@ -47,12 +46,6 @@
         </a>
         <div style="flex:1"></div>
         {if $flash == 'saved'}<span class="mt-flash mt-flash-success">Saved</span>{/if}
-        {if $flash == 'settings-only'}
-            <span class="mt-flash mt-flash-warn">
-                Saved the menu settings only — the browser sent no items so the existing items were left intact.
-                If something seems off, hit reload and try again.
-            </span>
-        {/if}
         {if $flash == 'empty-payload-rejected'}
             <span class="mt-flash mt-flash-warn">
                 Save refused — the browser sent zero items so we didn't wipe your menu.
@@ -272,17 +265,16 @@
     // Each entry: { tempId, id|null, parent_id|null, position, item_type,
     //               label:{whmcs,custom}, config:{...}, active }
     // ──────────────────────────────────────────────────────────────────────
-    // deletedIds tracks DB ids the admin removed via the × button. They're
-    // submitted in deleted_ids_json. The controller ONLY deletes ids in this
-    // list — no implicit sweep based on payload absence.
-    //
     // `pristine` starts true and stays true until the admin actually edits
     // something (add / delete / drag / drawer field input / icon pick). On
     // submit, if pristine, we LEAVE the server-rendered <input> form-array
     // fields untouched and let the browser submit them natively. This avoids
     // the JS regen path entirely, which is the place where a JSON round-trip
     // bug could corrupt label / config on a no-op save.
-    var state = { items: [], deletedIds: [], nextTemp: 1, pristine: true };
+    //
+    // No deletedIds tracking — the server uses delete-all-then-recreate,
+    // so absence from the payload IS the deletion signal.
+    var state = { items: [], nextTemp: 1, pristine: true };
     var selectedTempId = null;
 
     function uid(){ return 'new_' + (state.nextTemp++); }
@@ -476,7 +468,9 @@
             if (!li) return;
             if (!confirm('Delete this item and any children?')) return;
             var tempId = li.getAttribute('data-temp');
-            // Collect this row + descendants by tempId
+            // Collect this row + descendants by tempId. The server uses
+            // delete-all-then-recreate, so absence from the payload IS the
+            // deletion — no need to track removed DB ids separately.
             var toRemove = new Set([tempId]);
             var changed = true;
             while (changed){
@@ -487,12 +481,6 @@
                     }
                 });
             }
-            // Record DB ids of removed rows (skip new items — they were never persisted)
-            state.items.forEach(function(it){
-                if (toRemove.has(it.tempId) && it.id != null) {
-                    if (state.deletedIds.indexOf(it.id) < 0) state.deletedIds.push(it.id);
-                }
-            });
             state.items = state.items.filter(function(it){ return !toRemove.has(it.tempId); });
             li.remove();
             updateCount();
@@ -688,7 +676,7 @@
         // "open + save without changes wipes everything" bug — the regen
         // was destructive and any subtle round-trip quirk in state.items
         // would propagate into the DB.
-        if (state.pristine && state.deletedIds.length === 0) {
+        if (state.pristine) {
             console.log('[MyTheme menu] submit (pristine) — skipping JS regen, server inputs submit as-is');
             return;
         }
@@ -720,8 +708,11 @@
         }
         // SAFETY: if state.items is empty AND there's still tree DOM, the
         // ingest never happened. Bail and ask the admin to reload — better
-        // UX than a round-trip + flash-message redirect.
-        if (payload.length === 0 && state.deletedIds.length === 0) {
+        // UX than a round-trip + flash-message redirect. (With the
+        // delete-all-then-recreate server flow, an empty payload would
+        // wipe the menu; the server-side empty-payload-rejected flash
+        // also catches this, but doing it here saves a round trip.)
+        if (payload.length === 0) {
             var existing = document.querySelectorAll('li.mt-menu-item').length;
             if (existing > 0) {
                 e.preventDefault();
@@ -772,22 +763,13 @@
                 addField('config_json',  JSON.stringify(deepObjectify(it.config || {})));
                 addField('active',       it.active ? '1' : '0');
             });
-            // Deleted ids → form-array
-            state.deletedIds.forEach(function(id, i){
-                var inp = document.createElement('input');
-                inp.type = 'hidden';
-                inp.name = 'deleted_ids[' + i + ']';
-                inp.value = String(id);
-                fields.appendChild(inp);
-            });
         }
 
-        // Legacy JSON inputs — kept as a backup so a broken form-array
-        // doesn't kill the submit.
+        // Legacy JSON fallback — set so a broken form-array doesn't kill
+        // the submit. The server prefers $_POST['items'] (form-array)
+        // and only falls through to items_json if items isn't an array.
         var itemsJson = JSON.stringify(payload);
-        var deletedJson = JSON.stringify(state.deletedIds);
         var itemsInput = document.getElementById('menuItemsJson');
-        var deletedInput = document.getElementById('menuDeletedIdsJson');
         if (!itemsInput) {
             itemsInput = document.createElement('input');
             itemsInput.type = 'hidden';
@@ -795,21 +777,13 @@
             itemsInput.id = 'menuItemsJson';
             this.appendChild(itemsInput);
         }
-        if (!deletedInput) {
-            deletedInput = document.createElement('input');
-            deletedInput.type = 'hidden';
-            deletedInput.name = 'deleted_ids_json';
-            deletedInput.id = 'menuDeletedIdsJson';
-            this.appendChild(deletedInput);
-        }
         itemsInput.value = itemsJson;
-        deletedInput.value = deletedJson;
-        // Verbose dump for diagnosing "new items not saved" / "items deleted"
-        // bugs. Each item shows id (null for new), type, label, parent_id, position.
+        // Verbose dump for diagnosing save bugs. With delete-all-recreate
+        // there's no separate "deletions" stream — absence from this
+        // payload IS the deletion.
         console.group('[MyTheme menu] submit (dirty)');
         console.log('Total items in state:', state.items.length);
         console.log('Payload size (chars):', itemsJson.length);
-        console.log('Deletions:', state.deletedIds);
         console.table(payload.map(function(p, i){
             return {
                 idx: i,
