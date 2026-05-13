@@ -40,6 +40,58 @@ use MyTheme\Models\Configuration;
 use MyTheme\Service\Hooks as HookService;
 
 // ============================================================================
+// Branding AJAX intercept — runs BEFORE WHMCS renders admin chrome
+// ============================================================================
+// Previously lived in adminHooks.php, but adminHooks.php isn't reliably
+// auto-loaded on all WHMCS 9 installs for AJAX POSTs (observed: request
+// fell through to the normal addonmodules.php → MainController flow,
+// which redirected and returned HTML, breaking the JS JSON.parse).
+// hooks.php IS reliably auto-loaded for every request, so moving the
+// intercept here guarantees it fires. The admin-auth gate below means
+// non-admin requests can't reach the upload endpoint by URL guessing.
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST'
+    && ($_GET['module'] ?? '') === 'MyTheme'
+    && ($_GET['action'] ?? '') === 'branding'
+    && in_array($_GET['sub'] ?? '', ['upload-ajax', 'remove-ajax'], true)
+) {
+    try {
+        // Defence in depth — admin gate even though the only way to reach
+        // this URL is through the admin area in normal use.
+        $_mtUser = new \WHMCS\Authentication\CurrentUser();
+        if (!$_mtUser->isAuthenticatedAdmin()) {
+            while (ob_get_level() > 0) { @ob_end_clean(); }
+            http_response_code(403);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['ok' => false, 'error' => 'Not authenticated.']);
+            exit;
+        }
+
+        $_mtBrandingCtl = new \MyTheme\Controller\Admin\BrandingController();
+        if ($_GET['sub'] === 'upload-ajax') {
+            $_mtBrandingCtl->uploadAjaxAction();   // never returns
+        }
+        $_mtBrandingCtl->removeAjaxAction();        // never returns
+    } catch (\Throwable $_mtAjaxEx) {
+        error_log('MyTheme branding AJAX: ' . $_mtAjaxEx->getMessage()
+            . ' at ' . $_mtAjaxEx->getFile() . ':' . $_mtAjaxEx->getLine());
+        while (ob_get_level() > 0) { @ob_end_clean(); }
+        if (!headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        // Surface the real exception message so the admin can diagnose
+        // without grepping the PHP error log. The endpoint is admin-only
+        // (gated above), so leaking internals here is acceptable.
+        echo json_encode([
+            'ok'    => false,
+            'error' => 'Server error: ' . $_mtAjaxEx->getMessage(),
+        ]);
+        exit;
+    }
+}
+
+// ============================================================================
 // License enforcement: kill ?systpl= override of disabled templates
 // ============================================================================
 add_hook('ClientAreaPage', 1, function ($vars) {
