@@ -58,8 +58,19 @@ if (
     try {
         // Defence in depth — admin gate even though the only way to reach
         // this URL is through the admin area in normal use.
-        $_mtUser = new \WHMCS\Authentication\CurrentUser();
-        if (!$_mtUser->isAuthenticatedAdmin()) {
+        //
+        // hooks.php loads earlier than adminHooks.php in the WHMCS request
+        // lifecycle, and \WHMCS\Authentication\CurrentUser isn't reliably
+        // initialised here (observed: isAuthenticatedAdmin() returned
+        // false for an actively-logged-in admin). $_SESSION['adminid'] is
+        // WHMCS's canonical session marker and is populated as soon as
+        // session_start() runs — which WHMCS does before hooks load —
+        // so it's the right primitive to check this early.
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            @session_start();
+        }
+        $_mtAdminId = (int)($_SESSION['adminid'] ?? 0);
+        if ($_mtAdminId <= 0) {
             while (ob_get_level() > 0) { @ob_end_clean(); }
             http_response_code(403);
             header('Content-Type: application/json; charset=utf-8');
