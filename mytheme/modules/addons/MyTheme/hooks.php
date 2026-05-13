@@ -142,6 +142,11 @@ if (AddonHelper::isActive()) {
                 $primaryNavbar->removeChild($name);
             }
             MyTheme\Menu\TreeRenderer::populate($primaryNavbar, $menu);
+            // Stash the ordered flat list in a global so the next
+            // ClientAreaPage hook (priority lower than this 100) can expose
+            // it to Smarty as $mtSidebarItems. We can't directly return
+            // template vars from a Navbar hook.
+            $GLOBALS['__mytheme_sidebar_items'] = MyTheme\Menu\TreeRenderer::orderedTopLevel();
         } catch (\Throwable $e) {
             // Don't blow up the page if the menu system fails. Log and let the
             // default WHMCS navbar render.
@@ -149,6 +154,15 @@ if (AddonHelper::isActive()) {
                 logActivity('MyTheme menu render failed: ' . $e->getMessage());
             }
         }
+    });
+
+    // Surface the ordered top-level list to Smarty. Runs at priority 3 —
+    // AFTER the ClientAreaPrimaryNavbar hook above (which fires earlier in
+    // the page lifecycle and populates $GLOBALS) and AFTER the icon registry
+    // hook at priority 2, but before the priority 1 / -1 dispatch hooks.
+    add_hook('ClientAreaPage', 3, function ($vars) {
+        $items = $GLOBALS['__mytheme_sidebar_items'] ?? null;
+        return is_array($items) ? ['mtSidebarItems' => $items] : null;
     });
 
     // Secondary navbar — same pattern (location = secondary). If no menu, leave alone.

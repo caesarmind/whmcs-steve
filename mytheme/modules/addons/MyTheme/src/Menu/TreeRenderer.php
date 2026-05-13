@@ -34,6 +34,20 @@ final class TreeRenderer
      */
     private static int $orderCounter = 0;
 
+    /**
+     * Flat ordered list of top-level items collected during populate(). The
+     * sidebar/topnav templates iterate THIS instead of
+     * $primaryNavbar->getChildren() because WHMCS\View\Menu\Item's getChildren()
+     * reorders items in ways we can't predict (headers grouped, dropdowns
+     * bucketed, etc.) — even with consistent setOrder() values across every
+     * item. Building our own flat list bypasses that entirely.
+     *
+     * Each entry is the WHMCS Item we created via addChild, in the exact
+     * order TreeRenderer added them. Children of dropdowns stay attached to
+     * their parent Item (still accessible via getChildren on the dropdown).
+     */
+    private static array $orderedTopLevel = [];
+
     public static function populate(Item $parent, Menu $menu): void
     {
         $audience = $menu->audience === Audience::ALL ? Audience::current() : $menu->audience;
@@ -41,11 +55,27 @@ final class TreeRenderer
 
         // Reset per-render so two menus on the same page (primary + secondary)
         // each start from zero.
-        self::$orderCounter = 0;
+        self::$orderCounter   = 0;
+        self::$orderedTopLevel = [];
 
         foreach ($menu->topLevelItems() as $node) {
             try {
+                $itemBefore = count($parent->getChildren());
                 self::renderNode($parent, $node, $audience, $layout);
+                // Capture whatever child WHMCS minted for this top-level
+                // node, by diffing the children-set before and after. This
+                // is more robust than grabbing $parent->getChild(keyFor())
+                // because the child may have been filtered out (inactive,
+                // wrong audience, etc.) — in which case we want to skip it
+                // in the flat list too.
+                $childrenNow = $parent->getChildren();
+                if (count($childrenNow) > $itemBefore) {
+                    $key  = self::keyFor($node);
+                    $made = $childrenNow[$key] ?? null;
+                    if ($made !== null) {
+                        self::$orderedTopLevel[] = $made;
+                    }
+                }
             } catch (\Throwable $e) {
                 // One broken item must never kill the rest of the menu.
                 error_log(sprintf(
@@ -56,6 +86,17 @@ final class TreeRenderer
                 ));
             }
         }
+    }
+
+    /**
+     * Returns the flat ordered list of top-level Items rendered by the most
+     * recent populate() call. The sidebar/topnav templates use this to
+     * iterate in the correct order — bypassing the WHMCS Menu Item children
+     * map that reorders by criteria we can't control.
+     */
+    public static function orderedTopLevel(): array
+    {
+        return self::$orderedTopLevel;
     }
 
     private static function renderNode(Item $parent, MenuItem $node, string $audience, string $layout): void

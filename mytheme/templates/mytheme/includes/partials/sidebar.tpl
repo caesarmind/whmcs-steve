@@ -124,7 +124,16 @@
     </div>
 
     <nav class="sidebar-nav">
-        {if isset($primaryNavbar) && $primaryNavbar->getChildren()}
+        {if isset($mtSidebarItems) && $mtSidebarItems}
+            {* $mtSidebarItems is a flat ordered array of WHMCS Menu Items
+               built by MyTheme's TreeRenderer in DB position order. We
+               iterate THIS instead of $primaryNavbar->getChildren() because
+               the latter reorders children in ways we can't predict
+               (headers bucketed, dropdowns grouped). *}
+            {foreach $mtSidebarItems as $item}
+                {mtSidebarItem item=$item}
+            {/foreach}
+        {elseif isset($primaryNavbar) && $primaryNavbar->getChildren()}
             {foreach $primaryNavbar->getChildren() as $item}
                 {mtSidebarItem item=$item}
             {/foreach}
