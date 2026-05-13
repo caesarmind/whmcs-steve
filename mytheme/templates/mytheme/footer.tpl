@@ -29,13 +29,11 @@
        per-page Pages-tab override (Hooks.php::clientAreaPage) has
        already been applied to $myTheme.layouts.footer by the time we
        get here, so we just include the picked layout. *}
-    {assign var=mtFooterLayoutName value=$myTheme.layouts.footer.name|default:'default'}
-    {assign var=mtFooterLayoutPath value="templates/`$template`/core/layouts/footer/`$mtFooterLayoutName`/default.tpl"}
-    <!-- mytheme footer dispatch: picked={$mtFooterLayoutName|escape} path={$mtFooterLayoutPath|escape} exists={if file_exists($mtFooterLayoutPath)}yes{else}no{/if} items={if isset($mtFooterItems)}{$mtFooterItems|@count}{else}unset{/if} setting={$myTheme.addonSettings.mytheme_active_layout_footer|default:'unset'|escape} -->
-    {if file_exists($mtFooterLayoutPath)}
+    {assign var=mtFooterLayoutName value=$myTheme.layouts.footer.name|default:'extended'}
+    {if file_exists("templates/`$template`/core/layouts/footer/`$mtFooterLayoutName`/default.tpl")}
         {include file="`$template`/core/layouts/footer/`$mtFooterLayoutName`/default.tpl"}
     {else}
-        {include file="`$template`/core/layouts/footer/default/default.tpl"}
+        {include file="`$template`/core/layouts/footer/extended/default.tpl"}
     {/if}
 
 </div>{* /.ph-main-wrap *}

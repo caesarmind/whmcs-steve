@@ -667,8 +667,12 @@ final class Hooks
 
     private function resolveActiveLayout(Template $template, string $kind): array
     {
-        // Default per kind — `main-menu` defaults to `sidebar` (the Hostnodes default).
-        $defaultByKind = ['main-menu' => 'sidebar', 'footer' => 'default'];
+        // Default per kind — `main-menu` defaults to `sidebar` (the Hostnodes
+        // default), `footer` defaults to `extended` so the Lagom-style multi-
+        // column footer with menu items renders out of the box. Admins who
+        // want the slim copyright-only footer pick `default` in the Layouts
+        // tab — the setting then overrides this default.
+        $defaultByKind = ['main-menu' => 'sidebar', 'footer' => 'extended'];
         $active = (string)Settings::getValue(
             $template->getName() . '_active_layout_' . $kind,
             $defaultByKind[$kind] ?? 'default'
