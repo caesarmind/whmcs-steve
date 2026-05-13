@@ -1,0 +1,173 @@
+/* ──────────────────────────────────────────────────────────────────────
+   store-sitelock.css — Website Security store landing.
+   Loaded by core/pages/store-sitelock/default/default.tpl
+
+   Classes named .store-* are shared across every store landing; the
+   per-product specifics live under .store-sitelock. When porting the
+   next store page (socialbee, ssl, etc.), copy the .store-* block into
+   a shared partial and only keep the per-product overrides per-page.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* ── shared store-landing chrome ──────────────────────────────────── */
+.store-landing {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.store-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 24px;
+    padding: 14px 0;
+    margin: 0 0 32px;
+    border-bottom: 1px solid var(--color-border, #e8e8ed);
+    font-size: 14px;
+}
+.store-nav a {
+    color: var(--color-text-secondary, #6e6e73);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 4px 2px;
+    border-bottom: 2px solid transparent;
+    transition: color .15s ease, border-color .15s ease;
+}
+.store-nav a:hover {
+    color: var(--color-text, #1d1d1f);
+    text-decoration: none;
+}
+.store-nav a.is-active {
+    color: var(--color-accent, #0071e3);
+    border-bottom-color: var(--color-accent, #0071e3);
+}
+
+.store-hero {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 32px;
+    align-items: center;
+    padding: 32px 0;
+}
+@media (max-width: 720px) {
+    .store-hero { grid-template-columns: 1fr; gap: 16px; text-align: center; }
+}
+
+.store-hero-icon {
+    width: 96px;
+    height: 96px;
+    border-radius: 24px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+}
+.store-hero-icon svg {
+    width: 48px;
+    height: 48px;
+}
+.tile-icon.green  { background: linear-gradient(135deg, #30D158 0%, #2A9F4A 100%); }
+.tile-icon.blue   { background: linear-gradient(135deg, #0A84FF 0%, #006EDB 100%); }
+.tile-icon.purple { background: linear-gradient(135deg, #BF5AF2 0%, #9333E8 100%); }
+.tile-icon.orange { background: linear-gradient(135deg, #FF9F0A 0%, #E07800 100%); }
+.tile-icon.red    { background: linear-gradient(135deg, #FF453A 0%, #D92632 100%); }
+.tile-icon.teal   { background: linear-gradient(135deg, #5AC8FA 0%, #2E9DDF 100%); }
+.tile-icon.indigo { background: linear-gradient(135deg, #5856D6 0%, #3A38B3 100%); }
+.tile-icon.pink   { background: linear-gradient(135deg, #FF2D55 0%, #D70039 100%); }
+.tile-icon.gray   { background: linear-gradient(135deg, #8E8E93 0%, #6B6B70 100%); }
+
+.store-hero-content h1 {
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    margin: 0 0 8px;
+    line-height: 1.1;
+}
+.store-hero-content > p {
+    font-size: 17px;
+    color: var(--color-text-secondary, #6e6e73);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.store-hero-pricing {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 16px;
+}
+@media (max-width: 720px) { .store-hero-pricing { justify-content: center; } }
+.store-hero-price {
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+.store-hero-cycle {
+    font-size: 15px;
+    color: var(--color-text-secondary, #6e6e73);
+}
+
+.store-hero-cta {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+@media (max-width: 720px) { .store-hero-cta { justify-content: center; flex-wrap: wrap; } }
+
+.store-features { margin-top: 16px; }
+.store-features h2 {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 48px 0 24px;
+}
+.feature-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+}
+.feature-list li {
+    position: relative;
+    padding: 14px 16px 14px 44px;
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e8e8ed);
+    border-radius: 12px;
+    font-size: 15px;
+    color: var(--color-text, #1d1d1f);
+}
+.feature-list li::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #30D158 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='3,8 7,12 13,4'/></svg>") center/12px no-repeat;
+}
+
+.store-faq { margin-top: 56px; }
+.store-faq h2 {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 24px;
+}
+.faq-item {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--color-border, #e8e8ed);
+}
+.faq-item:last-child { border-bottom: 0; }
+.faq-q {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text, #1d1d1f);
+    margin-bottom: 6px;
+}
+.faq-a {
+    font-size: 15px;
+    color: var(--color-text-secondary, #6e6e73);
+    line-height: 1.5;
+}
+
+/* ── per-product overrides — none for SiteLock so far ─────────────── */
+.store-sitelock {}
