@@ -11,7 +11,7 @@
  *                  ├── sidebar-categories.tpl  (Categories + Actions rail)
  *                  └── .card
  *                        ├── .st-cat-head (icon · title · tagline · billing pills)
- *                        ├── .when-full
+ *                        ├── .cart-plans-grid (renamed from .when-full to
  *                        │     ├── Variant A — 3-up feature-list cards   (default)
  *                        │     ├── Variant B — 4-up minimal cards
  *                        │     ├── Variant C — horizontal rows
@@ -21,7 +21,10 @@
  *                        │     ├── Variant G — spec matrix
  *                        │     ├── Variant H — addon cards w/ radio tiers
  *                        │     └── .st-compare (fine print)
- *                        └── .when-empty (.st-empty)
+ *                        │                          avoid mytheme's global
+ *                        │                          body[data-data="empty"]
+ *                        │                          .when-full toggle)
+ *                        └── .st-empty
  *                + .st-guarantees (3 trust cards)
  *
  * Variant switching is driven by mytheme's state-chip (`data-plan-set`).
@@ -251,9 +254,16 @@
                 </script>
                 {/if}
 
-                <div class="when-full">
+                {* Wrapper class renamed from .when-full to .cart-plans-grid
+                   because mytheme/apple-layout.css ships a global
+                   `body[data-data="empty"] .when-full { display: none !important; }`
+                   toggle for client-area pages with empty-state previews.
+                   On cart pages we choose state via Smarty {if/else}, so we
+                   don't want that toggle activating and nuking the plan
+                   grid whenever something sets body[data-data="empty"]. *}
+                <div class="cart-plans-grid">
 
-                    {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_IN_WHENFULL · inside .when-full · about to render variant label</div>{/if}
+                    {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_IN_WHENFULL · inside .cart-plans-grid · about to render variant label</div>{/if}
 
                     {* ════════════════════════════════════════════════════════════
                        Variant A — 3-up feature-list cards  (default / recommended)
@@ -769,7 +779,7 @@
                         <span>{$LANG.cart.pricesin|default:'Prices in'} {$currency.code|default:'USD'} · <a href="#" data-currency-toggle>{$LANG.changecurrency|default:'Change currency'}</a></span>
                     </div>
 
-                </div>{* /.when-full *}
+                </div>{* /.cart-plans-grid *}
 
                 {if $smarty.get.debug eq 'cart'}<div style="background:#ff66cc;color:#fff;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #c03;font-weight:700;">SENTINEL_POST_WHENFULL · .when-full closed cleanly · Smarty rendered all 8 variants without bailing</div>{/if}
 
@@ -782,7 +792,7 @@
                    sat outside the {if $productCount} conditional and
                    leaked below the variants whenever a group had any
                    products at all. *}
-                <div class="when-empty st-empty">
+                <div class="st-empty">
                     <div class="st-empty-ico" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
                     </div>
@@ -806,7 +816,7 @@
 
             {* ── Guarantees strip — 3 trust cards below the main card ── *}
             {if $productCount > 0}
-                <div class="st-guarantees when-full">
+                <div class="st-guarantees">
                     <div class="card st-guarantee">
                         <div class="st-guarantee-ico">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4h22v16H1z"/><path d="M1 12h22"/><path d="M15 4v16"/></svg>
