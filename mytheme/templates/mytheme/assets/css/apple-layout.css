@@ -1207,3 +1207,436 @@ body[data-tpl="fraudcheck"] {
     .card-minimise, .panel-minimise,
     .fa, .fas, .far, .fab { display: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Apple-language overrides for standard_cart's cart-flow pages
+   ───────────────────────────────────────────────────────────────
+   The base Bootstrap shim above gets standard_cart rendering at
+   all. These rules take that further: reshape the actual DOM
+   standard_cart emits so it matches the Apple visual language
+   from apple-client-area/store.html — 240px sidebar + main grid,
+   .subnav-card-style sidebar items, .st-cat-head-style page
+   header, .st-plan-style product cards, and pill-shaped Apple
+   buttons. All achieved via CSS targeting standard_cart's
+   wrapper structure (no TPL changes — forms keep working).
+   ═══════════════════════════════════════════════════════════════ */
+body[data-tpl="cart"],
+body[data-tpl="viewcart"],
+body[data-tpl="configureproduct"],
+body[data-tpl="configureproductdomain"],
+body[data-tpl="configuredomains"],
+body[data-tpl="checkout"],
+body[data-tpl="products"],
+body[data-tpl="domainregister"],
+body[data-tpl="domaintransfer"],
+body[data-tpl="domainoptions"],
+body[data-tpl="ordersummary"],
+body[data-tpl="addons"],
+body[data-tpl="complete"],
+body[data-tpl="fraudcheck"] {
+
+    /* ── Root cart wrapper — neutralize the default 14px font + padding ── */
+    #order-standard_cart {
+        font-size: 14px;
+        color: var(--color-text-primary, #1d1d1f);
+        padding: 8px 0 32px !important;
+    }
+
+    /* ── 2-col split: 240px sidebar + flex main, like .st-split ── */
+    #order-standard_cart > .row {
+        display: grid !important;
+        grid-template-columns: 240px 1fr;
+        gap: 24px;
+        margin: 0 !important;
+        align-items: start;
+    }
+    @media (max-width: 880px) {
+        #order-standard_cart > .row { grid-template-columns: 1fr; }
+    }
+    #order-standard_cart .cart-sidebar,
+    #order-standard_cart .secondary-cart-sidebar {
+        float: none !important;
+        width: 100% !important;
+        max-width: 100%;
+        padding: 0 !important;
+    }
+    #order-standard_cart .cart-body,
+    #order-standard_cart .secondary-cart-body {
+        float: none !important;
+        width: 100% !important;
+        max-width: 100%;
+        padding: 0 !important;
+        min-width: 0;
+    }
+
+    /* ── Sidebar cards (.panel.card.card-sidebar) — render as .subnav-card ── */
+    #order-standard_cart .cart-sidebar .panel,
+    #order-standard_cart .cart-sidebar .card,
+    #order-standard_cart .cart-sidebar .card-sidebar {
+        padding: 8px;
+        margin-bottom: 12px;
+        border-radius: var(--radius-lg, 14px);
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        background: var(--color-surface, #fff);
+    }
+    #order-standard_cart .cart-sidebar .panel-heading,
+    #order-standard_cart .cart-sidebar .card-header {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--color-text-tertiary, #86868b);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 10px 12px 8px !important;
+        background: transparent !important;
+        border-bottom: 0 !important;
+    }
+    #order-standard_cart .cart-sidebar .panel-title {
+        font-size: inherit;
+        font-weight: inherit;
+        color: inherit;
+        margin: 0;
+    }
+    #order-standard_cart .cart-sidebar .list-group {
+        background: transparent;
+        margin: 0;
+    }
+    #order-standard_cart .cart-sidebar .list-group-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px !important;
+        border-radius: var(--radius-sm, 8px);
+        border: 0 !important;
+        margin: 0 !important;
+        background: transparent;
+        color: var(--color-text-primary, #1d1d1f);
+        font-size: 13px;
+        letter-spacing: -0.008em;
+        font-weight: 400;
+    }
+    #order-standard_cart .cart-sidebar .list-group-item:hover {
+        background: rgba(0, 0, 0, 0.04);
+    }
+    #order-standard_cart .cart-sidebar .list-group-item.active {
+        background: rgba(0, 0, 0, 0.06);
+        color: var(--color-text-primary, #1d1d1f);
+        font-weight: 500;
+        border: 0 !important;
+    }
+    #order-standard_cart .cart-sidebar .badge {
+        margin-left: auto;
+        background: var(--color-accent-light, rgba(0, 113, 227, 0.08));
+        color: var(--color-accent, #0071e3);
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    /* ── Page header (.header-lined) — render as .st-cat-head ── */
+    #order-standard_cart .header-lined {
+        padding: 24px 28px 22px !important;
+        margin: 0 0 18px !important;
+        border-bottom: 0 !important;
+        background: var(--color-surface, #fff);
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: var(--radius-lg, 14px);
+    }
+    #order-standard_cart .header-lined h1,
+    #order-standard_cart .header-lined .font-size-36 {
+        font-size: 26px !important;
+        font-weight: 600 !important;
+        color: var(--color-text-primary, #1d1d1f) !important;
+        letter-spacing: -0.02em !important;
+        margin: 0 0 4px !important;
+        line-height: 1.2 !important;
+    }
+    #order-standard_cart .header-lined p {
+        font-size: 14px;
+        color: var(--color-text-secondary, #6e6e73);
+        letter-spacing: -0.008em;
+        line-height: 1.5;
+        max-width: 540px;
+        margin: 0;
+    }
+
+    /* ── Products grid (.products .row .col-md-6) — render as .ds-pricing-grid ── */
+    #order-standard_cart .products,
+    #order-standard_cart #products {
+        margin: 18px 0;
+    }
+    #order-standard_cart .products .row {
+        margin: 0 !important;
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 14px;
+    }
+    @media (max-width: 560px) {
+        #order-standard_cart .products .row { grid-template-columns: 1fr; }
+    }
+    #order-standard_cart .products [class*="col-"] {
+        padding: 0 !important;
+        max-width: 100% !important;
+        flex: 1 !important;
+    }
+    #order-standard_cart .product {
+        padding: 24px 22px 22px !important;
+        border: 0.5px solid var(--color-border, #e8e8ed) !important;
+        border-radius: var(--radius-lg, 14px) !important;
+        background: var(--color-surface, #fff) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 14px !important;
+        transition: all var(--transition-fast, 150ms);
+        height: 100%;
+    }
+    #order-standard_cart .product:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        transform: translateY(-2px);
+    }
+    #order-standard_cart .product header {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--color-text-primary, #1d1d1f);
+        letter-spacing: -0.012em;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+    }
+    #order-standard_cart .product-desc {
+        font-size: 12.5px;
+        color: var(--color-text-tertiary, #86868b);
+        letter-spacing: -0.004em;
+        line-height: 1.5;
+    }
+    #order-standard_cart .product-desc ul {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--color-text-secondary, #6e6e73);
+    }
+    #order-standard_cart .product-desc ul li {
+        position: relative;
+        padding-left: 18px;
+    }
+    #order-standard_cart .product-desc ul li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 7px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--color-green-text, #248a3d);
+    }
+    #order-standard_cart .product-desc ul li .feature-value {
+        font-weight: 600;
+        color: var(--color-text-primary, #1d1d1f);
+        margin-right: 6px;
+    }
+    #order-standard_cart .product footer {
+        margin-top: auto !important;
+        padding-top: 14px !important;
+        border-top: 0.5px solid var(--color-border, #e8e8ed);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    #order-standard_cart .product-pricing {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+        font-variant-numeric: tabular-nums;
+    }
+    #order-standard_cart .product-pricing .price {
+        font-size: 28px !important;
+        font-weight: 600 !important;
+        color: var(--color-text-primary, #1d1d1f) !important;
+        letter-spacing: -0.022em !important;
+        line-height: 1 !important;
+    }
+    #order-standard_cart .product footer .btn,
+    #order-standard_cart .product .btn-add {
+        width: 100%;
+        justify-content: center;
+        height: 40px;
+        background: var(--color-accent, #0071e3);
+        color: #fff;
+        border-color: var(--color-accent, #0071e3);
+    }
+    #order-standard_cart .product footer .btn:hover,
+    #order-standard_cart .product .btn-add:hover {
+        background: var(--color-accent-hover, #0077ED);
+        border-color: var(--color-accent-hover, #0077ED);
+        color: #fff;
+    }
+
+    /* ── Domain selection (.domain-selection-options) — Apple radio cards ── */
+    #order-standard_cart .domain-selection-options {
+        background: var(--color-surface, #fff);
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: var(--radius-lg, 14px);
+        overflow: hidden;
+        margin-bottom: 18px;
+    }
+    #order-standard_cart .domain-selection-options .option {
+        padding: 18px 22px;
+        border-bottom: 0.5px solid var(--color-border, #e8e8ed);
+        transition: background var(--transition-fast, 150ms);
+    }
+    #order-standard_cart .domain-selection-options .option:last-child {
+        border-bottom: 0;
+    }
+    #order-standard_cart .domain-selection-options .option:has(input[type="radio"]:checked) {
+        background: var(--color-accent-light, rgba(0, 113, 227, 0.08));
+    }
+    #order-standard_cart .domain-selection-options .option > label {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14.5px;
+        font-weight: 500;
+        color: var(--color-text-primary, #1d1d1f);
+        letter-spacing: -0.008em;
+        margin: 0 0 12px;
+        cursor: pointer;
+    }
+    #order-standard_cart .domain-selection-options input[type="radio"] {
+        accent-color: var(--color-accent, #0071e3);
+        margin: 0;
+    }
+    #order-standard_cart .domain-input-group {
+        padding: 6px 0 0;
+    }
+    #order-standard_cart .domain-input-group .input-group {
+        display: flex;
+        align-items: stretch;
+        max-width: 480px;
+    }
+    #order-standard_cart .domain-input-group .input-group-addon,
+    #order-standard_cart .domain-input-group .input-group-prepend {
+        padding: 0 14px;
+        background: var(--color-surface-secondary, #f5f5f7);
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-right: 0;
+        border-radius: var(--radius-pill, 980px) 0 0 var(--radius-pill, 980px);
+        display: flex;
+        align-items: center;
+        font-size: 12.5px;
+        color: var(--color-text-tertiary, #86868b);
+        font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+    }
+    #order-standard_cart .domain-input-group .form-control {
+        height: 42px;
+        border-radius: 0;
+        border-color: var(--color-border, #e8e8ed);
+    }
+    #order-standard_cart .domain-input-group .col-xs-9 .form-control,
+    #order-standard_cart .domain-input-group .col-9 .form-control {
+        border-right: 0;
+    }
+    #order-standard_cart .domain-input-group select.form-control {
+        border-radius: 0 var(--radius-pill, 980px) var(--radius-pill, 980px) 0;
+    }
+    #order-standard_cart .domain-input-group .btn-block {
+        height: 42px;
+        width: 100%;
+        background: var(--color-accent, #0071e3);
+        color: #fff;
+        border-color: var(--color-accent, #0071e3);
+        border-radius: var(--radius-pill, 980px);
+        justify-content: center;
+    }
+    #order-standard_cart .domain-input-group .btn-block:hover {
+        background: var(--color-accent-hover, #0077ED);
+        border-color: var(--color-accent-hover, #0077ED);
+        color: #fff;
+    }
+
+    /* ── Domain search results / availability messages ───────── */
+    #order-standard_cart .domain-checker-available {
+        background: var(--color-green-bg, rgba(48, 209, 88, 0.10));
+        color: var(--color-green-text, #248a3d);
+        padding: 14px 18px;
+        border-radius: var(--radius-md, 12px);
+        margin: 14px 0;
+    }
+    #order-standard_cart .domain-checker-unavailable,
+    #order-standard_cart .domain-checker-invalid {
+        background: var(--color-red-bg, rgba(255, 59, 48, 0.10));
+        color: var(--color-red-text, #d70015);
+        padding: 14px 18px;
+        border-radius: var(--radius-md, 12px);
+        margin: 14px 0;
+    }
+
+    /* ── Bottom action bar / continue / checkout buttons ─────── */
+    #order-standard_cart .btn-continue-shopping,
+    #order-standard_cart .btn-checkout {
+        height: 44px;
+        padding: 0 24px;
+        border-radius: var(--radius-pill, 980px);
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: -0.008em;
+    }
+    #order-standard_cart .btn-checkout {
+        background: var(--color-accent, #0071e3);
+        color: #fff;
+        border-color: var(--color-accent, #0071e3);
+    }
+    #order-standard_cart .btn-checkout:hover {
+        background: var(--color-accent-hover, #0077ED);
+        color: #fff;
+    }
+    #order-standard_cart .btn-continue-shopping {
+        background: transparent;
+        color: var(--color-text-primary, #1d1d1f);
+        border-color: var(--color-border, #e8e8ed);
+    }
+    #order-standard_cart .btn-continue-shopping:hover {
+        border-color: var(--color-accent, #0071e3);
+        color: var(--color-accent, #0071e3);
+    }
+
+    /* ── View Cart / Order Summary table — Apple style ───────── */
+    #order-standard_cart .bordered-totals,
+    #order-standard_cart .checkout-summary,
+    #order-standard_cart .summary-container {
+        background: var(--color-surface, #fff);
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: var(--radius-lg, 14px);
+        padding: 18px 20px;
+        margin-bottom: 16px;
+    }
+    #order-standard_cart table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+    }
+    #order-standard_cart table th,
+    #order-standard_cart table td {
+        padding: 10px 14px;
+        border-bottom: 0.5px solid var(--color-border, #e8e8ed);
+        text-align: left;
+    }
+    #order-standard_cart table th {
+        font-weight: 600;
+        color: var(--color-text-secondary, #6e6e73);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    #order-standard_cart table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+    #order-standard_cart table tr.total td,
+    #order-standard_cart table .totals-row td {
+        font-weight: 600;
+        color: var(--color-text-primary, #1d1d1f);
+        font-size: 15px;
+    }
+}
