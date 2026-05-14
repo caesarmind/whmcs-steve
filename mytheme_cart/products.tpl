@@ -222,7 +222,34 @@
 
                 {if $productCount > 0}
 
-                {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_IN_IF · passed productCount > 0 · about to open .when-full</div>{/if}
+                {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_IN_IF · passed productCount > 0 · about to open .when-full</div>
+                <div id="dbg-runtime-state" style="background:#fff;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:11px;border:1px dashed #999;">SENTINEL_RUNTIME · checking runtime state...</div>
+                <script>
+                (function () {
+                    var dump = function () {
+                        var el = document.getElementById('dbg-runtime-state');
+                        var wf = document.querySelector('.when-full');
+                        var lines = [
+                            'body[data-data] = ' + (document.body.getAttribute('data-data') || '(unset)'),
+                            'body[data-plan] = ' + (document.body.getAttribute('data-plan') || '(unset)'),
+                            'body[data-svc-layout] = ' + (document.body.getAttribute('data-svc-layout') || '(unset)'),
+                            '.when-full exists = ' + !!wf,
+                            '.when-full display = ' + (wf ? getComputedStyle(wf).display : 'N/A'),
+                            '.when-full height = ' + (wf ? wf.offsetHeight + 'px' : 'N/A'),
+                            '.when-full children count = ' + (wf ? wf.children.length : 'N/A')
+                        ];
+                        el.innerHTML = '<strong>SENTINEL_RUNTIME</strong><br>' + lines.join('<br>');
+                    };
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', dump);
+                    } else {
+                        dump();
+                    }
+                    // Re-check after apple-layout.js has settled
+                    setTimeout(dump, 500);
+                })();
+                </script>
+                {/if}
 
                 <div class="when-full">
 
@@ -743,6 +770,8 @@
                     </div>
 
                 </div>{* /.when-full *}
+
+                {if $smarty.get.debug eq 'cart'}<div style="background:#ff66cc;color:#fff;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #c03;font-weight:700;">SENTINEL_POST_WHENFULL · .when-full closed cleanly · Smarty rendered all 8 variants without bailing</div>{/if}
 
                 {else}
 
