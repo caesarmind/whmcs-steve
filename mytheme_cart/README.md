@@ -49,7 +49,7 @@ mytheme_cart/
 | `common.tpl` | ✓ | — |
 | `products.tpl` | ✓ | `apple-client-area/store.html` (2-column sidebar + plan grid Variant A) |
 | `viewcart.tpl` | ✓ | `apple-client-area/cart.html` + `cart-empty.html` |
-| `configureproduct.tpl` | pending | `apple-client-area/configureproduct.html` |
+| `configureproduct.tpl` | ✓ | `apple-client-area/configureproduct.html` |
 | `domainregister.tpl` | pending | `apple-client-area/cart-domain-register.html` |
 | `domaintransfer.tpl` | pending | `apple-client-area/cart-domain-transfer.html` |
 | `checkout.tpl` | pending | `apple-client-area/checkout.html` |
