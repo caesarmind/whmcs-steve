@@ -2051,4 +2051,166 @@ body[data-tpl="fraudcheck"] {
     #order-standard_cart .btn-continue-shopping .fas {
         font-size: 10px;
     }
+
+    /* ═══ configureproduct — product header card + addon picker ═══
+       The product-info block is the page-top intro card (icon + title
+       + description). Addons render as bordered cards that highlight
+       when checked (.panel-addon-selected class is toggled by JS). */
+    #order-standard_cart .product-info {
+        display: flex; gap: 16px; align-items: flex-start;
+        padding: 22px 22px 20px;
+        margin-bottom: 18px;
+        background: var(--color-surface-primary, #fff);
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: 14px;
+    }
+    #order-standard_cart .product-info-ico {
+        width: 48px; height: 48px; border-radius: 12px;
+        background: var(--color-accent-light, #e8f0fe);
+        color: var(--color-accent, #0071e3);
+        display: inline-flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        font-size: 20px;
+    }
+    #order-standard_cart .product-info-meta {
+        flex: 1; min-width: 0;
+    }
+    #order-standard_cart .product-info .product-title {
+        font-size: 19px; font-weight: 600;
+        color: var(--color-text-primary, #1d1d1f);
+        letter-spacing: -0.016em;
+        margin: 0 0 4px;
+    }
+    #order-standard_cart .product-info p:not(.product-title) {
+        font-size: 13px;
+        color: var(--color-text-tertiary, #86868b);
+        margin: 0;
+        line-height: 1.5;
+        letter-spacing: -0.004em;
+    }
+
+    /* Section sub-heading (Server config, Configure package, Available
+       addons, Required info). Standard_cart uses a flat-color band; we
+       want a thin Apple eyebrow label. */
+    #order-standard_cart .sub-heading {
+        margin: 24px 0 12px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+    }
+    #order-standard_cart .sub-heading > span {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--color-text-tertiary, #86868b) !important;
+        background: transparent !important;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 0 !important;
+    }
+
+    /* Addon cards inside #productAddonsContainer */
+    #order-standard_cart .addon-products {
+        margin-left: -6px;
+        margin-right: -6px;
+    }
+    #order-standard_cart .addon-products > [class*="col-"] {
+        padding-left: 6px;
+        padding-right: 6px;
+        margin-bottom: 12px;
+    }
+    #order-standard_cart .panel-addon {
+        position: relative;
+        padding: 16px 18px;
+        background: var(--color-surface-primary, #fff);
+        border: 0.5px solid var(--color-border, #e8e8ed) !important;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        box-shadow: none !important;
+        margin: 0;
+    }
+    #order-standard_cart .panel-addon:hover {
+        border-color: var(--color-text-quaternary, #b8b8c0) !important;
+    }
+    #order-standard_cart .panel-addon .panel-body,
+    #order-standard_cart .panel-addon .card-body {
+        padding: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+    }
+    #order-standard_cart .panel-addon label {
+        display: flex; align-items: flex-start;
+        gap: 10px;
+        margin: 0;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--color-text-primary, #1d1d1f);
+        letter-spacing: -0.008em;
+        cursor: pointer;
+    }
+    #order-standard_cart .panel-addon label input[type="checkbox"] {
+        margin: 3px 0 0;
+        flex-shrink: 0;
+        accent-color: var(--color-accent, #0071e3);
+    }
+    #order-standard_cart .panel-addon .addon-name {
+        flex: 1;
+        font-weight: 500;
+    }
+    #order-standard_cart .panel-addon .addon-description {
+        margin-top: 6px;
+        padding-left: 24px;
+        font-size: 12.5px;
+        color: var(--color-text-tertiary, #86868b);
+        line-height: 1.5;
+        letter-spacing: -0.004em;
+    }
+    #order-standard_cart .panel-addon .panel-price {
+        padding-left: 24px;
+        margin-top: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--color-text-primary, #1d1d1f);
+        font-variant-numeric: tabular-nums;
+    }
+    #order-standard_cart .panel-addon .panel-add {
+        display: none;
+    }
+    #order-standard_cart .panel-addon-selected {
+        border-color: var(--color-accent, #0071e3) !important;
+        background: var(--color-accent-light, #f0f7ff);
+    }
+    #order-standard_cart .panel-addon-selected:hover {
+        border-color: var(--color-accent, #0071e3) !important;
+    }
+
+    /* Help / contact banner */
+    #order-standard_cart .info-text-sm {
+        padding: 14px 16px;
+        font-size: 13px;
+        border-radius: 12px;
+        background: var(--color-surface-secondary, #f5f5f7) !important;
+        color: var(--color-text-secondary, #424245) !important;
+        border: 0 !important;
+        margin-top: 22px;
+    }
+    #order-standard_cart .info-text-sm .fas {
+        color: var(--color-accent, #0071e3);
+        margin-right: 6px;
+    }
+    #order-standard_cart .info-text-sm .alert-link {
+        color: var(--color-accent, #0071e3) !important;
+        font-weight: 500;
+        text-decoration: underline;
+    }
+
+    /* Configure-product Continue button (the big right-rail CTA) */
+    #order-standard_cart #btnCompleteProductConfig {
+        width: 100%;
+        height: 46px;
+        border-radius: var(--radius-pill, 980px);
+        font-weight: 500;
+        letter-spacing: -0.008em;
+    }
 }
