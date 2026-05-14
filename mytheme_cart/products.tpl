@@ -59,10 +59,15 @@
  *   - $product.stockControlEnabled → "N available" chip.
  *   - $errormessage + missing-group alert preserved.
  *
- * $productgroup vs $productGroup: WHMCS 9 assigns the lowercase form
- * on the live install. The `.X|default:->X` dual-pattern accesses both
- * the array and object property shapes since the TPL has to render
- * across multiple WHMCS minor versions.
+ * $productgroup vs $productGroup: WHMCS sets the variable name
+ * inconsistently depending on entry point — standard_cart's own
+ * products.tpl reads $productGroup (capital G), while some friendly-URL
+ * routes (e.g. /store/<slug>) appeared to set only the lowercase form
+ * on our test install. To survive both, we resolve a single $_pg via
+ * `$productGroup|default:$productgroup` and read every meta field
+ * off that. The `.X|default:->X` dual-pattern on each meta field then
+ * handles the array-vs-object property shape since older WHMCS
+ * minor versions returned arrays here while newer ones return models.
  *
  * CSS: every class used here lives in mytheme_cart/css/style.min.css
  * (.st-* tokens) which is loaded by common.tpl. The Apple primitives
@@ -92,12 +97,18 @@
 {$featuredIndex = -1}
 {if $productCount >= 3}{$featuredIndex = floor($productCount / 2)}{/if}
 
+{* Resolve group: WHMCS uses $productGroup on /cart.php?gid=X (standard
+   route) and may use $productgroup on /store/<slug> (friendly URL).
+   Fall back through both names so we always have a handle. The
+   `|default` chain returns the first non-empty value. *}
+{$_pg = $productGroup|default:$productgroup}
+
 {* Resolve group meta (array vs object shape across WHMCS versions) *}
-{$_curGroupId = $productgroup.id|default:$productgroup->id}
-{$_groupName  = $productgroup.name|default:$productgroup->name}
-{$_headline   = $productgroup.headline|default:$productgroup->headline}
-{$_tagline    = $productgroup.tagline|default:$productgroup->tagline}
-{$_image      = $productgroup.image|default:$productgroup->image}
+{$_curGroupId = $_pg.id|default:$_pg->id}
+{$_groupName  = $_pg.name|default:$_pg->name}
+{$_headline   = $_pg.headline|default:$_pg->headline}
+{$_tagline    = $_pg.tagline|default:$_pg->tagline}
+{$_image      = $_pg.image|default:$_pg->image}
 
 <div id="order-standard_cart">
 
@@ -114,7 +125,12 @@
         <div class="alert alert-danger" role="alert" style="margin-bottom: 16px;">
             {$errormessage}
         </div>
-    {elseif !$productgroup}
+    {elseif !$_pg && $productCount == 0}
+        {* Only show the "please choose" prompt when we have neither
+           a resolved group nor any products to render. If WHMCS sets
+           $products but skips the group object on friendly-URL routes,
+           we proceed to render the plan grid below using $_groupName
+           ?: $pagetitle as the heading fallback. *}
         <div class="alert alert-info" role="alert" style="margin-bottom: 16px;">
             {lang key='orderForm.selectCategory'}
         </div>
@@ -134,10 +150,16 @@
         {* ── LEFT: Categories + Actions rail (reusable partial) ── *}
         {include file="orderforms/$carttpl/sidebar-categories.tpl"}
 
-        {* ── RIGHT: category detail ── *}
+        {* ── RIGHT: category detail ──
+           Render the category card whenever we have a resolved group
+           OR at least one product to show. Some WHMCS routes
+           (e.g. /store/<slug>) pass $products without setting
+           $productgroup, and we'd rather show plans against a fallback
+           heading than fall through to the landing tiles when products
+           are clearly available. *}
         <div style="min-width: 0;">
 
-            {if $productgroup}
+            {if $_pg || $productCount > 0}
 
             <div class="card" style="padding: 0; overflow: hidden;">
 
@@ -153,7 +175,10 @@
                         </div>
                         <div class="st-cat-head-meta">
                             <h2 class="st-cat-head-title" id="cat-title">
-                                {if $_headline}{$_headline}{else}{$_groupName|escape}{/if}
+                                {if $_headline}{$_headline}
+                                {elseif $_groupName}{$_groupName|escape}
+                                {elseif $pagetitle}{$pagetitle|escape}
+                                {else}{$LANG.cart.plansheading|default:'Available plans'}{/if}
                             </h2>
                             {if $_tagline}
                                 <p class="st-cat-head-desc" id="cat-desc">{$_tagline}</p>
