@@ -121,6 +121,33 @@
         <p class="page-subtitle">{$LANG.ordernewservicestagline|default:'Browse our plans and add the ones you need to your cart. All plans come with a 30-day money-back guarantee.'}</p>
     </header>
 
+    {* ─ Diagnostic block. Visible only when ?debug=cart is appended to
+       the URL. Useful when "No packages in this category yet" fires
+       despite a package being configured in admin — shows whether the
+       group resolved, whether $products is populated, the active client
+       state, etc. Strip this block when the rebuild stabilizes. *}
+    {if $smarty.get.debug eq 'cart'}
+        <div style="background:#fff8e1;border:0.5px solid #f6c84c;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.55;color:#5a4400;">
+            <div style="font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;">cart debug · /?debug=cart</div>
+            <div><strong>$productGroup:</strong> {if $productGroup}set · id={$productGroup.id|default:$productGroup->id|default:'?'} · name="{$productGroup.name|default:$productGroup->name|default:'?'}"{else}<em>not set</em>{/if}</div>
+            <div><strong>$productgroup:</strong> {if $productgroup}set · id={$productgroup.id|default:$productgroup->id|default:'?'} · name="{$productgroup.name|default:$productgroup->name|default:'?'}"{else}<em>not set</em>{/if}</div>
+            <div><strong>$_pg (resolved):</strong> {if $_pg}id={$_curGroupId} · name="{$_groupName}" · headline="{$_headline}" · tagline="{$_tagline}"{else}<em>none</em>{/if}</div>
+            <div><strong>$products:</strong> {if isset($products)}set · count={$productCount}{else}<em>NOT SET — WHMCS didn't pass it</em>{/if}</div>
+            <div><strong>$productCount:</strong> {$productCount}</div>
+            <div><strong>$productgroups (sidebar source):</strong> {if $productgroups}{$productgroups|@count} group(s) total{else}<em>not set</em>{/if}</div>
+            <div><strong>$secondarySidebar:</strong> {if $secondarySidebar}{$secondarySidebar|@count} panel(s){else}<em>not set</em>{/if}</div>
+            <div><strong>$pagetitle:</strong> "{$pagetitle|default:''}"</div>
+            <div><strong>$templatefile:</strong> "{$templatefile|default:''}"</div>
+            <div><strong>$errormessage:</strong> "{$errormessage|default:'(none)'}"</div>
+            <div><strong>$loggedin:</strong> {if $loggedin}YES{else}NO (anonymous visitor){/if}</div>
+            <div><strong>$activeCurrency:</strong> {if $activeCurrency}{$activeCurrency.code|default:'?'} (id={$activeCurrency.id|default:'?'}){else}<em>not set</em>{/if}</div>
+            {if $products && $productCount > 0}
+                <div style="margin-top:6px;"><strong>First product:</strong> pid={$products[0].pid|default:'?'} · name="{$products[0].name|default:'?'}" · hidden={$products[0].hidden|default:'?'}</div>
+            {/if}
+            <div style="margin-top:10px;font-size:11px;opacity:0.8;">If $products is empty but you have a package configured, check in WHMCS admin: Setup → Products → your package → (1) Hidden checkbox is OFF, (2) Product Group is the same group you're viewing, (3) Pricing has at least one cycle configured for the active currency.</div>
+        </div>
+    {/if}
+
     {if $errormessage}
         <div class="alert alert-danger" role="alert" style="margin-bottom: 16px;">
             {$errormessage}
