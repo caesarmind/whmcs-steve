@@ -120,10 +120,14 @@
         </div>
     {/if}
 
-    {* Mobile-only currency + category picker (WHMCS-rendered). On md+
-       it's hidden by standard_cart's collapsed-sidebar CSS; here it
-       sits above the desktop split as a fallback. *}
-    {include file="orderforms/standard_cart/sidebar-categories-collapsed.tpl"}
+    {* NOTE: sidebar-categories-collapsed.tpl include (the WHMCS mobile
+       picker) is intentionally NOT included here. Its `<select>`-based
+       output relies on Bootstrap responsive utilities (.hidden-md /
+       .visible-xs) to stay invisible on desktop, which we don't load in
+       this theme. Instead, the sidebar-categories partial below
+       responsive-wraps under the main column at 880px via the .st-split
+       grid breakpoint — that handles mobile cleanly without the
+       duplicate select panels. *}
 
     <div class="st-split">
 

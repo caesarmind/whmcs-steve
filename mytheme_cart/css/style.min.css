@@ -59,8 +59,41 @@
     --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+/* Dark mode is opt-in via [data-theme="dark"] on <html> or <body>.
+   We do NOT gate on @media (prefers-color-scheme: dark) — the parent
+   mytheme uses explicit data-theme so the deployed site can default
+   to light even when the visitor's OS is in dark mode. The OS
+   preference is honored only as a fallback when no data-theme is
+   set anywhere in the document (see :where(html:not(...)) below). */
+html[data-theme="dark"],
+body[data-theme="dark"],
+[data-theme="dark"] {
+    --color-bg:                #1c1c1e;
+    --color-surface:           #2c2c2e;
+    --color-surface-secondary: #3a3a3c;
+    --color-surface-tertiary:  #252527;
+    --color-border:            #3a3a3c;
+    --color-border-light:      #2c2c2e;
+    --color-text-primary:      #f5f5f7;
+    --color-text-secondary:    #a1a1a6;
+    --color-text-tertiary:     #8e8e93;
+    --color-text-quaternary:   #636366;
+    --color-accent:            #2997ff;
+    --color-accent-hover:      #40a3ff;
+    --color-accent-light:      rgba(41, 151, 255, 0.12);
+    --color-green-bg:          rgba(48, 209, 88, 0.16);
+    --color-green-text:        #30d158;
+    --color-orange-bg:         rgba(255, 159, 10, 0.16);
+    --color-orange-text:       #ff9f0a;
+    --color-red-bg:            rgba(255, 59, 48, 0.16);
+    --color-red-text:          #ff453a;
+}
+
+/* OS-preference fallback — only applies when the page does NOT set
+   data-theme explicitly. The :where() keeps specificity at zero so
+   any [data-theme] attribute on <html>/<body> wins. */
 @media (prefers-color-scheme: dark) {
-    :root {
+    :where(html:not([data-theme]):not([data-theme="light"])) {
         --color-bg:                #1c1c1e;
         --color-surface:           #2c2c2e;
         --color-surface-secondary: #3a3a3c;
@@ -1541,6 +1574,26 @@ body[data-plan] .st-variant-label { display: none; }
     font-size: 11px; color: var(--color-text-tertiary); font-weight: 400;
     letter-spacing: -0.004em;
 }
+
+/* ── Bootstrap modal + helper-hidden safety net ──────────────────
+   The standard_cart recommendations-modal.tpl uses Bootstrap 4 modal
+   markup (.modal.fade + .modal-dialog) which relies on Bootstrap's CSS
+   to keep it invisible until JS adds .show. If Bootstrap CSS isn't
+   loaded on the cart page (or loads late), the modal contents leak
+   into the page as raw stacked HTML. These rules hide them by default
+   so a missing/late Bootstrap doesn't reveal the modal scaffolding.
+   Bootstrap's own .modal.show / .modal.in / .modal.fade.in rules still
+   work the moment Bootstrap drops in.
+
+   `.hidden` / `.w-hidden` are Bootstrap/WHMCS utility classes used
+   inside the modal partial to mark elements as not-yet-shown (e.g.,
+   the `.product-recommendation.clonable` template node). Forcing them
+   to display:none here keeps the page clean.
+
+   The selectors stay attribute-/class-precise so we don't accidentally
+   strip elements the host theme intentionally toggles via .show. */
+.modal:not(.show):not(.in) { display: none !important; }
+.hidden, .w-hidden { display: none !important; }
 
 /* Shared card frame used by sidebar + main content */
 .card {
