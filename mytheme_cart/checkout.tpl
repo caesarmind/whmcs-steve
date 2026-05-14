@@ -152,20 +152,20 @@
 
 <div class="content-area">
     <header class="co-page-header">
-        <h1>{lang key='cart.checkout.title'|default:'Checkout'}</h1>
-        <p class="page-subtitle">{lang key='cart.checkout.subtitle'|default:'Review your items, enter your billing details, and pick a way to pay.'}</p>
+        <h1>Checkout</h1>
+        <p class="page-subtitle">Review your items, enter your billing details, and pick a way to pay.</p>
     </header>
 
     <div class="co-steps">
-        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{lang key='cart.step.plan'|default:'Choose plan'}</span>
+        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Choose plan</span>
         <span class="co-step-sep">›</span>
-        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{lang key='cart.step.domain'|default:'Domain'}</span>
+        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Domain</span>
         <span class="co-step-sep">›</span>
-        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{lang key='cart.step.configure'|default:'Configure'}</span>
+        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Configure</span>
         <span class="co-step-sep">›</span>
-        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{lang key='cart.step.cart'|default:'Cart'}</span>
+        <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Cart</span>
         <span class="co-step-sep">›</span>
-        <span class="co-step active"><span class="co-step-num">5</span>{lang key='cart.step.checkout'|default:'Checkout'}</span>
+        <span class="co-step active"><span class="co-step-num">5</span>Checkout</span>
     </div>
 
     <form method="post" action="{$WEB_ROOT}/cart.php?a=checkout" id="checkoutForm">
@@ -181,11 +181,11 @@
                 <div class="card co-section">
                     <div class="co-section-head">
                         <h2 class="co-section-title">
-                            {lang key='cart.checkout.items'|default:'Items in your cart'}
+                            Items in your cart
                             <span style="color: var(--color-text-tertiary); font-weight: 500; margin-left: 4px;">· {$cartitemcount|default:0}</span>
                         </h2>
                         <a href="{$WEB_ROOT}/cart.php" class="co-section-head-action">
-                            {lang key='cart.checkout.addanother'|default:'Add another'}
+                            Add another
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                         </a>
                     </div>
@@ -201,7 +201,7 @@
                                     <div class="co-item-right">
                                         <div class="co-item-price">{$p.pricing}</div>
                                         <div class="co-item-actions">
-                                            <a href="{$WEB_ROOT}/cart.php?a=confproduct&i={$p@iteration - 1}" class="co-item-btn" title="{lang key='cart.edit'|default:'Edit'}">
+                                            <a href="{$WEB_ROOT}/cart.php?a=confproduct&i={$p@iteration - 1}" class="co-item-btn" title="Edit">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                             </a>
                                         </div>
@@ -215,7 +215,7 @@
                                     <div class="co-item-ico domain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
                                     <div class="co-item-meta">
                                         <div class="co-item-name" style="font-family: var(--font-mono, ui-monospace, Menlo, monospace); font-size: 13.5px;">{$d.domain|escape}</div>
-                                        <div class="co-item-sub">{if $d.type == 'register'}{lang key='cart.domain.register'|default:'Register'}{elseif $d.type == 'transfer'}{lang key='cart.domain.transfer'|default:'Transfer'}{/if} · {$d.regperiod|escape} {lang key='cart.yearplural'|default:'year(s)'}</div>
+                                        <div class="co-item-sub">{if $d.type == 'register'}Register{elseif $d.type == 'transfer'}Transfer{/if} · {$d.regperiod|escape} year(s)</div>
                                     </div>
                                     <div class="co-item-right">
                                         <div class="co-item-price">{$d.pricing}</div>
@@ -230,49 +230,49 @@
                 {if !$loggedin}
                     <div class="card co-section">
                         <div class="co-section-head">
-                            <h2 class="co-section-title">{lang key='cart.checkout.youraccount'|default:'Your account'}</h2>
+                            <h2 class="co-section-title">Your account</h2>
                         </div>
                         <div class="co-auth-tabs" role="tablist">
-                            <button type="button" class="co-auth-tab active" data-atab="create">{lang key='cart.checkout.createaccount'|default:'Create an account'}</button>
-                            <button type="button" class="co-auth-tab" data-atab="signin">{lang key='cart.checkout.havesigning'|default:'I already have one'}</button>
+                            <button type="button" class="co-auth-tab active" data-atab="create">Create an account</button>
+                            <button type="button" class="co-auth-tab" data-atab="signin">I already have one</button>
                         </div>
 
                         <div class="co-auth-panel is-active" data-apanel="create">
-                            <p class="co-auth-hint">{lang key='cart.checkout.createhint'|default:"We'll use this for your invoices and to let you manage your services later."}</p>
+                            <p class="co-auth-hint">We'll use this for your invoices and to let you manage your services later.</p>
                             <div class="co-form">
                                 <div class="co-row">
-                                    <label class="co-label" for="acct-email">{lang key='cart.checkout.email'|default:'Email address'}</label>
+                                    <label class="co-label" for="acct-email">Email address</label>
                                     <input id="acct-email" name="email" type="email" class="co-input" placeholder="you@example.com" autocomplete="email" required>
                                 </div>
                                 <div class="co-form-grid">
                                     <div class="co-row">
-                                        <label class="co-label" for="acct-pw">{lang key='cart.checkout.password'|default:'Password'}</label>
-                                        <input id="acct-pw" name="password" type="password" class="co-input" placeholder="{lang key='cart.checkout.pw.placeholder'|default:'At least 8 characters'}" autocomplete="new-password" required>
+                                        <label class="co-label" for="acct-pw">Password</label>
+                                        <input id="acct-pw" name="password" type="password" class="co-input" placeholder="At least 8 characters" autocomplete="new-password" required>
                                     </div>
                                     <div class="co-row">
-                                        <label class="co-label" for="acct-pw2">{lang key='cart.checkout.confirmpw'|default:'Confirm password'}</label>
-                                        <input id="acct-pw2" name="password2" type="password" class="co-input" placeholder="{lang key='cart.checkout.confirmpw.placeholder'|default:'Repeat password'}" autocomplete="new-password" required>
+                                        <label class="co-label" for="acct-pw2">Confirm password</label>
+                                        <input id="acct-pw2" name="password2" type="password" class="co-input" placeholder="Repeat password" autocomplete="new-password" required>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="co-auth-panel" data-apanel="signin">
-                            <p class="co-auth-hint">{lang key='cart.checkout.signinhint'|default:"Sign in with the account you already have and we'll use its details for this order."}</p>
+                            <p class="co-auth-hint">Sign in with the account you already have and we'll use its details for this order.</p>
                             <div class="co-form">
                                 <div class="co-row">
-                                    <label class="co-label" for="signin-email">{lang key='cart.checkout.email'|default:'Email address'}</label>
+                                    <label class="co-label" for="signin-email">Email address</label>
                                     <input id="signin-email" name="loginemail" type="email" class="co-input" placeholder="you@example.com" autocomplete="email">
                                 </div>
                                 <div class="co-row">
                                     <div class="co-signin-row">
-                                        <label class="co-label" for="signin-pw">{lang key='cart.checkout.password'|default:'Password'}</label>
-                                        <a href="{$WEB_ROOT}/pwreset.php" class="co-forgot-link">{lang key='cart.checkout.forgotpw'|default:'Forgot your password?'}</a>
+                                        <label class="co-label" for="signin-pw">Password</label>
+                                        <a href="{$WEB_ROOT}/pwreset.php" class="co-forgot-link">Forgot your password?</a>
                                     </div>
-                                    <input id="signin-pw" name="loginpassword" type="password" class="co-input" placeholder="{lang key='cart.checkout.yourpw'|default:'Your password'}" autocomplete="current-password">
+                                    <input id="signin-pw" name="loginpassword" type="password" class="co-input" placeholder="Your password" autocomplete="current-password">
                                 </div>
                                 <button type="submit" name="login" value="true" class="co-signin-btn">
-                                    {lang key='cart.checkout.signincontinue'|default:'Sign in and continue'}
+                                    Sign in and continue
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                                 </button>
                             </div>
@@ -283,68 +283,68 @@
                 {* Billing details *}
                 <div class="card co-section">
                     <div class="co-section-head">
-                        <h2 class="co-section-title">{lang key='cart.checkout.billingdetails'|default:'Billing details'}</h2>
+                        <h2 class="co-section-title">Billing details</h2>
                         {if $loggedin}
-                            <a href="{$WEB_ROOT}/clientarea.php?action=details" class="co-section-head-action">{lang key='cart.checkout.useaccountdetails'|default:'Use account details'}</a>
+                            <a href="{$WEB_ROOT}/clientarea.php?action=details" class="co-section-head-action">Use account details</a>
                         {/if}
                     </div>
                     <div class="co-section-body">
                         <div class="co-form">
                             <div class="co-row">
-                                <label class="co-label">{lang key='cart.checkout.accounttype'|default:'Account type'}</label>
+                                <label class="co-label">Account type</label>
                                 <div class="co-account-type">
-                                    <label>{lang key='cart.checkout.individual'|default:'Individual'} <input type="radio" name="accounttype" value="individual" checked></label>
-                                    <label>{lang key='cart.checkout.business'|default:'Business'} <input type="radio" name="accounttype" value="business"></label>
+                                    <label>Individual <input type="radio" name="accounttype" value="individual" checked></label>
+                                    <label>Business <input type="radio" name="accounttype" value="business"></label>
                                 </div>
                             </div>
                             <div class="co-form-grid">
                                 <div class="co-row">
-                                    <label class="co-label" for="co-first">{lang key='cart.checkout.firstname'|default:'First name'}</label>
+                                    <label class="co-label" for="co-first">First name</label>
                                     <input id="co-first" name="firstname" type="text" class="co-input" value="{$clientdetails.firstname|escape}" autocomplete="given-name" required>
                                 </div>
                                 <div class="co-row">
-                                    <label class="co-label" for="co-last">{lang key='cart.checkout.lastname'|default:'Last name'}</label>
+                                    <label class="co-label" for="co-last">Last name</label>
                                     <input id="co-last" name="lastname" type="text" class="co-input" value="{$clientdetails.lastname|escape}" autocomplete="family-name" required>
                                 </div>
                             </div>
                             <div class="co-form-grid">
                                 {if $loggedin}
                                     <div class="co-row">
-                                        <label class="co-label" for="co-email">{lang key='cart.checkout.email'|default:'Email'}</label>
+                                        <label class="co-label" for="co-email">Email</label>
                                         <input id="co-email" name="email" type="email" class="co-input" value="{$clientdetails.email|escape}" autocomplete="email" required>
                                     </div>
                                 {/if}
                                 <div class="co-row">
-                                    <label class="co-label" for="co-phone">{lang key='cart.checkout.phone'|default:'Phone'}</label>
+                                    <label class="co-label" for="co-phone">Phone</label>
                                     <input id="co-phone" name="phonenumber" type="tel" class="co-input" value="{$clientdetails.phonenumber|escape}" placeholder="+1 555 123 4567" autocomplete="tel">
                                 </div>
                             </div>
                             <div class="co-row">
-                                <label class="co-label" for="co-company">{lang key='cart.checkout.company'|default:'Company name (optional)'}</label>
+                                <label class="co-label" for="co-company">Company name (optional)</label>
                                 <input id="co-company" name="companyname" type="text" class="co-input" value="{$clientdetails.companyname|escape}" autocomplete="organization">
                             </div>
                             <div class="co-row">
-                                <label class="co-label" for="co-street">{lang key='cart.checkout.street'|default:'Street address'}</label>
+                                <label class="co-label" for="co-street">Street address</label>
                                 <input id="co-street" name="address1" type="text" class="co-input" value="{$clientdetails.address1|escape}" placeholder="742 Evergreen Terrace" autocomplete="street-address" required>
                             </div>
                             <div class="co-form-grid col3">
                                 <div class="co-row">
-                                    <label class="co-label" for="co-city">{lang key='cart.checkout.city'|default:'City'}</label>
+                                    <label class="co-label" for="co-city">City</label>
                                     <input id="co-city" name="city" type="text" class="co-input" value="{$clientdetails.city|escape}" placeholder="Springfield" autocomplete="address-level2" required>
                                 </div>
                                 <div class="co-row">
-                                    <label class="co-label" for="co-zip">{lang key='cart.checkout.postcode'|default:'Postcode'}</label>
+                                    <label class="co-label" for="co-zip">Postcode</label>
                                     <input id="co-zip" name="postcode" type="text" class="co-input" value="{$clientdetails.postcode|escape}" autocomplete="postal-code" required>
                                 </div>
                                 <div class="co-row">
-                                    <label class="co-label" for="co-country">{lang key='cart.checkout.country'|default:'Country'}</label>
+                                    <label class="co-label" for="co-country">Country</label>
                                     <select id="co-country" name="country" class="co-select" required>
                                         {if $countries}
                                             {foreach $countries as $cKey => $cName}
                                                 <option value="{$cKey|escape}"{if $cKey == $clientdetails.country} selected{/if}>{$cName|escape}</option>
                                             {/foreach}
                                         {else}
-                                            <option>{lang key='cart.checkout.selectcountry'|default:'Select country'}</option>
+                                            <option>Select country</option>
                                         {/if}
                                     </select>
                                 </div>
@@ -356,7 +356,7 @@
                 {* Payment method *}
                 <div class="card co-section">
                     <div class="co-section-head">
-                        <h2 class="co-section-title">{lang key='cart.checkout.paymentmethod'|default:'Payment method'}</h2>
+                        <h2 class="co-section-title">Payment method</h2>
                     </div>
                     <div class="co-section-body">
                         <div class="co-pay-list">
@@ -378,7 +378,7 @@
                                     <span class="co-pay-radio"></span>
                                     <span class="co-pay-logo">BANK</span>
                                     <div class="co-pay-meta">
-                                        <div class="co-pay-name">{lang key='cart.checkout.banktransfer'|default:'Bank transfer'}</div>
+                                        <div class="co-pay-name">Bank transfer</div>
                                     </div>
                                 </label>
                             {/if}
@@ -390,11 +390,11 @@
                 <label class="co-terms">
                     <input type="checkbox" name="accepttos" value="on" required>
                     <span>
-                        {lang key='cart.checkout.terms'|default:"I have read and agree to the"}
-                        <a href="{$WEB_ROOT}/terms-of-service" target="_blank">{lang key='cart.checkout.tos'|default:'Terms of Service'}</a>
-                        {lang key='cart.checkout.and'|default:'and'}
-                        <a href="{$WEB_ROOT}/privacy-policy" target="_blank">{lang key='cart.checkout.privacy'|default:'Privacy Policy'}</a>.
-                        {lang key='cart.checkout.authorise'|default:'I authorise charging my selected payment method today and for any recurring renewals until I cancel.'}
+                        I have read and agree to the
+                        <a href="{$WEB_ROOT}/terms-of-service" target="_blank">Terms of Service</a>
+                        and
+                        <a href="{$WEB_ROOT}/privacy-policy" target="_blank">Privacy Policy</a>.
+                        I authorise charging my selected payment method today and for any recurring renewals until I cancel.
                     </span>
                 </label>
             </div>
@@ -402,7 +402,7 @@
             {* ══ RIGHT — sticky summary + place-order button ══ *}
             <aside>
                 <div class="card co-summary-card">
-                    <div class="co-summary-head"><h2>{lang key='cart.ordersummary'|default:'Order summary'}</h2></div>
+                    <div class="co-summary-head"><h2>Order summary</h2></div>
                     <div class="co-summary-list">
                         {if $products}
                             {foreach $products as $p}
@@ -415,42 +415,42 @@
                         {if $domains}
                             {foreach $domains as $d}
                                 <div class="co-summary-line">
-                                    <span class="label">{lang key='cart.checkout.domain'|default:'Domain'} · {$d.domain|escape}</span>
+                                    <span class="label">Domain · {$d.domain|escape}</span>
                                     <span class="value">{$d.pricing}</span>
                                 </div>
                             {/foreach}
                         {/if}
                         {if $rawdata.subtotal}
                             <div class="co-summary-line divider">
-                                <span class="label">{lang key='cart.subtotal'|default:'Subtotal'}</span>
+                                <span class="label">Subtotal</span>
                                 <span class="value">{$rawdata.subtotal}</span>
                             </div>
                         {/if}
                         {if $rawdata.taxtotal}
                             <div class="co-summary-line">
-                                <span class="label">{lang key='cart.tax'|default:'Tax'}</span>
+                                <span class="label">Tax</span>
                                 <span class="value">{$rawdata.taxtotal}</span>
                             </div>
                         {/if}
                     </div>
                     <div class="co-summary-total">
-                        <span class="label">{lang key='cart.duetoday'|default:'Due today'}</span>
+                        <span class="label">Due today</span>
                         <span class="value">{$totaltodaytext|default:$rawdata.total}</span>
                     </div>
                     <div class="co-summary-footer">
                         <button type="submit" name="placeorder" value="true" class="co-place-order">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                            {lang key='cart.checkout.placeorder'|default:'Place order'}{if $totaltodaytext} — {$totaltodaytext}{/if}
+                            Place order{if $totaltodaytext} — {$totaltodaytext}{/if}
                         </button>
                     </div>
                     <div class="co-trust">
                         <span class="co-trust-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                            {lang key='cart.trust.ssl'|default:'256-bit SSL · PCI-DSS Level 1'}
+                            256-bit SSL · PCI-DSS Level 1
                         </span>
                         <span class="co-trust-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            {lang key='cart.trust.moneyback'|default:'30-day money-back guarantee'}
+                            30-day money-back guarantee
                         </span>
                     </div>
                 </div>

@@ -203,32 +203,32 @@
     {* ── Page header — title + count/monthly subtotal + "browse" CTA ── *}
     <header class="ct-page-header">
         <div>
-            <h1>{lang key='cart.yourcart'|default:'Your cart'}</h1>
+            <h1>Your cart</h1>
             {if ($products && count($products) > 0) || ($domains && count($domains) > 0)}
                 {$totalItems = (count($products)|default:0) + (count($domains)|default:0)}
                 <p class="sub">
-                    <strong>{$totalItems} {if $totalItems == 1}{lang key='cart.item'|default:'item'}{else}{lang key='cart.items'|default:'items'}{/if}</strong>
-                    {if $totaltodaytext} · <strong>{$totaltodaytext}</strong> {lang key='cart.duetoday'|default:'due today'}{/if}
+                    <strong>{$totalItems} {if $totalItems == 1}item{else}items{/if}</strong>
+                    {if $totaltodaytext} · <strong>{$totaltodaytext}</strong> due today{/if}
                 </p>
             {/if}
         </div>
         <a href="{$WEB_ROOT}/cart.php" class="ct-back-shop">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 5 12 12 19"/></svg>
-            {lang key='cart.browseproducts'|default:'Browse products & services'}
+            Browse products & services
         </a>
     </header>
 
     {* ── Step strip — Cart is the active step ── *}
     <div class="ct-steps">
-        <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{lang key='cart.step.plan'|default:'Choose plan'}</span>
+        <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Choose plan</span>
         <span class="ct-step-sep">›</span>
-        <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{lang key='cart.step.domain'|default:'Domain'}</span>
+        <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Domain</span>
         <span class="ct-step-sep">›</span>
-        <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{lang key='cart.step.configure'|default:'Configure'}</span>
+        <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Configure</span>
         <span class="ct-step-sep">›</span>
-        <span class="ct-step active"><span class="ct-step-num">4</span>{lang key='cart.step.cart'|default:'Cart'}</span>
+        <span class="ct-step active"><span class="ct-step-num">4</span>Cart</span>
         <span class="ct-step-sep">›</span>
-        <span class="ct-step"><span class="ct-step-num">5</span>{lang key='cart.step.checkout'|default:'Checkout'}</span>
+        <span class="ct-step"><span class="ct-step-num">5</span>Checkout</span>
     </div>
 
     {* ─────────────────────────────────────────────────────────
@@ -266,7 +266,7 @@
                             <form method="post" action="{$WEB_ROOT}/cart.php" style="margin:0;">
                                 <input type="hidden" name="a" value="remove">
                                 <input type="hidden" name="i" value="{$itemIndex}">
-                                <button type="submit" class="ct-product-remove" title="{lang key='cart.removeproduct'|default:'Remove product'}">
+                                <button type="submit" class="ct-product-remove" title="Remove product">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                                 </button>
                             </form>
@@ -275,7 +275,7 @@
                         {* Addons block — only if this product has selected addons *}
                         {if $cartItem.addons && count($cartItem.addons) > 0}
                             <div class="ct-addons-head">
-                                {lang key='cart.includedaddons'|default:'Included addons'} · {count($cartItem.addons)}
+                                Included addons · {count($cartItem.addons)}
                             </div>
                             {foreach $cartItem.addons as $addon}
                                 <div class="ct-addon-row">
@@ -290,7 +290,7 @@
                                     </div>
                                     <div class="ct-addon-price{if $addon.isFree} free{/if}">
                                         {if $addon.isFree}
-                                            {lang key='orderpaymenttermfree'|default:'Free'}
+                                            Free
                                         {else}
                                             {$addon.pricing}
                                         {/if}
@@ -301,7 +301,7 @@
                             <div class="ct-manage-addons">
                                 <a href="{$WEB_ROOT}/cart.php?a=confproduct&i={$itemIndex}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                    {lang key='cart.manageaddons'|default:'Manage addons'}
+                                    Manage addons
                                 </a>
                             </div>
                         {/if}
@@ -309,7 +309,7 @@
                         {* Footer — billing cycle + price *}
                         <div class="ct-product-foot">
                             <div class="ct-cycle-row">
-                                <label class="ct-cycle-label" for="ct-cycle-{$itemIndex}">{lang key='cart.billingcycle'|default:'Billing cycle'}</label>
+                                <label class="ct-cycle-label" for="ct-cycle-{$itemIndex}">Billing cycle</label>
                                 <select id="ct-cycle-{$itemIndex}" class="ct-cycle-select" data-cart-item="{$itemIndex}" name="billingcycle">
                                     {if $cartItem.pricingcycles}
                                         {foreach $cartItem.pricingcycles as $cycleKey => $cyclePrice}
@@ -331,7 +331,7 @@
                                     {/if}
                                 </span>
                                 <div class="period">
-                                    {$cartItem.billingcycle|escape} {lang key='cart.price'|default:'price'}
+                                    {$cartItem.billingcycle|escape} price
                                 </div>
                             </div>
                         </div>
@@ -343,7 +343,7 @@
             {if $domains && count($domains) > 0}
                 <div class="card ct-domain-card">
                     <div class="ct-addons-head" style="border-bottom: 0.5px solid var(--color-border); padding: 18px 24px 14px;">
-                        {lang key='cart.domains'|default:'Domains'} · {count($domains)}
+                        Domains · {count($domains)}
                     </div>
                     {foreach $domains as $dom}
                         <div class="ct-domain-row" style="border-bottom: 0.5px solid var(--color-border);">
@@ -353,8 +353,8 @@
                             <div class="ct-domain-meta">
                                 <div class="ct-domain-name">{$dom.domain|escape}</div>
                                 <div class="ct-domain-sub">
-                                    {if $dom.type == 'register'}{lang key='cart.domain.register'|default:'Register'}{elseif $dom.type == 'transfer'}{lang key='cart.domain.transfer'|default:'Transfer'}{else}{$dom.type|escape}{/if}
-                                    · {$dom.regperiod|escape} {lang key='cart.yearplural'|default:'year(s)'}
+                                    {if $dom.type == 'register'}Register{elseif $dom.type == 'transfer'}Transfer{else}{$dom.type|escape}{/if}
+                                    · {$dom.regperiod|escape} year(s)
                                 </div>
                             </div>
                             <div class="ct-domain-price">{$dom.pricing|escape}</div>
@@ -366,8 +366,8 @@
             {* ── Promo / taxes tabs ── *}
             <div class="card ct-tabs-card">
                 <div class="ct-tabs" role="tablist">
-                    <button type="button" class="ct-tab active" data-tab="promo">{lang key='cart.applypromo'|default:'Apply promo code'}</button>
-                    <button type="button" class="ct-tab" data-tab="tax">{lang key='cart.estimatetax'|default:'Estimate taxes'}</button>
+                    <button type="button" class="ct-tab active" data-tab="promo">Apply promo code</button>
+                    <button type="button" class="ct-tab" data-tab="tax">Estimate taxes</button>
                 </div>
 
                 <div class="ct-tab-panel is-active" data-panel="promo">
@@ -376,9 +376,9 @@
                         <div class="ct-promo-row">
                             <div class="ct-promo-input-wrap">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 01-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 00-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
-                                <input type="text" name="promocode" class="ct-promo-input" placeholder="{lang key='cart.promoplaceholder'|default:'Enter promo code if you have one'}" value="{$promotioncode|escape}">
+                                <input type="text" name="promocode" class="ct-promo-input" placeholder="Enter promo code if you have one" value="{$promotioncode|escape}">
                             </div>
-                            <button type="submit" name="validatepromo" value="true" class="ct-promo-apply{if $promotioncode} is-active{/if}">{lang key='cart.apply'|default:'Apply'}</button>
+                            <button type="submit" name="validatepromo" value="true" class="ct-promo-apply{if $promotioncode} is-active{/if}">Apply</button>
                         </div>
                     </form>
                 </div>
@@ -387,33 +387,33 @@
                     <form method="post" action="{$WEB_ROOT}/cart.php?a=view">
                         <div class="ct-tax-grid">
                             <div class="ct-tax-row">
-                                <label class="ct-tax-label" for="ct-tax-country">{lang key='cart.country'|default:'Country'}</label>
+                                <label class="ct-tax-label" for="ct-tax-country">Country</label>
                                 <select id="ct-tax-country" name="country" class="ct-tax-input">
                                     {if $countries}
                                         {foreach $countries as $cKey => $cName}
                                             <option value="{$cKey|escape}"{if $cKey == $taxcountry} selected{/if}>{$cName|escape}</option>
                                         {/foreach}
                                     {else}
-                                        <option>{lang key='cart.selectcountry'|default:'Select country'}</option>
+                                        <option>Select country</option>
                                     {/if}
                                 </select>
                             </div>
                             <div class="ct-tax-row">
-                                <label class="ct-tax-label" for="ct-tax-state">{lang key='cart.stateregion'|default:'State / region'}</label>
-                                <input id="ct-tax-state" type="text" name="state" class="ct-tax-input" placeholder="{lang key='cart.statepalceholder'|default:'California'}" value="{$taxstate|escape}">
+                                <label class="ct-tax-label" for="ct-tax-state">State / region</label>
+                                <input id="ct-tax-state" type="text" name="state" class="ct-tax-input" placeholder="California" value="{$taxstate|escape}">
                             </div>
                         </div>
                         <div class="ct-tax-grid">
                             <div class="ct-tax-row">
-                                <label class="ct-tax-label" for="ct-tax-city">{lang key='cart.city'|default:'City'}</label>
+                                <label class="ct-tax-label" for="ct-tax-city">City</label>
                                 <input id="ct-tax-city" type="text" name="city" class="ct-tax-input" value="{$taxcity|escape}">
                             </div>
                             <div class="ct-tax-row">
-                                <label class="ct-tax-label" for="ct-tax-zip">{lang key='cart.postcode'|default:'Postcode'}</label>
+                                <label class="ct-tax-label" for="ct-tax-zip">Postcode</label>
                                 <input id="ct-tax-zip" type="text" name="postcode" class="ct-tax-input" value="{$taxpostcode|escape}">
                             </div>
                         </div>
-                        <button type="submit" name="updatetax" value="true" class="ct-promo-apply is-active" style="width: 100%;">{lang key='cart.estimatetaxes'|default:'Estimate taxes'}</button>
+                        <button type="submit" name="updatetax" value="true" class="ct-promo-apply is-active" style="width: 100%;">Estimate taxes</button>
                     </form>
                 </div>
             </div>
@@ -423,9 +423,9 @@
         <aside>
             <div class="card ct-summary-card">
                 <div class="ct-summary-head">
-                    <h2>{lang key='cart.ordersummary'|default:'Order summary'}</h2>
+                    <h2>Order summary</h2>
                     {if $totalItems}
-                        <span class="count">{$totalItems} {if $totalItems == 1}{lang key='cart.item'|default:'item'}{else}{lang key='cart.items'|default:'items'}{/if}</span>
+                        <span class="count">{$totalItems} {if $totalItems == 1}item{else}items{/if}</span>
                     {/if}
                 </div>
 
@@ -438,7 +438,7 @@
                                     {if $cartItem.group}{$cartItem.group|escape} / {/if}{$cartItem.name|escape}
                                 </div>
                                 <div class="ct-summary-product-sub">
-                                    {$cartItem.billingcycle|capitalize|escape} {lang key='cart.renewal'|default:'renewal'}
+                                    {$cartItem.billingcycle|capitalize|escape} renewal
                                     {if $cartItem.domain} · {$cartItem.domain|escape}{/if}
                                 </div>
                             </div>
@@ -454,8 +454,8 @@
                             <div class="ct-summary-product-meta">
                                 <div class="ct-summary-product-name">{$dom.domain|escape}</div>
                                 <div class="ct-summary-product-sub">
-                                    {if $dom.type == 'register'}{lang key='cart.domain.register'|default:'Register'}{elseif $dom.type == 'transfer'}{lang key='cart.domain.transfer'|default:'Transfer'}{/if}
-                                    · {$dom.regperiod|escape} {lang key='cart.yearplural'|default:'year(s)'}
+                                    {if $dom.type == 'register'}Register{elseif $dom.type == 'transfer'}Transfer{/if}
+                                    · {$dom.regperiod|escape} year(s)
                                 </div>
                             </div>
                             <div class="ct-summary-product-price">{$dom.pricing|escape}</div>
@@ -467,7 +467,7 @@
                 <div class="ct-totals">
                     {if $totalrecurringmonthly && $totalrecurringmonthly != '0.00'}
                         <div class="ct-totals-row">
-                            <span class="label">{lang key='cart.recurring'|default:'Recurring'}
+                            <span class="label">Recurring
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                             </span>
                             <span class="value">{$totalrecurringmonthly}</span>
@@ -475,13 +475,13 @@
                     {/if}
                     {if $rawdata.subtotal}
                         <div class="ct-totals-row">
-                            <span class="label">{lang key='cart.subtotal'|default:'Subtotal'}</span>
+                            <span class="label">Subtotal</span>
                             <span class="value">{$rawdata.subtotal}</span>
                         </div>
                     {/if}
                     {if $rawdata.taxtotal}
                         <div class="ct-totals-row">
-                            <span class="label">{lang key='cart.tax'|default:'Tax'}</span>
+                            <span class="label">Tax</span>
                             <span class="value">{$rawdata.taxtotal}</span>
                         </div>
                     {/if}
@@ -489,7 +489,7 @@
 
                 {* Grand total *}
                 <div class="ct-summary-total">
-                    <span class="label">{lang key='cart.total'|default:'Total'}</span>
+                    <span class="label">Total</span>
                     <span class="value">{$totaltodaytext|default:$rawdata.total}</span>
                 </div>
 
@@ -497,23 +497,23 @@
                 <div class="ct-summary-footer">
                     <a href="{$WEB_ROOT}/cart.php?a=checkout" class="ct-checkout-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                        {lang key='cart.checkout'|default:'Checkout'}
+                        Checkout
                         {if $totaltodaytext} — {$totaltodaytext}{/if}
                     </a>
                     <a href="{$WEB_ROOT}/cart.php" class="ct-continue-shop">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                        {lang key='cart.continueshopping'|default:'Continue shopping'}
+                        Continue shopping
                     </a>
                 </div>
 
                 <div class="ct-trust">
                     <span class="ct-trust-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                        {lang key='cart.trust.ssl'|default:'256-bit SSL · PCI-DSS Level 1'}
+                        256-bit SSL · PCI-DSS Level 1
                     </span>
                     <span class="ct-trust-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        {lang key='cart.trust.moneyback'|default:'30-day money-back guarantee'}
+                        30-day money-back guarantee
                     </span>
                 </div>
             </div>
@@ -529,16 +529,16 @@
         <div class="ct-empty-ico">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
         </div>
-        <h2 class="ct-empty-title">{lang key='cart.empty.title'|default:'Your cart is empty'}</h2>
-        <p class="ct-empty-desc">{lang key='cart.empty.desc'|default:'Browse our plans and add something to get started. Everything comes with a 30-day money-back guarantee.'}</p>
+        <h2 class="ct-empty-title">Your cart is empty</h2>
+        <p class="ct-empty-desc">Browse our plans and add something to get started. Everything comes with a 30-day money-back guarantee.</p>
         <div class="ct-empty-actions">
             <a href="{$WEB_ROOT}/cart.php" class="btn-primary">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                {lang key='cart.empty.browseplans'|default:'Browse plans'}
+                Browse plans
             </a>
             <a href="{$WEB_ROOT}/cart.php?a=add&domain=register" class="btn-secondary">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                {lang key='cart.empty.registerdomain'|default:'Register a domain'}
+                Register a domain
             </a>
         </div>
     </div>

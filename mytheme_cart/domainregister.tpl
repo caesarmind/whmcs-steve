@@ -109,9 +109,9 @@
 
 <div class="content-area">
     <header class="dr-page-header">
-        <p class="page-eyebrow">{lang key='cart.order'|default:'ORDER'}</p>
-        <h1>{lang key='cart.domain.register.title'|default:'Register a Domain'}</h1>
-        <p class="page-subtitle">{lang key='cart.domain.register.subtitle'|default:'Search availability and add it to your cart.'}</p>
+        <p class="page-eyebrow">ORDER</p>
+        <h1>Register a Domain</h1>
+        <p class="page-subtitle">Search availability and add it to your cart.</p>
     </header>
 
     {* Search form *}
@@ -120,8 +120,8 @@
             <input type="hidden" name="checkavailability" value="true">
             <div class="dr-search-box">
                 <svg class="dr-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" name="domain" class="dr-search-input" placeholder="{lang key='cart.domain.search.placeholder'|default:'yourdomain.com'}" value="{$domain|escape}" aria-label="{lang key='cart.domain.search.placeholder'|default:'Search for a domain'}" autocomplete="off" required>
-                <button type="submit" class="dr-generate-btn">{lang key='cart.domain.search'|default:'Search'}</button>
+                <input type="text" name="domain" class="dr-search-input" placeholder="yourdomain.com" value="{$domain|escape}" aria-label="Search for a domain" autocomplete="off" required>
+                <button type="submit" class="dr-generate-btn">Search</button>
             </div>
         </form>
     </div>
@@ -133,19 +133,19 @@
         {if $domainresult.available}
             <div class="dr-result-card available">
                 <div class="dr-result-left">
-                    <div class="dr-check-badge" aria-label="{lang key='cart.domain.available'|default:'Available'}">
+                    <div class="dr-check-badge" aria-label="Available">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
                     <div class="dr-result-info">
                         <div class="dr-result-name">
                             <strong>{$domain|escape}</strong>
-                            <span class="dr-available-text">{lang key='cart.domain.isavailable'|default:'is available.'}</span>
+                            <span class="dr-available-text">is available.</span>
                         </div>
                         {if $domainresult.pricing}
                             <div class="dr-result-meta">
                                 <span class="dr-result-price">{$domainresult.pricing}<span class="per">/yr</span></span>
                                 <span class="dr-result-dot" aria-hidden="true">·</span>
-                                <span>{lang key='cart.domain.whoispriv'|default:'Free WHOIS privacy included'}</span>
+                                <span>Free WHOIS privacy included</span>
                             </div>
                         {/if}
                     </div>
@@ -154,21 +154,21 @@
                     <input type="hidden" name="domain" value="register">
                     <input type="hidden" name="sld" value="{$domainresult.sld|escape}">
                     <input type="hidden" name="tld" value="{$domainresult.tld|escape}">
-                    <button type="submit" class="dr-add-btn">{lang key='cart.domain.addtocart'|default:'Add to Cart'}</button>
+                    <button type="submit" class="dr-add-btn">Add to Cart</button>
                 </form>
             </div>
         {else}
             <div class="dr-result-card unavailable">
                 <div class="dr-result-left">
-                    <div class="dr-check-badge unavailable" aria-label="{lang key='cart.domain.unavailable'|default:'Unavailable'}">
+                    <div class="dr-check-badge unavailable" aria-label="Unavailable">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </div>
                     <div class="dr-result-info">
                         <div class="dr-result-name">
                             <strong>{$domain|escape}</strong>
-                            <span class="dr-unavailable-text">{lang key='cart.domain.isunavailable'|default:'is already taken.'}</span>
+                            <span class="dr-unavailable-text">is already taken.</span>
                         </div>
-                        <div class="dr-result-meta">{lang key='cart.domain.trydifferent'|default:'Try a different spelling, or pick a TLD below.'}</div>
+                        <div class="dr-result-meta">Try a different spelling, or pick a TLD below.</div>
                     </div>
                 </div>
             </div>
@@ -181,23 +181,23 @@
     {if $featured && count($featured) > 0}
         <div class="dr-section">
             <div class="dr-section-head">
-                <h2>{lang key='cart.domain.popular'|default:'Most popular'}</h2>
-                <p>{lang key='cart.domain.populardesc'|default:'A handful of the best-known extensions for your domain.'}</p>
+                <h2>Most popular</h2>
+                <p>A handful of the best-known extensions for your domain.</p>
             </div>
             <div class="dr-popular-grid">
                 {foreach $featured as $tld}
                     <div class="dr-tld-card">
                         <div class="dr-tld-name">{$tld.name|escape}</div>
                         {if $tld.available === false}
-                            <div class="dr-tld-status unavailable">{lang key='cart.domain.unavailable'|default:'Unavailable'}</div>
-                            <button class="dr-tld-btn disabled" disabled>{lang key='cart.domain.unavailable'|default:'Unavailable'}</button>
+                            <div class="dr-tld-status unavailable">Unavailable</div>
+                            <button class="dr-tld-btn disabled" disabled>Unavailable</button>
                         {else}
                             {if $tld.price}<div class="dr-tld-price">{$tld.price|escape}<span>/yr</span></div>{/if}
                             <form method="post" action="{$WEB_ROOT}/cart.php?a=add" style="width:100%; margin:0;">
                                 <input type="hidden" name="domain" value="register">
                                 <input type="hidden" name="sld" value="{$tld.sld|escape}">
                                 <input type="hidden" name="tld" value="{$tld.tld|escape}">
-                                <button type="submit" class="dr-tld-btn">{lang key='cart.domain.add'|default:'Add'}</button>
+                                <button type="submit" class="dr-tld-btn">Add</button>
                             </form>
                         {/if}
                     </div>
@@ -212,29 +212,29 @@
     {if $suggestions && count($suggestions) > 0}
         <div class="dr-section">
             <div class="dr-section-head">
-                <h2>{lang key='cart.domain.suggested'|default:'Suggested for you'}</h2>
-                <p>{lang key='cart.domain.suggesteddesc'|default:'Availability is checked in real time when you add to the cart.'}</p>
+                <h2>Suggested for you</h2>
+                <p>Availability is checked in real time when you add to the cart.</p>
             </div>
             <div class="dr-suggested-list">
                 {foreach $suggestions as $sug}
                     <div class="dr-sug-row">
                         <div class="dr-sug-name">
                             {$sug.sld|escape}<span class="tld">.{$sug.tld|escape}</span>
-                            {if $sug.onsale}<span class="dr-sug-chip sale">{lang key='cart.domain.sale'|default:'Sale'}</span>{/if}
-                            {if $sug.isnew}<span class="dr-sug-chip new">{lang key='cart.domain.new'|default:'New'}</span>{/if}
+                            {if $sug.onsale}<span class="dr-sug-chip sale">Sale</span>{/if}
+                            {if $sug.isnew}<span class="dr-sug-chip new">New</span>{/if}
                         </div>
                         <form method="post" action="{$WEB_ROOT}/cart.php?a=add" class="dr-sug-actions" style="margin:0;">
                             <input type="hidden" name="domain" value="register">
                             <input type="hidden" name="sld" value="{$sug.sld|escape}">
                             <input type="hidden" name="tld" value="{$sug.tld|escape}">
                             {if $sug.terms && count($sug.terms) > 0}
-                                <select name="regperiod" class="dr-sug-term" aria-label="{lang key='cart.domain.regterm'|default:'Registration term'}">
+                                <select name="regperiod" class="dr-sug-term" aria-label="Registration term">
                                     {foreach $sug.terms as $tKey => $tPrice}
                                         <option value="{$tKey|escape}">{$tPrice|escape} / {$tKey|escape}yr</option>
                                     {/foreach}
                                 </select>
                             {/if}
-                            <button type="submit" class="dr-add-btn outline">{lang key='cart.domain.addtocart'|default:'Add to Cart'}</button>
+                            <button type="submit" class="dr-add-btn outline">Add to Cart</button>
                         </form>
                     </div>
                 {/foreach}
@@ -246,11 +246,11 @@
        "Already own" — link to transfer page
        ───────────────────────────────────────────────────────── *}
     <div class="dr-transfer-panel">
-        <h2>{lang key='cart.domain.bringover.title'|default:'Already own a domain?'}</h2>
-        <p>{lang key='cart.domain.bringover.desc'|default:'Transfer it in — your registration term is extended by an extra year and we keep WHOIS privacy on for free.'}</p>
+        <h2>Already own a domain?</h2>
+        <p>Transfer it in — your registration term is extended by an extra year and we keep WHOIS privacy on for free.</p>
         <form class="dr-transfer-form" method="post" action="{$WEB_ROOT}/cart.php?a=add&domain=transfer">
-            <input type="text" name="domain" placeholder="{lang key='cart.domain.transfer.placeholder'|default:'yourdomain.com'}" autocomplete="off">
-            <button type="submit">{lang key='cart.domain.transfer'|default:'Transfer in a domain'}</button>
+            <input type="text" name="domain" placeholder="yourdomain.com" autocomplete="off">
+            <button type="submit">Transfer in a domain</button>
         </form>
     </div>
 
@@ -260,8 +260,8 @@
             <div class="dr-empty-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
             </div>
-            <h3 class="dr-empty-title">{lang key='cart.domain.empty.title'|default:'Find the perfect domain'}</h3>
-            <p class="dr-empty-desc">{lang key='cart.domain.empty.desc'|default:'Type a name above to check availability across all our supported TLDs.'}</p>
+            <h3 class="dr-empty-title">Find the perfect domain</h3>
+            <p class="dr-empty-desc">Type a name above to check availability across all our supported TLDs.</p>
         </div>
     {/if}
 </div>

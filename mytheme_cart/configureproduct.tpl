@@ -157,20 +157,20 @@
 
 <div class="content-area">
     <header class="cp-page-header">
-        <h1>{lang key='cart.configure.title'|default:'Configure your plan'}</h1>
-        <p class="page-subtitle">{lang key='cart.configure.subtitle'|default:"Pick a billing cycle and any optional add-ons — we'll keep a running total on the right."}</p>
+        <h1>Configure your plan</h1>
+        <p class="page-subtitle">Pick a billing cycle and any optional add-ons — we'll keep a running total on the right.</p>
     </header>
 
     <div class="cp-steps">
-        <span class="cp-step done"><span class="cp-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{lang key='cart.step.plan'|default:'Choose plan'}</span>
+        <span class="cp-step done"><span class="cp-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Choose plan</span>
         <span class="cp-step-sep">›</span>
-        <span class="cp-step done"><span class="cp-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{lang key='cart.step.domain'|default:'Domain'}</span>
+        <span class="cp-step done"><span class="cp-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Domain</span>
         <span class="cp-step-sep">›</span>
-        <span class="cp-step active"><span class="cp-step-num">3</span>{lang key='cart.step.configure'|default:'Configure'}</span>
+        <span class="cp-step active"><span class="cp-step-num">3</span>Configure</span>
         <span class="cp-step-sep">›</span>
-        <span class="cp-step"><span class="cp-step-num">4</span>{lang key='cart.step.cart'|default:'Cart'}</span>
+        <span class="cp-step"><span class="cp-step-num">4</span>Cart</span>
         <span class="cp-step-sep">›</span>
-        <span class="cp-step"><span class="cp-step-num">5</span>{lang key='cart.step.checkout'|default:'Checkout'}</span>
+        <span class="cp-step"><span class="cp-step-num">5</span>Checkout</span>
     </div>
 
     <form method="post" action="{$WEB_ROOT}/cart.php?a=confproduct&i={$cartitemid|default:0}" id="configProductForm">
@@ -201,14 +201,14 @@
                             {/if}
                         </div>
                         <a href="{$WEB_ROOT}/cart.php" class="cp-plan-hero-change">
-                            {lang key='cart.configure.changeplan'|default:'Change plan'}
+                            Change plan
                         </a>
                     </div>
                     {if $domain}
                         <div class="cp-domain-row">
                             <svg class="dom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
                             <div>
-                                <div class="label">{lang key='cart.configure.domain'|default:'Domain'}</div>
+                                <div class="label">Domain</div>
                                 <div class="value">{$domain|escape}</div>
                             </div>
                         </div>
@@ -219,11 +219,11 @@
                 {if $pricingcycles && count($pricingcycles) > 0}
                     <div class="card cp-section">
                         <div class="cp-section-head">
-                            <h2 class="cp-section-title">{lang key='cart.configure.billingcycle'|default:'Billing cycle'}</h2>
-                            <div class="cp-section-sub">{lang key='cart.configure.billingcyclesub'|default:'Longer commitments unlock bigger savings. You can upgrade or switch later.'}</div>
+                            <h2 class="cp-section-title">Billing cycle</h2>
+                            <div class="cp-section-sub">Longer commitments unlock bigger savings. You can upgrade or switch later.</div>
                         </div>
                         <div class="cp-section-body">
-                            <div class="cp-cycle" role="radiogroup" aria-label="{lang key='cart.configure.billingcycle'|default:'Billing cycle'}">
+                            <div class="cp-cycle" role="radiogroup" aria-label="Billing cycle">
                                 {foreach $pricingcycles as $cycleKey => $cyclePrice}
                                     <label class="cp-cycle-opt">
                                         <input type="radio" name="billingcycle" value="{$cycleKey|escape}"{if $cycleKey == $billingcycle} checked{/if}>
@@ -242,8 +242,8 @@
                 {if $configurableoptions && count($configurableoptions) > 0}
                     <div class="card cp-section">
                         <div class="cp-section-head">
-                            <h2 class="cp-section-title">{lang key='cart.configure.options'|default:'Configuration'}</h2>
-                            <div class="cp-section-sub">{lang key='cart.configure.optionssub'|default:'Optional resources and extras. You can change these later from the service page.'}</div>
+                            <h2 class="cp-section-title">Configuration</h2>
+                            <div class="cp-section-sub">Optional resources and extras. You can change these later from the service page.</div>
                         </div>
                         <div class="cp-section-body">
                             {foreach $configurableoptions as $configoption}
@@ -298,8 +298,8 @@
                 {if $customfields && count($customfields) > 0}
                     <div class="card cp-section">
                         <div class="cp-section-head">
-                            <h2 class="cp-section-title">{lang key='cart.configure.additional'|default:'Additional information'}</h2>
-                            <div class="cp-section-sub">{lang key='cart.configure.additionalsub'|default:"Anything our deployment team should know."}</div>
+                            <h2 class="cp-section-title">Additional information</h2>
+                            <div class="cp-section-sub">Anything our deployment team should know.</div>
                         </div>
                         <div class="cp-section-body">
                             {foreach $customfields as $cfield}
@@ -322,8 +322,8 @@
                 {if $addons && count($addons) > 0}
                     <div class="card cp-section">
                         <div class="cp-section-head">
-                            <h2 class="cp-section-title">{lang key='cart.configure.addons'|default:'Available add-ons'}</h2>
-                            <div class="cp-section-sub">{lang key='cart.configure.addonssub'|default:'Optional extras billed alongside your plan. Change or cancel any time.'}</div>
+                            <h2 class="cp-section-title">Available add-ons</h2>
+                            <div class="cp-section-sub">Optional extras billed alongside your plan. Change or cancel any time.</div>
                         </div>
                         <div class="cp-section-body">
                             {foreach $addons as $addon}
@@ -347,7 +347,7 @@
             <aside>
                 <div class="card cp-summary-card">
                     <div class="cp-summary-head">
-                        <h2>{lang key='cart.ordersummary'|default:'Order summary'}</h2>
+                        <h2>Order summary</h2>
                     </div>
                     <div class="cp-summary-list">
                         <div class="cp-summary-line">
@@ -356,36 +356,36 @@
                         </div>
                         {if $domain}
                             <div class="cp-summary-line">
-                                <span class="label">{lang key='cart.configure.domain'|default:'Domain'} · {$domain|escape}</span>
+                                <span class="label">Domain · {$domain|escape}</span>
                                 <span class="value">{$domainprice|default:'—'}</span>
                             </div>
                         {/if}
                         {if $rawdata.subtotal}
                             <div class="cp-summary-line divider">
-                                <span class="label">{lang key='cart.subtotal'|default:'Subtotal'}</span>
+                                <span class="label">Subtotal</span>
                                 <span class="value">{$rawdata.subtotal}</span>
                             </div>
                         {/if}
                     </div>
                     <div class="cp-summary-total">
-                        <span class="label">{lang key='cart.duetoday'|default:'Due today'}</span>
+                        <span class="label">Due today</span>
                         <span class="value">{$totaltodaytext|default:$rawdata.total|default:''}</span>
                     </div>
                     {if $billingcycle}
                         <p class="cp-summary-cycle">
-                            {lang key='cart.configure.renewsnote'|default:'Renews on'} {$billingcycle|escape} {lang key='cart.configure.cycle'|default:'cycle'}.
-                            {lang key='cart.configure.guarantee'|default:'30-day money-back guarantee.'}
+                            Renews on {$billingcycle|escape} cycle.
+                            30-day money-back guarantee.
                         </p>
                     {/if}
 
                     <div class="cp-summary-footer">
                         <button type="submit" class="cp-submit">
-                            {lang key='cart.configure.continue'|default:'Continue to cart'}
+                            Continue to cart
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><polyline points="9 18 15 12 9 6"/></svg>
                         </button>
                         <a href="{$WEB_ROOT}/cart.php" class="cp-back-link">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                            {lang key='cart.configure.back'|default:'Back to catalogue'}
+                            Back to catalogue
                         </a>
                     </div>
                 </div>

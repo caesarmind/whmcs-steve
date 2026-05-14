@@ -62,9 +62,9 @@
 
 <div class="content-area">
     <header class="su-page-header">
-        <p class="page-eyebrow">{lang key='signup.eyebrow'|default:'ACCOUNT'}</p>
-        <h1>{lang key='signup.title'|default:'Create an account'}</h1>
-        <p class="page-subtitle">{lang key='signup.subtitle'|default:"Set up your account in a minute — we'll use it to manage your services and send invoices."}</p>
+        <p class="page-eyebrow">ACCOUNT</p>
+        <h1>Create an account</h1>
+        <p class="page-subtitle">Set up your account in a minute — we'll use it to manage your services and send invoices.</p>
     </header>
 
     <div class="su-card-wrap">
@@ -78,58 +78,58 @@
 
                 <div class="su-form-grid">
                     <div class="su-row">
-                        <label class="su-label" for="su-first">{lang key='signup.firstname'|default:'First name'}</label>
+                        <label class="su-label" for="su-first">First name</label>
                         <input id="su-first" type="text" name="firstname" class="su-input" value="{$clientdetails.firstname|escape}" autocomplete="given-name" required>
                     </div>
                     <div class="su-row">
-                        <label class="su-label" for="su-last">{lang key='signup.lastname'|default:'Last name'}</label>
+                        <label class="su-label" for="su-last">Last name</label>
                         <input id="su-last" type="text" name="lastname" class="su-input" value="{$clientdetails.lastname|escape}" autocomplete="family-name" required>
                     </div>
                 </div>
 
                 <div class="su-row">
-                    <label class="su-label" for="su-email">{lang key='signup.email'|default:'Email address'}</label>
+                    <label class="su-label" for="su-email">Email address</label>
                     <input id="su-email" type="email" name="email" class="su-input" value="{$clientdetails.email|escape}" autocomplete="email" required>
                 </div>
 
                 <div class="su-row">
-                    <label class="su-label" for="su-phone">{lang key='signup.phone'|default:'Phone'}</label>
+                    <label class="su-label" for="su-phone">Phone</label>
                     <input id="su-phone" type="tel" name="phonenumber" class="su-input" value="{$clientdetails.phonenumber|escape}" autocomplete="tel">
                 </div>
 
                 <div class="su-row">
                     <label class="su-label" for="su-company">
-                        {lang key='signup.company'|default:'Company'}
-                        <span class="optional">({lang key='signup.optional'|default:'optional'})</span>
+                        Company
+                        <span class="optional">(optional)</span>
                     </label>
                     <input id="su-company" type="text" name="companyname" class="su-input" value="{$clientdetails.companyname|escape}" autocomplete="organization">
                 </div>
 
                 <div class="su-row">
-                    <label class="su-label" for="su-street">{lang key='signup.street'|default:'Street address'}</label>
+                    <label class="su-label" for="su-street">Street address</label>
                     <input id="su-street" type="text" name="address1" class="su-input" value="{$clientdetails.address1|escape}" autocomplete="street-address" required>
                 </div>
 
                 <div class="su-form-grid">
                     <div class="su-row">
-                        <label class="su-label" for="su-city">{lang key='signup.city'|default:'City'}</label>
+                        <label class="su-label" for="su-city">City</label>
                         <input id="su-city" type="text" name="city" class="su-input" value="{$clientdetails.city|escape}" autocomplete="address-level2" required>
                     </div>
                     <div class="su-row">
-                        <label class="su-label" for="su-state">{lang key='signup.state'|default:'State / region'}</label>
+                        <label class="su-label" for="su-state">State / region</label>
                         <input id="su-state" type="text" name="state" class="su-input" value="{$clientdetails.state|escape}" autocomplete="address-level1">
                     </div>
                 </div>
 
                 <div class="su-form-grid">
                     <div class="su-row">
-                        <label class="su-label" for="su-zip">{lang key='signup.postcode'|default:'Postcode'}</label>
+                        <label class="su-label" for="su-zip">Postcode</label>
                         <input id="su-zip" type="text" name="postcode" class="su-input" value="{$clientdetails.postcode|escape}" autocomplete="postal-code" required>
                     </div>
                     <div class="su-row">
-                        <label class="su-label" for="su-country">{lang key='signup.country'|default:'Country'}</label>
+                        <label class="su-label" for="su-country">Country</label>
                         <select id="su-country" name="country" class="su-select" required>
-                            <option value="">{lang key='signup.selectcountry'|default:'Select a country'}</option>
+                            <option value="">Select a country</option>
                             {if $countries}
                                 {foreach $countries as $cKey => $cName}
                                     <option value="{$cKey|escape}"{if $cKey == $clientdetails.country} selected{/if}>{$cName|escape}</option>
@@ -141,19 +141,19 @@
 
                 <div class="su-form-grid">
                     <div class="su-row">
-                        <label class="su-label" for="su-pw">{lang key='signup.password'|default:'Password'}</label>
+                        <label class="su-label" for="su-pw">Password</label>
                         <div class="su-pw-wrap">
-                            <input id="su-pw" type="password" name="password" class="su-input" placeholder="{lang key='signup.passwordhint'|default:'At least 8 characters'}" autocomplete="new-password" required>
-                            <button type="button" class="su-pw-toggle" data-pw-toggle aria-label="{lang key='signup.showpw'|default:'Show password'}">
+                            <input id="su-pw" type="password" name="password" class="su-input" placeholder="At least 8 characters" autocomplete="new-password" required>
+                            <button type="button" class="su-pw-toggle" data-pw-toggle aria-label="Show password">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </button>
                         </div>
                     </div>
                     <div class="su-row">
-                        <label class="su-label" for="su-pw2">{lang key='signup.confirmpw'|default:'Confirm password'}</label>
+                        <label class="su-label" for="su-pw2">Confirm password</label>
                         <div class="su-pw-wrap">
-                            <input id="su-pw2" type="password" name="password2" class="su-input" placeholder="{lang key='signup.confirmpwhint'|default:'Repeat password'}" autocomplete="new-password" required>
-                            <button type="button" class="su-pw-toggle" data-pw-toggle aria-label="{lang key='signup.showpw'|default:'Show password'}">
+                            <input id="su-pw2" type="password" name="password2" class="su-input" placeholder="Repeat password" autocomplete="new-password" required>
+                            <button type="button" class="su-pw-toggle" data-pw-toggle aria-label="Show password">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </button>
                         </div>
@@ -163,19 +163,19 @@
                 <label class="su-terms">
                     <input type="checkbox" name="accepttos" value="on" required>
                     <span>
-                        {lang key='signup.agree'|default:'I agree to the'}
-                        <a href="{$WEB_ROOT}/terms-of-service" target="_blank">{lang key='signup.tos'|default:'Terms of Service'}</a>
-                        {lang key='signup.and'|default:'and'}
-                        <a href="{$WEB_ROOT}/privacy-policy" target="_blank">{lang key='signup.privacy'|default:'Privacy Policy'}</a>.
+                        I agree to the
+                        <a href="{$WEB_ROOT}/terms-of-service" target="_blank">Terms of Service</a>
+                        and
+                        <a href="{$WEB_ROOT}/privacy-policy" target="_blank">Privacy Policy</a>.
                     </span>
                 </label>
 
-                <button type="submit" class="su-submit">{lang key='signup.create'|default:'Create account &amp; continue'}</button>
+                <button type="submit" class="su-submit">Create account &amp; continue</button>
             </form>
 
             <div class="su-footer">
-                {lang key='signup.alreadyhave'|default:'Already have an account?'}
-                <a href="{$WEB_ROOT}/clientarea.php">{lang key='signup.signin'|default:'Sign in'}</a>
+                Already have an account?
+                <a href="{$WEB_ROOT}/clientarea.php">Sign in</a>
             </div>
         </div>
     </div>

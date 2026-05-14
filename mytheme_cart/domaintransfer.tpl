@@ -77,9 +77,9 @@
 
 <div class="content-area">
     <header class="dt-page-header">
-        <p class="page-eyebrow">{lang key='cart.order'|default:'ORDER'}</p>
-        <h1>{lang key='cart.domain.transfer.title'|default:'Transfer a Domain'}</h1>
-        <p class="page-subtitle">{lang key='cart.domain.transfer.subtitle'|default:'Bring your domain to us — add a free year, transfer in about 24 hours.'}</p>
+        <p class="page-eyebrow">ORDER</p>
+        <h1>Transfer a Domain</h1>
+        <p class="page-subtitle">Bring your domain to us — add a free year, transfer in about 24 hours.</p>
     </header>
 
     {* Search form *}
@@ -88,8 +88,8 @@
             <input type="hidden" name="checktransfer" value="true">
             <div class="dt-search-box">
                 <svg class="dt-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-                <input type="text" name="domain" class="dt-search-input" placeholder="{lang key='cart.domain.transfer.placeholder'|default:'yourdomain.com'}" value="{$domain|escape}" autocomplete="off" required>
-                <button type="submit" class="dt-generate-btn">{lang key='cart.domain.check'|default:'Check'}</button>
+                <input type="text" name="domain" class="dt-search-input" placeholder="yourdomain.com" value="{$domain|escape}" autocomplete="off" required>
+                <button type="submit" class="dt-generate-btn">Check</button>
             </div>
         </form>
     </div>
@@ -106,10 +106,10 @@
                     </div>
                     <div class="dt-result-info">
                         <div class="dt-result-title">
-                            <strong>{$domain|escape}</strong> {lang key='cart.domain.transfer.iseligible'|default:'is eligible for transfer.'}
+                            <strong>{$domain|escape}</strong> is eligible for transfer.
                         </div>
                         <div class="dt-result-sub">
-                            {if $transferresult.pricing}{$transferresult.pricing|escape} · {/if}{lang key='cart.domain.transfer.freeyear'|default:'Includes 1 extra year of registration'}
+                            {if $transferresult.pricing}{$transferresult.pricing|escape} · {/if}Includes 1 extra year of registration
                         </div>
                     </div>
                 </div>
@@ -117,11 +117,11 @@
                     <input type="hidden" name="domain" value="transfer">
                     <input type="hidden" name="sld" value="{$transferresult.sld|escape}">
                     <input type="hidden" name="tld" value="{$transferresult.tld|escape}">
-                    <label for="dt-epp">{lang key='cart.domain.transfer.epp'|default:'EPP / Auth code'} <span style="font-weight:400;color:var(--color-text-tertiary);">({lang key='cart.domain.transfer.optional'|default:'optional — we will ask later if needed'})</span></label>
+                    <label for="dt-epp">EPP / Auth code <span style="font-weight:400;color:var(--color-text-tertiary);">(optional — we will ask later if needed)</span></label>
                     <input id="dt-epp" type="text" name="eppcode" placeholder="abc123-def456">
                     <div class="dt-actions">
                         <button type="submit" class="btn-primary">
-                            {lang key='cart.domain.transfer.startadd'|default:'Add transfer to cart'}
+                            Add transfer to cart
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;margin-left:6px;"><polyline points="9 18 15 12 9 6"/></svg>
                         </button>
                     </div>
@@ -135,7 +135,7 @@
                     </div>
                     <div class="dt-result-info">
                         <div class="dt-result-title">
-                            <strong>{$domain|escape}</strong> {lang key='cart.domain.transfer.notetransferable'|default:'cannot be transferred right now.'}
+                            <strong>{$domain|escape}</strong> cannot be transferred right now.
                         </div>
                         <div class="dt-result-sub">
                             {$transferresult.reason|default:'It may be locked at the current registrar, recently registered or expired, or not under one of our supported TLDs.'|escape}
@@ -151,29 +151,29 @@
        ───────────────────────────────────────────────────────── *}
     <div class="dt-section">
         <div class="dt-section-head">
-            <h2>{lang key='cart.domain.transfer.why'|default:'Why transfer to us'}</h2>
+            <h2>Why transfer to us</h2>
         </div>
         <div class="dt-steps">
             <div class="dt-step">
                 <div class="dt-step-ico purple">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
-                <h4>{lang key='cart.domain.transfer.benefit1.title'|default:'+1 free year'}</h4>
-                <p>{lang key='cart.domain.transfer.benefit1.desc'|default:'Every transfer includes an additional year of registration at no extra cost.'}</p>
+                <h4>+1 free year</h4>
+                <p>Every transfer includes an additional year of registration at no extra cost.</p>
             </div>
             <div class="dt-step">
                 <div class="dt-step-ico blue">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
-                <h4>{lang key='cart.domain.transfer.benefit2.title'|default:'24-hour transfer'}</h4>
-                <p>{lang key='cart.domain.transfer.benefit2.desc'|default:'Most transfers complete within 24 hours — no downtime for your site.'}</p>
+                <h4>24-hour transfer</h4>
+                <p>Most transfers complete within 24 hours — no downtime for your site.</p>
             </div>
             <div class="dt-step">
                 <div class="dt-step-ico green">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 </div>
-                <h4>{lang key='cart.domain.transfer.benefit3.title'|default:'Free WHOIS privacy'}</h4>
-                <p>{lang key='cart.domain.transfer.benefit3.desc'|default:'Included with every transfer, on every eligible TLD. Keep your info private.'}</p>
+                <h4>Free WHOIS privacy</h4>
+                <p>Included with every transfer, on every eligible TLD. Keep your info private.</p>
             </div>
         </div>
     </div>
@@ -184,8 +184,8 @@
             <div class="dt-empty-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h13"/><polyline points="11 7 16 12 11 17"/><path d="M19 5v14a2 2 0 01-2 2"/></svg>
             </div>
-            <h3 class="dt-empty-title">{lang key='cart.domain.transfer.empty.title'|default:'Enter a domain to transfer'}</h3>
-            <p class="dt-empty-desc">{lang key='cart.domain.transfer.empty.desc'|default:"Type your existing domain above and we will start the transfer flow."}</p>
+            <h3 class="dt-empty-title">Enter a domain to transfer</h3>
+            <p class="dt-empty-desc">Type your existing domain above and we will start the transfer flow.</p>
         </div>
     {/if}
 </div>
