@@ -48,7 +48,7 @@ mytheme_cart/
 | `css/custom.css` | ✓ | — (Apple `--vl-*` tokens for any Shadow DOM fallback) |
 | `common.tpl` | ✓ | — |
 | `products.tpl` | ✓ | `apple-client-area/store.html` (2-column sidebar + plan grid Variant A) |
-| `viewcart.tpl` | pending | `apple-client-area/cart.html` + `cart-empty.html` |
+| `viewcart.tpl` | ✓ | `apple-client-area/cart.html` + `cart-empty.html` |
 | `configureproduct.tpl` | pending | `apple-client-area/configureproduct.html` |
 | `domainregister.tpl` | pending | `apple-client-area/cart-domain-register.html` |
 | `domaintransfer.tpl` | pending | `apple-client-area/cart-domain-transfer.html` |
