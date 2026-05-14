@@ -225,6 +225,18 @@
        Skip entirely on mytheme_cart pages — its own components are
        self-contained and don't need any of this. ── *}
     {if in_array($templatefile, ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck']) && $carttpl != 'mytheme_cart'}
+        {* Globals that classic WHMCS themes inject inline before the cart
+           scripts run. standard_cart's scripts.min.js references these
+           directly as globals (not via window.X), so they need to be
+           top-level `var` declarations before that file is parsed.
+           Missing csrfToken → ReferenceError on the first form submit. *}
+        <script>
+            var csrfToken      = "{$token|escape:'javascript'}";
+            var language       = "{$language|default:'english'|escape:'javascript'}";
+            var WEB_ROOT       = "{$WEB_ROOT|escape:'javascript'}";
+            var markdownGuideUri = "{$WEB_ROOT|escape:'javascript'}/index.php/markdown-guide";
+        </script>
+
         {* No SRI integrity attributes — adding them requires fetching the
            current canonical hash from the CDN, which we can't verify here.
            Re-add with correct hashes from https://www.srihash.org/ later
