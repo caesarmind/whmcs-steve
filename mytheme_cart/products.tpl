@@ -1,216 +1,761 @@
 {*
  * mytheme_cart/products.tpl — Product group landing page.
  *
- * Rendered URL:   cart.php?gid=<id>  (and any friendly-URL mapping
- *                 WHMCS exposes, e.g. /store/<group-slug>)
+ * Rendered URL:   cart.php?gid=<id>
+ *                 (+ any friendly-URL mapping WHMCS exposes — e.g. /store/<slug>)
  *
- * Visual source: apple-client-area/store/{vps-hosting,wordpress-hosting,
- *                web-hosting,reseller-hosting,...}.html
+ * Visual source: apple-client-area/store.html  ← /store on the dev server
  *
- *   Shell      = .store-nav (horizontal pill row, dynamic from $productgroups)
- *                + .store-hero (icon + title + tagline)
- *                + .store-plans (3-up plan grid)
+ *   Shell      = .st-page-header (H1 banner "Order new services")
+ *                + .st-split (240px sidebar  |  main card)
+ *                  ├── sidebar-categories.tpl  (Categories + Actions rail)
+ *                  └── .card
+ *                        ├── .st-cat-head (icon · title · tagline · billing pills)
+ *                        ├── .when-full
+ *                        │     ├── Variant A — 3-up feature-list cards   (default)
+ *                        │     ├── Variant B — 4-up minimal cards
+ *                        │     ├── Variant C — horizontal rows
+ *                        │     ├── Variant D — comparison table
+ *                        │     ├── Variant E — bento (1 hero + 2 minis)
+ *                        │     ├── Variant F — segmented bar
+ *                        │     ├── Variant G — spec matrix
+ *                        │     ├── Variant H — addon cards w/ radio tiers
+ *                        │     └── .st-compare (fine print)
+ *                        └── .when-empty (.st-empty)
+ *                + .st-guarantees (3 trust cards)
+ *
+ * Variant switching is driven by mytheme's state-chip (`data-plan-set`).
+ * The active variant is captured on <body data-plan="x"> and the
+ * `.plan-variant:not(.v-x)` CSS rules in style.min.css hide the rest.
+ * On "All" the chip emits no `data-plan` attr → every variant stacks
+ * with an `.st-variant-label` above it so authors can preview them
+ * side-by-side.
+ *
+ * Billing-cycle pills: each price block carries `data-price-<cycle>`
+ * attributes for every cycle the admin configured per-product. A pill
+ * click fires the inline JS at the bottom; it walks every visible
+ * `[data-price-host]` and swaps in the cycle's formatted string,
+ * falling back to `data-price-min` (the WHMCS minprice) when the
+ * selected cycle is not configured for that product. Pills are also
+ * cosmetic-safe — if the admin only configured one cycle they still
+ * render but click is a no-op since every card falls back to min.
  *
  * Standard_cart contract preserved (so the WHMCS cart-add server-side
  * pipeline + recommendations modal keep working):
- *   - Outer wrapper #order-standard_cart  (apple-layout.css scopes its
- *     wrapper resets to this id)
+ *   - Outer wrapper #order-standard_cart
  *   - sidebar-categories-collapsed.tpl include (mobile currency picker)
  *   - recommendations-modal.tpl include (triggered by data-has-recommendations
  *     on .btn-order-now via scripts.min.js)
- *   - Each plan card carries:
- *       id="{idPrefix}"                   ← product123 or bundle45
+ *   - Each card carries:
+ *       id="{idPrefix}"  ← product123 or bundle45
  *       #{idPrefix}-name, #{idPrefix}-price, #{idPrefix}-description,
  *       #{idPrefix}-feature{N}, #{idPrefix}-order-button
  *     so the WHMCS DOM hooks for in-page JS (recommendations, qty,
  *     analytics) still bind.
- *   - <a href="{$product.productUrl}"> rather than a hand-built
+ *   - <a href="{$product.productUrl}"> rather than hand-built
  *     cart.php?a=add&pid= — productUrl honours custom routing.
  *   - $product.bid (bundles) handled with $product.displayprice +
  *     $LANG.bundledeal copy.
- *   - $product.stockControlEnabled → qty available chip.
+ *   - $product.stockControlEnabled → "N available" chip.
  *   - $errormessage + missing-group alert preserved.
  *
  * $productgroup vs $productGroup: WHMCS 9 assigns the lowercase form
- * on the live install (verified). The .X|default:->X dual-pattern
- * accesses both array and object property shapes since the same TPL
- * has to render across multiple WHMCS minor versions.
+ * on the live install. The `.X|default:->X` dual-pattern accesses both
+ * the array and object property shapes since the TPL has to render
+ * across multiple WHMCS minor versions.
  *
- * CSS: every class used here (.store-nav, .store-hero, .store-plans,
- * .store-plan-card, .featured-badge, .tile-icon, .btn-primary,
- * .btn-secondary) is owned by mytheme's apple-theme.css, which is
- * loaded by mytheme/header.tpl on every cart-flow page. mytheme_cart's
- * style.min.css only owns cart-specific tweaks.
+ * CSS: every class used here lives in mytheme_cart/css/style.min.css
+ * (.st-* tokens) which is loaded by common.tpl. The Apple primitives
+ * `.card`, `.btn-primary`, `.btn-secondary` live in the same sheet.
  *}
 
 {include file="orderforms/$carttpl/common.tpl"}
 
+{* Cycle abbreviation map — keep in sync with standard_cart's price renderer.
+   Used in every variant's price block. *}
+{$cycleAbbr = [
+    'monthly'      => '/mo',
+    'quarterly'    => '/qtr',
+    'semiannually' => '/6mo',
+    'annually'     => '/yr',
+    'biennially'   => '/2yr',
+    'triennially'  => '/3yr',
+    'free'         => '',
+    'onetime'      => ''
+]}
+
+{* Pre-compute featured index — middle item when count >= 3, else first.
+   Featured = "Most popular" CTA highlight; only applies when we have
+   enough plans for a meaningful highlight (a 2-plan grid with one
+   "featured" looks dishonest). *}
+{$productCount = ($products) ? count($products) : 0}
+{$featuredIndex = -1}
+{if $productCount >= 3}{$featuredIndex = floor($productCount / 2)}{/if}
+
+{* Resolve group meta (array vs object shape across WHMCS versions) *}
+{$_curGroupId = $productgroup.id|default:$productgroup->id}
+{$_groupName  = $productgroup.name|default:$productgroup->name}
+{$_headline   = $productgroup.headline|default:$productgroup->headline}
+{$_tagline    = $productgroup.tagline|default:$productgroup->tagline}
+{$_image      = $productgroup.image|default:$productgroup->image}
+
 <div id="order-standard_cart">
-    <div class="content-area">
 
-        {if $errormessage}
-            <div class="alert alert-danger" role="alert">
-                {$errormessage}
-            </div>
-        {elseif !$productgroup}
-            <div class="alert alert-info" role="alert">
-                {lang key='orderForm.selectCategory'}
-            </div>
-        {/if}
+    {* ──────────────────────────────────────────────────────────
+       Page header banner — H1 "Order new services" + subtitle
+       Sits above the 2-column split.
+       ────────────────────────────────────────────────────────── *}
+    <header class="st-page-header">
+        <h1>{$LANG.ordernewservices|default:'Order new services'}</h1>
+        <p class="page-subtitle">{$LANG.ordernewservicestagline|default:'Browse our plans and add the ones you need to your cart. All plans come with a 30-day money-back guarantee.'}</p>
+    </header>
 
-        {* ──────────────────────────────────────────────────────────
-           Horizontal category pill nav — visible md+
-           ────────────────────────────────────────────────────────── *}
-        {if $productgroups}
-            {$_curGroupId = $productgroup.id|default:$productgroup->id}
-            <div class="store-nav hidden-xs hidden-sm d-none d-md-flex">
-                {foreach $productgroups as $cat}
-                    {$_catId = $cat.id|default:$cat->id}
-                    <a href="{$WEB_ROOT}/cart.php?gid={$_catId}"{if $_catId == $_curGroupId} class="active"{/if}>
-                        {$cat.name|default:$cat->name|escape}
-                    </a>
-                {/foreach}
-            </div>
-        {/if}
-
-        {* ── Mobile category picker — WHMCS-rendered currency + category select ── *}
-        {include file="orderforms/standard_cart/sidebar-categories-collapsed.tpl"}
-
-        {* ──────────────────────────────────────────────────────────
-           Hero — group icon + title + tagline
-           ────────────────────────────────────────────────────────── *}
-        <div class="store-hero">
-            <div class="store-hero-icon tile-icon orange" aria-hidden="true">
-                {$_image = $productgroup.image|default:$productgroup->image}
-                {if $_image}
-                    <img src="{$_image|escape}" alt="">
-                {else}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                {/if}
-            </div>
-            <h1 class="store-hero-title">
-                {$_headline = $productgroup.headline|default:$productgroup->headline}
-                {if $_headline}
-                    {$_headline}
-                {else}
-                    {$productgroup.name|default:$productgroup->name|escape}
-                {/if}
-            </h1>
-            {$_tagline = $productgroup.tagline|default:$productgroup->tagline}
-            {if $_tagline}
-                <p class="store-hero-subtitle">{$_tagline}</p>
-            {/if}
+    {if $errormessage}
+        <div class="alert alert-danger" role="alert" style="margin-bottom: 16px;">
+            {$errormessage}
         </div>
+    {elseif !$productgroup}
+        <div class="alert alert-info" role="alert" style="margin-bottom: 16px;">
+            {lang key='orderForm.selectCategory'}
+        </div>
+    {/if}
 
-        {* ──────────────────────────────────────────────────────────
-           Plan grid (or empty state)
-           ────────────────────────────────────────────────────────── *}
-        {if $products && count($products) > 0}
+    {* Mobile-only currency + category picker (WHMCS-rendered). On md+
+       it's hidden by standard_cart's collapsed-sidebar CSS; here it
+       sits above the desktop split as a fallback. *}
+    {include file="orderforms/standard_cart/sidebar-categories-collapsed.tpl"}
 
-            {$productCount = count($products)}
-            {$featuredIndex = -1}
-            {if $productCount >= 3}{$featuredIndex = 1}{/if}
+    <div class="st-split">
 
-            <div class="store-plans" id="products">
-                {foreach $products as $key => $product}
-                    {$idPrefix = ($product.bid) ? ("bundle"|cat:$product.bid) : ("product"|cat:$product.pid)}
-                    {$idx = $product@iteration - 1}
-                    {$isFeatured = ($idx == $featuredIndex)}
+        {* ── LEFT: Categories + Actions rail (reusable partial) ── *}
+        {include file="orderforms/$carttpl/sidebar-categories.tpl"}
 
-                    <div class="store-plan-card{if $isFeatured} featured{/if}" id="{$idPrefix}">
+        {* ── RIGHT: category detail ── *}
+        <div style="min-width: 0;">
 
-                        <div class="store-plan-name">
-                            <span id="{$idPrefix}-name">{$product.name}</span>
-                            {if $isFeatured}
-                                <span class="featured-badge">Most Popular</span>
-                            {/if}
-                            {if $product.stockControlEnabled}
-                                <span class="store-plan-stock">
-                                    {$product.qty} {$LANG.orderavailable}
-                                </span>
-                            {/if}
-                        </div>
+            <div class="card" style="padding: 0; overflow: hidden;">
 
-                        <div class="store-plan-price" id="{$idPrefix}-price">
-                            {if $product.bid}
-                                {if $product.displayprice}
-                                    {$product.displayprice}
-                                {/if}
-                                <span class="period">{$LANG.bundledeal}</span>
+                {* ── Category header ─────────────────────────── *}
+                <div class="st-cat-head">
+                    <div class="st-cat-head-row">
+                        <div class="st-cat-head-ico" aria-hidden="true">
+                            {if $_image}
+                                <img src="{$_image|escape}" alt="">
                             {else}
-                                {if $product.pricing.hasconfigoptions}
-                                    <span class="store-plan-price-prefix">{$LANG.startingfrom}</span>
-                                {/if}
-                                {$product.pricing.minprice.price}
-                                <span class="period">
-                                    {if $product.pricing.minprice.cycle eq "monthly"}/mo
-                                    {elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr
-                                    {elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo
-                                    {elseif $product.pricing.minprice.cycle eq "annually"}/yr
-                                    {elseif $product.pricing.minprice.cycle eq "biennially"}/2yr
-                                    {elseif $product.pricing.minprice.cycle eq "triennially"}/3yr
-                                    {/if}
-                                </span>
-                                {if $product.pricing.minprice.setupFee}
-                                    <span class="store-plan-setup">
-                                        + {$product.pricing.minprice.setupFee->toPrefixed()} {$LANG.ordersetupfee}
-                                    </span>
-                                {/if}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                            {/if}
+                        </div>
+                        <div class="st-cat-head-meta">
+                            <h2 class="st-cat-head-title" id="cat-title">
+                                {if $_headline}{$_headline}{else}{$_groupName|escape}{/if}
+                            </h2>
+                            {if $_tagline}
+                                <p class="st-cat-head-desc" id="cat-desc">{$_tagline}</p>
                             {/if}
                         </div>
 
-                        {if $product.featuresdesc}
-                            <p class="store-plan-desc" id="{$idPrefix}-description">
-                                {$product.featuresdesc}
-                            </p>
-                        {elseif $product.description}
-                            <p class="store-plan-desc" id="{$idPrefix}-description">
-                                {$product.description|strip_tags|truncate:140}
-                            </p>
-                        {/if}
-
-                        {if $product.features}
-                            <ul class="store-plan-features">
-                                {foreach $product.features as $feature => $value}
-                                    <li id="{$idPrefix}-feature{$value@iteration}">
-                                        <strong>{$value}</strong> {$feature}
-                                    </li>
-                                {/foreach}
-                            </ul>
-                        {/if}
-
-                        <div class="store-plan-cta">
-                            <a href="{$product.productUrl}"
-                               id="{$idPrefix}-order-button"
-                               class="{if $isFeatured}btn-primary{else}btn-secondary{/if} btn-order-now"
-                               {if $product.hasRecommendations} data-has-recommendations="1"{/if}>
-                                {$LANG.ordernowbutton}
-                            </a>
+                        {* Billing cycle pill switcher — wired to inline JS below.
+                           Pills render unconditionally; the JS click handler is
+                           a no-op when no card has data for the picked cycle. *}
+                        <div class="st-cycle" role="tablist" aria-label="Billing cycle" data-cycle-switcher>
+                            <button type="button" data-cycle="monthly">Monthly</button>
+                            <button type="button" data-cycle="annually" class="active">Annual <span class="st-cycle-saving">Save 20%</span></button>
+                            <button type="button" data-cycle="biennially">Biennial</button>
                         </div>
-
                     </div>
-                {/foreach}
-            </div>
-
-        {else}
-
-            <div class="store-empty">
-                <div class="store-empty-ico" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
                 </div>
-                <h3 class="store-empty-title">No plans in this category yet</h3>
-                <p class="store-empty-desc">We're preparing plans for this service. Browse another category or get in touch — our team can put together a custom quote for you.</p>
-                <div class="store-empty-actions">
-                    <a href="{$WEB_ROOT}/submitticket.php" class="btn-primary">Request a quote</a>
-                    <a href="{$WEB_ROOT}/cart.php" class="btn-secondary">Browse all categories</a>
+
+                {if $productCount > 0}
+
+                <div class="when-full">
+
+                    {* ════════════════════════════════════════════════════════════
+                       Variant A — 3-up feature-list cards  (default / recommended)
+                       ════════════════════════════════════════════════════════════ *}
+                    <div class="st-variant-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        Variant A · 3-up · feature list
+                    </div>
+                    <div class="plan-variant v-a">
+                        <div class="st-pricing">
+                            {foreach $products as $key => $product}
+                                {$idPrefix = ($product.bid) ? ("bundle"|cat:$product.bid) : ("product"|cat:$product.pid)}
+                                {$isFeatured = ($product@index == $featuredIndex)}
+                                <div class="st-plan{if $isFeatured} featured{/if}" id="{$idPrefix}">
+                                    {if $isFeatured}
+                                        <span class="st-plan-badge">Most popular</span>
+                                    {/if}
+                                    <h3 class="st-plan-name" id="{$idPrefix}-name">{$product.name}</h3>
+                                    {if $product.featuresdesc}
+                                        <p class="st-plan-tag" id="{$idPrefix}-description">{$product.featuresdesc|strip_tags|truncate:80}</p>
+                                    {elseif $product.description}
+                                        <p class="st-plan-tag" id="{$idPrefix}-description">{$product.description|strip_tags|truncate:80}</p>
+                                    {else}
+                                        <p class="st-plan-tag">&nbsp;</p>
+                                    {/if}
+
+                                    <div class="st-plan-price"
+                                         id="{$idPrefix}-price"
+                                         data-price-host
+                                         data-price-min="{$product.pricing.minprice.price|escape}"
+                                         data-cycle-min="{$product.pricing.minprice.cycle|escape}"
+                                         {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
+                                             {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
+                                         {/foreach}>
+                                        {if $product.bid}
+                                            {if $product.displayprice}
+                                                <span class="amount" data-price-display>{$product.displayprice}</span>
+                                            {/if}
+                                            <span class="period" data-period-display>{$LANG.bundledeal}</span>
+                                        {else}
+                                            {if $product.pricing.hasconfigoptions}
+                                                <span class="period" style="margin-right: 4px;">{$LANG.startingfrom}</span>
+                                            {/if}
+                                            <span class="amount" data-price-display>{$product.pricing.minprice.price}</span>
+                                            <span class="period" data-period-display>{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}</span>
+                                        {/if}
+                                    </div>
+                                    {if $product.pricing.minprice.setupFee}
+                                        <div class="st-plan-price-sub">+ {$product.pricing.minprice.setupFee->toPrefixed()} {$LANG.ordersetupfee}</div>
+                                    {/if}
+
+                                    {if $product.features}
+                                        <ul class="st-plan-features">
+                                            {foreach $product.features as $feature => $value}
+                                                <li id="{$idPrefix}-feature{$value@iteration}">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                                    <strong>{$value}</strong> {$feature}
+                                                </li>
+                                            {/foreach}
+                                        </ul>
+                                    {else}
+                                        <ul class="st-plan-features"></ul>
+                                    {/if}
+
+                                    {if $product.stockControlEnabled}
+                                        <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 8px;">{$product.qty} {$LANG.orderavailable}</div>
+                                    {/if}
+
+                                    <a href="{$product.productUrl}"
+                                       id="{$idPrefix}-order-button"
+                                       class="st-plan-cta{if !$isFeatured} secondary{/if} btn-order-now"
+                                       {if $product.hasRecommendations} data-has-recommendations="1"{/if}>
+                                        {$LANG.ordernowbutton}
+                                    </a>
+                                </div>
+                            {/foreach}
+                        </div>
+                    </div>{* /.plan-variant.v-a *}
+
+                    {* ════════════════════════════════════════════════════════════
+                       Variant B — 4-up minimal cards
+                       ════════════════════════════════════════════════════════════ *}
+                    <div class="st-variant-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        Variant B · 4-up · minimal cards
+                    </div>
+                    <div class="plan-variant v-b">
+                        <div class="st-pricing-b">
+                            {foreach $products as $key => $product}
+                                {$idPrefix = ($product.bid) ? ("bundle"|cat:$product.bid) : ("product"|cat:$product.pid)}
+                                {$isFeatured = ($product@index == $featuredIndex)}
+                                <div class="st-plan-b{if $isFeatured} featured{/if}">
+                                    <div class="st-plan-b-name">{$product.name}</div>
+                                    <div class="st-plan-b-tag">
+                                        {if $product.featuresdesc}{$product.featuresdesc|strip_tags|truncate:50}
+                                        {elseif $product.description}{$product.description|strip_tags|truncate:50}
+                                        {else}&nbsp;{/if}
+                                    </div>
+                                    <div class="st-plan-b-price"
+                                         data-price-host
+                                         data-price-min="{$product.pricing.minprice.price|escape}"
+                                         data-cycle-min="{$product.pricing.minprice.cycle|escape}"
+                                         {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
+                                             {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
+                                         {/foreach}>
+                                        <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                        <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
+                                    </div>
+                                    {if $product.features}
+                                        <ul class="st-plan-b-specs">
+                                            {foreach $product.features as $feature => $value}
+                                                {if $feature@iteration <= 4}
+                                                    <li><strong>{$value}</strong> {$feature}</li>
+                                                {/if}
+                                            {/foreach}
+                                        </ul>
+                                    {/if}
+                                    <a href="{$product.productUrl}" class="st-plan-b-cta">{$LANG.ordernowbutton}</a>
+                                </div>
+                            {/foreach}
+                        </div>
+                    </div>{* /.plan-variant.v-b *}
+
+                    {* ════════════════════════════════════════════════════════════
+                       Variant C — horizontal rows
+                       ════════════════════════════════════════════════════════════ *}
+                    <div class="st-variant-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                        Variant C · horizontal rows
+                    </div>
+                    <div class="plan-variant v-c">
+                        <div class="st-rows">
+                            {foreach $products as $key => $product}
+                                {$idPrefix = ($product.bid) ? ("bundle"|cat:$product.bid) : ("product"|cat:$product.pid)}
+                                {$isFeatured = ($product@index == $featuredIndex)}
+                                <div class="st-row{if $isFeatured} featured{/if}">
+                                    <div class="st-row-name">
+                                        <strong>{$product.name}</strong>
+                                        {if $product.featuresdesc}
+                                            <span>{$product.featuresdesc|strip_tags|truncate:48}</span>
+                                        {/if}
+                                    </div>
+                                    <div class="st-row-specs">
+                                        {if $product.features}
+                                            {foreach $product.features as $feature => $value}
+                                                {if $feature@iteration <= 4}
+                                                    <span class="st-row-spec">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                                        <strong>{$value}</strong> {$feature}
+                                                    </span>
+                                                {/if}
+                                            {/foreach}
+                                        {/if}
+                                    </div>
+                                    <div class="st-row-price"
+                                         data-price-host
+                                         data-price-min="{$product.pricing.minprice.price|escape}"
+                                         data-cycle-min="{$product.pricing.minprice.cycle|escape}"
+                                         {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
+                                             {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
+                                         {/foreach}>
+                                        <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                        <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
+                                    </div>
+                                    <a href="{$product.productUrl}" class="st-row-cta">{$LANG.ordernowbutton}</a>
+                                </div>
+                            {/foreach}
+                        </div>
+                    </div>{* /.plan-variant.v-c *}
+
+                    {* ════════════════════════════════════════════════════════════
+                       Variant D — comparison table
+                       Note: features rows are sourced from the FIRST product —
+                       WHMCS features are per-product k:v pairs, not normalized
+                       across the group. For perfectly aligned compare tables
+                       the admin should keep feature labels consistent.
+                       ════════════════════════════════════════════════════════════ *}
+                    <div class="st-variant-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+                        Variant D · comparison table
+                    </div>
+                    <div class="plan-variant v-d">
+                        {* Take feature labels from first product as canonical rows. *}
+                        {$_firstFeatures = []}
+                        {foreach $products as $_p}
+                            {if $_p@first && $_p.features}
+                                {$_firstFeatures = $_p.features}
+                            {/if}
+                        {/foreach}
+                        <div style="padding: 0 20px 24px;">
+                            <table class="st-compare-tbl">
+                                <thead>
+                                    <tr>
+                                        <th>&nbsp;</th>
+                                        {foreach $products as $product}
+                                            {$isFeatured = ($product@index == $featuredIndex)}
+                                            <th{if $isFeatured} class="featured"{/if}>
+                                                <div class="st-compare-plan-name">{$product.name}</div>
+                                                <div class="st-compare-plan-price"
+                                                     data-price-host
+                                                     data-price-min="{$product.pricing.minprice.price|escape}"
+                                                     {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
+                                                         {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
+                                                     {/foreach}>
+                                                    <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                                    <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
+                                                </div>
+                                            </th>
+                                        {/foreach}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $_firstFeatures as $featureLabel => $_canonicalValue}
+                                        <tr>
+                                            <td>{$featureLabel}</td>
+                                            {foreach $products as $product}
+                                                {$isFeatured = ($product@index == $featuredIndex)}
+                                                {* Look up this product's value for the canonical feature label.
+                                                   If not present, render the green check (≈ "included"). *}
+                                                {$cellVal = $product.features[$featureLabel]|default:''}
+                                                <td{if $isFeatured} class="featured"{/if}>
+                                                    {if $cellVal}
+                                                        <span class="st-compare-val">{$cellVal}</span>
+                                                    {else}
+                                                        <span class="st-compare-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                                                    {/if}
+                                                </td>
+                                            {/foreach}
+                                        </tr>
+                                    {/foreach}
+                                </tbody>
+                            </table>
+                            <div class="st-compare-footer">
+                                <div>&nbsp;</div>
+                                {foreach $products as $product}
+                                    {$isFeatured = ($product@index == $featuredIndex)}
+                                    <div class="st-compare-footer-cta">
+                                        <a href="{$product.productUrl}" class="st-plan-cta{if !$isFeatured} secondary{/if}" style="width: auto; min-width: 140px;">{$LANG.ordernowbutton}</a>
+                                    </div>
+                                {/foreach}
+                            </div>
+                        </div>
+                    </div>{* /.plan-variant.v-d *}
+
+                    {* ════════════════════════════════════════════════════════════
+                       Variant E — Bento asymmetric (1 hero + N minis)
+                       First product = hero card spanning both cols at top
+                       Remaining products = mini cards below in 2-col grid
+                       ════════════════════════════════════════════════════════════ *}
+                    <div class="st-variant-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="8" rx="1"/><rect x="3" y="14" width="8" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        Variant E · bento (hero + minis)
+                    </div>
+                    <div class="plan-variant v-e">
+                        <div class="st-bento">
+                            {foreach $products as $key => $product}
+                                {$idPrefix = ($product.bid) ? ("bundle"|cat:$product.bid) : ("product"|cat:$product.pid)}
+                                {if $product@first}
+                                    <div class="st-bento-hero">
+                                        <span class="st-plan-badge">Most popular</span>
+                                        <div>
+                                            <h3 class="st-bento-hero-name">{$product.name}</h3>
+                                            {if $product.featuresdesc}
+                                                <p class="st-bento-hero-tag">{$product.featuresdesc|strip_tags|truncate:120}</p>
+                                            {/if}
+                                            {if $product.features}
+                                                <div class="st-bento-hero-specs">
+                                                    {foreach $product.features as $feature => $value}
+                                                        {if $feature@iteration <= 5}
+                                                            <span><strong>{$value}</strong> {$feature}</span>
+                                                        {/if}
+                                                    {/foreach}
+                                                </div>
+                                            {/if}
+                                        </div>
+                                        <div class="st-bento-hero-right">
+                                            <div class="st-bento-hero-price"
+                                                 data-price-host
+                                                 data-price-min="{$product.pricing.minprice.price|escape}"
+                                                 {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
+                                                     {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
+                                                 {/foreach}>
+                                                <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                                <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
+                                            </div>
+                                            <a href="{$product.productUrl}" class="st-bento-hero-cta">{$LANG.ordernowbutton}</a>
+                                        </div>
+                                    </div>
+                                {else}
+                                    <div class="st-bento-mini">
+                                        <div class="st-bento-mini-name">{$product.name}</div>
+                                        {if $product.featuresdesc}
+                                            <div class="st-bento-mini-tag">{$product.featuresdesc|strip_tags|truncate:60}</div>
+                                        {/if}
+                                        <div class="st-bento-mini-price"
+                                             data-price-host
+                                             data-price-min="{$product.pricing.minprice.price|escape}"
+                                             {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
+                                                 {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
+                                             {/foreach}>
+                                            <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                            <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
+                                        </div>
+                                        {if $product.features}
+                                            <ul class="st-bento-mini-specs">
+                                                {foreach $product.features as $feature => $value}
+                                                    {if $feature@iteration <= 4}
+                                                        <li><strong>{$value}</strong> {$feature}</li>
+                                                    {/if}
+                                                {/foreach}
+                                            </ul>
+                                        {/if}
+                                        <a href="{$product.productUrl}" class="st-bento-mini-cta">{$LANG.ordernowbutton}</a>
+                                    </div>
+                                {/if}
+                            {/foreach}
+                        </div>
+                    </div>{* /.plan-variant.v-e *}
+
+                    {* ════════════════════════════════════════════════════════════
+                       Variant F — Segmented bar
+                       ════════════════════════════════════════════════════════════ *}
+                    <div class="st-variant-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><line x1="9" y1="6" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="18"/></svg>
+                        Variant F · segmented bar
+                    </div>
+                    <div class="plan-variant v-f">
+                        <div class="st-seg">
+                            {foreach $products as $key => $product}
+                                {$isFeatured = ($product@index == $featuredIndex)}
+                                <div class="st-seg-col{if $isFeatured} featured{/if}">
+                                    <div class="st-seg-name">{$product.name}</div>
+                                    {if $product.featuresdesc}
+                                        <div class="st-seg-tag">{$product.featuresdesc|strip_tags|truncate:60}</div>
+                                    {/if}
+                                    <div class="st-seg-price"
+                                         data-price-host
+                                         data-price-min="{$product.pricing.minprice.price|escape}"
+                                         {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
+                                             {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
+                                         {/foreach}>
+                                        <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                        <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
+                                    </div>
+                                    {if $product.features}
+                                        <ul class="st-seg-specs">
+                                            {foreach $product.features as $feature => $value}
+                                                {if $feature@iteration <= 5}
+                                                    <li><strong>{$value}</strong> {$feature}</li>
+                                                {/if}
+                                            {/foreach}
+                                        </ul>
+                                    {/if}
+                                    <a href="{$product.productUrl}" class="st-seg-cta">{$LANG.ordernowbutton}</a>
+                                </div>
+                            {/foreach}
+                        </div>
+                    </div>{* /.plan-variant.v-f *}
+
+                    {* ════════════════════════════════════════════════════════════
+                       Variant G — Spec matrix (label / value rows)
+                       ════════════════════════════════════════════════════════════ *}
+                    <div class="st-variant-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+                        Variant G · spec matrix
+                    </div>
+                    <div class="plan-variant v-g">
+                        <div class="st-matrix">
+                            {foreach $products as $key => $product}
+                                {$isFeatured = ($product@index == $featuredIndex)}
+                                <div class="st-matrix-card{if $isFeatured} featured{/if}">
+                                    <div class="st-matrix-head">
+                                        {if $isFeatured}<div class="st-matrix-eyebrow">Most popular</div>{/if}
+                                        <h3 class="st-matrix-name">{$product.name}</h3>
+                                    </div>
+                                    {if $product.features}
+                                        <div class="st-matrix-specs">
+                                            {foreach $product.features as $feature => $value}
+                                                {if $feature@iteration <= 6}
+                                                    <div class="st-matrix-row">
+                                                        <span class="label">{$feature}</span>
+                                                        <span class="value">{$value}</span>
+                                                    </div>
+                                                {/if}
+                                            {/foreach}
+                                        </div>
+                                    {/if}
+                                    <div class="st-matrix-foot">
+                                        <div class="st-matrix-price"
+                                             data-price-host
+                                             data-price-min="{$product.pricing.minprice.price|escape}"
+                                             {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
+                                                 {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
+                                             {/foreach}>
+                                            <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                            <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
+                                        </div>
+                                        <a href="{$product.productUrl}" class="st-matrix-cta">{$LANG.ordernowbutton}</a>
+                                    </div>
+                                </div>
+                            {/foreach}
+                        </div>
+                    </div>{* /.plan-variant.v-g *}
+
+                    {* ════════════════════════════════════════════════════════════
+                       Variant H — Addon cards with radio tiers
+                       Each $product gets one card with a single tier row at the
+                       admin-configured minprice cycle. The radio is visual-only;
+                       wiring it to a real cart-add form is deferred until the
+                       admin picks H as the final layout.
+                       ════════════════════════════════════════════════════════════ *}
+                    <div class="st-variant-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Variant H · addon cards with radio tiers
+                    </div>
+                    <div class="plan-variant v-h">
+                        {foreach $products as $key => $product}
+                            {$idPrefix = ($product.bid) ? ("bundle"|cat:$product.bid) : ("product"|cat:$product.pid)}
+                            <div class="st-addon-wrap">
+                                <div class="st-addon">
+                                    <div class="st-addon-head">
+                                        <div>
+                                            <h3 class="st-addon-title">{$product.name}</h3>
+                                            {if $product.featuresdesc}
+                                                <p class="st-addon-desc">{$product.featuresdesc|strip_tags|truncate:240}</p>
+                                            {elseif $product.description}
+                                                <p class="st-addon-desc">{$product.description|strip_tags|truncate:240}</p>
+                                            {/if}
+                                        </div>
+                                        <div class="st-addon-illus">
+                                            {if $_image}
+                                                <img src="{$_image|escape}" alt="" style="max-width: 80px; max-height: 80px;">
+                                            {else}
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                                            {/if}
+                                        </div>
+                                    </div>
+                                    <label class="st-addon-tier">
+                                        <input type="radio" name="addon-{$idPrefix}" value="{$idPrefix}" checked>
+                                        <span class="st-addon-radio"></span>
+                                        <div>
+                                            <div class="st-addon-tier-label">{$product.name}</div>
+                                            {if $product.featuresdesc}
+                                                <div class="st-addon-tier-sub">{$product.featuresdesc|strip_tags|truncate:80}</div>
+                                            {/if}
+                                        </div>
+                                        <div class="st-addon-tier-price"
+                                             data-price-host
+                                             data-price-min="{$product.pricing.minprice.price|escape}"
+                                             {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
+                                                 {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
+                                             {/foreach}>
+                                            <span data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                            <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+                                    <a href="{$product.productUrl}" class="st-plan-cta" style="width: auto; padding: 0 22px;">{$LANG.ordernowbutton}</a>
+                                </div>
+                            </div>
+                        {/foreach}
+                    </div>{* /.plan-variant.v-h *}
+
+                    {* ── Compare bar (fine print) ────────────────── *}
+                    <div class="st-compare">
+                        <span>{$LANG.cart.compareplans|default:'Not sure which plan is right for you?'}</span>
+                        <a href="#" id="cart-compare-link">{$LANG.cart.compareall|default:'Compare all features'}</a>
+                        <span class="spacer"></span>
+                        <span>{$LANG.cart.pricesin|default:'Prices in'} {$currency.code|default:'USD'} · <a href="#" data-currency-toggle>{$LANG.changecurrency|default:'Change currency'}</a></span>
+                    </div>
+
+                </div>{* /.when-full *}
+
+                {/if}{* /productCount > 0 *}
+
+                {* ── Empty state ─────────────────────────────── *}
+                <div class="when-empty st-empty">
+                    <div class="st-empty-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+                    </div>
+                    <h3 class="st-empty-title">{$LANG.cart.emptygroup|default:'No packages in this category yet'}</h3>
+                    <p class="st-empty-desc">{$LANG.cart.emptygroupdesc|default:"We're preparing plans for this service. Browse another category or get in touch — our team can put together a custom quote for you."}</p>
+                    <div class="st-empty-actions">
+                        <a href="{$WEB_ROOT}/submitticket.php" class="btn-primary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                            {$LANG.cart.requestquote|default:'Request a quote'}
+                        </a>
+                        <a href="{$WEB_ROOT}/cart.php" class="btn-secondary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            {$LANG.cart.browseall|default:'Browse all categories'}
+                        </a>
+                    </div>
                 </div>
-            </div>
 
-        {/if}
+            </div>{* /.card *}
 
-    </div>
-</div>
+            {* ── Guarantees strip — 3 trust cards below the main card ── *}
+            {if $productCount > 0}
+                <div class="st-guarantees when-full">
+                    <div class="card st-guarantee">
+                        <div class="st-guarantee-ico">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4h22v16H1z"/><path d="M1 12h22"/><path d="M15 4v16"/></svg>
+                        </div>
+                        <div>
+                            <div class="st-guarantee-title">{$LANG.cart.moneyback|default:'30-day money back'}</div>
+                            <div class="st-guarantee-sub">{$LANG.cart.moneybacksub|default:"Full refund if you're not happy — no questions asked."}</div>
+                        </div>
+                    </div>
+                    <div class="card st-guarantee">
+                        <div class="st-guarantee-ico">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <div>
+                            <div class="st-guarantee-title">{$LANG.cart.support247|default:'24/7 support'}</div>
+                            <div class="st-guarantee-sub">{$LANG.cart.support247sub|default:'Reach a human engineer any time via chat or ticket.'}</div>
+                        </div>
+                    </div>
+                    <div class="card st-guarantee">
+                        <div class="st-guarantee-ico">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        </div>
+                        <div>
+                            <div class="st-guarantee-title">{$LANG.cart.uptime|default:'99.99% uptime SLA'}</div>
+                            <div class="st-guarantee-sub">{$LANG.cart.uptimesub|default:'Backed by global anycast and redundant power.'}</div>
+                        </div>
+                    </div>
+                </div>
+            {/if}
+
+        </div>{* /right column *}
+    </div>{* /.st-split *}
+
+</div>{* /#order-standard_cart *}
 
 {* Cart-add recommendations modal — populated server-side, triggered by
    data-has-recommendations on order buttons via scripts.min.js. *}
 {include file="orderforms/standard_cart/recommendations-modal.tpl"}
+
+{* ──────────────────────────────────────────────────────────────────
+   Billing-cycle pill swap.
+   Reads data-price-<cycle> from every [data-price-host] currently in
+   the DOM and substitutes the [data-price-display] text. When a card
+   has no data for the picked cycle, falls back to data-price-min.
+   Inert when the page has no .st-cycle pills (defensive).
+   ────────────────────────────────────────────────────────────────── *}
+<script>
+(function () {
+    var CYCLE_LABEL = {
+        monthly:      '/mo',
+        quarterly:    '/qtr',
+        semiannually: '/6mo',
+        annually:     '/yr',
+        biennially:   '/2yr',
+        triennially:  '/3yr'
+    };
+
+    var switcher = document.querySelector('[data-cycle-switcher]');
+    if (!switcher) return;
+    var pills = switcher.querySelectorAll('button[data-cycle]');
+
+    function applyCycle(cycle) {
+        pills.forEach(function (p) {
+            p.classList.toggle('active', p.getAttribute('data-cycle') === cycle);
+        });
+        var hosts = document.querySelectorAll('[data-price-host]');
+        hosts.forEach(function (host) {
+            var amountEl = host.querySelector('[data-price-display]');
+            var periodEl = host.querySelector('[data-period-display]');
+            if (!amountEl) return;
+            var price = host.getAttribute('data-price-' + cycle);
+            if (price) {
+                amountEl.textContent = price;
+                if (periodEl) periodEl.textContent = CYCLE_LABEL[cycle] || '';
+            } else {
+                // Fall back to minprice when this product doesn't offer the picked cycle.
+                var min = host.getAttribute('data-price-min');
+                var minCycle = host.getAttribute('data-cycle-min');
+                if (min) amountEl.textContent = min;
+                if (periodEl) periodEl.textContent = CYCLE_LABEL[minCycle] || '';
+            }
+        });
+    }
+
+    pills.forEach(function (p) {
+        p.addEventListener('click', function () {
+            applyCycle(this.getAttribute('data-cycle'));
+        });
+    });
+})();
+</script>

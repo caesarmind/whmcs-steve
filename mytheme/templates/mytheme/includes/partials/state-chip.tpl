@@ -78,6 +78,21 @@
     </div>
 
     <div class="chip-group">
+        <span class="label">Plan:</span>
+        <div class="pill-group">
+            <button type="button" data-plan-set="all" class="active">All</button>
+            <button type="button" data-plan-set="a" title="Variant A — 3 packages, feature list cards">A</button>
+            <button type="button" data-plan-set="b" title="Variant B — 4 packages, minimal cards">B</button>
+            <button type="button" data-plan-set="c" title="Variant C — 5 packages, horizontal rows">C</button>
+            <button type="button" data-plan-set="d" title="Variant D — side-by-side comparison table">D</button>
+            <button type="button" data-plan-set="e" title="Variant E — bento (1 hero + 2 minis)">E</button>
+            <button type="button" data-plan-set="f" title="Variant F — segmented bar (single card, vertical dividers)">F</button>
+            <button type="button" data-plan-set="g" title="Variant G — spec matrix (label/value rows)">G</button>
+            <button type="button" data-plan-set="h" title="Variant H — addon cards with radio tiers">H</button>
+        </div>
+    </div>
+
+    <div class="chip-group">
         <span class="label">Palette:</span>
         <div class="swatch-group" role="group" aria-label="Color palette">
             <button type="button" data-palette="blue"    class="active" title="Apple Blue"></button>
