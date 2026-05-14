@@ -28,6 +28,7 @@ The trade-off: we lose the SPA's client-side reactivity (real-time cart updates,
 | `css/custom.css` | ✓ | — (Apple `--vl-*` tokens for any Shadow DOM fallback) |
 | `common.tpl` | ✓ | — (shared partial — loads CSS + resets WHMCS chrome) |
 | `products.tpl` | ✓ | `apple-client-area/store.html` (sidebar + plan grid + cycle pills + guarantees) |
+| `configureproductdomain.tpl` | ✓ | `apple-client-area/configureproductdomain.html` (domain method picker — register / transfer / use own) |
 | `viewcart.tpl` | ✓ | `apple-client-area/cart.html` + `cart-empty.html` |
 | `configureproduct.tpl` | ✓ | `apple-client-area/configureproduct.html` |
 | `checkout.tpl` | ✓ | `apple-client-area/checkout.html` |
