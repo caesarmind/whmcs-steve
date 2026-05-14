@@ -137,6 +137,8 @@
         {* ── RIGHT: category detail ── *}
         <div style="min-width: 0;">
 
+            {if $productgroup}
+
             <div class="card" style="padding: 0; overflow: hidden;">
 
                 {* ── Category header ─────────────────────────── *}
@@ -699,6 +701,43 @@
                             <div class="st-guarantee-sub">{$LANG.cart.uptimesub|default:'Backed by global anycast and redundant power.'}</div>
                         </div>
                     </div>
+                </div>
+            {/if}
+
+            {else}
+                {* ── Landing state: no category selected ──────────────
+                   User landed on /cart.php without ?gid. The error/info
+                   alert already explains "pick a category"; this card
+                   reinforces the CTA and lists the active categories as
+                   clickable tiles so the user has a clear next step
+                   without scanning the sidebar. *}
+                <div class="card st-pick">
+                    <div class="st-pick-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    </div>
+                    <h2 class="st-pick-title">{$LANG.cart.pickcategorytitle|default:'Choose a category to get started'}</h2>
+                    <p class="st-pick-desc">{$LANG.cart.pickcategorydesc|default:'Browse our plans by service. All plans come with a 30-day money-back guarantee.'}</p>
+
+                    {if $productgroups}
+                        <div class="st-pick-grid">
+                            {foreach $productgroups as $cat}
+                                {$_cId   = $cat.id|default:$cat->id}
+                                {$_cName = $cat.name|default:$cat->name}
+                                {$_cTag  = $cat.tagline|default:$cat->tagline}
+                                <a href="{$WEB_ROOT}/cart.php?gid={$_cId}" class="st-pick-tile">
+                                    <div class="st-pick-tile-ico" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                                    </div>
+                                    <div class="st-pick-tile-name">{$_cName|escape}</div>
+                                    {if $_cTag}<div class="st-pick-tile-tag">{$_cTag|escape}</div>{/if}
+                                    <span class="st-pick-tile-cta">
+                                        {$LANG.cart.viewplans|default:'View plans'}
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                    </span>
+                                </a>
+                            {/foreach}
+                        </div>
+                    {/if}
                 </div>
             {/if}
 
