@@ -1,489 +1,351 @@
 {*
- * mytheme_cart/configureproductdomain.tpl
- *
- * Apple visual shell over standard_cart's exact form + JS contract.
- *
- * What "exact contract" means here:
- *   - Both forms preserved (#frmProductDomain visible UI, plus the
- *     hidden #frmProductDomainSelections that posts to
- *     cart.php?a=add&pid={$pid}&domainselect=1).
- *   - Every element id scripts.min.js binds to is kept verbatim:
- *       #frmProductDomainPid
- *       #selregister #seltransfer #selowndomain #selsubdomain #selincart
- *       #domainregister #domaintransfer #domainowndomain #domainsubdomain #domainincart
- *       #registersld #registertld #transfersld #transfertld
- *       #owndomainsld #owndomaintld #subdomainsld #subdomaintld
- *       #incartsld
- *       #btnCheckAvailability #useOwnDomain #btnDomainContinue
- *       #DomainSearchResults #searchDomainInfo
- *       #primaryLookupResult #primaryLookupSearching
- *       #primarySuggestionHeading #primaryExactHeading
- *       #resultDomainOption #resultDomain #resultDomainPricingTerm
- *       #spotlightTlds #suggestionsLoader #domainSuggestions
- *       #moreSuggestions #noMoreSuggestions
- *       #idnLanguageSelector
- *       #message
- *   - All the class hooks scripts.min.js queries via $('.X') are kept
- *     (.domain-selection-options .option .domain-input-group
- *      .domain-checker-available .domain-checker-unavailable
- *      .domain-checker-invalid .domain-lookup-result .domain-lookup-loader
- *      .domain-lookup-message .spotlight-tld .suggested-domains
- *      .domain-suggestion .btn-add-to-cart .product-domain
- *      .transfer-eligible .transfer-not-eligible .domain-invalid
- *      .headline .w-hidden, etc.)
- *   - Form input names match standard_cart (name="domainoption" on
- *     the radios; name="message" on the AI textarea; name="tlds[]" and
- *     name="maxLength" on the multiselects; name="filter" on Safe Search;
- *     name="incartdomain" on the existing-cart-domain select).
- *
- * Only the surrounding HTML structure + classes change to apply the
- * Apple visual language. scripts.min.js, the multiselect plugin, and
- * cart-add server-side handler keep working unchanged.
+ * mytheme_cart/configureproductdomain.tpl — mockup-faithful rebuild
  *
  * Visual source: apple-client-area/configureproductdomain.html
+ *   Shell    = .dp-split (240px sidebar + main) wrapping
+ *              .dp-steps (4-step progress strip)
+ *              .card containing .dp-options (radio cards)
+ *                                .dp-panel[data-panel] (per-option search)
+ *                                .dp-footer (back + continue)
+ *
+ * Server contract (preserved verbatim):
+ *   - POST to {$WEB_ROOT}/cart.php?a=add&pid={$pid}&domainselect=1
+ *   - Body fields:
+ *       pid           — int (also in query string; doubled for safety)
+ *       domainoption  — register | transfer | owndomain | subdomain | incart
+ *       domains[]     — full <sld>.<tld> (everything except incart)
+ *       incartdomain  — full domain string (only when option=incart)
+ *
+ * JS contract DROPPED (per user direction "replace JS where it
+ * conflicts"):
+ *   - scripts.min.js's AJAX domain-availability check.
+ *     The "Search" button just submits the form; WHMCS server-side
+ *     validates the domain and bounces back with an error if invalid.
+ *   - $showAdvancedSearchOptions AI search variant + tlds[] / maxLength
+ *     / safe-search multiselect. Re-introduce as a separate panel later.
+ *   - $spotlightTlds card grid + $domainSuggestions / suggested-domains
+ *     list — those are scripts.min.js-driven AJAX features.
+ *   - $idnLanguages selector — IDN registrations now happen server-side
+ *     only; edge case for follow-up.
+ *
+ * The inline <script> at the bottom owns the new behavior:
+ *   - Swap visible .dp-panel when the radio in .dp-options changes.
+ *   - On form submit, read the active panel's [data-input] fields and
+ *     write the result into the hidden #resultDomain / #resultIncart.
+ *   - Clear panel error state on input.
  *}
 
 {include file="orderforms/$carttpl/common.tpl"}
 
 <div id="order-standard_cart">
-    <div class="row">
-        <div class="cart-sidebar">
-            {include file="orderforms/standard_cart/sidebar-categories.tpl"}
-        </div>
+    <div class="content-area">
 
-        <div class="cart-body">
+        <header class="page-header">
+            <h1>{$LANG.domaincheckerchoosedomain}</h1>
+            <p class="page-subtitle">Register something new, transfer one you already own, or point an existing domain at our nameservers.</p>
+        </header>
 
-            {* Apple-style page header card *}
-            <div class="header-lined">
-                <h1 class="font-size-36">{$LANG.domaincheckerchoosedomain}</h1>
-                <p>Register a new domain, transfer one you already own, or use an existing domain and update your nameservers.</p>
-            </div>
+        <div class="dp-split">
 
-            {include file="orderforms/standard_cart/sidebar-categories-collapsed.tpl"}
+            {* ── Sidebar: Categories + Actions ── *}
+            <aside>
+                {include file="orderforms/$carttpl/sidebar-categories.tpl"}
+            </aside>
 
-            {* ════════════════════════════════════════════════════
-               UI FORM #frmProductDomain
-               Visible radio-card list. scripts.min.js intercepts
-               its submit, reads which option is selected, populates
-               the hidden #frmProductDomainSelections form with the
-               correct domain values, and submits THAT form.
-               ════════════════════════════════════════════════════ *}
-            <form id="frmProductDomain">
-                <input type="hidden" id="frmProductDomainPid" value="{$pid}" />
+            {* ── Main column: step strip + chooser card ── *}
+            <div style="min-width: 0;">
 
-                <div class="domain-selection-options">
-
-                    {if $incartdomains}
-                        <div class="option" id="optionincart">
-                            <label>
-                                <input type="radio" name="domainoption" value="incart" id="selincart" />
-                                {$LANG.cartproductdomainuseincart}
-                            </label>
-                            <div class="domain-input-group clearfix" id="domainincart">
-                                <div class="row align-items-center">
-                                    <div class="col-sm-9 col-md-9">
-                                        <select id="incartsld" name="incartdomain" class="form-control">
-                                            {foreach key=num item=incartdomain from=$incartdomains}
-                                                <option value="{$incartdomain}">{$incartdomain}</option>
-                                            {/foreach}
-                                        </select>
-                                    </div>
-                                    <div class="col-sm-3 col-md-3">
-                                        <button type="submit" class="btn btn-primary btn-block">
-                                            {$LANG.orderForm.use}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {/if}
-
-                    {if $registerdomainenabled}
-                        <div class="option" id="optionregister">
-                            <label>
-                                <input type="radio" name="domainoption" value="register" id="selregister"{if $domainoption eq "register"} checked{/if} />
-                                {$LANG.cartregisterdomainchoice|sprintf2:$companyname}
-                            </label>
-                            <div class="domain-input-group clearfix{if $showAdvancedSearchOptions} domain-checker-advanced{/if}" id="domainregister">
-                                <div class="row align-items-center">
-                                    <div class="col-sm-9 col-md-9">
-                                        <div class="row domains-row">
-                                            {if $showAdvancedSearchOptions}
-                                                <textarea name="message"
-                                                          id="message"
-                                                          title="{lang key='domainSearch.domainOrAiPrompt'}"
-                                                          data-placement="left"
-                                                          data-trigger="manual"
-                                                          placeholder="{lang key='domainSearch.domainOrAiInstruction'}">{$message}</textarea>
-                                            {else}
-                                            <div class="col-xs-9 col-9">
-                                                <div class="input-group">
-                                                    <div class="input-group-addon input-group-prepend">
-                                                        <span class="input-group-text">{$LANG.orderForm.www}</span>
-                                                    </div>
-                                                    <input type="text" id="registersld" value="{$sld}" class="form-control" autocapitalize="none" data-toggle="tooltip" data-placement="top" data-trigger="manual" title="{lang key='orderForm.enterDomain'}" />
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-3 col-3">
-                                                <select id="registertld" class="form-control">
-                                                    {foreach from=$registertlds item=listtld}
-                                                        <option value="{$listtld}"{if $listtld eq $tld} selected="selected"{/if}>{$listtld}</option>
-                                                    {/foreach}
-                                                </select>
-                                            </div>
-                                            {/if}
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-3 col-md-3">
-                                        <button id="btnCheckAvailability" type="submit" class="btn btn-primary btn-block">
-                                            {$LANG.orderForm.check}
-                                        </button>
-                                    </div>
-                                </div>
-                                {if $showAdvancedSearchOptions}
-                                    <div class="row mt-3">
-                                        <div class="col-sm-12">
-                                            <div class="row domains-row advanced-search-controls">
-                                                <select name="tlds[]" class="multiselect multiselect-filter" multiple="multiple" data-placeholder="{lang key='domainSearch.tlds'}" data-min-selection="1">
-                                                    {foreach $tlds as $tld}
-                                                        <option{if in_array($tld, $selectedTlds)} selected {if count($selectedTlds) <= 1}disabled="disabled"{/if}{/if} value="{$tld}">{$tld}</option>
-                                                    {/foreach}
-                                                </select>
-                                                <select name="maxLength" class="multiselect" data-placeholder="{lang key='domainSearch.maxLength'}">
-                                                    {foreach $searchLengths as $len}
-                                                        <option value="{$len}" {if $maxLength === $len}selected{/if}>{$len}</option>
-                                                    {/foreach}
-                                                </select>
-                                                <label class="safe-search-label">
-                                                    <input type="checkbox" name="filter" class="no-icheck" {if $safeSearchSelected}checked{/if}>
-                                                    {lang key="domainSearch.safeSearch"}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {/if}
-                            </div>
-                        </div>
-                    {/if}
-
-                    {if $transferdomainenabled}
-                        <div class="option" id="optiontransfer">
-                            <label>
-                                <input type="radio" name="domainoption" value="transfer" id="seltransfer"{if $domainoption eq "transfer"} checked{/if} />
-                                {$LANG.carttransferdomainchoice|sprintf2:$companyname}
-                            </label>
-                            <div class="domain-input-group clearfix" id="domaintransfer">
-                                <div class="row align-items-center">
-                                    <div class="col-sm-9 col-md-9">
-                                        <div class="row domains-row">
-                                            <div class="col-xs-9 col-9">
-                                                <div class="input-group">
-                                                    <div class="input-group-addon input-group-prepend">
-                                                        <span class="input-group-text">{$LANG.orderForm.www}</span>
-                                                    </div>
-                                                    <input type="text" id="transfersld" value="{$sld}" class="form-control" autocapitalize="none" data-toggle="tooltip" data-placement="top" data-trigger="manual" title="{lang key='orderForm.enterDomain'}" />
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-3 col-3">
-                                                <select id="transfertld" class="form-control">
-                                                    {foreach from=$transfertlds item=listtld}
-                                                        <option value="{$listtld}"{if $listtld eq $tld} selected="selected"{/if}>{$listtld}</option>
-                                                    {/foreach}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-3 col-md-3">
-                                        <button type="submit" class="btn btn-primary btn-block">
-                                            {$LANG.orderForm.transfer}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {/if}
-
-                    {if $owndomainenabled}
-                        <div class="option" id="optionowndomain">
-                            <label>
-                                <input type="radio" name="domainoption" value="owndomain" id="selowndomain"{if $domainoption eq "owndomain"} checked{/if} />
-                                {$LANG.cartexistingdomainchoice|sprintf2:$companyname}
-                            </label>
-                            <div class="domain-input-group clearfix" id="domainowndomain">
-                                <div class="row align-items-center">
-                                    <div class="col-sm-9 col-md-9">
-                                        <div class="row domains-row">
-                                            <div class="col-xs-9 col-9">
-                                                <div class="input-group">
-                                                    <div class="input-group-addon input-group-prepend">
-                                                        <span class="input-group-text">{lang key='orderForm.www'}</span>
-                                                    </div>
-                                                    <input type="text" id="owndomainsld" value="{$sld}" placeholder="{lang key='yourdomainplaceholder'}" class="form-control" autocapitalize="none" data-toggle="tooltip" data-placement="top" data-trigger="manual" title="{lang key='orderForm.enterDomain'}" />
-                                                </div>
-                                            </div>
-                                            <div class="col-xs-3 col-3">
-                                                <input type="text" id="owndomaintld" value="{$tld|substr:1}" placeholder="{$LANG.yourtldplaceholder}" class="form-control" autocapitalize="none" data-toggle="tooltip" data-placement="top" data-trigger="manual" title="{lang key='orderForm.required'}" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-3 col-md-3">
-                                        <button type="submit" class="btn btn-primary btn-block" id="useOwnDomain">
-                                            {$LANG.orderForm.use}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {/if}
-
-                    {if $subdomains}
-                        <div class="option" id="optionsubdomain">
-                            <label>
-                                <input type="radio" name="domainoption" value="subdomain" id="selsubdomain"{if $domainoption eq "subdomain"} checked{/if} />
-                                {$LANG.cartsubdomainchoice|sprintf2:$companyname}
-                            </label>
-                            <div class="domain-input-group clearfix" id="domainsubdomain">
-                                <div class="row align-items-center">
-                                    <div class="col-sm-9 col-md-9">
-                                        <div class="row domains-row">
-                                            <div class="col-xs-5 col-5">
-                                                <input type="text" id="subdomainsld" value="{$sld}" placeholder="yourname" class="form-control" autocapitalize="none" data-toggle="tooltip" data-placement="top" data-trigger="manual" title="{lang key='orderForm.enterDomain'}" />
-                                            </div>
-                                            <div class="col-xs-7 col-7">
-                                                <select id="subdomaintld" class="form-control">
-                                                    {foreach $subdomains as $subid => $subdomain}
-                                                        <option value="{$subid}">.{$subdomain}</option>
-                                                    {/foreach}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-3 col-md-3">
-                                        <button type="submit" class="btn btn-primary btn-block">
-                                            {$LANG.orderForm.check}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {/if}
-
+                <div class="dp-steps" aria-label="Order progress">
+                    <span class="dp-step done">
+                        <span class="dp-step-num">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </span>
+                        Choose plan
+                    </span>
+                    <span class="dp-step-sep">›</span>
+                    <span class="dp-step active"><span class="dp-step-num">2</span>Choose a domain</span>
+                    <span class="dp-step-sep">›</span>
+                    <span class="dp-step"><span class="dp-step-num">3</span>Configure</span>
+                    <span class="dp-step-sep">›</span>
+                    <span class="dp-step"><span class="dp-step-num">4</span>Checkout</span>
                 </div>
 
-                {if $freedomaintlds}
-                    <p class="freedomain-note">
-                        <span class="freedomain-star">*</span>
-                        <em>{$LANG.orderfreedomainregistration} {$LANG.orderfreedomainappliesto}: {$freedomaintlds}</em>
-                    </p>
-                {/if}
-            </form>
+                <form id="frmProductDomain"
+                      method="post"
+                      action="{$WEB_ROOT}/cart.php?a=add&pid={$pid}&domainselect=1">
 
-            <div class="clearfix"></div>
+                    <input type="hidden" name="pid" value="{$pid}">
+                    {* JS populates these two on submit based on the active option *}
+                    <input type="hidden" name="domains[]" id="resultDomain" value="">
+                    <input type="hidden" name="incartdomain" id="resultIncartDomain" value="">
 
-            {* ════════════════════════════════════════════════════
-               SELECTION + RESULTS FORM #frmProductDomainSelections
-               This is the actual form that POSTs to cart.php with
-               the selected domain. scripts.min.js populates the
-               hidden #resultDomainOption / #resultDomain inputs and
-               submits it. We just wrap it in an Apple results card.
-               ════════════════════════════════════════════════════ *}
-            <form method="post" action="{$WEB_ROOT}/cart.php?a=add&pid={$pid}&domainselect=1" id="frmProductDomainSelections">
+                    <div class="card" style="padding: 0;">
 
-                <div id="DomainSearchResults" class="w-hidden">
-                    <div id="primarySuggestionHeading" class="primary-domain-header">
-                        <i class="fa-regular fa-sparkles"></i>
-                        {$LANG.domainSearch.topSuggestion}
-                    </div>
-                    <div id="primaryExactHeading" class="primary-domain-header">
-                        {$LANG.domainSearch.exactMatch}
-                    </div>
-                    <div id="searchDomainInfo">
-                        <p id="primaryLookupSearching" class="domain-lookup-loader domain-lookup-primary-loader domain-searching domain-checker-result-headline">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <span class="domain-lookup-register-loader">{lang key='orderForm.checkingAvailability'}...</span>
-                            <span class="domain-lookup-transfer-loader">{lang key='orderForm.verifyingTransferEligibility'}...</span>
-                            <span class="domain-lookup-other-loader">{lang key='orderForm.verifyingDomain'}...</span>
-                        </p>
-                        <div id="primaryLookupResult" class="domain-lookup-result domain-lookup-primary-results w-hidden">
-                            <div class="domain-unavailable domain-checker-unavailable headline">{lang key='orderForm.domainIsUnavailable'}</div>
-                            <div class="domain-available domain-checker-available headline">{$LANG.domainavailablemessage}</div>
-                            <div class="btn btn-primary domain-contact-support headline">{$LANG.domainContactUs}</div>
-                            <div class="transfer-eligible">
-                                <p class="domain-checker-available headline">{lang key='orderForm.transferEligible'}</p>
-                                <p>{lang key='orderForm.transferUnlockBeforeContinuing'}</p>
-                            </div>
-                            <div class="transfer-not-eligible">
-                                <p class="domain-checker-unavailable headline">{lang key='orderForm.transferNotEligible'}</p>
-                                <p>{lang key='orderForm.transferNotRegistered'}</p>
-                                <p>{lang key='orderForm.trasnferRecentlyRegistered'}</p>
-                                <p>{lang key='orderForm.transferAlternativelyRegister'}</p>
-                            </div>
-                            <div class="domain-invalid">
-                                <p class="domain-checker-unavailable headline">{lang key='orderForm.domainInvalid'}</p>
-                                <p>
-                                    {lang key='orderForm.domainLetterOrNumber'}<span class="domain-length-restrictions">{lang key='orderForm.domainLengthRequirements'}</span><br />
-                                    {lang key='orderForm.domainInvalidCheckEntry'}
-                                </p>
-                            </div>
-                            <div id="idnLanguageSelector" class="margin-10 idn-language-selector idn-language w-hidden">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="text-center mb-3">
-                                            {lang key='cart.idnLanguageDescription'}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <select name="idnlanguage" class="form-control">
-                                                <option value="">{lang key='cart.idnLanguage'}</option>
-                                                {foreach $idnLanguages as $idnLanguageKey => $idnLanguage}
-                                                    <option value="{$idnLanguageKey}">{lang key='idnLanguage.'|cat:$idnLanguageKey}</option>
-                                                {/foreach}
-                                            </select>
-                                            <div class="field-error-msg">
-                                                {lang key='cart.selectIdnLanguageForRegister'}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="domain-price">
-                                <span class="register-price-label">{lang key='orderForm.domainPriceRegisterLabel'}</span>
-                                <span class="transfer-price-label w-hidden">{lang key='orderForm.domainPriceTransferLabel'}</span>
-                                <span class="price"></span>
-                            </div>
-                            <p class="domain-error domain-checker-unavailable headline"></p>
-                            <input type="hidden" id="resultDomainOption" name="domainoption" />
-                            <input type="hidden" id="resultDomain" name="domains[]" />
-                            <input type="hidden" id="resultDomainPricingTerm" />
+                        {* ─── Option radio cards ─── *}
+                        <div class="dp-options" role="radiogroup" aria-label="How you'll provide a domain">
+
+                            {if $incartdomains}
+                                {$_chk = ($domainoption eq "incart")}
+                                <label class="dp-option">
+                                    <input type="radio" name="domainoption" value="incart"{if $_chk} checked{/if}>
+                                    <span class="dp-option-check">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    </span>
+                                    <span class="dp-option-ico">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                                    </span>
+                                    <span class="dp-option-title">{$LANG.cartproductdomainuseincart}</span>
+                                    <span class="dp-option-desc">Use a domain that's already in your cart.</span>
+                                </label>
+                            {/if}
+
+                            {if $registerdomainenabled}
+                                {$_chk = (!$domainoption || $domainoption eq "register")}
+                                <label class="dp-option">
+                                    <input type="radio" name="domainoption" value="register"{if $_chk} checked{/if}>
+                                    <span class="dp-option-check">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    </span>
+                                    <span class="dp-option-ico">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                                    </span>
+                                    <span class="dp-option-title">{$LANG.cartregisterdomainchoice|sprintf2:$companyname}</span>
+                                    <span class="dp-option-desc">Search and register a brand-new domain name.</span>
+                                </label>
+                            {/if}
+
+                            {if $transferdomainenabled}
+                                {$_chk = ($domainoption eq "transfer")}
+                                <label class="dp-option">
+                                    <input type="radio" name="domainoption" value="transfer"{if $_chk} checked{/if}>
+                                    <span class="dp-option-check">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    </span>
+                                    <span class="dp-option-ico">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                                    </span>
+                                    <span class="dp-option-title">{$LANG.carttransferdomainchoice|sprintf2:$companyname}</span>
+                                    <span class="dp-option-desc">Move your domain to us — usually includes a free year extension.</span>
+                                </label>
+                            {/if}
+
+                            {if $owndomainenabled}
+                                {$_chk = ($domainoption eq "owndomain")}
+                                <label class="dp-option">
+                                    <input type="radio" name="domainoption" value="owndomain"{if $_chk} checked{/if}>
+                                    <span class="dp-option-check">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    </span>
+                                    <span class="dp-option-ico">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                                    </span>
+                                    <span class="dp-option-title">{$LANG.cartexistingdomainchoice|sprintf2:$companyname}</span>
+                                    <span class="dp-option-desc">Keep it with your current registrar and point DNS at us.</span>
+                                </label>
+                            {/if}
+
+                            {if $subdomains}
+                                {$_chk = ($domainoption eq "subdomain")}
+                                <label class="dp-option">
+                                    <input type="radio" name="domainoption" value="subdomain"{if $_chk} checked{/if}>
+                                    <span class="dp-option-check">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    </span>
+                                    <span class="dp-option-ico">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 22 9 12 15 12 15 22"/><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                                    </span>
+                                    <span class="dp-option-title">{$LANG.cartsubdomainchoice|sprintf2:$companyname}</span>
+                                    <span class="dp-option-desc">Use a subdomain on one of our shared domains.</span>
+                                </label>
+                            {/if}
+
                         </div>
-                    </div>
 
-                    {if $registerdomainenabled}
-                        {if $spotlightTlds}
-                            <div id="spotlightTlds" class="spotlight-tlds clearfix w-hidden">
-                                <div class="spotlight-tlds-container">
-                                    {foreach $spotlightTlds as $key => $data}
-                                        <div class="spotlight-tld-container spotlight-tld-container-{$spotlightTlds|count}">
-                                            <div id="spotlight{$data.tldNoDots}" class="spotlight-tld">
-                                                {if $data.group}
-                                                    <div class="spotlight-tld-{$data.group}">{$data.groupDisplayName}</div>
-                                                {/if}
-                                                {$data.tld}
-                                                <span class="domain-lookup-loader domain-lookup-spotlight-loader">
-                                                    <i class="fas fa-spinner fa-spin"></i>
-                                                </span>
-                                                <div class="domain-lookup-result">
-                                                    <button type="button" class="btn unavailable w-hidden" disabled="disabled">
-                                                        {lang key='domainunavailable'}
-                                                    </button>
-                                                    <button type="button" class="btn invalid w-hidden" disabled="disabled">
-                                                        {lang key='domainunavailable'}
-                                                    </button>
-                                                    <span class="available price w-hidden">{$data.register}</span>
-                                                    <button type="button" class="btn btn-add-to-cart product-domain w-hidden" data-whois="0" data-domain="">
-                                                        <span class="to-add">{lang key='orderForm.add'}</span>
-                                                        <span class="loading">
-                                                            <i class="fas fa-spinner fa-spin"></i> {lang key='loading'}
-                                                        </span>
-                                                        <span class="added"><i class="far fa-shopping-cart"></i> {lang key='domaincheckeradded'}</span>
-                                                        <span class="unavailable">{$LANG.domaincheckertaken}</span>
-                                                    </button>
-                                                    <button type="button" class="btn btn-primary domain-contact-support w-hidden">
-                                                        {lang key='domainChecker.contactSupport'}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {/foreach}
+                        {* ─── Per-option search panels ─── *}
+
+                        {if $incartdomains}
+                            <div class="dp-panel{if $domainoption eq "incart"} is-active{/if}" data-panel="incart">
+                                <p class="dp-panel-hint">Pick from the domains already in your cart.</p>
+                                <div class="dp-search-row">
+                                    <select class="dp-input no-ico" data-input="incartsld">
+                                        {foreach $incartdomains as $incartdomain}
+                                            <option value="{$incartdomain}">{$incartdomain}</option>
+                                        {/foreach}
+                                    </select>
+                                    <button type="submit" class="dp-search-cta">{$LANG.orderForm.use}</button>
                                 </div>
                             </div>
                         {/if}
 
-                        <div class="suggested-domains w-hidden">
-                            <div class="panel-heading card-header">
-                                {lang key='orderForm.suggestedDomains'}
-                            </div>
-                            <div id="suggestionsLoader" class="card-body panel-body domain-lookup-loader domain-lookup-suggestions-loader">
-                                <i class="fas fa-spinner fa-spin"></i> {lang key='orderForm.generatingSuggestions'}
-                            </div>
-                            <div class="panel-body card-body domain-lookup-message domain-lookup-suggestions-message">
-                                {lang key='domainSearch.errors.noSuggestions'}
-                            </div>
-                            <div id="domainSuggestions" class="domain-lookup-result list-group w-hidden">
-                                <div class="domain-suggestion list-group-item w-hidden">
-                                    <span class="domain"></span><span class="extension"></span>
-                                    <div class="actions">
-                                        <button type="button" class="btn btn-add-to-cart product-domain" data-whois="1" data-domain="">
-                                            <span class="to-add">{$LANG.addtocart}</span>
-                                            <span class="loading">
-                                                <i class="fas fa-spinner fa-spin"></i> {lang key='loading'}
-                                            </span>
-                                            <span class="added">{lang key='domaincheckeradded'}</span>
-                                            <span class="unavailable">{$LANG.domaincheckertaken}</span>
-                                        </button>
-                                        <button type="button" class="btn btn-primary domain-contact-support w-hidden">{lang key='domainChecker.contactSupport'}</button>
-                                        <span class="price"></span>
-                                        <span class="promo w-hidden"></span>
+                        {if $registerdomainenabled}
+                            <div class="dp-panel{if !$domainoption || $domainoption eq "register"} is-active{/if}" data-panel="register">
+                                <p class="dp-panel-hint"><strong>Search by domain.</strong> We'll check availability across our registrar partners.</p>
+                                <div class="dp-search-row">
+                                    <div class="dp-input-wrap">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="example" autocomplete="off" autocapitalize="none">
                                     </div>
+                                    <select class="dp-input no-ico" data-input="tld" style="flex: 0 0 130px;">
+                                        {foreach from=$registertlds item=listtld}
+                                            <option value="{$listtld}"{if $listtld eq $tld} selected{/if}>{$listtld}</option>
+                                        {/foreach}
+                                    </select>
+                                    <button type="submit" class="dp-search-cta">
+                                        {$LANG.orderForm.check}
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                    </button>
+                                </div>
+                                {if $freedomaintlds}
+                                    <p class="dp-example">
+                                        <strong>Free domain on:</strong> {$freedomaintlds}
+                                    </p>
+                                {/if}
+                            </div>
+                        {/if}
+
+                        {if $transferdomainenabled}
+                            <div class="dp-panel{if $domainoption eq "transfer"} is-active{/if}" data-panel="transfer">
+                                <p class="dp-panel-hint"><strong>Transfer your domain from another registrar.</strong> Most transfers add a <strong>free extra year</strong> to your registration.</p>
+                                <div class="dp-search-row">
+                                    <div class="dp-input-wrap">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="mydomain" autocomplete="off" autocapitalize="none">
+                                    </div>
+                                    <select class="dp-input no-ico" data-input="tld" style="flex: 0 0 130px;">
+                                        {foreach from=$transfertlds item=listtld}
+                                            <option value="{$listtld}"{if $listtld eq $tld} selected{/if}>{$listtld}</option>
+                                        {/foreach}
+                                    </select>
+                                    <button type="submit" class="dp-search-cta">{$LANG.orderForm.transfer}</button>
+                                </div>
+                                <p class="dp-example">
+                                    Before transferring: domain must be <strong>unlocked</strong>, registered for at least <strong>60 days</strong>, and you'll need the <strong>auth / EPP code</strong> from your current registrar.
+                                </p>
+                            </div>
+                        {/if}
+
+                        {if $owndomainenabled}
+                            <div class="dp-panel{if $domainoption eq "owndomain"} is-active{/if}" data-panel="owndomain">
+                                <p class="dp-panel-hint"><strong>I'll use my existing domain.</strong> After checkout we'll email you the nameservers to set at your current registrar.</p>
+                                <div class="dp-search-row">
+                                    <div class="dp-input-wrap">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{lang key='yourdomainplaceholder'}" autocomplete="off" autocapitalize="none">
+                                    </div>
+                                    <input type="text" class="dp-input no-ico" data-input="tld" value="{$tld|substr:1}" placeholder="{$LANG.yourtldplaceholder}" autocomplete="off" autocapitalize="none" style="flex: 0 0 130px;">
+                                    <button type="submit" class="dp-search-cta">{$LANG.orderForm.use}</button>
                                 </div>
                             </div>
-                            <div class="panel-footer card-footer more-suggestions text-center w-hidden">
-                                <a id="moreSuggestions" href="#" onclick="loadMoreSuggestions();return false;">{lang key='domainsmoresuggestions'}</a>
-                                <span id="noMoreSuggestions" class="no-more small w-hidden">{lang key='domaincheckernomoresuggestions'}</span>
-                            </div>
-                            <div class="text-center domain-suggestions-warning">
-                                <p>{lang key='domainssuggestionswarnings'}</p>
-                            </div>
-                        </div>
-                    {/if}
-                </div>
+                        {/if}
 
-                <div class="domain-continue-row text-center">
-                    <button id="btnDomainContinue" type="submit" class="btn btn-primary btn-lg w-hidden" disabled="disabled">
-                        {$LANG.continue}
-                        &nbsp;<i class="fas fa-arrow-circle-right"></i>
-                    </button>
-                </div>
-            </form>
+                        {if $subdomains}
+                            <div class="dp-panel{if $domainoption eq "subdomain"} is-active{/if}" data-panel="subdomain">
+                                <p class="dp-panel-hint"><strong>Use a subdomain.</strong> Pick a parent domain and enter the prefix you'd like.</p>
+                                <div class="dp-search-row">
+                                    <input type="text" class="dp-input no-ico" data-input="sld" value="{$sld}" placeholder="yourname" autocomplete="off" autocapitalize="none">
+                                    <select class="dp-input no-ico" data-input="tld" style="flex: 0 0 200px;">
+                                        {foreach $subdomains as $subid => $subdomain}
+                                            <option value="{$subdomain}">.{$subdomain}</option>
+                                        {/foreach}
+                                    </select>
+                                    <button type="submit" class="dp-search-cta">{$LANG.orderForm.check}</button>
+                                </div>
+                            </div>
+                        {/if}
+
+                        {* ─── Footer: privacy note + Back / Continue ─── *}
+                        <div class="dp-footer">
+                            <span class="dp-footer-note">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                                Your domain details stay private — WHOIS privacy included on every TLD that supports it.
+                            </span>
+                            <span class="spacer"></span>
+                            <a href="{$WEB_ROOT}/cart.php" class="dp-back">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                                Back
+                            </a>
+                            <button type="submit" class="dp-continue">
+                                {$LANG.continue}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 {include file="orderforms/standard_cart/recommendations-modal.tpl"}
 
-{if $showAdvancedSearchOptions}
-    <script>
-    {literal}
-        $(document).ready(function() {
-            jQuery('#frmProductDomain .multiselect').each(function () {
-                let enableFiltering = $(this).hasClass('multiselect-filter');
-                const minSelection = jQuery(this).data('min-selection');
-                $(this).multiselect({
-                    onChange: function (element) {
-                        const closestSelect = element.closest('select');
-                        const selectedOptions = closestSelect.find('option:selected');
-                        if (minSelection === undefined) {
-                            return;
-                        }
-                        const atMinOptions = selectedOptions.length <= minSelection;
-                        const targetOptions = atMinOptions ? selectedOptions : closestSelect.find('option');
-                        targetOptions.each(function () {
-                            const inputElement = jQuery('input[value="' + jQuery(this).val() + '"]');
-                            inputElement.prop('disabled', atMinOptions ? 'disabled' : false);
-                        });
-                    },
-                    buttonText: function(options, select) {
-                        return select.data('placeholder');
-                    },
-                    maxHeight: 200,
-                    includeFilterClearBtn: false,
-                    enableCaseInsensitiveFiltering: enableFiltering,
-                });
-            })
+<script>
+{literal}
+(function () {
+    var form = document.getElementById('frmProductDomain');
+    if (!form) return;
+
+    var radios = form.querySelectorAll('input[name="domainoption"]');
+    var panels = form.querySelectorAll('.dp-panel');
+    var resultDomain = document.getElementById('resultDomain');
+    var resultIncart = document.getElementById('resultIncartDomain');
+
+    function showPanel(key) {
+        panels.forEach(function (p) {
+            p.classList.toggle('is-active', p.dataset.panel === key);
+            p.removeAttribute('data-state');
         });
-    {/literal}
-    </script>
-{/if}
+    }
+
+    function readInput(panel, key) {
+        var el = panel.querySelector('[data-input="' + key + '"]');
+        return el ? String(el.value || '').trim() : '';
+    }
+
+    // Switch visible panel when option radio changes.
+    radios.forEach(function (r) {
+        r.addEventListener('change', function () { showPanel(r.value); });
+    });
+
+    // Clear error state once the user starts typing.
+    panels.forEach(function (p) {
+        p.querySelectorAll('.dp-input').forEach(function (inp) {
+            inp.addEventListener('input', function () { p.removeAttribute('data-state'); });
+        });
+    });
+
+    // Populate the hidden submit fields based on the chosen option.
+    form.addEventListener('submit', function () {
+        var checked = form.querySelector('input[name="domainoption"]:checked');
+        var opt = checked ? checked.value : 'register';
+        var panel = form.querySelector('.dp-panel.is-active') ||
+                    form.querySelector('[data-panel="' + opt + '"]');
+        if (!panel) return;
+
+        resultDomain.value = '';
+        resultIncart.value = '';
+
+        if (opt === 'incart') {
+            resultIncart.value = readInput(panel, 'incartsld');
+        } else if (opt === 'register' || opt === 'transfer') {
+            var sld = readInput(panel, 'sld').toLowerCase();
+            var tld = readInput(panel, 'tld');
+            if (sld) resultDomain.value = sld + tld;
+        } else if (opt === 'owndomain') {
+            var sld = readInput(panel, 'sld').toLowerCase();
+            var tld = readInput(panel, 'tld').toLowerCase();
+            if (tld && tld.charAt(0) !== '.') tld = '.' + tld;
+            if (sld) resultDomain.value = sld + tld;
+        } else if (opt === 'subdomain') {
+            var sld = readInput(panel, 'sld').toLowerCase();
+            var parent = readInput(panel, 'tld');
+            if (sld && parent) resultDomain.value = sld + '.' + parent;
+        }
+    });
+
+    // Sync panel to whichever radio is initially checked.
+    var initial = form.querySelector('input[name="domainoption"]:checked');
+    if (initial) showPanel(initial.value);
+})();
+{/literal}
+</script>
