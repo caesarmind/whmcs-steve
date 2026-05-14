@@ -15,39 +15,19 @@ This folder is the second of those two. Activate it in **Configuration → Syste
 
 ## Parent theme
 
-`mytheme_cart` inherits from `standard_cart` — **not** `nexus_cart`. We're rebuilding the cart UI as traditional Smarty templates instead of inheriting the locked Vue SPA, because the user wanted full visual + structural control across the cart flow (per the "everything needs to rebuild" direction).
+`mytheme_cart` inherits from `standard_cart` — **not** `nexus_cart`. We're rebuilding the cart UI as traditional Smarty templates instead of inheriting the locked Vue SPA, because the user wanted full visual + structural control across the cart flow.
 
 The trade-off: we lose the SPA's client-side reactivity (real-time cart updates, AJAX-driven domain validation), but gain full Apple-language styling control and the ability to redesign any page. Nexus's SPA can still be re-inherited later by flipping `parent` back in `theme.yaml`.
 
-## Structure (target)
-
-```
-mytheme_cart/
-├── theme.yaml             # parent: standard_cart
-├── css/
-│   ├── style.min.css      # main Apple-language stylesheet (cart-page layout, components)
-│   └── custom.css         # --vl-* token overrides (safety net for any Vue SPA bits)
-├── common.tpl             # shared header partial (assets + WHMCS chrome reset)
-├── products.tpl           # /store/<slug> — product group landing  ← DONE
-├── viewcart.tpl           # /cart.php?a=view                       ← TODO
-├── configureproduct.tpl   # /cart.php?a=confproduct                ← TODO
-├── domainregister.tpl     # /cart.php?a=add&domains=register       ← TODO
-├── domaintransfer.tpl     # /cart.php?a=add&domains=transfer       ← TODO
-├── checkout.tpl           # /cart.php?a=checkout                   ← TODO
-├── signup.tpl             # signup during checkout                 ← TODO
-├── sidebar-categories.tpl # left rail with product group list      ← TODO
-└── README.md              # this file
-```
-
-## Current status
+## File status
 
 | File | Status | Source mockup |
 | --- | --- | --- |
 | `theme.yaml` | ✓ | — |
 | `css/style.min.css` | ✓ | `apple-client-area/store.html` (.st-* layout) + dynamic-store block fallbacks (.ds-*) from `apple-client-area/store/wordpress-hosting.html` |
 | `css/custom.css` | ✓ | — (Apple `--vl-*` tokens for any Shadow DOM fallback) |
-| `common.tpl` | ✓ | — |
-| `products.tpl` | ✓ | `apple-client-area/store.html` (2-column sidebar + plan grid Variant A) |
+| `common.tpl` | ✓ | — (shared partial — loads CSS + resets WHMCS chrome) |
+| `products.tpl` | ✓ | `apple-client-area/store.html` (sidebar + plan grid + cycle pills + guarantees) |
 | `viewcart.tpl` | ✓ | `apple-client-area/cart.html` + `cart-empty.html` |
 | `configureproduct.tpl` | ✓ | `apple-client-area/configureproduct.html` |
 | `checkout.tpl` | ✓ | `apple-client-area/checkout.html` |
@@ -56,16 +36,61 @@ mytheme_cart/
 | `signup.tpl` | ✓ | `apple-client-area/clientregister.html` |
 | `sidebar-categories.tpl` | ✓ | reusable partial extracted from `products.tpl` sidebar |
 
-The pending pieces all have approved visual mockups in `apple-client-area/` already (state-chip + `when-full`/`when-empty` per the per-page processing checklist), so each port is mechanical: strip the outer `<html>`/`<body>`/nav/footer (WHMCS provides those), translate hardcoded data into Smarty variables, inline only what doesn't already live in `style.min.css`.
+## Smarty variable shapes (what we actually learned from live rendering)
+
+The first deploy hit two classes of bugs that turned out to be hidden assumptions in the WHMCS 9 docs. These are the empirical shapes confirmed against the live `bill.hostnodes.com` install:
+
+### `$products` is an ARRAY of associative arrays
+
+Each `$product` item looks like:
+
+```php
+[
+    'pid'         => 12,             // (sometimes also .id — use $product.pid|default:$product.id)
+    'name'        => 'Pro Plan',
+    'description' => 'Built for…',   // string, can contain HTML
+    'paytype'     => 'recurring',    // 'recurring' | 'onetime' | 'free'
+    'pricing'     => [
+        'type'         => 'recurring',  // ← METADATA, not a price. Skip it.
+        'monthly'      => '$2.99 USD',
+        'quarterly'    => '$8.97 USD',
+        'semiannually' => '$17.94 USD',
+        'annually'     => '$35.88 USD',
+        'biennially'   => '$71.76 USD',
+        'triennially'  => '...',
+        'minimum'      => '...',         // ← min cycle, also metadata
+    ],
+    // ...
+]
+```
+
+**Do NOT** call methods on `$product` — `$product->isFree()` and `$product->pricing()->first()` will fatal with *"Call to a member function on array"*. The WHMCS 9 docs §27 show object syntax (`$plan->pricing()->first()->toPrefixedString()`); that's only valid in the **dynamic-store** context, not the traditional `products.tpl` cart-product loop.
+
+Read cycle prices directly: `$product.pricing.monthly`, `$product.pricing.annually`, etc. Skip the `'type'` and `'minimum'` keys when iterating — they're metadata, not prices. Cycles that are disabled for a product show `'-1.00'` and should be skipped too.
+
+### `$productgroups` / `$productgroup` can be array OR object
+
+Depends on WHMCS minor version. The TPLs use a dual-fallback `$cat.id|default:$cat->id` pattern so the same code works for both shapes.
+
+### `{lang key='X'|default:'Y'}` does NOT fall back when the key is missing
+
+WHMCS's `{lang}` returns the **key itself** when there's no translation, which is a non-empty string, so the `|default:` modifier never fires. The whole `mytheme_cart/` set hardcodes English copy directly instead — admins who want localization should drop a language override file at `lang/overrides/<locale>.php` or override the TPLs in a child theme. The only `{lang key=…}` reference left is `orderpaymenttermfree`, which is a real WHMCS-shipped key.
+
+## Common conventions across every TPL
+
+- `{include file="orderforms/$carttpl/common.tpl"}` at the top — loads `style.min.css` + `custom.css`, hides the duplicate WHMCS nav wrapper.
+- Form actions go to real WHMCS endpoints: `cart.php?a=add`, `cart.php?a=view`, `cart.php?a=confproduct&i=N`, `cart.php?a=update`, `cart.php?a=remove`, `cart.php?a=checkout`, `cart.php?a=add&domain=register|transfer`.
+- Inline `<style>{literal}…{/literal}</style>` block per page for page-specific component vocabulary (`.ct-*` cart, `.cp-*` configure, `.co-*` checkout, `.dr-*` domain register, `.dt-*` domain transfer, `.su-*` signup). Shared tokens + the `.st-*` products-page styles live in `style.min.css`.
+- Cycle pills on `products.tpl` actually filter the displayed plan price (each plan card emits every available cycle as a hidden `.cycle-price[data-cycle-price="X"]` span; the active pill toggles `is-active`). The pill choice is persisted to `sessionStorage` so `configureproduct.tpl` can preselect it.
 
 ## Local preview
 
-This theme cannot be previewed inside the apple-client-area dev server — the `.tpl` files only run on a WHMCS install. For visual reference, the Apple-themed mockups that match how this theme should look once rendered live at:
+This theme cannot be previewed inside the `apple-client-area` dev server — the `.tpl` files only run on a WHMCS install. For visual reference, the Apple-themed mockups that match how each page should look:
 
 | Mockup | Maps to |
 | --- | --- |
-| [apple-client-area/store.html](../apple-client-area/store.html) | **`products.tpl` (group landing, the actual target)** |
-| [apple-client-area/store/wordpress-hosting.html](../apple-client-area/store/wordpress-hosting.html) | `products.tpl` alt-style — dynamic-store builder marketing landing (only relevant if WHMCS dynamic store is configured for a group) |
+| [apple-client-area/store.html](../apple-client-area/store.html) | **`products.tpl`** (group landing — primary target) |
+| [apple-client-area/store/wordpress-hosting.html](../apple-client-area/store/wordpress-hosting.html) | `products.tpl` alt-style — dynamic-store builder marketing landing (only when WHMCS dynamic store is configured) |
 | [apple-client-area/cart.html](../apple-client-area/cart.html) | `viewcart.tpl` (cart contents) |
 | [apple-client-area/cart-empty.html](../apple-client-area/cart-empty.html) | `viewcart.tpl` (empty state) |
 | [apple-client-area/cart-domain-register.html](../apple-client-area/cart-domain-register.html) | `domainregister.tpl` |
@@ -96,6 +121,8 @@ https://your-domain/cart.php?carttpl=mytheme_cart
 https://your-domain/index.php/store/wordpress-hosting?carttpl=mytheme_cart
 ```
 
-## Lang-key plumbing
+## Troubleshooting
 
-Every visible string in `products.tpl` runs through `{lang key='...'|default:'...'}` so admins can translate via WHMCS's standard language overrides without editing TPLs. The defaults are the English copy from the mockup; new language packs only need to provide the keys that should change.
+- **Page shows "Array" or fatals with "member function on array"** — a TPL is calling a method on a variable that's actually an associative array. Switch to dot access (`$x.key`) and use the shapes documented above.
+- **Visible label shows as `store.X` or `cart.X`** — a leftover `{lang key='X'}` reference. Replace with the English string directly (only `{lang key='orderpaymenttermfree'}` should remain).
+- **Page renders but with the wrong WHMCS chrome** — the parent theme `standard_cart` might not be activated, or the `common.tpl` reset isn't loading. Check that `css/style.min.css` and `css/custom.css` URLs resolve in the page's `<head>`.

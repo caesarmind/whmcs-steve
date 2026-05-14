@@ -6,23 +6,43 @@
  *
  * Visual source: apple-client-area/store.html
  *
- * Variable shapes confirmed against live WHMCS install:
- *   $productgroups  — sidebar list of all groups
- *                      access either as $cat.id / $cat.name or $cat->id
- *   $productgroup   — current group (object on this install)
- *                      access either as $productgroup.id or ->id
- *   $products       — array of ARRAYS (NOT objects, despite the WHMCS docs
- *                     hint). Each item:
- *                       .pid, .name, .description (strings)
- *                       .pricing (assoc array, cycle => formatted string)
+ * Variable shapes (confirmed against the live bill.hostnodes.com install):
+ *   $productgroups  — sidebar list of all groups. Items can be either
+ *                     associative arrays OR objects depending on WHMCS
+ *                     minor version — use the dual `.X|default:->X`
+ *                     pattern so the same TPL works for both.
+ *   $productgroup   — current group (object on this install).
+ *                     Same dual-fallback access.
+ *   $products       — array of ASSOCIATIVE ARRAYS. Each item:
+ *                       .pid       — int (product id, sometimes also .id)
+ *                       .name      — string
+ *                       .description — string (can contain HTML)
+ *                       .paytype   — 'recurring' | 'onetime' | 'free'
+ *                       .pricing   — assoc array of the shape:
+ *                         {
+ *                           'type'         => 'recurring',   ← metadata
+ *                           'monthly'      => '$2.99 USD',
+ *                           'quarterly'    => '$8.97 USD',
+ *                           'semiannually' => '$17.94 USD',
+ *                           'annually'     => '$35.88 USD',
+ *                           'biennially'   => '$71.76 USD',
+ *                           'triennially'  => '...',
+ *                           'minimum'      => '...',          ← min cycle
+ *                         }
+ *                         Each cycle key holds the formatted price string
+ *                         or '-1.00' if that cycle is disabled for the
+ *                         product. The 'type' key is metadata (NOT a
+ *                         price) — iterating naively grabs 'recurring'
+ *                         as the first "price" which is wrong.
  *   $cartcount      — int
  *   $loggedin       — bool
  *   $WEB_ROOT, $carttpl
  *
- * Important: products are arrays — DO NOT call methods like ->isFree()
- * or ->pricing() on them, they'll fatal with "Call to a member function
- * on array". Pricing is itself an array, so iterate to grab the first
- * cycle's formatted string.
+ * Critical: products are arrays — DO NOT call methods like ->isFree()
+ * or ->pricing()->first() on them, they fatal with "Call to a member
+ * function on array". Pricing is itself an associative array, so we
+ * read explicit cycle keys (monthly, annually, biennially, …) and
+ * skip the 'type' metadata.
  *}
 
 {include file="orderforms/$carttpl/common.tpl"}
@@ -137,20 +157,58 @@
                                     <p class="st-plan-tag">&nbsp;</p>
                                 {/if}
 
-                                {* Pricing — $product.pricing is an assoc array of
-                                   cycle => formatted string. Grab the first one
-                                   (typically monthly or the cheapest available). *}
-                                <div class="st-plan-price">
-                                    {if is_array($product.pricing)}
-                                        {foreach $product.pricing as $cycleKey => $cyclePrice}
-                                            {if $cyclePrice@first}
-                                                <span class="amount" style="font-size: 28px;">{$cyclePrice}</span>
-                                            {/if}
-                                        {/foreach}
-                                    {elseif $product.pricing}
-                                        <span class="amount" style="font-size: 28px;">{$product.pricing}</span>
-                                    {else}
-                                        <span class="amount" style="font-size: 18px; color: var(--color-text-tertiary);">Contact us</span>
+                                {* Pricing — render every available cycle as a hidden
+                                   span tagged with data-cycle-price; the JS at the
+                                   bottom shows the one matching the active cycle
+                                   pill. Skips the 'type' / 'minimum' metadata keys
+                                   and any cycle whose value is '-1.00' (disabled). *}
+                                <div class="st-plan-price" data-plan-price>
+                                    {if $product.pricing.monthly && $product.pricing.monthly != '-1.00'}
+                                        <span class="cycle-price" data-cycle-price="monthly">
+                                            <span class="amount" style="font-size: 28px;">{$product.pricing.monthly}</span>
+                                            <span class="period" style="font-size: 12px; color: var(--color-text-tertiary); margin-left: 4px;">/ mo</span>
+                                        </span>
+                                    {/if}
+                                    {if $product.pricing.quarterly && $product.pricing.quarterly != '-1.00'}
+                                        <span class="cycle-price" data-cycle-price="quarterly">
+                                            <span class="amount" style="font-size: 28px;">{$product.pricing.quarterly}</span>
+                                            <span class="period" style="font-size: 12px; color: var(--color-text-tertiary); margin-left: 4px;">/ qtr</span>
+                                        </span>
+                                    {/if}
+                                    {if $product.pricing.semiannually && $product.pricing.semiannually != '-1.00'}
+                                        <span class="cycle-price" data-cycle-price="semiannually">
+                                            <span class="amount" style="font-size: 28px;">{$product.pricing.semiannually}</span>
+                                            <span class="period" style="font-size: 12px; color: var(--color-text-tertiary); margin-left: 4px;">/ 6mo</span>
+                                        </span>
+                                    {/if}
+                                    {if $product.pricing.annually && $product.pricing.annually != '-1.00'}
+                                        <span class="cycle-price" data-cycle-price="annually">
+                                            <span class="amount" style="font-size: 28px;">{$product.pricing.annually}</span>
+                                            <span class="period" style="font-size: 12px; color: var(--color-text-tertiary); margin-left: 4px;">/ yr</span>
+                                        </span>
+                                    {/if}
+                                    {if $product.pricing.biennially && $product.pricing.biennially != '-1.00'}
+                                        <span class="cycle-price" data-cycle-price="biennially">
+                                            <span class="amount" style="font-size: 28px;">{$product.pricing.biennially}</span>
+                                            <span class="period" style="font-size: 12px; color: var(--color-text-tertiary); margin-left: 4px;">/ 2yr</span>
+                                        </span>
+                                    {/if}
+                                    {if $product.pricing.triennially && $product.pricing.triennially != '-1.00'}
+                                        <span class="cycle-price" data-cycle-price="triennially">
+                                            <span class="amount" style="font-size: 28px;">{$product.pricing.triennially}</span>
+                                            <span class="period" style="font-size: 12px; color: var(--color-text-tertiary); margin-left: 4px;">/ 3yr</span>
+                                        </span>
+                                    {/if}
+                                    {if $product.pricing.onetime && $product.pricing.onetime != '-1.00'}
+                                        <span class="cycle-price" data-cycle-price="onetime">
+                                            <span class="amount" style="font-size: 28px;">{$product.pricing.onetime}</span>
+                                            <span class="period" style="font-size: 12px; color: var(--color-text-tertiary); margin-left: 4px;">one-time</span>
+                                        </span>
+                                    {/if}
+                                    {if $product.paytype == 'free' || $product.pricing.type == 'free'}
+                                        <span class="cycle-price" data-cycle-price="free">
+                                            <span class="amount" style="font-size: 28px; color: var(--color-green-text);">Free</span>
+                                        </span>
                                     {/if}
                                 </div>
 
@@ -226,29 +284,57 @@
     </div>
 </div>
 
+<style>{literal}
+/* Hide every cycle-price span by default; JS reveals the one matching
+   the active pill (or the first available cycle as a fallback). */
+.st-plan-price .cycle-price { display: none; }
+.st-plan-price .cycle-price.is-active { display: inline-flex; align-items: baseline; }
+{/literal}</style>
+
 <script>
 {literal}
 (function () {
-    // Billing cycle pill switcher — UI only.
-    // Cycle is committed on the per-product configure step
-    // (configureproduct.tpl); here we just persist the choice so
-    // the next page can read it from sessionStorage.
+    // Billing cycle pill switcher — both UI affordance AND price filter.
+    // Each .st-plan-price renders every available cycle as a hidden
+    // .cycle-price span; the active pill controls which one shows.
+    // We also persist the choice in sessionStorage so the configureproduct
+    // step can pre-select the same cycle.
     var KEY = 'mytheme_cart.preferredCycle';
-    document.querySelectorAll('.st-cycle button[data-cycle]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            document.querySelectorAll('.st-cycle button').forEach(function (b) {
-                b.classList.toggle('active', b === btn);
-            });
-            try { sessionStorage.setItem(KEY, btn.dataset.cycle); } catch (e) {}
+
+    function applyCycle(cycle) {
+        // Pill state
+        document.querySelectorAll('.st-cycle button[data-cycle]').forEach(function (b) {
+            b.classList.toggle('active', b.dataset.cycle === cycle);
         });
-    });
+        // Per-plan price reveal — falls back to the first available cycle
+        // if the plan doesn't price that specific cycle.
+        document.querySelectorAll('[data-plan-price]').forEach(function (priceBox) {
+            var all = priceBox.querySelectorAll('.cycle-price');
+            all.forEach(function (el) { el.classList.remove('is-active'); });
+            var match = priceBox.querySelector('.cycle-price[data-cycle-price="' + cycle + '"]');
+            if (match) {
+                match.classList.add('is-active');
+            } else if (all.length > 0) {
+                all[0].classList.add('is-active');
+            }
+        });
+    }
+
+    // Default cycle — what the markup has 'active' or saved in storage
+    var initialCycle = 'annually';
     try {
         var saved = sessionStorage.getItem(KEY);
-        if (saved) {
-            var btn = document.querySelector('.st-cycle button[data-cycle="' + saved + '"]');
-            if (btn) btn.click();
-        }
+        if (saved) initialCycle = saved;
     } catch (e) {}
+    applyCycle(initialCycle);
+
+    document.querySelectorAll('.st-cycle button[data-cycle]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var c = btn.dataset.cycle;
+            applyCycle(c);
+            try { sessionStorage.setItem(KEY, c); } catch (e) {}
+        });
+    });
 })();
 {/literal}
 </script>
