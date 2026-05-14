@@ -2388,4 +2388,238 @@ body[data-tpl="fraudcheck"] {
     #order-standard_cart .password-strength-meter #passwordStrengthMeterBar {
         background-color: var(--color-accent, #0071e3) !important;
     }
+
+    /* ═══ domainregister — search hero + TLD pricing table ═══ */
+    #order-standard_cart .domain-checker-container {
+        margin: 18px 0 24px;
+    }
+    #order-standard_cart .domain-checker-bg {
+        padding: 28px 24px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, var(--color-surface-secondary, #f5f5f7) 0%, var(--color-surface-primary, #fff) 100%);
+        border: 0.5px solid var(--color-border, #e8e8ed);
+    }
+    #order-standard_cart .domain-checker-bg .input-group-box {
+        background: var(--color-surface-primary, #fff);
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: var(--radius-pill, 980px);
+        padding: 4px 4px 4px 18px;
+        display: flex; align-items: center;
+        gap: 6px;
+        overflow: hidden;
+    }
+    #order-standard_cart .domain-checker-bg .input-group-box .form-control {
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        font-size: 15px !important;
+        padding: 12px 4px !important;
+        height: auto !important;
+    }
+    #order-standard_cart .domain-checker-bg .input-group-box textarea[name="message"] {
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        font-size: 15px !important;
+        padding: 12px 4px !important;
+        resize: none !important;
+        min-height: 44px;
+        flex: 1;
+    }
+    #order-standard_cart .domain-checker-bg .input-group-box .domain-check-availability {
+        flex-shrink: 0;
+        height: 44px;
+        padding: 0 24px;
+        border-radius: var(--radius-pill, 980px);
+        font-weight: 500;
+        font-size: 14px;
+        letter-spacing: -0.008em;
+        background: var(--color-accent, #0071e3) !important;
+        border-color: var(--color-accent, #0071e3) !important;
+    }
+    #order-standard_cart .domain-checker-bg .input-group-box .domain-check-availability:hover {
+        background: var(--color-accent-hover, #0077ED) !important;
+        border-color: var(--color-accent-hover, #0077ED) !important;
+    }
+
+    /* Featured TLDs row (logo + price card grid) */
+    #order-standard_cart .featured-tlds-container {
+        margin: 28px 0 14px;
+    }
+    #order-standard_cart .featured-tld {
+        background: var(--color-surface-primary, #fff);
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        text-align: center;
+        transition: border-color 0.15s ease;
+    }
+    #order-standard_cart .featured-tld:hover {
+        border-color: var(--color-accent, #0071e3);
+    }
+    #order-standard_cart .featured-tld .img-container img {
+        max-height: 40px;
+    }
+    #order-standard_cart .featured-tld .price {
+        margin-top: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--color-text-primary, #1d1d1f);
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Category filter chips */
+    #order-standard_cart .tld-filters {
+        margin: 18px 0;
+        display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    #order-standard_cart .tld-filters a {
+        display: inline-flex; align-items: center;
+        padding: 5px 12px;
+        border-radius: var(--radius-pill, 980px);
+        background: var(--color-surface-secondary, #f5f5f7);
+        color: var(--color-text-secondary, #424245);
+        font-size: 12px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+    #order-standard_cart .tld-filters a:hover {
+        background: var(--color-surface-tertiary, #ededf0);
+        color: var(--color-text-primary, #1d1d1f);
+    }
+    #order-standard_cart .tld-filters a.active,
+    #order-standard_cart .tld-filters a:focus {
+        background: var(--color-accent, #0071e3);
+        color: #fff;
+    }
+
+    /* TLD pricing table */
+    #order-standard_cart .domain-pricing .bg-white {
+        background: var(--color-surface-primary, #fff);
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    #order-standard_cart .tld-pricing-header {
+        padding: 14px 18px;
+        background: var(--color-surface-secondary, #f5f5f7);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--color-text-tertiary, #86868b);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin: 0;
+    }
+    #order-standard_cart .tld-row {
+        padding: 14px 18px;
+        border-top: 0.5px solid var(--color-border, #e8e8ed);
+        font-size: 13.5px;
+        color: var(--color-text-primary, #1d1d1f);
+        font-variant-numeric: tabular-nums;
+        margin: 0;
+    }
+    #order-standard_cart .tld-row strong {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.008em;
+    }
+    #order-standard_cart .tld-row small {
+        color: var(--color-text-tertiary, #86868b);
+        font-size: 11px;
+    }
+    #order-standard_cart .tld-sale-group {
+        margin-left: 8px;
+        padding: 2px 8px;
+        border-radius: var(--radius-pill, 980px);
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    #order-standard_cart .tld-sale-group-hot {
+        background: var(--color-red-bg, #fee);
+        color: var(--color-red-text, #b00);
+    }
+    #order-standard_cart .tld-sale-group-new {
+        background: var(--color-green-bg, #e6f4ea);
+        color: var(--color-green-text, #1d7a32);
+    }
+    #order-standard_cart .tld-sale-group-sale {
+        background: var(--color-accent-light, #f0f7ff);
+        color: var(--color-accent, #0071e3);
+    }
+
+    /* Hosting / transfer promo cards at the bottom */
+    #order-standard_cart .domain-promo-box {
+        padding: 22px;
+        border-radius: 14px;
+        background: var(--color-surface-secondary, #f5f5f7);
+        margin-bottom: 14px;
+        min-height: 200px;
+    }
+    #order-standard_cart .domain-promo-box .fas {
+        color: var(--color-accent, #0071e3);
+        margin-bottom: 12px;
+        opacity: 0.9;
+    }
+    #order-standard_cart .domain-promo-box h3 {
+        margin: 0 0 8px;
+        font-weight: 600;
+        color: var(--color-text-primary, #1d1d1f);
+        letter-spacing: -0.012em;
+    }
+    #order-standard_cart .domain-promo-box p {
+        font-size: 13.5px;
+        color: var(--color-text-secondary, #424245);
+        margin: 0 0 14px;
+        line-height: 1.5;
+    }
+
+    /* ═══ domaintransfer — single card on this page ═══ */
+    #order-standard_cart .domain-transfer-card {
+        margin-top: 18px;
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: 14px;
+        background: var(--color-surface-primary, #fff);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        overflow: hidden;
+    }
+    #order-standard_cart .domain-transfer-card .card-header {
+        padding: 22px 22px 6px;
+        background: transparent;
+        border: 0;
+    }
+    #order-standard_cart .domain-transfer-card .card-header .panel-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--color-text-primary, #1d1d1f);
+        letter-spacing: -0.014em;
+    }
+    #order-standard_cart .domain-transfer-card .card-header .panel-title .fas {
+        color: var(--color-accent, #0071e3);
+        margin-right: 8px;
+    }
+    #order-standard_cart .domain-transfer-card .card-subtitle {
+        margin: 6px 0 0;
+        font-size: 13px;
+        color: var(--color-text-tertiary, #86868b);
+    }
+    #order-standard_cart .domain-transfer-card .card-body {
+        padding: 18px 22px;
+    }
+    #order-standard_cart .domain-transfer-card .card-footer {
+        padding: 14px 22px 22px;
+        background: transparent;
+        border: 0;
+    }
+    #order-standard_cart .domain-transfer-card #btnTransferDomain {
+        height: 44px;
+        padding: 0 22px;
+        border-radius: var(--radius-pill, 980px);
+        font-size: 14px;
+        font-weight: 500;
+    }
 }
