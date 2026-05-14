@@ -58,16 +58,30 @@ jobs:
           fi
 
           if [ -n "$DELETED_MAIN" ]; then
-            echo "=== Deleting removed mytheme/ files ==="
-            echo "$DELETED_MAIN"
-            DEL=$(echo "$DELETED_MAIN" | sed "s|^mytheme/|rm -f '$REMOTE_BASE/|; s|$|'|")
-            echo "$DEL" | $SSH "bash -s"
+            echo "=== Filtering deletes through safety allowlist ==="
+            # SAFETY GUARD: only allow deletes inside the two intended subtrees.
+            # Anything outside (e.g. mytheme/modules/autoload.php, mytheme/init.php)
+            # is logged and SKIPPED so it can never reach `rm -f` on the server.
+            SAFE_MAIN=$(echo "$DELETED_MAIN" | grep -E '^mytheme/(modules/addons/MyTheme|templates/mytheme)/' || true)
+            BLOCKED=$(echo "$DELETED_MAIN" | grep -vE '^mytheme/(modules/addons/MyTheme|templates/mytheme)/' || true)
+            if [ -n "$BLOCKED" ]; then
+              echo "⚠️  BLOCKED from delete (outside allowed subtrees):"
+              echo "$BLOCKED"
+            fi
+            if [ -n "$SAFE_MAIN" ]; then
+              echo "=== Deleting safe mytheme/ files ==="
+              echo "$SAFE_MAIN"
+              DEL=$(echo "$SAFE_MAIN" | sed "s|^mytheme/|rm -f '$REMOTE_BASE/|; s|$|'|")
+              echo "$DEL" | $SSH "bash -s"
+            fi
           fi
 
           # ─────────────────────────────────────────────────────────────
           # PASS 2: mytheme_cart/  →  $REMOTE_BASE/templates/orderforms/mytheme_cart/
           #   mytheme_cart/css/x.css → templates/orderforms/mytheme_cart/css/x.css
           #   mytheme_cart/theme.yaml → templates/orderforms/mytheme_cart/theme.yaml
+          # PASS 2 is inherently safe — the sed hardcodes the destination
+          # subtree, so deletes can ONLY happen inside templates/orderforms/mytheme_cart/.
           # ─────────────────────────────────────────────────────────────
           CHANGED_CART=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'mytheme_cart/**' | grep -v '/\.' || true)
           DELETED_CART=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'mytheme_cart/**' | grep -v '/\.' || true)
