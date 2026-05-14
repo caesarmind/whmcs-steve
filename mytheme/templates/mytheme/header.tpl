@@ -212,19 +212,20 @@
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v=1.0">
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-layout.css?v=1.0">
 
-    {* ── jQuery + Bootstrap 4 + plugins escape hatch for legacy cart templates ──
-       Loaded ONLY on cart-flow pages so the rest of mytheme stays free of
-       jQuery + Bootstrap bloat. Synchronous (no defer) because
-       standard_cart's scripts.min.js executes mid-body and uses:
+    {* ── jQuery + Bootstrap 4 + plugins for all cart-flow pages ──
+       Loaded on cart-flow pages regardless of which cart theme is
+       active. mytheme_cart inherits from standard_cart and only
+       overrides products.tpl with a custom Apple-language version —
+       every other cart template comes from standard_cart and uses
+       its scripts.min.js, which needs jQuery + Bootstrap + multiselect
+       in scope. Synchronous load (no defer) because scripts.min.js
+       executes mid-body and references:
          · $.fn.tooltip   (Bootstrap)
          · $.fn.modal     (Bootstrap)
          · $.fn.tab       (Bootstrap)
          · $.fn.multiselect  (Bootstrap-Multiselect — separate plugin)
-       All three need to be defined before scripts.min.js parses, hence
-       the head-injection synchronous load.
-       Skip entirely on mytheme_cart pages — its own components are
-       self-contained and don't need any of this. ── *}
-    {if in_array($templatefile, ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck']) && $carttpl != 'mytheme_cart'}
+         · csrfToken (top-level global, injected inline below) ── *}
+    {if in_array($templatefile, ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck'])}
         {* Globals that classic WHMCS themes inject inline before the cart
            scripts run. standard_cart's scripts.min.js references these
            directly as globals (not via window.X), so they need to be
