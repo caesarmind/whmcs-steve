@@ -879,3 +879,58 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
 @media (max-width: 420px) {
     .homepage-nav .icon-btn { display: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Cart-page wrapper integration
+   ───────────────────────────────────────────────────────────────
+   When the client area renders ANY order-form template
+   (mytheme_cart, standard_cart, nexus_cart, …) inside mytheme's
+   chrome, the order form ships its own navbar + container styling
+   that fights ours. These rules live HERE (in the client-area
+   theme) so they apply regardless of which cart template is
+   active — switching templates from WHMCS admin doesn't break
+   the chrome.
+
+   $templatefile values WHMCS sets on cart-related pages:
+     cart, viewcart, configureproduct, configureproductdomain,
+     checkout, products, domainregister, domaintransfer,
+     domainoptions, ordersummary, complete, fraudcheck, addons,
+     configuredomains
+   ═══════════════════════════════════════════════════════════════ */
+body[data-tpl="cart"],
+body[data-tpl="viewcart"],
+body[data-tpl="configureproduct"],
+body[data-tpl="configureproductdomain"],
+body[data-tpl="configuredomains"],
+body[data-tpl="checkout"],
+body[data-tpl="products"],
+body[data-tpl="domainregister"],
+body[data-tpl="domaintransfer"],
+body[data-tpl="domainoptions"],
+body[data-tpl="ordersummary"],
+body[data-tpl="addons"],
+body[data-tpl="complete"],
+body[data-tpl="fraudcheck"] {
+
+    /* WHMCS injects a generic .main-navbar-wrapper on order-form
+       pages — mytheme's nav already handles auth + active state,
+       so hide the dupe whichever cart theme is rendering. */
+    .main-navbar-wrapper,
+    [data-target="#mainNavbar"],
+    nav.main-navbar,
+    nav#mainNavbar { display: none !important; }
+
+    /* Default WHMCS cart wrapper styling fights edge-to-edge
+       sections — flatten the padding + background so the cart's
+       own card layout breathes inside mytheme's .content-area. */
+    section#main-body,
+    section.main-body,
+    #main-body { padding: 0 !important; background: transparent !important; }
+    section#main-body > .container,
+    section.main-body > .container,
+    #main-body > .container { max-width: none !important; padding: 0 !important; }
+
+    /* standard_cart wraps its content in #order-standard_cart with
+       its own padding — flatten so .content-area handles it. */
+    #order-standard_cart { padding: 0 !important; background: transparent !important; }
+}

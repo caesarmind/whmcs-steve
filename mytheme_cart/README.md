@@ -77,9 +77,15 @@ Depends on WHMCS minor version. The TPLs use a dual-fallback `$cat.id|default:$c
 
 WHMCS's `{lang}` returns the **key itself** when there's no translation, which is a non-empty string, so the `|default:` modifier never fires. The whole `mytheme_cart/` set hardcodes English copy directly instead — admins who want localization should drop a language override file at `lang/overrides/<locale>.php` or override the TPLs in a child theme. The only `{lang key=…}` reference left is `orderpaymenttermfree`, which is a real WHMCS-shipped key.
 
+## Cart-template-agnostic chrome
+
+`mytheme/` (the client-area theme) wraps every order-form page inside its own `.content-area` regardless of which cart template is active. To prevent the active cart theme's default chrome (a duplicate `.main-navbar-wrapper`, the `#main-body` container's padding, `standard_cart`'s `#order-standard_cart` wrapper styling) from fighting our layout, the necessary resets live in **`mytheme/templates/mytheme/assets/css/apple-layout.css`** (search for `Cart-page wrapper integration`).
+
+They're targeted on `body[data-tpl="cart" | "viewcart" | "configureproduct" | "configureproductdomain" | "checkout" | "products" | ...]` — the `$templatefile` value WHMCS sets on the wrapper. This means switching the cart theme to `standard_cart`, `nexus_cart`, or anything else still respects mytheme's chrome — the rules apply regardless of which cart template renders the content.
+
 ## Common conventions across every TPL
 
-- `{include file="orderforms/$carttpl/common.tpl"}` at the top — loads `style.min.css` + `custom.css`, hides the duplicate WHMCS nav wrapper.
+- `{include file="orderforms/$carttpl/common.tpl"}` at the top — loads `style.min.css` + `custom.css`. (The chrome resets are NOT here anymore — see "Cart-template-agnostic chrome" above.)
 - Form actions go to real WHMCS endpoints: `cart.php?a=add`, `cart.php?a=view`, `cart.php?a=confproduct&i=N`, `cart.php?a=update`, `cart.php?a=remove`, `cart.php?a=checkout`, `cart.php?a=add&domain=register|transfer`.
 - Inline `<style>{literal}…{/literal}</style>` block per page for page-specific component vocabulary (`.ct-*` cart, `.cp-*` configure, `.co-*` checkout, `.dr-*` domain register, `.dt-*` domain transfer, `.su-*` signup). Shared tokens + the `.st-*` products-page styles live in `style.min.css`.
 - Cycle pills on `products.tpl` actually filter the displayed plan price (each plan card emits every available cycle as a hidden `.cycle-price[data-cycle-price="X"]` span; the active pill toggles `is-active`). The pill choice is persisted to `sessionStorage` so `configureproduct.tpl` can preselect it.
