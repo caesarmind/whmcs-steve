@@ -1940,4 +1940,115 @@ body[data-tpl="fraudcheck"] {
         letter-spacing: 0.06em;
         margin-bottom: 12px;
     }
+
+    /* ═══ viewcart — Apple empty state + trust strip + addon nesting ═══
+       The view-cart-empty / .ct-empty markup lives inside the cart
+       items list when $cartitems == 0. Style it as an Apple "nothing
+       to see" panel with icon, headline, and 2-button action row.
+       ──────────────────────────────────────────────────────────── */
+    #order-standard_cart .view-cart-empty {
+        padding: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+    }
+    #order-standard_cart .ct-empty {
+        padding: 72px 24px 64px;
+        text-align: center;
+    }
+    #order-standard_cart .ct-empty-ico {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: var(--color-surface-secondary, #f5f5f7);
+        color: var(--color-text-tertiary, #86868b);
+        display: inline-flex; align-items: center; justify-content: center;
+        margin-bottom: 18px;
+        font-size: 24px;
+    }
+    #order-standard_cart .ct-empty-title {
+        font-size: 19px; font-weight: 600;
+        color: var(--color-text-primary, #1d1d1f);
+        letter-spacing: -0.016em;
+        margin: 0 0 6px;
+    }
+    #order-standard_cart .ct-empty-desc {
+        font-size: 14px; color: var(--color-text-tertiary, #86868b);
+        max-width: 420px; margin: 0 auto 22px;
+        line-height: 1.55; letter-spacing: -0.008em;
+    }
+    #order-standard_cart .ct-empty-actions {
+        display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    }
+    #order-standard_cart .ct-empty-actions .btn {
+        height: 40px; padding: 0 20px; font-size: 13.5px;
+        display: inline-flex; align-items: center; gap: 6px;
+        border-radius: var(--radius-pill, 980px);
+    }
+
+    /* Trust strip in the order-summary sidebar */
+    #order-standard_cart .ct-trust {
+        margin-top: 18px;
+        padding: 14px 0 4px;
+        border-top: 0.5px solid var(--color-border, #e8e8ed);
+        display: flex; flex-direction: column; gap: 6px;
+        font-size: 11.5px; color: var(--color-text-tertiary, #86868b);
+        letter-spacing: -0.004em;
+    }
+    #order-standard_cart .ct-trust-item {
+        display: inline-flex; align-items: center; gap: 6px;
+    }
+    #order-standard_cart .ct-trust-item .fas,
+    #order-standard_cart .ct-trust-item .far {
+        color: var(--color-green-text, #1d7a32);
+        font-size: 12px;
+    }
+
+    /* Visual nesting hint for addons attached to a product line.
+       The .item-addon class is added to product-attached addons (not
+       standalone $addons) — gives them a slight inset + lighter title
+       so the parent product is the focal point. */
+    #order-standard_cart .item.item-addon {
+        padding-left: 36px;
+    }
+    #order-standard_cart .item.item-addon .item-title {
+        font-weight: 400;
+        color: var(--color-text-secondary, #424245);
+    }
+    #order-standard_cart .item.item-addon .item-title .fas.fa-plus-circle {
+        color: var(--color-text-quaternary, #b8b8c0);
+        font-size: 10px;
+        margin-right: 4px;
+    }
+
+    /* Promo-applied chip — when a promotion is active the
+       .view-cart-promotion-code block shows the code + description. */
+    #order-standard_cart .view-cart-promotion-code {
+        display: flex; align-items: center; gap: 8px;
+        padding: 12px 14px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: var(--color-green-bg, #e6f4ea);
+        color: var(--color-green-text, #1d7a32);
+        font-size: 13px;
+        letter-spacing: -0.004em;
+    }
+    #order-standard_cart .view-cart-promotion-code .fas {
+        font-size: 14px;
+    }
+
+    /* Continue-shopping link styling in the order-summary */
+    #order-standard_cart .btn-continue-shopping {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px !important;
+        font-size: 13px;
+        color: var(--color-text-tertiary, #86868b) !important;
+        margin-top: 6px;
+        text-decoration: none !important;
+    }
+    #order-standard_cart .btn-continue-shopping:hover {
+        color: var(--color-accent, #0071e3) !important;
+    }
+    #order-standard_cart .btn-continue-shopping .fas {
+        font-size: 10px;
+    }
 }
