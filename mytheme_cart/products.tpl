@@ -218,9 +218,15 @@
                     </div>
                 </div>
 
+                {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_PRE_IF · about to evaluate {literal}{if $productCount > 0}{/literal} · productCount={$productCount}</div>{/if}
+
                 {if $productCount > 0}
 
+                {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_IN_IF · passed productCount > 0 · about to open .when-full</div>{/if}
+
                 <div class="when-full">
+
+                    {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_IN_WHENFULL · inside .when-full · about to render variant label</div>{/if}
 
                     {* ════════════════════════════════════════════════════════════
                        Variant A — 3-up feature-list cards  (default / recommended)
@@ -229,6 +235,9 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                         Variant A · 3-up · feature list
                     </div>
+
+                    {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_AFTER_LABEL · variant label rendered · about to open .plan-variant.v-a</div>{/if}
+
                     <div class="plan-variant v-a">
                         {if $smarty.get.debug eq 'cart'}<div style="background:#d4ffea;color:#000;padding:8px;margin:8px 20px;border-radius:4px;font-family:monospace;font-size:12px;border:1px solid #0a0;">SENTINEL_A1 · entered .plan-variant.v-a · about to start foreach over $products</div>{/if}
                         <div class="st-pricing">
