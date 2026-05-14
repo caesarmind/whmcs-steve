@@ -119,32 +119,6 @@
         <p class="page-subtitle">{$LANG.ordernewservicestagline|default:'Browse our plans and add the ones you need to your cart. All plans come with a 30-day money-back guarantee.'}</p>
     </header>
 
-    {* ─ Diagnostic block. Visible only when ?debug=cart is appended to
-       the URL. Useful when "No packages in this category yet" fires
-       despite a package being configured in admin — shows whether the
-       group resolved, whether $products is populated, the active client
-       state, etc. Strip this block when the rebuild stabilizes. *}
-    {if $smarty.get.debug eq 'cart'}
-        <div style="background:#fff8e1;border:0.5px solid #f6c84c;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.55;color:#5a4400;">
-            <div style="font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;">cart debug · /?debug=cart</div>
-            <div><strong>$productGroup:</strong> {if $productGroup}set · id={$productGroup.id|default:$productGroup->id|default:'?'} · name="{$productGroup.name|default:$productGroup->name|default:'?'}"{else}<em>not set</em>{/if}</div>
-            <div><strong>$productgroup:</strong> {if $productgroup}set · id={$productgroup.id|default:$productgroup->id|default:'?'} · name="{$productgroup.name|default:$productgroup->name|default:'?'}"{else}<em>not set</em>{/if}</div>
-            <div><strong>$_pg (resolved):</strong> {if $_pg}id={$_curGroupId} · name="{$_groupName}" · headline="{$_headline}" · tagline="{$_tagline}"{else}<em>none</em>{/if}</div>
-            <div><strong>$products:</strong> {if isset($products)}set · count={$productCount}{else}<em>NOT SET — WHMCS didn't pass it</em>{/if}</div>
-            <div><strong>$productCount:</strong> {$productCount}</div>
-            <div><strong>$productgroups (sidebar source):</strong> {if $productgroups}{$productgroups|@count} group(s) total{else}<em>not set</em>{/if}</div>
-            <div><strong>$secondarySidebar:</strong> {if $secondarySidebar}{$secondarySidebar|@count} panel(s){else}<em>not set</em>{/if}</div>
-            <div><strong>$pagetitle:</strong> "{$pagetitle|default:''}"</div>
-            <div><strong>$templatefile:</strong> "{$templatefile|default:''}"</div>
-            <div><strong>$errormessage:</strong> "{$errormessage|default:'(none)'}"</div>
-            <div><strong>$loggedin:</strong> {if $loggedin}YES{else}NO (anonymous visitor){/if}</div>
-            <div><strong>$activeCurrency:</strong> {if $activeCurrency}{$activeCurrency.code|default:'?'} (id={$activeCurrency.id|default:'?'}){else}<em>not set</em>{/if}</div>
-            {if $products && $productCount > 0}
-                <div style="margin-top:6px;"><strong>First product:</strong> pid={$products[0].pid|default:'?'} · name="{$products[0].name|default:'?'}" · hidden={$products[0].hidden|default:'?'}</div>
-            {/if}
-            <div style="margin-top:10px;font-size:11px;opacity:0.8;">If $products is empty but you have a package configured, check in WHMCS admin: Setup → Products → your package → (1) Hidden checkbox is OFF, (2) Product Group is the same group you're viewing, (3) Pricing has at least one cycle configured for the active currency.</div>
-        </div>
-    {/if}
 
     {if $errormessage}
         <div class="alert alert-danger" role="alert" style="margin-bottom: 16px;">
@@ -221,38 +195,7 @@
                     </div>
                 </div>
 
-                {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_PRE_IF · about to evaluate {literal}{if $productCount > 0}{/literal} · productCount={$productCount}</div>{/if}
-
                 {if $productCount > 0}
-
-                {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_IN_IF · passed productCount > 0 · about to open .when-full</div>
-                <div id="dbg-runtime-state" style="background:#fff;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:11px;border:1px dashed #999;">SENTINEL_RUNTIME · checking runtime state...</div>
-                <script>
-                (function () {
-                    var dump = function () {
-                        var el = document.getElementById('dbg-runtime-state');
-                        var wf = document.querySelector('.when-full');
-                        var lines = [
-                            'body[data-data] = ' + (document.body.getAttribute('data-data') || '(unset)'),
-                            'body[data-plan] = ' + (document.body.getAttribute('data-plan') || '(unset)'),
-                            'body[data-svc-layout] = ' + (document.body.getAttribute('data-svc-layout') || '(unset)'),
-                            '.when-full exists = ' + !!wf,
-                            '.when-full display = ' + (wf ? getComputedStyle(wf).display : 'N/A'),
-                            '.when-full height = ' + (wf ? wf.offsetHeight + 'px' : 'N/A'),
-                            '.when-full children count = ' + (wf ? wf.children.length : 'N/A')
-                        ];
-                        el.innerHTML = '<strong>SENTINEL_RUNTIME</strong><br>' + lines.join('<br>');
-                    };
-                    if (document.readyState === 'loading') {
-                        document.addEventListener('DOMContentLoaded', dump);
-                    } else {
-                        dump();
-                    }
-                    // Re-check after apple-layout.js has settled
-                    setTimeout(dump, 500);
-                })();
-                </script>
-                {/if}
 
                 {* Wrapper class renamed from .when-full to .cart-plans-grid
                    because mytheme/apple-layout.css ships a global
@@ -263,8 +206,6 @@
                    grid whenever something sets body[data-data="empty"]. *}
                 <div class="cart-plans-grid">
 
-                    {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_IN_WHENFULL · inside .cart-plans-grid · about to render variant label</div>{/if}
-
                     {* ════════════════════════════════════════════════════════════
                        Variant A — 3-up feature-list cards  (default / recommended)
                        ════════════════════════════════════════════════════════════ *}
@@ -272,23 +213,16 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                         Variant A · 3-up · feature list
                     </div>
-
-                    {if $smarty.get.debug eq 'cart'}<div style="background:#a0ffa0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #060;">SENTINEL_AFTER_LABEL · variant label rendered · about to open .plan-variant.v-a</div>{/if}
-
                     <div class="plan-variant v-a">
-                        {if $smarty.get.debug eq 'cart'}<div style="background:#d4ffea;color:#000;padding:8px;margin:8px 20px;border-radius:4px;font-family:monospace;font-size:12px;border:1px solid #0a0;">SENTINEL_A1 · entered .plan-variant.v-a · about to start foreach over $products</div>{/if}
                         <div class="st-pricing">
                             {foreach $products as $key => $product}
-                                {if $smarty.get.debug eq 'cart'}<div style="background:#fff3bf;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #c90;">SENTINEL_A2 · foreach iteration · product.pid={$product.pid|default:'?'} · product.name="{$product.name|default:'?'}"</div>{/if}
                                 {if $product.bid}
                                     {$idPrefix = "bundle"|cat:$product.bid}
                                 {else}
                                     {$idPrefix = "product"|cat:$product.pid}
                                 {/if}
-                                {if $smarty.get.debug eq 'cart'}<div style="background:#bee5ff;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #07c;">SENTINEL_A3 · idPrefix assigned · "{$idPrefix}"</div>{/if}
                                 {$isFeatured = false}
                                 {if $product@index == $featuredIndex}{$isFeatured = true}{/if}
-                                {if $smarty.get.debug eq 'cart'}<div style="background:#ffd9d9;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #c00;">SENTINEL_A4 · isFeatured={$isFeatured} · about to emit .st-plan card</div>{/if}
                                 <div class="st-plan{if $isFeatured} featured{/if}" id="{$idPrefix}">
                                     {if $isFeatured}
                                         <span class="st-plan-badge">Most popular</span>
@@ -326,7 +260,6 @@
                                             <span class="period" data-period-display>{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}</span>
                                         {/if}
                                     </div>
-                                    {if $smarty.get.debug eq 'cart'}<div style="background:#e0d4ff;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #60c;">SENTINEL_A5 · price div emitted · about to render features list</div>{/if}
                                     {if $product.pricing.minprice.setupFee}
                                         <div class="st-plan-price-sub">+ {$product.pricing.minprice.setupFee->toPrefixed()} {$LANG.ordersetupfee}</div>
                                     {/if}
@@ -348,17 +281,14 @@
                                         <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 8px;">{$product.qty} {$LANG.orderavailable}</div>
                                     {/if}
 
-                                    {if $smarty.get.debug eq 'cart'}<div style="background:#ffd9f0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #c09;">SENTINEL_A6 · features emitted · about to render order-now CTA</div>{/if}
                                     <a href="{$product.productUrl}"
                                        id="{$idPrefix}-order-button"
                                        class="st-plan-cta{if !$isFeatured} secondary{/if} btn-order-now"
                                        {if $product.hasRecommendations} data-has-recommendations="1"{/if}>
                                         {$LANG.ordernowbutton}
                                     </a>
-                                    {if $smarty.get.debug eq 'cart'}<div style="background:#caffca;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #0a0;">SENTINEL_A7 · END of .st-plan card · foreach iteration complete</div>{/if}
                                 </div>
                             {/foreach}
-                            {if $smarty.get.debug eq 'cart'}<div style="background:#ccc;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #333;">SENTINEL_A8 · END of foreach over $products · .st-pricing closing</div>{/if}
                         </div>
                     </div>{* /.plan-variant.v-a *}
 
@@ -780,8 +710,6 @@
                     </div>
 
                 </div>{* /.cart-plans-grid *}
-
-                {if $smarty.get.debug eq 'cart'}<div style="background:#ff66cc;color:#fff;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:2px solid #c03;font-weight:700;">SENTINEL_POST_WHENFULL · .when-full closed cleanly · Smarty rendered all 8 variants without bailing</div>{/if}
 
                 {else}
 
