@@ -2213,4 +2213,179 @@ body[data-tpl="fraudcheck"] {
         font-weight: 500;
         letter-spacing: -0.008em;
     }
+
+    /* ═══ checkout — total-due banner, gateway picker, CC inputs ═══
+       The big green "total due today" banner sits between the form
+       sections and the payment method picker. Apple-style: white
+       card with subtle accent border + large total. */
+    #order-standard_cart #totalDueToday {
+        background: linear-gradient(180deg, var(--color-surface-tertiary, #fafafd) 0%, var(--color-surface-primary, #fff) 100%);
+        color: var(--color-text-primary, #1d1d1f) !important;
+        border: 0.5px solid var(--color-border, #e8e8ed) !important;
+        border-radius: 14px !important;
+        padding: 22px 20px !important;
+        margin: 18px 0;
+        font-size: 14px;
+        letter-spacing: -0.008em;
+        text-align: center;
+    }
+    #order-standard_cart #totalDueToday #totalCartPrice {
+        display: block;
+        margin-top: 4px;
+        font-size: 28px; font-weight: 600;
+        color: var(--color-accent, #0071e3);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.022em;
+    }
+
+    /* Credit-balance picker */
+    #order-standard_cart #applyCreditContainer {
+        padding: 16px 18px;
+        margin: 14px 0;
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: 12px;
+        background: var(--color-surface-secondary, #f5f5f7);
+    }
+    #order-standard_cart #applyCreditContainer p {
+        margin: 0 0 10px;
+        font-size: 13px;
+        color: var(--color-text-secondary, #424245);
+    }
+    #order-standard_cart #applyCreditContainer label.radio {
+        display: flex; align-items: flex-start; gap: 8px;
+        margin: 6px 0;
+        font-size: 13px;
+        color: var(--color-text-primary, #1d1d1f);
+        cursor: pointer;
+        padding: 6px 0;
+    }
+
+    /* Gateway radio picker — wrap each one as a tappable card */
+    #order-standard_cart #paymentGatewaysContainer {
+        padding: 14px 0;
+    }
+    #order-standard_cart #paymentGatewaysContainer p.small {
+        text-align: center;
+        font-size: 12px !important;
+        color: var(--color-text-tertiary, #86868b) !important;
+        margin-bottom: 14px;
+    }
+    #order-standard_cart #paymentGatewaysContainer .radio-inline {
+        display: inline-flex; align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        margin: 4px;
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: var(--radius-pill, 980px);
+        background: var(--color-surface-primary, #fff);
+        font-size: 13px;
+        color: var(--color-text-primary, #1d1d1f);
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    #order-standard_cart #paymentGatewaysContainer .radio-inline:hover {
+        border-color: var(--color-accent, #0071e3);
+        color: var(--color-accent, #0071e3);
+    }
+    #order-standard_cart #paymentGatewaysContainer .payment-methods {
+        margin: 0;
+        accent-color: var(--color-accent, #0071e3);
+    }
+
+    /* CC input grid */
+    #order-standard_cart #creditCardInputFields {
+        padding: 18px;
+        margin-top: 14px;
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: 12px;
+        background: var(--color-surface-secondary, #f9f9fb);
+    }
+    #order-standard_cart #creditCardInputFields ul {
+        list-style: none;
+        padding: 0;
+        margin: 6px 0 14px;
+    }
+
+    /* TOS + complete-order footer */
+    #order-standard_cart .checkout-footer {
+        padding: 26px 0 8px;
+        border-top: 0.5px solid var(--color-border, #e8e8ed);
+        margin-top: 26px;
+    }
+    #order-standard_cart .checkout-footer p {
+        font-size: 13px;
+        color: var(--color-text-secondary, #424245);
+        margin-bottom: 14px;
+    }
+    #order-standard_cart #btnCompleteOrder {
+        min-width: 240px;
+        height: 50px;
+        padding: 0 28px;
+        border-radius: var(--radius-pill, 980px);
+        font-size: 14.5px;
+        font-weight: 500;
+        letter-spacing: -0.008em;
+        background: var(--color-accent, #0071e3) !important;
+        border-color: var(--color-accent, #0071e3) !important;
+    }
+    #order-standard_cart #btnCompleteOrder:hover {
+        background: var(--color-accent-hover, #0077ED) !important;
+        border-color: var(--color-accent-hover, #0077ED) !important;
+    }
+    #order-standard_cart .ct-trust-checkout {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 0;
+        align-items: center;
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    /* Already-registered / new-user toggle (top-right CTA on checkout) */
+    #order-standard_cart .already-registered {
+        padding: 14px 18px;
+        margin-bottom: 18px;
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: 12px;
+        background: var(--color-surface-secondary, #f5f5f7);
+    }
+    #order-standard_cart .already-registered p {
+        margin: 4px 0 !important;
+        font-size: 13px;
+        color: var(--color-text-secondary, #424245);
+    }
+
+    /* Existing-account picker — card-style radios */
+    #order-standard_cart .account-select-container .account {
+        padding: 16px 18px;
+        margin-bottom: 10px;
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: 12px;
+        background: var(--color-surface-primary, #fff);
+        transition: border-color 0.15s ease;
+    }
+    #order-standard_cart .account-select-container .account.active {
+        border-color: var(--color-accent, #0071e3);
+        background: var(--color-accent-light, #f0f7ff);
+    }
+    #order-standard_cart .account-select-container .account label {
+        display: flex; align-items: flex-start; gap: 10px;
+        margin: 0;
+        cursor: pointer;
+        font-size: 13.5px;
+    }
+
+    /* Password-strength meter */
+    #order-standard_cart .password-strength-meter .progress {
+        height: 8px;
+        background: var(--color-surface-secondary, #f5f5f7);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 6px;
+    }
+    #order-standard_cart .password-strength-meter #passwordStrengthMeterBar {
+        background-color: var(--color-accent, #0071e3) !important;
+    }
 }
