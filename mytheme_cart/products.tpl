@@ -230,10 +230,19 @@
                         Variant A · 3-up · feature list
                     </div>
                     <div class="plan-variant v-a">
+                        {if $smarty.get.debug eq 'cart'}<div style="background:#d4ffea;color:#000;padding:8px;margin:8px 20px;border-radius:4px;font-family:monospace;font-size:12px;border:1px solid #0a0;">SENTINEL_A1 · entered .plan-variant.v-a · about to start foreach over $products</div>{/if}
                         <div class="st-pricing">
                             {foreach $products as $key => $product}
-                                {$idPrefix = ($product.bid) ? ("bundle"|cat:$product.bid) : ("product"|cat:$product.pid)}
-                                {$isFeatured = ($product@index == $featuredIndex)}
+                                {if $smarty.get.debug eq 'cart'}<div style="background:#fff3bf;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #c90;">SENTINEL_A2 · foreach iteration · product.pid={$product.pid|default:'?'} · product.name="{$product.name|default:'?'}"</div>{/if}
+                                {if $product.bid}
+                                    {$idPrefix = "bundle"|cat:$product.bid}
+                                {else}
+                                    {$idPrefix = "product"|cat:$product.pid}
+                                {/if}
+                                {if $smarty.get.debug eq 'cart'}<div style="background:#bee5ff;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #07c;">SENTINEL_A3 · idPrefix assigned · "{$idPrefix}"</div>{/if}
+                                {$isFeatured = false}
+                                {if $product@index == $featuredIndex}{$isFeatured = true}{/if}
+                                {if $smarty.get.debug eq 'cart'}<div style="background:#ffd9d9;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #c00;">SENTINEL_A4 · isFeatured={$isFeatured} · about to emit .st-plan card</div>{/if}
                                 <div class="st-plan{if $isFeatured} featured{/if}" id="{$idPrefix}">
                                     {if $isFeatured}
                                         <span class="st-plan-badge">Most popular</span>
@@ -271,6 +280,7 @@
                                             <span class="period" data-period-display>{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}</span>
                                         {/if}
                                     </div>
+                                    {if $smarty.get.debug eq 'cart'}<div style="background:#e0d4ff;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #60c;">SENTINEL_A5 · price div emitted · about to render features list</div>{/if}
                                     {if $product.pricing.minprice.setupFee}
                                         <div class="st-plan-price-sub">+ {$product.pricing.minprice.setupFee->toPrefixed()} {$LANG.ordersetupfee}</div>
                                     {/if}
@@ -292,14 +302,17 @@
                                         <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 8px;">{$product.qty} {$LANG.orderavailable}</div>
                                     {/if}
 
+                                    {if $smarty.get.debug eq 'cart'}<div style="background:#ffd9f0;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #c09;">SENTINEL_A6 · features emitted · about to render order-now CTA</div>{/if}
                                     <a href="{$product.productUrl}"
                                        id="{$idPrefix}-order-button"
                                        class="st-plan-cta{if !$isFeatured} secondary{/if} btn-order-now"
                                        {if $product.hasRecommendations} data-has-recommendations="1"{/if}>
                                         {$LANG.ordernowbutton}
                                     </a>
+                                    {if $smarty.get.debug eq 'cart'}<div style="background:#caffca;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #0a0;">SENTINEL_A7 · END of .st-plan card · foreach iteration complete</div>{/if}
                                 </div>
                             {/foreach}
+                            {if $smarty.get.debug eq 'cart'}<div style="background:#ccc;color:#000;padding:8px;margin:8px 20px;font-family:monospace;font-size:12px;border:1px solid #333;">SENTINEL_A8 · END of foreach over $products · .st-pricing closing</div>{/if}
                         </div>
                     </div>{* /.plan-variant.v-a *}
 
