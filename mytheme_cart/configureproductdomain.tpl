@@ -130,15 +130,38 @@
                 <span class="dp-step"><span class="dp-step-num">5</span>Checkout</span>
             </div>
 
-            <form method="post" action="{$WEB_ROOT}/cart.php?a=add" id="dpForm" name="orderfrm">
-                <input type="hidden" name="pid" value="{$productinfo.pid|default:$productinfo.id|default:$pid|escape}">
-                {if $cartitemid || $i || $i === 0}
-                    <input type="hidden" name="i" value="{$cartitemid|default:$i|escape}">
+            {* Post back to the SAME URL — WHMCS's router rendered this
+               page, so it knows what to do with the submission. Using a
+               hardcoded cart.php?a=add in WHMCS 9 bypasses the route
+               handler and 500s. *}
+            <form method="post" action="{$smarty.server.REQUEST_URI|default:$smarty.server.PHP_SELF}" id="dpForm" name="orderfrm">
+                {* PID — try every shape WHMCS has used for this variable.
+                   On the bill.hostnodes pid lives as $pid; older versions
+                   nested it under $productinfo. *}
+                {$_pid = $pid|default:$productinfo.pid|default:$productinfo.id|default:$smarty.get.pid|default:''}
+                {if $_pid}
+                    <input type="hidden" name="pid" value="{$_pid|escape}">
                 {/if}
 
-                {* Hidden split-domain fields — JS populates these from the
-                   visible inputs (which take the full "mycompany.com") just
-                   before submission. WHMCS expects sld + tld pairs per option. *}
+                {* Cart item index — required when WHMCS is updating an
+                   already-added cart item (right after Order Now i=0). *}
+                {$_i = $cartitemid|default:$i|default:$smarty.get.i|default:''}
+                {if $_i !== ''}
+                    <input type="hidden" name="i" value="{$_i|escape}">
+                {/if}
+
+                {* Billing cycle — JS picks this up from sessionStorage
+                   (set on products.tpl) so the user's cycle choice
+                   propagates through. Default is annually. *}
+                <input type="hidden" name="billingcycle" id="dp-billingcycle" value="annually">
+
+                {* Hidden split-domain fields — JS populates the right
+                   pair from the visible inputs (which take the full
+                   "mycompany.com") just before submission. WHMCS expects
+                   sld + tld pairs per option. Inputs for the non-selected
+                   options are *removed* in the submit handler so we
+                   never POST stale values from a panel the user typed in
+                   then switched away from. *}
                 <input type="hidden" name="sld" id="dp-h-sld" value="">
                 <input type="hidden" name="tld" id="dp-h-tld" value="">
                 <input type="hidden" name="transfersld" id="dp-h-transfersld" value="">
@@ -283,35 +306,59 @@
         return { sld: v.substring(0, dot), tld: v.substring(dot) };
     }
 
-    // Before submit, populate the hidden sld/tld pair WHMCS expects.
-    // Field naming matches WHMCS standard_cart conventions per the
-    // selected option.
-    form.addEventListener('submit', function (e) {
+    // Restore the cycle the user picked on products.tpl
+    try {
+        var savedCycle = sessionStorage.getItem('mytheme_cart.preferredCycle');
+        if (savedCycle) {
+            var hb = document.getElementById('dp-billingcycle');
+            if (hb) hb.value = savedCycle;
+        }
+    } catch (e) {}
+
+    // Map: option name → (sld field id, tld field id). The id is null
+    // for options that don't need split fields (none right now, but
+    // leaves the door open for "subdomain" / "no-domain" later).
+    var FIELDS = {
+        register:  { sld: 'dp-h-sld',         tld: 'dp-h-tld' },
+        transfer:  { sld: 'dp-h-transfersld', tld: 'dp-h-transfertld' },
+        owndomain: { sld: 'dp-h-owndomainsld', tld: 'dp-h-owndomaintld' }
+    };
+
+    // Before submit:
+    //   • Populate ONLY the sld/tld pair for the chosen option.
+    //   • Disable every other split-field so it doesn't appear in the
+    //     POST body — WHMCS validators on some versions choke on empty
+    //     sld/tld pairs even when the active "domain" radio is something
+    //     else.
+    //   • Disable the visible "full domain" inputs in the inactive
+    //     panels so they don't pollute the POST either.
+    form.addEventListener('submit', function () {
         var picked = form.querySelector('.dp-option input[type="radio"]:checked');
         if (!picked) return;
         var opt = picked.value;
         var visible = form.querySelector('.dp-panel[data-panel="' + opt + '"] [data-domain-input]');
-        if (!visible) return;
 
-        var parts = splitDomain(visible.value);
-        // Clear all hidden pairs first so we don't accidentally send
-        // a stale value from a previously-typed option.
+        // Wipe + disable every split field by default
         ['sld','tld','transfersld','transfertld','owndomainsld','owndomaintld'].forEach(function (n) {
             var h = document.getElementById('dp-h-' + n);
-            if (h) h.value = '';
+            if (h) { h.value = ''; h.disabled = true; }
         });
-        if (!parts) return; // let WHMCS validate the empty submit
 
-        if (opt === 'register') {
-            document.getElementById('dp-h-sld').value = parts.sld;
-            document.getElementById('dp-h-tld').value = parts.tld;
-        } else if (opt === 'transfer') {
-            document.getElementById('dp-h-transfersld').value = parts.sld;
-            document.getElementById('dp-h-transfertld').value = parts.tld;
-        } else if (opt === 'owndomain') {
-            document.getElementById('dp-h-owndomainsld').value = parts.sld;
-            document.getElementById('dp-h-owndomaintld').value = parts.tld;
-        }
+        // Disable any visible domain inputs in non-selected panels
+        form.querySelectorAll('[data-domain-input]').forEach(function (el) {
+            if (el !== visible) el.disabled = true;
+        });
+
+        if (!visible) return;
+        var parts = splitDomain(visible.value);
+        if (!parts) return; // empty submit — let WHMCS validate
+
+        var map = FIELDS[opt];
+        if (!map) return;
+        var sldEl = document.getElementById(map.sld);
+        var tldEl = document.getElementById(map.tld);
+        if (sldEl) { sldEl.value = parts.sld; sldEl.disabled = false; }
+        if (tldEl) { tldEl.value = parts.tld; tldEl.disabled = false; }
     });
 
     // Sync to the currently checked radio on load
