@@ -6,6 +6,7 @@ on:
     paths:
       - 'mytheme/modules/addons/MyTheme/**'
       - 'mytheme/templates/mytheme/**'
+      - 'mytheme_cart/**'
       - '.github/workflows/main.yml'
   workflow_dispatch:
 
@@ -30,7 +31,7 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -p "$REMOTE_PORT" -t ed25519 "$REMOTE_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Compute diff & deploy only changed files (archive + extract)
+      - name: Compute diff & deploy only changed files
         run: |
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
@@ -39,25 +40,52 @@ jobs:
           fi
           echo "Diff range: $BEFORE..$AFTER"
 
-          CHANGED=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'mytheme/**' | grep -v '/\.' || true)
-          DELETED=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'mytheme/**' | grep -v '/\.' || true)
-
           SSH="ssh -i $HOME/.ssh/id_ed25519 -p $REMOTE_PORT -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST"
 
-          if [ -n "$CHANGED" ]; then
-            echo "=== Uploading changed files ==="
-            echo "$CHANGED"
-            # Bundle changed files into one gzipped tar stream, strip mytheme/ prefix,
-            # pipe over a single SSH connection, extract on the server.
-            echo "$CHANGED" | tar czf - --files-from=- --transform='s|^mytheme/||' \
-              | $SSH "tar xzpf - -C $REMOTE_BASE && echo '✅ Upload complete'"
-          else
-            echo "No files to upload."
+          # ─────────────────────────────────────────────────────────────
+          # PASS 1: mytheme/  →  $REMOTE_BASE/  (strip "mytheme/" prefix)
+          #   mytheme/templates/mytheme/header.tpl → templates/mytheme/header.tpl
+          #   mytheme/modules/addons/MyTheme/x.php → modules/addons/MyTheme/x.php
+          # ─────────────────────────────────────────────────────────────
+          CHANGED_MAIN=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'mytheme/**' | grep -v '/\.' || true)
+          DELETED_MAIN=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'mytheme/**' | grep -v '/\.' || true)
+
+          if [ -n "$CHANGED_MAIN" ]; then
+            echo "=== Uploading mytheme/ changes ==="
+            echo "$CHANGED_MAIN"
+            echo "$CHANGED_MAIN" | tar czf - --files-from=- --transform='s|^mytheme/||' \
+              | $SSH "tar xzpf - -C $REMOTE_BASE && echo '✅ mytheme upload complete'"
           fi
 
-          if [ -n "$DELETED" ]; then
-            echo "=== Deleting removed files ==="
-            echo "$DELETED"
-            DEL_CMDS=$(echo "$DELETED" | sed "s|^mytheme/|rm -f '$REMOTE_BASE/|; s|$|'|")
-            echo "$DEL_CMDS" | $SSH "bash -s"
+          if [ -n "$DELETED_MAIN" ]; then
+            echo "=== Deleting removed mytheme/ files ==="
+            echo "$DELETED_MAIN"
+            DEL=$(echo "$DELETED_MAIN" | sed "s|^mytheme/|rm -f '$REMOTE_BASE/|; s|$|'|")
+            echo "$DEL" | $SSH "bash -s"
+          fi
+
+          # ─────────────────────────────────────────────────────────────
+          # PASS 2: mytheme_cart/  →  $REMOTE_BASE/templates/orderforms/mytheme_cart/
+          #   mytheme_cart/css/x.css → templates/orderforms/mytheme_cart/css/x.css
+          #   mytheme_cart/theme.yaml → templates/orderforms/mytheme_cart/theme.yaml
+          # ─────────────────────────────────────────────────────────────
+          CHANGED_CART=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'mytheme_cart/**' | grep -v '/\.' || true)
+          DELETED_CART=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'mytheme_cart/**' | grep -v '/\.' || true)
+
+          if [ -n "$CHANGED_CART" ]; then
+            echo "=== Uploading mytheme_cart/ changes ==="
+            echo "$CHANGED_CART"
+            echo "$CHANGED_CART" | tar czf - --files-from=- --transform='s|^mytheme_cart/|templates/orderforms/mytheme_cart/|' \
+              | $SSH "tar xzpf - -C $REMOTE_BASE && echo '✅ mytheme_cart upload complete'"
+          fi
+
+          if [ -n "$DELETED_CART" ]; then
+            echo "=== Deleting removed mytheme_cart/ files ==="
+            echo "$DELETED_CART"
+            DEL=$(echo "$DELETED_CART" | sed "s|^mytheme_cart/|rm -f '$REMOTE_BASE/templates/orderforms/mytheme_cart/|; s|$|'|")
+            echo "$DEL" | $SSH "bash -s"
+          fi
+
+          if [ -z "$CHANGED_MAIN" ] && [ -z "$CHANGED_CART" ] && [ -z "$DELETED_MAIN" ] && [ -z "$DELETED_CART" ]; then
+            echo "No files to upload or delete."
           fi
