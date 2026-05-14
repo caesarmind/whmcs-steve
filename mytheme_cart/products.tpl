@@ -4,26 +4,25 @@
  * Rendered URL:   /store/<group-slug>  (e.g. /store/wordpress-hosting)
  * Legacy URL:     cart.php?gid=<id>
  *
- * Visual source: apple-client-area/store.html (2-column layout —
- * categories sidebar + main card with category header, billing
- * cycle pill switcher, plan grid, guarantees strip).
+ * Visual source: apple-client-area/store.html
  *
- * Variable conventions (per WHMCS 9 docs §5 / §27):
- *   $productgroups  — collection of Product Group objects
- *                      (id, name, slug, headline, tagline, image)
- *   $productgroup   — current group object
- *   $products       — collection of Product objects:
- *                      ->id, ->name, ->description,
- *                      ->pricing() (Pricing collection),
- *                      ->isFree()
- *   $cartcount      — number of items in cart
+ * Variable shapes confirmed against live WHMCS install:
+ *   $productgroups  — sidebar list of all groups
+ *                      access either as $cat.id / $cat.name or $cat->id
+ *   $productgroup   — current group (object on this install)
+ *                      access either as $productgroup.id or ->id
+ *   $products       — array of ARRAYS (NOT objects, despite the WHMCS docs
+ *                     hint). Each item:
+ *                       .pid, .name, .description (strings)
+ *                       .pricing (assoc array, cycle => formatted string)
+ *   $cartcount      — int
  *   $loggedin       — bool
- *   $WEB_ROOT       — site root
- *   $carttpl        — current order-form theme slug (e.g. 'mytheme_cart')
+ *   $WEB_ROOT, $carttpl
  *
- * Note: $product is accessed with -> (object) not . (array).
- * Smarty allows .name on objects via magic getters but .pricing
- * misses because pricing() is a method, not a property.
+ * Important: products are arrays — DO NOT call methods like ->isFree()
+ * or ->pricing() on them, they'll fatal with "Call to a member function
+ * on array". Pricing is itself an array, so iterate to grab the first
+ * cycle's formatted string.
  *}
 
 {include file="orderforms/$carttpl/common.tpl"}
@@ -40,21 +39,19 @@
            SIDEBAR — Categories + Actions
            ══════════════════════════════════════════════════════════ *}
         <aside>
-            {* Categories list *}
             <div class="card subnav-card">
                 <div class="subnav-heading">Categories</div>
                 {if $productgroups}
                     {foreach $productgroups as $cat}
-                        <a href="{$WEB_ROOT}/cart.php?gid={$cat->id}"
-                           class="subnav-item{if $cat->id == $productgroup->id} active{/if}">
+                        <a href="{$WEB_ROOT}/cart.php?gid={$cat.id|default:$cat->id}"
+                           class="subnav-item{if ($cat.id|default:$cat->id) == ($productgroup.id|default:$productgroup->id)} active{/if}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                            {$cat->name|escape}
+                            {$cat.name|default:$cat->name|escape}
                         </a>
                     {/foreach}
                 {/if}
             </div>
 
-            {* Actions *}
             <div class="card subnav-card" style="margin-top: 12px;">
                 <div class="subnav-heading">Actions</div>
                 <a href="{$WEB_ROOT}/clientarea.php?action=domains" class="subnav-item">
@@ -89,18 +86,21 @@
                 <div class="st-cat-head">
                     <div class="st-cat-head-row">
                         <div class="st-cat-head-ico">
-                            {if $productgroup->image}
-                                <img src="{$productgroup->image|escape}" alt="{$productgroup->name|escape}">
+                            {$_image = $productgroup.image|default:$productgroup->image}
+                            {if $_image}
+                                <img src="{$_image|escape}" alt="{$productgroup.name|default:$productgroup->name|escape}">
                             {else}
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                             {/if}
                         </div>
                         <div class="st-cat-head-meta">
-                            <h2 class="st-cat-head-title">{$productgroup->name|escape}</h2>
-                            {if $productgroup->headline}
-                                <p class="st-cat-head-desc">{$productgroup->headline}</p>
-                            {elseif $productgroup->tagline}
-                                <p class="st-cat-head-desc">{$productgroup->tagline}</p>
+                            <h2 class="st-cat-head-title">{$productgroup.name|default:$productgroup->name|escape}</h2>
+                            {$_headline = $productgroup.headline|default:$productgroup->headline}
+                            {$_tagline = $productgroup.tagline|default:$productgroup->tagline}
+                            {if $_headline}
+                                <p class="st-cat-head-desc">{$_headline}</p>
+                            {elseif $_tagline}
+                                <p class="st-cat-head-desc">{$_tagline}</p>
                             {/if}
                         </div>
 
@@ -118,7 +118,7 @@
                 {if $products && count($products) > 0}
 
                     <div class="st-pricing">
-                        {assign var=productCount value=count($products)}
+                        {$productCount = count($products)}
                         {$featuredIndex = -1}
                         {if $productCount >= 3}{$featuredIndex = 1}{/if}
 
@@ -129,27 +129,32 @@
                                     <span class="st-plan-badge">Most popular</span>
                                 {/if}
 
-                                <h3 class="st-plan-name">{$product->name|escape}</h3>
+                                <h3 class="st-plan-name">{$product.name|escape}</h3>
 
-                                {if $product->description}
-                                    <p class="st-plan-tag">{$product->description|strip_tags|truncate:90}</p>
+                                {if $product.description}
+                                    <p class="st-plan-tag">{$product.description|strip_tags|truncate:90}</p>
                                 {else}
                                     <p class="st-plan-tag">&nbsp;</p>
                                 {/if}
 
+                                {* Pricing — $product.pricing is an assoc array of
+                                   cycle => formatted string. Grab the first one
+                                   (typically monthly or the cheapest available). *}
                                 <div class="st-plan-price">
-                                    {if $product->isFree()}
-                                        <span class="amount" style="font-size: 28px;">{lang key='orderpaymenttermfree'}</span>
+                                    {if is_array($product.pricing)}
+                                        {foreach $product.pricing as $cycleKey => $cyclePrice}
+                                            {if $cyclePrice@first}
+                                                <span class="amount" style="font-size: 28px;">{$cyclePrice}</span>
+                                            {/if}
+                                        {/foreach}
+                                    {elseif $product.pricing}
+                                        <span class="amount" style="font-size: 28px;">{$product.pricing}</span>
                                     {else}
-                                        {$pricing = $product->pricing()->first()}
-                                        <span class="amount" style="font-size: 32px;">{$pricing->toPrefixedString()}</span>
-                                        {if $pricing->isRecurring()}
-                                            <span class="period">/ {$pricing->cycle()}</span>
-                                        {/if}
+                                        <span class="amount" style="font-size: 18px; color: var(--color-text-tertiary);">Contact us</span>
                                     {/if}
                                 </div>
 
-                                <a href="{$WEB_ROOT}/cart.php?a=add&pid={$product->id}"
+                                <a href="{$WEB_ROOT}/cart.php?a=add&pid={$product.pid|default:$product.id}"
                                    class="st-plan-cta{if $idx != $featuredIndex} secondary{/if}">
                                     Order Now
                                 </a>
@@ -224,10 +229,10 @@
 <script>
 {literal}
 (function () {
-    // Billing cycle pill switcher — UI affordance only.
+    // Billing cycle pill switcher — UI only.
     // Cycle is committed on the per-product configure step
-    // (configureproduct.tpl); here we just remember the choice in
-    // sessionStorage so it persists across category navigation.
+    // (configureproduct.tpl); here we just persist the choice so
+    // the next page can read it from sessionStorage.
     var KEY = 'mytheme_cart.preferredCycle';
     document.querySelectorAll('.st-cycle button[data-cycle]').forEach(function (btn) {
         btn.addEventListener('click', function () {
