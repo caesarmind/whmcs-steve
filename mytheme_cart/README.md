@@ -44,10 +44,10 @@ mytheme_cart/
 | File | Status | Source mockup |
 | --- | --- | --- |
 | `theme.yaml` | ✓ | — |
-| `css/style.min.css` | ✓ | extracted from `apple-client-area/store/wordpress-hosting.html` |
+| `css/style.min.css` | ✓ | `apple-client-area/store.html` (.st-* layout) + dynamic-store block fallbacks (.ds-*) from `apple-client-area/store/wordpress-hosting.html` |
 | `css/custom.css` | ✓ | — (Apple `--vl-*` tokens for any Shadow DOM fallback) |
 | `common.tpl` | ✓ | — |
-| `products.tpl` | ✓ | `apple-client-area/store/wordpress-hosting.html` |
+| `products.tpl` | ✓ | `apple-client-area/store.html` (2-column sidebar + plan grid Variant A) |
 | `viewcart.tpl` | pending | `apple-client-area/cart.html` + `cart-empty.html` |
 | `configureproduct.tpl` | pending | `apple-client-area/configureproduct.html` |
 | `domainregister.tpl` | pending | `apple-client-area/cart-domain-register.html` |
@@ -64,7 +64,8 @@ This theme cannot be previewed inside the apple-client-area dev server — the `
 
 | Mockup | Maps to |
 | --- | --- |
-| [apple-client-area/store/wordpress-hosting.html](../apple-client-area/store/wordpress-hosting.html) | `products.tpl` (group landing) |
+| [apple-client-area/store.html](../apple-client-area/store.html) | **`products.tpl` (group landing, the actual target)** |
+| [apple-client-area/store/wordpress-hosting.html](../apple-client-area/store/wordpress-hosting.html) | `products.tpl` alt-style — dynamic-store builder marketing landing (only relevant if WHMCS dynamic store is configured for a group) |
 | [apple-client-area/cart.html](../apple-client-area/cart.html) | `viewcart.tpl` (cart contents) |
 | [apple-client-area/cart-empty.html](../apple-client-area/cart-empty.html) | `viewcart.tpl` (empty state) |
 | [apple-client-area/cart-domain-register.html](../apple-client-area/cart-domain-register.html) | `domainregister.tpl` |

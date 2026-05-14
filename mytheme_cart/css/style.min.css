@@ -668,6 +668,381 @@ body {
     color: #fff;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   STORE (.st-*) — the actual products-page layout.
+   Source: apple-client-area/store.html
+   Used by: products.tpl, sidebar-categories.tpl
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Page header (sits above the split) ────────────────────── */
+.st-page-header { margin-bottom: 24px; }
+.st-page-header h1 {
+    font-size: 32px; font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    margin: 0 0 6px;
+}
+.st-page-header .page-subtitle {
+    font-size: 14px; color: var(--color-text-secondary);
+    letter-spacing: -0.008em; line-height: 1.5;
+    margin: 0; max-width: 620px;
+}
+
+/* ── 2-column split: sidebar + main ──────────────────────── */
+.st-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+@media (max-width: 880px) { .st-split { grid-template-columns: 1fr; } }
+
+/* ── Sidebar cards (Categories + Actions) ────────────────── */
+.subnav-card { padding: 8px; }
+.subnav-heading {
+    font-size: 11px; font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 10px 12px 8px;
+}
+.subnav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    font-size: 13px; letter-spacing: -0.008em;
+    text-decoration: none; font-family: inherit;
+    background: transparent; border: 0;
+    width: 100%; text-align: left; cursor: pointer;
+    transition: background var(--transition-fast);
+}
+.subnav-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+.subnav-item.active {
+    background: rgba(0, 0, 0, 0.06);
+    font-weight: 500;
+}
+.subnav-item svg {
+    width: 14px; height: 14px;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+}
+.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item .subnav-badge {
+    margin-left: auto;
+    font-size: 11px; font-weight: 500;
+    padding: 1px 7px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+}
+.subnav-divider {
+    height: 0.5px;
+    background: var(--color-border);
+    margin: 8px 12px;
+}
+
+/* ── Category header (with billing cycle pill switch) ────── */
+.st-cat-head { padding: 24px 28px 22px; }
+.st-cat-head-row {
+    display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
+}
+.st-cat-head-ico {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.st-cat-head-ico svg { width: 22px; height: 22px; }
+.st-cat-head-ico img { width: 28px; height: 28px; object-fit: contain; }
+.st-cat-head-meta { flex: 1; min-width: 0; }
+.st-cat-head-title {
+    font-size: 22px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: 0 0 4px;
+}
+.st-cat-head-desc {
+    font-size: 14px; color: var(--color-text-secondary);
+    letter-spacing: -0.008em;
+    line-height: 1.5;
+    max-width: 540px;
+    margin: 0;
+}
+
+/* Billing cycle pill switcher */
+.st-cycle {
+    display: inline-flex;
+    background: var(--color-surface-secondary);
+    border-radius: var(--radius-pill);
+    padding: 3px;
+    flex-shrink: 0;
+}
+.st-cycle button {
+    border: 0; background: transparent;
+    padding: 6px 14px;
+    font-size: 12.5px; font-weight: 500;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-pill);
+    cursor: pointer; font-family: inherit;
+    letter-spacing: -0.008em;
+    transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.st-cycle button.active {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.st-cycle-saving {
+    display: inline-flex; align-items: center;
+    padding: 1px 6px; border-radius: var(--radius-pill);
+    background: var(--color-green-bg); color: var(--color-green-text);
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* ── Plan grid (Variant A — 3 cards w/ feature list) ─────── */
+.st-pricing {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    padding: 0 20px 24px;
+}
+@media (max-width: 900px) { .st-pricing { grid-template-columns: 1fr; } }
+
+.st-plan {
+    padding: 24px 22px 22px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    background: var(--color-surface);
+    transition: all var(--transition-fast);
+    position: relative;
+    display: flex; flex-direction: column;
+}
+.st-plan:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    transform: translateY(-2px);
+}
+.st-plan.featured {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-accent);
+}
+.st-plan-badge {
+    position: absolute; top: 0; right: 22px;
+    transform: translateY(-50%);
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase;
+}
+.st-plan-name {
+    font-size: 15px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    margin: 0 0 6px;
+}
+.st-plan-tag {
+    font-size: 12.5px;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.004em;
+    line-height: 1.45;
+    margin: 0 0 18px;
+    min-height: 36px;
+}
+.st-plan-price {
+    display: flex; align-items: baseline; gap: 4px;
+    margin-bottom: 14px;
+    font-variant-numeric: tabular-nums;
+}
+.st-plan-price .currency {
+    font-size: 18px; font-weight: 500;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.014em;
+    align-self: flex-start; margin-top: 4px;
+}
+.st-plan-price .amount {
+    font-size: 44px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+.st-plan-price .period {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.008em;
+    margin-left: 4px;
+}
+.st-plan-price-sub {
+    font-size: 11.5px;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.004em;
+    margin: -8px 0 18px;
+}
+.st-plan-features {
+    list-style: none; padding: 0; margin: 0 0 22px;
+    display: flex; flex-direction: column; gap: 9px;
+    flex: 1;
+}
+.st-plan-features li {
+    display: flex; align-items: flex-start; gap: 9px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.008em;
+    line-height: 1.4;
+}
+.st-plan-features li svg {
+    width: 14px; height: 14px;
+    color: var(--color-green-text);
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.st-plan-features li strong {
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+.st-plan-features li.muted {
+    color: var(--color-text-tertiary);
+}
+.st-plan-features li.muted svg {
+    color: var(--color-text-quaternary);
+}
+
+.st-plan-cta {
+    height: 40px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: #fff;
+    border: 0;
+    font-size: 13.5px; font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer; font-family: inherit;
+    transition: all var(--transition-fast);
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    text-decoration: none;
+    width: 100%;
+}
+.st-plan-cta:hover { background: var(--color-accent-hover); color: #fff; }
+.st-plan-cta.secondary {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 0.5px solid var(--color-border);
+}
+.st-plan-cta.secondary:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: var(--color-accent-light);
+}
+
+/* ── Compare bar (fine print under the grid) ────────────── */
+.st-compare {
+    margin-top: 16px;
+    padding: 14px 20px;
+    border-top: 0.5px solid var(--color-border);
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: var(--color-surface-tertiary);
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.004em;
+}
+.st-compare .spacer { flex: 1; }
+.st-compare a {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* ── Guarantees strip (3 trust cards below the grid) ────── */
+.st-guarantees {
+    margin-top: 20px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+@media (max-width: 720px) { .st-guarantees { grid-template-columns: 1fr; } }
+.st-guarantee {
+    padding: 14px 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+}
+.st-guarantee-ico {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.st-guarantee-ico svg { width: 15px; height: 15px; }
+.st-guarantee-title {
+    font-size: 13px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+}
+.st-guarantee-sub {
+    font-size: 11.5px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+    line-height: 1.4;
+}
+
+/* ── Empty state — used inside the main card when the
+   selected category has no purchasable packages ───────── */
+.st-empty {
+    padding: 72px 24px 64px;
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+.st-empty-ico {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: var(--color-surface-secondary);
+    color: var(--color-text-tertiary);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+}
+.st-empty-ico svg { width: 26px; height: 26px; }
+.st-empty-title {
+    font-size: 17px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.014em;
+    margin: 0 0 8px;
+}
+.st-empty-desc {
+    font-size: 13.5px; color: var(--color-text-secondary);
+    line-height: 1.55;
+    letter-spacing: -0.008em;
+    max-width: 380px;
+    margin: 0 auto 22px;
+}
+.st-empty-actions {
+    display: inline-flex; gap: 8px; flex-wrap: wrap;
+    justify-content: center;
+}
+.st-empty-actions a {
+    height: 34px; padding: 0 16px; font-size: 13px;
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    font-weight: 500; letter-spacing: -0.008em;
+    transition: all var(--transition-fast);
+}
+.st-empty-actions .btn-primary {
+    background: var(--color-accent); color: #fff;
+    border: 1px solid var(--color-accent);
+}
+.st-empty-actions .btn-primary:hover {
+    background: var(--color-accent-hover); border-color: var(--color-accent-hover); color: #fff;
+}
+.st-empty-actions .btn-secondary {
+    background: transparent; color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+}
+.st-empty-actions .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.st-empty-actions svg { width: 13px; height: 13px; }
+
+/* Shared card frame used by sidebar + main content */
+.card {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+}
+
 /* ───────────────────────────────────────────────────────────────
   12. SHARED FORM PRIMITIVES (buttons, inputs)
    ─────────────────────────────────────────────────────────────── */
