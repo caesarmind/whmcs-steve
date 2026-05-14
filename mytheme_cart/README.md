@@ -79,9 +79,13 @@ WHMCS's `{lang}` returns the **key itself** when there's no translation, which i
 
 ## Cart-template-agnostic chrome
 
-`mytheme/` (the client-area theme) wraps every order-form page inside its own `.content-area` regardless of which cart template is active. To prevent the active cart theme's default chrome (a duplicate `.main-navbar-wrapper`, the `#main-body` container's padding, `standard_cart`'s `#order-standard_cart` wrapper styling) from fighting our layout, the necessary resets live in **`mytheme/templates/mytheme/assets/css/apple-layout.css`** (search for `Cart-page wrapper integration`).
+`mytheme/` (the client-area theme) wraps every order-form page inside its own `.content-area` regardless of which cart template is active. Three pieces of integration live in `mytheme/` so any cart template — `mytheme_cart`, `standard_cart`, `nexus_cart`, anything else — renders correctly:
 
-They're targeted on `body[data-tpl="cart" | "viewcart" | "configureproduct" | "configureproductdomain" | "checkout" | "products" | ...]` — the `$templatefile` value WHMCS sets on the wrapper. This means switching the cart theme to `standard_cart`, `nexus_cart`, or anything else still respects mytheme's chrome — the rules apply regardless of which cart template renders the content.
+1. **Wrapper resets** (`assets/css/apple-layout.css` → `Cart-page wrapper integration`): hide WHMCS's duplicate `.main-navbar-wrapper`, flatten `#main-body` padding, neutralize `#order-standard_cart` so our `.content-area` controls spacing.
+2. **Bootstrap-grid + utilities shim** (same file → `Bootstrap grid + utilities shim for legacy cart templates`): provides `.row` / `.col-md-*` / `.panel` / `.card` / `.list-group` / `.btn` / `.alert` / form / utility rules in Apple visual tokens. Classic WHMCS order-form templates expect Bootstrap to be loaded by the client-area theme; mytheme uses its own design system, so without this shim the layout collapses to an unstyled stack.
+3. **Bootstrap-JS escape hatch** (`header.tpl`): conditionally loads jQuery 3.7.1 + Bootstrap 4.6.2 from CDN **only** when `$templatefile` is a cart-flow value AND the active cart theme is NOT `mytheme_cart`. Lets `standard_cart`'s interactive bits (`data-toggle="tab"`, dropdowns, panel collapse) work without bloating mytheme_cart pages where none of that matters.
+
+All three pieces are targeted on `body[data-tpl="cart" | "viewcart" | "configureproduct" | "configureproductdomain" | "checkout" | "products" | ...]` — the `$templatefile` value WHMCS sets on the wrapper. The chrome stays consistent regardless of which cart template renders the content.
 
 ## Common conventions across every TPL
 

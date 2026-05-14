@@ -211,6 +211,21 @@
     {/if}
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v=1.0">
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-layout.css?v=1.0">
+
+    {* ── Bootstrap 4 + jQuery escape hatch for legacy cart templates ──
+       Loaded ONLY on cart-flow pages so the rest of mytheme stays free of
+       jQuery + Bootstrap bloat. Synchronous (no defer) because
+       standard_cart's scripts.min.js executes mid-body and assumes both
+       are already defined. The CSS-side Bootstrap shim in apple-layout.css
+       handles the visual side; this script load makes interactive bits
+       work too: data-toggle="tab", panel collapse, dropdowns, etc.
+       Skip entirely on mytheme_cart pages — its own .ct-* / .st-* / .dp-*
+       components are self-contained and don't need either dependency. ── *}
+    {if in_array($templatefile, ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck']) && $carttpl != 'mytheme_cart'}
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-VHvPCCyXqtD5DqJeNxl2dtTyhF78xXNXdkwX1CZeRusQfRKp+tA7hAShOK/B/fQ2" crossorigin="anonymous"></script>
+    {/if}
+
     {$headoutput}
 </head>
 <body class="client-area-layout"
