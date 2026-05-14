@@ -257,9 +257,12 @@
                                          data-price-host
                                          data-price-min="{$product.pricing.minprice.price|escape}"
                                          data-cycle-min="{$product.pricing.minprice.cycle|escape}"
-                                         {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
-                                             {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
-                                         {/foreach}>
+                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
+                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
+                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
+                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
+                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
+                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
                                         {if $product.bid}
                                             {if $product.displayprice}
                                                 <span class="amount" data-price-display>{$product.displayprice}</span>
@@ -328,9 +331,12 @@
                                          data-price-host
                                          data-price-min="{$product.pricing.minprice.price|escape}"
                                          data-cycle-min="{$product.pricing.minprice.cycle|escape}"
-                                         {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
-                                             {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
-                                         {/foreach}>
+                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
+                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
+                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
+                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
+                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
+                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
                                         <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
                                         <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
                                     </div>
@@ -384,9 +390,12 @@
                                          data-price-host
                                          data-price-min="{$product.pricing.minprice.price|escape}"
                                          data-cycle-min="{$product.pricing.minprice.cycle|escape}"
-                                         {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
-                                             {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
-                                         {/foreach}>
+                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
+                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
+                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
+                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
+                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
+                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
                                         <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
                                         <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
                                     </div>
@@ -427,9 +436,12 @@
                                                 <div class="st-compare-plan-price"
                                                      data-price-host
                                                      data-price-min="{$product.pricing.minprice.price|escape}"
-                                                     {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
-                                                         {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
-                                                     {/foreach}>
+                                                     {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
+                                                     {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
+                                                     {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
+                                                     {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
+                                                     {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
+                                                     {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
                                                     <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
                                                     <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
                                                 </div>
@@ -505,9 +517,12 @@
                                             <div class="st-bento-hero-price"
                                                  data-price-host
                                                  data-price-min="{$product.pricing.minprice.price|escape}"
-                                                 {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
-                                                     {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
-                                                 {/foreach}>
+                                                 {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
+                                                 {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
+                                                 {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
+                                                 {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
+                                                 {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
+                                                 {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
                                                 <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
                                                 <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
                                             </div>
@@ -523,9 +538,12 @@
                                         <div class="st-bento-mini-price"
                                              data-price-host
                                              data-price-min="{$product.pricing.minprice.price|escape}"
-                                             {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
-                                                 {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
-                                             {/foreach}>
+                                             {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
+                                             {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
+                                             {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
+                                             {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
+                                             {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
+                                             {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
                                             <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
                                             <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
                                         </div>
@@ -564,9 +582,12 @@
                                     <div class="st-seg-price"
                                          data-price-host
                                          data-price-min="{$product.pricing.minprice.price|escape}"
-                                         {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
-                                             {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
-                                         {/foreach}>
+                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
+                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
+                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
+                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
+                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
+                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
                                         <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
                                         <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
                                     </div>
@@ -617,9 +638,12 @@
                                         <div class="st-matrix-price"
                                              data-price-host
                                              data-price-min="{$product.pricing.minprice.price|escape}"
-                                             {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
-                                                 {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
-                                             {/foreach}>
+                                             {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
+                                             {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
+                                             {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
+                                             {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
+                                             {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
+                                             {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
                                             <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
                                             <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
                                         </div>
@@ -675,9 +699,12 @@
                                         <div class="st-addon-tier-price"
                                              data-price-host
                                              data-price-min="{$product.pricing.minprice.price|escape}"
-                                             {foreach ['monthly','quarterly','semiannually','annually','biennially','triennially'] as $_cyc}
-                                                 {if $product.pricing.$_cyc}data-price-{$_cyc}="{$product.pricing.$_cyc|escape}" {/if}
-                                             {/foreach}>
+                                             {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
+                                             {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
+                                             {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
+                                             {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
+                                             {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
+                                             {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
                                             <span data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
                                             <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{$cycleAbbr[$product.pricing.minprice.cycle]|default:''}{/if}</span>
                                         </div>
