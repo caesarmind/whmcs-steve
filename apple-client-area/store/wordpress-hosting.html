@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress Hosting — WHMCS by Apple</title>
+    <link rel="stylesheet" href="../css/apple-theme.css?v=2">
+    <link rel="stylesheet" href="../css/apple-layout.css?v=2">
+    <style>
+        body { display: block; }
+
+        /* ───────────────────────────────────────────────────────────
+           SHARED — dynamic-store section scaffolding
+           Each block is a full-bleed <section> that alternates
+           background between --color-bg (main) and --color-surface
+           (lifted). The inner .ds-container clamps to a max width
+           so long-form content stays readable.
+           ─────────────────────────────────────────────────────────── */
+        .ds-section {
+            padding: 80px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        @media (max-width: 720px) { .ds-section { padding: 56px 20px; } }
+        .ds-section.bg-main    { background: var(--color-bg); }
+        .ds-section.bg-lifted  { background: var(--color-surface); }
+        .ds-container { max-width: 1100px; margin: 0 auto; }
+
+        .ds-eyebrow {
+            font-size: 11.5px; font-weight: 600;
+            color: var(--color-accent);
+            text-transform: uppercase; letter-spacing: 0.08em;
+            margin: 0 0 14px;
+        }
+        .ds-section-title {
+            font-size: 36px; font-weight: 600;
+            letter-spacing: -0.026em; line-height: 1.1;
+            color: var(--color-text-primary);
+            margin: 0 0 14px;
+            text-wrap: balance;
+        }
+        @media (max-width: 720px) { .ds-section-title { font-size: 28px; } }
+        .ds-section-subtitle {
+            font-size: 17px; line-height: 1.5;
+            color: var(--color-text-secondary);
+            letter-spacing: -0.012em;
+            margin: 0 0 36px; max-width: 640px;
+            text-wrap: pretty;
+        }
+        @media (max-width: 720px) { .ds-section-subtitle { font-size: 15px; margin-bottom: 28px; } }
+        .ds-section-subtitle.center { margin-left: auto; margin-right: auto; }
+
+        /* ═══════════════════════════════════════════════════════════
+           BLOCK 1 — header.tpl (hero with brand + title + subtitle + description)
+           ═══════════════════════════════════════════════════════════ */
+        .ds-hero { padding: 120px 24px 96px; }
+        @media (max-width: 720px) { .ds-hero { padding: 72px 20px 56px; } }
+        .ds-hero-inner {
+            max-width: 980px; margin: 0 auto;
+            text-align: center;
+        }
+        .ds-hero-logo {
+            width: 88px; height: 88px;
+            margin: 0 auto 28px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, var(--color-accent) 0%, #5856d6 100%);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 14px 40px rgba(0, 113, 227, 0.30);
+        }
+        .ds-hero-logo svg { width: 44px; height: 44px; }
+        .ds-hero-title {
+            font-size: 56px; font-weight: 600;
+            letter-spacing: -0.038em; line-height: 1.04;
+            color: var(--color-text-primary);
+            margin: 0 0 18px;
+            text-wrap: balance;
+        }
+        @media (max-width: 960px) { .ds-hero-title { font-size: 44px; } }
+        @media (max-width: 560px) { .ds-hero-title { font-size: 34px; letter-spacing: -0.028em; } }
+        .ds-hero-subtitle {
+            font-size: 22px; font-weight: 400;
+            line-height: 1.34;
+            color: var(--color-text-secondary);
+            letter-spacing: -0.018em;
+            margin: 0 auto 16px; max-width: 720px;
+            text-wrap: balance;
+        }
+        @media (max-width: 720px) { .ds-hero-subtitle { font-size: 17px; } }
+        .ds-hero-description {
+            font-size: 15px; line-height: 1.55;
+            color: var(--color-text-tertiary);
+            letter-spacing: -0.008em;
+            margin: 0 auto 32px; max-width: 600px;
+            text-wrap: pretty;
+        }
+        .ds-hero-cta {
+            display: inline-flex; align-items: center; gap: 8px;
+            height: 46px; padding: 0 24px;
+            border-radius: var(--radius-pill);
+            background: var(--color-accent); color: #fff;
+            font-size: 14.5px; font-weight: 500;
+            letter-spacing: -0.008em;
+            text-decoration: none;
+            transition: background var(--transition-fast), transform var(--transition-fast);
+        }
+        .ds-hero-cta:hover { background: var(--color-accent-hover); transform: translateY(-1px); }
+        .ds-hero-cta svg { width: 14px; height: 14px; }
+
+        /* Soft accent glow at the bottom-edge of the hero */
+        .ds-hero-accent {
+            position: absolute; left: 50%; bottom: -120px; transform: translateX(-50%);
+            width: 620px; height: 240px;
+            background: radial-gradient(ellipse at center, var(--color-accent-light), transparent 70%);
+            pointer-events: none; opacity: 0.7;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           BLOCK 2 — grid_of_cards.tpl (pricing tiers)
+           ═══════════════════════════════════════════════════════════ */
+        .ds-pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        @media (max-width: 1000px) { .ds-pricing-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 560px)  { .ds-pricing-grid { grid-template-columns: 1fr; } }
+
+        .ds-plan {
+            position: relative;
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: 18px;
+            padding: 28px 24px 24px;
+            display: flex; flex-direction: column;
+            transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        .ds-plan:hover {
+            border-color: var(--color-text-quaternary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-card-hover);
+        }
+        .ds-plan.featured {
+            border-color: var(--color-accent);
+            border-width: 1px;
+            box-shadow: 0 0 0 1px var(--color-accent), 0 8px 24px var(--color-accent-light);
+        }
+        .ds-plan-badge {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            padding: 4px 12px; border-radius: var(--radius-pill);
+            background: var(--color-accent); color: #fff;
+            font-size: 10.5px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            white-space: nowrap;
+        }
+        .ds-plan-name {
+            font-size: 13px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--color-text-tertiary);
+            margin: 0 0 8px;
+        }
+        .ds-plan-price {
+            display: flex; align-items: baseline; gap: 4px;
+            margin: 0 0 6px;
+            font-variant-numeric: tabular-nums;
+        }
+        .ds-plan-price .currency { font-size: 18px; color: var(--color-text-secondary); font-weight: 500; }
+        .ds-plan-price .amount   { font-size: 40px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.028em; line-height: 1; }
+        .ds-plan-price .period   { font-size: 14px; color: var(--color-text-tertiary); margin-left: 2px; font-weight: 500; }
+        .ds-plan-price.free .amount {
+            font-size: 28px; color: var(--color-green-text);
+            letter-spacing: -0.018em;
+            text-transform: uppercase; font-weight: 700;
+        }
+        .ds-plan-desc {
+            font-size: 13px; color: var(--color-text-tertiary);
+            letter-spacing: -0.004em; line-height: 1.5;
+            margin: 0 0 20px;
+            min-height: 39px;
+        }
+        .ds-plan-features {
+            list-style: none; padding: 0; margin: 0 0 22px;
+            display: flex; flex-direction: column; gap: 9px;
+            flex: 1;
+        }
+        .ds-plan-features li {
+            display: flex; align-items: flex-start; gap: 9px;
+            font-size: 13px; color: var(--color-text-secondary);
+            letter-spacing: -0.004em; line-height: 1.45;
+        }
+        .ds-plan-features li svg {
+            width: 13px; height: 13px;
+            color: var(--color-green-text);
+            flex-shrink: 0; margin-top: 3px;
+        }
+        .ds-plan-features li.muted { color: var(--color-text-quaternary); text-decoration: line-through; }
+        .ds-plan-features li.muted svg { color: var(--color-text-quaternary); }
+        .ds-plan-features li b {
+            color: var(--color-text-primary); font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+        .ds-plan-cta {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            height: 40px; padding: 0 18px;
+            border-radius: var(--radius-pill);
+            background: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-primary);
+            font-size: 13px; font-weight: 500;
+            letter-spacing: -0.008em;
+            cursor: pointer; font-family: inherit;
+            text-decoration: none;
+            transition: all var(--transition-fast);
+        }
+        .ds-plan-cta:hover {
+            border-color: var(--color-accent); color: var(--color-accent);
+        }
+        .ds-plan.featured .ds-plan-cta {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+            color: #fff;
+        }
+        .ds-plan.featured .ds-plan-cta:hover {
+            background: var(--color-accent-hover);
+            border-color: var(--color-accent-hover);
+        }
+
+        /* Grid empty state (no plans) — replaces the grid entirely */
+        .ds-grid-empty {
+            padding: 56px 24px;
+            text-align: center;
+            background: var(--color-surface);
+            border: 1px dashed var(--color-border);
+            border-radius: 18px;
+        }
+        .ds-grid-empty-ico {
+            width: 56px; height: 56px; margin: 0 auto 16px;
+            border-radius: 16px;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ds-grid-empty-ico svg { width: 24px; height: 24px; }
+        .ds-grid-empty-title {
+            font-size: 18px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.016em;
+            margin: 0 0 6px;
+        }
+        .ds-grid-empty-desc {
+            font-size: 14px; color: var(--color-text-tertiary);
+            letter-spacing: -0.008em; line-height: 1.5;
+            margin: 0 auto 22px; max-width: 380px;
+        }
+        .ds-grid-empty-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            height: 38px; padding: 0 18px;
+            border-radius: var(--radius-pill);
+            background: var(--color-accent); color: #fff;
+            text-decoration: none;
+            font-size: 13px; font-weight: 500; letter-spacing: -0.008em;
+            transition: background var(--transition-fast);
+        }
+        .ds-grid-empty-link:hover { background: var(--color-accent-hover); }
+        .ds-grid-empty-link svg { width: 12px; height: 12px; }
+
+        /* ═══════════════════════════════════════════════════════════
+           BLOCK 3 — product_preview.tpl (split image + content)
+           ═══════════════════════════════════════════════════════════ */
+        .ds-showcase {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 48px; align-items: center;
+        }
+        @media (max-width: 880px) { .ds-showcase { grid-template-columns: 1fr; gap: 28px; } }
+        .ds-showcase.reverse { direction: rtl; }
+        .ds-showcase.reverse > * { direction: ltr; }
+        .ds-showcase-content { max-width: 480px; }
+        .ds-showcase-title {
+            font-size: 32px; font-weight: 600;
+            letter-spacing: -0.022em; line-height: 1.1;
+            color: var(--color-text-primary);
+            margin: 0 0 14px;
+            text-wrap: balance;
+        }
+        @media (max-width: 720px) { .ds-showcase-title { font-size: 26px; } }
+        .ds-showcase-subtitle {
+            font-size: 17px; line-height: 1.45;
+            color: var(--color-text-secondary);
+            letter-spacing: -0.012em;
+            margin: 0 0 18px;
+        }
+        .ds-showcase-description {
+            font-size: 14.5px; line-height: 1.6;
+            color: var(--color-text-tertiary);
+            letter-spacing: -0.008em;
+        }
+        .ds-showcase-description p { margin: 0 0 12px; }
+        .ds-showcase-description p:last-child { margin: 0; }
+        .ds-showcase-description ul {
+            padding-left: 0; list-style: none;
+            margin: 14px 0 0;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .ds-showcase-description ul li {
+            display: flex; align-items: flex-start; gap: 8px;
+            color: var(--color-text-secondary);
+        }
+        .ds-showcase-description ul li::before {
+            content: ""; width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--color-accent);
+            margin-top: 9px; flex-shrink: 0;
+        }
+        .ds-showcase-media {
+            position: relative;
+            aspect-ratio: 4 / 3;
+            border-radius: 24px;
+            background: linear-gradient(135deg, var(--color-accent-light) 0%, rgba(88, 86, 214, 0.10) 100%);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .ds-showcase-media::before {
+            content: ""; position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(0, 113, 227, 0.20), transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(88, 86, 214, 0.16), transparent 50%);
+        }
+        .ds-showcase-media-fallback {
+            position: relative; z-index: 1;
+            color: var(--color-accent);
+            opacity: 0.85;
+        }
+        .ds-showcase-media-fallback svg { width: 96px; height: 96px; }
+
+        /* ═══════════════════════════════════════════════════════════
+           BLOCK 4 — price_comparison.tpl (feature matrix table)
+           ═══════════════════════════════════════════════════════════ */
+        .ds-table-wrap {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: 18px;
+            overflow: hidden;
+        }
+        .ds-table {
+            width: 100%; border-collapse: collapse;
+            font-size: 13.5px; letter-spacing: -0.004em;
+        }
+        .ds-table thead { background: var(--color-surface-tertiary); }
+        .ds-table th,
+        .ds-table td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 0.5px solid var(--color-border);
+        }
+        .ds-table tr:last-child td { border-bottom: 0; }
+        .ds-table thead th {
+            font-size: 14.5px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.012em;
+            padding-top: 20px; padding-bottom: 20px;
+            white-space: nowrap;
+        }
+        .ds-table thead th:not(:first-child) { text-align: center; }
+        .ds-table tbody td:not(:first-child) {
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+        .ds-table tbody td:first-child {
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+        .ds-table tbody tr:hover { background: var(--sidebar-item-hover); }
+        .ds-table-check {
+            color: var(--color-green-text);
+            display: inline-flex;
+        }
+        .ds-table-check svg { width: 16px; height: 16px; }
+        .ds-table-cross {
+            color: var(--color-text-quaternary);
+            display: inline-flex;
+        }
+        .ds-table-cross svg { width: 16px; height: 16px; }
+        .ds-table-value {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+        .ds-table-mobile-hint {
+            display: none;
+            padding: 10px 16px;
+            font-size: 11px; color: var(--color-text-tertiary);
+            background: var(--color-surface-tertiary);
+            border-top: 0.5px solid var(--color-border);
+        }
+        @media (max-width: 720px) {
+            .ds-table-wrap { overflow-x: auto; }
+            .ds-table { min-width: 600px; }
+            .ds-table-mobile-hint { display: block; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           BLOCK 5 — video.tpl (poster + play overlay → modal)
+           ═══════════════════════════════════════════════════════════ */
+        .ds-video {
+            position: relative; max-width: 880px; margin: 0 auto;
+            aspect-ratio: 16 / 9;
+            border-radius: 22px; overflow: hidden;
+            background: linear-gradient(135deg, #1d1d1f 0%, #3a3a3c 100%);
+            cursor: pointer;
+        }
+        .ds-video::before {
+            content: ""; position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(0, 113, 227, 0.16), transparent 60%);
+        }
+        .ds-video-poster {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255, 255, 255, 0.40);
+        }
+        .ds-video-poster svg { width: 120px; height: 120px; }
+        .ds-video-play {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 84px; height: 84px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--color-accent);
+            transition: transform var(--transition-fast), background var(--transition-fast);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.30);
+        }
+        .ds-video:hover .ds-video-play { transform: translate(-50%, -50%) scale(1.06); }
+        .ds-video-play svg { width: 32px; height: 32px; margin-left: 4px; }
+
+        /* Video modal */
+        .ds-video-modal {
+            position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(20px);
+            display: none;
+            align-items: center; justify-content: center;
+            z-index: 1000;
+            padding: 32px;
+        }
+        .ds-video-modal.is-open { display: flex; }
+        .ds-video-modal-content {
+            position: relative;
+            max-width: 1000px; width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000; border-radius: 14px; overflow: hidden;
+        }
+        .ds-video-modal-close {
+            position: absolute; top: -42px; right: 0;
+            width: 32px; height: 32px;
+            border-radius: 50%; border: 0;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff; font-size: 20px;
+            cursor: pointer; font-family: inherit;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: background var(--transition-fast);
+        }
+        .ds-video-modal-close:hover { background: rgba(255, 255, 255, 0.25); }
+
+        /* ═══════════════════════════════════════════════════════════
+           BLOCK 6 — free_form.tpl (rich content area)
+           ═══════════════════════════════════════════════════════════ */
+        .ds-freeform {
+            font-size: 15.5px; line-height: 1.65;
+            color: var(--color-text-secondary);
+            letter-spacing: -0.008em;
+        }
+        .ds-freeform-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
+            margin-top: 40px;
+        }
+        @media (max-width: 880px) { .ds-freeform-grid { grid-template-columns: 1fr; gap: 24px; } }
+        .ds-freeform-card {
+            padding: 28px 24px;
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: 18px;
+        }
+        .ds-freeform-card-ico {
+            width: 48px; height: 48px; border-radius: 14px;
+            background: var(--color-accent-light);
+            color: var(--color-accent);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+        }
+        .ds-freeform-card-ico svg { width: 22px; height: 22px; }
+        .ds-freeform-card-title {
+            font-size: 16px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.012em;
+            margin: 0 0 8px;
+        }
+        .ds-freeform-card-desc {
+            font-size: 13.5px; color: var(--color-text-tertiary);
+            line-height: 1.55; letter-spacing: -0.004em;
+            margin: 0;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           BLOCK 7 — faq.tpl (accordion)
+           ═══════════════════════════════════════════════════════════ */
+        .ds-faq {
+            max-width: 760px; margin: 0 auto;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .ds-faq-item {
+            border: 0.5px solid var(--color-border);
+            border-radius: 14px;
+            background: var(--color-surface);
+            overflow: hidden;
+            transition: border-color var(--transition-fast);
+        }
+        .ds-faq-item:has(.ds-faq-toggle:checked) {
+            border-color: var(--color-accent);
+        }
+        .ds-faq-toggle { position: absolute; opacity: 0; pointer-events: none; }
+        .ds-faq-question {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 16px;
+            padding: 18px 22px;
+            cursor: pointer;
+            font-size: 15px; font-weight: 500;
+            color: var(--color-text-primary);
+            letter-spacing: -0.012em;
+            user-select: none;
+            transition: color var(--transition-fast);
+        }
+        .ds-faq-question:hover { color: var(--color-accent); }
+        .ds-faq-icon {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--color-surface-tertiary);
+            color: var(--color-text-secondary);
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: transform var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+        }
+        .ds-faq-icon svg { width: 12px; height: 12px; transition: transform var(--transition-fast); }
+        .ds-faq-item:has(.ds-faq-toggle:checked) .ds-faq-icon {
+            background: var(--color-accent);
+            color: #fff;
+            transform: rotate(45deg);
+        }
+        .ds-faq-answer {
+            max-height: 0; overflow: hidden;
+            transition: max-height 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .ds-faq-item:has(.ds-faq-toggle:checked) .ds-faq-answer { max-height: 600px; }
+        .ds-faq-answer-inner {
+            padding: 0 22px 22px;
+            font-size: 14px; line-height: 1.6;
+            color: var(--color-text-secondary);
+            letter-spacing: -0.008em;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           PAGE EMPTY STATE — entire group has no blocks / no plans
+           ═══════════════════════════════════════════════════════════ */
+        .ds-empty {
+            padding: 120px 24px;
+            text-align: center;
+        }
+        .ds-empty-ico {
+            width: 80px; height: 80px;
+            margin: 0 auto 22px;
+            border-radius: 22px;
+            background: var(--color-surface-secondary);
+            color: var(--color-text-tertiary);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ds-empty-ico svg { width: 36px; height: 36px; }
+        .ds-empty-title {
+            font-size: 26px; font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.022em;
+            margin: 0 0 10px;
+        }
+        .ds-empty-desc {
+            font-size: 15px; color: var(--color-text-tertiary);
+            line-height: 1.55; letter-spacing: -0.008em;
+            margin: 0 auto 26px; max-width: 460px;
+        }
+        .ds-empty-actions { display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .ds-empty-actions .btn-primary,
+        .ds-empty-actions .btn-secondary {
+            height: 42px; padding: 0 22px; font-size: 14px;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .ds-empty-actions svg { width: 14px; height: 14px; }
+    </style>
+</head>
+<body class="client-area-layout" data-auth="out" data-layout="top" data-active-nav="store" data-page-title="WordPress Hosting">
+
+<div data-include="../partials/state-chip.html"></div>
+<div data-include="../partials/rail.html"></div>
+<div data-include="../partials/rail-panels.html"></div>
+<div data-include="../partials/sidebar.html"></div>
+
+<div class="ph-main-wrap">
+
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>No Notifications</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;"><a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a></div>
+    </div>
+</div>
+
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="../clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+    <a href="../index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="../clientareaproducts.html">My Services</a><a href="../store.html">Order New Services</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="../clientareadomains.html">My Domains</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="../clientareainvoices.html">My Invoices</a><a href="../clientareaquotes.html">My Quotes</a><a href="../masspay.html">Mass Payment</a><a href="../clientareaaddfunds.html">Add Funds</a><a href="../account-paymentmethods.html">Payment Methods</a></div></div>
+    <div class="nav-simple-dropdown only-in"><a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-simple-menu"><a href="../supportticketslist.html">Tickets</a><a href="../announcements.html">Announcements</a><a href="../knowledgebase.html">Knowledgebase</a></div></div>
+    <a href="../supportticketsubmit.html" class="only-in">Open Ticket</a>
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+    <a href="../cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+    <a href="../login.html" class="nav-signin only-out">Sign in</a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap"><div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div><div class="profile-dropdown" id="profileDropdown"><div class="profile-dropdown-header"><div class="profile-dropdown-name">Arshile Gogia</div><div class="profile-dropdown-email">arshileg@gmail.com</div></div><a href="../clientareadetails.html" class="profile-dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a><div class="profile-dropdown-divider"></div><a href="../login.html" class="profile-dropdown-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</a></div></div>
+</div></nav>
+
+<div data-include="../partials/inner-topbar.html"></div>
+
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="../clientareahome.html">Home</a><span class="sep">/</span>
+        <a href="../store.html">Store</a><span class="sep">/</span>
+        <span class="current" aria-current="page">WordPress Hosting</span>
+    </div>
+</nav>
+
+<div class="when-full">
+
+    <!-- ═══════════════════════════════════════════════════════════
+         BLOCK 1: header.tpl — Hero
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="ds-section ds-hero bg-main">
+        <div class="ds-hero-inner">
+            <div class="ds-hero-logo" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.32 12c0 3.44 2 6.41 4.9 7.82L4.07 8.7C3.59 9.71 3.32 10.83 3.32 12zM17.86 11.56c0-1.07-.38-1.81-.71-2.39-.44-.72-.85-1.32-.85-2.04 0-.80.61-1.55 1.46-1.55h.11c-1.54-1.41-3.59-2.27-5.86-2.27-3.04 0-5.72 1.56-7.28 3.93.20 0 .40-.01.56-.01.91 0 2.30.11 2.30.11.47.03.52.66.06.71 0 0-.47.06-1 .08l3.18 9.46 1.91-5.73-1.36-3.73c-.47-.03-.92-.08-.92-.08-.47-.03-.42-.69.05-.71 0 0 1.41.11 2.27.11.91 0 2.31-.11 2.31-.11.47-.03.53.66.06.71 0 0-.47.06-1 .08l3.16 9.39.87-2.91c.39-1.25.69-2.14.69-2.91zM12.16 12.76L9.5 20.34C10.30 20.57 11.13 20.69 12 20.69c1.03 0 2.02-.18 2.93-.5-.02-.04-.05-.08-.07-.13l-2.70-7.30zm7.52-4.94c.04.28.06.58.06.91 0 .91-.17 1.93-.68 3.21l-2.73 7.91C19 18 20.69 15.20 20.69 12c0-1.51-.39-2.93-1.06-4.18zM12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10z"/></svg>
+            </div>
+            <h1 class="ds-hero-title">WordPress Hosting</h1>
+            <p class="ds-hero-subtitle">The fastest way to run WordPress. Pre-tuned for speed, secured by default, scaled as you grow.</p>
+            <p class="ds-hero-description">NVMe storage, server-level caching, free SSL, daily backups and Jetpack-class security on every plan — no plugins required.</p>
+            <a href="#plans" class="ds-hero-cta">
+                See plans
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+        </div>
+        <div class="ds-hero-accent" aria-hidden="true"></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         BLOCK 2: grid_of_cards.tpl — Pricing tiers
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="ds-section bg-lifted" id="plans">
+        <div class="ds-container">
+            <p class="ds-eyebrow">Choose your plan</p>
+            <h2 class="ds-section-title">Built for every stage</h2>
+            <p class="ds-section-subtitle">Start where you are. Upgrade or downgrade any time without migrating.</p>
+
+            <div class="ds-pricing-grid">
+                <!-- Starter -->
+                <div class="ds-plan">
+                    <div class="ds-plan-name">Starter</div>
+                    <div class="ds-plan-price">
+                        <span class="currency">$</span><span class="amount">2.99</span><span class="period">/ mo</span>
+                    </div>
+                    <p class="ds-plan-desc">For your first blog or personal site.</p>
+                    <ul class="ds-plan-features">
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>1 WordPress site</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>10 GB</b> NVMe SSD storage</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Unmetered bandwidth</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Free SSL + CDN</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Daily backups</span></li>
+                    </ul>
+                    <a href="order.html?pid=1" class="ds-plan-cta">Get started</a>
+                </div>
+
+                <!-- Pro (featured) -->
+                <div class="ds-plan featured">
+                    <span class="ds-plan-badge">Most popular</span>
+                    <div class="ds-plan-name">Pro</div>
+                    <div class="ds-plan-price">
+                        <span class="currency">$</span><span class="amount">6.99</span><span class="period">/ mo</span>
+                    </div>
+                    <p class="ds-plan-desc">For growing sites and small teams.</p>
+                    <ul class="ds-plan-features">
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>10 sites</b></span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>50 GB</b> NVMe SSD storage</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>WP-aware object cache</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Free SSL + premium CDN</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Hourly backups</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Staging environment</span></li>
+                    </ul>
+                    <a href="order.html?pid=2" class="ds-plan-cta">Get started</a>
+                </div>
+
+                <!-- Business -->
+                <div class="ds-plan">
+                    <div class="ds-plan-name">Business</div>
+                    <div class="ds-plan-price">
+                        <span class="currency">$</span><span class="amount">14.99</span><span class="period">/ mo</span>
+                    </div>
+                    <p class="ds-plan-desc">For e-commerce and busy traffic.</p>
+                    <ul class="ds-plan-features">
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>25 sites</b></span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>150 GB</b> NVMe SSD</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>WooCommerce-tuned PHP</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Dedicated IP option</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Priority support</span></li>
+                    </ul>
+                    <a href="order.html?pid=3" class="ds-plan-cta">Get started</a>
+                </div>
+
+                <!-- Enterprise -->
+                <div class="ds-plan">
+                    <div class="ds-plan-name">Enterprise</div>
+                    <div class="ds-plan-price">
+                        <span class="currency">$</span><span class="amount">39.99</span><span class="period">/ mo</span>
+                    </div>
+                    <p class="ds-plan-desc">For high-traffic, mission-critical sites.</p>
+                    <ul class="ds-plan-features">
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>Unlimited</b> sites</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>500 GB</b> NVMe SSD</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Dedicated resources</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>SLA &amp; 24/7 phone support</span></li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Free migrations</span></li>
+                    </ul>
+                    <a href="order.html?pid=4" class="ds-plan-cta">Get started</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         BLOCK 3: product_preview.tpl — Showcase
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="ds-section bg-main">
+        <div class="ds-container">
+            <div class="ds-showcase">
+                <div class="ds-showcase-content">
+                    <p class="ds-eyebrow">Built for WordPress</p>
+                    <h2 class="ds-showcase-title">One-click install. Tuned at the server level.</h2>
+                    <p class="ds-showcase-subtitle">No plugin patching, no `.htaccess` archaeology. WP runs the way it was meant to.</p>
+                    <div class="ds-showcase-description">
+                        <p>Every plan ships with PHP 8.3, OPcache, Redis object cache and a server-side full-page cache. Together they cut Time to First Byte by 4× over generic hosts in our benchmarks.</p>
+                        <ul>
+                            <li>WP-CLI on every shell</li>
+                            <li>Staging → production push with one command</li>
+                            <li>Auto-updates with rollback if a theme/plugin update breaks the homepage</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="ds-showcase-media">
+                    <div class="ds-showcase-media-fallback" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.32 12c0 3.44 2 6.41 4.9 7.82L4.07 8.7C3.59 9.71 3.32 10.83 3.32 12zM17.86 11.56c0-1.07-.38-1.81-.71-2.39-.44-.72-.85-1.32-.85-2.04 0-.80.61-1.55 1.46-1.55h.11c-1.54-1.41-3.59-2.27-5.86-2.27-3.04 0-5.72 1.56-7.28 3.93.20 0 .40-.01.56-.01.91 0 2.30.11 2.30.11.47.03.52.66.06.71 0 0-.47.06-1 .08l3.18 9.46 1.91-5.73-1.36-3.73c-.47-.03-.92-.08-.92-.08-.47-.03-.42-.69.05-.71 0 0 1.41.11 2.27.11.91 0 2.31-.11 2.31-.11.47-.03.53.66.06.71 0 0-.47.06-1 .08l3.16 9.39.87-2.91c.39-1.25.69-2.14.69-2.91zM12.16 12.76L9.5 20.34C10.30 20.57 11.13 20.69 12 20.69c1.03 0 2.02-.18 2.93-.5-.02-.04-.05-.08-.07-.13l-2.70-7.30zm7.52-4.94c.04.28.06.58.06.91 0 .91-.17 1.93-.68 3.21l-2.73 7.91C19 18 20.69 15.20 20.69 12c0-1.51-.39-2.93-1.06-4.18zM12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10z"/></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         BLOCK 4: price_comparison.tpl — Feature matrix
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="ds-section bg-lifted">
+        <div class="ds-container">
+            <p class="ds-eyebrow">Compare</p>
+            <h2 class="ds-section-title">Every plan, side by side</h2>
+            <p class="ds-section-subtitle">All the boring fine print, in one table.</p>
+
+            <div class="ds-table-wrap">
+                <table class="ds-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Starter</th>
+                            <th>Pro</th>
+                            <th>Business</th>
+                            <th>Enterprise</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sites</td>
+                            <td><span class="ds-table-value">1</span></td>
+                            <td><span class="ds-table-value">10</span></td>
+                            <td><span class="ds-table-value">25</span></td>
+                            <td><span class="ds-table-value">Unlimited</span></td>
+                        </tr>
+                        <tr>
+                            <td>NVMe SSD storage</td>
+                            <td><span class="ds-table-value">10 GB</span></td>
+                            <td><span class="ds-table-value">50 GB</span></td>
+                            <td><span class="ds-table-value">150 GB</span></td>
+                            <td><span class="ds-table-value">500 GB</span></td>
+                        </tr>
+                        <tr>
+                            <td>Monthly visits (estimate)</td>
+                            <td><span class="ds-table-value">25k</span></td>
+                            <td><span class="ds-table-value">150k</span></td>
+                            <td><span class="ds-table-value">500k</span></td>
+                            <td><span class="ds-table-value">Unmetered</span></td>
+                        </tr>
+                        <tr>
+                            <td>Free SSL + CDN</td>
+                            <td><span class="ds-table-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                            <td><span class="ds-table-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                            <td><span class="ds-table-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                            <td><span class="ds-table-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                        </tr>
+                        <tr>
+                            <td>WP-CLI &amp; staging</td>
+                            <td><span class="ds-table-cross"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
+                            <td><span class="ds-table-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                            <td><span class="ds-table-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                            <td><span class="ds-table-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                        </tr>
+                        <tr>
+                            <td>Backup frequency</td>
+                            <td><span class="ds-table-value">Daily</span></td>
+                            <td><span class="ds-table-value">Hourly</span></td>
+                            <td><span class="ds-table-value">Hourly</span></td>
+                            <td><span class="ds-table-value">Real-time</span></td>
+                        </tr>
+                        <tr>
+                            <td>Dedicated IP</td>
+                            <td><span class="ds-table-cross"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
+                            <td><span class="ds-table-cross"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></td>
+                            <td><span class="ds-table-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                            <td><span class="ds-table-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></td>
+                        </tr>
+                        <tr>
+                            <td>Support</td>
+                            <td><span class="ds-table-value">Email</span></td>
+                            <td><span class="ds-table-value">Chat</span></td>
+                            <td><span class="ds-table-value">Priority</span></td>
+                            <td><span class="ds-table-value">24/7 phone</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="ds-table-mobile-hint">↔ Scroll horizontally to compare plans</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         BLOCK 5: video.tpl — Demo video
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="ds-section bg-main">
+        <div class="ds-container">
+            <p class="ds-eyebrow" style="text-align:center">Watch</p>
+            <h2 class="ds-section-title" style="text-align:center">See it in 90 seconds</h2>
+            <p class="ds-section-subtitle center" style="text-align:center">From signup to live site, without leaving the dashboard.</p>
+
+            <div class="ds-video" role="button" tabindex="0" aria-label="Play product demo video" data-video-trigger>
+                <div class="ds-video-poster" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.32 12c0 3.44 2 6.41 4.9 7.82L4.07 8.7C3.59 9.71 3.32 10.83 3.32 12zM17.86 11.56c0-1.07-.38-1.81-.71-2.39-.44-.72-.85-1.32-.85-2.04 0-.80.61-1.55 1.46-1.55h.11c-1.54-1.41-3.59-2.27-5.86-2.27-3.04 0-5.72 1.56-7.28 3.93.20 0 .40-.01.56-.01.91 0 2.30.11 2.30.11.47.03.52.66.06.71 0 0-.47.06-1 .08l3.18 9.46 1.91-5.73-1.36-3.73c-.47-.03-.92-.08-.92-.08-.47-.03-.42-.69.05-.71 0 0 1.41.11 2.27.11.91 0 2.31-.11 2.31-.11.47-.03.53.66.06.71 0 0-.47.06-1 .08l3.16 9.39.87-2.91c.39-1.25.69-2.14.69-2.91zM12.16 12.76L9.5 20.34C10.30 20.57 11.13 20.69 12 20.69c1.03 0 2.02-.18 2.93-.5-.02-.04-.05-.08-.07-.13l-2.70-7.30zm7.52-4.94c.04.28.06.58.06.91 0 .91-.17 1.93-.68 3.21l-2.73 7.91C19 18 20.69 15.20 20.69 12c0-1.51-.39-2.93-1.06-4.18zM12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10z"/></svg>
+                </div>
+                <div class="ds-video-play" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="ds-video-modal" id="ds-video-modal" role="dialog" aria-modal="true" aria-label="Product demo video">
+        <div class="ds-video-modal-content">
+            <button type="button" class="ds-video-modal-close" data-video-close aria-label="Close video">&times;</button>
+            <video controls preload="none" id="ds-video-player" style="width:100%;height:100%;">
+                <source src="" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         BLOCK 6: free_form.tpl — Rich content (3-up feature grid)
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="ds-section bg-lifted">
+        <div class="ds-container">
+            <p class="ds-eyebrow">Why our WordPress hosting</p>
+            <h2 class="ds-section-title">The boring engineering, done for you</h2>
+            <p class="ds-section-subtitle">Three things every fast WordPress install needs — built in, no plugin shopping.</p>
+
+            <div class="ds-freeform">
+                <div class="ds-freeform-grid">
+                    <div class="ds-freeform-card">
+                        <div class="ds-freeform-card-ico">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        </div>
+                        <h3 class="ds-freeform-card-title">Performance, by default</h3>
+                        <p class="ds-freeform-card-desc">Server-side full-page cache, Redis object cache, HTTP/3 + Brotli. We benchmark every PHP release and only ship a new version once it beats the last in real-world WP tests.</p>
+                    </div>
+                    <div class="ds-freeform-card">
+                        <div class="ds-freeform-card-ico">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                        </div>
+                        <h3 class="ds-freeform-card-title">Security that doesn't nag</h3>
+                        <p class="ds-freeform-card-desc">Web app firewall in front of every site. Brute-force and bot-traffic mitigation at the network edge. Two-factor on the dashboard. Mandatory disk encryption.</p>
+                    </div>
+                    <div class="ds-freeform-card">
+                        <div class="ds-freeform-card-ico">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-9-9c2.52 0 4.82.99 6.5 2.6"/><polyline points="22 4 22 10 16 10"/></svg>
+                        </div>
+                        <h3 class="ds-freeform-card-title">One-click rollback</h3>
+                        <p class="ds-freeform-card-desc">Pre-staging snapshots before every theme, plugin, and core update. If something breaks the homepage, hit "rollback" and you're back in 30 seconds.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         BLOCK 7: faq.tpl — FAQ accordion
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="ds-section bg-main">
+        <div class="ds-container">
+            <p class="ds-eyebrow" style="text-align:center">FAQ</p>
+            <h2 class="ds-section-title" style="text-align:center">Common questions</h2>
+            <p class="ds-section-subtitle center" style="text-align:center;margin-bottom:48px;">Still on the fence? <a href="../contact.html" style="color:var(--color-accent);text-decoration:none;">Talk to us</a> — we usually reply within an hour.</p>
+
+            <div class="ds-faq">
+                <div class="ds-faq-item">
+                    <input type="checkbox" id="ds-faq-1" class="ds-faq-toggle" checked>
+                    <label for="ds-faq-1" class="ds-faq-question">
+                        <span>Can I migrate my existing WordPress site for free?</span>
+                        <span class="ds-faq-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                    </label>
+                    <div class="ds-faq-answer">
+                        <div class="ds-faq-answer-inner">
+                            Yes — every paid plan gets one free, hands-off migration. Pro and above get unlimited migrations. We handle the dance with the old host, including DNS cutover at a low-traffic time of your choosing, with zero downtime in the typical case.
+                        </div>
+                    </div>
+                </div>
+                <div class="ds-faq-item">
+                    <input type="checkbox" id="ds-faq-2" class="ds-faq-toggle">
+                    <label for="ds-faq-2" class="ds-faq-question">
+                        <span>Do you have a money-back guarantee?</span>
+                        <span class="ds-faq-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                    </label>
+                    <div class="ds-faq-answer">
+                        <div class="ds-faq-answer-inner">
+                            30 days, no questions asked. If you decide we're not the right fit, email us within 30 days of signup and we'll refund the unused balance back to the original payment method within 3 business days.
+                        </div>
+                    </div>
+                </div>
+                <div class="ds-faq-item">
+                    <input type="checkbox" id="ds-faq-3" class="ds-faq-toggle">
+                    <label for="ds-faq-3" class="ds-faq-question">
+                        <span>Can I install custom plugins?</span>
+                        <span class="ds-faq-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                    </label>
+                    <div class="ds-faq-answer">
+                        <div class="ds-faq-answer-inner">
+                            Yes. We don't disallow any plugins on principle. A small number (file-based caching plugins, security plugins that conflict with our WAF) are disabled because they break things — we keep that list short and public, and we always recommend an alternative we know works.
+                        </div>
+                    </div>
+                </div>
+                <div class="ds-faq-item">
+                    <input type="checkbox" id="ds-faq-4" class="ds-faq-toggle">
+                    <label for="ds-faq-4" class="ds-faq-question">
+                        <span>What happens if I outgrow my plan?</span>
+                        <span class="ds-faq-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                    </label>
+                    <div class="ds-faq-answer">
+                        <div class="ds-faq-answer-inner">
+                            Upgrade instantly from your dashboard — no migration, no downtime, no IP change. We pro-rate the new plan against your current billing cycle so you only pay the difference for the days remaining.
+                        </div>
+                    </div>
+                </div>
+                <div class="ds-faq-item">
+                    <input type="checkbox" id="ds-faq-5" class="ds-faq-toggle">
+                    <label for="ds-faq-5" class="ds-faq-question">
+                        <span>Where are your data centers?</span>
+                        <span class="ds-faq-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+                    </label>
+                    <div class="ds-faq-answer">
+                        <div class="ds-faq-answer-inner">
+                            US East (Ashburn, VA), EU West (Frankfurt, DE), and Asia (Singapore). You pick during checkout based on where most of your visitors are. The free CDN serves cached pages from 280+ global PoPs regardless of origin region.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div><!-- /.when-full -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE EMPTY STATE — no blocks configured OR no plans in group
+     ═══════════════════════════════════════════════════════════ -->
+<div class="when-empty">
+    <section class="ds-section ds-empty bg-main">
+        <div class="ds-empty-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+        </div>
+        <h1 class="ds-empty-title">This category is being prepared</h1>
+        <p class="ds-empty-desc">We don't have any active WordPress Hosting plans configured yet. Pop into the store catalog or get in touch — we'll point you to the right product.</p>
+        <div class="ds-empty-actions">
+            <a href="../store.html" class="btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Browse all products
+            </a>
+            <a href="../contact.html" class="btn-secondary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Contact sales
+            </a>
+        </div>
+    </section>
+</div>
+
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="../cloud-hosting.html">Cloud Hosting</a></li><li><a href="../vps.html">VPS</a></li><li><a href="../domains.html">Domains</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="../knowledgebase.html">Knowledgebase</a></li><li><a href="../contact.html">Contact us</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="../login.html">Sign in</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Careers</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security</h4><ul><li><a href="../ssl-certificates.html">SSL Certificates</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open><span class="flag">🇺🇸</span><span>English</span><span class="sep">/</span><span>$ USD</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
+        </div>
+    </div>
+</footer>
+
+<div data-include="../partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+<div data-include="../partials/locale-modal.html"></div>
+
+<script src="../js/apple-theme.js?v=2"></script>
+<script src="../js/apple-layout.js?v=2"></script>
+<script>
+(function () {
+    // ─── Video modal open / close ────────────────────────────
+    var modal   = document.getElementById('ds-video-modal');
+    var player  = document.getElementById('ds-video-player');
+    var trigger = document.querySelector('[data-video-trigger]');
+    var closer  = document.querySelector('[data-video-close]');
+
+    function open() {
+        if (!modal) return;
+        modal.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+        // The poster doesn't have a real video URL — would be wired
+        // server-side via $config->url. Just demonstrate the modal.
+    }
+    function close() {
+        if (!modal) return;
+        modal.classList.remove('is-open');
+        document.body.style.overflow = '';
+        if (player && !player.paused) player.pause();
+    }
+    if (trigger) trigger.addEventListener('click', open);
+    if (trigger) trigger.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+    if (closer)  closer.addEventListener('click', close);
+    if (modal)   modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('is-open')) close();
+    });
+
+    // ─── FAQ accordion — close siblings when one opens ───────
+    // The checkbox already toggles via :has() in CSS, but for the
+    // typical FAQ behavior of one-open-at-a-time we untoggle the others.
+    document.querySelectorAll('.ds-faq-toggle').forEach(function (input) {
+        input.addEventListener('change', function () {
+            if (!this.checked) return;
+            document.querySelectorAll('.ds-faq-toggle').forEach(function (other) {
+                if (other !== input) other.checked = false;
+            });
+        });
+    });
+})();
+</script>
+</body>
+</html>
