@@ -1088,10 +1088,17 @@ body {
 .st-empty-actions svg { width: 13px; height: 13px; }
 
 /* ── Plan variant switching (All / A / B / C / D / E / F / G / H) ──
-   When no data-plan is set, all variants stack with labels so they can
-   be previewed together. When a specific one is chosen via the state-
-   chip, every other .plan-variant AND every .st-variant-label is
-   hidden, leaving only the selected block visible. */
+   When a specific plan is chosen via the state-chip (`data-plan` set
+   on <body>), every other .plan-variant AND every .st-variant-label is
+   hidden, leaving only the selected block visible. When no data-plan
+   is set (i.e., the state-chip "All" mode used for dev preview only),
+   the cart wrapper falls back to Variant A — stacking all 8 variants
+   for one product is overwhelming for end users and was leaving the
+   visible viewport empty after the category header.
+
+   The per-wrapper fallback uses #order-standard_cart so it only
+   applies inside the cart-flow page, not in apple-client-area mockups
+   where stacking all variants is the intended dev behavior. */
 .plan-variant { display: block; }
 body[data-plan="a"] .plan-variant:not(.v-a),
 body[data-plan="b"] .plan-variant:not(.v-b),
@@ -1101,6 +1108,12 @@ body[data-plan="e"] .plan-variant:not(.v-e),
 body[data-plan="f"] .plan-variant:not(.v-f),
 body[data-plan="g"] .plan-variant:not(.v-g),
 body[data-plan="h"] .plan-variant:not(.v-h) { display: none; }
+
+/* Default-to-Variant-A when state-chip is in "All" mode (no data-plan
+   attribute on body). The mutually-exclusive [data-plan] selectors
+   above take precedence when the chip picks a specific variant. */
+body:not([data-plan]) #order-standard_cart .plan-variant:not(.v-a) { display: none; }
+body:not([data-plan]) #order-standard_cart .st-variant-label { display: none; }
 
 .st-variant-label {
     display: flex; align-items: center; gap: 10px;

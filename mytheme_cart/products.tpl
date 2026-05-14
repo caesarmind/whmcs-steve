@@ -700,9 +700,15 @@
 
                 </div>{* /.when-full *}
 
-                {/if}{* /productCount > 0 *}
+                {else}
 
-                {* ── Empty state ─────────────────────────────── *}
+                {* ── Empty state ──────────────────────────────
+                   Renders only when the group resolved but has zero
+                   products (typical "category exists but admin hasn't
+                   published packages yet" case). Previously this block
+                   sat outside the {if $productCount} conditional and
+                   leaked below the variants whenever a group had any
+                   products at all. *}
                 <div class="when-empty st-empty">
                     <div class="st-empty-ico" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
@@ -720,6 +726,8 @@
                         </a>
                     </div>
                 </div>
+
+                {/if}{* /productCount > 0 *}
 
             </div>{* /.card *}
 
