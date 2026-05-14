@@ -1639,4 +1639,305 @@ body[data-tpl="fraudcheck"] {
         color: var(--color-text-primary, #1d1d1f);
         font-size: 15px;
     }
+
+    /* ═══ Refinements for configureproductdomain to match the mockup ═══
+       The .domain-selection-options rules above style the SECTION,
+       this section styles each radio option to look like a tappable
+       Apple card with a 20px radio circle and the accent-light
+       background flag when checked. ──────────────────────────── */
+    #order-standard_cart .domain-selection-options {
+        padding: 0;
+    }
+    #order-standard_cart .domain-selection-options .option {
+        position: relative;
+        padding: 22px 24px !important;
+        border: 0 !important;
+        border-bottom: 0.5px solid var(--color-border, #e8e8ed) !important;
+        background: transparent;
+        transition: background var(--transition-fast, 150ms);
+    }
+    #order-standard_cart .domain-selection-options .option:last-child {
+        border-bottom: 0 !important;
+    }
+    #order-standard_cart .domain-selection-options .option:has(input[type="radio"]:checked) {
+        background: var(--color-accent-light, rgba(0, 113, 227, 0.08)) !important;
+    }
+    #order-standard_cart .domain-selection-options .option > label {
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 14px !important;
+        font-size: 15px !important;
+        font-weight: 500;
+        color: var(--color-text-primary, #1d1d1f);
+        cursor: pointer;
+        user-select: none;
+    }
+    /* Custom-styled radio — accent ring + filled center on check */
+    #order-standard_cart .domain-selection-options .option > label input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1.5px solid var(--color-border, #e8e8ed);
+        background: var(--color-surface, #fff);
+        margin: 0;
+        flex-shrink: 0;
+        cursor: pointer;
+        position: relative;
+        transition: all 150ms;
+    }
+    #order-standard_cart .domain-selection-options .option > label input[type="radio"]:checked {
+        border-color: var(--color-accent, #0071e3);
+        background: var(--color-accent, #0071e3);
+    }
+    #order-standard_cart .domain-selection-options .option > label input[type="radio"]:checked::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #fff;
+    }
+    /* The whole option row hidden when its radio isn't the one with the input shown.
+       Standard_cart shows the .domain-input-group for ALL options unconditionally
+       (its scripts.min.js toggles visibility on radio change). Use :has() so the
+       CSS-only path also hides the inactive groups even without the JS firing. */
+    #order-standard_cart .domain-selection-options .option:not(:has(input[type="radio"]:checked)) .domain-input-group {
+        display: none;
+    }
+
+    /* AI-search textarea (advanced register mode) */
+    #order-standard_cart .domain-selection-options textarea#message {
+        width: 100%;
+        min-height: 100px;
+        padding: 14px 18px;
+        font-size: 13.5px;
+        line-height: 1.55;
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        border-radius: var(--radius-md, 12px);
+        background: var(--color-surface, #fff);
+        color: var(--color-text-primary, #1d1d1f);
+        font-family: inherit;
+        resize: vertical;
+        letter-spacing: -0.004em;
+    }
+    #order-standard_cart .domain-selection-options textarea#message:focus {
+        outline: 0;
+        border-color: var(--color-accent, #0071e3);
+        box-shadow: 0 0 0 3px var(--color-accent-light, rgba(0, 113, 227, 0.08));
+    }
+    #order-standard_cart .domain-selection-options textarea#message::placeholder {
+        color: var(--color-text-tertiary, #86868b);
+    }
+
+    /* ── Bootstrap-Multiselect plugin styling ──────────────────
+       The plugin wraps a <select> in:
+         .btn-group > button.multiselect + ul.multiselect-container.dropdown-menu
+       Without these rules the open dropdown shows raw browser radios + checkboxes
+       on a plain box — exactly what the user's screenshot caught.
+       ────────────────────────────────────────────────────────── */
+    #order-standard_cart .btn-group.multiselect-native-select {
+        position: relative;
+        display: inline-block;
+    }
+    #order-standard_cart button.multiselect,
+    #order-standard_cart .multiselect.dropdown-toggle {
+        height: 40px !important;
+        padding: 0 36px 0 14px !important;
+        border: 0.5px solid var(--color-border, #e8e8ed) !important;
+        border-radius: var(--radius-pill, 980px) !important;
+        background: var(--color-surface, #fff) !important;
+        color: var(--color-text-primary, #1d1d1f) !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        letter-spacing: -0.008em;
+        font-family: inherit;
+        text-align: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        min-width: 160px;
+        position: relative;
+    }
+    #order-standard_cart button.multiselect::after {
+        content: "";
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        width: 10px;
+        height: 10px;
+        margin-top: -3px;
+        border-right: 1.5px solid var(--color-text-tertiary, #86868b);
+        border-bottom: 1.5px solid var(--color-text-tertiary, #86868b);
+        transform: rotate(45deg);
+    }
+    #order-standard_cart .multiselect-container.dropdown-menu {
+        margin-top: 4px !important;
+        padding: 6px !important;
+        border: 0.5px solid var(--color-border, #e8e8ed) !important;
+        border-radius: var(--radius-md, 12px) !important;
+        background: var(--color-surface, #fff) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+        min-width: 240px !important;
+        max-height: 280px;
+        overflow-y: auto;
+        list-style: none;
+        font-size: 13px;
+        z-index: 100;
+    }
+    #order-standard_cart .multiselect-container li { margin: 0; padding: 0; list-style: none; }
+    #order-standard_cart .multiselect-container li > a {
+        display: block;
+        padding: 0 !important;
+        border-radius: var(--radius-sm, 8px);
+        background: transparent !important;
+        color: var(--color-text-primary, #1d1d1f) !important;
+        text-decoration: none !important;
+        transition: background 150ms;
+    }
+    #order-standard_cart .multiselect-container li > a:hover {
+        background: rgba(0, 0, 0, 0.04) !important;
+    }
+    #order-standard_cart .multiselect-container li > a > label {
+        display: flex !important;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px !important;
+        margin: 0 !important;
+        cursor: pointer;
+        font-weight: 400;
+        font-size: 13px;
+        color: var(--color-text-primary, #1d1d1f);
+        line-height: 1.4;
+    }
+    /* Custom-styled checkbox + radio inside multiselect items */
+    #order-standard_cart .multiselect-container input[type="checkbox"],
+    #order-standard_cart .multiselect-container input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        flex-shrink: 0;
+        background: var(--color-surface, #fff);
+        border: 1.5px solid var(--color-border, #e8e8ed);
+        cursor: pointer;
+        position: relative;
+    }
+    #order-standard_cart .multiselect-container input[type="checkbox"] { border-radius: 4px; }
+    #order-standard_cart .multiselect-container input[type="radio"] { border-radius: 50%; }
+    #order-standard_cart .multiselect-container input[type="checkbox"]:checked,
+    #order-standard_cart .multiselect-container input[type="radio"]:checked {
+        background: var(--color-accent, #0071e3);
+        border-color: var(--color-accent, #0071e3);
+    }
+    #order-standard_cart .multiselect-container input[type="checkbox"]:checked::after {
+        content: "";
+        position: absolute;
+        left: 4px;
+        top: 1px;
+        width: 5px;
+        height: 9px;
+        border-right: 2px solid #fff;
+        border-bottom: 2px solid #fff;
+        transform: rotate(45deg);
+    }
+    #order-standard_cart .multiselect-container input[type="radio"]:checked::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #fff;
+    }
+    #order-standard_cart .multiselect-container li.multiselect-item.multiselect-filter,
+    #order-standard_cart .multiselect-container li.multiselect-filter {
+        padding: 4px;
+    }
+    #order-standard_cart .multiselect-container .multiselect-search,
+    #order-standard_cart .multiselect-container input.multiselect-search {
+        height: 32px;
+        padding: 0 12px;
+        border-radius: var(--radius-sm, 8px);
+        border: 0.5px solid var(--color-border, #e8e8ed);
+        font-size: 12.5px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    /* The "Include TLDs" / "Length" inline label that overlaps the
+       dropdown panel in the screenshot — let it flow underneath
+       cleanly instead of butting up against the button. */
+    #order-standard_cart .domain-selection-options .domains-row > .multiselect-native-select,
+    #order-standard_cart .domain-selection-options .domains-row > select.multiselect {
+        margin-right: 12px;
+        margin-bottom: 8px;
+        vertical-align: middle;
+    }
+
+    /* "Safe Search" inline checkbox label */
+    #order-standard_cart .domain-selection-options .domains-row > label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--color-text-secondary, #6e6e73);
+        margin-left: 8px;
+    }
+    #order-standard_cart .domain-selection-options .domains-row > label input[type="checkbox"] {
+        accent-color: var(--color-accent, #0071e3);
+        width: 16px;
+        height: 16px;
+        margin: 0;
+    }
+
+    /* Page-bottom "Continue" / "Place Order" submit buttons — make sure
+       any .btn at the form root is the filled accent CTA, not outline. */
+    #order-standard_cart form .text-center .btn,
+    #order-standard_cart form > .btn,
+    #order-standard_cart form > div > .btn-primary,
+    #order-standard_cart .btn-continue,
+    #order-standard_cart #btnContinueCheckout,
+    #order-standard_cart .domain-checkout-area .btn,
+    #order-standard_cart .domain-add-domain {
+        background: var(--color-accent, #0071e3) !important;
+        color: #fff !important;
+        border-color: var(--color-accent, #0071e3) !important;
+        height: 44px;
+        padding: 0 24px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: var(--radius-pill, 980px) !important;
+    }
+    #order-standard_cart form .text-center .btn:hover,
+    #order-standard_cart form > .btn:hover,
+    #order-standard_cart form > div > .btn-primary:hover,
+    #order-standard_cart .btn-continue:hover,
+    #order-standard_cart #btnContinueCheckout:hover,
+    #order-standard_cart .domain-checkout-area .btn:hover,
+    #order-standard_cart .domain-add-domain:hover {
+        background: var(--color-accent-hover, #0077ED) !important;
+        border-color: var(--color-accent-hover, #0077ED) !important;
+        color: #fff !important;
+    }
+
+    /* DomainSearchResults panel that appears after a search */
+    #order-standard_cart #DomainSearchResults {
+        margin-top: 22px;
+    }
+    #order-standard_cart .primary-domain-header {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--color-text-tertiary, #86868b);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 12px;
+    }
 }
