@@ -2,44 +2,50 @@
  * mytheme_cart/configureproductdomain.tpl — Domain selection step.
  *
  * Rendered URL: /index.php/store/<group-slug>/<product-slug>
- *                (and the legacy cart.php?a=add&pid=X path that
- *                immediately follows Order Now on products.tpl)
+ *                (also: cart.php?a=add&pid=X after Order Now)
  *
  * Visual source: apple-client-area/configureproductdomain.html.
  *
- * The user has just clicked Order Now on products.tpl. The product
- * is already in the cart; this page asks how they want to handle
- * the domain — register a new one, transfer one in, or point an
- * existing domain at our nameservers.
+ * Form field names match WHMCS standard_cart conventions, learned
+ * the hard way: WHMCS silently re-renders this page (no error,
+ * no proceed) when the field names don't match — that's what the
+ * "click Continue and the page refreshes" symptom was.
  *
- * Available Smarty variables (cart-domain-options bootstrap):
- *   $productinfo / $productname  — the product just selected
- *   $domain                       — pre-filled if user came from search
- *   $errormessage                 — validation error from previous submit
+ * Required field names per option:
+ *
+ *   Radio: <input name="domain" value="register|transfer|owndomain|subdomain">
+ *
+ *   Register:  name="sld" + name="tld"   (e.g. sld="mycompany", tld=".com")
+ *   Transfer:  name="transfersld" + name="transfertld"
+ *   Own:       name="owndomainsld" + name="owndomaintld"
+ *   Subdomain: name="sld" + name="rootdomain"  (rootdomain is full domain)
+ *
+ *   Submit:    name="incart" value="1"   (some versions accept name="continue")
+ *
+ * To keep the UX simple, each option's visible input takes a FULL
+ * domain string ("mycompany.com"). The JS at the bottom splits it
+ * into sld + tld pairs in hidden fields just before submit so the
+ * user never has to think about it.
+ *
+ * Available Smarty variables:
+ *   $productinfo / $pid           — the product being configured
+ *   $cartitemid / $i              — cart item index (sometimes 0 here)
+ *   $errormessage                 — set when WHMCS rejected the previous submit
  *   $productgroups, $productgroup — for the sidebar
  *   $cartcount                    — view-cart badge
  *   $WEB_ROOT, $carttpl
- *
- * Form posts to cart.php?a=add with `domainoption` set to one of:
- *   register | transfer | owndomain | subdomain
- * plus the relevant {sld,tld} fields for the chosen option.
  *}
 
 {include file="orderforms/$carttpl/common.tpl"}
 
 <style>{literal}
-/* configureproductdomain.tpl page-specific styles (.dp-*)
-   Apple-language port of apple-client-area/configureproductdomain.html */
-
 .dp-page-header { margin-bottom: 24px; }
 .dp-page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
 .dp-page-header .page-subtitle { font-size: 14px; color: var(--color-text-secondary); letter-spacing: -0.008em; line-height: 1.5; margin: 0; max-width: 620px; }
 
-/* 2-col split matching products.tpl */
 .dp-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
 @media (max-width: 880px) { .dp-split { grid-template-columns: 1fr; } }
 
-/* Step strip */
 .dp-steps { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; font-size: 12.5px; color: var(--color-text-tertiary); letter-spacing: -0.008em; }
 .dp-step { display: inline-flex; align-items: center; gap: 8px; }
 .dp-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
@@ -48,7 +54,6 @@
 .dp-step.active { color: var(--color-text-primary); font-weight: 500; }
 .dp-step-sep { color: var(--color-text-quaternary); }
 
-/* Option radio cards — 3-up grid */
 .dp-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 22px 22px 0; }
 @media (max-width: 720px) { .dp-options { grid-template-columns: 1fr; } }
 .dp-option { position: relative; padding: 18px 18px 16px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); cursor: pointer; transition: all var(--transition-fast); display: flex; flex-direction: column; gap: 4px; }
@@ -65,7 +70,6 @@
 .dp-option-check svg { width: 10px; height: 10px; opacity: 0; }
 .dp-option:has(input:checked) .dp-option-check svg { opacity: 1; }
 
-/* Panel — the form for the currently selected option */
 .dp-panel { display: none; padding: 22px 22px 24px; border-top: 0.5px solid var(--color-border); margin-top: 22px; }
 .dp-panel.is-active { display: block; }
 .dp-panel-hint { font-size: 12.5px; color: var(--color-text-tertiary); letter-spacing: -0.004em; line-height: 1.55; margin: 0 0 14px; max-width: 640px; }
@@ -90,7 +94,6 @@
 .dp-error-text { font-size: 12.5px; margin: 0; line-height: 1.5; color: var(--color-red-text); }
 .dp-error-text a { color: var(--color-red-text); text-decoration: underline; }
 
-/* Footer action bar */
 .dp-footer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px 22px; border-top: 0.5px solid var(--color-border); background: var(--color-surface-tertiary); }
 .dp-footer .spacer { flex: 1; }
 .dp-footer-note { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--color-text-tertiary); letter-spacing: -0.004em; }
@@ -111,10 +114,8 @@
 
     <div class="dp-split">
 
-        {* ══ LEFT — Categories + Actions sidebar (mirrors products.tpl) ══ *}
         {include file="orderforms/$carttpl/sidebar-categories.tpl"}
 
-        {* ══ RIGHT — domain picker ══ *}
         <div style="min-width: 0;">
 
             <div class="dp-steps">
@@ -129,29 +130,41 @@
                 <span class="dp-step"><span class="dp-step-num">5</span>Checkout</span>
             </div>
 
-            <form method="post" action="{$WEB_ROOT}/cart.php?a=add" id="dpForm">
+            <form method="post" action="{$WEB_ROOT}/cart.php?a=add" id="dpForm" name="orderfrm">
                 <input type="hidden" name="pid" value="{$productinfo.pid|default:$productinfo.id|default:$pid|escape}">
+                {if $cartitemid || $i || $i === 0}
+                    <input type="hidden" name="i" value="{$cartitemid|default:$i|escape}">
+                {/if}
+
+                {* Hidden split-domain fields — JS populates these from the
+                   visible inputs (which take the full "mycompany.com") just
+                   before submission. WHMCS expects sld + tld pairs per option. *}
+                <input type="hidden" name="sld" id="dp-h-sld" value="">
+                <input type="hidden" name="tld" id="dp-h-tld" value="">
+                <input type="hidden" name="transfersld" id="dp-h-transfersld" value="">
+                <input type="hidden" name="transfertld" id="dp-h-transfertld" value="">
+                <input type="hidden" name="owndomainsld" id="dp-h-owndomainsld" value="">
+                <input type="hidden" name="owndomaintld" id="dp-h-owndomaintld" value="">
 
                 <div class="card" style="padding: 0;">
 
-                    {* Three radio cards — chosen value drives which panel shows *}
                     <div class="dp-options" role="radiogroup" aria-label="How you'll provide a domain">
                         <label class="dp-option">
-                            <input type="radio" name="domainoption" value="register" checked>
+                            <input type="radio" name="domain" value="register" checked>
                             <span class="dp-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                             <span class="dp-option-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span>
                             <span class="dp-option-title">Register a new domain</span>
                             <span class="dp-option-desc">Search and register a brand-new domain name.</span>
                         </label>
                         <label class="dp-option">
-                            <input type="radio" name="domainoption" value="transfer">
+                            <input type="radio" name="domain" value="transfer">
                             <span class="dp-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                             <span class="dp-option-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span>
                             <span class="dp-option-title">Transfer from another registrar</span>
                             <span class="dp-option-desc">Move your domain to us — includes a free year extension.</span>
                         </label>
                         <label class="dp-option">
-                            <input type="radio" name="domainoption" value="owndomain">
+                            <input type="radio" name="domain" value="owndomain">
                             <span class="dp-option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                             <span class="dp-option-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
                             <span class="dp-option-title">Use my existing domain</span>
@@ -159,7 +172,6 @@
                         </label>
                     </div>
 
-                    {* Display server-side error if any *}
                     {if $errormessage}
                         <div style="padding: 0 22px;">
                             <div class="dp-error" style="margin-top: 22px;">
@@ -172,33 +184,33 @@
                         </div>
                     {/if}
 
-                    {* Panel: Register a new domain *}
+                    {* Register a new domain — visible input takes full domain;
+                       JS splits to #dp-h-sld + #dp-h-tld before submission. *}
                     <div class="dp-panel is-active" data-panel="register">
-                        <p class="dp-panel-hint"><strong>Search by keyword or full domain.</strong> We'll check availability across all our supported TLDs and offer suggestions if your first choice is taken.</p>
+                        <p class="dp-panel-hint"><strong>Search by full domain.</strong> We'll check availability and offer suggestions if your first choice is taken.</p>
                         <div class="dp-search-row">
                             <div class="dp-input-wrap">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                                <input type="text" name="sld" class="dp-input" placeholder="example.com" value="{$domain|default:$sld|escape}" autocomplete="off">
+                                <input type="text" class="dp-input" placeholder="example.com" value="{$domain|escape}" autocomplete="off" data-domain-input="register">
                             </div>
-                            <input type="hidden" name="domain" value="register">
                             <button type="submit" name="checkavailability" value="1" class="dp-search-cta">
                                 Search
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                             </button>
                         </div>
                         <p class="dp-example">
-                            For example: <code>mycompany.com</code>, <code>my-store</code>, or <code>example.io</code>.
+                            For example: <code>mycompany.com</code>, <code>my-store.io</code>, or <code>example.shop</code>.
                             Free WHOIS privacy included on every TLD that supports it.
                         </p>
                     </div>
 
-                    {* Panel: Transfer from another registrar *}
+                    {* Transfer — JS splits to #dp-h-transfersld + #dp-h-transfertld. *}
                     <div class="dp-panel" data-panel="transfer">
-                        <p class="dp-panel-hint"><strong>Transfer your domain from another registrar.</strong> Enter your existing domain and we'll guide you through unlock + auth-code. Most transfers add a <strong>free extra year</strong> to your registration.</p>
+                        <p class="dp-panel-hint"><strong>Transfer your domain from another registrar.</strong> Enter your existing domain and we'll guide you through unlock + auth-code. Most transfers add a <strong>free extra year</strong>.</p>
                         <div class="dp-search-row">
                             <div class="dp-input-wrap">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                                <input type="text" name="transfer" class="dp-input" placeholder="mycompany.com" value="{$transfer|default:''|escape}" autocomplete="off">
+                                <input type="text" class="dp-input" placeholder="mycompany.com" autocomplete="off" data-domain-input="transfer">
                             </div>
                             <button type="submit" name="checktransfer" value="1" class="dp-search-cta">Check</button>
                         </div>
@@ -207,13 +219,13 @@
                         </p>
                     </div>
 
-                    {* Panel: Use existing domain *}
+                    {* Own domain — JS splits to #dp-h-owndomainsld + #dp-h-owndomaintld. *}
                     <div class="dp-panel" data-panel="owndomain">
                         <p class="dp-panel-hint"><strong>I'll use my existing domain and update my nameservers.</strong> Tell us which domain you'd like to use — after checkout we'll email you the nameservers to set at your current registrar.</p>
                         <div class="dp-search-row">
                             <div class="dp-input-wrap">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                <input type="text" name="owndomain" class="dp-input" placeholder="mysite.com" value="{$owndomain|default:''|escape}" autocomplete="off">
+                                <input type="text" class="dp-input" placeholder="mysite.com" autocomplete="off" data-domain-input="owndomain">
                             </div>
                         </div>
                         <p class="dp-example">
@@ -224,14 +236,14 @@
                     <div class="dp-footer">
                         <span class="dp-footer-note">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                            Free WHOIS privacy included on every TLD that supports it.
+                            Free WHOIS privacy on every TLD that supports it.
                         </span>
                         <span class="spacer"></span>
                         <a href="{$WEB_ROOT}/cart.php" class="dp-back">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                             Back
                         </a>
-                        <button type="submit" class="dp-continue">
+                        <button type="submit" name="incart" value="1" class="dp-continue">
                             Continue
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                         </button>
@@ -245,24 +257,65 @@
 <script>
 {literal}
 (function () {
-    // Reveal only the panel matching the selected option
-    var radios = document.querySelectorAll('.dp-option input[type="radio"]');
-    var panels = document.querySelectorAll('.dp-panel');
+    var form = document.getElementById('dpForm');
+    if (!form) return;
 
+    // Reveal only the panel matching the currently-checked option
+    var radios = form.querySelectorAll('.dp-option input[type="radio"]');
+    var panels = form.querySelectorAll('.dp-panel');
     function showPanel(key) {
         panels.forEach(function (p) { p.classList.remove('is-active'); });
-        var target = document.querySelector('.dp-panel[data-panel="' + key + '"]');
+        var target = form.querySelector('.dp-panel[data-panel="' + key + '"]');
         if (target) target.classList.add('is-active');
     }
-
     radios.forEach(function (r) {
-        r.addEventListener('change', function () {
-            if (r.checked) showPanel(r.value);
-        });
+        r.addEventListener('change', function () { if (r.checked) showPanel(r.value); });
     });
 
-    // Sync on load — if a non-default option is already checked
-    var checked = document.querySelector('.dp-option input[type="radio"]:checked');
+    // Split "mycompany.com" → sld="mycompany", tld=".com"
+    function splitDomain(value) {
+        var v = (value || '').trim().toLowerCase()
+            .replace(/^https?:\/\//, '')
+            .replace(/^www\./, '')
+            .replace(/\/.*$/, '');
+        var dot = v.indexOf('.');
+        if (dot <= 0) return null;
+        return { sld: v.substring(0, dot), tld: v.substring(dot) };
+    }
+
+    // Before submit, populate the hidden sld/tld pair WHMCS expects.
+    // Field naming matches WHMCS standard_cart conventions per the
+    // selected option.
+    form.addEventListener('submit', function (e) {
+        var picked = form.querySelector('.dp-option input[type="radio"]:checked');
+        if (!picked) return;
+        var opt = picked.value;
+        var visible = form.querySelector('.dp-panel[data-panel="' + opt + '"] [data-domain-input]');
+        if (!visible) return;
+
+        var parts = splitDomain(visible.value);
+        // Clear all hidden pairs first so we don't accidentally send
+        // a stale value from a previously-typed option.
+        ['sld','tld','transfersld','transfertld','owndomainsld','owndomaintld'].forEach(function (n) {
+            var h = document.getElementById('dp-h-' + n);
+            if (h) h.value = '';
+        });
+        if (!parts) return; // let WHMCS validate the empty submit
+
+        if (opt === 'register') {
+            document.getElementById('dp-h-sld').value = parts.sld;
+            document.getElementById('dp-h-tld').value = parts.tld;
+        } else if (opt === 'transfer') {
+            document.getElementById('dp-h-transfersld').value = parts.sld;
+            document.getElementById('dp-h-transfertld').value = parts.tld;
+        } else if (opt === 'owndomain') {
+            document.getElementById('dp-h-owndomainsld').value = parts.sld;
+            document.getElementById('dp-h-owndomaintld').value = parts.tld;
+        }
+    });
+
+    // Sync to the currently checked radio on load
+    var checked = form.querySelector('.dp-option input[type="radio"]:checked');
     if (checked) showPanel(checked.value);
 })();
 {/literal}
