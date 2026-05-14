@@ -278,8 +278,19 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                             Back
                         </a>
-                        <button type="submit" name="continue" value="1" class="dp-continue">
-                            Continue
+                        {* Secondary: add to cart and let user browse for more.
+                           WHMCS treats name=continue as "continueShopping" and
+                           bounces to the storefront — for a logged-in user
+                           that's clientarea.php, which feels like a dead end. *}
+                        <button type="submit" name="continue" value="1" class="dp-back" style="font-weight: 500;">
+                            Add &amp; keep shopping
+                        </button>
+                        {* Primary: proceed forward in the order flow. WHMCS
+                           treats name=checkout as "go to next step" and lands
+                           on cart-view / checkout, which is what users expect
+                           when they click the big blue button. *}
+                        <button type="submit" name="checkout" value="1" class="dp-continue">
+                            Continue to checkout
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                         </button>
                     </div>
