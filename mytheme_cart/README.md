@@ -51,11 +51,10 @@ mytheme_cart/
 | `viewcart.tpl` | ✓ | `apple-client-area/cart.html` + `cart-empty.html` |
 | `configureproduct.tpl` | ✓ | `apple-client-area/configureproduct.html` |
 | `checkout.tpl` | ✓ | `apple-client-area/checkout.html` |
-| `domainregister.tpl` | pending | `apple-client-area/cart-domain-register.html` |
-| `domaintransfer.tpl` | pending | `apple-client-area/cart-domain-transfer.html` |
-| `checkout.tpl` | pending | `apple-client-area/checkout.html` |
-| `signup.tpl` | pending | `apple-client-area/clientregister.html` |
-| `sidebar-categories.tpl` | pending | — (Apple sidebar styling) |
+| `domainregister.tpl` | ✓ | `apple-client-area/cart-domain-register.html` |
+| `domaintransfer.tpl` | ✓ | `apple-client-area/cart-domain-transfer.html` |
+| `signup.tpl` | ✓ | `apple-client-area/clientregister.html` |
+| `sidebar-categories.tpl` | ✓ | reusable partial extracted from `products.tpl` sidebar |
 
 The pending pieces all have approved visual mockups in `apple-client-area/` already (state-chip + `when-full`/`when-empty` per the per-page processing checklist), so each port is mechanical: strip the outer `<html>`/`<body>`/nav/footer (WHMCS provides those), translate hardcoded data into Smarty variables, inline only what doesn't already live in `style.min.css`.
 
