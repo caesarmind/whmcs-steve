@@ -9,57 +9,75 @@ WHMCS 9 splits the client experience into two independent theme types:
 | Folder | Server path | Renders |
 | --- | --- | --- |
 | `mytheme/` | `templates/mytheme/` | Client area pages: dashboard, services, invoices, support, `/store/order` (product configure) |
-| **`mytheme_cart/`** | `templates/orderforms/mytheme_cart/` | The cart + checkout flow: `viewcart`, `domainregister`, `checkout` |
+| **`mytheme_cart/`** | `templates/orderforms/mytheme_cart/` | The full cart + checkout flow: product group landing (`/store/<slug>`), `viewcart`, `domainregister`, `domaintransfer`, `configureproduct`, `checkout`, `signup` |
 
 This folder is the second of those two. Activate it in **Configuration → System Settings → General Settings → Ordering** (or per product group).
 
-## Structure
+## Parent theme
+
+`mytheme_cart` inherits from `standard_cart` — **not** `nexus_cart`. We're rebuilding the cart UI as traditional Smarty templates instead of inheriting the locked Vue SPA, because the user wanted full visual + structural control across the cart flow (per the "everything needs to rebuild" direction).
+
+The trade-off: we lose the SPA's client-side reactivity (real-time cart updates, AJAX-driven domain validation), but gain full Apple-language styling control and the ability to redesign any page. Nexus's SPA can still be re-inherited later by flipping `parent` back in `theme.yaml`.
+
+## Structure (target)
 
 ```
 mytheme_cart/
-├── theme.yaml         # parent: nexus_cart  (inherit the Vue SPA)
+├── theme.yaml             # parent: standard_cart
 ├── css/
-│   └── custom.css     # Apple visual language via --vl-* overrides
-└── README.md          # this file
+│   ├── style.min.css      # main Apple-language stylesheet (cart-page layout, components)
+│   └── custom.css         # --vl-* token overrides (safety net for any Vue SPA bits)
+├── common.tpl             # shared header partial (assets + WHMCS chrome reset)
+├── products.tpl           # /store/<slug> — product group landing  ← DONE
+├── viewcart.tpl           # /cart.php?a=view                       ← TODO
+├── configureproduct.tpl   # /cart.php?a=confproduct                ← TODO
+├── domainregister.tpl     # /cart.php?a=add&domains=register       ← TODO
+├── domaintransfer.tpl     # /cart.php?a=add&domains=transfer       ← TODO
+├── checkout.tpl           # /cart.php?a=checkout                   ← TODO
+├── signup.tpl             # signup during checkout                 ← TODO
+├── sidebar-categories.tpl # left rail with product group list      ← TODO
+└── README.md              # this file
 ```
 
-That's the whole theme. The cart UI itself is a locked Vue SPA shipped by WHMCS — see "Customization limits" below.
+## Current status
 
-## How it works
+| File | Status | Source mockup |
+| --- | --- | --- |
+| `theme.yaml` | ✓ | — |
+| `css/style.min.css` | ✓ | extracted from `apple-client-area/store/wordpress-hosting.html` |
+| `css/custom.css` | ✓ | — (Apple `--vl-*` tokens for any Shadow DOM fallback) |
+| `common.tpl` | ✓ | — |
+| `products.tpl` | ✓ | `apple-client-area/store/wordpress-hosting.html` |
+| `viewcart.tpl` | pending | `apple-client-area/cart.html` + `cart-empty.html` |
+| `configureproduct.tpl` | pending | `apple-client-area/configureproduct.html` |
+| `domainregister.tpl` | pending | `apple-client-area/cart-domain-register.html` |
+| `domaintransfer.tpl` | pending | `apple-client-area/cart-domain-transfer.html` |
+| `checkout.tpl` | pending | `apple-client-area/checkout.html` |
+| `signup.tpl` | pending | `apple-client-area/clientregister.html` |
+| `sidebar-categories.tpl` | pending | — (Apple sidebar styling) |
 
-1. `theme.yaml` declares `parent: nexus_cart`. WHMCS loads everything from `nexus_cart` (the SPA mount points `viewcart.tpl` / `domainregister.tpl`, the `main.min.js` Vue bundle, the `common.tpl` page chrome) and then layers our theme on top.
-2. `css/custom.css` re-defines the `--vl-*` Shadow-DOM variables that the SPA's components read. Our values come straight from `apple-client-area/css/apple-theme.css`, so the cart looks like the rest of the Apple-themed client area.
-3. Anything outside the SPA Shadow DOM (the wrapper page, header, breadcrumb, footer pulled in from `standard_cart/common.tpl`) is styled by the same tokens via `:root`, plus a small block at the bottom of `custom.css` that sets the Apple system font and link colour on the wrapper.
-
-## Customization limits
-
-Per `WHMCS9-Theme-Development-Documentation.md` §18:
-
-> The layout of Nexus SPA pages cannot be modified — only CSS customization is allowed.
-
-That covers the four SPA-rendered pages: **domain pricing**, **domain search results**, **view cart**, and **checkout**. Their HTML structure is locked. The four CSS variable categories below are what we can move:
-
-- **Colors** — `--vl-primary`, `--vl-secondary`, `--vl-success`, `--vl-info`, `--vl-notice`, `--vl-warning`, `--vl-error`, `--vl-grayscale`, `--vl-neutral` (each with `-lifted` and `-accented` variants)
-- **Text / border / background hierarchy** — `--vl-text*`, `--vl-border*`, `--vl-bg*`
-- **Typography** — `--vl-text-xs`, `--vl-text-sm`, `--vl-text-md`, `--vl-text-lg`
-- **Geometry** — `--vl-outline-*`, `--vl-rounding-*`, `--vl-letter-spacing`, `--vl-disabled-opacity`
-
-If you need to change the actual cart layout (rearrange columns, add a hero, remove a section), the only options are: (a) override `viewcart.tpl` / `domainregister.tpl` to swap the SPA out for traditional Smarty templates from `standard_cart`, or (b) inject changes via post-render JS — both fall outside what this theme is doing.
+The pending pieces all have approved visual mockups in `apple-client-area/` already (state-chip + `when-full`/`when-empty` per the per-page processing checklist), so each port is mechanical: strip the outer `<html>`/`<body>`/nav/footer (WHMCS provides those), translate hardcoded data into Smarty variables, inline only what doesn't already live in `style.min.css`.
 
 ## Local preview
 
-This theme cannot be previewed inside the apple-client-area dev server — the Vue SPA and the `{getNexusData}` Smarty function only exist on a real WHMCS install. For visual reference, the Apple-themed mockups that match how this theme should look once rendered live at:
+This theme cannot be previewed inside the apple-client-area dev server — the `.tpl` files only run on a WHMCS install. For visual reference, the Apple-themed mockups that match how this theme should look once rendered live at:
 
 | Mockup | Maps to |
 | --- | --- |
-| [apple-client-area/cart.html](../apple-client-area/cart.html) | `viewcart.tpl` (full cart) |
+| [apple-client-area/store/wordpress-hosting.html](../apple-client-area/store/wordpress-hosting.html) | `products.tpl` (group landing) |
+| [apple-client-area/cart.html](../apple-client-area/cart.html) | `viewcart.tpl` (cart contents) |
 | [apple-client-area/cart-empty.html](../apple-client-area/cart-empty.html) | `viewcart.tpl` (empty state) |
-| [apple-client-area/cart-domain-register.html](../apple-client-area/cart-domain-register.html) | `domainregister.tpl` (register flow) |
-| [apple-client-area/cart-domain-transfer.html](../apple-client-area/cart-domain-transfer.html) | `domainregister.tpl` (transfer flow) |
-| [apple-client-area/checkout.html](../apple-client-area/checkout.html) | `checkout.tpl` (inherited from `standard_cart`) |
-| [apple-client-area/store/order.html](../apple-client-area/store/order.html) | **`mytheme/store/order.tpl`** — lives in the *client area* theme, NOT here |
+| [apple-client-area/cart-domain-register.html](../apple-client-area/cart-domain-register.html) | `domainregister.tpl` |
+| [apple-client-area/cart-domain-transfer.html](../apple-client-area/cart-domain-transfer.html) | `domaintransfer.tpl` |
+| [apple-client-area/configureproduct.html](../apple-client-area/configureproduct.html) | `configureproduct.tpl` |
+| [apple-client-area/checkout.html](../apple-client-area/checkout.html) | `checkout.tpl` |
+| [apple-client-area/clientregister.html](../apple-client-area/clientregister.html) | `signup.tpl` |
 
-The last row is the catch we just untangled: `/store/order` (the per-product configure form that submits to `cart-order-addtocart`) is a **client area** route in WHMCS 9, so its template lives in `mytheme/`, not `mytheme_cart/`. It pairs with `nexus/store/order.tpl`, not anything inside `nexus_cart/`.
+The single client-area-theme route that's adjacent (not part of this folder):
+
+| Mockup | Maps to |
+| --- | --- |
+| [apple-client-area/store/order.html](../apple-client-area/store/order.html) | **`mytheme/store/order.tpl`** — `/store/order` is a client-area route, lives in `mytheme/`, NOT here |
 
 ## Install on the server
 
@@ -74,13 +92,9 @@ Preview from any URL with `?carttpl=mytheme_cart`, e.g.:
 
 ```
 https://your-domain/cart.php?carttpl=mytheme_cart
+https://your-domain/index.php/store/wordpress-hosting?carttpl=mytheme_cart
 ```
 
-## Extending
+## Lang-key plumbing
 
-If you later decide you want to move past CSS-only customization, the two practical escape hatches are:
-
-1. **Override the SPA mount with traditional templates.** Drop `viewcart.tpl` and `domainregister.tpl` into this folder, copy them from `standard_cart` (not `nexus_cart`), and you get full Smarty control at the cost of the SPA's reactivity.
-2. **Override non-SPA pages.** `configureproduct.tpl`, `products.tpl`, `checkout.tpl`, and `signup.tpl` from `standard_cart` are regular Smarty and can be redesigned freely — they're outside the SPA constraint.
-
-For the matching reference TPL set, look at `templates/orderforms/standard_cart/` on your WHMCS install.
+Every visible string in `products.tpl` runs through `{lang key='...'|default:'...'}` so admins can translate via WHMCS's standard language overrides without editing TPLs. The defaults are the English copy from the mockup; new language packs only need to provide the keys that should change.

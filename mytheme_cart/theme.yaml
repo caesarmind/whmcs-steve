@@ -1,2 +1,3 @@
 config:
-  parent: nexus_cart
+  parent: standard_cart
+
