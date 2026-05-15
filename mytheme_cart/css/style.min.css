@@ -2121,13 +2121,12 @@ body[data-plan] .st-variant-label { display: none; }
 @media (max-width: 720px) { .cp-cycle { grid-template-columns: 1fr; } }
 .cp-cycle-opt {
     position: relative;
-    padding: 20px 22px 22px;
+    padding: 16px 16px 14px;
     border: 0.5px solid var(--color-border);
     border-radius: var(--radius-md);
     background: var(--color-surface);
     cursor: pointer;
     transition: all var(--transition-fast);
-    min-height: 144px;
 }
 .cp-cycle-opt input { position: absolute; opacity: 0; pointer-events: none; }
 .cp-cycle-opt:hover { border-color: var(--color-accent); }
@@ -2149,47 +2148,16 @@ body[data-plan] .st-variant-label { display: none; }
 .cp-cycle-price .amount   { font-size: 22px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.02em; line-height: 1; }
 .cp-cycle-price .period   { font-size: 12px; color: var(--color-text-tertiary); margin-left: 2px; }
 
-/* Raw price text -- WHMCS gives us a pre-formatted string like
-   "$20.00 USD Monthly". An inline script at the bottom of
-   configureproduct.tpl parses each .cp-cycle-price-raw at page load
-   and wraps the pieces in .currency / .amount / .period spans so the
-   mockup small-big-small typography ($ 7.99 /mo) actually applies. */
-.cp-cycle-price-raw {
-    display: flex;
-    align-items: baseline;
-    gap: 3px;
-    margin-top: 16px;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-}
-.cp-cycle-price-raw .currency {
+/* Fallback while the JS at the bottom of configureproduct.tpl hasn't
+   run yet -- keeps the raw WHMCS price string readable. Once the JS
+   wraps the text into .currency / .amount / .period spans, the
+   structured rules above (.cp-cycle-price .currency / .amount / .period)
+   take over and produce the mockup small-big-small typography. */
+.cp-cycle-price:not(:has(.amount)) {
     font-size: 16px;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    letter-spacing: -0.014em;
-    align-self: flex-start;
-    margin-top: 4px;
-}
-.cp-cycle-price-raw .amount {
-    font-size: 32px;
     font-weight: 600;
     color: var(--color-text-primary);
-    letter-spacing: -0.025em;
-    line-height: 1;
-}
-.cp-cycle-price-raw .period {
-    font-size: 12.5px;
-    color: var(--color-text-tertiary);
-    margin-left: 3px;
-    letter-spacing: -0.004em;
-}
-/* Fallback while JS hasn't run yet -- keep the raw string readable */
-.cp-cycle-price-raw:not(:has(.amount)) {
-    display: block;
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.012em;
 }
 
 /* -- Form fields --------------------------------------- */

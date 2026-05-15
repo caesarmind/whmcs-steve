@@ -136,7 +136,7 @@ var _localLang = {
                                    WHMCS-formatted price as a prominent number.
                                    WHMCS provides each cycle's price as a
                                    pre-formatted string ($pricing.monthly etc.),
-                                   so we drop it into .cp-cycle-price-raw which
+                                   so we drop it into .cp-cycle-price which
                                    styles it large + tabular-nums. The mockup
                                    also shows "SAVE X%" badges on annual+; that
                                    would require computing the per-cycle
@@ -148,7 +148,7 @@ var _localLang = {
                                             <input type="radio" name="billingcycle" value="monthly"{if $billingcycle eq "monthly"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermmonthly}</div>
                                             <div class="cp-cycle-sub">{$LANG.cartbilledmonthly|default:'Billed every month'}</div>
-                                            <div class="cp-cycle-price-raw">{$pricing.monthly}</div>
+                                            <div class="cp-cycle-price">{$pricing.monthly}</div>
                                         </label>
                                     {/if}
                                     {if $pricing.quarterly}
@@ -156,7 +156,7 @@ var _localLang = {
                                             <input type="radio" name="billingcycle" value="quarterly"{if $billingcycle eq "quarterly"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermquarterly}</div>
                                             <div class="cp-cycle-sub">{$LANG.cartbilledquarterly|default:'Billed every 3 months'}</div>
-                                            <div class="cp-cycle-price-raw">{$pricing.quarterly}</div>
+                                            <div class="cp-cycle-price">{$pricing.quarterly}</div>
                                         </label>
                                     {/if}
                                     {if $pricing.semiannually}
@@ -164,7 +164,7 @@ var _localLang = {
                                             <input type="radio" name="billingcycle" value="semiannually"{if $billingcycle eq "semiannually"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermsemiannually}</div>
                                             <div class="cp-cycle-sub">{$LANG.cartbilledsemiannually|default:'Billed every 6 months'}</div>
-                                            <div class="cp-cycle-price-raw">{$pricing.semiannually}</div>
+                                            <div class="cp-cycle-price">{$pricing.semiannually}</div>
                                         </label>
                                     {/if}
                                     {if $pricing.annually}
@@ -172,7 +172,7 @@ var _localLang = {
                                             <input type="radio" name="billingcycle" value="annually"{if $billingcycle eq "annually"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermannually}</div>
                                             <div class="cp-cycle-sub">{$LANG.cartbilledannually|default:'Billed once per year'}</div>
-                                            <div class="cp-cycle-price-raw">{$pricing.annually}</div>
+                                            <div class="cp-cycle-price">{$pricing.annually}</div>
                                         </label>
                                     {/if}
                                     {if $pricing.biennially}
@@ -180,7 +180,7 @@ var _localLang = {
                                             <input type="radio" name="billingcycle" value="biennially"{if $billingcycle eq "biennially"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermbiennially}</div>
                                             <div class="cp-cycle-sub">{$LANG.cartbilledbiennially|default:'Billed every 2 years'}</div>
-                                            <div class="cp-cycle-price-raw">{$pricing.biennially}</div>
+                                            <div class="cp-cycle-price">{$pricing.biennially}</div>
                                         </label>
                                     {/if}
                                     {if $pricing.triennially}
@@ -188,7 +188,7 @@ var _localLang = {
                                             <input type="radio" name="billingcycle" value="triennially"{if $billingcycle eq "triennially"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermtriennially}</div>
                                             <div class="cp-cycle-sub">{$LANG.cartbilledtriennially|default:'Billed every 3 years'}</div>
-                                            <div class="cp-cycle-price-raw">{$pricing.triennially}</div>
+                                            <div class="cp-cycle-price">{$pricing.triennially}</div>
                                         </label>
                                     {/if}
                                 </div>
@@ -536,7 +536,7 @@ var _localLang = {
 
 <script>
 {literal}
-/* Split each .cp-cycle-price-raw text into currency / amount / period
+/* Split each .cp-cycle-price text into currency / amount / period
    spans so the mockup typography (small / big / small) can be applied.
    WHMCS emits price as one string e.g. "$20.00 USD Monthly". We parse:
      - leading non-digit run -> currency symbol ($)
@@ -556,7 +556,7 @@ var _localLang = {
         triennially:  '/3yr',
         triennial:    '/3yr'
     };
-    var nodes = document.querySelectorAll('.cp-cycle-price-raw');
+    var nodes = document.querySelectorAll('.cp-cycle-price');
     for (var i = 0; i < nodes.length; i++) {
         var el = nodes[i];
         var raw = (el.textContent || '').trim();
