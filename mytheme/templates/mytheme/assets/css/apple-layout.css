@@ -1,5 +1,5 @@
 /* ============================================================
-   apple-layout.css — Shared layout system for every page
+   apple-layout.css -- Shared layout system for every page
    ------------------------------------------------------------
    Extracted from portal-home.html so every page can opt into
    the three-way layout (top / sidebar / icon-rail), the palette
@@ -15,7 +15,7 @@
    --color-*) this file references.
    ============================================================ */
 
-/* ── State machine ────────────────────────────────────────── */
+/* -- State machine ------------------------------------------ */
 body[data-auth="out"] .only-in { display: none !important; }
 body[data-auth="in"]  .only-out { display: none !important; }
 body:not([data-layout="top"])  .only-top  { display: none !important; }
@@ -29,7 +29,7 @@ body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
 
 /* Topbar/footer stay within .ph-main-wrap (right of the sidebar/rail).
    Earlier negative-margin trick was reverted because it covered the
-   sidebar header — sidebar should own its full-height left column. */
+   sidebar header -- sidebar should own its full-height left column. */
 /* Flex column so footers stick to the bottom of the viewport on short pages */
 .ph-main-wrap {
     display: flex;
@@ -38,7 +38,7 @@ body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
     /* Fill the body's flex row remaining space. Without flex:1 the wrap
        shrinks to its content's natural width (which is capped at the
        .content-area max-width of 1120px), so .content-area's auto margins
-       have no remaining space to center against — content sticks to the
+       have no remaining space to center against -- content sticks to the
        left edge of the viewport. */
     flex: 1;
     min-width: 0;
@@ -50,17 +50,17 @@ body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
     flex: 1 0 auto;
     width: 100%;
 }
-/* Align: Left — preview chip toggle (body[data-align="left"]).
+/* Align: Left -- preview chip toggle (body[data-align="left"]).
    Only meaningful in sidebar/rail layouts where there's a fixed-width
    sidebar to anchor against. In top layout the page-nav is sticky and
-   .ph-main-wrap is already full-width, so alignment has nothing to do —
+   .ph-main-wrap is already full-width, so alignment has nothing to do --
    any align value is a no-op. */
 body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area {
     margin-left: 0;
     margin-right: auto;
 }
 
-/* Defensive centering in top layout — overrides any align / subnav-side
+/* Defensive centering in top layout -- overrides any align / subnav-side
    rules that might otherwise leak in via stale cached CSS. Content-area
    always centers horizontally when there's no sidebar to anchor against. */
 body[data-layout="top"] .ph-main-wrap .content-area {
@@ -68,11 +68,11 @@ body[data-layout="top"] .ph-main-wrap .content-area {
     margin-right: auto !important;
     transform: none !important;
 }
-/* Footers sit as natural block children at the end of the flex column — no extra rule needed */
-/* Rail panel overlays content on hover — does NOT shift main wrap */
+/* Footers sit as natural block children at the end of the flex column -- no extra rule needed */
+/* Rail panel overlays content on hover -- does NOT shift main wrap */
 body:not([data-layout="top"]) { background: var(--color-bg); }
 
-/* ── Dev preview chip / options tab ───────────────────────── */
+/* -- Dev preview chip / options tab ------------------------- */
 /* Top-center floating, draggable. Drag by the "preview" tag on
    the left; double-click the tag to snap back to default. */
 .state-chip {
@@ -142,7 +142,7 @@ body:not([data-layout="top"]) { background: var(--color-bg); }
 body[data-preview="off"] .state-chip,
 body.screenshot .state-chip { display: none !important; }
 
-/* ── Palette overrides ────────────────────────────────────── */
+/* -- Palette overrides -------------------------------------- */
 /* Each data-palette on <html> swaps the accent token chain so
    buttons, links, hovers and dropdown highlights pick up the
    new hue. Base colors still live in apple-theme.css. */
@@ -191,7 +191,7 @@ html[data-palette="slate"] {
     --color-blue-bg: rgba(100, 116, 139, 0.10);
     --color-blue-text: #475569;
 }
-/* Avatar / sidebar-avatar gradients use hard-coded hex —
+/* Avatar / sidebar-avatar gradients use hard-coded hex --
    nudge them per palette to match. */
 html[data-palette="emerald"] .topbar-avatar,
 html[data-palette="emerald"] .sidebar-avatar { background: linear-gradient(135deg, #14b17d, #5ac8a3); }
@@ -204,7 +204,7 @@ html[data-palette="amber"]   .sidebar-avatar { background: linear-gradient(135de
 html[data-palette="slate"]   .topbar-avatar,
 html[data-palette="slate"]   .sidebar-avatar { background: linear-gradient(135deg, #64748b, #94a3b8); }
 
-/* ── Auth strip (logged-in + top-layout) ──────────────────── */
+/* -- Auth strip (logged-in + top-layout) -------------------- */
 .ph-auth-strip {
     background: var(--color-surface-secondary);
     border-bottom: 1px solid var(--color-border);
@@ -239,10 +239,10 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
     background: #3a2f0a; color: #fbbf24; border-color: #54430a;
 }
 
-/* ── Homepage-nav adjustments (topbar-btn inside nav) ─────── */
+/* -- Homepage-nav adjustments (topbar-btn inside nav) ------- */
 /* apple-theme.css defines .topbar-btn with 34px box; when the
    button is an <a> inside .homepage-nav the parent's <a> rules
-   sometimes clip it — re-assert the box sizing here. */
+   sometimes clip it -- re-assert the box sizing here. */
 .homepage-nav .topbar-btn {
     width: 34px; height: 34px; min-width: 34px;
     flex-shrink: 0; opacity: 1;
@@ -275,7 +275,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .homepage-nav-inner > a,
 .homepage-nav-inner .nav-simple-trigger { font-size: 12px; }
 
-/* ── Lightweight nav dropdowns (WHMCS-style, compact) ─────── */
+/* -- Lightweight nav dropdowns (WHMCS-style, compact) ------- */
 .nav-simple-dropdown { position: relative; display: flex; align-items: center; align-self: stretch; }
 .nav-simple-trigger {
     display: inline-flex; align-items: center; gap: 4px;
@@ -311,7 +311,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 }
 .nav-simple-menu .divider { height: 1px; background: var(--color-border); margin: 5px 0; }
 
-/* ── Promo slider (shared component — auto-cycles store addons) ──────────── */
+/* -- Promo slider (shared component -- auto-cycles store addons) ------------ */
 /* Default: vertical layout (sidebar-width-friendly). Container queries upgrade
    to horizontal when the slider has enough room (dashboards, wide columns). */
 .promo-slider {
@@ -365,7 +365,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .promo-slider-dot:hover { background: var(--color-text-tertiary); }
 .promo-slider-dot.active { background: var(--color-accent); width: 16px; border-radius: 3px; }
 
-/* Wide containers (≥ 420px inline-size) — horizontal arrangement.
+/* Wide containers (≥ 420px inline-size) -- horizontal arrangement.
    Visual on the left, text block on the right, link aligns bottom-right. */
 @container promo (min-width: 420px) {
     .promo-slider { padding: 18px 22px 14px; }
@@ -386,7 +386,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
     .promo-slide-link svg { width: 12px; height: 12px; }
 }
 
-/* ── Pill-tab group (shared across domain tabs, Register/Transfer, promo tabs) ── */
+/* -- Pill-tab group (shared across domain tabs, Register/Transfer, promo tabs) -- */
 .ph-domain-tabs {
     display: inline-flex;
     background: var(--color-surface-secondary);
@@ -406,7 +406,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
     box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
-/* ── Breadcrumb (top-layout) ──────────────────────────────── */
+/* -- Breadcrumb (top-layout) -------------------------------- */
 .ph-breadcrumb {
     background: var(--color-surface-secondary);
     border-bottom: 1px solid var(--color-border);
@@ -425,9 +425,9 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .ph-breadcrumb-inner .sep { opacity: 0.4; font-size: 11px; }
 .ph-breadcrumb-inner .current { color: var(--color-text-primary); font-weight: 500; }
 
-/* ═════════════════════════════════════════════════════════════
-   RAIL LAYOUT — icon rail (80px) + flyout panel (240px)
-   ═════════════════════════════════════════════════════════════ */
+/* =============================================================
+   RAIL LAYOUT -- icon rail (80px) + flyout panel (240px)
+   ============================================================= */
 .ph-rail {
     position: fixed; top: 0; left: 0; bottom: 0; width: 80px;
     background: var(--sidebar-bg);
@@ -481,7 +481,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
     margin: 8px auto 4px; cursor: pointer;
 }
 
-/* Flyout panel — overlays content on hover; content below doesn't shift */
+/* Flyout panel -- overlays content on hover; content below doesn't shift */
 .ph-rail-panel {
     position: fixed; top: 0; bottom: 0; left: 80px; width: 240px;
     background: var(--color-surface);
@@ -541,9 +541,9 @@ body[data-layout="rail"] .ph-hero-inner { max-width: none; }
     body[data-layout="rail"] .ph-section { padding-left: 24px; padding-right: 24px; }
 }
 
-/* ═════════════════════════════════════════════════════════════
-   SIDEBAR LAYOUT — collapsible groups + inner topbar + footer
-   ═════════════════════════════════════════════════════════════ */
+/* =============================================================
+   SIDEBAR LAYOUT -- collapsible groups + inner topbar + footer
+   ============================================================= */
 .sidebar-group { display: flex; flex-direction: column; }
 .sidebar-group-toggle {
     display: flex; align-items: center; gap: 10px;
@@ -665,7 +665,7 @@ body[data-layout="side"] .ph-section:last-of-type { padding-bottom: 48px; }
     body[data-layout="side"] .ph-side-footer-inner { padding-left: 24px; padding-right: 24px; }
 }
 
-/* ── Language / currency chooser ──────────────────────────── */
+/* -- Language / currency chooser ---------------------------- */
 .locale-btn {
     display: inline-flex; align-items: center; gap: 7px;
     padding: 5px 12px; background: var(--color-surface);
@@ -758,12 +758,12 @@ body[data-layout="side"] .ph-section:last-of-type { padding-bottom: 48px; }
 .locale-modal-footer .apply { background: var(--color-accent); color: #fff; }
 .locale-modal-footer .apply:hover { background: #0077ed; }
 
-/* ── Partial include placeholder ──────────────────────────── */
+/* -- Partial include placeholder ---------------------------- */
 /* Nodes with [data-include] are empty shells the JS fills via
    fetch. Hide them until loaded to avoid a layout flash. */
 [data-include]:not([data-loaded]) { display: none; }
 
-/* ── .when-full / .when-empty toggle ───────────────────────────────
+/* -- .when-full / .when-empty toggle -------------------------------
    Some page tpls render both states and rely on body[data-data] (set
    by the page tpl's inline script) to pick which one is visible. The
    preview chip in the apple-client-area mockups also relies on this
@@ -771,14 +771,14 @@ body[data-layout="side"] .ph-section:last-of-type { padding-bottom: 48px; }
 body[data-data="empty"] .when-full       { display: none !important; }
 body:not([data-data="empty"]) .when-empty { display: none !important; }
 
-/* ── Responsive sidebar drawer (≤900px, side layout) ──────── */
+/* -- Responsive sidebar drawer (≤900px, side layout) -------- */
 /* On narrow viewports the fixed 260px sidebar would crowd content,
    so we convert it to a slide-in drawer. The hamburger toggle lives
    in the inner-topbar (`.ph-mobile-toggle`); JS flips `body.nav-open`
    to slide the sidebar in and reveal the backdrop. The inner-topbar
-   stays as the only nav chrome — no homepage-nav fallback needed. */
+   stays as the only nav chrome -- no homepage-nav fallback needed. */
 
-/* Backdrop overlay — sits between content and drawer when open */
+/* Backdrop overlay -- sits between content and drawer when open */
 .ph-nav-backdrop {
     position: fixed; inset: 0; z-index: 99;
     background: rgba(0, 0, 0, 0.4);
@@ -789,11 +789,11 @@ body:not([data-data="empty"]) .when-empty { display: none !important; }
 }
 body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
 
-/* Hamburger toggle — only visible on side/rail at narrow widths */
+/* Hamburger toggle -- only visible on side/rail at narrow widths */
 .ph-mobile-toggle { display: none; }
 
 @media (max-width: 900px) {
-    /* Reset main content offset — drawer overlays, doesn't push */
+    /* Reset main content offset -- drawer overlays, doesn't push */
     body[data-layout="side"] .ph-main-wrap,
     body[data-layout="rail"] .ph-main-wrap { margin-left: 0; }
 
@@ -810,7 +810,7 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
     }
     body[data-layout="side"].nav-open .sidebar { transform: translateX(0); }
 
-    /* Rail also slides in as a drawer (panel hidden — rail items are
+    /* Rail also slides in as a drawer (panel hidden -- rail items are
        self-contained on touch) */
     body[data-layout="rail"] .ph-rail {
         transform: translateX(-100%);
@@ -821,13 +821,13 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
     body[data-layout="rail"].nav-open .ph-rail { transform: translateX(0); }
     body[data-layout="rail"] .ph-rail-panel { display: none !important; }
 
-    /* Show hamburger toggle — only when in side/rail layout */
+    /* Show hamburger toggle -- only when in side/rail layout */
     body:not([data-layout="top"]) .ph-mobile-toggle { display: inline-flex; }
 
     /* Lock body scroll while drawer is open */
     body.nav-open { overflow: hidden; }
 
-    /* The inner-topbar IS the nav chrome on side/rail mobile —
+    /* The inner-topbar IS the nav chrome on side/rail mobile --
        suppress the top-layout fallback so we don't double up. */
     body[data-layout="side"] .only-top,
     body[data-layout="rail"] .only-top { display: none !important; }
@@ -880,15 +880,15 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
     .homepage-nav .icon-btn { display: none; }
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    Cart-page wrapper integration
-   ───────────────────────────────────────────────────────────────
+   ---------------------------------------------------------------
    When the client area renders ANY order-form template
    (mytheme_cart, standard_cart, nexus_cart, …) inside mytheme's
    chrome, the order form ships its own navbar + container styling
    that fights ours. These rules live HERE (in the client-area
    theme) so they apply regardless of which cart template is
-   active — switching templates from WHMCS admin doesn't break
+   active -- switching templates from WHMCS admin doesn't break
    the chrome.
 
    $templatefile values WHMCS sets on cart-related pages:
@@ -896,7 +896,7 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
      checkout, products, domainregister, domaintransfer,
      domainoptions, ordersummary, complete, fraudcheck, addons,
      configuredomains
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 body[data-tpl="cart"],
 body[data-tpl="viewcart"],
 body[data-tpl="configureproduct"],
@@ -913,7 +913,7 @@ body[data-tpl="complete"],
 body[data-tpl="fraudcheck"] {
 
     /* WHMCS injects a generic .main-navbar-wrapper on order-form
-       pages — mytheme's nav already handles auth + active state,
+       pages -- mytheme's nav already handles auth + active state,
        so hide the dupe whichever cart theme is rendering. */
     .main-navbar-wrapper,
     [data-target="#mainNavbar"],
@@ -921,7 +921,7 @@ body[data-tpl="fraudcheck"] {
     nav#mainNavbar { display: none !important; }
 
     /* Default WHMCS cart wrapper styling fights edge-to-edge
-       sections — flatten the padding + background so the cart's
+       sections -- flatten the padding + background so the cart's
        own card layout breathes inside mytheme's .content-area. */
     section#main-body,
     section.main-body,
@@ -931,17 +931,17 @@ body[data-tpl="fraudcheck"] {
     #main-body > .container { max-width: none !important; padding: 0 !important; }
 
     /* standard_cart wraps its content in #order-standard_cart with
-       its own padding — flatten so .content-area handles it. */
+       its own padding -- flatten so .content-area handles it. */
     #order-standard_cart { padding: 0 !important; background: transparent !important; }
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    Bootstrap-grid + utilities shim for legacy cart templates
-   ───────────────────────────────────────────────────────────────
+   ---------------------------------------------------------------
    standard_cart (and most classic-WHMCS order-form templates) use
    Bootstrap 3/4 grid + utility classes (.row, .col-md-*, .panel,
    .card, .list-group, .btn, .alert, …). Their own all.min.css
-   doesn't include Bootstrap itself — they expect the client-area
+   doesn't include Bootstrap itself -- they expect the client-area
    theme to load it. mytheme doesn't, so without this shim the
    cart layout collapses to a single-column unstyled stack.
 
@@ -949,7 +949,7 @@ body[data-tpl="fraudcheck"] {
    into the rest of the client area (which uses .ph-*, .ct-*, etc.
    without any class overlap). Apple visual tokens used throughout
    so the cart still feels native instead of like raw Bootstrap.
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 body[data-tpl="cart"],
 body[data-tpl="viewcart"],
 body[data-tpl="configureproduct"],
@@ -965,7 +965,7 @@ body[data-tpl="addons"],
 body[data-tpl="complete"],
 body[data-tpl="fraudcheck"] {
 
-    /* ── Grid ──────────────────────────────────────────── */
+    /* -- Grid -------------------------------------------- */
     .row { display: flex; flex-wrap: wrap; margin-right: -12px; margin-left: -12px; }
     .row-eq-height { display: flex; flex-wrap: wrap; }
     .row > [class*="col-"] { position: relative; min-height: 1px; padding-right: 12px; padding-left: 12px; box-sizing: border-box; }
@@ -994,7 +994,7 @@ body[data-tpl="fraudcheck"] {
     .container { max-width: 1200px; margin: 0 auto; padding: 0 16px; box-sizing: border-box; }
     .container-fluid { width: 100%; padding: 0 16px; box-sizing: border-box; }
 
-    /* ── Panels / cards (Bootstrap 3 + 4 + 5 aliases) ──── */
+    /* -- Panels / cards (Bootstrap 3 + 4 + 5 aliases) ---- */
     .panel, .card, .card-sidebar {
         background: var(--color-surface, #fff);
         border: 0.5px solid var(--color-border, #e8e8ed);
@@ -1017,7 +1017,7 @@ body[data-tpl="fraudcheck"] {
         background: var(--color-surface-tertiary, #fafafa);
     }
 
-    /* ── List groups ───────────────────────────────────── */
+    /* -- List groups ------------------------------------- */
     .list-group { display: flex; flex-direction: column; }
     .list-group-item {
         padding: 10px 14px;
@@ -1038,7 +1038,7 @@ body[data-tpl="fraudcheck"] {
     }
     .list-group-item.disabled { color: var(--color-text-tertiary, #86868b); pointer-events: none; }
 
-    /* ── Buttons ───────────────────────────────────────── */
+    /* -- Buttons ----------------------------------------- */
     .btn, button.btn, a.btn {
         height: 38px;
         padding: 0 18px;
@@ -1083,7 +1083,7 @@ body[data-tpl="fraudcheck"] {
     .btn-sm { height: 32px; padding: 0 14px; font-size: 12.5px; }
     .btn-group { display: inline-flex; gap: 6px; }
 
-    /* ── Forms ─────────────────────────────────────────── */
+    /* -- Forms ------------------------------------------- */
     .form-control, .custom-select {
         height: 40px;
         padding: 0 14px;
@@ -1109,14 +1109,14 @@ body[data-tpl="fraudcheck"] {
     .input-group .form-control:first-child { border-radius: var(--radius-md, 12px) 0 0 var(--radius-md, 12px); }
     .input-group .form-control:last-child { border-radius: 0 var(--radius-md, 12px) var(--radius-md, 12px) 0; }
 
-    /* ── Alerts ────────────────────────────────────────── */
+    /* -- Alerts ------------------------------------------ */
     .alert { padding: 12px 16px; border-radius: var(--radius-md, 12px); margin-bottom: 16px; font-size: 13px; line-height: 1.5; }
     .alert-info { background: var(--color-accent-light, rgba(0, 113, 227, 0.08)); color: var(--color-accent, #0071e3); }
     .alert-danger, .alert-error { background: var(--color-red-bg, rgba(255, 59, 48, 0.10)); color: var(--color-red-text, #d70015); }
     .alert-success { background: var(--color-green-bg, rgba(48, 209, 88, 0.10)); color: var(--color-green-text, #248a3d); }
     .alert-warning { background: var(--color-orange-bg, rgba(255, 159, 10, 0.10)); color: var(--color-orange-text, #c27400); }
 
-    /* ── Badges ────────────────────────────────────────── */
+    /* -- Badges ------------------------------------------ */
     .badge, .label {
         display: inline-flex; align-items: center;
         padding: 2px 8px;
@@ -1132,7 +1132,7 @@ body[data-tpl="fraudcheck"] {
     .label-danger,  .badge-danger  { background: var(--color-red-bg);   color: var(--color-red-text); }
     .label-warning, .badge-warning { background: var(--color-orange-bg); color: var(--color-orange-text); }
 
-    /* ── Utilities ─────────────────────────────────────── */
+    /* -- Utilities --------------------------------------- */
     .pull-right, .float-right { float: right; }
     .pull-left,  .float-left  { float: left; }
     .text-right  { text-align: right; }
@@ -1166,12 +1166,25 @@ body[data-tpl="fraudcheck"] {
     .w-100 { width: 100% !important; }
     .font-size-36 { font-size: 36px; font-weight: 600; letter-spacing: -0.022em; }
 
-    /* Headings inside the cart area inherit the Apple type scale */
-    h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.024em; margin-top: 0; }
-    h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.018em; }
-    h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.014em; }
+    /* Headings inside the cart area inherit the Apple type scale.
+       Wrapped in :is() with the outer body[data-tpl=...] inside :where()
+       so the resulting specificity is just (0,0,1) -- the element. That
+       makes these DEFAULTS that any class-based rule (e.g. .cp-section-title,
+       .addon-promo-container h3, .cp-plan-hero-name) can override without
+       needing !important. Previously the rule had specificity (0,1,2)
+       because the body[data-tpl="..."] wrapper added an attribute + body
+       element to the chain; that beat almost every per-page heading rule
+       and forced workarounds throughout mytheme_cart's CSS.
 
-    /* ── standard_cart-specific helpers ────────────────── */
+       The :where() trick: :where(X) y has the specificity of just y.
+       So body[data-tpl=cart] :where(h1) and :where(body[data-tpl=cart]) h1
+       both compute to specificity (0,0,1). Same visual result, but the
+       rule now loses to any class selector. */
+    :where(h1) { font-size: 32px; font-weight: 600; letter-spacing: -0.024em; margin-top: 0; }
+    :where(h2) { font-size: 24px; font-weight: 600; letter-spacing: -0.018em; }
+    :where(h3) { font-size: 18px; font-weight: 600; letter-spacing: -0.014em; }
+
+    /* -- standard_cart-specific helpers ------------------ */
     .header-lined {
         padding-bottom: 14px;
         border-bottom: 0.5px solid var(--color-border, #e8e8ed);
@@ -1208,18 +1221,18 @@ body[data-tpl="fraudcheck"] {
     .fa, .fas, .far, .fab { display: none; }
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    Apple-language overrides for standard_cart's cart-flow pages
-   ───────────────────────────────────────────────────────────────
+   ---------------------------------------------------------------
    The base Bootstrap shim above gets standard_cart rendering at
    all. These rules take that further: reshape the actual DOM
    standard_cart emits so it matches the Apple visual language
-   from apple-client-area/store.html — 240px sidebar + main grid,
+   from apple-client-area/store.html -- 240px sidebar + main grid,
    .subnav-card-style sidebar items, .st-cat-head-style page
    header, .st-plan-style product cards, and pill-shaped Apple
    buttons. All achieved via CSS targeting standard_cart's
-   wrapper structure (no TPL changes — forms keep working).
-   ═══════════════════════════════════════════════════════════════ */
+   wrapper structure (no TPL changes -- forms keep working).
+   =============================================================== */
 body[data-tpl="cart"],
 body[data-tpl="viewcart"],
 body[data-tpl="configureproduct"],
@@ -1235,14 +1248,14 @@ body[data-tpl="addons"],
 body[data-tpl="complete"],
 body[data-tpl="fraudcheck"] {
 
-    /* ── Root cart wrapper — neutralize the default 14px font + padding ── */
+    /* -- Root cart wrapper -- neutralize the default 14px font + padding -- */
     #order-standard_cart {
         font-size: 14px;
         color: var(--color-text-primary, #1d1d1f);
         padding: 8px 0 32px !important;
     }
 
-    /* ── 2-col split: 240px sidebar + flex main, like .st-split ── */
+    /* -- 2-col split: 240px sidebar + flex main, like .st-split -- */
     #order-standard_cart > .row {
         display: grid !important;
         grid-template-columns: 240px 1fr;
@@ -1269,7 +1282,7 @@ body[data-tpl="fraudcheck"] {
         min-width: 0;
     }
 
-    /* ── Sidebar cards (.panel.card.card-sidebar) — render as .subnav-card ── */
+    /* -- Sidebar cards (.panel.card.card-sidebar) -- render as .subnav-card -- */
     #order-standard_cart .cart-sidebar .panel,
     #order-standard_cart .cart-sidebar .card,
     #order-standard_cart .cart-sidebar .card-sidebar {
@@ -1331,7 +1344,7 @@ body[data-tpl="fraudcheck"] {
         font-weight: 500;
     }
 
-    /* ── Page header (.header-lined) — render as .st-cat-head ── */
+    /* -- Page header (.header-lined) -- render as .st-cat-head -- */
     #order-standard_cart .header-lined {
         padding: 24px 28px 22px !important;
         margin: 0 0 18px !important;
@@ -1358,7 +1371,7 @@ body[data-tpl="fraudcheck"] {
         margin: 0;
     }
 
-    /* ── Products grid (.products .row .col-md-6) — render as .ds-pricing-grid ── */
+    /* -- Products grid (.products .row .col-md-6) -- render as .ds-pricing-grid -- */
     #order-standard_cart .products,
     #order-standard_cart #products {
         margin: 18px 0;
@@ -1474,7 +1487,7 @@ body[data-tpl="fraudcheck"] {
         color: #fff;
     }
 
-    /* ── Domain selection (.domain-selection-options) — Apple radio cards ── */
+    /* -- Domain selection (.domain-selection-options) -- Apple radio cards -- */
     #order-standard_cart .domain-selection-options {
         background: var(--color-surface, #fff);
         border: 0.5px solid var(--color-border, #e8e8ed);
@@ -1556,7 +1569,7 @@ body[data-tpl="fraudcheck"] {
         color: #fff;
     }
 
-    /* ── Domain search results / availability messages ───────── */
+    /* -- Domain search results / availability messages --------- */
     #order-standard_cart .domain-checker-available {
         background: var(--color-green-bg, rgba(48, 209, 88, 0.10));
         color: var(--color-green-text, #248a3d);
@@ -1573,7 +1586,7 @@ body[data-tpl="fraudcheck"] {
         margin: 14px 0;
     }
 
-    /* ── Bottom action bar / continue / checkout buttons ─────── */
+    /* -- Bottom action bar / continue / checkout buttons ------- */
     #order-standard_cart .btn-continue-shopping,
     #order-standard_cart .btn-checkout {
         height: 44px;
@@ -1602,7 +1615,7 @@ body[data-tpl="fraudcheck"] {
         color: var(--color-accent, #0071e3);
     }
 
-    /* ── View Cart / Order Summary table — Apple style ───────── */
+    /* -- View Cart / Order Summary table -- Apple style --------- */
     #order-standard_cart .bordered-totals,
     #order-standard_cart .checkout-summary,
     #order-standard_cart .summary-container {
@@ -1640,11 +1653,11 @@ body[data-tpl="fraudcheck"] {
         font-size: 15px;
     }
 
-    /* ═══ Refinements for configureproductdomain to match the mockup ═══
+    /* === Refinements for configureproductdomain to match the mockup ===
        The .domain-selection-options rules above style the SECTION,
        this section styles each radio option to look like a tappable
        Apple card with a 20px radio circle and the accent-light
-       background flag when checked. ──────────────────────────── */
+       background flag when checked. ---------------------------- */
     #order-standard_cart .domain-selection-options {
         padding: 0;
     }
@@ -1673,7 +1686,7 @@ body[data-tpl="fraudcheck"] {
         cursor: pointer;
         user-select: none;
     }
-    /* Custom-styled radio — accent ring + filled center on check */
+    /* Custom-styled radio -- accent ring + filled center on check */
     #order-standard_cart .domain-selection-options .option > label input[type="radio"] {
         appearance: none;
         -webkit-appearance: none;
@@ -1735,12 +1748,12 @@ body[data-tpl="fraudcheck"] {
         color: var(--color-text-tertiary, #86868b);
     }
 
-    /* ── Bootstrap-Multiselect plugin styling ──────────────────
+    /* -- Bootstrap-Multiselect plugin styling ------------------
        The plugin wraps a <select> in:
          .btn-group > button.multiselect + ul.multiselect-container.dropdown-menu
        Without these rules the open dropdown shows raw browser radios + checkboxes
-       on a plain box — exactly what the user's screenshot caught.
-       ────────────────────────────────────────────────────────── */
+       on a plain box -- exactly what the user's screenshot caught.
+       ---------------------------------------------------------- */
     #order-standard_cart .btn-group.multiselect-native-select {
         position: relative;
         display: inline-block;
@@ -1873,7 +1886,7 @@ body[data-tpl="fraudcheck"] {
         box-sizing: border-box;
     }
     /* The "Include TLDs" / "Length" inline label that overlaps the
-       dropdown panel in the screenshot — let it flow underneath
+       dropdown panel in the screenshot -- let it flow underneath
        cleanly instead of butting up against the button. */
     #order-standard_cart .domain-selection-options .domains-row > .multiselect-native-select,
     #order-standard_cart .domain-selection-options .domains-row > select.multiselect {
@@ -1898,7 +1911,7 @@ body[data-tpl="fraudcheck"] {
         margin: 0;
     }
 
-    /* Page-bottom "Continue" / "Place Order" submit buttons — make sure
+    /* Page-bottom "Continue" / "Place Order" submit buttons -- make sure
        any .btn at the form root is the filled accent CTA, not outline. */
     #order-standard_cart form .text-center .btn,
     #order-standard_cart form > .btn,
@@ -1941,11 +1954,11 @@ body[data-tpl="fraudcheck"] {
         margin-bottom: 12px;
     }
 
-    /* ═══ viewcart — Apple empty state + trust strip + addon nesting ═══
+    /* === viewcart -- Apple empty state + trust strip + addon nesting ===
        The view-cart-empty / .ct-empty markup lives inside the cart
        items list when $cartitems == 0. Style it as an Apple "nothing
        to see" panel with icon, headline, and 2-button action row.
-       ──────────────────────────────────────────────────────────── */
+       ------------------------------------------------------------ */
     #order-standard_cart .view-cart-empty {
         padding: 0 !important;
         background: transparent !important;
@@ -2003,7 +2016,7 @@ body[data-tpl="fraudcheck"] {
 
     /* Visual nesting hint for addons attached to a product line.
        The .item-addon class is added to product-attached addons (not
-       standalone $addons) — gives them a slight inset + lighter title
+       standalone $addons) -- gives them a slight inset + lighter title
        so the parent product is the focal point. */
     #order-standard_cart .item.item-addon {
         padding-left: 36px;
@@ -2018,7 +2031,7 @@ body[data-tpl="fraudcheck"] {
         margin-right: 4px;
     }
 
-    /* Promo-applied chip — when a promotion is active the
+    /* Promo-applied chip -- when a promotion is active the
        .view-cart-promotion-code block shows the code + description. */
     #order-standard_cart .view-cart-promotion-code {
         display: flex; align-items: center; gap: 8px;
@@ -2052,7 +2065,7 @@ body[data-tpl="fraudcheck"] {
         font-size: 10px;
     }
 
-    /* ═══ configureproduct — product header card + addon picker ═══
+    /* === configureproduct -- product header card + addon picker ===
        The product-info block is the page-top intro card (icon + title
        + description). Addons render as bordered cards that highlight
        when checked (.panel-addon-selected class is toggled by JS). */
@@ -2214,7 +2227,7 @@ body[data-tpl="fraudcheck"] {
         letter-spacing: -0.008em;
     }
 
-    /* ═══ checkout — total-due banner, gateway picker, CC inputs ═══
+    /* === checkout -- total-due banner, gateway picker, CC inputs ===
        The big green "total due today" banner sits between the form
        sections and the payment method picker. Apple-style: white
        card with subtle accent border + large total. */
@@ -2260,7 +2273,7 @@ body[data-tpl="fraudcheck"] {
         padding: 6px 0;
     }
 
-    /* Gateway radio picker — wrap each one as a tappable card */
+    /* Gateway radio picker -- wrap each one as a tappable card */
     #order-standard_cart #paymentGatewaysContainer {
         padding: 14px 0;
     }
@@ -2357,7 +2370,7 @@ body[data-tpl="fraudcheck"] {
         color: var(--color-text-secondary, #424245);
     }
 
-    /* Existing-account picker — card-style radios */
+    /* Existing-account picker -- card-style radios */
     #order-standard_cart .account-select-container .account {
         padding: 16px 18px;
         margin-bottom: 10px;
@@ -2389,7 +2402,7 @@ body[data-tpl="fraudcheck"] {
         background-color: var(--color-accent, #0071e3) !important;
     }
 
-    /* ═══ domainregister — search hero + TLD pricing table ═══ */
+    /* === domainregister -- search hero + TLD pricing table === */
     #order-standard_cart .domain-checker-container {
         margin: 18px 0 24px;
     }
@@ -2577,7 +2590,7 @@ body[data-tpl="fraudcheck"] {
         line-height: 1.5;
     }
 
-    /* ═══ domaintransfer — single card on this page ═══ */
+    /* === domaintransfer -- single card on this page === */
     #order-standard_cart .domain-transfer-card {
         margin-top: 18px;
         border: 0.5px solid var(--color-border, #e8e8ed);
