@@ -137,6 +137,38 @@
 .already-registered { padding: 10px 0 14px; }
 .already-registered p { color: var(--color-text-secondary); font-size: 13px; margin: 0; }
 
+/* Additional Notes card */
+.co-notes { padding: 18px 22px; background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: 14px; }
+.co-notes-label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; margin: 0 0 8px; flex-wrap: wrap; }
+.co-notes-label .hint { font-size: 11.5px; font-weight: 400; color: var(--color-text-tertiary); letter-spacing: -0.004em; }
+.co-notes-area { width: 100%; min-height: 84px; padding: 10px 14px; border: 0.5px solid var(--color-border); border-radius: 10px; background: var(--color-surface); font-family: inherit; font-size: 13px; color: var(--color-text-primary); letter-spacing: -0.008em; line-height: 1.5; resize: vertical; transition: all 0.15s; box-sizing: border-box; }
+.co-notes-area::placeholder { color: var(--color-text-quaternary, #c7c7cc); }
+.co-notes-area:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+
+/* Marketing-email-optin card */
+.co-mailing { padding: 16px 20px; display: flex; align-items: center; gap: 14px; background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: 14px; }
+.co-mailing-icon { width: 38px; height: 38px; border-radius: 10px; background: var(--color-accent-light); color: var(--color-accent); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.co-mailing-icon svg { width: 18px; height: 18px; }
+.co-mailing-meta { flex: 1; min-width: 0; }
+.co-mailing-title { font-size: 13.5px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; margin: 0 0 3px; }
+.co-mailing-desc { font-size: 12px; color: var(--color-text-tertiary); margin: 0; letter-spacing: -0.004em; line-height: 1.5; }
+.co-mailing-toggle { position: relative; cursor: pointer; user-select: none; flex-shrink: 0; display: inline-flex; align-items: center; }
+.co-mailing-toggle input { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; margin: 0; }
+.co-mailing-switch { width: 40px; height: 22px; background: var(--color-surface-secondary); border-radius: 999px; position: relative; transition: background 0.15s; border: 0.5px solid var(--color-border); display: block; }
+.co-mailing-switch::after { content: ""; position: absolute; top: 1px; left: 1px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.18); transition: transform 0.15s; }
+.co-mailing-toggle input:checked + .co-mailing-switch { background: var(--color-green-text, #34c759); border-color: var(--color-green-text, #34c759); }
+.co-mailing-toggle input:checked + .co-mailing-switch::after { transform: translateX(18px); }
+
+/* Last-chance offers card (wraps $hookOutput on checkout) */
+.co-lastchance { padding: 0; background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: 14px; }
+.co-lastchance-head { padding: 16px 22px; border-bottom: 0.5px solid var(--color-border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.co-lastchance-badge { padding: 3px 10px; border-radius: 999px; background: var(--color-orange-bg, #fff7e6); color: var(--color-orange-text, #b25c00); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.co-lastchance-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.012em; }
+.co-lastchance-sub { font-size: 11.5px; color: var(--color-text-tertiary); margin-left: auto; letter-spacing: -0.004em; }
+.co-lastchance-body { padding: 14px 22px 18px; }
+.co-lastchance-body > div + div { margin-top: 10px; }
+.co-lastchance-body img { max-width: 100%; height: auto; }
+
 /* Override standard_cart wrapper artefacts so the .content-area frame is clean */
 #order-standard_cart { padding: 0 !important; background: transparent !important; }
 {/literal}</style>
@@ -691,11 +723,24 @@
 
                 {/if}
 
-                {foreach $hookOutput as $output}
-                    <div>
-                        {$output}
+                {* ─── Last-chance offers (3rd-party hookOutput) ───
+                   Wrap whatever the merchant's checkout-hook integrations
+                   render in an Apple .co-lastchance card so it doesn't
+                   bleed raw markup into the page. *}
+                {if $hookOutput}
+                    <div class="co-lastchance" style="margin-bottom: 16px;">
+                        <div class="co-lastchance-head">
+                            <span class="co-lastchance-badge">{$LANG.lastchance|default:'Last chance'}</span>
+                            <span class="co-lastchance-title">{$LANG.lastchancetitle|default:'Protect your services and add value'}</span>
+                            <span class="co-lastchance-sub">{$LANG.oneclickadd|default:'One-click add. Remove anytime.'}</span>
+                        </div>
+                        <div class="co-lastchance-body">
+                            {foreach $hookOutput as $output}
+                                <div>{$output}</div>
+                            {/foreach}
+                        </div>
                     </div>
-                {/foreach}
+                {/if}
 
                 {* ─── Captcha ─── *}
                 {if $captcha && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
@@ -888,29 +933,38 @@
                     {/if}
                 {/if}
 
-                {* ─── Order notes ─── *}
+                {* ─── Order notes (Apple .co-notes card) ───
+                   Keeps the textarea name="notes" field so WHMCS still
+                   captures order notes server-side. *}
                 {if $shownotesfield}
-
-                    <div class="sub-heading">
-                        <span class="primary-bg-color">{$LANG.orderForm.additionalNotes}</span>
+                    <div class="co-notes" style="margin-bottom: 16px;">
+                        <label class="co-notes-label" for="orderNotesTextarea">
+                            {$LANG.orderForm.additionalNotes}
+                            <span class="hint">{$LANG.orderForm.optional|default:'Optional'} &mdash; {$LANG.includedwithyourorder|default:'included with your order'}</span>
+                        </label>
+                        <textarea id="orderNotesTextarea" name="notes" class="co-notes-area" rows="3" placeholder="{$LANG.ordernotesdescription}">{$orderNotes}</textarea>
                     </div>
-
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <textarea name="notes" class="field form-control" rows="4" placeholder="{$LANG.ordernotesdescription}">{$orderNotes}</textarea>
-                            </div>
-                        </div>
-                    </div>
-
                 {/if}
 
-                {* ─── Marketing opt-in ─── *}
+                {* ─── Marketing opt-in (Apple .co-mailing card with toggle switch) ───
+                   Keeps the checkbox name="marketingoptin" so the WHMCS
+                   server still receives the opt-in flag. The toggle UI is
+                   pure CSS over the underlying checkbox -- no scripts.js
+                   bootstrap-switch widget here, which means we don't need
+                   the .toggle-switch-success / no-icheck classes. *}
                 {if $showMarketingEmailOptIn}
-                    <div class="marketing-email-optin">
-                        <h4 class="font-size-18">{lang key='emailMarketing.joinOurMailingList'}</h4>
-                        <p>{$marketingEmailOptInMessage}</p>
-                        <input type="checkbox" name="marketingoptin" value="1"{if $marketingEmailOptIn} checked{/if} class="no-icheck toggle-switch-success" data-size="small" data-on-text="{lang key='yes'}" data-off-text="{lang key='no'}">
+                    <div class="co-mailing" style="margin-bottom: 16px;">
+                        <div class="co-mailing-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+                        </div>
+                        <div class="co-mailing-meta">
+                            <h4 class="co-mailing-title">{lang key='emailMarketing.joinOurMailingList'}</h4>
+                            <p class="co-mailing-desc">{$marketingEmailOptInMessage}</p>
+                        </div>
+                        <label class="co-mailing-toggle">
+                            <input type="checkbox" name="marketingoptin" value="1"{if $marketingEmailOptIn} checked{/if}>
+                            <span class="co-mailing-switch" aria-hidden="true"></span>
+                        </label>
                     </div>
                 {/if}
 

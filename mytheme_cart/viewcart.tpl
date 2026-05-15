@@ -506,6 +506,32 @@
     .ct-express-row .separator { text-align: center; font-size: 11px; color: var(--color-text-quaternary); letter-spacing: 0.05em; }
     .ct-hookout { margin-top: 12px; }
 
+    /* "Recommended for you" offers card (mockup .ct-recommend-*) -- wraps
+       the third-party $hookOutput so it sits in an Apple card with a
+       proper header strip instead of bleeding raw HTML into the layout. */
+    .ct-recommend { padding: 0; }
+    .ct-recommend-head {
+        padding: 16px 22px; border-bottom: 0.5px solid var(--color-border);
+        display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .ct-recommend-badge {
+        padding: 3px 10px; border-radius: var(--radius-pill, 999px);
+        background: var(--color-accent-light); color: var(--color-accent);
+        font-size: 10px; font-weight: 600;
+        letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .ct-recommend-title {
+        font-size: 14px; font-weight: 600; color: var(--color-text-primary);
+        letter-spacing: -0.012em;
+    }
+    .ct-recommend-sub {
+        font-size: 11.5px; color: var(--color-text-tertiary);
+        margin-left: auto; letter-spacing: -0.004em;
+    }
+    .ct-recommend-body { padding: 14px 22px 18px; }
+    .ct-recommend-body > div + div { margin-top: 10px; }
+    .ct-recommend-body img { max-width: 100%; height: auto; }
+
     /* Empty state */
     body[data-data="empty"] .vc-when-full { display: none; }
     body:not([data-data="empty"]) .vc-when-empty { display: none; }
@@ -1006,12 +1032,25 @@
                     {/if}
                 </div>
 
-                {* ─── Hook output (3rd-party additions to the cart body) ─── *}
+                {* ─── Hook output (3rd-party additions to the cart body) ───
+                   Wrapped in the Apple .ct-recommend offers card so the
+                   third-party HTML sits inside a styled "Recommended for
+                   you" panel instead of bleeding raw markup into the
+                   layout. The hook content itself stays untouched -- it
+                   may render its own grid / cards / banner depending on
+                   what the merchant has installed. *}
                 {if $hookOutput}
-                    <div class="ct-hookout">
-                        {foreach $hookOutput as $output}
-                            <div>{$output}</div>
-                        {/foreach}
+                    <div class="card ct-recommend">
+                        <div class="ct-recommend-head">
+                            <span class="ct-recommend-badge">{$LANG.recommended|default:'Recommended'}</span>
+                            <span class="ct-recommend-title">{$LANG.recommendedforyou|default:'Recommended for you'}</span>
+                            <span class="ct-recommend-sub">{$LANG.oneclickadd|default:'One-click add. Remove anytime.'}</span>
+                        </div>
+                        <div class="ct-recommend-body">
+                            {foreach $hookOutput as $output}
+                                <div>{$output}</div>
+                            {/foreach}
+                        </div>
                     </div>
                 {/if}
 
