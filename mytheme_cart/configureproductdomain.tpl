@@ -229,22 +229,21 @@
                         {/if}
 
                         {if $owndomainenabled}
-                            {* Owndomain panel — single full-domain input, NO per-panel button.
-                               The mockup design (apple-client-area/configureproductdomain.html
-                               lines 524-540) has no Search/Check/Use button here — submission
-                               happens via the footer Continue. Standard_cart split this into
-                               SLD + TLD inputs because it ran a server-side check on the Use
-                               click; we don't need that because WHMCS validates server-side
-                               after Continue is pressed.
-                               JS submit handler reads [data-input="domain"] and writes the
-                               full string into resultDomain. *}
+                            {* Owndomain panel — split SLD + free-text TLD, mirroring standard_cart.
+                               TLD is a TEXT input (not a <select>) because owndomain must accept
+                               ANY TLD — not just registrar-supported ones. Register/transfer use
+                               <select> populated from $registertlds / $transfertlds because those
+                               flows are restricted to TLDs we actually sell.
+                               JS submit handler joins sld + '.' + tld into resultDomain. *}
                             <div class="dp-panel{if $domainoption eq "owndomain"} is-active{/if}" data-panel="owndomain">
                                 <p class="dp-panel-hint"><strong>I'll use my existing domain and update my nameservers.</strong> Tell us which domain you'd like to use - after checkout we'll email you the nameservers to set at your current registrar.</p>
                                 <div class="dp-search-row">
                                     <div class="dp-input-wrap">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                        <input type="text" class="dp-input" data-input="domain" value="{if $sld && $tld}{$sld}{$tld}{/if}" placeholder="mysite.com" autocomplete="off" autocapitalize="none">
+                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{$LANG.yourdomainplaceholder|default:'mysite'}" autocomplete="off" autocapitalize="none">
                                     </div>
+                                    <input type="text" class="dp-input no-ico" data-input="tld" value="{$tld|substr:1}" placeholder="{$LANG.yourtldplaceholder|default:'com'}" autocomplete="off" autocapitalize="none" style="flex: 0 0 130px;">
+                                    <button type="submit" class="dp-search-cta">{$LANG.orderForm.use}</button>
                                 </div>
                             </div>
                         {/if}
@@ -342,11 +341,11 @@
             var tld = readInput(panel, 'tld');
             if (sld) resultDomain.value = sld + tld;
         } else if (opt === 'owndomain') {
-            // Single full-domain input (e.g. "mysite.com") - no split SLD/TLD.
-            // WHMCS server-side will validate the format and reject if it's
-            // not a parseable <sld>.<tld>.
-            var fullDomain = readInput(panel, 'domain').toLowerCase();
-            if (fullDomain) resultDomain.value = fullDomain;
+            // Split SLD + free-text TLD (mirrors standard_cart). User can enter
+            // any TLD — WHMCS server-side validates the join is parseable.
+            var sld = readInput(panel, 'sld').toLowerCase();
+            var tld = readInput(panel, 'tld').toLowerCase().replace(/^\./, '');
+            if (sld && tld) resultDomain.value = sld + '.' + tld;
         } else if (opt === 'subdomain') {
             var sld = readInput(panel, 'sld').toLowerCase();
             var parent = readInput(panel, 'tld');

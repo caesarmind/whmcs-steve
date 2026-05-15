@@ -521,13 +521,19 @@
                 </div>
 
                 <!-- Panel: Use existing domain -->
+                <!-- Split SLD + free-text TLD (mirrors standard_cart). TLD is a text
+                     input, not a select, because owndomain accepts ANY TLD — register
+                     and transfer use selects because those flows are restricted to
+                     registrar-supported TLDs. -->
                 <div class="dp-panel" data-panel="existing" data-state="error">
                     <p class="dp-panel-hint"><strong>I'll use my existing domain and update my nameservers.</strong> Tell us which domain you'd like to use — after checkout we'll email you the nameservers to set at your current registrar.</p>
                     <div class="dp-search-row">
                         <div class="dp-input-wrap">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                            <input type="text" class="dp-input" placeholder="mysite.com" autocomplete="off" value="not-a-domain">
+                            <input type="text" class="dp-input" placeholder="mysite" autocomplete="off" value="not-a-domain">
                         </div>
+                        <input type="text" class="dp-input no-ico" placeholder="com" autocomplete="off" style="flex: 0 0 130px;">
+                        <button type="button" class="dp-search-cta">Use</button>
                     </div>
 
                     <!-- Error state: invalid domain -->
