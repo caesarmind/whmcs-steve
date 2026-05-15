@@ -2477,7 +2477,7 @@ body[data-plan] .st-variant-label { display: none; }
 }
 
 /* ===============================================================
-   PROMO ADDONS (.addon-promo-container) — WHMCS-rendered markup.
+   PROMO ADDONS (.addon-promo-container) -- WHMCS-rendered markup.
    On configureproduct.tpl the {foreach $addonsPromoOutput} loop
    echoes pre-built HTML from MarketConnect (Symantec SSL, Weebly,
    SpamExperts, CodeGuard, SiteLock, MarketGoo, OX, etc.). The
@@ -2500,7 +2500,7 @@ body[data-plan] .st-variant-label { display: none; }
     margin-top: 12px;
 }
 
-/* Header band: title + paragraph on LEFT, logo on RIGHT — matches the
+/* Header band: title + paragraph on LEFT, logo on RIGHT -- matches the
    mockup's .st-addon-head pattern (text takes 1fr, logo is a 200px
    wide rounded illustration box on the right). The mockup-faithful
    layout has logo on the right; the prior version had it on the left
@@ -2616,7 +2616,7 @@ body[data-plan] .st-variant-label { display: none; }
     width: 3px;
     background: var(--color-accent);
 }
-/* Custom radio circle — hide the native input visually and draw our own. */
+/* Custom radio circle -- hide the native input visually and draw our own. */
 .addon-promo-container .radio-inline input[type="radio"] {
     appearance: none;
     -webkit-appearance: none;
