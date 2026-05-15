@@ -2116,7 +2116,7 @@ body[data-plan] .st-variant-label { display: none; }
 }
 .cp-plan-hero-change:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
-/* ── Selected-plan card domain row ──────────────────────
+/* -- Selected-plan card domain row ----------------------
    Sub-row inside the plan-hero card showing the chosen domain.
    Lives below the plan info, divided by a hairline border. Globe
    icon on the left, "Domain" label + monospace domain name + optional
