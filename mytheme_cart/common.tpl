@@ -21,8 +21,16 @@
  * that goes INSIDE that wrapper.
  *}
 
-{* Apple-language stylesheet — owns all cart-page typography, layout, components *}
+{* Apple-language stylesheet -- owns all cart-page typography, layout, components *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/style.min.css?v={$myTheme.assetVersion|default:'1'}">
 
-{* --vl-* token overrides (safety net — applies inside any Vue Shadow DOM that loads) *}
+{* --vl-* token overrides (safety net -- applies inside any Vue Shadow DOM that loads) *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/custom.css?v={$myTheme.assetVersion|default:'1'}">
+
+{* Inherited from standard_cart: scripts.min.js defines recalctotals(),
+   selectChangeNavigate(), the addon-recommendations modal trigger, and
+   other cart-page JS that WHMCS expects available globally. mytheme_cart
+   doesn't ship its own scripts.min.js, so load standard_cart's directly
+   -- it lives at templates/orderforms/standard_cart/js/scripts.min.js
+   on the server regardless of which orderform is active. *}
+<script src="{$WEB_ROOT}/templates/orderforms/standard_cart/js/scripts.min.js?v={$myTheme.assetVersion|default:'1'}"></script>
