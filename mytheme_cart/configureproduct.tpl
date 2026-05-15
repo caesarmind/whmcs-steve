@@ -126,8 +126,8 @@ var _localLang = {
                     {if $pricing.type eq "recurring"}
                         <div class="card cp-section">
                             <div class="cp-section-head">
-                                <h2 class="cp-section-title">{$LANG.cartchoosecycle}</h2>
-                                <div class="cp-section-sub">Longer commitments unlock bigger discounts — you can change or upgrade later.</div>
+                                <h2 class="cp-section-title">{$LANG.cartbillingcycle|default:'Billing cycle'}</h2>
+                                <div class="cp-section-sub">{$LANG.cartbillingcyclesub|default:'Longer commitments = bigger discounts. You can upgrade or switch later.'}</div>
                             </div>
                             <div class="cp-section-body">
                                 {* ── Billing-cycle cards ──
@@ -533,3 +533,49 @@ var _localLang = {
 {include file="orderforms/standard_cart/recommendations-modal.tpl"}
 
 <script>recalctotals();</script>
+
+<script>
+{literal}
+/* Split each .cp-cycle-price-raw text into currency / amount / period
+   spans so the mockup typography (small / big / small) can be applied.
+   WHMCS emits price as one string e.g. "$20.00 USD Monthly". We parse:
+     - leading non-digit run -> currency symbol ($)
+     - numeric run           -> amount (20.00)
+     - optional ISO code     -> dropped (USD)
+     - trailing word         -> cycle name -> mapped to /mo abbreviation */
+(function () {
+    var CYCLE_ABBR = {
+        monthly:      '/mo',
+        quarterly:    '/qtr',
+        semiannually: '/6mo',
+        semi:         '/6mo',
+        annually:     '/yr',
+        annual:       '/yr',
+        biennially:   '/2yr',
+        biennial:     '/2yr',
+        triennially:  '/3yr',
+        triennial:    '/3yr'
+    };
+    var nodes = document.querySelectorAll('.cp-cycle-price-raw');
+    for (var i = 0; i < nodes.length; i++) {
+        var el = nodes[i];
+        var raw = (el.textContent || '').trim();
+        if (!raw) continue;
+        // Match: [non-digits][digits.decimals] [optional ISO code] [optional cycle word]
+        var m = raw.match(/^([^\d\-]*)\s*(-?\d[\d.,]*)\s*([A-Za-z]{2,4})?\s*(.*)$/);
+        if (!m) continue;
+        var currency = (m[1] || '').trim() || '$';
+        var amount = (m[2] || '').trim();
+        var rest = (m[4] || '').toLowerCase().trim();
+        // If the third group is a 3-letter ISO code (USD, EUR, etc.) it's
+        // already consumed; whatever is left is the cycle term.
+        var key = rest.replace(/[^a-z]/g, '');
+        var period = CYCLE_ABBR[key] || (rest ? '/' + rest.substr(0, 3) : '');
+        el.innerHTML = '<span class="currency"></span><span class="amount"></span><span class="period"></span>';
+        el.querySelector('.currency').textContent = currency;
+        el.querySelector('.amount').textContent = amount;
+        el.querySelector('.period').textContent = period;
+    }
+})();
+{/literal}
+</script>
