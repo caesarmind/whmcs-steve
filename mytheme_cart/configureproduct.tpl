@@ -100,26 +100,46 @@ var _localLang = {
                     </div>
 
                     {* ── Selected-plan hero ────────────────────────────
-                       Shows the product the user picked on the previous
-                       step (icon + name + short description), with a
-                       "Change plan" link back to the products listing
-                       for the same group. Mockup-faithful version of
-                       what was previously only a one-line text in the
-                       page-header subtitle. *}
-                    <div class="card cp-plan-hero">
-                        <div class="cp-plan-hero-ico" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                       Shows the product picked on the products step (icon
+                       + name + short description) and, when WHMCS has
+                       captured a domain on the previous configureproductdomain
+                       step, a second row with the chosen domain + "Included"
+                       badge. The mockup combines both inside one .card with
+                       a top + bottom row separated by a 0.5px divider. *}
+                    <div class="card cp-plan-hero-card">
+                        <div class="cp-plan-hero">
+                            <div class="cp-plan-hero-ico" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                            </div>
+                            <div class="cp-plan-hero-meta">
+                                <div class="cp-plan-hero-eyebrow">{$LANG.cartselectedplan|default:'Selected plan'}</div>
+                                <div class="cp-plan-hero-name">{$productinfo.name}</div>
+                                {if $productinfo.description}
+                                    <div class="cp-plan-hero-desc">{$productinfo.description|strip_tags|truncate:120}</div>
+                                {/if}
+                            </div>
+                            <a href="{$WEB_ROOT}/cart.php{if $productinfo.gid}?gid={$productinfo.gid}{/if}" class="cp-plan-hero-change">
+                                {$LANG.cartchangeplan|default:'Change plan'}
+                            </a>
                         </div>
-                        <div class="cp-plan-hero-meta">
-                            <div class="cp-plan-hero-eyebrow">{$LANG.cartselectedplan|default:'Selected plan'}</div>
-                            <div class="cp-plan-hero-name">{$productinfo.name}</div>
-                            {if $productinfo.description}
-                                <div class="cp-plan-hero-desc">{$productinfo.description|strip_tags|truncate:120}</div>
-                            {/if}
-                        </div>
-                        <a href="{$WEB_ROOT}/cart.php{if $productinfo.gid}?gid={$productinfo.gid}{/if}" class="cp-plan-hero-change">
-                            {$LANG.cartchangeplan|default:'Change plan'}
-                        </a>
+
+                        {if $domain}
+                            <div class="cp-plan-hero-domain">
+                                <svg class="cp-plan-hero-domain-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                                <div class="cp-plan-hero-domain-meta">
+                                    <div class="cp-plan-hero-domain-label">{$LANG.domain|default:'Domain'}</div>
+                                    <div class="cp-plan-hero-domain-value">
+                                        <span class="cp-plan-hero-domain-name">{$domain}</span>
+                                        {if $domainoption eq "owndomain" || $domainoption eq "subdomain"}
+                                            <span class="cp-plan-hero-domain-badge">{$LANG.cartdomainincluded|default:'Included'}</span>
+                                        {/if}
+                                    </div>
+                                </div>
+                                <a href="{$WEB_ROOT}/cart.php?a=add&pid={$pid}&domainselect=1" class="cp-plan-hero-change">
+                                    {$LANG.cartchangedomain|default:'Change'}
+                                </a>
+                            </div>
+                        {/if}
                     </div>
 
                     {* ── Billing cycle (only for recurring products) ── *}
