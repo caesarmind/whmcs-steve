@@ -50,7 +50,14 @@
        palette. Loaded BEFORE main.min.js so the SPA paints with the
        right colors on first frame. *}
 
-    <script type="text/javascript" src="{$WEB_ROOT}/templates/orderforms/mytheme_cart/js/apple-vars.js"></script>
+    {* apple-vars.js lives under templates/mytheme/assets/js/ (the same
+       trusted path as apple-theme.js / apple-layout.js) because WHMCS's
+       cart TPL sanitizer allows <script src=> from templates/mytheme/...
+       and templates/orderforms/{standard_cart,nexus_cart}/... but
+       STRIPS references to templates/orderforms/mytheme_cart/...
+       Verified live: every script src= in the previous attempt was
+       allowed except the mytheme_cart one. *}
+    <script type="text/javascript" src="{$WEB_ROOT}/templates/mytheme/assets/js/apple-vars.js"></script>
 
     <div id="order-standard_cart">
         <div id="nexus-root" data-app="cart-module" data-init="{getNexusData}"></div>
