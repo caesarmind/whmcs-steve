@@ -42,81 +42,90 @@
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/nexus_cart/css/style.min.css">
 
     <style>{literal}
-    /* ── Apple-themed overrides for nexus_cart's --vl-* variable surface ──
-       Set on BOTH :root (page) and :host (Shadow DOM root) so the SPA
-       picks them up through custom-property inheritance. Values mirror
-       apple-client-area/css/apple-theme.css's light-mode palette. */
+    /* ── Apple-themed customization of nexus_cart ──
+       nexus_cart auto-loads its own custom.css AFTER any inline styles
+       we add here, and that file maps every --vl-* variable from an
+       unprefixed --* (e.g. --vl-primary: var(--primary)). So setting
+       --vl-* directly gets overwritten. We set the unprefixed --*
+       layer instead -- nexus's mapping then carries our values into
+       the SPA's Shadow DOM via custom-property inheritance.
+       Values mirror apple-client-area/css/apple-theme.css's light
+       palette. */
     :root, :host {
         /* Primary -- Apple blue */
-        --vl-primary:           #0071e3;
-        --vl-primary-lifted:    #0077ed;
-        --vl-primary-accented:  #005bb5;
+        --primary:           #0071e3;
+        --primary-lifted:    #0077ed;
+        --primary-accented:  #005bb5;
 
         /* Secondary -- neutral chip / muted button */
-        --vl-secondary:           #f5f5f7;
-        --vl-secondary-lifted:    #ebebef;
-        --vl-secondary-accented:  #e8e8ed;
+        --secondary:           #f5f5f7;
+        --secondary-lifted:    #ebebef;
+        --secondary-accented:  #e8e8ed;
 
         /* Status colors */
-        --vl-success:           #34c759;
-        --vl-success-lifted:    #30b751;
-        --vl-success-accented:  #2aa24a;
-        --vl-info:              #0071e3;
-        --vl-info-lifted:       #0077ed;
-        --vl-info-accented:     #005bb5;
-        --vl-notice:            #ff9f0a;
-        --vl-notice-lifted:     #ff8e00;
-        --vl-notice-accented:   #e07a00;
-        --vl-warning:           #ff9500;
-        --vl-warning-lifted:    #f08a00;
-        --vl-warning-accented:  #d97a00;
-        --vl-error:             #ff3b30;
-        --vl-error-lifted:      #ef352b;
-        --vl-error-accented:    #d62d24;
+        --success:           #34c759;
+        --success-lifted:    #30b751;
+        --success-accented:  #2aa24a;
+        --info:              #0071e3;
+        --info-lifted:       #0077ed;
+        --info-accented:     #005bb5;
+        --notice:            #ff9f0a;
+        --notice-lifted:     #ff8e00;
+        --notice-accented:   #e07a00;
+        --warning:           #ff9500;
+        --warning-lifted:    #f08a00;
+        --warning-accented:  #d97a00;
+        --error:             #ff3b30;
+        --error-lifted:      #ef352b;
+        --error-accented:    #d62d24;
 
         /* Grayscale / neutral */
-        --vl-grayscale:  #1d1d1f;
-        --vl-neutral:    #6e6e73;
+        --grayscale:           #1d1d1f;
+        --grayscale-lifted:    #2c2c2e;
+        --grayscale-accented:  #000000;
+        --neutral:           #6e6e73;
+        --neutral-lifted:    #86868b;
+        --neutral-accented:  #4a4a4f;
 
         /* Text hierarchy */
-        --vl-text:           #1d1d1f;
-        --vl-text-lifted:    #6e6e73;
-        --vl-text-accented:  #000000;
-        --vl-text-muted:     #86868b;
-        --vl-text-inverted:  #ffffff;
+        --text:           #1d1d1f;
+        --text-lifted:    #6e6e73;
+        --text-accented:  #000000;
+        --text-muted:     #86868b;
+        --text-inverted:  #ffffff;
 
         /* Border hierarchy */
-        --vl-border:           #e8e8ed;
-        --vl-border-muted:     #f0f0f5;
-        --vl-border-lifted:    #d2d2d7;
-        --vl-border-accented:  #1d1d1f;
+        --border:           #e8e8ed;
+        --border-muted:     #f0f0f5;
+        --border-lifted:    #d2d2d7;
+        --border-accented:  #1d1d1f;
 
         /* Background hierarchy */
-        --vl-bg:           #fbfbfd;
-        --vl-bg-muted:     #f5f5f7;
-        --vl-bg-lifted:    #ffffff;
-        --vl-bg-accented:  #fafafa;
-        --vl-bg-inverted:  #1d1d1f;
+        --bg:           #fbfbfd;
+        --bg-muted:     #f5f5f7;
+        --bg-lifted:    #ffffff;
+        --bg-accented:  #fafafa;
+        --bg-inverted:  #1d1d1f;
 
         /* Typography (Apple system font sizing) */
-        --vl-text-xs:  11.5px;
-        --vl-text-sm:  13px;
-        --vl-text-md:  15px;
-        --vl-text-lg:  17px;
+        --text-xs:  11.5px;
+        --text-sm:  13px;
+        --text-md:  15px;
+        --text-lg:  17px;
 
         /* Spacing -- focus rings */
-        --vl-outline-sm: 2px;
-        --vl-outline-md: 3px;
-        --vl-outline-lg: 4px;
+        --outline-sm: 2px;
+        --outline-md: 3px;
+        --outline-lg: 4px;
 
         /* Rounding -- Apple uses generous rounding + pills */
-        --vl-rounding-sm:  8px;
-        --vl-rounding-md:  12px;
-        --vl-rounding-lg:  999px;
+        --rounding-sm:  8px;
+        --rounding-md:  12px;
+        --rounding-lg:  999px;
 
         /* Letter spacing matches Apple SF Pro tracking at body sizes */
-        --vl-letter-spacing:    -0.008em;
-        --vl-disabled-opacity:  0.5;
+        --letter-spacing:    -0.008em;
+        --disabled-opacity:  0.5;
     }
 
     /* Hide old standard_cart wrapper artefacts that the global mytheme
