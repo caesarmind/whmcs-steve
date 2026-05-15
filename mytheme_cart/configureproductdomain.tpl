@@ -312,8 +312,19 @@
     }
 
     // Switch visible panel when option radio changes.
+    //
+    // Bind BOTH native 'change' and iCheck's 'ifChecked' event:
+    //   - 'change'    — used by the apple-client-area mockup (no iCheck).
+    //   - 'ifChecked' — used in production. WHMCS's scripts.min.js wraps
+    //     each radio in iCheck (.iradio_square-blue + .iCheck-helper),
+    //     which swallows the native 'change' event and exposes its own
+    //     jQuery-only events. Without this, clicking the third option
+    //     ticks the radio but never swaps the dp-panel.
     radios.forEach(function (r) {
         r.addEventListener('change', function () { showPanel(r.value); });
+        if (window.jQuery) {
+            window.jQuery(r).on('ifChecked', function () { showPanel(r.value); });
+        }
     });
 
     // Clear error state once the user starts typing.
