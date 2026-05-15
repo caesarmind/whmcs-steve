@@ -375,3 +375,94 @@ document.addEventListener('click', function(e) {
         });
     });
 })();
+
+// Apple --* CSS variables for nexus_cart Vue SPA
+//
+// Lives here (vs the cart TPL) because WHMCS's cart page render strips
+// any <script src="..."> we add inside viewcart.tpl when the page is
+// served with mytheme's full layout shell. apple-theme.js is loaded
+// globally by mytheme on every page including the cart, so this IIFE
+// reliably sets the unprefixed --* variables on document.documentElement
+// before nexus_cart's main.min.js initializes its Vue Shadow DOM.
+//
+// nexus_cart's auto-loaded custom.css does --vl-primary: var(--primary)
+// etc. on :host, :root -- so by populating the unprefixed layer here,
+// every --vl-* downstream resolves to the Apple light palette and
+// inherits through the open Shadow DOM into every Vue component.
+//
+// Harmless on non-cart pages: the variables are new names that don't
+// collide with mytheme's existing --color-* / --color-accent surface,
+// and nothing outside the cart SPA reads them.
+(function () {
+    var s = document.documentElement.style;
+    var v = {
+        // Primary / status (Apple system colors)
+        'primary':            '#0071e3',
+        'primary-lifted':     '#0077ed',
+        'primary-accented':   '#005bb5',
+        'secondary':          '#f5f5f7',
+        'secondary-lifted':   '#ebebef',
+        'secondary-accented': '#e8e8ed',
+        'success':            '#34c759',
+        'success-lifted':     '#30b751',
+        'success-accented':   '#2aa24a',
+        'info':               '#0071e3',
+        'info-lifted':        '#0077ed',
+        'info-accented':      '#005bb5',
+        'notice':             '#ff9f0a',
+        'notice-lifted':      '#ff8e00',
+        'notice-accented':    '#e07a00',
+        'warning':            '#ff9500',
+        'warning-lifted':     '#f08a00',
+        'warning-accented':   '#d97a00',
+        'error':              '#ff3b30',
+        'error-lifted':       '#ef352b',
+        'error-accented':     '#d62d24',
+
+        // Grayscale / neutral
+        'grayscale':          '#1d1d1f',
+        'grayscale-lifted':   '#2c2c2e',
+        'grayscale-accented': '#000000',
+        'neutral':            '#6e6e73',
+        'neutral-lifted':     '#86868b',
+        'neutral-accented':   '#4a4a4f',
+
+        // Text / border / background hierarchy
+        'text':               '#1d1d1f',
+        'text-lifted':        '#6e6e73',
+        'text-accented':      '#000000',
+        'text-muted':         '#86868b',
+        'text-inverted':      '#ffffff',
+
+        'border':             '#e8e8ed',
+        'border-muted':       '#f0f0f5',
+        'border-lifted':      '#d2d2d7',
+        'border-accented':    '#1d1d1f',
+
+        'bg':                 '#fbfbfd',
+        'bg-muted':           '#f5f5f7',
+        'bg-lifted':          '#ffffff',
+        'bg-accented':        '#fafafa',
+        'bg-inverted':        '#1d1d1f',
+
+        // Typography (Apple SF Pro sizing)
+        'text-xs':            '11.5px',
+        'text-sm':            '13px',
+        'text-md':            '15px',
+        'text-lg':            '17px',
+
+        // Spacing / focus rings
+        'outline-sm':         '2px',
+        'outline-md':         '3px',
+        'outline-lg':         '4px',
+
+        // Rounding -- Apple uses generous rounding + pills
+        'rounding-sm':        '8px',
+        'rounding-md':        '12px',
+        'rounding-lg':        '999px',
+
+        'letter-spacing':     '-0.008em',
+        'disabled-opacity':   '0.5'
+    };
+    for (var k in v) s.setProperty('--' + k, v[k]);
+})();

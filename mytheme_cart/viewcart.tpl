@@ -36,28 +36,15 @@
 
     {include file="orderforms/standard_cart/common.tpl"}
 
-    {* WHMCS aggressively sanitizes cart TPL output: <style>, <link>,
-       style="..." attributes, AND inline <script> blocks all get
-       stripped. The only injection points that survive are
-       <script src="..."> and a fixed allowlist of attributes on the
-       mount div (id / data-app / data-init).
-
-       So Apple-theme the SPA via an EXTERNAL js file:
-       js/apple-vars.js sets the unprefixed --* CSS variables on
-       document.documentElement. nexus_cart's auto-loaded custom.css
-       maps each --vl-* from var(--*), and the SPA's open Shadow DOM
-       inherits through -- so every Vue component picks up the Apple
-       palette. Loaded BEFORE main.min.js so the SPA paints with the
-       right colors on first frame. *}
-
-    {* apple-vars.js lives under templates/mytheme/assets/js/ (the same
-       trusted path as apple-theme.js / apple-layout.js) because WHMCS's
-       cart TPL sanitizer allows <script src=> from templates/mytheme/...
-       and templates/orderforms/{standard_cart,nexus_cart}/... but
-       STRIPS references to templates/orderforms/mytheme_cart/...
-       Verified live: every script src= in the previous attempt was
-       allowed except the mytheme_cart one. *}
-    <script type="text/javascript" src="{$WEB_ROOT}/templates/mytheme/assets/js/apple-vars.js"></script>
+    {* The Apple --primary / --bg / --text variable overrides for the
+       Vue SPA live in mytheme/templates/mytheme/assets/js/apple-theme.js
+       (loaded globally by mytheme on every page including this one).
+       We can't inject them from this TPL because WHMCS strips any
+       <script src=>, <style>, <link>, style=, or inline <script> we
+       add to cart TPL output when the page renders with the full
+       mytheme layout shell. Putting the IIFE in the always-loaded
+       global script reliably seeds the SPA's variable surface before
+       main.min.js initializes its Shadow DOM. *}
 
     <div id="order-standard_cart">
         <div id="nexus-root" data-app="cart-module" data-init="{getNexusData}"></div>
