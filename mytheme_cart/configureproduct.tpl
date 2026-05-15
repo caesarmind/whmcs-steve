@@ -635,5 +635,46 @@ var _localLang = {
         el.querySelector('.period').textContent = period;
     }
 })();
+
+/* Compute savings vs the monthly cycle and inject a "Save X%" pill into
+   each non-monthly .cp-cycle-opt. WHMCS emits the TOTAL price for each
+   cycle (e.g. annually = price for 12 months), so:
+       savings = (monthly_amount * cycle_months - cycle_amount)
+                 / (monthly_amount * cycle_months)
+   Skips when there's no monthly baseline, when savings <= 0, or when a
+   pill is already present (defensive against re-runs). */
+(function () {
+    var CYCLE_MONTHS = {
+        monthly: 1, quarterly: 3,
+        semiannually: 6, annually: 12,
+        biennially: 24, triennially: 36
+    };
+    var labels = document.querySelectorAll('.cp-cycle-opt');
+    var monthlyAmount = null;
+    var rows = [];
+    for (var i = 0; i < labels.length; i++) {
+        var label = labels[i];
+        var input = label.querySelector('input[name="billingcycle"]');
+        var amountEl = label.querySelector('.cp-cycle-price .amount');
+        if (!input || !amountEl) continue;
+        var months = CYCLE_MONTHS[input.value];
+        var amount = parseFloat((amountEl.textContent || '').replace(/[^\d.\-]/g, ''));
+        if (!months || isNaN(amount)) continue;
+        if (input.value === 'monthly') monthlyAmount = amount;
+        rows.push({ label: label, cycle: input.value, months: months, amount: amount });
+    }
+    if (monthlyAmount === null) return;
+    for (var j = 0; j < rows.length; j++) {
+        var r = rows[j];
+        if (r.cycle === 'monthly') continue;
+        if (r.label.querySelector('.cp-cycle-save')) continue;
+        var savings = (monthlyAmount * r.months - r.amount) / (monthlyAmount * r.months);
+        if (savings < 0.005) continue;
+        var badge = document.createElement('span');
+        badge.className = 'cp-cycle-save';
+        badge.textContent = 'Save ' + Math.round(savings * 100) + '%';
+        r.label.insertBefore(badge, r.label.firstChild);
+    }
+})();
 {/literal}
 </script>
