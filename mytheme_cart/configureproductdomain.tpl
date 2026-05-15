@@ -291,20 +291,25 @@
 <script>
 {literal}
 (function () {
-    var form = document.getElementById('frmProductDomain');
-    if (!form) return;
+    function init() {
+        var form = document.getElementById('frmProductDomain');
+        if (!form) return;
 
-    // standard_cart's scripts.min.js binds a jQuery submit handler on
-    // #frmProductDomain (scripts.js:2724) that calls e.preventDefault()
-    // and expects a different DOM (#registersld / #owndomainsld /
-    // #DomainSearchResults / #frmProductDomainSelections / ...) which we
-    // don't render. It silently blocks submission for every option.
-    // Drop ALL jQuery-bound submit handlers before our native one runs.
-    if (window.jQuery) {
-        window.jQuery(form).off('submit');
-    }
+        // standard_cart's scripts.min.js binds a jQuery submit handler on
+        // #frmProductDomain (scripts.js:2724) inside its own
+        // jQuery(document).ready, expecting DOM (#registersld /
+        // #DomainSearchResults / #frmProductDomainSelections / ...) we
+        // don't render. It silently blocks submission for every option.
+        //
+        // We must run AFTER scripts.min.js's ready callback so its handler
+        // is in place when we drop it -- hence init() is wrapped in a
+        // jQuery ready callback below (queued after scripts.min.js's,
+        // since scripts.min.js loads earlier in the document).
+        if (window.jQuery) {
+            window.jQuery(form).off('submit');
+        }
 
-    var radios = form.querySelectorAll('input[name="domainoption"]');
+        var radios = form.querySelectorAll('input[name="domainoption"]');
     var panels = form.querySelectorAll('.dp-panel');
     var resultDomain = document.getElementById('resultDomain');
     var resultIncart = document.getElementById('resultIncartDomain');
@@ -374,9 +379,20 @@
         }
     });
 
-    // Sync panel to whichever radio is initially checked.
-    var initial = form.querySelector('input[name="domainoption"]:checked');
-    if (initial) showPanel(initial.value);
+        // Sync panel to whichever radio is initially checked.
+        var initial = form.querySelector('input[name="domainoption"]:checked');
+        if (initial) showPanel(initial.value);
+    }
+
+    if (window.jQuery) {
+        // Queues AFTER scripts.min.js's ready callback (since scripts.min.js
+        // loads earlier in the document and its ready was registered first).
+        window.jQuery(init);
+    } else if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();
 {/literal}
 </script>
