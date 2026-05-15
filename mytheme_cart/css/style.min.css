@@ -2519,24 +2519,42 @@ body[data-plan] .st-variant-label { display: none; }
 .addon-promo-container > .clearfix,
 .addon-promo-container > br { display: none; }
 
-/* Tier rows (each pricing tier rendered as label.radio-inline). */
+/* Tier rows (each pricing tier rendered as label.radio-inline).
+   WHMCS emits each label as:
+     <label class="radio-inline">
+       <input class="addon-selector" type="radio">
+       Option name text node
+       <span class="pull-right float-right">$X.XX USD/yr</span>
+     </label>
+   So the radio + name sit on the left of the flex row, and we push the
+   .pull-right price span to the right edge via margin-left: auto. */
 .addon-promo-container .radio-inline {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 14px 22px;
+    padding: 14px 24px;
     margin: 0;
     border-bottom: 0.5px solid var(--color-border);
     cursor: pointer;
-    font-size: 13.5px;
+    font-size: 14px;
     color: var(--color-text-primary);
     letter-spacing: -0.008em;
     font-weight: 500;
+    font-family: var(--font-family);
     transition: background var(--transition-fast);
     position: relative;
-    /* WHMCS puts the price text right after the option name with no
-       separator. justify-content + ::before pseudo-trick reshapes the
-       label into: [radio] [name] [spacer] [price]. */
+}
+.addon-promo-container .radio-inline .pull-right,
+.addon-promo-container .radio-inline .float-right {
+    margin-left: auto;
+    float: none !important;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 .addon-promo-container .radio-inline:last-of-type { border-bottom: 0; }
 .addon-promo-container .radio-inline:hover {
