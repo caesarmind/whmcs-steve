@@ -509,14 +509,56 @@ document.addEventListener('click', function(e) {
         '--vl-outline-md: 3px !important;' +
         '--vl-outline-lg: 4px !important;' +
         '--vl-disabled-opacity: 50% !important;' +
-    '}';
+    '}' +
+    // Hide elements we tag with data-apple-hide via tagShadowElements()
+    // below. Targets the duplicate "Shopping Cart" h1, the inner
+    // Shopping Cart > Checkout breadcrumb, and the SPA's own
+    // "Browse Products & Services" back-arrow link (we already render
+    // a Browse pill in the page-level vc-page-header).
+    '[data-apple-hide]{display:none !important;}';
+
+    // Walk the SPA's open shadow DOM and tag elements we want hidden
+    // with data-apple-hide. Targeting by structural / text matching
+    // rather than the SPA's minified Tailwind class names so future
+    // nexus_cart bundle updates don't silently break our overrides.
+    function tagShadowElements(sh) {
+        // 1. Duplicate "Shopping Cart" h1 (text-2xl div with exactly
+        //    that text content -- avoids accidentally hiding the
+        //    "Order Summary" h1 which shares the same Tailwind classes)
+        sh.querySelectorAll('div').forEach(function (d) {
+            var direct = Array.from(d.childNodes)
+                .filter(function (c) { return c.nodeType === 3 && c.textContent.trim(); })
+                .map(function (c) { return c.textContent.trim(); })
+                .join('|');
+            if (direct === 'Shopping Cart' && /text-2xl/.test(d.className || '')) {
+                d.setAttribute('data-apple-hide', 'duplicate-h1');
+            }
+            // Inner breadcrumb container: parent of a div whose only
+            // text-content child is "Checkout", with exactly 3 sibling
+            // children (Shopping Cart link + > separator + Checkout).
+            if (direct === 'Checkout' && d.parentElement &&
+                d.parentElement.children.length === 3) {
+                d.parentElement.setAttribute('data-apple-hide', 'inner-breadcrumb');
+            }
+        });
+        // 2. SPA's "Browse Products & Services" back-arrow link --
+        //    we render an equivalent pill in vc-page-header above
+        sh.querySelectorAll('a').forEach(function (a) {
+            if ((a.textContent || '').trim() === 'Browse Products & Services') {
+                a.setAttribute('data-apple-hide', 'spa-browse-link');
+            }
+        });
+    }
 
     function injectShadowSheet() {
         var mount = document.getElementById('nexus-root');
         if (!mount) return false;
         var sh = mount.shadowRoot;
         if (!sh) return false; // SPA hasn't mounted yet
-        if (mount.dataset.appleSheetInjected) return true; // re-entry guard
+        if (mount.dataset.appleSheetInjected) {
+            tagShadowElements(sh); // re-tag on subsequent calls (Vue may have re-rendered)
+            return true;
+        }
         if (!('adoptedStyleSheets' in sh) || typeof CSSStyleSheet === 'undefined' ||
             !CSSStyleSheet.prototype.replaceSync) return false;
         try {
@@ -524,6 +566,21 @@ document.addEventListener('click', function(e) {
             sheet.replaceSync(SHADOW_OVERRIDES);
             sh.adoptedStyleSheets = [].concat(sh.adoptedStyleSheets || [], sheet);
             mount.dataset.appleSheetInjected = '1';
+            tagShadowElements(sh);
+            // MutationObserver re-tags when Vue re-renders (debounced via
+            // requestAnimationFrame to avoid thrashing on every tick).
+            if (typeof MutationObserver !== 'undefined') {
+                var pending = false;
+                var observer = new MutationObserver(function () {
+                    if (pending) return;
+                    pending = true;
+                    requestAnimationFrame(function () {
+                        pending = false;
+                        tagShadowElements(sh);
+                    });
+                });
+                observer.observe(sh, { childList: true, subtree: true });
+            }
             return true;
         } catch (e) {
             return false;
