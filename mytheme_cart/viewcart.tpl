@@ -37,53 +37,20 @@
     {include file="orderforms/standard_cart/common.tpl"}
 
     {* WHMCS aggressively sanitizes cart TPL output: <style>, <link>,
-       and even style="..." attributes on rendered elements all get
-       stripped. The only injection points that survive are <script>
-       tags and a fixed allowlist of attributes on the mount div
-       (id / data-app / data-init).
+       style="..." attributes, AND inline <script> blocks all get
+       stripped. The only injection points that survive are
+       <script src="..."> and a fixed allowlist of attributes on the
+       mount div (id / data-app / data-init).
 
-       So Apple-theme the SPA via JS: set the unprefixed --* CSS
-       variables on document.documentElement BEFORE main.min.js runs.
-       nexus_cart's custom.css is auto-loaded and maps each --vl-*
-       from var(--*), so by the time the Vue app initializes its
-       Shadow DOM the variables are in place and inherit through.
+       So Apple-theme the SPA via an EXTERNAL js file:
+       js/apple-vars.js sets the unprefixed --* CSS variables on
+       document.documentElement. nexus_cart's auto-loaded custom.css
+       maps each --vl-* from var(--*), and the SPA's open Shadow DOM
+       inherits through -- so every Vue component picks up the Apple
+       palette. Loaded BEFORE main.min.js so the SPA paints with the
+       right colors on first frame. *}
 
-       Values mirror apple-client-area/css/apple-theme.css's light
-       palette. Kept inline (vs an external file) so a stale CDN
-       cache can't strand the page in the wrong palette. *}
-
-    <script>{literal}
-    (function () {
-        var s = document.documentElement.style;
-        var v = {
-            // Primary / status (Apple system colors)
-            'primary':'#0071e3', 'primary-lifted':'#0077ed', 'primary-accented':'#005bb5',
-            'secondary':'#f5f5f7', 'secondary-lifted':'#ebebef', 'secondary-accented':'#e8e8ed',
-            'success':'#34c759', 'success-lifted':'#30b751', 'success-accented':'#2aa24a',
-            'info':'#0071e3', 'info-lifted':'#0077ed', 'info-accented':'#005bb5',
-            'notice':'#ff9f0a', 'notice-lifted':'#ff8e00', 'notice-accented':'#e07a00',
-            'warning':'#ff9500', 'warning-lifted':'#f08a00', 'warning-accented':'#d97a00',
-            'error':'#ff3b30', 'error-lifted':'#ef352b', 'error-accented':'#d62d24',
-            // Grayscale / neutral
-            'grayscale':'#1d1d1f', 'grayscale-lifted':'#2c2c2e', 'grayscale-accented':'#000000',
-            'neutral':'#6e6e73', 'neutral-lifted':'#86868b', 'neutral-accented':'#4a4a4f',
-            // Text / border / background hierarchy
-            'text':'#1d1d1f', 'text-lifted':'#6e6e73', 'text-accented':'#000000',
-            'text-muted':'#86868b', 'text-inverted':'#ffffff',
-            'border':'#e8e8ed', 'border-muted':'#f0f0f5',
-            'border-lifted':'#d2d2d7', 'border-accented':'#1d1d1f',
-            'bg':'#fbfbfd', 'bg-muted':'#f5f5f7', 'bg-lifted':'#ffffff',
-            'bg-accented':'#fafafa', 'bg-inverted':'#1d1d1f',
-            // Typography (Apple SF Pro sizing)
-            'text-xs':'11.5px', 'text-sm':'13px', 'text-md':'15px', 'text-lg':'17px',
-            // Spacing / rounding (Apple uses generous rounding + pills)
-            'outline-sm':'2px', 'outline-md':'3px', 'outline-lg':'4px',
-            'rounding-sm':'8px', 'rounding-md':'12px', 'rounding-lg':'999px',
-            'letter-spacing':'-0.008em', 'disabled-opacity':'0.5'
-        };
-        for (var k in v) s.setProperty('--' + k, v[k]);
-    })();
-    {/literal}</script>
+    <script type="text/javascript" src="{$WEB_ROOT}/templates/orderforms/mytheme_cart/js/apple-vars.js"></script>
 
     <div id="order-standard_cart">
         <div id="nexus-root" data-app="cart-module" data-init="{getNexusData}"></div>
