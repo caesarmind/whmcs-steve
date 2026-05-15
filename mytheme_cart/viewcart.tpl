@@ -450,18 +450,18 @@
     .ct-summary-total {
         display: flex; justify-content: space-between; align-items: center;
         gap: 10px;
-        padding: 14px 20px;
+        padding: 18px 24px;
         border-top: 0.5px solid var(--color-border);
         background: var(--color-surface-tertiary);
         font-variant-numeric: tabular-nums;
     }
     .ct-summary-total .label {
-        font-size: 14px; font-weight: 600;
+        font-size: 15px; font-weight: 600;
         color: var(--color-text-primary); letter-spacing: -0.01em;
     }
     .ct-summary-total .value {
-        font-size: 22px; font-weight: 600;
-        color: var(--color-text-primary); letter-spacing: -0.022em;
+        font-size: 24px; font-weight: 600;
+        color: var(--color-text-primary); letter-spacing: -0.025em;
         white-space: nowrap;
     }
 

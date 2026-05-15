@@ -88,21 +88,87 @@
     window.langVatErrorInvalidFormat = "{$LANG.tax.errorVatInvalidFormat}";
 </script>
 
-<div id="order-standard_cart">
+<style>{literal}
+/* ── Apple checkout chrome (.co-*) ──
+   Page-level wrapper around standard_cart's checkout form. Form body
+   classes (.form-group prepend-icon, .sub-heading, .alert, .btn etc)
+   are styled separately by apple-layout.css's cart-flow CSS shim --
+   we only own the OUTER layout (page header, 5-step strip, 2-col
+   split, sticky summary card on the right). Mirrors
+   apple-client-area/checkout.html. */
+.co-page-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.co-page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
+.co-page-header .co-sub { font-size: 14px; color: var(--color-text-tertiary); letter-spacing: -0.008em; margin: 0; }
+.co-page-header .co-back-cart { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 500; color: var(--color-text-primary); background: transparent; border: 0.5px solid var(--color-border); border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; letter-spacing: -0.008em; transition: all 0.15s; }
+.co-page-header .co-back-cart:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
-    <div class="row">
-        <div class="cart-sidebar">
-            {include file="orderforms/standard_cart/sidebar-categories.tpl"}
+.co-steps { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; font-size: 12.5px; color: var(--color-text-tertiary); letter-spacing: -0.008em; }
+.co-step { display: inline-flex; align-items: center; gap: 8px; }
+.co-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+.co-step.done .co-step-num { background: var(--color-green-bg, #e8f5e8); color: var(--color-green-text, #34c759); }
+.co-step.active .co-step-num { background: var(--color-accent); color: #fff; }
+.co-step.active { color: var(--color-text-primary); font-weight: 500; }
+.co-step-sep { color: var(--color-text-quaternary, #c7c7cc); }
+
+.co-split { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+@media (max-width: 960px) { .co-split { grid-template-columns: 1fr; } }
+.co-left { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+
+/* Right summary card */
+.co-summary-card { position: sticky; top: 72px; padding: 0; background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: 14px; }
+.co-summary-head { padding: 18px 20px 14px; border-bottom: 0.5px solid var(--color-border); }
+.co-summary-head h2 { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; margin: 0; }
+.co-summary-list { padding: 8px 20px; }
+.co-summary-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 8px 0; font-size: 12.5px; font-variant-numeric: tabular-nums; letter-spacing: -0.004em; }
+.co-summary-line .label { color: var(--color-text-secondary); flex: 1; min-width: 0; }
+.co-summary-line .value { color: var(--color-text-primary); font-weight: 500; white-space: nowrap; }
+.co-summary-line .value.muted { color: var(--color-text-tertiary); font-weight: 400; }
+.co-summary-line .value.good { color: var(--color-green-text, #34c759); font-weight: 500; }
+.co-summary-line.divider { border-top: 0.5px solid var(--color-border); padding-top: 12px; margin-top: 4px; }
+.co-summary-total { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 18px 24px; border-top: 0.5px solid var(--color-border); background: var(--color-surface-tertiary); font-variant-numeric: tabular-nums; }
+.co-summary-total .label { font-size: 15px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
+.co-summary-total .value { font-size: 24px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.025em; white-space: nowrap; }
+.co-summary-cycle { font-size: 11px; color: var(--color-text-tertiary); padding: 10px 20px 14px; letter-spacing: -0.004em; margin: 0; }
+.co-trust-strip { padding: 14px 20px 16px; border-top: 0.5px solid var(--color-border); display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: var(--color-text-tertiary); letter-spacing: -0.004em; }
+.co-trust-strip .item { display: inline-flex; align-items: center; gap: 6px; }
+.co-trust-strip .item i { color: var(--color-green-text, #34c759); width: 12px; flex-shrink: 0; }
+
+/* Already-registered toggle row, restyled minimally so it fits the Apple chrome */
+.already-registered { padding: 10px 0 14px; }
+.already-registered p { color: var(--color-text-secondary); font-size: 13px; margin: 0; }
+
+/* Override standard_cart wrapper artefacts so the .content-area frame is clean */
+#order-standard_cart { padding: 0 !important; background: transparent !important; }
+{/literal}</style>
+
+<div id="order-standard_cart">
+    <div class="content-area">
+
+        <header class="co-page-header">
+            <div>
+                <h1>{$LANG.orderForm.checkout|default:'Your cart'}</h1>
+                <p class="co-sub">{$LANG.orderForm.almostDone|default:'Almost there. Enter your details, choose how you\'d like to pay, and complete your order.'}</p>
+            </div>
+            <a href="{$WEB_ROOT}/cart.php?a=view" class="co-back-cart">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                {$LANG.orderForm.backToCart|default:'Back to cart'}
+            </a>
+        </header>
+
+        <div class="co-steps" aria-label="Checkout progress">
+            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.orderForm.chooseProduct|default:'Choose plan'}</span>
+            <span class="co-step-sep">&rsaquo;</span>
+            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.cartdomain|default:'Domain'}</span>
+            <span class="co-step-sep">&rsaquo;</span>
+            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.cartconfigure|default:'Configure'}</span>
+            <span class="co-step-sep">&rsaquo;</span>
+            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.cart|default:'Cart'}</span>
+            <span class="co-step-sep">&rsaquo;</span>
+            <span class="co-step active"><span class="co-step-num">5</span>{$LANG.checkout|default:'Checkout'}</span>
         </div>
 
-        <div class="cart-body">
-
-            <div class="header-lined">
-                <h1 class="font-size-36">{$LANG.orderForm.checkout}</h1>
-                <p>Almost there. Enter your details, choose how you'd like to pay, and complete your order.</p>
-            </div>
-
-            {include file="orderforms/standard_cart/sidebar-categories-collapsed.tpl"}
+        <div class="co-split">
+        <div class="co-left">
 
             <div class="already-registered clearfix">
                 <div class="pull-right float-right">
@@ -889,8 +955,77 @@
                     <div class="clearfix"></div>
                 </div>
             {/if}
-        </div>
-    </div>
+
+        </div>{* /.co-left *}
+
+        {* ── RIGHT: sticky order summary ── *}
+        <aside>
+            <div class="co-summary-card">
+                <div class="co-summary-head">
+                    <h2>{$LANG.ordersummary|default:'Order summary'}</h2>
+                </div>
+                <div class="co-summary-list">
+                    {foreach $products as $num => $product}
+                        <div class="co-summary-line">
+                            <span class="label">{$product.productinfo.name}{if $product.billingcyclefriendly} &middot; {$product.billingcyclefriendly}{/if}</span>
+                            <span class="value">{$product.pricing.totalTodayExcludingTaxSetup}</span>
+                        </div>
+                    {/foreach}
+                    {foreach $domains as $num => $domain}
+                        <div class="co-summary-line">
+                            <span class="label">{if $domain.type eq "register"}{$LANG.orderdomainregistration}{else}{$LANG.orderdomaintransfer}{/if} &middot; {$domain.domain}</span>
+                            <span class="value">{$domain.price}</span>
+                        </div>
+                    {/foreach}
+                    {foreach $addons as $num => $addon}
+                        <div class="co-summary-line">
+                            <span class="label">+ {$addon.name}</span>
+                            <span class="value">{$addon.totaltoday}</span>
+                        </div>
+                    {/foreach}
+
+                    <div class="co-summary-line divider">
+                        <span class="label">{$LANG.ordersubtotal}</span>
+                        <span class="value" id="subtotal">{$subtotal}</span>
+                    </div>
+                    {if $promotioncode}
+                        <div class="co-summary-line">
+                            <span class="label">{$promotiondescription}</span>
+                            <span class="value good" id="discount">{$discount}</span>
+                        </div>
+                    {/if}
+                    {if $taxrate}
+                        <div class="co-summary-line">
+                            <span class="label">{$taxname} @ {$taxrate}%</span>
+                            <span class="value muted" id="taxTotal1">{$taxtotal}</span>
+                        </div>
+                    {/if}
+                    {if $taxrate2}
+                        <div class="co-summary-line">
+                            <span class="label">{$taxname2} @ {$taxrate2}%</span>
+                            <span class="value muted" id="taxTotal2">{$taxtotal2}</span>
+                        </div>
+                    {/if}
+                </div>
+
+                <div class="co-summary-total">
+                    <span class="label">{$LANG.ordertotalduetoday|default:'Total due today'}</span>
+                    <span class="value" id="totalDueToday">{$total}</span>
+                </div>
+
+                {if $totalrecurring}
+                    <p class="co-summary-cycle">{$LANG.orderForm.recurringTotal|default:'Recurring'}: <strong id="totalCartPrice">{$totalrecurring}</strong></p>
+                {/if}
+
+                <div class="co-trust-strip">
+                    <span class="item"><i class="fas fa-lock"></i> {$LANG.cartsecured|default:'256-bit SSL &middot; PCI-DSS Level 1'}</span>
+                    <span class="item"><i class="fas fa-check"></i> {$LANG.cartmoneyback|default:'30-day money-back guarantee'}</span>
+                </div>
+            </div>
+        </aside>
+
+        </div>{* /.co-split *}
+    </div>{* /.content-area *}
 </div>
 
 <script type="text/javascript" src="{$BASE_PATH_JS}/jquery.payment.js"></script>
