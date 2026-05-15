@@ -130,47 +130,65 @@ var _localLang = {
                                 <div class="cp-section-sub">Longer commitments unlock bigger discounts — you can change or upgrade later.</div>
                             </div>
                             <div class="cp-section-body">
+                                {* ── Billing-cycle cards ──
+                                   Each card lays out as: cycle name (title) +
+                                   "Billed every X" sub-description + the
+                                   WHMCS-formatted price as a prominent number.
+                                   WHMCS provides each cycle's price as a
+                                   pre-formatted string ($pricing.monthly etc.),
+                                   so we drop it into .cp-cycle-price-raw which
+                                   styles it large + tabular-nums. The mockup
+                                   also shows "SAVE X%" badges on annual+; that
+                                   would require computing the per-cycle
+                                   savings from the raw prices, which WHMCS
+                                   doesn't expose directly — skipped for now. *}
                                 <div class="cp-cycle" role="radiogroup" aria-label="{$LANG.cartchoosecycle}">
                                     {if $pricing.monthly}
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="monthly"{if $billingcycle eq "monthly"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermmonthly}</div>
-                                            <div class="cp-cycle-sub">{$pricing.monthly}</div>
+                                            <div class="cp-cycle-sub">{$LANG.cartbilledmonthly|default:'Billed every month'}</div>
+                                            <div class="cp-cycle-price-raw">{$pricing.monthly}</div>
                                         </label>
                                     {/if}
                                     {if $pricing.quarterly}
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="quarterly"{if $billingcycle eq "quarterly"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermquarterly}</div>
-                                            <div class="cp-cycle-sub">{$pricing.quarterly}</div>
+                                            <div class="cp-cycle-sub">{$LANG.cartbilledquarterly|default:'Billed every 3 months'}</div>
+                                            <div class="cp-cycle-price-raw">{$pricing.quarterly}</div>
                                         </label>
                                     {/if}
                                     {if $pricing.semiannually}
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="semiannually"{if $billingcycle eq "semiannually"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermsemiannually}</div>
-                                            <div class="cp-cycle-sub">{$pricing.semiannually}</div>
+                                            <div class="cp-cycle-sub">{$LANG.cartbilledsemiannually|default:'Billed every 6 months'}</div>
+                                            <div class="cp-cycle-price-raw">{$pricing.semiannually}</div>
                                         </label>
                                     {/if}
                                     {if $pricing.annually}
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="annually"{if $billingcycle eq "annually"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermannually}</div>
-                                            <div class="cp-cycle-sub">{$pricing.annually}</div>
+                                            <div class="cp-cycle-sub">{$LANG.cartbilledannually|default:'Billed once per year'}</div>
+                                            <div class="cp-cycle-price-raw">{$pricing.annually}</div>
                                         </label>
                                     {/if}
                                     {if $pricing.biennially}
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="biennially"{if $billingcycle eq "biennially"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermbiennially}</div>
-                                            <div class="cp-cycle-sub">{$pricing.biennially}</div>
+                                            <div class="cp-cycle-sub">{$LANG.cartbilledbiennially|default:'Billed every 2 years'}</div>
+                                            <div class="cp-cycle-price-raw">{$pricing.biennially}</div>
                                         </label>
                                     {/if}
                                     {if $pricing.triennially}
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="triennially"{if $billingcycle eq "triennially"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermtriennially}</div>
-                                            <div class="cp-cycle-sub">{$pricing.triennially}</div>
+                                            <div class="cp-cycle-sub">{$LANG.cartbilledtriennially|default:'Billed every 3 years'}</div>
+                                            <div class="cp-cycle-price-raw">{$pricing.triennially}</div>
                                         </label>
                                     {/if}
                                 </div>

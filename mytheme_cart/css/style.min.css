@@ -2148,6 +2148,19 @@ body[data-plan] .st-variant-label { display: none; }
 .cp-cycle-price .amount   { font-size: 22px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.02em; line-height: 1; }
 .cp-cycle-price .period   { font-size: 12px; color: var(--color-text-tertiary); margin-left: 2px; }
 
+/* Raw price text variant — used when WHMCS gives us a pre-formatted
+   price string (e.g. "$20.00 USD Monthly") that we can't split into
+   currency/amount/period spans. Styled to read as a focal number. */
+.cp-cycle-price-raw {
+    margin-top: 14px;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+}
+
 /* -- Form fields --------------------------------------- */
 .cp-form { display: flex; flex-direction: column; gap: 16px; }
 .cp-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
