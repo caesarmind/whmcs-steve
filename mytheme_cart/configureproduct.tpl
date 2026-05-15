@@ -86,6 +86,9 @@ var _localLang = {
             <input type="hidden" name="configure" value="true">
             <input type="hidden" name="i" value="{$i}">
 
+            {* DEBUG: dump available WHMCS vars so we can pick the right product-id field for the back URL. Remove once verified. *}
+            <div id="dbg-vars" style="display:none">i={$i}|pid={$pid}|productid={$productid}|productinfo.pid={$productinfo.pid}|productinfo.id={$productinfo.id}|productinfo.gid={$productinfo.gid}|productinfo.productid={$productinfo.productid}|productinfo.name={$productinfo.name}</div>
+
             <div class="cp-grid">
 
                 {* ════════════════════════════════════════════
