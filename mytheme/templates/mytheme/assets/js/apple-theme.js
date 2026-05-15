@@ -488,10 +488,14 @@ document.addEventListener('click', function(e) {
 // no-op everywhere else mytheme is loaded.
 (function () {
     var SHADOW_OVERRIDES = ':host{' +
-        // Apple uses pill buttons + medium-rounded cards
-        '--vl-rounding-sm: 8px !important;' +
-        '--vl-rounding-md: 12px !important;' +
-        '--vl-rounding-lg: 999px !important;' +
+        // Apple card-style rounding. The SPA maps Tailwind's
+        // rounded-{sm,md,large} -> --vl-rounding-{sm,md,lg}, and the
+        // product / summary / promo cards all use rounded-large -- so
+        // we deliberately keep --vl-rounding-lg at Apple's CARD size
+        // (~14px), NOT pill (999px), or the cards become stadium shaped.
+        '--vl-rounding-sm: 6px !important;' +
+        '--vl-rounding-md: 10px !important;' +
+        '--vl-rounding-lg: 14px !important;' +
         // Apple SF Pro typography sizing -- bumped from nexus defaults
         // (0.625/0.75/0.875/1rem) to mockup-matching 11.5/13/14/15px
         '--vl-text-xs: 11.5px !important;' +
