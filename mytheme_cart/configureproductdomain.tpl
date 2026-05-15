@@ -38,22 +38,26 @@
 {include file="orderforms/$carttpl/common.tpl"}
 
 <div id="order-standard_cart">
-    <div class="content-area">
 
-        <header class="page-header">
-            <h1>{$LANG.domaincheckerchoosedomain}</h1>
-            <p class="page-subtitle">Register something new, transfer one you already own, or point an existing domain at our nameservers.</p>
-        </header>
+    {* Note: mytheme's header.tpl already opens <div class="content-area">
+       so we render straight into it. The inner .content-area that used
+       to live here produced double padding. *}
 
-        <div class="dp-split">
+    <header class="st-page-header">
+        <h1>{$LANG.domaincheckerchoosedomain|default:'Choose a domain'}</h1>
+        <p class="page-subtitle">{$LANG.choosedomainsubtitle|default:'Register something new, transfer one you already own, or point an existing domain at our nameservers.'}</p>
+    </header>
 
-            {* ── Sidebar: Categories + Actions ── *}
-            <aside>
-                {include file="orderforms/$carttpl/sidebar-categories.tpl"}
-            </aside>
+    <div class="dp-split">
 
-            {* ── Main column: step strip + chooser card ── *}
-            <div style="min-width: 0;">
+        {* ── Sidebar: Categories + Actions ──
+           sidebar-categories.tpl already wraps its content in <aside>,
+           so we include it directly here (the old <aside><aside>...</aside></aside>
+           double-wrap was invalid HTML and added a stray layout box). *}
+        {include file="orderforms/$carttpl/sidebar-categories.tpl"}
+
+        {* ── Main column: step strip + chooser card ── *}
+        <div style="min-width: 0;">
 
                 <div class="dp-steps" aria-label="Order progress">
                     <span class="dp-step done">
@@ -272,10 +276,9 @@
 
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
-</div>
+            </div>{* /right column *}
+        </div>{* /.dp-split *}
+</div>{* /#order-standard_cart *}
 
 {include file="orderforms/standard_cart/recommendations-modal.tpl"}
 
