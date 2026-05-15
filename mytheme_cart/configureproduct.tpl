@@ -56,8 +56,8 @@ var _localLang = {
        latter). *}
 
     <header class="st-page-header">
-        <h1>{$LANG.orderconfigure}</h1>
-        <p class="page-subtitle">{$productinfo.name} · {$LANG.orderForm.configureDesiredOptions}</p>
+        <h1>{$LANG.orderconfigure|default:'Configure your plan'}</h1>
+        <p class="page-subtitle">{$LANG.cartconfigsubtitle|default:"Pick your billing cycle, server region and any add-ons — we'll total it up on the right."}</p>
     </header>
 
         <div class="cp-steps" aria-label="Order progress">
@@ -97,6 +97,29 @@ var _localLang = {
                     <div class="alert alert-danger w-hidden" role="alert" id="containerProductValidationErrors">
                         <p>{$LANG.orderForm.correctErrors}:</p>
                         <ul id="containerProductValidationErrorsList"></ul>
+                    </div>
+
+                    {* ── Selected-plan hero ────────────────────────────
+                       Shows the product the user picked on the previous
+                       step (icon + name + short description), with a
+                       "Change plan" link back to the products listing
+                       for the same group. Mockup-faithful version of
+                       what was previously only a one-line text in the
+                       page-header subtitle. *}
+                    <div class="card cp-plan-hero">
+                        <div class="cp-plan-hero-ico" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                        </div>
+                        <div class="cp-plan-hero-meta">
+                            <div class="cp-plan-hero-eyebrow">{$LANG.cartselectedplan|default:'Selected plan'}</div>
+                            <div class="cp-plan-hero-name">{$productinfo.name}</div>
+                            {if $productinfo.description}
+                                <div class="cp-plan-hero-desc">{$productinfo.description|strip_tags|truncate:120}</div>
+                            {/if}
+                        </div>
+                        <a href="{$WEB_ROOT}/cart.php{if $productinfo.gid}?gid={$productinfo.gid}{/if}" class="cp-plan-hero-change">
+                            {$LANG.cartchangeplan|default:'Change plan'}
+                        </a>
                     </div>
 
                     {* ── Billing cycle (only for recurring products) ── *}
