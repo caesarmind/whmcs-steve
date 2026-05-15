@@ -542,10 +542,18 @@ document.addEventListener('click', function(e) {
             }
         });
         // 2. SPA's "Browse Products & Services" back-arrow link --
-        //    we render an equivalent pill in vc-page-header above
+        //    we render an equivalent pill in vc-page-header above.
+        //    Tag the PARENT row (which also contains the chevron SVG
+        //    sibling) so we don't leave the icon orphaned next to a
+        //    hidden link.
         sh.querySelectorAll('a').forEach(function (a) {
             if ((a.textContent || '').trim() === 'Browse Products & Services') {
-                a.setAttribute('data-apple-hide', 'spa-browse-link');
+                var row = a.parentElement;
+                if (row && row.children.length === 2) {
+                    row.setAttribute('data-apple-hide', 'spa-browse-row');
+                } else {
+                    a.setAttribute('data-apple-hide', 'spa-browse-link');
+                }
             }
         });
     }
