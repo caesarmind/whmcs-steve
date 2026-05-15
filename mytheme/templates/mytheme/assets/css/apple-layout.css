@@ -365,7 +365,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .promo-slider-dot:hover { background: var(--color-text-tertiary); }
 .promo-slider-dot.active { background: var(--color-accent); width: 16px; border-radius: 3px; }
 
-/* Wide containers (≥ 420px inline-size) -- horizontal arrangement.
+/* Wide containers (>= 420px inline-size) -- horizontal arrangement.
    Visual on the left, text block on the right, link aligns bottom-right. */
 @container promo (min-width: 420px) {
     .promo-slider { padding: 18px 22px 14px; }
@@ -771,7 +771,7 @@ body[data-layout="side"] .ph-section:last-of-type { padding-bottom: 48px; }
 body[data-data="empty"] .when-full       { display: none !important; }
 body:not([data-data="empty"]) .when-empty { display: none !important; }
 
-/* -- Responsive sidebar drawer (≤900px, side layout) -------- */
+/* -- Responsive sidebar drawer (<=900px, side layout) -------- */
 /* On narrow viewports the fixed 260px sidebar would crowd content,
    so we convert it to a slide-in drawer. The hamburger toggle lives
    in the inner-topbar (`.ph-mobile-toggle`); JS flips `body.nav-open`
@@ -798,7 +798,7 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
     body[data-layout="rail"] .ph-main-wrap { margin-left: 0; }
 
     /* Sidebar becomes a slide-in drawer (overrides the legacy
-       `.sidebar { display: none }` rule at ≤768px from apple-theme.css) */
+       `.sidebar { display: none }` rule at <=768px from apple-theme.css) */
     body[data-layout="side"] .sidebar {
         display: flex !important;
         width: 280px;
@@ -884,7 +884,7 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
    Cart-page wrapper integration
    ---------------------------------------------------------------
    When the client area renders ANY order-form template
-   (mytheme_cart, standard_cart, nexus_cart, …) inside mytheme's
+   (mytheme_cart, standard_cart, nexus_cart, ...) inside mytheme's
    chrome, the order form ships its own navbar + container styling
    that fights ours. These rules live HERE (in the client-area
    theme) so they apply regardless of which cart template is
@@ -940,7 +940,7 @@ body[data-tpl="fraudcheck"] {
    ---------------------------------------------------------------
    standard_cart (and most classic-WHMCS order-form templates) use
    Bootstrap 3/4 grid + utility classes (.row, .col-md-*, .panel,
-   .card, .list-group, .btn, .alert, …). Their own all.min.css
+   .card, .list-group, .btn, .alert, ...). Their own all.min.css
    doesn't include Bootstrap itself -- they expect the client-area
    theme to load it. mytheme doesn't, so without this shim the
    cart layout collapses to a single-column unstyled stack.
