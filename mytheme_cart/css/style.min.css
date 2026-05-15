@@ -2418,6 +2418,118 @@ body[data-plan] .st-variant-label { display: none; }
 .cp-summary-head { padding: 18px 20px 14px; border-bottom: 0.5px solid var(--color-border); }
 .cp-summary-head h2 { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; margin: 0; }
 .cp-summary-line-list { padding: 8px 20px; }
+
+/* ===============================================================
+   WHMCS recalctotals() output styling.
+   The AJAX-fetched HTML that WHMCS injects into #producttotal uses
+   Bootstrap-era markup: .product-name + .product-group eyebrow, then
+   .clearfix rows containing .pull-left.float-left (label) +
+   .pull-right.float-right (price), grouped under .summary-totals
+   for setup/recurring, plus .total-due-today as the closing strip.
+   We restyle each of those classes in place so the WHMCS-driven
+   summary reads as the Apple-style line list + Due Today block.
+   =============================================================== */
+
+/* Product name + group eyebrow at the very top of the summary body */
+#producttotal .product-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    line-height: 1.3;
+    margin-bottom: 2px;
+}
+#producttotal .product-group {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 14px;
+}
+
+/* Line item rows -- both standalone .clearfix (addons / base price) AND
+   the ones nested inside .summary-totals (setup + recurring). The legacy
+   .pull-left.float-left + .pull-right.float-right pattern needs the
+   float killed so flex layout can take over and right-align the price. */
+#producttotal > .clearfix,
+#producttotal .summary-totals > .clearfix {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.004em;
+}
+#producttotal .pull-left,
+#producttotal .float-left {
+    color: var(--color-text-secondary);
+    flex: 1;
+    min-width: 0;
+    float: none !important;
+    font-weight: 400;
+}
+#producttotal .pull-right,
+#producttotal .float-right {
+    color: var(--color-text-primary);
+    font-weight: 500;
+    white-space: nowrap;
+    float: none !important;
+}
+
+/* "Setup Fees" + "Monthly" sub-totals -- divider above */
+#producttotal .summary-totals {
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 0.5px solid var(--color-border);
+}
+#producttotal .summary-totals .pull-left {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+/* "Total Due Today" strip at the bottom of the summary body. DOM order
+   is .amt first then a plain span -- we want the label on the left and
+   the big number on the right, so row-reverse flips the visual order. */
+#producttotal .total-due-today {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 14px -22px -20px;
+    padding: 14px 22px;
+    border-top: 0.5px solid var(--color-border);
+    background: var(--color-surface-tertiary);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.004em;
+}
+#producttotal .total-due-today .amt {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.022em;
+    white-space: nowrap;
+    line-height: 1;
+}
+#producttotal .total-due-today > span:not(.amt) {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+    flex: 1;
+}
+
+/* The recalctotals loader overlay (spinner) -- align to the right of
+   the head row instead of stacking under the heading. */
+#orderSummary .cp-section-head { display: flex; align-items: center; justify-content: space-between; }
+#orderSummaryLoader { font-size: 12px; color: var(--color-text-tertiary); }
+
+
 .cp-summary-line {
     display: flex; justify-content: space-between; align-items: baseline;
     gap: 10px;
