@@ -1166,23 +1166,14 @@ body[data-tpl="fraudcheck"] {
     .w-100 { width: 100% !important; }
     .font-size-36 { font-size: 36px; font-weight: 600; letter-spacing: -0.022em; }
 
-    /* Headings inside the cart area inherit the Apple type scale.
-       Wrapped in :is() with the outer body[data-tpl=...] inside :where()
-       so the resulting specificity is just (0,0,1) -- the element. That
-       makes these DEFAULTS that any class-based rule (e.g. .cp-section-title,
-       .addon-promo-container h3, .cp-plan-hero-name) can override without
-       needing !important. Previously the rule had specificity (0,1,2)
-       because the body[data-tpl="..."] wrapper added an attribute + body
-       element to the chain; that beat almost every per-page heading rule
-       and forced workarounds throughout mytheme_cart's CSS.
-
-       The :where() trick: :where(X) y has the specificity of just y.
-       So body[data-tpl=cart] :where(h1) and :where(body[data-tpl=cart]) h1
-       both compute to specificity (0,0,1). Same visual result, but the
-       rule now loses to any class selector. */
-    :where(h1) { font-size: 32px; font-weight: 600; letter-spacing: -0.024em; margin-top: 0; }
-    :where(h2) { font-size: 24px; font-weight: 600; letter-spacing: -0.018em; }
-    :where(h3) { font-size: 18px; font-weight: 600; letter-spacing: -0.014em; }
+    /* Heading rules moved OUTSIDE this body[data-tpl="..."] nested
+       block (see the flat :where()-wrapped rules at the bottom of this
+       file). Keeping them nested here gave them specificity (0,1,1)
+       even with :where(h2) because the parent body[data-tpl=...]
+       wrapper still contributed (0,1,0) via CSS nesting's implicit
+       `& <selector>` parent chain. The flat versions below use
+       :where(body[data-tpl=...]) on the OUTSIDE so the whole chain
+       drops to (0,0,1) and any class-based rule wins. */
 
     /* -- standard_cart-specific helpers ------------------ */
     .header-lined {
@@ -2636,3 +2627,61 @@ body[data-tpl="fraudcheck"] {
         font-weight: 500;
     }
 }
+
+/* ===============================================================
+   Cart-area heading defaults -- specificity (0,0,1) so any class
+   selector wins. The body[data-tpl=...] list is inside :where() so
+   it contributes 0 specificity; only the trailing h1/h2/h3 counts.
+   These define the Apple-style sizes for ANY heading in the cart
+   flow that doesn't have a more specific class rule attached.
+   =============================================================== */
+:where(
+    body[data-tpl="cart"],
+    body[data-tpl="viewcart"],
+    body[data-tpl="configureproduct"],
+    body[data-tpl="configureproductdomain"],
+    body[data-tpl="configuredomains"],
+    body[data-tpl="checkout"],
+    body[data-tpl="products"],
+    body[data-tpl="domainregister"],
+    body[data-tpl="domaintransfer"],
+    body[data-tpl="domainoptions"],
+    body[data-tpl="ordersummary"],
+    body[data-tpl="addons"],
+    body[data-tpl="complete"],
+    body[data-tpl="fraudcheck"]
+) h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.024em; margin-top: 0; }
+
+:where(
+    body[data-tpl="cart"],
+    body[data-tpl="viewcart"],
+    body[data-tpl="configureproduct"],
+    body[data-tpl="configureproductdomain"],
+    body[data-tpl="configuredomains"],
+    body[data-tpl="checkout"],
+    body[data-tpl="products"],
+    body[data-tpl="domainregister"],
+    body[data-tpl="domaintransfer"],
+    body[data-tpl="domainoptions"],
+    body[data-tpl="ordersummary"],
+    body[data-tpl="addons"],
+    body[data-tpl="complete"],
+    body[data-tpl="fraudcheck"]
+) h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.018em; }
+
+:where(
+    body[data-tpl="cart"],
+    body[data-tpl="viewcart"],
+    body[data-tpl="configureproduct"],
+    body[data-tpl="configureproductdomain"],
+    body[data-tpl="configuredomains"],
+    body[data-tpl="checkout"],
+    body[data-tpl="products"],
+    body[data-tpl="domainregister"],
+    body[data-tpl="domaintransfer"],
+    body[data-tpl="domainoptions"],
+    body[data-tpl="ordersummary"],
+    body[data-tpl="addons"],
+    body[data-tpl="complete"],
+    body[data-tpl="fraudcheck"]
+) h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.014em; }
