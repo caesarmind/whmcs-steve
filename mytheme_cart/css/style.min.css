@@ -2599,6 +2599,7 @@ body[data-plan] .st-variant-label { display: none; }
     transition: background var(--transition-fast);
 }
 .cp-checkout-btn:hover { background: var(--color-accent-hover); color: #fff; }
+.cp-checkout-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
 .cp-back-link {
     font-size: 12.5px; color: var(--color-text-tertiary);
     text-align: center; text-decoration: none;
