@@ -209,8 +209,8 @@
             <link rel="apple-touch-icon" href="{$myTheme.branding.square.light|escape}">
         {/if}
     {/if}
-    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v=1.0">
-    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-layout.css?v=1.0">
+    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v={$myTheme.version|default:'1.0'}">
+    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-layout.css?v={$myTheme.version|default:'1.0'}">
 
     {* ── jQuery + Bootstrap 4 + plugins for all cart-flow pages ──
        Loaded on cart-flow pages regardless of which cart theme is

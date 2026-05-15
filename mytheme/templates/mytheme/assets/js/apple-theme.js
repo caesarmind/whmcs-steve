@@ -466,3 +466,56 @@ document.addEventListener('click', function(e) {
     };
     for (var k in v) s.setProperty('--' + k, v[k]);
 })();
+
+// Cart page chrome (page header + 5-step strip) for /cart.php?a=view
+//
+// Injected via JS rather than mytheme_cart/viewcart.tpl because WHMCS's
+// cart-page render with full mytheme layout cookies STRIPS arbitrary
+// HTML elements added inside cart TPL output. Verified live: anonymous
+// CLI fetch sees the markup, browser-with-session render does not.
+//
+// Runs only when #nexus-root exists (cart view page), so this is a
+// no-op everywhere else mytheme is loaded.
+(function () {
+    function init() {
+        var mount = document.getElementById('nexus-root');
+        if (!mount) return;
+        if (document.querySelector('.vc-page-header')) return; // re-entry guard
+        var orderWrap = document.getElementById('order-standard_cart') || mount.parentElement;
+        if (!orderWrap || !orderWrap.parentElement) return;
+
+        var checkSvg = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+        var arrowSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 5 12 12 19"/></svg>';
+
+        var header = document.createElement('header');
+        header.className = 'vc-page-header';
+        header.innerHTML =
+            '<div>' +
+                '<h1>Your cart</h1>' +
+                '<p class="vc-sub">Review the items in your cart, apply a promo code, and head to checkout.</p>' +
+            '</div>' +
+            '<a href="/cart.php" class="vc-browse-btn">' + arrowSvg + 'Browse products &amp; services</a>';
+
+        var steps = document.createElement('div');
+        steps.className = 'vc-steps';
+        steps.setAttribute('aria-label', 'Checkout progress');
+        steps.innerHTML =
+            '<span class="vc-step done"><span class="vc-step-num">' + checkSvg + '</span>Choose plan</span>' +
+            '<span class="vc-step-sep">›</span>' +
+            '<span class="vc-step done"><span class="vc-step-num">' + checkSvg + '</span>Domain</span>' +
+            '<span class="vc-step-sep">›</span>' +
+            '<span class="vc-step done"><span class="vc-step-num">' + checkSvg + '</span>Configure</span>' +
+            '<span class="vc-step-sep">›</span>' +
+            '<span class="vc-step active"><span class="vc-step-num">4</span>Cart</span>' +
+            '<span class="vc-step-sep">›</span>' +
+            '<span class="vc-step"><span class="vc-step-num">5</span>Checkout</span>';
+
+        orderWrap.parentElement.insertBefore(header, orderWrap);
+        orderWrap.parentElement.insertBefore(steps, orderWrap);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
