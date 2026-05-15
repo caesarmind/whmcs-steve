@@ -426,20 +426,48 @@ var _localLang = {
                    ════════════════════════════════════════════ *}
                 <aside class="cp-summary-wrap" id="scrollingPanelContainer">
                     <div class="card cp-summary-card" id="orderSummary">
-                        <div class="cp-section-head">
-                            <h2 class="cp-section-title">{$LANG.ordersummary}</h2>
+                        {* Heading uses .cp-summary-head (NOT .cp-section-head)
+                           so it picks up the 14px h2 sizing from the mockup
+                           rather than the 15px global .cp-section-title. *}
+                        <div class="cp-summary-head">
+                            <h2>{$LANG.ordersummary|default:'Order summary'}</h2>
                             <div class="loader w-hidden" id="orderSummaryLoader" aria-hidden="true">
                                 <i class="fas fa-fw fa-sync fa-spin"></i>
                             </div>
                         </div>
-                        <div class="cp-section-body">
-                            <div class="summary-container" id="producttotal"></div>
+
+                        {* WHMCS injects line items + subtotals + Due Today
+                           into #producttotal via recalctotals(). CSS styles
+                           the emitted .product-name / .clearfix / .summary-totals
+                           / .total-due-today in place. *}
+                        <div class="summary-container" id="producttotal"></div>
+
+                        {* Renewal note + promo code row sit between the
+                           Due Today strip and the action footer. Renewal
+                           text is hardcoded here as a static reassurance
+                           line (mockup-faithful); WHMCS doesn't expose a
+                           ready-made 'Renews $X every year' string. *}
+                        <p class="cp-summary-cycle">{$LANG.cartsummarycycle|default:'Cancel anytime - 30-day money-back guarantee.'}</p>
+
+                        <div class="cp-promo-row">
+                            <input type="text" class="cp-promo-input" id="promocode" name="promocode" placeholder="{$LANG.promotioncode|default:'Promo code'}" value="{if $promocode}{$promocode|escape}{/if}">
+                            <button type="button" class="cp-promo-apply" onclick="applyPromoCode();">{$LANG.applypromo|default:'Apply'}</button>
                         </div>
+
                         <div class="cp-summary-footer">
-                            <button type="submit" id="btnCompleteProductConfig" class="btn-primary">
-                                {$LANG.continue}
+                            <button type="submit" id="btnCompleteProductConfig" class="cp-checkout-btn">
+                                {$LANG.cartreviewcart|default:'Review cart'}
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                             </button>
+                            <a href="{$WEB_ROOT}/cart.php?a=add&pid={$pid}&domainselect=1" class="cp-back-link">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                                {$LANG.cartbacktodomain|default:'Back to domain'}
+                            </a>
+                        </div>
+
+                        <div class="cp-guarantees">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            {$LANG.cartsecured|default:'Secured by 256-bit SSL - PCI-DSS Level 1'}
                         </div>
                     </div>
                 </aside>

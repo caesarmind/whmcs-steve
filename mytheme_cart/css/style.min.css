@@ -2430,41 +2430,48 @@ body[data-plan] .st-variant-label { display: none; }
    summary reads as the Apple-style line list + Due Today block.
    =============================================================== */
 
-/* Product name + group eyebrow at the very top of the summary body */
+/* Product name + group eyebrow at the very top of the summary body.
+   Each row owns its own horizontal padding (20px) since #producttotal
+   is now a direct child of the padding:0 .cp-summary-card. */
+#producttotal { padding: 0; }
 #producttotal .product-name {
     display: block;
-    font-size: 14px;
+    padding: 14px 20px 2px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--color-text-primary);
     letter-spacing: -0.012em;
     line-height: 1.3;
-    margin-bottom: 2px;
+    margin: 0;
 }
 #producttotal .product-group {
     display: block;
+    padding: 0 20px 12px;
     font-size: 10.5px;
     font-weight: 600;
     color: var(--color-accent);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    margin: 0 0 14px;
+    margin: 0;
+    border-bottom: 0.5px solid var(--color-border);
 }
 
-/* Line item rows -- both standalone .clearfix (addons / base price) AND
-   the ones nested inside .summary-totals (setup + recurring). The legacy
-   .pull-left.float-left + .pull-right.float-right pattern needs the
-   float killed so flex layout can take over and right-align the price. */
-#producttotal > .clearfix,
-#producttotal .summary-totals > .clearfix {
+/* Line item rows -- standalone .clearfix (base + addons). Self-padded
+   on the sides; gap to the next row controlled via top margin on the
+   first one. */
+#producttotal > .clearfix {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     gap: 10px;
-    padding: 6px 0;
+    margin: 0 20px;
+    padding: 7px 0;
     font-size: 12.5px;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.004em;
 }
+#producttotal > .clearfix:first-of-type { margin-top: 8px; }
+#producttotal > .clearfix:last-of-type { margin-bottom: 4px; }
 #producttotal .pull-left,
 #producttotal .float-left {
     color: var(--color-text-secondary);
@@ -2481,28 +2488,43 @@ body[data-plan] .st-variant-label { display: none; }
     float: none !important;
 }
 
-/* "Setup Fees" + "Monthly" sub-totals -- divider above */
+/* Setup Fees + Monthly sub-totals -- bordered top, slightly muted to
+   read as secondary information vs the line items. */
 #producttotal .summary-totals {
-    margin-top: 10px;
-    padding-top: 12px;
+    margin: 8px 20px 0;
+    padding: 10px 0 8px;
     border-top: 0.5px solid var(--color-border);
 }
+#producttotal .summary-totals > .clearfix {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0;
+    padding: 5px 0;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.004em;
+}
 #producttotal .summary-totals .pull-left {
-    font-weight: 500;
-    color: var(--color-text-primary);
+    color: var(--color-text-secondary);
+    font-weight: 400;
+}
+#producttotal .summary-totals .pull-right {
+    color: var(--color-text-tertiary);
+    font-weight: 400;
 }
 
-/* "Total Due Today" strip at the bottom of the summary body. DOM order
-   is .amt first then a plain span -- we want the label on the left and
-   the big number on the right, so row-reverse flips the visual order. */
+/* Total Due Today strip -- full-width tertiary tint, big amount. DOM
+   order is .amt first then a label span; row-reverse flips them so the
+   label sits on the left and the number on the right. */
 #producttotal .total-due-today {
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    margin: 14px -22px -20px;
-    padding: 14px 22px;
+    padding: 14px 20px;
     border-top: 0.5px solid var(--color-border);
     background: var(--color-surface-tertiary);
     font-variant-numeric: tabular-nums;
@@ -2524,9 +2546,8 @@ body[data-plan] .st-variant-label { display: none; }
     flex: 1;
 }
 
-/* The recalctotals loader overlay (spinner) -- align to the right of
-   the head row instead of stacking under the heading. */
-#orderSummary .cp-section-head { display: flex; align-items: center; justify-content: space-between; }
+/* recalctotals spinner aligned right inside the head row */
+#orderSummary .cp-summary-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 #orderSummaryLoader { font-size: 12px; color: var(--color-text-tertiary); }
 
 
