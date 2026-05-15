@@ -48,12 +48,17 @@ var _localLang = {
 </script>
 
 <div id="order-standard_cart">
-    <div class="content-area">
 
-        <header class="page-header">
-            <h1>{$LANG.orderconfigure}</h1>
-            <p class="page-subtitle">{$productinfo.name} · {$LANG.orderForm.configureDesiredOptions}</p>
-        </header>
+    {* mytheme/header.tpl already opens <div class="content-area"> for
+       us; the inner wrapper that used to live here produced double
+       padding. Class renamed from .page-header to .st-page-header to
+       match products.tpl (style.min.css only defines rules for the
+       latter). *}
+
+    <header class="st-page-header">
+        <h1>{$LANG.orderconfigure}</h1>
+        <p class="page-subtitle">{$productinfo.name} · {$LANG.orderForm.configureDesiredOptions}</p>
+    </header>
 
         <div class="cp-steps" aria-label="Order progress">
             <span class="cp-step done">
@@ -380,8 +385,7 @@ var _localLang = {
 
             </div>
         </form>
-    </div>
-</div>
+</div>{* /#order-standard_cart *}
 
 <style>{literal}
 /* Page-local layout helpers — most .cp-* classes come from mytheme's
