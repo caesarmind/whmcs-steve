@@ -44,7 +44,41 @@
        add to cart TPL output when the page renders with the full
        mytheme layout shell. Putting the IIFE in the always-loaded
        global script reliably seeds the SPA's variable surface before
-       main.min.js initializes its Shadow DOM. *}
+       main.min.js initializes its Shadow DOM.
+
+       The .vc-* CSS rules used by the page-level chrome below live in
+       mytheme/templates/mytheme/assets/css/apple-theme.css for the same
+       reason -- inline <style>/<link> in this TPL would be stripped. *}
+
+    {* ── Page-level chrome wrapping the Nexus SPA ──
+       The SPA's layout is locked by WHMCS (sect 18 docs), so the only
+       way to add Apple-mockup framing is page-level markup ABOVE the
+       mount. The SPA's own "Shopping Cart" h1 + breadcrumb still
+       render below this -- they live in the Shadow DOM, no way to
+       hide them from outside. *}
+
+    <header class="vc-page-header">
+        <div>
+            <h1>{$LANG.viewcart|default:'Your cart'}</h1>
+            <p class="vc-sub">{$LANG.cartreviewcheckoutdesc|default:'Review the items in your cart, apply a promo code, and head to checkout.'}</p>
+        </div>
+        <a href="{$WEB_ROOT}/cart.php" class="vc-browse-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 5 12 12 19"/></svg>
+            {$LANG.orderForm.continueShopping|default:'Browse products & services'}
+        </a>
+    </header>
+
+    <div class="vc-steps" aria-label="Checkout progress">
+        <span class="vc-step done"><span class="vc-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.orderForm.chooseProduct|default:'Choose plan'}</span>
+        <span class="vc-step-sep">&rsaquo;</span>
+        <span class="vc-step done"><span class="vc-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.cartdomain|default:'Domain'}</span>
+        <span class="vc-step-sep">&rsaquo;</span>
+        <span class="vc-step done"><span class="vc-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.cartconfigure|default:'Configure'}</span>
+        <span class="vc-step-sep">&rsaquo;</span>
+        <span class="vc-step active"><span class="vc-step-num">4</span>{$LANG.cart|default:'Cart'}</span>
+        <span class="vc-step-sep">&rsaquo;</span>
+        <span class="vc-step"><span class="vc-step-num">5</span>{$LANG.checkout|default:'Checkout'}</span>
+    </div>
 
     <div id="order-standard_cart">
         <div id="nexus-root" data-app="cart-module" data-init="{getNexusData}"></div>

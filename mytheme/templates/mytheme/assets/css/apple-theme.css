@@ -3030,3 +3030,64 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .homepage-nav .nav-dropdown-item:hover { background: var(--color-surface-secondary); }
 .homepage-nav .nav-dropdown-divider { height: 1px; background: var(--color-border); margin: 4px 0; }
 .homepage-nav .nav-dropdown-section { padding: 6px 12px 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-tertiary); }
+
+/* ============================================
+   Cart view-page chrome (.vc-*)
+   --------------------------------------------
+   Wraps the nexus_cart Vue SPA at /cart.php?a=view with the Apple
+   mockup's page header + 5-step strip. Lives here (not inline in
+   mytheme_cart/viewcart.tpl) because WHMCS strips <style>/<link>
+   from cart TPL output. .vc- prefix prevents collisions with the
+   .ct-* classes used inside the mockups and the .cp-* classes on
+   the configure-product page.
+   ============================================ */
+.vc-page-header {
+    margin-bottom: 24px;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 16px; flex-wrap: wrap;
+}
+.vc-page-header h1 {
+    font-size: 32px; font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    margin: 0 0 6px;
+}
+.vc-page-header .vc-sub {
+    font-size: 14px; color: var(--color-text-tertiary);
+    letter-spacing: -0.008em;
+    margin: 0;
+}
+.vc-page-header .vc-browse-btn {
+    height: 36px; padding: 0 16px;
+    font-size: 13px; font-weight: 500;
+    color: var(--color-text-primary);
+    background: transparent;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-pill, 999px);
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    letter-spacing: -0.008em;
+    transition: all var(--transition-fast, 0.15s);
+}
+.vc-page-header .vc-browse-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.vc-steps {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 18px;
+    font-size: 12.5px; color: var(--color-text-tertiary);
+    letter-spacing: -0.008em;
+}
+.vc-step { display: inline-flex; align-items: center; gap: 8px; }
+.vc-step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--color-surface-secondary); color: var(--color-text-tertiary);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; flex-shrink: 0;
+}
+.vc-step.done .vc-step-num { background: var(--color-green-bg, #e8f5e8); color: var(--color-green-text, #34c759); }
+.vc-step.active .vc-step-num { background: var(--color-accent); color: #fff; }
+.vc-step.active { color: var(--color-text-primary); font-weight: 500; }
+.vc-step-sep { color: var(--color-text-quaternary, #c7c7cc); }
