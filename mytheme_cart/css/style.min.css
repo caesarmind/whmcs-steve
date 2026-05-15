@@ -1,9 +1,9 @@
 /*
- * mytheme_cart — main Apple-language stylesheet
+ * mytheme_cart -- main Apple-language stylesheet
  * --------------------------------------------------------------
  * Owns the visual look for every cart-flow page (products,
  * viewcart, configureproduct, domainregister, domaintransfer,
- * checkout, signup). The `.min` suffix is a name convention —
+ * checkout, signup). The `.min` suffix is a name convention --
  * the file is left readable here and minified in CI.
  *
  * Companion file: css/custom.css owns the `--vl-*` Shadow-DOM
@@ -24,12 +24,12 @@
  *  12. Buttons / form primitives shared across cart pages
  */
 
-/* ───────────────────────────────────────────────────────────────
-   1. TOKENS — Apple light mode + system dark mode mirror.
+/* ---------------------------------------------------------------
+   1. TOKENS -- Apple light mode + system dark mode mirror.
    These are the same values apple-client-area/css/apple-theme.css
    exposes; redeclared here so the cart pages don't have to
    depend on the client-area theme bundle being loaded first.
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 :root {
     --color-bg:                #fbfbfd;
     --color-surface:           #ffffff;
@@ -60,7 +60,7 @@
 }
 
 /* Dark mode is opt-in via [data-theme="dark"] on <html> or <body>.
-   We do NOT gate on @media (prefers-color-scheme: dark) — the parent
+   We do NOT gate on @media (prefers-color-scheme: dark) -- the parent
    mytheme uses explicit data-theme so the deployed site can default
    to light even when the visitor's OS is in dark mode. The OS
    preference is honored only as a fallback when no data-theme is
@@ -89,7 +89,7 @@ body[data-theme="dark"],
     --color-red-text:          #ff453a;
 }
 
-/* OS-preference fallback — only applies when the page does NOT set
+/* OS-preference fallback -- only applies when the page does NOT set
    data-theme explicitly. The :where() keeps specificity at zero so
    any [data-theme] attribute on <html>/<body> wins. */
 @media (prefers-color-scheme: dark) {
@@ -125,9 +125,9 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
    2. SHARED SECTION SCAFFOLDING
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 .ds-section { padding: 80px 24px; position: relative; overflow: hidden; }
 @media (max-width: 720px) { .ds-section { padding: 56px 20px; } }
 .ds-section.bg-main   { background: var(--color-bg); }
@@ -158,9 +158,9 @@ body {
 @media (max-width: 720px) { .ds-section-subtitle { font-size: 15px; margin-bottom: 28px; } }
 .ds-section-subtitle.center { margin-left: auto; margin-right: auto; }
 
-/* ───────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
    3. HERO (group landing)
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 .ds-hero { padding: 120px 24px 96px; }
 @media (max-width: 720px) { .ds-hero { padding: 72px 20px 56px; } }
 .ds-hero-inner { max-width: 980px; margin: 0 auto; text-align: center; }
@@ -221,9 +221,9 @@ body {
     pointer-events: none; opacity: 0.7;
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
    4. PRICING GRID (plan cards)
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 .ds-pricing-grid {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
 }
@@ -328,9 +328,9 @@ body {
     color: #fff;
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
    5. SHOWCASE (product_preview split)
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 .ds-showcase {
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 48px; align-items: center;
@@ -400,9 +400,9 @@ body {
 }
 .ds-showcase-media-fallback svg { width: 96px; height: 96px; }
 
-/* ───────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
    6. COMPARISON TABLE
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 .ds-table-wrap {
     background: var(--color-surface);
     border: 0.5px solid var(--color-border);
@@ -459,9 +459,9 @@ body {
     .ds-table-mobile-hint { display: block; }
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
    7. VIDEO BLOCK + MODAL
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 .ds-video {
     position: relative; max-width: 880px; margin: 0 auto;
     aspect-ratio: 16 / 9;
@@ -521,9 +521,9 @@ body {
 }
 .ds-video-modal-close:hover { background: rgba(255, 255, 255, 0.25); }
 
-/* ───────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
    8. FREE-FORM 3-UP
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 .ds-freeform {
     font-size: 15.5px; line-height: 1.65;
     color: var(--color-text-secondary);
@@ -560,9 +560,9 @@ body {
     margin: 0;
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
    9. FAQ ACCORDION
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 .ds-faq {
     max-width: 760px; margin: 0 auto;
     display: flex; flex-direction: column; gap: 10px;
@@ -614,9 +614,9 @@ body {
     letter-spacing: -0.008em;
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
   10. EMPTY STATE (no products / blocks / blank flow)
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 .ds-empty { padding: 120px 24px; text-align: center; }
 .ds-empty-ico {
     width: 80px; height: 80px;
@@ -659,9 +659,9 @@ body {
 .ds-empty-actions .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
 .ds-empty-actions svg { width: 14px; height: 14px; }
 
-/* ───────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
   11. ORDER FORM SIDEBAR (categories + mini-cart)
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 .ds-cart-layout {
     display: grid; grid-template-columns: 240px 1fr;
     gap: 32px;
@@ -701,13 +701,13 @@ body {
     color: #fff;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   STORE (.st-*) — the actual products-page layout.
+/* ===============================================================
+   STORE (.st-*) -- the actual products-page layout.
    Source: apple-client-area/store.html
    Used by: products.tpl, sidebar-categories.tpl
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
-/* ── Page header (sits above the split) ────────────────────── */
+/* -- Page header (sits above the split) ---------------------- */
 .st-page-header { margin-bottom: 24px; }
 .st-page-header h1 {
     font-size: 32px; font-weight: 600;
@@ -721,11 +721,11 @@ body {
     margin: 0; max-width: 620px;
 }
 
-/* ── 2-column split: sidebar + main ──────────────────────── */
+/* -- 2-column split: sidebar + main ------------------------ */
 .st-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
 @media (max-width: 880px) { .st-split { grid-template-columns: 1fr; } }
 
-/* ── Sidebar cards (Categories + Actions) ────────────────── */
+/* -- Sidebar cards (Categories + Actions) ------------------ */
 .subnav-card { padding: 8px; }
 .subnav-heading {
     font-size: 11px; font-weight: 600;
@@ -788,10 +788,10 @@ body {
     background: var(--color-border);
     margin: 8px 12px;
 }
-/* Vertical gap between stacked sidebar panels (Categories → Actions) */
+/* Vertical gap between stacked sidebar panels (Categories -> Actions) */
 .subnav-card--gap { margin-top: 12px; }
 
-/* ── Category header (with billing cycle pill switch) ────── */
+/* -- Category header (with billing cycle pill switch) ------ */
 .st-cat-head { padding: 24px 28px 22px; }
 .st-cat-head-row {
     display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
@@ -853,7 +853,7 @@ body {
     text-transform: uppercase;
 }
 
-/* ── Plan grid (Variant A — 3 cards w/ feature list) ─────── */
+/* -- Plan grid (Variant A -- 3 cards w/ feature list) ------- */
 .st-pricing {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
     padding: 0 20px 24px;
@@ -985,7 +985,7 @@ body {
     background: var(--color-accent-light);
 }
 
-/* ── Compare bar (fine print under the grid) ────────────── */
+/* -- Compare bar (fine print under the grid) -------------- */
 .st-compare {
     margin-top: 16px;
     padding: 14px 20px;
@@ -1003,7 +1003,7 @@ body {
     font-weight: 500;
 }
 
-/* ── Guarantees strip (3 trust cards below the grid) ────── */
+/* -- Guarantees strip (3 trust cards below the grid) ------ */
 .st-guarantees {
     margin-top: 20px;
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
@@ -1033,8 +1033,8 @@ body {
     line-height: 1.4;
 }
 
-/* ── Empty state — used inside the main card when the
-   selected category has no purchasable packages ───────── */
+/* -- Empty state -- used inside the main card when the
+   selected category has no purchasable packages --------- */
 .st-empty {
     padding: 72px 24px 64px;
     text-align: center;
@@ -1087,12 +1087,12 @@ body {
 .st-empty-actions .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
 .st-empty-actions svg { width: 13px; height: 13px; }
 
-/* ── Plan variant switching (All / A / B / C / D / E / F / G / H) ──
+/* -- Plan variant switching (All / A / B / C / D / E / F / G / H) --
    When a specific plan is chosen via the state-chip (`data-plan` set
    on <body>), every other .plan-variant AND every .st-variant-label is
    hidden, leaving only the selected block visible. When no data-plan
    is set (i.e., the state-chip "All" mode used for dev preview only),
-   the cart wrapper falls back to Variant A — stacking all 8 variants
+   the cart wrapper falls back to Variant A -- stacking all 8 variants
    for one product is overwhelming for end users and was leaving the
    visible viewport empty after the category header.
 
@@ -1129,7 +1129,7 @@ body:not([data-plan]) #order-standard_cart .st-variant-label { display: none; }
 /* Hide every variant-label when a specific variant is picked */
 body[data-plan] .st-variant-label { display: none; }
 
-/* ── Variant B — 4 minimal packages ───────────────────────── */
+/* -- Variant B -- 4 minimal packages ------------------------- */
 .st-pricing-b {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
     padding: 0 20px 24px;
@@ -1186,7 +1186,7 @@ body[data-plan] .st-variant-label { display: none; }
 .st-plan-b.featured .st-plan-b-cta { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
 .st-plan-b.featured .st-plan-b-cta:hover { background: var(--color-accent-hover); }
 
-/* ── Variant C — 5 horizontal rows ───────────────────────── */
+/* -- Variant C -- 5 horizontal rows ------------------------- */
 .st-rows { padding: 0; }
 .st-row {
     display: grid;
@@ -1245,7 +1245,7 @@ body[data-plan] .st-variant-label { display: none; }
 .st-row-cta:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
 .st-row.featured .st-row-cta { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
 
-/* ── Variant D — comparison table ─────────────────────────── */
+/* -- Variant D -- comparison table --------------------------- */
 .st-compare-tbl {
     width: 100%;
     border-collapse: collapse;
@@ -1311,7 +1311,7 @@ body[data-plan] .st-variant-label { display: none; }
 .st-compare-footer > * { padding: 0 18px; }
 .st-compare-footer-cta { display: flex; justify-content: center; }
 
-/* ── Variant E — Bento asymmetric ─────────────────────────── */
+/* -- Variant E -- Bento asymmetric --------------------------- */
 .st-bento {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1396,7 +1396,7 @@ body[data-plan] .st-variant-label { display: none; }
 }
 .st-bento-mini-cta:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
 
-/* ── Variant F — Segmented bar ────────────────────────────── */
+/* -- Variant F -- Segmented bar ------------------------------ */
 .st-seg {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1455,7 +1455,7 @@ body[data-plan] .st-variant-label { display: none; }
 .st-seg-col.featured .st-seg-cta { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
 .st-seg-col.featured .st-seg-cta:hover { background: var(--color-accent-hover); }
 
-/* ── Variant G — Spec matrix (label/value rows) ───────────── */
+/* -- Variant G -- Spec matrix (label/value rows) ------------- */
 .st-matrix {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
     padding: 0 20px 24px;
@@ -1509,7 +1509,7 @@ body[data-plan] .st-variant-label { display: none; }
 .st-matrix-card.featured .st-matrix-cta { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
 .st-matrix-card.featured .st-matrix-cta:hover { background: var(--color-accent-hover); }
 
-/* ── Variant H — Addon card with radio tiers ──────────────── */
+/* -- Variant H -- Addon card with radio tiers ---------------- */
 .st-addon-wrap { padding: 0 20px 24px; }
 .st-addon-wrap + .st-addon-wrap { padding-top: 0; }
 .st-addon {
@@ -1606,10 +1606,10 @@ body[data-plan] .st-variant-label { display: none; }
     letter-spacing: -0.004em;
 }
 
-/* ── "Pick a category" landing — shown in the right column when
+/* -- "Pick a category" landing -- shown in the right column when
    no productgroup is selected. Replaces the awkward
    category-card + empty-state combo that was rendering whenever a
-   visitor hit /cart.php without a ?gid. ───────────────────────── */
+   visitor hit /cart.php without a ?gid. ------------------------- */
 .st-pick {
     padding: 56px 32px 60px;
     text-align: center;
@@ -1692,7 +1692,7 @@ body[data-plan] .st-variant-label { display: none; }
 }
 .st-pick-tile-cta svg { width: 12px; height: 12px; }
 
-/* ── Bootstrap modal + helper-hidden safety net ──────────────────
+/* -- Bootstrap modal + helper-hidden safety net ------------------
    The standard_cart recommendations-modal.tpl uses Bootstrap 4 modal
    markup (.modal.fade + .modal-dialog) which relies on Bootstrap's CSS
    to keep it invisible until JS adds .show. If Bootstrap CSS isn't
@@ -1712,8 +1712,8 @@ body[data-plan] .st-variant-label { display: none; }
 .modal:not(.show):not(.in) { display: none !important; }
 .hidden, .w-hidden { display: none !important; }
 
-/* ═══════════════════════════════════════════════════════════════
-   DOMAIN PICKER (.dp-*) — configureproductdomain.tpl layout.
+/* ===============================================================
+   DOMAIN PICKER (.dp-*) -- configureproductdomain.tpl layout.
    Source: apple-client-area/configureproductdomain.html inline <style>
    Used by: configureproductdomain.tpl
 
@@ -1724,13 +1724,13 @@ body[data-plan] .st-variant-label { display: none; }
    the mockup's --sidebar-item-hover / --sidebar-item-active tokens are
    replaced with literal rgba() values since style.min.css doesn't
    redeclare those (same pattern as .subnav-item above).
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
-/* ── 2-column split (matches .st-split) ──────────────────── */
+/* -- 2-column split (matches .st-split) -------------------- */
 .dp-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
 @media (max-width: 880px) { .dp-split { grid-template-columns: 1fr; } }
 
-/* ── Checkout progress strip (above the card) ───────────── */
+/* -- Checkout progress strip (above the card) ------------- */
 .dp-steps {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     margin-bottom: 18px;
@@ -1751,7 +1751,7 @@ body[data-plan] .st-variant-label { display: none; }
 .dp-step.active { color: var(--color-text-primary); font-weight: 500; }
 .dp-step-sep { color: var(--color-text-quaternary); }
 
-/* ── Option tabs (3-up radio cards) ──────────────────────── */
+/* -- Option tabs (3-up radio cards) ------------------------ */
 .dp-options {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
     padding: 22px 22px 0;
@@ -1809,7 +1809,7 @@ body[data-plan] .st-variant-label { display: none; }
 .dp-option-check svg { width: 10px; height: 10px; opacity: 0; }
 .dp-option:has(input:checked) .dp-option-check svg { opacity: 1; }
 
-/* ── Panel body (contents for selected option) ───────────── */
+/* -- Panel body (contents for selected option) ------------- */
 .dp-panel {
     padding: 22px 22px 24px;
     border-top: 0.5px solid var(--color-border);
@@ -1891,7 +1891,7 @@ body[data-plan] .st-variant-label { display: none; }
     color: var(--color-text-secondary);
 }
 
-/* Safe-search toggle — Apple switch style */
+/* Safe-search toggle -- Apple switch style */
 .dp-toggle-row {
     display: flex; align-items: center; gap: 12px;
     padding: 12px 0;
@@ -1933,7 +1933,7 @@ body[data-plan] .st-variant-label { display: none; }
 .dp-switch.off { background: var(--color-border); }
 .dp-switch.off::after { transform: translateX(-16px); }
 
-/* ── Error / validation states ───────────────────────────── */
+/* -- Error / validation states ----------------------------- */
 .dp-error {
     display: none;
     align-items: flex-start; gap: 12px;
@@ -2039,15 +2039,15 @@ body[data-plan] .st-variant-label { display: none; }
 }
 .dp-continue:hover { background: var(--color-accent-hover); color: #fff; }
 
-/* ═══════════════════════════════════════════════════════════════
-   CONFIGURE PRODUCT (.cp-*) — configureproduct.tpl layout.
+/* ===============================================================
+   CONFIGURE PRODUCT (.cp-*) -- configureproduct.tpl layout.
    Source: apple-client-area/configureproduct.html inline <style>
    Used by: configureproduct.tpl
    The .st-addon-* classes referenced from this page are already
    defined above (ported earlier for products.tpl Variant H).
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 
-/* ── Step strip (mirrors .dp-steps) ────────────────────── */
+/* -- Step strip (mirrors .dp-steps) ---------------------- */
 .cp-steps {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     margin-bottom: 18px;
@@ -2067,18 +2067,18 @@ body[data-plan] .st-variant-label { display: none; }
 .cp-step.active { color: var(--color-text-primary); font-weight: 500; }
 .cp-step-sep { color: var(--color-text-quaternary); }
 
-/* ── 2-column split (form + sticky summary) ───────────── */
+/* -- 2-column split (form + sticky summary) ------------- */
 .cp-split { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
 @media (max-width: 960px) { .cp-split { grid-template-columns: 1fr; } }
 
-/* ── Section card ─────────────────────────────────────── */
+/* -- Section card --------------------------------------- */
 .cp-section { padding: 0; }
 .cp-section-head { padding: 18px 22px 14px; border-bottom: 0.5px solid var(--color-border); }
 .cp-section-title { font-size: 15px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.012em; margin: 0; }
 .cp-section-sub { font-size: 12.5px; color: var(--color-text-tertiary); margin-top: 2px; letter-spacing: -0.008em; }
 .cp-section-body { padding: 18px 22px 20px; }
 
-/* ── Selected-plan hero ──────────────────────────────── */
+/* -- Selected-plan hero -------------------------------- */
 .cp-plan-hero { display: flex; align-items: center; gap: 18px; padding: 22px 24px; flex-wrap: wrap; }
 .cp-plan-hero-ico {
     width: 52px; height: 52px; border-radius: 14px;
@@ -2116,7 +2116,7 @@ body[data-plan] .st-variant-label { display: none; }
 }
 .cp-plan-hero-change:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
-/* ── Billing cycle picker ────────────────────────────── */
+/* -- Billing cycle picker ------------------------------ */
 .cp-cycle { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 @media (max-width: 720px) { .cp-cycle { grid-template-columns: 1fr; } }
 .cp-cycle-opt {
@@ -2148,7 +2148,7 @@ body[data-plan] .st-variant-label { display: none; }
 .cp-cycle-price .amount   { font-size: 22px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.02em; line-height: 1; }
 .cp-cycle-price .period   { font-size: 12px; color: var(--color-text-tertiary); margin-left: 2px; }
 
-/* ── Form fields ─────────────────────────────────────── */
+/* -- Form fields --------------------------------------- */
 .cp-form { display: flex; flex-direction: column; gap: 16px; }
 .cp-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 @media (max-width: 640px) { .cp-form-grid { grid-template-columns: 1fr; } }
@@ -2183,7 +2183,7 @@ body[data-plan] .st-variant-label { display: none; }
 .cp-field { display: flex; flex-direction: column; gap: 6px; }
 .cp-field-help { font-size: 11.5px; color: var(--color-text-tertiary); letter-spacing: -0.004em; margin-top: 2px; }
 
-/* ── Region picker ───────────────────────────────────── */
+/* -- Region picker ------------------------------------- */
 .cp-regions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 @media (max-width: 720px) { .cp-regions { grid-template-columns: 1fr; } }
 .cp-region {
@@ -2223,7 +2223,7 @@ body[data-plan] .st-variant-label { display: none; }
     background: var(--color-green-text);
 }
 
-/* ── Configurable options list ───────────────────────── */
+/* -- Configurable options list ------------------------- */
 .cp-opt-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 0.5px solid var(--color-border); }
 .cp-opt-row:last-child { border-bottom: 0; }
 .cp-opt-meta { flex: 1; min-width: 0; }
@@ -2287,7 +2287,7 @@ body[data-plan] .st-variant-label { display: none; }
 .cp-opt-qty-unit { font-size: 11.5px; color: var(--color-text-tertiary); margin-left: 8px; letter-spacing: -0.004em; }
 .cp-metric-list { display: flex; flex-direction: column; gap: 4px; }
 
-/* ── Add-ons list ────────────────────────────────────── */
+/* -- Add-ons list -------------------------------------- */
 .cp-addons { display: flex; flex-direction: column; gap: 10px; }
 .cp-addon {
     position: relative;
@@ -2332,7 +2332,7 @@ body[data-plan] .st-variant-label { display: none; }
 }
 .cp-addon-price .period { font-size: 11px; color: var(--color-text-tertiary); font-weight: 400; }
 
-/* ── Promo code row ──────────────────────────────────── */
+/* -- Promo code row ------------------------------------ */
 .cp-promo-row { display: flex; gap: 8px; align-items: center; padding: 12px 22px 16px; flex-wrap: wrap; }
 .cp-promo-input {
     flex: 1; min-width: 200px; height: 34px;
@@ -2356,7 +2356,7 @@ body[data-plan] .st-variant-label { display: none; }
 }
 .cp-promo-apply:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
 
-/* ── Sticky order summary (right column) ─────────────── */
+/* -- Sticky order summary (right column) --------------- */
 .cp-summary-card { position: sticky; top: 72px; padding: 0; }
 .cp-summary-head { padding: 18px 20px 14px; border-bottom: 0.5px solid var(--color-border); }
 .cp-summary-head h2 { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; margin: 0; }
@@ -2432,9 +2432,9 @@ body[data-plan] .st-variant-label { display: none; }
     border-radius: var(--radius-lg, 14px);
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ---------------------------------------------------------------
   12. SHARED FORM PRIMITIVES (buttons, inputs)
-   ─────────────────────────────────────────────────────────────── */
+   --------------------------------------------------------------- */
 .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     height: 40px; padding: 0 20px;
