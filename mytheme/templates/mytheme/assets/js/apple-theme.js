@@ -467,20 +467,79 @@ document.addEventListener('click', function(e) {
     for (var k in v) s.setProperty('--' + k, v[k]);
 })();
 
-// Cart page chrome (page header + 5-step strip) for /cart.php?a=view
+// Cart page chrome + Shadow DOM Apple-tuning for /cart.php?a=view
 //
-// Injected via JS rather than mytheme_cart/viewcart.tpl because WHMCS's
-// cart-page render with full mytheme layout cookies STRIPS arbitrary
-// HTML elements added inside cart TPL output. Verified live: anonymous
-// CLI fetch sees the markup, browser-with-session render does not.
+// 1. Page chrome (header + 5-step strip): injected via JS rather than
+//    mytheme_cart/viewcart.tpl because WHMCS strips arbitrary HTML from
+//    cart TPL output when the page is rendered with mytheme's full
+//    layout cookies. Verified live: anonymous CLI fetch sees the
+//    markup, browser-with-session render does not.
 //
-// Runs only when #nexus-root exists (cart view page), so this is a
+// 2. Shadow DOM stylesheet adoption: the Nexus SPA's compiled :host
+//    rule overrides our cascaded --vl-rounding-*, --vl-text-*,
+//    --vl-outline-*, --vl-letter-spacing, --vl-disabled-opacity --
+//    these get the SPA's defaults regardless of what we set on
+//    documentElement. Use Constructable Stylesheets + adoptedStyleSheets
+//    to inject a sheet INSIDE the shadow that wins via !important.
+//    Only --vl-* names not in our injected sheet keep nexus's mapping
+//    from custom.css (which already gives us the right colors).
+//
+// Both run only when #nexus-root exists, so this whole block is a
 // no-op everywhere else mytheme is loaded.
 (function () {
+    var SHADOW_OVERRIDES = ':host{' +
+        // Apple uses pill buttons + medium-rounded cards
+        '--vl-rounding-sm: 8px !important;' +
+        '--vl-rounding-md: 12px !important;' +
+        '--vl-rounding-lg: 999px !important;' +
+        // Apple SF Pro typography sizing -- bumped from nexus defaults
+        // (0.625/0.75/0.875/1rem) to mockup-matching 11.5/13/14/15px
+        '--vl-text-xs: 11.5px !important;' +
+        '--vl-text-sm: 13px !important;' +
+        '--vl-text-md: 14px !important;' +
+        '--vl-text-lg: 15px !important;' +
+        // Apple SF Pro tracking
+        '--vl-letter-spacing: -0.008em !important;' +
+        // Focus ring widths (subtle Apple)
+        '--vl-outline-sm: 2px !important;' +
+        '--vl-outline-md: 3px !important;' +
+        '--vl-outline-lg: 4px !important;' +
+        '--vl-disabled-opacity: 50% !important;' +
+    '}';
+
+    function injectShadowSheet() {
+        var mount = document.getElementById('nexus-root');
+        if (!mount) return false;
+        var sh = mount.shadowRoot;
+        if (!sh) return false; // SPA hasn't mounted yet
+        if (mount.dataset.appleSheetInjected) return true; // re-entry guard
+        if (!('adoptedStyleSheets' in sh) || typeof CSSStyleSheet === 'undefined' ||
+            !CSSStyleSheet.prototype.replaceSync) return false;
+        try {
+            var sheet = new CSSStyleSheet();
+            sheet.replaceSync(SHADOW_OVERRIDES);
+            sh.adoptedStyleSheets = [].concat(sh.adoptedStyleSheets || [], sheet);
+            mount.dataset.appleSheetInjected = '1';
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // Poll until the SPA mounts its shadow root (Vue async mount).
+    // Stops as soon as injection succeeds; gives up after ~10s.
+    function startShadowWatch() {
+        var attempts = 0;
+        var iv = setInterval(function () {
+            if (injectShadowSheet() || ++attempts > 100) clearInterval(iv);
+        }, 100);
+    }
+
     function init() {
         var mount = document.getElementById('nexus-root');
         if (!mount) return;
-        if (document.querySelector('.vc-page-header')) return; // re-entry guard
+        startShadowWatch();
+        if (document.querySelector('.vc-page-header')) return; // chrome re-entry guard
         var orderWrap = document.getElementById('order-standard_cart') || mount.parentElement;
         if (!orderWrap || !orderWrap.parentElement) return;
 
