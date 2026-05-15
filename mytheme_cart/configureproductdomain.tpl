@@ -294,6 +294,16 @@
     var form = document.getElementById('frmProductDomain');
     if (!form) return;
 
+    // standard_cart's scripts.min.js binds a jQuery submit handler on
+    // #frmProductDomain (scripts.js:2724) that calls e.preventDefault()
+    // and expects a different DOM (#registersld / #owndomainsld /
+    // #DomainSearchResults / #frmProductDomainSelections / ...) which we
+    // don't render. It silently blocks submission for every option.
+    // Drop ALL jQuery-bound submit handlers before our native one runs.
+    if (window.jQuery) {
+        window.jQuery(form).off('submit');
+    }
+
     var radios = form.querySelectorAll('input[name="domainoption"]');
     var panels = form.querySelectorAll('.dp-panel');
     var resultDomain = document.getElementById('resultDomain');
