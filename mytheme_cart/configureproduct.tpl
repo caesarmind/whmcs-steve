@@ -86,9 +86,6 @@ var _localLang = {
             <input type="hidden" name="configure" value="true">
             <input type="hidden" name="i" value="{$i}">
 
-            {* DEBUG: dump available WHMCS vars so we can pick the right product-id field for the back URL. Remove once verified. *}
-            <div id="dbg-vars" style="display:none">i={$i}|pid={$pid}|productid={$productid}|productinfo.pid={$productinfo.pid}|productinfo.id={$productinfo.id}|productinfo.gid={$productinfo.gid}|productinfo.productid={$productinfo.productid}|productinfo.name={$productinfo.name}</div>
-
             <div class="cp-grid">
 
                 {* ════════════════════════════════════════════
@@ -139,14 +136,12 @@ var _localLang = {
                                     </div>
                                 </div>
                                 {* "Change" sends the user back to the configureproductdomain step
-                                   for THIS specific plan. We want the friendly URL form
-                                   (e.g. /store/wordpress-hosting/pro-plan) so WHMCS routes
-                                   them straight to the domain picker, not the group listing.
-                                   `cart.php?a=add&pid={$pid}` is what WHMCS rewrites to that
-                                   friendly URL (same source as $product.productUrl in products.tpl).
-                                   Adding &domainselect=1 made WHMCS treat the GET like a posted
-                                   domain submission with no data and bounce to /store/<group>/. *}
-                                <a href="{$WEB_ROOT}/cart.php?a=add&pid={$pid}" class="cp-plan-hero-change">
+                                   for THIS specific plan. We use $productinfo.pid (NOT $pid -- on
+                                   the configureproduct route WHMCS only exposes $pid on the
+                                   configureproductdomain step). With a real pid, WHMCS rewrites
+                                   cart.php?a=add&pid=X to the friendly URL /store/<group>/<plan>
+                                   and re-enters the domain picker. *}
+                                <a href="{$WEB_ROOT}/cart.php?a=add&pid={$productinfo.pid}" class="cp-plan-hero-change">
                                     {$LANG.cartchangedomain|default:'Change'}
                                 </a>
                             </div>
@@ -471,10 +466,10 @@ var _localLang = {
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                             </button>
                             {* Same URL strategy as .cp-plan-hero-change above:
-                               cart.php?a=add&pid={$pid} rewrites to the plan's friendly
-                               URL (/store/<group>/<product>) which lands on the
-                               configureproductdomain step for THIS specific plan. *}
-                            <a href="{$WEB_ROOT}/cart.php?a=add&pid={$pid}" class="cp-back-link">
+                               cart.php?a=add&pid={$productinfo.pid} rewrites to the
+                               plan's friendly URL (/store/<group>/<product>) which lands
+                               on the configureproductdomain step for THIS specific plan. *}
+                            <a href="{$WEB_ROOT}/cart.php?a=add&pid={$productinfo.pid}" class="cp-back-link">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                                 {$LANG.cartbacktodomain|default:'Back to domain'}
                             </a>
