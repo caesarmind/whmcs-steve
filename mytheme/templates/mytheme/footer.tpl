@@ -40,8 +40,8 @@
 
 {$footeroutput}
 
-<script src="{$WEB_ROOT}/templates/{$template}/assets/js/apple-theme.js?v={$myTheme.version|default:'1.0'}"></script>
-<script src="{$WEB_ROOT}/templates/{$template}/assets/js/apple-layout.js?v={$myTheme.version|default:'1.0'}"></script>
+<script src="{$WEB_ROOT}/templates/{$template}/assets/js/apple-theme.js?v={$myTheme.version|default:'1.1'}"></script>
+<script src="{$WEB_ROOT}/templates/{$template}/assets/js/apple-layout.js?v={$myTheme.version|default:'1.1'}"></script>
 
 </body>
 </html>
