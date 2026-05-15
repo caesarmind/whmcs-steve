@@ -407,20 +407,30 @@ var _localLang = {
                                     <div>{$output}</div>
                                 {/foreach}
 
-                                {foreach $addons as $addon}
-                                    <label class="st-addon{if $addon.status} is-selected{/if}">
-                                        <div class="st-addon-head">
-                                            <div>
-                                                <div class="st-addon-title">
-                                                    <input type="checkbox" name="addons[{$addon.id}]"{if $addon.status} checked{/if}>
-                                                    {$addon.name}
+                                {* .addon-products + .panel-addon hook scripts.js:4980's
+                                   delegated 'ifChecked' so toggling an $addons checkbox
+                                   triggers recalctotals() and refreshes #producttotal.
+                                   The classes are appended to (not replacing) our Apple
+                                   .st-addon styling -- they're invisible to CSS, used
+                                   only as JS selectors. *}
+                                {if $addons}
+                                    <div class="addon-products">
+                                        {foreach $addons as $addon}
+                                            <label class="st-addon panel-addon{if $addon.status} is-selected{/if}">
+                                                <div class="st-addon-head">
+                                                    <div>
+                                                        <div class="st-addon-title">
+                                                            <input type="checkbox" name="addons[{$addon.id}]"{if $addon.status} checked{/if}>
+                                                            {$addon.name}
+                                                        </div>
+                                                        <div class="st-addon-desc">{$addon.description}</div>
+                                                    </div>
+                                                    <div class="st-addon-tier-price">{$addon.pricing}</div>
                                                 </div>
-                                                <div class="st-addon-desc">{$addon.description}</div>
-                                            </div>
-                                            <div class="st-addon-tier-price">{$addon.pricing}</div>
-                                        </div>
-                                    </label>
-                                {/foreach}
+                                            </label>
+                                        {/foreach}
+                                    </div>
+                                {/if}
                             </div>
                         </div>
                     {/if}
