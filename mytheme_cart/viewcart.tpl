@@ -36,109 +36,33 @@
 
     {include file="orderforms/standard_cart/common.tpl"}
 
-    {* Nexus SPA stylesheet + bundle. Referenced by absolute path so
-       WHMCS's assetPath() resolution doesn't try to look them up in
-       mytheme_cart/{js,css}/ (where they don't live). *}
-    <link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/nexus_cart/css/style.min.css">
+    {* WHMCS strips <style> and <link> elements from cart TPL output,
+       so we cannot inject CSS via a <style> block here. Two
+       implications:
 
-    <style>{literal}
-    /* ── Apple-themed customization of nexus_cart ──
-       nexus_cart auto-loads its own custom.css AFTER any inline styles
-       we add here, and that file maps every --vl-* variable from an
-       unprefixed --* (e.g. --vl-primary: var(--primary)). So setting
-       --vl-* directly gets overwritten. We set the unprefixed --*
-       layer instead -- nexus's mapping then carries our values into
-       the SPA's Shadow DOM via custom-property inheritance.
+       1. The Nexus SPA bundle (main.min.js) is referenced via <script>
+          (which DOES survive the strip) -- nexus_cart's compiled
+          stylesheet is auto-loaded by WHMCS as part of the cart module
+          regardless of which carttpl is active, so we don't need to
+          link it ourselves.
+
+       2. To override nexus's --vl-* CSS variables with the Apple
+          palette, we set the unprefixed --* layer (which nexus_cart's
+          custom.css maps into --vl-* via var() references) directly
+          on the mount element via the `style=` attribute. Custom
+          properties cascade INTO the Shadow DOM via inheritance, so
+          variables set on the host element reach every Vue component
+          inside.
+
        Values mirror apple-client-area/css/apple-theme.css's light
-       palette. */
-    :root, :host {
-        /* Primary -- Apple blue */
-        --primary:           #0071e3;
-        --primary-lifted:    #0077ed;
-        --primary-accented:  #005bb5;
+       palette. Kept on one long line per CSS variable per inline-
+       style convention. *}
 
-        /* Secondary -- neutral chip / muted button */
-        --secondary:           #f5f5f7;
-        --secondary-lifted:    #ebebef;
-        --secondary-accented:  #e8e8ed;
-
-        /* Status colors */
-        --success:           #34c759;
-        --success-lifted:    #30b751;
-        --success-accented:  #2aa24a;
-        --info:              #0071e3;
-        --info-lifted:       #0077ed;
-        --info-accented:     #005bb5;
-        --notice:            #ff9f0a;
-        --notice-lifted:     #ff8e00;
-        --notice-accented:   #e07a00;
-        --warning:           #ff9500;
-        --warning-lifted:    #f08a00;
-        --warning-accented:  #d97a00;
-        --error:             #ff3b30;
-        --error-lifted:      #ef352b;
-        --error-accented:    #d62d24;
-
-        /* Grayscale / neutral */
-        --grayscale:           #1d1d1f;
-        --grayscale-lifted:    #2c2c2e;
-        --grayscale-accented:  #000000;
-        --neutral:           #6e6e73;
-        --neutral-lifted:    #86868b;
-        --neutral-accented:  #4a4a4f;
-
-        /* Text hierarchy */
-        --text:           #1d1d1f;
-        --text-lifted:    #6e6e73;
-        --text-accented:  #000000;
-        --text-muted:     #86868b;
-        --text-inverted:  #ffffff;
-
-        /* Border hierarchy */
-        --border:           #e8e8ed;
-        --border-muted:     #f0f0f5;
-        --border-lifted:    #d2d2d7;
-        --border-accented:  #1d1d1f;
-
-        /* Background hierarchy */
-        --bg:           #fbfbfd;
-        --bg-muted:     #f5f5f7;
-        --bg-lifted:    #ffffff;
-        --bg-accented:  #fafafa;
-        --bg-inverted:  #1d1d1f;
-
-        /* Typography (Apple system font sizing) */
-        --text-xs:  11.5px;
-        --text-sm:  13px;
-        --text-md:  15px;
-        --text-lg:  17px;
-
-        /* Spacing -- focus rings */
-        --outline-sm: 2px;
-        --outline-md: 3px;
-        --outline-lg: 4px;
-
-        /* Rounding -- Apple uses generous rounding + pills */
-        --rounding-sm:  8px;
-        --rounding-md:  12px;
-        --rounding-lg:  999px;
-
-        /* Letter spacing matches Apple SF Pro tracking at body sizes */
-        --letter-spacing:    -0.008em;
-        --disabled-opacity:  0.5;
-    }
-
-    /* Hide old standard_cart wrapper artefacts that the global mytheme
-       layout doesn't strip. Without these, the SPA mount has stray
-       padding/borders inherited from #order-standard_cart. */
-    #order-standard_cart {
-        padding: 0 !important;
-        background: transparent !important;
-    }
-    {/literal}</style>
-
-    <div id="order-standard_cart">
-        <div id="nexus-root" data-app="cart-module" data-init="{getNexusData}"></div>
+    <div id="order-standard_cart" style="padding: 0; background: transparent;">
+        <div id="nexus-root"
+             data-app="cart-module"
+             data-init="{getNexusData}"
+             style="--primary:#0071e3;--primary-lifted:#0077ed;--primary-accented:#005bb5;--secondary:#f5f5f7;--secondary-lifted:#ebebef;--secondary-accented:#e8e8ed;--success:#34c759;--success-lifted:#30b751;--success-accented:#2aa24a;--info:#0071e3;--info-lifted:#0077ed;--info-accented:#005bb5;--notice:#ff9f0a;--notice-lifted:#ff8e00;--notice-accented:#e07a00;--warning:#ff9500;--warning-lifted:#f08a00;--warning-accented:#d97a00;--error:#ff3b30;--error-lifted:#ef352b;--error-accented:#d62d24;--grayscale:#1d1d1f;--grayscale-lifted:#2c2c2e;--grayscale-accented:#000000;--neutral:#6e6e73;--neutral-lifted:#86868b;--neutral-accented:#4a4a4f;--text:#1d1d1f;--text-lifted:#6e6e73;--text-accented:#000000;--text-muted:#86868b;--text-inverted:#ffffff;--border:#e8e8ed;--border-muted:#f0f0f5;--border-lifted:#d2d2d7;--border-accented:#1d1d1f;--bg:#fbfbfd;--bg-muted:#f5f5f7;--bg-lifted:#ffffff;--bg-accented:#fafafa;--bg-inverted:#1d1d1f;--text-xs:11.5px;--text-sm:13px;--text-md:15px;--text-lg:17px;--outline-sm:2px;--outline-md:3px;--outline-lg:4px;--rounding-sm:8px;--rounding-md:12px;--rounding-lg:999px;--letter-spacing:-0.008em;--disabled-opacity:0.5;"></div>
     </div>
 
     <script type="text/javascript" src="{$WEB_ROOT}/templates/orderforms/nexus_cart/js/main.min.js"></script>
