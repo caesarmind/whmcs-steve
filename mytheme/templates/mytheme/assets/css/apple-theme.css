@@ -361,7 +361,8 @@ html { scroll-behavior: smooth; }
 /* ============================================
    CONTENT AREA
    ============================================ */
-.content, .content-area { flex: 1; padding: 40px 48px 60px; max-width: 1120px; }
+.content, .content-area { flex: 1; padding: 10px 48px; max-width: 1120px; }
+.mc-promo .content { padding: 10px 0; max-width: none; }
 .page-actions { margin-top: 24px; }
 .service-item-info { flex: 1; min-width: 0; }
 .service-item-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
@@ -729,7 +730,7 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 @media (max-width: 768px) {
     .sidebar { display: none; }
     .main, .main-content { margin-left: 0; }
-    .content, .content-area { width: 100%; max-width: none; padding: 24px 20px 40px; }
+    .content, .content-area { width: 100%; max-width: none; padding: 10px 20px; }
     .topbar { padding: 0 20px; }
     .page-header-row,
     .card-header { align-items: flex-start; flex-wrap: wrap; }
