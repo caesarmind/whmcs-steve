@@ -183,9 +183,10 @@
        template" on every page load and throws a TypeError trying to read
        WHMCS.BaseUrl.validateBaseUrl. The <base> tag is the canonical fix
        per docs.whmcs.com/9-0/customization/whmcs-base-url-template/.
-       $BASE_PATH_HREF is provided by WHMCS and resolves to the full
-       install root (e.g. https://billing.example.com/). *}
-    <base href="{$BASE_PATH_HREF}">
+       $BASE_PATH_HREF is the WHMCS-documented var but resolves to empty
+       on some installs (silently), so fall back to $WEB_ROOT/ which is
+       always populated. *}
+    <base href="{if $BASE_PATH_HREF}{$BASE_PATH_HREF}{else}{$WEB_ROOT}/{/if}">
     {* Admin-configured SEO (from the Pages tab) layers on top of WHMCS defaults.
        $myTheme.pages[<templatefile>] is populated by Hooks::resolveCurrentPage. *}
     {assign var=mt_pageEntry value=null}
