@@ -110,9 +110,10 @@
 .co-step.active { color: var(--color-text-primary); font-weight: 500; }
 .co-step-sep { color: var(--color-text-quaternary, #c7c7cc); }
 
-.co-split { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+.co-split { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: stretch; }
 @media (max-width: 960px) { .co-split { grid-template-columns: 1fr; } }
 .co-left { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.co-split > aside { min-height: 100%; }
 
 /* Right summary card */
 .co-summary-card { position: sticky; top: 72px; padding: 0; background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: 14px; }
@@ -431,22 +432,26 @@
    stacks vertically full-width. Force a responsive grid with
    bounded image sizes so it reads as a card row rather than a
    billboard wall. */
-.co-lastchance-body { padding: 16px 18px 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.co-lastchance-body { padding: 14px 16px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
 .co-lastchance-body > div + div { margin-top: 0; }
 .co-lastchance-body > div {
-    padding: 14px;
+    padding: 12px;
     border: 0.5px solid var(--color-border);
     border-radius: 12px;
     background: var(--color-surface-tertiary, var(--color-surface));
     display: flex; flex-direction: column;
-    font-size: 12.5px;
+    font-size: 12px;
     line-height: 1.45;
     color: var(--color-text-secondary);
     letter-spacing: -0.004em;
-    min-height: 200px;
+    min-height: 0;
+    max-height: 260px;
     overflow: hidden;
+    position: relative;
 }
-.co-lastchance-body > div img { max-width: 100%; max-height: 56px; object-fit: contain; align-self: flex-start; margin-bottom: 8px; }
+.co-lastchance-body > div img { max-width: 100%; max-height: 38px; object-fit: contain; align-self: flex-start; margin-bottom: 6px; }
+.co-lastchance-body > div br + br { display: none; }
+.co-lastchance-body > div p { margin: 0 0 4px; }
 .co-lastchance-body > div ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
 .co-lastchance-body > div h2,
 .co-lastchance-body > div h3,
