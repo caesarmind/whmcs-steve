@@ -171,6 +171,313 @@
 
 /* Override standard_cart wrapper artefacts so the .content-area frame is clean */
 #order-standard_cart { padding: 0 !important; background: transparent !important; }
+
+/* ─── Form section cards ──────────────────────────────────────────
+   The TPL is structured as a long series of (.sub-heading + .row)
+   pairs with no per-section wrapper, so we use CSS to draw the card
+   chrome around the two known containers (#containerNewUserSignup
+   for Personal Info + Billing, #containerNewUserSecurity for
+   Password + Security) and around the Payment Details block we
+   wrap below. */
+#containerNewUserSignup,
+#containerNewUserSecurity,
+#containerExistingUserSignin,
+#containerExistingAccountSelect,
+.co-payment-card,
+.co-captcha-card {
+    padding: 4px 22px 18px;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: 14px;
+}
+#containerNewUserSignup > .sub-heading:first-child,
+#containerNewUserSecurity > .sub-heading:first-child,
+.co-payment-card > .sub-heading:first-child { margin-top: 18px; }
+
+.co-left .sub-heading {
+    margin: 22px 0 12px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+}
+.co-left .sub-heading .primary-bg-color,
+.co-left .sub-heading > span {
+    background: transparent !important;
+    color: inherit !important;
+    padding: 0 !important;
+    border: 0 !important;
+    font: inherit;
+}
+
+/* Bootstrap-era form rows -- compact Apple-style inputs */
+.co-left .row { margin: 0 -7px; }
+.co-left .row > [class*="col-"] { padding: 0 7px; margin-bottom: 12px; }
+.co-left .form-group { margin: 0; }
+.co-left .form-group.prepend-icon { position: relative; }
+.co-left .form-group.prepend-icon .field-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    color: var(--color-text-tertiary);
+    font-size: 13px;
+    pointer-events: none;
+    margin: 0;
+}
+.co-left .form-group.prepend-icon .field-icon i { line-height: 1; }
+.co-left .form-control,
+.co-left .field {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px 0 38px;
+    border: 0.5px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+    font-family: inherit;
+    letter-spacing: -0.008em;
+    box-sizing: border-box;
+    transition: all 0.15s;
+}
+.co-left textarea.form-control { height: auto; padding: 10px 14px; }
+.co-left select.form-control { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 32px; }
+.co-left .form-control:focus,
+.co-left .field:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+.co-left .form-control::placeholder { color: var(--color-text-quaternary, #c7c7cc); }
+
+/* Already-registered + Create-account buttons -- pill secondary */
+.already-registered .btn,
+#btnAlreadyRegistered,
+#btnNewUserSignup,
+.generate-password,
+.btn-default,
+.btn-info,
+.btn-warning {
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 0.5px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.already-registered .btn:hover,
+#btnAlreadyRegistered:hover,
+#btnNewUserSignup:hover,
+.generate-password:hover,
+.btn-default:hover,
+.btn-info:hover,
+.btn-warning:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+/* Existing-user signin form */
+#containerExistingUserSignin .sub-heading { margin-top: 18px; }
+#btnExistingLogin {
+    margin-top: 8px;
+    height: 42px;
+    padding: 0 22px;
+    background: var(--color-accent);
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+#btnExistingLogin:hover { filter: brightness(0.95); }
+
+/* Password-strength meter */
+.password-strength-meter { margin-top: 4px; }
+.password-strength-meter .progress {
+    height: 6px;
+    background: var(--color-surface-secondary);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 0;
+}
+.password-strength-meter .progress-bar {
+    height: 100%;
+    transition: width 0.2s ease, background 0.2s ease;
+}
+#passwordStrengthTextLabel { font-size: 11px; color: var(--color-text-tertiary); margin: 6px 0 0; text-align: left; letter-spacing: -0.004em; }
+
+/* "Total Due Today" banner above payment radios */
+#totalDueToday.alert-success {
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    border: 0;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.008em;
+    margin: 4px 0 14px;
+}
+#totalDueToday.alert-success #totalCartPrice { font-size: 18px; font-weight: 600; letter-spacing: -0.012em; }
+
+/* Apply-credit radio group */
+#applyCreditContainer { padding: 12px 0 4px; }
+#applyCreditContainer p { font-size: 12px; color: var(--color-text-tertiary); margin: 0 0 8px; }
+#applyCreditContainer .radio { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 13px; color: var(--color-text-primary); cursor: pointer; margin: 0; }
+#applyCreditContainer .radio input { margin-top: 3px; accent-color: var(--color-accent); }
+
+/* Payment method radios -- Apple-style cards */
+#paymentGatewaysContainer { margin: 0 0 12px; }
+#paymentGatewaysContainer p.small.text-muted { font-size: 12px; color: var(--color-text-tertiary); margin: 0 0 10px; letter-spacing: -0.004em; }
+#paymentGatewaysContainer .text-center { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
+#paymentGatewaysContainer .radio-inline {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 16px;
+    border: 0.5px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    font-size: 13px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin: 0;
+    letter-spacing: -0.008em;
+}
+#paymentGatewaysContainer .radio-inline:hover { border-color: var(--color-text-primary); }
+#paymentGatewaysContainer .radio-inline:has(input:checked) {
+    border-color: var(--color-accent);
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    font-weight: 500;
+}
+#paymentGatewaysContainer .radio-inline input { accent-color: var(--color-accent); margin: 0; }
+
+/* Credit-card input fields card */
+#creditCardInputFields .form-group { margin-bottom: 12px; }
+#creditCardInputFields .control-label { font-size: 12px; color: var(--color-text-tertiary); margin: 0 0 4px; display: block; }
+
+/* TOS + complete-order footer */
+.checkout-footer { margin: 22px 0 16px; padding: 0; }
+.checkout-footer label,
+.checkout-footer .checkbox { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--color-text-secondary); margin: 0 0 16px; cursor: pointer; letter-spacing: -0.008em; }
+.checkout-footer label input,
+.checkout-footer .checkbox input { margin-top: 3px; accent-color: var(--color-accent); flex-shrink: 0; }
+#btnCompleteOrder {
+    width: 100%;
+    height: 48px;
+    padding: 0 22px;
+    background: var(--color-accent);
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    cursor: pointer;
+    transition: filter 0.15s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+#btnCompleteOrder:hover:not(:disabled) { filter: brightness(0.95); }
+#btnCompleteOrder:disabled { opacity: 0.7; cursor: not-allowed; }
+.checkout-footer .ct-trust,
+.checkout-footer .ct-trust-checkout { display: none; }
+
+/* SSL security alert */
+.checkout-security-msg {
+    background: var(--color-yellow-bg, #fff7e6);
+    color: var(--color-yellow-text, #b25c00);
+    border: 0.5px solid var(--color-yellow-text, #b25c00);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    letter-spacing: -0.004em;
+    margin: 12px 0 0;
+}
+
+/* Validation-error banner */
+.checkout-error-feedback {
+    background: var(--color-red-bg, rgba(255,59,48,0.08));
+    color: var(--color-red-text, #d70015);
+    border: 0.5px solid var(--color-red-text, #d70015);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 0 0 14px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.checkout-error-feedback p { margin: 0 0 4px; font-weight: 600; }
+.checkout-error-feedback ul { margin: 0; padding-left: 18px; }
+
+/* Captcha block */
+.co-captcha-card { padding: 18px 22px; text-align: center; }
+
+/* ─── Last-chance inner ($hookOutput grid) ──────────────────────
+   The hookOutput is opaque marketing HTML from WHMCS hooks (logos
+   + bullets + Add to Cart) -- without intervention each item
+   stacks vertically full-width. Force a responsive grid with
+   bounded image sizes so it reads as a card row rather than a
+   billboard wall. */
+.co-lastchance-body { padding: 16px 18px 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.co-lastchance-body > div + div { margin-top: 0; }
+.co-lastchance-body > div {
+    padding: 14px;
+    border: 0.5px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface-tertiary, var(--color-surface));
+    display: flex; flex-direction: column;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.004em;
+    min-height: 200px;
+    overflow: hidden;
+}
+.co-lastchance-body > div img { max-width: 100%; max-height: 56px; object-fit: contain; align-self: flex-start; margin-bottom: 8px; }
+.co-lastchance-body > div ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
+.co-lastchance-body > div h2,
+.co-lastchance-body > div h3,
+.co-lastchance-body > div h4,
+.co-lastchance-body > div strong { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.008em; }
+.co-lastchance-body > div .btn,
+.co-lastchance-body > div button,
+.co-lastchance-body > div a.btn,
+.co-lastchance-body > div input[type="submit"],
+.co-lastchance-body > div input[type="button"] {
+    margin-top: auto;
+    align-self: flex-start;
+    height: 32px;
+    padding: 0 14px;
+    border: 0.5px solid var(--color-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-text-primary);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex; align-items: center;
+    transition: all 0.15s;
+}
+.co-lastchance-body > div .btn:hover,
+.co-lastchance-body > div button:hover,
+.co-lastchance-body > div a.btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
 {/literal}</style>
 
 <div id="order-standard_cart">
@@ -194,7 +501,7 @@
             <span class="co-step-sep">&rsaquo;</span>
             <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.cartconfigure|default:'Configure'}</span>
             <span class="co-step-sep">&rsaquo;</span>
-            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.cart|default:'Cart'}</span>
+            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Cart</span>
             <span class="co-step-sep">&rsaquo;</span>
             <span class="co-step active"><span class="co-step-num">5</span>{$LANG.checkout|default:'Checkout'}</span>
         </div>
@@ -744,19 +1051,23 @@
 
                 {* ─── Captcha ─── *}
                 {if $captcha && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
-                    {if !$captcha->isInvisible()}
-                        <div class="sub-heading">
-                            <span class="primary-bg-color">{$LANG.captchatitle}</span>
-                        </div>
-                    {/if}
-                    <div class="text-center">
+                    <div class="co-captcha-card">
+                        {if !$captcha->isInvisible()}
+                            <div class="sub-heading">
+                                <span class="primary-bg-color">{$LANG.captchatitle}</span>
+                            </div>
+                        {/if}
                         <div class="text-center margin-bottom">
                             {include file="$template/includes/captcha.tpl"}
                         </div>
                     </div>
                 {/if}
 
-                {* ─── Payment details + total ─── *}
+                {* ─── Payment details + total ───
+                   Wrapped in .co-payment-card so the section reads as
+                   a single Apple card (sub-heading + total banner +
+                   apply-credit + gateway radios + CC fields). *}
+                <div class="co-payment-card">
                 <div class="sub-heading">
                     <span class="primary-bg-color">{$LANG.orderForm.paymentDetails}</span>
                 </div>
@@ -932,6 +1243,7 @@
                         </p>
                     {/if}
                 {/if}
+                </div>{* /.co-payment-card *}
 
                 {* ─── Order notes (Apple .co-notes card) ───
                    Keeps the textarea name="notes" field so WHMCS still
