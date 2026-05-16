@@ -964,13 +964,10 @@ var _localLang = {
                     var baseMsg = promoOk ? promoOk.textContent.trim()
                                  : promoInfo ? promoInfo.textContent.trim()
                                  : ('Promo code "' + code + '" applied.');
-                    var detail = (newDiscount && newTotal)
-                        ? (' Save ' + newDiscount.replace(/^-/, '') + ' — new total ' + newTotal + '.')
-                        : '';
                     showInlineError({
                         variant: variant,
                         title: 'Promo code',
-                        bodyText: baseMsg + detail
+                        bodyText: baseMsg
                     });
                 }).catch(function (err) {
                     applyBtn.disabled = false;
