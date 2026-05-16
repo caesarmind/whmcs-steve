@@ -596,21 +596,6 @@ var _localLang = {
     border-top: 0.5px solid var(--color-border);
 }
 .cp-summary-footer .btn-primary { width: 100%; justify-content: center; }
-
-/* Cart-wide discount row injected above .total-due-today after a
-   valid promo Apply. Sits in the same 20px gutter as the other
-   #producttotal clearfix rows so it lines up vertically with the
-   item lines. */
-#producttotal > .cp-discount-row {
-    padding: 8px 20px 4px;
-    color: var(--color-green-text, #248a3d);
-    font-size: 13px;
-    font-weight: 500;
-}
-#producttotal > .cp-discount-row .pull-left,
-#producttotal > .cp-discount-row .float-left { float: left; }
-#producttotal > .cp-discount-row .pull-right,
-#producttotal > .cp-discount-row .float-right { float: right; font-variant-numeric: tabular-nums; }
 {/literal}</style>
 
 {include file="orderforms/standard_cart/recommendations-modal.tpl"}
@@ -751,20 +736,26 @@ var _localLang = {
             var totalDue = pt.querySelector('.total-due-today');
             if (!totalDue) return;
 
-            // Insert / update the green discount row directly above
-            // the Total Due Today strip. Idempotent on re-entry so
-            // the MutationObserver loop converges in one extra pass.
-            var row = pt.querySelector('.cp-discount-row');
+            // Append the discount as a plain .clearfix row inside
+            // .summary-totals so it inherits the existing secondary
+            // styling used for Setup Fees / Monthly etc. -- no custom
+            // class, no decoration; the row reads as a natural WHMCS
+            // summary line. Idempotent re-entry so the MutationObserver
+            // loop converges in one extra pass.
+            var totalsBox = pt.querySelector('.summary-totals');
+            var row = pt.querySelector('[data-promo-row="1"]');
             if (!row) {
                 row = document.createElement('div');
-                row.className = 'clearfix cp-discount-row';
+                row.className = 'clearfix';
+                row.setAttribute('data-promo-row', '1');
                 var l = document.createElement('span');
                 l.className = 'pull-left float-left';
                 var r = document.createElement('span');
                 r.className = 'pull-right float-right';
                 row.appendChild(l);
                 row.appendChild(r);
-                totalDue.parentNode.insertBefore(row, totalDue);
+                if (totalsBox) totalsBox.appendChild(row);
+                else totalDue.parentNode.insertBefore(row, totalDue);
             }
             var lSpan = row.querySelector('.pull-left');
             var rSpan = row.querySelector('.pull-right');
