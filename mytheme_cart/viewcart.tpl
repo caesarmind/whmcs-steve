@@ -791,7 +791,7 @@
     (function () {
         try { localStorage.removeItem('hn.data'); } catch (e) {}
         var d = document.body && document.body.dataset;
-        if (d) {/literal} d.data = '{if $cartitems == 0}empty{else}full{/if}'; {literal} }
+        if (d) { d.data = '{/literal}{if $cartitems == 0}empty{else}full{/if}{literal}'; }
     })();
     {/literal}</script>
 
