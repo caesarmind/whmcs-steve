@@ -580,6 +580,106 @@
     .vc-alert.ok     { border-color: var(--color-green-text); background: var(--color-green-bg); color: var(--color-green-text); }
     .vc-alert ul { margin: 4px 0 0; padding-left: 18px; }
 
+    /* ── Remove-item / Empty-cart confirm modal ──
+       The TPL uses Bootstrap's .modal markup but the mytheme bundle
+       doesn't ship Bootstrap's modal positioning, so the dialog used
+       to drop in-flow at the bottom of the page. Re-implement just
+       enough to render it as a centered overlay with the same Apple
+       card chrome used elsewhere -- backdrop blur, soft shadow, no
+       chrome-borrowed icons. Bootstrap's JS (jQuery.modal) already
+       toggles `.show` / inline `display: block` and inserts the
+       .modal-backdrop sibling, so these rules just style what's there. */
+    .modal {
+        position: fixed; inset: 0;
+        z-index: 1050;
+        display: none;
+        align-items: center; justify-content: center;
+        padding: 24px;
+        overflow-y: auto;
+    }
+    .modal.show, .modal[style*="display: block"], .modal[style*="display:block"] {
+        display: flex !important;
+    }
+    .modal-backdrop {
+        position: fixed; inset: 0;
+        z-index: 1040;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: saturate(140%) blur(6px);
+        -webkit-backdrop-filter: saturate(140%) blur(6px);
+    }
+    .modal-backdrop.show, .modal-backdrop.fade.in { opacity: 1; }
+    .modal-dialog {
+        position: relative;
+        width: 100%; max-width: 420px;
+        margin: 0;
+    }
+    .modal-content {
+        background: var(--color-surface);
+        border: 0.5px solid var(--color-border);
+        border-radius: 16px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+        overflow: hidden;
+    }
+    .modal-body {
+        padding: 22px 24px 12px;
+        font-size: 13.5px;
+        line-height: 1.5;
+        color: var(--color-text-secondary);
+    }
+    .modal-body .float-right { float: right; }
+    .modal-body .close {
+        appearance: none; background: transparent;
+        border: 0; padding: 0;
+        font-size: 22px; line-height: 1;
+        color: var(--color-text-tertiary);
+        cursor: pointer;
+    }
+    .modal-body .close:hover { color: var(--color-text-primary); }
+    .modal-title {
+        display: flex; align-items: center; gap: 10px;
+        margin: 0 0 6px;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--color-text-primary);
+        letter-spacing: -0.01em;
+    }
+    .modal-title i { font-size: 18px; color: var(--color-red-text, #d70015); }
+    .modal-title .fa-3x { font-size: 18px; }
+    .modal-footer {
+        display: flex; gap: 8px;
+        justify-content: flex-end;
+        padding: 14px 24px 18px;
+        border-top: 0.5px solid var(--color-border);
+        background: var(--color-surface-tertiary, transparent);
+    }
+    .modal-footer.justify-content-center { justify-content: center; }
+    .modal-footer .btn,
+    .modal-footer button {
+        height: 36px;
+        padding: 0 18px;
+        border-radius: 999px;
+        border: 0.5px solid var(--color-border);
+        background: transparent;
+        color: var(--color-text-primary);
+        font-size: 13px; font-weight: 500;
+        cursor: pointer;
+        transition: all .12s ease;
+    }
+    .modal-footer .btn:hover,
+    .modal-footer button:hover { border-color: var(--color-text-primary); }
+    .modal-footer .btn-primary,
+    .modal-footer button[type="submit"] {
+        background: var(--color-red-text, #d70015);
+        color: #fff;
+        border-color: var(--color-red-text, #d70015);
+    }
+    .modal-footer .btn-primary:hover,
+    .modal-footer button[type="submit"]:hover {
+        filter: brightness(0.95);
+        border-color: var(--color-red-text, #d70015);
+    }
+    body.modal-open { overflow: hidden; }
+
     {/literal}</style>
 
     {* Initial body state so the global state-chip overlay (Full/Empty)
