@@ -178,6 +178,14 @@
     <meta charset="{$charset|default:'utf-8'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {* WHMCS base URL declaration. Without this, scripts.min.js logs
+       "Warning: The WHMCS Base URL definition is missing from your active
+       template" on every page load and throws a TypeError trying to read
+       WHMCS.BaseUrl.validateBaseUrl. The <base> tag is the canonical fix
+       per docs.whmcs.com/9-0/customization/whmcs-base-url-template/.
+       $BASE_PATH_HREF is provided by WHMCS and resolves to the full
+       install root (e.g. https://billing.example.com/). *}
+    <base href="{$BASE_PATH_HREF}">
     {* Admin-configured SEO (from the Pages tab) layers on top of WHMCS defaults.
        $myTheme.pages[<templatefile>] is populated by Hooks::resolveCurrentPage. *}
     {assign var=mt_pageEntry value=null}
