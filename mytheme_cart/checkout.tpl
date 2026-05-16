@@ -77,43 +77,90 @@
     var stateNotRequired = true;
 </script>
 {* ── WHMCS namespace stubs ──
-   scripts.min.js and gateway scripts (e.g. stripe.min.js) expect a
-   global WHMCS object with a handful of APIs pre-populated by the
-   WHMCS app shell. On this install several of them are missing and
-   throw at document-ready, killing every subsequent .ready() handler
-   (form submit wiring, bootstrap-switch toggles, generate-password,
-   gateway validators). Define safe stubs before common.tpl loads
-   scripts.min.js so the ready chain completes.
+   scripts.min.js (orderforms/standard_cart/js/scripts.min.js) wraps
+   its bootstrap in an IIFE that runs:
+       "object" != typeof e.WHMCS && (e.WHMCS = { hasModule, loadModule })
+   i.e. if we pre-define `window.WHMCS` at all before scripts.min.js,
+   the bootstrap is SKIPPED -- and with it the functional hasModule /
+   loadModule that scripts.min.js itself uses to register
+   `utils`, `http`, `authn`, `ui`, `form`, `recaptcha`, `client`.
+   When those modules never register, the very next top-level call
+   `WHMCS.utils.validateBaseUrl()` throws
+       Cannot read properties of undefined (reading 'validateBaseUrl')
+   and kills every subsequent .ready() handler.
+
+   So our stub must replicate the bootstrap byte-for-byte (same
+   hasModule + loadModule shape) before adding the host-specific
+   missing pieces (WHMCS.payment.event.*, WHMCS.payment.display.*,
+   WHMCS.jqClient). This install's WHMCS app shell doesn't emit those.
 
    Stubs cover:
-   - WHMCS.hasModule(name) -> always false (no module preloaded)
-   - WHMCS.loadModule(...) -> no-op (skip async module loads)
-   - WHMCS.payment.event.gatewayInit -> no-op
-   - WHMCS.jqClient -> alias to jQuery so Stripe's validateStripe()
-     can read jqClient.fn / etc. without crashing
-   - WHMCS.events / WHMCS.client -> empty containers
+   - WHMCS.hasModule / loadModule -> faithful copy of scripts.min.js
+     bootstrap (so module registration still works)
+   - WHMCS.payment.event.* -> no-op stubs for gatewayInit,
+     gatewayOptionInit, gatewayUnselected, gatewaySelected,
+     checkoutFormSubmit + previouslySelected.module bag
+   - WHMCS.payment.display.errorClear -> no-op
+   - WHMCS.jqClient -> live getter that returns window.jQuery once it
+     loads (Stripe etc. read this AFTER jQuery is on the page)
 
    IMPORTANT: this <script> body contains object-literal `{}` braces
    so it must be wrapped in {literal}...{/literal} -- otherwise Smarty
    treats `{ return false; }` etc. as tags and emits broken JS that
    throws SyntaxError: Unexpected token '}' on the page. *}
 <script>{literal}
-    window.WHMCS = window.WHMCS || {};
-    if (typeof window.WHMCS.hasModule !== 'function') {
-        window.WHMCS.hasModule = function () { return false; };
+    /* Faithful copy of the bootstrap shape in scripts.min.js so we
+       don't break its check `"object" != typeof window.WHMCS`. */
+    if (typeof window.WHMCS !== 'object') {
+        window.WHMCS = {
+            hasModule: function (name) {
+                return typeof window.WHMCS[name] !== 'undefined'
+                    && Object.getOwnPropertyNames(window.WHMCS[name]).length > 0;
+            },
+            loadModule: function (name, body) {
+                if (this.hasModule(name)) { return; }
+                window.WHMCS[name] = {};
+                if (typeof body === 'function') {
+                    body.apply(window.WHMCS[name]);
+                } else {
+                    for (var key in body) {
+                        if (body.hasOwnProperty(key)) {
+                            window.WHMCS[name][key] = {};
+                            body[key].apply(window.WHMCS[name][key]);
+                        }
+                    }
+                }
+            }
+        };
     }
-    if (typeof window.WHMCS.loadModule !== 'function') {
-        window.WHMCS.loadModule = function () {};
-    }
+
+    /* Host-shell pieces this install never emits. scripts.min.js
+       calls these inside its document.ready handler that wires up
+       .payment-methods radios -- without them the ready chain
+       throws and every subsequent handler is silently dropped. */
     window.WHMCS.payment = window.WHMCS.payment || {};
     window.WHMCS.payment.event = window.WHMCS.payment.event || {};
-    if (typeof window.WHMCS.payment.event.gatewayInit !== 'function') {
-        window.WHMCS.payment.event.gatewayInit = function () {};
+    window.WHMCS.payment.event.previouslySelected =
+        window.WHMCS.payment.event.previouslySelected || { module: undefined };
+    [
+        'gatewayInit',
+        'gatewayOptionInit',
+        'gatewaySelected',
+        'gatewayUnselected',
+        'checkoutFormSubmit'
+    ].forEach(function (fn) {
+        if (typeof window.WHMCS.payment.event[fn] !== 'function') {
+            window.WHMCS.payment.event[fn] = function () {};
+        }
+    });
+    window.WHMCS.payment.display = window.WHMCS.payment.display || {};
+    if (typeof window.WHMCS.payment.display.errorClear !== 'function') {
+        window.WHMCS.payment.display.errorClear = function () {};
     }
+
     /* jqClient is read by gateway scripts (Stripe etc.) AFTER jQuery
-       has loaded via common.tpl. Use a getter so each access returns
-       the live window.jQuery -- works even though this stub runs
-       before jQuery is on the page. */
+       has loaded via common.tpl. Live getter so each access returns
+       the current window.jQuery. */
     if (!Object.getOwnPropertyDescriptor(window.WHMCS, 'jqClient')) {
         Object.defineProperty(window.WHMCS, 'jqClient', {
             configurable: true,
@@ -125,8 +172,6 @@
             }
         });
     }
-    window.WHMCS.events = window.WHMCS.events || {};
-    window.WHMCS.client = window.WHMCS.client || {};
 {/literal}</script>
 {include file="orderforms/$carttpl/common.tpl"}
 <script type="text/javascript" src="{$BASE_PATH_JS}/StatesDropdown.js"></script>
