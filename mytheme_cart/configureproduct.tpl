@@ -733,13 +733,26 @@ var _localLang = {
             return parts.join('&');
         }
 
-        function showInlineError(html) {
+        // Inline error box. Accepts either a plain HTML string (legacy
+        // call -- WHMCS validation HTML is trusted markup we want to
+        // render) or an options object { title, bodyHtml, bodyText }.
+        // bodyText takes the safe textContent path; bodyHtml uses
+        // innerHTML for trusted markup.
+        function showInlineError(arg) {
+            var opts = (typeof arg === 'string') ? { bodyHtml: arg } : (arg || {});
             var existing = document.getElementById('cpValidationErrorBox');
             if (existing) existing.parentNode.removeChild(existing);
             var box = document.createElement('div');
             box.id = 'cpValidationErrorBox';
             box.style.cssText = 'margin: 0 0 16px; padding: 12px 16px; background: var(--color-red-bg, rgba(255,59,48,0.08)); color: var(--color-red-text, #d70015); border: 0.5px solid var(--color-red-text, #d70015); border-radius: 10px; font-size: 13px; line-height: 1.5;';
-            box.innerHTML = '<strong>Please correct the following:</strong><div style="margin-top: 4px;">' + html + '</div>';
+            var title = document.createElement('strong');
+            title.textContent = opts.title || 'Please correct the following:';
+            var body = document.createElement('div');
+            body.style.marginTop = '4px';
+            if (typeof opts.bodyText === 'string') body.textContent = opts.bodyText;
+            else if (typeof opts.bodyHtml === 'string') body.innerHTML = opts.bodyHtml;
+            box.appendChild(title);
+            box.appendChild(body);
             form.parentNode.insertBefore(box, form);
             box.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -776,7 +789,14 @@ var _localLang = {
             });
         });
 
-        // Promo Apply: same commit, then POST validatepromo to viewcart.
+        // Promo Apply: commit config, then AJAX-validate the promo against
+        // viewcart so we can stay on this page when the code is invalid.
+        // The previous version submitted a hidden form to /cart.php?a=view,
+        // which dumped the user on viewcart even for bad codes -- the
+        // user only ever saw $promoerrormessage after a full navigation
+        // away from the configure step. Here we fetch the same response,
+        // detect the error banner, and either render it inline or follow
+        // through to viewcart on success.
         var applyBtn = document.querySelector('.cp-promo-apply');
         var promoInput = document.getElementById('promocode');
         if (applyBtn && promoInput) {
@@ -785,22 +805,59 @@ var _localLang = {
                 var code = (promoInput.value || '').trim();
                 if (!code) { promoInput.focus(); return; }
                 applyBtn.disabled = true;
+
                 commitConfig().then(function () {
-                    var f = document.createElement('form');
-                    f.method = 'post';
-                    f.action = '/cart.php?a=view';
-                    var add = function (n, v) {
-                        var i = document.createElement('input');
-                        i.type = 'hidden'; i.name = n; i.value = v;
-                        f.appendChild(i);
-                    };
-                    add('promocode', code);
-                    add('validatepromo', '1');
-                    document.body.appendChild(f);
-                    f.submit();
-                }).catch(function (errHtml) {
+                    return fetch('/cart.php?a=view', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'promocode=' + encodeURIComponent(code) + '&validatepromo=1'
+                    });
+                }).then(function (res) {
+                    return res.text();
+                }).then(function (html) {
+                    // mytheme viewcart renders the promo-error banner as
+                    //   <div class="vc-alert warn" role="alert">{$promoerrormessage}</div>
+                    // (viewcart.tpl line 601). Bundlewarnings reuse the same
+                    // classes but always include <strong> + <ul>, so filter
+                    // out compound alerts to isolate the promo line.
+                    // Fall back to standard_cart's .alert-warning structure
+                    // in case the deployed template is swapped back.
+                    var doc = (new DOMParser()).parseFromString(html, 'text/html');
+                    var warns = doc.querySelectorAll(
+                        '.vc-alert.warn[role="alert"], .alert-warning[role="alert"]'
+                    );
+                    var promoErr = null;
+                    for (var i = 0; i < warns.length; i++) {
+                        if (!warns[i].querySelector('strong, ul, li')) {
+                            promoErr = warns[i];
+                            break;
+                        }
+                    }
+                    if (promoErr) {
+                        applyBtn.disabled = false;
+                        showInlineError({
+                            title: 'Promo code',
+                            bodyText: promoErr.textContent.trim()
+                        });
+                        promoInput.focus();
+                        promoInput.select();
+                        return;
+                    }
+                    // No error banner -- code accepted (or applied with
+                    // no discount). Navigate to viewcart so the user
+                    // sees the new line item + the applied promotion.
+                    window.location = '/cart.php?a=view';
+                }).catch(function (err) {
                     applyBtn.disabled = false;
-                    showInlineError(errHtml);
+                    if (typeof err === 'string') {
+                        showInlineError(err);
+                    } else {
+                        showInlineError({
+                            title: 'Promo code',
+                            bodyText: 'Network error -- please try again.'
+                        });
+                    }
                 });
             });
         }
