@@ -29,6 +29,7 @@
       "homepage",
       "login",
       "supporttickets",
+      "supportticketslist",
       "viewinvoice",
       "viewticket"
     ],

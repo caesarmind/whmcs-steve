@@ -1053,117 +1053,175 @@ button.generate-password:hover {
 }
 
 /* ─── Last-chance inner ($hookOutput grid) ──────────────────────
-   WHMCS marketing hooks emit ONE outer wrapper containing a
-   .mc-promos.checkout that holds MANY .mc-promo product items.
-   Tile on .mc-promo so each upsell becomes its own card -- the
-   foreach wrapper and the .mc-promos container both relay the
-   grid through. Defensive fallback: if a hook emits a simpler
-   "one tile per outer div" structure with no .mc-promos, the
-   outer-div rules still apply. */
-.co-lastchance-body { padding: 14px 16px 16px; }
+   WHMCS marketconnect hookOutput emits .mc-promos.checkout with N
+   .mc-promo cards. Compact 1-per-row layout: icon | headline+tagline
+   | price+Add button | expander. Body (features) hidden by default
+   -- click the expander chevron to reveal. Defensive fallbacks for
+   hooks that emit a simpler "one tile per outer div" structure. */
+.co-lastchance-body { padding: 12px 16px 16px; }
 .co-lastchance-body > div { margin: 0; padding: 0; }
-.co-lastchance-body > div + div { margin-top: 12px; }
+.co-lastchance-body > div + div { margin-top: 6px; }
 
-/* Grid container: the .mc-promos wrapper if WHMCS emitted one,
-   otherwise the foreach <div> wrapper. */
+/* Grid container -- 1 card per row (compact list). */
 .co-lastchance-body .mc-promos,
 .co-lastchance-body .mc-promos.checkout {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 10px;
+    grid-template-columns: 1fr;
+    gap: 6px;
     padding: 0;
     margin: 0;
     list-style: none;
 }
-.co-lastchance-body .mc-promo .content { padding: 10px 0; max-width: none; }
-
-/* Each tile -- targets .mc-promo (WHMCS marketconnect) and falls
-   back to a direct .co-lastchance-body > div when no .mc-promos
-   container exists. */
+/* Per-card grid: icon | content | cta | expander on row 1, body
+   underneath spans all. .header uses display:contents so its
+   children flatten into the .mc-promo grid. */
 .co-lastchance-body .mc-promo,
 .co-lastchance-body > div:not(:has(.mc-promos)):not(.sub-heading) {
-    padding: 12px;
+    position: relative;
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto 22px;
+    grid-template-areas: "icon content cta expander" "body body body body";
+    column-gap: 12px;
+    align-items: center;
+    padding: 8px 12px;
     border: 0.5px solid var(--color-border);
-    border-radius: 12px;
-    background: var(--color-surface-tertiary, var(--color-surface));
-    display: flex; flex-direction: column;
+    border-radius: 10px;
+    background: var(--color-surface);
     font-size: 12px;
     line-height: 1.45;
     color: var(--color-text-secondary);
     letter-spacing: -0.004em;
-    max-height: 260px;
-    overflow: hidden;
-    position: relative;
+    max-height: none;
+    overflow: visible;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
-.co-lastchance-body .mc-promo img,
+.co-lastchance-body .mc-promo:hover { border-color: var(--color-accent); box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+.co-lastchance-body .mc-promo .header { display: contents; }
+.co-lastchance-body .mc-promo .icon {
+    grid-area: icon;
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--color-surface-secondary);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0;
+    padding: 0; margin: 0;
+}
+.co-lastchance-body .mc-promo .icon img,
+.co-lastchance-body .mc-promo > img,
 .co-lastchance-body > div:not(:has(.mc-promos)) img {
-    max-width: 100%; max-height: 38px; object-fit: contain;
-    align-self: flex-start; margin-bottom: 6px;
+    max-width: 22px; max-height: 22px; object-fit: contain;
+    margin: 0; align-self: center; display: block;
 }
+/* Brand-tinted icons (matches native .mc-promo brand modifier classes) */
+.co-lastchance-body .mc-promo.threesixtymonitoring .icon,
+.co-lastchance-body .mc-promo.codeguard .icon,
+.co-lastchance-body .mc-promo.marketgoo .icon { background: var(--color-orange-bg); }
+.co-lastchance-body .mc-promo.symantec .icon,
+.co-lastchance-body .mc-promo.nordvpn .icon,
+.co-lastchance-body .mc-promo.sitelock .icon { background: var(--color-green-bg); }
+.co-lastchance-body .mc-promo.spamexperts .icon { background: var(--color-red-bg, rgba(255,69,58,0.10)); }
+.co-lastchance-body .mc-promo.appsuite .icon,
+.co-lastchance-body .mc-promo.sitebuilder .icon,
+.co-lastchance-body .mc-promo.weebly .icon { background: var(--color-accent-light); }
+.co-lastchance-body .mc-promo .content {
+    grid-area: content; min-width: 0; align-self: center;
+    padding: 0; max-width: none;
+}
+.co-lastchance-body .mc-promo .headline,
+.co-lastchance-body .mc-promo .headline.truncate {
+    font-size: 13px; font-weight: 600; color: var(--color-text-primary);
+    letter-spacing: -0.008em; line-height: 1.3;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin: 0;
+}
+.co-lastchance-body .mc-promo .tagline,
+.co-lastchance-body .mc-promo .tagline.truncate {
+    font-size: 11px; color: var(--color-text-tertiary);
+    margin: 1px 0 0; letter-spacing: -0.004em; line-height: 1.35;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.co-lastchance-body .mc-promo .cta {
+    grid-area: cta;
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0; padding: 0; margin: 0;
+}
+.co-lastchance-body .mc-promo .price {
+    font-size: 12.5px; font-weight: 600; color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.008em;
+    white-space: nowrap; margin: 0;
+}
+.co-lastchance-body .mc-promo .btn-add,
+.co-lastchance-body .mc-promo .btn.btn-add,
+.co-lastchance-body .mc-promo button.btn-add,
+.co-lastchance-body .mc-promo a.btn-add {
+    height: 26px; padding: 0 12px;
+    border-radius: 999px;
+    background: var(--color-accent); color: #fff; border: 0;
+    font-size: 11.5px; font-weight: 500; letter-spacing: -0.008em;
+    cursor: pointer; font-family: inherit; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px;
+    transition: background 0.15s;
+    flex-shrink: 0; margin: 0; align-self: auto;
+}
+.co-lastchance-body .mc-promo .btn-add:hover { background: var(--color-accent-hover, #0066cc); color: #fff; border-color: transparent; }
+.co-lastchance-body .mc-promo .btn-add .arrow { display: inline-flex; align-items: center; }
+.co-lastchance-body .mc-promo .btn-add .arrow i { font-style: normal; font-size: 11px; }
+.co-lastchance-body .mc-promo .btn-add .arrow i.fa-chevron-right::before { content: "\203A"; font-weight: 600; }
+.co-lastchance-body .mc-promo .expander {
+    grid-area: expander; align-self: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--color-text-tertiary); cursor: pointer;
+    transition: all 0.15s; padding: 0; margin: 0;
+}
+.co-lastchance-body .mc-promo .expander:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+.co-lastchance-body .mc-promo .expander i {
+    font-style: normal; font-size: 11px; display: inline-block;
+    transform: rotate(0deg); transition: transform 0.15s;
+}
+.co-lastchance-body .mc-promo .expander i.fa-chevron-right::before { content: "\203A"; font-weight: 600; }
+.co-lastchance-body .mc-promo.is-open .expander i { transform: rotate(90deg); }
+.co-lastchance-body .mc-promo .body {
+    grid-area: body;
+    margin: 8px 0 0;
+    padding: 8px 0 0;
+    border-top: 0.5px solid var(--color-border);
+    display: none;
+}
+.co-lastchance-body .mc-promo.is-open .body { display: block; }
+.co-lastchance-body .mc-promo .body ul {
+    margin: 0; padding: 0; list-style: none;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 3px 14px;
+}
+.co-lastchance-body .mc-promo .body li {
+    font-size: 11px; color: var(--color-text-secondary);
+    letter-spacing: -0.004em; line-height: 1.4;
+    display: flex; align-items: center; gap: 5px;
+    margin: 0; padding: 0;
+}
+.co-lastchance-body .mc-promo .body li i { font-style: normal; flex-shrink: 0; }
+.co-lastchance-body .mc-promo .body li i.fa-check {
+    width: 10px; height: 10px; color: var(--color-green-text);
+    font-size: 9px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.co-lastchance-body .mc-promo .body li i.fa-check::before { content: "\2713"; }
 .co-lastchance-body br + br { display: none; }
-.co-lastchance-body p { margin: 0 0 4px; }
-
+.co-lastchance-body p { margin: 0; }
 /* Hide WHMCS's inner "Last Chance" heading -- already shown in
    .co-lastchance-head above the grid. */
 .co-lastchance-body > div > .sub-heading,
 .co-lastchance-body .mc-promo .sub-heading { display: none; }
-
-/* Single-promo banner: WHMCS emits one .mc-promo -- collapse the
-   grid to 1fr and lay the tile out horizontally. */
-.co-lastchance-body .mc-promos:has(> .mc-promo:only-child) {
-    grid-template-columns: 1fr;
-}
-.co-lastchance-body .mc-promo:only-child {
-    max-height: none;
-    padding: 14px 16px;
-    flex-direction: row;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-.co-lastchance-body .mc-promo:only-child img {
-    max-height: 48px;
-    margin-bottom: 0;
-    align-self: center;
-    flex-shrink: 0;
-}
-.co-lastchance-body .mc-promo:only-child .btn,
-.co-lastchance-body .mc-promo:only-child button {
-    margin-top: 0;
-    margin-left: auto;
-    align-self: center;
-}
-
-.co-lastchance-body ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
-.co-lastchance-body h2,
-.co-lastchance-body h3,
-.co-lastchance-body h4,
-.co-lastchance-body strong { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.008em; }
-.co-lastchance-body .btn,
-.co-lastchance-body button,
-.co-lastchance-body a.btn,
-.co-lastchance-body input[type="submit"],
-.co-lastchance-body input[type="button"] {
-    margin-top: auto;
-    align-self: flex-start;
-    height: 32px;
-    padding: 0 14px;
-    border: 0.5px solid var(--color-border);
-    border-radius: 999px;
-    background: transparent;
-    color: var(--color-text-primary);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex; align-items: center;
-    transition: all 0.15s;
-}
-.co-lastchance-body .btn:hover,
-.co-lastchance-body button:hover,
-.co-lastchance-body a.btn:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
+/* Mobile: stack header into 2 rows so price+btn drop below */
+@media (max-width: 640px) {
+    .co-lastchance-body .mc-promo {
+        grid-template-columns: 32px minmax(0, 1fr) 22px;
+        grid-template-areas: "icon content expander" "body body body" "cta cta cta";
+    }
+    .co-lastchance-body .mc-promo .cta {
+        margin-top: 8px; padding-top: 8px;
+        border-top: 0.5px solid var(--color-border);
+        justify-content: space-between;
+    }
 }
 {/literal}</style>
 
@@ -1581,6 +1639,18 @@ button.generate-password:hover {
     if (window.jQuery) { window.jQuery(init); }
     else if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
     else { init(); }
+
+    // MarketConnect promo expander: toggle .is-open on the .mc-promo card
+    // to reveal/hide its .body (feature list). Bound via delegation so it
+    // catches hookOutput markup injected after our init.
+    document.addEventListener('click', function (e) {
+        var exp = e.target.closest('.co-lastchance-body .mc-promo .expander');
+        if (!exp) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var card = exp.closest('.mc-promo');
+        if (card) card.classList.toggle('is-open');
+    });
 })();
 {/literal}</script>
 {include file="orderforms/standard_cart/recommendations-modal.tpl"}

@@ -50,6 +50,17 @@ This pattern: 5-line dispatcher, default lives at `core/pages/<page>/default/def
 
 The "default" variant is a real file with a real implementation. The dispatcher just picks between configured variant and default. No 300-line `else` branches in the WHMCS-named entry points.
 
+## Layout dispatch model — one selected layout, not all layouts
+
+The production layout model follows Lagom's useful pattern: the addon resolves the active layout path, then Smarty includes only that file.
+
+```text
+$myTheme.layouts.main-menu.mediumPath → selected main-menu layout tpl
+$myTheme.layouts.footer.mediumPath    → selected footer layout tpl
+```
+
+Do not render top-nav, sidebar, and rail layout HTML together and hide inactive versions with CSS in production. That is only acceptable for design-preview mode.
+
 ## Hook architecture
 
 ONE `ClientAreaPage` registration → `HookDispatcher::dispatch()` → routes to a method on `Service\Hooks`.

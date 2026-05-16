@@ -358,6 +358,84 @@
         .q-empty-sub { font-size: 13px; color: var(--color-text-tertiary); margin: 0 auto 18px; max-width: 340px; line-height: 1.45; }
         .q-empty .btn-primary,
         .q-empty .btn-secondary { height: 32px; padding: 0 16px; font-size: 13px; }
+
+        /* ── Responsive: card-stack at mobile (mirrors clientareainvoices) ── */
+        @media (max-width: 880px) {
+            .q-split,
+            body[data-subnav-side="left"] .q-split,
+            body[data-subnav-side="outside"] .q-split,
+            body[data-subnav-side="outside-left"] .q-split { grid-template-columns: 1fr; }
+            body[data-subnav-side="left"] .q-split > aside,
+            body[data-subnav-side="outside-left"] .q-split > aside,
+            body[data-subnav-side="left"] .q-split > .q-main,
+            body[data-subnav-side="outside-left"] .q-split > .q-main { grid-column: auto; grid-row: auto; }
+            .page-header h1 { font-size: 34px; }
+        }
+
+        @media (max-width: 720px) {
+            .page-header { margin-bottom: 24px; }
+            .page-header-row { align-items: flex-start; }
+            .q-banner { align-items: flex-start; flex-wrap: wrap; }
+            .q-banner .spacer { display: none; }
+            .q-banner .btn-secondary { margin-left: 36px; }
+            .q-main .filter-tabs { width: 100%; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; -ms-overflow-style: none; }
+            .q-main .filter-tabs::-webkit-scrollbar { display: none; }
+            .q-main .filter-tab { flex: 0 0 auto; }
+
+            /* Card-stack table: hide column header row + colgroup, make rows block-level grids */
+            .q-table-head-row,
+            .q-table colgroup { display: none; }
+            .q-table,
+            .q-table tbody,
+            .q-table tr,
+            .q-table td { display: block; width: 100%; }
+            .q-table tbody tr {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 8px 14px;
+                padding: 16px;
+            }
+            .q-table tbody td {
+                padding: 0;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: clip;
+            }
+            /* td#1 quote-id (full width, leave space for kebab on right) */
+            .q-table td:nth-child(1) { grid-column: 1 / -1; padding-right: 96px; }
+            /* td#2 date, td#3 valid until, td#4 amount — stacked under main on left */
+            .q-table td:nth-child(2),
+            .q-table td:nth-child(3),
+            .q-table td:nth-child(4) { grid-column: 1; }
+            .q-table td:nth-child(2)::before,
+            .q-table td:nth-child(3)::before,
+            .q-table td:nth-child(4)::before {
+                display: block;
+                margin-bottom: 1px;
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                color: var(--color-text-tertiary);
+            }
+            .q-table td:nth-child(2)::before { content: "Date"; }
+            .q-table td:nth-child(3)::before { content: "Valid until"; }
+            .q-table td:nth-child(4)::before { content: "Amount"; }
+            /* td#5 status (top-right), td#6 actions (bottom-right) */
+            .q-table td:nth-child(5) { grid-column: 2; grid-row: 1; justify-self: end; }
+            .q-table td:nth-child(6) { grid-column: 2; grid-row: 2 / 5; justify-self: end; align-self: end; }
+            .q-table td.actions { padding: 0; text-align: left; }
+            .q-stack > .q-footer { padding: 12px 16px 16px; }
+            .q-footer .spacer { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            .page-header h1 { font-size: 30px; }
+            .page-header-action { width: 100%; }
+            .q-banner .btn-secondary { margin-left: 0; }
+            .q-table tbody tr { grid-template-columns: 1fr; }
+            .q-table td:nth-child(1) { padding-right: 0; }
+        }
     </style>
 </head>
 <body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="quotes" data-page-title="My Quotes">

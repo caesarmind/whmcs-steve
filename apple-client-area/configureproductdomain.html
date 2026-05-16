@@ -235,6 +235,105 @@
         .dp-switch.off { background: var(--color-border); }
         .dp-switch.off::after { transform: translateX(-16px); }
 
+        /* Search filter row (Include TLDs / Max length / Safe search) */
+        .dp-filters {
+            display: flex; align-items: center; gap: 10px;
+            flex-wrap: wrap;
+            padding: 12px 0;
+            margin-top: 4px;
+            border-top: 0.5px solid var(--color-border-light, var(--color-border));
+        }
+        .dp-filter-chip {
+            position: relative;
+            display: inline-flex; align-items: center; gap: 6px;
+            height: 32px; padding: 0 14px;
+            border-radius: var(--radius-pill);
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            font-family: inherit;
+            font-size: 12.5px; font-weight: 500;
+            color: var(--color-text-primary); letter-spacing: -0.008em;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .dp-filter-chip:hover { border-color: var(--color-text-quaternary); }
+        .dp-filter-chip.is-open { border-color: var(--color-accent); color: var(--color-accent); }
+        .dp-filter-chip.has-value { background: var(--color-accent-light); border-color: var(--color-accent); color: var(--color-accent); }
+        .dp-filter-chip svg.caret { width: 10px; height: 10px; opacity: 0.8; transition: transform var(--transition-fast); }
+        .dp-filter-chip.is-open svg.caret { transform: rotate(180deg); }
+        .dp-filter-chip-count {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 16px; height: 16px; padding: 0 5px;
+            border-radius: 999px;
+            background: var(--color-accent); color: #fff;
+            font-size: 10.5px; font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+        .dp-filter-menu {
+            position: absolute; top: calc(100% + 6px); left: 0;
+            min-width: 200px; max-height: 280px; overflow-y: auto;
+            padding: 6px;
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+            z-index: 50;
+            display: none;
+        }
+        .dp-filter-chip.is-open .dp-filter-menu { display: block; }
+        .dp-filter-menu-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 7px 10px; border-radius: 8px;
+            font-size: 12.5px; color: var(--color-text-primary);
+            letter-spacing: -0.008em;
+            cursor: pointer; user-select: none;
+            transition: background var(--transition-fast);
+        }
+        .dp-filter-menu-item:hover { background: var(--color-surface-secondary); }
+        .dp-filter-menu-item input {
+            position: absolute; opacity: 0; pointer-events: none;
+        }
+        .dp-filter-menu-item .check {
+            width: 16px; height: 16px; border-radius: 4px;
+            border: 1.5px solid var(--color-border);
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all var(--transition-fast);
+        }
+        .dp-filter-menu-item .check.radio { border-radius: 50%; }
+        .dp-filter-menu-item .check svg { width: 11px; height: 11px; color: #fff; opacity: 0; }
+        .dp-filter-menu-item input:checked ~ .check { background: var(--color-accent); border-color: var(--color-accent); }
+        .dp-filter-menu-item input:checked ~ .check svg { opacity: 1; }
+        .dp-filter-menu-item input:checked ~ .check.radio { background: var(--color-accent); border-color: var(--color-accent); position: relative; }
+        .dp-filter-menu-item input:checked ~ .check.radio::after {
+            content: ""; position: absolute; top: 50%; left: 50%;
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #fff; transform: translate(-50%, -50%);
+        }
+        .dp-filter-menu-item .label { flex: 1; min-width: 0; }
+
+        /* Compact Safe-search toggle inline in the filter row */
+        .dp-filter-toggle {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-left: auto;
+            font-size: 12.5px; font-weight: 500;
+            color: var(--color-text-secondary);
+            letter-spacing: -0.008em;
+            cursor: pointer; user-select: none;
+        }
+        .dp-filter-toggle:hover { color: var(--color-text-primary); }
+        .dp-filter-toggle .dp-switch { width: 32px; height: 18px; }
+        .dp-filter-toggle .dp-switch::after { width: 14px; height: 14px; top: 1.5px; right: 1.5px; }
+        .dp-filter-toggle .dp-switch.off::after { transform: translateX(-13px); }
+        .dp-filter-toggle .help {
+            width: 12px; height: 12px;
+            color: var(--color-text-tertiary);
+            cursor: help;
+        }
+        @media (max-width: 520px) {
+            .dp-filters { gap: 8px; }
+            .dp-filter-toggle { margin-left: 0; flex: 1 1 100%; justify-content: space-between; padding-top: 8px; border-top: 0.5px solid var(--color-border); }
+        }
+
         /* ── Error / validation states ── */
         .dp-error {
             display: flex; align-items: flex-start; gap: 12px;
@@ -486,12 +585,45 @@
                     <p class="dp-example">
                         For example: <code>Fun business events</code>, <code>A comprehensive financial planning service for professionals</code>, or <code>example.com</code>.
                     </p>
-                    <div class="dp-toggle-row">
-                        <div class="dp-toggle-row-meta">
-                            <div class="dp-toggle-row-title">Safe search <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" title="Filters adult-themed suggestions and look-alike spoof domains"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-                            <div class="dp-toggle-row-sub">Filters adult-themed suggestions and look-alike spoof domains.</div>
+                    <div class="dp-filters">
+                        <!-- Include TLDs (multiselect) -->
+                        <div class="dp-filter-chip" data-filter="tlds" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="dp-filter-chip-label">Include TLDs</span>
+                            <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            <div class="dp-filter-menu" role="listbox" aria-multiselectable="true" data-menu="tlds" onclick="event.stopPropagation();">
+                                <label class="dp-filter-menu-item"><input type="checkbox" name="tlds[]" value=".com"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="label">.com</span></label>
+                                <label class="dp-filter-menu-item"><input type="checkbox" name="tlds[]" value=".net"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="label">.net</span></label>
+                                <label class="dp-filter-menu-item"><input type="checkbox" name="tlds[]" value=".org"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="label">.org</span></label>
+                                <label class="dp-filter-menu-item"><input type="checkbox" name="tlds[]" value=".io"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="label">.io</span></label>
+                                <label class="dp-filter-menu-item"><input type="checkbox" name="tlds[]" value=".ai"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="label">.ai</span></label>
+                                <label class="dp-filter-menu-item"><input type="checkbox" name="tlds[]" value=".co"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="label">.co</span></label>
+                                <label class="dp-filter-menu-item"><input type="checkbox" name="tlds[]" value=".dev"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="label">.dev</span></label>
+                                <label class="dp-filter-menu-item"><input type="checkbox" name="tlds[]" value=".app"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="label">.app</span></label>
+                                <label class="dp-filter-menu-item"><input type="checkbox" name="tlds[]" value=".xyz"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="label">.xyz</span></label>
+                                <label class="dp-filter-menu-item"><input type="checkbox" name="tlds[]" value=".shop"><span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="label">.shop</span></label>
+                            </div>
                         </div>
-                        <button type="button" class="dp-switch" role="switch" aria-checked="true" aria-label="Toggle safe search"></button>
+
+                        <!-- Maximum length (single-select) -->
+                        <div class="dp-filter-chip" data-filter="maxlen" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="dp-filter-chip-label">Max length: 63</span>
+                            <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            <div class="dp-filter-menu" role="listbox" data-menu="maxlen" onclick="event.stopPropagation();">
+                                <label class="dp-filter-menu-item"><input type="radio" name="maxLength" value="10"><span class="check radio"></span><span class="label">10</span></label>
+                                <label class="dp-filter-menu-item"><input type="radio" name="maxLength" value="15"><span class="check radio"></span><span class="label">15</span></label>
+                                <label class="dp-filter-menu-item"><input type="radio" name="maxLength" value="25"><span class="check radio"></span><span class="label">25</span></label>
+                                <label class="dp-filter-menu-item"><input type="radio" name="maxLength" value="40"><span class="check radio"></span><span class="label">40</span></label>
+                                <label class="dp-filter-menu-item"><input type="radio" name="maxLength" value="63" checked><span class="check radio"></span><span class="label">63</span></label>
+                            </div>
+                        </div>
+
+                        <!-- Safe search toggle -->
+                        <label class="dp-filter-toggle">
+                            <span>Safe search</span>
+                            <svg class="help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" title="Filters adult-themed suggestions and look-alike spoof domains"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <input type="checkbox" name="filter" checked style="position: absolute; opacity: 0; pointer-events: none;">
+                            <button type="button" class="dp-switch" role="switch" aria-checked="true" aria-label="Toggle safe search"></button>
+                        </label>
                     </div>
                 </div>
 
@@ -636,14 +768,74 @@
         });
     });
 
-    // Safe-search toggle
-    var sw = document.querySelector('.dp-switch');
-    if (sw) {
-        sw.addEventListener('click', function () {
+    // Safe-search toggle (now lives inside .dp-filter-toggle)
+    document.querySelectorAll('.dp-filter-toggle .dp-switch, .dp-toggle-row .dp-switch').forEach(function (sw) {
+        sw.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             sw.classList.toggle('off');
-            sw.setAttribute('aria-checked', sw.classList.contains('off') ? 'false' : 'true');
+            var on = !sw.classList.contains('off');
+            sw.setAttribute('aria-checked', on ? 'true' : 'false');
+            var input = sw.parentElement.querySelector('input[type="checkbox"]');
+            if (input) input.checked = on;
         });
+    });
+
+    // Filter-chip dropdowns (Include TLDs, Max length)
+    var chips = document.querySelectorAll('.dp-filter-chip');
+    chips.forEach(function (chip) {
+        chip.addEventListener('click', function (e) {
+            if (e.target.closest('.dp-filter-menu')) return;
+            var wasOpen = chip.classList.contains('is-open');
+            chips.forEach(function (c) { c.classList.remove('is-open'); c.setAttribute('aria-expanded', 'false'); });
+            if (!wasOpen) {
+                chip.classList.add('is-open');
+                chip.setAttribute('aria-expanded', 'true');
+            }
+        });
+    });
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.dp-filter-chip')) {
+            chips.forEach(function (c) { c.classList.remove('is-open'); c.setAttribute('aria-expanded', 'false'); });
+        }
+    });
+
+    // Sync chip labels with selection
+    function syncTldsLabel() {
+        var chip = document.querySelector('.dp-filter-chip[data-filter="tlds"]');
+        if (!chip) return;
+        var checked = chip.querySelectorAll('input[name="tlds[]"]:checked');
+        var label = chip.querySelector('.dp-filter-chip-label');
+        var oldCount = chip.querySelector('.dp-filter-chip-count');
+        if (oldCount) oldCount.remove();
+        if (checked.length === 0) {
+            label.textContent = 'Include TLDs';
+            chip.classList.remove('has-value');
+        } else if (checked.length === 1) {
+            label.textContent = 'TLD: ' + checked[0].value;
+            chip.classList.add('has-value');
+        } else {
+            label.textContent = 'TLDs';
+            chip.classList.add('has-value');
+            var count = document.createElement('span');
+            count.className = 'dp-filter-chip-count';
+            count.textContent = checked.length;
+            chip.insertBefore(count, chip.querySelector('.caret'));
+        }
     }
+    function syncMaxLenLabel() {
+        var chip = document.querySelector('.dp-filter-chip[data-filter="maxlen"]');
+        if (!chip) return;
+        var sel = chip.querySelector('input[name="maxLength"]:checked');
+        var label = chip.querySelector('.dp-filter-chip-label');
+        label.textContent = sel ? 'Max length: ' + sel.value : 'Maximum length';
+    }
+    document.querySelectorAll('.dp-filter-menu input[name="tlds[]"]').forEach(function (i) {
+        i.addEventListener('change', syncTldsLabel);
+    });
+    document.querySelectorAll('.dp-filter-menu input[name="maxLength"]').forEach(function (i) {
+        i.addEventListener('change', syncMaxLenLabel);
+    });
 })();
 </script>
 </body>

@@ -146,6 +146,44 @@ Variant renders native WHMCS objects with MyTheme markup
 
 The template should never need to query WHMCS tables directly for normal page data. If a page needs fallback data, use `localAPI` in the addon and keep native objects as the first source.
 
+## Layout loading model
+
+Use Lagom's production pattern for layouts: **resolve one active layout in the addon, then include only that layout file in Smarty.**
+
+The theme must not load every layout HTML version and hide inactive versions with CSS. That preview approach is acceptable for static design demos, but not for the sellable WHMCS theme.
+
+Target flow:
+
+```text
+Admin selects layout
+  ↓
+mytheme_settings row: <slug>_active_layout_main-menu = sidebar
+  ↓
+Hooks::resolveActiveLayout() builds $myTheme.layouts.main-menu.mediumPath
+  ↓
+header.tpl includes only $myTheme.layouts.main-menu.mediumPath
+```
+
+Footer layouts follow the same rule:
+
+```text
+mytheme_settings row: <slug>_active_layout_footer = default
+  ↓
+Hooks::resolveActiveLayout() builds $myTheme.layouts.footer.mediumPath
+  ↓
+footer.tpl includes only $myTheme.layouts.footer.mediumPath
+```
+
+Required production behavior:
+
+- `top`, `sidebar`, and `rail` can all exist on disk.
+- Only the selected main-menu layout renders for a request.
+- Only the selected footer layout renders for a request.
+- Shared CSS may support all layouts, but inactive layout HTML should not be included.
+- Preview controls such as `?layout=top|side|rail` should be dev/admin-only and must not be the final production switching mechanism.
+
+This mirrors Lagom's `$RSThemes['layouts']['mediumPath']` and `$RSThemes['footer-layouts']['mediumPath']` pattern, but keeps MyTheme's implementation smaller and native-first through `$myTheme.layouts.*.mediumPath`.
+
 ## Manifest contract
 
 `theme.json` is the source of what the theme can provide. The addon can only manage items declared there.
@@ -223,6 +261,7 @@ mytheme_extensions              json
 ### Phase 2: Make existing admin screens real
 
 - Save page variants from `PagesController` into `mytheme_settings`.
+- Wire `header.tpl` and `footer.tpl` to include only selected `$myTheme.layouts.*.mediumPath` files.
 - Replace menu stub data with JSON-backed menu profiles.
 - Add native navbar/sidebar hook methods to apply configured rules.
 - Add branding upload/settings support and expose it through `$myTheme.branding`.
@@ -253,11 +292,13 @@ mytheme_extensions              json
 6. Do not make buyer overrides edit encoded files.
 7. Do not remove WHMCS-native compatibility for menus, sidebars, panels, or order forms.
 8. Do not let `templates/mytheme` render normal pages when the addon/license layer is absent.
+9. Do not load all layout HTML versions in production; resolve one active layout and include only that file.
 
 ## Next code targets
 
 1. Build and test the real license server endpoint.
-2. Add save handling to `PagesController::editAction()`.
-3. Replace `MenuController` stub data with JSON-backed settings.
-4. Add `clientAreaPrimaryNavbar()`, `clientAreaSecondaryNavbar()`, `clientAreaPrimarySidebar()`, and `clientAreaSecondarySidebar()` methods to `Hooks`.
-5. Add dashboard settings UI only after the native `$panels` rendering is stable in production.
+2. Wire production layout includes to `$myTheme.layouts.main-menu.mediumPath` and `$myTheme.layouts.footer.mediumPath`.
+3. Add save handling to `PagesController::editAction()`.
+4. Replace `MenuController` stub data with JSON-backed settings.
+5. Add `clientAreaPrimaryNavbar()`, `clientAreaSecondaryNavbar()`, `clientAreaPrimarySidebar()`, and `clientAreaSecondarySidebar()` methods to `Hooks`.
+6. Add dashboard settings UI only after the native `$panels` rendering is stable in production.

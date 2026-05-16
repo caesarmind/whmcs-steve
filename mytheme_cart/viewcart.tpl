@@ -529,103 +529,172 @@
         font-size: 11.5px; color: var(--color-text-tertiary);
         margin-left: auto; letter-spacing: -0.004em;
     }
-    /* WHMCS marketing hooks emit ONE outer wrapper containing a
-       .mc-promos.checkout with MANY .mc-promo items. Tile on
-       .mc-promo so each upsell becomes its own card. */
-    .ct-recommend-body { padding: 14px 18px 18px; }
+    /* WHMCS marketconnect hookOutput emits .mc-promos.checkout with N
+       .mc-promo cards. Compact 1-per-row layout: icon | headline+tagline
+       | price+Add button | expander. Body (features) hidden by default
+       -- click the expander chevron to reveal. */
+    .ct-recommend-body { padding: 12px 18px 16px; }
     .ct-recommend-body > div { margin: 0; padding: 0; }
-    .ct-recommend-body > div + div { margin-top: 12px; }
+    .ct-recommend-body > div + div { margin-top: 6px; }
     .ct-recommend-body .mc-promos,
     .ct-recommend-body .mc-promos.checkout {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 10px;
+        grid-template-columns: 1fr;
+        gap: 6px;
         padding: 0;
         margin: 0;
         list-style: none;
     }
-    .ct-recommend-body .mc-promo .content { padding: 10px 0; max-width: none; }
-
+    /* Per-card grid: icon | content+expander on row 1, body underneath
+       (spans all). .header uses display:contents so its children flatten
+       into the .mc-promo grid. */
     .ct-recommend-body .mc-promo,
     .ct-recommend-body > div:not(:has(.mc-promos)):not(.sub-heading) {
-        padding: 12px;
+        position: relative;
+        display: grid;
+        grid-template-columns: 32px minmax(0, 1fr) auto 22px;
+        grid-template-areas: "icon content cta expander" "body body body body";
+        column-gap: 12px;
+        align-items: center;
+        padding: 8px 12px;
         border: 0.5px solid var(--color-border);
-        border-radius: 12px;
-        background: var(--color-surface-tertiary, var(--color-surface));
-        display: flex; flex-direction: column;
+        border-radius: 10px;
+        background: var(--color-surface);
         font-size: 12px;
         line-height: 1.45;
         color: var(--color-text-secondary);
         letter-spacing: -0.004em;
-        max-height: 280px;
-        overflow: hidden;
-        position: relative;
+        max-height: none;
+        overflow: visible;
+        transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .ct-recommend-body .mc-promo img,
+    .ct-recommend-body .mc-promo:hover { border-color: var(--color-accent); box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+    .ct-recommend-body .mc-promo .header { display: contents; }
+    .ct-recommend-body .mc-promo .icon {
+        grid-area: icon;
+        width: 32px; height: 32px; border-radius: 8px;
+        background: var(--color-surface-secondary);
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden; flex-shrink: 0;
+        padding: 0; margin: 0;
+    }
+    .ct-recommend-body .mc-promo .icon img,
+    .ct-recommend-body .mc-promo > img,
     .ct-recommend-body > div:not(:has(.mc-promos)) img {
-        max-width: 100%; max-height: 42px; object-fit: contain;
-        align-self: flex-start; margin-bottom: 8px;
+        max-width: 22px; max-height: 22px; object-fit: contain;
+        margin: 0; align-self: center; display: block;
     }
+    /* Brand-tinted icons */
+    .ct-recommend-body .mc-promo.threesixtymonitoring .icon,
+    .ct-recommend-body .mc-promo.codeguard .icon,
+    .ct-recommend-body .mc-promo.marketgoo .icon { background: var(--color-orange-bg); }
+    .ct-recommend-body .mc-promo.symantec .icon,
+    .ct-recommend-body .mc-promo.nordvpn .icon,
+    .ct-recommend-body .mc-promo.sitelock .icon { background: var(--color-green-bg); }
+    .ct-recommend-body .mc-promo.spamexperts .icon { background: var(--color-red-bg, rgba(255,69,58,0.10)); }
+    .ct-recommend-body .mc-promo.appsuite .icon,
+    .ct-recommend-body .mc-promo.sitebuilder .icon,
+    .ct-recommend-body .mc-promo.weebly .icon { background: var(--color-accent-light); }
+    .ct-recommend-body .mc-promo .content {
+        grid-area: content; min-width: 0; align-self: center;
+        padding: 0; max-width: none;
+    }
+    .ct-recommend-body .mc-promo .headline,
+    .ct-recommend-body .mc-promo .headline.truncate {
+        font-size: 13px; font-weight: 600; color: var(--color-text-primary);
+        letter-spacing: -0.008em; line-height: 1.3;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        margin: 0;
+    }
+    .ct-recommend-body .mc-promo .tagline,
+    .ct-recommend-body .mc-promo .tagline.truncate {
+        font-size: 11px; color: var(--color-text-tertiary);
+        margin: 1px 0 0; letter-spacing: -0.004em; line-height: 1.35;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ct-recommend-body .mc-promo .cta {
+        grid-area: cta;
+        display: flex; align-items: center; gap: 10px;
+        flex-shrink: 0; padding: 0; margin: 0;
+    }
+    .ct-recommend-body .mc-promo .price {
+        font-size: 12.5px; font-weight: 600; color: var(--color-text-primary);
+        font-variant-numeric: tabular-nums; letter-spacing: -0.008em;
+        white-space: nowrap; margin: 0;
+    }
+    .ct-recommend-body .mc-promo .btn-add,
+    .ct-recommend-body .mc-promo .btn.btn-add,
+    .ct-recommend-body .mc-promo button.btn-add,
+    .ct-recommend-body .mc-promo a.btn-add {
+        height: 26px; padding: 0 12px;
+        border-radius: var(--radius-pill, 999px);
+        background: var(--color-accent); color: #fff; border: 0;
+        font-size: 11.5px; font-weight: 500; letter-spacing: -0.008em;
+        cursor: pointer; font-family: inherit; text-decoration: none;
+        display: inline-flex; align-items: center; gap: 4px;
+        transition: background 0.15s;
+        flex-shrink: 0; margin: 0; align-self: auto;
+    }
+    .ct-recommend-body .mc-promo .btn-add:hover { background: var(--color-accent-hover, #0066cc); color: #fff; border-color: transparent; }
+    .ct-recommend-body .mc-promo .btn-add .arrow { display: inline-flex; align-items: center; }
+    .ct-recommend-body .mc-promo .btn-add .arrow i { font-style: normal; font-size: 11px; }
+    .ct-recommend-body .mc-promo .btn-add .arrow i.fa-chevron-right::before { content: "\203A"; font-weight: 600; }
+    .ct-recommend-body .mc-promo .expander {
+        grid-area: expander; align-self: center;
+        width: 22px; height: 22px; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: var(--color-text-tertiary); cursor: pointer;
+        transition: all 0.15s; padding: 0; margin: 0;
+    }
+    .ct-recommend-body .mc-promo .expander:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+    .ct-recommend-body .mc-promo .expander i {
+        font-style: normal; font-size: 11px; display: inline-block;
+        transform: rotate(0deg); transition: transform 0.15s;
+    }
+    .ct-recommend-body .mc-promo .expander i.fa-chevron-right::before { content: "\203A"; font-weight: 600; }
+    .ct-recommend-body .mc-promo.is-open .expander i { transform: rotate(90deg); }
+    .ct-recommend-body .mc-promo .body {
+        grid-area: body;
+        margin: 8px 0 0;
+        padding: 8px 0 0;
+        border-top: 0.5px solid var(--color-border);
+        display: none;
+    }
+    .ct-recommend-body .mc-promo.is-open .body { display: block; }
+    .ct-recommend-body .mc-promo .body ul {
+        margin: 0; padding: 0; list-style: none;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 3px 14px;
+    }
+    .ct-recommend-body .mc-promo .body li {
+        font-size: 11px; color: var(--color-text-secondary);
+        letter-spacing: -0.004em; line-height: 1.4;
+        display: flex; align-items: center; gap: 5px;
+        margin: 0; padding: 0;
+    }
+    .ct-recommend-body .mc-promo .body li i { font-style: normal; flex-shrink: 0; }
+    .ct-recommend-body .mc-promo .body li i.fa-check {
+        width: 10px; height: 10px; color: var(--color-green-text);
+        font-size: 9px; font-weight: 700;
+        display: inline-flex; align-items: center; justify-content: center;
+    }
+    .ct-recommend-body .mc-promo .body li i.fa-check::before { content: "\2713"; }
     .ct-recommend-body br + br { display: none; }
-    .ct-recommend-body p { margin: 0 0 4px; }
-    /* Hide WHMCS's inner Recommended/Last-Chance label -- already
+    .ct-recommend-body p { margin: 0; }
+    /* Hide WHMCS's inner Recommended/Last-Chance label -- already shown
        in .ct-recommend-head above the grid. */
     .ct-recommend-body > div > .sub-heading,
     .ct-recommend-body .mc-promo .sub-heading { display: none; }
-    /* Single-promo banner: collapse the grid and lay out horizontally. */
-    .ct-recommend-body .mc-promos:has(> .mc-promo:only-child) {
-        grid-template-columns: 1fr;
-    }
-    .ct-recommend-body .mc-promo:only-child {
-        max-height: none;
-        padding: 16px 18px;
-        flex-direction: row;
-        align-items: center;
-        gap: 16px;
-        flex-wrap: wrap;
-    }
-    .ct-recommend-body .mc-promo:only-child img {
-        max-height: 48px;
-        margin-bottom: 0;
-        align-self: center;
-        flex-shrink: 0;
-    }
-    .ct-recommend-body .mc-promo:only-child .btn,
-    .ct-recommend-body .mc-promo:only-child button {
-        margin-top: 0;
-        margin-left: auto;
-        align-self: center;
-    }
-    .ct-recommend-body ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
-    .ct-recommend-body h2,
-    .ct-recommend-body h3,
-    .ct-recommend-body h4,
-    .ct-recommend-body strong { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.008em; }
-    .ct-recommend-body .btn,
-    .ct-recommend-body button,
-    .ct-recommend-body a.btn,
-    .ct-recommend-body input[type="submit"],
-    .ct-recommend-body input[type="button"] {
-        margin-top: auto;
-        align-self: flex-start;
-        height: 32px;
-        padding: 0 14px;
-        border: 0.5px solid var(--color-border);
-        border-radius: var(--radius-pill, 999px);
-        background: transparent;
-        color: var(--color-text-primary);
-        font-size: 12px;
-        font-weight: 500;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex; align-items: center;
-        transition: all 0.15s;
-    }
-    .ct-recommend-body .btn:hover,
-    .ct-recommend-body button:hover,
-    .ct-recommend-body a.btn:hover {
-        border-color: var(--color-accent);
-        color: var(--color-accent);
+    /* Mobile: stack header into 2 rows so price+btn drop below */
+    @media (max-width: 640px) {
+        .ct-recommend-body .mc-promo {
+            grid-template-columns: 32px minmax(0, 1fr) 22px;
+            grid-template-areas: "icon content expander" "body body body" "cta cta cta";
+        }
+        .ct-recommend-body .mc-promo .cta {
+            margin-top: 8px; padding-top: 8px;
+            border-top: 0.5px solid var(--color-border);
+            justify-content: space-between;
+        }
     }
 
     /* Empty state */
@@ -1505,6 +1574,18 @@
                 }
             });
         }
+
+        // MarketConnect promo expander: toggle .is-open on the .mc-promo
+        // card to reveal/hide its .body (feature list). Bound via
+        // delegation so it catches hookOutput markup injected later.
+        document.addEventListener('click', function (e) {
+            var exp = e.target.closest('.ct-recommend-body .mc-promo .expander');
+            if (!exp) return;
+            e.preventDefault();
+            e.stopPropagation();
+            var card = exp.closest('.mc-promo');
+            if (card) card.classList.toggle('is-open');
+        });
     })();
     {/literal}</script>
 
