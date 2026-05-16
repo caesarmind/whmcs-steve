@@ -766,15 +766,77 @@ var _localLang = {
             if (amt && amt.textContent.trim() !== promoState.total) amt.textContent = promoState.total;
         }
 
+        // Debounced refetch of the cart-level discount/total. When the
+        // user changes billing cycle / addons / qty after a promo is
+        // applied, WHMCS recalctotals() updates #producttotal with the
+        // new product-scoped subtotal but never re-evaluates the
+        // cart-wide discount on its own. We re-POST to /cart.php?a=view
+        // to pull the freshly-computed #discount, #totalDueToday and
+        // promotion description, then update promoState + repatch.
+        // If the new config no longer qualifies for the promo, WHMCS
+        // omits #discount -- treat that as "promo dropped" and clear
+        // promoState so the row disappears.
+        var refetchTimeoutId = null;
+        var refetchInflight = false;
+        function refetchPromoTotals() {
+            if (!promoState) return;
+            if (refetchTimeoutId) clearTimeout(refetchTimeoutId);
+            refetchTimeoutId = setTimeout(function () {
+                refetchTimeoutId = null;
+                if (refetchInflight) return;
+                refetchInflight = true;
+                fetch('/cart.php?a=view', { method: 'GET', credentials: 'same-origin' })
+                    .then(function (r) { return r.text(); })
+                    .then(function (html) {
+                        var d = (new DOMParser()).parseFromString(html, 'text/html');
+                        var disc = d.querySelector('#discount');
+                        var tot = d.querySelector('#totalDueToday');
+                        var lbl = d.querySelector('.ct-totals-row.discount .label');
+                        if (!tot) return;
+                        if (disc) {
+                            promoState = {
+                                description: lbl ? lbl.textContent.trim() : promoState.description,
+                                discount: disc.textContent.trim(),
+                                total: tot.textContent.trim()
+                            };
+                            syncPromoToSummary();
+                        } else {
+                            // Promo no longer applies to this config.
+                            promoState = null;
+                            var pt = document.getElementById('producttotal');
+                            var row = pt && pt.querySelector('[data-promo-row="1"]');
+                            if (row && row.parentNode) row.parentNode.removeChild(row);
+                            showInlineError({
+                                variant: 'info',
+                                title: 'Promo code',
+                                bodyText: 'Promotion no longer applies to this configuration.'
+                            });
+                        }
+                    })
+                    .catch(function () { /* ignore refetch errors -- patch stays stale */ })
+                    .then(function () { refetchInflight = false; });
+            }, 400);
+        }
+
         // Re-apply the discount patch whenever WHMCS rewrites the
         // summary (billing-cycle change, addon toggle, qty input, etc.
         // all trigger recalctotals() which replaces the innerHTML).
         // syncPromoToSummary is idempotent, so the observer's own
-        // mutations terminate after the patch is stable.
+        // mutations terminate after the patch is stable. We detect
+        // "WHMCS just wiped our row" by the row being missing, and
+        // kick off a debounced refetch to refresh the discount math
+        // against the new config.
         var producttotalEl = document.getElementById('producttotal');
         if (producttotalEl && typeof MutationObserver === 'function') {
-            new MutationObserver(function () { syncPromoToSummary(); })
-                .observe(producttotalEl, { childList: true, subtree: true });
+            new MutationObserver(function () {
+                if (!promoState) return;
+                var pt = document.getElementById('producttotal');
+                var myRow = pt && pt.querySelector('[data-promo-row="1"]');
+                if (!myRow) {
+                    syncPromoToSummary();
+                    refetchPromoTotals();
+                }
+            }).observe(producttotalEl, { childList: true, subtree: true });
         }
 
         function buildBody(includePromo) {

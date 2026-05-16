@@ -585,9 +585,18 @@
     {* Initial body state so the global state-chip overlay (Full/Empty)
        lines up with the actual server-side cart state on first paint.
        Without this the .vc-when-full block would always be visible even
-       when the cart is empty. *}
+       when the cart is empty.
+
+       Also clear any stale hn.data preview state from localStorage:
+       apple-layout.js's initStateToggles runs after partials load and
+       resolves the chip state from (URL param > existing body attr >
+       saved localStorage > 'full'). On real-cart routes the server's
+       $cartitems is authoritative -- a previous chip click stored as
+       'empty' should not hide a populated cart. Removing the saved key
+       lets the body[data-data] we set below win the priority chain. *}
     <script>{literal}
     (function () {
+        try { localStorage.removeItem('hn.data'); } catch (e) {}
         var d = document.body && document.body.dataset;
         if (d) {/literal} d.data = '{if $cartitems == 0}empty{else}full{/if}'; {literal} }
     })();
