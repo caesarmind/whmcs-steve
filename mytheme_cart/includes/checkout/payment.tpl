@@ -21,7 +21,7 @@
 
 <div class="co-payment-card">
 <div class="sub-heading">
-    <span class="primary-bg-color">{$LANG.orderForm.paymentDetails}</span>
+    <span class="primary-bg-color">{$LANG.orderpaymentmethod|default:'Payment method'}</span>
 </div>
 
 <div class="alert alert-success text-center large-text" role="alert" id="totalDueToday">
@@ -47,12 +47,25 @@
 </div>
 
 {if !$inExpressCheckout}
-    <div id="paymentGatewaysContainer" class="form-group">
-        <p class="small text-muted">{$LANG.orderForm.preferredPaymentMethod}</p>
-
-        <div class="text-center">
+    <div id="paymentGatewaysContainer" class="form-group co-pay-gateways">
+        <div class="co-pay-list" data-inputs-container>
             {foreach $gateways as $gateway}
-                <label class="radio-inline">
+                {assign var=gatewayKey value=$gateway.sysname|lower|replace:" ":"-"}
+                {assign var=gatewayNameLower value=$gateway.name|lower}
+                {assign var=gatewayLogoClass value="gateway"}
+                {assign var=gatewayBadge value=$gateway.name|strip_tags|truncate:4:""|upper}
+                {if $gateway.type eq "CC"}
+                    {assign var=gatewayLogoClass value="card"}
+                    {assign var=gatewayBadge value="CARD"}
+                {elseif $gatewayKey|strstr:"paypal" || $gatewayNameLower|strstr:"paypal"}
+                    {assign var=gatewayLogoClass value="pp"}
+                    {assign var=gatewayBadge value="PP"}
+                {elseif $gatewayKey|strstr:"bank" || $gatewayNameLower|strstr:"bank" || $gatewayKey|strstr:"ach" || $gatewayNameLower|strstr:"ach"}
+                    {assign var=gatewayLogoClass value="bank"}
+                    {assign var=gatewayBadge value="ACH"}
+                {/if}
+
+                <label class="co-pay co-pay-gateway {$gatewayKey}{if $gateway.type eq "CC"} new-card{/if}" data-virtual-input data-gateway="{$gatewayKey|escape}">
                     <input type="radio"
                            name="paymentmethod"
                            value="{$gateway.sysname}"
@@ -62,7 +75,22 @@
                            class="payment-methods{if $gateway.type eq "CC"} is-credit-card{/if}"
                             {if $selectedgateway eq $gateway.sysname} checked{/if}
                     />
-                    {$gateway.name}
+                    <span class="co-pay-radio" aria-hidden="true"></span>
+                    <span class="co-pay-logo {$gatewayLogoClass|escape}" aria-hidden="true">{$gatewayBadge|escape}</span>
+                    <span class="co-pay-meta">
+                        <span class="co-pay-name">{$gateway.name|escape}</span>
+                        <span class="co-pay-sub">
+                            {if $gateway.type eq "CC"}
+                                Visa &middot; Mastercard &middot; Amex — processed securely.
+                            {elseif $gatewayKey|strstr:"paypal" || $gatewayNameLower|strstr:"paypal"}
+                                You'll be redirected to authorise the charge.
+                            {elseif $gatewayKey|strstr:"bank" || $gatewayNameLower|strstr:"bank" || $gatewayKey|strstr:"ach" || $gatewayNameLower|strstr:"ach"}
+                                Direct debit or bank transfer, depending on gateway setup.
+                            {else}
+                                Pay securely using this gateway.
+                            {/if}
+                        </span>
+                    </span>
                 </label>
             {/foreach}
         </div>
@@ -74,7 +102,7 @@
 
     <div id="paymentGatewayInput"></div>
 
-    <div class="cc-input-container{if $selectedgatewaytype neq "CC"} w-hidden{/if}" id="creditCardInputFields">
+    <div class="cc-input-container co-card-input-panel{if $selectedgatewaytype neq "CC"} w-hidden{/if}" id="creditCardInputFields">
         {if $client}
             <div id="existingCardsContainer" class="existing-cc-grid">
                 {include file="orderforms/standard_cart/includes/existing-paymethods.tpl"}

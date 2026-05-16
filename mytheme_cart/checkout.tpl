@@ -539,35 +539,127 @@
 #applyCreditContainer .radio { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 13px; color: var(--color-text-primary); cursor: pointer; margin: 0; }
 #applyCreditContainer .radio input { margin-top: 3px; accent-color: var(--color-accent); }
 
-/* Payment method radios -- Apple-style cards */
-#paymentGatewaysContainer { margin: 0 0 12px; }
-#paymentGatewaysContainer p.small.text-muted { font-size: 12px; color: var(--color-text-tertiary); margin: 0 0 10px; letter-spacing: -0.004em; }
-#paymentGatewaysContainer .text-center { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
-#paymentGatewaysContainer .radio-inline {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 16px;
+/* Payment method radios -- matches apple-client-area/checkout.html while
+   preserving WHMCS's native paymentmethod radio contract. */
+#paymentGatewaysContainer.co-pay-gateways { margin: 0 0 14px; }
+#paymentGatewaysContainer .co-pay-list { display: flex; flex-direction: column; gap: 10px; }
+#paymentGatewaysContainer .co-pay {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
     border: 0.5px solid var(--color-border);
-    border-radius: 999px;
+    border-radius: 12px;
     background: var(--color-surface);
-    font-size: 13px;
     color: var(--color-text-primary);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    position: relative;
     margin: 0;
-    letter-spacing: -0.008em;
+    text-align: left;
+    min-height: 64px;
 }
-#paymentGatewaysContainer .radio-inline:hover { border-color: var(--color-text-primary); }
-#paymentGatewaysContainer .radio-inline:has(input:checked) {
+#paymentGatewaysContainer .co-pay input.payment-methods {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+#paymentGatewaysContainer .co-pay:hover,
+#paymentGatewaysContainer .co-pay:focus-within { border-color: var(--color-accent); }
+#paymentGatewaysContainer .co-pay:has(input:checked),
+#paymentGatewaysContainer .co-pay.checked,
+#paymentGatewaysContainer .co-pay.is-selected {
     border-color: var(--color-accent);
     background: var(--color-accent-light);
-    color: var(--color-accent);
-    font-weight: 500;
 }
-#paymentGatewaysContainer .radio-inline input { accent-color: var(--color-accent); margin: 0; }
+#paymentGatewaysContainer .co-pay-radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-surface);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+#paymentGatewaysContainer .co-pay-radio::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    transform: scale(0);
+    transition: transform 0.15s;
+}
+#paymentGatewaysContainer .co-pay:has(input:checked) .co-pay-radio,
+#paymentGatewaysContainer .co-pay.checked .co-pay-radio,
+#paymentGatewaysContainer .co-pay.is-selected .co-pay-radio {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+}
+#paymentGatewaysContainer .co-pay:has(input:checked) .co-pay-radio::after,
+#paymentGatewaysContainer .co-pay.checked .co-pay-radio::after,
+#paymentGatewaysContainer .co-pay.is-selected .co-pay-radio::after { transform: scale(1); }
+#paymentGatewaysContainer .co-pay-logo {
+    width: 40px;
+    height: 26px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff;
+    flex-shrink: 0;
+}
+#paymentGatewaysContainer .co-pay-logo.card { background: #1a1f71; }
+#paymentGatewaysContainer .co-pay-logo.pp { background: #003087; }
+#paymentGatewaysContainer .co-pay-logo.bank { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+#paymentGatewaysContainer .co-pay-logo.gateway { background: #635bff; }
+#paymentGatewaysContainer .co-pay-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+#paymentGatewaysContainer .co-pay-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+}
+#paymentGatewaysContainer .co-pay-sub {
+    font-size: 11.5px;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.004em;
+    line-height: 1.35;
+}
 
 /* Credit-card input fields card */
+#creditCardInputFields.co-card-input-panel {
+    margin-top: 6px;
+    padding: 16px;
+    border: 0.5px dashed var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface-tertiary, var(--color-surface));
+}
 #creditCardInputFields .form-group { margin-bottom: 12px; }
 #creditCardInputFields .control-label { font-size: 12px; color: var(--color-text-tertiary); margin: 0 0 4px; display: block; }
+#creditCardInputFields > ul {
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+}
+#creditCardInputFields > ul .radio-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    font-size: 12.5px;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+#creditCardInputFields > ul .radio-inline input { margin: 0; accent-color: var(--color-accent); }
 
 /* TOS + complete-order footer */
 .checkout-footer { margin: 22px 0 16px; padding: 0; }

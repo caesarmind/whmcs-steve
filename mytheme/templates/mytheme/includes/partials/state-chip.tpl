@@ -1,11 +1,11 @@
 {* Hostnodes — Dev preview chip (layout / palette / data toggles).
    Floating, draggable. Wired by apple-layout.js (state persists to
-   localStorage). Always rendered during development so toggles work
-   on every page. Use ?preview=0 to hide explicitly. *}
+   localStorage). Hidden from public visitors unless preview mode or an
+   admin session is active. *}
 
-{assign var=_showChip value=true}
-{if isset($smarty.get.preview) && $smarty.get.preview == '0'}
-    {assign var=_showChip value=false}
+{assign var=_showChip value=false}
+{if (isset($smarty.get.preview) && $smarty.get.preview == '1') || $adminLoggedIn || $adminMasqueradingAsClient}
+    {assign var=_showChip value=true}
 {/if}
 
 {if $_showChip}
