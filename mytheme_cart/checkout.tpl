@@ -186,7 +186,7 @@
 .co-mailing-title { font-size: 13.5px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; margin: 0 0 3px; }
 .co-mailing-desc { font-size: 12px; color: var(--color-text-tertiary); margin: 0; letter-spacing: -0.004em; line-height: 1.5; }
 .co-mailing-toggle { position: relative; cursor: pointer; user-select: none; flex-shrink: 0; display: inline-flex; align-items: center; }
-.co-mailing-toggle input { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; margin: 0; }
+.co-mailing-toggle input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
 .co-mailing-switch { width: 40px; height: 22px; background: var(--color-surface-secondary); border-radius: 999px; position: relative; transition: background 0.15s; border: 0.5px solid var(--color-border); display: block; }
 .co-mailing-switch::after { content: ""; position: absolute; top: 1px; left: 1px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.18); transition: transform 0.15s; }
 .co-mailing-toggle input:checked + .co-mailing-switch { background: var(--color-green-text, #34c759); border-color: var(--color-green-text, #34c759); }
@@ -476,14 +476,34 @@
 .co-captcha-card { padding: 18px 22px; text-align: center; }
 
 /* ─── Last-chance inner ($hookOutput grid) ──────────────────────
-   The hookOutput is opaque marketing HTML from WHMCS hooks (logos
-   + bullets + Add to Cart) -- without intervention each item
-   stacks vertically full-width. Force a responsive grid with
-   bounded image sizes so it reads as a card row rather than a
-   billboard wall. */
-.co-lastchance-body { padding: 14px 16px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
-.co-lastchance-body > div + div { margin-top: 0; }
-.co-lastchance-body > div {
+   WHMCS marketing hooks emit ONE outer wrapper containing a
+   .mc-promos.checkout that holds MANY .mc-promo product items.
+   Tile on .mc-promo so each upsell becomes its own card -- the
+   foreach wrapper and the .mc-promos container both relay the
+   grid through. Defensive fallback: if a hook emits a simpler
+   "one tile per outer div" structure with no .mc-promos, the
+   outer-div rules still apply. */
+.co-lastchance-body { padding: 14px 16px 16px; }
+.co-lastchance-body > div { margin: 0; padding: 0; }
+.co-lastchance-body > div + div { margin-top: 12px; }
+
+/* Grid container: the .mc-promos wrapper if WHMCS emitted one,
+   otherwise the foreach <div> wrapper. */
+.co-lastchance-body .mc-promos,
+.co-lastchance-body .mc-promos.checkout {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+/* Each tile -- targets .mc-promo (WHMCS marketconnect) and falls
+   back to a direct .co-lastchance-body > div when no .mc-promos
+   container exists. */
+.co-lastchance-body .mc-promo,
+.co-lastchance-body > div:not(:has(.mc-promos)):not(.sub-heading) {
     padding: 12px;
     border: 0.5px solid var(--color-border);
     border-radius: 12px;
@@ -493,58 +513,59 @@
     line-height: 1.45;
     color: var(--color-text-secondary);
     letter-spacing: -0.004em;
-    min-height: 0;
     max-height: 260px;
     overflow: hidden;
     position: relative;
 }
-.co-lastchance-body > div img { max-width: 100%; max-height: 38px; object-fit: contain; align-self: flex-start; margin-bottom: 6px; }
-.co-lastchance-body > div br + br { display: none; }
-.co-lastchance-body > div p { margin: 0 0 4px; }
-/* WHMCS's hookOutput emits an extra .sub-heading "Last Chance" pill
-   inside each tile -- already shown in .co-lastchance-head above. */
-.co-lastchance-body > div > .sub-heading { display: none; }
-/* Single-tile case: span full width as a horizontal banner instead
-   of a narrow card with empty space to its right. Mirrors
-   apple-client-area/checkout.html. */
-.co-lastchance-body:has(> div:only-child) {
-    grid-template-columns: 1fr;
-    padding: 14px 16px;
+.co-lastchance-body .mc-promo img,
+.co-lastchance-body > div:not(:has(.mc-promos)) img {
+    max-width: 100%; max-height: 38px; object-fit: contain;
+    align-self: flex-start; margin-bottom: 6px;
 }
-.co-lastchance-body > div:only-child {
+.co-lastchance-body br + br { display: none; }
+.co-lastchance-body p { margin: 0 0 4px; }
+
+/* Hide WHMCS's inner "Last Chance" heading -- already shown in
+   .co-lastchance-head above the grid. */
+.co-lastchance-body > div > .sub-heading,
+.co-lastchance-body .mc-promo .sub-heading { display: none; }
+
+/* Single-promo banner: WHMCS emits one .mc-promo -- collapse the
+   grid to 1fr and lay the tile out horizontally. */
+.co-lastchance-body .mc-promos:has(> .mc-promo:only-child) {
+    grid-template-columns: 1fr;
+}
+.co-lastchance-body .mc-promo:only-child {
     max-height: none;
-    min-height: 0;
     padding: 14px 16px;
     flex-direction: row;
     align-items: center;
     gap: 16px;
     flex-wrap: wrap;
 }
-.co-lastchance-body > div:only-child img {
+.co-lastchance-body .mc-promo:only-child img {
     max-height: 48px;
     margin-bottom: 0;
     align-self: center;
     flex-shrink: 0;
 }
-.co-lastchance-body > div:only-child .btn,
-.co-lastchance-body > div:only-child button,
-.co-lastchance-body > div:only-child a.btn,
-.co-lastchance-body > div:only-child input[type="submit"],
-.co-lastchance-body > div:only-child input[type="button"] {
+.co-lastchance-body .mc-promo:only-child .btn,
+.co-lastchance-body .mc-promo:only-child button {
     margin-top: 0;
     margin-left: auto;
     align-self: center;
 }
-.co-lastchance-body > div ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
-.co-lastchance-body > div h2,
-.co-lastchance-body > div h3,
-.co-lastchance-body > div h4,
-.co-lastchance-body > div strong { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.008em; }
-.co-lastchance-body > div .btn,
-.co-lastchance-body > div button,
-.co-lastchance-body > div a.btn,
-.co-lastchance-body > div input[type="submit"],
-.co-lastchance-body > div input[type="button"] {
+
+.co-lastchance-body ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
+.co-lastchance-body h2,
+.co-lastchance-body h3,
+.co-lastchance-body h4,
+.co-lastchance-body strong { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.008em; }
+.co-lastchance-body .btn,
+.co-lastchance-body button,
+.co-lastchance-body a.btn,
+.co-lastchance-body input[type="submit"],
+.co-lastchance-body input[type="button"] {
     margin-top: auto;
     align-self: flex-start;
     height: 32px;
@@ -560,9 +581,9 @@
     display: inline-flex; align-items: center;
     transition: all 0.15s;
 }
-.co-lastchance-body > div .btn:hover,
-.co-lastchance-body > div button:hover,
-.co-lastchance-body > div a.btn:hover {
+.co-lastchance-body .btn:hover,
+.co-lastchance-body button:hover,
+.co-lastchance-body a.btn:hover {
     border-color: var(--color-accent);
     color: var(--color-accent);
 }
@@ -1539,6 +1560,46 @@
                 }
             }).observe(msg, { childList: true, subtree: true, characterData: true });
         }
+
+        // Generate password fallback. WHMCS scripts.min.js does not
+        // bind .generate-password on this template, so the button is
+        // a no-op out of the box. Drop in a self-contained generator:
+        // 14 chars with mixed case + digits + symbols, written into
+        // both data-targetfields password inputs with input + change
+        // events so the strength meter and form-validators update.
+        $('.generate-password').on('click', function (e) {
+            e.preventDefault();
+            var targets = (this.dataset.targetfields || '').split(',')
+                .map(function (s) { return s.trim(); }).filter(Boolean);
+            if (!targets.length) return;
+
+            var upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+            var lower = 'abcdefghijkmnpqrstuvwxyz';
+            var digit = '23456789';
+            var symb  = '!@#$%^&*-_+=';
+            var all   = upper + lower + digit + symb;
+            function pick(s) { return s.charAt(Math.floor(Math.random() * s.length)); }
+            // Guarantee one of each class.
+            var chars = [pick(upper), pick(lower), pick(digit), pick(symb)];
+            for (var i = chars.length; i < 14; i++) chars.push(pick(all));
+            // Fisher-Yates shuffle so the guaranteed positions don't leak.
+            for (var j = chars.length - 1; j > 0; j--) {
+                var k = Math.floor(Math.random() * (j + 1));
+                var tmp = chars[j]; chars[j] = chars[k]; chars[k] = tmp;
+            }
+            var pwd = chars.join('');
+            targets.forEach(function (id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                // Briefly switch to text so the user sees the value.
+                var original = el.type;
+                el.type = 'text';
+                el.value = pwd;
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+                setTimeout(function () { el.type = original; }, 1800);
+            });
+        });
     }
     if (window.jQuery) { window.jQuery(init); }
     else if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }

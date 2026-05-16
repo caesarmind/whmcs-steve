@@ -528,14 +528,24 @@
         font-size: 11.5px; color: var(--color-text-tertiary);
         margin-left: auto; letter-spacing: -0.004em;
     }
-    /* Inner $hookOutput is opaque marketing HTML (logos + bullets +
-       Add to Cart) -- without intervention each item stacks vertically
-       full-width. Force a responsive grid with bounded image sizes so
-       it reads as a row of tiles. Mirrors checkout's .co-lastchance-body. */
-    .ct-recommend-body { padding: 14px 18px 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-    .ct-recommend-body > div + div { margin-top: 0; }
-    .ct-recommend-body > div {
-        padding: 14px;
+    /* WHMCS marketing hooks emit ONE outer wrapper containing a
+       .mc-promos.checkout with MANY .mc-promo items. Tile on
+       .mc-promo so each upsell becomes its own card. */
+    .ct-recommend-body { padding: 14px 18px 18px; }
+    .ct-recommend-body > div { margin: 0; padding: 0; }
+    .ct-recommend-body > div + div { margin-top: 12px; }
+    .ct-recommend-body .mc-promos,
+    .ct-recommend-body .mc-promos.checkout {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 10px;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+    .ct-recommend-body .mc-promo,
+    .ct-recommend-body > div:not(:has(.mc-promos)):not(.sub-heading) {
+        padding: 12px;
         border: 0.5px solid var(--color-border);
         border-radius: 12px;
         background: var(--color-surface-tertiary, var(--color-surface));
@@ -544,58 +554,55 @@
         line-height: 1.45;
         color: var(--color-text-secondary);
         letter-spacing: -0.004em;
-        min-height: 0;
         max-height: 280px;
         overflow: hidden;
         position: relative;
     }
-    .ct-recommend-body > div img { max-width: 100%; max-height: 42px; object-fit: contain; align-self: flex-start; margin-bottom: 8px; }
-    .ct-recommend-body > div br + br { display: none; }
-    .ct-recommend-body > div p { margin: 0 0 4px; }
-    /* WHMCS hookOutput repeats a Recommended/Last-Chance label inside
-       each tile -- already shown in .ct-recommend-head above. */
-    .ct-recommend-body > div > .sub-heading { display: none; }
-    /* Single-item recommendations: span full width as a horizontal
-       banner instead of a narrow card on the left with empty space
-       to its right. Mirrors apple-client-area/cart.html. */
-    .ct-recommend-body:has(> div:only-child) {
-        grid-template-columns: 1fr;
-        padding: 16px 18px;
+    .ct-recommend-body .mc-promo img,
+    .ct-recommend-body > div:not(:has(.mc-promos)) img {
+        max-width: 100%; max-height: 42px; object-fit: contain;
+        align-self: flex-start; margin-bottom: 8px;
     }
-    .ct-recommend-body > div:only-child {
+    .ct-recommend-body br + br { display: none; }
+    .ct-recommend-body p { margin: 0 0 4px; }
+    /* Hide WHMCS's inner Recommended/Last-Chance label -- already
+       in .ct-recommend-head above the grid. */
+    .ct-recommend-body > div > .sub-heading,
+    .ct-recommend-body .mc-promo .sub-heading { display: none; }
+    /* Single-promo banner: collapse the grid and lay out horizontally. */
+    .ct-recommend-body .mc-promos:has(> .mc-promo:only-child) {
+        grid-template-columns: 1fr;
+    }
+    .ct-recommend-body .mc-promo:only-child {
         max-height: none;
-        min-height: 0;
         padding: 16px 18px;
         flex-direction: row;
         align-items: center;
         gap: 16px;
         flex-wrap: wrap;
     }
-    .ct-recommend-body > div:only-child img {
+    .ct-recommend-body .mc-promo:only-child img {
         max-height: 48px;
         margin-bottom: 0;
         align-self: center;
         flex-shrink: 0;
     }
-    .ct-recommend-body > div:only-child .btn,
-    .ct-recommend-body > div:only-child button,
-    .ct-recommend-body > div:only-child a.btn,
-    .ct-recommend-body > div:only-child input[type="submit"],
-    .ct-recommend-body > div:only-child input[type="button"] {
+    .ct-recommend-body .mc-promo:only-child .btn,
+    .ct-recommend-body .mc-promo:only-child button {
         margin-top: 0;
         margin-left: auto;
         align-self: center;
     }
-    .ct-recommend-body > div ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
-    .ct-recommend-body > div h2,
-    .ct-recommend-body > div h3,
-    .ct-recommend-body > div h4,
-    .ct-recommend-body > div strong { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.008em; }
-    .ct-recommend-body > div .btn,
-    .ct-recommend-body > div button,
-    .ct-recommend-body > div a.btn,
-    .ct-recommend-body > div input[type="submit"],
-    .ct-recommend-body > div input[type="button"] {
+    .ct-recommend-body ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
+    .ct-recommend-body h2,
+    .ct-recommend-body h3,
+    .ct-recommend-body h4,
+    .ct-recommend-body strong { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.008em; }
+    .ct-recommend-body .btn,
+    .ct-recommend-body button,
+    .ct-recommend-body a.btn,
+    .ct-recommend-body input[type="submit"],
+    .ct-recommend-body input[type="button"] {
         margin-top: auto;
         align-self: flex-start;
         height: 32px;
@@ -611,9 +618,9 @@
         display: inline-flex; align-items: center;
         transition: all 0.15s;
     }
-    .ct-recommend-body > div .btn:hover,
-    .ct-recommend-body > div button:hover,
-    .ct-recommend-body > div a.btn:hover {
+    .ct-recommend-body .btn:hover,
+    .ct-recommend-body button:hover,
+    .ct-recommend-body a.btn:hover {
         border-color: var(--color-accent);
         color: var(--color-accent);
     }
