@@ -195,6 +195,9 @@
 </script>
 
 <style>{literal}
+/* Page-local checkout frame spacing */
+.content-area { padding-top: 10px; padding-bottom: 10px; }
+
 /* ── Apple checkout chrome (.co-*) ──
    Page-level wrapper around standard_cart's checkout form. Form body
    classes (.form-group prepend-icon, .sub-heading, .alert, .btn etc)
@@ -1072,6 +1075,7 @@ button.generate-password:hover {
     margin: 0;
     list-style: none;
 }
+.co-lastchance-body .mc-promo .content { padding: 10px 0; max-width: none; }
 
 /* Each tile -- targets .mc-promo (WHMCS marketconnect) and falls
    back to a direct .co-lastchance-body > div when no .mc-promos

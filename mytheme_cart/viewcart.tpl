@@ -69,6 +69,7 @@
        a stale CSS cache can't strand the page in the old Bootstrap look. */
 
     /* Page header */
+    .content-area { padding-top: 10px; padding-bottom: 10px; }
     .page-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
     .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
     .page-header .sub { font-size: 14px; color: var(--color-text-tertiary); letter-spacing: -0.008em; }
@@ -543,6 +544,8 @@
         margin: 0;
         list-style: none;
     }
+    .ct-recommend-body .mc-promo .content { padding: 10px 0; max-width: none; }
+
     .ct-recommend-body .mc-promo,
     .ct-recommend-body > div:not(:has(.mc-promos)):not(.sub-heading) {
         padding: 12px;
@@ -1244,8 +1247,8 @@
                 {if $hookOutput}
                     <div class="card ct-recommend">
                         <div class="ct-recommend-head">
-                            <span class="ct-recommend-badge">{$LANG.recommended|default:'Recommended'}</span>
-                            <span class="ct-recommend-title">{$LANG.recommendedforyou|default:'Recommended for you'}</span>
+                            <span class="ct-recommend-badge">{$LANG.lastchance|default:'Last chance'}</span>
+                            <span class="ct-recommend-title">{$LANG.lastchancetitle|default:'Protect your services and add value'}</span>
                             <span class="ct-recommend-sub">{$LANG.oneclickadd|default:'One-click add. Remove anytime.'}</span>
                         </div>
                         <div class="ct-recommend-body">
