@@ -594,7 +594,7 @@
     margin: 12px 0 0;
 }
 
-/* Validation-error banner */
+/* Validation-error banner (server-side, top of form) */
 .checkout-error-feedback {
     background: var(--color-red-bg, rgba(255,59,48,0.08));
     color: var(--color-red-text, #d70015);
@@ -607,6 +607,72 @@
 }
 .checkout-error-feedback p { margin: 0 0 4px; font-weight: 600; }
 .checkout-error-feedback ul { margin: 0; padding-left: 18px; }
+
+/* Gateway-error banner (client-side -- Stripe iframe validation, payment
+   intent validation_feedback). Lives inside .co-payment-card via
+   includes/checkout/payment.tpl, between the gateway radios and the
+   CC input fields (same position as lagom2's includes/viewcart/form-
+   payment-gateway.tpl:67). Default Bootstrap .alert-danger styling
+   reads as a stray red pill -- restyle to match #existingLoginMessage
+   and .checkout-error-feedback so it feels like a member of the card.
+   Strip the .text-center markup quirk by left-aligning so multi-line
+   feedback wraps naturally. */
+.co-payment-card .gateway-errors,
+.co-payment-card .assisted-cc-input-feedback,
+.gateway-errors.alert,
+.gateway-errors.alert-danger {
+    text-align: left;
+    background: var(--color-red-bg, rgba(255,59,48,0.08));
+    color: var(--color-red-text, #d70015);
+    border: 0.5px solid var(--color-red-text, #d70015);
+    border-radius: 12px;
+    padding: 11px 14px 11px 36px;
+    margin: 4px 0 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    letter-spacing: -0.004em;
+    position: relative;
+}
+/* Inline warning glyph -- pure CSS so we don't depend on FontAwesome
+   being loaded at first paint. */
+.co-payment-card .gateway-errors::before,
+.gateway-errors.alert::before {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: 13px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-red-text, #d70015);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 14px;
+    text-align: center;
+    box-shadow: inset 0 0 0 2px var(--color-red-text, #d70015);
+}
+.co-payment-card .gateway-errors::after,
+.gateway-errors.alert::after {
+    content: "!";
+    position: absolute;
+    left: 14px;
+    top: 13px;
+    width: 14px;
+    height: 14px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 14px;
+    text-align: center;
+}
+/* Validation feedback can come back as a bare <li> (no enclosing <ul>)
+   from WHMCS's payment-intent response -- reset the bullet so it
+   reads as plain text. */
+.co-payment-card .gateway-errors li,
+.gateway-errors li { list-style: none; }
+.co-payment-card .gateway-errors ul,
+.gateway-errors ul { margin: 0; padding: 0; }
 
 /* Captcha block */
 .co-captcha-card { padding: 18px 22px; text-align: center; }
