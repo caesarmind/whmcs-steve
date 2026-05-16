@@ -690,42 +690,93 @@ var _localLang = {
 /* ── Fix #frmConfigureProduct submit + promo Apply ──────────────────
    Two bugs in the original wiring:
 
-   #3  scripts.min.js binds a submit handler on #frmConfigureProduct
-       (scripts.js:2660) that AJAX-posts to /cart.php?a=confproduct
-       and on success redirects to /cart.php?a=confdomains. On this
-       install that redirect ends up on an empty viewcart page (the
-       ajax post or the confdomains step destabilises the cart
-       session). Drop scripts.js's jQuery handler so the form does
-       a normal POST submit to a=confproduct directly -- WHMCS
-       commits the configuration server-side and forwards to the
-       proper next step.
+   #3  Review cart never commits the configuration on this install.
+       scripts.min.js's submit handler (scripts.js:2660) AJAX-posts
+       and then redirects to /cart.php?a=confdomains -- the
+       confdomains step destabilises the cart session and the user
+       lands on an empty viewcart. A naive natural form POST also
+       fails because WHMCS's confproduct controller renders the
+       configure form again (no commit) when posted without the
+       expected ajax flag.
 
-   #2  Promo Apply button calls applyPromoCode() which doesn't exist
-       on this install (no global function). Define a minimal handler
-       that builds an ad-hoc <form> POST to /cart.php?a=view with
-       name=promocode + name=validatepromo so WHMCS's standard viewcart
-       promo handler validates and reports back. */
+       Fix: drop scripts.js's submit handler and replace with our
+       own AJAX commit -- POST /cart.php?ajax=1&a=confproduct&...
+       (same payload scripts.js sends), then on a clean / empty
+       response redirect straight to /cart.php?a=view. On a non-
+       empty response (validation HTML), inject it as an inline
+       error block above the form so the user sees what's wrong.
+
+   #2  Promo Apply on configureproduct posts the promocode to
+       /cart.php?a=view + validatepromo, but the configureproduct's
+       in-flight configuration changes get DROPPED (cart shows
+       empty after the redirect) because we navigated away without
+       committing first. Chain the two requests: AJAX-commit the
+       configureproduct form, THEN POST to viewcart with the promo
+       + validatepromo flag so WHMCS validates against the now-
+       populated cart. */
 (function () {
     function init() {
         var form = document.getElementById('frmConfigureProduct');
         if (!form) return;
 
-        // Make the form a normal POST that returns to the same URL --
-        // WHMCS's confproduct handler reads the form fields, persists
-        // the config, then redirects to confdomains / viewcart per
-        // its own routing.
-        if (!form.getAttribute('action')) {
-            form.setAttribute('action', window.location.pathname + window.location.search);
-        }
-        if (!form.getAttribute('method')) form.setAttribute('method', 'post');
-
-        // Drop scripts.js's submit handler that calls e.preventDefault().
+        // Drop scripts.js's submit handler that redirects to confdomains.
         if (window.jQuery) window.jQuery(form).off('submit');
 
-        // Wire the promo Apply button. Posts the promocode to /cart.php?a=view
-        // with name=validatepromo so WHMCS's viewcart promo handler runs.
-        // Bypasses the configureproduct form so the user lands on viewcart
-        // with the promo accepted (or with an error message displayed).
+        function buildBody(includePromo) {
+            var data = new FormData(form);
+            // Strip the promocode out of the configure POST -- WHMCS's
+            // confproduct controller doesn't read it here, and leaving
+            // it in confuses the recalc downstream.
+            if (!includePromo) data.delete('promocode');
+            var parts = [];
+            data.forEach(function (v, k) { parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(v)); });
+            return parts.join('&');
+        }
+
+        function showInlineError(html) {
+            var existing = document.getElementById('cpValidationErrorBox');
+            if (existing) existing.parentNode.removeChild(existing);
+            var box = document.createElement('div');
+            box.id = 'cpValidationErrorBox';
+            box.style.cssText = 'margin: 0 0 16px; padding: 12px 16px; background: var(--color-red-bg, rgba(255,59,48,0.08)); color: var(--color-red-text, #d70015); border: 0.5px solid var(--color-red-text, #d70015); border-radius: 10px; font-size: 13px; line-height: 1.5;';
+            box.innerHTML = '<strong>Please correct the following:</strong><div style="margin-top: 4px;">' + html + '</div>';
+            form.parentNode.insertBefore(box, form);
+            box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function commitConfig() {
+            // Returns a Promise. Resolves with `true` on success
+            // (empty WHMCS response), rejects with the error HTML
+            // on validation failure.
+            return new Promise(function (resolve, reject) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/cart.php?ajax=1&a=confproduct', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.setRequestHeader('Accept', 'text/html, */*');
+                xhr.onload = function () {
+                    var data = (xhr.responseText || '').trim();
+                    if (!data) resolve(true);
+                    else reject(data);
+                };
+                xhr.onerror = function () { reject('Network error -- please try again.'); };
+                xhr.send(buildBody(false));
+            });
+        }
+
+        // Review cart: commit config -> redirect to viewcart.
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var btn = document.getElementById('btnCompleteProductConfig');
+            if (btn) btn.disabled = true;
+            commitConfig().then(function () {
+                window.location = '/cart.php?a=view';
+            }).catch(function (errHtml) {
+                if (btn) btn.disabled = false;
+                showInlineError(errHtml);
+            });
+        });
+
+        // Promo Apply: same commit, then POST validatepromo to viewcart.
         var applyBtn = document.querySelector('.cp-promo-apply');
         var promoInput = document.getElementById('promocode');
         if (applyBtn && promoInput) {
@@ -733,18 +784,24 @@ var _localLang = {
             applyBtn.addEventListener('click', function () {
                 var code = (promoInput.value || '').trim();
                 if (!code) { promoInput.focus(); return; }
-                var f = document.createElement('form');
-                f.method = 'post';
-                f.action = (window.WHMCS_BASE_URL || '') + '/cart.php?a=view';
-                var add = function (n, v) {
-                    var i = document.createElement('input');
-                    i.type = 'hidden'; i.name = n; i.value = v;
-                    f.appendChild(i);
-                };
-                add('promocode', code);
-                add('validatepromo', '1');
-                document.body.appendChild(f);
-                f.submit();
+                applyBtn.disabled = true;
+                commitConfig().then(function () {
+                    var f = document.createElement('form');
+                    f.method = 'post';
+                    f.action = '/cart.php?a=view';
+                    var add = function (n, v) {
+                        var i = document.createElement('input');
+                        i.type = 'hidden'; i.name = n; i.value = v;
+                        f.appendChild(i);
+                    };
+                    add('promocode', code);
+                    add('validatepromo', '1');
+                    document.body.appendChild(f);
+                    f.submit();
+                }).catch(function (errHtml) {
+                    applyBtn.disabled = false;
+                    showInlineError(errHtml);
+                });
             });
         }
     }
