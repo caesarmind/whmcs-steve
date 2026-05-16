@@ -528,9 +528,61 @@
         font-size: 11.5px; color: var(--color-text-tertiary);
         margin-left: auto; letter-spacing: -0.004em;
     }
-    .ct-recommend-body { padding: 14px 22px 18px; }
-    .ct-recommend-body > div + div { margin-top: 10px; }
-    .ct-recommend-body img { max-width: 100%; height: auto; }
+    /* Inner $hookOutput is opaque marketing HTML (logos + bullets +
+       Add to Cart) -- without intervention each item stacks vertically
+       full-width. Force a responsive grid with bounded image sizes so
+       it reads as a row of tiles. Mirrors checkout's .co-lastchance-body. */
+    .ct-recommend-body { padding: 14px 18px 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+    .ct-recommend-body > div + div { margin-top: 0; }
+    .ct-recommend-body > div {
+        padding: 14px;
+        border: 0.5px solid var(--color-border);
+        border-radius: 12px;
+        background: var(--color-surface-tertiary, var(--color-surface));
+        display: flex; flex-direction: column;
+        font-size: 12px;
+        line-height: 1.45;
+        color: var(--color-text-secondary);
+        letter-spacing: -0.004em;
+        min-height: 0;
+        max-height: 280px;
+        overflow: hidden;
+        position: relative;
+    }
+    .ct-recommend-body > div img { max-width: 100%; max-height: 42px; object-fit: contain; align-self: flex-start; margin-bottom: 8px; }
+    .ct-recommend-body > div br + br { display: none; }
+    .ct-recommend-body > div p { margin: 0 0 4px; }
+    .ct-recommend-body > div ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
+    .ct-recommend-body > div h2,
+    .ct-recommend-body > div h3,
+    .ct-recommend-body > div h4,
+    .ct-recommend-body > div strong { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.008em; }
+    .ct-recommend-body > div .btn,
+    .ct-recommend-body > div button,
+    .ct-recommend-body > div a.btn,
+    .ct-recommend-body > div input[type="submit"],
+    .ct-recommend-body > div input[type="button"] {
+        margin-top: auto;
+        align-self: flex-start;
+        height: 32px;
+        padding: 0 14px;
+        border: 0.5px solid var(--color-border);
+        border-radius: var(--radius-pill, 999px);
+        background: transparent;
+        color: var(--color-text-primary);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex; align-items: center;
+        transition: all 0.15s;
+    }
+    .ct-recommend-body > div .btn:hover,
+    .ct-recommend-body > div button:hover,
+    .ct-recommend-body > div a.btn:hover {
+        border-color: var(--color-accent);
+        color: var(--color-accent);
+    }
 
     /* Empty state */
     body[data-data="empty"] .vc-when-full { display: none; }
