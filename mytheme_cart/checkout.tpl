@@ -130,6 +130,38 @@
 .co-summary-total .label { font-size: 15px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
 .co-summary-total .value { font-size: 24px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.025em; white-space: nowrap; }
 .co-summary-cycle { font-size: 11px; color: var(--color-text-tertiary); padding: 10px 20px 14px; letter-spacing: -0.004em; margin: 0; }
+.co-summary-footer {
+    padding: 12px 18px 14px;
+    border-top: 0.5px solid var(--color-border);
+    display: flex; flex-direction: column; gap: 8px; align-items: stretch;
+}
+.co-summary-footer #btnCompleteOrder {
+    width: 100%;
+    height: 44px;
+    padding: 0 18px;
+    background: var(--color-accent);
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    cursor: pointer;
+    transition: filter 0.15s;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.co-summary-footer #btnCompleteOrder:hover:not(:disabled) { filter: brightness(0.95); }
+.co-summary-footer #btnCompleteOrder:disabled { opacity: 0.7; cursor: not-allowed; }
+.co-summary-footer .co-back-link {
+    align-self: center;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px;
+    letter-spacing: -0.008em;
+    margin-top: 2px;
+}
+.co-summary-footer .co-back-link:hover { color: var(--color-accent); }
 .co-trust-strip { padding: 14px 20px 16px; border-top: 0.5px solid var(--color-border); display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: var(--color-text-tertiary); letter-spacing: -0.004em; }
 .co-trust-strip .item { display: inline-flex; align-items: center; gap: 6px; }
 .co-trust-strip .item i { color: var(--color-green-text, #34c759); width: 12px; flex-shrink: 0; }
@@ -290,6 +322,23 @@
 
 /* Existing-user signin form */
 #containerExistingUserSignin .sub-heading { margin-top: 18px; }
+/* Bad-credentials error banner -- WHMCS scripts.js removes
+   .w-hidden and injects the message text here on failure. Style
+   so when it shows it actually looks like an alert. */
+#existingLoginMessage,
+#existingLoginMessage.alert.alert-danger {
+    margin: 0 0 12px;
+    padding: 12px 16px;
+    background: var(--color-red-bg, rgba(255,59,48,0.08));
+    color: var(--color-red-text, #d70015);
+    border: 0.5px solid var(--color-red-text, #d70015);
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    letter-spacing: -0.004em;
+}
+#existingLoginMessage.w-hidden { display: none; }
+#existingLoginMessage:empty { display: none; }
 #btnExistingLogin {
     margin-top: 8px;
     height: 42px;
@@ -455,6 +504,37 @@
 /* WHMCS's hookOutput emits an extra .sub-heading "Last Chance" pill
    inside each tile -- already shown in .co-lastchance-head above. */
 .co-lastchance-body > div > .sub-heading { display: none; }
+/* Single-tile case: span full width as a horizontal banner instead
+   of a narrow card with empty space to its right. Mirrors
+   apple-client-area/checkout.html. */
+.co-lastchance-body:has(> div:only-child) {
+    grid-template-columns: 1fr;
+    padding: 14px 16px;
+}
+.co-lastchance-body > div:only-child {
+    max-height: none;
+    min-height: 0;
+    padding: 14px 16px;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.co-lastchance-body > div:only-child img {
+    max-height: 48px;
+    margin-bottom: 0;
+    align-self: center;
+    flex-shrink: 0;
+}
+.co-lastchance-body > div:only-child .btn,
+.co-lastchance-body > div:only-child button,
+.co-lastchance-body > div:only-child a.btn,
+.co-lastchance-body > div:only-child input[type="submit"],
+.co-lastchance-body > div:only-child input[type="button"] {
+    margin-top: 0;
+    margin-left: auto;
+    align-self: center;
+}
 .co-lastchance-body > div ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
 .co-lastchance-body > div h2,
 .co-lastchance-body > div h3,
@@ -1288,38 +1368,21 @@
                     </div>
                 {/if}
 
-                {* ─── TOS + complete order ─── *}
-                <div class="text-center checkout-footer">
-                    {if $accepttos}
-                        <p>
-                            <label class="checkbox-inline">
-                                <input type="checkbox" name="accepttos" id="accepttos" />
-                                &nbsp;
-                                {$LANG.ordertosagreement}
-                                <a href="{$tosurl}" target="_blank">{$LANG.ordertos}</a>
-                            </label>
-                        </p>
-                    {/if}
-
-                    <button type="submit"
-                            id="btnCompleteOrder"
-                            class="btn btn-primary btn-lg disable-on-click spinner-on-click{if $captcha}{$captcha->getButtonClass($captchaForm)}{/if}"
-                            {if $cartitems==0}disabled="disabled"{/if}
-                    >
-                        {if $inExpressCheckout}{$LANG.confirmAndPay}{else}{$LANG.completeorder}{/if}
-                        &nbsp;<i class="fas fa-arrow-circle-right"></i>
-                    </button>
-
-                    {* ─── Apple trust strip ─── *}
-                    <div class="ct-trust ct-trust-checkout">
-                        <span class="ct-trust-item">
-                            <i class="fas fa-lock"></i> 256-bit SSL · PCI-DSS Level 1
-                        </span>
-                        <span class="ct-trust-item">
-                            <i class="fas fa-check"></i> 30-day money-back guarantee
-                        </span>
+                {* ─── TOS only ───
+                   The Complete Order button has been moved into the
+                   summary aside (mirrors apple-client-area/checkout.html).
+                   This footer keeps only the TOS checkbox so users
+                   tick it inline with the form before navigating up
+                   to the sticky aside button. *}
+                {if $accepttos}
+                    <div class="checkout-footer">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="accepttos" id="accepttos" />
+                            {$LANG.ordertosagreement}
+                            <a href="{$tosurl}" target="_blank">{$LANG.ordertos}</a>
+                        </label>
                     </div>
-                </div>
+                {/if}
             </form>
 
             {if $servedOverSsl}
@@ -1391,6 +1454,26 @@
                     <p class="co-summary-cycle">{$LANG.orderForm.recurringTotal|default:'Recurring'}: <strong id="totalCartPrice">{$totalrecurring}</strong></p>
                 {/if}
 
+                {* Complete Order lives inside the sticky summary card
+                   (mirrors apple-client-area/checkout.html). The form=
+                   attribute binds the button to the form even though
+                   it sits outside the <form> in the DOM. *}
+                <div class="co-summary-footer">
+                    <button type="submit"
+                            form="frmCheckout"
+                            id="btnCompleteOrder"
+                            class="btn btn-primary btn-lg disable-on-click spinner-on-click{if $captcha}{$captcha->getButtonClass($captchaForm)}{/if}"
+                            {if $cartitems==0}disabled="disabled"{/if}
+                    >
+                        {if $inExpressCheckout}{$LANG.confirmAndPay}{else}{$LANG.completeorder}{/if}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px;"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                    <a href="{$WEB_ROOT}/cart.php?a=view" class="co-back-link">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        {$LANG.orderForm.backToCart|default:'Back to cart'}
+                    </a>
+                </div>
+
                 <div class="co-trust-strip">
                     <span class="item"><i class="fas fa-lock"></i> {$LANG.cartsecured|default:'256-bit SSL &middot; PCI-DSS Level 1'}</span>
                     <span class="item"><i class="fas fa-check"></i> {$LANG.cartmoneyback|default:'30-day money-back guarantee'}</span>
@@ -1415,7 +1498,13 @@
    display: none from the global mytheme stylesheet, .show() can't
    reveal it. Add a sibling handler that removes/adds the class on
    the relevant containers and toggles the button visibility so the
-   correct one shows in each mode. */
+   correct one shows in each mode.
+
+   Also watch #existingLoginMessage for content injected by WHMCS's
+   login handler -- on bad credentials the message text gets set but
+   sometimes the .w-hidden class isn't cleared, which makes the
+   failure look silent. The observer ensures any non-empty content
+   immediately removes the hidden state. */
 (function () {
     function init() {
         var $ = window.jQuery; if (!$) return;
@@ -1441,6 +1530,15 @@
         }
         btnExisting.on('click', showLogin);
         btnNew.on('click', showSignup);
+
+        var msg = document.getElementById('existingLoginMessage');
+        if (msg && typeof MutationObserver === 'function') {
+            new MutationObserver(function () {
+                if (msg.textContent.trim() && msg.classList.contains('w-hidden')) {
+                    msg.classList.remove('w-hidden');
+                }
+            }).observe(msg, { childList: true, subtree: true, characterData: true });
+        }
     }
     if (window.jQuery) { window.jQuery(init); }
     else if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }

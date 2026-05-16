@@ -555,6 +555,37 @@
     /* WHMCS hookOutput repeats a Recommended/Last-Chance label inside
        each tile -- already shown in .ct-recommend-head above. */
     .ct-recommend-body > div > .sub-heading { display: none; }
+    /* Single-item recommendations: span full width as a horizontal
+       banner instead of a narrow card on the left with empty space
+       to its right. Mirrors apple-client-area/cart.html. */
+    .ct-recommend-body:has(> div:only-child) {
+        grid-template-columns: 1fr;
+        padding: 16px 18px;
+    }
+    .ct-recommend-body > div:only-child {
+        max-height: none;
+        min-height: 0;
+        padding: 16px 18px;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .ct-recommend-body > div:only-child img {
+        max-height: 48px;
+        margin-bottom: 0;
+        align-self: center;
+        flex-shrink: 0;
+    }
+    .ct-recommend-body > div:only-child .btn,
+    .ct-recommend-body > div:only-child button,
+    .ct-recommend-body > div:only-child a.btn,
+    .ct-recommend-body > div:only-child input[type="submit"],
+    .ct-recommend-body > div:only-child input[type="button"] {
+        margin-top: 0;
+        margin-left: auto;
+        align-self: center;
+    }
     .ct-recommend-body > div ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
     .ct-recommend-body > div h2,
     .ct-recommend-body > div h3,

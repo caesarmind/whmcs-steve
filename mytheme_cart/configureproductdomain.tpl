@@ -3,7 +3,7 @@
  *
  * Visual source: apple-client-area/configureproductdomain.html
  *   Shell    = .dp-split (240px sidebar + main) wrapping
- *              .dp-steps (4-step progress strip)
+ *              .dp-steps (5-step progress strip)
  *              .card containing .dp-options (radio cards)
  *                                .dp-panel[data-panel] (per-option search)
  *                                .dp-footer (back + continue)
@@ -71,7 +71,9 @@
                     <span class="dp-step-sep">›</span>
                     <span class="dp-step"><span class="dp-step-num">3</span>Configure</span>
                     <span class="dp-step-sep">›</span>
-                    <span class="dp-step"><span class="dp-step-num">4</span>Checkout</span>
+                    <span class="dp-step"><span class="dp-step-num">4</span>Cart</span>
+                    <span class="dp-step-sep">›</span>
+                    <span class="dp-step"><span class="dp-step-num">5</span>Checkout</span>
                 </div>
 
                 <form id="frmProductDomain"
