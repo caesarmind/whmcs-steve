@@ -250,6 +250,20 @@
             var WEB_ROOT       = "{$WEB_ROOT|escape:'javascript'}";
             var markdownGuideUri = "{$WEB_ROOT|escape:'javascript'}/index.php/markdown-guide";
         </script>
+        {* WHMCS namespace stub. scripts.min.js calls WHMCS.BaseUrl
+           .validateBaseUrl() at init and logs "Warning: The WHMCS
+           Base URL definition is missing from your active template"
+           when WHMCS.BaseUrl is undefined. The <base> tag we emit
+           above isn't enough -- this install's scripts.min.js still
+           looks for the JS API. Stub it so validateBaseUrl() resolves
+           to a no-op; pair with the <base> tag for any modern check. *}
+        <script>{literal}
+            window.WHMCS = window.WHMCS || {};
+            window.WHMCS.BaseUrl = window.WHMCS.BaseUrl || {
+                url: document.baseURI || document.location.origin + '/',
+                validateBaseUrl: function () { return true; }
+            };
+        {/literal}</script>
 
         {* No SRI integrity attributes — adding them requires fetching the
            current canonical hash from the CDN, which we can't verify here.
