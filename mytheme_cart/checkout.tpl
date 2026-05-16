@@ -608,7 +608,7 @@
                 {/if}
 
                 {* ─── Existing customer login ─── *}
-                <div id="containerExistingUserSignin"{if $loggedin || $custtype neq "existing"} class="w-hidden{/if}">
+                <div id="containerExistingUserSignin"{if $loggedin || $custtype neq "existing"} class="w-hidden"{/if}>
                     <div class="sub-heading">
                         <span class="primary-bg-color">{$LANG.orderForm.existingCustomerLogin}</span>
                     </div>
