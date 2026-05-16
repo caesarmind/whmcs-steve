@@ -762,15 +762,53 @@ var _localLang = {
             if (lSpan && lSpan.textContent !== promoState.description) lSpan.textContent = promoState.description;
             if (rSpan && rSpan.textContent !== promoState.discount) rSpan.textContent = promoState.discount;
 
+            // Clear the "Recalculating…" placeholder marker if present
+            // so subsequent observer ticks treat the row as fully
+            // populated.
+            if (row.hasAttribute('data-promo-state')) row.removeAttribute('data-promo-state');
+            if (row.style.opacity) row.style.opacity = '';
+
             var amt = totalDue.querySelector('.amt');
             if (amt && amt.textContent.trim() !== promoState.total) amt.textContent = promoState.total;
+        }
+
+        // Insert a "Recalculating promo..." placeholder in place of
+        // the discount row so the user never sees stale numbers between
+        // a config change and the refetch landing. The placeholder
+        // re-uses the [data-promo-row] marker so the MutationObserver
+        // treats it as "row present" (no re-trigger). Total Due Today
+        // is left at WHMCS's freshly-recalculated, non-discounted value
+        // until refetch resolves.
+        function showPlaceholderRow() {
+            var pt = document.getElementById('producttotal');
+            if (!pt) return;
+            var totalsBox = pt.querySelector('.summary-totals');
+            var totalDue = pt.querySelector('.total-due-today');
+            var row = pt.querySelector('[data-promo-row="1"]');
+            if (!row) {
+                row = document.createElement('div');
+                row.className = 'clearfix';
+                row.setAttribute('data-promo-row', '1');
+                var l = document.createElement('span');
+                l.className = 'pull-left float-left';
+                var r = document.createElement('span');
+                r.className = 'pull-right float-right';
+                row.appendChild(l);
+                row.appendChild(r);
+                if (totalsBox) totalsBox.appendChild(row);
+                else if (totalDue) totalDue.parentNode.insertBefore(row, totalDue);
+            }
+            row.setAttribute('data-promo-state', 'pending');
+            row.style.opacity = '0.55';
+            row.querySelector('.pull-left').textContent = 'Recalculating promo…';
+            row.querySelector('.pull-right').textContent = '—';
         }
 
         // Debounced refetch of the cart-level discount/total. When the
         // user changes billing cycle / addons / qty after a promo is
         // applied, WHMCS recalctotals() updates #producttotal with the
         // new product-scoped subtotal but never re-evaluates the
-        // cart-wide discount on its own. We re-POST to /cart.php?a=view
+        // cart-wide discount on its own. We re-GET /cart.php?a=view
         // to pull the freshly-computed #discount, #totalDueToday and
         // promotion description, then update promoState + repatch.
         // If the new config no longer qualifies for the promo, WHMCS
@@ -813,19 +851,18 @@ var _localLang = {
                             });
                         }
                     })
-                    .catch(function () { /* ignore refetch errors -- patch stays stale */ })
+                    .catch(function () { /* ignore refetch errors -- placeholder remains */ })
                     .then(function () { refetchInflight = false; });
-            }, 400);
+            }, 150);
         }
 
         // Re-apply the discount patch whenever WHMCS rewrites the
         // summary (billing-cycle change, addon toggle, qty input, etc.
         // all trigger recalctotals() which replaces the innerHTML).
-        // syncPromoToSummary is idempotent, so the observer's own
-        // mutations terminate after the patch is stable. We detect
-        // "WHMCS just wiped our row" by the row being missing, and
-        // kick off a debounced refetch to refresh the discount math
-        // against the new config.
+        // When the row is missing AND a promo is active, show the
+        // "Recalculating…" placeholder immediately so the user never
+        // sees stale discount math, then debounce-refetch the fresh
+        // cart-wide discount + total from viewcart.
         var producttotalEl = document.getElementById('producttotal');
         if (producttotalEl && typeof MutationObserver === 'function') {
             new MutationObserver(function () {
@@ -833,7 +870,7 @@ var _localLang = {
                 var pt = document.getElementById('producttotal');
                 var myRow = pt && pt.querySelector('[data-promo-row="1"]');
                 if (!myRow) {
-                    syncPromoToSummary();
+                    showPlaceholderRow();
                     refetchPromoTotals();
                 }
             }).observe(producttotalEl, { childList: true, subtree: true });
