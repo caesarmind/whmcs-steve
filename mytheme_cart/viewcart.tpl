@@ -552,6 +552,9 @@
     .ct-recommend-body > div img { max-width: 100%; max-height: 42px; object-fit: contain; align-self: flex-start; margin-bottom: 8px; }
     .ct-recommend-body > div br + br { display: none; }
     .ct-recommend-body > div p { margin: 0 0 4px; }
+    /* WHMCS hookOutput repeats a Recommended/Last-Chance label inside
+       each tile -- already shown in .ct-recommend-head above. */
+    .ct-recommend-body > div > .sub-heading { display: none; }
     .ct-recommend-body > div ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
     .ct-recommend-body > div h2,
     .ct-recommend-body > div h3,

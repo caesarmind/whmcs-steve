@@ -452,6 +452,9 @@
 .co-lastchance-body > div img { max-width: 100%; max-height: 38px; object-fit: contain; align-self: flex-start; margin-bottom: 6px; }
 .co-lastchance-body > div br + br { display: none; }
 .co-lastchance-body > div p { margin: 0 0 4px; }
+/* WHMCS's hookOutput emits an extra .sub-heading "Last Chance" pill
+   inside each tile -- already shown in .co-lastchance-head above. */
+.co-lastchance-body > div > .sub-heading { display: none; }
 .co-lastchance-body > div ul { margin: 6px 0 8px; padding-left: 18px; font-size: 11.5px; color: var(--color-text-tertiary); }
 .co-lastchance-body > div h2,
 .co-lastchance-body > div h3,
