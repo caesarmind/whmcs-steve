@@ -596,6 +596,21 @@ var _localLang = {
     border-top: 0.5px solid var(--color-border);
 }
 .cp-summary-footer .btn-primary { width: 100%; justify-content: center; }
+
+/* Cart-wide discount row injected above .total-due-today after a
+   valid promo Apply. Sits in the same 20px gutter as the other
+   #producttotal clearfix rows so it lines up vertically with the
+   item lines. */
+#producttotal > .cp-discount-row {
+    padding: 8px 20px 4px;
+    color: var(--color-green-text, #248a3d);
+    font-size: 13px;
+    font-weight: 500;
+}
+#producttotal > .cp-discount-row .pull-left,
+#producttotal > .cp-discount-row .float-left { float: left; }
+#producttotal > .cp-discount-row .pull-right,
+#producttotal > .cp-discount-row .float-right { float: right; font-variant-numeric: tabular-nums; }
 {/literal}</style>
 
 {include file="orderforms/standard_cart/recommendations-modal.tpl"}
@@ -721,6 +736,55 @@ var _localLang = {
 
         // Drop scripts.js's submit handler that redirects to confdomains.
         if (window.jQuery) window.jQuery(form).off('submit');
+
+        // Cart-wide promo state captured from the last successful
+        // validatepromo response. WHMCS's recalctotals() endpoint is
+        // product-scoped and never returns the cart-level discount, so
+        // once we've validated a promo we patch its discount line and
+        // adjusted total directly into #producttotal -- and reapply on
+        // every WHMCS-driven recalc via MutationObserver below.
+        var promoState = null; // null | { description, discount, total }
+
+        function syncPromoToSummary() {
+            var pt = document.getElementById('producttotal');
+            if (!pt || !promoState) return;
+            var totalDue = pt.querySelector('.total-due-today');
+            if (!totalDue) return;
+
+            // Insert / update the green discount row directly above
+            // the Total Due Today strip. Idempotent on re-entry so
+            // the MutationObserver loop converges in one extra pass.
+            var row = pt.querySelector('.cp-discount-row');
+            if (!row) {
+                row = document.createElement('div');
+                row.className = 'clearfix cp-discount-row';
+                var l = document.createElement('span');
+                l.className = 'pull-left float-left';
+                var r = document.createElement('span');
+                r.className = 'pull-right float-right';
+                row.appendChild(l);
+                row.appendChild(r);
+                totalDue.parentNode.insertBefore(row, totalDue);
+            }
+            var lSpan = row.querySelector('.pull-left');
+            var rSpan = row.querySelector('.pull-right');
+            if (lSpan && lSpan.textContent !== promoState.description) lSpan.textContent = promoState.description;
+            if (rSpan && rSpan.textContent !== promoState.discount) rSpan.textContent = promoState.discount;
+
+            var amt = totalDue.querySelector('.amt');
+            if (amt && amt.textContent.trim() !== promoState.total) amt.textContent = promoState.total;
+        }
+
+        // Re-apply the discount patch whenever WHMCS rewrites the
+        // summary (billing-cycle change, addon toggle, qty input, etc.
+        // all trigger recalctotals() which replaces the innerHTML).
+        // syncPromoToSummary is idempotent, so the observer's own
+        // mutations terminate after the patch is stable.
+        var producttotalEl = document.getElementById('producttotal');
+        if (producttotalEl && typeof MutationObserver === 'function') {
+            new MutationObserver(function () { syncPromoToSummary(); })
+                .observe(producttotalEl, { childList: true, subtree: true });
+        }
 
         function buildBody(includePromo) {
             var data = new FormData(form);
@@ -873,22 +937,41 @@ var _localLang = {
                         return;
                     }
 
-                    // Accepted: render success/info banner inline and
-                    // refresh #producttotal so the new discount line
-                    // appears in the summary. WHMCS keeps the applied
-                    // promo in the session, so recalctotals() (which
-                    // re-posts the form to /cart.php?ajax=1&a=confproduct)
-                    // returns a summary that already includes the discount.
-                    var msg, variant;
-                    if (promoOk) { msg = promoOk.textContent.trim(); variant = 'success'; }
-                    else if (promoInfo) { msg = promoInfo.textContent.trim(); variant = 'info'; }
-                    else { msg = 'Promo code "' + code + '" applied.'; variant = 'success'; }
+                    // Accepted: pull the cart-level discount line and
+                    // adjusted total from the response and patch them
+                    // into #producttotal (see syncPromoToSummary above).
+                    // recalctotals() returns a *product-scoped* summary
+                    // and never includes the cart-wide discount, so
+                    // calling it here would actually clobber the patch
+                    // -- we rely on the MutationObserver to reapply.
+                    var discountEl = doc.querySelector('#discount');
+                    var totalEl = doc.querySelector('#totalDueToday');
+                    var promoLabelEl = doc.querySelector('.ct-totals-row.discount .label');
+                    var newDiscount = discountEl ? discountEl.textContent.trim() : '';
+                    var newTotal = totalEl ? totalEl.textContent.trim() : '';
+                    var newDesc = promoLabelEl ? promoLabelEl.textContent.trim() : ('Promo: ' + code);
+
+                    if (newTotal) {
+                        promoState = {
+                            description: newDesc,
+                            discount: newDiscount || 'Applied',
+                            total: newTotal
+                        };
+                        syncPromoToSummary();
+                    }
+
+                    var variant = promoOk ? 'success' : (promoInfo ? 'info' : 'success');
+                    var baseMsg = promoOk ? promoOk.textContent.trim()
+                                 : promoInfo ? promoInfo.textContent.trim()
+                                 : ('Promo code "' + code + '" applied.');
+                    var detail = (newDiscount && newTotal)
+                        ? (' Save ' + newDiscount.replace(/^-/, '') + ' — new total ' + newTotal + '.')
+                        : '';
                     showInlineError({
                         variant: variant,
                         title: 'Promo code',
-                        bodyText: msg
+                        bodyText: baseMsg + detail
                     });
-                    if (typeof window.recalctotals === 'function') window.recalctotals();
                 }).catch(function (err) {
                     applyBtn.disabled = false;
                     if (typeof err === 'string') {
