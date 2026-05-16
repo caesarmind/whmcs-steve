@@ -181,12 +181,16 @@
     {* WHMCS base URL declaration. Without this, scripts.min.js logs
        "Warning: The WHMCS Base URL definition is missing from your active
        template" on every page load and throws a TypeError trying to read
-       WHMCS.BaseUrl.validateBaseUrl. The <base> tag is the canonical fix
-       per docs.whmcs.com/9-0/customization/whmcs-base-url-template/.
-       $BASE_PATH_HREF is the WHMCS-documented var but resolves to empty
-       on some installs (silently), so fall back to $WEB_ROOT/ which is
-       always populated. *}
-    <base href="{if $BASE_PATH_HREF}{$BASE_PATH_HREF}{else}{$WEB_ROOT}/{/if}">
+       WHMCS.BaseUrl.validateBaseUrl. The canonical fix per
+       docs.whmcs.com/9-0/customization/whmcs-base-url-template/ is a
+       <base> tag with the absolute install URL.
+       Variable resolution order:
+         1. $BASE_PATH_HREF -- the documented WHMCS variable. Empty on
+            this install for unknown reasons; kept as the first option
+            so other installs still work.
+         2. Construct from $smarty.server -- scheme + host + WEB_ROOT.
+            WEB_ROOT is empty for root installs (no subdirectory). *}
+    <base href="{if $BASE_PATH_HREF}{$BASE_PATH_HREF}{else}{$smarty.server.REQUEST_SCHEME|default:'https'}://{$smarty.server.HTTP_HOST}{$WEB_ROOT}/{/if}">
     {* Admin-configured SEO (from the Pages tab) layers on top of WHMCS defaults.
        $myTheme.pages[<templatefile>] is populated by Hooks::resolveCurrentPage. *}
     {assign var=mt_pageEntry value=null}
