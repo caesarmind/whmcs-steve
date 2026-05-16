@@ -379,6 +379,112 @@
         }
     });
 
+        // ── WHMCS owndomain validation (mirrors standard_cart) ──
+        // Standard_cart's domain panel POSTs to WHMCS's /domain/check
+        // endpoint to verify the entered domain (right format, not
+        // already in cart, etc.) BEFORE accepting the submission.
+        // Mirror that here so an invalid domain in the owndomain panel
+        // shows a proper error instead of getting silently bounced
+        // back by the server.
+        //
+        // Implementation: hook another submit listener that runs FIRST
+        // (capture phase). For owndomain only, intercept, AJAX-call
+        // /domain/check, then re-fire form.submit() with the bypass
+        // flag set so we don't loop.
+        var ownValidationBypass = false;
+        form.addEventListener('submit', function (ev) {
+            if (ownValidationBypass) return; // re-fire from successful AJAX
+            var checked = form.querySelector('input[name="domainoption"]:checked');
+            if (!checked || checked.value !== 'owndomain') return;
+            var panel = form.querySelector('[data-panel="owndomain"]');
+            if (!panel) return;
+            var sld = readInput(panel, 'sld').toLowerCase();
+            var tld = readInput(panel, 'tld').toLowerCase().replace(/^\./, '');
+            if (!sld || !tld) {
+                ev.preventDefault();
+                showOwndomainError(panel, 'Please enter both the domain name and the TLD.');
+                return;
+            }
+
+            ev.preventDefault();
+            clearOwndomainError(panel);
+            var btn = panel.querySelector('button.dp-search-cta');
+            var btnOriginalText = btn ? btn.textContent : null;
+            if (btn) { btn.disabled = true; btn.textContent = 'Checking...'; }
+
+            var pid = (form.querySelector('input[name="pid"]') || {}).value || '';
+            var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            var csrf = csrfMeta ? csrfMeta.getAttribute('content') : '';
+            var routeBase = (window.WHMCS_BASE_URL || '');
+
+            // POST to /domain/check via the WHMCS jQuery helper if
+            // available (handles the WHMCS CSRF / route prefixing
+            // internals); otherwise fall through to a plain fetch.
+            var doRequest;
+            if (window.WHMCS && WHMCS.utils && WHMCS.utils.getRouteUrl) {
+                doRequest = window.jQuery.post(
+                    WHMCS.utils.getRouteUrl('/domain/check'),
+                    { token: csrf, type: 'owndomain', pid: pid, domain: sld + '.' + tld, sld: sld, tld: '.' + tld, source: 'cartAddDomain' },
+                    null, 'json'
+                );
+            } else {
+                doRequest = fetch(routeBase + '/index.php/domain/check', {
+                    method: 'POST', credentials: 'include',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+                    body: 'token=' + encodeURIComponent(csrf) + '&type=owndomain&pid=' + encodeURIComponent(pid) +
+                          '&domain=' + encodeURIComponent(sld + '.' + tld) +
+                          '&sld=' + encodeURIComponent(sld) + '&tld=' + encodeURIComponent('.' + tld) +
+                          '&source=cartAddDomain'
+                }).then(function (r) { return r.json(); });
+            }
+
+            (window.jQuery && doRequest.done ? doRequest.done.bind(doRequest) : doRequest.then.bind(doRequest))(function (data) {
+                var ok = false;
+                if (data && data.result) {
+                    var first = Array.isArray(data.result) ? data.result[0] : data.result;
+                    if (first && first.status === true) ok = true;
+                }
+                if (ok) {
+                    if (btn) { btn.disabled = false; btn.textContent = btnOriginalText; }
+                    ownValidationBypass = true;
+                    form.submit();
+                } else {
+                    if (btn) { btn.disabled = false; btn.textContent = btnOriginalText; }
+                    var msg = '';
+                    if (data && data.result) {
+                        var first = Array.isArray(data.result) ? data.result[0] : data.result;
+                        if (typeof first === 'string') msg = first;
+                        else if (first && first.message) msg = first.message;
+                    }
+                    showOwndomainError(panel, msg || 'The domain you entered is not valid.');
+                }
+            });
+            (window.jQuery && doRequest.fail ? doRequest.fail.bind(doRequest) : doRequest.catch.bind(doRequest))(function () {
+                if (btn) { btn.disabled = false; btn.textContent = btnOriginalText; }
+                // On network / route failure, fall back to the previous
+                // behaviour: let the form submit and let WHMCS server-side
+                // do its own validation.
+                ownValidationBypass = true;
+                form.submit();
+            });
+        }, true); // capture so this runs before the field-populating handler
+
+        function showOwndomainError(panel, message) {
+            clearOwndomainError(panel);
+            var box = document.createElement('div');
+            box.className = 'dp-error compact';
+            box.setAttribute('data-apple-owndomain-error', '1');
+            box.style.cssText = 'margin: 12px 24px 0; padding: 10px 14px; background: var(--color-red-bg, rgba(255,59,48,0.08)); color: var(--color-red-text, #d70015); border: 0.5px solid var(--color-red-text, #d70015); border-radius: 8px; font-size: 12.5px; line-height: 1.5;';
+            box.textContent = message;
+            panel.appendChild(box);
+            panel.setAttribute('data-state', 'error');
+        }
+        function clearOwndomainError(panel) {
+            var existing = panel.querySelector('[data-apple-owndomain-error]');
+            if (existing) existing.parentNode.removeChild(existing);
+            panel.removeAttribute('data-state');
+        }
+
         // Sync panel to whichever radio is initially checked.
         var initial = form.querySelector('input[name="domainoption"]:checked');
         if (initial) showPanel(initial.value);

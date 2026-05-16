@@ -686,5 +686,75 @@ var _localLang = {
         r.label.insertBefore(badge, r.label.firstChild);
     }
 })();
+
+/* ── Fix #frmConfigureProduct submit + promo Apply ──────────────────
+   Two bugs in the original wiring:
+
+   #3  scripts.min.js binds a submit handler on #frmConfigureProduct
+       (scripts.js:2660) that AJAX-posts to /cart.php?a=confproduct
+       and on success redirects to /cart.php?a=confdomains. On this
+       install that redirect ends up on an empty viewcart page (the
+       ajax post or the confdomains step destabilises the cart
+       session). Drop scripts.js's jQuery handler so the form does
+       a normal POST submit to a=confproduct directly -- WHMCS
+       commits the configuration server-side and forwards to the
+       proper next step.
+
+   #2  Promo Apply button calls applyPromoCode() which doesn't exist
+       on this install (no global function). Define a minimal handler
+       that builds an ad-hoc <form> POST to /cart.php?a=view with
+       name=promocode + name=validatepromo so WHMCS's standard viewcart
+       promo handler validates and reports back. */
+(function () {
+    function init() {
+        var form = document.getElementById('frmConfigureProduct');
+        if (!form) return;
+
+        // Make the form a normal POST that returns to the same URL --
+        // WHMCS's confproduct handler reads the form fields, persists
+        // the config, then redirects to confdomains / viewcart per
+        // its own routing.
+        if (!form.getAttribute('action')) {
+            form.setAttribute('action', window.location.pathname + window.location.search);
+        }
+        if (!form.getAttribute('method')) form.setAttribute('method', 'post');
+
+        // Drop scripts.js's submit handler that calls e.preventDefault().
+        if (window.jQuery) window.jQuery(form).off('submit');
+
+        // Wire the promo Apply button. Posts the promocode to /cart.php?a=view
+        // with name=validatepromo so WHMCS's viewcart promo handler runs.
+        // Bypasses the configureproduct form so the user lands on viewcart
+        // with the promo accepted (or with an error message displayed).
+        var applyBtn = document.querySelector('.cp-promo-apply');
+        var promoInput = document.getElementById('promocode');
+        if (applyBtn && promoInput) {
+            applyBtn.removeAttribute('onclick');
+            applyBtn.addEventListener('click', function () {
+                var code = (promoInput.value || '').trim();
+                if (!code) { promoInput.focus(); return; }
+                var f = document.createElement('form');
+                f.method = 'post';
+                f.action = (window.WHMCS_BASE_URL || '') + '/cart.php?a=view';
+                var add = function (n, v) {
+                    var i = document.createElement('input');
+                    i.type = 'hidden'; i.name = n; i.value = v;
+                    f.appendChild(i);
+                };
+                add('promocode', code);
+                add('validatepromo', '1');
+                document.body.appendChild(f);
+                f.submit();
+            });
+        }
+    }
+    if (window.jQuery) {
+        window.jQuery(init);
+    } else if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
 {/literal}
 </script>
