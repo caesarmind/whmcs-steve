@@ -76,6 +76,23 @@
     var statesTab = 10;
     var stateNotRequired = true;
 </script>
+{* ── WHMCS.payment stub ──
+   scripts.min.js's document.ready handler iterates .payment-methods
+   and calls WHMCS.payment.event.gatewayInit(...). On this install
+   WHMCS.payment isn't defined globally (a separate gateway script
+   would normally set it up), so the .each() throws and every
+   subsequent ready-handler in scripts.min.js -- submit wiring,
+   bootstrap-switch toggles, generate-password, etc. -- never runs.
+   Define a no-op stub before common.tpl loads scripts.min.js so the
+   iteration completes and the rest of the wiring binds. *}
+<script>
+    window.WHMCS = window.WHMCS || {};
+    window.WHMCS.payment = window.WHMCS.payment || {};
+    window.WHMCS.payment.event = window.WHMCS.payment.event || {};
+    if (typeof window.WHMCS.payment.event.gatewayInit !== 'function') {
+        window.WHMCS.payment.event.gatewayInit = function () {};
+    }
+</script>
 {include file="orderforms/$carttpl/common.tpl"}
 <script type="text/javascript" src="{$BASE_PATH_JS}/StatesDropdown.js"></script>
 <script type="text/javascript" src="{$BASE_PATH_JS}/PasswordStrength.js"></script>
@@ -1561,45 +1578,11 @@
             }).observe(msg, { childList: true, subtree: true, characterData: true });
         }
 
-        // Generate password fallback. WHMCS scripts.min.js does not
-        // bind .generate-password on this template, so the button is
-        // a no-op out of the box. Drop in a self-contained generator:
-        // 14 chars with mixed case + digits + symbols, written into
-        // both data-targetfields password inputs with input + change
-        // events so the strength meter and form-validators update.
-        $('.generate-password').on('click', function (e) {
-            e.preventDefault();
-            var targets = (this.dataset.targetfields || '').split(',')
-                .map(function (s) { return s.trim(); }).filter(Boolean);
-            if (!targets.length) return;
-
-            var upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-            var lower = 'abcdefghijkmnpqrstuvwxyz';
-            var digit = '23456789';
-            var symb  = '!@#$%^&*-_+=';
-            var all   = upper + lower + digit + symb;
-            function pick(s) { return s.charAt(Math.floor(Math.random() * s.length)); }
-            // Guarantee one of each class.
-            var chars = [pick(upper), pick(lower), pick(digit), pick(symb)];
-            for (var i = chars.length; i < 14; i++) chars.push(pick(all));
-            // Fisher-Yates shuffle so the guaranteed positions don't leak.
-            for (var j = chars.length - 1; j > 0; j--) {
-                var k = Math.floor(Math.random() * (j + 1));
-                var tmp = chars[j]; chars[j] = chars[k]; chars[k] = tmp;
-            }
-            var pwd = chars.join('');
-            targets.forEach(function (id) {
-                var el = document.getElementById(id);
-                if (!el) return;
-                // Briefly switch to text so the user sees the value.
-                var original = el.type;
-                el.type = 'text';
-                el.value = pwd;
-                el.dispatchEvent(new Event('input', { bubbles: true }));
-                el.dispatchEvent(new Event('change', { bubbles: true }));
-                setTimeout(function () { el.type = original; }, 1800);
-            });
-        });
+        // (Previously had a custom .generate-password handler here.
+        //  Removed: with the WHMCS.payment stub above, scripts.min.js
+        //  completes its document.ready loop and PasswordStrength.js
+        //  wires the standard_cart generate-password behaviour just
+        //  like the reference install.)
     }
     if (window.jQuery) { window.jQuery(init); }
     else if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
