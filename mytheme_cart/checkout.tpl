@@ -1404,4 +1404,44 @@
     var hideCvcOnCheckoutForExistingCard = '{if $canUseCreditOnCheckout && $applyCredit && ($creditBalance->toNumeric() >= $total->toNumeric())}1{else}0{/if}';
 </script>
 <script type="text/javascript" src="{$BASE_PATH_JS}/CartTotalUpdater.js"></script>
+<script>{literal}
+/* Already-registered / Create-account toggle hardening.
+   scripts.min.js's default handler uses jQuery.show()/hide(), which
+   sets inline display but doesn't touch the .w-hidden class. Since
+   #containerExistingUserSignin starts with class="w-hidden" applying
+   display: none from the global mytheme stylesheet, .show() can't
+   reveal it. Add a sibling handler that removes/adds the class on
+   the relevant containers and toggles the button visibility so the
+   correct one shows in each mode. */
+(function () {
+    function init() {
+        var $ = window.jQuery; if (!$) return;
+        var login = $('#containerExistingUserSignin');
+        var signup = $('#containerNewUserSignup');
+        var btnExisting = $('#btnAlreadyRegistered');
+        var btnNew = $('#btnNewUserSignup');
+        var custType = $('#inputCustType');
+
+        function showLogin() {
+            login.removeClass('w-hidden').show();
+            signup.addClass('w-hidden').hide();
+            btnExisting.addClass('w-hidden');
+            btnNew.removeClass('w-hidden');
+            if (custType.length) custType.val('existing');
+        }
+        function showSignup() {
+            signup.removeClass('w-hidden').show();
+            login.addClass('w-hidden').hide();
+            btnNew.addClass('w-hidden');
+            btnExisting.removeClass('w-hidden');
+            if (custType.length) custType.val('new');
+        }
+        btnExisting.on('click', showLogin);
+        btnNew.on('click', showSignup);
+    }
+    if (window.jQuery) { window.jQuery(init); }
+    else if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
+    else { init(); }
+})();
+{/literal}</script>
 {include file="orderforms/standard_cart/recommendations-modal.tpl"}
