@@ -76,22 +76,52 @@
     var statesTab = 10;
     var stateNotRequired = true;
 </script>
-{* ── WHMCS.payment stub ──
-   scripts.min.js's document.ready handler iterates .payment-methods
-   and calls WHMCS.payment.event.gatewayInit(...). On this install
-   WHMCS.payment isn't defined globally (a separate gateway script
-   would normally set it up), so the .each() throws and every
-   subsequent ready-handler in scripts.min.js -- submit wiring,
-   bootstrap-switch toggles, generate-password, etc. -- never runs.
-   Define a no-op stub before common.tpl loads scripts.min.js so the
-   iteration completes and the rest of the wiring binds. *}
+{* ── WHMCS namespace stubs ──
+   scripts.min.js and gateway scripts (e.g. stripe.min.js) expect a
+   global WHMCS object with a handful of APIs pre-populated by the
+   WHMCS app shell. On this install several of them are missing and
+   throw at document-ready, killing every subsequent .ready() handler
+   (form submit wiring, bootstrap-switch toggles, generate-password,
+   gateway validators). Define safe stubs before common.tpl loads
+   scripts.min.js so the ready chain completes.
+
+   Stubs cover:
+   - WHMCS.hasModule(name) -> always false (no module preloaded)
+   - WHMCS.loadModule(...) -> no-op (skip async module loads)
+   - WHMCS.payment.event.gatewayInit -> no-op
+   - WHMCS.jqClient -> alias to jQuery so Stripe's validateStripe()
+     can read jqClient.fn / etc. without crashing
+   - WHMCS.events / WHMCS.client -> empty containers *}
 <script>
     window.WHMCS = window.WHMCS || {};
+    if (typeof window.WHMCS.hasModule !== 'function') {
+        window.WHMCS.hasModule = function () { return false; };
+    }
+    if (typeof window.WHMCS.loadModule !== 'function') {
+        window.WHMCS.loadModule = function () {};
+    }
     window.WHMCS.payment = window.WHMCS.payment || {};
     window.WHMCS.payment.event = window.WHMCS.payment.event || {};
     if (typeof window.WHMCS.payment.event.gatewayInit !== 'function') {
         window.WHMCS.payment.event.gatewayInit = function () {};
     }
+    /* jqClient is read by gateway scripts (Stripe etc.) AFTER jQuery
+       has loaded via common.tpl. Use a getter so each access returns
+       the live window.jQuery -- works even though this stub runs
+       before jQuery is on the page. */
+    if (!Object.getOwnPropertyDescriptor(window.WHMCS, 'jqClient')) {
+        Object.defineProperty(window.WHMCS, 'jqClient', {
+            configurable: true,
+            get: function () { return window.jQuery; },
+            set: function (v) {
+                Object.defineProperty(window.WHMCS, 'jqClient', {
+                    value: v, writable: true, configurable: true, enumerable: true
+                });
+            }
+        });
+    }
+    window.WHMCS.events = window.WHMCS.events || {};
+    window.WHMCS.client = window.WHMCS.client || {};
 </script>
 {include file="orderforms/$carttpl/common.tpl"}
 <script type="text/javascript" src="{$BASE_PATH_JS}/StatesDropdown.js"></script>
