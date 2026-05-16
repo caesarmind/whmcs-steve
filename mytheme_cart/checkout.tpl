@@ -424,14 +424,19 @@
 }
 .co-left .form-control::placeholder { color: var(--color-text-quaternary, #c7c7cc); }
 
-/* Already-registered + Create-account buttons -- pill secondary */
-.already-registered .btn,
-#btnAlreadyRegistered,
-#btnNewUserSignup,
-.generate-password,
-.btn-default,
-.btn-info,
-.btn-warning {
+/* Already-registered + Create-account buttons -- pill secondary.
+   Qualify with :not(.w-hidden) so the `display: inline-flex` rule
+   doesn't outrank `.w-hidden { display: none }` (ID specificity 1,0,0
+   would otherwise beat the class). Without this, Smarty correctly
+   emits `.w-hidden` on the inactive button (default custtype=new
+   hides #btnNewUserSignup) but it stays visible in the DOM. */
+.already-registered .btn:not(.w-hidden),
+#btnAlreadyRegistered:not(.w-hidden),
+#btnNewUserSignup:not(.w-hidden),
+.generate-password:not(.w-hidden),
+.btn-default:not(.w-hidden),
+.btn-info:not(.w-hidden),
+.btn-warning:not(.w-hidden) {
     height: 36px;
     padding: 0 16px;
     border-radius: 999px;

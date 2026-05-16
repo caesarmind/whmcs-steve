@@ -1714,6 +1714,88 @@ body[data-plan] .st-variant-label { display: none; }
 .hidden { display: none !important; }
 .w-hidden { display: none; }
 
+/* -- Bootstrap modal base positioning ------------------------------
+   mytheme_cart's common.tpl deliberately doesn't pull in standard_cart's
+   bulky all.min.css, so Bootstrap 4's own .modal / .modal-dialog /
+   .modal-content base rules never reach the cart pages. Without them
+   Bootstrap's .modal('show') just removes our .w-hidden / display:none
+   safety net and the modal HTML cascades inline at the end of the page
+   ("Generate Password" form rendering below the cart instead of
+   floating over it). Restate the minimum Bootstrap modal scaffolding
+   here so .modal.show / .modal.in render as a real centred overlay
+   with a backdrop -- works for every modal the cart loads
+   (#modalRemoveItem, #modalEmptyCart, #recommendationsModal,
+   #modalGeneratePassword). Individual modals can still override the
+   chrome via their own selector (e.g. .modal-generate-password). */
+.modal.show,
+.modal.in {
+    display: block !important;
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+    z-index: 1050;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+    background: rgba(0, 0, 0, 0.45);
+    -webkit-overflow-scrolling: touch;
+}
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 1.75rem auto;
+    max-width: 500px;
+    pointer-events: none;
+}
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 0.3rem;
+    outline: 0;
+}
+.modal-header,
+.modal-body,
+.modal-footer {
+    padding: 1rem;
+}
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid #dee2e6;
+}
+.modal-body { position: relative; flex: 1 1 auto; }
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    border-top: 1px solid #dee2e6;
+}
+.modal-footer > :not(:last-child) { margin-right: 0.25rem; }
+.modal-footer > :not(:first-child) { margin-left: 0.25rem; }
+.modal-title { margin: 0; line-height: 1.5; }
+.modal-backdrop {
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+    z-index: 1040;
+    background-color: #000;
+}
+.modal-backdrop.fade { opacity: 0; }
+.modal-backdrop.show,
+.modal-backdrop.in { opacity: 0.5; }
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
+    transform: translate(0, -50px);
+}
+.modal.show .modal-dialog,
+.modal.in .modal-dialog { transform: none; }
+body.modal-open { overflow: hidden; }
+
 /* ===============================================================
    DOMAIN PICKER (.dp-*) -- configureproductdomain.tpl layout.
    Source: apple-client-area/configureproductdomain.html inline <style>
