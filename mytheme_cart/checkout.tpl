@@ -770,13 +770,13 @@
                         </div>
                         <div class="co-lastchance-body">
                             {foreach $hookOutput as $output}
-                                {* Strip the inner <div class="sub-heading">
-                                   ...</div> WHMCS emits inside each promo;
-                                   the outer .co-lastchance-head already
-                                   carries the badge + title. Mirrors
-                                   lagom2's hookOutput post-processing
-                                   (lagom2/viewcart.tpl:78). *}
-                                <div>{$output|regex_replace:"/<div class=\"sub-heading\">[\s\S]*?<\/div>/":""}</div>
+                                {* Inner <div class="sub-heading"> is hidden
+                                   via the `.co-lastchance-body .mc-promo
+                                   .sub-heading { display: none }` CSS rule
+                                   above. Earlier attempts to strip it with
+                                   Smarty's regex_replace broke inline
+                                   scripts in $hookOutput on this install. *}
+                                <div>{$output}</div>
                             {/foreach}
                         </div>
                     </div>

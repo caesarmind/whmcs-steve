@@ -1250,16 +1250,16 @@
                         </div>
                         <div class="ct-recommend-body">
                             {foreach $hookOutput as $output}
-                                {* Strip the inner <div class="sub-heading">
-                                   ...</div> WHMCS emits inside each promo --
-                                   we already render the badge + title in
-                                   .ct-recommend-head above. Borrowed from
-                                   lagom2's pattern of post-processing
-                                   hookOutput via Smarty string modifiers
-                                   (lagom2/viewcart.tpl:78 uses |replace to
-                                   rename classes; here we drop the element
-                                   entirely with regex_replace). *}
-                                <div>{$output|regex_replace:"/<div class=\"sub-heading\">[\s\S]*?<\/div>/":""}</div>
+                                {* The inner <div class="sub-heading">
+                                   ...</div> WHMCS emits inside each promo
+                                   is hidden via the
+                                   `.ct-recommend-body .mc-promo .sub-heading
+                                   { display: none }` CSS rule above
+                                   (deliberately CSS-only -- the earlier
+                                   Smarty regex_replace approach interacted
+                                   badly with this install's Smarty parser
+                                   and broke inline scripts in $hookOutput). *}
+                                <div>{$output}</div>
                             {/foreach}
                         </div>
                     </div>
