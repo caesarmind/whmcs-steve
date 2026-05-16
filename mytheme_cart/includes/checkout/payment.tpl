@@ -54,7 +54,10 @@
                 {assign var=gatewayNameLower value=$gateway.name|lower}
                 {assign var=gatewayLogoClass value="gateway"}
                 {assign var=gatewayBadge value=$gateway.name|strip_tags|truncate:4:""|upper}
-                {if $gateway.type eq "CC"}
+                {if $gatewayKey|strstr:"stripe" || $gatewayNameLower|strstr:"stripe"}
+                    {assign var=gatewayLogoClass value="stripe"}
+                    {assign var=gatewayBadge value="stripe"}
+                {elseif $gateway.type eq "CC"}
                     {assign var=gatewayLogoClass value="card"}
                     {assign var=gatewayBadge value="CARD"}
                 {elseif $gatewayKey|strstr:"paypal" || $gatewayNameLower|strstr:"paypal"}
@@ -80,7 +83,9 @@
                     <span class="co-pay-meta">
                         <span class="co-pay-name">{$gateway.name|escape}</span>
                         <span class="co-pay-sub">
-                            {if $gateway.type eq "CC"}
+                            {if $gatewayKey|strstr:"stripe" || $gatewayNameLower|strstr:"stripe"}
+                                Cards are processed securely by Stripe.
+                            {elseif $gateway.type eq "CC"}
                                 Visa &middot; Mastercard &middot; Amex — processed securely.
                             {elseif $gatewayKey|strstr:"paypal" || $gatewayNameLower|strstr:"paypal"}
                                 You'll be redirected to authorise the charge.

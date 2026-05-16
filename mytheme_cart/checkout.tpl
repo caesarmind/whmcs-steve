@@ -616,6 +616,7 @@
 }
 #paymentGatewaysContainer .co-pay-logo.card { background: #1a1f71; }
 #paymentGatewaysContainer .co-pay-logo.pp { background: #003087; }
+#paymentGatewaysContainer .co-pay-logo.stripe { background: #635bff; font-size: 10px; letter-spacing: 0; text-transform: lowercase; }
 #paymentGatewaysContainer .co-pay-logo.bank { background: var(--color-surface-secondary); color: var(--color-text-primary); }
 #paymentGatewaysContainer .co-pay-logo.gateway { background: #635bff; }
 #paymentGatewaysContainer .co-pay-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
