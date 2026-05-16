@@ -249,21 +249,14 @@
             var language       = "{$language|default:'english'|escape:'javascript'}";
             var WEB_ROOT       = "{$WEB_ROOT|escape:'javascript'}";
             var markdownGuideUri = "{$WEB_ROOT|escape:'javascript'}/index.php/markdown-guide";
+            {* scripts.min.js's WHMCS.BaseUrl.validateBaseUrl() literally
+               checks `typeof window.WHMCSBaseUrl === "undefined"` and
+               logs the "Base URL definition is missing" warning when
+               true. Set the global to the install root so the check
+               passes. Verified by reading scripts.min.js around
+               offset 29235 (the warning emit site). *}
+            var WHMCSBaseUrl = "{$smarty.server.REQUEST_SCHEME|default:'https'}://{$smarty.server.HTTP_HOST}{$WEB_ROOT}";
         </script>
-        {* WHMCS namespace stub. scripts.min.js calls WHMCS.BaseUrl
-           .validateBaseUrl() at init and logs "Warning: The WHMCS
-           Base URL definition is missing from your active template"
-           when WHMCS.BaseUrl is undefined. The <base> tag we emit
-           above isn't enough -- this install's scripts.min.js still
-           looks for the JS API. Stub it so validateBaseUrl() resolves
-           to a no-op; pair with the <base> tag for any modern check. *}
-        <script>{literal}
-            window.WHMCS = window.WHMCS || {};
-            window.WHMCS.BaseUrl = window.WHMCS.BaseUrl || {
-                url: document.baseURI || document.location.origin + '/',
-                validateBaseUrl: function () { return true; }
-            };
-        {/literal}</script>
 
         {* No SRI integrity attributes — adding them requires fetching the
            current canonical hash from the CDN, which we can't verify here.
