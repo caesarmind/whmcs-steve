@@ -733,25 +733,39 @@ var _localLang = {
             return parts.join('&');
         }
 
-        // Inline error box. Accepts either a plain HTML string (legacy
-        // call -- WHMCS validation HTML is trusted markup we want to
-        // render) or an options object { title, bodyHtml, bodyText }.
-        // bodyText takes the safe textContent path; bodyHtml uses
-        // innerHTML for trusted markup.
+        // Inline banner above the form. Accepts either a plain HTML
+        // string (legacy WHMCS validation markup we want to render) or
+        // an options object { variant, title, bodyHtml, bodyText }.
+        //   variant: 'error' (default) | 'success' | 'info'
+        //   bodyText: safe textContent path (escaped on insert)
+        //   bodyHtml: trusted-markup innerHTML path
+        // Replaces any banner already on the page so a second promo
+        // attempt doesn't stack.
         function showInlineError(arg) {
             var opts = (typeof arg === 'string') ? { bodyHtml: arg } : (arg || {});
-            var existing = document.getElementById('cpValidationErrorBox');
+            var variant = opts.variant || 'error';
+            var palettes = {
+                error:   { bg: 'var(--color-red-bg, rgba(255,59,48,0.08))',    fg: 'var(--color-red-text, #d70015)' },
+                success: { bg: 'var(--color-green-bg, rgba(52,199,89,0.10))',  fg: 'var(--color-green-text, #248a3d)' },
+                info:    { bg: 'var(--color-blue-bg, rgba(0,122,255,0.10))',   fg: 'var(--color-blue-text, #0040dd)' }
+            };
+            var p = palettes[variant] || palettes.error;
+            var existing = document.getElementById('cpInlineBanner');
             if (existing) existing.parentNode.removeChild(existing);
             var box = document.createElement('div');
-            box.id = 'cpValidationErrorBox';
-            box.style.cssText = 'margin: 0 0 16px; padding: 12px 16px; background: var(--color-red-bg, rgba(255,59,48,0.08)); color: var(--color-red-text, #d70015); border: 0.5px solid var(--color-red-text, #d70015); border-radius: 10px; font-size: 13px; line-height: 1.5;';
-            var title = document.createElement('strong');
-            title.textContent = opts.title || 'Please correct the following:';
+            box.id = 'cpInlineBanner';
+            box.style.cssText = 'margin: 0 0 16px; padding: 12px 16px; background: ' + p.bg + '; color: ' + p.fg + '; border: 0.5px solid ' + p.fg + '; border-radius: 10px; font-size: 13px; line-height: 1.5;';
+            var defaultTitle = (variant === 'error') ? 'Please correct the following:' : '';
+            var titleText = (typeof opts.title === 'string') ? opts.title : defaultTitle;
+            if (titleText) {
+                var title = document.createElement('strong');
+                title.textContent = titleText;
+                box.appendChild(title);
+            }
             var body = document.createElement('div');
-            body.style.marginTop = '4px';
+            if (titleText) body.style.marginTop = '4px';
             if (typeof opts.bodyText === 'string') body.textContent = opts.bodyText;
             else if (typeof opts.bodyHtml === 'string') body.innerHTML = opts.bodyHtml;
-            box.appendChild(title);
             box.appendChild(body);
             form.parentNode.insertBefore(box, form);
             box.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -789,14 +803,16 @@ var _localLang = {
             });
         });
 
-        // Promo Apply: commit config, then AJAX-validate the promo against
-        // viewcart so we can stay on this page when the code is invalid.
-        // The previous version submitted a hidden form to /cart.php?a=view,
-        // which dumped the user on viewcart even for bad codes -- the
-        // user only ever saw $promoerrormessage after a full navigation
-        // away from the configure step. Here we fetch the same response,
-        // detect the error banner, and either render it inline or follow
-        // through to viewcart on success.
+        // Promo Apply: commit config, then AJAX-validate the promo
+        // against viewcart and update the page in-place for both
+        // outcomes -- the user never leaves the configure step.
+        //  - Invalid code: surface $promoerrormessage as an inline
+        //    error banner; the cart session still holds the committed
+        //    config so the user can correct the code and retry.
+        //  - Valid code: surface promotionAccepted as a success banner
+        //    and call recalctotals(), which re-fetches #producttotal.
+        //    WHMCS keeps the applied promotion in the session, so the
+        //    refreshed summary already includes the discount line.
         var applyBtn = document.querySelector('.cp-promo-apply');
         var promoInput = document.getElementById('promocode');
         if (applyBtn && promoInput) {
@@ -816,27 +832,39 @@ var _localLang = {
                 }).then(function (res) {
                     return res.text();
                 }).then(function (html) {
-                    // mytheme viewcart renders the promo-error banner as
-                    //   <div class="vc-alert warn" role="alert">{$promoerrormessage}</div>
-                    // (viewcart.tpl line 601). Bundlewarnings reuse the same
-                    // classes but always include <strong> + <ul>, so filter
-                    // out compound alerts to isolate the promo line.
-                    // Fall back to standard_cart's .alert-warning structure
-                    // in case the deployed template is swapped back.
+                    // mytheme viewcart renders four mutually-exclusive
+                    // promo banners (viewcart.tpl lines 601-611):
+                    //   .vc-alert.warn  -> $promoerrormessage  (invalid code)
+                    //   .vc-alert.ok    -> promotionAccepted   (valid w/ discount)
+                    //   .vc-alert.info  -> promoappliedbutnodiscount
+                    //   .vc-alert.error -> generic $errormessage (config-level)
+                    // Bundlewarnings reuse .vc-alert.warn but always
+                    // include <strong> + <ul>, so filter compound
+                    // alerts to isolate the promo banner. Fall back to
+                    // standard_cart's .alert-* classes in case the
+                    // deployed template is ever swapped.
                     var doc = (new DOMParser()).parseFromString(html, 'text/html');
-                    var warns = doc.querySelectorAll(
-                        '.vc-alert.warn[role="alert"], .alert-warning[role="alert"]'
+                    var alerts = doc.querySelectorAll(
+                        '.vc-alert[role="alert"], ' +
+                        '.alert-warning[role="alert"], ' +
+                        '.alert-success[role="alert"], ' +
+                        '.alert-info[role="alert"]'
                     );
-                    var promoErr = null;
-                    for (var i = 0; i < warns.length; i++) {
-                        if (!warns[i].querySelector('strong, ul, li')) {
-                            promoErr = warns[i];
-                            break;
-                        }
+                    var promoErr = null, promoOk = null, promoInfo = null;
+                    for (var i = 0; i < alerts.length; i++) {
+                        var a = alerts[i];
+                        if (a.querySelector('strong, ul, li')) continue;
+                        var cl = a.classList;
+                        if (!promoErr && (cl.contains('warn') || cl.contains('alert-warning'))) promoErr = a;
+                        else if (!promoOk && (cl.contains('ok') || cl.contains('alert-success'))) promoOk = a;
+                        else if (!promoInfo && (cl.contains('info') || cl.contains('alert-info'))) promoInfo = a;
                     }
+
+                    applyBtn.disabled = false;
+
                     if (promoErr) {
-                        applyBtn.disabled = false;
                         showInlineError({
+                            variant: 'error',
                             title: 'Promo code',
                             bodyText: promoErr.textContent.trim()
                         });
@@ -844,10 +872,23 @@ var _localLang = {
                         promoInput.select();
                         return;
                     }
-                    // No error banner -- code accepted (or applied with
-                    // no discount). Navigate to viewcart so the user
-                    // sees the new line item + the applied promotion.
-                    window.location = '/cart.php?a=view';
+
+                    // Accepted: render success/info banner inline and
+                    // refresh #producttotal so the new discount line
+                    // appears in the summary. WHMCS keeps the applied
+                    // promo in the session, so recalctotals() (which
+                    // re-posts the form to /cart.php?ajax=1&a=confproduct)
+                    // returns a summary that already includes the discount.
+                    var msg, variant;
+                    if (promoOk) { msg = promoOk.textContent.trim(); variant = 'success'; }
+                    else if (promoInfo) { msg = promoInfo.textContent.trim(); variant = 'info'; }
+                    else { msg = 'Promo code "' + code + '" applied.'; variant = 'success'; }
+                    showInlineError({
+                        variant: variant,
+                        title: 'Promo code',
+                        bodyText: msg
+                    });
+                    if (typeof window.recalctotals === 'function') window.recalctotals();
                 }).catch(function (err) {
                     applyBtn.disabled = false;
                     if (typeof err === 'string') {
