@@ -264,18 +264,11 @@
                                         <div class="st-plan-price-sub">+ {$product.pricing.minprice.setupFee->toPrefixed()} {$LANG.ordersetupfee}</div>
                                     {/if}
 
-                                    {if $product.features}
-                                        <ul class="st-plan-features">
-                                            {foreach $product.features as $feature => $value}
-                                                <li id="{$idPrefix}-feature{$value@iteration}">
-                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                                    <strong>{$value}</strong> {$feature}
-                                                </li>
-                                            {/foreach}
-                                        </ul>
-                                    {else}
-                                        <ul class="st-plan-features"></ul>
-                                    {/if}
+                                    <ul class="st-plan-features">
+                                        {if $product.description}
+                                            {$product.description}
+                                        {/if}
+                                    </ul>
 
                                     {if $product.stockControlEnabled}
                                         <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 8px;">{$product.qty} {$LANG.orderavailable}</div>
