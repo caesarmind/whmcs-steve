@@ -975,6 +975,49 @@
         //  completes its document.ready loop and PasswordStrength.js
         //  wires the standard_cart generate-password behaviour just
         //  like the reference install.)
+
+        /* Complete Order lives in the right-rail summary aside, bound
+           to the form only via the HTML5 form="frmCheckout" attribute.
+           DOM-wise it's NOT a descendant of the form, so scripts.min.js's
+           re-enable selector
+               t.closest("form").find('button[type="submit"]').prop("disabled", !1)
+           (called by scrollToGatewayInputError + the Stripe / gateway
+           fail handlers) never matches our button. After a failed
+           submit, the .disable-on-click handler has added .disabled
+           and nothing removes it, so the button stays grayed out and
+           the user thinks "Complete Order doesn't work."
+
+           Wrap scrollToGatewayInputError so it also clears our button's
+           disabled state -- and as a belt-and-suspenders fallback,
+           watch .gateway-errors for slideDown (inline display:block
+           appearing) and clear state then too. */
+        function reEnableCompleteOrder() {
+            var btn = document.getElementById('btnCompleteOrder');
+            if (!btn) return;
+            btn.disabled = false;
+            btn.classList.remove('disabled');
+            var spinner = btn.querySelector('i.fas, i.far, i.fal, i.fab');
+            if (spinner) {
+                spinner.className = '';
+                spinner.classList.add('fas', 'fa-arrow-circle-right');
+            }
+        }
+        if (typeof window.scrollToGatewayInputError === 'function') {
+            var _origScroll = window.scrollToGatewayInputError;
+            window.scrollToGatewayInputError = function () {
+                var r = _origScroll.apply(this, arguments);
+                reEnableCompleteOrder();
+                return r;
+            };
+        }
+        var gwErr = document.querySelector('.gateway-errors');
+        if (gwErr && typeof MutationObserver === 'function') {
+            new MutationObserver(function () {
+                if (gwErr.style.display === 'block' || (gwErr.offsetHeight > 0 && gwErr.textContent.trim())) {
+                    reEnableCompleteOrder();
+                }
+            }).observe(gwErr, { attributes: true, attributeFilter: ['style', 'class'] });
+        }
     }
     if (window.jQuery) { window.jQuery(init); }
     else if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }

@@ -1697,20 +1697,22 @@ body[data-plan] .st-variant-label { display: none; }
    markup (.modal.fade + .modal-dialog) which relies on Bootstrap's CSS
    to keep it invisible until JS adds .show. If Bootstrap CSS isn't
    loaded on the cart page (or loads late), the modal contents leak
-   into the page as raw stacked HTML. These rules hide them by default
-   so a missing/late Bootstrap doesn't reveal the modal scaffolding.
-   Bootstrap's own .modal.show / .modal.in / .modal.fade.in rules still
-   work the moment Bootstrap drops in.
+   into the page as raw stacked HTML. .modal:not(.show):not(.in) keeps
+   the scaffolding hidden until Bootstrap drops in.
 
-   `.hidden` / `.w-hidden` are Bootstrap/WHMCS utility classes used
-   inside the modal partial to mark elements as not-yet-shown (e.g.,
-   the `.product-recommendation.clonable` template node). Forcing them
-   to display:none here keeps the page clean.
-
-   The selectors stay attribute-/class-precise so we don't accidentally
-   strip elements the host theme intentionally toggles via .show. */
+   `.w-hidden` is a WHMCS utility class that scripts.min.js and the
+   gateway scripts (Stripe etc.) toggle via jQuery slideDown / slideUp
+   / show / hide. Those use INLINE styles to override the class --
+   which only works when our class rule is NOT !important. The earlier
+   `.w-hidden { display: none !important }` rule silently broke the
+   entire error-feedback path: .gateway-errors never became visible on
+   a Stripe failure, so the user saw "click button -> nothing happens"
+   instead of "Remote Transaction Failure. Please Contact Support."
+   Keep this rule plain `display: none` (matches standard_cart's
+   own .w-hidden in standard_cart/css/all.css:1864). */
 .modal:not(.show):not(.in) { display: none !important; }
-.hidden, .w-hidden { display: none !important; }
+.hidden { display: none !important; }
+.w-hidden { display: none; }
 
 /* ===============================================================
    DOMAIN PICKER (.dp-*) -- configureproductdomain.tpl layout.
