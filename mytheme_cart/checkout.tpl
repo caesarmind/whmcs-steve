@@ -677,6 +677,191 @@
 /* Captcha block */
 .co-captcha-card { padding: 18px 22px; text-align: center; }
 
+/* ─── Generate-Password modal (.modal-generate-password) ─────────
+   Apple-language modal that opens when the user clicks
+   .generate-password (security.tpl). Bootstrap modal scaffolding
+   (.modal / .modal-dialog / .modal-content) handles show/hide; the
+   visual chrome (rounded card, header + body + footer, pill buttons,
+   readonly password field with refresh icon) is owned here. */
+.modal-generate-password .modal-dialog {
+    margin: 8vh auto;
+    max-width: 440px;
+}
+.modal-generate-password .modal-content {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: 0 24px 60px -16px rgba(0,0,0,0.18);
+    overflow: hidden;
+}
+.modal-generate-password .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px 14px;
+    border-bottom: 0.5px solid var(--color-border);
+    background: var(--color-surface);
+}
+.modal-generate-password .modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    margin: 0;
+}
+.modal-generate-password .modal-header .close {
+    background: transparent;
+    border: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: var(--color-text-tertiary);
+    font-size: 22px;
+    line-height: 26px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    padding: 0;
+}
+.modal-generate-password .modal-header .close:hover {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+}
+.modal-generate-password .modal-body { padding: 18px 22px 8px; }
+.modal-generate-password .gp-field { margin: 0 0 14px; }
+.modal-generate-password .gp-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin: 0 0 6px;
+    letter-spacing: -0.004em;
+}
+.modal-generate-password .form-control {
+    width: 100%;
+    height: 38px;
+    padding: 0 14px;
+    border: 0.5px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    font-size: 13.5px;
+    letter-spacing: -0.008em;
+    font-variant-numeric: tabular-nums;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
+}
+.modal-generate-password .form-control:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+.modal-generate-password #inputGeneratePasswordOutput {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 14px;
+    letter-spacing: 0;
+}
+/* Number-input spinner trim for the length field */
+.modal-generate-password #inputGeneratePasswordLength {
+    max-width: 110px;
+}
+
+.modal-generate-password .gp-output-row {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+}
+.modal-generate-password .gp-output-row .form-control { flex: 1; min-width: 0; }
+.modal-generate-password .gp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer;
+    border: 0;
+    transition: filter 0.15s, background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+.modal-generate-password .gp-btn-ghost {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+    border: 0.5px solid var(--color-border);
+}
+.modal-generate-password .gp-btn-ghost:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+.modal-generate-password .gp-btn-ghost i {
+    font-size: 11px;
+    opacity: 0.8;
+}
+.modal-generate-password .gp-btn-secondary {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+    border: 0.5px solid var(--color-border);
+}
+.modal-generate-password .gp-btn-secondary:hover {
+    border-color: var(--color-text-secondary);
+}
+.modal-generate-password .gp-btn-primary {
+    background: var(--color-accent);
+    color: #fff;
+}
+.modal-generate-password .gp-btn-primary:hover { filter: brightness(0.95); }
+
+.modal-generate-password #generatePwLengthError {
+    background: var(--color-red-bg, rgba(255,59,48,0.08));
+    color: var(--color-red-text, #d70015);
+    border: 0.5px solid var(--color-red-text, #d70015);
+    border-radius: 10px;
+    padding: 9px 12px;
+    margin: 0 0 12px;
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+.modal-generate-password .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 22px 18px;
+    border-top: 0.5px solid var(--color-border);
+    background: var(--color-surface-tertiary);
+}
+
+/* Generate-password trigger button in security.tpl is the standard_cart
+   .btn-default.generate-password. Restyle to match the Apple pill so it
+   doesn't read as a stray grey rectangle next to the password meter. */
+.generate-password.btn-default,
+button.generate-password {
+    height: 36px;
+    padding: 0 14px;
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+    border: 0.5px solid var(--color-border);
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.generate-password.btn-default:hover,
+button.generate-password:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
 /* ─── Last-chance inner ($hookOutput grid) ──────────────────────
    WHMCS marketing hooks emit ONE outer wrapper containing a
    .mc-promos.checkout that holds MANY .mc-promo product items.
@@ -1036,11 +1221,66 @@
             }).observe(msg, { childList: true, subtree: true, characterData: true });
         }
 
-        // (Previously had a custom .generate-password handler here.
-        //  Removed: with the WHMCS.payment stub above, scripts.min.js
-        //  completes its document.ready loop and PasswordStrength.js
-        //  wires the standard_cart generate-password behaviour just
-        //  like the reference install.)
+        /* Generate-Password modal wiring.
+           standard_cart's default behaviour is "silent prefill" -- it
+           sets a random password into both inputs and slides the
+           container up so the user never sees what was generated. That
+           leaves the user without a copy of their own password. Mirror
+           the hostnodes-apple flow instead: clicking .generate-password
+           opens a modal that lets the user pick a length, see the
+           generated password, copy it, and only then insert it into
+           the password fields. */
+        var genBtn = document.querySelector('.generate-password');
+        var modal = document.getElementById('modalGeneratePassword');
+        if (genBtn && modal && window.WHMCS && WHMCS.utils && typeof WHMCS.utils.generatePassword === 'function') {
+            /* Replace the default WHMCS handler that hides the password
+               container. We bind via $(document).on so this wins over
+               whatever PasswordStrength.js / scripts.min.js bound on
+               the same selector. */
+            $(document).off('click.gpmodal', '.generate-password');
+            $(document).on('click.gpmodal', '.generate-password', function (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                var $modal = $('#modalGeneratePassword');
+                $modal.data('targetfields', $(this).data('targetfields') || '');
+                $('#inputGeneratePasswordLength').val(12);
+                $('#inputGeneratePasswordOutput').val('');
+                $('#generatePwLengthError').addClass('w-hidden').hide();
+                /* Generate one immediately so the field isn't empty when the modal opens. */
+                $('#frmGeneratePassword').trigger('submit');
+                $modal.modal('show');
+            });
+            $('#frmGeneratePassword').on('submit', function (e) {
+                e.preventDefault();
+                var length = parseInt($('#inputGeneratePasswordLength').val(), 10);
+                if (isNaN(length) || length < 8 || length > 64) {
+                    $('#generatePwLengthError').removeClass('w-hidden').show();
+                    return;
+                }
+                $('#generatePwLengthError').addClass('w-hidden').hide();
+                $('#inputGeneratePasswordOutput').val(WHMCS.utils.generatePassword(length));
+            });
+            $('#btnGeneratePasswordInsert').on('click', function () {
+                var $modal = $(this).closest('.modal');
+                var $out = $('#inputGeneratePasswordOutput');
+                var pwd = $out.val();
+                if (!pwd) return;
+                var fields = ($modal.data('targetfields') || '').split(',');
+                for (var i = 0; i < fields.length; i++) {
+                    var id = fields[i] && fields[i].trim();
+                    if (id) $('#' + id).val(pwd).trigger('keyup');
+                }
+                /* Copy via WHMCS.ui.clipboard if available, else fall back
+                   to the Async Clipboard API (modern HTTPS-only contexts). */
+                if (window.WHMCS && WHMCS.ui && WHMCS.ui.clipboard && typeof WHMCS.ui.clipboard.copy === 'function') {
+                    try { WHMCS.ui.clipboard.copy.call(this); } catch (e) {}
+                } else if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(pwd);
+                }
+                $modal.modal('hide');
+                $out.val('');
+            });
+        }
 
         /* Complete Order lives in the right-rail summary aside, bound
            to the form only via the HTML5 form="frmCheckout" attribute.
@@ -1091,3 +1331,4 @@
 })();
 {/literal}</script>
 {include file="orderforms/standard_cart/recommendations-modal.tpl"}
+{include file="orderforms/$carttpl/includes/checkout/generate-password-modal.tpl"}
