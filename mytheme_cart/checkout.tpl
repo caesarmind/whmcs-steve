@@ -177,6 +177,15 @@
 <script type="text/javascript" src="{$BASE_PATH_JS}/StatesDropdown.js"></script>
 <script type="text/javascript" src="{$BASE_PATH_JS}/PasswordStrength.js"></script>
 <script type="text/javascript" src="{$BASE_PATH_JS}/VatValidator.js"></script>
+
+{* intl-tel-input -- country-code chooser for #inputPhone. Adds a flag
+   dropdown next to the phone field that lets the user pick their
+   country, prepends the dial code, and formats as they type. Pinned
+   to v18 because v19+ removes the auto-bundled utils and would need
+   us to host utils.js ourselves. *}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/css/intlTelInput.css">
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/js/intlTelInput.min.js"></script>
+
 <script>
     window.langPasswordStrength = "{$LANG.pwstrength}";
     window.langPasswordWeak = "{$LANG.pwstrengthweak}";
@@ -681,6 +690,86 @@
 
 /* Captcha block */
 .co-captcha-card { padding: 18px 22px; text-align: center; }
+
+/* ─── intl-tel-input override -- Apple-style ─────────────────────
+   intl-tel-input ships with its own greyish chrome that clashes
+   with the Apple look. Restyle the flag/dial-code button + dropdown
+   so it reads as a real Apple-style segment of the phone field.
+   .has-iti hides the absolute .field-icon (the FA phone glyph) on
+   the phone form-group so we don't double-decorate the input. */
+.form-group.prepend-icon.has-iti .field-icon { display: none; }
+.form-group.prepend-icon.has-iti .iti { width: 100%; }
+.form-group.prepend-icon.has-iti .iti__tel-input,
+.form-group.prepend-icon.has-iti input.iti__tel-input.form-control {
+    padding-left: 16px; /* iti's separateDialCode mode reserves left space already */
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Selected-flag pill (the click target on the left) */
+.iti--separate-dial-code .iti__selected-flag {
+    background: var(--color-surface-secondary);
+    border-right: 0.5px solid var(--color-border);
+    border-radius: 10px 0 0 10px;
+    padding: 0 10px 0 12px;
+}
+.iti--separate-dial-code .iti__selected-flag:hover,
+.iti--separate-dial-code .iti__selected-flag:focus {
+    background: var(--color-surface-tertiary);
+}
+.iti--separate-dial-code .iti__selected-dial-code {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.008em;
+    margin-left: 6px;
+    font-variant-numeric: tabular-nums;
+}
+.iti__arrow {
+    border-top-color: var(--color-text-tertiary);
+    margin-left: 6px;
+}
+
+/* Dropdown panel */
+.iti__country-list {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 16px 40px -8px rgba(0,0,0,0.18);
+    padding: 6px 0;
+    max-height: 260px;
+    margin-top: 6px;
+}
+.iti__country {
+    padding: 7px 14px;
+    font-size: 13px;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.iti__country:hover,
+.iti__country.iti__highlight {
+    background: var(--color-surface-secondary);
+}
+.iti__dial-code {
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+    font-size: 12px;
+}
+.iti__divider {
+    border-bottom: 0.5px solid var(--color-border);
+    margin: 4px 0;
+}
+
+/* Make the whole input row visually one unit */
+.form-group.prepend-icon.has-iti {
+    position: relative;
+}
+.form-group.prepend-icon.has-iti .iti__flag-container {
+    z-index: 2;
+}
 
 /* ─── Generate-Password modal (.modal-generate-password) ─────────
    Apple-language modal that opens when the user clicks
@@ -1285,6 +1374,68 @@ button.generate-password:hover {
                 $modal.modal('hide');
                 $out.val('');
             });
+        }
+
+        /* Phone country-code chooser via intl-tel-input.
+           Adds a flag + dial-code dropdown next to #inputPhone so the
+           user picks a country instead of typing the prefix. On submit
+           we replace the input value with the canonical E.164 number
+           (+15551234567) so WHMCS receives a normalised phone. The
+           library auto-detects the initial country from the address
+           country field if present, otherwise falls back to US. */
+        var phoneEl = document.getElementById('inputPhone');
+        if (phoneEl && typeof window.intlTelInput === 'function') {
+            /* Adjust the prepend-icon wrapper -- intl-tel-input injects
+               its flag dropdown on the left of the input and our
+               .prepend-icon label puts an absolute-positioned phone
+               icon there too. Hide the icon when iti owns the slot. */
+            var phoneGroup = phoneEl.closest('.form-group.prepend-icon');
+            if (phoneGroup) phoneGroup.classList.add('has-iti');
+
+            var iti = window.intlTelInput(phoneEl, {
+                separateDialCode: true,
+                preferredCountries: ['us', 'gb', 'ca', 'au', 'de', 'fr', 'nl', 'es', 'it'],
+                /* Sync initial country to the billing country field once
+                   the user picks one -- and pre-seed from $clientsdetails
+                   country if WHMCS already provided one. */
+                initialCountry: (function () {
+                    var c = (document.getElementById('inputCountry') || {}).value;
+                    return (c && c.length === 2) ? c.toLowerCase() : 'us';
+                })(),
+                utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/js/utils.js?onlyCountries=false'
+            });
+
+            /* Keep the country in sync if the user changes the billing
+               country -- only nudge, don't overwrite a country they
+               picked deliberately in the iti dropdown. */
+            var lastSyncedCountry = '';
+            $('#inputCountry').on('change', function () {
+                var c = (this.value || '').toLowerCase();
+                if (!c || c.length !== 2) return;
+                var current = iti.getSelectedCountryData().iso2;
+                /* If they haven't touched the iti dropdown OR the iti
+                   country matches the previous billing country, sync. */
+                if (current === lastSyncedCountry || lastSyncedCountry === '') {
+                    iti.setCountry(c);
+                    lastSyncedCountry = c;
+                }
+            });
+
+            /* On form submit, replace the input value with the
+               canonical E.164 number so WHMCS stores a normalised
+               phone. Bind in the capture phase so we beat the form's
+               submit handlers. */
+            var form = document.getElementById('frmCheckout');
+            if (form) {
+                form.addEventListener('submit', function () {
+                    if (typeof iti.isValidNumber === 'function' && iti.isValidNumber()) {
+                        phoneEl.value = iti.getNumber();
+                    } else if (typeof iti.getNumber === 'function') {
+                        var n = iti.getNumber();
+                        if (n) phoneEl.value = n;
+                    }
+                }, true);
+            }
         }
 
         /* Complete Order lives in the right-rail summary aside, bound
