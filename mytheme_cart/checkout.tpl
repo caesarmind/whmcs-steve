@@ -91,8 +91,13 @@
    - WHMCS.payment.event.gatewayInit -> no-op
    - WHMCS.jqClient -> alias to jQuery so Stripe's validateStripe()
      can read jqClient.fn / etc. without crashing
-   - WHMCS.events / WHMCS.client -> empty containers *}
-<script>
+   - WHMCS.events / WHMCS.client -> empty containers
+
+   IMPORTANT: this <script> body contains object-literal `{}` braces
+   so it must be wrapped in {literal}...{/literal} -- otherwise Smarty
+   treats `{ return false; }` etc. as tags and emits broken JS that
+   throws SyntaxError: Unexpected token '}' on the page. *}
+<script>{literal}
     window.WHMCS = window.WHMCS || {};
     if (typeof window.WHMCS.hasModule !== 'function') {
         window.WHMCS.hasModule = function () { return false; };
@@ -122,7 +127,7 @@
     }
     window.WHMCS.events = window.WHMCS.events || {};
     window.WHMCS.client = window.WHMCS.client || {};
-</script>
+{/literal}</script>
 {include file="orderforms/$carttpl/common.tpl"}
 <script type="text/javascript" src="{$BASE_PATH_JS}/StatesDropdown.js"></script>
 <script type="text/javascript" src="{$BASE_PATH_JS}/PasswordStrength.js"></script>
