@@ -354,13 +354,12 @@
 #order-standard_cart { padding: 0 !important; background: transparent !important; }
 
 /* ─── Form section cards ──────────────────────────────────────────
-   The TPL is structured as a long series of (.sub-heading + .row)
-   pairs with no per-section wrapper, so we use CSS to draw the card
-   chrome around the two known containers (#containerNewUserSignup
-   for Personal Info + Billing, #containerNewUserSecurity for
-   Password + Security) and around the Payment Details block we
-   wrap below. */
-#containerNewUserSignup,
+   Single-section containers (Existing Signin/Account, Security,
+   Payment, Captcha) keep their one-card chrome. The multi-section
+   container #containerNewUserSignup (Personal Info + Billing Address
+   + optional Custom Fields) gets its chrome stripped and each
+   .sub-heading + following .row pair becomes its own independent
+   card via direct-child selectors. */
 #containerNewUserSecurity,
 #containerExistingUserSignin,
 #containerExistingAccountSelect,
@@ -371,9 +370,34 @@
     border: 0.5px solid var(--color-border);
     border-radius: 14px;
 }
-#containerNewUserSignup > .sub-heading:first-child,
 #containerNewUserSecurity > .sub-heading:first-child,
 .co-payment-card > .sub-heading:first-child { margin-top: 18px; }
+
+/* Multi-section: each .sub-heading + .row pair = independent card */
+#containerNewUserSignup {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+}
+#containerNewUserSignup > .sub-heading {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-bottom: 0;
+    border-radius: 14px 14px 0 0;
+    margin: 12px 0 0;
+    padding: 18px 22px 8px;
+}
+#containerNewUserSignup > .sub-heading:first-of-type { margin-top: 0; }
+#containerNewUserSignup > .sub-heading + .row,
+#containerNewUserSignup > .sub-heading + .field-container {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-top: 0;
+    border-radius: 0 0 14px 14px;
+    margin: 0;
+    padding: 0 22px 12px;
+}
 
 .co-left .sub-heading {
     margin: 22px 0 12px;
