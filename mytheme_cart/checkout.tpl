@@ -237,12 +237,51 @@
 .co-mailing-meta { flex: 1; min-width: 0; }
 .co-mailing-title { font-size: 13.5px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; margin: 0 0 3px; }
 .co-mailing-desc { font-size: 12px; color: var(--color-text-tertiary); margin: 0; letter-spacing: -0.004em; line-height: 1.5; }
-.co-mailing-toggle { position: relative; cursor: pointer; user-select: none; flex-shrink: 0; display: inline-flex; align-items: center; }
-.co-mailing-toggle input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
-.co-mailing-switch { width: 40px; height: 22px; background: var(--color-surface-secondary); border-radius: 999px; position: relative; transition: background 0.15s; border: 0.5px solid var(--color-border); display: block; }
-.co-mailing-switch::after { content: ""; position: absolute; top: 1px; left: 1px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.18); transition: transform 0.15s; }
-.co-mailing-toggle input:checked + .co-mailing-switch { background: var(--color-green-text, #34c759); border-color: var(--color-green-text, #34c759); }
-.co-mailing-toggle input:checked + .co-mailing-switch::after { transform: translateX(18px); }
+/* Switch (ported from lagom2's switch__/switch__container/switch__handle
+   pattern -- real <span> handle inside a real <span> track instead of a
+   ::after pseudo. The hidden checkbox is sized to overlay the track
+   with cursor:pointer so any click anywhere on the visible widget
+   toggles state. No pointer-events tricks. */
+.co-mailing-toggle {
+    position: relative;
+    width: 40px; height: 22px;
+    flex-shrink: 0;
+    cursor: pointer;
+    user-select: none;
+    display: inline-block;
+}
+.co-mailing-toggle input {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    margin: 0; padding: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+.co-mailing-switch {
+    position: absolute; inset: 0;
+    background: var(--color-surface-secondary);
+    border: 0.5px solid var(--color-border);
+    border-radius: 999px;
+    transition: background 0.15s, border-color 0.15s;
+    z-index: 1;
+}
+.co-mailing-handle {
+    position: absolute;
+    top: 1px; left: 1px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    transition: transform 0.15s;
+}
+.co-mailing-toggle input:checked ~ .co-mailing-switch {
+    background: var(--color-green-text, #34c759);
+    border-color: var(--color-green-text, #34c759);
+}
+.co-mailing-toggle input:checked ~ .co-mailing-switch .co-mailing-handle {
+    transform: translateX(18px);
+}
 
 /* Last-chance offers card (wraps $hookOutput on checkout) */
 .co-lastchance { padding: 0; background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: 14px; }
@@ -1204,7 +1243,13 @@
                         </div>
                         <div class="co-lastchance-body">
                             {foreach $hookOutput as $output}
-                                <div>{$output}</div>
+                                {* Strip the inner <div class="sub-heading">
+                                   ...</div> WHMCS emits inside each promo;
+                                   the outer .co-lastchance-head already
+                                   carries the badge + title. Mirrors
+                                   lagom2's hookOutput post-processing
+                                   (lagom2/viewcart.tpl:78). *}
+                                <div>{$output|regex_replace:"/<div class=\"sub-heading\">[\s\S]*?<\/div>/":""}</div>
                             {/foreach}
                         </div>
                     </div>
@@ -1436,7 +1481,9 @@
                         </div>
                         <label class="co-mailing-toggle">
                             <input type="checkbox" name="marketingoptin" value="1"{if $marketingEmailOptIn} checked{/if}>
-                            <span class="co-mailing-switch" aria-hidden="true"></span>
+                            <span class="co-mailing-switch" aria-hidden="true">
+                                <span class="co-mailing-handle"></span>
+                            </span>
                         </label>
                     </div>
                 {/if}

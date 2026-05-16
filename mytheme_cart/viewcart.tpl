@@ -1250,7 +1250,16 @@
                         </div>
                         <div class="ct-recommend-body">
                             {foreach $hookOutput as $output}
-                                <div>{$output}</div>
+                                {* Strip the inner <div class="sub-heading">
+                                   ...</div> WHMCS emits inside each promo --
+                                   we already render the badge + title in
+                                   .ct-recommend-head above. Borrowed from
+                                   lagom2's pattern of post-processing
+                                   hookOutput via Smarty string modifiers
+                                   (lagom2/viewcart.tpl:78 uses |replace to
+                                   rename classes; here we drop the element
+                                   entirely with regex_replace). *}
+                                <div>{$output|regex_replace:"/<div class=\"sub-heading\">[\s\S]*?<\/div>/":""}</div>
                             {/foreach}
                         </div>
                     </div>
@@ -1456,63 +1465,12 @@
             </div>
         </div>
 
-        {* ═══════════════════════════════════════════════════════════════
-           Remove-item modal -- populated by removeItem(type, ref[, rType])
-           inline JS from scripts.js. Form posts to cart.php?a=remove.
-           ═══════════════════════════════════════════════════════════════ *}
-        <form method="post" action="{$WEB_ROOT}/cart.php">
-            <input type="hidden" name="a" value="remove">
-            <input type="hidden" name="r" value="" id="inputRemoveItemType">
-            <input type="hidden" name="i" value="" id="inputRemoveItemRef">
-            <input type="hidden" name="rt" value="" id="inputRemoveItemRenewalType">
-            <div class="modal fade modal-remove-item" id="modalRemoveItem" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <div class="float-right">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="{lang key='orderForm.close'}"><span aria-hidden="true">&times;</span></button>
-                            </div>
-                            <h4 class="modal-title margin-bottom mb-3">
-                                <i class="fas fa-times fa-3x"></i>
-                                <span>{lang key='orderForm.removeItem'}</span>
-                            </h4>
-                            {lang key='cartremoveitemconfirm'}
-                        </div>
-                        <div class="modal-footer justify-content-center">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">{lang key='no'}</button>
-                            <button type="submit" class="btn btn-primary">{lang key='yes'}</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-
-        {* ═══════════════════════════════════════════════════════════════
-           Empty-cart modal -- triggered by #btnEmptyCart click.
-           ═══════════════════════════════════════════════════════════════ *}
-        <form method="post" action="{$WEB_ROOT}/cart.php">
-            <input type="hidden" name="a" value="empty">
-            <div class="modal fade modal-remove-item" id="modalEmptyCart" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <div class="float-right">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="{$LANG.orderForm.close}"><span aria-hidden="true">&times;</span></button>
-                            </div>
-                            <h4 class="modal-title margin-bottom mb-3">
-                                <i class="fas fa-trash-alt fa-3x"></i>
-                                <span>{$LANG.emptycart}</span>
-                            </h4>
-                            {$LANG.cartemptyconfirm}
-                        </div>
-                        <div class="modal-footer justify-content-center">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">{$LANG.no}</button>
-                            <button type="submit" class="btn btn-primary">{$LANG.yes}</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
+        {* Modals extracted to /includes/viewcart/modal/ (mirrors lagom2's
+           directory layout). The forms preserve the same WHMCS POST
+           contracts (a=remove / a=empty) and the same modal IDs so the
+           inline removeItem() / #btnEmptyCart trigger JS still works. *}
+        {include file="orderforms/$carttpl/includes/viewcart/modal/remove-item.tpl"}
+        {include file="orderforms/$carttpl/includes/viewcart/modal/empty-cart.tpl"}
 
     </div>{* /#order-standard_cart *}
 
