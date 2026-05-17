@@ -22,10 +22,10 @@
  *}
 
 {* Apple-language stylesheet -- owns all cart-page typography, layout, components *}
-<link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/style.min.css?v={$myTheme.assetVersion|default:'3'}">
+<link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/style.min.css?v={$myTheme.assetVersion|default:'4'}">
 
 {* --vl-* token overrides (safety net -- applies inside any Vue Shadow DOM that loads) *}
-<link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/custom.css?v={$myTheme.assetVersion|default:'3'}">
+<link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/custom.css?v={$myTheme.assetVersion|default:'4'}">
 
 {* Inherited from standard_cart: scripts.min.js defines recalctotals(),
    selectChangeNavigate(), the addon-recommendations modal trigger, and
@@ -33,21 +33,4 @@
    doesn't ship its own scripts.min.js, so load standard_cart's directly
    -- it lives at templates/orderforms/standard_cart/js/scripts.min.js
    on the server regardless of which orderform is active. *}
-<script src="{$WEB_ROOT}/templates/orderforms/standard_cart/js/scripts.min.js?v={$myTheme.assetVersion|default:'3'}"></script>
-
-{* Plan-layout preference -- restore the user's A/B layout pick from
-   localStorage and stamp it onto <body data-plan="x"> BEFORE the variant
-   markup renders, so a B-preferring user doesn't flash A on every page
-   load. Runs inline here (common.tpl is the first include in every
-   cart TPL, executed inside <body> right after WHMCS opens it). The
-   toggle UI + click handler live in products.tpl. *}
-<script>
-(function () {
-    try {
-        var p = localStorage.getItem('hn-cart-layout');
-        if ((p === 'a' || p === 'b') && document.body) {
-            document.body.setAttribute('data-plan', p);
-        }
-    } catch (e) { /* localStorage disabled -- fall back to CSS default (Variant A). */ }
-})();
-</script>
+<script src="{$WEB_ROOT}/templates/orderforms/standard_cart/js/scripts.min.js?v={$myTheme.assetVersion|default:'4'}"></script>

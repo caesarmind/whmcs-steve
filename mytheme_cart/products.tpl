@@ -27,18 +27,13 @@
  *                        └── .st-empty
  *                + .st-guarantees (3 trust cards)
  *
- * Variant switching is captured on <body data-plan="x"> and the
+ * Variant switching is driven by mytheme's state-chip (`data-plan-set`).
+ * The active variant is captured on <body data-plan="x"> and the
  * `.plan-variant:not(.v-x)` CSS rules in style.min.css hide the rest.
- * Two writers set the attribute:
- *   1. End-user A/B toggle (.st-layout, this file) — visible to clients on
- *      every product-group page. Defaults to A; user pick persists in
- *      localStorage('hn-cart-layout') and is restored pre-paint by common.tpl
- *      to avoid an A→B flash on subsequent loads.
- *   2. mytheme's dev state-chip (`data-plan-set`) — admin-only preview tool.
- *      On "All" the chip emits no `data-plan` attr → every variant stacks
- *      with an `.st-variant-label` above it so authors can preview them
- *      side-by-side. When data-plan is absent on cart pages the CSS falls
- *      back to Variant A.
+ * On "All" the chip emits no `data-plan` attr → every variant stacks
+ * with an `.st-variant-label` above it so authors can preview them
+ * side-by-side. When data-plan is absent on cart pages the CSS falls
+ * back to Variant A (the end-user default).
  *
  * Billing-cycle pills: each price block carries `data-price-<cycle>`
  * attributes for every cycle the admin configured per-product. A pill
@@ -197,22 +192,6 @@
                             <button type="button" data-cycle="monthly">Monthly</button>
                             <button type="button" data-cycle="annually" class="active">Annual <span class="st-cycle-saving">Save 20%</span></button>
                             <button type="button" data-cycle="biennially">Biennial</button>
-                        </div>
-
-                        {* Layout pill switcher — end-user A/B toggle. Detailed = Variant A
-                           (3-up feature cards), Compact = Variant B (4-up minimal cards).
-                           Initial active class is set by JS from <body data-plan> after
-                           common.tpl restores the saved preference. Falls back to A here
-                           so unstyled-first-paint is correct when JS hasn't run yet. *}
-                        <div class="st-layout" role="tablist" aria-label="Layout" data-layout-switcher>
-                            <button type="button" data-layout="a" class="active" aria-label="Detailed layout — 3-up cards with feature list">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="18" rx="1.5"/><rect x="14" y="3" width="7" height="18" rx="1.5"/></svg>
-                                Detailed
-                            </button>
-                            <button type="button" data-layout="b" aria-label="Compact layout — 4-up minimal cards">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="4" height="18" rx="1"/><rect x="10" y="3" width="4" height="18" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
-                                Compact
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -881,41 +860,6 @@
     pills.forEach(function (p) {
         p.addEventListener('click', function () {
             applyCycle(this.getAttribute('data-cycle'));
-        });
-    });
-})();
-
-/* ──────────────────────────────────────────────────────────────────
-   Plan-layout switcher (Variant A / B end-user toggle).
-   Reads <body data-plan> to seed the .active highlight (common.tpl
-   restores the saved value before this runs), then on click flips
-   data-plan + persists to localStorage. Empty data-plan defaults to
-   "a" — matches the CSS fallback for cart pages.
-   ────────────────────────────────────────────────────────────────── */
-(function () {
-    var switcher = document.querySelector('[data-layout-switcher]');
-    if (!switcher) return;
-    var pills = switcher.querySelectorAll('button[data-layout]');
-
-    function applyLayout(layout, persist) {
-        if (layout !== 'a' && layout !== 'b') return;
-        document.body.setAttribute('data-plan', layout);
-        pills.forEach(function (p) {
-            p.classList.toggle('active', p.getAttribute('data-layout') === layout);
-        });
-        if (persist) {
-            try { localStorage.setItem('hn-cart-layout', layout); } catch (e) { /* localStorage disabled */ }
-        }
-    }
-
-    // Seed .active from the current data-plan (set by common.tpl from
-    // localStorage). When neither is set, the markup defaults to A.
-    var current = document.body.getAttribute('data-plan');
-    if (current === 'a' || current === 'b') applyLayout(current, false);
-
-    pills.forEach(function (p) {
-        p.addEventListener('click', function () {
-            applyLayout(this.getAttribute('data-layout'), true);
         });
     });
 })();
