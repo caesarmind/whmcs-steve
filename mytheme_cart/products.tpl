@@ -240,24 +240,24 @@
                                     <div class="st-plan-price"
                                          id="{$idPrefix}-price"
                                          data-price-host
-                                         data-price-min="{$product.pricing.minprice.price|escape}"
+                                         data-price-min="{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}"
                                          data-cycle-min="{$product.pricing.minprice.cycle|escape}"
-                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
-                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
-                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
-                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
-                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
-                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
+                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
                                         {if $product.bid}
                                             {if $product.displayprice}
-                                                <span class="amount" data-price-display>{$product.displayprice}</span>
+                                                <span class="amount" data-price-display>{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}</span>
                                             {/if}
                                             <span class="period" data-period-display>{$LANG.bundledeal}</span>
                                         {else}
                                             {if $product.pricing.hasconfigoptions}
                                                 <span class="period" style="margin-right: 4px;">{$LANG.startingfrom}</span>
                                             {/if}
-                                            <span class="amount" data-price-display>{$product.pricing.minprice.price}</span>
+                                            <span class="amount" data-price-display>{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}</span>
                                             <span class="period" data-period-display>{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}</span>
                                         {/if}
                                     </div>
@@ -313,15 +313,15 @@
                                     </div>
                                     <div class="st-plan-b-price"
                                          data-price-host
-                                         data-price-min="{$product.pricing.minprice.price|escape}"
+                                         data-price-min="{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}"
                                          data-cycle-min="{$product.pricing.minprice.cycle|escape}"
-                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
-                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
-                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
-                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
-                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
-                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
-                                        <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
+                                        <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
                                         <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
                                     </div>
                                     {* Description body — see Variant A note. Same admin-authored
@@ -368,15 +368,15 @@
                                     </div>
                                     <div class="st-row-price"
                                          data-price-host
-                                         data-price-min="{$product.pricing.minprice.price|escape}"
+                                         data-price-min="{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}"
                                          data-cycle-min="{$product.pricing.minprice.cycle|escape}"
-                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
-                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
-                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
-                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
-                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
-                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
-                                        <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
+                                        <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
                                         <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
                                     </div>
                                     <a href="{$product.productUrl}" class="st-row-cta">{$LANG.ordernowbutton}</a>
@@ -415,14 +415,14 @@
                                                 <div class="st-compare-plan-name">{$product.name}</div>
                                                 <div class="st-compare-plan-price"
                                                      data-price-host
-                                                     data-price-min="{$product.pricing.minprice.price|escape}"
-                                                     {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
-                                                     {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
-                                                     {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
-                                                     {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
-                                                     {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
-                                                     {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
-                                                    <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                                     data-price-min="{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}"
+                                                     {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                                     {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                                     {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                                     {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                                     {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                                     {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
+                                                    <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
                                                     <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
                                                 </div>
                                             </th>
@@ -496,14 +496,14 @@
                                         <div class="st-bento-hero-right">
                                             <div class="st-bento-hero-price"
                                                  data-price-host
-                                                 data-price-min="{$product.pricing.minprice.price|escape}"
-                                                 {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
-                                                 {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
-                                                 {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
-                                                 {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
-                                                 {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
-                                                 {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
-                                                <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                                 data-price-min="{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}"
+                                                 {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                                 {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                                 {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                                 {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                                 {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                                 {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
+                                                <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
                                                 <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
                                             </div>
                                             <a href="{$product.productUrl}" class="st-bento-hero-cta">{$LANG.ordernowbutton}</a>
@@ -517,14 +517,14 @@
                                         {/if}
                                         <div class="st-bento-mini-price"
                                              data-price-host
-                                             data-price-min="{$product.pricing.minprice.price|escape}"
-                                             {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
-                                             {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
-                                             {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
-                                             {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
-                                             {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
-                                             {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
-                                            <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                             data-price-min="{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}"
+                                             {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
+                                            <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
                                             <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
                                         </div>
                                         {if $product.features}
@@ -561,14 +561,14 @@
                                     {/if}
                                     <div class="st-seg-price"
                                          data-price-host
-                                         data-price-min="{$product.pricing.minprice.price|escape}"
-                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
-                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
-                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
-                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
-                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
-                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
-                                        <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                         data-price-min="{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}"
+                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
+                                        <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
                                         <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
                                     </div>
                                     {if $product.features}
@@ -612,14 +612,14 @@
                                     <div class="st-matrix-foot">
                                         <div class="st-matrix-price"
                                              data-price-host
-                                             data-price-min="{$product.pricing.minprice.price|escape}"
-                                             {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
-                                             {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
-                                             {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
-                                             {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
-                                             {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
-                                             {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
-                                            <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                             data-price-min="{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}"
+                                             {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
+                                            <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
                                             <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
                                         </div>
                                         <a href="{$product.productUrl}" class="st-matrix-cta">{$LANG.ordernowbutton}</a>
@@ -673,14 +673,14 @@
                                         </div>
                                         <div class="st-addon-tier-price"
                                              data-price-host
-                                             data-price-min="{$product.pricing.minprice.price|escape}"
-                                             {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|escape}" {/if}
-                                             {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|escape}" {/if}
-                                             {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|escape}" {/if}
-                                             {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|escape}" {/if}
-                                             {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|escape}" {/if}
-                                             {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|escape}" {/if}>
-                                            <span data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
+                                             data-price-min="{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}"
+                                             {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
+                                             {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
+                                            <span data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
                                             <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
                                         </div>
                                     </label>
