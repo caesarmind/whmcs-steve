@@ -359,14 +359,21 @@
                         </div>
                         <div id="domainSuggestions" class="domain-lookup-result list-group dr-suggested-list w-hidden">
                             <div class="domain-suggestion list-group-item dr-sug-row w-hidden">
-                                <div class="dr-sug-name">
+                                {* CRITICAL: this wrapper MUST be a <span>, not a <div>.
+                                   scripts.js (line 3749 + 2809) resets state before every
+                                   search via `suggestions.find('div:not(.actions)').hide()`
+                                   which catches every <div> descendant -- a <div class="dr-sug-name">
+                                   would get inline display:none stamped on it, and the
+                                   .domain / .extension spans inside would render with
+                                   content but be invisible because their parent is hidden. *}
+                                <span class="dr-sug-name">
                                     <span class="domain"></span><span class="extension tld"></span>
                                     <span class="promo dr-sug-chip w-hidden">
                                         <span class="sales-group-hot w-hidden">{lang key='domainCheckerSalesGroup.hot'}</span>
                                         <span class="sales-group-new w-hidden">{lang key='domainCheckerSalesGroup.new'}</span>
                                         <span class="sales-group-sale w-hidden">{lang key='domainCheckerSalesGroup.sale'}</span>
                                     </span>
-                                </div>
+                                </span>
                                 <div class="actions dr-sug-actions">
                                     <span class="price dr-sug-price"></span>
                                     <button type="button" class="btn btn-add-to-cart dr-add-btn outline" data-whois="1" data-domain="">
