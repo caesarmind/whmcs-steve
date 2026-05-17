@@ -30,7 +30,12 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Dark mode toggle
+// Dark mode toggle. Null-checks #darkModeToggle because some layouts
+// (e.g. logged-out top-nav) render the toggle as a plain .topbar-btn
+// without the sidebar #darkModeToggle slider element -- without the
+// guard, toggle.classList.remove() throws and the inline onclick
+// (`toggleDarkMode && toggleDarkMode(); return false;`) never reaches
+// `return false`, so the <a href="#"> follows the href and reloads.
 function toggleDarkMode() {
     const html = document.documentElement;
     const toggle = document.getElementById('darkModeToggle');
@@ -38,11 +43,11 @@ function toggleDarkMode() {
 
     if (isDark) {
         html.setAttribute('data-theme', 'light');
-        toggle.classList.remove('active');
+        if (toggle) toggle.classList.remove('active');
         localStorage.setItem('apple-theme', 'light');
     } else {
         html.setAttribute('data-theme', 'dark');
-        toggle.classList.add('active');
+        if (toggle) toggle.classList.add('active');
         localStorage.setItem('apple-theme', 'dark');
     }
 }
