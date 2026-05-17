@@ -1193,13 +1193,41 @@ body:not([data-plan]) #order-standard_cart .st-variant-label { display: none; }
 /* Hide every variant-label when a specific variant is picked */
 body[data-plan] .st-variant-label { display: none; }
 
-/* -- Variant B -- 4 minimal packages ------------------------- */
+/* -- Variant B -- 4 minimal packages -------------------------
+   4-column default with :has() collapses to 3 / 2 / 1 columns when
+   fewer packages exist (same pattern as .st-pricing for Variant A).
+   Without this a single-product category renders as a narrow 1/4-width
+   card with three empty grid tracks beside it. */
 .st-pricing-b {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
     padding: 0 20px 24px;
+    justify-content: center;
 }
-@media (max-width: 1040px) { .st-pricing-b { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 540px)  { .st-pricing-b { grid-template-columns: 1fr; } }
+.st-pricing-b:has(.st-plan-b:nth-child(3):last-child) {
+    grid-template-columns: repeat(3, minmax(0, 280px));
+}
+.st-pricing-b:has(.st-plan-b:nth-child(2):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 320px));
+}
+.st-pricing-b:has(.st-plan-b:only-child) {
+    grid-template-columns: minmax(0, 360px);
+}
+@media (max-width: 1040px) {
+    .st-pricing-b,
+    .st-pricing-b:has(.st-plan-b:nth-child(3):last-child) {
+        grid-template-columns: repeat(2, minmax(0, 320px));
+    }
+}
+@media (max-width: 540px) {
+    .st-pricing-b,
+    .st-pricing-b:has(.st-plan-b:only-child),
+    .st-pricing-b:has(.st-plan-b:nth-child(2):last-child),
+    .st-pricing-b:has(.st-plan-b:nth-child(3):last-child) {
+        grid-template-columns: minmax(0, 360px);
+    }
+}
 .st-plan-b {
     padding: 20px 18px 18px;
     border: 0.5px solid var(--color-border);
@@ -1553,12 +1581,29 @@ body[data-plan] .st-variant-label { display: none; }
 .st-seg-col.featured .st-seg-cta { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
 .st-seg-col.featured .st-seg-cta:hover { background: var(--color-accent-hover); }
 
-/* -- Variant G -- Spec matrix (label/value rows) ------------- */
+/* -- Variant G -- Spec matrix (label/value rows) -------------
+   3-column default with :has() collapses for groups with fewer
+   packages -- same pattern as Variants A and B. */
 .st-matrix {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
     padding: 0 20px 24px;
+    justify-content: center;
 }
-@media (max-width: 900px) { .st-matrix { grid-template-columns: 1fr; } }
+.st-matrix:has(.st-matrix-card:nth-child(2):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 380px));
+}
+.st-matrix:has(.st-matrix-card:only-child) {
+    grid-template-columns: minmax(0, 420px);
+}
+@media (max-width: 900px) {
+    .st-matrix,
+    .st-matrix:has(.st-matrix-card:only-child),
+    .st-matrix:has(.st-matrix-card:nth-child(2):last-child) {
+        grid-template-columns: minmax(0, 420px);
+    }
+}
 .st-matrix-card {
     border: 0.5px solid var(--color-border);
     border-radius: var(--radius-lg, 14px);
