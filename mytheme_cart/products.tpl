@@ -27,12 +27,18 @@
  *                        └── .st-empty
  *                + .st-guarantees (3 trust cards)
  *
- * Variant switching is driven by mytheme's state-chip (`data-plan-set`).
- * The active variant is captured on <body data-plan="x"> and the
+ * Variant switching is captured on <body data-plan="x"> and the
  * `.plan-variant:not(.v-x)` CSS rules in style.min.css hide the rest.
- * On "All" the chip emits no `data-plan` attr → every variant stacks
- * with an `.st-variant-label` above it so authors can preview them
- * side-by-side.
+ * Two writers set the attribute:
+ *   1. End-user A/B toggle (.st-layout, this file) — visible to clients on
+ *      every product-group page. Defaults to A; user pick persists in
+ *      localStorage('hn-cart-layout') and is restored pre-paint by common.tpl
+ *      to avoid an A→B flash on subsequent loads.
+ *   2. mytheme's dev state-chip (`data-plan-set`) — admin-only preview tool.
+ *      On "All" the chip emits no `data-plan` attr → every variant stacks
+ *      with an `.st-variant-label` above it so authors can preview them
+ *      side-by-side. When data-plan is absent on cart pages the CSS falls
+ *      back to Variant A.
  *
  * Billing-cycle pills: each price block carries `data-price-<cycle>`
  * attributes for every cycle the admin configured per-product. A pill
@@ -192,6 +198,22 @@
                             <button type="button" data-cycle="annually" class="active">Annual <span class="st-cycle-saving">Save 20%</span></button>
                             <button type="button" data-cycle="biennially">Biennial</button>
                         </div>
+
+                        {* Layout pill switcher — end-user A/B toggle. Detailed = Variant A
+                           (3-up feature cards), Compact = Variant B (4-up minimal cards).
+                           Initial active class is set by JS from <body data-plan> after
+                           common.tpl restores the saved preference. Falls back to A here
+                           so unstyled-first-paint is correct when JS hasn't run yet. *}
+                        <div class="st-layout" role="tablist" aria-label="Layout" data-layout-switcher>
+                            <button type="button" data-layout="a" class="active" aria-label="Detailed layout — 3-up cards with feature list">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="18" rx="1.5"/><rect x="14" y="3" width="7" height="18" rx="1.5"/></svg>
+                                Detailed
+                            </button>
+                            <button type="button" data-layout="b" aria-label="Compact layout — 4-up minimal cards">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="4" height="18" rx="1"/><rect x="10" y="3" width="4" height="18" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+                                Compact
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -264,11 +286,17 @@
                                         <div class="st-plan-price-sub">+ {$product.pricing.minprice.setupFee->toPrefixed()} {$LANG.ordersetupfee}</div>
                                     {/if}
 
-                                    <ul class="st-plan-features">
-                                        {if $product.description}
-                                            {$product.description}
-                                        {/if}
-                                    </ul>
+                                    {* Description body — admin writes <ul><li>...</li></ul> in
+                                       the WHMCS product description. Same wrapper class used by
+                                       Variants B and G so a single bit of HTML in the description
+                                       renders consistently regardless of which variant is active.
+                                       regex_replace strips WHMCS's auto-nl2br: WHMCS converts every
+                                       newline in $product.description to <br />, which then leaks
+                                       between <ul>/<li> and creates visible blank lines that no
+                                       CSS rule can erase. *}
+                                    <div class="st-plan-features">
+                                        {if $product.description}{$product.description|regex_replace:'/<br\s*\/?>/i':''}{/if}
+                                    </div>
 
                                     {if $product.stockControlEnabled}
                                         <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 8px;">{$product.qty} {$LANG.orderavailable}</div>
@@ -317,15 +345,11 @@
                                         <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice}{else}{$product.pricing.minprice.price}{/if}</span>
                                         <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
                                     </div>
-                                    {if $product.features}
-                                        <ul class="st-plan-b-specs">
-                                            {foreach $product.features as $feature => $value}
-                                                {if $feature@iteration <= 4}
-                                                    <li><strong>{$value}</strong> {$feature}</li>
-                                                {/if}
-                                            {/foreach}
-                                        </ul>
-                                    {/if}
+                                    {* Description body — see Variant A note. Same admin-authored
+                                       HTML, smaller scale per Variant B's denser card chrome. *}
+                                    <div class="st-plan-b-specs">
+                                        {if $product.description}{$product.description|regex_replace:'/<br\s*\/?>/i':''}{/if}
+                                    </div>
                                     <a href="{$product.productUrl}" class="st-plan-b-cta">{$LANG.ordernowbutton}</a>
                                 </div>
                             {/foreach}
@@ -599,18 +623,13 @@
                                         {if $isFeatured}<div class="st-matrix-eyebrow">Most popular</div>{/if}
                                         <h3 class="st-matrix-name">{$product.name}</h3>
                                     </div>
-                                    {if $product.features}
-                                        <div class="st-matrix-specs">
-                                            {foreach $product.features as $feature => $value}
-                                                {if $feature@iteration <= 6}
-                                                    <div class="st-matrix-row">
-                                                        <span class="label">{$feature}</span>
-                                                        <span class="value">{$value}</span>
-                                                    </div>
-                                                {/if}
-                                            {/foreach}
-                                        </div>
-                                    {/if}
+                                    {* Description body — see Variant A note. Was previously a
+                                       label/value matrix sourced from $product.features; now
+                                       renders the same description HTML as A and B so admins
+                                       only write one set of <ul><li>...</li></ul>. *}
+                                    <div class="st-matrix-specs">
+                                        {if $product.description}{$product.description|regex_replace:'/<br\s*\/?>/i':''}{/if}
+                                    </div>
                                     <div class="st-matrix-foot">
                                         <div class="st-matrix-price"
                                              data-price-host
@@ -862,6 +881,41 @@
     pills.forEach(function (p) {
         p.addEventListener('click', function () {
             applyCycle(this.getAttribute('data-cycle'));
+        });
+    });
+})();
+
+/* ──────────────────────────────────────────────────────────────────
+   Plan-layout switcher (Variant A / B end-user toggle).
+   Reads <body data-plan> to seed the .active highlight (common.tpl
+   restores the saved value before this runs), then on click flips
+   data-plan + persists to localStorage. Empty data-plan defaults to
+   "a" — matches the CSS fallback for cart pages.
+   ────────────────────────────────────────────────────────────────── */
+(function () {
+    var switcher = document.querySelector('[data-layout-switcher]');
+    if (!switcher) return;
+    var pills = switcher.querySelectorAll('button[data-layout]');
+
+    function applyLayout(layout, persist) {
+        if (layout !== 'a' && layout !== 'b') return;
+        document.body.setAttribute('data-plan', layout);
+        pills.forEach(function (p) {
+            p.classList.toggle('active', p.getAttribute('data-layout') === layout);
+        });
+        if (persist) {
+            try { localStorage.setItem('hn-cart-layout', layout); } catch (e) { /* localStorage disabled */ }
+        }
+    }
+
+    // Seed .active from the current data-plan (set by common.tpl from
+    // localStorage). When neither is set, the markup defaults to A.
+    var current = document.body.getAttribute('data-plan');
+    if (current === 'a' || current === 'b') applyLayout(current, false);
+
+    pills.forEach(function (p) {
+        p.addEventListener('click', function () {
+            applyLayout(this.getAttribute('data-layout'), true);
         });
     });
 })();

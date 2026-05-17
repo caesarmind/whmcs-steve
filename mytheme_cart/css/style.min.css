@@ -861,6 +861,41 @@ body[data-subnav-side="left"] .st-split > aside { grid-column: 1; grid-row: 1; }
     text-transform: uppercase;
 }
 
+/* Layout pill switcher -- Variant A / B end-user toggle. Mirrors .st-cycle
+   chrome so the two pill groups sit naturally side-by-side in the category
+   header. JS in products.tpl handles click + localStorage persistence. */
+.st-layout {
+    display: inline-flex;
+    background: var(--color-surface-secondary);
+    border-radius: var(--radius-pill);
+    padding: 3px;
+    flex-shrink: 0;
+}
+.st-layout button {
+    border: 0; background: transparent;
+    padding: 6px 12px;
+    font-size: 12.5px; font-weight: 500;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-pill);
+    cursor: pointer; font-family: inherit;
+    letter-spacing: -0.008em;
+    transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.st-layout button svg { width: 13px; height: 13px; flex-shrink: 0; }
+.st-layout button.active {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.st-layout button:hover:not(.active) { color: var(--color-text-primary); }
+/* Drop the SVG label on very narrow screens — keeps the toggle from
+   wrapping when the category header gets cramped. */
+@media (max-width: 540px) {
+    .st-layout button { padding: 6px 10px; font-size: 0; gap: 0; }
+    .st-layout button svg { width: 15px; height: 15px; }
+}
+
 /* -- Plan grid (Variant A -- 3 cards w/ feature list) ------- */
 .st-pricing {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
@@ -938,33 +973,69 @@ body[data-subnav-side="left"] .st-split > aside { grid-column: 1; grid-row: 1; }
     letter-spacing: -0.004em;
     margin: -8px 0 18px;
 }
+/* Description body for Variant A.
+   Wrapper is a <div> populated from $product.description (admin-authored HTML,
+   typically <ul><li>...</li></ul>). Same class also styles a legacy ul-as-wrapper
+   used by the mockup (apple-client-area/store.html) for backward compatibility.
+   Variants B + G use the same pattern at smaller scale so a single bit of HTML
+   in the description renders consistently regardless of which variant is active. */
 .st-plan-features {
-    list-style: none; padding: 0; margin: 0 0 22px;
-    display: flex; flex-direction: column; gap: 9px;
     flex: 1;
-}
-.st-plan-features li {
-    display: flex; align-items: flex-start; gap: 9px;
+    margin: 0 0 22px;
     font-size: 13px;
     color: var(--color-text-secondary);
     letter-spacing: -0.008em;
-    line-height: 1.4;
+    line-height: 1.45;
 }
-.st-plan-features li svg {
+.st-plan-features,
+.st-plan-features ul,
+.st-plan-features ol {
+    list-style: none; padding: 0;
+}
+.st-plan-features ul,
+.st-plan-features ol {
+    margin: 0;
+    display: flex; flex-direction: column; gap: 9px;
+}
+.st-plan-features li {
+    display: flex; align-items: flex-start; gap: 9px;
+    margin: 0;
+}
+.st-plan-features li > svg {
     width: 14px; height: 14px;
     color: var(--color-green-text);
     flex-shrink: 0;
     margin-top: 1px;
 }
-.st-plan-features li strong {
+/* Green checkmark bullet for plain-text <li> (no inline svg). Mask-image lets
+   the bullet color follow --color-green-text in light + dark mode. */
+.st-plan-features li:not(:has(> svg))::before {
+    content: '';
+    display: block;
+    width: 14px; height: 14px;
+    flex-shrink: 0; margin-top: 1px;
+    background-color: var(--color-green-text);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.st-plan-features li strong,
+.st-plan-features li b {
     color: var(--color-text-primary);
     font-weight: 500;
 }
 .st-plan-features li.muted {
     color: var(--color-text-tertiary);
 }
-.st-plan-features li.muted svg {
-    color: var(--color-text-quaternary);
+.st-plan-features li.muted > svg { color: var(--color-text-quaternary); }
+.st-plan-features li.muted:not(:has(> svg))::before { background-color: var(--color-text-quaternary); }
+/* Graceful fallback if admin pastes paragraphs / headings into the description. */
+.st-plan-features p { margin: 0 0 8px; }
+.st-plan-features p:last-child { margin-bottom: 0; }
+.st-plan-features h1, .st-plan-features h2, .st-plan-features h3,
+.st-plan-features h4, .st-plan-features h5, .st-plan-features h6 {
+    font-size: 13px; font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 6px;
 }
 
 .st-plan-cta {
@@ -1168,15 +1239,49 @@ body[data-plan] .st-variant-label { display: none; }
 .st-plan-b-price .currency { font-size: 14px; color: var(--color-text-secondary); margin-top: 2px; }
 .st-plan-b-price .amount   { font-size: 28px; font-weight: 600; letter-spacing: -0.025em; color: var(--color-text-primary); line-height: 1; }
 .st-plan-b-price .period   { font-size: 11.5px; color: var(--color-text-tertiary); margin-left: 2px; }
+/* Description body for Variant B — same admin-authored HTML as Variant A,
+   smaller scale to suit the denser 4-up card chrome. See .st-plan-features
+   for the full pattern. */
 .st-plan-b-specs {
-    list-style: none; padding: 0;
+    flex: 1;
     margin: 0 0 14px;
-    display: flex; flex-direction: column; gap: 4px;
     font-size: 12px; color: var(--color-text-secondary);
     letter-spacing: -0.004em;
-    flex: 1;
+    line-height: 1.45;
 }
-.st-plan-b-specs li strong { color: var(--color-text-primary); font-weight: 500; }
+.st-plan-b-specs,
+.st-plan-b-specs ul,
+.st-plan-b-specs ol { list-style: none; padding: 0; }
+.st-plan-b-specs ul,
+.st-plan-b-specs ol {
+    margin: 0;
+    display: flex; flex-direction: column; gap: 6px;
+}
+.st-plan-b-specs li { display: flex; align-items: flex-start; gap: 7px; margin: 0; }
+.st-plan-b-specs li > svg {
+    width: 12px; height: 12px;
+    color: var(--color-green-text);
+    flex-shrink: 0; margin-top: 2px;
+}
+.st-plan-b-specs li:not(:has(> svg))::before {
+    content: '';
+    display: block;
+    width: 12px; height: 12px;
+    flex-shrink: 0; margin-top: 2px;
+    background-color: var(--color-green-text);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.st-plan-b-specs li strong,
+.st-plan-b-specs li b { color: var(--color-text-primary); font-weight: 500; }
+.st-plan-b-specs p { margin: 0 0 6px; }
+.st-plan-b-specs p:last-child { margin-bottom: 0; }
+.st-plan-b-specs h1, .st-plan-b-specs h2, .st-plan-b-specs h3,
+.st-plan-b-specs h4, .st-plan-b-specs h5, .st-plan-b-specs h6 {
+    font-size: 12px; font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 4px;
+}
 .st-plan-b-cta {
     height: 32px; padding: 0 14px;
     border-radius: var(--radius-pill);
@@ -1485,17 +1590,49 @@ body[data-plan] .st-variant-label { display: none; }
 .st-matrix-card.featured .st-matrix-head { border-bottom-color: rgba(0,113,227,0.2); }
 .st-matrix-eyebrow { font-size: 10.5px; font-weight: 600; color: var(--color-accent); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
 .st-matrix-name { font-size: 17px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.014em; margin: 0; }
-.st-matrix-specs { padding: 14px 22px; flex: 1; }
-.st-matrix-row {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding: 8px 0;
-    border-bottom: 0.5px solid var(--color-border);
-    font-size: 12.5px;
+/* Description body for Variant G — same admin-authored HTML as Variants A
+   and B. Was previously a label/value matrix sourced from $product.features;
+   now mirrors A/B so admins write one set of <ul><li>...</li></ul> and it
+   renders consistently across all three variants. */
+.st-matrix-specs {
+    padding: 14px 22px; flex: 1;
+    font-size: 12.5px; color: var(--color-text-secondary);
     letter-spacing: -0.004em;
+    line-height: 1.45;
 }
-.st-matrix-row:last-child { border-bottom: 0; }
-.st-matrix-row .label { color: var(--color-text-tertiary); }
-.st-matrix-row .value { color: var(--color-text-primary); font-weight: 500; font-variant-numeric: tabular-nums; }
+.st-matrix-specs,
+.st-matrix-specs ul,
+.st-matrix-specs ol { list-style: none; }
+.st-matrix-specs ul,
+.st-matrix-specs ol {
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 8px;
+}
+.st-matrix-specs li { display: flex; align-items: flex-start; gap: 8px; margin: 0; }
+.st-matrix-specs li > svg {
+    width: 13px; height: 13px;
+    color: var(--color-green-text);
+    flex-shrink: 0; margin-top: 1px;
+}
+.st-matrix-specs li:not(:has(> svg))::before {
+    content: '';
+    display: block;
+    width: 13px; height: 13px;
+    flex-shrink: 0; margin-top: 1px;
+    background-color: var(--color-green-text);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.st-matrix-specs li strong,
+.st-matrix-specs li b { color: var(--color-text-primary); font-weight: 500; }
+.st-matrix-specs p { margin: 0 0 6px; }
+.st-matrix-specs p:last-child { margin-bottom: 0; }
+.st-matrix-specs h1, .st-matrix-specs h2, .st-matrix-specs h3,
+.st-matrix-specs h4, .st-matrix-specs h5, .st-matrix-specs h6 {
+    font-size: 12.5px; font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 6px;
+}
 .st-matrix-foot { padding: 18px 22px 22px; border-top: 0.5px solid var(--color-border); display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .st-matrix-card.featured .st-matrix-foot { border-top-color: rgba(0,113,227,0.2); }
 .st-matrix-price { display: flex; align-items: baseline; gap: 2px; font-variant-numeric: tabular-nums; }
