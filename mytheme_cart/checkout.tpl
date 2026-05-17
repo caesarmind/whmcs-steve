@@ -221,7 +221,7 @@
 
 .co-split { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: stretch; }
 @media (max-width: 960px) { .co-split { grid-template-columns: 1fr; } }
-.co-left { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.co-left { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
 .co-split > aside { min-height: 100%; }
 
 /* Right summary card */
@@ -229,15 +229,18 @@
 .co-summary-head { padding: 18px 20px 14px; border-bottom: 0.5px solid var(--color-border); }
 .co-summary-head h2 { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; margin: 0; }
 .co-summary-list { padding: 8px 20px; }
-.co-summary-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 8px 0; font-size: 12.5px; font-variant-numeric: tabular-nums; letter-spacing: -0.004em; }
-.co-summary-line .label { color: var(--color-text-secondary); flex: 1; min-width: 0; }
-.co-summary-line .value { color: var(--color-text-primary); font-weight: 500; white-space: nowrap; }
+.co-summary-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 8px 0; font-size: 12.5px; font-variant-numeric: tabular-nums; letter-spacing: -0.004em; background: transparent; border: 0; border-radius: 0; }
+/* Explicit resets -- .label and .value are also Bootstrap badge class
+   names, so without these the global Bootstrap shim from WHMCS paints
+   each row's text with a white/grey pill behind it. */
+.co-summary-line .label { color: var(--color-text-secondary); flex: 1; min-width: 0; background: transparent !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; font-size: inherit; font-weight: inherit; line-height: inherit; text-align: left; display: inline; white-space: normal; vertical-align: baseline; color: var(--color-text-secondary) !important; }
+.co-summary-line .value { color: var(--color-text-primary); font-weight: 500; white-space: nowrap; background: transparent !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; }
 .co-summary-line .value.muted { color: var(--color-text-tertiary); font-weight: 400; }
-.co-summary-line .value.good { color: var(--color-green-text, #34c759); font-weight: 500; }
+.co-summary-line .value.good { color: var(--color-green-text, #34c759) !important; font-weight: 500; }
 .co-summary-line.divider { border-top: 0.5px solid var(--color-border); padding-top: 12px; margin-top: 4px; }
 .co-summary-total { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 18px 24px; border-top: 0.5px solid var(--color-border); background: var(--color-surface-tertiary); font-variant-numeric: tabular-nums; }
-.co-summary-total .label { font-size: 15px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
-.co-summary-total .value { font-size: 24px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.025em; white-space: nowrap; }
+.co-summary-total .label { font-size: 15px; font-weight: 600; color: var(--color-text-primary) !important; letter-spacing: -0.01em; background: transparent !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; line-height: 1.2; display: inline; white-space: normal; vertical-align: baseline; }
+.co-summary-total .value { font-size: 24px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.025em; white-space: nowrap; background: transparent !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; }
 .co-summary-cycle { font-size: 11px; color: var(--color-text-tertiary); padding: 10px 20px 14px; letter-spacing: -0.004em; margin: 0; }
 .co-summary-footer {
     padding: 12px 18px 14px;
