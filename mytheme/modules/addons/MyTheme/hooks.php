@@ -172,6 +172,50 @@ if (AddonHelper::isActive()) {
         return ['mtIcons' => MyTheme\Menu\Icons::all()];
     });
 
+    // Global cart count → $globalCartCount on EVERY client-area page.
+    //
+    // WHMCS only populates $cartitems on cart-flow pages (cart.php, viewcart,
+    // configureproduct, etc.), so the .topbar-cart-badge in topnav.tpl /
+    // inner-topbar.tpl can't render on plain clientarea routes
+    // (clientareahome, services, domains, etc.) even when items ARE in the
+    // session cart. This hook inspects the cart on every page render and
+    // surfaces the total item count so the badge fires everywhere.
+    //
+    // Strategy:
+    //  1. Prefer WHMCS\Cart\Cart::getInstance() with getProductCount() +
+    //     getDomainCount() — the documented API.
+    //  2. Fall back to a direct $_SESSION['cart'] inspection counting
+    //     products + domains + addons (mirrors how WHMCS itself derives
+    //     $cartitems inside cart.php).
+    //  3. Always return an int — 0 when no cart session exists.
+    //
+    // Defensive throughout: any exception falls through to the session
+    // count, and any malformed session still yields 0 instead of fataling.
+    add_hook('ClientAreaPage', 2, function ($vars) {
+        $count = 0;
+        try {
+            if (class_exists('\\WHMCS\\Cart\\Cart')) {
+                $cart = \WHMCS\Cart\Cart::getInstance();
+                if (method_exists($cart, 'getProductCount')) {
+                    $count += (int) $cart->getProductCount();
+                }
+                if (method_exists($cart, 'getDomainCount')) {
+                    $count += (int) $cart->getDomainCount();
+                }
+            }
+        } catch (\Throwable $e) {
+            // Fall through to the session-based fallback below.
+        }
+        if ($count === 0 && isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+            foreach (['products', 'domains', 'addons'] as $bucket) {
+                if (isset($_SESSION['cart'][$bucket]) && is_array($_SESSION['cart'][$bucket])) {
+                    $count += count($_SESSION['cart'][$bucket]);
+                }
+            }
+        }
+        return ['globalCartCount' => $count];
+    });
+
     add_hook('ClientAreaHeadOutput', 1, function ($vars) {
         return HookService::instance()->dispatch('ClientAreaHeadOutput', $vars);
     });

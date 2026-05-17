@@ -51,10 +51,12 @@
             {/if}
             <a href="{$WEB_ROOT}/cart.php?a=view" class="ph-side-iconbtn topbar-cart-btn" aria-label="{$LANG.cartTitle|default:'Cart'}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-                {* $cartitems is the WHMCS-set count on cart-flow pages;
-                   $cartcount is a fallback used on a few clientarea pages.
-                   Both are absent on most non-cart routes -- badge hides. *}
-                {if $cartitems && $cartitems > 0}
+                {* $globalCartCount is injected by MyTheme's ClientAreaPage
+                   hook (hooks.php) on every page. $cartitems / $cartcount
+                   are fallbacks for cart-flow pages if the hook isn't run. *}
+                {if $globalCartCount && $globalCartCount > 0}
+                    <span class="topbar-cart-badge" aria-label="{$globalCartCount} {$LANG.cartItems|default:'items in cart'}">{$globalCartCount}</span>
+                {elseif $cartitems && $cartitems > 0}
                     <span class="topbar-cart-badge" aria-label="{$cartitems} {$LANG.cartItems|default:'items in cart'}">{$cartitems}</span>
                 {elseif $cartcount && $cartcount > 0}
                     <span class="topbar-cart-badge" aria-label="{$cartcount} {$LANG.cartItems|default:'items in cart'}">{$cartcount}</span>
