@@ -1995,6 +1995,14 @@ body.modal-open { overflow: hidden; }
 /* -- 2-column split (matches .st-split) -------------------- */
 .dp-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
 @media (max-width: 880px) { .dp-split { grid-template-columns: 1fr; } }
+/* Sub-nav state-chip wiring -- same pattern as .st-split above. The
+   domain-search page (configureproductdomain.tpl, served at
+   /store/<group>/<product>) uses .dp-split with the same Categories
+   sidebar include as products.tpl, so the chip needs the same hooks. */
+body[data-subnav="off"] .dp-split { grid-template-columns: 1fr; }
+body[data-subnav="off"] .dp-split > aside { display: none; }
+body[data-subnav-side="left"] .dp-split { grid-template-columns: 240px 1fr; }
+body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
 
 /* -- Checkout progress strip (above the card) ------------- */
 .dp-steps {
