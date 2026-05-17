@@ -130,7 +130,7 @@
         {/if}
 
         <a href="{$WEB_ROOT}/cart.php?a=view" class="topbar-btn topbar-cart-btn" title="{$LANG.cartTitle|default:'Cart'}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-with="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
             {* $cartitems is the WHMCS-provided int count on every cart-flow
                page (cart.php, viewcart, configureproduct, etc.). $cartcount
                is the legacy/sidebar fallback used on a few clientarea pages.
