@@ -2924,3 +2924,574 @@ body.modal-open { overflow: hidden; }
     border-color: var(--color-border);
 }
 .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+
+/* ===============================================================
+   13. DOMAIN REGISTER (.dr-*)
+   Source: apple-client-area/cart-domain-register.html
+   Used by: domainregister.tpl
+   Search card + AI/Classic mode tabs + result card + popular TLD
+   grid + suggestions list + pricing table + transfer CTA.
+   =============================================================== */
+
+.dr-main { min-width: 0; }
+
+/* Page-eyebrow above the H1 (matches the mockup's "ORDER" tag) */
+.st-page-header .page-eyebrow {
+    font-size: 11px; font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin: 0 0 6px;
+}
+
+/* -- Search card -------------------------------------------- */
+.dr-search {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    padding: 22px;
+    margin-bottom: 24px;
+}
+
+/* Mode tabs (AI Generator / Classic Search pill switcher) */
+.dr-mode-tabs {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px;
+    background: var(--color-surface-secondary);
+    border-radius: var(--radius-pill);
+    margin-bottom: 14px;
+}
+.dr-mode-tab {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 30px; padding: 0 14px;
+    border-radius: var(--radius-pill);
+    background: transparent; border: 0;
+    color: var(--color-text-tertiary);
+    font-size: 12px; font-weight: 500;
+    font-family: inherit; cursor: pointer;
+    letter-spacing: -0.004em;
+    transition: all var(--transition-fast);
+}
+.dr-mode-tab:hover { color: var(--color-text-primary); }
+.dr-mode-tab.active {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.dr-mode-tab svg { width: 12px; height: 12px; }
+
+/* Form visibility driven by the parent .dr-search[data-search-mode] */
+.dr-search[data-search-mode="ai"]      .dr-search-form[data-mode-form="classic"] { display: none; }
+.dr-search[data-search-mode="classic"] .dr-search-form[data-mode-form="ai"]      { display: none; }
+
+.dr-search-form { display: flex; flex-direction: column; gap: 12px; margin: 0; }
+/* Re-cancel Bootstrap input-group's negative-margin / table-cell tricks
+   so the rounded pill renders without seams. WHMCS standard_cart adds
+   .input-group.input-group-lg.input-group-box on the search box for
+   the legacy plugin; we keep those for backwards-compat but blank out
+   their visual side-effects. */
+.dr-search-form .input-group { display: flex !important; flex-wrap: nowrap; }
+.dr-search-form .input-group > * { float: none; }
+
+/* Pill-shaped search box (icon + input + submit) */
+.dr-search-box {
+    display: flex; align-items: center; gap: 0;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    padding: 0 4px 0 16px;
+    height: 52px;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.dr-search-box:focus-within {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+.dr-search-icon {
+    width: 16px; height: 16px;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+}
+.dr-search-input {
+    flex: 1; min-width: 0;
+    border: 0 !important; background: transparent !important;
+    padding: 0 12px !important;
+    height: 100% !important;
+    font-size: 15px; letter-spacing: -0.012em;
+    color: var(--color-text-primary);
+    font-family: inherit;
+    box-shadow: none !important; outline: none;
+    resize: none;
+    /* textarea support -- single visual line for the AI form */
+    line-height: 50px;
+}
+.dr-search-input:focus { outline: none; box-shadow: none; }
+.dr-search-input::placeholder { color: var(--color-text-quaternary); }
+textarea.dr-search-input {
+    line-height: 1.4;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+}
+
+.dr-generate-btn {
+    height: 44px; padding: 0 22px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff; border: 0;
+    font-size: 13.5px; font-weight: 500;
+    font-family: inherit; cursor: pointer;
+    letter-spacing: -0.008em;
+    flex-shrink: 0;
+    transition: background var(--transition-fast);
+}
+.dr-generate-btn:hover { background: var(--color-accent-hover); color: #fff; }
+
+/* AI-mode filters row (TLD multiselect + max length + safe search) */
+.dr-filters-row {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+}
+.dr-filter-multiselect .multiselect.btn,
+.dr-filters-row .multiselect.btn {
+    height: 32px; padding: 0 14px;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-size: 12.5px; font-weight: 500;
+    font-family: inherit;
+    letter-spacing: -0.008em;
+    box-shadow: none;
+}
+.dr-filters-row .multiselect.btn:hover,
+.dr-filters-row .multiselect.btn:focus,
+.dr-filters-row .multiselect.btn.active {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+    box-shadow: none;
+}
+.dr-filter-safesearch {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12.5px; color: var(--color-text-secondary);
+    letter-spacing: -0.008em;
+    margin: 0;
+    padding: 0 10px;
+    height: 32px;
+    cursor: pointer;
+}
+.dr-filter-safesearch input[type="checkbox"] {
+    width: 14px; height: 14px;
+    margin: 0;
+    accent-color: var(--color-accent);
+}
+
+/* Captcha container -- modest margin tweak so it doesn't crowd the
+   filters row. */
+#captchaContainer { margin-top: 14px; }
+.default-captcha img { vertical-align: middle; }
+
+/* -- Section heads above sub-blocks ------------------------- */
+.dr-section { margin-bottom: 28px; }
+.dr-section-head { margin-bottom: 12px; }
+.dr-section-head h2 {
+    font-size: 18px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.018em;
+    margin: 0 0 4px;
+}
+.dr-section-head p {
+    font-size: 13px; color: var(--color-text-tertiary);
+    margin: 0; letter-spacing: -0.008em;
+}
+
+/* WHMCS-emitted "Top Suggestion" / "Exact Match" headlines */
+.dr-results-heading {
+    font-size: 13px; font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    margin: 18px 0 10px;
+}
+.dr-results-heading i { color: var(--color-accent); margin-right: 6px; }
+
+/* -- Primary result card ------------------------------------ */
+.dr-result-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    padding: 20px 22px;
+    margin-bottom: 24px;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+/* Available state -- WHMCS shows .domain-available text. We tint the
+   whole card via :has() so it reads like the mockup's green pill. */
+.dr-result-card:has(.domain-available:not([style*="display: none"]):not([style*="display:none"])) {
+    border-color: var(--color-green-text);
+    background: var(--color-green-bg);
+}
+.dr-result-card:has(.domain-unavailable:not([style*="display: none"]):not([style*="display:none"])),
+.dr-result-card:has(.domain-invalid:not([style*="display: none"]):not([style*="display:none"])),
+.dr-result-card:has(.domain-tld-unavailable:not([style*="display: none"]):not([style*="display:none"])) {
+    border-color: var(--color-red-text);
+    background: var(--color-red-bg);
+}
+
+.dr-result-card .domain-lookup-primary-loader {
+    margin: 0; padding: 0;
+    font-size: 14px; color: var(--color-text-secondary);
+    display: flex; align-items: center; gap: 10px;
+}
+.dr-result-card .domain-lookup-primary-loader i { color: var(--color-accent); }
+
+.dr-result-card .domain-checker-result-headline,
+.dr-result-card .domain-lookup-result { display: block; }
+
+.dr-result-card p { margin: 0 0 6px; font-size: 14px; }
+.dr-result-card .domain-available {
+    color: var(--color-green-text);
+    font-size: 16px; font-weight: 500;
+    letter-spacing: -0.012em;
+    margin-bottom: 8px;
+}
+.dr-result-card .domain-unavailable,
+.dr-result-card .domain-invalid,
+.dr-result-card .domain-tld-unavailable,
+.dr-result-card .domain-error {
+    color: var(--color-red-text);
+    font-size: 14px; font-weight: 500;
+    letter-spacing: -0.008em;
+}
+.dr-result-card .domain-price {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+    margin: 10px 0 0;
+}
+.dr-result-card .domain-price .price {
+    font-size: 18px; font-weight: 600;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.012em;
+}
+.dr-result-card .btn-add-to-cart {
+    height: 38px; padding: 0 22px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff;
+    border: 0;
+    font-size: 13px; font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.dr-result-card .btn-add-to-cart:hover { background: var(--color-accent-hover); color: #fff; }
+.dr-result-card .domain-contact-support { margin-top: 10px; }
+.dr-result-card .idn-language-selector { margin-top: 12px; }
+.dr-result-card .idn-language-selector select { max-width: 320px; }
+
+/* -- Popular TLD grid (spotlightTlds + featuredTlds) -------- */
+.dr-popular-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    float: none !important;
+}
+.dr-tld-card {
+    position: relative;
+    padding: 18px 16px 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    text-align: center;
+    float: none !important;
+    width: auto !important;
+    transition: border-color var(--transition-fast);
+}
+.dr-tld-card:hover { border-color: var(--color-text-quaternary); }
+
+.dr-tld-card .spotlight-tld { padding: 0; }
+.dr-tld-card .img-container {
+    height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 6px;
+}
+.dr-tld-card .img-container img { max-height: 32px; max-width: 80px; object-fit: contain; }
+
+.dr-tld-tag {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 2px 8px; border-radius: var(--radius-pill);
+}
+.dr-tld-tag-new,    .spotlight-tld-new    { background: var(--color-accent-light); color: var(--color-accent); }
+.dr-tld-tag-sale,   .spotlight-tld-sale   { background: var(--color-red-bg); color: var(--color-red-text); }
+.dr-tld-tag-hot,    .spotlight-tld-hot    { background: var(--color-orange-bg); color: var(--color-orange-text); }
+
+.dr-tld-name {
+    font-size: 22px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.022em;
+    margin-bottom: 8px;
+    line-height: 1.1;
+}
+.dr-tld-status {
+    display: block;
+    font-size: 12px; font-weight: 500;
+    color: var(--color-text-tertiary);
+    margin-bottom: 10px; letter-spacing: -0.004em;
+}
+.dr-tld-status.unavailable { color: var(--color-red-text); }
+.dr-tld-price {
+    display: block;
+    font-size: 13.5px; font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 10px; font-variant-numeric: tabular-nums;
+}
+.dr-tld-price span { font-weight: 400; color: var(--color-text-tertiary); }
+.dr-tld-btn {
+    display: inline-block; width: 100%;
+    height: 32px; padding: 0 14px;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    border: 0.5px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 12.5px; font-weight: 500;
+    text-decoration: none;
+    line-height: 31px; cursor: pointer;
+    font-family: inherit;
+    letter-spacing: -0.008em;
+    transition: all var(--transition-fast);
+    text-align: center;
+}
+.dr-tld-btn:hover { background: var(--color-accent); color: #fff; border-color: var(--color-accent); text-decoration: none; }
+.dr-tld-btn.disabled,
+.dr-tld-btn[disabled] {
+    color: var(--color-text-quaternary);
+    cursor: not-allowed; opacity: 0.6;
+}
+.dr-tld-btn.disabled:hover,
+.dr-tld-btn[disabled]:hover { background: transparent; color: var(--color-text-quaternary); border-color: var(--color-border); }
+
+/* -- Suggested-for-you list --------------------------------- */
+.suggested-domains.dr-section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    overflow: hidden;
+    padding: 0;
+}
+.suggested-domains .dr-section-head {
+    padding: 16px 18px 12px;
+    margin: 0;
+    border: 0; background: transparent;
+}
+.dr-suggested-list { border-radius: 0 !important; border: 0 !important; background: transparent !important; padding: 0 !important; margin: 0 !important; }
+.dr-sug-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+    padding: 14px 18px;
+    border: 0;
+    border-top: 0.5px solid var(--color-border);
+    background: transparent;
+    transition: background var(--transition-fast);
+}
+.dr-sug-row:hover { background: var(--color-surface-secondary); }
+.dr-sug-name {
+    font-size: 14px; font-weight: 500;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+    display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.dr-sug-name .extension,
+.dr-sug-name .tld { color: var(--color-text-tertiary); font-weight: 500; }
+.dr-sug-chip {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 2px 7px; border-radius: var(--radius-pill);
+}
+.dr-sug-chip.sale,  .tld-sale-group-sale  { background: var(--color-red-bg); color: var(--color-red-text); }
+.dr-sug-chip.new,   .tld-sale-group-new   { background: var(--color-accent-light); color: var(--color-accent); }
+.dr-sug-chip.hot,   .tld-sale-group-hot   { background: var(--color-orange-bg); color: var(--color-orange-text); }
+.dr-sug-actions {
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.dr-sug-actions .price,
+.dr-sug-price {
+    font-size: 13px; font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Generic add-to-cart pill used in result card + suggestions list */
+.dr-add-btn {
+    height: 38px; padding: 0 22px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff;
+    font-size: 13px; font-weight: 500;
+    text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    letter-spacing: -0.008em;
+    flex-shrink: 0;
+    border: 0;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+}
+.dr-add-btn:hover { background: var(--color-accent-hover); color: #fff; text-decoration: none; }
+.dr-add-btn.outline {
+    background: transparent; color: var(--color-accent);
+    border: 0.5px solid var(--color-border);
+}
+.dr-add-btn.outline:hover { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+
+/* "Give me more suggestions" link footer */
+.dr-more-wrap {
+    text-align: center;
+    padding: 14px;
+    border-top: 0.5px solid var(--color-border);
+    background: transparent;
+}
+.dr-more-link {
+    color: var(--color-accent); text-decoration: none;
+    font-size: 13px; letter-spacing: -0.008em; font-weight: 500;
+}
+.dr-more-link:hover { color: var(--color-accent-hover); text-decoration: underline; }
+
+/* Suppress the WHMCS "ssl warning" paragraph if needed */
+.suggested-domains .domain-suggestions-warning {
+    padding: 10px 18px 14px;
+    font-size: 11.5px; color: var(--color-text-tertiary);
+}
+
+/* -- TLD category filter chips ------------------------------ */
+.dr-tld-filters {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 14px;
+}
+.dr-tld-filter {
+    display: inline-flex; align-items: center;
+    height: 28px; padding: 0 12px;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-secondary);
+    border: 0;
+    color: var(--color-text-secondary);
+    font-size: 12px; font-weight: 500;
+    letter-spacing: -0.004em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.dr-tld-filter:hover,
+.dr-tld-filter:focus,
+.dr-tld-filter.active {
+    background: var(--color-accent); color: #fff;
+    text-decoration: none;
+}
+
+/* -- TLD pricing table -------------------------------------- */
+.dr-pricing-table {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    overflow: hidden;
+}
+.dr-pricing-head {
+    padding: 12px 16px;
+    background: var(--color-surface-secondary);
+    border-bottom: 0.5px solid var(--color-border);
+    font-size: 11px; font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dr-pricing-row {
+    padding: 14px 16px;
+    border-top: 0.5px solid var(--color-border);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+}
+.dr-pricing-row:first-of-type { border-top: 0; }
+.dr-pricing-row strong { font-weight: 600; letter-spacing: -0.012em; }
+.dr-pricing-row .two-row-center { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dr-pricing-row small { color: var(--color-text-tertiary); font-size: 11px; }
+.dr-pricing-row.no-tlds {
+    color: var(--color-text-tertiary);
+    font-size: 13px; text-align: center;
+    padding: 24px 16px;
+}
+
+/* -- Transfer CTA strip ------------------------------------- */
+.dr-transfer-cta {
+    margin-top: 16px;
+    padding: 22px 24px;
+    background: var(--color-surface-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 18px; flex-wrap: wrap;
+}
+.dr-transfer-eyebrow {
+    font-size: 11px; font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 4px;
+}
+.dr-transfer-cta h2 {
+    font-size: 18px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.018em; margin: 0 0 4px;
+}
+.dr-transfer-cta p {
+    font-size: 13px; color: var(--color-text-secondary);
+    margin: 0; letter-spacing: -0.008em;
+}
+
+/* Strip Bootstrap .domain-promo-box legacy borders / padding so the
+   above tokens are the only thing styling the CTA. */
+.dr-transfer-cta.domain-promo-box {
+    text-align: left;
+    box-shadow: none;
+}
+.dr-transfer-cta .fa,
+.dr-transfer-cta .fas,
+.dr-transfer-cta .far { display: none; }
+
+/* -- Empty state placeholder -------------------------------- */
+.dr-results-empty {
+    display: none;
+    text-align: center;
+    padding: 60px 24px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+}
+.dr-empty-ico {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--color-bg);
+    color: var(--color-text-tertiary);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+}
+.dr-empty-ico svg { width: 22px; height: 22px; }
+.dr-empty-title {
+    font-size: 17px; font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 6px;
+    letter-spacing: -0.014em;
+}
+.dr-empty-desc {
+    font-size: 14px; color: var(--color-text-secondary);
+    margin: 0 auto 0;
+    max-width: 380px;
+    line-height: 1.5;
+    letter-spacing: -0.008em;
+}
+
+/* -- Full / Empty state toggle, scoped to this page --------- */
+body[data-data="empty"] #order-standard_cart .dr-results-full  { display: none; }
+body[data-data="empty"] #order-standard_cart .dr-results-empty { display: block; }
+
+/* -- Responsive ---------------------------------------------- */
+@media (max-width: 640px) {
+    .dr-search { padding: 16px; }
+    .dr-search-box { height: 46px; }
+    .dr-generate-btn { height: 38px; padding: 0 16px; }
+    .dr-transfer-cta { flex-direction: column; align-items: flex-start; }
+    .dr-result-card { padding: 16px; }
+    .dr-result-card .domain-price { flex-direction: column; align-items: flex-start; }
+}
