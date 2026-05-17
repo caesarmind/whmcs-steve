@@ -1713,6 +1713,13 @@ body[data-plan] .st-variant-label { display: none; }
 .modal:not(.show):not(.in) { display: none !important; }
 .hidden { display: none !important; }
 .w-hidden { display: none; }
+/* `.w-hidden.w-hidden` doubles the specificity to (0,2,0) without changing
+   the matched set. Needed so `.btn { display: inline-flex }` (defined
+   later in this file at (0,1,0)) doesn't outrank `.w-hidden`'s display:
+   none and leave the inactive Already-Registered / Create-Account button
+   visible. We don't use !important here because scripts.min.js + gateway
+   scripts toggle visibility via inline styles (see note above). */
+.w-hidden.w-hidden { display: none; }
 
 /* -- Bootstrap modal base positioning ------------------------------
    mytheme_cart's common.tpl deliberately doesn't pull in standard_cart's

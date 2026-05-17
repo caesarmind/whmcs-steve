@@ -222,6 +222,16 @@
 .co-split { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: stretch; }
 @media (max-width: 960px) { .co-split { grid-template-columns: 1fr; } }
 .co-left { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+/* The form wraps everything from Existing-Account through TOS/submit, so
+   .co-left's 20px gap only reaches the few elements OUTSIDE the form
+   (.already-registered, .checkout-error-feedback) -- NOT the cards
+   stacked inside it. Promote #frmCheckout to a flex column too so its
+   children (Existing Signin, New Signup, Security, Last Chance, Notes,
+   Marketing opt-in, TOS+Submit) get the same 20px breathing room. */
+#frmCheckout { display: flex; flex-direction: column; gap: 20px; }
+/* The 5 hidden inputs at the top of the form would otherwise consume
+   slots in the flex column and inject spurious gaps. */
+#frmCheckout > input[type="hidden"] { display: none; }
 .co-split > aside { min-height: 100%; }
 
 /* Right summary card */
