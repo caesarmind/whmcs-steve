@@ -510,6 +510,15 @@ var _localLang = {
     .cp-grid { grid-template-columns: 1fr; }
     .cp-summary-wrap { position: static !important; }
 }
+/* Sub-nav state-chip wiring -- same pattern as .st-split (mytheme_cart
+   products page) and the client-area .ct-split / .pm-split / .um-split.
+   "Hide" collapses the order-summary aside and gives the form full
+   width; subnav-side="left" flips it to sit on the left of the form. */
+body[data-subnav="off"] .cp-grid { grid-template-columns: 1fr; }
+body[data-subnav="off"] .cp-grid > .cp-summary-wrap { display: none; }
+body[data-subnav-side="left"] .cp-grid { grid-template-columns: 340px minmax(0, 1fr); }
+body[data-subnav-side="left"] .cp-grid > .cp-summary-wrap { grid-column: 1; grid-row: 1; }
+body[data-subnav-side="left"] .cp-grid > .cp-main { grid-column: 2; grid-row: 1; }
 .cp-main > .cp-section + .cp-section { margin-top: 16px; }
 
 .cp-form-grid {
