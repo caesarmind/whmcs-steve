@@ -373,14 +373,17 @@
 #containerNewUserSecurity > .sub-heading:first-child,
 .co-payment-card > .sub-heading:first-child { margin-top: 18px; }
 
-/* Multi-section: each .sub-heading + .row pair = independent card */
-#containerNewUserSignup {
+/* Multi-section: each .sub-heading + .row pair = independent card.
+   Uses #order-standard_cart prefix to bump specificity to (2,1,0) so
+   we win the cascade against .co-left .sub-heading (which earlier in
+   this file resets sub-heading typography/spacing to flat eyebrow text). */
+#order-standard_cart #containerNewUserSignup {
     padding: 0;
     background: transparent;
     border: 0;
     border-radius: 0;
 }
-#containerNewUserSignup > .sub-heading {
+#order-standard_cart #containerNewUserSignup > .sub-heading {
     background: var(--color-surface);
     border: 0.5px solid var(--color-border);
     border-bottom: 0;
@@ -388,9 +391,9 @@
     margin: 12px 0 0;
     padding: 18px 22px 8px;
 }
-#containerNewUserSignup > .sub-heading:first-of-type { margin-top: 0; }
-#containerNewUserSignup > .sub-heading + .row,
-#containerNewUserSignup > .sub-heading + .field-container {
+#order-standard_cart #containerNewUserSignup > .sub-heading:first-of-type { margin-top: 0; }
+#order-standard_cart #containerNewUserSignup > .sub-heading + .row,
+#order-standard_cart #containerNewUserSignup > .sub-heading + .field-container {
     background: var(--color-surface);
     border: 0.5px solid var(--color-border);
     border-top: 0;
