@@ -510,15 +510,11 @@ var _localLang = {
     .cp-grid { grid-template-columns: 1fr; }
     .cp-summary-wrap { position: static !important; }
 }
-/* Sub-nav state-chip wiring -- same pattern as .st-split (mytheme_cart
-   products page) and the client-area .ct-split / .pm-split / .um-split.
-   "Hide" collapses the order-summary aside and gives the form full
-   width; subnav-side="left" flips it to sit on the left of the form. */
-body[data-subnav="off"] .cp-grid { grid-template-columns: 1fr; }
-body[data-subnav="off"] .cp-grid > .cp-summary-wrap { display: none; }
-body[data-subnav-side="left"] .cp-grid { grid-template-columns: 340px minmax(0, 1fr); }
-body[data-subnav-side="left"] .cp-grid > .cp-summary-wrap { grid-column: 1; grid-row: 1; }
-body[data-subnav-side="left"] .cp-grid > .cp-main { grid-column: 2; grid-row: 1; }
+/* No data-subnav wiring on this page on purpose: the right-side aside is
+   the order summary (content), not a Categories sidebar, so the state-
+   chip's "Sub-nav: Hide" should leave it alone. Same reasoning for
+   viewcart.tpl and checkout.tpl -- their right asides are also summary
+   panels and stay visible regardless of the chip state. */
 .cp-main > .cp-section + .cp-section { margin-top: 16px; }
 
 .cp-form-grid {
