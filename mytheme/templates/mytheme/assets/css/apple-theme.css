@@ -3017,6 +3017,10 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .homepage-nav .nav-switcher { color: var(--color-text-tertiary); font-size: 12px; text-decoration: none; }
 .homepage-nav .nav-switcher:hover { color: var(--color-text-primary); text-decoration: none; }
 .homepage-nav .nav-section { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-tertiary); pointer-events: none; }
+/* Header items in the admin menu tree are sidebar-only groupers — hide
+   them entirely on the top-nav layout so they don't render alongside
+   the actual nav-items they group (e.g. "HOME Home SERVICES Services"). */
+.homepage-nav.only-top .nav-section { display: none; }
 .homepage-nav .nav-divider { width: 1px; height: 16px; background: var(--color-border); }
 
 /* Topnav: dropdown */
