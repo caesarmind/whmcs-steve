@@ -724,6 +724,14 @@ body {
 /* -- 2-column split: sidebar + main ------------------------ */
 .st-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
 @media (max-width: 880px) { .st-split { grid-template-columns: 1fr; } }
+/* Sub-nav preview toggle (state-chip "Sub-nav: Hide") -- the per-page
+   CSS for .ct-split, .pm-split, .um-split already wires this for client-
+   area pages; replicate for the store .st-split sidebar (Categories +
+   Actions card) so the same chip control hides it on /store/* too. */
+body[data-subnav="off"] .st-split { grid-template-columns: 1fr; }
+body[data-subnav="off"] .st-split > aside { display: none; }
+body[data-subnav-side="left"] .st-split { grid-template-columns: 240px 1fr; }
+body[data-subnav-side="left"] .st-split > aside { grid-column: 1; grid-row: 1; }
 
 /* -- Sidebar cards (Categories + Actions) ------------------ */
 .subnav-card { padding: 8px; }
