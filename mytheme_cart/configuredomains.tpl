@@ -272,7 +272,19 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
     letter-spacing: -0.004em;
     display: inline-flex; align-items: center; gap: 4px;
 }
-.cd-addons .panel-addon-selected .panel-add { display: none; }
+/* When the addon is selected, scripts.js swaps the .panel-add text from
+   "+ Add to Cart" to "Added to Cart (Remove)" -- keep the element visible
+   in both states; it's the click target the user reads to toggle off. */
+.cd-addons .panel-addon-selected .panel-add { color: var(--color-accent); }
+/* iCheck (loaded by standard_cart/scripts.js) replaces the native
+   checkbox with a custom .icheckbox_minimal element; hide the now-
+   redundant original input. The icheckbox layer remains clickable. */
+.cd-addons .panel-body label input[type="checkbox"] { position: absolute; left: -9999px; }
+.cd-addons .panel-body .icheckbox_minimal,
+.cd-addons .panel-body .icheckbox_minimal-blue,
+.cd-addons .panel-body .icheckbox {
+    margin-right: 4px;
+}
 
 /* ---- Nameservers card ---- */
 .cd-nameservers-card { padding: 0; margin-bottom: 16px; }
@@ -451,10 +463,14 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
                                 {/if}
 
                                 {* Domain addon cards (DNS Management / ID Protection / Email Forwarding).
-                                   panel-* class structure is preserved verbatim because scripts.min.js
-                                   toggles panel-addon-selected on label-click. *}
+                                   The wrapper carries .addon-products in addition to .cd-addons
+                                   because scripts.js (registerAddonEvents) scopes its click +
+                                   iCheck handlers to ".addon-products .panel-addon" -- without
+                                   that class the panel never toggles .panel-addon-selected and
+                                   the cart total never updates. .panel-* inner structure is
+                                   preserved verbatim for the same reason. *}
                                 {if $domain.dnsmanagement || $domain.emailforwarding || $domain.idprotection}
-                                    <div class="cd-addons">
+                                    <div class="cd-addons addon-products">
 
                                         {if $domain.dnsmanagement}
                                             <div class="panel panel-default panel-addon{if $domain.dnsmanagementselected} panel-addon-selected{/if}">
