@@ -211,6 +211,28 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
 .topbar-btn:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); }
 .topbar-btn svg { width: 18px; height: 18px; }
 .topbar-notification-dot { position: absolute; top: 7px; right: 7px; width: 8px; height: 8px; background: var(--color-red); border-radius: 50%; border: 2px solid var(--topbar-bg); }
+/* Cart-count pill on the top-right cart icon. Rendered by topnav.tpl /
+   inner-topbar.tpl whenever {$cartcount} > 0 -- WHMCS exposes the count
+   globally on every page that loads cart state. The pill sits in the
+   top-right corner of the icon box (matches .topbar-notification-dot's
+   placement) and is a numeric counter rather than a binary indicator. */
+.topbar-cart-btn { position: relative; }
+.topbar-cart-badge {
+    position: absolute;
+    top: -2px; right: -2px;
+    min-width: 16px; height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: var(--color-accent, #0071e3);
+    color: #fff;
+    font-size: 10px; font-weight: 600;
+    line-height: 16px;
+    text-align: center;
+    letter-spacing: 0;
+    box-shadow: 0 0 0 2px var(--topbar-bg, var(--color-bg, #fff));
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+}
 .topbar-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #007aff, #5856d6); color: white; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity var(--transition-fast); }
 .topbar-avatar:hover { opacity: 0.85; }
 
