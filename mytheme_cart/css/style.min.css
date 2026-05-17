@@ -3221,6 +3221,36 @@ textarea.dr-search-input {
     accent-color: var(--color-accent);
 }
 
+/* bootstrap-multiselect 1.1.2 ships a default `display: block` on
+   .multiselect-container that overrides Bootstrap 4's .dropdown-menu
+   hide rule, so the dropdown panel renders open by default and
+   collides with the filter row. Force the menu hidden unless the
+   trigger has fired open via .show / aria-expanded. */
+.dr-search-form .multiselect-container,
+.dr-search-form .multiselect-container.dropdown-menu {
+    display: none;
+}
+.dr-search-form .multiselect-container.show,
+.dr-search-form .show > .multiselect-container,
+.dr-search-form .btn-group.show > .multiselect-container {
+    display: block;
+}
+/* Style the multiselect dropdown panel to match the Apple look */
+.dr-search-form .multiselect-container.dropdown-menu {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 6px;
+    background: var(--color-surface);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+.dr-search-form .multiselect-container .multiselect-option,
+.dr-search-form .multiselect-container > li > a {
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--color-text-primary);
+}
+
 /* Captcha container -- modest margin tweak so it doesn't crowd the
    filters row. */
 #captchaContainer { margin-top: 14px; }

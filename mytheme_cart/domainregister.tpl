@@ -86,8 +86,13 @@
         {* RIGHT: search + results *}
         <div class="dr-main" style="min-width: 0;">
 
-            {* Mobile collapsed picker (currency switcher fallback) *}
-            {include file="orderforms/standard_cart/sidebar-categories-collapsed.tpl"}
+            {* sidebar-categories-collapsed.tpl is deliberately NOT included
+               here. Its <select>-based output relies on Bootstrap responsive
+               utilities (.hidden-md / .visible-xs) to stay invisible on
+               desktop, which mytheme does not load -- so the collapsed
+               Categories + Actions cards leak into the main column. The
+               .st-split grid handles mobile by wrapping the aside under
+               the main column at 880px, so the picker is redundant. *}
 
             {* ---- Search card with AI/Classic mode tabs ---- *}
             <div class="dr-search domain-checker-container{if $showAdvancedSearchOptions} domain-checker-advanced{/if}"
