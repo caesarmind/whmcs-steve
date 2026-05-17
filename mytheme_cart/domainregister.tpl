@@ -562,10 +562,7 @@ jQuery(document).ready(function() {
 
     // --- AI / Classic mode tab switcher ---
     // The .dr-search container carries data-search-mode="ai|classic".
-    // Tab click flips it; CSS hides the inactive form. The WHMCS-bound
-    // form keeps its IDs intact (still hot for AJAX); the other-mode
-    // form is a regular HTML POST that reloads the page with the new
-    // field name -- WHMCS handles either `message` or `domain`.
+    // Tab click flips it; CSS hides the inactive form.
     jQuery('.dr-mode-tabs .dr-mode-tab').on('click', function () {
         var $btn = jQuery(this);
         var mode = $btn.data('mode');
@@ -581,6 +578,39 @@ jQuery(document).ready(function() {
         setTimeout(function () {
             $card.find('[data-mode-form="' + mode + '"] .dr-search-input').first().focus();
         }, 60);
+    });
+
+    // --- Inactive-mode form submit bridge ---
+    // scripts.min.js only AJAX-binds to the form WHMCS chose server-side
+    // (the one carrying id="frmDomainChecker" / id="btnCheckAvailability").
+    // The other form has dr-alt-* IDs and would submit as a plain HTML
+    // POST to cart.php?a=checkDomain -- which returns raw JSON and the
+    // browser renders the JSON instead of the search results. Intercept
+    // the alt form's submit, copy its query into the WHMCS-active form,
+    // and trigger its bound AJAX flow so both tabs share the same
+    // result-rendering pipeline.
+    jQuery('.dr-search-form').on('submit', function (e) {
+        var $form = jQuery(this);
+        // The WHMCS-bound form is the one carrying #btnCheckAvailability.
+        // If we're submitting it directly, let scripts.min.js handle it.
+        if ($form.find('#btnCheckAvailability').length) return;
+
+        e.preventDefault();
+        var query = $form.find('.dr-search-input').val();
+        if (!query || !query.trim()) {
+            $form.find('.dr-search-input').focus();
+            return;
+        }
+
+        // Find the WHMCS-active form (the one with #btnCheckAvailability)
+        // and copy our query into its primary input (#message for AI,
+        // #inputDomain for Classic -- whichever WHMCS rendered as active).
+        var $activeInput = jQuery('#message, #inputDomain').first();
+        if (!$activeInput.length) return;
+        $activeInput.val(query);
+
+        // Fire scripts.min.js's bound click handler on the search button.
+        jQuery('#btnCheckAvailability').click();
     });
 });
 
