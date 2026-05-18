@@ -13,11 +13,17 @@
    always render. *}
 <footer class="hp-footer hp-footer-extended">
     <div class="hp-footer-inner">
+        {* Brand block + menu cols wrapper. By default the wrapper is a
+           2-zone grid: brand-block left, menu cols right (matches the
+           apple-client-area html demo). The footer-layout chip below
+           toggles body[data-footer] between "split" (default) and
+           "menu-only" (brand hidden, menus full width). *}
+        <div class="hp-footer-top">
         {* Brand block — Apple-style company wordmark, tagline, Trustpilot
-           rating chip, social links and payment-method chips. Sits above
-           the admin-driven menu columns. The tagline is overridable via
-           the `footertagline` language string; social URLs and payment
-           chips are hardcoded for now (admin can edit via overwrites). *}
+           rating chip, social links and payment-method chips. The tagline
+           is overridable via the `footertagline` language string; social
+           URLs and payment chips are hardcoded for now (admin can edit
+           via overwrites). *}
         <div class="hp-footer-legal">
             <div class="hp-footer-brand-mark">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg>
@@ -65,6 +71,7 @@
                 {/foreach}
             </div>
         {/if}
+        </div>{* /.hp-footer-top *}
         <div class="hp-footer-bottom">
             <span class="hp-footer-copyright">&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$LANG.allrightsreserved|default:'All rights reserved.'}</span>
             <div class="hp-footer-bottom-links">
@@ -75,3 +82,29 @@
         </div>
     </div>
 </footer>
+
+{* Floating footer-layout preview chip — Apple-style dark pill at bottom
+   center. Toggles body[data-footer] between "split" (default: brand
+   block left, menu cols right) and "menu-only" (brand hidden, menus
+   full row). Choice persists via localStorage. *}
+<div class="fp-chip" role="group" aria-label="Footer layout preview">
+    <span class="fp-chip-tag">preview</span>
+    <span class="fp-chip-label">Footer:</span>
+    <div class="fp-chip-group">
+        <button type="button" data-footer="split" onclick="setFooter('split')">Brand + Menu</button>
+        <button type="button" data-footer="menu-only" onclick="setFooter('menu-only')">Menu only</button>
+    </div>
+</div>
+<script>
+function setFooter(t){
+    document.body.setAttribute('data-footer', t);
+    document.querySelectorAll('.fp-chip-group button').forEach(function(b){
+        b.classList.toggle('active', b.getAttribute('data-footer') === t);
+    });
+    try { localStorage.setItem('hp-footer', t); } catch(e){}
+}
+(function(){
+    var s; try { s = localStorage.getItem('hp-footer'); } catch(e){}
+    setFooter(s || 'split');
+})();
+</script>
