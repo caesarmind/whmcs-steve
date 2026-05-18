@@ -17,7 +17,7 @@
 
     <div class="row">
         <div class="cart-sidebar">
-            {include file="orderforms/standard_cart/sidebar-categories.tpl"}
+            {include file="orderforms/$carttpl/sidebar-categories.tpl"}
         </div>
 
         <div class="cart-body">
@@ -27,7 +27,7 @@
                 <p>Add-ons extend an existing service. Pick the service you'd like to attach each one to.</p>
             </div>
 
-            {include file="orderforms/standard_cart/sidebar-categories-collapsed.tpl"}
+            {include file="orderforms/$carttpl/sidebar-categories-collapsed.tpl"}
 
             {if count($addons) == 0}
                 <div id="noAddons" class="alert alert-warning text-center" role="alert">

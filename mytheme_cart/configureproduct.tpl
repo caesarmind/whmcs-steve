@@ -603,7 +603,7 @@ var _localLang = {
 .cp-summary-footer .btn-primary { width: 100%; justify-content: center; }
 {/literal}</style>
 
-{include file="orderforms/standard_cart/recommendations-modal.tpl"}
+{include file="orderforms/$carttpl/recommendations-modal.tpl"}
 
 <script>recalctotals();</script>
 

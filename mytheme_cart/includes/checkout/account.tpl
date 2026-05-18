@@ -126,7 +126,7 @@
 >
 
     <div{if $loggedin} class="w-hidden"{/if}>
-        {include file="orderforms/standard_cart/linkedaccounts.tpl" linkContext="checkout-new"}
+        {include file="orderforms/$carttpl/linkedaccounts.tpl" linkContext="checkout-new"}
     </div>
 
     <div class="sub-heading">
@@ -330,7 +330,7 @@
                 </button>
             </div>
 
-            {include file="orderforms/standard_cart/linkedaccounts.tpl" linkContext="checkout-existing"}
+            {include file="orderforms/$carttpl/linkedaccounts.tpl" linkContext="checkout-existing"}
         </div>
     </div>{* /.co-auth-panel[data-apanel=signin] *}
 </div>{* /.co-account-card *}

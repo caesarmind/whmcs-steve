@@ -11,7 +11,7 @@
  *     iframes / tokens (Stripe etc.)
  *   - #creditCardInputFields with ccnumber / ccexpirydate / cccvv /
  *     ccstartdate / ccissuenum / ccdescription / nostore for the
- *     "new card" path; existing saved cards via includes/existing-paymethods.tpl.
+ *     "new card" path; existing saved cards via $carttpl/includes/existing-paymethods.tpl.
  *   - Express-checkout branch ({else}) emits $expressCheckoutOutput
  *     verbatim so the gateway's own checkout button renders.
  *
@@ -110,7 +110,7 @@
     <div class="cc-input-container co-card-input-panel{if $selectedgatewaytype neq "CC"} w-hidden{/if}" id="creditCardInputFields">
         {if $client}
             <div id="existingCardsContainer" class="existing-cc-grid">
-                {include file="orderforms/standard_cart/includes/existing-paymethods.tpl"}
+                {include file="orderforms/$carttpl/includes/existing-paymethods.tpl"}
             </div>
         {/if}
         <div class="row cvv-input" id="existingCardInfo">

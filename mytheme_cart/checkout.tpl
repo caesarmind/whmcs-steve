@@ -1869,5 +1869,5 @@ button.generate-password:hover {
     });
 })();
 {/literal}</script>
-{include file="orderforms/standard_cart/recommendations-modal.tpl"}
+{include file="orderforms/$carttpl/recommendations-modal.tpl"}
 {include file="orderforms/$carttpl/includes/checkout/generate-password-modal.tpl"}

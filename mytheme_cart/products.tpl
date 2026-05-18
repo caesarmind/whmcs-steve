@@ -810,7 +810,7 @@
 
 {* Cart-add recommendations modal — populated server-side, triggered by
    data-has-recommendations on order buttons via scripts.min.js. *}
-{include file="orderforms/standard_cart/recommendations-modal.tpl"}
+{include file="orderforms/$carttpl/recommendations-modal.tpl"}
 
 {* ──────────────────────────────────────────────────────────────────
    Billing-cycle pill swap.

@@ -15,12 +15,12 @@
 
     <div class="row">
         <div class="cart-sidebar">
-            {include file="orderforms/standard_cart/sidebar-categories.tpl"}
+            {include file="orderforms/$carttpl/sidebar-categories.tpl"}
         </div>
 
         <div class="cart-body">
 
-            {include file="orderforms/standard_cart/sidebar-categories-collapsed.tpl"}
+            {include file="orderforms/$carttpl/sidebar-categories-collapsed.tpl"}
 
             {* ─── Apple success hero ─── *}
             <div class="order-complete-hero">
@@ -79,7 +79,7 @@
             </div>
 
             {if $hasRecommendations}
-                {include file="orderforms/standard_cart/includes/product-recommendations.tpl"}
+                {include file="orderforms/$carttpl/includes/product-recommendations.tpl"}
             {/if}
         </div>
     </div>
