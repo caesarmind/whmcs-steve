@@ -47,6 +47,10 @@
                     <button type="button" data-lang="ukrainian">&#1059;&#1082;&#1088;&#1072;&#1111;&#1085;&#1089;&#1100;&#1082;&#1072;</button>
                 {/if}
             </div>
+            {* Currency section hides entirely when the WHMCS install has a single
+               currency configured. We keep it visible when $currencies isn't
+               populated on a page so the modal still feels complete. *}
+            {if !isset($currencies) || $currencies|@count > 1}
             <div class="locale-modal-section-label">{$LANG.currencychoose|default:'Currency'}</div>
             <div class="locale-grid" role="radiogroup" aria-label="{$LANG.currencychoose|default:'Currency'}">
                 {if isset($currencies) && $currencies|@count > 0}
@@ -62,6 +66,7 @@
                     <button type="button" data-currency="jpy">&yen; JPY</button>
                 {/if}
             </div>
+            {/if}
         </div>
         <div class="locale-modal-footer">
             <button type="button" class="apply" id="localeApply">{$LANG.apply|default:'Apply'}</button>
