@@ -1071,6 +1071,22 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .hp-footer-bottom-links a + a::before { content: ""; position: absolute; left: 0; top: 50%; height: 12px; width: 1px; background: rgba(0,0,0,0.18); transform: translateY(-50%); }
 .hp-footer-bottom-links a:hover { text-decoration: underline; }
 .hp-footer-bottom > .locale-btn { justify-self: end; }
+/* Brand block — Apple-style wordmark + tagline + Trustpilot chip + socials + payments */
+.hp-footer-legal { color: var(--color-text-secondary); }
+.hp-footer-brand-mark { display: flex; align-items: center; gap: 7px; width: max-content; font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: var(--color-text-primary); margin-bottom: 14px; }
+.hp-footer-brand-mark svg { width: 18px; height: 18px; flex-shrink: 0; }
+.hp-footer-tagline { font-size: 12px; line-height: 1.55; color: var(--color-text-secondary); margin: 0 0 12px; max-width: 320px; }
+.hp-footer-rating { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-text-tertiary); }
+.hp-footer-rating-stars { color: #30d158; letter-spacing: 1.5px; font-size: 11px; }
+.hp-footer-legal .hp-footer-socials,
+.hp-footer-legal .hp-footer-payments { margin-top: 18px; }
+.hp-footer-socials { display: flex; gap: 6px; }
+.hp-footer-social { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; color: #6e6e73; text-decoration: none; transition: background 0.15s ease, color 0.15s ease; }
+.hp-footer-social svg { width: 14px; height: 14px; }
+.hp-footer-social:hover { background: rgba(0,0,0,0.06); color: #1d1d1f; }
+.hp-footer-payments { display: flex; flex-wrap: wrap; gap: 6px; }
+.hp-footer-payment { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: 52px; height: 28px; background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 5px; overflow: hidden; }
+.hp-footer-payment svg { max-width: 82%; max-height: 16px; }
 @media (max-width: 720px) {
     .hp-footer-bottom { grid-template-columns: 1fr; justify-items: center; gap: 12px; }
     .hp-footer-copyright, .hp-footer-bottom > .locale-btn { justify-self: center; }
