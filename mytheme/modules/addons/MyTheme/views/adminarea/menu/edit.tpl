@@ -264,9 +264,13 @@
                 <div class="mt-field" data-drawer-show-when="dropdown_parent">
                     <label class="mt-field-label" for="drawerDropdown">Dropdown style</label>
                     <select id="drawerDropdown" class="mt-select" data-drawer-field="config.dropdown_style">
-                        <option value="default">Default</option>
+                        <option value="default">Default (classic)</option>
                         <option value="mega">Mega menu</option>
                     </select>
+                    <div class="mt-field-help">
+                        <strong>Classic</strong> — narrow floating panel with a vertical list. Use <em>Header</em> child items as section labels and <em>Divider</em> child items as separators.<br>
+                        <strong>Mega menu</strong> — full-width panel; <em>Header</em> children become column titles, items between headers fill that column.
+                    </div>
                 </div>
 
                 <div class="mt-field">
@@ -290,6 +294,9 @@
                                 {/foreach}
                             </div>
                         </div>
+                    </div>
+                    <div class="mt-field-help">
+                        Top-nav icons render only when the global <a href="?module=MyTheme&amp;action=settings" target="_blank">Top-Nav Icons</a> setting is on. Sidebar and rail layouts always show icons.
                     </div>
                 </div>
 
