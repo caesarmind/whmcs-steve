@@ -168,8 +168,15 @@ if (AddonHelper::isActive()) {
     // Expose the menu icon registry to Smarty as $mtIcons (map of name → SVG
     // path data). sidebar.tpl / topnav.tpl look up {$mtIcons[$name]} when
     // rendering a menu item whose config.icon is a known registry name.
+    //
+    // Also surfaces $mtTopnavShowIcons (boolean) — the admin Settings flag
+    // that gates per-item icon rendering in the top-nav. Defaults to false,
+    // so unconfigured installs get a clean text-only nav.
     add_hook('ClientAreaPage', 2, function ($vars) {
-        return ['mtIcons' => MyTheme\Menu\Icons::all()];
+        return [
+            'mtIcons'            => MyTheme\Menu\Icons::all(),
+            'mtTopnavShowIcons'  => (bool)MyTheme\Models\Settings::getValue('topnav_show_icons', false),
+        ];
     });
 
     // Global cart count → $globalCartCount on EVERY client-area page.

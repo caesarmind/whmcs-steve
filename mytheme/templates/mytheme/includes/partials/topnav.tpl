@@ -35,7 +35,7 @@
     {elseif $mtType == 'dropdown_parent'}
         <div class="nav-dropdown-wrap{$sideRight}">
             <a href="#" class="nav-dropdown-toggle">
-                {if $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
+                {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
                 {$item->getLabel()|escape}
                 <svg class="nav-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
             </a>
@@ -50,7 +50,7 @@
                             <div class="nav-dropdown-section">{$child->getLabel()|escape}</div>
                         {else}
                             <a href="{$child->getUri()|escape}" class="nav-dropdown-item">
-                                {if $childIcon}<span class="nav-dropdown-item-icon">{mtTopnavIcon iconName=$childIcon}</span>{/if}
+                                {if $mtTopnavShowIcons && $childIcon}<span class="nav-dropdown-item-icon">{mtTopnavIcon iconName=$childIcon}</span>{/if}
                                 {$child->getLabel()|escape}
                             </a>
                         {/if}
@@ -60,14 +60,14 @@
         </div>
     {elseif $mtType == 'login_button'}
         <a href="{$item->getUri()|escape}" class="nav-cta{$sideRight}">
-            {if $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
+            {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
             {$item->getLabel()|escape}
         </a>
     {elseif $mtType == 'language' || $mtType == 'currency'}
         <a href="#" class="nav-switcher{$sideRight}" data-switcher="{$mtType|escape}">{$item->getLabel()|escape}</a>
     {else}
         <a href="{$item->getUri()|escape}" class="nav-item{$sideRight}">
-            {if $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
+            {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
             {$item->getLabel()|escape}
         </a>
     {/if}

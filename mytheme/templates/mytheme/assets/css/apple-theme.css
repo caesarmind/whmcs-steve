@@ -245,7 +245,7 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
 .homepage-nav-inner { max-width: 1024px; margin: 0 auto; display: flex; align-items: center; gap: 28px; height: 44px; font-size: 12px; }
 .homepage-nav a { color: var(--color-text-primary); opacity: 0.85; font-size: 12px; transition: opacity 0.15s ease; text-decoration: none; }
 .homepage-nav a:hover { opacity: 1; text-decoration: none; }
-.homepage-nav .nav-logo { font-size: 16px; opacity: 1; display: flex; align-items: center; }
+.homepage-nav .nav-logo { font-size: 16px; opacity: 1; display: flex; align-items: center; margin-inline-end: 20px; }
 .homepage-nav .nav-logo svg { width: 16px; height: 16px; }
 .homepage-nav .nav-spacer { flex: 1; }
 .homepage-nav .nav-signin { font-weight: 500; }

@@ -34,6 +34,7 @@ final class SettingsController extends AbstractController
         'enable_dynamic_ajax'    => ['Enable Dynamic AJAX Loading',  'Load some panels via AJAX after the page paints.',                   true,  'bool'],
         'custom_language_list'   => ['Custom Language List',     'Override the language list shown to clients in the locale chooser.',    false, 'bool'],
         'enable_dark_mode'       => ['Enable Dark Mode',         'Allow visitors to toggle dark mode.',                                   true,  'bool'],
+        'topnav_show_icons'      => ['Top-Nav Icons',            'Show icons next to menu items in the top navigation. Off by default.',  false, 'bool'],
     ];
 
     public function indexAction(): string
