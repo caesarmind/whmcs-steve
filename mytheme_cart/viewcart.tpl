@@ -1546,7 +1546,7 @@
 
     </div>{* /#order-standard_cart *}
 
-    {include file="orderforms/standard_cart/recommendations-modal.tpl"}
+    {include file="orderforms/$carttpl/recommendations-modal.tpl"}
 
     <script>{literal}
     (function () {
