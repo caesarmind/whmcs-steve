@@ -71,10 +71,14 @@
         </div>{* /.hp-footer-top *}
         <div class="hp-footer-bottom">
             <span class="hp-footer-copyright">&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$LANG.allrightsreserved|default:'All rights reserved.'}</span>
-            <div class="hp-footer-bottom-links">
-                <a href="#">{$LANG.privacypolicy|default:'Privacy Policy'}</a>
-                <a href="#">{$LANG.tos|default:'Terms of Use'}</a>
-            </div>
+            {if isset($mtFooterSecondaryItems) && $mtFooterSecondaryItems}
+                <div class="hp-footer-bottom-links">
+                    {foreach $mtFooterSecondaryItems as $item}
+                        {if $item.type == 'divider' || $item.type == 'header' || $item.type == 'dropdown_parent'}{continue}{/if}
+                        <a href="{$item.uri|escape}"{if $item.target} target="{$item.target|escape}"{/if}>{$item.label|escape}</a>
+                    {/foreach}
+                </div>
+            {/if}
             {include file="`$template`/includes/partials/locale-btn.tpl"}
         </div>
     </div>

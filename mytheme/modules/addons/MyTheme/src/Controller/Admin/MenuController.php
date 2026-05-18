@@ -22,7 +22,7 @@ use WHMCS\Database\Capsule;
  * dispatches based on ?action=. Sub-actions on this controller come in
  * via ?action=menu&sub=... (sub is read from $_GET['sub']):
  *
- *   index   → list of menus (filtered by ?tab=main|secondary|footer)
+ *   index   → list of menus (filtered by ?tab=main|secondary|footer|footer-secondary)
  *   edit    → editor for one menu (?id=N)
  *   save    → POST handler that rewrites the menu and its items
  *   delete  → DELETE menu (?id=N&confirm=1)
@@ -86,7 +86,7 @@ final class MenuController extends AbstractController
     public function indexAction(): string
     {
         $tab = (string)($_GET['tab'] ?? 'main');
-        if (!in_array($tab, ['main', 'secondary', 'footer'], true)) {
+        if (!in_array($tab, ['main', 'secondary', 'footer', 'footer-secondary'], true)) {
             $tab = 'main';
         }
 
@@ -384,7 +384,7 @@ final class MenuController extends AbstractController
     public function createAction(): string
     {
         $location = (string)($_POST['location'] ?? $_GET['tab'] ?? 'main');
-        if (!in_array($location, ['main', 'secondary', 'footer'], true)) {
+        if (!in_array($location, ['main', 'secondary', 'footer', 'footer-secondary'], true)) {
             $location = 'main';
         }
 

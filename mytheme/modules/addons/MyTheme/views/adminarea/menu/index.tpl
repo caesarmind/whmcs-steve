@@ -7,9 +7,10 @@
 </header>
 
 <div class="mt-tabs">
-    <a class="mt-tab {if $tab == 'main'}is-active{/if}"      href="?module=MyTheme&action=menu&tab=main">Main</a>
-    <a class="mt-tab {if $tab == 'secondary'}is-active{/if}" href="?module=MyTheme&action=menu&tab=secondary">Secondary</a>
-    <a class="mt-tab {if $tab == 'footer'}is-active{/if}"    href="?module=MyTheme&action=menu&tab=footer">Footer</a>
+    <a class="mt-tab {if $tab == 'main'}is-active{/if}"             href="?module=MyTheme&action=menu&tab=main">Main</a>
+    <a class="mt-tab {if $tab == 'secondary'}is-active{/if}"        href="?module=MyTheme&action=menu&tab=secondary">Secondary</a>
+    <a class="mt-tab {if $tab == 'footer'}is-active{/if}"           href="?module=MyTheme&action=menu&tab=footer">Footer</a>
+    <a class="mt-tab {if $tab == 'footer-secondary'}is-active{/if}" href="?module=MyTheme&action=menu&tab=footer-secondary">Footer secondary</a>
 </div>
 
 {if $flashMsg == 'seeded-0'}
@@ -50,7 +51,7 @@
 
 <section class="mt-section">
     <header class="mt-section-header">
-        <h2 class="mt-section-title">{if $tab == 'footer'}Footer Menu{elseif $tab == 'secondary'}Secondary Menu{else}Main Menu{/if}</h2>
+        <h2 class="mt-section-title">{if $tab == 'footer-secondary'}Footer Secondary Menu{elseif $tab == 'footer'}Footer Menu{elseif $tab == 'secondary'}Secondary Menu{else}Main Menu{/if}</h2>
         <div class="mt-section-tools">
             <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=MyTheme&action=menu&sub=seed" title="Re-seed any missing preset items (won't overwrite existing items)">Re-seed presets</a>
             <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=MyTheme&action=menu&sub=reset-defaults" title="Wipe and rebuild the WHMCS Defaults menus to match the latest preset" onclick="return confirm('Reset the WHMCS Defaults menus? Custom menus are unaffected.');">Reset WHMCS Defaults</a>

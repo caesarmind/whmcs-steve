@@ -40,6 +40,7 @@ final class Presets
             self::guestMain(),
             self::guestWhmcsDefaults(),
             self::footerDefaults(),
+            self::footerSecondaryDefaults(),
         ];
     }
 
@@ -396,6 +397,27 @@ final class Presets
                     self::customLink('', 'Legal',       '#'),
                     self::customLink('', 'Environment', '#'),
                  ]],
+            ],
+        ];
+    }
+
+    /**
+     * Footer secondary menu — the legal/utility links shown at the very
+     * bottom of the footer, beside the copyright row. Defaults to
+     * Privacy + Terms (both WHMCS LANG keys); admin can add more or
+     * swap them out from the Menu builder. Flat list of leaf links —
+     * no dropdowns are surfaced by the footer TPLs for this location.
+     */
+    private static function footerSecondaryDefaults(): array
+    {
+        return [
+            'name'     => 'Footer Secondary Menu',
+            'location' => 'footer-secondary',
+            'audience' => 'all',
+            'active'   => true,
+            'items'    => [
+                self::customLink('privacypolicy', 'Privacy Policy', '#'),
+                self::customLink('tos',           'Terms of Use',   '#'),
             ],
         ];
     }

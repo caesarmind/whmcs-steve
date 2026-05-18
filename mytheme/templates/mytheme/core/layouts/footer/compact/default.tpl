@@ -42,6 +42,14 @@
         {/if}
         <div class="hp-footer-compact-end">
             <span class="hp-footer-compact-copy">&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}</span>
+            {if isset($mtFooterSecondaryItems) && $mtFooterSecondaryItems}
+                <div class="hp-footer-bottom-links">
+                    {foreach $mtFooterSecondaryItems as $item}
+                        {if $item.type == 'divider' || $item.type == 'header' || $item.type == 'dropdown_parent'}{continue}{/if}
+                        <a href="{$item.uri|escape}"{if $item.target} target="{$item.target|escape}"{/if}>{$item.label|escape}</a>
+                    {/foreach}
+                </div>
+            {/if}
             {include file="`$template`/includes/partials/locale-btn.tpl"}
         </div>
     </div>

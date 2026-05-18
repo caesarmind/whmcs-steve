@@ -318,6 +318,32 @@ if (AddonHelper::isActive()) {
         }
     });
 
+    // Footer secondary menu — drives the bottom legal-links row of the
+    // footer (Privacy / Terms / etc.). Same pattern as the footer hook
+    // above. Items are returned as a flat list; footer TPLs render leaf
+    // links only — dropdowns are not surfaced for this location.
+    add_hook('ClientAreaPage', 3, function ($vars) {
+        try {
+            if (!\WHMCS\Database\Capsule::schema()->hasTable('mytheme_menus')) {
+                return null;
+            }
+            // Self-heal: if the seed predates the footer-secondary preset,
+            // run the Seeder once to top up. Same idempotency guard as the
+            // footer hook above — Seeder skips menus that already exist.
+            if (MyTheme\Models\Menu::where('location', 'footer-secondary')->count() === 0) {
+                (new MyTheme\Menu\Seeder())->run();
+            }
+            $audience = MyTheme\Menu\Audience::current();
+            $menu     = MyTheme\Models\Menu::pick('footer-secondary', $audience);
+            if ($menu === null) return null;
+            $items = MyTheme\Menu\TreeRenderer::buildFlatList($menu);
+            return ['mtFooterSecondaryItems' => $items];
+        } catch (\Throwable $e) {
+            error_log('MyTheme footer-secondary buildFlatList failed: ' . $e->getMessage());
+            return null;
+        }
+    });
+
     // Brand info — exposes $mtBrand to all client-area templates. Drives the
     // footer brand block (logo, description, social URLs) and is intended to
     // be the single source of truth for brand display across layouts. Empty

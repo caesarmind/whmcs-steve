@@ -23,7 +23,7 @@ final class Menus
             $schema->create('mytheme_menus', function ($t) {
                 $t->increments('id');
                 $t->string('name', 191);
-                $t->enum('location', ['main', 'secondary', 'footer'])->default('main');
+                $t->enum('location', ['main', 'secondary', 'footer', 'footer-secondary'])->default('main');
                 $t->enum('audience', ['client', 'guest', 'all'])->default('all');
                 $t->boolean('active')->default(false);
                 $t->string('version', 32)->default('1.0');
