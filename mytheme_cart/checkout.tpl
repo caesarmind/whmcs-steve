@@ -1533,7 +1533,7 @@ button.generate-password:hover {
                             <p class="co-mailing-desc">{$marketingEmailOptInMessage}</p>
                         </div>
                         <label class="co-mailing-toggle">
-                            <input type="checkbox" name="marketingoptin" value="1"{if $marketingEmailOptIn} checked{/if}>
+                            <input type="checkbox" name="marketingoptin" value="1" class="no-icheck" data-no-icheck="true"{if $marketingEmailOptIn} checked{/if}>
                             <span class="co-mailing-switch" aria-hidden="true">
                                 <span class="co-mailing-handle"></span>
                             </span>
@@ -1598,6 +1598,35 @@ button.generate-password:hover {
 (function () {
     function init() {
         var $ = window.jQuery; if (!$) return;
+
+        /* Defensive iCheck unwrap for the marketing-optin toggle.
+           WHMCS's scripts.min.js loads iCheck and auto-wraps every native
+           checkbox in <div class="icheckbox_square-blue">, pulling the
+           input out of its parent label and reducing its hit area to 0×0.
+           Our .co-mailing-toggle uses a label-wrapped native checkbox so
+           the visible switch span clicks through to the input. Undo the
+           iCheck wrap and re-attach our click handler. */
+        $('input[name="marketingoptin"]').each(function () {
+            var input = this;
+            var icheckWrap = input.parentElement &&
+                /icheckbox/.test(input.parentElement.className) ? input.parentElement : null;
+            if (icheckWrap && icheckWrap.parentElement) {
+                /* Move the input back to where iCheck took it from */
+                icheckWrap.parentElement.insertBefore(input, icheckWrap);
+                icheckWrap.parentNode.removeChild(icheckWrap);
+                /* Re-apply iCheck event handlers' canonical state on the input */
+                if (window.jQuery && jQuery(input).off) { jQuery(input).off('ifChecked ifUnchecked ifChanged'); }
+            }
+        });
+        /* Bind click on the .co-mailing-toggle (the visible switch container)
+           to toggle the underlying checkbox, since iCheck may have killed
+           the native label association during its earlier setup. */
+        $(document).off('click.coMailing').on('click.coMailing', '.co-mailing-toggle', function (e) {
+            if (e.target.tagName === 'INPUT') return; /* native click bubbles fine */
+            var cb = this.querySelector('input[type="checkbox"]');
+            if (cb && !cb.disabled) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', {bubbles: true})); e.preventDefault(); }
+        });
+
         var login = $('#containerExistingUserSignin');
         var signup = $('#containerNewUserSignup');
         var btnExisting = $('#btnAlreadyRegistered');
