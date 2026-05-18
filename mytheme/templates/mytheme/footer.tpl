@@ -38,6 +38,11 @@
 
 </div>{* /.ph-main-wrap *}
 
+{* Language / currency modal - lives outside .ph-main-wrap so its backdrop
+   covers the full viewport. Opened by [data-locale-open] buttons in the
+   footer; JS handler in apple-layout.js. *}
+{include file="`$template`/includes/partials/locale-modal.tpl"}
+
 {$footeroutput}
 
 <script src="{$WEB_ROOT}/templates/{$template}/assets/js/apple-theme.js?v={$myTheme.version|default:'1.1'}"></script>

@@ -684,21 +684,26 @@
             applyBtn.addEventListener('click', function () {
                 var lang = modal.querySelector('[data-lang].active');
                 var curr = modal.querySelector('[data-currency].active');
-                var flagMap = {
-                    english: '🇺🇸', german: '🇩🇪', french: '🇫🇷', spanish: '🇪🇸', italian: '🇮🇹',
-                    chinese: '🇨🇳', japanese: '🇯🇵', russian: '🇷🇺', portuguese: '🇵🇹',
-                    'portuguese-br': '🇧🇷', dutch: '🇳🇱', swedish: '🇸🇪', norwegian: '🇳🇴',
-                    danish: '🇩🇰', turkish: '🇹🇷', ukrainian: '🇺🇦'
-                };
-                var flag = (lang && flagMap[lang.dataset.lang]) || '🌐';
-                openBtns.forEach(function (summary) {
-                    var flagEl = summary.querySelector('.flag');
-                    if (flagEl) flagEl.textContent = flag;
-                    var spans = summary.querySelectorAll('span');
-                    if (spans[1]) spans[1].textContent = lang ? lang.textContent.trim() : 'English';
-                    if (spans[3]) spans[3].textContent = curr ? curr.textContent.trim() : '$ USD';
-                });
-                close();
+                var currentLang = modal.dataset.currentLang || '';
+                var currentCurrId = modal.dataset.currentCurrencyId || '';
+                var url = new URL(window.location.href);
+                var changed = false;
+                if (lang && lang.dataset.lang && lang.dataset.lang !== currentLang) {
+                    url.searchParams.set('language', lang.dataset.lang);
+                    changed = true;
+                }
+                // WHMCS expects ?currency=<numeric id>. The static fallback buttons have
+                // no data-currency-id, so currency switching only works when the page
+                // exposes $currencies (mytheme renders real IDs in the modal partial).
+                if (curr && curr.dataset.currencyId && curr.dataset.currencyId !== currentCurrId) {
+                    url.searchParams.set('currency', curr.dataset.currencyId);
+                    changed = true;
+                }
+                if (changed) {
+                    window.location.href = url.toString();
+                } else {
+                    close();
+                }
             });
         }
     }

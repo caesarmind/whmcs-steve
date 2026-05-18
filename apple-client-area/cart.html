@@ -1154,6 +1154,10 @@
                     </div>
 
                 </div>
+
+<script>
+(function () {
+    document.querySelectorAll('.ct-product').forEach(function (product) {
     var head        = product.querySelector('.ct-addons-head');
     var manageRow   = product.querySelector('.ct-manage-addons');
 
@@ -1211,6 +1215,8 @@
             });
         });
     }
+
+    });
 
     // MarketConnect promo expander toggle (reveal/hide body)
     document.querySelectorAll('.mc-promo .expander').forEach(function (exp) {

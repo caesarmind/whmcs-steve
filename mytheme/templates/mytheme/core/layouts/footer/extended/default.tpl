@@ -36,11 +36,12 @@
             </div>
         {/if}
         <div class="hp-footer-bottom">
-            <span>&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$LANG.allrightsreserved|default:'All rights reserved.'}</span>
+            <span class="hp-footer-copyright">&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$LANG.allrightsreserved|default:'All rights reserved.'}</span>
             <div class="hp-footer-bottom-links">
                 <a href="#">{$LANG.privacypolicy|default:'Privacy Policy'}</a>
                 <a href="#">{$LANG.tos|default:'Terms of Use'}</a>
             </div>
+            {include file="`$template`/includes/partials/locale-btn.tpl"}
         </div>
     </div>
 </footer>
