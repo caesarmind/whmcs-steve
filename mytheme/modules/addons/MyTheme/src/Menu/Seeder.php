@@ -119,16 +119,36 @@ final class Seeder
     }
 
     /**
-     * Hard-reset the two "WHMCS Defaults" preset menus to their preset
-     * definitions — delete existing items and re-seed. Useful when the
-     * default item list shipped in a code update and admins want it.
-     * User-customised menus (the non-defaults ones) are untouched.
+     * Hard-reset the factory preset menus to their preset definitions —
+     * delete existing items and re-seed. Useful when the default item
+     * list shipped in a code update and admins want it.
+     *
+     * Eligibility is by preset name substring:
+     *   - "WHMCS Defaults"        — Client/Guest "Main Menu — WHMCS Defaults"
+     *                                presets that ship parallel to the
+     *                                editable Client/Guest Main Menus.
+     *   - "Footer Secondary Menu" — singular legal-links preset; no
+     *                                parallel "— WHMCS Defaults" sibling,
+     *                                so resetting in place is the only path.
+     *
+     * Editable user-curated menus (Client Main Menu, Guest Main Menu,
+     * Footer Menu) stay untouched — admins customise them and we never
+     * stomp on that.
      */
     public function resetWhmcsDefaults(): int
     {
+        $resetable = ['WHMCS Defaults', 'Footer Secondary Menu'];
         $count = 0;
         foreach (Presets::all() as $preset) {
-            if (!str_contains((string)$preset['name'], 'WHMCS Defaults')) {
+            $name = (string)$preset['name'];
+            $matches = false;
+            foreach ($resetable as $needle) {
+                if (str_contains($name, $needle)) {
+                    $matches = true;
+                    break;
+                }
+            }
+            if (!$matches) {
                 continue;
             }
             $existing = $this->existingMenu($preset['name'], $preset['location']);
