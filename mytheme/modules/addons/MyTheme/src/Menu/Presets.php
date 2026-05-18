@@ -403,10 +403,15 @@ final class Presets
 
     /**
      * Footer secondary menu — the legal/utility links shown at the very
-     * bottom of the footer, beside the copyright row. Defaults to
-     * Privacy + Terms (both WHMCS LANG keys); admin can add more or
-     * swap them out from the Menu builder. Flat list of leaf links —
-     * no dropdowns are surfaced by the footer TPLs for this location.
+     * bottom of the footer, beside the copyright row. Ships with the five
+     * most common legal-row entries; admin can add, reorder, or swap them
+     * from the Menu builder. Flat list of leaf links — no dropdowns are
+     * surfaced by the footer TPLs for this location.
+     *
+     * Privacy + Terms use WHMCS LANG keys (privacypolicy, tos) so
+     * existing translations apply automatically. Cookie / Sitemap /
+     * Accessibility don't have canonical WHMCS keys and ship as plain
+     * English custom labels.
      */
     private static function footerSecondaryDefaults(): array
     {
@@ -418,6 +423,9 @@ final class Presets
             'items'    => [
                 self::customLink('privacypolicy', 'Privacy Policy', '#'),
                 self::customLink('tos',           'Terms of Use',   '#'),
+                self::customLink('',              'Cookie Policy',  '#'),
+                self::customLink('',              'Sitemap',        '#'),
+                self::customLink('',              'Accessibility',  '#'),
             ],
         ];
     }
