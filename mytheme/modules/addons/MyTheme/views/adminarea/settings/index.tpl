@@ -12,6 +12,13 @@
 </div>
 
 <style>
+    .mt-row-with-sub { border-bottom: 0; }
+    .mt-row-sub { padding: 4px 0 18px; border-bottom: 1px solid var(--mt-border); }
+    .mt-row-sub[hidden] { display: none; }
+    .mt-row-sub-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
+    .mt-row-sub-title { font-size: 14px; font-weight: 500; margin: 0; }
+    .mt-row-sub-help { font-size: 12px; color: var(--mt-text-3); margin: 0 0 14px; }
+    .mt-row-sub-count { font-size: 13px; color: var(--mt-text-3); }
     .mt-chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 4px; }
     .mt-chip-check { position: relative; display: block; cursor: pointer; }
     .mt-chip-check input { position: absolute; opacity: 0; pointer-events: none; }
@@ -23,8 +30,7 @@
     .mt-chip-check input:checked + .mt-chip-body .mt-chip-tick { border-color: var(--mt-accent, #0071e3); background: var(--mt-accent, #0071e3); color: #fff; }
     .mt-chip-check .mt-chip-tick svg { width: 10px; height: 10px; opacity: 0; }
     .mt-chip-check input:checked + .mt-chip-body .mt-chip-tick svg { opacity: 1; }
-    .mt-language-section[hidden] { display: none; }
-    .mt-language-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .mt-language-actions { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
     .mt-link-btn { background: none; border: 0; padding: 0; color: var(--mt-accent, #0071e3); font: inherit; cursor: pointer; font-size: 13px; }
     .mt-link-btn:hover { text-decoration: underline; }
 </style>
@@ -39,58 +45,56 @@
         </header>
 
         {foreach $flags as $key => $meta}
-            <div class="mt-row">
+            {assign var=mtIsLangToggle value=($key == 'custom_language_list')}
+            <div class="mt-row{if $mtIsLangToggle} mt-row-with-sub{/if}">
                 <div>
                     <div class="mt-row-label">{$meta[0]|escape}</div>
                     <div class="mt-row-help">{$meta[1]|escape}</div>
                 </div>
                 <label class="mt-toggle">
-                    <input type="checkbox" name="{$key|escape}" {if $key == 'custom_language_list'}data-toggle-target="mt-language-picker" {/if}{if $values[$key]}checked{/if}>
+                    <input type="checkbox" name="{$key|escape}" {if $mtIsLangToggle}data-toggle-target="mt-language-picker" {/if}{if $values[$key]}checked{/if}>
                     <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
                 </label>
             </div>
+
+            {* Lagom-style sub-field: the language picker lives directly below
+               the toggle row it belongs to, with no border separating them.
+               Always renders so the form can submit; hidden by default when
+               the toggle is off — JS reveals it on toggle change. *}
+            {if $mtIsLangToggle}
+                <div class="mt-row-sub" id="mt-language-picker"{if !$values[$key]} hidden{/if}>
+                    <header class="mt-row-sub-head">
+                        <h3 class="mt-row-sub-title">Languages shown to clients</h3>
+                        <span class="mt-row-sub-count" id="mt-lang-count"></span>
+                    </header>
+                    <p class="mt-row-sub-help">
+                        Pick which languages appear in the locale chooser. Only languages installed in <code>/lang/</code> are shown.
+                        {if !$installedLanguages}<strong>No language files found.</strong>{/if}
+                    </p>
+
+                    {if $installedLanguages}
+                        <div class="mt-chip-grid" id="mt-lang-grid">
+                            {foreach $installedLanguages as $code}
+                                <label class="mt-chip-check">
+                                    <input type="checkbox" name="{$langListKey|escape}[]" value="{$code|escape}"{if in_array($code, $selectedLanguages)} checked{/if}>
+                                    <span class="mt-chip-body">
+                                        <span class="mt-chip-tick" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                        </span>
+                                        <span>{$code|escape|capitalize}</span>
+                                    </span>
+                                </label>
+                            {/foreach}
+                        </div>
+                        <div class="mt-language-actions">
+                            <button type="button" class="mt-link-btn" data-lang-select-all>Select all</button>
+                            <span style="color: var(--mt-text-3)">&middot;</span>
+                            <button type="button" class="mt-link-btn" data-lang-select-none>Clear</button>
+                        </div>
+                    {/if}
+                </div>
+            {/if}
         {/foreach}
-    </section>
-
-    {* Language picker — only meaningful when "Custom Language List" is on, but
-       always rendered (collapsed) so the admin can preview the choices before
-       enabling. The toggle controls visibility via JS; values are submitted
-       under {$langListKey}[] regardless of toggle state, and Hooks.php only
-       reads them when the toggle is active. *}
-    <section class="mt-section mt-language-section" id="mt-language-picker" {if !$values.custom_language_list}hidden{/if}>
-        <header class="mt-section-header">
-            <h2 class="mt-section-title">Languages shown to clients</h2>
-            <div class="mt-section-tools">
-                <span class="mt-section-count" id="mt-lang-count"></span>
-            </div>
-        </header>
-
-        <p class="mt-row-help" style="margin: -8px 0 14px;">
-            Pick which languages appear in the locale chooser. Only languages installed in <code>/lang/</code> are shown.
-            {if !$installedLanguages}<strong>No language files found.</strong>{/if}
-        </p>
-
-        {if $installedLanguages}
-            <div class="mt-chip-grid" id="mt-lang-grid">
-                {foreach $installedLanguages as $code}
-                    <label class="mt-chip-check">
-                        <input type="checkbox" name="{$langListKey|escape}[]" value="{$code|escape}"{if in_array($code, $selectedLanguages)} checked{/if}>
-                        <span class="mt-chip-body">
-                            <span class="mt-chip-tick" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            </span>
-                            <span>{$code|escape|capitalize}</span>
-                        </span>
-                    </label>
-                {/foreach}
-            </div>
-
-            <div class="mt-language-actions">
-                <button type="button" class="mt-link-btn" data-lang-select-all>Select all</button>
-                <span style="color: var(--mt-text-3)">·</span>
-                <button type="button" class="mt-link-btn" data-lang-select-none>Clear</button>
-            </div>
-        {/if}
     </section>
 
     <div style="margin-top:16px;display:flex;justify-content:flex-end">
