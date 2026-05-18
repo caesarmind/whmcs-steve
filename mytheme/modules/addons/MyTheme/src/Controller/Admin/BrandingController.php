@@ -92,6 +92,60 @@ final class BrandingController extends AbstractController
         ],
     ];
 
+    /**
+     * Text/URL fields rendered in the same Branding tab below the image
+     * uploads. `description` is a short tagline shown in the footer brand
+     * block; the `social_*` URLs drive the footer social-icon row.
+     * `type` controls validation (free text vs http(s) URL).
+     *
+     * @var array<string, array{label: string, help: string, type: 'text'|'url', maxLen: int, multiline?: bool}>
+     */
+    public const TEXT_FIELDS = [
+        'footer_description' => [
+            'label'    => 'Footer description',
+            'help'     => '1-2 short sentences shown under the company name in the footer brand block.',
+            'type'     => 'text',
+            'maxLen'   => 280,
+            'multiline'=> true,
+        ],
+        'footer_social_x' => [
+            'label'  => 'X (Twitter)',
+            'help'   => 'Full https:// URL. Leave blank to hide.',
+            'type'   => 'url',
+            'maxLen' => 200,
+        ],
+        'footer_social_linkedin' => [
+            'label'  => 'LinkedIn',
+            'help'   => '',
+            'type'   => 'url',
+            'maxLen' => 200,
+        ],
+        'footer_social_facebook' => [
+            'label'  => 'Facebook',
+            'help'   => '',
+            'type'   => 'url',
+            'maxLen' => 200,
+        ],
+        'footer_social_github' => [
+            'label'  => 'GitHub',
+            'help'   => '',
+            'type'   => 'url',
+            'maxLen' => 200,
+        ],
+        'footer_social_youtube' => [
+            'label'  => 'YouTube',
+            'help'   => '',
+            'type'   => 'url',
+            'maxLen' => 200,
+        ],
+        'footer_social_instagram' => [
+            'label'  => 'Instagram',
+            'help'   => '',
+            'type'   => 'url',
+            'maxLen' => 200,
+        ],
+    ];
+
     private const FLASH_KEY  = 'mytheme_branding_flash';
     private const ERRORS_KEY = 'mytheme_branding_errors';
 
@@ -126,6 +180,36 @@ final class BrandingController extends AbstractController
                     $updated++;
                 } else {
                     $errors[$field] = $result['error'];
+                }
+            }
+
+            // Text + URL fields — only fields that are present in $_POST get
+            // touched. An empty input clears the setting; a missing key means
+            // the field wasn't on the submitted form and we leave it alone.
+            foreach (self::TEXT_FIELDS as $field => $cfg) {
+                if (!array_key_exists($field, $_POST)) {
+                    continue;
+                }
+                $value = trim((string)$_POST[$field]);
+                if ($value === '') {
+                    if ((string)Settings::getValue($field, '') !== '') {
+                        Settings::setValue($field, '');
+                        $updated++;
+                    }
+                    continue;
+                }
+                if (mb_strlen($value) > $cfg['maxLen']) {
+                    $errors[$field] = "Too long (max {$cfg['maxLen']} characters).";
+                    continue;
+                }
+                if ($cfg['type'] === 'url'
+                    && (!filter_var($value, FILTER_VALIDATE_URL) || !preg_match('#^https?://#i', $value))) {
+                    $errors[$field] = 'Must be a valid http(s) URL.';
+                    continue;
+                }
+                if ((string)Settings::getValue($field, '') !== $value) {
+                    Settings::setValue($field, $value);
+                    $updated++;
                 }
             }
 
@@ -283,11 +367,29 @@ final class BrandingController extends AbstractController
             ];
         }
 
+        // Brand Info section — pre-fill the description + social URL inputs
+        // from saved settings, attach the multiline flag and any per-field
+        // error so the view can render textarea vs input and inline errors.
+        $brandInfo = [];
+        foreach (self::TEXT_FIELDS as $field => $cfg) {
+            $brandInfo[$field] = [
+                'field'     => $field,
+                'label'     => $cfg['label'],
+                'help'      => $cfg['help'],
+                'type'      => $cfg['type'],
+                'maxLen'    => $cfg['maxLen'],
+                'multiline' => $cfg['multiline'] ?? false,
+                'value'     => (string)Settings::getValue($field, ''),
+                'error'     => $errors[$field] ?? '',
+            ];
+        }
+
         return $this->view('branding/index', [
-            'sections' => $sections,
-            'flash'    => $flash,
-            'errors'   => $errors,
-            'hasAny'   => $this->anyConfigured($sections),
+            'sections'  => $sections,
+            'brandInfo' => $brandInfo,
+            'flash'     => $flash,
+            'errors'    => $errors,
+            'hasAny'    => $this->anyConfigured($sections),
         ]);
     }
 

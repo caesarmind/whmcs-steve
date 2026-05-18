@@ -1075,6 +1075,14 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .hp-footer-legal { color: var(--color-text-secondary); }
 .hp-footer-brand-mark { display: flex; align-items: center; gap: 7px; width: max-content; font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: var(--color-text-primary); margin-bottom: 14px; }
 .hp-footer-brand-mark svg { width: 18px; height: 18px; flex-shrink: 0; }
+.hp-footer-brand-logo { height: 22px; width: auto; max-width: 200px; display: inline-block; }
+/* Theme-aware logo swap — both <img> tags are rendered in the TPL when
+   the admin has uploaded both light and dark variants; CSS picks which
+   one to show. When only one is uploaded, that single tag renders and
+   neither rule hides it. */
+.hp-footer-brand-mark .hp-footer-brand-logo.is-dark { display: none; }
+[data-theme="dark"] .hp-footer-brand-mark .hp-footer-brand-logo.is-light { display: none; }
+[data-theme="dark"] .hp-footer-brand-mark .hp-footer-brand-logo.is-dark { display: inline-block; }
 .hp-footer-tagline { font-size: 12px; line-height: 1.55; color: var(--color-text-secondary); margin: 0 0 12px; max-width: 320px; }
 .hp-footer-rating { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-text-tertiary); }
 .hp-footer-rating-stars { color: #30d158; letter-spacing: 1.5px; font-size: 11px; }
@@ -1136,10 +1144,26 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .fp-chip-group { display: flex; background: rgba(255,255,255,0.12); border-radius: 980px; padding: 2px; }
 .fp-chip-group button { border: 0; background: transparent; color: rgba(255,255,255,0.65); font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 980px; cursor: pointer; font-family: inherit; }
 .fp-chip-group button.active { background: #f5f5f7; color: #1d1d1f; }
+/* Compact footer layout — single horizontal row with three zones. */
+.hp-footer-compact { padding: 20px 22px; font-size: 12px; color: var(--color-text-secondary); }
+.hp-footer-compact-inner { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+.hp-footer-compact-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.hp-footer-compact-brand .hp-footer-brand-mark { margin-bottom: 0; }
+.hp-footer-compact-desc { font-size: 12px; color: var(--color-text-tertiary); max-width: 320px; line-height: 1.45; }
+.hp-footer-compact-nav { display: flex; gap: 18px; flex: 1; flex-wrap: wrap; justify-content: center; }
+.hp-footer-compact-nav a { color: var(--color-text-secondary); text-decoration: none; }
+.hp-footer-compact-nav a:hover { color: var(--color-text-primary); text-decoration: underline; }
+.hp-footer-compact-nav-label { color: var(--color-text-tertiary); }
+.hp-footer-compact-end { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+.hp-footer-compact-copy { color: var(--color-text-tertiary); }
+[data-theme="dark"] .hp-footer-compact { background: #1c1c1e; }
 @media (max-width: 720px) {
     .hp-footer-bottom { grid-template-columns: 1fr; justify-items: center; gap: 12px; }
     .hp-footer-copyright, .hp-footer-bottom > .locale-btn { justify-self: center; }
     .hp-footer-top { grid-template-columns: 1fr; gap: 20px; }
+    .hp-footer-compact-inner { flex-direction: column; align-items: flex-start; gap: 14px; }
+    .hp-footer-compact-nav { justify-content: flex-start; }
+    .hp-footer-compact-end { margin-left: 0; }
 }
 
 /* Homepage dark mode */

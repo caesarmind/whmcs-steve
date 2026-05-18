@@ -318,6 +318,34 @@ if (AddonHelper::isActive()) {
         }
     });
 
+    // Brand info — exposes $mtBrand to all client-area templates. Drives the
+    // footer brand block (logo, description, social URLs) and is intended to
+    // be the single source of truth for brand display across layouts. Empty
+    // values are kept as empty strings so TPLs can `{if !empty(...)}`-guard
+    // each piece individually without `isset()` ceremony.
+    add_hook('ClientAreaPage', 3, function ($vars) {
+        try {
+            $uploader = new MyTheme\Helpers\Uploader();
+            $logoLight = (string)MyTheme\Models\Settings::getValue('logo_light', '');
+            $logoDark  = (string)MyTheme\Models\Settings::getValue('logo_dark',  '');
+            $socials = [];
+            foreach (['x', 'linkedin', 'facebook', 'github', 'youtube', 'instagram'] as $platform) {
+                $socials[$platform] = (string)MyTheme\Models\Settings::getValue('footer_social_' . $platform, '');
+            }
+            return [
+                'mtBrand' => [
+                    'description' => (string)MyTheme\Models\Settings::getValue('footer_description', ''),
+                    'logoUrl'     => $logoLight !== '' ? $uploader->webUrlFor($logoLight) : '',
+                    'logoDarkUrl' => $logoDark  !== '' ? $uploader->webUrlFor($logoDark)  : '',
+                    'socials'     => $socials,
+                ],
+            ];
+        } catch (\Throwable $e) {
+            error_log('MyTheme brand-info hook failed: ' . $e->getMessage());
+            return null;
+        }
+    });
+
     // Secondary navbar — same pattern (location = secondary). If no menu, leave alone.
     add_hook('ClientAreaSecondaryNavbar', 100, function (WHMCS\View\Menu\Item $secondaryNavbar) {
         try {

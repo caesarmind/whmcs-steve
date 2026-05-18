@@ -48,8 +48,37 @@
     </section>
 {/foreach}
 
+{* Brand Info — description + social URLs. Saved via the same form POST
+   as the image uploads, so a single "Save changes" click persists
+   everything together. Under JS, the AJAX upload path only touches
+   $_FILES so these fields are unaffected by per-tile uploads. *}
+<section class="mt-section">
+    <header class="mt-section-header"><h2 class="mt-section-title">Brand Info</h2></header>
+    {if isset($brandInfo.footer_description)}
+        {$row = $brandInfo.footer_description}
+        <div class="mt-brand-field">
+            <label class="mt-brand-label" for="bi-{$row.field}">{$row.label|escape}</label>
+            <textarea id="bi-{$row.field}" name="{$row.field}" class="mt-textarea{if $row.error} has-error{/if}" rows="2" maxlength="{$row.maxLen}" placeholder="Premium web hosting on Google Cloud...">{$row.value|escape}</textarea>
+            {if $row.error}<div class="mt-upload-error">{$row.error|escape}</div>{else}<div class="mt-brand-help">{$row.help|escape}</div>{/if}
+        </div>
+    {/if}
+    <div class="mt-brand-grid">
+        {foreach $brandInfo as $row}
+            {if $row.field != 'footer_description'}
+                <div class="mt-brand-field">
+                    <label class="mt-brand-label" for="bi-{$row.field}">{$row.label|escape}</label>
+                    <input id="bi-{$row.field}" type="url" name="{$row.field}" value="{$row.value|escape}" class="mt-input{if $row.error} has-error{/if}" placeholder="https://" maxlength="{$row.maxLen}" inputmode="url" autocomplete="off">
+                    {if $row.error}<div class="mt-upload-error">{$row.error|escape}</div>{/if}
+                </div>
+            {/if}
+        {/foreach}
+    </div>
+</section>
+
     {* The Save button is only useful for no-JS fallback. JS hides it via
-       the .is-ajax class added on load -- under JS, every pick auto-uploads. *}
+       the .is-ajax class added on load -- under JS, every pick auto-uploads.
+       Brand Info fields, however, still need the Save button under JS since
+       the AJAX path only handles $_FILES. *}
     <div class="mt-branding-save-row" style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
         <button type="submit" class="mt-btn mt-btn-primary">Save changes</button>
     </div>
@@ -198,9 +227,18 @@
     transition: width 0.12s linear;
 }
 
-/* When the form has .is-ajax (set by JS on load), hide the Save row --
-   uploads commit immediately. The Save row is the no-JS fallback. */
-.mt-branding-form.is-ajax .mt-branding-save-row { display: none !important; }
+/* Brand Info section — text/URL fields rendered below the image tiles. */
+.mt-brand-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.mt-brand-label { font-size: 13px; font-weight: 500; color: var(--mt-text); }
+.mt-brand-help { font-size: 12px; color: var(--mt-text-3); }
+.mt-brand-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 18px; margin-top: 4px; }
+.mt-brand-grid .mt-brand-field { margin-bottom: 0; }
+.mt-input.has-error, .mt-textarea.has-error { border-color: var(--mt-danger); background: var(--mt-danger-tint); }
+@media (max-width: 720px) { .mt-brand-grid { grid-template-columns: 1fr; } }
+/* The Save row used to be hidden under .is-ajax — but the new Brand Info
+   section needs an explicit submit, so we keep it visible at all times.
+   Image uploads still happen instantly via the AJAX path; clicking Save
+   with no pending file selection is a harmless re-POST of the text vals. */
 
 /* Top-of-page status banner -- populated by JS after each operation. */
 .mt-branding-status:empty { display: none; }
