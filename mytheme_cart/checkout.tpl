@@ -292,6 +292,130 @@
 .already-registered { padding: 10px 0 14px; }
 .already-registered p { color: var(--color-text-secondary); font-size: 13px; margin: 0; }
 
+/* ── Account section card with Create-account / Sign-in tabs ──
+   Wraps WHMCS's #containerExistingUserSignin + #containerNewUserSignup
+   in an Apple-style card with two-tab switcher (mirrors
+   apple-client-area/checkout.html lines 1005-1085). Hidden for
+   logged-in users via the .only-out gate. */
+.co-account-card {
+    padding: 0;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: 14px;
+}
+.co-account-card .co-section-head {
+    padding: 18px 24px 14px;
+    border-bottom: 0.5px solid var(--color-border);
+    display: flex; align-items: center; gap: 10px;
+}
+.co-account-card .co-section-title {
+    font-size: 15px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    margin: 0;
+    flex: 1;
+}
+.co-auth-tabs {
+    display: flex; align-items: center; gap: 24px;
+    padding: 0 24px;
+    border-bottom: 0.5px solid var(--color-border);
+}
+.co-auth-tab {
+    position: relative;
+    padding: 14px 0;
+    background: transparent; border: 0;
+    font-size: 13px; font-weight: 500;
+    color: var(--color-text-tertiary);
+    cursor: pointer; font-family: inherit;
+    letter-spacing: -0.008em;
+    transition: color 0.15s;
+}
+.co-auth-tab:hover { color: var(--color-text-primary); }
+.co-auth-tab.active { color: var(--color-accent); font-weight: 600; }
+.co-auth-tab.active::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -0.5px;
+    height: 2px; background: var(--color-accent); border-radius: 2px 2px 0 0;
+}
+.co-auth-panel { display: none; padding: 20px 24px 22px; }
+.co-auth-panel.is-active { display: block; }
+.co-auth-hint {
+    font-size: 12.5px; color: var(--color-text-tertiary);
+    letter-spacing: -0.008em;
+    margin: 0 0 14px; line-height: 1.5;
+}
+
+/* Sign-in panel button + forgot link (the WHMCS-equivalent forms
+   inside #containerExistingUserSignin already use .btn-primary etc.,
+   so we only style the new wrapper elements). */
+.co-signin-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 4px;
+}
+.co-forgot-link {
+    font-size: 11.5px; color: var(--color-accent);
+    text-decoration: none; letter-spacing: -0.004em;
+}
+.co-forgot-link:hover { color: var(--color-accent-hover); text-decoration: underline; }
+
+/* "or sign up with" divider + social buttons (placeholders -- real
+   OAuth would need a WHMCS hook integration). */
+.co-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 18px 0 14px;
+    font-size: 10.5px; color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.08em;
+}
+.co-divider::before, .co-divider::after {
+    content: ""; flex: 1; height: 0.5px; background: var(--color-border);
+}
+.co-social { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 520px) { .co-social { grid-template-columns: 1fr; } }
+.co-social-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 42px; padding: 0 16px;
+    border-radius: 999px;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    font-size: 13px; font-weight: 500;
+    color: var(--color-text-primary);
+    cursor: pointer; font-family: inherit;
+    letter-spacing: -0.008em;
+    transition: background 0.15s;
+    text-decoration: none;
+}
+.co-social-btn:hover { background: var(--color-surface-secondary, #f5f5f7); }
+.co-social-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* When the account card hosts the signup container, strip
+   #containerNewUserSignup's outer card chrome (the multi-card
+   #order-standard_cart selector below otherwise paints it twice). */
+.co-account-card #containerNewUserSignup,
+.co-account-card #containerExistingUserSignin {
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+/* And flatten the inner sub-heading + row "section cards" that the
+   #order-standard_cart rules below would otherwise paint inside the
+   already-card account block. */
+.co-account-card #containerNewUserSignup > .sub-heading,
+.co-account-card #containerNewUserSignup > .sub-heading + .row,
+.co-account-card #containerNewUserSignup > .sub-heading + .field-container {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+.co-account-card #containerNewUserSignup > .sub-heading {
+    margin: 14px 0 8px !important;
+    padding: 0 !important;
+}
+.co-account-card #containerNewUserSignup > .sub-heading:first-of-type { margin-top: 0 !important; }
+.co-account-card #containerNewUserSignup > .sub-heading + .row,
+.co-account-card #containerNewUserSignup > .sub-heading + .field-container {
+    padding: 0 !important;
+}
+
 /* Additional Notes card */
 .co-notes { padding: 18px 22px; background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: 14px; }
 .co-notes-label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; margin: 0 0 8px; flex-wrap: wrap; }
@@ -1294,17 +1418,13 @@ button.generate-password:hover {
         <div class="co-split">
         <div class="co-left">
 
-            <div class="already-registered clearfix">
-                <div class="pull-right float-right">
-                    <button type="button" class="btn btn-info{if $loggedin || !$loggedin && $custtype eq "existing"} w-hidden{/if}" id="btnAlreadyRegistered">
-                        {$LANG.orderForm.alreadyRegistered}
-                    </button>
-                    <button type="button" class="btn btn-warning{if $loggedin || $custtype neq "existing"} w-hidden{/if}" id="btnNewUserSignup">
-                        {$LANG.orderForm.createAccount}
-                    </button>
-                </div>
-
-                <p class="text-sm-left overflow-hidden">{lang key='orderForm.enterPersonalDetails'}</p>
+            {* The Apple-style account card (tabs: Create / Sign in) lives
+               inside account.tpl. We keep the original toggle buttons as
+               hidden no-ops so scripts.min.js can still find them if it
+               wires programmatic .click() calls. *}
+            <div class="already-registered w-hidden" style="display:none">
+                <button type="button" id="btnAlreadyRegistered" class="w-hidden"></button>
+                <button type="button" id="btnNewUserSignup" class="w-hidden"></button>
             </div>
 
             <div class="alert alert-danger checkout-error-feedback {if !$errormessage}d-none{/if}" role="alert">
@@ -1484,12 +1604,26 @@ button.generate-password:hover {
         var btnNew = $('#btnNewUserSignup');
         var custType = $('#inputCustType');
 
+        function setActiveTab(key) {
+            $('.co-auth-tab').each(function () {
+                var t = $(this);
+                if (t.attr('data-atab') === key) { t.addClass('active'); }
+                else { t.removeClass('active'); }
+            });
+            $('.co-auth-panel').each(function () {
+                var p = $(this);
+                if (p.attr('data-apanel') === key) { p.addClass('is-active'); }
+                else { p.removeClass('is-active'); }
+            });
+        }
+
         function showLogin() {
             login.removeClass('w-hidden').show();
             signup.addClass('w-hidden').hide();
             btnExisting.addClass('w-hidden');
             btnNew.removeClass('w-hidden');
             if (custType.length) custType.val('existing');
+            setActiveTab('signin');
         }
         function showSignup() {
             signup.removeClass('w-hidden').show();
@@ -1497,9 +1631,22 @@ button.generate-password:hover {
             btnNew.addClass('w-hidden');
             btnExisting.removeClass('w-hidden');
             if (custType.length) custType.val('new');
+            setActiveTab('create');
         }
         btnExisting.on('click', showLogin);
         btnNew.on('click', showSignup);
+
+        /* Apple-style tab clicks. The .co-auth-panel data-apanel value
+           determines which container we surface -- "create" -> signup
+           panel, "signin" -> existing-login panel. We funnel through
+           showLogin/showSignup so WHMCS's hidden inputCustType + the
+           legacy w-hidden state on the containers stay in sync. */
+        $(document).on('click', '.co-auth-tab', function (e) {
+            e.preventDefault();
+            var key = $(this).attr('data-atab');
+            if (key === 'signin') { showLogin(); }
+            else if (key === 'create') { showSignup(); }
+        });
 
         var msg = document.getElementById('existingLoginMessage');
         if (msg && typeof MutationObserver === 'function') {

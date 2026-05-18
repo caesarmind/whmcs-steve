@@ -13,165 +13,160 @@
  * Spec source: WHMCS9-Theme-Development-Documentation.md §18, §27
  */
 
-/* ───────────────────────────────────────────────────────────────
-   Light mode — default
-   ─────────────────────────────────────────────────────────────── */
+/* Light-mode tokens (default). */
 :host, :root {
-    /* ── Primary (Apple blue) ───────────────────────────── */
+    /* Primary (Apple blue) */
     --vl-primary:               #0071e3;
     --vl-primary-lifted:        rgba(0, 113, 227, 0.08);
     --vl-primary-accented:      #0077ED;
 
-    /* ── Secondary (Apple dark text on neutral bg) ──────── */
+    /* Secondary (Apple dark text on neutral bg) */
     --vl-secondary:             #1d1d1f;
     --vl-secondary-lifted:      #f5f5f7;
     --vl-secondary-accented:    #000000;
 
-    /* ── Success (Apple green) ──────────────────────────── */
+    /* Success (Apple green) */
     --vl-success:               #30d158;
     --vl-success-lifted:        rgba(48, 209, 88, 0.10);
     --vl-success-accented:      #248a3d;
 
-    /* ── Info (uses primary blue family) ────────────────── */
+    /* Info (uses primary blue family) */
     --vl-info:                  #0071e3;
     --vl-info-lifted:           rgba(0, 113, 227, 0.08);
     --vl-info-accented:         #0066cc;
 
-    /* ── Notice (Apple purple/indigo) ───────────────────── */
+    /* Notice (Apple purple/indigo) */
     --vl-notice:                #5856d6;
     --vl-notice-lifted:         rgba(88, 86, 214, 0.10);
     --vl-notice-accented:       #4a47b8;
 
-    /* ── Warning (Apple orange) ─────────────────────────── */
+    /* Warning (Apple orange) */
     --vl-warning:               #ff9f0a;
     --vl-warning-lifted:        rgba(255, 159, 10, 0.10);
     --vl-warning-accented:      #c27400;
 
-    /* ── Error (Apple red) ──────────────────────────────── */
+    /* Error (Apple red) */
     --vl-error:                 #ff3b30;
     --vl-error-lifted:          rgba(255, 59, 48, 0.10);
     --vl-error-accented:        #d70015;
 
-    /* ── Grayscale (system gray family) ─────────────────── */
+    /* Grayscale (system gray family) */
     --vl-grayscale:             #6e6e73;
     --vl-grayscale-lifted:      #f5f5f7;
     --vl-grayscale-accented:    #1d1d1f;
 
-    /* ── Neutral (Apple tertiary text / soft surfaces) ──── */
+    /* Neutral (Apple tertiary text / soft surfaces) */
     --vl-neutral:               #86868b;
     --vl-neutral-lifted:        #f0f0f5;
     --vl-neutral-accented:      #6e6e73;
 
-    /* ── Text hierarchy ─────────────────────────────────── */
+    /* Text hierarchy */
     --vl-text-inverted:         #ffffff;
     --vl-text-muted:            #aeaeb2;
     --vl-text-lifted:           #6e6e73;
     --vl-text-accented:         #1d1d1f;
     --vl-text:                  #1d1d1f;
 
-    /* ── Border hierarchy ───────────────────────────────── */
+    /* Border hierarchy */
     --vl-border-muted:          #f0f0f5;
     --vl-border:                #e8e8ed;
     --vl-border-lifted:         #d2d2d7;
     --vl-border-accented:       #0071e3;       /* focus ring */
 
-    /* ── Background hierarchy ───────────────────────────── */
+    /* Background hierarchy */
     --vl-bg:                    #fbfbfd;       /* page bg */
     --vl-bg-muted:              #f5f5f7;       /* secondary surface */
     --vl-bg-lifted:             #ffffff;       /* cards / primary surface */
     --vl-bg-accented:           rgba(0, 113, 227, 0.08);
     --vl-bg-inverted:           #1d1d1f;       /* dark inverted bg */
 
-    /* ── Typography sizes — Apple-tight scale ───────────── */
+    /* Typography sizes (Apple-tight scale) */
     --vl-text-xs:               11.5px;
     --vl-text-sm:               12.5px;
     --vl-text-md:               13.5px;
     --vl-text-lg:               15px;
 
-    /* ── Outline / spacing tokens ───────────────────────── */
+    /* Outline / spacing tokens */
     --vl-outline-sm:            8px;
     --vl-outline-md:            12px;
     --vl-outline-lg:            16px;
 
-    /* ── Rounding — Apple uses soft 12-14px corners ─────── */
+    /* Rounding (Apple uses soft 12-14px corners) */
     --vl-rounding-sm:           8px;
     --vl-rounding-md:           12px;
     --vl-rounding-lg:           14px;
 
-    /* ── Misc ───────────────────────────────────────────── */
+    /* Misc */
     --vl-letter-spacing:        -0.008em;
     --vl-disabled-opacity:      0.5;
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Dark mode — system preference
-   ─────────────────────────────────────────────────────────────── */
-@media (prefers-color-scheme: dark) {
-    :host, :root {
-        /* Primary shifts up to Apple's brighter blue on dark */
-        --vl-primary:           #2997ff;
-        --vl-primary-lifted:    rgba(41, 151, 255, 0.12);
-        --vl-primary-accented:  #40a3ff;
+/* Dark mode tokens. Triggered ONLY by an explicit data-theme="dark" on
+   :root (set by the WHMCS theme switcher). Previously this block used
+   @media (prefers-color-scheme: dark), which made the OS preference
+   override the explicit light theme on /store, viewcart, and checkout,
+   leaving body bg dark in light mode. */
+:host[data-theme="dark"],
+:root[data-theme="dark"] {
+    --vl-primary:           #2997ff;
+    --vl-primary-lifted:    rgba(41, 151, 255, 0.12);
+    --vl-primary-accented:  #40a3ff;
 
-        --vl-secondary:         #f5f5f7;
-        --vl-secondary-lifted:  #3a3a3c;
-        --vl-secondary-accented:#ffffff;
+    --vl-secondary:         #f5f5f7;
+    --vl-secondary-lifted:  #3a3a3c;
+    --vl-secondary-accented:#ffffff;
 
-        --vl-success:           #30d158;
-        --vl-success-lifted:    rgba(48, 209, 88, 0.16);
-        --vl-success-accented:  #248a3d;
+    --vl-success:           #30d158;
+    --vl-success-lifted:    rgba(48, 209, 88, 0.16);
+    --vl-success-accented:  #248a3d;
 
-        --vl-info:              #2997ff;
-        --vl-info-lifted:       rgba(41, 151, 255, 0.14);
-        --vl-info-accented:     #40a3ff;
+    --vl-info:              #2997ff;
+    --vl-info-lifted:       rgba(41, 151, 255, 0.14);
+    --vl-info-accented:     #40a3ff;
 
-        --vl-notice:            #7a78f0;
-        --vl-notice-lifted:     rgba(122, 120, 240, 0.16);
-        --vl-notice-accented:   #9491f6;
+    --vl-notice:            #7a78f0;
+    --vl-notice-lifted:     rgba(122, 120, 240, 0.16);
+    --vl-notice-accented:   #9491f6;
 
-        --vl-warning:           #ff9f0a;
-        --vl-warning-lifted:    rgba(255, 159, 10, 0.16);
-        --vl-warning-accented:  #ffb340;
+    --vl-warning:           #ff9f0a;
+    --vl-warning-lifted:    rgba(255, 159, 10, 0.16);
+    --vl-warning-accented:  #ffb340;
 
-        --vl-error:             #ff453a;
-        --vl-error-lifted:      rgba(255, 69, 58, 0.16);
-        --vl-error-accented:    #ff6961;
+    --vl-error:             #ff453a;
+    --vl-error-lifted:      rgba(255, 69, 58, 0.16);
+    --vl-error-accented:    #ff6961;
 
-        --vl-grayscale:         #a1a1a6;
-        --vl-grayscale-lifted:  #3a3a3c;
-        --vl-grayscale-accented:#f5f5f7;
+    --vl-grayscale:         #a1a1a6;
+    --vl-grayscale-lifted:  #3a3a3c;
+    --vl-grayscale-accented:#f5f5f7;
 
-        --vl-neutral:           #8e8e93;
-        --vl-neutral-lifted:    #2c2c2e;
-        --vl-neutral-accented:  #a1a1a6;
+    --vl-neutral:           #8e8e93;
+    --vl-neutral-lifted:    #2c2c2e;
+    --vl-neutral-accented:  #a1a1a6;
 
-        --vl-text-inverted:     #1d1d1f;
-        --vl-text-muted:        #636366;
-        --vl-text-lifted:       #a1a1a6;
-        --vl-text-accented:     #ffffff;
-        --vl-text:              #f5f5f7;
+    --vl-text-inverted:     #1d1d1f;
+    --vl-text-muted:        #636366;
+    --vl-text-lifted:       #a1a1a6;
+    --vl-text-accented:     #ffffff;
+    --vl-text:              #f5f5f7;
 
-        --vl-border-muted:      #2c2c2e;
-        --vl-border:            #3a3a3c;
-        --vl-border-lifted:     #545458;
-        --vl-border-accented:   #2997ff;
+    --vl-border-muted:      #2c2c2e;
+    --vl-border:            #3a3a3c;
+    --vl-border-lifted:     #545458;
+    --vl-border-accented:   #2997ff;
 
-        --vl-bg:                #1c1c1e;
-        --vl-bg-muted:          #2c2c2e;
-        --vl-bg-lifted:         #3a3a3c;
-        --vl-bg-accented:       rgba(41, 151, 255, 0.14);
-        --vl-bg-inverted:       #f5f5f7;
-    }
+    --vl-bg:                #1c1c1e;
+    --vl-bg-muted:          #2c2c2e;
+    --vl-bg-lifted:         #3a3a3c;
+    --vl-bg-accented:       rgba(41, 151, 255, 0.14);
+    --vl-bg-inverted:       #f5f5f7;
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Wrapper-page styling
-   The Nexus cart SPA renders inside #order-standard_cart but the
-   page chrome AROUND it (header, breadcrumb, footer from
-   standard_cart/common.tpl) is regular DOM. Style it with the
-   same Apple tokens so the seam between SPA and wrapper is
-   invisible.
-   ─────────────────────────────────────────────────────────────── */
+/* Wrapper-page styling. The Nexus cart SPA renders inside
+   #order-standard_cart, but the page chrome around it (header,
+   breadcrumb, footer from standard_cart/common.tpl) is regular DOM.
+   Style it with the same Apple tokens so the seam between SPA and
+   wrapper is invisible. */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background: var(--vl-bg);
