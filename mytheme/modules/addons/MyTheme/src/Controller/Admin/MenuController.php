@@ -62,16 +62,22 @@ final class MenuController extends AbstractController
     }
 
     /**
-     * Self-heal: if the menu tables don't exist (because the admin upgraded
-     * MyTheme without going through _upgrade, which WHMCS doesn't reliably
-     * fire on file-replace deploys), run migrations + seeder now. Idempotent.
+     * Self-heal: run any pending migrations and seed missing preset menus.
+     * Called on every admin Menu page hit. Both operations are idempotent:
+     *   - Migrator tracks executed migrations in `mytheme_migrations` and
+     *     skips ones already run. Newly shipped schema changes (e.g.
+     *     extending an enum to add a new location value) land here without
+     *     requiring the admin to go through _upgrade.
+     *   - Seeder skips presets whose (name, location) menu already exists
+     *     and has items, so re-running it just creates anything missing.
+     *
+     * Earlier versions short-circuited when the tables existed — that hid
+     * new migrations from existing installs, which broke the rollout of
+     * the 'footer-secondary' enum value.
      */
     private function ensureMenuTables(): void
     {
         try {
-            if (Capsule::schema()->hasTable('mytheme_menus')) {
-                return;
-            }
             // Addon root = three dirs up from this file (src/Controller/Admin → addon root)
             $addonRoot = dirname(__DIR__, 3);
             (new Migrator($addonRoot))->migrate();
@@ -88,11 +94,6 @@ final class MenuController extends AbstractController
         $tab = (string)($_GET['tab'] ?? 'main');
         if (!in_array($tab, ['main', 'secondary', 'footer', 'footer-secondary'], true)) {
             $tab = 'main';
-        }
-
-        // Self-heal: if the tables exist but no presets are seeded, seed now.
-        if (Menu::query()->count() === 0) {
-            (new Seeder())->run();
         }
 
         $menus = Menu::where('location', $tab)
