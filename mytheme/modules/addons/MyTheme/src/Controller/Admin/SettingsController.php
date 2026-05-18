@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace MyTheme\Controller\Admin;
 
 use MyTheme\Controller\AbstractController;
+use MyTheme\Helpers\LocaleHelper;
 use MyTheme\Models\Settings;
 
 final class SettingsController extends AbstractController
@@ -11,6 +12,10 @@ final class SettingsController extends AbstractController
     /**
      * Available settings — used by the view to render the toggle list and by save() to validate keys.
      * Each entry: [label, help, default, type ('bool'|'string'|'int')]
+     *
+     * Only boolean toggles live here. Compound settings (e.g. the language
+     * picker — toggle plus a list of codes) are stored separately and
+     * handled in indexAction/save below.
      */
     public const FLAGS = [
         'custom_logo_url'        => ['Custom Logo URL',          'Send the visitor to this URL when clicking the logo.',                   false, 'bool'],
@@ -27,7 +32,7 @@ final class SettingsController extends AbstractController
         'disable_cms_cache'      => ['Disable CMS Menu Cache',   'Bypass the menu cache during development.',                             false, 'bool'],
         'hide_cycle_discounts'   => ['Hide Billing Cycle Discounts', 'Hide percentage savings shown next to billing cycles.',              false, 'bool'],
         'enable_dynamic_ajax'    => ['Enable Dynamic AJAX Loading',  'Load some panels via AJAX after the page paints.',                   true,  'bool'],
-        'custom_language_list'   => ['Custom Language List',     'Override the language list shown to clients.',                          false, 'bool'],
+        'custom_language_list'   => ['Custom Language List',     'Override the language list shown to clients in the locale chooser.',    false, 'bool'],
         'enable_dark_mode'       => ['Enable Dark Mode',         'Allow visitors to toggle dark mode.',                                   true,  'bool'],
     ];
 
@@ -42,10 +47,25 @@ final class SettingsController extends AbstractController
             $values[$key] = Settings::getValue($key, $default);
         }
 
+        $installedLanguages = LocaleHelper::detectInstalled();
+        $stored = Settings::getValue(LocaleHelper::LIST_KEY, []);
+        $selectedLanguages = [];
+        if (is_array($stored)) {
+            foreach ($stored as $code) {
+                if (is_string($code) && $code !== '') {
+                    $selectedLanguages[] = strtolower($code);
+                }
+            }
+            $selectedLanguages = array_values(array_unique($selectedLanguages));
+        }
+
         return $this->view('settings/index', [
-            'flags'  => self::FLAGS,
-            'values' => $values,
-            'tab'    => $_GET['tab'] ?? 'general',
+            'flags'              => self::FLAGS,
+            'values'             => $values,
+            'tab'                => $_GET['tab'] ?? 'general',
+            'installedLanguages' => $installedLanguages,
+            'selectedLanguages'  => $selectedLanguages,
+            'langListKey'        => LocaleHelper::LIST_KEY,
         ]);
     }
 
@@ -56,5 +76,19 @@ final class SettingsController extends AbstractController
             $val = isset($_POST[$key]) ? true : false;
             Settings::setValue($key, $val ? '1' : '0', $type);
         }
+
+        // Custom language picker — POST sends an array of checked codes under
+        // <key>[] (or nothing when the picker is hidden). Filter against the
+        // installed set so a stale browser tab can't sneak in unknown values.
+        $posted = $_POST[LocaleHelper::LIST_KEY] ?? [];
+        if (!is_array($posted)) {
+            $posted = [];
+        }
+        $installed = array_flip(LocaleHelper::detectInstalled());
+        $clean = array_values(array_unique(array_filter(
+            array_map(static fn($code) => strtolower((string)$code), $posted),
+            static fn($code) => $code !== '' && isset($installed[$code])
+        )));
+        Settings::setValue(LocaleHelper::LIST_KEY, $clean, 'json');
     }
 }

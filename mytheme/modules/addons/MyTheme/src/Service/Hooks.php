@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace MyTheme\Service;
 
 use MyTheme\Helpers\AddonHelper;
+use MyTheme\Helpers\LocaleHelper;
 use MyTheme\Helpers\ThemeManifest;
 use MyTheme\Helpers\Uploader;
 use MyTheme\Models\Settings;
@@ -94,6 +95,13 @@ final class Hooks
                 ],
                 'addonSettings' => Settings::all(),
                 'branding'      => $branding,
+                // Effective language list for the locale chooser. Respects the
+                // admin's "Custom Language List" toggle + curated codes from
+                // the Settings tab; otherwise falls back to every language
+                // installed in WHMCS root /lang/.
+                'locales'       => [
+                    'languages' => LocaleHelper::effectiveList(),
+                ],
             ],
             'rslang' => $this->loadLanguage($template, $vars['language'] ?? 'english'),
             // Convenience root alias — templates that just want "the logo"

@@ -12,10 +12,20 @@
             </button>
         </div>
         <div class="locale-modal-body">
+            {* Prefer the admin-curated list from MyTheme.locales.languages when
+               available; fall back to WHMCS's $languages, then to a static set
+               for pages where neither is populated. *}
+            {if isset($myTheme.locales.languages) && $myTheme.locales.languages|@count > 0}
+                {assign var=mtLangList value=$myTheme.locales.languages}
+            {elseif isset($languages) && $languages|@count > 0}
+                {assign var=mtLangList value=$languages}
+            {else}
+                {assign var=mtLangList value=[]}
+            {/if}
             <div class="locale-modal-section-label">{$LANG.languagechoose|default:'Language'}</div>
             <div class="locale-grid" role="radiogroup" aria-label="{$LANG.languagechoose|default:'Language'}">
-                {if isset($languages) && $languages|@count > 0}
-                    {foreach $languages as $lang}
+                {if $mtLangList|@count > 0}
+                    {foreach $mtLangList as $lang}
                         <button type="button" data-lang="{$lang|escape}"{if isset($language) && $language == $lang} class="active"{/if}>{$lang|escape|capitalize}</button>
                     {/foreach}
                 {else}
