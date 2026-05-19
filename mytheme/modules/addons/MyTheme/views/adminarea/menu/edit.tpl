@@ -259,14 +259,18 @@
         <div class="mt-menu-sect">
             <div class="mt-menu-sect-label">Type</div>
             <div>
-                <span class="mt-badge mt-badge-neutral" id="drawerTypeBadge">&mdash;</span>
+                <select id="drawerType" class="mt-select" data-drawer-field="item_type">
+                    {foreach $itemTypes as $key => $meta}
+                        <option value="{$key|escape}">{$meta.label|escape}</option>
+                    {/foreach}
+                </select>
                 <div class="mt-menu-sect-help" style="margin-top:6px">
-                    Set when the item is created and can't be changed afterwards. To switch type, delete this item and add a new one.
+                    Changing the type hides fields that don't apply. Existing label / icon / URL values are kept in case you switch back.
                 </div>
             </div>
         </div>
 
-        <div class="mt-menu-sect">
+        <div class="mt-menu-sect" data-section="name">
             <div class="mt-menu-sect-label">Name</div>
             <input id="drawerLabelEn" class="mt-input" type="text" data-drawer-field="label.custom.english" placeholder="English label">
             <div class="mt-menu-sect-help">Shown to clients. The WHMCS lang key (in <em>Advanced label</em>) takes precedence if set.</div>
@@ -330,7 +334,7 @@
             </div>
         </div>
 
-        <div class="mt-menu-sect">
+        <div class="mt-menu-sect" data-section="icon">
             <div class="mt-menu-sect-label">Icon</div>
             <div class="mt-icon-picker-wrap">
                 <button type="button" class="mt-icon-picker-trigger" id="drawerIconBtn">
@@ -358,7 +362,7 @@
         </div>
 
         {* COLLAPSIBLE — Advanced label *}
-        <div class="mt-menu-sub" data-sub="label">
+        <div class="mt-menu-sub" data-sub="label" data-section="langKey">
             <button type="button" class="mt-menu-sub-h">
                 <span>Advanced label</span>
                 <span class="mt-menu-sub-chev"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -373,7 +377,7 @@
         </div>
 
         {* COLLAPSIBLE — Display & Advanced settings *}
-        <div class="mt-menu-sub" data-sub="display">
+        <div class="mt-menu-sub" data-sub="display" data-section="display">
             <button type="button" class="mt-menu-sub-h">
                 <span>Display &amp; advanced</span>
                 <span class="mt-menu-sub-chev"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -689,8 +693,8 @@
     var selectedTempId = null;
 
     // Human-readable labels for the item_type values. Mirrors
-    // ItemTypes::all() in PHP — kept in sync manually. Falls back to the
-    // raw type string if a future PHP type is added without an entry here.
+    // ItemTypes::all() in PHP — kept in sync manually. Used for the
+    // "(Divider)" fallback label on label-less rows.
     var TYPE_LABELS = {
         whmcs_page:       'WHMCS Page',
         custom_link:      'Custom Link',
@@ -703,6 +707,93 @@
         account_dropdown: 'Account Dropdown',
         whmcs_default:    'WHMCS Default'
     };
+
+    // Field-visibility map per type. Each key here corresponds to a
+    // [data-section="..."] element in the inline panel; `false` hides it
+    // for that type. The per-type Page / URL / Dropdown sections still use
+    // [data-drawer-show-when="<exact type>"] since they're single-type
+    // exclusives. Unknown types default to "show everything" so a future
+    // PHP type addition doesn't blank the panel.
+    var TYPE_FIELDS = {
+        whmcs_page:       { name: true,  icon: true,  langKey: true,  display: true  },
+        custom_link:      { name: true,  icon: true,  langKey: true,  display: true  },
+        dropdown_parent:  { name: true,  icon: true,  langKey: true,  display: true  },
+        header:           { name: true,  icon: false, langKey: true,  display: true  },
+        divider:          { name: false, icon: false, langKey: false, display: true  },
+        language:         { name: false, icon: false, langKey: false, display: true  },
+        currency:         { name: false, icon: false, langKey: false, display: true  },
+        login_button:     { name: true,  icon: true,  langKey: true,  display: true  },
+        account_dropdown: { name: true,  icon: true,  langKey: true,  display: true  },
+        whmcs_default:    { name: false, icon: false, langKey: false, display: true  }
+    };
+    var TYPE_FIELDS_DEFAULT = { name: true, icon: true, langKey: true, display: true };
+
+    function applyTypeVisibility(type) {
+        var fields = TYPE_FIELDS[type] || TYPE_FIELDS_DEFAULT;
+        panel.querySelectorAll('[data-section]').forEach(function (el) {
+            var key = el.getAttribute('data-section');
+            el.style.display = fields[key] === false ? 'none' : '';
+        });
+    }
+
+    // Tree-row label shown next to the chevron. For types without a Name
+    // field (divider, language, etc.) we fall back to a parenthesized type
+    // name so the row isn't empty after a switch.
+    function rowLabelFor(entry) {
+        var fields = TYPE_FIELDS[entry.item_type] || TYPE_FIELDS_DEFAULT;
+        if (fields.name === false) {
+            return '(' + (TYPE_LABELS[entry.item_type] || entry.item_type) + ')';
+        }
+        var l = entry.label || {};
+        return (l.custom && l.custom.english) || l.whmcs || '(no label)';
+    }
+
+    // Show or hide the per-row "+ Add child" button based on whether the
+    // type accepts children. Only dropdown_parent does today.
+    function refreshAddChildButton(li, type) {
+        var row = li.querySelector(':scope > .mt-menu-item-row');
+        if (!row) return;
+        var ctrls = row.querySelector('.mt-menu-ctrls');
+        var existing = row.querySelector('.mt-menu-btn-add');
+        if (type === 'dropdown_parent') {
+            if (!existing && ctrls) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'mt-menu-btn mt-menu-btn-add';
+                btn.setAttribute('data-action', 'add-child');
+                btn.title = 'Add child item';
+                btn.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+                ctrls.insertBefore(btn, ctrls.firstChild);
+            }
+        } else if (existing) {
+            existing.remove();
+        }
+    }
+
+    // Side effect for item_type changes — confirm before orphaning children,
+    // sync DOM state (data-type + Add Child button), refresh visibility maps.
+    function onTypeChanged(entry, oldType) {
+        if (oldType === 'dropdown_parent' && entry.item_type !== 'dropdown_parent') {
+            var hasChildren = state.items.some(function (it) { return it.parent_id === entry.tempId; });
+            if (hasChildren) {
+                if (!confirm('This dropdown has child items. Changing type will hide them on the frontend (they stay in the menu data and re-appear if you switch back). Continue?')) {
+                    entry.item_type = oldType;
+                    var sel = document.getElementById('drawerType');
+                    if (sel) sel.value = oldType;
+                    return;
+                }
+            }
+        }
+        var li = document.querySelector('li[data-temp="' + entry.tempId + '"]');
+        if (li) {
+            li.setAttribute('data-type', entry.item_type);
+            refreshAddChildButton(li, entry.item_type);
+        }
+        applyTypeVisibility(entry.item_type);
+        panel.querySelectorAll('[data-drawer-show-when]').forEach(function (el) {
+            el.style.display = (el.getAttribute('data-drawer-show-when') === entry.item_type) ? '' : 'none';
+        });
+    }
 
     function uid(){ return 'new_' + (state.nextTemp++); }
     function markDirty(){ state.pristine = false; }
@@ -894,10 +985,9 @@
     function populatePanelFromEntry(tempId){
         var entry = state.items.find(function(it){ return it.tempId === tempId; });
         if (!entry) return;
-        // Type badge — read-only display of the item's type.
-        var typeBadge = document.getElementById('drawerTypeBadge');
-        if (typeBadge) typeBadge.textContent = TYPE_LABELS[entry.item_type] || entry.item_type;
-        // Toggle per-type sections.
+        // Per-type field visibility (drives data-section show/hide).
+        applyTypeVisibility(entry.item_type);
+        // Toggle per-type-exclusive sections (Page / URL / Dropdown).
         panel.querySelectorAll('[data-drawer-show-when]').forEach(function(el){
             el.style.display = (el.getAttribute('data-drawer-show-when') === entry.item_type) ? '' : 'none';
         });
@@ -1276,6 +1366,9 @@
         var path = el.getAttribute('data-drawer-field');
         var multi = el.getAttribute('data-drawer-multi');
         var checkboxVal = el.getAttribute('data-drawer-checkbox-value');
+        // Capture old value when changing item_type so onTypeChanged can
+        // detect dropdown_parent → other-type transitions and warn.
+        var oldType = (path === 'item_type') ? readPath(entry, path) : null;
         if (multi){
             var arr = readPath(entry, path) || [];
             if (!Array.isArray(arr)) arr = [];
@@ -1288,24 +1381,27 @@
             writePath(entry, path, el.checked);
             // If toggling the "active" field in the panel, mirror to the row toggle.
             if (path === 'active') {
-                var li = document.querySelector('li[data-temp="' + selectedTempId + '"]');
-                if (li){
-                    var rowCb = li.querySelector(':scope > .mt-menu-item-row [data-action="toggle-visible"]');
+                var li2 = document.querySelector('li[data-temp="' + selectedTempId + '"]');
+                if (li2){
+                    var rowCb = li2.querySelector(':scope > .mt-menu-item-row [data-action="toggle-visible"]');
                     if (rowCb) rowCb.checked = el.checked;
-                    li.classList.toggle('is-row-hidden', !el.checked);
+                    li2.classList.toggle('is-row-hidden', !el.checked);
                 }
             }
         } else {
             writePath(entry, path, el.value);
         }
+        // item_type side-effects: re-apply visibility + may revert on user cancel.
+        if (path === 'item_type') {
+            onTypeChanged(entry, oldType);
+        }
         markDirty();
-        // Reflect label changes in the tree row
+        // Reflect label changes in the tree row (type-aware fallback).
         var li = document.querySelector('li[data-temp="' + selectedTempId + '"]');
         if (li){
             var labelEl = li.querySelector('[data-role=label]');
             if (labelEl){
-                var l = entry.label || {};
-                labelEl.textContent = (l.custom && l.custom.english) || l.whmcs || '(no label)';
+                labelEl.textContent = rowLabelFor(entry);
             }
         }
     });
