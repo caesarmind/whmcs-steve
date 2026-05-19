@@ -756,10 +756,22 @@
 .mt-menu-sub-chev svg { width: 12px; height: 12px; transition: transform .15s; }
 .mt-menu-sub.is-open .mt-menu-sub-chev svg { transform: rotate(90deg); color: var(--mt-primary); }
 .mt-menu-sub.is-open .mt-menu-sub-chev { color: var(--mt-primary); }
-.mt-menu-sub-body { padding: 4px 16px 16px 32px; border-top: 1px solid var(--mt-border-2); padding-top: 14px; }
+.mt-menu-sub.is-open > .mt-menu-sub-h { color: var(--mt-primary); }
+
+/* Sub-body — left accent bar + soft primary tint show that these fields
+   belong to the section header above. Without these, the body just flows
+   inline and reads as part of the next section. */
+.mt-menu-sub-body {
+    padding: 14px 16px 16px 16px;
+    margin: 4px 16px 12px 32px;
+    background: var(--mt-primary-tint);
+    border-left: 3px solid var(--mt-primary);
+    border-radius: 0 6px 6px 0;
+}
 .mt-menu-sub-body[hidden] { display: none; }
 .mt-menu-sub-body .mt-field { margin-bottom: 12px; }
 .mt-menu-sub-body .mt-field:last-child { margin-bottom: 0; }
+.mt-menu-sub-body .mt-field-label { color: var(--mt-text-2); }
 
 @media (max-width: 640px) {
     .mt-menu-grip { display: none; } /* hide on touch — use up/down buttons */
