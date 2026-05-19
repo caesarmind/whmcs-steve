@@ -509,28 +509,31 @@
 .mt-menu-tree-col ul.mt-menu-children { list-style: none; margin: 0 0 0 22px; padding: 8px 0 8px 12px; border-left: 1.5px solid var(--mt-border); display: flex; flex-direction: column; gap: 0; background: transparent; }
 .mt-menu-tree-col ul.mt-menu-children:empty { display: none; }
 
+/* Default rows are borderless — just a hairline between adjacent items
+   for separation. The full bordered "card" look is reserved for the
+   currently-open item, which makes the editing focus unmistakable. */
 .mt-menu-tree-col li.mt-menu-item {
-    background: var(--mt-surface);
-    border: 1px solid var(--mt-border);
-    border-top: 0;
+    background: transparent;
+    border: 0;
     border-radius: 0;
     position: relative;
     list-style: none;
 }
-/* Connected-row treatment — adjacent items share a single 1px border, no
-   double-line at the seam. Top-level + children both follow the same
-   pattern: first child draws the top border (+ rounded top corners), last
-   child rounds the bottom corners. Plain children carry no special radii
-   so they fit flush. */
-.mt-menu-tree-col ul.mt-menu-list > li.mt-menu-item:first-child { border-top: 1px solid var(--mt-border); border-top-left-radius: 8px; border-top-right-radius: 8px; }
-.mt-menu-tree-col ul.mt-menu-list > li.mt-menu-item:last-child  { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
-.mt-menu-tree-col ul.mt-menu-children > li.mt-menu-item:first-child { border-top: 1px solid var(--mt-border); border-top-left-radius: 6px; border-top-right-radius: 6px; }
-.mt-menu-tree-col ul.mt-menu-children > li.mt-menu-item:last-child  { border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; }
+.mt-menu-tree-col ul.mt-menu-list > li.mt-menu-item + li.mt-menu-item,
+.mt-menu-tree-col ul.mt-menu-children > li.mt-menu-item + li.mt-menu-item {
+    border-top: 1px solid var(--mt-border-2);
+}
 
 .mt-menu-tree-col li.mt-menu-item.is-open {
-    box-shadow: inset 3px 0 0 var(--mt-primary);
+    background: var(--mt-surface);
+    border-radius: 8px;
+    /* Inset 3px left bar (accent) + 1px gray ring around the open item. */
+    box-shadow: inset 3px 0 0 var(--mt-primary), 0 0 0 1px var(--mt-border);
     z-index: 1;
 }
+/* Suppress the hairline above the sibling immediately after an open item —
+   the open item's box-shadow ring already draws its own border there. */
+.mt-menu-tree-col li.mt-menu-item.is-open + li.mt-menu-item { border-top: 0; }
 .mt-menu-tree-col li.mt-menu-item.is-dragging { opacity: 0.4; }
 
 /* Drag-over insertion line (drop indicator) */
