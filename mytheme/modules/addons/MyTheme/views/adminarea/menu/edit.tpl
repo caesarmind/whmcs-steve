@@ -496,7 +496,7 @@
 /* ----- Items list (flat hairline-divided rows, left accent bar on open) ----- */
 .mt-menu-tree-col .mt-menu-tree { display: flex; flex-direction: column; gap: 0; }
 .mt-menu-tree-col ul.mt-menu-list { display: flex; flex-direction: column; gap: 0; list-style: none; margin: 0; padding: 0; }
-.mt-menu-tree-col ul.mt-menu-children { list-style: none; margin: 0 0 0 22px; padding: 8px 0 8px 12px; border-left: 1.5px solid var(--mt-border); display: flex; flex-direction: column; gap: 6px; background: transparent; }
+.mt-menu-tree-col ul.mt-menu-children { list-style: none; margin: 0 0 0 22px; padding: 8px 0 8px 12px; border-left: 1.5px solid var(--mt-border); display: flex; flex-direction: column; gap: 0; background: transparent; }
 .mt-menu-tree-col ul.mt-menu-children:empty { display: none; }
 
 .mt-menu-tree-col li.mt-menu-item {
@@ -507,9 +507,15 @@
     position: relative;
     list-style: none;
 }
+/* Connected-row treatment — adjacent items share a single 1px border, no
+   double-line at the seam. Top-level + children both follow the same
+   pattern: first child draws the top border (+ rounded top corners), last
+   child rounds the bottom corners. Plain children carry no special radii
+   so they fit flush. */
 .mt-menu-tree-col ul.mt-menu-list > li.mt-menu-item:first-child { border-top: 1px solid var(--mt-border); border-top-left-radius: 8px; border-top-right-radius: 8px; }
-.mt-menu-tree-col ul.mt-menu-list > li.mt-menu-item:last-child { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
-.mt-menu-tree-col ul.mt-menu-children li.mt-menu-item { border: 1px solid var(--mt-border); border-radius: 8px; }
+.mt-menu-tree-col ul.mt-menu-list > li.mt-menu-item:last-child  { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+.mt-menu-tree-col ul.mt-menu-children > li.mt-menu-item:first-child { border-top: 1px solid var(--mt-border); border-top-left-radius: 6px; border-top-right-radius: 6px; }
+.mt-menu-tree-col ul.mt-menu-children > li.mt-menu-item:last-child  { border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; }
 
 .mt-menu-tree-col li.mt-menu-item.is-open {
     box-shadow: inset 3px 0 0 var(--mt-primary);
