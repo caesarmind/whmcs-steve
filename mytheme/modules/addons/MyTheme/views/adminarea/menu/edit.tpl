@@ -496,6 +496,16 @@
 /* ----- Items list (flat hairline-divided rows, left accent bar on open) ----- */
 .mt-menu-tree-col .mt-menu-tree { display: flex; flex-direction: column; gap: 0; }
 .mt-menu-tree-col ul.mt-menu-list { display: flex; flex-direction: column; gap: 0; list-style: none; margin: 0; padding: 0; }
+
+/* Override footer.tpl's global .mt-menu-add-row that draws a dashed
+   top-border + padding-top — those produce a visible second horizontal
+   line below the last item ("double line"). Inside the new flat tree
+   we just want breathing space, no extra rule. */
+.mt-menu-tree-col .mt-menu-add-row {
+    border-top: 0;
+    padding-top: 0;
+    margin-top: 12px;
+}
 .mt-menu-tree-col ul.mt-menu-children { list-style: none; margin: 0 0 0 22px; padding: 8px 0 8px 12px; border-left: 1.5px solid var(--mt-border); display: flex; flex-direction: column; gap: 0; background: transparent; }
 .mt-menu-tree-col ul.mt-menu-children:empty { display: none; }
 
