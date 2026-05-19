@@ -126,9 +126,35 @@
     .mt-multi-option .mt-multi-check svg { width: 10px; height: 10px; opacity: 0; }
     .mt-multi-option.is-checked .mt-multi-check svg { opacity: 1; }
     .mt-multi-empty { padding: 14px; text-align: center; color: var(--mt-text-3); font-size: 12px; }
-    .mt-multi-actions { padding: 6px 12px; border-top: 1px solid var(--mt-border); display: flex; gap: 14px; }
-    .mt-link-btn { background: none; border: 0; padding: 0; color: var(--mt-primary, #0071e3); font: inherit; cursor: pointer; font-size: 12px; }
-    .mt-link-btn:hover { text-decoration: underline; }
+
+    /* "All" pseudo-option — separated from the language list with a divider,
+       and visually disabled when a specific language is checked. */
+    .mt-multi-option.is-all {
+        font-weight: 600;
+        border-bottom: 1px solid var(--mt-border);
+        border-radius: 4px 4px 0 0;
+        padding-bottom: 9px;
+        margin-bottom: 4px;
+    }
+    .mt-multi-option .mt-multi-globe { color: var(--mt-text-3); display: inline-flex; align-items: center; }
+    .mt-multi-option .mt-multi-globe svg { width: 14px; height: 14px; display: block; }
+    .mt-multi-option.is-all.is-checked .mt-multi-globe { color: var(--mt-primary, #0071e3); }
+    .mt-multi-option.is-disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    .mt-multi-option.is-disabled .mt-multi-globe { color: var(--mt-text-4); }
+
+    /* "All" chip — distinguished from regular chips with the primary tint + globe icon */
+    .mt-multi-chip.is-all {
+        background: rgba(0, 113, 227, 0.08);
+        border-color: rgba(0, 113, 227, 0.20);
+        color: var(--mt-primary, #0071e3);
+        font-weight: 500;
+    }
+    .mt-multi-chip-icon { display: inline-flex; align-items: center; color: currentColor; }
+    .mt-multi-chip-icon svg { width: 12px; height: 12px; display: block; }
 </style>
 
 <form method="post" action="" novalidate>
@@ -193,6 +219,19 @@
                                     <input type="search" id="mt-lang-search" placeholder="Search languages…" autocomplete="off" aria-label="Search languages">
                                 </div>
                                 <div class="mt-multi-options" id="mt-lang-options">
+                                    {* "All" is a pseudo-option: it represents the "no restriction"
+                                       state (all installed languages checked). It auto-disables
+                                       when any specific language is checked — to re-enable it,
+                                       remove the specific selections first. *}
+                                    <button type="button" class="mt-multi-option is-all" data-code="__all__" role="option" aria-selected="false">
+                                        <span class="mt-multi-check" aria-hidden="true">
+                                            <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg>
+                                        </span>
+                                        <span class="mt-multi-globe" aria-hidden="true">
+                                            <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 7h11M7 1.5c2 1.5 2 9.5 0 11M7 1.5c-2 1.5-2 9.5 0 11" stroke="currentColor" stroke-width="1.2"/></svg>
+                                        </span>
+                                        <span>All</span>
+                                    </button>
                                     {foreach $installedLanguages as $code}
                                         <button type="button" class="mt-multi-option" data-code="{$code|escape}" role="option" aria-selected="false">
                                             <span class="mt-multi-check" aria-hidden="true">
@@ -203,10 +242,6 @@
                                     {/foreach}
                                 </div>
                                 <div class="mt-multi-empty" id="mt-lang-empty" hidden>No languages match.</div>
-                                <div class="mt-multi-actions">
-                                    <button type="button" class="mt-link-btn" id="mt-lang-all">Select all</button>
-                                    <button type="button" class="mt-link-btn" id="mt-lang-none">Clear</button>
-                                </div>
                             </div>
                         </div>
                     {/if}
@@ -256,38 +291,69 @@
         return Array.prototype.map.call(inputs.querySelectorAll('input:checked'), function (cb) { return cb.value; });
     }
 
+    function allInputs() { return inputs.querySelectorAll('input'); }
+
     function render() {
+        var allCbs = allInputs();
+        var total = allCbs.length;
         var selected = selectedCodes();
-        // Rebuild chip row
+        var n = selected.length;
+        // Tri-state: empty | partial | all. "All" means every installed
+        // language checkbox is checked — UI collapses to a single "All" chip.
+        var state = (n === 0) ? 'empty' : (n === total ? 'all' : 'partial');
+
+        // Chip row
         chips.innerHTML = '';
-        selected.forEach(function (code) {
-            var chip = document.createElement('span');
-            chip.className = 'mt-multi-chip';
-            var label = document.createElement('span');
-            label.textContent = capitalize(code);
-            var x = document.createElement('span');
-            x.className = 'mt-multi-chip-x';
-            x.setAttribute('data-remove', code);
-            x.setAttribute('role', 'button');
-            x.setAttribute('aria-label', 'Remove ' + code);
-            x.innerHTML = '&times;';
-            chip.appendChild(label);
-            chip.appendChild(x);
-            chips.appendChild(chip);
-        });
-        placeholder.hidden = selected.length > 0;
-        // Update option ticks
+        if (state === 'all') {
+            var allChip = document.createElement('span');
+            allChip.className = 'mt-multi-chip is-all';
+            allChip.innerHTML =
+                '<span class="mt-multi-chip-icon" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 7h11M7 1.5c2 1.5 2 9.5 0 11M7 1.5c-2 1.5-2 9.5 0 11" stroke="currentColor" stroke-width="1.2"/></svg></span>' +
+                '<span>All</span>' +
+                '<span class="mt-multi-chip-x" data-remove="__all__" role="button" aria-label="Remove All">&times;</span>';
+            chips.appendChild(allChip);
+        } else if (state === 'partial') {
+            selected.forEach(function (code) {
+                var chip = document.createElement('span');
+                chip.className = 'mt-multi-chip';
+                var label = document.createElement('span');
+                label.textContent = capitalize(code);
+                var x = document.createElement('span');
+                x.className = 'mt-multi-chip-x';
+                x.setAttribute('data-remove', code);
+                x.setAttribute('role', 'button');
+                x.setAttribute('aria-label', 'Remove ' + code);
+                x.innerHTML = '&times;';
+                chip.appendChild(label);
+                chip.appendChild(x);
+                chips.appendChild(chip);
+            });
+        }
+        placeholder.hidden = state !== 'empty';
+
+        // Option states
         var selectedSet = {};
         selected.forEach(function (c) { selectedSet[c] = true; });
         Array.prototype.forEach.call(options.querySelectorAll('.mt-multi-option'), function (opt) {
-            var on = !!selectedSet[opt.getAttribute('data-code')];
-            opt.classList.toggle('is-checked', on);
-            opt.setAttribute('aria-selected', on ? 'true' : 'false');
+            if (opt.classList.contains('is-all')) {
+                opt.classList.toggle('is-checked', state === 'all');
+                // "Unavailable" when the user has selected something other
+                // than "All" — clear specifics first to re-enable.
+                opt.classList.toggle('is-disabled', state === 'partial');
+                opt.setAttribute('aria-selected', state === 'all' ? 'true' : 'false');
+                opt.setAttribute('aria-disabled', state === 'partial' ? 'true' : 'false');
+            } else {
+                var on = !!selectedSet[opt.getAttribute('data-code')];
+                opt.classList.toggle('is-checked', on);
+                opt.setAttribute('aria-selected', on ? 'true' : 'false');
+            }
         });
+
         // Sub-header counter
         if (counter) {
-            var total = inputs.querySelectorAll('input').length;
-            counter.textContent = selected.length + ' of ' + total + ' selected';
+            counter.textContent = state === 'all'
+                ? 'All ' + total + ' languages'
+                : (n + ' of ' + total + ' selected');
         }
     }
 
@@ -318,12 +384,18 @@
         q = (q || '').toLowerCase().trim();
         var anyVisible = false;
         Array.prototype.forEach.call(options.querySelectorAll('.mt-multi-option'), function (opt) {
+            // "All" is a pseudo-option — always visible regardless of query.
+            if (opt.classList.contains('is-all')) return;
             var code = (opt.getAttribute('data-code') || '').toLowerCase();
             var match = !q || code.indexOf(q) >= 0;
             opt.style.display = match ? '' : 'none';
             if (match) anyVisible = true;
         });
         if (empty) empty.hidden = anyVisible;
+    }
+
+    function setAll(checked) {
+        Array.prototype.forEach.call(allInputs(), function (cb) { cb.checked = checked; });
     }
 
     // Open the panel on field click OR keyboard activation. Chip × is
@@ -333,7 +405,14 @@
         var rm = e.target.closest('[data-remove]');
         if (rm) {
             e.stopPropagation();
-            setSelection(rm.getAttribute('data-remove'), false);
+            var code = rm.getAttribute('data-remove');
+            if (code === '__all__') {
+                // Removing the "All" chip means dropping back to no selection.
+                setAll(false);
+                render();
+            } else {
+                setSelection(code, false);
+            }
             return;
         }
         if (panel.hidden) openPanel();
@@ -352,11 +431,20 @@
         closePanel();
     });
 
-    // Option pick — toggle selection. Keeps panel open for multi-pick.
+    // Option pick — toggle selection. The "All" pseudo-option is special:
+    // disabled when a specific language is already checked, and clicking
+    // it toggles every checkbox at once.
     options.addEventListener('click', function (e) {
         var opt = e.target.closest('.mt-multi-option');
-        if (!opt) return;
+        if (!opt || opt.classList.contains('is-disabled')) return;
         e.preventDefault();
+        if (opt.classList.contains('is-all')) {
+            // Toggle: if every checkbox is checked, clear; else select all.
+            var allOn = !Array.prototype.some.call(allInputs(), function (cb) { return !cb.checked; });
+            setAll(!allOn);
+            render();
+            return;
+        }
         var code = opt.getAttribute('data-code');
         var cb = checkboxFor(code);
         if (!cb) return;
@@ -368,18 +456,6 @@
         search.addEventListener('input', function () { filter(search.value); });
         search.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePanel(); });
     }
-
-    // Select all / Clear
-    var bSelectAll = document.getElementById('mt-lang-all');
-    var bSelectNone = document.getElementById('mt-lang-none');
-    if (bSelectAll) bSelectAll.addEventListener('click', function () {
-        Array.prototype.forEach.call(inputs.querySelectorAll('input'), function (cb) { cb.checked = true; });
-        render();
-    });
-    if (bSelectNone) bSelectNone.addEventListener('click', function () {
-        Array.prototype.forEach.call(inputs.querySelectorAll('input'), function (cb) { cb.checked = false; });
-        render();
-    });
 
     render();
 })();
