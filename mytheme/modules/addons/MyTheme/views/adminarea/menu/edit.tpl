@@ -257,6 +257,16 @@
     <div id="mtItemDrawer" class="mt-menu-props">
 
         <div class="mt-menu-sect">
+            <div class="mt-menu-sect-label">Type</div>
+            <div>
+                <span class="mt-badge mt-badge-neutral" id="drawerTypeBadge">&mdash;</span>
+                <div class="mt-menu-sect-help" style="margin-top:6px">
+                    Set when the item is created and can't be changed afterwards. To switch type, delete this item and add a new one.
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-menu-sect">
             <div class="mt-menu-sect-label">Name</div>
             <input id="drawerLabelEn" class="mt-input" type="text" data-drawer-field="label.custom.english" placeholder="English label">
             <div class="mt-menu-sect-help">Shown to clients. The WHMCS lang key (in <em>Advanced label</em>) takes precedence if set.</div>
@@ -678,6 +688,22 @@
     var state = { items: [], nextTemp: 1, pristine: true };
     var selectedTempId = null;
 
+    // Human-readable labels for the item_type values. Mirrors
+    // ItemTypes::all() in PHP — kept in sync manually. Falls back to the
+    // raw type string if a future PHP type is added without an entry here.
+    var TYPE_LABELS = {
+        whmcs_page:       'WHMCS Page',
+        custom_link:      'Custom Link',
+        dropdown_parent:  'Dropdown',
+        header:           'Section Header',
+        divider:          'Divider',
+        language:         'Language Switcher',
+        currency:         'Currency Switcher',
+        login_button:     'Login Button',
+        account_dropdown: 'Account Dropdown',
+        whmcs_default:    'WHMCS Default'
+    };
+
     function uid(){ return 'new_' + (state.nextTemp++); }
     function markDirty(){ state.pristine = false; }
 
@@ -868,6 +894,9 @@
     function populatePanelFromEntry(tempId){
         var entry = state.items.find(function(it){ return it.tempId === tempId; });
         if (!entry) return;
+        // Type badge — read-only display of the item's type.
+        var typeBadge = document.getElementById('drawerTypeBadge');
+        if (typeBadge) typeBadge.textContent = TYPE_LABELS[entry.item_type] || entry.item_type;
         // Toggle per-type sections.
         panel.querySelectorAll('[data-drawer-show-when]').forEach(function(el){
             el.style.display = (el.getAttribute('data-drawer-show-when') === entry.item_type) ? '' : 'none';
