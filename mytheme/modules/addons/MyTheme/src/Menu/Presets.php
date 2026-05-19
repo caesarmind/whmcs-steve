@@ -95,6 +95,25 @@ final class Presets
                 self::whmcsPage('clientareadomains'),
                 self::whmcsPage('clientareainvoices'),
                 self::whmcsPage('supportticketslist'),
+                // Second mega — Resources. Three-column panel with
+                // documentation / tools / status groupings so admins can
+                // see two megas living together in the same menu.
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('', 'Resources'),
+                 'config' => ['icon' => 'book', 'dropdown_style' => 'mega'],
+                 'children' => [
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Documentation'), 'config' => []],
+                    self::whmcsPage('knowledgebase', 'book'),
+                    self::whmcsPage('announcements', 'megaphone'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Tools'), 'config' => []],
+                    self::whmcsPage('downloads',    'download'),
+                    self::whmcsPage('serverstatus', 'status'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Support'), 'config' => []],
+                    self::whmcsPage('contact',              'envelope'),
+                    self::whmcsPage('supportticketsubmit',  'plus'),
+                 ]],
                 ['type' => ItemTypes::ACCOUNT_DROPDOWN,
                  'label' => self::label('accounttab', 'Account'),
                  'config' => ['position_side' => 'right'],
@@ -261,6 +280,24 @@ final class Presets
                     self::whmcsPage('serverstatus'),
                     self::whmcsPage('knowledgebase'),
                     self::whmcsPage('announcements'),
+                 ]],
+                // Second mega — Resources. Sits next to the Hosting mega
+                // so admins can see two mega panels living in the same nav.
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('', 'Resources'),
+                 'config' => ['icon' => 'book', 'dropdown_style' => 'mega'],
+                 'children' => [
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Learn'), 'config' => []],
+                    self::whmcsPage('knowledgebase', 'book'),
+                    self::whmcsPage('announcements', 'megaphone'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Status'), 'config' => []],
+                    self::whmcsPage('serverstatus', 'status'),
+                    self::customLink('', 'Network map',   '/network',   'globe'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Connect'), 'config' => []],
+                    self::whmcsPage('contact',  'envelope'),
+                    self::customLink('', 'Affiliates',    'affiliates.php', 'star'),
                  ]],
                 ['type' => ItemTypes::LOGIN_BUTTON, 'label' => self::label('login', 'Login'),
                  'config' => ['position_side' => 'right', 'style' => 'primary']],
