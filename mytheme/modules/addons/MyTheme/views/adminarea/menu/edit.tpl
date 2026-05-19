@@ -1,5 +1,22 @@
 {include file="includes/header.tpl"}
 
+{* Short labels for the row-level type tag — keeps "WHMCS Default Navigation
+   (pass-through)" from blowing out the row, and gives every type a
+   compact, scannable identifier. Falls back to the raw item_type if a
+   future PHP type is added without an entry here. *}
+{assign var="mtTagFor" value=[
+    'whmcs_page'       => 'Page',
+    'custom_link'      => 'Link',
+    'dropdown_parent'  => 'Dropdown',
+    'header'           => 'Header',
+    'divider'          => 'Divider',
+    'language'         => 'Language',
+    'currency'         => 'Currency',
+    'login_button'     => 'Login',
+    'account_dropdown' => 'Account',
+    'whmcs_default'    => 'Default'
+]}
+
 <form id="menuForm" method="post" action="?module=MyTheme&action=menu&sub=save">
     <input type="hidden" name="id" value="{$menu->id|escape}">
 
@@ -138,6 +155,7 @@
                                 <button type="button" class="mt-menu-chev" data-action="toggle-item" title="Expand">
                                     <svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </button>
+                                <span class="mt-menu-type-tag mt-menu-type-tag-{$itm->item_type|escape}" data-role="type-tag">{$mtTagFor[$itm->item_type]|default:$itm->item_type|escape}</span>
                                 <span class="mt-menu-name" data-role="label">{$itm->resolvedLabel()|escape}</span>
                                 <div class="mt-menu-ctrls">
                                     {if $itemTypes[$itm->item_type]['accepts_children']}
@@ -177,6 +195,7 @@
                                             <button type="button" class="mt-menu-chev" data-action="toggle-item" title="Expand">
                                                 <svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                             </button>
+                                            <span class="mt-menu-type-tag mt-menu-type-tag-{$childItm->item_type|escape}" data-role="type-tag">{$mtTagFor[$childItm->item_type]|default:$childItm->item_type|escape}</span>
                                             <span class="mt-menu-name" data-role="label">{$childItm->resolvedLabel()|escape}</span>
                                             <div class="mt-menu-ctrls">
                                                 <button type="button" class="mt-menu-btn mt-menu-btn-del" data-action="delete-item" title="Delete">
@@ -563,6 +582,32 @@
 .mt-menu-item.is-open > .mt-menu-item-row > .mt-menu-chev { color: var(--mt-primary); }
 .mt-menu-item.is-open > .mt-menu-item-row > .mt-menu-chev svg { transform: rotate(90deg); }
 
+/* Type tag — small uppercase pill before the name so admins can tell
+   pages / links / headers / dividers / special types apart at a glance. */
+.mt-menu-type-tag {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    line-height: 1.5;
+    margin-left: 2px;
+    background: rgba(120,113,108,0.10);
+    color: #57534e;
+}
+.mt-menu-type-tag-whmcs_page       { background: rgba(0,113,227,0.10);  color: #0040A0; }
+.mt-menu-type-tag-custom_link      { background: rgba(255,159,10,0.14); color: #b35900; }
+.mt-menu-type-tag-dropdown_parent  { background: rgba(48,209,88,0.14);  color: #1e7e34; }
+.mt-menu-type-tag-header           { background: rgba(120,113,108,0.18); color: #44403c; }
+.mt-menu-type-tag-divider          { background: rgba(120,113,108,0.10); color: #78716c; }
+.mt-menu-type-tag-language         { background: rgba(99,102,241,0.10); color: #4338ca; }
+.mt-menu-type-tag-currency         { background: rgba(168,85,247,0.10); color: #6b21a8; }
+.mt-menu-type-tag-login_button     { background: rgba(236,72,153,0.10); color: #be185d; }
+.mt-menu-type-tag-account_dropdown { background: rgba(20,184,166,0.12); color: #0f766e; }
+.mt-menu-type-tag-whmcs_default    { background: rgba(100,116,139,0.12); color: #475569; }
+
 .mt-menu-name {
     flex: 1;
     font-size: 13.5px;
@@ -576,6 +621,39 @@
     cursor: pointer;
 }
 .mt-menu-name:hover { color: var(--mt-primary); }
+
+/* Per-type row variants — reinforce the type-tag visually so a row's
+   purpose is readable even at a glance. */
+.mt-menu-item[data-type="dropdown_parent"] > .mt-menu-item-row > .mt-menu-name { font-weight: 600; }
+.mt-menu-item[data-type="header"] > .mt-menu-item-row > .mt-menu-name {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--mt-text-2);
+}
+.mt-menu-item[data-type="divider"] > .mt-menu-item-row > .mt-menu-name {
+    color: var(--mt-text-4);
+    font-style: italic;
+    font-size: 12px;
+}
+/* Divider row renders a thin dashed rule across the name area for visual cue */
+.mt-menu-item[data-type="divider"] > .mt-menu-item-row > .mt-menu-name::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    border-top: 1px dashed var(--mt-text-4);
+    vertical-align: middle;
+    margin-right: 8px;
+}
+.mt-menu-item[data-type="divider"] > .mt-menu-item-row > .mt-menu-name::after {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    border-top: 1px dashed var(--mt-text-4);
+    vertical-align: middle;
+    margin-left: 8px;
+}
 
 .mt-menu-ctrls { display: flex; align-items: center; gap: 1px; flex-shrink: 0; margin-left: auto; }
 .mt-menu-btn {
@@ -708,6 +786,31 @@
         whmcs_default:    'WHMCS Default'
     };
 
+    // Short tag text rendered on each row's type pill. Mirrors the
+    // $mtTagFor array in the Smarty header above.
+    var TYPE_TAGS = {
+        whmcs_page:       'Page',
+        custom_link:      'Link',
+        dropdown_parent:  'Dropdown',
+        header:           'Header',
+        divider:          'Divider',
+        language:         'Language',
+        currency:         'Currency',
+        login_button:     'Login',
+        account_dropdown: 'Account',
+        whmcs_default:    'Default'
+    };
+    function typeTagText(type) { return TYPE_TAGS[type] || type; }
+
+    function updateTypeTag(li, type) {
+        var tag = li.querySelector(':scope > .mt-menu-item-row > [data-role="type-tag"]');
+        if (!tag) return;
+        // Strip any existing per-type modifier class; add the new one.
+        tag.className = tag.className.replace(/\bmt-menu-type-tag-\S+/g, '').trim();
+        tag.classList.add('mt-menu-type-tag', 'mt-menu-type-tag-' + type);
+        tag.textContent = typeTagText(type);
+    }
+
     // Field-visibility map per type. Each key here corresponds to a
     // [data-section="..."] element in the inline panel; `false` hides it
     // for that type. The per-type Page / URL / Dropdown sections still use
@@ -788,6 +891,7 @@
         if (li) {
             li.setAttribute('data-type', entry.item_type);
             refreshAddChildButton(li, entry.item_type);
+            updateTypeTag(li, entry.item_type);
         }
         applyTypeVisibility(entry.item_type);
         panel.querySelectorAll('[data-drawer-show-when]').forEach(function (el) {
@@ -1178,7 +1282,8 @@
                 '<button type="button" class="mt-menu-chev" data-action="toggle-item" title="Expand">' +
                     '<svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
                 '</button>' +
-                '<span class="mt-menu-name" data-role="label">' + escapeHtml(entry.label.custom.english || entry.item_type) + '</span>' +
+                '<span class="mt-menu-type-tag mt-menu-type-tag-' + entry.item_type + '" data-role="type-tag">' + escapeHtml(typeTagText(entry.item_type)) + '</span>' +
+                '<span class="mt-menu-name" data-role="label">' + escapeHtml(rowLabelFor(entry)) + '</span>' +
                 '<div class="mt-menu-ctrls">' +
                     (acceptsKids ?
                     '<button type="button" class="mt-menu-btn mt-menu-btn-add" data-action="add-child" title="Add child"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>' : '') +
