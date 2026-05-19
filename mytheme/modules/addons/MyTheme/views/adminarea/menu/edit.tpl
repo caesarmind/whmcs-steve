@@ -489,9 +489,14 @@
 }
 
 /* ----- Compact toggle (used on each item row) ----- */
-.mt-toggle-sm { width: 32px; height: 18px; }
-.mt-toggle-sm .mt-toggle-thumb { width: 14px; height: 14px; top: 2px; left: 2px; }
-.mt-toggle-sm input:checked ~ .mt-toggle-track .mt-toggle-thumb { transform: translateX(14px); }
+/* footer.tpl's .mt-toggle rule loads AFTER this style block, so a flat
+   .mt-toggle-sm selector (specificity 0,1,0) ties with .mt-toggle and
+   loses on source-order. Chaining both classes raises specificity to
+   0,2,0 — and the descendant rules to 0,4,0 — which beats every footer
+   rule unambiguously. */
+.mt-toggle.mt-toggle-sm { width: 32px; height: 18px; }
+.mt-toggle.mt-toggle-sm .mt-toggle-thumb { width: 14px; height: 14px; top: 2px; left: 2px; }
+.mt-toggle.mt-toggle-sm input:checked ~ .mt-toggle-track .mt-toggle-thumb { transform: translateX(14px); }
 
 /* ----- Items list (flat hairline-divided rows, left accent bar on open) ----- */
 .mt-menu-tree-col .mt-menu-tree { display: flex; flex-direction: column; gap: 0; }
