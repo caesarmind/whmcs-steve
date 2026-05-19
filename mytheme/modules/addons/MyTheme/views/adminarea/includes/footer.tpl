@@ -122,6 +122,22 @@
 
 .mt-input, .mt-select, .mt-textarea { width: 100%; padding: 12px 16px; border: 1px solid var(--mt-input-border); border-radius: var(--mt-radius); background: var(--mt-surface); color: var(--mt-text); font-family: inherit; font-size: 15px; line-height: 1.4; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
 .mt-input:focus, .mt-select:focus, .mt-textarea:focus { outline: none; border-color: var(--mt-primary); box-shadow: 0 0 0 4px rgba(0,113,227,0.15); }
+/* Custom select chevron — strips the native browser caret and paints a
+   consistent caret matching the rest of the design. ASCII-only data URI
+   so it survives Chrome's CSS-skip quirk on this WHMCS install. */
+.mt-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%236e6e73' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='4 6 8 10 12 6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px 14px;
+    padding-right: 36px;
+    cursor: pointer;
+}
+.mt-select:disabled { opacity: 0.6; cursor: not-allowed; }
+.mt-select::-ms-expand { display: none; } /* IE/Edge legacy caret */
 .mt-search { position: relative; max-width: 280px; }
 .mt-search .mt-input { padding-left: 32px; }
 .mt-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--mt-text-3); pointer-events: none; }
