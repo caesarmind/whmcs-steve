@@ -30,6 +30,7 @@
         form:          'hn.form',
         product:       'hn.product',
         plan:          'hn.plan',
+        crumbs:        'hn.crumbs',
         svcLayout:     'hn.svcLayout',
         chipPos:       'hn.chipPos',
         sidebarGroups: 'hn.sidebarGroups'
@@ -375,6 +376,25 @@
         applyForm(params.get('form') || savedForm || 'all');
         formButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyForm(this.dataset.formSet); });
+        });
+
+        // Crumbs (trail/back/none — top-layout breadcrumb treatment; markup lives
+        // per-page, e.g. user-profile.html has both .crumbs-trail and .crumbs-back)
+        var crumbsButtons = document.querySelectorAll('.state-chip [data-crumbs-set]');
+        function applyCrumbs(variant) {
+            var valid = ['trail', 'back', 'none'];
+            if (valid.indexOf(variant) === -1) variant = 'trail';
+            if (variant === 'trail') body.removeAttribute('data-crumbs');
+            else body.setAttribute('data-crumbs', variant);
+            crumbsButtons.forEach(function (b) {
+                b.classList.toggle('active', b.dataset.crumbsSet === variant);
+            });
+            try { localStorage.setItem(KEYS.crumbs, variant); } catch (e) {}
+        }
+        var savedCrumbs; try { savedCrumbs = localStorage.getItem(KEYS.crumbs); } catch (e) {}
+        applyCrumbs(params.get('crumbs') || savedCrumbs || 'trail');
+        crumbsButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () { applyCrumbs(this.dataset.crumbsSet); });
         });
 
         // Plan (A/B/C/D or All — pricing package variants on the catalog page)

@@ -426,6 +426,30 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .ph-breadcrumb-inner .sep { opacity: 0.4; font-size: 11px; }
 .ph-breadcrumb-inner .current { color: var(--color-text-primary); font-weight: 500; }
 
+/* ── Breadcrumb variants (preview chip → body[data-crumbs]) ─────────
+   trail (default) = full trail · back = single chevron back-link ·
+   none = no breadcrumb (rely on the page title). Wired in apple-layout.js. */
+.ph-breadcrumb-inner.crumbs-back { display: none; }   /* shown only in back mode */
+.ph-back-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--color-accent); font-size: 13px; font-weight: 400;
+    text-decoration: none; transition: opacity 0.15s;
+}
+.ph-back-link svg { width: 15px; height: 15px; margin-left: -3px; }
+.ph-back-link:hover { text-decoration: none; opacity: 0.7; }
+
+/* Back mode: drop the grey band + hairline so the link reads as a content
+   affordance (Apple back buttons don't live in their own chrome bar). */
+body[data-crumbs="back"] .ph-breadcrumb {
+    background: transparent; border-bottom: 0;
+    padding-top: 14px; padding-bottom: 0;
+}
+body[data-crumbs="back"] .ph-breadcrumb-inner.crumbs-trail { display: none; }
+body[data-crumbs="back"] .ph-breadcrumb-inner.crumbs-back  { display: flex; }
+
+/* None mode: no breadcrumb at all — the large page title carries context. */
+body[data-crumbs="none"] .ph-breadcrumb { display: none; }
+
 /* ═════════════════════════════════════════════════════════════
    RAIL LAYOUT — icon rail (80px) + flyout panel (240px)
    ═════════════════════════════════════════════════════════════ */
