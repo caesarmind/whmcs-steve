@@ -62,6 +62,17 @@ body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .hp-footer-inner 
     margin-left: 0;
     margin-right: auto;
 }
+/* .content-area uses a 48px side gutter but .hp-footer's band uses 22px, so a
+   left-anchored footer-inner would sit 26px further left than the content
+   column. Match the content gutter so the footer columns line up beneath the
+   content. Scoped to >768px, where .content-area actually uses 48px; at or
+   below 768px its gutter drops to 20px and the sidebar has already collapsed
+   (margin-left:0 at <=900px), so the small residual offset is moot. */
+@media (min-width: 769px) {
+    body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .hp-footer {
+        padding-left: 48px;
+    }
+}
 
 /* Defensive centering in top layout -- overrides any align / subnav-side
    rules that might otherwise leak in via stale cached CSS. Content-area
