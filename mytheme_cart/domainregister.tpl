@@ -130,7 +130,7 @@
                                       {if $showAdvancedSearchOptions}id="message"{else}id="dr-alt-message"{/if}
                                       rows="1"
                                       title="{lang key='domainSearch.domainOrAiPrompt'}"
-                                      data-placement="left"
+                                      data-placement="top"
                                       data-trigger="manual"
                                       placeholder="{lang key='domainSearch.domainOrAiInstruction'}">{if $showAdvancedSearchOptions}{$message}{/if}</textarea>
                             <button type="submit"
@@ -204,7 +204,7 @@
                                    placeholder="{$LANG.findyourdomain}"
                                    value="{if !$showAdvancedSearchOptions}{$lookupTerm}{/if}"
                                    data-toggle="tooltip"
-                                   data-placement="left"
+                                   data-placement="top"
                                    data-trigger="manual"
                                    title="{lang key='orderForm.domainOrKeyword'}" />
                             <button type="submit"
@@ -564,19 +564,14 @@ jQuery(document).ready(function() {
     // WHMCS core's domainSearch.domainOrAiInstruction is a 3-line string
     // ("...domain.\nFor example: ..."), but our AI field is a single-line
     // pill (rows="1", fixed height), so lines 2-3 overflow and overlap the
-    // box border. Keep the first line as the placeholder and move the detail
-    // into the title tooltip (Lagom-style). Classic mode's input has a
-    // one-line placeholder, so the newline guard skips it.
+    // box border. Keep only the first line. Classic mode's input has a
+    // one-line placeholder, so the newline guard skips it. (We deliberately
+    // do NOT touch title -- WHMCS/Bootstrap manage the prompt tooltip there.)
     jQuery('.dr-search-input').each(function () {
         var ph = this.getAttribute('placeholder') || '';
         var nl = ph.search(/\r?\n/);
         if (nl === -1) return;
-        var first = ph.slice(0, nl).trim();
-        var rest  = ph.slice(nl).replace(/\s+/g, ' ').trim();
-        this.setAttribute('placeholder', first);
-        if (rest && !(this.getAttribute('title') || '').trim()) {
-            this.setAttribute('title', rest);
-        }
+        this.setAttribute('placeholder', ph.slice(0, nl).trim());
     });
 
     // --- AI / Classic mode tab switcher ---
