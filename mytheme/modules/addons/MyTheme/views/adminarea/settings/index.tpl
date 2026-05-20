@@ -95,6 +95,7 @@
         overflow: hidden;
     }
     .mt-multi-panel[hidden] { display: none; }
+    .mt-multi-panel--up { top: auto; bottom: calc(100% + 4px); }
     .mt-multi-search-wrap { padding: 8px; border-bottom: 1px solid var(--mt-border); }
     .mt-multi-search-wrap input { width: 100%; padding: 6px 10px; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 6px; background: #fff; font: inherit; }
     .mt-multi-search-wrap input:focus { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 2px rgba(0,113,227,0.15); }
@@ -605,6 +606,10 @@
             panel.hidden = false;
             multi.classList.add('is-focused');
             multi.setAttribute('aria-expanded', 'true');
+            // Open upward when there isn't ~room below (e.g. the last picker on
+            // the page) so the dropdown isn't clipped by the card edge.
+            var rect = multi.getBoundingClientRect();
+            panel.classList.toggle('mt-multi-panel--up', (window.innerHeight - rect.bottom) < 300);
             if (search) { search.value = ''; filter(''); setTimeout(function () { search.focus(); }, 0); }
         }
         function closePanel() {
