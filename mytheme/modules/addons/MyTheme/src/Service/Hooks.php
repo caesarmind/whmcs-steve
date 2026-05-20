@@ -819,10 +819,23 @@ final class Hooks
     {
         $metaPath = $template->getFullPath() . "/core/layouts/{$kind}/{$name}/layout.php";
         $meta     = ThemeManifest::loadVariantMeta($metaPath);
+
+        // Resolve the layout's saved options (e.g. content alignment); each
+        // stored value falls back to the option's declared default. The admin
+        // writes these in the Layouts cards (see LayoutsController).
+        $supported  = is_array($meta['supportedOptions'] ?? null) ? $meta['supportedOptions'] : [];
+        $storedOpts = Settings::getValue($template->getName() . "_layout_opts_{$kind}_{$name}", []);
+        if (!is_array($storedOpts)) { $storedOpts = []; }
+        $options = [];
+        foreach ($supported as $okey => $ospec) {
+            $options[$okey] = (string)($storedOpts[$okey] ?? ($ospec['default'] ?? ''));
+        }
+
         return [
             'name'       => $name,
             'meta'       => $meta,
             'vars'       => $meta['variables'] ?? [],
+            'options'    => $options,
             'mediumPath' => "{$template->getName()}/core/layouts/{$kind}/{$name}/default.tpl",
         ];
     }

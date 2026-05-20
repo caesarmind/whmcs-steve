@@ -67,12 +67,15 @@
     {if $_q == 'top' || $_q == 'rail' || $_q == 'side'}{assign var=mt_layout value=$_q}{/if}
 {/if}
 
-{* align *}
-{assign var=mt_align value=''}
-{if isset($smarty.get.align)}
+{* align — default from the active main-menu layout's saved option (admin
+   Layouts card); ?align= overrides in preview. 'center' emits no attribute.
+   Only non-top layouts honor data-align (apple-layout.css). *}
+{assign var=mt_align value=$myTheme.layouts['main-menu'].options.align|default:'center'}
+{if $mt_preview && isset($smarty.get.align)}
     {assign var=_q value=$smarty.get.align}
     {if $_q == 'center' || $_q == 'content' || $_q == 'left'}{assign var=mt_align value=$_q}{/if}
 {/if}
+{if $mt_align == 'center'}{assign var=mt_align value=''}{/if}
 
 {* subnav (on/off) *}
 {assign var=mt_subnav value=''}

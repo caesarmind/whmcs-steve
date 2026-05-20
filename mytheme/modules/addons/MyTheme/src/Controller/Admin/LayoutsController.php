@@ -44,39 +44,65 @@ final class LayoutsController extends AbstractController
             return $this->view('error', ['error' => 'No active template']);
         }
 
-        $kind = $_GET['kind'] ?? 'main-menu';
-        if (!in_array($kind, ['main-menu', 'footer'], true)) {
-            $kind = 'main-menu';
-        }
-
+        // POST = activation OR an option change. The form carries its own `kind`
+        // because the Main-menu/Footer tabs are client-side (no page reload), so
+        // `kind` can't be read from the URL.
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['layout'])) {
-            return $this->saveAction($template, $kind);
+            $postKind = (string)($_POST['kind'] ?? 'main-menu');
+            if (!in_array($postKind, ['main-menu', 'footer'], true)) {
+                $postKind = 'main-menu';
+            }
+            return $this->saveAction($template, $postKind);
         }
 
-        $available     = $template->getLayouts($kind);
-        $default       = self::DEFAULT_BY_KIND[$kind] ?? 'default';
-        $currentGuest  = $this->resolvePointer($template, $kind, 'guest',  $default);
-        $currentClient = $this->resolvePointer($template, $kind, 'client', $default);
+        // Which tab opens first — preserved across save-redirects via ?kind.
+        $activeKind = (string)($_GET['kind'] ?? 'main-menu');
+        if (!in_array($activeKind, ['main-menu', 'footer'], true)) {
+            $activeKind = 'main-menu';
+        }
 
-        $list = [];
-        foreach ($available as $name) {
-            $meta = ThemeManifest::loadVariantMeta(
-                $template->getFullPath() . "/core/layouts/{$kind}/{$name}/layout.php"
-            );
-            $list[] = [
-                'name'              => $name,
-                'displayName'       => $meta['displayName'] ?? ucfirst($name),
-                'description'       => $meta['description'] ?? '',
-                'preview'           => $meta['preview'] ?? 'thumb.png',
-                'isActiveGuest'     => $name === $currentGuest,
-                'isActiveClient'    => $name === $currentClient,
-            ];
+        // Build BOTH kinds so the tabs are pure client-side toggles.
+        $groups = [];
+        foreach (['main-menu', 'footer'] as $kind) {
+            $default       = self::DEFAULT_BY_KIND[$kind] ?? 'default';
+            $currentGuest  = $this->resolvePointer($template, $kind, 'guest',  $default);
+            $currentClient = $this->resolvePointer($template, $kind, 'client', $default);
+
+            $list = [];
+            foreach ($template->getLayouts($kind) as $name) {
+                $meta = ThemeManifest::loadVariantMeta(
+                    $template->getFullPath() . "/core/layouts/{$kind}/{$name}/layout.php"
+                );
+
+                // Supported options + current values (stored value → declared default).
+                $supported  = is_array($meta['supportedOptions'] ?? null) ? $meta['supportedOptions'] : [];
+                $storedOpts = Settings::getValue($template->getName() . "_layout_opts_{$kind}_{$name}", []);
+                if (!is_array($storedOpts)) { $storedOpts = []; }
+                $options = [];
+                foreach ($supported as $okey => $ospec) {
+                    $options[$okey] = [
+                        'label'   => (string)($ospec['label'] ?? ucfirst($okey)),
+                        'choices' => is_array($ospec['choices'] ?? null) ? $ospec['choices'] : [],
+                        'value'   => (string)($storedOpts[$okey] ?? ($ospec['default'] ?? '')),
+                    ];
+                }
+
+                $list[] = [
+                    'name'           => $name,
+                    'displayName'    => $meta['displayName'] ?? ucfirst($name),
+                    'description'    => $meta['description'] ?? '',
+                    'isActiveGuest'  => $name === $currentGuest,
+                    'isActiveClient' => $name === $currentClient,
+                    'options'        => $options,
+                ];
+            }
+            $groups[$kind] = $list;
         }
 
         return $this->view('layouts/index', [
-            'layouts'  => $list,
-            'kind'     => $kind,
-            'template' => $template->getName(),
+            'groups'     => $groups,
+            'activeKind' => $activeKind,
+            'template'   => $template->getName(),
         ]);
     }
 
@@ -99,37 +125,51 @@ final class LayoutsController extends AbstractController
 
     private function saveAction($template, string $kind): string
     {
-        $layout   = (string)$_POST['layout'];
-        $audience = (string)($_POST['audience'] ?? '');
-
-        $validLayout   = in_array($layout, $template->getLayouts($kind), true);
-        $validAudience = in_array($audience, self::AUDIENCES, true);
+        $layout      = (string)$_POST['layout'];
+        $validLayout = in_array($layout, $template->getLayouts($kind), true);
 
         if ($validLayout) {
-            if ($validAudience) {
-                // New per-audience flow.
-                $key = $template->getName() . '_active_layout_' . $kind . '_' . $audience;
-                Settings::setValue($key, $layout);
-            } else {
-                // Legacy single-pointer flow — fires when the admin still
-                // has the old radio-only UI cached in their browser. Also
-                // mirror to both per-audience keys so the new resolver
-                // path picks the choice up immediately without needing
-                // the legacy fallback to kick in. Buyers who later switch
-                // one audience via the new UI overwrite just that
-                // audience's pointer.
-                $legacyKey = $template->getName() . '_active_layout_' . $kind;
-                Settings::setValue($legacyKey, $layout);
-                foreach (self::AUDIENCES as $aud) {
-                    $perAud = $template->getName() . '_active_layout_' . $kind . '_' . $aud;
-                    Settings::setValue($perAud, $layout);
+            if (isset($_POST['audience'])) {
+                // ── Activation (per-audience pointer) ──
+                $audience = (string)$_POST['audience'];
+                if (in_array($audience, self::AUDIENCES, true)) {
+                    $key = $template->getName() . '_active_layout_' . $kind . '_' . $audience;
+                    Settings::setValue($key, $layout);
+                } else {
+                    // Legacy single-pointer fallback (old cached UI) — mirror to
+                    // both per-audience keys so the resolver picks it up at once.
+                    $legacyKey = $template->getName() . '_active_layout_' . $kind;
+                    Settings::setValue($legacyKey, $layout);
+                    foreach (self::AUDIENCES as $aud) {
+                        Settings::setValue($template->getName() . '_active_layout_' . $kind . '_' . $aud, $layout);
+                    }
                 }
+            } elseif (isset($_POST['option'])) {
+                // ── Set a per-layout option (e.g. content alignment) ──
+                $this->saveLayoutOption($template, $kind, $layout, (string)$_POST['option'], (string)($_POST['value'] ?? ''));
             }
         }
 
-        // PRG redirect — calling indexAction() directly would re-enter
-        // the POST branch (REQUEST_METHOD is still POST) and recurse
-        // until PHP bails out, which WHMCS surfaces as a 404.
+        // PRG redirect — calling indexAction() directly would re-enter the POST
+        // branch and recurse. ?kind keeps the user on the tab they acted in.
         $this->redirect('?module=MyTheme&action=layouts&kind=' . urlencode($kind));
+    }
+
+    /** Persist one layout option, validated against the layout's supportedOptions. */
+    private function saveLayoutOption($template, string $kind, string $layout, string $option, string $value): void
+    {
+        $meta = ThemeManifest::loadVariantMeta(
+            $template->getFullPath() . "/core/layouts/{$kind}/{$layout}/layout.php"
+        );
+        $spec = $meta['supportedOptions'][$option] ?? null;
+        if (!is_array($spec)) { return; }
+        $choices = is_array($spec['choices'] ?? null) ? $spec['choices'] : [];
+        if ($choices !== [] && !isset($choices[$value])) { return; } // reject unknown value
+
+        $key    = $template->getName() . "_layout_opts_{$kind}_{$layout}";
+        $stored = Settings::getValue($key, []);
+        if (!is_array($stored)) { $stored = []; }
+        $stored[$option] = $value;
+        Settings::setValue($key, $stored, 'json');
     }
 }

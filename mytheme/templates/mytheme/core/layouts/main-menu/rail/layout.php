@@ -9,4 +9,11 @@ return [
         'bodyClass'      => 'layout-rail',
         'sidebarPresent' => true,
     ],
+    'supportedOptions' => [
+        'align' => [
+            'label'   => 'Content alignment',
+            'default' => 'center',
+            'choices' => ['center' => 'Center', 'left' => 'Left'],
+        ],
+    ],
 ];
