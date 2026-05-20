@@ -430,13 +430,16 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
    trail (default) = full trail · back = single chevron back-link ·
    none = no breadcrumb (rely on the page title). Wired in apple-layout.js. */
 .ph-breadcrumb-inner.crumbs-back { display: none; }   /* shown only in back mode */
-.ph-back-link {
+/* Selector carries .ph-breadcrumb-inner a so it outranks the trail rule
+   `.ph-breadcrumb-inner a { color: tertiary }` -- otherwise the back-link
+   renders grey instead of accent blue. */
+.ph-breadcrumb-inner a.ph-back-link {
     display: inline-flex; align-items: center; gap: 4px;
     color: var(--color-accent); font-size: 13px; font-weight: 400;
     text-decoration: none; transition: opacity 0.15s;
 }
-.ph-back-link svg { width: 15px; height: 15px; margin-left: -3px; }
-.ph-back-link:hover { text-decoration: none; opacity: 0.7; }
+.ph-breadcrumb-inner a.ph-back-link svg { width: 15px; height: 15px; margin-left: -3px; }
+.ph-breadcrumb-inner a.ph-back-link:hover { color: var(--color-accent); text-decoration: none; opacity: 0.7; }
 
 /* Back mode: drop the grey band + hairline so the link reads as a content
    affordance (Apple back buttons don't live in their own chrome bar). */
