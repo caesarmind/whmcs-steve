@@ -3153,6 +3153,12 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .homepage-nav .nav-dropdown-wrap:hover .nav-dropdown-toggle .nav-chevron { transform: rotate(180deg); }
 .homepage-nav .nav-dropdown-menu {
     position: absolute; top: 100%; left: 0;
+    /* Pull the panel up by 1px so it overlaps the topnav's
+       `border-bottom: 1px solid rgba(0,0,0,0.06)`. Without this, the
+       border bleeds through the panel's semi-transparent bg and reads
+       as a thin horizontal line between the trigger row and the panel
+       -- the "gap with border" reported on bill.hostnodes.com. */
+    margin-top: -1px;
     min-width: 220px;
     background: rgba(251,251,253,0.92);
     backdrop-filter: saturate(180%) blur(20px);
@@ -3166,11 +3172,10 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
     transition: opacity .2s ease, transform .2s ease;
     z-index: 51;
 }
-/* Transparent hover bridge -- the panel sits 4px below the trigger
-   (top: calc(100% + 4px)) which creates a dead zone the cursor traverses
-   on its way down. Without this bridge, :hover on the wrap is lost mid-
-   journey and the panel snaps shut. The ::before extends the panel's
-   hover-capture area 8px upward, covering the gap plus a small buffer. */
+/* Transparent hover bridge -- defensive cover for any future animation
+   that might re-introduce a transient gap during the panel's entry
+   transition. The ::before extends the panel's hover-capture area 8px
+   upward so the cursor never falls into dead space. */
 .homepage-nav .nav-dropdown-menu::before {
     content: '';
     position: absolute;
