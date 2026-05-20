@@ -53,6 +53,13 @@ body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .hp-footer-inner 
     margin-left: 0;
     margin-right: auto;
 }
+/* Match .content-area's 48px gutter so left-aligned footer columns line up
+   with the content (the footer band's own gutter is 22px). Desktop only. */
+@media (min-width: 769px) {
+    body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .hp-footer {
+        padding-left: 48px;
+    }
+}
 
 /* Defensive centering in top layout — content-area always centers
    horizontally when there's no sidebar to anchor against. */
