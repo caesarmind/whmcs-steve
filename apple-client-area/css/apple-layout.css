@@ -45,8 +45,11 @@ body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
     flex: 1 0 auto;
     width: 100%;
 }
-/* Align: Left — preview chip toggle (body[data-align="left"]) */
-body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area {
+/* Align: Left — preview chip toggle (body[data-align="left"]).
+   Footer follows: .hp-footer-inner has its own `margin: 0 auto`, so
+   without overriding it the footer stays centered while content shifts. */
+body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area,
+body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .hp-footer-inner {
     margin-left: 0;
     margin-right: auto;
 }
