@@ -91,6 +91,26 @@ final class Presets
             'active'   => true,
             'items'    => [
                 self::whmcsPage('clientareahome'),
+                // First mega — Services. Manage / Order / Shop layout that
+                // mirrors the WHMCS Defaults preset, so the client primary
+                // nav has a flagship mega next to the standard quick links.
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('navservices', 'Services'),
+                 'config' => ['icon' => 'server', 'dropdown_style' => 'mega'],
+                 'children' => [
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Manage'), 'config' => []],
+                    self::whmcsPage('clientareaproducts', 'server'),
+                    self::customLink('domainrenewals', 'Renew services', 'cart.php?gid=renewals', 'refresh'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Order'),  'config' => []],
+                    self::customLink('ordernew',    'Order new services',     'cart.php',             'cart'),
+                    self::customLink('orderaddons', 'View available add-ons', 'cart.php?gid=addons',  'puzzle'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Shop'),   'config' => []],
+                    self::customLink('', 'Hosting plans',    'cart.php?gid=shared', 'server'),
+                    self::customLink('', 'VPS & Dedicated',  'cart.php?gid=vps',    'server'),
+                    self::customLink('', 'SSL Certificates', 'cart.php?gid=ssl',    'lock'),
+                 ]],
                 self::whmcsPage('clientareaproducts'),
                 self::whmcsPage('clientareadomains'),
                 self::whmcsPage('clientareainvoices'),
