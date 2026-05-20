@@ -3152,7 +3152,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .homepage-nav .nav-dropdown-toggle:hover { opacity: 1; }
 .homepage-nav .nav-dropdown-wrap:hover .nav-dropdown-toggle .nav-chevron { transform: rotate(180deg); }
 .homepage-nav .nav-dropdown-menu {
-    position: absolute; top: calc(100% + 4px); left: 0;
+    position: absolute; top: 100%; left: 0;
     min-width: 220px;
     background: rgba(251,251,253,0.92);
     backdrop-filter: saturate(180%) blur(20px);
