@@ -3206,6 +3206,9 @@ textarea.dr-search-input {
     line-height: 1.4;
     padding-top: 16px !important;
     padding-bottom: 16px !important;
+    /* Guard: clip any multi-line placeholder so it can't bleed past the
+       single-line pill (covers the pre-JS frame + future long placeholders). */
+    overflow: hidden !important;
 }
 
 .dr-generate-btn {

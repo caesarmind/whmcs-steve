@@ -560,6 +560,25 @@ jQuery(document).ready(function() {
         jQuery('.domain-invalid').toggle();
     {/if}
 
+    // --- Flatten the AI search placeholder to a single line ---
+    // WHMCS core's domainSearch.domainOrAiInstruction is a 3-line string
+    // ("...domain.\nFor example: ..."), but our AI field is a single-line
+    // pill (rows="1", fixed height), so lines 2-3 overflow and overlap the
+    // box border. Keep the first line as the placeholder and move the detail
+    // into the title tooltip (Lagom-style). Classic mode's input has a
+    // one-line placeholder, so the newline guard skips it.
+    jQuery('.dr-search-input').each(function () {
+        var ph = this.getAttribute('placeholder') || '';
+        var nl = ph.search(/\r?\n/);
+        if (nl === -1) return;
+        var first = ph.slice(0, nl).trim();
+        var rest  = ph.slice(nl).replace(/\s+/g, ' ').trim();
+        this.setAttribute('placeholder', first);
+        if (rest && !(this.getAttribute('title') || '').trim()) {
+            this.setAttribute('title', rest);
+        }
+    });
+
     // --- AI / Classic mode tab switcher ---
     // The .dr-search container carries data-search-mode="ai|classic".
     // Tab click flips it; CSS hides the inactive form.
