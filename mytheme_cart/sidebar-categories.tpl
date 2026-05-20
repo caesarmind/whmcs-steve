@@ -29,6 +29,11 @@
  * primitives. Per-category-name icon mapping can be layered on later.
  *}
 
+{* Server-side gate for the admin "Order Category Sidebar" toggle. In production
+   we skip the markup entirely when the order sub-nav is off; in preview we still
+   render it so the dev chip can toggle it live. ($mt_subnavOrder / $mt_preview
+   are set in mytheme's header.tpl, which wraps the cart pages.) *}
+{if ($mt_preview|default:false) || ($mt_subnavOrder|default:'') != 'off'}
 <aside>
     {if $secondarySidebar}
         {foreach $secondarySidebar as $panel}
@@ -102,3 +107,4 @@
         </div>
     {/if}
 </aside>
+{/if}

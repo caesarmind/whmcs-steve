@@ -733,6 +733,15 @@ body[data-subnav="off"] .st-split > aside { display: none; }
 body[data-subnav-side="left"] .st-split { grid-template-columns: 240px 1fr; }
 body[data-subnav-side="left"] .st-split > aside { grid-column: 1; grid-row: 1; }
 
+/* Admin "Order Category Sidebar" toggle (Addons -> MyTheme -> Settings).
+   Independent of the dev chip's data-subnav; drives the same hide + reflow
+   as data-subnav="off", but scoped to order/cart pages only. */
+body[data-subnav-order="off"] .st-split,
+body[data-subnav-order="off"] .dp-split { grid-template-columns: 1fr; }
+body[data-subnav-order="off"] .st-split > aside,
+body[data-subnav-order="off"] .dp-split > aside { display: none; }
+body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
+
 /* -- Sidebar cards (Categories + Actions) ------------------ */
 .subnav-card { padding: 8px; }
 .subnav-heading {

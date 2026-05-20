@@ -81,6 +81,18 @@
     {if $_q == 'on' || $_q == 'off'}{assign var=mt_subnav value=$_q}{/if}
 {/if}
 
+{* order (cart) sub-nav — driven by the admin "Order Category Sidebar" setting,
+   independent of the website sub-nav. Default (setting unset) = shown; the dev
+   chip's ?subnav=off still overrides in preview. Consumed by mytheme_cart CSS
+   (body[data-subnav-order="off"] .st-split / .dp-split). *}
+{assign var=mt_subnavOrder value=''}
+{if isset($myTheme.addonSettings.cart_subnav) && !$myTheme.addonSettings.cart_subnav}
+    {assign var=mt_subnavOrder value='off'}
+{/if}
+{if $mt_preview && isset($smarty.get.subnav) && $smarty.get.subnav == 'off'}
+    {assign var=mt_subnavOrder value='off'}
+{/if}
+
 {* subnav side *}
 {assign var=mt_subnavSide value=''}
 {if isset($smarty.get.subnavside)}
@@ -281,7 +293,7 @@
       data-layout="{$mt_layout}"
       data-active-nav="{$mt_activeNav|escape}"
       data-page-title="{$pagetitle|escape|default:'Page'}"
-      data-tpl="{$templatefile|default:''|escape}"{if $mt_align} data-align="{$mt_align|escape}"{/if}{if $mt_subnav} data-subnav="{$mt_subnav|escape}"{/if}{if $mt_subnavSide} data-subnav-side="{$mt_subnavSide|escape}"{/if}{if $mt_svcLayout} data-svc-layout="{$mt_svcLayout|escape}"{/if}{if $mt_data} data-data="{$mt_data|escape}"{/if}{if $mt_tiles} data-tiles="{$mt_tiles|escape}"{/if}{if $mt_form} data-form="{$mt_form|escape}"{/if}{if $mt_plan} data-plan="{$mt_plan|escape}"{/if}{if $mt_product} data-product="{$mt_product|escape}"{/if}>
+      data-tpl="{$templatefile|default:''|escape}"{if $mt_align} data-align="{$mt_align|escape}"{/if}{if $mt_subnav} data-subnav="{$mt_subnav|escape}"{/if}{if $mt_subnavOrder} data-subnav-order="{$mt_subnavOrder|escape}"{/if}{if $mt_subnavSide} data-subnav-side="{$mt_subnavSide|escape}"{/if}{if $mt_svcLayout} data-svc-layout="{$mt_svcLayout|escape}"{/if}{if $mt_data} data-data="{$mt_data|escape}"{/if}{if $mt_tiles} data-tiles="{$mt_tiles|escape}"{/if}{if $mt_form} data-form="{$mt_form|escape}"{/if}{if $mt_plan} data-plan="{$mt_plan|escape}"{/if}{if $mt_product} data-product="{$mt_product|escape}"{/if}>
 
 {$headeroutput}
 
