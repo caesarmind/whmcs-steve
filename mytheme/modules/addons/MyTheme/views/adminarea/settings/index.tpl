@@ -12,7 +12,11 @@
 </div>
 
 <style>
+    .mt-tab-off { display: none !important; }
     .mt-row-with-sub { border-bottom: 0; }
+    .mt-subnav-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 18px; margin-top: 6px; }
+    .mt-subnav-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mt-text); padding: 3px 0; cursor: pointer; }
+    .mt-subnav-check input { margin: 0; flex-shrink: 0; }
     .mt-row-sub { padding: 4px 0 18px; border-bottom: 1px solid var(--mt-border); }
     .mt-row-sub[hidden] { display: none; }
     .mt-row-sub-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
@@ -160,7 +164,7 @@
 <form method="post" action="" novalidate>
     <section class="mt-section">
         <header class="mt-section-header">
-            <h2 class="mt-section-title">General Settings</h2>
+            <h2 class="mt-section-title">{if $tab == 'order'}Order Process{else}General{/if} Settings</h2>
             <div class="mt-section-tools">
                 <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
             </div>
@@ -168,7 +172,9 @@
 
         {foreach $flags as $key => $meta}
             {assign var=mtIsLangToggle value=($key == 'custom_language_list')}
-            <div class="mt-row{if $mtIsLangToggle} mt-row-with-sub{/if}">
+            {assign var=mtFlagTab value=$flagTabs[$key]|default:'general'}
+            {assign var=mtHasSub value=($mtIsLangToggle || $key == 'cart_subnav' || $key == 'website_subnav')}
+            <div class="mt-row{if $mtHasSub} mt-row-with-sub{/if}{if $mtFlagTab != $tab} mt-tab-off{/if}">
                 <div>
                     <div class="mt-row-label">{$meta[0]|escape}</div>
                     <div class="mt-row-help">{$meta[1]|escape}</div>
@@ -184,7 +190,7 @@
                Always renders so the form can submit; hidden by default when
                the toggle is off — JS reveals it on toggle change. *}
             {if $mtIsLangToggle}
-                <div class="mt-row-sub" id="mt-language-picker"{if !$values[$key]} hidden{/if}>
+                <div class="mt-row-sub{if $mtFlagTab != $tab} mt-tab-off{/if}" id="mt-language-picker"{if !$values[$key]} hidden{/if}>
                     <header class="mt-row-sub-head">
                         <h3 class="mt-row-sub-title">Languages shown to clients</h3>
                         <span class="mt-row-sub-count" id="mt-lang-count"></span>
@@ -245,6 +251,44 @@
                             </div>
                         </div>
                     {/if}
+                </div>
+            {/if}
+
+            {* Order sub-nav exception picker — renders under the
+               "Order Category Sidebar" toggle (Order Process tab). *}
+            {if $key == 'cart_subnav'}
+                <div class="mt-row-sub{if $mtFlagTab != $tab} mt-tab-off{/if}">
+                    <header class="mt-row-sub-head">
+                        <h3 class="mt-row-sub-title">Per-page exceptions</h3>
+                    </header>
+                    <p class="mt-row-sub-help">Checked pages are <strong>exceptions</strong> — the order sub-nav is flipped on them (hidden when the toggle above is On, shown when Off). A page's own setting in the Pages editor still wins.</p>
+                    <div class="mt-subnav-checks">
+                        {foreach $orderPages as $oTf => $oLabel}
+                            <label class="mt-subnav-check">
+                                <input type="checkbox" name="subnav_pages_order[]" value="{$oTf|escape}"{if in_array($oTf, $subnavOrderList)} checked{/if}>
+                                <span>{$oLabel|escape}</span>
+                            </label>
+                        {/foreach}
+                    </div>
+                </div>
+            {/if}
+
+            {* Website sub-nav exception picker — renders under the
+               "Website Section Sidebar" toggle (General tab). *}
+            {if $key == 'website_subnav'}
+                <div class="mt-row-sub{if $mtFlagTab != $tab} mt-tab-off{/if}">
+                    <header class="mt-row-sub-head">
+                        <h3 class="mt-row-sub-title">Per-page exceptions</h3>
+                    </header>
+                    <p class="mt-row-sub-help">Checked pages are <strong>exceptions</strong> — the section sub-nav is flipped on them (hidden when the toggle above is On, shown when Off). A page's own setting in the Pages editor still wins.</p>
+                    <div class="mt-subnav-checks">
+                        {foreach $websitePages as $wTf => $wLabel}
+                            <label class="mt-subnav-check">
+                                <input type="checkbox" name="subnav_pages_website[]" value="{$wTf|escape}"{if in_array($wTf, $subnavWebsiteList)} checked{/if}>
+                                <span>{$wLabel|escape}</span>
+                            </label>
+                        {/foreach}
+                    </div>
                 </div>
             {/if}
         {/foreach}

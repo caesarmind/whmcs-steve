@@ -81,39 +81,28 @@
     {if $_q == 'on' || $_q == 'off'}{assign var=mt_subnav value=$_q}{/if}
 {/if}
 
-{* Per-page sub-nav override (Pages editor → Sub-navigation): on|off|inherit.
-   'inherit' (or unset) falls through to the global setting below. *}
-{assign var=mt_pageSubnav value=$myTheme.pages[$templatefile].subnav|default:'inherit'}
+{* Sub-nav visibility is resolved in PHP (Hooks::resolveSubnav): per-page editor
+   field > Settings exception-list picker > global toggle. header.tpl just maps the
+   effective boolean to the body attribute the CSS reads. *}
 
-{* order (cart) sub-nav — per-page override → admin "Order Category Sidebar"
-   global. Independent of the website sub-nav; the dev chip's ?subnav=off still
-   overrides in preview. Consumed by mytheme_cart CSS
-   (body[data-subnav-order="off"] .st-split / .dp-split). *}
+{* order (cart) sub-nav → body[data-subnav-order]; consumed by mytheme_cart CSS
+   (.st-split / .dp-split). The dev chip's ?subnav=off still overrides in preview. *}
 {assign var=mt_subnavOrder value=''}
-{if $mt_pageSubnav == 'off'}
-    {assign var=mt_subnavOrder value='off'}
-{elseif $mt_pageSubnav != 'on' && isset($myTheme.addonSettings.cart_subnav) && !$myTheme.addonSettings.cart_subnav}
-    {assign var=mt_subnavOrder value='off'}
-{/if}
+{if !($myTheme.subnav.order|default:true)}{assign var=mt_subnavOrder value='off'}{/if}
 {if $mt_preview && isset($smarty.get.subnav) && $smarty.get.subnav == 'off'}
     {assign var=mt_subnavOrder value='off'}
 {/if}
 
-{* website (client-area) sub-nav — per-page override → admin "Website Section
-   Sidebar" global. Gated to NON-order pages so it never touches the cart's
-   *-split grids (some class names are shared, e.g. cp-split). Consumed by
-   apple-layout.css (body[data-subnav-website="off"] [class$="-split"]). *}
+{* website (client-area) sub-nav → body[data-subnav-website]. Gated to NON-order
+   pages so it never touches the cart's *-split grids (shared class names, e.g.
+   cp-split). Consumed by apple-layout.css ([class$="-split"]). *}
 {assign var=mt_isOrder value=false}
 {if ($inShoppingCart|default:false) || in_array($templatefile|default:'', ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck']) || (($templatefile|default:'')|strstr:'store')}
     {assign var=mt_isOrder value=true}
 {/if}
 {assign var=mt_subnavWebsite value=''}
-{if !$mt_isOrder}
-    {if $mt_pageSubnav == 'off'}
-        {assign var=mt_subnavWebsite value='off'}
-    {elseif $mt_pageSubnav != 'on' && isset($myTheme.addonSettings.website_subnav) && !$myTheme.addonSettings.website_subnav}
-        {assign var=mt_subnavWebsite value='off'}
-    {/if}
+{if !$mt_isOrder && !($myTheme.subnav.website|default:true)}
+    {assign var=mt_subnavWebsite value='off'}
 {/if}
 
 {* subnav side *}

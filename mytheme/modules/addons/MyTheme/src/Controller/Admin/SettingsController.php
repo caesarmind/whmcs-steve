@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace MyTheme\Controller\Admin;
 
 use MyTheme\Controller\AbstractController;
+use MyTheme\Helpers\AddonHelper;
 use MyTheme\Helpers\LocaleHelper;
 use MyTheme\Models\Settings;
+use MyTheme\Template\Template;
 
 final class SettingsController extends AbstractController
 {
@@ -39,6 +41,11 @@ final class SettingsController extends AbstractController
         'website_subnav'         => ['Website Section Sidebar',  'Show the per-page section sub-nav (Account, Domain Tools, etc.) on client-area pages.', true, 'bool'],
     ];
 
+    /** Which Settings tab each flag renders on. Unlisted flags default to 'general'. */
+    public const FLAG_TABS = [
+        'cart_subnav' => 'order',
+    ];
+
     public function indexAction(): string
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -62,13 +69,33 @@ final class SettingsController extends AbstractController
             $selectedLanguages = array_values(array_unique($selectedLanguages));
         }
 
+        $template     = AddonHelper::getTemplate();
+        $orderPages   = Template::ORDER_PAGES;
+        $websitePages = [];
+        if ($template !== null) {
+            foreach ($template->getPages() as $p) {
+                if (isset($orderPages[$p])) { continue; }
+                $meta = $template->getPageMeta($p);
+                $websitePages[$p] = (string)($meta['display_name'] ?? ucwords(str_replace(['-', '_'], ' ', $p)));
+            }
+        }
+        $subnavOrderList   = Settings::getValue('subnav_pages_order', []);
+        $subnavWebsiteList = Settings::getValue('subnav_pages_website', []);
+        if (!is_array($subnavOrderList))   { $subnavOrderList = []; }
+        if (!is_array($subnavWebsiteList)) { $subnavWebsiteList = []; }
+
         return $this->view('settings/index', [
             'flags'              => self::FLAGS,
+            'flagTabs'           => self::FLAG_TABS,
             'values'             => $values,
             'tab'                => $_GET['tab'] ?? 'general',
             'installedLanguages' => $installedLanguages,
             'selectedLanguages'  => $selectedLanguages,
             'langListKey'        => LocaleHelper::LIST_KEY,
+            'orderPages'         => $orderPages,
+            'websitePages'       => $websitePages,
+            'subnavOrderList'    => $subnavOrderList,
+            'subnavWebsiteList'  => $subnavWebsiteList,
         ]);
     }
 
@@ -93,5 +120,29 @@ final class SettingsController extends AbstractController
             static fn($code) => $code !== '' && isset($installed[$code])
         )));
         Settings::setValue(LocaleHelper::LIST_KEY, $clean, 'json');
+
+        // Sub-nav exception lists — page templatefiles that flip the global toggle.
+        $orderKeys   = Template::ORDER_PAGES;
+        $template    = AddonHelper::getTemplate();
+        $websiteKeys = [];
+        if ($template !== null) {
+            foreach ($template->getPages() as $p) {
+                if (!isset($orderKeys[$p])) { $websiteKeys[$p] = true; }
+            }
+        }
+        $this->saveSubnavList('subnav_pages_order', $orderKeys);
+        $this->saveSubnavList('subnav_pages_website', $websiteKeys);
+    }
+
+    /** Persist a sub-nav exception list, filtered to the given valid page set. */
+    private function saveSubnavList(string $key, array $validSet): void
+    {
+        $posted = $_POST[$key] ?? [];
+        if (!is_array($posted)) { $posted = []; }
+        $clean = array_values(array_unique(array_filter(
+            array_map('strval', $posted),
+            static fn($p) => $p !== '' && isset($validSet[$p])
+        )));
+        Settings::setValue($key, $clean, 'json');
     }
 }

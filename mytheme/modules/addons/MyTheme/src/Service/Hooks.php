@@ -89,6 +89,7 @@ final class Hooks
                 'styles'        => $this->resolveActiveStyle($template),
                 'layouts'       => $layouts,
                 'pages'         => $pages,
+                'subnav'        => $this->resolveSubnav($template, $vars, $pages),
                 'license'       => [
                     'canRender' => true,
                     'devMode'   => $template->license()->isDevMode(),
@@ -741,6 +742,44 @@ final class Hooks
             'meta' => $meta,
             'vars' => $meta['variables'] ?? [],
         ];
+    }
+
+    /**
+     * Effective sub-nav visibility for the current page, per scope.
+     * Precedence (most specific wins): per-page editor field (on/off) >
+     * Settings exception-list picker (a listed page flips the global) >
+     * global toggle. Exposed as $myTheme.subnav.{order,website}.
+     *
+     * @param array<string,mixed> $pages resolveCurrentPage() output
+     * @return array{order:bool, website:bool}
+     */
+    private function resolveSubnav(Template $template, array $vars, array $pages): array
+    {
+        $tf     = (string)($vars['templatefile'] ?? '');
+        $editor = (string)($pages[$tf]['subnav'] ?? 'inherit');
+
+        $orderList = Settings::getValue('subnav_pages_order', []);
+        $webList   = Settings::getValue('subnav_pages_website', []);
+        if (!is_array($orderList)) { $orderList = []; }
+        if (!is_array($webList))   { $webList   = []; }
+
+        $eff = static function (string $editor, bool $inList, bool $global): bool {
+            if ($editor === 'on')  { return true; }
+            if ($editor === 'off') { return false; }
+            return $inList ? !$global : $global; // exception list flips the global
+        };
+
+        return [
+            'order'   => $eff($editor, in_array($tf, $orderList, true), $this->settingFlag('cart_subnav')),
+            'website' => $eff($editor, in_array($tf, $webList, true), $this->settingFlag('website_subnav')),
+        ];
+    }
+
+    /** A boolean addon flag — defaults to true (shown) when unset. */
+    private function settingFlag(string $key): bool
+    {
+        $v = Settings::getValue($key, '1');
+        return $v !== '0' && $v !== 0 && $v !== false && $v !== '';
     }
 
     private function resolveActiveLayout(Template $template, string $kind): array
