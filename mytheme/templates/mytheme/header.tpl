@@ -93,6 +93,19 @@
     {assign var=mt_subnavOrder value='off'}
 {/if}
 
+{* website (client-area) sub-nav — driven by the admin "Website Section Sidebar"
+   setting. Gated to NON-order pages so it never touches the cart's *-split grids
+   (some class names are shared, e.g. cp-split). Consumed by apple-layout.css
+   (body[data-subnav-website="off"] [class$="-split"]). Default (unset) = shown. *}
+{assign var=mt_isOrder value=false}
+{if ($inShoppingCart|default:false) || in_array($templatefile|default:'', ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck']) || (($templatefile|default:'')|strstr:'store')}
+    {assign var=mt_isOrder value=true}
+{/if}
+{assign var=mt_subnavWebsite value=''}
+{if !$mt_isOrder && isset($myTheme.addonSettings.website_subnav) && !$myTheme.addonSettings.website_subnav}
+    {assign var=mt_subnavWebsite value='off'}
+{/if}
+
 {* subnav side *}
 {assign var=mt_subnavSide value=''}
 {if isset($smarty.get.subnavside)}
@@ -293,7 +306,7 @@
       data-layout="{$mt_layout}"
       data-active-nav="{$mt_activeNav|escape}"
       data-page-title="{$pagetitle|escape|default:'Page'}"
-      data-tpl="{$templatefile|default:''|escape}"{if $mt_align} data-align="{$mt_align|escape}"{/if}{if $mt_subnav} data-subnav="{$mt_subnav|escape}"{/if}{if $mt_subnavOrder} data-subnav-order="{$mt_subnavOrder|escape}"{/if}{if $mt_subnavSide} data-subnav-side="{$mt_subnavSide|escape}"{/if}{if $mt_svcLayout} data-svc-layout="{$mt_svcLayout|escape}"{/if}{if $mt_data} data-data="{$mt_data|escape}"{/if}{if $mt_tiles} data-tiles="{$mt_tiles|escape}"{/if}{if $mt_form} data-form="{$mt_form|escape}"{/if}{if $mt_plan} data-plan="{$mt_plan|escape}"{/if}{if $mt_product} data-product="{$mt_product|escape}"{/if}>
+      data-tpl="{$templatefile|default:''|escape}"{if $mt_align} data-align="{$mt_align|escape}"{/if}{if $mt_subnav} data-subnav="{$mt_subnav|escape}"{/if}{if $mt_subnavOrder} data-subnav-order="{$mt_subnavOrder|escape}"{/if}{if $mt_subnavWebsite} data-subnav-website="{$mt_subnavWebsite|escape}"{/if}{if $mt_subnavSide} data-subnav-side="{$mt_subnavSide|escape}"{/if}{if $mt_svcLayout} data-svc-layout="{$mt_svcLayout|escape}"{/if}{if $mt_data} data-data="{$mt_data|escape}"{/if}{if $mt_tiles} data-tiles="{$mt_tiles|escape}"{/if}{if $mt_form} data-form="{$mt_form|escape}"{/if}{if $mt_plan} data-plan="{$mt_plan|escape}"{/if}{if $mt_product} data-product="{$mt_product|escape}"{/if}>
 
 {$headeroutput}
 

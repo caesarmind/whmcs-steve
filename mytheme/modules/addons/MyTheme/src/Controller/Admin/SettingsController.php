@@ -36,6 +36,7 @@ final class SettingsController extends AbstractController
         'enable_dark_mode'       => ['Enable Dark Mode',         'Allow visitors to toggle dark mode.',                                   true,  'bool'],
         'topnav_show_icons'      => ['Top-Nav Icons',            'Show icons next to menu items in the top navigation. Off by default.',  false, 'bool'],
         'cart_subnav'            => ['Order Category Sidebar',   'Show the Categories / Actions sidebar on order (cart) pages.',          true,  'bool'],
+        'website_subnav'         => ['Website Section Sidebar',  'Show the per-page section sub-nav (Account, Domain Tools, etc.) on client-area pages.', true, 'bool'],
     ];
 
     public function indexAction(): string

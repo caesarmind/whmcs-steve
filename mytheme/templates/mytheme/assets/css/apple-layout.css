@@ -27,6 +27,15 @@ body[data-layout="top"] .only-inner { display: none !important; }
 body[data-layout="side"] .ph-main-wrap { margin-left: 260px; }
 body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
 
+/* Admin "Website Section Sidebar" toggle (Addons -> MyTheme -> Settings).
+   Hides the per-page section sub-nav and reflows the page to full width,
+   independent of the order/cart sidebar. header.tpl sets data-subnav-website
+   only on client-area (non-order) pages, so this never matches the cart's
+   *-split grids. Every client-area page grid uses a `*-split` wrapper + aside. */
+body[data-subnav-website="off"] [class$="-split"] { grid-template-columns: 1fr !important; }
+body[data-subnav-website="off"] [class$="-split"] > aside,
+body[data-subnav-website="off"] [class$="-split"] > [class$="-aside"] { display: none !important; }
+
 /* Topbar/footer stay within .ph-main-wrap (right of the sidebar/rail).
    Earlier negative-margin trick was reverted because it covered the
    sidebar header -- sidebar should own its full-height left column. */
