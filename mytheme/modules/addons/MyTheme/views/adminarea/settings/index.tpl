@@ -19,20 +19,142 @@
     .mt-row-sub-title { font-size: 14px; font-weight: 500; margin: 0; }
     .mt-row-sub-help { font-size: 12px; color: var(--mt-text-3); margin: 0 0 14px; }
     .mt-row-sub-count { font-size: 13px; color: var(--mt-text-3); }
-    .mt-chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 4px; }
-    .mt-chip-check { position: relative; display: block; cursor: pointer; }
-    .mt-chip-check input { position: absolute; opacity: 0; pointer-events: none; }
-    .mt-chip-check .mt-chip-body { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--mt-border); border-radius: 8px; background: #fff; font-size: 13px; color: var(--mt-text-1); transition: border-color .15s ease, background .15s ease; }
-    .mt-chip-check:hover .mt-chip-body { border-color: var(--mt-text-3); }
-    .mt-chip-check input:checked + .mt-chip-body { border-color: var(--mt-accent, #0071e3); background: rgba(0, 113, 227, 0.06); color: var(--mt-text-1); }
-    .mt-chip-check input:focus-visible + .mt-chip-body { outline: 2px solid var(--mt-accent, #0071e3); outline-offset: 2px; }
-    .mt-chip-check .mt-chip-tick { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--mt-border); border-radius: 4px; flex-shrink: 0; }
-    .mt-chip-check input:checked + .mt-chip-body .mt-chip-tick { border-color: var(--mt-accent, #0071e3); background: var(--mt-accent, #0071e3); color: #fff; }
-    .mt-chip-check .mt-chip-tick svg { width: 10px; height: 10px; opacity: 0; }
-    .mt-chip-check input:checked + .mt-chip-body .mt-chip-tick svg { opacity: 1; }
-    .mt-language-actions { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
-    .mt-link-btn { background: none; border: 0; padding: 0; color: var(--mt-accent, #0071e3); font: inherit; cursor: pointer; font-size: 13px; }
-    .mt-link-btn:hover { text-decoration: underline; }
+
+    /* Chip multi-select — single field with removable chips + dropdown picker.
+       Replaces the previous grid of checkbox-chips. The real form fields
+       live in a hidden .mt-multi-inputs container; the visible widget is
+       just a view onto their state. */
+    .mt-multi-wrap { position: relative; max-width: 520px; }
+    .mt-multi {
+        width: 100%;
+        min-height: 40px;
+        padding: 5px 32px 5px 8px;
+        border: 1px solid var(--mt-input-border);
+        border-radius: 8px;
+        background: #fff;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        position: relative;
+        transition: border-color .15s, box-shadow .15s;
+    }
+    .mt-multi:hover { border-color: var(--mt-text-3); }
+    .mt-multi.is-focused { border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 3px rgba(0,113,227,0.15); }
+    .mt-multi-caret {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--mt-text-4);
+        pointer-events: none;
+    }
+    .mt-multi-caret svg { width: 12px; height: 12px; display: block; }
+    .mt-multi-placeholder { color: var(--mt-text-3); font-size: 13px; padding: 6px 4px; }
+    .mt-multi-placeholder[hidden] { display: none; }
+    .mt-multi-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        height: 26px;
+        padding: 0 4px 0 9px;
+        background: var(--mt-surface-2, #f5f5f7);
+        border: 1px solid var(--mt-border);
+        border-radius: 6px;
+        font-size: 12.5px;
+        color: var(--mt-text);
+    }
+    .mt-multi-chip-x {
+        color: var(--mt-primary, #0071e3);
+        cursor: pointer;
+        padding: 0 4px;
+        line-height: 1;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 3px;
+        user-select: none;
+    }
+    .mt-multi-chip-x:hover { background: rgba(0,113,227,0.10); }
+
+    .mt-multi-panel {
+        position: absolute;
+        left: 0; right: 0; top: calc(100% + 4px);
+        background: #fff;
+        border: 1px solid var(--mt-border);
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        z-index: 30;
+        max-height: 300px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .mt-multi-panel[hidden] { display: none; }
+    .mt-multi-search-wrap { padding: 8px; border-bottom: 1px solid var(--mt-border); }
+    .mt-multi-search-wrap input { width: 100%; padding: 6px 10px; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 6px; background: #fff; font: inherit; }
+    .mt-multi-search-wrap input:focus { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 2px rgba(0,113,227,0.15); }
+    .mt-multi-options { padding: 4px; overflow-y: auto; flex: 1; }
+    .mt-multi-option {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        width: 100%;
+        padding: 7px 10px;
+        border: 0;
+        background: transparent;
+        border-radius: 4px;
+        font: inherit;
+        font-size: 13px;
+        color: var(--mt-text);
+        cursor: pointer;
+        text-align: left;
+    }
+    .mt-multi-option:hover { background: var(--mt-surface-2, #f5f5f7); }
+    .mt-multi-option .mt-multi-check {
+        width: 14px;
+        height: 14px;
+        border: 1.5px solid var(--mt-input-border);
+        border-radius: 3px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: #fff;
+    }
+    .mt-multi-option.is-checked .mt-multi-check { background: var(--mt-primary, #0071e3); border-color: var(--mt-primary, #0071e3); }
+    .mt-multi-option .mt-multi-check svg { width: 10px; height: 10px; opacity: 0; }
+    .mt-multi-option.is-checked .mt-multi-check svg { opacity: 1; }
+    .mt-multi-empty { padding: 14px; text-align: center; color: var(--mt-text-3); font-size: 12px; }
+
+    /* "All" pseudo-option — separated from the language list with a divider,
+       and visually disabled when a specific language is checked. */
+    .mt-multi-option.is-all {
+        font-weight: 600;
+        border-bottom: 1px solid var(--mt-border);
+        border-radius: 4px 4px 0 0;
+        padding-bottom: 9px;
+        margin-bottom: 4px;
+    }
+    .mt-multi-option .mt-multi-globe { color: var(--mt-text-3); display: inline-flex; align-items: center; }
+    .mt-multi-option .mt-multi-globe svg { width: 14px; height: 14px; display: block; }
+    .mt-multi-option.is-all.is-checked .mt-multi-globe { color: var(--mt-primary, #0071e3); }
+    .mt-multi-option.is-disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    .mt-multi-option.is-disabled .mt-multi-globe { color: var(--mt-text-4); }
+
+    /* "All" chip — distinguished from regular chips with the primary tint + globe icon */
+    .mt-multi-chip.is-all {
+        background: rgba(0, 113, 227, 0.08);
+        border-color: rgba(0, 113, 227, 0.20);
+        color: var(--mt-primary, #0071e3);
+        font-weight: 500;
+    }
+    .mt-multi-chip-icon { display: inline-flex; align-items: center; color: currentColor; }
+    .mt-multi-chip-icon svg { width: 12px; height: 12px; display: block; }
 </style>
 
 <form method="post" action="" novalidate>
@@ -73,23 +195,54 @@
                     </p>
 
                     {if $installedLanguages}
-                        <div class="mt-chip-grid" id="mt-lang-grid">
-                            {foreach $installedLanguages as $code}
-                                <label class="mt-chip-check">
+                        <div class="mt-multi-wrap" id="mt-lang-wrap">
+                            {* Hidden form fields — the source of truth for submission. The
+                               visible widget below just mirrors their checked state. *}
+                            <div class="mt-multi-inputs" hidden id="mt-lang-inputs">
+                                {foreach $installedLanguages as $code}
                                     <input type="checkbox" name="{$langListKey|escape}[]" value="{$code|escape}"{if in_array($code, $selectedLanguages)} checked{/if}>
-                                    <span class="mt-chip-body">
-                                        <span class="mt-chip-tick" aria-hidden="true">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                {/foreach}
+                            </div>
+
+                            {* Visible chip field *}
+                            <div class="mt-multi" id="mt-lang-multi" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                                <div class="mt-multi-chips" id="mt-lang-chips"></div>
+                                <span class="mt-multi-placeholder" id="mt-lang-placeholder">Click to add languages…</span>
+                                <span class="mt-multi-caret" aria-hidden="true">
+                                    <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                                </span>
+                            </div>
+
+                            {* Dropdown panel *}
+                            <div class="mt-multi-panel" id="mt-lang-panel" hidden role="listbox" aria-multiselectable="true">
+                                <div class="mt-multi-search-wrap">
+                                    <input type="search" id="mt-lang-search" placeholder="Search languages…" autocomplete="off" aria-label="Search languages">
+                                </div>
+                                <div class="mt-multi-options" id="mt-lang-options">
+                                    {* "All" is a pseudo-option: it represents the "no restriction"
+                                       state (all installed languages checked). It auto-disables
+                                       when any specific language is checked — to re-enable it,
+                                       remove the specific selections first. *}
+                                    <button type="button" class="mt-multi-option is-all" data-code="__all__" role="option" aria-selected="false">
+                                        <span class="mt-multi-check" aria-hidden="true">
+                                            <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg>
                                         </span>
-                                        <span>{$code|escape|capitalize}</span>
-                                    </span>
-                                </label>
-                            {/foreach}
-                        </div>
-                        <div class="mt-language-actions">
-                            <button type="button" class="mt-link-btn" data-lang-select-all>Select all</button>
-                            <span style="color: var(--mt-text-3)">&middot;</span>
-                            <button type="button" class="mt-link-btn" data-lang-select-none>Clear</button>
+                                        <span class="mt-multi-globe" aria-hidden="true">
+                                            <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 7h11M7 1.5c2 1.5 2 9.5 0 11M7 1.5c-2 1.5-2 9.5 0 11" stroke="currentColor" stroke-width="1.2"/></svg>
+                                        </span>
+                                        <span>All</span>
+                                    </button>
+                                    {foreach $installedLanguages as $code}
+                                        <button type="button" class="mt-multi-option" data-code="{$code|escape}" role="option" aria-selected="false">
+                                            <span class="mt-multi-check" aria-hidden="true">
+                                                <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg>
+                                            </span>
+                                            <span>{$code|escape|capitalize}</span>
+                                        </button>
+                                    {/foreach}
+                                </div>
+                                <div class="mt-multi-empty" id="mt-lang-empty" hidden>No languages match.</div>
+                            </div>
                         </div>
                     {/if}
                 </div>
@@ -104,43 +257,207 @@
 
 <script>
 (function () {
-    var toggle = document.querySelector('[data-toggle-target="mt-language-picker"]');
+    // ── Toggle reveal (parent row toggle ↔ sub-section) ──
+    var toggle  = document.querySelector('[data-toggle-target="mt-language-picker"]');
     var section = document.getElementById('mt-language-picker');
-    var grid = document.getElementById('mt-lang-grid');
-    var counter = document.getElementById('mt-lang-count');
-
-    function refreshCount() {
-        if (!grid || !counter) return;
-        var checked = grid.querySelectorAll('input[type="checkbox"]:checked').length;
-        var total = grid.querySelectorAll('input[type="checkbox"]').length;
-        counter.textContent = checked + ' of ' + total + ' selected';
-    }
-
     if (toggle && section) {
         toggle.addEventListener('change', function () {
             section.hidden = !toggle.checked;
         });
     }
 
-    if (grid) {
-        grid.addEventListener('change', refreshCount);
-        refreshCount();
+    // ── Chip multi-select ──
+    var inputs      = document.getElementById('mt-lang-inputs');
+    var multi       = document.getElementById('mt-lang-multi');
+    var chips       = document.getElementById('mt-lang-chips');
+    var placeholder = document.getElementById('mt-lang-placeholder');
+    var panel       = document.getElementById('mt-lang-panel');
+    var options     = document.getElementById('mt-lang-options');
+    var search      = document.getElementById('mt-lang-search');
+    var empty       = document.getElementById('mt-lang-empty');
+    var counter     = document.getElementById('mt-lang-count');
+    if (!inputs || !multi) return;
+
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    function checkboxFor(code) {
+        // Defensive value selector — language codes are ASCII so CSS.escape
+        // isn't strictly needed, but use it when available for safety.
+        var esc = (window.CSS && CSS.escape) ? CSS.escape(code) : code.replace(/[^a-zA-Z0-9_-]/g, '\\$&');
+        return inputs.querySelector('input[value="' + esc + '"]');
     }
 
-    var selectAll = document.querySelector('[data-lang-select-all]');
-    var selectNone = document.querySelector('[data-lang-select-none]');
-    if (selectAll && grid) {
-        selectAll.addEventListener('click', function () {
-            grid.querySelectorAll('input[type="checkbox"]').forEach(function (cb) { cb.checked = true; });
-            refreshCount();
-        });
+    function selectedCodes() {
+        return Array.prototype.map.call(inputs.querySelectorAll('input:checked'), function (cb) { return cb.value; });
     }
-    if (selectNone && grid) {
-        selectNone.addEventListener('click', function () {
-            grid.querySelectorAll('input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
-            refreshCount();
+
+    function allInputs() { return inputs.querySelectorAll('input'); }
+
+    function render() {
+        var allCbs = allInputs();
+        var total = allCbs.length;
+        var selected = selectedCodes();
+        var n = selected.length;
+        // Tri-state: empty | partial | all. "All" means every installed
+        // language checkbox is checked — UI collapses to a single "All" chip.
+        var state = (n === 0) ? 'empty' : (n === total ? 'all' : 'partial');
+
+        // Chip row
+        chips.innerHTML = '';
+        if (state === 'all') {
+            var allChip = document.createElement('span');
+            allChip.className = 'mt-multi-chip is-all';
+            allChip.innerHTML =
+                '<span class="mt-multi-chip-icon" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 7h11M7 1.5c2 1.5 2 9.5 0 11M7 1.5c-2 1.5-2 9.5 0 11" stroke="currentColor" stroke-width="1.2"/></svg></span>' +
+                '<span>All</span>' +
+                '<span class="mt-multi-chip-x" data-remove="__all__" role="button" aria-label="Remove All">&times;</span>';
+            chips.appendChild(allChip);
+        } else if (state === 'partial') {
+            selected.forEach(function (code) {
+                var chip = document.createElement('span');
+                chip.className = 'mt-multi-chip';
+                var label = document.createElement('span');
+                label.textContent = capitalize(code);
+                var x = document.createElement('span');
+                x.className = 'mt-multi-chip-x';
+                x.setAttribute('data-remove', code);
+                x.setAttribute('role', 'button');
+                x.setAttribute('aria-label', 'Remove ' + code);
+                x.innerHTML = '&times;';
+                chip.appendChild(label);
+                chip.appendChild(x);
+                chips.appendChild(chip);
+            });
+        }
+        placeholder.hidden = state !== 'empty';
+
+        // Option states
+        var selectedSet = {};
+        selected.forEach(function (c) { selectedSet[c] = true; });
+        Array.prototype.forEach.call(options.querySelectorAll('.mt-multi-option'), function (opt) {
+            if (opt.classList.contains('is-all')) {
+                opt.classList.toggle('is-checked', state === 'all');
+                // "Unavailable" when the user has selected something other
+                // than "All" — clear specifics first to re-enable.
+                opt.classList.toggle('is-disabled', state === 'partial');
+                opt.setAttribute('aria-selected', state === 'all' ? 'true' : 'false');
+                opt.setAttribute('aria-disabled', state === 'partial' ? 'true' : 'false');
+            } else {
+                var on = !!selectedSet[opt.getAttribute('data-code')];
+                opt.classList.toggle('is-checked', on);
+                opt.setAttribute('aria-selected', on ? 'true' : 'false');
+            }
         });
+
+        // Sub-header counter
+        if (counter) {
+            counter.textContent = state === 'all'
+                ? 'All ' + total + ' languages'
+                : (n + ' of ' + total + ' selected');
+        }
     }
+
+    function setSelection(code, on) {
+        var cb = checkboxFor(code);
+        if (!cb) return;
+        cb.checked = on;
+        render();
+    }
+
+    function openPanel() {
+        panel.hidden = false;
+        multi.classList.add('is-focused');
+        multi.setAttribute('aria-expanded', 'true');
+        if (search) {
+            search.value = '';
+            filter('');
+            setTimeout(function () { search.focus(); }, 0);
+        }
+    }
+    function closePanel() {
+        panel.hidden = true;
+        multi.classList.remove('is-focused');
+        multi.setAttribute('aria-expanded', 'false');
+    }
+
+    function filter(q) {
+        q = (q || '').toLowerCase().trim();
+        var anyVisible = false;
+        Array.prototype.forEach.call(options.querySelectorAll('.mt-multi-option'), function (opt) {
+            // "All" is a pseudo-option — always visible regardless of query.
+            if (opt.classList.contains('is-all')) return;
+            var code = (opt.getAttribute('data-code') || '').toLowerCase();
+            var match = !q || code.indexOf(q) >= 0;
+            opt.style.display = match ? '' : 'none';
+            if (match) anyVisible = true;
+        });
+        if (empty) empty.hidden = anyVisible;
+    }
+
+    function setAll(checked) {
+        Array.prototype.forEach.call(allInputs(), function (cb) { cb.checked = checked; });
+    }
+
+    // Open the panel on field click OR keyboard activation. Chip × is
+    // handled here too so a click on × removes the chip but doesn't bubble
+    // up to open the panel.
+    multi.addEventListener('click', function (e) {
+        var rm = e.target.closest('[data-remove]');
+        if (rm) {
+            e.stopPropagation();
+            var code = rm.getAttribute('data-remove');
+            if (code === '__all__') {
+                // Removing the "All" chip means dropping back to no selection.
+                setAll(false);
+                render();
+            } else {
+                setSelection(code, false);
+            }
+            return;
+        }
+        if (panel.hidden) openPanel();
+    });
+    multi.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (panel.hidden) openPanel();
+        }
+        if (e.key === 'Escape') closePanel();
+    });
+
+    // Outside click closes
+    document.addEventListener('click', function (e) {
+        if (multi.contains(e.target) || panel.contains(e.target)) return;
+        closePanel();
+    });
+
+    // Option pick — toggle selection. The "All" pseudo-option is special:
+    // disabled when a specific language is already checked, and clicking
+    // it toggles every checkbox at once.
+    options.addEventListener('click', function (e) {
+        var opt = e.target.closest('.mt-multi-option');
+        if (!opt || opt.classList.contains('is-disabled')) return;
+        e.preventDefault();
+        if (opt.classList.contains('is-all')) {
+            // Toggle: if every checkbox is checked, clear; else select all.
+            var allOn = !Array.prototype.some.call(allInputs(), function (cb) { return !cb.checked; });
+            setAll(!allOn);
+            render();
+            return;
+        }
+        var code = opt.getAttribute('data-code');
+        var cb = checkboxFor(code);
+        if (!cb) return;
+        setSelection(code, !cb.checked);
+    });
+
+    // Search filter
+    if (search) {
+        search.addEventListener('input', function () { filter(search.value); });
+        search.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePanel(); });
+    }
+
+    render();
 })();
 </script>
 

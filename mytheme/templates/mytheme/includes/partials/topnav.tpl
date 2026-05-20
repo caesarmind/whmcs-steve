@@ -22,53 +22,96 @@
     {/if}
 {/function}
 
+{* Renders one entry from the $mtSidebarItems plain-array list (built by
+   TreeRenderer::buildFlatList). Each entry has: type, name, label, uri, icon,
+   color, side, css_class, badge_source, dropdown_style, target, children.
+   We iterate THIS instead of $primaryNavbar->getChildren() because the
+   WHMCS\View\Menu\Item tree reorders/filters children in ways we can't
+   control — e.g. custom_link grandchildren of a dropdown_parent silently
+   disappear from getChildren() on the top layout. The flat list bypasses
+   that entirely. *}
 {function name=mtTopnavItem item=null}
-    {assign var=mtType value=$item->getAttribute('data-mt-type')|default:'whmcs_page'}
-    {assign var=mtIconName value=$item->getAttribute('data-mt-icon')|default:$item->getIcon()|default:''}
+    {assign var=mtType value=$item.type|default:'whmcs_page'}
+    {assign var=mtIconName value=$item.icon|default:''}
     {assign var=sideRight value=''}
-    {if $item->getAttribute('data-mt-side') == 'right'}{assign var=sideRight value=' nav-item-right'}{/if}
+    {if $item.side == 'right'}{assign var=sideRight value=' nav-item-right'}{/if}
     {if $mtType == 'header'}
         {* Headers are sidebar-only — collapse to a plain disabled span on top-nav *}
-        <span class="nav-section{$sideRight}">{$item->getLabel()|escape}</span>
+        <span class="nav-section{$sideRight}">{$item.label|escape}</span>
     {elseif $mtType == 'divider'}
         <span class="nav-divider{$sideRight}"></span>
-    {elseif $mtType == 'dropdown_parent'}
-        <div class="nav-dropdown-wrap{$sideRight}">
+    {elseif $mtType == 'dropdown_parent' || ($mtType == 'account_dropdown' && $item.children)}
+        {assign var=mtDropdownStyle value=$item.dropdown_style|default:'default'}
+        <div class="nav-dropdown-wrap{$sideRight}{if $mtDropdownStyle == 'mega'} nav-dropdown-wrap--mega{/if}">
             <a href="#" class="nav-dropdown-toggle">
                 {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
-                {$item->getLabel()|escape}
+                {$item.label|escape}
                 <svg class="nav-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
             </a>
-            {if $item->getChildren()}
-                <div class="nav-dropdown-menu">
-                    {foreach $item->getChildren() as $child}
-                        {assign var=childType value=$child->getAttribute('data-mt-type')|default:'whmcs_page'}
-                        {assign var=childIcon value=$child->getAttribute('data-mt-icon')|default:$child->getIcon()|default:''}
-                        {if $childType == 'divider'}
-                            <div class="nav-dropdown-divider"></div>
-                        {elseif $childType == 'header'}
-                            <div class="nav-dropdown-section">{$child->getLabel()|escape}</div>
-                        {else}
-                            <a href="{$child->getUri()|escape}" class="nav-dropdown-item">
-                                {if $mtTopnavShowIcons && $childIcon}<span class="nav-dropdown-item-icon">{mtTopnavIcon iconName=$childIcon}</span>{/if}
-                                {$child->getLabel()|escape}
-                            </a>
-                        {/if}
-                    {/foreach}
-                </div>
+            {if $item.children}
+                {if $mtDropdownStyle == 'mega'}
+                    {* MEGA: full-width panel split into columns by `header` items.
+                       Items appearing before any header fall into an auto-opened
+                       first column. Dividers are dropped (mega layout uses
+                       columns instead of inline dividers). *}
+                    <div class="nav-dropdown-menu nav-dropdown-menu--mega">
+                        <div class="nav-mega-inner">
+                            {assign var=_megaOpen value=false}
+                            {foreach $item.children as $child}
+                                {assign var=childType value=$child.type|default:'whmcs_page'}
+                                {assign var=childIcon value=$child.icon|default:''}
+                                {if $childType == 'header'}
+                                    {if $_megaOpen}</div>{/if}
+                                    <div class="nav-mega-col"><h4>{$child.label|escape}</h4>
+                                    {assign var=_megaOpen value=true}
+                                {elseif $childType != 'divider'}
+                                    {if !$_megaOpen}<div class="nav-mega-col">{assign var=_megaOpen value=true}{/if}
+                                    <a href="{$child.uri|escape}" class="nav-mega-item{if $mtTopnavShowIcons && $childIcon} nav-mega-item--icon{/if}"{if $child.target} target="{$child.target|escape}"{/if}>
+                                        {if $mtTopnavShowIcons && $childIcon}
+                                            <span class="nav-mega-icon">{mtTopnavIcon iconName=$childIcon}</span><span class="nav-mega-text"><span class="name">{$child.label|escape}</span></span>
+                                        {else}
+                                            <span class="name">{$child.label|escape}</span>
+                                        {/if}
+                                    </a>
+                                {/if}
+                            {/foreach}
+                            {if $_megaOpen}</div>{/if}
+                        </div>
+                    </div>
+                {else}
+                    {* CLASSIC: narrow floating panel — items, headers as section
+                       labels, dividers as thin separators. Icons render only
+                       when topnav_show_icons is on AND the child has config.icon. *}
+                    <div class="nav-dropdown-menu">
+                        {foreach $item.children as $child}
+                            {assign var=childType value=$child.type|default:'whmcs_page'}
+                            {assign var=childIcon value=$child.icon|default:''}
+                            {if $childType == 'divider'}
+                                <div class="nav-dropdown-divider"></div>
+                            {elseif $childType == 'header'}
+                                <div class="nav-dropdown-section">{$child.label|escape}</div>
+                            {else}
+                                <a href="{$child.uri|escape}" class="nav-dropdown-item"{if $child.target} target="{$child.target|escape}"{/if}>
+                                    {if $mtTopnavShowIcons && $childIcon}<span class="nav-dropdown-item-icon">{mtTopnavIcon iconName=$childIcon}</span>{/if}
+                                    {$child.label|escape}
+                                </a>
+                            {/if}
+                        {/foreach}
+                    </div>
+                {/if}
             {/if}
         </div>
     {elseif $mtType == 'login_button'}
-        <a href="{$item->getUri()|escape}" class="nav-cta{$sideRight}">
+        <a href="{$item.uri|escape}" class="nav-cta{$sideRight}">
             {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
-            {$item->getLabel()|escape}
+            {$item.label|escape}
         </a>
     {elseif $mtType == 'language' || $mtType == 'currency'}
-        <a href="#" class="nav-switcher{$sideRight}" data-switcher="{$mtType|escape}">{$item->getLabel()|escape}</a>
+        <a href="#" class="nav-switcher{$sideRight}" data-switcher="{$mtType|escape}">{$item.label|escape}</a>
     {else}
-        <a href="{$item->getUri()|escape}" class="nav-item{$sideRight}">
+        <a href="{$item.uri|escape}" class="nav-item{$sideRight}"{if $item.target} target="{$item.target|escape}"{/if}>
             {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
-            {$item->getLabel()|escape}
+            {$item.label|escape}
         </a>
     {/if}
 {/function}
@@ -87,8 +130,8 @@
             <a href="{$WEB_ROOT}/" class="nav-logo text-logo">{$companyname|escape}</a>
         {/if}
 
-        {if isset($primaryNavbar) && $primaryNavbar->getChildren()}
-            {foreach $primaryNavbar->getChildren() as $item}
+        {if isset($mtSidebarItems) && $mtSidebarItems}
+            {foreach $mtSidebarItems as $item}
                 {mtTopnavItem item=$item}
             {/foreach}
         {else}

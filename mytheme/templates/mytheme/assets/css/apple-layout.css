@@ -54,10 +54,24 @@ body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
    Only meaningful in sidebar/rail layouts where there's a fixed-width
    sidebar to anchor against. In top layout the page-nav is sticky and
    .ph-main-wrap is already full-width, so alignment has nothing to do --
-   any align value is a no-op. */
-body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area {
+   any align value is a no-op. Footer follows: .hp-footer-inner has its
+   own `margin: 0 auto` for centering, so without overriding it the
+   footer would stay centered while the content shifted left. */
+body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area,
+body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .hp-footer-inner {
     margin-left: 0;
     margin-right: auto;
+}
+/* .content-area uses a 48px side gutter but .hp-footer's band uses 22px, so a
+   left-anchored footer-inner would sit 26px further left than the content
+   column. Match the content gutter so the footer columns line up beneath the
+   content. Scoped to >768px, where .content-area actually uses 48px; at or
+   below 768px its gutter drops to 20px and the sidebar has already collapsed
+   (margin-left:0 at <=900px), so the small residual offset is moot. */
+@media (min-width: 769px) {
+    body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .hp-footer {
+        padding-left: 48px;
+    }
 }
 
 /* Defensive centering in top layout -- overrides any align / subnav-side
@@ -424,6 +438,27 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .ph-breadcrumb-inner a:hover { color: var(--color-accent); text-decoration: none; }
 .ph-breadcrumb-inner .sep { opacity: 0.4; font-size: 11px; }
 .ph-breadcrumb-inner .current { color: var(--color-text-primary); font-weight: 500; }
+
+/* Back-link breadcrumb (top-layout): a single Apple-style "< Home" link in
+   place of a full trail. The band drops its grey fill + hairline so the link
+   reads as a content affordance, not a chrome bar. The current page is
+   carried by the large page title just below. */
+.ph-breadcrumb-back {
+    background: transparent;
+    border-bottom: 0;
+    padding-top: 14px;
+    padding-bottom: 0;
+}
+/* Selector carries .ph-breadcrumb-inner a so it outranks the trail rule
+   `.ph-breadcrumb-inner a { color: tertiary }` -- otherwise the back-link
+   renders grey instead of accent blue. */
+.ph-breadcrumb-inner a.ph-back-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--color-accent); font-size: 13px; font-weight: 400;
+    text-decoration: none; transition: opacity 0.15s;
+}
+.ph-breadcrumb-inner a.ph-back-link svg { width: 15px; height: 15px; margin-left: -3px; }
+.ph-breadcrumb-inner a.ph-back-link:hover { color: var(--color-accent); text-decoration: none; opacity: 0.7; }
 
 /* =============================================================
    RAIL LAYOUT -- icon rail (80px) + flyout panel (240px)

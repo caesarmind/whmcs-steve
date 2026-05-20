@@ -91,10 +91,49 @@ final class Presets
             'active'   => true,
             'items'    => [
                 self::whmcsPage('clientareahome'),
+                // First mega — Services. Manage / Order / Shop layout that
+                // mirrors the WHMCS Defaults preset, so the client primary
+                // nav has a flagship mega next to the standard quick links.
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('navservices', 'Services'),
+                 'config' => ['icon' => 'server', 'dropdown_style' => 'mega'],
+                 'children' => [
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Manage'), 'config' => []],
+                    self::whmcsPage('clientareaproducts', 'server'),
+                    self::customLink('domainrenewals', 'Renew services', 'cart.php?gid=renewals', 'refresh'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Order'),  'config' => []],
+                    self::customLink('ordernew',    'Order new services',     'cart.php',             'cart'),
+                    self::customLink('orderaddons', 'View available add-ons', 'cart.php?gid=addons',  'puzzle'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Shop'),   'config' => []],
+                    self::customLink('', 'Hosting plans',    'cart.php?gid=shared', 'server'),
+                    self::customLink('', 'VPS & Dedicated',  'cart.php?gid=vps',    'server'),
+                    self::customLink('', 'SSL Certificates', 'cart.php?gid=ssl',    'lock'),
+                 ]],
                 self::whmcsPage('clientareaproducts'),
                 self::whmcsPage('clientareadomains'),
                 self::whmcsPage('clientareainvoices'),
                 self::whmcsPage('supportticketslist'),
+                // Second mega — Resources. Three-column panel with
+                // documentation / tools / status groupings so admins can
+                // see two megas living together in the same menu.
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('', 'Resources'),
+                 'config' => ['icon' => 'book', 'dropdown_style' => 'mega'],
+                 'children' => [
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Documentation'), 'config' => []],
+                    self::whmcsPage('knowledgebase', 'book'),
+                    self::whmcsPage('announcements', 'megaphone'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Tools'), 'config' => []],
+                    self::whmcsPage('downloads',    'download'),
+                    self::whmcsPage('serverstatus', 'status'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Support'), 'config' => []],
+                    self::whmcsPage('contact',              'envelope'),
+                    self::whmcsPage('supportticketsubmit',  'plus'),
+                 ]],
                 ['type' => ItemTypes::ACCOUNT_DROPDOWN,
                  'label' => self::label('accounttab', 'Account'),
                  'config' => ['position_side' => 'right'],
@@ -132,17 +171,26 @@ final class Presets
                 self::whmcsPage('clientareahome', 'home'),
 
                 ['type' => ItemTypes::HEADER, 'label' => self::label('navservices', 'Services'), 'config' => []],
+                // Demo mega menu — HEADER children separate the panel into
+                // columns (Manage / Order / Add-ons). Order-form deeplinks
+                // stay custom_link because they don't route through a
+                // client-area templatefile.
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navservices', 'Services'),
-                 'config' => ['icon' => 'server'],
+                 'config' => ['icon' => 'server', 'dropdown_style' => 'mega'],
                  'children' => [
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Manage'), 'config' => []],
                     self::whmcsPage('clientareaproducts', 'server'),
-                    ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
-                    // Order-form deeplinks — these are NOT client-area templatefiles, so they
-                    // stay custom_link. WHMCS routes them through the order-form theme.
-                    self::customLink('domainrenewals', 'Renew Services',   'cart.php?gid=renewals',  'refresh'),
-                    self::customLink('ordernew',       'Order New Services','cart.php',              'cart'),
-                    self::customLink('orderaddons',    'View Available Addons','cart.php?gid=addons','puzzle'),
+                    self::customLink('domainrenewals', 'Renew services', 'cart.php?gid=renewals', 'refresh'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Order'),  'config' => []],
+                    self::customLink('ordernew',    'Order new services',   'cart.php',              'cart'),
+                    self::customLink('orderaddons', 'View available add-ons','cart.php?gid=addons',  'puzzle'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Shop'),   'config' => []],
+                    self::customLink('', 'Hosting plans',     'cart.php?gid=shared',     'server'),
+                    self::customLink('', 'VPS & Dedicated',   'cart.php?gid=vps',        'server'),
+                    self::customLink('', 'SSL Certificates',  'cart.php?gid=ssl',        'lock'),
                  ]],
 
                 ['type' => ItemTypes::HEADER, 'label' => self::label('navdomains', 'Domains'), 'config' => []],
@@ -211,14 +259,27 @@ final class Presets
             'active'   => true,
             'items'    => [
                 self::customLink('', 'Home', '/', 'home'),
+                // Demo mega menu — 3 columns separated by HEADER children. The
+                // topnav renderer turns each header into a column title and
+                // collects the following non-header siblings underneath it.
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navhostingproducts', 'Hosting'),
-                 'config' => ['dropdown_style' => 'default'],
+                 'config' => ['dropdown_style' => 'mega'],
                  'children' => [
-                    // Group-specific cart filters — custom_link.
-                    self::customLink('', 'Shared Hosting', 'cart.php?gid=shared'),
-                    self::customLink('', 'VPS',            'cart.php?gid=vps'),
-                    self::customLink('', 'Dedicated',      'cart.php?gid=dedicated'),
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Web Hosting'),     'config' => []],
+                    self::customLink('', 'Shared Hosting',    'cart.php?gid=shared'),
+                    self::customLink('', 'WordPress Hosting', 'cart.php?gid=wordpress'),
+                    self::customLink('', 'Reseller Hosting',  'cart.php?gid=reseller'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Servers'),         'config' => []],
+                    self::customLink('', 'VPS',               'cart.php?gid=vps'),
+                    self::customLink('', 'Cloud Servers',     'cart.php?gid=cloud'),
+                    self::customLink('', 'Dedicated',         'cart.php?gid=dedicated'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Add-ons'),         'config' => []],
+                    self::customLink('', 'SSL Certificates',  'cart.php?gid=ssl'),
+                    self::customLink('', 'Email Hosting',     'cart.php?gid=email'),
+                    self::customLink('', 'Website Builder',   'cart.php?gid=sitebuilder'),
                  ]],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navdomains', 'Domains'),
@@ -239,6 +300,24 @@ final class Presets
                     self::whmcsPage('serverstatus'),
                     self::whmcsPage('knowledgebase'),
                     self::whmcsPage('announcements'),
+                 ]],
+                // Second mega — Resources. Sits next to the Hosting mega
+                // so admins can see two mega panels living in the same nav.
+                ['type' => ItemTypes::DROPDOWN_PARENT,
+                 'label' => self::label('', 'Resources'),
+                 'config' => ['icon' => 'book', 'dropdown_style' => 'mega'],
+                 'children' => [
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Learn'), 'config' => []],
+                    self::whmcsPage('knowledgebase', 'book'),
+                    self::whmcsPage('announcements', 'megaphone'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Status'), 'config' => []],
+                    self::whmcsPage('serverstatus', 'status'),
+                    self::customLink('', 'Network map',   '/network',   'globe'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Connect'), 'config' => []],
+                    self::whmcsPage('contact',  'envelope'),
+                    self::customLink('', 'Affiliates',    'affiliates.php', 'star'),
                  ]],
                 ['type' => ItemTypes::LOGIN_BUTTON, 'label' => self::label('login', 'Login'),
                  'config' => ['position_side' => 'right', 'style' => 'primary']],
@@ -268,14 +347,24 @@ final class Presets
                 self::customLink('orderproducts', 'Browse Products', 'cart.php', 'shop'),
 
                 ['type' => ItemTypes::HEADER, 'label' => self::label('navdomains', 'Domains'), 'config' => []],
+                // Demo mega menu — HEADER children become column titles in
+                // the full-width dropdown panel.
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navdomains', 'Domains'),
-                 'config' => ['icon' => 'globe'],
+                 'config' => ['icon' => 'globe', 'dropdown_style' => 'mega'],
                  'children' => [
-                    self::customLink('domainregister', 'Register a Domain',     'cart.php?a=add&domain=register', 'plus'),
-                    self::customLink('domaintransfer', 'Transfer Domain',       'cart.php?a=add&domain=transfer', 'transfer'),
-                    ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
-                    self::customLink('', 'Domain Pricing', 'cart.php?a=add&domain=register', 'tag'),
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Register'),      'config' => []],
+                    self::customLink('domainregister', 'Register a domain',  'cart.php?a=add&domain=register'),
+                    self::customLink('',               'Bulk domain search', 'cart.php?a=add&domain=register'),
+                    self::customLink('',               'Domain pricing',     'domainchecker.php'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Transfer'),      'config' => []],
+                    self::customLink('domaintransfer', 'Transfer a domain',  'cart.php?a=add&domain=transfer'),
+                    self::customLink('',               'Bulk transfers',     'cart.php?a=add&domain=transfer'),
+
+                    ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Tools'),         'config' => []],
+                    self::customLink('',               'DNS Manager',        '#'),
+                    self::customLink('',               'WHOIS lookup',       '#'),
                  ]],
 
                 ['type' => ItemTypes::HEADER, 'label' => self::label('navsupport', 'Information'), 'config' => []],
