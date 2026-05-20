@@ -261,14 +261,30 @@
                     <header class="mt-row-sub-head">
                         <h3 class="mt-row-sub-title">Per-page exceptions</h3>
                     </header>
-                    <p class="mt-row-sub-help">Checked pages are <strong>exceptions</strong> — the order sub-nav is flipped on them (hidden when the toggle above is On, shown when Off). A page's own setting in the Pages editor still wins.</p>
-                    <div class="mt-subnav-checks">
-                        {foreach $orderPages as $oTf => $oLabel}
-                            <label class="mt-subnav-check">
+                    <p class="mt-row-sub-help">Pages added here are <strong>exceptions</strong> — the order sub-nav is flipped on them (hidden when the toggle above is On, shown when Off). A page's own setting in the Pages editor still wins.</p>
+                    <div class="mt-multi-wrap" data-chip-picker>
+                        <div class="mt-multi-inputs" hidden>
+                            {foreach $orderPages as $oTf => $oLabel}
                                 <input type="checkbox" name="subnav_pages_order[]" value="{$oTf|escape}"{if in_array($oTf, $subnavOrderList)} checked{/if}>
-                                <span>{$oLabel|escape}</span>
-                            </label>
-                        {/foreach}
+                            {/foreach}
+                        </div>
+                        <div class="mt-multi" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                            <div class="mt-multi-chips"></div>
+                            <span class="mt-multi-placeholder">Click to add pages…</span>
+                            <span class="mt-multi-caret" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                        </div>
+                        <div class="mt-multi-panel" hidden role="listbox" aria-multiselectable="true">
+                            <div class="mt-multi-search-wrap"><input type="search" placeholder="Search pages…" autocomplete="off" aria-label="Search pages"></div>
+                            <div class="mt-multi-options">
+                                {foreach $orderPages as $oTf => $oLabel}
+                                    <button type="button" class="mt-multi-option" data-code="{$oTf|escape}" data-label="{$oLabel|escape}" role="option" aria-selected="false">
+                                        <span class="mt-multi-check" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg></span>
+                                        <span>{$oLabel|escape}</span>
+                                    </button>
+                                {/foreach}
+                            </div>
+                            <div class="mt-multi-empty" hidden>No pages match.</div>
+                        </div>
                     </div>
                 </div>
             {/if}
@@ -280,14 +296,30 @@
                     <header class="mt-row-sub-head">
                         <h3 class="mt-row-sub-title">Per-page exceptions</h3>
                     </header>
-                    <p class="mt-row-sub-help">Checked pages are <strong>exceptions</strong> — the section sub-nav is flipped on them (hidden when the toggle above is On, shown when Off). A page's own setting in the Pages editor still wins.</p>
-                    <div class="mt-subnav-checks">
-                        {foreach $websitePages as $wTf => $wLabel}
-                            <label class="mt-subnav-check">
+                    <p class="mt-row-sub-help">Pages added here are <strong>exceptions</strong> — the section sub-nav is flipped on them (hidden when the toggle above is On, shown when Off). A page's own setting in the Pages editor still wins.</p>
+                    <div class="mt-multi-wrap" data-chip-picker>
+                        <div class="mt-multi-inputs" hidden>
+                            {foreach $websitePages as $wTf => $wLabel}
                                 <input type="checkbox" name="subnav_pages_website[]" value="{$wTf|escape}"{if in_array($wTf, $subnavWebsiteList)} checked{/if}>
-                                <span>{$wLabel|escape}</span>
-                            </label>
-                        {/foreach}
+                            {/foreach}
+                        </div>
+                        <div class="mt-multi" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                            <div class="mt-multi-chips"></div>
+                            <span class="mt-multi-placeholder">Click to add pages…</span>
+                            <span class="mt-multi-caret" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                        </div>
+                        <div class="mt-multi-panel" hidden role="listbox" aria-multiselectable="true">
+                            <div class="mt-multi-search-wrap"><input type="search" placeholder="Search pages…" autocomplete="off" aria-label="Search pages"></div>
+                            <div class="mt-multi-options">
+                                {foreach $websitePages as $wTf => $wLabel}
+                                    <button type="button" class="mt-multi-option" data-code="{$wTf|escape}" data-label="{$wLabel|escape}" role="option" aria-selected="false">
+                                        <span class="mt-multi-check" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg></span>
+                                        <span>{$wLabel|escape}</span>
+                                    </button>
+                                {/foreach}
+                            </div>
+                            <div class="mt-multi-empty" hidden>No pages match.</div>
+                        </div>
                     </div>
                 </div>
             {/if}
@@ -502,6 +534,122 @@
     }
 
     render();
+})();
+</script>
+
+<script>
+// Generalized chip multi-select for the sub-nav exception pickers. Mirrors the
+// language picker above (minus the "All" option). Each [data-chip-picker] wires
+// a hidden checkbox group to a visible chip field + searchable dropdown. Scoped
+// by [data-chip-picker] so it never touches the language widget.
+(function () {
+    document.querySelectorAll('[data-chip-picker]').forEach(function (wrap) {
+        var inputs      = wrap.querySelector('.mt-multi-inputs');
+        var multi       = wrap.querySelector('.mt-multi');
+        var chips       = wrap.querySelector('.mt-multi-chips');
+        var placeholder = wrap.querySelector('.mt-multi-placeholder');
+        var panel       = wrap.querySelector('.mt-multi-panel');
+        var options     = wrap.querySelector('.mt-multi-options');
+        var search      = wrap.querySelector('.mt-multi-search-wrap input');
+        var empty       = wrap.querySelector('.mt-multi-empty');
+        if (!inputs || !multi || !panel || !options) { return; }
+
+        function optionFor(val) {
+            return Array.prototype.filter.call(options.querySelectorAll('.mt-multi-option'),
+                function (o) { return o.getAttribute('data-code') === val; })[0] || null;
+        }
+        function checkboxFor(val) {
+            return Array.prototype.filter.call(inputs.querySelectorAll('input'),
+                function (cb) { return cb.value === val; })[0] || null;
+        }
+        function labelFor(val) {
+            var o = optionFor(val);
+            return o ? (o.getAttribute('data-label') || o.textContent.trim()) : val;
+        }
+        function selected() {
+            return Array.prototype.map.call(inputs.querySelectorAll('input:checked'),
+                function (cb) { return cb.value; });
+        }
+        function render() {
+            var sel = selected();
+            chips.innerHTML = '';
+            sel.forEach(function (val) {
+                var chip = document.createElement('span');
+                chip.className = 'mt-multi-chip';
+                var lbl = document.createElement('span');
+                lbl.textContent = labelFor(val);
+                var x = document.createElement('span');
+                x.className = 'mt-multi-chip-x';
+                x.setAttribute('data-remove', val);
+                x.setAttribute('role', 'button');
+                x.setAttribute('aria-label', 'Remove');
+                x.innerHTML = '&times;';
+                chip.appendChild(lbl);
+                chip.appendChild(x);
+                chips.appendChild(chip);
+            });
+            placeholder.hidden = sel.length > 0;
+            var set = {};
+            sel.forEach(function (v) { set[v] = true; });
+            Array.prototype.forEach.call(options.querySelectorAll('.mt-multi-option'), function (o) {
+                var on = !!set[o.getAttribute('data-code')];
+                o.classList.toggle('is-checked', on);
+                o.setAttribute('aria-selected', on ? 'true' : 'false');
+            });
+        }
+        function setSelection(val, on) {
+            var cb = checkboxFor(val);
+            if (cb) { cb.checked = on; render(); }
+        }
+        function openPanel() {
+            panel.hidden = false;
+            multi.classList.add('is-focused');
+            multi.setAttribute('aria-expanded', 'true');
+            if (search) { search.value = ''; filter(''); setTimeout(function () { search.focus(); }, 0); }
+        }
+        function closePanel() {
+            panel.hidden = true;
+            multi.classList.remove('is-focused');
+            multi.setAttribute('aria-expanded', 'false');
+        }
+        function filter(q) {
+            q = (q || '').toLowerCase().trim();
+            var any = false;
+            Array.prototype.forEach.call(options.querySelectorAll('.mt-multi-option'), function (o) {
+                var t = (o.getAttribute('data-label') || o.textContent || '').toLowerCase();
+                var m = !q || t.indexOf(q) >= 0;
+                o.style.display = m ? '' : 'none';
+                if (m) { any = true; }
+            });
+            if (empty) { empty.hidden = any; }
+        }
+        multi.addEventListener('click', function (e) {
+            var rm = e.target.closest('[data-remove]');
+            if (rm) { e.stopPropagation(); setSelection(rm.getAttribute('data-remove'), false); return; }
+            if (panel.hidden) { openPanel(); }
+        });
+        multi.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); if (panel.hidden) { openPanel(); } }
+            if (e.key === 'Escape') { closePanel(); }
+        });
+        document.addEventListener('click', function (e) {
+            if (multi.contains(e.target) || panel.contains(e.target)) { return; }
+            closePanel();
+        });
+        options.addEventListener('click', function (e) {
+            var o = e.target.closest('.mt-multi-option');
+            if (!o) { return; }
+            e.preventDefault();
+            var val = o.getAttribute('data-code');
+            var cb = checkboxFor(val);
+            if (cb) { setSelection(val, !cb.checked); }
+        });
+        if (search) {
+            search.addEventListener('input', function () { filter(search.value); });
+            search.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closePanel(); } });
+        }
+        render();
+    });
 })();
 </script>
 
