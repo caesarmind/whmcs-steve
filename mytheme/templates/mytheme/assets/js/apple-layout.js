@@ -172,6 +172,10 @@
     // ── Auth / Layout / Palette toggles ────────────────────
     function initStateToggles(params) {
         var body = document.body;
+        // ?preview=1 unlocks the dev chip's live toggles. Outside preview none
+        // of this dev/mockup state (layout, data, variants, palette…) is read
+        // from the URL or localStorage, so it can't leak into the real portal.
+        var previewMode = params.get('preview') === '1';
 
         // Auth
         var authButtons = document.querySelectorAll('.state-chip [data-auth-set]');
@@ -191,19 +195,28 @@
             btn.addEventListener('click', function () { applyAuth(this.dataset.authSet); });
         });
 
-        // Layout
+        // Layout. The server renders the admin-picked layout in production and
+        // only that layout's markup exists in the DOM. The live switch (URL /
+        // localStorage) is a ?preview=1-only affordance — outside preview we
+        // MUST honor the server's data-layout, or we'd point it at markup that
+        // isn't on the page.
         var layoutButtons = document.querySelectorAll('.state-chip [data-layout-set]');
-        function applyLayout(layout) {
+        function applyLayout(layout, persist) {
             if (['top', 'side', 'rail'].indexOf(layout) === -1) layout = 'top';
             body.dataset.layout = layout;
             layoutButtons.forEach(function (b) {
                 b.classList.toggle('active', b.dataset.layoutSet === layout);
             });
             body.classList.remove('rail-panel-open');
-            try { localStorage.setItem(KEYS.layout, layout); } catch (e) {}
+            if (persist !== false) { try { localStorage.setItem(KEYS.layout, layout); } catch (e) {} }
         }
-        var savedLayout; try { savedLayout = localStorage.getItem(KEYS.layout); } catch (e) {}
-        applyLayout(params.get('layout') || savedLayout || body.dataset.layout || 'top');
+        if (previewMode) {
+            var savedLayout; try { savedLayout = localStorage.getItem(KEYS.layout); } catch (e) {}
+            applyLayout(params.get('layout') || savedLayout || body.dataset.layout || 'top');
+        } else {
+            // Respect the server-rendered layout; don't clobber the dev's saved choice.
+            applyLayout(body.dataset.layout || 'top', false);
+        }
         layoutButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyLayout(this.dataset.layoutSet); });
         });
@@ -222,8 +235,10 @@
             });
             try { localStorage.setItem(KEYS.align, state); } catch (e) {}
         }
-        var savedAlign; try { savedAlign = localStorage.getItem(KEYS.align); } catch (e) {}
-        applyAlign(params.get('align') || savedAlign || 'center');
+        if (previewMode) {
+            var savedAlign; try { savedAlign = localStorage.getItem(KEYS.align); } catch (e) {}
+            applyAlign(params.get('align') || savedAlign || 'center');
+        }
         alignButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyAlign(this.dataset.alignSet); });
         });
@@ -242,8 +257,10 @@
             });
             try { localStorage.setItem(KEYS.subnav, state); } catch (e) {}
         }
-        var savedSubnav; try { savedSubnav = localStorage.getItem(KEYS.subnav); } catch (e) {}
-        applySubnav(params.get('subnav') || savedSubnav || body.dataset.subnav || 'on');
+        if (previewMode) {
+            var savedSubnav; try { savedSubnav = localStorage.getItem(KEYS.subnav); } catch (e) {}
+            applySubnav(params.get('subnav') || savedSubnav || body.dataset.subnav || 'on');
+        }
         subnavButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applySubnav(this.dataset.subnavSet); });
         });
@@ -257,8 +274,10 @@
             });
             try { localStorage.setItem(KEYS.subnavSide, side); } catch (e) {}
         }
-        var savedSubnavSide; try { savedSubnavSide = localStorage.getItem(KEYS.subnavSide); } catch (e) {}
-        applySubnavSide(params.get('subnavSide') || savedSubnavSide || 'right');
+        if (previewMode) {
+            var savedSubnavSide; try { savedSubnavSide = localStorage.getItem(KEYS.subnavSide); } catch (e) {}
+            applySubnavSide(params.get('subnavSide') || savedSubnavSide || 'right');
+        }
         subnavSideButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applySubnavSide(this.dataset.subnavSideSet); });
         });
@@ -287,8 +306,10 @@
             });
             try { localStorage.setItem(KEYS.svcLayout, state); } catch (e) {}
         }
-        var savedSvcLayout; try { savedSvcLayout = localStorage.getItem(KEYS.svcLayout); } catch (e) {}
-        applySvcLayout(params.get('svcLayout') || savedSvcLayout || 'inside');
+        if (previewMode) {
+            var savedSvcLayout; try { savedSvcLayout = localStorage.getItem(KEYS.svcLayout); } catch (e) {}
+            applySvcLayout(params.get('svcLayout') || savedSvcLayout || 'inside');
+        }
         svcLayoutButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applySvcLayout(this.dataset.svcLayoutSet); });
         });
@@ -313,15 +334,17 @@
             });
             try { localStorage.setItem(KEYS.data, state); } catch (e) {}
         }
-        var savedData; try { savedData = localStorage.getItem(KEYS.data); } catch (e) {}
-        // Priority: explicit URL param > page reality > saved chip preference > default.
-        // The page tpl's inline script sets body[data-data] based on actual WHMCS
-        // record counts. That reality wins over a saved chip toggle — otherwise a
-        // user who once clicked "Full" on a populated page would see filter tabs +
-        // pagination + zero rows on a page where they genuinely have no data,
-        // instead of the empty-state message.
+        // The page tpl's inline script sets body[data-data] from real WHMCS
+        // record counts — that reality is authoritative. In preview the chip
+        // (URL/saved) may override it to demo empty states; outside preview we
+        // never read saved/URL, so the real data state always wins.
         var existingData = body.hasAttribute('data-data') ? body.dataset.data : null;
-        applyData(params.get('data') || existingData || savedData || 'full');
+        if (previewMode) {
+            var savedData; try { savedData = localStorage.getItem(KEYS.data); } catch (e) {}
+            applyData(params.get('data') || existingData || savedData || 'full');
+        } else {
+            applyData(existingData || 'full');
+        }
         dataButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyData(this.dataset.dataSet); });
         });
@@ -355,8 +378,10 @@
             });
             try { localStorage.setItem(KEYS.tiles, variant); } catch (e) {}
         }
-        var savedTiles; try { savedTiles = localStorage.getItem(KEYS.tiles); } catch (e) {}
-        applyTiles(params.get('tiles') || savedTiles || 'all');
+        if (previewMode) {
+            var savedTiles; try { savedTiles = localStorage.getItem(KEYS.tiles); } catch (e) {}
+            applyTiles(params.get('tiles') || savedTiles || 'all');
+        }
         tilesButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyTiles(this.dataset.tilesSet); });
         });
@@ -376,8 +401,10 @@
             });
             try { localStorage.setItem(KEYS.form, variant); } catch (e) {}
         }
-        var savedForm; try { savedForm = localStorage.getItem(KEYS.form); } catch (e) {}
-        applyForm(params.get('form') || savedForm || 'all');
+        if (previewMode) {
+            var savedForm; try { savedForm = localStorage.getItem(KEYS.form); } catch (e) {}
+            applyForm(params.get('form') || savedForm || 'all');
+        }
         formButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyForm(this.dataset.formSet); });
         });
@@ -394,8 +421,10 @@
             });
             try { localStorage.setItem(KEYS.plan, variant); } catch (e) {}
         }
-        var savedPlan; try { savedPlan = localStorage.getItem(KEYS.plan); } catch (e) {}
-        applyPlan(params.get('plan') || savedPlan || 'all');
+        if (previewMode) {
+            var savedPlan; try { savedPlan = localStorage.getItem(KEYS.plan); } catch (e) {}
+            applyPlan(params.get('plan') || savedPlan || 'all');
+        }
         planButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyPlan(this.dataset.planSet); });
         });
@@ -412,8 +441,10 @@
             });
             try { localStorage.setItem(KEYS.product, variant); } catch (e) {}
         }
-        var savedProduct; try { savedProduct = localStorage.getItem(KEYS.product); } catch (e) {}
-        applyProduct(params.get('product') || savedProduct || 'all');
+        if (previewMode) {
+            var savedProduct; try { savedProduct = localStorage.getItem(KEYS.product); } catch (e) {}
+            applyProduct(params.get('product') || savedProduct || 'all');
+        }
         productButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyProduct(this.dataset.productSet); });
         });
@@ -433,8 +464,10 @@
             });
             try { localStorage.setItem(KEYS.palette, name); } catch (e) {}
         }
-        var savedPalette; try { savedPalette = localStorage.getItem(KEYS.palette); } catch (e) {}
-        applyPalette(params.get('palette') || savedPalette || 'blue');
+        if (previewMode) {
+            var savedPalette; try { savedPalette = localStorage.getItem(KEYS.palette); } catch (e) {}
+            applyPalette(params.get('palette') || savedPalette || 'blue');
+        }
         paletteButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyPalette(this.dataset.palette); });
         });

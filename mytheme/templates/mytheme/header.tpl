@@ -52,14 +52,19 @@
 {* auth state *}
 {if $loggedin}{assign var=mt_auth value='in'}{else}{assign var=mt_auth value='out'}{/if}
 
-{* layout *}
-{assign var=mt_layout value='side'}
-{if isset($smarty.get.layout)}
+{* preview mode — ?preview=1 unlocks the dev state-chip's live layout switch.
+   The switch toggles between layouts in-browser via CSS, which needs all three
+   rendered. Outside preview, the server renders ONLY the admin-picked layout. *}
+{assign var=mt_preview value=false}
+{if isset($smarty.get.preview) && $smarty.get.preview == '1'}{assign var=mt_preview value=true}{/if}
+
+{* layout — resolved server-side from the admin Layouts pick (audience- and
+   per-page-override-aware; see Hooks::resolveActiveLayout). vars.dataLayout is
+   the body[data-layout] token: top|side|rail. ?layout= overrides in preview. *}
+{assign var=mt_layout value=$myTheme.layouts['main-menu'].vars.dataLayout|default:'side'}
+{if $mt_preview && isset($smarty.get.layout)}
     {assign var=_q value=$smarty.get.layout}
-    {if $_q == 'top'}{assign var=mt_layout value='top'}
-    {elseif $_q == 'rail'}{assign var=mt_layout value='rail'}
-    {elseif $_q == 'side'}{assign var=mt_layout value='side'}
-    {/if}
+    {if $_q == 'top' || $_q == 'rail' || $_q == 'side'}{assign var=mt_layout value=$_q}{/if}
 {/if}
 
 {* align *}
@@ -280,24 +285,42 @@
 
 {$headeroutput}
 
-{* Dev preview chip — render on ?preview=1 or for admins *}
+{* Dev preview chip — renders only on ?preview=1 (never in the live portal) *}
 {include file="`$template`/includes/partials/state-chip.tpl"}
 
-{include file="`$template`/includes/partials/rail.tpl"}
-{include file="`$template`/includes/partials/sidebar.tpl"}
+{* ── Main-menu layout dispatch ──────────────────────────────────────────
+   Production renders ONLY the admin-picked layout's chrome; ?preview=1
+   renders all three so the state-chip can switch live via CSS. rail + sidebar
+   are siblings before .ph-main-wrap; the top navbar renders inside it. *}
+{if $mt_preview || $mt_layout == 'rail'}
+    {include file="`$template`/includes/partials/rail.tpl"}
+{/if}
+{if $mt_preview || $mt_layout == 'side'}
+    {include file="`$template`/includes/partials/sidebar.tpl"}
+{/if}
 
 <div class="ph-main-wrap">
 
-    {include file="`$template`/includes/partials/topnav.tpl"}
-    {include file="`$template`/includes/partials/inner-topbar.tpl"}
+    {if $mt_preview || $mt_layout == 'top'}
+        {include file="`$template`/includes/partials/topnav.tpl"}
+    {/if}
+    {if $mt_preview || $mt_layout != 'top'}
+        {include file="`$template`/includes/partials/inner-topbar.tpl"}
+    {/if}
 
-    <nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    {* Breadcrumb (top layout only): Apple-style single back-link to Home.
+       The page title below carries the current page, so a "< Home" affordance
+       is cleaner than a full "Home / Page" trail. *}
+    {if $mt_preview || $mt_layout == 'top'}
+    <nav class="ph-breadcrumb ph-breadcrumb-back only-top" aria-label="breadcrumb">
         <div class="ph-breadcrumb-inner">
-            <a href="{$WEB_ROOT}/">{$LANG.home|default:'Home'}</a>
-            <span class="sep">/</span>
-            <span class="current" aria-current="page">{$mt_pageLabel|escape|default:'Page'}</span>
+            <a href="{$WEB_ROOT}/" class="ph-back-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                {$LANG.home|default:'Home'}
+            </a>
         </div>
     </nav>
+    {/if}
 
     <div class="content-area">
 {/if}
