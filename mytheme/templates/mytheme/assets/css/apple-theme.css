@@ -3153,12 +3153,6 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .homepage-nav .nav-dropdown-wrap:hover .nav-dropdown-toggle .nav-chevron { transform: rotate(180deg); }
 .homepage-nav .nav-dropdown-menu {
     position: absolute; top: 100%; left: 0;
-    /* Pull the panel up by 1px so it overlaps the topnav's
-       `border-bottom: 1px solid rgba(0,0,0,0.06)`. Without this, the
-       border bleeds through the panel's semi-transparent bg and reads
-       as a thin horizontal line between the trigger row and the panel
-       -- the "gap with border" reported on bill.hostnodes.com. */
-    margin-top: -1px;
     min-width: 220px;
     background: rgba(251,251,253,0.92);
     backdrop-filter: saturate(180%) blur(20px);
