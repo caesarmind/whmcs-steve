@@ -9,6 +9,7 @@
 </header>
 
 <style>
+{literal}
     .mt-lay-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
     .mt-lay-card{border:1.5px solid var(--mt-line2,#d2d2d7);border-radius:14px;background:#fff;display:flex;flex-direction:column;overflow:hidden}
     .mt-lay-card.is-on{border-color:var(--mt-primary,#0071e3);box-shadow:0 0 0 3px rgba(0,113,227,.10)}
@@ -25,6 +26,7 @@
     .mt-seg button{flex:1;border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;color:var(--mt-text-2,#6e6e73);padding:6px 0;border-radius:7px;cursor:pointer}
     .mt-seg button.on{background:#fff;color:var(--mt-text,#1d1d1f);box-shadow:0 1px 2px rgba(0,0,0,.12)}
     .mt-lay-optnone{border-top:1px dashed var(--mt-border,#e5e5ea);padding-top:11px;font-size:11.5px;color:var(--mt-text-3,#86868b);font-style:italic}
+{/literal}
 </style>
 
 <div class="mt-tabs" role="tablist">
@@ -117,6 +119,7 @@
 {/foreach}
 
 <script>
+{literal}
 (function () {
     // Client-side tab switch (no reload). The links keep real ?kind= hrefs as a
     // no-JS fallback; the server already renders the active tab from ?kind.
@@ -130,6 +133,7 @@
         t.addEventListener('click', function (e) { e.preventDefault(); show(t.getAttribute('data-kind-tab')); });
     });
 })();
+{/literal}
 </script>
 
 {include file="includes/footer.tpl"}
