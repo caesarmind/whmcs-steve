@@ -125,14 +125,35 @@ final class Template
      *
      * @return list<string>
      */
+    /**
+     * Cart/order pages — rendered by the separate mytheme_cart order-form
+     * template, so they have no core/pages/<page> dir. We surface them in the
+     * Pages admin (grouped under "Order Process", Lagom-style) so they can carry
+     * per-page settings such as the sub-nav override. Keyed templatefile => label.
+     */
+    public const ORDER_PAGES = [
+        'products'               => 'Products',
+        'domainregister'         => 'Register a Domain',
+        'domaintransfer'         => 'Transfer a Domain',
+        'configuredomains'       => 'Configure Domains',
+        'configureproductdomain' => 'Product Domain',
+        'configureproduct'       => 'Configure Product',
+        'viewcart'               => 'View Cart',
+        'checkout'               => 'Checkout',
+        'addons'                 => 'Addons',
+        'complete'               => 'Order Complete',
+        'fraudcheck'             => 'Fraud Check',
+    ];
+
     public function getPages(): array
     {
         $declared   = $this->manifest['provides']['pages'] ?? [];
         $discovered = PagesCache::read($this) ?? [];
+        $order      = array_keys(self::ORDER_PAGES);
 
         $seen = [];
         $out  = [];
-        foreach ([...$declared, ...$discovered] as $name) {
+        foreach ([...$declared, ...$discovered, ...$order] as $name) {
             if (!is_string($name) || $name === '' || isset($seen[$name])) continue;
             $seen[$name] = true;
             $out[] = $name;
@@ -159,10 +180,23 @@ final class Template
      */
     public function getPageMeta(string $page): array
     {
-        return \MyTheme\Helpers\ThemeManifest::loadVariantMeta(
+        $meta = \MyTheme\Helpers\ThemeManifest::loadVariantMeta(
             $this->fullPath . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR
             . 'pages' . DIRECTORY_SEPARATOR . $page . DIRECTORY_SEPARATOR . 'page.php'
         );
+        // Cart/order pages have no core/pages dir — synthesize their metadata so
+        // they list under "Order Process" in the Pages admin (see ORDER_PAGES).
+        if ($meta === [] && isset(self::ORDER_PAGES[$page])) {
+            return [
+                'display_name'     => self::ORDER_PAGES[$page],
+                'group'            => 'Order Process',
+                'type'             => 'order-process',
+                'description'      => 'Order-form page (rendered by the mytheme_cart template).',
+                'listDisplay'      => true,
+                'supportedOptions' => [],
+            ];
+        }
+        return $meta;
     }
 
     /**

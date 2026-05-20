@@ -867,6 +867,8 @@ final class Hooks
                 'social_image' => (string)($stored['seo']['social_image'] ?? ''),
             ],
             'options' => is_array($stored['options'] ?? null) ? $stored['options'] : [],
+            'subnav'  => in_array((string)($stored['subnav'] ?? 'inherit'), ['inherit', 'on', 'off'], true)
+                ? (string)($stored['subnav'] ?? 'inherit') : 'inherit',
             'layout_overrides' => [
                 'main-menu' => isset($stored['layout_overrides']['main-menu']) && is_string($stored['layout_overrides']['main-menu'])
                     ? $stored['layout_overrides']['main-menu'] : null,

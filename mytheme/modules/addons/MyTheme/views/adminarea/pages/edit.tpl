@@ -144,6 +144,21 @@
     </section>
 
     <section class="mt-section">
+        <header class="mt-section-header"><h2 class="mt-section-title">Sub-navigation</h2></header>
+        <div class="mt-inline-row">
+            <div>
+                <div class="mt-row-label">Section sub-nav</div>
+                <div class="mt-row-help">Show or hide this page's sidebar sub-nav. <strong>Inherit</strong> follows the global toggle (Settings → Order / Website Section Sidebar).</div>
+            </div>
+            <select class="mt-select" name="subnav">
+                <option value="inherit" {if $subnav == 'inherit'}selected{/if}>Inherit (global default)</option>
+                <option value="on"      {if $subnav == 'on'}selected{/if}>On (always show)</option>
+                <option value="off"     {if $subnav == 'off'}selected{/if}>Off (always hide)</option>
+            </select>
+        </div>
+    </section>
+
+    <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Visibility</h2></header>
         <div class="mt-inline-row">
             <div>

@@ -81,29 +81,39 @@
     {if $_q == 'on' || $_q == 'off'}{assign var=mt_subnav value=$_q}{/if}
 {/if}
 
-{* order (cart) sub-nav — driven by the admin "Order Category Sidebar" setting,
-   independent of the website sub-nav. Default (setting unset) = shown; the dev
-   chip's ?subnav=off still overrides in preview. Consumed by mytheme_cart CSS
+{* Per-page sub-nav override (Pages editor → Sub-navigation): on|off|inherit.
+   'inherit' (or unset) falls through to the global setting below. *}
+{assign var=mt_pageSubnav value=$myTheme.pages[$templatefile].subnav|default:'inherit'}
+
+{* order (cart) sub-nav — per-page override → admin "Order Category Sidebar"
+   global. Independent of the website sub-nav; the dev chip's ?subnav=off still
+   overrides in preview. Consumed by mytheme_cart CSS
    (body[data-subnav-order="off"] .st-split / .dp-split). *}
 {assign var=mt_subnavOrder value=''}
-{if isset($myTheme.addonSettings.cart_subnav) && !$myTheme.addonSettings.cart_subnav}
+{if $mt_pageSubnav == 'off'}
+    {assign var=mt_subnavOrder value='off'}
+{elseif $mt_pageSubnav != 'on' && isset($myTheme.addonSettings.cart_subnav) && !$myTheme.addonSettings.cart_subnav}
     {assign var=mt_subnavOrder value='off'}
 {/if}
 {if $mt_preview && isset($smarty.get.subnav) && $smarty.get.subnav == 'off'}
     {assign var=mt_subnavOrder value='off'}
 {/if}
 
-{* website (client-area) sub-nav — driven by the admin "Website Section Sidebar"
-   setting. Gated to NON-order pages so it never touches the cart's *-split grids
-   (some class names are shared, e.g. cp-split). Consumed by apple-layout.css
-   (body[data-subnav-website="off"] [class$="-split"]). Default (unset) = shown. *}
+{* website (client-area) sub-nav — per-page override → admin "Website Section
+   Sidebar" global. Gated to NON-order pages so it never touches the cart's
+   *-split grids (some class names are shared, e.g. cp-split). Consumed by
+   apple-layout.css (body[data-subnav-website="off"] [class$="-split"]). *}
 {assign var=mt_isOrder value=false}
 {if ($inShoppingCart|default:false) || in_array($templatefile|default:'', ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck']) || (($templatefile|default:'')|strstr:'store')}
     {assign var=mt_isOrder value=true}
 {/if}
 {assign var=mt_subnavWebsite value=''}
-{if !$mt_isOrder && isset($myTheme.addonSettings.website_subnav) && !$myTheme.addonSettings.website_subnav}
-    {assign var=mt_subnavWebsite value='off'}
+{if !$mt_isOrder}
+    {if $mt_pageSubnav == 'off'}
+        {assign var=mt_subnavWebsite value='off'}
+    {elseif $mt_pageSubnav != 'on' && isset($myTheme.addonSettings.website_subnav) && !$myTheme.addonSettings.website_subnav}
+        {assign var=mt_subnavWebsite value='off'}
+    {/if}
 {/if}
 
 {* subnav side *}
