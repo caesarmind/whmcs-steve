@@ -439,6 +439,24 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .ph-breadcrumb-inner .sep { opacity: 0.4; font-size: 11px; }
 .ph-breadcrumb-inner .current { color: var(--color-text-primary); font-weight: 500; }
 
+/* Back-link breadcrumb (top-layout): a single Apple-style "< Home" link in
+   place of a full trail. The band drops its grey fill + hairline so the link
+   reads as a content affordance, not a chrome bar. The current page is
+   carried by the large page title just below. */
+.ph-breadcrumb-back {
+    background: transparent;
+    border-bottom: 0;
+    padding-top: 14px;
+    padding-bottom: 0;
+}
+.ph-back-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--color-accent); font-size: 13px; font-weight: 400;
+    text-decoration: none; transition: opacity 0.15s;
+}
+.ph-back-link svg { width: 15px; height: 15px; margin-left: -3px; }
+.ph-back-link:hover { text-decoration: none; opacity: 0.7; }
+
 /* =============================================================
    RAIL LAYOUT -- icon rail (80px) + flyout panel (240px)
    ============================================================= */

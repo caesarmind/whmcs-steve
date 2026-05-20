@@ -291,11 +291,16 @@
     {include file="`$template`/includes/partials/topnav.tpl"}
     {include file="`$template`/includes/partials/inner-topbar.tpl"}
 
-    <nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    {* Breadcrumb (top-layout): Apple-style single back-link to the parent
+       (Home) rather than a full trail. The current page is already carried
+       by the large page title below, so a "< Home" affordance is cleaner and
+       more on-brand than a "Home / Page" trail. *}
+    <nav class="ph-breadcrumb ph-breadcrumb-back only-top" aria-label="breadcrumb">
         <div class="ph-breadcrumb-inner">
-            <a href="{$WEB_ROOT}/">{$LANG.home|default:'Home'}</a>
-            <span class="sep">/</span>
-            <span class="current" aria-current="page">{$mt_pageLabel|escape|default:'Page'}</span>
+            <a href="{$WEB_ROOT}/" class="ph-back-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                {$LANG.home|default:'Home'}
+            </a>
         </div>
     </nav>
 
