@@ -1,0 +1,321 @@
+/* Affiliates - page CSS (Apple-style dashboard + signup) */
+
+.page-header { margin: 8px 0 24px; }
+.page-header h1 {
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: -0.028em;
+    color: var(--color-text-primary);
+    margin: 0 0 8px;
+    line-height: 1.1;
+}
+.page-header .page-subtitle {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.01em;
+    line-height: 1.45;
+    margin: 0;
+    max-width: 600px;
+}
+
+/* ---- Summary tiles ---- */
+.aff-tiles .tile { cursor: default; }
+.tile-icon.violet { background: rgba(94, 92, 230, 0.12); color: #5e5ce6; }
+[data-theme="dark"] .tile-icon.violet { background: rgba(125, 122, 255, 0.16); color: #7d7aff; }
+
+/* ---- Success flash ---- */
+.aff-flash {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 18px;
+    border-radius: var(--radius-md);
+    background: var(--color-green-bg);
+    color: var(--color-green-text);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+.aff-flash svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* ---- Generic card head ---- */
+.aff-card { padding: 20px 24px 22px; }
+.aff-card-head { margin-bottom: 14px; }
+.aff-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.016em;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+.aff-card-desc {
+    font-size: 13.5px;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.005em;
+    line-height: 1.5;
+    margin: 6px 0 0;
+    max-width: 640px;
+}
+
+/* ---- Referral link ---- */
+.aff-link-row { display: flex; gap: 10px; align-items: stretch; }
+.aff-link-input {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 16px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+    font-size: 14px;
+    font-family: var(--font-family);
+    letter-spacing: -0.006em;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.aff-link-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+    background: var(--color-surface);
+}
+.aff-copy-btn {
+    height: 44px;
+    padding: 0 20px;
+    flex-shrink: 0;
+    gap: 8px;
+}
+.aff-copy-btn svg { width: 15px; height: 15px; }
+.aff-copy-btn.copied { background: var(--color-green-text); border-color: var(--color-green-text); }
+
+/* ---- Commissions / payout ---- */
+.aff-payout {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+.aff-figures { display: flex; gap: 36px; flex-wrap: wrap; }
+.aff-figure { display: flex; flex-direction: column; gap: 4px; }
+.aff-figure-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+}
+.aff-figure-value {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+.aff-figure-value.accent { color: var(--color-green-text); }
+.aff-payout-action { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.aff-withdraw-btn { gap: 8px; white-space: nowrap; }
+.aff-withdraw-btn svg { width: 16px; height: 16px; }
+.aff-withdraw-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+.aff-min-hint {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin: 0;
+    text-align: right;
+    max-width: 260px;
+}
+
+/* ---- Referrals section ---- */
+.aff-section { margin-top: 4px; }
+.aff-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-tertiary);
+    margin: 0 0 12px;
+}
+.aff-table-card { padding: 6px 24px; overflow-x: auto; }
+.aff-table { width: 100%; border-collapse: collapse; min-width: 560px; }
+.aff-table th {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 14px 10px 10px;
+    text-align: left;
+    border-bottom: 0.5px solid var(--color-border-light);
+    white-space: nowrap;
+}
+.aff-table td {
+    padding: 14px 10px;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    border-bottom: 0.5px solid var(--color-border-light);
+    vertical-align: middle;
+    letter-spacing: -0.006em;
+}
+.aff-table tr:last-child td { border-bottom: none; }
+.aff-table th:first-child, .aff-table td:first-child { padding-left: 0; }
+.aff-table th:last-child, .aff-table td:last-child { padding-right: 0; }
+.aff-table .aff-num { text-align: right; font-variant-numeric: tabular-nums; }
+.aff-table .aff-date { color: var(--color-text-secondary); white-space: nowrap; }
+.aff-table .aff-commission { font-weight: 600; }
+.aff-table .aff-status-col { text-align: right; }
+
+/* ---- Empty state ---- */
+.aff-empty { padding: 44px 24px 40px; text-align: center; }
+.aff-empty-ico {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--color-surface-secondary);
+    color: var(--color-text-tertiary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+.aff-empty-ico svg { width: 24px; height: 24px; }
+.aff-empty-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+}
+.aff-empty-sub {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    margin: 0 auto;
+    max-width: 380px;
+    line-height: 1.5;
+}
+
+/* ---- Banner code ---- */
+.aff-banner-code {
+    background: var(--color-surface-secondary);
+    border: 0.5px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    overflow-x: auto;
+    word-break: break-all;
+}
+
+/* ---- Disabled / unavailable ---- */
+.aff-disabled { padding: 44px 24px 40px; text-align: center; }
+.aff-disabled-ico {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--color-orange-bg);
+    color: var(--color-orange-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+.aff-disabled-ico svg { width: 24px; height: 24px; }
+.aff-disabled-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 4px;
+    letter-spacing: -0.012em;
+}
+.aff-disabled-sub {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    margin: 0 auto;
+    max-width: 380px;
+    line-height: 1.5;
+}
+
+/* ---- Signup / activation CTA ---- */
+.aff-signup-card { padding: 48px 32px; text-align: center; max-width: 620px; margin-left: auto; margin-right: auto; }
+.aff-signup-ico {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--color-blue-bg);
+    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.aff-signup-ico svg { width: 30px; height: 30px; }
+.aff-signup-title {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 10px;
+    line-height: 1.15;
+}
+.aff-signup-intro {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+    letter-spacing: -0.006em;
+    margin: 0 auto 24px;
+    max-width: 460px;
+}
+.aff-benefits {
+    list-style: none;
+    margin: 0 auto 28px;
+    padding: 0;
+    max-width: 380px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.aff-benefits li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14.5px;
+    color: var(--color-text-primary);
+    letter-spacing: -0.006em;
+    line-height: 1.45;
+}
+.aff-benefits li svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: var(--color-green-text);
+    margin-top: 1px;
+}
+.aff-signup-form { margin: 0; }
+.aff-signup-btn { height: 44px; padding: 0 28px; font-size: 15px; }
+
+/* ---- Responsive ---- */
+@media (max-width: 720px) {
+    .aff-payout { flex-direction: column; align-items: stretch; }
+    .aff-payout-action { align-items: stretch; }
+    .aff-payout-action form { display: flex; }
+    .aff-withdraw-btn { width: 100%; justify-content: center; }
+    .aff-min-hint { text-align: left; max-width: none; }
+    .aff-figures { gap: 24px; justify-content: space-between; }
+}
+
+@media (max-width: 880px) {
+    .page-header h1 { font-size: 34px; }
+}
+
+@media (max-width: 560px) {
+    .aff-link-row { flex-direction: column; }
+    .aff-copy-btn { width: 100%; justify-content: center; }
+    .aff-signup-card { padding: 40px 22px; }
+    .aff-signup-title { font-size: 23px; }
+}
+
+@media (max-width: 480px) {
+    .page-header h1 { font-size: 30px; }
+}
