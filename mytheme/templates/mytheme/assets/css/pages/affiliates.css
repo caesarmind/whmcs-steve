@@ -57,6 +57,31 @@
     max-width: 640px;
 }
 
+/* ---- Preview: block title inside / outside the block (data-svc-layout) ----
+   Sentinel keeps the state-chip "Controls inside/outside" option visible; the
+   "outside" rules drop the card chrome so each block title sits on the page
+   background with its body kept on a surface (the §6e "controls outside" pattern). */
+.svc-table-card { display: none !important; }
+
+body[data-svc-layout="outside"] .aff-card {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+    overflow: visible;
+}
+body[data-svc-layout="outside"] .aff-card-head {
+    margin-bottom: 12px;
+    padding: 0 2px;
+}
+body[data-svc-layout="outside"] .aff-card > .aff-link-row,
+body[data-svc-layout="outside"] .aff-card > .aff-payout {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+}
+
 /* ---- Referral link ---- */
 .aff-link-row { display: flex; gap: 10px; align-items: stretch; }
 .aff-link-input {
