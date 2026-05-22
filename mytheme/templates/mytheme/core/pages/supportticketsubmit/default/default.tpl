@@ -104,7 +104,7 @@
                                 {elseif $deptKind == 'abuse'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                                 {else}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>{/if}
                             </span>
-                            <span class="dept-name">{$deptName|escape}</span>
+                            <span class="dept-name">{$deptName}</span>
                             <span class="dept-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                         </div>
                         {if isset($dept.description) && $dept.description}
@@ -126,7 +126,7 @@
                 <p class="tk-step">{$LANG.step2of2|default:'Step 2 of 2'}</p>
                 <h2>{$LANG.ticketdetails|default:'Ticket details'}</h2>
                 {if isset($deptname) && $deptname}
-                <p>{$LANG.replyingto|default:'Replying via'} <strong>{$deptname|escape}</strong></p>
+                <p>{$LANG.replyingto|default:'Replying via'} <strong>{$deptname}</strong></p>
                 {/if}
             </div>
             <form method="post" action="{$WEB_ROOT}/submitticket.php?step=3" enctype="multipart/form-data" class="tk-submit-form">
