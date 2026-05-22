@@ -1,19 +1,57 @@
-/* Ticket Submitted — page CSS */
+/* Ticket flow (Apple-style) — shared CSS for submit-confirm / customfields /
+   kbsuggestions / ticketfeedback. Reuses global .card / .form-* / .btn-*. Prefix: .tk-* */
 
-.page-header { margin: 8px 0 24px; }
-.page-header h1 {
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: -0.028em;
-    color: var(--color-text-primary);
-    margin: 0 0 8px;
-    line-height: 1.1;
-}
+.page-header { margin: 8px 0 20px; }
+.page-header .page-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px; }
+.page-header h1 { font-size: 40px; font-weight: 600; letter-spacing: -0.028em; color: var(--color-text-primary); margin: 0 0 8px; line-height: 1.1; }
+@media (max-width: 880px) { .page-header h1 { font-size: 34px; } }
+@media (max-width: 480px) { .page-header h1 { font-size: 30px; } }
+.tk-wrap { max-width: 640px; }
 
-@media (max-width: 880px) {
-    .page-header h1 { font-size: 34px; }
-}
+/* Centered notice / success */
+.tk-notice { text-align: center; padding: 56px 24px; }
+.tk-notice-ico { width: 68px; height: 68px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; background: var(--color-accent-light); color: var(--color-accent); }
+.tk-notice-ico.ok { background: #34c759; color: #fff; }
+.tk-notice-ico.warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
+.tk-notice-ico svg { width: 32px; height: 32px; }
+.tk-notice-title { font-size: 22px; font-weight: 600; letter-spacing: -0.016em; color: var(--color-text-primary); margin: 0 0 8px; }
+.tk-notice-sub { font-size: 14px; color: var(--color-text-secondary); line-height: 1.55; margin: 0 auto 24px; max-width: 420px; }
 
-@media (max-width: 480px) {
-    .page-header h1 { font-size: 30px; }
-}
+/* KB suggestion list */
+.tk-kb { display: flex; flex-direction: column; }
+.tk-kb-item { display: flex; align-items: flex-start; gap: 14px; padding: 16px 20px; border-bottom: 0.5px solid var(--color-border); text-decoration: none; color: inherit; transition: background var(--transition-fast); }
+.tk-kb-item:last-child { border-bottom: 0; }
+.tk-kb-item:hover { background: var(--sidebar-item-hover); }
+.tk-kb-ico { width: 36px; height: 36px; border-radius: 9px; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tk-kb-ico svg { width: 18px; height: 18px; }
+.tk-kb-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
+.tk-kb-excerpt { font-size: 12.5px; color: var(--color-text-tertiary); margin-top: 3px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Custom-field helper text */
+.tk-hint { display: block; font-size: 12px; color: var(--color-text-tertiary); margin-top: 5px; line-height: 1.4; }
+.tk-required { color: var(--color-red-text); }
+
+/* Feedback: ticket info list */
+.tk-info { margin: 0; }
+.tk-info-row { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; border-bottom: 0.5px solid var(--color-border); font-size: 13.5px; }
+.tk-info-row:last-child { border-bottom: 0; }
+.tk-info-label { color: var(--color-text-tertiary); }
+.tk-info-val { color: var(--color-text-primary); font-weight: 500; text-align: right; }
+
+/* Feedback: rating buttons */
+.tk-staff-block { padding: 18px 0; border-bottom: 0.5px solid var(--color-border); }
+.tk-staff-block:last-child { border-bottom: 0; }
+.tk-rate-q { font-size: 13.5px; color: var(--color-text-primary); margin: 0 0 10px; }
+.tk-rate-group { display: inline-flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.tk-rate-btn { position: relative; }
+.tk-rate-btn input { position: absolute; opacity: 0; width: 0; height: 0; }
+.tk-rate-btn span { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; height: 38px; padding: 0 10px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); font-size: 14px; font-weight: 500; color: var(--color-text-secondary); cursor: pointer; transition: all var(--transition-fast); }
+.tk-rate-btn input:checked + span { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+.tk-rate-btn input:focus-visible + span { box-shadow: 0 0 0 3px var(--color-accent-light); }
+
+/* Empty */
+.tk-empty { text-align: center; padding: 60px 24px; }
+.tk-empty-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--color-bg); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--color-text-tertiary); }
+.tk-empty-ico svg { width: 22px; height: 22px; }
+.tk-empty-title { font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 6px; }
+.tk-empty-sub { font-size: 14px; color: var(--color-text-secondary); margin: 0 auto 20px; max-width: 380px; line-height: 1.5; }

@@ -1,19 +1,22 @@
-/* View Email — page CSS */
+/* View email (Apple-style) — standalone popup window (no client-area chrome).
+   Uses var() with literal fallbacks so it renders even if tokens don't load. */
 
-.page-header { margin: 8px 0 24px; }
-.page-header h1 {
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: -0.028em;
-    color: var(--color-text-primary);
-    margin: 0 0 8px;
-    line-height: 1.1;
+body.vem-popup {
+    background: var(--color-bg, #f5f5f7);
+    margin: 0; padding: 20px;
+    font-family: var(--font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif);
+    color: var(--color-text-primary, #1d1d1f);
+    -webkit-font-smoothing: antialiased;
 }
-
-@media (max-width: 880px) {
-    .page-header h1 { font-size: 34px; }
-}
-
-@media (max-width: 480px) {
-    .page-header h1 { font-size: 30px; }
-}
+.vem-card { max-width: 640px; margin: 0 auto; background: var(--color-surface, #ffffff); border: 0.5px solid var(--color-border, #d2d2d7); border-radius: 14px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+.vem-header { padding: 18px 22px; border-bottom: 0.5px solid var(--color-border, #d2d2d7); }
+.vem-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary, #86868b); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 4px; }
+.vem-title { font-size: 16px; font-weight: 600; letter-spacing: -0.012em; color: var(--color-text-primary, #1d1d1f); margin: 0; }
+.vem-message { padding: 22px; font-size: 14px; line-height: 1.6; color: var(--color-text-primary, #1d1d1f); word-wrap: break-word; }
+.vem-message img { max-width: 100%; height: auto; }
+.vem-message a { color: var(--color-accent, #0071e3); }
+.vem-attach { padding: 16px 22px; border-top: 0.5px solid var(--color-border, #d2d2d7); background: var(--color-surface-tertiary, #fafafa); }
+.vem-attach-title { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary, #86868b); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px; }
+.vem-attach-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; color: var(--color-text-secondary, #424245); }
+.vem-attach-item svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--color-text-tertiary, #86868b); }
+.vem-empty { padding: 56px 22px; text-align: center; color: var(--color-text-tertiary, #86868b); font-size: 14px; }

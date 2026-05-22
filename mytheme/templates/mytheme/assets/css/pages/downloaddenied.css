@@ -1,6 +1,8 @@
-/* Download Denied — page CSS */
+/* Download denied (Apple-style) — access notice.
+   Ported from apple-client-area/downloaddenied.html. Prefix: .denied-* */
 
-.page-header { margin: 8px 0 24px; }
+.page-header { margin: 8px 0 32px; }
+.page-header .eyebrow { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 10px; }
 .page-header h1 {
     font-size: 40px;
     font-weight: 600;
@@ -9,11 +11,19 @@
     margin: 0 0 8px;
     line-height: 1.1;
 }
+@media (max-width: 880px) { .page-header h1 { font-size: 34px; } }
+@media (max-width: 480px) { .page-header h1 { font-size: 30px; } }
 
-@media (max-width: 880px) {
-    .page-header h1 { font-size: 34px; }
-}
+/* Denied card */
+.denied-card { text-align: center; padding: 60px 24px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 14px; }
+.denied-icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(255, 59, 48, 0.08); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; color: #ff3b30; }
+.denied-card h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.014em; color: var(--color-text-primary); margin: 0 0 8px; }
+.denied-card p { font-size: 14px; color: var(--color-text-secondary); margin: 0 auto 24px; max-width: 420px; line-height: 1.5; }
+.denied-actions { display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; }
 
-@media (max-width: 480px) {
-    .page-header h1 { font-size: 30px; }
-}
+/* Empty (preview) state */
+.denied-empty { text-align: center; padding: 60px 24px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 14px; }
+.denied-empty-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--color-bg); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--color-text-tertiary); }
+.denied-empty-ico svg { width: 22px; height: 22px; }
+.denied-empty-title { font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 6px; }
+.denied-empty-sub { font-size: 14px; color: var(--color-text-secondary); margin: 0 auto 20px; max-width: 380px; line-height: 1.5; }

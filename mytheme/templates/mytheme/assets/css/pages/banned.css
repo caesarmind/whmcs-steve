@@ -1,19 +1,15 @@
-/* Account Banned — page CSS */
+/* Error / notice (Apple-style) — shared by access-denied + banned. Prefix: .err-* */
 
 .page-header { margin: 8px 0 24px; }
-.page-header h1 {
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: -0.028em;
-    color: var(--color-text-primary);
-    margin: 0 0 8px;
-    line-height: 1.1;
-}
+.page-header .page-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px; }
+.page-header h1 { font-size: 40px; font-weight: 600; letter-spacing: -0.028em; color: var(--color-text-primary); margin: 0 0 8px; line-height: 1.1; }
+@media (max-width: 880px) { .page-header h1 { font-size: 34px; } }
+@media (max-width: 480px) { .page-header h1 { font-size: 30px; } }
 
-@media (max-width: 880px) {
-    .page-header h1 { font-size: 34px; }
-}
-
-@media (max-width: 480px) {
-    .page-header h1 { font-size: 30px; }
-}
+.err-card { max-width: 520px; margin: 0 auto; text-align: center; padding: 56px 32px; }
+.err-ico { width: 68px; height: 68px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; background: rgba(255,59,48,0.08); color: #ff3b30; }
+.err-ico.warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
+.err-ico svg { width: 32px; height: 32px; }
+.err-title { font-size: 22px; font-weight: 600; letter-spacing: -0.016em; color: var(--color-text-primary); margin: 0 0 8px; }
+.err-sub { font-size: 14px; color: var(--color-text-secondary); line-height: 1.55; margin: 0 auto 24px; max-width: 400px; }
+.err-actions { display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center; }

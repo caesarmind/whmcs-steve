@@ -1,19 +1,38 @@
-/* Cancel Service — page CSS */
+/* Cancel service request (Apple-style).
+   Ported from apple-client-area/clientareacancelrequest.html. Prefix: .cr-* */
 
-.page-header { margin: 8px 0 24px; }
-.page-header h1 {
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: -0.028em;
-    color: var(--color-text-primary);
-    margin: 0 0 8px;
-    line-height: 1.1;
-}
+.page-header { margin: 8px 0 20px; }
+.page-header .page-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px; }
+.page-header h1 { font-size: 40px; font-weight: 600; letter-spacing: -0.028em; color: var(--color-text-primary); margin: 0 0 8px; line-height: 1.1; }
+@media (max-width: 880px) { .page-header h1 { font-size: 34px; } }
+@media (max-width: 480px) { .page-header h1 { font-size: 30px; } }
 
-@media (max-width: 880px) {
-    .page-header h1 { font-size: 34px; }
-}
+.cr-wrap { max-width: 640px; }
 
-@media (max-width: 480px) {
-    .page-header h1 { font-size: 30px; }
-}
+/* Warning callout */
+.cr-callout { display: flex; gap: 12px; padding: 14px 18px; border-radius: var(--radius-md); background: var(--color-orange-bg); color: var(--color-orange-text); margin-bottom: 16px; }
+.cr-callout svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+.cr-callout-text { font-size: 13px; line-height: 1.5; letter-spacing: -0.004em; }
+
+/* Service summary block */
+.cr-service { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-secondary); margin-bottom: 4px; }
+.cr-service-ico { width: 36px; height: 36px; border-radius: 9px; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cr-service-ico svg { width: 18px; height: 18px; }
+.cr-service-name { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
+.cr-service-domain { font-size: 12.5px; color: var(--color-text-tertiary); margin-top: 1px; }
+
+/* Domain-cancel checkbox row */
+.cr-check { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); font-size: 13px; color: var(--color-text-secondary); line-height: 1.45; }
+.cr-check input { margin-top: 2px; accent-color: var(--color-accent); }
+
+/* Danger button (in case not provided globally) */
+.btn-danger { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 20px; background: #ff3b30; color: #fff; border: none; border-radius: var(--radius-pill); font-size: 14px; font-weight: 500; font-family: var(--font-family); cursor: pointer; transition: all var(--transition-fast); letter-spacing: -0.008em; text-decoration: none; }
+.btn-danger:hover { background: #e0271d; color: #fff; }
+
+/* Notice / empty */
+.cr-notice { text-align: center; padding: 60px 24px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 14px; }
+.cr-notice-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--color-bg); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--color-text-tertiary); }
+.cr-notice-ico.ok { color: var(--color-green-text); background: var(--color-green-bg); }
+.cr-notice-ico svg { width: 22px; height: 22px; }
+.cr-notice-title { font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 6px; }
+.cr-notice-sub { font-size: 14px; color: var(--color-text-secondary); margin: 0 auto 20px; max-width: 380px; line-height: 1.5; }

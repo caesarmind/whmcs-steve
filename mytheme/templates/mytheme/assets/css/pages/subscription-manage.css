@@ -1,19 +1,20 @@
-/* Manage Subscription — page CSS */
+/* Email subscription management (Apple-style) — opt-in / opt-out confirmation.
+   Matches the real WHMCS subscription-manage templatefile (newsletter), styled
+   in the apple visual language. Prefix: .sm-* */
 
-.page-header { margin: 8px 0 24px; }
-.page-header h1 {
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: -0.028em;
-    color: var(--color-text-primary);
-    margin: 0 0 8px;
-    line-height: 1.1;
-}
+.page-header { margin: 8px 0 20px; }
+.page-header .page-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px; }
+.page-header h1 { font-size: 40px; font-weight: 600; letter-spacing: -0.028em; color: var(--color-text-primary); margin: 0 0 8px; line-height: 1.1; }
+@media (max-width: 880px) { .page-header h1 { font-size: 34px; } }
+@media (max-width: 480px) { .page-header h1 { font-size: 30px; } }
 
-@media (max-width: 880px) {
-    .page-header h1 { font-size: 34px; }
-}
-
-@media (max-width: 480px) {
-    .page-header h1 { font-size: 30px; }
-}
+.sm-card { max-width: 520px; text-align: center; padding: 48px 32px; }
+.sm-ico { width: 64px; height: 64px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 18px; background: var(--color-accent-light); color: var(--color-accent); }
+.sm-ico.ok { background: var(--color-green-bg); color: var(--color-green-text); }
+.sm-ico.warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
+.sm-ico.error { background: var(--color-red-bg); color: var(--color-red-text); }
+.sm-ico svg { width: 28px; height: 28px; }
+.sm-title { font-size: 20px; font-weight: 600; letter-spacing: -0.016em; color: var(--color-text-primary); margin: 0 0 8px; }
+.sm-text { font-size: 14px; color: var(--color-text-secondary); line-height: 1.55; margin: 0 auto 24px; max-width: 380px; }
+.sm-text a { color: var(--color-accent); text-decoration: none; }
+.sm-text a:hover { text-decoration: underline; }

@@ -1,19 +1,43 @@
-/* Bulk Domain Management — page CSS */
+/* Bulk domain management (Apple-style). Reuses global .card / .form-* / .btn-*.
+   Prefix: .bdm-* */
 
-.page-header { margin: 8px 0 24px; }
-.page-header h1 {
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: -0.028em;
-    color: var(--color-text-primary);
-    margin: 0 0 8px;
-    line-height: 1.1;
-}
+.page-header { margin: 8px 0 20px; }
+.page-header .page-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px; }
+.page-header h1 { font-size: 40px; font-weight: 600; letter-spacing: -0.028em; color: var(--color-text-primary); margin: 0 0 8px; line-height: 1.1; }
+@media (max-width: 880px) { .page-header h1 { font-size: 34px; } }
+@media (max-width: 480px) { .page-header h1 { font-size: 30px; } }
+.bdm-wrap { max-width: 720px; }
 
-@media (max-width: 880px) {
-    .page-header h1 { font-size: 34px; }
-}
+/* Alerts */
+.bdm-alert { display: flex; gap: 10px; padding: 13px 16px; border-radius: var(--radius-md); font-size: 13px; line-height: 1.5; margin-bottom: 16px; }
+.bdm-alert svg { width: 17px; height: 17px; flex-shrink: 0; margin-top: 1px; }
+.bdm-alert.info { background: var(--color-accent-light); color: var(--color-accent); }
+.bdm-alert.success { background: var(--color-green-bg); color: var(--color-green-text); }
+.bdm-alert.error { background: var(--color-red-bg); color: var(--color-red-text); }
+.bdm-alert ul { margin: 6px 0 0; padding-left: 18px; }
 
-@media (max-width: 480px) {
-    .page-header h1 { font-size: 30px; }
-}
+/* Affected domains */
+.bdm-domains-label { font-size: 12.5px; color: var(--color-text-secondary); margin: 0 0 8px; }
+.bdm-domains { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.bdm-domain-item { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 0.5px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-surface-secondary); font-size: 13px; color: var(--color-text-primary); }
+.bdm-domain-item svg { width: 13px; height: 13px; color: var(--color-green-text); flex-shrink: 0; }
+
+/* NS choice cards */
+.bdm-choice { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+.bdm-radio { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: all var(--transition-fast); }
+.bdm-radio:hover { border-color: var(--color-accent); }
+.bdm-radio.checked { border: 2px solid var(--color-accent); background: var(--color-accent-light); }
+.bdm-radio input { margin-top: 2px; accent-color: var(--color-accent); flex-shrink: 0; }
+.bdm-radio-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.bdm-ns-fields { margin-top: 12px; display: none; }
+.bdm-ns-fields.show { display: block; }
+
+.bdm-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+.bdm-or { font-size: 12px; color: var(--color-text-tertiary); }
+
+/* Empty */
+.bdm-empty { text-align: center; padding: 60px 24px; }
+.bdm-empty-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--color-bg); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--color-text-tertiary); }
+.bdm-empty-ico svg { width: 22px; height: 22px; }
+.bdm-empty-title { font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 6px; }
+.bdm-empty-sub { font-size: 14px; color: var(--color-text-secondary); margin: 0 auto 20px; max-width: 380px; line-height: 1.5; }

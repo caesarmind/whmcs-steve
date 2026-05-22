@@ -1,19 +1,47 @@
-/* Domain Pricing — page CSS */
+/* Domain pricing (Apple-style) — TLD price table. Prefix: .dp-* */
 
-.page-header { margin: 8px 0 24px; }
-.page-header h1 {
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: -0.028em;
-    color: var(--color-text-primary);
-    margin: 0 0 8px;
-    line-height: 1.1;
-}
+.page-header { margin: 8px 0 20px; }
+.page-header .page-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px; }
+.page-header h1 { font-size: 40px; font-weight: 600; letter-spacing: -0.028em; color: var(--color-text-primary); margin: 0 0 8px; line-height: 1.1; }
+@media (max-width: 880px) { .page-header h1 { font-size: 34px; } }
+@media (max-width: 480px) { .page-header h1 { font-size: 30px; } }
 
-@media (max-width: 880px) {
-    .page-header h1 { font-size: 34px; }
-}
+/* Toolbar */
+.dp-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.dp-search { flex: 1 1 240px; min-width: 200px; position: relative; display: inline-flex; align-items: center; }
+.dp-search svg { position: absolute; left: 14px; width: 14px; height: 14px; color: var(--color-text-tertiary); pointer-events: none; }
+.dp-search input { width: 100%; height: 40px; padding: 0 16px 0 38px; border: 0.5px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-surface); font-size: 14px; color: var(--color-text-primary); font-family: inherit; }
+.dp-search input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+.dp-filter { appearance: none; height: 40px; padding: 0 36px 0 14px; border: 0.5px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-surface); font-size: 13px; font-weight: 500; color: var(--color-text-primary); font-family: inherit; cursor: pointer; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: right 12px center; }
+.dp-filter:focus { outline: none; border-color: var(--color-accent); }
 
-@media (max-width: 480px) {
-    .page-header h1 { font-size: 30px; }
+/* Table */
+.dp-table { width: 100%; border-collapse: collapse; }
+.dp-table thead th { padding: 12px 18px; font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; text-align: left; border-bottom: 0.5px solid var(--color-border); background: var(--color-surface-tertiary); white-space: nowrap; }
+.dp-table tbody td { padding: 14px 18px; font-size: 13.5px; color: var(--color-text-primary); border-bottom: 0.5px solid var(--color-border); vertical-align: middle; font-variant-numeric: tabular-nums; }
+.dp-table tbody tr:last-child td { border-bottom: 0; }
+.dp-table tbody tr:hover { background: var(--sidebar-item-hover); }
+.dp-table tbody td small { color: var(--color-text-tertiary); font-size: 11.5px; }
+.dp-table tbody tr[hidden] { display: none; }
+.tld-name { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
+.tld-name span { color: var(--color-text-tertiary); }
+.dp-cat { color: var(--color-text-secondary); }
+.dp-group { display: inline-flex; align-items: center; margin-left: 8px; padding: 1px 7px; border-radius: var(--radius-pill); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.dp-group.hot { background: var(--color-red-bg); color: var(--color-red-text); }
+.dp-group.new { background: var(--color-green-bg); color: var(--color-green-text); }
+.dp-group.sale { background: var(--color-accent-light); color: var(--color-accent); }
+.dp-label { display: none; }
+
+/* Empty */
+.dp-empty { text-align: center; padding: 60px 24px; }
+.dp-empty-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--color-bg); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--color-text-tertiary); }
+.dp-empty-ico svg { width: 22px; height: 22px; }
+.dp-empty-title { font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 6px; }
+.dp-empty-sub { font-size: 14px; color: var(--color-text-secondary); margin: 0 auto 20px; max-width: 380px; line-height: 1.5; }
+
+@media (max-width: 720px) {
+    .dp-table thead { display: none; }
+    .dp-table tbody td { display: flex; justify-content: space-between; gap: 16px; border-bottom: 0; padding: 6px 18px; }
+    .dp-table tbody tr { display: block; padding: 14px 0; border-bottom: 0.5px solid var(--color-border); }
+    .dp-label { display: inline; color: var(--color-text-tertiary); font-size: 12px; }
 }
