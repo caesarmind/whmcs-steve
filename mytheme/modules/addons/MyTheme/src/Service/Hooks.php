@@ -163,9 +163,11 @@ final class Hooks
 
     private function clientAreaHeadOutput(array $vars, Template $template): ?string
     {
-        $typo = $this->buildTypographyHead($template);
-        $ext  = (string)$this->extensionOutput($template, $vars, slot: 'headOutput');
-        $out  = $typo . $ext;
+        $typo   = $this->buildTypographyHead($template);
+        $ext    = (string)$this->extensionOutput($template, $vars, slot: 'headOutput');
+        $custom = $this->buildCustomCss($template);
+        // Custom CSS goes LAST so it can override the theme + typography overrides.
+        $out    = $typo . $ext . $custom;
         return $out !== '' ? $out : null;
     }
 
@@ -256,6 +258,21 @@ final class Hooks
         $css .= '}';
 
         return $links . '<style id="mytheme-typography">' . $css . '</style>';
+    }
+
+    /**
+     * Emit the admin's global Custom CSS (Styles → Custom CSS), LAST in head
+     * output so it overrides everything. Admin-entered (trusted), but strip any
+     * </style> as defense-in-depth so it can't break out of the tag.
+     */
+    private function buildCustomCss(Template $template): string
+    {
+        $css = trim((string)Settings::getValue($template->getName() . '_custom_css', ''));
+        if ($css === '') {
+            return '';
+        }
+        $css = (string)preg_replace('#</\s*style#i', '', $css);
+        return '<style id="mytheme-custom-css">' . $css . '</style>';
     }
 
     private function clientAreaFooterOutput(array $vars, Template $template): ?string

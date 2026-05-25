@@ -14,12 +14,13 @@
 </header>
 
 <div class="mt-tabs">
-    <a class="mt-tab is-active">Style Variables</a>
+    <a class="mt-tab {if $tab != 'custom-css'}is-active{/if}" data-tab="variables">Style Variables</a>
     <a class="mt-tab">Style Settings</a>
-    <a class="mt-tab">Custom CSS</a>
+    <a class="mt-tab {if $tab == 'custom-css'}is-active{/if}" data-tab="custom-css">Custom CSS</a>
     <a class="mt-tab">Menu</a>
 </div>
 
+<div class="mt-tab-panel" data-tab-panel="variables"{if $tab == 'custom-css'} hidden{/if}>
 <div class="mt-split">
     <nav class="mt-subcats">
         <a class="mt-subcat {if $subcat == 'colors'}is-active{/if}"     data-subcat="colors"     href="?module=MyTheme&action=editStyle&style={$style|escape}&subcat=colors">Colors</a>
@@ -87,6 +88,21 @@
         </div>
         {/foreach}
     </div>
+</div>
+</div>{* /variables tab-panel *}
+
+<div class="mt-tab-panel" data-tab-panel="custom-css"{if $tab != 'custom-css'} hidden{/if}>
+    <form method="post" action="?module=MyTheme&action=editStyle&style={$style|escape}&tab=custom-css" class="mt-custom-css">
+        <input type="hidden" name="mt_custom_css_save" value="1">
+        <input type="hidden" name="style" value="{$style|escape}">
+        {if $cssSaved}<div class="mt-alert mt-alert-success">Custom CSS saved.</div>{/if}
+        <section class="mt-section">
+            <header class="mt-section-header"><h2 class="mt-section-title">Custom CSS</h2></header>
+            <p class="mt-field-help">Injected into every client-area page <em>after</em> the theme styles, so it overrides them. Applies site-wide (regardless of active style).</p>
+            <textarea name="custom_css" class="mt-textarea mt-code" rows="18" spellcheck="false" placeholder="/* Your CSS — e.g. */&#10;.card { border-radius: 18px; }">{$customCss|escape}</textarea>
+        </section>
+        <div class="mt-typo-actions"><button type="submit" class="mt-btn mt-btn-primary">Save CSS</button></div>
+    </form>
 </div>
 
 {include file="includes/footer.tpl"}

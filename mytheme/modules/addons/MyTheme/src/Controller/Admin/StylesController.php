@@ -53,6 +53,9 @@ final class StylesController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_typography'])) {
             return $this->saveTypographyAction($template);
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_custom_css_save'])) {
+            return $this->saveCustomCss($template);
+        }
 
         $style  = (string)($_GET['style'] ?? 'default');
         $subcat = (string)($_GET['subcat'] ?? 'colors');
@@ -74,6 +77,9 @@ final class StylesController extends AbstractController
             // client-side (no-reload) tab switching.
             'typography' => $this->buildTypographyViewModel($template),
             'saved'      => isset($_GET['saved']),
+            'tab'        => (string)($_GET['tab'] ?? 'variables'),
+            'customCss'  => (string)Settings::getValue($template->getName() . '_custom_css', ''),
+            'cssSaved'   => isset($_GET['css_saved']),
         ]);
     }
 
@@ -239,5 +245,17 @@ final class StylesController extends AbstractController
 
         $style = (string)($_POST['style'] ?? 'default');
         $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=typography&saved=1');
+    }
+
+    /**
+     * Persist the global Custom CSS box (site-wide, all styles). Stored raw so
+     * the textarea round-trips exactly; the render-time emitter
+     * (Hooks::buildCustomCss) neutralizes any </style> on output.
+     */
+    private function saveCustomCss($template): string
+    {
+        Settings::setValue($template->getName() . '_custom_css', (string)($_POST['custom_css'] ?? ''), 'string');
+        $style = (string)($_POST['style'] ?? 'default');
+        $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&tab=custom-css&css_saved=1');
     }
 }
