@@ -187,6 +187,8 @@
 .mt-card-title { font-size: 14px; font-weight: 600; margin: 0; }
 .mt-card-meta { font-size: 12px; color: var(--mt-text-3); margin: 0; }
 .mt-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+.mt-card-edit { font-size: 12px; font-weight: 500; color: var(--mt-primary); text-decoration: none; white-space: nowrap; position: relative; z-index: 1; }
+.mt-card-edit:hover { text-decoration: underline; }
 .mt-card label { cursor: pointer; }
 .mt-card input[type="radio"] { display: none; }
 

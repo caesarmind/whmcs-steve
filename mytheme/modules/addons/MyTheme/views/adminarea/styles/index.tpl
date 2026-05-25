@@ -32,6 +32,9 @@
                         {else}
                             <span class="mt-badge mt-badge-primary">Click to activate</span>
                         {/if}
+                        {* <a href> is interactive content, so clicking it does NOT
+                           toggle the wrapping label's radio — it just navigates. *}
+                        <a class="mt-card-edit" href="?module=MyTheme&action=editStyle&style={$style.name|escape}&subcat=typography">Customize &rsaquo;</a>
                     </div>
                 </label>
             {/foreach}
