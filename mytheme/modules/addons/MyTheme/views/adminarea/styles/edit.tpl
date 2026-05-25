@@ -14,13 +14,12 @@
 </header>
 
 <div class="mt-tabs">
-    <a class="mt-tab {if $tab != 'custom-css'}is-active{/if}" data-tab="variables">Style Variables</a>
-    <a class="mt-tab">Style Settings</a>
-    <a class="mt-tab {if $tab == 'custom-css'}is-active{/if}" data-tab="custom-css">Custom CSS</a>
-    <a class="mt-tab">Menu</a>
+    <a class="mt-tab {if $tab == 'variables'}is-active{/if}" href="?module=MyTheme&action=editStyle&style={$style|escape}&tab=variables">Style Variables</a>
+    <a class="mt-tab {if $tab == 'settings'}is-active{/if}" href="?module=MyTheme&action=editStyle&style={$style|escape}&tab=settings">Style Settings</a>
+    <a class="mt-tab {if $tab == 'custom-css'}is-active{/if}" href="?module=MyTheme&action=editStyle&style={$style|escape}&tab=custom-css">Custom CSS</a>
 </div>
 
-<div class="mt-tab-panel" data-tab-panel="variables"{if $tab == 'custom-css'} hidden{/if}>
+{if $tab == 'variables'}
 <div class="mt-split">
     <nav class="mt-subcats">
         <a class="mt-subcat {if $subcat == 'colors'}is-active{/if}"     data-subcat="colors"     href="?module=MyTheme&action=editStyle&style={$style|escape}&subcat=colors">Colors</a>
@@ -89,9 +88,16 @@
         {/foreach}
     </div>
 </div>
-</div>{* /variables tab-panel *}
+{/if}{* /variables tab *}
 
-<div class="mt-tab-panel" data-tab-panel="custom-css"{if $tab != 'custom-css'} hidden{/if}>
+{if $tab == 'settings'}
+<div class="mt-empty">
+    <div class="mt-empty-title">Style Settings</div>
+    <p>This panel isn&rsquo;t available yet.</p>
+</div>
+{/if}
+
+{if $tab == 'custom-css'}
     <form method="post" action="?module=MyTheme&action=editStyle&style={$style|escape}&tab=custom-css" class="mt-custom-css">
         <input type="hidden" name="mt_custom_css_save" value="1">
         <input type="hidden" name="style" value="{$style|escape}">
@@ -103,6 +109,6 @@
         </section>
         <div class="mt-typo-actions"><button type="submit" class="mt-btn mt-btn-primary">Save CSS</button></div>
     </form>
-</div>
+{/if}
 
 {include file="includes/footer.tpl"}

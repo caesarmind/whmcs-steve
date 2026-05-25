@@ -59,6 +59,10 @@ final class StylesController extends AbstractController
 
         $style  = (string)($_GET['style'] ?? 'default');
         $subcat = (string)($_GET['subcat'] ?? 'colors');
+        $tab    = (string)($_GET['tab'] ?? 'variables');
+        if (!in_array($tab, ['variables', 'settings', 'custom-css'], true)) {
+            $tab = 'variables';
+        }
 
         return $this->view('styles/edit', [
             'template'   => $template->getName(),
@@ -73,11 +77,11 @@ final class StylesController extends AbstractController
                 ['name' => 'Red',     'dot' => '#D92632', 'active' => false],
             ],
             'subcat'     => $subcat,
-            // Always built so every subcat panel is present in the DOM for
-            // client-side (no-reload) tab switching.
-            'typography' => $this->buildTypographyViewModel($template),
+            'tab'        => $tab,
+            // Built only for the Variables tab (the only one that renders it),
+            // so the other tabs skip the folder scan + view-model work.
+            'typography' => $tab === 'variables' ? $this->buildTypographyViewModel($template) : null,
             'saved'      => isset($_GET['saved']),
-            'tab'        => (string)($_GET['tab'] ?? 'variables'),
             'customCss'  => (string)Settings::getValue($template->getName() . '_custom_css', ''),
             'cssSaved'   => isset($_GET['css_saved']),
         ]);

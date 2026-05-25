@@ -393,28 +393,4 @@
     if (fsel) fsel.addEventListener('focus', function(){ var f = form.querySelector('input[name="ff_mode"][value="folder"]'); if (f) { f.checked = true; sync(); } });
     sync();
 })();
-
-/* Style editor: top tabs (Style Variables / Custom CSS) switch with no reload. */
-(function(){
-    var tabs = [].slice.call(document.querySelectorAll('.mt-tabs .mt-tab[data-tab]'));
-    if (!tabs.length) return;
-    var panels = [].slice.call(document.querySelectorAll('[data-tab-panel]'));
-    function show(name) {
-        var matched = false;
-        panels.forEach(function(p){ var on = p.getAttribute('data-tab-panel') === name; p.hidden = !on; if (on) matched = true; });
-        if (!matched) return false;
-        tabs.forEach(function(t){ t.classList.toggle('is-active', t.getAttribute('data-tab') === name); });
-        return true;
-    }
-    tabs.forEach(function(t){
-        t.addEventListener('click', function(e){
-            var name = t.getAttribute('data-tab');
-            if (!name) return;
-            e.preventDefault();
-            if (show(name)) {
-                try { var u = new URL(window.location.href); u.searchParams.set('tab', name); window.history.replaceState({}, '', u); } catch (_) {}
-            }
-        });
-    });
-})();
 </script>
