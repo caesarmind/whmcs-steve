@@ -410,12 +410,10 @@
     sync();
 })();
 
-{literal}
-/* Color scheme: preset chips fill the accent picker; the hex field and the
-   native color input stay in sync; a live preview approximates the derived
-   accent chain (the real chain is computed server-side, Hooks::buildColorsHead,
-   on save). NOTE: wrapped in {literal} because the hex regexes use {3}/{6}
-   quantifiers, which Smarty would otherwise parse as tags. */
+/* Color scheme panel: preset chips fill the accent picker; the hex field and
+   the native color input stay in sync; a live preview approximates the derived
+   accent chain (computed for real server-side on save). Hex parsing avoids
+   regex brace-quantifiers so Smarty leaves this script alone (no literal tag). */
 (function(){
     var form = document.querySelector('.mt-colors');
     if (!form) return;
@@ -432,12 +430,20 @@
     var prevLink   = form.querySelector('[data-prev-link]');
 
     function clamp(n){ return Math.max(0, Math.min(255, Math.round(n))); }
+    // Parse to 6 lowercase hex chars (no '#'), expanding 3-digit shorthand;
+    // null if invalid. No regex brace-quantifiers, so Smarty won't see a tag.
+    function clean(v){
+        if (!v) return null;
+        var s = ('' + v).trim();
+        if (s.charAt(0) === '#') s = s.slice(1);
+        if (s.length === 3) s = s.charAt(0) + s.charAt(0) + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2);
+        if (s.length !== 6 || !/^[0-9a-f]+$/i.test(s)) return null;
+        return s.toLowerCase();
+    }
     function toRgb(hex){
-        var m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
-        if (m){ var i = parseInt(m[1], 16); return [(i >> 16) & 255, (i >> 8) & 255, i & 255]; }
-        var s = /^#?([0-9a-f]{3})$/i.exec(hex || '');
-        if (s){ var c = s[1]; return [parseInt(c[0] + c[0], 16), parseInt(c[1] + c[1], 16), parseInt(c[2] + c[2], 16)]; }
-        return null;
+        var s = clean(hex); if (!s) return null;
+        var i = parseInt(s, 16);
+        return [(i >> 16) & 255, (i >> 8) & 255, i & 255];
     }
     function hx(v){ return ('0' + clamp(v).toString(16)).slice(-2); }
     function toHex(rgb){ return '#' + hx(rgb[0]) + hx(rgb[1]) + hx(rgb[2]); }
@@ -486,5 +492,4 @@
 
     preview((colorInput && colorInput.value) || '#0071e3');
 })();
-{/literal}
 </script>
