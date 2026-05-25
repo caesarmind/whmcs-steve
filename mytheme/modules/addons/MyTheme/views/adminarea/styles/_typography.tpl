@@ -1,51 +1,57 @@
-{* Typography settings form. Rendered by StylesController::editAction when
-   subcat=typography; $typography view-model carries the schema + the current
-   effective value per token. POSTs back to action=editStyle (PRG in editAction).
-   Inherits $style / $saved from the parent edit.tpl. *}
+{* Typography settings form. Rendered by StylesController::editAction;
+   $typography view-model carries the schema + the current effective value per
+   token. POSTs back to action=editStyle (PRG in editAction). The font-family
+   controls + their enable/disable are wired by JS in includes/footer.tpl. *}
 <form method="post" action="?module=MyTheme&action=editStyle&style={$style|escape}&subcat=typography" class="mt-typography">
     <input type="hidden" name="mt_typography" value="1">
     <input type="hidden" name="style" value="{$style|escape}">
 
-    {if $saved}<div class="mt-notice mt-notice-success">Typography saved.</div>{/if}
+    {if $saved}<div class="mt-alert mt-alert-success">Typography saved.</div>{/if}
 
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Font Family</h2></header>
-        <div class="mt-field-stack">
-            <label class="mt-radio">
+        <div class="mt-typo-fonts">
+            <label class="mt-typo-radio">
                 <input type="radio" name="ff_mode" value="default"{if $typography.fontFamily.mode == 'default'} checked{/if}>
                 <span>System default <em>(San Francisco / Segoe / Roboto)</em></span>
             </label>
-            <label class="mt-radio">
+
+            <label class="mt-typo-radio">
                 <input type="radio" name="ff_mode" value="google"{if $typography.fontFamily.mode == 'google'} checked{/if}>
                 <span>Google Font</span>
             </label>
-            <select name="ff_google" class="mt-input">
-                <option value="">&mdash; select a Google font &mdash;</option>
-                {foreach $typography.googleFonts as $gf}
-                    <option value="{$gf|escape}"{if $gf == $typography.fontFamily.google} selected{/if}>{$gf|escape}</option>
-                {/foreach}
-            </select>
-            <label class="mt-radio">
+            <div class="mt-typo-dep">
+                <select name="ff_google" class="mt-select">
+                    <option value="">&mdash; select a Google font &mdash;</option>
+                    {foreach $typography.googleFonts as $gf}
+                        <option value="{$gf|escape}"{if $gf == $typography.fontFamily.google} selected{/if}>{$gf|escape}</option>
+                    {/foreach}
+                </select>
+            </div>
+
+            <label class="mt-typo-radio">
                 <input type="radio" name="ff_mode" value="custom"{if $typography.fontFamily.mode == 'custom'} checked{/if}>
                 <span>Custom font stack</span>
             </label>
-            <input type="text" name="ff_custom" class="mt-input" placeholder="'My Font', Helvetica, Arial, sans-serif" value="{$typography.fontFamily.custom|escape}">
+            <div class="mt-typo-dep">
+                <input type="text" name="ff_custom" class="mt-input" placeholder="'My Font', Helvetica, Arial, sans-serif" value="{$typography.fontFamily.custom|escape}">
+            </div>
         </div>
     </section>
 
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Font Size</h2></header>
         {foreach $typography.sizeGroups as $groupName => $items}
-            <h3 class="mt-color-group-title">{$groupName|escape}</h3>
-            <div class="mt-field-grid">
+            <div class="mt-typo-group-label">{$groupName|escape}</div>
+            <div class="mt-typo-grid">
                 {foreach $items as $it}
-                    <label class="mt-field">
-                        <span class="mt-field-label">{$it.label|escape}</span>
-                        <span class="mt-input-unit">
-                            <input type="number" name="size_{$it.var|replace:'--':''}" value="{$it.value}" min="{$typography.sizeMin}" max="{$typography.sizeMax}" step="1" class="mt-input mt-input-num">
-                            <em>px</em>
+                    <div class="mt-typo-field">
+                        <label class="mt-typo-field-label" for="size_{$it.var|replace:'--':''}">{$it.label|escape}</label>
+                        <span class="mt-affix">
+                            <input type="number" id="size_{$it.var|replace:'--':''}" name="size_{$it.var|replace:'--':''}" value="{$it.value}" min="{$typography.sizeMin}" max="{$typography.sizeMax}" step="1" class="mt-input mt-input-compact">
+                            <span class="mt-affix-unit">px</span>
                         </span>
-                    </label>
+                    </div>
                 {/foreach}
             </div>
         {/foreach}
@@ -53,21 +59,21 @@
 
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Font Weight</h2></header>
-        <div class="mt-field-grid">
+        <div class="mt-typo-grid">
             {foreach $typography.weights as $it}
-                <label class="mt-field">
-                    <span class="mt-field-label">{$it.label|escape}</span>
-                    <select name="weight_{$it.var|replace:'--':''}" class="mt-input">
+                <div class="mt-typo-field">
+                    <label class="mt-typo-field-label" for="weight_{$it.var|replace:'--':''}">{$it.label|escape}</label>
+                    <select id="weight_{$it.var|replace:'--':''}" name="weight_{$it.var|replace:'--':''}" class="mt-select mt-input-compact">
                         {foreach $typography.weightOptions as $opt}
                             <option value="{$opt}"{if $opt == $it.value} selected{/if}>{$opt}</option>
                         {/foreach}
                     </select>
-                </label>
+                </div>
             {/foreach}
         </div>
     </section>
 
-    <div class="mt-toolbar">
+    <div class="mt-typo-actions">
         <button type="submit" class="mt-btn mt-btn-primary">Save typography</button>
     </div>
 </form>

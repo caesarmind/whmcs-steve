@@ -70,7 +70,9 @@ final class StylesController extends AbstractController
                 ['name' => 'Red',     'dot' => '#D92632', 'active' => false],
             ],
             'subcat'     => $subcat,
-            'typography' => $subcat === 'typography' ? $this->buildTypographyViewModel($template) : null,
+            // Always built so every subcat panel is present in the DOM for
+            // client-side (no-reload) tab switching.
+            'typography' => $this->buildTypographyViewModel($template),
             'saved'      => isset($_GET['saved']),
         ]);
     }

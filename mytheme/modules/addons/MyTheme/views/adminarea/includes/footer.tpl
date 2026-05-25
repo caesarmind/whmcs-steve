@@ -314,6 +314,24 @@
 .mt-detail-kicker { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--mt-text-3); margin: 16px 0 8px; font-weight: 600; }
 .mt-detail-kicker:first-child { margin-top: 0; }
 @media (max-width: 900px) { .mt-detail-grid { grid-template-columns: 1fr; } }
+
+/* Typography panel */
+.mt-subcat-panel { min-width: 0; }
+.mt-typo-fonts { display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
+.mt-typo-radio { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.mt-typo-radio em { font-style: normal; color: var(--mt-text-3); font-weight: 400; }
+.mt-typo-radio input:disabled ~ span { opacity: 0.5; }
+.mt-typo-dep { margin: 0 0 6px 24px; max-width: 420px; }
+.mt-typo-group-label { font-size: 11px; font-weight: 600; color: var(--mt-text-3); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 10px; }
+.mt-typo-group-label:first-of-type { margin-top: 0; }
+.mt-typo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px 14px; }
+.mt-typo-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.mt-typo-field-label { font-size: 12px; font-weight: 500; color: var(--mt-text-2); }
+.mt-input-compact { padding-top: 8px !important; padding-bottom: 8px !important; font-size: 14px !important; }
+.mt-affix { position: relative; display: block; }
+.mt-affix .mt-input { padding-right: 32px !important; }
+.mt-affix-unit { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--mt-text-3); pointer-events: none; }
+.mt-typo-actions { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--mt-border); display: flex; justify-content: flex-end; }
 </style>
 
 <script>
@@ -328,5 +346,48 @@
         }
         el.addEventListener('input', update);
     });
+})();
+
+/* Style editor: switch sub-category panels with no page reload. The <a> hrefs
+   remain a no-JS fallback; here we just toggle the pre-rendered panels. */
+(function(){
+    var nav = document.querySelector('.mt-subcats');
+    var content = document.querySelector('[data-subcats]');
+    if (!nav || !content) return;
+    var tabs = [].slice.call(nav.querySelectorAll('.mt-subcat[data-subcat]'));
+    var panels = [].slice.call(content.querySelectorAll('.mt-subcat-panel[data-panel]'));
+    function show(name) {
+        var matched = false;
+        panels.forEach(function(p){ var on = p.getAttribute('data-panel') === name; p.hidden = !on; if (on) matched = true; });
+        if (!matched) return false;
+        tabs.forEach(function(t){ t.classList.toggle('is-active', t.getAttribute('data-subcat') === name); });
+        return true;
+    }
+    tabs.forEach(function(t){
+        t.addEventListener('click', function(e){
+            var name = t.getAttribute('data-subcat');
+            if (!name) return;
+            e.preventDefault();
+            if (show(name)) {
+                try { var u = new URL(window.location.href); u.searchParams.set('subcat', name); window.history.replaceState({}, '', u); } catch (_) {}
+            }
+        });
+    });
+})();
+
+/* Typography: only the input matching the chosen font-family mode is enabled,
+   and focusing a dependent control selects its radio — so the active font is
+   always unambiguous. */
+(function(){
+    var form = document.querySelector('.mt-typography');
+    if (!form) return;
+    var gsel = form.querySelector('select[name="ff_google"]');
+    var ccustom = form.querySelector('input[name="ff_custom"]');
+    function mode() { var c = form.querySelector('input[name="ff_mode"]:checked'); return c ? c.value : 'default'; }
+    function sync() { var m = mode(); if (gsel) gsel.disabled = m !== 'google'; if (ccustom) ccustom.disabled = m !== 'custom'; }
+    [].slice.call(form.querySelectorAll('input[name="ff_mode"]')).forEach(function(r){ r.addEventListener('change', sync); });
+    if (gsel) gsel.addEventListener('focus', function(){ var g = form.querySelector('input[name="ff_mode"][value="google"]'); if (g) { g.checked = true; sync(); } });
+    if (ccustom) ccustom.addEventListener('focus', function(){ var c = form.querySelector('input[name="ff_mode"][value="custom"]'); if (c) { c.checked = true; sync(); } });
+    sync();
 })();
 </script>
