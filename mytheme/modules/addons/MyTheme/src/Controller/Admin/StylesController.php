@@ -10,6 +10,21 @@ use MyTheme\Models\Settings;
 
 final class StylesController extends AbstractController
 {
+    /**
+     * Built-in accent presets for the Color Scheme picker. Each carries a single
+     * accent hex; the render-time emitter (Hooks::buildColorsHead) derives the
+     * hover / tint / link / dark-mode variants from it. Index [0] is the theme
+     * default (no override is stored while it's selected).
+     */
+    private const COLOR_PRESETS = [
+        ['name' => 'Default', 'accent' => '#0071e3'],
+        ['name' => 'Emerald', 'accent' => '#14b17d'],
+        ['name' => 'Violet',  'accent' => '#8c5cff'],
+        ['name' => 'Rose',    'accent' => '#ff2d6b'],
+        ['name' => 'Amber',   'accent' => '#f08a00'],
+        ['name' => 'Slate',   'accent' => '#64748b'],
+    ];
+
     public function indexAction(): string
     {
         $template = AddonHelper::getTemplate();
@@ -56,6 +71,9 @@ final class StylesController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_custom_css_save'])) {
             return $this->saveCustomCss($template);
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_colors'])) {
+            return $this->saveColorsAction($template);
+        }
 
         $style  = (string)($_GET['style'] ?? 'default');
         $subcat = (string)($_GET['subcat'] ?? 'colors');
@@ -65,25 +83,19 @@ final class StylesController extends AbstractController
         }
 
         return $this->view('styles/edit', [
-            'template'   => $template->getName(),
-            'style'      => $style,
-            'styleName'  => ucfirst($style),
-            // Default Apple-spec color groups; real impl reads from core/styles/<style>/style.php
-            'schemes'    => [
-                ['name' => 'Default', 'dot' => '#1062fe', 'active' => true],
-                ['name' => 'Green',   'dot' => '#299341', 'active' => false],
-                ['name' => 'Orange',  'dot' => '#E07800', 'active' => false],
-                ['name' => 'Purple',  'dot' => '#7B2CBF', 'active' => false],
-                ['name' => 'Red',     'dot' => '#D92632', 'active' => false],
-            ],
-            'subcat'     => $subcat,
-            'tab'        => $tab,
-            // Built only for the Variables tab (the only one that renders it),
+            'template'    => $template->getName(),
+            'style'       => $style,
+            'styleName'   => ucfirst($style),
+            'subcat'      => $subcat,
+            'tab'         => $tab,
+            // Built only for the Variables tab (the only one that renders them),
             // so the other tabs skip the folder scan + view-model work.
-            'typography' => $tab === 'variables' ? $this->buildTypographyViewModel($template) : null,
-            'saved'      => isset($_GET['saved']),
-            'customCss'  => (string)Settings::getValue($template->getName() . '_custom_css', ''),
-            'cssSaved'   => isset($_GET['css_saved']),
+            'colors'      => $tab === 'variables' ? $this->buildColorsViewModel($template) : null,
+            'typography'  => $tab === 'variables' ? $this->buildTypographyViewModel($template) : null,
+            'saved'       => isset($_GET['saved']),
+            'colorsSaved' => isset($_GET['colors_saved']),
+            'customCss'   => (string)Settings::getValue($template->getName() . '_custom_css', ''),
+            'cssSaved'    => isset($_GET['css_saved']),
         ]);
     }
 
@@ -261,5 +273,78 @@ final class StylesController extends AbstractController
         Settings::setValue($template->getName() . '_custom_css', (string)($_POST['custom_css'] ?? ''), 'string');
         $style = (string)($_POST['style'] ?? 'default');
         $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&tab=custom-css&css_saved=1');
+    }
+
+    /** Normalize a #rgb or #rrggbb string to a lowercase #rrggbb, or null if invalid. */
+    private function normalizeHex(string $hex): ?string
+    {
+        $hex = trim($hex);
+        if (preg_match('/^#?([0-9a-fA-F]{6})$/', $hex, $m)) {
+            return '#' . strtolower($m[1]);
+        }
+        if (preg_match('/^#?([0-9a-fA-F]{3})$/', $hex, $m)) {
+            $c = $m[1];
+            return '#' . strtolower($c[0] . $c[0] . $c[1] . $c[1] . $c[2] . $c[2]);
+        }
+        return null;
+    }
+
+    /**
+     * View-model for the Colors subcat: the preset list (flagging which one
+     * matches the stored accent), the current effective accent, the resolved
+     * active scheme name, and the theme default.
+     */
+    private function buildColorsViewModel($template): array
+    {
+        $stored = Settings::getValue($template->getName() . '_colors', []);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+        $accent = $this->normalizeHex((string)($stored['accent'] ?? '')) ?? self::COLOR_PRESETS[0]['accent'];
+
+        $activeScheme = 'custom';
+        $presets = [];
+        foreach (self::COLOR_PRESETS as $p) {
+            $isActive = strcasecmp($p['accent'], $accent) === 0;
+            if ($isActive) {
+                $activeScheme = $p['name'];
+            }
+            $presets[] = $p + ['active' => $isActive];
+        }
+
+        return [
+            'presets'       => $presets,
+            'accent'        => $accent,
+            'activeScheme'  => $activeScheme,
+            'defaultAccent' => self::COLOR_PRESETS[0]['accent'],
+        ];
+    }
+
+    /**
+     * Validate + persist the Color Scheme form. Stores only a non-default accent
+     * (keeps the override set empty while on Default, mirroring Typography). The
+     * render-time emitter (Hooks::buildColorsHead) derives the full token chain.
+     * PRG redirect back to the Colors subcat.
+     */
+    private function saveColorsAction($template): string
+    {
+        $accent = $this->normalizeHex((string)($_POST['accent'] ?? ''));
+
+        $out = [];
+        if ($accent !== null && strcasecmp($accent, self::COLOR_PRESETS[0]['accent']) !== 0) {
+            $scheme = 'custom';
+            foreach (self::COLOR_PRESETS as $p) {
+                if (strcasecmp($p['accent'], $accent) === 0) {
+                    $scheme = $p['name'];
+                    break;
+                }
+            }
+            $out = ['scheme' => $scheme, 'accent' => $accent];
+        }
+
+        Settings::setValue($template->getName() . '_colors', $out, 'json');
+
+        $style = (string)($_POST['style'] ?? 'default');
+        $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=colors&colors_saved=1');
     }
 }

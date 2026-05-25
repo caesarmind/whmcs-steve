@@ -333,6 +333,22 @@
 .mt-affix-unit { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--mt-text-3); pointer-events: none; }
 .mt-typo-actions { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--mt-border); display: flex; justify-content: flex-end; }
 .mt-custom-css .mt-textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.5; resize: vertical; min-height: 320px; }
+
+/* Color scheme panel */
+.mt-colors .mt-scheme { font-family: inherit; }
+.mt-color-picker-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.mt-color-input { width: 46px; height: 38px; padding: 3px; border: 1px solid var(--mt-input-border); border-radius: var(--mt-radius-sm); background: var(--mt-surface); cursor: pointer; flex-shrink: 0; }
+.mt-color-input::-webkit-color-swatch-wrapper { padding: 0; }
+.mt-color-input::-webkit-color-swatch { border: 0; border-radius: 4px; }
+.mt-color-input::-moz-color-swatch { border: 0; border-radius: 4px; }
+.mt-color-hex-input { max-width: 130px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-transform: lowercase; }
+.mt-preview-strip { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.mt-preview-chip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-pill); font-size: 12px; font-weight: 500; }
+.mt-preview-sw { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.08); background: var(--mt-primary); }
+.mt-preview-demo { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 8px; }
+.mt-preview-btn { padding: 9px 20px; border: 0; border-radius: var(--mt-radius-pill); background: var(--mt-primary); color: #fff; font: inherit; font-size: 13px; font-weight: 500; cursor: default; }
+.mt-preview-link { font-size: 13px; font-weight: 500; color: var(--mt-primary); text-decoration: none; }
+.mt-preview-link:hover { text-decoration: underline; }
 </style>
 
 <script>
@@ -393,4 +409,82 @@
     if (fsel) fsel.addEventListener('focus', function(){ var f = form.querySelector('input[name="ff_mode"][value="folder"]'); if (f) { f.checked = true; sync(); } });
     sync();
 })();
+
+{literal}
+/* Color scheme: preset chips fill the accent picker; the hex field and the
+   native color input stay in sync; a live preview approximates the derived
+   accent chain (the real chain is computed server-side, Hooks::buildColorsHead,
+   on save). NOTE: wrapped in {literal} because the hex regexes use {3}/{6}
+   quantifiers, which Smarty would otherwise parse as tags. */
+(function(){
+    var form = document.querySelector('.mt-colors');
+    if (!form) return;
+    var colorInput = form.querySelector('#mt-accent');
+    var hexInput   = form.querySelector('#mt-accent-hex');
+    var resetBtn   = form.querySelector('#mt-accent-reset');
+    var customDot  = form.querySelector('[data-custom-dot]');
+    var customChip = form.querySelector('.mt-scheme-custom');
+    var chips      = [].slice.call(form.querySelectorAll('.mt-scheme[data-accent]'));
+    var swAccent   = form.querySelector('[data-sw="accent"]');
+    var swHover    = form.querySelector('[data-sw="hover"]');
+    var swLight    = form.querySelector('[data-sw="light"]');
+    var prevBtn    = form.querySelector('[data-prev-btn]');
+    var prevLink   = form.querySelector('[data-prev-link]');
+
+    function clamp(n){ return Math.max(0, Math.min(255, Math.round(n))); }
+    function toRgb(hex){
+        var m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+        if (m){ var i = parseInt(m[1], 16); return [(i >> 16) & 255, (i >> 8) & 255, i & 255]; }
+        var s = /^#?([0-9a-f]{3})$/i.exec(hex || '');
+        if (s){ var c = s[1]; return [parseInt(c[0] + c[0], 16), parseInt(c[1] + c[1], 16), parseInt(c[2] + c[2], 16)]; }
+        return null;
+    }
+    function hx(v){ return ('0' + clamp(v).toString(16)).slice(-2); }
+    function toHex(rgb){ return '#' + hx(rgb[0]) + hx(rgb[1]) + hx(rgb[2]); }
+    function shade(rgb, p){
+        return [0, 1, 2].map(function(i){
+            var c = rgb[i];
+            return clamp(p >= 0 ? c + (255 - c) * p : c * (1 + p));
+        });
+    }
+    function rgba(rgb, a){ return 'rgba(' + clamp(rgb[0]) + ',' + clamp(rgb[1]) + ',' + clamp(rgb[2]) + ',' + a + ')'; }
+    function normalize(v){ var rgb = toRgb(v); return rgb ? toHex(rgb) : null; }
+
+    function setActiveChip(hex){
+        var matched = false;
+        chips.forEach(function(c){
+            var on = normalize(c.getAttribute('data-accent')) === hex;
+            c.classList.toggle('is-active', on);
+            if (on) matched = true;
+        });
+        if (customChip) customChip.classList.toggle('is-active', !matched);
+    }
+    function preview(hex){
+        var rgb = toRgb(hex); if (!rgb) return;
+        if (swAccent) swAccent.style.background = hex;
+        if (swHover)  swHover.style.background  = toHex(shade(rgb, -0.08));
+        if (swLight)  swLight.style.background  = rgba(rgb, 0.10);
+        if (prevBtn)  prevBtn.style.background  = hex;
+        if (prevLink) prevLink.style.color      = hex;
+        if (customDot) customDot.style.background = hex;
+    }
+    function apply(value, fromHexField){
+        var hex = normalize(value); if (!hex) return;
+        if (colorInput) colorInput.value = hex;
+        if (hexInput && !fromHexField) hexInput.value = hex;
+        setActiveChip(hex);
+        preview(hex);
+    }
+
+    chips.forEach(function(c){
+        c.addEventListener('click', function(){ apply(c.getAttribute('data-accent'), false); });
+    });
+    if (customChip) customChip.addEventListener('click', function(){ if (colorInput) colorInput.focus(); });
+    if (colorInput) colorInput.addEventListener('input', function(){ apply(colorInput.value, false); });
+    if (hexInput) hexInput.addEventListener('input', function(){ if (normalize(hexInput.value)) apply(hexInput.value, true); });
+    if (resetBtn) resetBtn.addEventListener('click', function(){ apply(resetBtn.getAttribute('data-default') || '#0071e3', false); });
+
+    preview((colorInput && colorInput.value) || '#0071e3');
+})();
+{/literal}
 </script>
