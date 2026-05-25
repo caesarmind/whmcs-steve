@@ -21,12 +21,12 @@
     padding: 14px 0;
     margin: 0 0 32px;
     border-bottom: 1px solid var(--color-border, #e8e8ed);
-    font-size: 14px;
+    font-size: var(--text-md);
 }
 .store-nav a {
     color: var(--color-text-secondary, #6e6e73);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     padding: 4px 2px;
     border-bottom: 2px solid transparent;
     transition: color .15s ease, border-color .15s ease;
@@ -74,14 +74,14 @@
 .tile-icon.gray   { background: linear-gradient(135deg, #8E8E93 0%, #6B6B70 100%); }
 
 .store-hero-content h1 {
-    font-size: 40px;
-    font-weight: 600;
+    font-size: var(--text-h2);
+    font-weight: var(--fw-semibold);
     letter-spacing: -0.025em;
     margin: 0 0 8px;
     line-height: 1.1;
 }
 .store-hero-content > p {
-    font-size: 17px;
+    font-size: var(--text-xl);
     color: var(--color-text-secondary, #6e6e73);
     margin: 0;
     line-height: 1.5;
@@ -95,12 +95,12 @@
 }
 @media (max-width: 720px) { .store-hero-pricing { justify-content: center; } }
 .store-hero-price {
-    font-size: 40px;
-    font-weight: 600;
+    font-size: var(--text-h2);
+    font-weight: var(--fw-semibold);
     letter-spacing: -0.02em;
 }
 .store-hero-cycle {
-    font-size: 15px;
+    font-size: var(--text-lg);
     color: var(--color-text-secondary, #6e6e73);
 }
 
@@ -113,8 +113,8 @@
 
 .store-features { margin-top: 16px; }
 .store-features h2 {
-    font-size: 28px;
-    font-weight: 600;
+    font-size: var(--text-h4);
+    font-weight: var(--fw-semibold);
     margin: 48px 0 24px;
 }
 .feature-list {
@@ -131,7 +131,7 @@
     background: var(--color-surface, #fff);
     border: 1px solid var(--color-border, #e8e8ed);
     border-radius: 12px;
-    font-size: 15px;
+    font-size: var(--text-lg);
     color: var(--color-text, #1d1d1f);
 }
 .feature-list li::before {
@@ -148,8 +148,8 @@
 
 .store-faq { margin-top: 56px; }
 .store-faq h2 {
-    font-size: 28px;
-    font-weight: 600;
+    font-size: var(--text-h4);
+    font-weight: var(--fw-semibold);
     margin: 0 0 24px;
 }
 .faq-item {
@@ -158,13 +158,13 @@
 }
 .faq-item:last-child { border-bottom: 0; }
 .faq-q {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: var(--text-xl);
+    font-weight: var(--fw-semibold);
     color: var(--color-text, #1d1d1f);
     margin-bottom: 6px;
 }
 .faq-a {
-    font-size: 15px;
+    font-size: var(--text-lg);
     color: var(--color-text-secondary, #6e6e73);
     line-height: 1.5;
 }

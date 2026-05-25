@@ -10,9 +10,9 @@
 .uve-ico-success { background: var(--color-green-bg); color: var(--color-green-text); }
 .uve-ico-warn    { background: var(--color-orange-bg); color: var(--color-orange-text); }
 .uve-ico-error   { background: var(--color-red-bg); color: var(--color-red-text); }
-.uve-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--color-text-primary); margin: 0 0 8px; line-height: 1.3; }
-.uve-sub { font-size: 14px; color: var(--color-text-secondary); line-height: 1.55; margin: 0 auto 24px; max-width: 360px; }
+.uve-title { font-size: var(--text-3xl); font-weight: var(--fw-semibold); letter-spacing: -0.02em; color: var(--color-text-primary); margin: 0 0 8px; line-height: 1.3; }
+.uve-sub { font-size: var(--text-md); color: var(--color-text-secondary); line-height: 1.55; margin: 0 auto 24px; max-width: 360px; }
 .uve-action { margin-bottom: 16px; }
-.uve-cta { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 18px; font-size: 14px; }
+.uve-cta { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 18px; font-size: var(--text-md); }
 .uve-cta svg { width: 14px; height: 14px; }
-@media (max-width: 480px) { .uve-card { padding: 32px 20px 28px; } .uve-title { font-size: 20px; } }
+@media (max-width: 480px) { .uve-card { padding: 32px 20px 28px; } .uve-title { font-size: var(--text-2xl); } }

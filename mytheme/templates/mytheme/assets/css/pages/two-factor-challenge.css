@@ -7,9 +7,9 @@
     margin: 0 auto 18px;
 }
 .tfac-ico svg { width: 24px; height: 24px; }
-.tfac-title { font-size: 22px; font-weight: 600; letter-spacing: -0.018em; color: var(--color-text-primary); margin: 0 0 10px; }
-.tfac-sub { font-size: 14px; color: var(--color-text-secondary); line-height: 1.55; margin: 0 auto 22px; max-width: 360px; }
-.tfac-alert { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin: 0 0 18px; text-align: left; }
+.tfac-title { font-size: var(--text-3xl); font-weight: var(--fw-semibold); letter-spacing: -0.018em; color: var(--color-text-primary); margin: 0 0 10px; }
+.tfac-sub { font-size: var(--text-md); color: var(--color-text-secondary); line-height: 1.55; margin: 0 auto 22px; max-width: 360px; }
+.tfac-alert { padding: 10px 14px; border-radius: var(--radius-sm); font-size: var(--text-base); margin: 0 0 18px; text-align: left; }
 .tfac-alert-success { background: var(--color-green-bg); color: var(--color-green-text); }
 .tfac-alert-error   { background: var(--color-red-bg); color: var(--color-red-text); }
 .tfac-form { display: flex; flex-direction: column; gap: 12px; }
@@ -20,7 +20,7 @@
     width: 100%; height: 44px; padding: 0 14px;
     border: 0.5px solid var(--color-border);
     border-radius: var(--radius-md);
-    font-size: 16px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--text-xl); font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     text-align: center; letter-spacing: 0.2em;
     background: var(--color-surface);
     color: var(--color-text-primary);
@@ -30,18 +30,18 @@
     outline: none; border-color: var(--color-accent);
     box-shadow: 0 0 0 3px var(--color-accent-light);
 }
-.tfac-challenge button[type="submit"] { width: 100%; height: 44px; font-size: 14px; font-weight: 500; }
+.tfac-challenge button[type="submit"] { width: 100%; height: 44px; font-size: var(--text-md); font-weight: var(--fw-medium); }
 .tfac-backup-input {
     width: 100%; height: 44px; padding: 0 14px;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     letter-spacing: 0.1em; text-align: center;
 }
-.tfac-submit { width: 100%; height: 44px; font-size: 14px; }
+.tfac-submit { width: 100%; height: 44px; font-size: var(--text-md); }
 .tfac-foot { margin-top: 16px; padding-top: 16px; border-top: 0.5px solid var(--color-border); }
 .tfac-link {
     background: none; border: 0; padding: 0;
-    color: var(--color-accent); font-size: 13px; font-weight: 500;
+    color: var(--color-accent); font-size: var(--text-base); font-weight: var(--fw-medium);
     cursor: pointer; font-family: inherit;
 }
 .tfac-link:hover { text-decoration: underline; }
-@media (max-width: 480px) { .tfac-card { padding: 28px 20px 22px; } .tfac-title { font-size: 20px; } }
+@media (max-width: 480px) { .tfac-card { padding: 28px 20px 22px; } .tfac-title { font-size: var(--text-2xl); } }

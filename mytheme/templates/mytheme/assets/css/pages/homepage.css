@@ -7,8 +7,8 @@
 /* ─── Hero domain search ─── */
 .ph-hero { padding: 48px 22px 56px; text-align: center; }
 .ph-hero-inner { max-width: 760px; margin: 0 auto; }
-.ph-hero h1 { font-size: 44px; font-weight: 600; letter-spacing: -0.025em; margin: 0 0 12px; color: var(--color-text-primary); line-height: 1.08; }
-.ph-hero p { font-size: 17px; color: var(--color-text-secondary); margin: 0 0 28px; }
+.ph-hero h1 { font-size: var(--text-h1); font-weight: var(--fw-semibold); letter-spacing: -0.025em; margin: 0 0 12px; color: var(--color-text-primary); line-height: 1.08; }
+.ph-hero p { font-size: var(--text-xl); color: var(--color-text-secondary); margin: 0 0 28px; }
 .ph-hero .ph-domain-tabs {
     display: inline-flex; gap: 4px; padding: 4px;
     background: var(--color-surface-secondary);
@@ -17,7 +17,7 @@
 .ph-hero .ph-domain-tabs button {
     padding: 8px 18px; border-radius: 980px;
     border: 0; background: transparent;
-    font: inherit; font-size: 13px; font-weight: 500;
+    font: inherit; font-size: var(--text-base); font-weight: var(--fw-medium);
     color: var(--color-text-secondary); cursor: pointer;
     transition: background var(--transition-fast), color var(--transition-fast);
 }
@@ -49,7 +49,7 @@
 .ph-domain-box input {
     flex: 1; border: 0; outline: none;
     background: transparent;
-    font: inherit; font-size: 16px;
+    font: inherit; font-size: var(--text-xl);
     color: var(--color-text-primary);
     padding: 14px 0; min-width: 0;
 }
@@ -58,7 +58,7 @@
     background: var(--color-accent); color: #fff;
     border: 0; border-radius: 12px;
     padding: 12px 24px;
-    font: inherit; font-size: 14px; font-weight: 500;
+    font: inherit; font-size: var(--text-md); font-weight: var(--fw-medium);
     cursor: pointer; transition: background 0.15s;
     white-space: nowrap;
 }
@@ -67,7 +67,7 @@
 .ph-domain-footer {
     margin-top: 12px;
     display: flex; justify-content: space-between; align-items: center;
-    font-size: 12px; color: var(--color-text-tertiary);
+    font-size: var(--text-sm); color: var(--color-text-tertiary);
 }
 .ph-domain-footer a { color: var(--color-accent); text-decoration: none; }
 .ph-domain-footer a:hover { text-decoration: underline; }
@@ -86,21 +86,21 @@
     background: repeating-linear-gradient(45deg, #dcdcdc, #dcdcdc 6px, #e8e8ed 6px, #e8e8ed 12px);
     border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-family: "Courier New", monospace; font-weight: 700; font-size: 17px;
+    font-family: "Courier New", monospace; font-weight: var(--fw-bold); font-size: var(--text-xl);
     color: #1d1d1f; letter-spacing: 3px; font-style: italic;
     transform: skewX(-6deg);
 }
 .ph-captcha input {
     padding: 10px 14px;
     border: 1px solid var(--color-border); border-radius: 10px;
-    font-size: 14px;
+    font-size: var(--text-md);
     background: var(--color-surface); color: var(--color-text-primary);
     text-align: center; letter-spacing: 2px; text-transform: uppercase;
     font-family: inherit;
 }
 .ph-captcha .help {
     grid-column: 1 / -1;
-    font-size: 11px; color: var(--color-text-tertiary); text-align: center;
+    font-size: var(--text-xs); color: var(--color-text-tertiary); text-align: center;
 }
 
 /* ─── Body sections ─── */
@@ -110,13 +110,13 @@
 }
 .ph-section-head { text-align: center; margin-bottom: 28px; }
 .ph-section-head .eyebrow {
-    font-size: 12px; font-weight: 600;
+    font-size: var(--text-sm); font-weight: var(--fw-semibold);
     letter-spacing: 0.05em; text-transform: uppercase;
     color: var(--color-accent);
     margin-bottom: 6px;
 }
 .ph-section-head h2 {
-    font-size: 32px; font-weight: 600;
+    font-size: var(--text-h3); font-weight: var(--fw-semibold);
     letter-spacing: -0.025em;
     margin: 0; color: var(--color-text-primary);
 }
@@ -149,13 +149,13 @@
 .ph-pg-card .pg-icon.purple { background: rgba(175,130,255,0.12); color: #af82ff; }
 .ph-pg-card .pg-icon.orange { background: rgba(255,159,10,0.12);  color: #ff9f0a; }
 .ph-pg-card h3 {
-    font-size: 19px; font-weight: 600;
+    font-size: var(--text-2xl); font-weight: var(--fw-semibold);
     margin: 0 0 8px;
     color: var(--color-text-primary);
     letter-spacing: -0.01em;
 }
 .ph-pg-card p {
-    font-size: 14px; color: var(--color-text-secondary);
+    font-size: var(--text-md); color: var(--color-text-secondary);
     margin: 0 0 20px; min-height: 42px; line-height: 1.5;
 }
 .ph-pg-card a.cta {
@@ -165,7 +165,7 @@
     background: transparent;
     color: var(--color-accent);
     border: 1px solid var(--color-accent);
-    font-size: 13px; font-weight: 500;
+    font-size: var(--text-base); font-weight: var(--fw-medium);
     text-decoration: none;
     transition: all 0.15s;
 }
@@ -208,4 +208,4 @@
 .ph-action .ico.blue   { background: rgba(0,113,227,0.10);   color: var(--color-accent); }
 .ph-action .ico.purple { background: rgba(175,130,255,0.14); color: #af82ff; }
 .ph-action .ico.indigo { background: rgba(94,92,230,0.16);   color: #5e5ce6; }
-.ph-action .lbl { font-size: 13px; font-weight: 500; }
+.ph-action .lbl { font-size: var(--text-base); font-weight: var(--fw-medium); }

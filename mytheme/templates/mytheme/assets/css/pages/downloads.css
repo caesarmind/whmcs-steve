@@ -3,15 +3,15 @@
 
 .page-header { margin: 8px 0 24px; }
 .page-header h1 {
-    font-size: 40px;
-    font-weight: 600;
+    font-size: var(--text-h2);
+    font-weight: var(--fw-semibold);
     letter-spacing: -0.028em;
     color: var(--color-text-primary);
     margin: 0 0 8px;
     line-height: 1.1;
 }
-@media (max-width: 880px) { .page-header h1 { font-size: 34px; } }
-@media (max-width: 480px) { .page-header h1 { font-size: 30px; } }
+@media (max-width: 880px) { .page-header h1 { font-size: var(--text-h3); } }
+@media (max-width: 480px) { .page-header h1 { font-size: var(--text-h4); } }
 
 /* 2-column split: support sub-nav + content */
 .dl-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
@@ -21,10 +21,10 @@
 
 /* Shared sub-nav (page-local copy — see PAGE-CHECKLIST §6b) */
 .subnav-card { padding: 8px; }
-.subnav-heading { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }
-.subnav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: 13px; letter-spacing: -0.008em; text-decoration: none; transition: background var(--transition-fast); }
+.subnav-heading { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }
+.subnav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: var(--text-base); letter-spacing: -0.008em; text-decoration: none; transition: background var(--transition-fast); }
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
-.subnav-item.active { background: var(--sidebar-item-active); font-weight: 500; }
+.subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
 .subnav-item.active svg { color: var(--color-accent); }
 
@@ -37,7 +37,7 @@
     border: 0.5px solid var(--color-border);
     border-radius: var(--radius-md);
     background: var(--color-surface);
-    font-size: 14px; letter-spacing: -0.008em;
+    font-size: var(--text-md); letter-spacing: -0.008em;
     color: var(--color-text-primary);
     font-family: inherit;
     transition: all var(--transition-fast);
@@ -73,19 +73,19 @@
 
 .dl-cat-meta { flex: 1; min-width: 0; }
 .dl-cat-title {
-    font-size: 14.5px; font-weight: 600;
+    font-size: var(--text-lg); font-weight: var(--fw-semibold);
     color: var(--color-text-primary);
     letter-spacing: -0.012em;
     display: flex; align-items: center; gap: 8px;
 }
 .dl-cat-title .chev { width: 13px; height: 13px; color: var(--color-text-tertiary); opacity: 0; transform: translateX(-4px); transition: all var(--transition-fast); }
 .dl-cat:hover .dl-cat-title .chev { opacity: 1; transform: translateX(0); }
-.dl-cat-desc { font-size: 12.5px; color: var(--color-text-tertiary); margin-top: 3px; line-height: 1.5; letter-spacing: -0.004em; }
-.dl-cat-count { font-size: 11.5px; color: var(--color-text-tertiary); margin-top: 8px; letter-spacing: -0.004em; display: inline-flex; align-items: center; gap: 6px; }
+.dl-cat-desc { font-size: var(--text-base); color: var(--color-text-tertiary); margin-top: 3px; line-height: 1.5; letter-spacing: -0.004em; }
+.dl-cat-count { font-size: var(--text-sm); color: var(--color-text-tertiary); margin-top: 8px; letter-spacing: -0.004em; display: inline-flex; align-items: center; gap: 6px; }
 .dl-cat-count .dot { opacity: 0.45; }
 
 /* Section heading */
-.dl-section-title { font-size: 13px; font-weight: 600; color: var(--color-text-secondary); letter-spacing: -0.005em; margin: 0 0 10px; padding-left: 2px; }
+.dl-section-title { font-size: var(--text-base); font-weight: var(--fw-semibold); color: var(--color-text-secondary); letter-spacing: -0.005em; margin: 0 0 10px; padding-left: 2px; }
 
 /* File list */
 .dl-file-list { padding: 0; }
@@ -101,7 +101,7 @@
 .dl-file-ico {
     width: 34px; height: 42px; border-radius: 5px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 8.5px; font-weight: 700; letter-spacing: 0.04em;
+    font-size: var(--text-xs); font-weight: var(--fw-bold); letter-spacing: 0.04em;
     color: #fff; flex-shrink: 0; position: relative;
     background: #86868b;
 }
@@ -118,8 +118,8 @@
 .dl-file-ico.img { background: #248a3d; }
 
 .dl-file-meta { flex: 1; min-width: 0; }
-.dl-file-name { font-size: 13.5px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -0.008em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dl-file-sub { font-size: 11.5px; color: var(--color-text-tertiary); margin-top: 2px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dl-file-name { font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-text-primary); letter-spacing: -0.008em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dl-file-sub { font-size: var(--text-sm); color: var(--color-text-tertiary); margin-top: 2px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .dl-file-sub .dot { opacity: 0.45; }
 
 .dl-file-action {
@@ -135,5 +135,5 @@
 .dl-empty { text-align: center; padding: 60px 24px; }
 .dl-empty-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--color-bg); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--color-text-tertiary); }
 .dl-empty-ico svg { width: 22px; height: 22px; }
-.dl-empty-title { font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 6px; }
-.dl-empty-sub { font-size: 14px; color: var(--color-text-secondary); margin: 0 auto 20px; max-width: 380px; line-height: 1.5; }
+.dl-empty-title { font-size: var(--text-xl); font-weight: var(--fw-semibold); color: var(--color-text-primary); margin: 0 0 6px; }
+.dl-empty-sub { font-size: var(--text-md); color: var(--color-text-secondary); margin: 0 auto 20px; max-width: 380px; line-height: 1.5; }
