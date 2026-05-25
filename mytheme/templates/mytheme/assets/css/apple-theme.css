@@ -49,6 +49,16 @@
     --color-blue-text: #0071e3;
     --color-gray-bg: rgba(142, 142, 147, 0.12);
     --color-gray-text: #6e6e73;
+    /* Sidebar icon tiles (Apple system-color palette) */
+    --color-icon-blue: #007aff;
+    --color-icon-purple: #af52de;
+    --color-icon-orange: #ff9500;
+    --color-icon-green: #34c759;
+    --color-icon-red: #ff3b30;
+    --color-icon-teal: #5ac8fa;
+    --color-icon-gray: #8e8e93;
+    --color-icon-indigo: #5856d6;
+    --color-icon-pink: #ff2d55;
     --sidebar-width: 260px;
     --sidebar-bg: rgba(246, 246, 248, 0.80);
     --sidebar-item-hover: rgba(0, 0, 0, 0.04);
@@ -206,15 +216,15 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
 .sidebar-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .sidebar-item-icon { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sidebar-item-icon svg { width: 15px; height: 15px; }
-.sidebar-item-icon.blue { background: #007aff; color: white; }
-.sidebar-item-icon.purple { background: #af52de; color: white; }
-.sidebar-item-icon.orange { background: #ff9500; color: white; }
-.sidebar-item-icon.green { background: #34c759; color: white; }
-.sidebar-item-icon.red { background: var(--color-red); color: white; }
-.sidebar-item-icon.teal { background: #5ac8fa; color: white; }
-.sidebar-item-icon.gray { background: #8e8e93; color: white; }
-.sidebar-item-icon.indigo { background: #5856d6; color: white; }
-.sidebar-item-icon.pink { background: #ff2d55; color: white; }
+.sidebar-item-icon.blue { background: var(--color-icon-blue); color: white; }
+.sidebar-item-icon.purple { background: var(--color-icon-purple); color: white; }
+.sidebar-item-icon.orange { background: var(--color-icon-orange); color: white; }
+.sidebar-item-icon.green { background: var(--color-icon-green); color: white; }
+.sidebar-item-icon.red { background: var(--color-icon-red); color: white; }
+.sidebar-item-icon.teal { background: var(--color-icon-teal); color: white; }
+.sidebar-item-icon.gray { background: var(--color-icon-gray); color: white; }
+.sidebar-item-icon.indigo { background: var(--color-icon-indigo); color: white; }
+.sidebar-item-icon.pink { background: var(--color-icon-pink); color: white; }
 .sidebar-item-badge { margin-left: auto; font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--color-text-tertiary); background: var(--color-gray-bg); padding: 1px 7px; border-radius: var(--radius-pill); min-width: 20px; text-align: center; }
 .sidebar-footer { padding: 12px; border-top: 0.5px solid var(--color-border); }
 .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: var(--radius-sm); cursor: pointer; transition: background var(--transition-fast); }

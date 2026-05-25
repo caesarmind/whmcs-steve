@@ -77,5 +77,16 @@ return [
         'Topbar' => [
             ['var' => '--topbar-bg', 'label' => 'Background', 'light' => 'rgba(251,251,253,0.72)', 'dark' => 'rgba(44,44,46,0.72)'],
         ],
+        'Icon tiles' => [
+            ['var' => '--color-icon-blue',   'label' => 'Blue',   'light' => '#007aff', 'dark' => '#007aff'],
+            ['var' => '--color-icon-purple', 'label' => 'Purple', 'light' => '#af52de', 'dark' => '#af52de'],
+            ['var' => '--color-icon-orange', 'label' => 'Orange', 'light' => '#ff9500', 'dark' => '#ff9500'],
+            ['var' => '--color-icon-green',  'label' => 'Green',  'light' => '#34c759', 'dark' => '#34c759'],
+            ['var' => '--color-icon-red',    'label' => 'Red',    'light' => '#ff3b30', 'dark' => '#ff3b30'],
+            ['var' => '--color-icon-teal',   'label' => 'Teal',   'light' => '#5ac8fa', 'dark' => '#5ac8fa'],
+            ['var' => '--color-icon-gray',   'label' => 'Gray',   'light' => '#8e8e93', 'dark' => '#8e8e93'],
+            ['var' => '--color-icon-indigo', 'label' => 'Indigo', 'light' => '#5856d6', 'dark' => '#5856d6'],
+            ['var' => '--color-icon-pink',   'label' => 'Pink',   'light' => '#ff2d55', 'dark' => '#ff2d55'],
+        ],
     ],
 ];
