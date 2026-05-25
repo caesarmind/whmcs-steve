@@ -189,8 +189,9 @@ final class Hooks
         $cfg      = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/typography.php');
         $fallback = (string)($cfg['fontFamily']['fallback'] ?? 'sans-serif');
 
-        $decls = [];
-        $links = '';
+        $decls    = [];
+        $links    = '';
+        $fontFace = '';
 
         // Font family
         $ff   = is_array($stored['fontFamily'] ?? null) ? $stored['fontFamily'] : [];
@@ -209,6 +210,21 @@ final class Hooks
             $custom = trim((string)preg_replace('/[^A-Za-z0-9 ,\'"\-]/', '', (string)$ff['custom']));
             if ($custom !== '') {
                 $decls['--font-family'] = $custom;
+            }
+        } elseif ($mode === 'folder' && !empty($ff['folder'])) {
+            // A font dropped into assets/fonts/custom (scanned by StylesController).
+            // Sanitize hard: basename + extension allowlist + must exist on disk.
+            $file = basename((string)$ff['folder']);
+            if (preg_match('/^[A-Za-z0-9._-]+\.(woff2|woff|ttf|otf)$/i', $file)
+                && is_file($template->getFullPath() . '/assets/fonts/custom/' . $file)) {
+                $famName  = pathinfo($file, PATHINFO_FILENAME);
+                $ext      = strtolower((string)pathinfo($file, PATHINFO_EXTENSION));
+                $fmt      = ['woff2' => 'woff2', 'woff' => 'woff', 'ttf' => 'truetype', 'otf' => 'opentype'][$ext] ?? 'woff2';
+                $webRoot  = defined('WEB_ROOT') ? rtrim((string)WEB_ROOT, '/') : '';
+                $url      = $webRoot . '/templates/' . $template->getName() . '/assets/fonts/custom/' . $file;
+                $fontFace = '@font-face{font-family:"' . $famName . '";font-style:normal;font-weight:100 900;'
+                          . 'font-display:swap;src:url("' . $url . '") format("' . $fmt . '");}';
+                $decls['--font-family'] = '"' . $famName . '", ' . $fallback;
             }
         }
 
@@ -233,7 +249,7 @@ final class Hooks
             return $links;
         }
 
-        $css = ':root{';
+        $css = $fontFace . ':root{';
         foreach ($decls as $var => $val) {
             $css .= $var . ':' . $val . ';';
         }

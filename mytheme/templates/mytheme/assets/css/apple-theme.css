@@ -3,6 +3,19 @@
    Cupertino / macOS Ventura+
    ============================================ */
 
+/* --- Bundled font: Inter (self-hosted, SIL OFL) ---
+   One variable file (weights 100-900) covers the whole type scale with no
+   external request. Inter is the theme's default typeface (see --font-family)
+   for a consistent SF-Pro-like look on every platform; the system stack stays
+   as the fallback if the font fails to load. */
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('../fonts/InterVariable.woff2') format('woff2');
+}
+
 /* --- Reset & Base --- */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -53,7 +66,7 @@
     --radius-pill: 980px;
     --transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
     --transition-medium: 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
-    --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     --font-mono: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
 
     /* ── Type scale ───────────────────────────────────────────────

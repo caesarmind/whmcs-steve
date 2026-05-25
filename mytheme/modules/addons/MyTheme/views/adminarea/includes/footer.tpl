@@ -383,11 +383,13 @@
     if (!form) return;
     var gsel = form.querySelector('select[name="ff_google"]');
     var ccustom = form.querySelector('input[name="ff_custom"]');
+    var fsel = form.querySelector('select[name="ff_folder"]');
     function mode() { var c = form.querySelector('input[name="ff_mode"]:checked'); return c ? c.value : 'default'; }
-    function sync() { var m = mode(); if (gsel) gsel.disabled = m !== 'google'; if (ccustom) ccustom.disabled = m !== 'custom'; }
+    function sync() { var m = mode(); if (gsel) gsel.disabled = m !== 'google'; if (ccustom) ccustom.disabled = m !== 'custom'; if (fsel) fsel.disabled = m !== 'folder'; }
     [].slice.call(form.querySelectorAll('input[name="ff_mode"]')).forEach(function(r){ r.addEventListener('change', sync); });
     if (gsel) gsel.addEventListener('focus', function(){ var g = form.querySelector('input[name="ff_mode"][value="google"]'); if (g) { g.checked = true; sync(); } });
     if (ccustom) ccustom.addEventListener('focus', function(){ var c = form.querySelector('input[name="ff_mode"][value="custom"]'); if (c) { c.checked = true; sync(); } });
+    if (fsel) fsel.addEventListener('focus', function(){ var f = form.querySelector('input[name="ff_mode"][value="folder"]'); if (f) { f.checked = true; sync(); } });
     sync();
 })();
 </script>

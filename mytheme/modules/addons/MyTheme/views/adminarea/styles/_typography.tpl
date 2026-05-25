@@ -13,7 +13,7 @@
         <div class="mt-typo-fonts">
             <label class="mt-typo-radio">
                 <input type="radio" name="ff_mode" value="default"{if $typography.fontFamily.mode == 'default'} checked{/if}>
-                <span>System default <em>(San Francisco / Segoe / Roboto)</em></span>
+                <span>Default <em>(San Francisco on Apple, bundled Inter on other platforms)</em></span>
             </label>
 
             <label class="mt-typo-radio">
@@ -28,6 +28,21 @@
                     {/foreach}
                 </select>
             </div>
+
+            {if $typography.folderFonts}
+            <label class="mt-typo-radio">
+                <input type="radio" name="ff_mode" value="folder"{if $typography.fontFamily.mode == 'folder'} checked{/if}>
+                <span>Your fonts <em>(dropped into /assets/fonts/custom)</em></span>
+            </label>
+            <div class="mt-typo-dep">
+                <select name="ff_folder" class="mt-select">
+                    <option value="">&mdash; select a font &mdash;</option>
+                    {foreach $typography.folderFonts as $ffont}
+                        <option value="{$ffont.file|escape}"{if $ffont.file == $typography.fontFamily.folder} selected{/if}>{$ffont.name|escape}</option>
+                    {/foreach}
+                </select>
+            </div>
+            {/if}
 
             <label class="mt-typo-radio">
                 <input type="radio" name="ff_mode" value="custom"{if $typography.fontFamily.mode == 'custom'} checked{/if}>

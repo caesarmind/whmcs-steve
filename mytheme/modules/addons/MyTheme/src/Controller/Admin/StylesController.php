@@ -100,6 +100,29 @@ final class StylesController extends AbstractController
     }
 
     /**
+     * Scan assets/fonts/custom for buyer-dropped web fonts. Each becomes a
+     * pickable "Your fonts" option. The regex doubles as a filename allowlist
+     * (letters/numbers/._- + a font extension), so stored values can't traverse.
+     *
+     * @return list<array{file:string, name:string}>
+     */
+    private function scanFontFolder($template): array
+    {
+        $dir = $template->getFullPath() . '/assets/fonts/custom';
+        if (!is_dir($dir)) {
+            return [];
+        }
+        $out = [];
+        foreach ((array)scandir($dir) as $file) {
+            if (!preg_match('/^[A-Za-z0-9._-]+\.(?:woff2|woff|ttf|otf)$/i', (string)$file)) {
+                continue;
+            }
+            $out[] = ['file' => $file, 'name' => pathinfo($file, PATHINFO_FILENAME)];
+        }
+        return $out;
+    }
+
+    /**
      * Merge stored overrides onto the schema defaults so the form shows each
      * token's current EFFECTIVE value.
      */
@@ -113,6 +136,7 @@ final class StylesController extends AbstractController
         $sizesStored   = is_array($stored['sizes'] ?? null)      ? $stored['sizes']      : [];
         $weightsStored = is_array($stored['weights'] ?? null)    ? $stored['weights']    : [];
         $ff            = is_array($stored['fontFamily'] ?? null) ? $stored['fontFamily'] : [];
+        $folderFonts   = $this->scanFontFolder($template);
 
         $sizeGroups = [];
         foreach (($cfg['sizeGroups'] ?? []) as $group => $items) {
@@ -134,10 +158,12 @@ final class StylesController extends AbstractController
             'googleFonts'   => $cfg['googleFonts'] ?? [],
             'sizeMin'       => (int)($cfg['sizeMin'] ?? 8),
             'sizeMax'       => (int)($cfg['sizeMax'] ?? 160),
+            'folderFonts'   => $folderFonts,
             'fontFamily'    => [
                 'mode'   => (string)($ff['mode']   ?? 'default'),
                 'google' => (string)($ff['google'] ?? ''),
                 'custom' => (string)($ff['custom'] ?? ''),
+                'folder' => (string)($ff['folder'] ?? ''),
             ],
         ];
     }
@@ -198,6 +224,15 @@ final class StylesController extends AbstractController
             $out['fontFamily'] = ['mode' => 'google', 'google' => trim((string)$_POST['ff_google'])];
         } elseif ($mode === 'custom' && trim((string)($_POST['ff_custom'] ?? '')) !== '') {
             $out['fontFamily'] = ['mode' => 'custom', 'custom' => trim((string)$_POST['ff_custom'])];
+        } elseif ($mode === 'folder' && trim((string)($_POST['ff_folder'] ?? '')) !== '') {
+            // Only accept a filename that's actually present in the scanned folder.
+            $file = basename(trim((string)$_POST['ff_folder']));
+            foreach ($this->scanFontFolder($template) as $f) {
+                if ($f['file'] === $file) {
+                    $out['fontFamily'] = ['mode' => 'folder', 'folder' => $file];
+                    break;
+                }
+            }
         }
 
         Settings::setValue($template->getName() . '_typography', $out, 'json');
