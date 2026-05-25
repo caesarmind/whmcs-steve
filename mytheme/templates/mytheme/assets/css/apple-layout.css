@@ -854,6 +854,18 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
 /* Hamburger toggle -- only visible on side/rail at narrow widths */
 .ph-mobile-toggle { display: none; }
 
+/* Drawer close (X) -- only shown when the sidebar is a mobile drawer (<=900px,
+   see media block). Hidden on desktop where the sidebar is a permanent column. */
+.sidebar-close {
+    display: none; align-items: center; justify-content: center;
+    margin-left: auto; flex-shrink: 0;
+    width: 32px; height: 32px; padding: 0;
+    border: 0; border-radius: 8px; background: transparent; cursor: pointer;
+    color: var(--color-text-secondary);
+}
+.sidebar-close:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); }
+.sidebar-close svg { width: 20px; height: 20px; }
+
 @media (max-width: 900px) {
     /* Reset main content offset -- drawer overlays, doesn't push */
     body[data-layout="side"] .ph-main-wrap,
@@ -890,6 +902,10 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
 
     /* Show hamburger toggle -- only when in side/rail layout */
     body:not([data-layout="top"]) .ph-mobile-toggle { display: inline-flex; }
+
+    /* Drawer close (X) -- visible whenever the sidebar is a mobile drawer
+       (applies to both side and top layouts; on rail the sidebar isn't rendered). */
+    .sidebar-close { display: inline-flex; }
 
     /* ...and surface the brand logo here (the sidebar/rail logo is now in the
        collapsed drawer); drop the breadcrumb to make room for it. */
@@ -946,8 +962,28 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
     .ph-breadcrumb-inner::-webkit-scrollbar { display: none; }
     .ph-side-topbar-inner { padding: 10px 16px; }
     .ph-side-crumbs { min-width: 0; overflow-x: auto; white-space: nowrap; }
-    .profile-dropdown,
-    .notification-dropdown { max-width: calc(100vw - 24px); }
+    /* Anchor dropdowns to the viewport on mobile so they never run off-screen.
+       The absolute right:0 / 320px panel overflows when its trigger isn't at the
+       edge (e.g. the notifications bell sits left of cart + avatar). The nav bars
+       are full-width at top:0, so these fixed offsets resolve to viewport
+       coordinates even though the bar's backdrop-filter is the containing block. */
+    /* Scoped to the bar (.homepage-nav / .ph-side-topbar) so this beats the
+       existing `.<bar> .notification-dropdown { top: calc(100%+8px); right: 0 }`
+       rules on specificity. Those only looked OK because calc(100%) resolved
+       against the short bar; anchor explicitly to the viewport instead. The
+       vw-based width keeps symmetric 12px gutters regardless of the bar's
+       backdrop-filter containing block. */
+    .homepage-nav .notification-dropdown,
+    .homepage-nav .profile-dropdown,
+    .ph-side-topbar .notification-dropdown,
+    .ph-side-topbar .profile-dropdown {
+        position: fixed;
+        top: 54px;
+        left: 12px;
+        right: auto;
+        width: calc(100vw - 24px);
+        max-width: none;
+    }
 }
 
 @media (max-width: 420px) {

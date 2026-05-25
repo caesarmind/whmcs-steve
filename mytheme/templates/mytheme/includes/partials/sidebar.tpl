@@ -105,6 +105,12 @@
                 <span class="sidebar-brand">{$companyname|escape}</span>
             {/if}
         </a>
+        {* Close button — only visible when the sidebar is a mobile drawer
+           (<=900px). data-nav-toggle closes the open drawer via apple-layout.js.
+           Hidden on desktop where the sidebar is a permanent column. *}
+        <button type="button" class="sidebar-close" aria-label="{$LANG.close|default:'Close menu'}" data-nav-toggle>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
     </div>
     <div class="sidebar-search">
         <form action="{$WEB_ROOT}/knowledgebase.php" method="get">
