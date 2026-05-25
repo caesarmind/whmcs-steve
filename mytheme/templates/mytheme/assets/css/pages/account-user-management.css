@@ -39,7 +39,7 @@ body[data-subnav="off"] .um-split > aside { display: none; }
 .um-row-avatar {
     width: 36px; height: 36px; border-radius: 50%;
     background: linear-gradient(135deg, #007aff, #5856d6);
-    color: #fff;
+    color: var(--color-surface);
     display: inline-flex; align-items: center; justify-content: center;
     font-size: var(--text-md); font-weight: var(--fw-semibold); flex-shrink: 0;
 }

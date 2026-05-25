@@ -71,7 +71,7 @@ body[data-subnav="off"] .pd-split > .pd-aside { display: none; }
 
 .pd-section-text { font-size: var(--text-md); color: var(--color-text-secondary); line-height: 1.55; margin: 0 0 18px; }
 .pd-cancel-btn { color: var(--color-red-text); border-color: var(--color-red-text); }
-.pd-cancel-btn:hover { background: var(--color-red-text); color: #fff; }
+.pd-cancel-btn:hover { background: var(--color-red-text); color: var(--color-surface); }
 
 .subnav-card { padding: 8px; }
 .subnav-heading { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }

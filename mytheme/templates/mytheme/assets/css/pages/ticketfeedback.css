@@ -11,7 +11,7 @@
 /* Centered notice / success */
 .tk-notice { text-align: center; padding: 56px 24px; }
 .tk-notice-ico { width: 68px; height: 68px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; background: var(--color-accent-light); color: var(--color-accent); }
-.tk-notice-ico.ok { background: #34c759; color: #fff; }
+.tk-notice-ico.ok { background: #34c759; color: var(--color-surface); }
 .tk-notice-ico.warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
 .tk-notice-ico svg { width: 32px; height: 32px; }
 .tk-notice-title { font-size: var(--text-3xl); font-weight: var(--fw-semibold); letter-spacing: -0.016em; color: var(--color-text-primary); margin: 0 0 8px; }
@@ -46,7 +46,7 @@
 .tk-rate-btn { position: relative; }
 .tk-rate-btn input { position: absolute; opacity: 0; width: 0; height: 0; }
 .tk-rate-btn span { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; height: 38px; padding: 0 10px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-text-secondary); cursor: pointer; transition: all var(--transition-fast); }
-.tk-rate-btn input:checked + span { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+.tk-rate-btn input:checked + span { background: var(--color-accent); color: var(--color-surface); border-color: var(--color-accent); }
 .tk-rate-btn input:focus-visible + span { box-shadow: 0 0 0 3px var(--color-accent-light); }
 
 /* Empty */

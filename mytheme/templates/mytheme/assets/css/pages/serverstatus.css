@@ -164,7 +164,7 @@ body[data-subnav-side="left"] .ss-split > .ss-main  { grid-column: 2; grid-row: 
     background: var(--color-gray-bg);
     color: var(--color-text-tertiary);
 }
-.ss-filter-tab.active .ss-filter-count { background: rgba(255,255,255,0.22); color: #fff; }
+.ss-filter-tab.active .ss-filter-count { background: rgba(255,255,255,0.22); color: var(--color-surface); }
 
 /* ---- Sections ---- */
 .ss-section { margin-bottom: 28px; }

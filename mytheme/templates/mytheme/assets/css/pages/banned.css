@@ -7,7 +7,7 @@
 @media (max-width: 480px) { .page-header h1 { font-size: var(--text-h4); } }
 
 .err-card { max-width: 520px; margin: 0 auto; text-align: center; padding: 56px 32px; }
-.err-ico { width: 68px; height: 68px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; background: rgba(255,59,48,0.08); color: #ff3b30; }
+.err-ico { width: 68px; height: 68px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; background: rgba(255,59,48,0.08); color: var(--color-red); }
 .err-ico.warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
 .err-ico svg { width: 32px; height: 32px; }
 .err-title { font-size: var(--text-3xl); font-weight: var(--fw-semibold); letter-spacing: -0.016em; color: var(--color-text-primary); margin: 0 0 8px; }

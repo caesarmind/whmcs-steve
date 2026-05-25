@@ -238,9 +238,9 @@ body[data-svc-layout="outside"] .inv-main .card > .card-body {
     color: var(--color-text-primary);
     flex-shrink: 0;
 }
-.inv-pay-method-logo.visa { background: #1a1f71; color: #fff; }
+.inv-pay-method-logo.visa { background: #1a1f71; color: var(--color-surface); }
 .inv-pay-method-logo.mc { background: linear-gradient(90deg, #eb001b 50%, #f79e1b 50%); color: transparent; }
-.inv-pay-method-logo.pp { background: #003087; color: #fff; }
+.inv-pay-method-logo.pp { background: #003087; color: var(--color-surface); }
 .inv-pay-method-logo.plus { background: var(--color-surface-secondary); color: var(--color-text-tertiary); }
 .inv-pay-method-meta { flex: 1; min-width: 0; }
 .inv-pay-method-name {

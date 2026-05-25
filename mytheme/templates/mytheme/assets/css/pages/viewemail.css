@@ -2,21 +2,21 @@
    Uses var() with literal fallbacks so it renders even if tokens don't load. */
 
 body.vem-popup {
-    background: var(--color-bg, #f5f5f7);
+    background: var(--color-bg, var(--color-surface-secondary));
     margin: 0; padding: 20px;
     font-family: var(--font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif);
-    color: var(--color-text-primary, #1d1d1f);
+    color: var(--color-text-primary, var(--color-text-primary));
     -webkit-font-smoothing: antialiased;
 }
-.vem-card { max-width: 640px; margin: 0 auto; background: var(--color-surface, #ffffff); border: 0.5px solid var(--color-border, #d2d2d7); border-radius: 14px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+.vem-card { max-width: 640px; margin: 0 auto; background: var(--color-surface, var(--color-surface)); border: 0.5px solid var(--color-border, #d2d2d7); border-radius: 14px; overflow: hidden; box-shadow: 0 4px 24px var(--sidebar-item-active); }
 .vem-header { padding: 18px 22px; border-bottom: 0.5px solid var(--color-border, #d2d2d7); }
-.vem-eyebrow { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary, #86868b); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 4px; }
-.vem-title { font-size: var(--text-xl); font-weight: var(--fw-semibold); letter-spacing: -0.012em; color: var(--color-text-primary, #1d1d1f); margin: 0; }
-.vem-message { padding: 22px; font-size: var(--text-md); line-height: 1.6; color: var(--color-text-primary, #1d1d1f); word-wrap: break-word; }
+.vem-eyebrow { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary, var(--color-text-tertiary)); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 4px; }
+.vem-title { font-size: var(--text-xl); font-weight: var(--fw-semibold); letter-spacing: -0.012em; color: var(--color-text-primary, var(--color-text-primary)); margin: 0; }
+.vem-message { padding: 22px; font-size: var(--text-md); line-height: 1.6; color: var(--color-text-primary, var(--color-text-primary)); word-wrap: break-word; }
 .vem-message img { max-width: 100%; height: auto; }
-.vem-message a { color: var(--color-accent, #0071e3); }
-.vem-attach { padding: 16px 22px; border-top: 0.5px solid var(--color-border, #d2d2d7); background: var(--color-surface-tertiary, #fafafa); }
-.vem-attach-title { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary, #86868b); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px; }
+.vem-message a { color: var(--color-accent, var(--color-accent)); }
+.vem-attach { padding: 16px 22px; border-top: 0.5px solid var(--color-border, #d2d2d7); background: var(--color-surface-tertiary, var(--color-surface-tertiary)); }
+.vem-attach-title { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary, var(--color-text-tertiary)); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px; }
 .vem-attach-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: var(--text-base); color: var(--color-text-secondary, #424245); }
-.vem-attach-item svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--color-text-tertiary, #86868b); }
-.vem-empty { padding: 56px 22px; text-align: center; color: var(--color-text-tertiary, #86868b); font-size: var(--text-md); }
+.vem-attach-item svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--color-text-tertiary, var(--color-text-tertiary)); }
+.vem-empty { padding: 56px 22px; text-align: center; color: var(--color-text-tertiary, var(--color-text-tertiary)); font-size: var(--text-md); }

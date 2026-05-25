@@ -39,7 +39,7 @@
 .perm-toggle { position: relative; width: 42px; height: 25px; flex-shrink: 0; }
 .perm-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
 .perm-track { display: block; width: 42px; height: 25px; border-radius: 13px; background: var(--color-border); transition: background var(--transition-fast); cursor: pointer; }
-.perm-track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 21px; height: 21px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform var(--transition-fast); }
+.perm-track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 21px; height: 21px; border-radius: 50%; background: var(--color-surface); box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform var(--transition-fast); }
 .perm-toggle input:checked + .perm-track { background: var(--color-accent); }
 .perm-toggle input:checked + .perm-track::after { transform: translateX(17px); }
 .perm-toggle input:focus-visible + .perm-track { box-shadow: 0 0 0 3px var(--color-accent-light); }

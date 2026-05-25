@@ -102,14 +102,14 @@
 .auth-notice {
     padding: 12px 14px;
     border-radius: 10px;
-    background: var(--color-red-bg, rgba(255, 59, 48, 0.10));
-    color: var(--color-red-text, #d70015);
+    background: var(--color-red-bg, var(--color-red-bg));
+    color: var(--color-red-text, var(--color-red-text));
     font-size: var(--text-base); line-height: 1.45;
     margin-bottom: 16px;
 }
 .auth-notice.success {
     background: var(--color-green-bg, rgba(52, 199, 89, 0.10));
-    color: var(--color-green-text, #248a3d);
+    color: var(--color-green-text, var(--color-green-text));
 }
 .auth-notice.info {
     background: var(--color-blue-bg, rgba(0, 122, 255, 0.10));

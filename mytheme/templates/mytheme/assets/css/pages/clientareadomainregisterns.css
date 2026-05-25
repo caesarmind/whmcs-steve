@@ -41,7 +41,7 @@ body[data-subnav-side="left"] .rns-split > .rns-main { grid-column: 2; grid-row:
 .rns-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
 .rns-actions .btn-primary, .rns-actions .btn-secondary { height: 36px; padding: 0 18px; font-size: var(--text-base); }
 .rns-danger-btn { color: var(--color-red-text); border-color: var(--color-red-text); }
-.rns-danger-btn:hover { background: var(--color-red-text); color: #fff; }
+.rns-danger-btn:hover { background: var(--color-red-text); color: var(--color-surface); }
 
 .subnav-card { padding: 8px; }
 .subnav-heading { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }

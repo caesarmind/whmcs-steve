@@ -21,7 +21,7 @@
 
 /* Current-card hero */
 .pm-hero { display: flex; align-items: center; gap: 16px; padding: 20px 22px; }
-.pm-hero-visual { width: 56px; height: 38px; border-radius: 7px; background: linear-gradient(135deg, #1d1d1f, #3a3a3c); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--text-xs); font-weight: var(--fw-bold); letter-spacing: 0.06em; flex-shrink: 0; }
+.pm-hero-visual { width: 56px; height: 38px; border-radius: 7px; background: linear-gradient(135deg, var(--color-text-primary), #3a3a3c); color: var(--color-surface); display: flex; align-items: center; justify-content: center; font-size: var(--text-xs); font-weight: var(--fw-bold); letter-spacing: 0.06em; flex-shrink: 0; }
 .pm-hero-meta { flex: 1; min-width: 0; }
 .pm-hero-name { display: flex; align-items: center; gap: 8px; font-size: var(--text-lg); font-weight: var(--fw-semibold); color: var(--color-text-primary); letter-spacing: -0.01em; }
 .pm-hero-pill { font-size: var(--text-xs); font-weight: var(--fw-semibold); text-transform: uppercase; letter-spacing: 0.04em; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--color-green-bg); color: var(--color-green-text); }

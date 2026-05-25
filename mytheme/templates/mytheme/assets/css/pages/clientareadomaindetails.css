@@ -64,7 +64,7 @@ body[data-subnav-side="left"] .dd-split > .dd-main { grid-column: 2; grid-row: 1
 .dd-tag-off { background: var(--color-surface);  color: var(--color-text-tertiary); border: 0.5px solid var(--color-border); }
 .dd-toggle-form { margin-top: 4px; }
 .dd-danger-btn { color: var(--color-red-text); border-color: var(--color-red-text); }
-.dd-danger-btn:hover { background: var(--color-red-text); color: #fff; }
+.dd-danger-btn:hover { background: var(--color-red-text); color: var(--color-surface); }
 
 /* Form */
 .dd-form { display: flex; flex-direction: column; gap: 14px; }

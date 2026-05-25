@@ -24,7 +24,7 @@
 .da-confirm { font-size: var(--text-base); color: var(--color-text-secondary); margin: 0 0 6px; }
 .da-cta { height: 42px; padding: 0 24px; font-size: var(--text-md); }
 .da-danger-btn { color: var(--color-red-text); border-color: var(--color-red-text); }
-.da-danger-btn:hover { background: var(--color-red-text); color: #fff; }
+.da-danger-btn:hover { background: var(--color-red-text); color: var(--color-surface); }
 .da-back { font-size: var(--text-base); color: var(--color-text-tertiary); text-decoration: none; margin-top: 6px; transition: color var(--transition-fast); }
 .da-back:hover { color: var(--color-accent); }
 

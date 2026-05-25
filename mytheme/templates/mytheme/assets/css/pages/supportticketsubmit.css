@@ -181,7 +181,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .dept-card:has(input[type="radio"]:checked) .dept-check {
     border-color: var(--color-accent);
     background: var(--color-accent);
-    color: #fff;
+    color: var(--color-surface);
 }
 .dept-check svg { width: 10px; height: 10px; }
 .dept-desc {

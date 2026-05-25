@@ -57,19 +57,19 @@
 
 .dl-filters { display: inline-flex; background: var(--color-surface-secondary); border-radius: var(--radius-pill); padding: 3px; gap: 0; }
 .dl-filters button { border: 0; background: transparent; padding: 5px 12px; font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--color-text-secondary); border-radius: var(--radius-pill); cursor: pointer; font-family: inherit; transition: all 0.15s; }
-.dl-filters button.active { background: var(--color-surface); color: var(--color-text-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.dl-filters button.active { background: var(--color-surface); color: var(--color-text-primary); box-shadow: 0 1px 3px var(--sidebar-item-active); }
 
 /* File rows */
 .dl-file-row { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 0.5px solid var(--color-border); text-decoration: none; color: inherit; transition: background var(--transition-fast); }
 .dl-file-row:last-child { border-bottom: 0; }
 .dl-file-row:hover { background: var(--sidebar-item-hover); }
 
-.dl-file-ico { width: 34px; height: 42px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: var(--text-xs); font-weight: var(--fw-bold); letter-spacing: 0.04em; color: #fff; flex-shrink: 0; position: relative; background: #86868b; }
+.dl-file-ico { width: 34px; height: 42px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: var(--text-xs); font-weight: var(--fw-bold); letter-spacing: 0.04em; color: var(--color-surface); flex-shrink: 0; position: relative; background: var(--color-text-tertiary); }
 .dl-file-ico::before { content: ""; position: absolute; top: 0; right: 0; border-width: 0 0 6px 6px; border-style: solid; border-color: transparent transparent rgba(255,255,255,0.35) transparent; }
-.dl-file-ico.pdf { background: #d70015; }
-.dl-file-ico.zip { background: #c27400; }
-.dl-file-ico.exe { background: #0071e3; }
-.dl-file-ico.dmg { background: #6e6e73; }
+.dl-file-ico.pdf { background: var(--color-red-text); }
+.dl-file-ico.zip { background: var(--color-orange-text); }
+.dl-file-ico.exe { background: var(--color-accent); }
+.dl-file-ico.dmg { background: var(--color-text-secondary); }
 
 .dl-file-meta { flex: 1; min-width: 0; }
 .dl-file-name { font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-text-primary); letter-spacing: -0.008em; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }

@@ -148,7 +148,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     height: 36px;
     border-radius: 50%;
     background: linear-gradient(135deg, #007aff, #5856d6);
-    color: #fff;
+    color: var(--color-surface);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -297,7 +297,7 @@ html[data-palette="slate"]   .tk-info-avatar { background: linear-gradient(135de
     height: 28px;
     border-radius: 50%;
     background: linear-gradient(135deg, #007aff, #5856d6);
-    color: #fff;
+    color: var(--color-surface);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -343,9 +343,9 @@ html[data-palette="slate"]   .tk-info-avatar { background: linear-gradient(135de
     font-size: var(--text-xs);
     font-weight: var(--fw-bold);
     letter-spacing: 0.04em;
-    color: #fff;
+    color: var(--color-surface);
     flex-shrink: 0;
-    background: #6e6e73;
+    background: var(--color-text-secondary);
 }
 .thread-att-meta { min-width: 0; flex: 1; }
 .thread-att-name {
