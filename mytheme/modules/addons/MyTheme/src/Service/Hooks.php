@@ -163,7 +163,83 @@ final class Hooks
 
     private function clientAreaHeadOutput(array $vars, Template $template): ?string
     {
-        return $this->extensionOutput($template, $vars, slot: 'headOutput');
+        $typo = $this->buildTypographyHead($template);
+        $ext  = (string)$this->extensionOutput($template, $vars, slot: 'headOutput');
+        $out  = $typo . $ext;
+        return $out !== '' ? $out : null;
+    }
+
+    /**
+     * Emit a small inline <style> overriding ONLY the typography tokens the
+     * admin changed from default (Styles → Typography). Defaults stay in the
+     * cacheable static apple-theme.css; this block lands in {$headoutput},
+     * which header.tpl renders AFTER the stylesheet links, so it wins on
+     * source order. Returns '' when nothing is overridden.
+     *
+     * Values are sanitized (var-name allowlist, int sizes/weights, font-stack
+     * char allowlist, Google font name allowlist) to avoid CSS injection.
+     */
+    private function buildTypographyHead(Template $template): string
+    {
+        $stored = Settings::getValue($template->getName() . '_typography', null);
+        if (!is_array($stored)) {
+            return '';
+        }
+
+        $cfg      = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/typography.php');
+        $fallback = (string)($cfg['fontFamily']['fallback'] ?? 'sans-serif');
+
+        $decls = [];
+        $links = '';
+
+        // Font family
+        $ff   = is_array($stored['fontFamily'] ?? null) ? $stored['fontFamily'] : [];
+        $mode = (string)($ff['mode'] ?? 'default');
+        if ($mode === 'google' && !empty($ff['google'])) {
+            $name = trim((string)preg_replace('/[^A-Za-z0-9 ]/', '', (string)$ff['google']));
+            if ($name !== '') {
+                $href  = 'https://fonts.googleapis.com/css2?family=' . rawurlencode($name)
+                       . ':wght@300;400;500;600;700&display=swap';
+                $links = '<link rel="preconnect" href="https://fonts.googleapis.com">'
+                       . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+                       . '<link rel="stylesheet" href="' . htmlspecialchars($href, ENT_QUOTES) . '">';
+                $decls['--font-family'] = "'{$name}', {$fallback}";
+            }
+        } elseif ($mode === 'custom' && !empty($ff['custom'])) {
+            $custom = trim((string)preg_replace('/[^A-Za-z0-9 ,\'"\-]/', '', (string)$ff['custom']));
+            if ($custom !== '') {
+                $decls['--font-family'] = $custom;
+            }
+        }
+
+        // Sizes (px) + weights (numeric). Each stored bucket holds only overrides.
+        foreach (['sizes' => 'px', 'weights' => ''] as $bucket => $unit) {
+            if (!is_array($stored[$bucket] ?? null)) {
+                continue;
+            }
+            foreach ($stored[$bucket] as $var => $val) {
+                if (!preg_match('/^--[a-z0-9-]+$/', (string)$var)) {
+                    continue;
+                }
+                $num = (int)$val;
+                if ($num <= 0) {
+                    continue;
+                }
+                $decls[(string)$var] = $num . $unit;
+            }
+        }
+
+        if ($decls === []) {
+            return $links;
+        }
+
+        $css = ':root{';
+        foreach ($decls as $var => $val) {
+            $css .= $var . ':' . $val . ';';
+        }
+        $css .= '}';
+
+        return $links . '<style id="mytheme-typography">' . $css . '</style>';
     }
 
     private function clientAreaFooterOutput(array $vars, Template $template): ?string

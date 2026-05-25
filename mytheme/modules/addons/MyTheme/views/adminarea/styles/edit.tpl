@@ -34,6 +34,9 @@
     </nav>
 
     <div>
+        {if $subcat == 'typography'}
+        {include file="styles/_typography.tpl"}
+        {else}
         <section class="mt-section">
             <header class="mt-section-header"><h2 class="mt-section-title">Color Schemes</h2></header>
             <div class="mt-schemes">
@@ -69,6 +72,7 @@
                 <div class="mt-color-tile"><div class="mt-color-swatch" style="background:#d70015"></div><div class="mt-color-meta"><div class="mt-color-name">Darker</div><div class="mt-color-hex">#d70015</div></div></div>
             </div></div>
         </section>
+        {/if}
     </div>
 </div>
 
