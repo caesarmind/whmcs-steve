@@ -277,127 +277,63 @@ final class Hooks
     }
 
     /**
-     * Emit an inline <style> overriding the accent token chain when the admin
-     * picked a non-default Color Scheme (Styles -> Colors). Mirrors
-     * buildTypographyHead: defaults stay in the cacheable apple-theme.css; this
-     * block lands after the stylesheet links so it wins on source order. The
-     * single chosen accent drives accent/link/highlight tokens for BOTH light
-     * and dark (dark gets a lightened variant). Returns '' when not overridden.
+     * Emit an inline <style> applying the admin's per-token Color overrides
+     * (Styles -> Colors). Mirrors buildTypographyHead: defaults stay in the
+     * cacheable apple-theme.css; this block lands after the stylesheet links so
+     * it wins on source order. Overrides are stored per style; each style emits
+     * into the selector matching its colorMode (light => :root, dark =>
+     * [data-theme="dark"]). Var names + color values are re-validated on the way
+     * out. Returns '' when nothing is overridden.
      */
     private function buildColorsHead(Template $template): string
     {
-        $stored = Settings::getValue($template->getName() . '_colors', null);
-        if (!is_array($stored)) {
-            return '';
+        try {
+            $styles = (array)$template->getStyles();
+        } catch (\Throwable $e) {
+            $styles = ['default', 'dark'];
         }
-        $accent = $this->colorNormalizeHex((string)($stored['accent'] ?? ''));
-        // Default accent => nothing to override (leave the static CSS in play).
-        if ($accent === null || strcasecmp($accent, '#0071e3') === 0) {
-            return '';
-        }
-        $rgb = $this->colorHexToRgb($accent);
-        if ($rgb === null) {
-            return '';
+        if ($styles === []) {
+            $styles = ['default', 'dark'];
         }
 
-        // Light: chosen accent, a slightly darker hover, a low-alpha tint.
-        $hover = $this->colorRgbToHex($this->colorShade($rgb, -0.08));
-        $tint  = $this->colorRgba($rgb, 0.08);
-        $light = [
-            '--color-accent'       => $accent,
-            '--color-accent-hover' => $hover,
-            '--color-accent-light' => $tint,
-            '--color-link'         => $accent,
-            '--color-link-hover'   => $hover,
-            '--color-blue-bg'      => $tint,
-            '--color-blue-text'    => $accent,
-        ];
+        $blocks = '';
+        foreach ($styles as $style) {
+            $style  = (string)$style;
+            $stored = Settings::getValue($template->getName() . '_colors_' . $style, null);
+            if (!is_array($stored) || $stored === []) {
+                continue;
+            }
+            $meta     = ThemeManifest::loadVariantMeta($template->getFullPath() . "/core/styles/{$style}/style.php");
+            $mode     = (($meta['variables']['colorMode'] ?? 'light') === 'dark') ? 'dark' : 'light';
+            $selector = $mode === 'dark' ? '[data-theme="dark"]' : ':root';
 
-        // Dark: lighten so the accent stays vivid on dark surfaces.
-        $dRgb    = $this->colorShade($rgb, 0.22);
-        $dAccent = $this->colorRgbToHex($dRgb);
-        $dHover  = $this->colorRgbToHex($this->colorShade($rgb, 0.34));
-        $dTint   = $this->colorRgba($dRgb, 0.14);
-        $dark = [
-            '--color-accent'       => $dAccent,
-            '--color-accent-hover' => $dHover,
-            '--color-accent-light' => $dTint,
-            '--color-link'         => $dAccent,
-            '--color-link-hover'   => $dHover,
-            '--color-blue-bg'      => $dTint,
-            '--color-blue-text'    => $dAccent,
-        ];
+            $decls = '';
+            foreach ($stored as $var => $val) {
+                if (!preg_match('/^--[a-z0-9-]+$/', (string)$var)) {
+                    continue;
+                }
+                if (!$this->isColorValue((string)$val)) {
+                    continue;
+                }
+                $decls .= (string)$var . ':' . trim((string)$val) . ';';
+            }
+            if ($decls !== '') {
+                $blocks .= $selector . '{' . $decls . '}';
+            }
+        }
 
-        $css  = ':root{' . $this->colorEmitVars($light) . '}';
-        $css .= '[data-theme="dark"]{' . $this->colorEmitVars($dark) . '}';
-
-        return '<style id="mytheme-colors">' . $css . '</style>';
+        return $blocks !== '' ? '<style id="mytheme-colors">' . $blocks . '</style>' : '';
     }
 
-    /** @param array<string,string> $vars */
-    private function colorEmitVars(array $vars): string
+    /** Re-validate a stored color before emitting (defense-in-depth vs CSS injection). */
+    private function isColorValue(string $v): bool
     {
-        $out = '';
-        foreach ($vars as $name => $val) {
-            $out .= $name . ':' . $val . ';';
-        }
-        return $out;
-    }
-
-    /** Normalize #rgb / #rrggbb to a lowercase #rrggbb, or null if invalid. */
-    private function colorNormalizeHex(string $hex): ?string
-    {
-        $hex = trim($hex);
-        if (preg_match('/^#?([0-9a-fA-F]{6})$/', $hex, $m)) {
-            return '#' . strtolower($m[1]);
-        }
-        if (preg_match('/^#?([0-9a-fA-F]{3})$/', $hex, $m)) {
-            $c = $m[1];
-            return '#' . strtolower($c[0] . $c[0] . $c[1] . $c[1] . $c[2] . $c[2]);
-        }
-        return null;
-    }
-
-    /** @return array{0:int,1:int,2:int}|null */
-    private function colorHexToRgb(string $hex): ?array
-    {
-        $hex = $this->colorNormalizeHex($hex);
-        if ($hex === null) {
-            return null;
-        }
-        return [
-            (int)hexdec(substr($hex, 1, 2)),
-            (int)hexdec(substr($hex, 3, 2)),
-            (int)hexdec(substr($hex, 5, 2)),
-        ];
-    }
-
-    /**
-     * Shade an RGB triple — lighten toward white when $pct > 0, darken toward
-     * black when $pct < 0 ($pct is a fraction, e.g. 0.22 or -0.08).
-     *
-     * @param array{0:int,1:int,2:int} $rgb
-     * @return array{0:int,1:int,2:int}
-     */
-    private function colorShade(array $rgb, float $pct): array
-    {
-        $f = static function (int $c) use ($pct): int {
-            $v = $pct >= 0 ? $c + (255 - $c) * $pct : $c * (1 + $pct);
-            return (int)max(0, min(255, round($v)));
-        };
-        return [$f($rgb[0]), $f($rgb[1]), $f($rgb[2])];
-    }
-
-    /** @param array{0:int,1:int,2:int} $rgb */
-    private function colorRgbToHex(array $rgb): string
-    {
-        return sprintf('#%02x%02x%02x', $rgb[0], $rgb[1], $rgb[2]);
-    }
-
-    /** @param array{0:int,1:int,2:int} $rgb */
-    private function colorRgba(array $rgb, float $a): string
-    {
-        return 'rgba(' . $rgb[0] . ',' . $rgb[1] . ',' . $rgb[2] . ',' . $a . ')';
+        $v = trim($v);
+        return (bool)(
+            preg_match('/^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $v)
+            || preg_match('/^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(,\s*(?:0|1|0?\.\d+)\s*)?\)$/i', $v)
+            || preg_match('/^hsla?\(\s*\d{1,3}\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\s*(,\s*(?:0|1|0?\.\d+)\s*)?\)$/i', $v)
+        );
     }
 
     private function clientAreaFooterOutput(array $vars, Template $template): ?string

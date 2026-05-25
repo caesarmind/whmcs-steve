@@ -10,21 +10,6 @@ use MyTheme\Models\Settings;
 
 final class StylesController extends AbstractController
 {
-    /**
-     * Built-in accent presets for the Color Scheme picker. Each carries a single
-     * accent hex; the render-time emitter (Hooks::buildColorsHead) derives the
-     * hover / tint / link / dark-mode variants from it. Index [0] is the theme
-     * default (no override is stored while it's selected).
-     */
-    private const COLOR_PRESETS = [
-        ['name' => 'Default', 'accent' => '#0071e3'],
-        ['name' => 'Emerald', 'accent' => '#14b17d'],
-        ['name' => 'Violet',  'accent' => '#8c5cff'],
-        ['name' => 'Rose',    'accent' => '#ff2d6b'],
-        ['name' => 'Amber',   'accent' => '#f08a00'],
-        ['name' => 'Slate',   'accent' => '#64748b'],
-    ];
-
     public function indexAction(): string
     {
         $template = AddonHelper::getTemplate();
@@ -90,7 +75,7 @@ final class StylesController extends AbstractController
             'tab'         => $tab,
             // Built only for the Variables tab (the only one that renders them),
             // so the other tabs skip the folder scan + view-model work.
-            'colors'      => $tab === 'variables' ? $this->buildColorsViewModel($template) : null,
+            'colors'      => $tab === 'variables' ? $this->buildColorsViewModel($template, $style) : null,
             'typography'  => $tab === 'variables' ? $this->buildTypographyViewModel($template) : null,
             'saved'       => isset($_GET['saved']),
             'colorsSaved' => isset($_GET['colors_saved']),
@@ -275,76 +260,118 @@ final class StylesController extends AbstractController
         $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&tab=custom-css&css_saved=1');
     }
 
-    /** Normalize a #rgb or #rrggbb string to a lowercase #rrggbb, or null if invalid. */
-    private function normalizeHex(string $hex): ?string
+    /**
+     * Resolve which color mode a style edits (light => :root, dark =>
+     * [data-theme="dark"]) from its style.php manifest.
+     */
+    private function styleMode($template, string $style): string
     {
-        $hex = trim($hex);
-        if (preg_match('/^#?([0-9a-fA-F]{6})$/', $hex, $m)) {
+        $meta = ThemeManifest::loadVariantMeta($template->getFullPath() . "/core/styles/{$style}/style.php");
+        return (($meta['variables']['colorMode'] ?? 'light') === 'dark') ? 'dark' : 'light';
+    }
+
+    /** Accept a hex (#rgb/#rgba/#rrggbb/#rrggbbaa) or rgb()/rgba()/hsl()/hsla() value. */
+    private function isColor(string $v): bool
+    {
+        $v = trim($v);
+        return (bool)(
+            preg_match('/^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $v)
+            || preg_match('/^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(,\s*(?:0|1|0?\.\d+)\s*)?\)$/i', $v)
+            || preg_match('/^hsla?\(\s*\d{1,3}\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\s*(,\s*(?:0|1|0?\.\d+)\s*)?\)$/i', $v)
+        );
+    }
+
+    /** Loose equality for "did the buyer change it?" — case + whitespace insensitive. */
+    private function normColor(string $v): string
+    {
+        return strtolower((string)preg_replace('/\s+/', '', $v));
+    }
+
+    /** Best-effort hex for the native <input type="color"> swatch (drops any alpha). */
+    private function toHexInput(string $v): string
+    {
+        $v = trim($v);
+        if (preg_match('/^#([0-9a-fA-F]{6})/', $v, $m)) {
             return '#' . strtolower($m[1]);
         }
-        if (preg_match('/^#?([0-9a-fA-F]{3})$/', $hex, $m)) {
+        if (preg_match('/^#([0-9a-fA-F]{3})$/', $v, $m)) {
             $c = $m[1];
             return '#' . strtolower($c[0] . $c[0] . $c[1] . $c[1] . $c[2] . $c[2]);
         }
-        return null;
+        if (preg_match('/rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/i', $v, $m)) {
+            return sprintf('#%02x%02x%02x', min(255, (int)$m[1]), min(255, (int)$m[2]), min(255, (int)$m[3]));
+        }
+        return '#000000';
     }
 
     /**
-     * View-model for the Colors subcat: the preset list (flagging which one
-     * matches the stored accent), the current effective accent, the resolved
-     * active scheme name, and the theme default.
+     * View-model for the Colors subcat. Loads the token schema (core/config/
+     * colors.php), resolves the style's mode, and merges stored overrides onto
+     * the per-mode defaults so every row shows its current EFFECTIVE value.
      */
-    private function buildColorsViewModel($template): array
+    private function buildColorsViewModel($template, string $style): array
     {
-        $stored = Settings::getValue($template->getName() . '_colors', []);
+        $cfg    = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/colors.php');
+        $mode   = $this->styleMode($template, $style);
+        $stored = Settings::getValue($template->getName() . '_colors_' . $style, []);
         if (!is_array($stored)) {
             $stored = [];
         }
-        $accent = $this->normalizeHex((string)($stored['accent'] ?? '')) ?? self::COLOR_PRESETS[0]['accent'];
 
-        $activeScheme = 'custom';
-        $presets = [];
-        foreach (self::COLOR_PRESETS as $p) {
-            $isActive = strcasecmp($p['accent'], $accent) === 0;
-            if ($isActive) {
-                $activeScheme = $p['name'];
+        $groups = [];
+        foreach (($cfg['groups'] ?? []) as $groupName => $tokens) {
+            foreach ($tokens as $t) {
+                $default      = (string)($t[$mode] ?? $t['light'] ?? '#000000');
+                $value        = isset($stored[$t['var']]) ? (string)$stored[$t['var']] : $default;
+                $t['default'] = $default;
+                $t['value']   = $value;
+                $t['hex']     = $this->toHexInput($value);
+                $groups[$groupName][] = $t;
             }
-            $presets[] = $p + ['active' => $isActive];
         }
 
         return [
-            'presets'       => $presets,
-            'accent'        => $accent,
-            'activeScheme'  => $activeScheme,
-            'defaultAccent' => self::COLOR_PRESETS[0]['accent'],
+            'groups'  => $groups,
+            'presets' => $cfg['presets'] ?? [],
+            'mode'    => $mode,
         ];
     }
 
     /**
-     * Validate + persist the Color Scheme form. Stores only a non-default accent
-     * (keeps the override set empty while on Default, mirroring Typography). The
-     * render-time emitter (Hooks::buildColorsHead) derives the full token chain.
-     * PRG redirect back to the Colors subcat.
+     * Validate + persist the Colors form for one style. Stores ONLY tokens that
+     * differ from the per-mode default (keeps the override set minimal; the
+     * emitter renders exactly what's stored). PRG redirect to the Colors subcat.
      */
     private function saveColorsAction($template): string
     {
-        $accent = $this->normalizeHex((string)($_POST['accent'] ?? ''));
+        $style = (string)($_POST['style'] ?? 'default');
+        if (!in_array($style, $template->getStyles(), true)) {
+            $style = 'default';
+        }
+        $cfg  = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/colors.php');
+        $mode = $this->styleMode($template, $style);
+        $in   = is_array($_POST['c'] ?? null) ? $_POST['c'] : [];
 
         $out = [];
-        if ($accent !== null && strcasecmp($accent, self::COLOR_PRESETS[0]['accent']) !== 0) {
-            $scheme = 'custom';
-            foreach (self::COLOR_PRESETS as $p) {
-                if (strcasecmp($p['accent'], $accent) === 0) {
-                    $scheme = $p['name'];
-                    break;
+        foreach (($cfg['groups'] ?? []) as $tokens) {
+            foreach ($tokens as $t) {
+                $var = (string)$t['var'];
+                if (!isset($in[$var])) {
+                    continue;
                 }
+                $val = trim((string)$in[$var]);
+                if ($val === '' || !$this->isColor($val)) {
+                    continue;
+                }
+                $default = (string)($t[$mode] ?? $t['light'] ?? '');
+                if ($this->normColor($val) === $this->normColor($default)) {
+                    continue;
+                }
+                $out[$var] = $val;
             }
-            $out = ['scheme' => $scheme, 'accent' => $accent];
         }
 
-        Settings::setValue($template->getName() . '_colors', $out, 'json');
-
-        $style = (string)($_POST['style'] ?? 'default');
+        Settings::setValue($template->getName() . '_colors_' . $style, $out, 'json');
         $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=colors&colors_saved=1');
     }
 }

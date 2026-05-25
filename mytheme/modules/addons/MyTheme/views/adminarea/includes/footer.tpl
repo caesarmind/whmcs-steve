@@ -334,21 +334,17 @@
 .mt-typo-actions { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--mt-border); display: flex; justify-content: flex-end; }
 .mt-custom-css .mt-textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.5; resize: vertical; min-height: 320px; }
 
-/* Color scheme panel */
+/* Colors panel (per-token editor) */
 .mt-colors .mt-scheme { font-family: inherit; }
-.mt-color-picker-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-.mt-color-input { width: 46px; height: 38px; padding: 3px; border: 1px solid var(--mt-input-border); border-radius: var(--mt-radius-sm); background: var(--mt-surface); cursor: pointer; flex-shrink: 0; }
-.mt-color-input::-webkit-color-swatch-wrapper { padding: 0; }
-.mt-color-input::-webkit-color-swatch { border: 0; border-radius: 4px; }
-.mt-color-input::-moz-color-swatch { border: 0; border-radius: 4px; }
-.mt-color-hex-input { max-width: 130px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-transform: lowercase; }
-.mt-preview-strip { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-.mt-preview-chip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-pill); font-size: 12px; font-weight: 500; }
-.mt-preview-sw { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.08); background: var(--mt-primary); }
-.mt-preview-demo { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 8px; }
-.mt-preview-btn { padding: 9px 20px; border: 0; border-radius: var(--mt-radius-pill); background: var(--mt-primary); color: #fff; font: inherit; font-size: 13px; font-weight: 500; cursor: default; }
-.mt-preview-link { font-size: 13px; font-weight: 500; color: var(--mt-primary); text-decoration: none; }
-.mt-preview-link:hover { text-decoration: underline; }
+.mt-color-rows { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px 18px; }
+.mt-color-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
+.mt-color-row-label { font-size: 13px; color: var(--mt-text-2); font-weight: 500; }
+.mt-color-control { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.mt-color-swatch-input { width: 30px; height: 30px; padding: 2px; border: 1px solid var(--mt-input-border); border-radius: 6px; background: var(--mt-surface); cursor: pointer; flex-shrink: 0; }
+.mt-color-swatch-input::-webkit-color-swatch-wrapper { padding: 0; }
+.mt-color-swatch-input::-webkit-color-swatch { border: 0; border-radius: 3px; }
+.mt-color-swatch-input::-moz-color-swatch { border: 0; border-radius: 3px; }
+.mt-color-text { max-width: 132px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; text-transform: lowercase; }
 </style>
 
 <script>
@@ -410,28 +406,15 @@
     sync();
 })();
 
-/* Color scheme panel: preset chips fill the accent picker; the hex field and
-   the native color input stay in sync; a live preview approximates the derived
-   accent chain (computed for real server-side on save). Hex parsing avoids
-   regex brace-quantifiers so Smarty leaves this script alone (no literal tag). */
+/* Colors panel: every token row has a native swatch + a hex/rgba text field
+   kept in sync; preset chips cascade the brand-token fields; "Reset all" puts
+   every field back to its per-style default. Hex parsing uses length checks +
+   /^[0-9a-f]+$/i (no brace-quantifiers) so Smarty leaves this script alone. */
 (function(){
     var form = document.querySelector('.mt-colors');
     if (!form) return;
-    var colorInput = form.querySelector('#mt-accent');
-    var hexInput   = form.querySelector('#mt-accent-hex');
-    var resetBtn   = form.querySelector('#mt-accent-reset');
-    var customDot  = form.querySelector('[data-custom-dot]');
-    var customChip = form.querySelector('.mt-scheme-custom');
-    var chips      = [].slice.call(form.querySelectorAll('.mt-scheme[data-accent]'));
-    var swAccent   = form.querySelector('[data-sw="accent"]');
-    var swHover    = form.querySelector('[data-sw="hover"]');
-    var swLight    = form.querySelector('[data-sw="light"]');
-    var prevBtn    = form.querySelector('[data-prev-btn]');
-    var prevLink   = form.querySelector('[data-prev-link]');
 
     function clamp(n){ return Math.max(0, Math.min(255, Math.round(n))); }
-    // Parse to 6 lowercase hex chars (no '#'), expanding 3-digit shorthand;
-    // null if invalid. No regex brace-quantifiers, so Smarty won't see a tag.
     function clean(v){
         if (!v) return null;
         var s = ('' + v).trim();
@@ -440,56 +423,59 @@
         if (s.length !== 6 || !/^[0-9a-f]+$/i.test(s)) return null;
         return s.toLowerCase();
     }
-    function toRgb(hex){
-        var s = clean(hex); if (!s) return null;
-        var i = parseInt(s, 16);
-        return [(i >> 16) & 255, (i >> 8) & 255, i & 255];
-    }
+    function toRgb(hex){ var s = clean(hex); if (!s) return null; var i = parseInt(s, 16); return [(i >> 16) & 255, (i >> 8) & 255, i & 255]; }
     function hx(v){ return ('0' + clamp(v).toString(16)).slice(-2); }
     function toHex(rgb){ return '#' + hx(rgb[0]) + hx(rgb[1]) + hx(rgb[2]); }
-    function shade(rgb, p){
-        return [0, 1, 2].map(function(i){
-            var c = rgb[i];
-            return clamp(p >= 0 ? c + (255 - c) * p : c * (1 + p));
-        });
-    }
+    function shade(rgb, p){ return [0, 1, 2].map(function(i){ var c = rgb[i]; return clamp(p >= 0 ? c + (255 - c) * p : c * (1 + p)); }); }
     function rgba(rgb, a){ return 'rgba(' + clamp(rgb[0]) + ',' + clamp(rgb[1]) + ',' + clamp(rgb[2]) + ',' + a + ')'; }
-    function normalize(v){ var rgb = toRgb(v); return rgb ? toHex(rgb) : null; }
 
-    function setActiveChip(hex){
-        var matched = false;
-        chips.forEach(function(c){
-            var on = normalize(c.getAttribute('data-accent')) === hex;
-            c.classList.toggle('is-active', on);
-            if (on) matched = true;
+    function textFor(name){ return form.querySelector('input.mt-color-text[data-var="' + name + '"]'); }
+    function swatchFor(name){ return form.querySelector('input.mt-color-swatch-input[data-for="' + name + '"]'); }
+
+    function syncSwatch(name, value){
+        var sw = swatchFor(name); if (!sw) return;
+        var h = clean(value);
+        if (h) { sw.value = '#' + h; return; }
+        var rgb = toRgb(value);
+        if (rgb) sw.value = toHex(rgb);
+    }
+    function setToken(name, value){
+        var t = textFor(name); if (!t) return;
+        t.value = value;
+        syncSwatch(name, value);
+    }
+
+    // Native picker -> text field
+    [].slice.call(form.querySelectorAll('input.mt-color-swatch-input')).forEach(function(sw){
+        sw.addEventListener('input', function(){
+            var t = textFor(sw.getAttribute('data-for'));
+            if (t) t.value = sw.value;
         });
-        if (customChip) customChip.classList.toggle('is-active', !matched);
-    }
-    function preview(hex){
-        var rgb = toRgb(hex); if (!rgb) return;
-        if (swAccent) swAccent.style.background = hex;
-        if (swHover)  swHover.style.background  = toHex(shade(rgb, -0.08));
-        if (swLight)  swLight.style.background  = rgba(rgb, 0.10);
-        if (prevBtn)  prevBtn.style.background  = hex;
-        if (prevLink) prevLink.style.color      = hex;
-        if (customDot) customDot.style.background = hex;
-    }
-    function apply(value, fromHexField){
-        var hex = normalize(value); if (!hex) return;
-        if (colorInput) colorInput.value = hex;
-        if (hexInput && !fromHexField) hexInput.value = hex;
-        setActiveChip(hex);
-        preview(hex);
-    }
-
-    chips.forEach(function(c){
-        c.addEventListener('click', function(){ apply(c.getAttribute('data-accent'), false); });
     });
-    if (customChip) customChip.addEventListener('click', function(){ if (colorInput) colorInput.focus(); });
-    if (colorInput) colorInput.addEventListener('input', function(){ apply(colorInput.value, false); });
-    if (hexInput) hexInput.addEventListener('input', function(){ if (normalize(hexInput.value)) apply(hexInput.value, true); });
-    if (resetBtn) resetBtn.addEventListener('click', function(){ apply(resetBtn.getAttribute('data-default') || '#0071e3', false); });
+    // Text field -> native picker (when it parses to a hex)
+    [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
+        t.addEventListener('input', function(){ syncSwatch(t.getAttribute('data-var'), t.value); });
+    });
 
-    preview((colorInput && colorInput.value) || '#0071e3');
+    // Preset chips cascade the brand fields; every other token is left alone.
+    [].slice.call(form.querySelectorAll('.mt-scheme[data-accent]')).forEach(function(chip){
+        chip.addEventListener('click', function(){
+            var h = clean(chip.getAttribute('data-accent')); if (!h) return;
+            var rgb = toRgb('#' + h);
+            var dark = toHex(shade(rgb, -0.08));
+            setToken('--color-accent', '#' + h);
+            setToken('--color-accent-hover', dark);
+            setToken('--color-accent-light', rgba(rgb, 0.08));
+            setToken('--color-link', '#' + h);
+            setToken('--color-link-hover', dark);
+        });
+    });
+
+    var reset = form.querySelector('#mt-colors-reset');
+    if (reset) reset.addEventListener('click', function(){
+        [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
+            setToken(t.getAttribute('data-var'), t.getAttribute('data-default'));
+        });
+    });
 })();
 </script>
