@@ -532,7 +532,6 @@
         }
 
         function open() {
-            if (body.dataset.layout === 'top') return;
             body.classList.add('nav-open');
             document.querySelectorAll('[data-nav-toggle]').forEach(function (b) {
                 b.setAttribute('aria-expanded', 'true');

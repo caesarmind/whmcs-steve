@@ -298,6 +298,19 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .homepage-nav-inner > a,
 .homepage-nav-inner .nav-simple-trigger { font-size: 12px; }
 
+/* Mobile drawer toggle (top layout). Hidden on desktop; revealed <=900px. */
+.nav-mobile-toggle {
+    display: none;
+    align-items: center; justify-content: center;
+    width: 34px; height: 34px; min-width: 34px;
+    margin-right: 2px; padding: 0; flex-shrink: 0;
+    border: 0; background: transparent; cursor: pointer;
+    border-radius: 8px;
+    color: var(--color-text-primary); opacity: 0.85;
+}
+.nav-mobile-toggle:hover { opacity: 1; background: var(--sidebar-item-hover); }
+.nav-mobile-toggle svg { width: 20px; height: 20px; }
+
 /* -- Lightweight nav dropdowns (WHMCS-style, compact) ------- */
 .nav-simple-dropdown { position: relative; display: flex; align-items: center; align-self: stretch; }
 .nav-simple-trigger {
@@ -646,6 +659,11 @@ body[data-layout="rail"] .ph-hero-inner { max-width: none; }
 .ph-side-crumbs .sep { opacity: 0.4; font-size: 11px; }
 .ph-side-crumbs .current { color: var(--color-text-primary); font-weight: 500; }
 .ph-side-topbar-actions { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+/* Mobile-only brand in the side/rail topbar — hidden on desktop, where the
+   sidebar/rail itself shows the logo. Revealed <=900px (see media block). */
+.ph-side-logo { display: none; align-items: center; flex-shrink: 0; text-decoration: none; color: var(--color-text-primary); font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
+.ph-side-logo:hover { color: var(--color-accent); text-decoration: none; }
+.ph-side-logo.img-logo img { max-height: 24px; max-width: 140px; object-fit: contain; display: block; }
 .ph-side-iconbtn {
     width: 32px; height: 32px; border-radius: 10px;
     border: 0; background: transparent;
@@ -842,8 +860,12 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
     body[data-layout="rail"] .ph-main-wrap { margin-left: 0; }
 
     /* Sidebar becomes a slide-in drawer (overrides the legacy
-       `.sidebar { display: none }` rule at <=768px from apple-theme.css) */
-    body[data-layout="side"] .sidebar {
+       `.sidebar { display: none }` rule at <=768px from apple-theme.css).
+       The TOP layout reuses this exact drawer chrome — its sidebar is
+       display:none above 900px (the .only-side gate) and only surfaces
+       here, as the hamburger drawer the top-nav opens. */
+    body[data-layout="side"] .sidebar,
+    body[data-layout="top"] .sidebar {
         display: flex !important;
         width: 280px;
         max-width: 85vw;
@@ -852,7 +874,8 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
         z-index: 110;
         box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
     }
-    body[data-layout="side"].nav-open .sidebar { transform: translateX(0); }
+    body[data-layout="side"].nav-open .sidebar,
+    body[data-layout="top"].nav-open .sidebar { transform: translateX(0); }
 
     /* Rail also slides in as a drawer (panel hidden -- rail items are
        self-contained on touch) */
@@ -868,6 +891,11 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
     /* Show hamburger toggle -- only when in side/rail layout */
     body:not([data-layout="top"]) .ph-mobile-toggle { display: inline-flex; }
 
+    /* ...and surface the brand logo here (the sidebar/rail logo is now in the
+       collapsed drawer); drop the breadcrumb to make room for it. */
+    body:not([data-layout="top"]) .ph-side-logo { display: inline-flex; margin-right: auto; }
+    body:not([data-layout="top"]) .ph-side-crumbs { display: none; }
+
     /* Lock body scroll while drawer is open */
     body.nav-open { overflow: hidden; }
 
@@ -875,6 +903,16 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
        suppress the top-layout fallback so we don't double up. */
     body[data-layout="side"] .only-top,
     body[data-layout="rail"] .only-top { display: none !important; }
+
+    /* Top layout: collapse the inline link list into the hamburger drawer.
+       Logo + utility buttons (cart/notifications/profile) stay in the bar. */
+    body[data-layout="top"] .nav-mobile-toggle { display: inline-flex; }
+    body[data-layout="top"] .homepage-nav .nav-item,
+    body[data-layout="top"] .homepage-nav .nav-dropdown-wrap,
+    body[data-layout="top"] .homepage-nav .nav-cta,
+    body[data-layout="top"] .homepage-nav .nav-switcher,
+    body[data-layout="top"] .homepage-nav .nav-section,
+    body[data-layout="top"] .homepage-nav .nav-divider { display: none !important; }
 }
 
 [data-theme="dark"] .ph-nav-backdrop { background: rgba(0, 0, 0, 0.55); }
@@ -910,14 +948,6 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
     .ph-side-crumbs { min-width: 0; overflow-x: auto; white-space: nowrap; }
     .profile-dropdown,
     .notification-dropdown { max-width: calc(100vw - 24px); }
-}
-
-@media (max-width: 640px) {
-    .homepage-nav-inner .nav-simple-dropdown,
-    .homepage-nav-inner > a.only-in:not(.nav-logo):not(.topbar-btn):not(.icon-btn) {
-        display: none !important;
-    }
-    .homepage-nav-inner { overflow: visible; }
 }
 
 @media (max-width: 420px) {

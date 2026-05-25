@@ -322,7 +322,10 @@
 {if $mt_preview || $mt_layout == 'rail'}
     {include file="`$template`/includes/partials/rail.tpl"}
 {/if}
-{if $mt_preview || $mt_layout == 'side'}
+{* Sidebar also renders on the TOP layout, where it stays off-canvas and acts
+   as the mobile slide-in drawer (opened by the top-nav hamburger). CSS scoped
+   to body[data-layout="top"] keeps it hidden until .nav-open. *}
+{if $mt_preview || $mt_layout == 'side' || $mt_layout == 'top'}
     {include file="`$template`/includes/partials/sidebar.tpl"}
 {/if}
 

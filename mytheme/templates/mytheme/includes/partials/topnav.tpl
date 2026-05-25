@@ -118,6 +118,12 @@
 
 <nav class="homepage-nav only-top">
     <div class="homepage-nav-inner">
+        {* Mobile drawer toggle — hidden on desktop; shown <=900px (apple-layout.css).
+           data-nav-toggle wires it to the shared body.nav-open drawer (apple-layout.js);
+           the off-canvas sidebar (rendered on this layout too) is what slides in. *}
+        <button type="button" class="nav-mobile-toggle" aria-label="{$LANG.menu|default:'Open navigation'}" aria-controls="appSidebar" aria-expanded="false" data-nav-toggle>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
         {* Admin Branding tab: prefer uploaded logo over the company-name
            fallback. Light variant is the default; the dark URL ships as a
            data-attribute so theme JS can swap it on data-theme="dark". *}

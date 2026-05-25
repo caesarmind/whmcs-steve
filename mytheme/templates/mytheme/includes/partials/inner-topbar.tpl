@@ -14,6 +14,17 @@
         <button type="button" class="ph-side-iconbtn ph-mobile-toggle" aria-label="{$LANG.menu|default:'Open navigation'}" aria-controls="appSidebar" aria-expanded="false" data-nav-toggle>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
+        {* Mobile-only brand: on <=900px the sidebar/rail (which normally shows
+           the logo) collapses into the drawer, so surface the logo here so it's
+           visible without opening the menu. Hidden on desktop via CSS. *}
+        {if !empty($myTheme.branding.logo.light)}
+            <a href="{$WEB_ROOT}/" class="ph-side-logo img-logo">
+                <img src="{$myTheme.branding.logo.light|escape}" alt="{$companyname|escape}"
+                     {if !empty($myTheme.branding.logo.dark) && $myTheme.branding.logo.dark != $myTheme.branding.logo.light}data-logo-dark="{$myTheme.branding.logo.dark|escape}"{/if}>
+            </a>
+        {else}
+            <a href="{$WEB_ROOT}/" class="ph-side-logo text-logo">{$companyname|escape}</a>
+        {/if}
         <div class="ph-side-crumbs">
             <a href="{$WEB_ROOT}/">{$LANG.home|default:'Home'}</a>
             <span class="sep">›</span>
