@@ -76,6 +76,9 @@
     --radius-md: 12px;
     --radius-lg: 12px;
     --radius-pill: 980px;
+    /* Element (component shape) tokens — admin Styles > Elements overrides. */
+    --card-radius: var(--radius-lg);  --card-shadow: var(--shadow-card);  --card-pad: 24px;
+    --pagination-radius: var(--radius-sm);
     --transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
     --transition-medium: 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
     --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -586,12 +589,12 @@ a.service-item:last-child { border-bottom: none; }
 .tile-label { font-size: var(--text-xs); color: var(--color-text-secondary); margin-top: 2px; font-weight: var(--fw-normal); }
 
 /* --- Cards --- */
-.card { background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); margin-bottom: 24px; overflow: hidden; }
+.card { background: var(--color-surface); border-radius: var(--card-radius); box-shadow: var(--card-shadow); margin-bottom: 24px; overflow: hidden; }
 .card-header { padding: 20px 24px 0; display: flex; align-items: center; justify-content: space-between; }
 .card-title { font-size: var(--text-2xl); font-weight: var(--fw-semibold); letter-spacing: -0.02em; color: var(--color-text-primary); }
 .card-action { font-size: var(--text-md); font-weight: var(--fw-normal); color: var(--color-link); display: flex; align-items: center; gap: 3px; white-space: nowrap; }
 .card-action:hover { color: var(--color-link-hover); text-decoration: underline; }
-.card-body { padding: 16px 24px 24px; }
+.card-body { padding: 16px var(--card-pad) var(--card-pad); }
 
 /* --- Services List (clickable rows) --- */
 .service-item { display: flex; align-items: center; gap: 14px; padding: 12px 16px; margin: 0 -16px; border-radius: 10px; border-bottom: 1px solid var(--color-surface-secondary); transition: background var(--transition-fast); font-size: var(--text-base); text-decoration: none; color: inherit; cursor: pointer; }
@@ -891,7 +894,7 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
    PAGINATION
    ============================================ */
 .pagination { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 24px; }
-.pagination-btn { width: 32px; height: 32px; border-radius: 8px; border: none; background: none; color: var(--color-text-secondary); font-size: var(--text-base); font-weight: var(--fw-medium); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--transition-fast); font-family: var(--font-family); }
+.pagination-btn { width: 32px; height: 32px; border-radius: var(--pagination-radius); border: none; background: none; color: var(--color-text-secondary); font-size: var(--text-base); font-weight: var(--fw-medium); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--transition-fast); font-family: var(--font-family); }
 .pagination-btn:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
 .pagination-btn.active { background: var(--color-accent); color: white; }
 .pagination-btn:disabled { opacity: 0.3; cursor: default; }

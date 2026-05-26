@@ -68,6 +68,9 @@ final class StylesController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_layout'])) {
             return $this->saveLayoutAction($template);
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_elements'])) {
+            return $this->saveElementsAction($template);
+        }
 
         $style  = (string)($_GET['style'] ?? 'default');
         $subcat = (string)($_GET['subcat'] ?? 'colors');
@@ -89,11 +92,13 @@ final class StylesController extends AbstractController
             'buttons'     => $tab === 'variables' ? $this->buildButtonsViewModel($template) : null,
             'forms'       => $tab === 'variables' ? $this->buildFormsViewModel($template) : null,
             'layoutVars'  => $tab === 'variables' ? $this->buildLayoutViewModel($template) : null,
+            'elements'    => $tab === 'variables' ? $this->buildElementsViewModel($template) : null,
             'saved'       => isset($_GET['saved']),
             'colorsSaved' => isset($_GET['colors_saved']),
             'buttonsSaved'=> isset($_GET['buttons_saved']),
             'formsSaved'  => isset($_GET['forms_saved']),
             'layoutSaved' => isset($_GET['layout_saved']),
+            'elementsSaved'=> isset($_GET['elements_saved']),
             'customCss'   => (string)Settings::getValue($template->getName() . '_custom_css', ''),
             'cssSaved'    => isset($_GET['css_saved']),
         ]);
@@ -755,5 +760,87 @@ final class StylesController extends AbstractController
         Settings::setValue($template->getName() . '_layout_vars', $out, 'json');
         $style = (string)($_POST['style'] ?? 'default');
         $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=layout&layout_saved=1');
+    }
+
+    /**
+     * View-model for the Elements subcat — component shape (radius/shadow/
+     * padding). Px fields carry an int 'value'; scale fields carry 'current' +
+     * 'options'. Merges GLOBAL stored overrides onto core/config/elements.php
+     * defaults. Site-wide; no per-style key. (Same size shape as Forms.)
+     */
+    private function buildElementsViewModel($template): array
+    {
+        $cfg    = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/elements.php');
+        $stored = Settings::getValue($template->getName() . '_elements', []);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+        $sizesStored = is_array($stored['sizes'] ?? null) ? $stored['sizes'] : [];
+
+        $scales     = $cfg['scales'] ?? [];
+        $sizeGroups = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $group => $fields) {
+            foreach ($fields as $f) {
+                if (($f['type'] ?? 'px') === 'scale') {
+                    $opts  = $scales[(string)($f['scale'] ?? '')] ?? [];
+                    $cur   = (string)($sizesStored[$f['var']] ?? $f['default']);
+                    $valid = false;
+                    foreach ($opts as $o) {
+                        if ((string)$o['key'] === $cur) { $valid = true; break; }
+                    }
+                    $f['current'] = $valid ? $cur : (string)$f['default'];
+                    $f['options'] = $opts;
+                } else {
+                    $f['value'] = (int)($sizesStored[$f['var']] ?? $f['default']);
+                }
+                $sizeGroups[(string)$group][] = $f;
+            }
+        }
+
+        return ['sizeGroups' => $sizeGroups];
+    }
+
+    /**
+     * Validate + persist the Elements form (site-wide). px int / scale key,
+     * differing from default. PRG redirect to the Elements subcat.
+     */
+    private function saveElementsAction($template): string
+    {
+        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/elements.php');
+        $min = (int)($cfg['sizeMin'] ?? 0);
+        $max = (int)($cfg['sizeMax'] ?? 999);
+
+        $scales  = $cfg['scales'] ?? [];
+        $sizesIn = is_array($_POST['size'] ?? null) ? $_POST['size'] : [];
+        $sizes   = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $var = (string)$f['var'];
+                if (!isset($sizesIn[$var]) || $sizesIn[$var] === '') {
+                    continue;
+                }
+                if (($f['type'] ?? 'px') === 'scale') {
+                    $key = (string)$sizesIn[$var];
+                    $ok  = false;
+                    foreach (($scales[(string)($f['scale'] ?? '')] ?? []) as $o) {
+                        if ((string)$o['key'] === $key) { $ok = true; break; }
+                    }
+                    if (!$ok || $key === (string)$f['default']) {
+                        continue;
+                    }
+                    $sizes[$var] = $key;
+                } else {
+                    $val = (int)$sizesIn[$var];
+                    if ($val < $min || $val > $max || $val === (int)$f['default']) {
+                        continue;
+                    }
+                    $sizes[$var] = $val;
+                }
+            }
+        }
+
+        Settings::setValue($template->getName() . '_elements', ($sizes !== [] ? ['sizes' => $sizes] : []), 'json');
+        $style = (string)($_POST['style'] ?? 'default');
+        $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=elements&elements_saved=1');
     }
 }

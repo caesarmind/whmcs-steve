@@ -168,10 +168,11 @@ final class Hooks
         $buttons = $this->buildButtonsHead($template);
         $forms   = $this->buildFormsHead($template);
         $layout  = $this->buildLayoutHead($template);
+        $elements = $this->buildElementsHead($template);
         $ext     = (string)$this->extensionOutput($template, $vars, slot: 'headOutput');
         $custom  = $this->buildCustomCss($template);
         // Custom CSS goes LAST so it can override the theme + token overrides.
-        $out     = $colors . $typo . $buttons . $forms . $layout . $ext . $custom;
+        $out     = $colors . $typo . $buttons . $forms . $layout . $elements . $ext . $custom;
         return $out !== '' ? $out : null;
     }
 
@@ -548,6 +549,61 @@ final class Hooks
         }
 
         return $decls !== '' ? '<style id="mytheme-layout">:root{' . $decls . '}</style>' : '';
+    }
+
+    /**
+     * Emit the admin's Elements overrides (Styles -> Elements) — component shape
+     * tokens, into :root. Sizes: px -> Npx, scale -> the scale option's css. Var
+     * names + keys re-validated against core/config/elements.php; option css is
+     * authored there. Mirrors the size half of buildFormsHead.
+     */
+    private function buildElementsHead(Template $template): string
+    {
+        $stored = Settings::getValue($template->getName() . '_elements', null);
+        if (!is_array($stored) || $stored === [] || !is_array($stored['sizes'] ?? null)) {
+            return '';
+        }
+
+        $cfg      = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/elements.php');
+        $sizeMeta = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $sizeMeta[(string)$f['var']] = $f;
+            }
+        }
+        $scales = $cfg['scales'] ?? [];
+        $min    = (int)($cfg['sizeMin'] ?? 0);
+        $max    = (int)($cfg['sizeMax'] ?? 999);
+
+        $decls = '';
+        foreach ($stored['sizes'] as $var => $val) {
+            $var = (string)$var;
+            if (!isset($sizeMeta[$var])) {
+                continue;
+            }
+            $f = $sizeMeta[$var];
+            if (($f['type'] ?? 'px') === 'scale') {
+                $css = null;
+                foreach (($scales[(string)($f['scale'] ?? '')] ?? []) as $o) {
+                    if ((string)$o['key'] === (string)$val) {
+                        $css = (string)$o['css'];
+                        break;
+                    }
+                }
+                if ($css === null) {
+                    continue;
+                }
+                $decls .= $var . ':' . $css . ';';
+            } else {
+                $num = (int)$val;
+                if ($num < $min || $num > $max) {
+                    continue;
+                }
+                $decls .= $var . ':' . $num . 'px;';
+            }
+        }
+
+        return $decls !== '' ? '<style id="mytheme-elements">:root{' . $decls . '}</style>' : '';
     }
 
     /** Re-validate a stored color before emitting (defense-in-depth vs CSS injection). */

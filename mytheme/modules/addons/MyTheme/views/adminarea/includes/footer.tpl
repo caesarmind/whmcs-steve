@@ -551,4 +551,16 @@
         });
     });
 })();
+
+/* Elements panel: "Reset all" puts every px + scale field back to default. */
+(function(){
+    var form = document.querySelector('.mt-elements');
+    if (!form) return;
+    var ereset = form.querySelector('#mt-elements-reset');
+    if (ereset) ereset.addEventListener('click', function(){
+        [].slice.call(form.querySelectorAll('input[data-default], select[data-default]')).forEach(function(el){
+            el.value = el.getAttribute('data-default');
+        });
+    });
+})();
 </script>
