@@ -164,14 +164,8 @@ body.mt-login-fullpage { display: block; margin: 0; }
 
 /* ---- Responsive: stack under 900px ---- */
 @media (max-width: 900px) {
+    /* Mobile: show only the sign-in form; hide the info/announcements panel. */
     .mt-loginscreen, .mt-loginscreen.is-info-right { grid-template-columns: 1fr; }
-    .mt-ls-panel {
-        padding: 36px 28px;
-        border-right: none;
-        border-left: none;
-        border-bottom: 1px solid var(--color-border);
-    }
-    .mt-ls-copy { margin: 28px 0 24px; }
-    .mt-ls-news { margin-top: 40px; }
+    .mt-ls-panel { display: none; }
     .mt-ls-main { padding: 36px 24px; }
 }
