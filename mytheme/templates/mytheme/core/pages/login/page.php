@@ -38,6 +38,12 @@ return [
             'help'    => 'Show the brand logo at the top of the page.',
             'default' => true,
         ],
+        'info_right' => [
+            'type'    => 'bool',
+            'label'   => 'Info panel on the right',
+            'help'    => 'Split variant only: place the brand + announcements panel on the right and the sign-in form on the left (default: info on the left).',
+            'default' => false,
+        ],
     ],
 
     'seoDefaults' => [

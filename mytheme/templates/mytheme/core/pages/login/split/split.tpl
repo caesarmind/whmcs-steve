@@ -15,9 +15,10 @@
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/login.css?v={$myTheme.version|default:'1.0'}">
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/login-split.css?v={$myTheme.version|default:'1.0'}">
 
-<div class="mt-loginscreen">
+<div class="mt-loginscreen{if !empty($myTheme.pages.login.options.info_right)} is-info-right{/if}">
 
-    {* ── Left: brand + welcome + latest announcements ── *}
+    {* ── Info panel: brand + welcome + latest announcements (left by default;
+       admin "Info panel on the right" option moves it to the right) ── *}
     <aside class="mt-ls-panel">
         <a href="{$WEB_ROOT}/" class="mt-ls-brand">
             {if !empty($myTheme.branding.logo.light)}
@@ -48,6 +49,7 @@
                     {foreach $loginAnnouncements as $a}
                         <a href="{$WEB_ROOT}/announcements.php?id={$a.id|escape:'url'}" class="mt-ls-news-item">
                             <span class="mt-ls-news-title">{$a.title|escape}</span>
+                            {if !empty($a.excerpt)}<span class="mt-ls-news-excerpt">{$a.excerpt|escape}</span>{/if}
                             <span class="mt-ls-news-date">{$a.date|escape}</span>
                         </a>
                     {/foreach}

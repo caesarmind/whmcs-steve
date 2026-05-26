@@ -130,7 +130,7 @@ final class Hooks
      * Latest published, past-dated announcements. Defensive: any DB failure
      * returns an empty list so the login page can never break.
      *
-     * @return list<array{id:int,title:string,date:string}>
+     * @return list<array{id:int,title:string,date:string,excerpt:string}>
      */
     private function fetchRecentAnnouncements(int $limit): array
     {
@@ -140,7 +140,7 @@ final class Hooks
                 ->where('date', '<=', date('Y-m-d H:i:s'))
                 ->orderBy('date', 'desc')
                 ->limit($limit)
-                ->get(['id', 'title', 'date']);
+                ->get(['id', 'title', 'date', 'announcement']);
         } catch (\Throwable $e) {
             return [];
         }
@@ -149,12 +149,23 @@ final class Hooks
         foreach ($rows as $row) {
             $ts = strtotime((string)($row->date ?? ''));
             $out[] = [
-                'id'    => (int)($row->id ?? 0),
-                'title' => (string)($row->title ?? ''),
-                'date'  => $ts ? date('M j, Y', $ts) : '',
+                'id'      => (int)($row->id ?? 0),
+                'title'   => (string)($row->title ?? ''),
+                'date'    => $ts ? date('M j, Y', $ts) : '',
+                'excerpt' => $this->announcementExcerpt((string)($row->announcement ?? '')),
             ];
         }
         return $out;
+    }
+
+    /** First ~160 chars of an announcement body — tags stripped, cut on a word boundary. */
+    private function announcementExcerpt(string $body): string
+    {
+        $text = trim((string)preg_replace('/\s+/', ' ', strip_tags($body)));
+        if (mb_strlen($text) <= 160) {
+            return $text;
+        }
+        return (string)preg_replace('/\s+\S*$/', '', mb_substr($text, 0, 160)) . '…';
     }
 
     /**
