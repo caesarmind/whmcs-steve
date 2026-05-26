@@ -21,6 +21,8 @@
     var KEYS = {
         auth:          'hn.auth',
         layout:        'hn.layout',
+        sidebar:       'hn.sidebar',
+        icons:         'hn.icons',
         palette:       'hn.palette',
         data:          'hn.data',
         align:         'hn.align',
@@ -30,6 +32,7 @@
         form:          'hn.form',
         product:       'hn.product',
         plan:          'hn.plan',
+        packages:      'hn.packages',
         crumbs:        'hn.crumbs',
         svcLayout:     'hn.svcLayout',
         chipPos:       'hn.chipPos',
@@ -209,6 +212,47 @@
             btn.addEventListener('click', function () { applyLayout(this.dataset.layoutSet); });
         });
 
+        // Sidebar tone (light / dark / tinted — retones the side menu only)
+        var sidebarButtons = document.querySelectorAll('.state-chip [data-sidebar-set]');
+        function applySidebar(tone) {
+            if (['light', 'dark', 'tinted', 'graphite', 'brand'].indexOf(tone) === -1) tone = 'light';
+            if (tone === 'light') {
+                body.removeAttribute('data-sidebar');
+            } else {
+                body.setAttribute('data-sidebar', tone);
+            }
+            sidebarButtons.forEach(function (b) {
+                b.classList.toggle('active', b.dataset.sidebarSet === tone);
+            });
+            try { localStorage.setItem(KEYS.sidebar, tone); } catch (e) {}
+        }
+        var savedSidebar; try { savedSidebar = localStorage.getItem(KEYS.sidebar); } catch (e) {}
+        applySidebar(params.get('sidebar') || savedSidebar || 'light');
+        sidebarButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () { applySidebar(this.dataset.sidebarSet); });
+        });
+
+        // Icon style (colorful / mono — colored tiles vs uniform muted glyphs,
+        // applies to both the sidebar and the icon rail)
+        var iconButtons = document.querySelectorAll('.state-chip [data-icons-set]');
+        function applyIcons(mode) {
+            if (mode !== 'mono' && mode !== 'colorful') mode = 'colorful';
+            if (mode === 'colorful') {
+                body.removeAttribute('data-icons');
+            } else {
+                body.setAttribute('data-icons', mode);
+            }
+            iconButtons.forEach(function (b) {
+                b.classList.toggle('active', b.dataset.iconsSet === mode);
+            });
+            try { localStorage.setItem(KEYS.icons, mode); } catch (e) {}
+        }
+        var savedIcons; try { savedIcons = localStorage.getItem(KEYS.icons); } catch (e) {}
+        applyIcons(params.get('icons') || savedIcons || 'colorful');
+        iconButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () { applyIcons(this.dataset.iconsSet); });
+        });
+
         // Align (center / left — preview toggle for content horizontal alignment)
         var alignButtons = document.querySelectorAll('.state-chip [data-align-set]');
         function applyAlign(state) {
@@ -328,7 +372,8 @@
             { selector: '.tile-variant', pickerAttr: '[data-tiles-set]' },
             { selector: '.form-variant', pickerAttr: '[data-form-set]' },
             { selector: '.product-variant', pickerAttr: '[data-product-set]' },
-            { selector: '.plan-variant', pickerAttr: '[data-plan-set]' }
+            { selector: '.plan-variant', pickerAttr: '[data-plan-set]' },
+            { selector: '.plan-variant', pickerAttr: '[data-packages-set]' }
         ].forEach(function (cfg) {
             if (document.querySelector(cfg.selector)) return;
             var btn = document.querySelector('.state-chip ' + cfg.pickerAttr);
@@ -413,6 +458,24 @@
         applyPlan(params.get('plan') || savedPlan || 'all');
         planButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyPlan(this.dataset.planSet); });
+        });
+
+        // Packages (all/1/2/3/4 — caps how many packages each plan variant shows)
+        var packagesButtons = document.querySelectorAll('.state-chip [data-packages-set]');
+        function applyPackages(count) {
+            var valid = ['all', '1', '2', '3', '4'];
+            if (valid.indexOf(count) === -1) count = 'all';
+            if (count === 'all') body.removeAttribute('data-packages');
+            else body.setAttribute('data-packages', count);
+            packagesButtons.forEach(function (b) {
+                b.classList.toggle('active', b.dataset.packagesSet === count);
+            });
+            try { localStorage.setItem(KEYS.packages, count); } catch (e) {}
+        }
+        var savedPackages; try { savedPackages = localStorage.getItem(KEYS.packages); } catch (e) {}
+        applyPackages(params.get('packages') || savedPackages || 'all');
+        packagesButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () { applyPackages(this.dataset.packagesSet); });
         });
 
         // Product (A/B/All — pages with product-variant blocks show only the chosen one)
@@ -739,6 +802,144 @@
         });
     }
 
+    // Live color control panel: a floating, draggable, collapsible panel that
+    // live-edits every --color-* token by writing inline custom-props on <html>
+    // (which override :root + dark mode). Prototyping aid for the mockup;
+    // "Copy CSS" exports only the tokens you changed.
+    function initColorPanel() {
+        if (document.querySelector('.cp-panel')) return;
+        var root = document.documentElement;
+
+        var GROUPS = [
+            ['Brand', [['--color-accent', 'Accent'], ['--color-accent-hover', 'Accent hover'], ['--color-accent-light', 'Accent tint'], ['--color-link', 'Link'], ['--color-link-hover', 'Link hover']]],
+            ['Backgrounds', [['--color-bg', 'Page'], ['--color-surface', 'Surface'], ['--color-surface-secondary', 'Surface 2'], ['--color-surface-tertiary', 'Surface 3']]],
+            ['Text', [['--color-text-primary', 'Primary'], ['--color-text-secondary', 'Secondary'], ['--color-text-tertiary', 'Tertiary'], ['--color-text-quaternary', 'Quaternary']]],
+            ['Borders', [['--color-border', 'Border'], ['--color-border-light', 'Border light'], ['--color-border-card', 'Card border']]],
+            ['Status', [['--color-green', 'Success'], ['--color-green-text', 'Success text'], ['--color-green-bg', 'Success fill'], ['--color-orange', 'Warning'], ['--color-orange-text', 'Warning text'], ['--color-orange-bg', 'Warning fill'], ['--color-red', 'Danger'], ['--color-red-text', 'Danger text'], ['--color-red-bg', 'Danger fill']]],
+            ['Badges', [['--color-blue-text', 'Info'], ['--color-blue-bg', 'Info fill'], ['--color-gray-text', 'Neutral'], ['--color-gray-bg', 'Neutral fill']]],
+            ['Sidebar', [['--sidebar-bg', 'Background'], ['--sidebar-item-hover', 'Item hover'], ['--sidebar-item-active', 'Item active'], ['--sidebar-icon-bg', 'Icon tile']]],
+            ['Topbar', [['--topbar-bg', 'Background']]],
+            ['Icon tiles', [['--color-icon-blue', 'Blue'], ['--color-icon-purple', 'Purple'], ['--color-icon-orange', 'Orange'], ['--color-icon-green', 'Green'], ['--color-icon-red', 'Red'], ['--color-icon-teal', 'Teal'], ['--color-icon-gray', 'Gray'], ['--color-icon-indigo', 'Indigo'], ['--color-icon-pink', 'Pink'], ['--color-icon-mono', 'Uniform (mono)']]]
+        ];
+        var PRESETS = [
+            ['Default', '#0071e3'], ['Emerald', '#14b17d'], ['Violet', '#8c5cff'], ['Rose', '#ff2d6b'], ['Amber', '#f08a00'], ['Slate', '#64748b'],
+            // [name, primary, deep] — Roman brand palettes (gold accent flagged separately).
+            ['Hadrian', '#0d5c56', '#0a4944'], ['Augustus', '#4a2545', '#2f1a2d'], ['Trajan', '#1f3a5f', '#142844'], ['Aurelius', '#2d4a2a', '#1a2e18'], ['Constantine', '#5b2a2a', '#3a1818']
+        ];
+
+        var css = [
+            '.cp-fab{position:fixed;right:16px;bottom:16px;z-index:99998;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:0;border-radius:980px;background:#1d1d1f;color:#fff;font:600 13px -apple-system,system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);}',
+            '.cp-fab svg{width:14px;height:14px;}',
+            '.cp-panel{position:fixed;right:16px;bottom:16px;z-index:99999;width:300px;max-height:82vh;display:flex;flex-direction:column;background:#fff;color:#1d1d1f;border:1px solid #e8e8ed;border-radius:14px;box-shadow:0 12px 48px rgba(0,0,0,0.22);font:13px -apple-system,system-ui,sans-serif;overflow:hidden;}',
+            '.cp-head{display:flex;align-items:center;gap:4px;padding:9px 12px;border-bottom:1px solid #e8e8ed;cursor:move;background:#fafafa;}',
+            '.cp-title{font-weight:600;flex:1;font-size:13px;}',
+            '.cp-head button{border:0;background:transparent;cursor:pointer;font:500 12px -apple-system,system-ui,sans-serif;color:#0071e3;padding:4px 7px;border-radius:6px;}',
+            '.cp-head button:hover{background:#eef0f3;}',
+            '.cp-body{overflow-y:auto;padding:10px 12px;}',
+            '.cp-presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}',
+            '.cp-preset{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border:1px solid #e8e8ed;border-radius:980px;background:#fff;cursor:pointer;font:500 12px -apple-system,system-ui,sans-serif;color:#1d1d1f;}',
+            '.cp-dot{width:11px;height:11px;border-radius:50%;}',
+            '.cp-grp{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#86868b;margin:12px 0 5px;}',
+            '.cp-grp.first{margin-top:0;}',
+            '.cp-row{display:flex;align-items:center;gap:8px;padding:3px 0;}',
+            '.cp-label{flex:1;font-size:12px;color:#6e6e73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}',
+            '.cp-sw{width:26px;height:26px;padding:2px;border:1px solid #d2d2d7;border-radius:6px;background:#fff;cursor:pointer;flex-shrink:0;}',
+            '.cp-tx{width:104px;flex-shrink:0;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;padding:5px 7px;border:1px solid #d2d2d7;border-radius:6px;color:#1d1d1f;}',
+            '.cp-foot{padding:8px 12px;border-top:1px solid #e8e8ed;font-size:11px;color:#86868b;line-height:1.4;}',
+            '.cp-iconmode{display:inline-flex;background:#eef0f3;border-radius:8px;padding:2px;margin:2px 0 8px;}',
+            '.cp-iconmode button{border:0;background:transparent;font:500 12px -apple-system,system-ui,sans-serif;color:#6e6e73;padding:5px 12px;border-radius:6px;cursor:pointer;}',
+            '.cp-iconmode button.active{background:#fff;color:#1d1d1f;box-shadow:0 1px 2px rgba(0,0,0,0.08);}',
+            'body[data-preview="off"] .cp-fab,body[data-preview="off"] .cp-panel,body.screenshot .cp-fab,body.screenshot .cp-panel{display:none!important;}'
+        ].join('');
+        var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+
+        function cur(v) { return getComputedStyle(root).getPropertyValue(v).trim(); }
+        function cl(n) { return Math.max(0, Math.min(255, Math.round(n))); }
+        function h2(n) { return ('0' + cl(n).toString(16)).slice(-2); }
+        function toHex(v) {
+            v = (v || '').trim();
+            var m = v.match(/^#([0-9a-f]{6})$/i); if (m) return '#' + m[1].toLowerCase();
+            m = v.match(/^#([0-9a-f]{3})$/i); if (m) { var c = m[1]; return ('#' + c[0] + c[0] + c[1] + c[1] + c[2] + c[2]).toLowerCase(); }
+            m = v.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i); if (m) return '#' + h2(+m[1]) + h2(+m[2]) + h2(+m[3]);
+            return '#000000';
+        }
+        function toRgb(v) { var i = parseInt(toHex(v).slice(1), 16); return [(i >> 16) & 255, (i >> 8) & 255, i & 255]; }
+        function darken(v, p) { var r = toRgb(v); return '#' + h2(r[0] * (1 - p)) + h2(r[1] * (1 - p)) + h2(r[2] * (1 - p)); }
+        function rgba(v, a) { var r = toRgb(v); return 'rgba(' + r[0] + ',' + r[1] + ',' + r[2] + ',' + a + ')'; }
+
+        var inner = '<div class="cp-presets">';
+        PRESETS.forEach(function (p) { inner += '<button type="button" class="cp-preset" data-accent="' + p[1] + '"' + (p[2] ? ' data-deep="' + p[2] + '"' : '') + '><span class="cp-dot" style="background:' + p[1] + '"></span>' + p[0] + '</button>'; });
+        inner += '</div>';
+        GROUPS.forEach(function (g, gi) {
+            inner += '<div class="cp-grp' + (gi === 0 ? ' first' : '') + '">' + g[0] + '</div>';
+            if (g[0] === 'Icon tiles') {
+                inner += '<div class="cp-iconmode"><button type="button" data-iconmode="colorful">Colorful</button><button type="button" data-iconmode="mono">Mono</button></div>';
+            }
+            g[1].forEach(function (t) {
+                var val = cur(t[0]);
+                inner += '<div class="cp-row" data-var="' + t[0] + '"><span class="cp-label">' + t[1] + '</span><input type="color" class="cp-sw" value="' + toHex(val) + '"><input type="text" class="cp-tx" spellcheck="false" value="' + val + '"></div>';
+            });
+        });
+
+        var panel = document.createElement('div'); panel.className = 'cp-panel'; panel.hidden = true;
+        panel.innerHTML = '<div class="cp-head"><span class="cp-title">Colors</span><button type="button" data-cp="reset">Reset</button><button type="button" data-cp="copy">Copy CSS</button><button type="button" data-cp="close" title="Close">Done</button></div><div class="cp-body">' + inner + '</div><div class="cp-foot">Live preview &mdash; this browser only. Edits the active mode. &ldquo;Copy CSS&rdquo; exports changed tokens.</div>';
+        document.body.appendChild(panel);
+
+        var fab = document.createElement('button'); fab.type = 'button'; fab.className = 'cp-fab';
+        fab.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4.5-8-10-8z"/></svg>Colors';
+        document.body.appendChild(fab);
+
+        function rowEls(v) { var r = panel.querySelector('.cp-row[data-var="' + v + '"]'); return r ? { sw: r.querySelector('.cp-sw'), tx: r.querySelector('.cp-tx') } : null; }
+        function setVar(v, val, fromTx) { root.style.setProperty(v, val); var e = rowEls(v); if (e) { e.sw.value = toHex(val); if (!fromTx) e.tx.value = val; } }
+
+        panel.querySelectorAll('.cp-sw').forEach(function (sw) { sw.addEventListener('input', function () { setVar(sw.closest('.cp-row').getAttribute('data-var'), sw.value, false); }); });
+        panel.querySelectorAll('.cp-tx').forEach(function (tx) { tx.addEventListener('input', function () { setVar(tx.closest('.cp-row').getAttribute('data-var'), tx.value, true); }); });
+        panel.querySelectorAll('.cp-preset').forEach(function (b) {
+            b.addEventListener('click', function () {
+                var hx = b.getAttribute('data-accent');
+                var deep = b.getAttribute('data-deep') || darken(hx, 0.08);
+                setVar('--color-accent', hx); setVar('--color-accent-hover', deep); setVar('--color-accent-light', rgba(hx, 0.08)); setVar('--color-link', hx); setVar('--color-link-hover', deep);
+            });
+        });
+        fab.addEventListener('click', function () { panel.hidden = false; fab.style.display = 'none'; });
+
+        // Colorful / Mono icon toggle inside the panel (mirrors the state-chip "Icons").
+        var imBtns = [].slice.call(panel.querySelectorAll('[data-iconmode]'));
+        function applyIconMode(mode) {
+            if (mode !== 'mono') mode = 'colorful';
+            if (mode === 'colorful') { document.body.removeAttribute('data-icons'); } else { document.body.setAttribute('data-icons', 'mono'); }
+            imBtns.forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-iconmode') === mode); });
+            [].slice.call(document.querySelectorAll('.state-chip [data-icons-set]')).forEach(function (b) { b.classList.toggle('active', b.dataset.iconsSet === mode); });
+            try { localStorage.setItem('hn.icons', mode); } catch (e) {}
+        }
+        imBtns.forEach(function (b) { b.addEventListener('click', function () { applyIconMode(b.getAttribute('data-iconmode')); }); });
+        applyIconMode(document.body.getAttribute('data-icons') === 'mono' ? 'mono' : 'colorful');
+        panel.querySelector('[data-cp="close"]').addEventListener('click', function () { panel.hidden = true; fab.style.display = ''; });
+        panel.querySelector('[data-cp="reset"]').addEventListener('click', function () {
+            GROUPS.forEach(function (g) { g[1].forEach(function (t) { root.style.removeProperty(t[0]); }); });
+            panel.querySelectorAll('.cp-row').forEach(function (r) { var v = r.getAttribute('data-var'), val = cur(v); r.querySelector('.cp-sw').value = toHex(val); r.querySelector('.cp-tx').value = val; });
+        });
+        panel.querySelector('[data-cp="copy"]').addEventListener('click', function (e) {
+            var lines = [];
+            GROUPS.forEach(function (g) { g[1].forEach(function (t) { var ov = root.style.getPropertyValue(t[0]); if (ov) lines.push('  ' + t[0] + ': ' + ov.trim() + ';'); }); });
+            var out = lines.length ? ':root {\n' + lines.join('\n') + '\n}' : '/* no changes yet */';
+            var btn = e.target, orig = btn.textContent;
+            var done = function () { btn.textContent = 'Copied!'; setTimeout(function () { btn.textContent = orig; }, 1200); };
+            if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(out).then(done, function () { window.prompt('Copy these tokens:', out); }); }
+            else { window.prompt('Copy these tokens:', out); }
+        });
+
+        var head = panel.querySelector('.cp-head'), dragging = false, sx, sy, ox, oy;
+        head.addEventListener('mousedown', function (e) {
+            if (e.target.tagName === 'BUTTON') return;
+            var r = panel.getBoundingClientRect();
+            panel.style.right = 'auto'; panel.style.bottom = 'auto'; panel.style.left = r.left + 'px'; panel.style.top = r.top + 'px';
+            ox = r.left; oy = r.top; sx = e.clientX; sy = e.clientY; dragging = true; e.preventDefault();
+        });
+        document.addEventListener('mousemove', function (e) { if (!dragging) return; panel.style.left = Math.max(4, ox + (e.clientX - sx)) + 'px'; panel.style.top = Math.max(4, oy + (e.clientY - sy)) + 'px'; });
+        document.addEventListener('mouseup', function () { dragging = false; });
+    }
+
     // ── Bootstrap ──────────────────────────────────────────
     function boot() {
         var params = new URLSearchParams(window.location.search);
@@ -759,6 +960,7 @@
             initLocaleModal();
             applyActiveNav();
             applyPageTitle();
+            initColorPanel();
             document.dispatchEvent(new CustomEvent('apple-layout:ready'));
         });
     }
