@@ -493,8 +493,8 @@
 })();
 
 /* Buttons panel: each matrix <select> drives its preview swatch; "Reset all"
-   puts every size field + variant select back to its default. Brace-safe (no
-   {n} quantifiers, every { is followed by whitespace) so Smarty leaves it be. */
+   puts every size field + variant select back to its default. Written so Smarty
+   auto-literal leaves this script alone (no risky brace sequences in raw text). */
 (function(){
     var form = document.querySelector('.mt-buttons');
     if (!form) return;
