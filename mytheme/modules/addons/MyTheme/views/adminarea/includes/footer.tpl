@@ -212,7 +212,8 @@
 .mt-color-tile.is-gradient .mt-color-hex em { color: var(--mt-text-3); font-style: normal; }
 
 .mt-variant-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
-.mt-variant { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.mt-variant { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; transition: border-color .12s, box-shadow .12s; }
+.mt-variant:hover { border-color: var(--mt-primary); }
 .mt-variant.is-active { border-color: var(--mt-primary); box-shadow: 0 0 0 2px var(--mt-primary-tint); }
 .mt-variant-name { font-size: 13px; font-weight: 500; }
 

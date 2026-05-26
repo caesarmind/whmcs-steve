@@ -26,7 +26,7 @@
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Template variant</h2></header>
         {if $variants|count}
-            <div class="mt-variant-grid">
+            <div class="mt-variant-grid" data-saved-variant="{$activeVariant|escape}">
                 {foreach $variants as $v}
                     <label class="mt-variant {if $v.name == $activeVariant}is-active{/if}">
                         <input type="radio" name="variant" value="{$v.name|escape}" {if $v.name == $activeVariant}checked{/if} hidden>
@@ -173,5 +173,45 @@
         </div>
     </section>
 </form>
+
+{literal}
+<script>
+// Variant picker: the cards are <label>s around hidden radios, so selection
+// works natively — but nothing highlights on click. Wire live feedback and
+// explicitly set the radio so the choice is reliable, then Save persists it.
+(function () {
+    var grid = document.querySelector('.mt-variant-grid');
+    if (!grid) return;
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('.mt-variant'));
+    if (cards.length < 2) return;
+    var saved = grid.getAttribute('data-saved-variant') || '';
+
+    function render() {
+        var checked = grid.querySelector('input[name="variant"]:checked');
+        var sel = checked ? checked.value : '';
+        cards.forEach(function (card) {
+            var radio = card.querySelector('input[name="variant"]');
+            var isSel = !!(radio && radio.value === sel);
+            card.classList.toggle('is-active', isSel);
+            var badge = card.querySelector('.mt-badge');
+            if (!badge) return;
+            badge.textContent = isSel
+                ? (radio.value === saved ? 'Active' : 'Selected — Save to apply')
+                : 'Click to activate';
+            badge.classList.remove('mt-badge-success', 'mt-badge-neutral');
+            badge.classList.add(isSel ? 'mt-badge-success' : 'mt-badge-neutral');
+        });
+    }
+
+    cards.forEach(function (card) {
+        card.addEventListener('click', function () {
+            var radio = card.querySelector('input[name="variant"]');
+            if (radio) radio.checked = true;
+            render();
+        });
+    });
+})();
+</script>
+{/literal}
 
 {include file="includes/footer.tpl"}
