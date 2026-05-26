@@ -52,7 +52,11 @@
             {include file="styles/_forms.tpl"}
         </div>
 
-        {foreach ['general', 'navigation', 'layout', 'elements', 'site'] as $sc}
+        <div class="mt-subcat-panel" data-panel="layout"{if $subcat != 'layout'} hidden{/if}>
+            {include file="styles/_layout.tpl"}
+        </div>
+
+        {foreach ['general', 'navigation', 'elements', 'site'] as $sc}
         <div class="mt-subcat-panel" data-panel="{$sc}"{if $subcat != $sc} hidden{/if}>
             <div class="mt-empty">
                 <div class="mt-empty-title">{$sc|capitalize}</div>

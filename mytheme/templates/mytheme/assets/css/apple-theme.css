@@ -60,6 +60,8 @@
     --color-icon-indigo: #5856d6;
     --color-icon-pink: #ff2d55;
     --sidebar-width: 260px;
+    --content-max-width: 1120px;
+    --content-pad-x: 48px;
     --sidebar-bg: rgba(246, 246, 248, 0.80);
     --sidebar-item-hover: rgba(0, 0, 0, 0.04);
     --sidebar-item-active: rgba(0, 0, 0, 0.06);
@@ -544,7 +546,7 @@ html { scroll-behavior: smooth; }
 /* ============================================
    CONTENT AREA
    ============================================ */
-.content, .content-area { flex: 1; padding: 40px 48px 60px; max-width: 1120px; }
+.content, .content-area { flex: 1; padding: 40px var(--content-pad-x) 60px; max-width: var(--content-max-width); }
 .page-actions { margin-top: 24px; }
 .service-item-info { flex: 1; min-width: 0; }
 .service-item-name { font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-text-primary); }

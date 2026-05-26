@@ -539,4 +539,16 @@
         });
     });
 })();
+
+/* Layout panel: "Reset all" puts every px field back to default. */
+(function(){
+    var form = document.querySelector('.mt-layout');
+    if (!form) return;
+    var lreset = form.querySelector('#mt-layout-reset');
+    if (lreset) lreset.addEventListener('click', function(){
+        [].slice.call(form.querySelectorAll('input[data-default]')).forEach(function(el){
+            el.value = el.getAttribute('data-default');
+        });
+    });
+})();
 </script>

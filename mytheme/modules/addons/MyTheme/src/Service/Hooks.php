@@ -167,10 +167,11 @@ final class Hooks
         $typo    = $this->buildTypographyHead($template);
         $buttons = $this->buildButtonsHead($template);
         $forms   = $this->buildFormsHead($template);
+        $layout  = $this->buildLayoutHead($template);
         $ext     = (string)$this->extensionOutput($template, $vars, slot: 'headOutput');
         $custom  = $this->buildCustomCss($template);
         // Custom CSS goes LAST so it can override the theme + token overrides.
-        $out     = $colors . $typo . $buttons . $forms . $ext . $custom;
+        $out     = $colors . $typo . $buttons . $forms . $layout . $ext . $custom;
         return $out !== '' ? $out : null;
     }
 
@@ -509,6 +510,44 @@ final class Hooks
         }
 
         return $decls !== '' ? '<style id="mytheme-forms">:root{' . $decls . '}</style>' : '';
+    }
+
+    /**
+     * Emit the admin's Layout overrides (Styles -> Layout) — page-structure
+     * dimensions, px only, into :root. Var names re-validated against
+     * core/config/layout.php; values are ints. Returns '' when nothing changed.
+     */
+    private function buildLayoutHead(Template $template): string
+    {
+        $stored = Settings::getValue($template->getName() . '_layout_vars', null);
+        if (!is_array($stored) || $stored === []) {
+            return '';
+        }
+
+        $cfg   = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');
+        $min   = (int)($cfg['sizeMin'] ?? 0);
+        $max   = (int)($cfg['sizeMax'] ?? 4000);
+        $valid = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $valid[(string)$f['var']] = true;
+            }
+        }
+
+        $decls = '';
+        foreach ($stored as $var => $val) {
+            $var = (string)$var;
+            if (!isset($valid[$var])) {
+                continue;
+            }
+            $num = (int)$val;
+            if ($num < $min || $num > $max) {
+                continue;
+            }
+            $decls .= $var . ':' . $num . 'px;';
+        }
+
+        return $decls !== '' ? '<style id="mytheme-layout">:root{' . $decls . '}</style>' : '';
     }
 
     /** Re-validate a stored color before emitting (defense-in-depth vs CSS injection). */

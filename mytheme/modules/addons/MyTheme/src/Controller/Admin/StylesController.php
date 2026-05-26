@@ -65,6 +65,9 @@ final class StylesController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_forms'])) {
             return $this->saveFormsAction($template);
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_layout'])) {
+            return $this->saveLayoutAction($template);
+        }
 
         $style  = (string)($_GET['style'] ?? 'default');
         $subcat = (string)($_GET['subcat'] ?? 'colors');
@@ -85,10 +88,12 @@ final class StylesController extends AbstractController
             'typography'  => $tab === 'variables' ? $this->buildTypographyViewModel($template) : null,
             'buttons'     => $tab === 'variables' ? $this->buildButtonsViewModel($template) : null,
             'forms'       => $tab === 'variables' ? $this->buildFormsViewModel($template) : null,
+            'layoutVars'  => $tab === 'variables' ? $this->buildLayoutViewModel($template) : null,
             'saved'       => isset($_GET['saved']),
             'colorsSaved' => isset($_GET['colors_saved']),
             'buttonsSaved'=> isset($_GET['buttons_saved']),
             'formsSaved'  => isset($_GET['forms_saved']),
+            'layoutSaved' => isset($_GET['layout_saved']),
             'customCss'   => (string)Settings::getValue($template->getName() . '_custom_css', ''),
             'cssSaved'    => isset($_GET['css_saved']),
         ]);
@@ -695,5 +700,60 @@ final class StylesController extends AbstractController
         Settings::setValue($template->getName() . '_forms', $out, 'json');
         $style = (string)($_POST['style'] ?? 'default');
         $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=forms&forms_saved=1');
+    }
+
+    /**
+     * View-model for the Layout subcat — page-structure dimensions (px). Merges
+     * GLOBAL stored overrides onto the core/config/layout.php defaults so each
+     * field shows its effective value. Site-wide; no per-style key.
+     */
+    private function buildLayoutViewModel($template): array
+    {
+        $cfg    = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');
+        $stored = Settings::getValue($template->getName() . '_layout_vars', []);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+        $sizeGroups = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $group => $fields) {
+            foreach ($fields as $f) {
+                $f['value'] = (int)($stored[$f['var']] ?? $f['default']);
+                $sizeGroups[(string)$group][] = $f;
+            }
+        }
+        return ['sizeGroups' => $sizeGroups];
+    }
+
+    /**
+     * Validate + persist the Layout form (site-wide). Keeps only in-bounds px
+     * values that differ from default. PRG redirect to the Layout subcat. Uses
+     * the `_layout_vars` key to avoid colliding with the Layouts manager's
+     * `_active_layout_*` / `_layout_opts_*` settings.
+     */
+    private function saveLayoutAction($template): string
+    {
+        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');
+        $min = (int)($cfg['sizeMin'] ?? 0);
+        $max = (int)($cfg['sizeMax'] ?? 4000);
+        $in  = is_array($_POST['size'] ?? null) ? $_POST['size'] : [];
+
+        $out = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $var = (string)$f['var'];
+                if (!isset($in[$var]) || $in[$var] === '') {
+                    continue;
+                }
+                $val = (int)$in[$var];
+                if ($val < $min || $val > $max || $val === (int)$f['default']) {
+                    continue;
+                }
+                $out[$var] = $val;
+            }
+        }
+
+        Settings::setValue($template->getName() . '_layout_vars', $out, 'json');
+        $style = (string)($_POST['style'] ?? 'default');
+        $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=layout&layout_saved=1');
     }
 }
