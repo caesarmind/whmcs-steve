@@ -340,8 +340,9 @@
 
     {* Breadcrumb (top layout only): Apple-style single back-link to Home.
        The page title below carries the current page, so a "< Home" affordance
-       is cleaner than a full "Home / Page" trail. *}
-    {if $mt_preview || $mt_layout == 'top'}
+       is cleaner than a full "Home / Page" trail. Skipped on the portal home
+       page ($_tf == 'homepage'), where "back to Home" would point at itself. *}
+    {if ($mt_preview || $mt_layout == 'top') && $_tf != 'homepage'}
     <nav class="ph-breadcrumb ph-breadcrumb-back only-top" aria-label="breadcrumb">
         <div class="ph-breadcrumb-inner">
             <a href="{$WEB_ROOT}/" class="ph-back-link">
