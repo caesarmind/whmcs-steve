@@ -8,6 +8,11 @@
    footer. *}
 {assign var=mtLicenseGateEnabled value=false}
 
+{* Mirror header.tpl — full-bleed pages (e.g. login "split") skip the footer
+   chrome too, since header.tpl never opened .content-area / .ph-main-wrap. *}
+{assign var=mt_fullPage value=false}
+{if isset($myTheme.pages) && isset($myTheme.pages[$templatefile]) && !empty($myTheme.pages[$templatefile].fullPage)}{assign var=mt_fullPage value=true}{/if}
+
 {if $mtLicenseGateEnabled && empty($myTheme.license.canRender)}
     </div>
 </body>
@@ -15,6 +20,7 @@
 {elseif file_exists("templates/$template/overwrites/footer.tpl")}
     {include file="`$template`/overwrites/footer.tpl"}
 {else}
+    {if !$mt_fullPage}
     </div>{* /.content-area *}
 
     {* Footer layout dispatch — admin picks one of `core/layouts/footer/*`
@@ -42,6 +48,7 @@
    covers the full viewport. Opened by [data-locale-open] buttons in the
    footer; JS handler in apple-layout.js. *}
 {include file="`$template`/includes/partials/locale-modal.tpl"}
+    {/if}{* end portal chrome close (skipped when fullPage) *}
 
 {$footeroutput}
 

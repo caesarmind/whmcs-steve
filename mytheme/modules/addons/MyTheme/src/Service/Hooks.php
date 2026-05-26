@@ -115,6 +115,49 @@ final class Hooks
     }
 
     /**
+     * Login page (priority 1 ClientAreaPageLogin). Surfaces the latest
+     * published announcements as $loginAnnouncements for the "split" login
+     * variant's featured panel. Other variants ignore the var.
+     *
+     * @return array{loginAnnouncements: list<array{id:int,title:string,date:string}>}
+     */
+    private function clientAreaPageLogin(array $vars, Template $template): array
+    {
+        return ['loginAnnouncements' => $this->fetchRecentAnnouncements(3)];
+    }
+
+    /**
+     * Latest published, past-dated announcements. Defensive: any DB failure
+     * returns an empty list so the login page can never break.
+     *
+     * @return list<array{id:int,title:string,date:string}>
+     */
+    private function fetchRecentAnnouncements(int $limit): array
+    {
+        try {
+            $rows = \WHMCS\Database\Capsule::table('tblannouncements')
+                ->where('published', 1)
+                ->where('date', '<=', date('Y-m-d H:i:s'))
+                ->orderBy('date', 'desc')
+                ->limit($limit)
+                ->get(['id', 'title', 'date']);
+        } catch (\Throwable $e) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($rows as $row) {
+            $ts = strtotime((string)($row->date ?? ''));
+            $out[] = [
+                'id'    => (int)($row->id ?? 0),
+                'title' => (string)($row->title ?? ''),
+                'date'  => $ts ? date('M j, Y', $ts) : '',
+            ];
+        }
+        return $out;
+    }
+
+    /**
      * Build the $myTheme.branding payload — resolved web URLs, ready for
      * the template to drop into <img src="..."> / <link rel="icon"> without
      * any further work.
@@ -1363,9 +1406,20 @@ final class Hooks
         }
         $seoDefaults = is_array($pageMeta['seoDefaults'] ?? null) ? $pageMeta['seoDefaults'] : [];
 
+        // Full-bleed flag — a variant can declare `fullPage => true` in its
+        // <variant>.php meta (e.g. login/split), or an admin can enable the
+        // page-level `full_page` option. Either makes header.tpl/footer.tpl
+        // suppress the portal nav, sidebar/rail, breadcrumb and footer.
+        $variantMeta  = ThemeManifest::loadVariantMeta(
+            $template->getFullPath() . "/core/pages/{$page}/{$variant}/{$variant}.php"
+        );
+        $fullPageFlag = (bool)($variantMeta['fullPage'] ?? false)
+            || (isset($stored['options']['full_page']) && (bool)$stored['options']['full_page']);
+
         $entry = [
             'meta'       => $pageMeta,
             'variant'    => $variant,
+            'fullPage'   => $fullPageFlag,
             'fullPath'   => $fullPath,
             'indexing'   => (string)($stored['indexing']   ?? $seoDefaults['indexing'] ?? 'inherit'),
             'visibility' => (string)($stored['visibility'] ?? 'public'),

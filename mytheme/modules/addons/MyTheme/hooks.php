@@ -252,6 +252,13 @@ if (AddonHelper::isActive()) {
         return HookService::instance()->dispatch('ClientAreaFooterOutput', $vars);
     });
 
+    // Login page — expose the latest published announcements to the login
+    // template ($loginAnnouncements). The "split" login variant features them
+    // in its side panel; other variants simply ignore the var.
+    add_hook('ClientAreaPageLogin', 1, function ($vars) {
+        return HookService::instance()->dispatch('ClientAreaPageLogin', $vars);
+    });
+
     add_hook('ClientAreaHomepagePanels', 9, function (WHMCS\View\Menu\Item $panels) {
         return HookService::instance()->dispatch('ClientAreaHomepagePanels', $panels);
     });

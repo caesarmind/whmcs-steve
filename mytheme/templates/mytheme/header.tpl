@@ -229,6 +229,10 @@
     {if isset($myTheme.pages) && isset($myTheme.pages[$templatefile])}
         {assign var=mt_pageEntry value=$myTheme.pages[$templatefile]}
     {/if}
+    {* Full-bleed pages (e.g. the login "split" variant) suppress the portal
+       chrome below — nav, sidebar/rail, breadcrumb and footer. *}
+    {assign var=mt_fullPage value=false}
+    {if $mt_pageEntry && !empty($mt_pageEntry.fullPage)}{assign var=mt_fullPage value=true}{/if}
     <title>{if $mt_pageEntry && !empty($mt_pageEntry.seo.title)}{$mt_pageEntry.seo.title|escape}{else}{if $pagetitle}{$pagetitle} — {/if}{$companyname|escape}{/if}</title>
     {if $mt_pageEntry && !empty($mt_pageEntry.seo.description)}
         <meta name="description" content="{$mt_pageEntry.seo.description|escape}">
@@ -303,7 +307,7 @@
 
     {$headoutput}
 </head>
-<body class="client-area-layout"
+<body class="{if $mt_fullPage}mt-login-fullpage{else}client-area-layout{/if}"
       data-auth="{$mt_auth}"
       data-layout="{$mt_layout}"
       data-active-nav="{$mt_activeNav|escape}"
@@ -312,6 +316,7 @@
 
 {$headeroutput}
 
+{if !$mt_fullPage}
 {* Dev preview chip — renders only on ?preview=1 (never in the live portal) *}
 {include file="`$template`/includes/partials/state-chip.tpl"}
 
@@ -354,4 +359,5 @@
     {/if}
 
     <div class="content-area">
+    {/if}{* end portal chrome (skipped when fullPage) *}
 {/if}
