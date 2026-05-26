@@ -291,26 +291,31 @@ final class Hooks
      */
     private function buildColorsHead(Template $template): string
     {
-        try {
-            $styles = (array)$template->getStyles();
-        } catch (\Throwable $e) {
-            $styles = ['default', 'dark'];
-        }
-        if ($styles === []) {
-            $styles = ['default', 'dark'];
+        $name   = $template->getName();
+        $active = (string)Settings::getValue($name . '_active_style', 'default');
+        if ($active === 'dark' || $active === '') {
+            $active = 'default'; // legacy dark/empty pointer -> base style
         }
 
+        // Each style now carries BOTH scopes: light -> :root, dark ->
+        // [data-theme="dark"]. Read the per-scope keys, falling back to the
+        // pre-refactor keys (_colors_<active> for light, _colors_dark for dark)
+        // so saved colors keep applying before the admin-side migration runs.
+        $scopes = [
+            ':root'               => ['_colors_' . $active . '_light', '_colors_' . $active],
+            '[data-theme="dark"]' => ['_colors_' . $active . '_dark',  '_colors_dark'],
+        ];
+
         $blocks = '';
-        foreach ($styles as $style) {
-            $style  = (string)$style;
-            $stored = Settings::getValue($template->getName() . '_colors_' . $style, null);
+        foreach ($scopes as $selector => $keys) {
+            $stored = null;
+            foreach ($keys as $k) {
+                $v = Settings::getValue($name . $k, null);
+                if (is_array($v) && $v !== []) { $stored = $v; break; }
+            }
             if (!is_array($stored) || $stored === []) {
                 continue;
             }
-            $meta     = ThemeManifest::loadVariantMeta($template->getFullPath() . "/core/styles/{$style}/style.php");
-            $mode     = (($meta['variables']['colorMode'] ?? 'light') === 'dark') ? 'dark' : 'light';
-            $selector = $mode === 'dark' ? '[data-theme="dark"]' : ':root';
-
             $decls = '';
             foreach ($stored as $var => $val) {
                 if (!preg_match('/^--[a-z0-9-]+$/', (string)$var)) {

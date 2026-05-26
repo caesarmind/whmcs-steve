@@ -4,16 +4,23 @@
    the accent presets and the resolved mode. POSTs back to action=editStyle (PRG
    in editAction) as c[--token]=value. Preset cascade + swatch<->text sync are
    wired by JS in includes/footer.tpl. Mirrors _typography.tpl. *}
-<form method="post" action="?module=MyTheme&action=editStyle&style={$style|escape}&subcat=colors" class="mt-colors">
+<form method="post" action="?module=MyTheme&action=editStyle&style={$style|escape}&subcat=colors&scope={$colors.mode}" class="mt-colors">
     <input type="hidden" name="mt_colors" value="1">
     <input type="hidden" name="style" value="{$style|escape}">
+    <input type="hidden" name="scope" value="{$colors.mode}">
 
     {if $colorsSaved}<div class="mt-alert mt-alert-success">Colors saved.</div>{/if}
 
     <section class="mt-section">
         <header class="mt-section-header">
             <h2 class="mt-section-title">Color Scheme</h2>
-            <span class="mt-section-count">{if $colors.mode == 'dark'}Editing dark mode{else}Editing light mode{/if}</span>
+            {* Light/Dark scope toggle — each style carries both color sets.
+               Switching reloads the editor for that scope (full nav, like the
+               subcat links); unsaved edits in the other scope aren't kept. *}
+            <div class="mt-tabs">
+                <a class="mt-tab {if $colors.mode != 'dark'}is-active{/if}" href="?module=MyTheme&action=editStyle&style={$style|escape}&subcat=colors&scope=light">Light</a>
+                <a class="mt-tab {if $colors.mode == 'dark'}is-active{/if}" href="?module=MyTheme&action=editStyle&style={$style|escape}&subcat=colors&scope=dark">Dark</a>
+            </div>
         </header>
         <p class="mt-field-help">Every token below is editable independently. Quick presets just cascade the brand fields (accent, hover, tint, link) &mdash; tweak any value after. Editing the <strong>{$styleName|escape}</strong> style changes its <strong>{$colors.mode}</strong> colors; only changed tokens are saved, and they apply site-wide.</p>
         <div class="mt-schemes">

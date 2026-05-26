@@ -21,24 +21,28 @@ final class StylesController extends AbstractController
             return $this->saveAction($template);
         }
 
+        $this->migrateColors($template);
+
         $available = $template->getStyles();
         $current   = Settings::getValue($template->getName() . '_active_style', 'default');
+        if ($current === 'dark') { $current = 'default'; }
 
         $list = [];
         foreach ($available as $name) {
             $meta = ThemeManifest::loadVariantMeta(
                 $template->getFullPath() . "/core/styles/{$name}/style.php"
             );
+            // Dark-colorMode entries are no longer activatable styles: dark is a
+            // per-style color SCOPE now (edited via the Light/Dark toggle in the
+            // Colors panel), not a standalone style.
+            if ((($meta['variables']['colorMode'] ?? 'light') === 'dark')) {
+                continue;
+            }
             $list[] = [
                 'name'        => $name,
                 'displayName' => $meta['name'] ?? ucfirst($name),
                 'preview'     => $meta['preview'] ?? 'thumb.png',
                 'isActive'    => $name === $current,
-                // colorMode 'dark' styles aren't activatable presets — they're
-                // the dark-mode color scheme, applied automatically when the
-                // mode (Settings -> Enable Dark Mode -> Default Mode / switcher)
-                // resolves to dark. The view renders them as "customize only".
-                'colorMode'   => (($meta['variables']['colorMode'] ?? 'light') === 'dark') ? 'dark' : 'light',
             ];
         }
 
@@ -80,9 +84,11 @@ final class StylesController extends AbstractController
         $style  = (string)($_GET['style'] ?? 'default');
         $subcat = (string)($_GET['subcat'] ?? 'colors');
         $tab    = (string)($_GET['tab'] ?? 'variables');
+        $scope  = (($_GET['scope'] ?? 'light') === 'dark') ? 'dark' : 'light';
         if (!in_array($tab, ['variables', 'settings', 'custom-css'], true)) {
             $tab = 'variables';
         }
+        $this->migrateColors($template);
 
         return $this->view('styles/edit', [
             'template'    => $template->getName(),
@@ -90,9 +96,10 @@ final class StylesController extends AbstractController
             'styleName'   => ucfirst($style),
             'subcat'      => $subcat,
             'tab'         => $tab,
+            'colorScope'  => $scope,
             // Built only for the Variables tab (the only one that renders them),
             // so the other tabs skip the folder scan + view-model work.
-            'colors'      => $tab === 'variables' ? $this->buildColorsViewModel($template, $style) : null,
+            'colors'      => $tab === 'variables' ? $this->buildColorsViewModel($template, $style, $scope) : null,
             'typography'  => $tab === 'variables' ? $this->buildTypographyViewModel($template) : null,
             'buttons'     => $tab === 'variables' ? $this->buildButtonsViewModel($template) : null,
             'forms'       => $tab === 'variables' ? $this->buildFormsViewModel($template) : null,
@@ -330,15 +337,48 @@ final class StylesController extends AbstractController
     }
 
     /**
-     * View-model for the Colors subcat. Loads the token schema (core/config/
-     * colors.php), resolves the style's mode, and merges stored overrides onto
-     * the per-mode defaults so every row shows its current EFFECTIVE value.
+     * One-time migration to per-style-per-mode color storage. Older builds kept
+     * a single override set per style (_colors_<style>) plus a separate "dark"
+     * style (_colors_dark). The new model gives each (light) style both a light
+     * and a dark scope:
+     *   _colors_default -> _colors_default_light
+     *   _colors_dark    -> _colors_default_dark
+     * Idempotent (only copies when the target is empty); also retires a legacy
+     * dark _active_style pointer back to the base style.
      */
-    private function buildColorsViewModel($template, string $style): array
+    private function migrateColors($template): void
+    {
+        $name = $template->getName();
+        $copy = static function (string $from, string $to) use ($name): void {
+            $existing = Settings::getValue($name . '_' . $to, null);
+            if (is_array($existing) && $existing !== []) {
+                return; // already migrated
+            }
+            $old = Settings::getValue($name . '_' . $from, null);
+            if (is_array($old) && $old !== []) {
+                Settings::setValue($name . '_' . $to, $old, 'json');
+            }
+        };
+        $copy('colors_default', 'colors_default_light');
+        $copy('colors_dark', 'colors_default_dark');
+        if ((string)Settings::getValue($name . '_active_style', 'default') === 'dark') {
+            Settings::setValue($name . '_active_style', 'default', 'string');
+        }
+    }
+
+    /**
+     * View-model for the Colors subcat. Loads the token schema (core/config/
+     * colors.php), resolves the editable scope (light|dark), and merges stored
+     * overrides onto the per-mode defaults so every row shows its EFFECTIVE value.
+     */
+    private function buildColorsViewModel($template, string $style, string $scope = 'light'): array
     {
         $cfg    = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/colors.php');
-        $mode   = $this->styleMode($template, $style);
-        $stored = Settings::getValue($template->getName() . '_colors_' . $style, []);
+        // Scope (light|dark) is the editable color mode — a property of THIS
+        // edit session, not the style. Each style stores its two scopes under
+        // _colors_<style>_light / _colors_<style>_dark.
+        $mode   = $scope === 'dark' ? 'dark' : 'light';
+        $stored = Settings::getValue($template->getName() . '_colors_' . $style . '_' . $mode, []);
         if (!is_array($stored)) {
             $stored = [];
         }
@@ -373,8 +413,9 @@ final class StylesController extends AbstractController
         if (!in_array($style, $template->getStyles(), true)) {
             $style = 'default';
         }
+        $scope = ((string)($_POST['scope'] ?? 'light')) === 'dark' ? 'dark' : 'light';
         $cfg  = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/colors.php');
-        $mode = $this->styleMode($template, $style);
+        $mode = $scope;
         $in   = is_array($_POST['c'] ?? null) ? $_POST['c'] : [];
 
         $out = [];
@@ -396,8 +437,8 @@ final class StylesController extends AbstractController
             }
         }
 
-        Settings::setValue($template->getName() . '_colors_' . $style, $out, 'json');
-        $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=colors&colors_saved=1');
+        Settings::setValue($template->getName() . '_colors_' . $style . '_' . $scope, $out, 'json');
+        $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=colors&scope=' . $scope . '&colors_saved=1');
     }
 
     /**
