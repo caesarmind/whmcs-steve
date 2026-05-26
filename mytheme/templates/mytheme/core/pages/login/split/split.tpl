@@ -15,10 +15,10 @@
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/login.css?v={$myTheme.version|default:'1.0'}">
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/login-split.css?v={$myTheme.version|default:'1.0'}">
 
-<div class="mt-login-split">
+<div class="mt-loginscreen">
 
     {* ── Left: brand + welcome + latest announcements ── *}
-    <aside class="mt-ls-aside">
+    <aside class="mt-ls-panel">
         <a href="{$WEB_ROOT}/" class="mt-ls-brand">
             {if !empty($myTheme.branding.logo.light)}
                 <img src="{$myTheme.branding.logo.light|escape}" alt="{$companyname|escape}">
