@@ -130,12 +130,13 @@
        these via select-colors dropdowns). Size tokens reference the type scale
        + radius so buttons track Typography until explicitly overridden.
        Per-variant defaults MUST mirror core/config/buttons.php. ========== */
-    --btn-height: 36px;  --btn-padding-x: 20px;  --btn-radius: var(--radius-pill);
+    /* Geometry: em-relative padding so a button's HEIGHT derives from its
+       (Typography-defined) font size. Defaults reproduce the ~36/30/44px Apple
+       heights; pick a bigger font size and the whole button scales. */
+    --btn-pad-y: 0.65em;  --btn-pad-x: 1.43em;  --btn-radius: var(--radius-pill);
     --btn-font-size: var(--text-md);  --btn-font-weight: var(--fw-medium);  --btn-line-height: 1.2;
-    --btn-sm-height: 30px;  --btn-sm-padding-x: 14px;  --btn-sm-font-size: var(--text-sm);
-    --btn-sm-font-weight: var(--fw-medium);  --btn-sm-line-height: 1.2;  --btn-sm-radius: var(--radius-pill);
-    --btn-lg-height: 44px;  --btn-lg-padding-x: 28px;  --btn-lg-font-size: var(--text-xl);
-    --btn-lg-font-weight: var(--fw-medium);  --btn-lg-line-height: 1.2;  --btn-lg-radius: var(--radius-pill);
+    --btn-sm-font-size: var(--text-sm);  --btn-sm-font-weight: var(--fw-medium);  --btn-sm-line-height: 1.2;  --btn-sm-radius: var(--radius-pill);
+    --btn-lg-font-size: var(--text-xl);  --btn-lg-font-weight: var(--fw-medium);  --btn-lg-line-height: 1.2;  --btn-lg-radius: var(--radius-pill);
 
     --btn-default-bg: transparent;                       --btn-default-border: var(--color-border);           --btn-default-color: var(--color-text-primary);
     --btn-default-hover-bg: var(--color-surface-secondary); --btn-default-hover-border: var(--color-border);  --btn-default-hover-color: var(--color-text-primary);
@@ -718,7 +719,7 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .btn-default, .btn-primary, .btn-primary-faded, .btn-secondary,
 .btn-success, .btn-info, .btn-warning, .btn-danger, .btn-light {
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    height: var(--btn-height); padding: 0 var(--btn-padding-x);
+    padding: var(--btn-pad-y) var(--btn-pad-x);
     border: 0.5px solid transparent; border-radius: var(--btn-radius);
     font-size: var(--btn-font-size); font-weight: var(--btn-font-weight);
     line-height: var(--btn-line-height); font-family: var(--font-family);
@@ -756,8 +757,8 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .btn-danger:active        { background: var(--btn-danger-active-bg);        border-color: var(--btn-danger-active-border); }
 .btn-light:active         { background: var(--btn-light-active-bg);         border-color: var(--btn-light-active-border); }
 /* Sizes */
-.btn-sm { height: var(--btn-sm-height); padding: 0 var(--btn-sm-padding-x); font-size: var(--btn-sm-font-size); font-weight: var(--btn-sm-font-weight); line-height: var(--btn-sm-line-height); border-radius: var(--btn-sm-radius); }
-.btn-lg { height: var(--btn-lg-height); padding: 0 var(--btn-lg-padding-x); font-size: var(--btn-lg-font-size); font-weight: var(--btn-lg-font-weight); line-height: var(--btn-lg-line-height); border-radius: var(--btn-lg-radius); }
+.btn-sm { font-size: var(--btn-sm-font-size); font-weight: var(--btn-sm-font-weight); line-height: var(--btn-sm-line-height); border-radius: var(--btn-sm-radius); }
+.btn-lg { font-size: var(--btn-lg-font-size); font-weight: var(--btn-lg-font-weight); line-height: var(--btn-lg-line-height); border-radius: var(--btn-lg-radius); }
 .btn-group { display: flex; gap: 10px; }
 
 /* ============================================

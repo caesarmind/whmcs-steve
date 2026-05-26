@@ -64,13 +64,15 @@ return [
         ['key' => 'white-24',          'group' => 'Basic',     'label' => 'White 24%',        'css' => 'rgba(255,255,255,0.24)',         'swatch' => '#4d4d4d'],
     ],
 
-    /* Size tiers (Small / Base / Large -> .btn-sm / .btn / .btn-lg). Geometry
-       (height + padding) stays px so the Apple pill keeps its exact dimensions;
-       font / weight / line-height / radius are SCALE references (Lagom-style),
-       resolved through `scales` below — so they track the design system and
-       default to the Apple look (radius -> Pill). For scale fields `default`
-       is a scale KEY; for px fields it's the numeric baseline. Defaults MUST
-       mirror the --btn-* tokens in apple-theme.css. */
+    /* Size tiers (Small / Base / Large -> .btn-sm / .btn / .btn-lg). Each tier
+       is built ENTIRELY from the Typography scale — font size + weight +
+       line-height + radius, all SCALE references resolved through `scales`
+       below. No custom pixels: the button's HEIGHT derives from its font size
+       because apple-theme.css uses em-relative padding, so picking a bigger
+       Typography size grows the whole button. `default` is a scale KEY; the
+       defaults keep the Apple look (radius -> Pill) and MUST mirror the --btn-*
+       tokens in apple-theme.css. (sizeMin/Max guard the px path the code still
+       supports, though no field uses it today.) */
     'sizeMin' => 0,
     'sizeMax' => 999,
     'scales'  => [
@@ -106,24 +108,18 @@ return [
     ],
     'sizeTiers' => [
         'Small' => [
-            ['var' => '--btn-sm-height',      'label' => 'Height',      'type' => 'px',    'default' => 30],
-            ['var' => '--btn-sm-padding-x',   'label' => 'Padding X',   'type' => 'px',    'default' => 14],
             ['var' => '--btn-sm-font-size',   'label' => 'Font size',   'type' => 'scale', 'scale' => 'font',       'default' => 'sm'],
             ['var' => '--btn-sm-font-weight', 'label' => 'Font weight', 'type' => 'scale', 'scale' => 'weight',     'default' => 'medium'],
             ['var' => '--btn-sm-line-height', 'label' => 'Line height', 'type' => 'scale', 'scale' => 'lineHeight', 'default' => 'normal'],
             ['var' => '--btn-sm-radius',      'label' => 'Radius',      'type' => 'scale', 'scale' => 'radius',     'default' => 'pill'],
         ],
         'Base' => [
-            ['var' => '--btn-height',      'label' => 'Height',      'type' => 'px',    'default' => 36],
-            ['var' => '--btn-padding-x',   'label' => 'Padding X',   'type' => 'px',    'default' => 20],
             ['var' => '--btn-font-size',   'label' => 'Font size',   'type' => 'scale', 'scale' => 'font',       'default' => 'md'],
             ['var' => '--btn-font-weight', 'label' => 'Font weight', 'type' => 'scale', 'scale' => 'weight',     'default' => 'medium'],
             ['var' => '--btn-line-height', 'label' => 'Line height', 'type' => 'scale', 'scale' => 'lineHeight', 'default' => 'normal'],
             ['var' => '--btn-radius',      'label' => 'Radius',      'type' => 'scale', 'scale' => 'radius',     'default' => 'pill'],
         ],
         'Large' => [
-            ['var' => '--btn-lg-height',      'label' => 'Height',      'type' => 'px',    'default' => 44],
-            ['var' => '--btn-lg-padding-x',   'label' => 'Padding X',   'type' => 'px',    'default' => 28],
             ['var' => '--btn-lg-font-size',   'label' => 'Font size',   'type' => 'scale', 'scale' => 'font',       'default' => 'xl'],
             ['var' => '--btn-lg-font-weight', 'label' => 'Font weight', 'type' => 'scale', 'scale' => 'weight',     'default' => 'medium'],
             ['var' => '--btn-lg-line-height', 'label' => 'Line height', 'type' => 'scale', 'scale' => 'lineHeight', 'default' => 'normal'],
