@@ -52,14 +52,25 @@ function toggleDarkMode() {
     }
 }
 
-// Theme initialization — check localStorage first, then system preference
+// Theme initialization — driven by the admin Default Mode + Display Type,
+// surfaced as <html data-dark-mode> alongside the server-rendered data-theme.
+// No OS auto-detect (by design): Default Mode is the source of truth.
 (function() {
-    const saved = localStorage.getItem('apple-theme');
-    if (saved === 'dark' || (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        const toggle = document.getElementById('darkModeToggle');
-        if (toggle) toggle.classList.add('active');
+    var html = document.documentElement;
+    var mode = html.getAttribute('data-dark-mode') || 'off';
+    if (mode === 'switcher') {
+        // Switcher: a visitor's saved choice overrides the server default.
+        var saved = localStorage.getItem('apple-theme');
+        if (saved === 'dark' || saved === 'light') {
+            html.setAttribute('data-theme', saved);
+        }
+    } else if (mode === 'forced') {
+        // Forced: locked to the server-rendered Default Mode; drop stale prefs.
+        localStorage.removeItem('apple-theme');
     }
+    // mode === 'off' → leave the server-rendered light theme untouched.
+    var toggle = document.getElementById('darkModeToggle');
+    if (toggle) toggle.classList.toggle('active', html.getAttribute('data-theme') === 'dark');
 })();
 
 // Active sidebar state — auto-detect from current page filename

@@ -24,6 +24,14 @@
     .mt-row-sub-help { font-size: 12px; color: var(--mt-text-3); margin: 0 0 14px; }
     .mt-row-sub-count { font-size: 13px; color: var(--mt-text-3); }
 
+    /* Plain dropdown sub-field (dark-mode Display Type / Default Mode). */
+    .mt-field { max-width: 520px; margin-bottom: 16px; }
+    .mt-field:last-child { margin-bottom: 0; }
+    .mt-field-label { display: block; font-size: 13px; font-weight: 500; color: var(--mt-text); margin-bottom: 6px; }
+    .mt-field-help { font-size: 12px; color: var(--mt-text-3); margin: 6px 0 0; }
+    .mt-select { width: 100%; padding: 9px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 8px; background: #fff; color: var(--mt-text); cursor: pointer; }
+    .mt-select:focus { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 3px rgba(0,113,227,0.15); }
+
     /* Chip multi-select — single field with removable chips + dropdown picker.
        Replaces the previous grid of checkbox-chips. The real form fields
        live in a hidden .mt-multi-inputs container; the visible widget is
@@ -174,14 +182,14 @@
         {foreach $flags as $key => $meta}
             {assign var=mtIsLangToggle value=($key == 'custom_language_list')}
             {assign var=mtFlagTab value=$flagTabs[$key]|default:'general'}
-            {assign var=mtHasSub value=($mtIsLangToggle || $key == 'cart_subnav' || $key == 'website_subnav')}
+            {assign var=mtHasSub value=($mtIsLangToggle || $key == 'cart_subnav' || $key == 'website_subnav' || $key == 'enable_dark_mode')}
             <div class="mt-row{if $mtHasSub} mt-row-with-sub{/if}{if $mtFlagTab != $tab} mt-tab-off{/if}">
                 <div>
                     <div class="mt-row-label">{$meta[0]|escape}</div>
                     <div class="mt-row-help">{$meta[1]|escape}</div>
                 </div>
                 <label class="mt-toggle">
-                    <input type="checkbox" name="{$key|escape}" {if $mtIsLangToggle}data-toggle-target="mt-language-picker" {/if}{if $values[$key]}checked{/if}>
+                    <input type="checkbox" name="{$key|escape}" {if $mtIsLangToggle}data-toggle-target="mt-language-picker" {/if}{if $key == 'enable_dark_mode'}data-toggle-target="mt-darkmode-sub" {/if}{if $values[$key]}checked{/if}>
                     <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
                 </label>
             </div>
@@ -252,6 +260,30 @@
                             </div>
                         </div>
                     {/if}
+                </div>
+            {/if}
+
+            {* Dark-mode options — Lagom-style sub-field revealed under the
+               "Enable Dark Mode" toggle. Display Type chooses Switcher vs
+               Forced; Default Mode chooses the mode the site loads in. *}
+            {if $key == 'enable_dark_mode'}
+                <div class="mt-row-sub{if $mtFlagTab != $tab} mt-tab-off{/if}" id="mt-darkmode-sub"{if !$values[$key]} hidden{/if}>
+                    <div class="mt-field">
+                        <label class="mt-field-label" for="mt-dark-display">Choose Display Type</label>
+                        <select class="mt-select" id="mt-dark-display" name="dark_mode_display">
+                            <option value="switcher"{if $darkModeDisplay != 'forced'} selected{/if}>Switcher (Light/Dark)</option>
+                            <option value="forced"{if $darkModeDisplay == 'forced'} selected{/if}>Forced</option>
+                        </select>
+                        <p class="mt-field-help">Switcher gives visitors a light/dark toggle. Forced locks the site to the default mode (no toggle).</p>
+                    </div>
+                    <div class="mt-field">
+                        <label class="mt-field-label" for="mt-dark-default">Choose Default Mode</label>
+                        <select class="mt-select" id="mt-dark-default" name="dark_mode_default">
+                            <option value="light"{if $darkModeDefault != 'dark'} selected{/if}>Light</option>
+                            <option value="dark"{if $darkModeDefault == 'dark'} selected{/if}>Dark</option>
+                        </select>
+                        <p class="mt-field-help">The mode the site loads in (no OS auto-detect).</p>
+                    </div>
                 </div>
             {/if}
 
@@ -335,13 +367,15 @@
 <script>
 (function () {
     // ── Toggle reveal (parent row toggle ↔ sub-section) ──
-    var toggle  = document.querySelector('[data-toggle-target="mt-language-picker"]');
-    var section = document.getElementById('mt-language-picker');
-    if (toggle && section) {
+    // Generalized: any checkbox with [data-toggle-target] shows/hides the
+    // element with that id (language picker, dark-mode options, …).
+    document.querySelectorAll('[data-toggle-target]').forEach(function (toggle) {
+        var section = document.getElementById(toggle.getAttribute('data-toggle-target'));
+        if (!section) return;
         toggle.addEventListener('change', function () {
             section.hidden = !toggle.checked;
         });
-    }
+    });
 
     // ── Chip multi-select ──
     var inputs      = document.getElementById('mt-lang-inputs');

@@ -34,6 +34,11 @@ final class StylesController extends AbstractController
                 'displayName' => $meta['name'] ?? ucfirst($name),
                 'preview'     => $meta['preview'] ?? 'thumb.png',
                 'isActive'    => $name === $current,
+                // colorMode 'dark' styles aren't activatable presets — they're
+                // the dark-mode color scheme, applied automatically when the
+                // mode (Settings -> Enable Dark Mode -> Default Mode / switcher)
+                // resolves to dark. The view renders them as "customize only".
+                'colorMode'   => (($meta['variables']['colorMode'] ?? 'light') === 'dark') ? 'dark' : 'light',
             ];
         }
 

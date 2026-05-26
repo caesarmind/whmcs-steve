@@ -173,14 +173,30 @@ if (AddonHelper::isActive()) {
     // that gates per-item icon rendering in the top-nav. Defaults to false,
     // so unconfigured installs get a clean text-only nav.
     //
-    // $mtEnableDarkMode (boolean) gates the client-facing dark-mode toggles
-    // (the "Allow visitors to toggle dark mode" Settings flag). Defaults to
-    // true so the toggle shows unless an admin turns it off.
+    // Dark-mode variables (Lagom-parity model):
+    //   $mtEnableDarkMode  (bool)  — master "Enable Dark Mode" flag.
+    //   $mtShowDarkToggle  (bool)  — show the light/dark switcher? Only when
+    //                                enabled AND Display Type = Switcher
+    //                                (Forced hides it). Gates the toggle markup.
+    //   $mtThemeMode       (string)— initial data-theme: the Default Mode when
+    //                                enabled, else 'light'. Server-rendered so
+    //                                there's no flash for the default.
+    //   $mtDarkMode        (string)— 'off' | 'switcher' | 'forced'; read by
+    //                                apple-theme.js to decide whether a saved
+    //                                preference may override the default.
     add_hook('ClientAreaPage', 2, function ($vars) {
+        $darkEnabled = (bool)MyTheme\Models\Settings::getValue('enable_dark_mode', true);
+        $darkDisplay = (string)MyTheme\Models\Settings::getValue('dark_mode_display', 'switcher');
+        $darkDefault = (string)MyTheme\Models\Settings::getValue('dark_mode_default', 'light');
+        if (!in_array($darkDisplay, ['switcher', 'forced'], true)) { $darkDisplay = 'switcher'; }
+        if (!in_array($darkDefault, ['light', 'dark'], true))      { $darkDefault = 'light'; }
         return [
             'mtIcons'            => MyTheme\Menu\Icons::all(),
             'mtTopnavShowIcons'  => (bool)MyTheme\Models\Settings::getValue('topnav_show_icons', false),
-            'mtEnableDarkMode'   => (bool)MyTheme\Models\Settings::getValue('enable_dark_mode', true),
+            'mtEnableDarkMode'   => $darkEnabled,
+            'mtShowDarkToggle'   => $darkEnabled && $darkDisplay === 'switcher',
+            'mtThemeMode'        => $darkEnabled ? $darkDefault : 'light',
+            'mtDarkMode'         => $darkEnabled ? $darkDisplay : 'off',
         ];
     });
 

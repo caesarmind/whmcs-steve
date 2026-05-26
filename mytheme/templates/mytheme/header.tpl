@@ -205,7 +205,7 @@
 {/if}
 <!DOCTYPE html>
 <!-- mytheme header v11 -->
-<html lang="{$activeLocale.languageCode|default:'en'}" data-theme="light" data-header-sentinel="v11"{if $mt_palette} data-palette="{$mt_palette|escape}"{/if}>
+<html lang="{$activeLocale.languageCode|default:'en'}" data-theme="{$mtThemeMode|default:'light'}" data-dark-mode="{$mtDarkMode|default:'off'}" data-header-sentinel="v11"{if $mt_palette} data-palette="{$mt_palette|escape}"{/if}>
 <head>
     <meta charset="{$charset|default:'utf-8'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">

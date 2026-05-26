@@ -88,6 +88,8 @@ final class SettingsController extends AbstractController
             'flags'              => self::FLAGS,
             'flagTabs'           => self::FLAG_TABS,
             'values'             => $values,
+            'darkModeDisplay'    => (string)Settings::getValue('dark_mode_display', 'switcher'),
+            'darkModeDefault'    => (string)Settings::getValue('dark_mode_default', 'light'),
             'tab'                => $_GET['tab'] ?? 'general',
             'installedLanguages' => $installedLanguages,
             'selectedLanguages'  => $selectedLanguages,
@@ -106,6 +108,16 @@ final class SettingsController extends AbstractController
             $val = isset($_POST[$key]) ? true : false;
             Settings::setValue($key, $val ? '1' : '0', $type);
         }
+
+        // Dark-mode sub-options (revealed under the Enable Dark Mode toggle).
+        // Display type: 'switcher' (visitors get a light/dark toggle) or
+        // 'forced' (locked to the default mode, no toggle). Default mode:
+        // 'light' or 'dark' — the mode the site loads in. Validated against
+        // their allowed sets so a stale form can't store junk.
+        $display = (string)($_POST['dark_mode_display'] ?? 'switcher');
+        Settings::setValue('dark_mode_display', in_array($display, ['switcher', 'forced'], true) ? $display : 'switcher', 'string');
+        $defaultMode = (string)($_POST['dark_mode_default'] ?? 'light');
+        Settings::setValue('dark_mode_default', in_array($defaultMode, ['light', 'dark'], true) ? $defaultMode : 'light', 'string');
 
         // Custom language picker — POST sends an array of checked codes under
         // <key>[] (or nothing when the picker is hidden). Filter against the
