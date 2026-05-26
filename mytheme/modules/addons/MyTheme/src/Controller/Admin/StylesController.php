@@ -292,16 +292,6 @@ final class StylesController extends AbstractController
         $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&tab=custom-css&css_saved=1');
     }
 
-    /**
-     * Resolve which color mode a style edits (light => :root, dark =>
-     * [data-theme="dark"]) from its style.php manifest.
-     */
-    private function styleMode($template, string $style): string
-    {
-        $meta = ThemeManifest::loadVariantMeta($template->getFullPath() . "/core/styles/{$style}/style.php");
-        return (($meta['variables']['colorMode'] ?? 'light') === 'dark') ? 'dark' : 'light';
-    }
-
     /** Accept a hex (#rgb/#rgba/#rrggbb/#rrggbbaa) or rgb()/rgba()/hsl()/hsla() value. */
     private function isColor(string $v): bool
     {
