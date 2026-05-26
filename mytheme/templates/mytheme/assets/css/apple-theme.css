@@ -79,6 +79,98 @@
     --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     --font-mono: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
 
+    /* ===== Ramp palette (Lagom-style) ====================================
+       A base color per family + color-mix-derived shades. Change a base (e.g.
+       --brand-primary) and its whole ramp recomputes live. The button tokens
+       below + the admin Buttons panel consume these, so the theme cascades
+       from a handful of bases. ASCII-only comments (see CSS-skip quirk). */
+    --brand-primary:   var(--color-accent);
+    --brand-primary-lighter:   color-mix(in srgb, var(--brand-primary), #fff 30%);
+    --brand-primary-lighter-2: color-mix(in srgb, var(--brand-primary), #fff 70%);
+    --brand-primary-lighter-3: color-mix(in srgb, var(--brand-primary), #fff 84%);
+    --brand-primary-lighter-4: color-mix(in srgb, var(--brand-primary), #fff 92%);
+    --brand-primary-darker:    color-mix(in srgb, var(--brand-primary), #000 22%);
+
+    --brand-secondary: #64748b;
+    --brand-secondary-lighter:   color-mix(in srgb, var(--brand-secondary), #fff 30%);
+    --brand-secondary-lighter-2: color-mix(in srgb, var(--brand-secondary), #fff 70%);
+    --brand-secondary-lighter-3: color-mix(in srgb, var(--brand-secondary), #fff 84%);
+    --brand-secondary-lighter-4: color-mix(in srgb, var(--brand-secondary), #fff 92%);
+    --brand-secondary-darker:    color-mix(in srgb, var(--brand-secondary), #000 22%);
+
+    --brand-info:      #0a84ff;
+    --brand-info-lighter:   color-mix(in srgb, var(--brand-info), #fff 30%);
+    --brand-info-lighter-2: color-mix(in srgb, var(--brand-info), #fff 70%);
+    --brand-info-lighter-3: color-mix(in srgb, var(--brand-info), #fff 84%);
+    --brand-info-lighter-4: color-mix(in srgb, var(--brand-info), #fff 92%);
+    --brand-info-darker:    color-mix(in srgb, var(--brand-info), #000 22%);
+
+    --brand-success:   var(--color-green);
+    --brand-success-lighter:   color-mix(in srgb, var(--brand-success), #fff 30%);
+    --brand-success-lighter-2: color-mix(in srgb, var(--brand-success), #fff 70%);
+    --brand-success-lighter-3: color-mix(in srgb, var(--brand-success), #fff 84%);
+    --brand-success-lighter-4: color-mix(in srgb, var(--brand-success), #fff 92%);
+    --brand-success-darker:    color-mix(in srgb, var(--brand-success), #000 22%);
+
+    --brand-warning:   var(--color-orange);
+    --brand-warning-lighter:   color-mix(in srgb, var(--brand-warning), #fff 30%);
+    --brand-warning-lighter-2: color-mix(in srgb, var(--brand-warning), #fff 70%);
+    --brand-warning-lighter-3: color-mix(in srgb, var(--brand-warning), #fff 84%);
+    --brand-warning-lighter-4: color-mix(in srgb, var(--brand-warning), #fff 92%);
+    --brand-warning-darker:    color-mix(in srgb, var(--brand-warning), #000 22%);
+
+    --brand-danger:    var(--color-red);
+    --brand-danger-lighter:   color-mix(in srgb, var(--brand-danger), #fff 30%);
+    --brand-danger-lighter-2: color-mix(in srgb, var(--brand-danger), #fff 70%);
+    --brand-danger-lighter-3: color-mix(in srgb, var(--brand-danger), #fff 84%);
+    --brand-danger-lighter-4: color-mix(in srgb, var(--brand-danger), #fff 92%);
+    --brand-danger-darker:    color-mix(in srgb, var(--brand-danger), #000 22%);
+
+    /* ===== Button tokens (consume the ramp; admin Buttons panel overrides
+       these via select-colors dropdowns). Size tokens reference the type scale
+       + radius so buttons track Typography until explicitly overridden.
+       Per-variant defaults MUST mirror core/config/buttons.php. ========== */
+    --btn-height: 36px;  --btn-padding-x: 20px;  --btn-radius: var(--radius-pill);
+    --btn-font-size: var(--text-md);  --btn-font-weight: var(--fw-medium);  --btn-line-height: 1.2;
+    --btn-sm-height: 30px;  --btn-sm-padding-x: 14px;  --btn-sm-font-size: var(--text-sm);
+    --btn-lg-height: 44px;  --btn-lg-padding-x: 28px;  --btn-lg-font-size: var(--text-xl);
+
+    --btn-default-bg: transparent;                       --btn-default-border: var(--color-border);           --btn-default-color: var(--color-text-primary);
+    --btn-default-hover-bg: var(--color-surface-secondary); --btn-default-hover-border: var(--color-border);  --btn-default-hover-color: var(--color-text-primary);
+    --btn-default-active-bg: var(--color-surface-secondary); --btn-default-active-border: transparent;
+
+    --btn-primary-bg: var(--brand-primary);              --btn-primary-border: var(--brand-primary);          --btn-primary-color: #ffffff;
+    --btn-primary-hover-bg: var(--color-accent-hover);   --btn-primary-hover-border: var(--color-accent-hover); --btn-primary-hover-color: #ffffff;
+    --btn-primary-active-bg: var(--color-accent-hover);  --btn-primary-active-border: var(--color-accent-hover);
+
+    --btn-primary-faded-bg: var(--brand-primary-lighter-3);   --btn-primary-faded-border: var(--brand-primary-lighter-3);   --btn-primary-faded-color: var(--brand-primary);
+    --btn-primary-faded-hover-bg: var(--brand-primary-lighter-2); --btn-primary-faded-hover-border: var(--brand-primary-lighter-2); --btn-primary-faded-hover-color: var(--brand-primary);
+    --btn-primary-faded-active-bg: var(--brand-primary-lighter-2); --btn-primary-faded-active-border: var(--brand-primary-lighter-2);
+
+    --btn-secondary-bg: var(--color-surface-secondary);  --btn-secondary-border: var(--color-border);         --btn-secondary-color: var(--color-text-primary);
+    --btn-secondary-hover-bg: var(--color-surface);      --btn-secondary-hover-border: var(--color-border);   --btn-secondary-hover-color: var(--color-text-primary);
+    --btn-secondary-active-bg: var(--color-surface-secondary); --btn-secondary-active-border: var(--color-border);
+
+    --btn-success-bg: var(--brand-success);              --btn-success-border: var(--brand-success);          --btn-success-color: #ffffff;
+    --btn-success-hover-bg: var(--brand-success-darker); --btn-success-hover-border: var(--brand-success-darker); --btn-success-hover-color: #ffffff;
+    --btn-success-active-bg: var(--brand-success-darker); --btn-success-active-border: var(--brand-success-darker);
+
+    --btn-info-bg: var(--brand-info);                    --btn-info-border: var(--brand-info);                --btn-info-color: #ffffff;
+    --btn-info-hover-bg: var(--brand-info-darker);       --btn-info-hover-border: var(--brand-info-darker);   --btn-info-hover-color: #ffffff;
+    --btn-info-active-bg: var(--brand-info-darker);      --btn-info-active-border: var(--brand-info-darker);
+
+    --btn-warning-bg: var(--brand-warning);              --btn-warning-border: var(--brand-warning);          --btn-warning-color: #ffffff;
+    --btn-warning-hover-bg: var(--brand-warning-darker); --btn-warning-hover-border: var(--brand-warning-darker); --btn-warning-hover-color: #ffffff;
+    --btn-warning-active-bg: var(--brand-warning-darker); --btn-warning-active-border: var(--brand-warning-darker);
+
+    --btn-danger-bg: var(--color-red-bg);                --btn-danger-border: transparent;                    --btn-danger-color: var(--color-red-text);
+    --btn-danger-hover-bg: var(--brand-danger);          --btn-danger-hover-border: var(--brand-danger);      --btn-danger-hover-color: #ffffff;
+    --btn-danger-active-bg: var(--brand-danger);         --btn-danger-active-border: var(--brand-danger);
+
+    --btn-light-bg: rgba(255,255,255,0.08);              --btn-light-border: rgba(255,255,255,0.16);          --btn-light-color: #ffffff;
+    --btn-light-hover-bg: rgba(255,255,255,0.16);        --btn-light-hover-border: rgba(255,255,255,0.24);    --btn-light-hover-color: #ffffff;
+    --btn-light-active-bg: rgba(255,255,255,0.24);       --btn-light-active-border: rgba(255,255,255,0.24);
+
     /* ── Type scale ───────────────────────────────────────────────
        Semantic font-size tokens (admin-overridable via Typography settings).
        Values are the theme's canonical scale; the migration snaps every
@@ -620,14 +712,51 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 /* ============================================
    BUTTONS
    ============================================ */
-.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 20px; background: var(--color-accent); color: white; border: none; border-radius: var(--radius-pill); font-size: var(--text-md); font-weight: var(--fw-medium); font-family: var(--font-family); cursor: pointer; transition: all var(--transition-fast); letter-spacing: -0.008em; text-decoration: none; }
-.btn-primary:hover { background: var(--color-accent-hover); color: white; text-decoration: none; }
-.btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 20px; background: var(--color-surface-secondary); color: var(--color-text-primary); border: 0.5px solid var(--color-border); border-radius: var(--radius-pill); font-size: var(--text-md); font-weight: var(--fw-medium); font-family: var(--font-family); cursor: pointer; transition: all var(--transition-fast); letter-spacing: -0.008em; text-decoration: none; }
-.btn-secondary:hover { background: var(--color-surface); box-shadow: 0 1px 3px var(--sidebar-item-active); color: var(--color-text-primary); text-decoration: none; }
-.btn-danger { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 20px; background: var(--color-red-bg); color: var(--color-red-text); border: none; border-radius: var(--radius-pill); font-size: var(--text-md); font-weight: var(--fw-medium); font-family: var(--font-family); cursor: pointer; transition: all var(--transition-fast); }
-.btn-danger:hover { background: var(--color-red); color: white; }
+/* Shared base — all 9 variants share geometry + typography (token-driven). */
+.btn-default, .btn-primary, .btn-primary-faded, .btn-secondary,
+.btn-success, .btn-info, .btn-warning, .btn-danger, .btn-light {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: var(--btn-height); padding: 0 var(--btn-padding-x);
+    border: 0.5px solid transparent; border-radius: var(--btn-radius);
+    font-size: var(--btn-font-size); font-weight: var(--btn-font-weight);
+    line-height: var(--btn-line-height); font-family: var(--font-family);
+    cursor: pointer; transition: all var(--transition-fast);
+    letter-spacing: -0.008em; text-decoration: none; white-space: nowrap;
+}
+/* Per-variant — base */
+.btn-default       { background: var(--btn-default-bg);        border-color: var(--btn-default-border);        color: var(--btn-default-color); }
+.btn-primary       { background: var(--btn-primary-bg);        border-color: var(--btn-primary-border);        color: var(--btn-primary-color); }
+.btn-primary-faded { background: var(--btn-primary-faded-bg);  border-color: var(--btn-primary-faded-border);  color: var(--btn-primary-faded-color); }
+.btn-secondary     { background: var(--btn-secondary-bg);      border-color: var(--btn-secondary-border);      color: var(--btn-secondary-color); }
+.btn-success       { background: var(--btn-success-bg);        border-color: var(--btn-success-border);        color: var(--btn-success-color); }
+.btn-info          { background: var(--btn-info-bg);           border-color: var(--btn-info-border);           color: var(--btn-info-color); }
+.btn-warning       { background: var(--btn-warning-bg);        border-color: var(--btn-warning-border);        color: var(--btn-warning-color); }
+.btn-danger        { background: var(--btn-danger-bg);         border-color: var(--btn-danger-border);         color: var(--btn-danger-color); }
+.btn-light         { background: var(--btn-light-bg);          border-color: var(--btn-light-border);          color: var(--btn-light-color); }
+/* Per-variant — hover */
+.btn-default:hover       { background: var(--btn-default-hover-bg);        border-color: var(--btn-default-hover-border);        color: var(--btn-default-hover-color); text-decoration: none; }
+.btn-primary:hover       { background: var(--btn-primary-hover-bg);        border-color: var(--btn-primary-hover-border);        color: var(--btn-primary-hover-color); text-decoration: none; }
+.btn-primary-faded:hover { background: var(--btn-primary-faded-hover-bg);  border-color: var(--btn-primary-faded-hover-border);  color: var(--btn-primary-faded-hover-color); text-decoration: none; }
+.btn-secondary:hover     { background: var(--btn-secondary-hover-bg);      border-color: var(--btn-secondary-hover-border);      color: var(--btn-secondary-hover-color); box-shadow: 0 1px 3px var(--sidebar-item-active); text-decoration: none; }
+.btn-success:hover       { background: var(--btn-success-hover-bg);        border-color: var(--btn-success-hover-border);        color: var(--btn-success-hover-color); text-decoration: none; }
+.btn-info:hover          { background: var(--btn-info-hover-bg);           border-color: var(--btn-info-hover-border);           color: var(--btn-info-hover-color); text-decoration: none; }
+.btn-warning:hover       { background: var(--btn-warning-hover-bg);        border-color: var(--btn-warning-hover-border);        color: var(--btn-warning-hover-color); text-decoration: none; }
+.btn-danger:hover        { background: var(--btn-danger-hover-bg);         border-color: var(--btn-danger-hover-border);         color: var(--btn-danger-hover-color); text-decoration: none; }
+.btn-light:hover         { background: var(--btn-light-hover-bg);          border-color: var(--btn-light-hover-border);          color: var(--btn-light-hover-color); text-decoration: none; }
+/* Per-variant — active */
+.btn-default:active       { background: var(--btn-default-active-bg);       border-color: var(--btn-default-active-border); }
+.btn-primary:active       { background: var(--btn-primary-active-bg);       border-color: var(--btn-primary-active-border); }
+.btn-primary-faded:active { background: var(--btn-primary-faded-active-bg); border-color: var(--btn-primary-faded-active-border); }
+.btn-secondary:active     { background: var(--btn-secondary-active-bg);     border-color: var(--btn-secondary-active-border); }
+.btn-success:active       { background: var(--btn-success-active-bg);       border-color: var(--btn-success-active-border); }
+.btn-info:active          { background: var(--btn-info-active-bg);          border-color: var(--btn-info-active-border); }
+.btn-warning:active       { background: var(--btn-warning-active-bg);       border-color: var(--btn-warning-active-border); }
+.btn-danger:active        { background: var(--btn-danger-active-bg);        border-color: var(--btn-danger-active-border); }
+.btn-light:active         { background: var(--btn-light-active-bg);         border-color: var(--btn-light-active-border); }
+/* Sizes */
+.btn-sm { height: var(--btn-sm-height); padding: 0 var(--btn-sm-padding-x); font-size: var(--btn-sm-font-size); }
+.btn-lg { height: var(--btn-lg-height); padding: 0 var(--btn-lg-padding-x); font-size: var(--btn-lg-font-size); }
 .btn-group { display: flex; gap: 10px; }
-.btn-lg { height: 44px; padding: 0 28px; font-size: var(--text-xl); }
 
 /* ============================================
    FORMS — Apple-style

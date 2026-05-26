@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order New Services — Services — WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css?v=2">
-    <link rel="stylesheet" href="css/apple-layout.css?v=2">
+    <link rel="stylesheet" href="css/apple-theme.css?v=12">
+    <link rel="stylesheet" href="css/apple-layout.css?v=12">
     <style>
         body { display: block; }
 
@@ -15,6 +15,40 @@
         /* ── 2-column split ── */
         .st-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
         @media (max-width: 880px) { .st-split { grid-template-columns: 1fr; } }
+        /* Sub-nav Hide toggle (state-chip) — collapse the in-page Categories/Actions sidebar */
+        body[data-subnav="off"] .st-split { grid-template-columns: 1fr; }
+        body[data-subnav="off"] .st-split > aside { display: none; }
+
+        /* ── Controls inside / outside (state-chip data-svc-layout) ──
+           Inside (default): the right-column card holds the category header + product grid on one white surface.
+           Outside: strip that card's shell, float .st-cat-head on the page background, and give the product
+           body (.when-full / .when-empty) its own white rounded card. The sidebar and guarantee cards stay put. */
+        .svc-table-card { display: none !important; } /* sentinel only — reveals the chip group */
+        body[data-svc-layout="outside"] .st-split > div > .card {
+            background: transparent; border: 0; box-shadow: none; overflow: visible;
+        }
+        body[data-svc-layout="outside"] .st-cat-head { padding: 2px 6px 16px; }
+        body[data-svc-layout="outside"] .st-split > div > .card > .when-full,
+        body[data-svc-layout="outside"] .st-split > div > .card > .when-empty {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        /* when a specific plan variant is picked the variant-label strip is hidden, so the grid would sit
+           flush against the white card top — restore a little breathing room in that case */
+        body[data-svc-layout="outside"][data-plan] .st-split > div > .card > .when-full { padding-top: 16px; }
+        /* Outside mode also lifts the sidebar sub-nav: float each heading on the page bg, items in a white card */
+        body[data-svc-layout="outside"] .st-split > aside > .subnav-card {
+            background: transparent; box-shadow: none; border: 0; padding: 0;
+        }
+        body[data-svc-layout="outside"] .subnav-heading { padding: 2px 6px 8px; }
+        body[data-svc-layout="outside"] .subnav-list {
+            background: var(--color-surface);
+            border: 0.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 8px;
+        }
 
         /* ── Sidebar (Categories + Actions) ── */
         .subnav-card { padding: 8px; }
@@ -63,14 +97,6 @@
         .st-cat-head-row {
             display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
         }
-        .st-cat-head-ico {
-            width: 48px; height: 48px; border-radius: 12px;
-            background: var(--color-accent-light);
-            color: var(--color-accent);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-        .st-cat-head-ico svg { width: 22px; height: 22px; }
         .st-cat-head-meta { flex: 1; min-width: 0; }
         .st-cat-head-title {
             font-size: 22px; font-weight: 600;
@@ -114,10 +140,8 @@
         }
         .st-cycle-saving {
             display: inline-flex; align-items: center;
-            padding: 1px 6px; border-radius: var(--radius-pill);
-            background: var(--color-green-bg); color: var(--color-green-text);
-            font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em;
-            text-transform: uppercase;
+            color: var(--color-accent);
+            font-size: 11px; font-weight: 590; letter-spacing: -0.004em;
         }
 
         /* ── Pricing grid ── */
@@ -142,7 +166,7 @@
         }
         .st-plan.featured {
             border-color: var(--color-accent);
-            box-shadow: 0 0 0 1px var(--color-accent);
+            box-shadow: var(--shadow-card-hover);
         }
         .st-plan-badge {
             position: absolute; top: 0; right: 22px;
@@ -151,8 +175,8 @@
             border-radius: var(--radius-pill);
             background: var(--color-accent);
             color: #fff;
-            font-size: 10px; font-weight: 600;
-            letter-spacing: 0.04em; text-transform: uppercase;
+            font-size: 11px; font-weight: 590;
+            letter-spacing: -0.004em;
         }
         .st-plan-name {
             font-size: 15px; font-weight: 600;
@@ -220,7 +244,7 @@
         .st-plan-features li { display: flex; align-items: flex-start; gap: 9px; margin: 0; }
         .st-plan-features li > svg {
             width: 14px; height: 14px;
-            color: var(--color-green-text);
+            color: var(--color-accent);
             flex-shrink: 0;
             margin-top: 1px;
         }
@@ -229,7 +253,7 @@
             display: block;
             width: 14px; height: 14px;
             flex-shrink: 0; margin-top: 1px;
-            background-color: var(--color-green-text);
+            background-color: var(--color-accent);
             -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
                     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
         }
@@ -302,13 +326,12 @@
             display: flex; align-items: flex-start; gap: 12px;
         }
         .st-guarantee-ico {
-            width: 32px; height: 32px; border-radius: 10px;
-            background: var(--color-accent-light);
-            color: var(--color-accent);
+            color: var(--color-text-secondary);
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
+            margin-top: 1px;
         }
-        .st-guarantee-ico svg { width: 15px; height: 15px; }
+        .st-guarantee-ico svg { width: 18px; height: 18px; }
         .st-guarantee-title {
             font-size: 13px; font-weight: 600;
             color: var(--color-text-primary);
@@ -349,6 +372,52 @@
         .st-variant-label svg { width: 12px; height: 12px; }
         /* Hide every variant-label when a specific variant is picked */
         body[data-plan] .st-variant-label { display: none; }
+
+        /* ── Packages count (state-chip) — cap how many packages each plan variant shows ──
+           Overflow items use the general-sibling chain (X ~ X …) so the count ignores
+           comments and non-package siblings. Card grids also reflow their columns. */
+        /* Variant A — .st-pricing */
+        body[data-packages="1"] .st-pricing { grid-template-columns: minmax(0, 360px); justify-content: center; }
+        body[data-packages="2"] .st-pricing { grid-template-columns: repeat(2, 1fr); }
+        body[data-packages="1"] .st-pricing > .st-plan ~ .st-plan { display: none; }
+        body[data-packages="2"] .st-pricing > .st-plan ~ .st-plan ~ .st-plan { display: none; }
+        body[data-packages="3"] .st-pricing > .st-plan ~ .st-plan ~ .st-plan ~ .st-plan { display: none; }
+        /* Variant B — .st-pricing-b */
+        body[data-packages="1"] .st-pricing-b { grid-template-columns: minmax(0, 360px); justify-content: center; }
+        body[data-packages="2"] .st-pricing-b { grid-template-columns: repeat(2, 1fr); }
+        body[data-packages="3"] .st-pricing-b { grid-template-columns: repeat(3, 1fr); }
+        body[data-packages="1"] .st-pricing-b > .st-plan-b ~ .st-plan-b { display: none; }
+        body[data-packages="2"] .st-pricing-b > .st-plan-b ~ .st-plan-b ~ .st-plan-b { display: none; }
+        body[data-packages="3"] .st-pricing-b > .st-plan-b ~ .st-plan-b ~ .st-plan-b ~ .st-plan-b { display: none; }
+        body[data-packages="4"] .st-pricing-b > .st-plan-b ~ .st-plan-b ~ .st-plan-b ~ .st-plan-b ~ .st-plan-b { display: none; }
+        /* Variant C — .st-rows (vertical rows) */
+        body[data-packages="1"] .st-rows > .st-row ~ .st-row { display: none; }
+        body[data-packages="2"] .st-rows > .st-row ~ .st-row ~ .st-row { display: none; }
+        body[data-packages="3"] .st-rows > .st-row ~ .st-row ~ .st-row ~ .st-row { display: none; }
+        body[data-packages="4"] .st-rows > .st-row ~ .st-row ~ .st-row ~ .st-row ~ .st-row { display: none; }
+        /* Variant D — .st-compare-tbl (col 1 = labels, then one column per package) */
+        body[data-packages="1"] .st-compare-tbl tr > *:nth-child(n+3) { display: none; }
+        body[data-packages="2"] .st-compare-tbl tr > *:nth-child(n+4) { display: none; }
+        body[data-packages="3"] .st-compare-tbl tr > *:nth-child(n+5) { display: none; }
+        /* Variant E — .st-bento (hero + minis) */
+        body[data-packages="1"] .st-bento { grid-template-columns: 1fr; }
+        body[data-packages="1"] .st-bento > * ~ * { display: none; }
+        body[data-packages="2"] .st-bento > * ~ * ~ * { display: none; }
+        /* Variant F — .st-seg (segmented bar) */
+        body[data-packages="1"] .st-seg { grid-template-columns: 1fr; }
+        body[data-packages="2"] .st-seg { grid-template-columns: repeat(2, 1fr); }
+        body[data-packages="1"] .st-seg > .st-seg-col ~ .st-seg-col { display: none; }
+        body[data-packages="2"] .st-seg > .st-seg-col ~ .st-seg-col ~ .st-seg-col { display: none; }
+        /* Variant G — .st-matrix (spec cards) */
+        body[data-packages="1"] .st-matrix { grid-template-columns: minmax(0, 360px); justify-content: center; }
+        body[data-packages="2"] .st-matrix { grid-template-columns: repeat(2, 1fr); }
+        body[data-packages="1"] .st-matrix > .st-matrix-card ~ .st-matrix-card { display: none; }
+        body[data-packages="2"] .st-matrix > .st-matrix-card ~ .st-matrix-card ~ .st-matrix-card { display: none; }
+        /* Variant H — .st-addon-wrap (stacked addons) */
+        body[data-packages="1"] .v-h .st-addon-wrap ~ .st-addon-wrap { display: none; }
+        body[data-packages="2"] .v-h .st-addon-wrap ~ .st-addon-wrap ~ .st-addon-wrap { display: none; }
+        body[data-packages="3"] .v-h .st-addon-wrap ~ .st-addon-wrap ~ .st-addon-wrap ~ .st-addon-wrap { display: none; }
+        body[data-packages="4"] .v-h .st-addon-wrap ~ .st-addon-wrap ~ .st-addon-wrap ~ .st-addon-wrap ~ .st-addon-wrap { display: none; }
 
         /* ── Per-category content blocks ── */
         /* Each [data-cat-content] wraps the 4 plan variants for a single category.
@@ -419,7 +488,7 @@
             border-color: var(--color-accent);
             background: var(--color-accent-light);
         }
-        .st-plan-b.featured { border-color: var(--color-accent); background: var(--color-accent-light); }
+        .st-plan-b.featured { border-color: var(--color-accent); background: var(--color-surface); box-shadow: var(--shadow-card-hover); }
         .st-plan-b-name { font-size: 13px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; margin-bottom: 4px; }
         .st-plan-b-tag  { font-size: 11.5px; color: var(--color-text-tertiary); letter-spacing: -0.004em; margin-bottom: 12px; min-height: 16px; }
         .st-plan-b-price {
@@ -448,7 +517,7 @@
         .st-plan-b-specs li { display: flex; align-items: flex-start; gap: 7px; margin: 0; }
         .st-plan-b-specs li > svg {
             width: 12px; height: 12px;
-            color: var(--color-green-text);
+            color: var(--color-accent);
             flex-shrink: 0; margin-top: 2px;
         }
         .st-plan-b-specs li:not(:has(> svg))::before {
@@ -456,7 +525,7 @@
             display: block;
             width: 12px; height: 12px;
             flex-shrink: 0; margin-top: 2px;
-            background-color: var(--color-green-text);
+            background-color: var(--color-accent);
             -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
                     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
         }
@@ -504,7 +573,7 @@
             .st-row { grid-template-columns: 1fr; gap: 10px; }
         }
         .st-row.featured {
-            background: var(--color-accent-light);
+            background: var(--color-surface);
             position: relative;
         }
         .st-row.featured::before {
@@ -522,7 +591,7 @@
         .st-row-spec {
             display: inline-flex; align-items: center; gap: 5px;
         }
-        .st-row-spec svg { width: 12px; height: 12px; color: var(--color-green-text); flex-shrink: 0; }
+        .st-row-spec svg { width: 12px; height: 12px; color: var(--color-accent); flex-shrink: 0; }
         .st-row-spec strong { color: var(--color-text-primary); font-weight: 500; }
         .st-row-price {
             display: flex; align-items: baseline; gap: 3px;
@@ -574,15 +643,14 @@
             vertical-align: top;
         }
         .st-compare-tbl thead th.featured {
-            background: var(--color-accent-light);
+            background: var(--color-surface-secondary);
             position: relative;
         }
         .st-compare-tbl thead th.featured::before {
             content: "Most popular";
             position: absolute; top: 6px; left: 50%;
             transform: translateX(-50%);
-            font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
-            text-transform: uppercase;
+            font-size: 10px; font-weight: 590; letter-spacing: -0.004em;
             color: var(--color-accent);
         }
         .st-compare-plan-name {
@@ -599,12 +667,12 @@
         .st-compare-plan-price .amount { font-size: 24px; font-weight: 600; letter-spacing: -0.022em; color: var(--color-text-primary); }
         .st-compare-plan-price .period { font-size: 11px; color: var(--color-text-tertiary); margin-left: 2px; }
         .st-compare-tbl tbody tr:last-child td { border-bottom: 0; }
-        .st-compare-tbl td.featured { background: var(--color-accent-light); }
+        .st-compare-tbl td.featured { background: var(--color-surface-secondary); }
         .st-compare-val {
             font-weight: 500; color: var(--color-text-primary);
         }
         .st-compare-val.muted { color: var(--color-text-quaternary); font-weight: 400; }
-        .st-compare-check { color: var(--color-green-text); }
+        .st-compare-check { color: var(--color-accent); }
         .st-compare-x { color: var(--color-text-quaternary); }
         .st-compare-check svg, .st-compare-x svg { width: 14px; height: 14px; }
         .st-compare-footer {
@@ -728,12 +796,11 @@
             .st-seg-col { border-right: 0; border-bottom: 0.5px solid var(--color-border); }
             .st-seg-col:last-child { border-bottom: 0; }
         }
-        .st-seg-col.featured { background: var(--color-accent-light); }
+        .st-seg-col.featured { background: var(--color-surface-secondary); }
         .st-seg-col.featured::before {
             content: "Most popular";
             position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-            font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em;
-            text-transform: uppercase;
+            font-size: 10px; font-weight: 590; letter-spacing: -0.004em;
             color: var(--color-accent);
         }
         .st-seg-col.featured .st-seg-name { margin-top: 14px; }
@@ -780,12 +847,12 @@
         }
         .st-matrix-card.featured {
             border-color: var(--color-accent);
-            background: linear-gradient(180deg, var(--color-accent-light) 0%, var(--color-surface) 80px);
-            box-shadow: 0 4px 20px rgba(0,113,227,0.08);
+            background: var(--color-surface);
+            box-shadow: var(--shadow-card-hover);
         }
         .st-matrix-head { padding: 22px 22px 18px; border-bottom: 0.5px solid var(--color-border); text-align: center; }
         .st-matrix-card.featured .st-matrix-head { border-bottom-color: rgba(0,113,227,0.2); }
-        .st-matrix-eyebrow { font-size: 10.5px; font-weight: 600; color: var(--color-accent); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+        .st-matrix-eyebrow { font-size: 11.5px; font-weight: 590; color: var(--color-accent); letter-spacing: -0.004em; margin-bottom: 6px; }
         .st-matrix-name { font-size: 17px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.014em; margin: 0; }
         .st-matrix-specs {
             padding: 14px 22px; flex: 1;
@@ -804,7 +871,7 @@
         .st-matrix-specs li { display: flex; align-items: flex-start; gap: 8px; margin: 0; }
         .st-matrix-specs li > svg {
             width: 13px; height: 13px;
-            color: var(--color-green-text);
+            color: var(--color-accent);
             flex-shrink: 0; margin-top: 1px;
         }
         .st-matrix-specs li:not(:has(> svg))::before {
@@ -812,7 +879,7 @@
             display: block;
             width: 13px; height: 13px;
             flex-shrink: 0; margin-top: 1px;
-            background-color: var(--color-green-text);
+            background-color: var(--color-accent);
             -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
                     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
         }
@@ -858,11 +925,11 @@
         .st-addon-wrap + .st-addon-wrap { padding-top: 0; }
 
         /* Per-addon illustration tints — keeps them visually distinct without hard color */
-        .st-addon-illus.weebly    { background: linear-gradient(135deg, rgba(0,113,227,0.12) 0%, rgba(88,86,214,0.06) 100%); color: #0071e3; }
+        .st-addon-illus.weebly    { background: linear-gradient(135deg, rgba(0,113,227,0.12) 0%, rgba(88,86,214,0.06) 100%); color: var(--color-accent); }
         .st-addon-illus.codeguard { background: linear-gradient(135deg, rgba(48,209,88,0.14) 0%, rgba(48,209,88,0.04) 100%); color: var(--color-green-text); }
         .st-addon-illus.sitelock  { background: linear-gradient(135deg, rgba(255,159,10,0.14) 0%, rgba(255,159,10,0.04) 100%); color: var(--color-orange-text); }
         .st-addon-illus.marketgoo { background: linear-gradient(135deg, rgba(175,82,222,0.12) 0%, rgba(175,82,222,0.04) 100%); color: #8c5cff; }
-        .st-addon-illus.ox        { background: linear-gradient(135deg, rgba(0,113,227,0.12) 0%, rgba(90,200,250,0.06) 100%); color: #0071e3; }
+        .st-addon-illus.ox        { background: linear-gradient(135deg, rgba(0,113,227,0.12) 0%, rgba(90,200,250,0.06) 100%); color: var(--color-accent); }
 
         /* ═════════════════ Variant H — Addon card with radio tiers ═════════════════
            Full-width card with title + description + illustration, tiers below
@@ -958,7 +1025,7 @@
             white-space: nowrap;
         }
         .st-addon-tier-price.muted { color: var(--color-text-tertiary); font-weight: 400; }
-        .st-addon-tier-price.free  { color: var(--color-green-text); font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; font-size: 11px; }
+        .st-addon-tier-price.free  { color: var(--color-accent); font-weight: 600; letter-spacing: -0.004em; font-size: 12px; }
         .st-addon-tier-price .period {
             font-size: 11px; color: var(--color-text-tertiary); font-weight: 400;
             letter-spacing: -0.004em;
@@ -1021,6 +1088,8 @@
 </nav>
 
 <div class="content-area">
+    <!-- Sentinel: reveals the state-chip "Controls inside/outside" pill on this page -->
+    <div class="svc-table-card" aria-hidden="true"></div>
     <header class="page-header">
         <h1>Order new services</h1>
         <p class="page-subtitle">Browse our plans and add the ones you need to your cart. All plans come with a 30-day money-back guarantee.</p>
@@ -1031,6 +1100,7 @@
         <aside>
             <div class="card subnav-card">
                 <div class="subnav-heading">Categories</div>
+                <div class="subnav-list">
                 <button type="button" class="subnav-item active" data-cat="web-hosting">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
                     Web Hosting
@@ -1083,10 +1153,12 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     Product Addons
                 </button>
+                </div>
             </div>
 
             <div class="card subnav-card" style="margin-top: 12px;">
                 <div class="subnav-heading">Actions</div>
+                <div class="subnav-list">
                 <a href="clientareadomains.html" class="subnav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-9-9c2.52 0 4.82.99 6.5 2.6"/><polyline points="22 4 22 10 16 10"/></svg>
                     Renew Domains
@@ -1105,6 +1177,7 @@
                     View Cart
                     <span style="margin-left: auto; font-size: 11px; font-weight: 500; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--color-accent-light); color: var(--color-accent);">2</span>
                 </a>
+                </div>
             </div>
         </aside>
 
@@ -1114,9 +1187,6 @@
                 <!-- Category header with billing cycle switch -->
                 <div class="st-cat-head">
                     <div class="st-cat-head-row">
-                        <div class="st-cat-head-ico">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                        </div>
                         <div class="st-cat-head-meta">
                             <h2 class="st-cat-head-title" id="cat-title">Web Hosting</h2>
                             <p class="st-cat-head-desc" id="cat-desc">Hosting is what makes your site visible on the web.</p>
@@ -1982,8 +2052,8 @@
 </div><!-- /.ph-main-wrap -->
 <div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js?v=2"></script>
-<script src="js/apple-layout.js?v=2"></script>
+<script src="js/apple-theme.js?v=12"></script>
+<script src="js/apple-layout.js?v=12"></script>
 <script>
 // Category switcher — updates title/desc client-side. Real flow posts to cart.php?gid=X.
 (function () {

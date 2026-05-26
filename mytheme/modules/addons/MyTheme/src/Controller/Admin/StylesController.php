@@ -59,6 +59,9 @@ final class StylesController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_colors'])) {
             return $this->saveColorsAction($template);
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_buttons'])) {
+            return $this->saveButtonsAction($template);
+        }
 
         $style  = (string)($_GET['style'] ?? 'default');
         $subcat = (string)($_GET['subcat'] ?? 'colors');
@@ -77,8 +80,10 @@ final class StylesController extends AbstractController
             // so the other tabs skip the folder scan + view-model work.
             'colors'      => $tab === 'variables' ? $this->buildColorsViewModel($template, $style) : null,
             'typography'  => $tab === 'variables' ? $this->buildTypographyViewModel($template) : null,
+            'buttons'     => $tab === 'variables' ? $this->buildButtonsViewModel($template) : null,
             'saved'       => isset($_GET['saved']),
             'colorsSaved' => isset($_GET['colors_saved']),
+            'buttonsSaved'=> isset($_GET['buttons_saved']),
             'customCss'   => (string)Settings::getValue($template->getName() . '_custom_css', ''),
             'cssSaved'    => isset($_GET['css_saved']),
         ]);
@@ -373,5 +378,152 @@ final class StylesController extends AbstractController
 
         Settings::setValue($template->getName() . '_colors_' . $style, $out, 'json');
         $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=colors&colors_saved=1');
+    }
+
+    /**
+     * View-model for the Buttons subcat. Loads the button schema (core/config/
+     * buttons.php), groups the select-colors options for <optgroup>s, and merges
+     * the GLOBAL stored overrides onto the defaults so every size field shows its
+     * effective value and every matrix cell shows its current option key + swatch.
+     * Unlike Colors, Buttons are site-wide (one mapping styles both modes), so
+     * there's no per-style key here.
+     */
+    private function buildButtonsViewModel($template): array
+    {
+        $cfg    = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/buttons.php');
+        $stored = Settings::getValue($template->getName() . '_buttons', []);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+        $sizesStored    = is_array($stored['sizes'] ?? null)    ? $stored['sizes']    : [];
+        $variantsStored = is_array($stored['variants'] ?? null) ? $stored['variants'] : [];
+
+        // Group colour options for <optgroup>; build a key->option lookup for swatches.
+        $optionGroups = [];
+        $optionByKey  = [];
+        foreach (($cfg['colorOptions'] ?? []) as $o) {
+            $optionGroups[(string)($o['group'] ?? 'Other')][] = $o;
+            $optionByKey[(string)$o['key']] = $o;
+        }
+
+        // Sizes — effective value = stored override or default.
+        $sizeGroups = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $group => $items) {
+            foreach ($items as $it) {
+                $it['value'] = (int)($sizesStored[$it['var']] ?? $it['default']);
+                $sizeGroups[(string)$group][] = $it;
+            }
+        }
+
+        // Variant matrix — resolve each slot's current option key + preview swatch.
+        $slots    = $cfg['slots'] ?? [];
+        $variants = [];
+        foreach (($cfg['variants'] ?? []) as $v) {
+            $vStored = is_array($variantsStored[$v['key']] ?? null) ? $variantsStored[$v['key']] : [];
+            $cells   = [];
+            foreach ($slots as $slot) {
+                $sk     = (string)$slot['key'];
+                $defKey = (string)($v['slots'][$sk] ?? 'transparent');
+                $curKey = (string)($vStored[$sk] ?? $defKey);
+                if (!isset($optionByKey[$curKey])) {
+                    $curKey = $defKey;
+                }
+                $cells[] = [
+                    'slot'    => $sk,
+                    'label'   => (string)$slot['label'],
+                    'current' => $curKey,
+                    'default' => $defKey,
+                    'swatch'  => (string)($optionByKey[$curKey]['swatch'] ?? '#000000'),
+                ];
+            }
+            $variants[] = ['key' => $v['key'], 'label' => $v['label'], 'cells' => $cells];
+        }
+
+        return [
+            'optionGroups'  => $optionGroups,
+            'sizeGroups'    => $sizeGroups,
+            'variants'      => $variants,
+            'slots'         => $slots,
+            'weightOptions' => $cfg['weightOptions'] ?? [400, 500, 600, 700],
+        ];
+    }
+
+    /**
+     * Validate + persist the Buttons form (site-wide). Stores ONLY sizes that
+     * differ from default (in-bounds) and matrix slots whose option key differs
+     * from default (and is a known option). PRG redirect to the Buttons subcat.
+     */
+    private function saveButtonsAction($template): string
+    {
+        $cfg            = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/buttons.php');
+        $min            = (int)($cfg['sizeMin'] ?? 0);
+        $max            = (int)($cfg['sizeMax'] ?? 999);
+        $allowedWeights = array_map('intval', $cfg['weightOptions'] ?? [400, 500, 600, 700]);
+
+        $validKeys = [];
+        foreach (($cfg['colorOptions'] ?? []) as $o) {
+            $validKeys[(string)$o['key']] = true;
+        }
+
+        $out = [];
+
+        // Sizes — keep only in-bounds values that differ from default.
+        $sizesIn = is_array($_POST['size'] ?? null) ? $_POST['size'] : [];
+        $sizes   = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $items) {
+            foreach ($items as $it) {
+                $var = (string)$it['var'];
+                if (!isset($sizesIn[$var]) || $sizesIn[$var] === '') {
+                    continue;
+                }
+                $val = (int)$sizesIn[$var];
+                if ($val < $min || $val > $max) {
+                    continue;
+                }
+                if (($it['type'] ?? 'px') === 'weight' && !in_array($val, $allowedWeights, true)) {
+                    continue;
+                }
+                if ($val === (int)$it['default']) {
+                    continue;
+                }
+                $sizes[$var] = $val;
+            }
+        }
+        if ($sizes !== []) {
+            $out['sizes'] = $sizes;
+        }
+
+        // Variant matrix — store only slots changed from default to a known key.
+        $vIn      = is_array($_POST['v'] ?? null) ? $_POST['v'] : [];
+        $variants = [];
+        foreach (($cfg['variants'] ?? []) as $v) {
+            $vk      = (string)$v['key'];
+            $row     = is_array($vIn[$vk] ?? null) ? $vIn[$vk] : [];
+            $changed = [];
+            foreach (($cfg['slots'] ?? []) as $slot) {
+                $sk = (string)$slot['key'];
+                if (!isset($row[$sk])) {
+                    continue;
+                }
+                $key = (string)$row[$sk];
+                if (!isset($validKeys[$key])) {
+                    continue;
+                }
+                if ($key === (string)($v['slots'][$sk] ?? '')) {
+                    continue;
+                }
+                $changed[$sk] = $key;
+            }
+            if ($changed !== []) {
+                $variants[$vk] = $changed;
+            }
+        }
+        if ($variants !== []) {
+            $out['variants'] = $variants;
+        }
+
+        Settings::setValue($template->getName() . '_buttons', $out, 'json');
+        $style = (string)($_POST['style'] ?? 'default');
+        $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=buttons&buttons_saved=1');
     }
 }

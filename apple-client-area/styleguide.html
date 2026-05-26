@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Style Guide — WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css?v=2">
-    <link rel="stylesheet" href="css/apple-layout.css?v=2">
+    <link rel="stylesheet" href="css/apple-theme.css?v=12">
+    <link rel="stylesheet" href="css/apple-layout.css?v=12">
     <style>
         body { display: block; }
 
@@ -110,7 +110,7 @@
         .sg-icon-demo { display: flex; gap: 14px; margin: 16px 0 24px; flex-wrap: wrap; }
         .sg-icon-circle { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
         .sg-icon-circle svg { width: 24px; height: 24px; }
-        .ic-blue { background: rgba(0,113,227,0.1); color: #0071e3; }
+        .ic-blue { background: rgba(0,113,227,0.1); color: var(--color-accent); }
         .ic-green { background: rgba(48,209,88,0.1); color: #30d158; }
         .ic-purple { background: rgba(175,130,255,0.1); color: #af82ff; }
         .ic-orange { background: rgba(255,159,10,0.1); color: #ff9f0a; }
@@ -121,7 +121,7 @@
         .sg-form-demo { max-width: 360px; margin: 16px 0 24px; }
         .sg-form-demo label { display: block; font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
         .sg-form-demo input { display: block; width: 100%; background: var(--color-surface); border: 1px solid #d2d2d7; border-radius: 12px; padding: 12px 16px; font-size: 15px; color: var(--color-text-primary); transition: border-color 0.15s, box-shadow 0.15s; box-sizing: border-box; }
-        .sg-form-demo input:focus { outline: none; border-color: #0071e3; box-shadow: 0 0 0 4px rgba(0,113,227,0.15); }
+        .sg-form-demo input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 4px rgba(0,113,227,0.15); }
         .sg-form-demo .hint { font-size: 12px; color: var(--color-text-secondary); margin-top: 6px; }
 
         /* Section anchor scroll offset */
@@ -678,7 +678,7 @@ box-shadow: 0 20px 60px rgba(48,209,88,0.3); /* tinted glow (matches element col
 }
 .form-input:focus {
     outline: none;
-    border-color: #0071e3;
+    border-color: var(--color-accent);
     box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
 }</code></pre>
 
@@ -724,7 +724,7 @@ box-shadow: 0 20px 60px rgba(48,209,88,0.3); /* tinted glow (matches element col
     &lt;svg&gt;...&lt;/svg&gt;
 &lt;/div&gt;
 
-.icon-circle.blue { background: rgba(0,113,227,0.1); color: #0071e3; }
+.icon-circle.blue { background: rgba(0,113,227,0.1); color: var(--color-accent); }
 /* Same pattern for green, purple, orange, red, teal */</code></pre>
         </section>
 
@@ -1134,8 +1134,8 @@ document.documentElement.setAttribute('data-theme', 'dark');</code></pre>
 <!-- Language / currency modal -->
 <div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js?v=2"></script>
-<script src="js/apple-layout.js?v=2"></script>
+<script src="js/apple-theme.js?v=12"></script>
+<script src="js/apple-layout.js?v=12"></script>
 <script>
     // Active section highlighting in TOC
     (function() {

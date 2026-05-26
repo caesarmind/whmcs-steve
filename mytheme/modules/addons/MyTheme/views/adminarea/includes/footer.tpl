@@ -345,6 +345,19 @@
 .mt-color-swatch-input::-webkit-color-swatch { border: 0; border-radius: 3px; }
 .mt-color-swatch-input::-moz-color-swatch { border: 0; border-radius: 3px; }
 .mt-color-text { max-width: 132px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; text-transform: lowercase; }
+
+/* Buttons panel (sizes + per-variant select-colors matrix) */
+.mt-btn-variants { display: flex; flex-direction: column; gap: 14px; }
+.mt-btn-variant { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius); padding: 14px 16px; }
+.mt-btn-variant-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.mt-btn-variant-name { font-size: 14px; font-weight: 600; }
+.mt-btn-variant-class { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; color: var(--mt-text-3); }
+.mt-btn-matrix { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px 14px; }
+.mt-btn-cell { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.mt-btn-cell-label { font-size: 12px; font-weight: 500; color: var(--mt-text-2); }
+.mt-btn-cell-control { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.mt-btn-cell-swatch { width: 22px; height: 22px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.12); flex-shrink: 0; background-clip: padding-box; }
+.mt-btn-cell .mt-select { flex: 1; min-width: 0; }
 </style>
 
 <script>
@@ -475,6 +488,31 @@
     if (reset) reset.addEventListener('click', function(){
         [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
             setToken(t.getAttribute('data-var'), t.getAttribute('data-default'));
+        });
+    });
+})();
+
+/* Buttons panel: each matrix <select> drives its preview swatch; "Reset all"
+   puts every size field + variant select back to its default. Brace-safe (no
+   {n} quantifiers, every { is followed by whitespace) so Smarty leaves it be. */
+(function(){
+    var form = document.querySelector('.mt-buttons');
+    if (!form) return;
+    function swatchFor(v, slot){ return form.querySelector('.mt-btn-cell-swatch[data-swatch-for="' + v + '.' + slot + '"]'); }
+    function syncSelect(sel){
+        var opt = sel.options[sel.selectedIndex];
+        if (!opt) return;
+        var sw = swatchFor(sel.getAttribute('data-variant'), sel.getAttribute('data-slot'));
+        if (sw) sw.style.background = opt.getAttribute('data-swatch') || 'transparent';
+    }
+    [].slice.call(form.querySelectorAll('select.mt-btn-select')).forEach(function(sel){
+        sel.addEventListener('change', function(){ syncSelect(sel); });
+    });
+    var breset = form.querySelector('#mt-buttons-reset');
+    if (breset) breset.addEventListener('click', function(){
+        [].slice.call(form.querySelectorAll('input[data-default], select[data-default]')).forEach(function(el){
+            el.value = el.getAttribute('data-default');
+            if (el.tagName === 'SELECT' && el.className.indexOf('mt-btn-select') !== -1) syncSelect(el);
         });
     });
 })();

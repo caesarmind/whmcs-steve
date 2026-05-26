@@ -163,12 +163,13 @@ final class Hooks
 
     private function clientAreaHeadOutput(array $vars, Template $template): ?string
     {
-        $colors = $this->buildColorsHead($template);
-        $typo   = $this->buildTypographyHead($template);
-        $ext    = (string)$this->extensionOutput($template, $vars, slot: 'headOutput');
-        $custom = $this->buildCustomCss($template);
+        $colors  = $this->buildColorsHead($template);
+        $typo    = $this->buildTypographyHead($template);
+        $buttons = $this->buildButtonsHead($template);
+        $ext     = (string)$this->extensionOutput($template, $vars, slot: 'headOutput');
+        $custom  = $this->buildCustomCss($template);
         // Custom CSS goes LAST so it can override the theme + token overrides.
-        $out    = $colors . $typo . $ext . $custom;
+        $out     = $colors . $typo . $buttons . $ext . $custom;
         return $out !== '' ? $out : null;
     }
 
@@ -323,6 +324,94 @@ final class Hooks
         }
 
         return $blocks !== '' ? '<style id="mytheme-colors">' . $blocks . '</style>' : '';
+    }
+
+    /**
+     * Emit an inline <style> applying the admin's Buttons overrides (Styles ->
+     * Buttons). GLOBAL (one mapping styles both modes), so it always targets
+     * :root — the referenced ramp/base tokens are themselves mode-aware, so the
+     * same var() resolves correctly under [data-theme="dark"]. Mirrors
+     * buildColorsHead: defaults stay in the cacheable apple-theme.css; this block
+     * lands after the stylesheet links so it wins on source order.
+     *
+     * Stored shape (only changed values): ['sizes' => ['--btn-...'=>int, ...],
+     * 'variants' => ['<variant>' => ['<slot>'=>'<optionKey>', ...], ...]]. Size
+     * vars + variant/slot keys are re-validated against core/config/buttons.php,
+     * and each option key is mapped through the config's own css strings (authored
+     * here, never user input) — so there's no injection surface. Returns '' when
+     * nothing is overridden.
+     */
+    private function buildButtonsHead(Template $template): string
+    {
+        $stored = Settings::getValue($template->getName() . '_buttons', null);
+        if (!is_array($stored) || $stored === []) {
+            return '';
+        }
+
+        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/buttons.php');
+
+        // option key -> emitted css value (var()/hex/rgba()/transparent)
+        $cssByKey = [];
+        foreach (($cfg['colorOptions'] ?? []) as $o) {
+            $cssByKey[(string)$o['key']] = (string)$o['css'];
+        }
+        // size var -> type (weight emits unitless; everything else px) + bounds
+        $sizeType = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $items) {
+            foreach ($items as $it) {
+                $sizeType[(string)$it['var']] = (string)($it['type'] ?? 'px');
+            }
+        }
+        $min = (int)($cfg['sizeMin'] ?? 0);
+        $max = (int)($cfg['sizeMax'] ?? 999);
+        // valid variant + slot keys
+        $validVariant = [];
+        foreach (($cfg['variants'] ?? []) as $v) {
+            $validVariant[(string)$v['key']] = true;
+        }
+        $validSlot = [];
+        foreach (($cfg['slots'] ?? []) as $s) {
+            $validSlot[(string)$s['key']] = true;
+        }
+
+        $decls = '';
+
+        if (is_array($stored['sizes'] ?? null)) {
+            foreach ($stored['sizes'] as $var => $val) {
+                $var = (string)$var;
+                if (!isset($sizeType[$var])) {
+                    continue;
+                }
+                $num = (int)$val;
+                if ($num < $min || $num > $max) {
+                    continue;
+                }
+                $unit  = $sizeType[$var] === 'weight' ? '' : 'px';
+                $decls .= $var . ':' . $num . $unit . ';';
+            }
+        }
+
+        if (is_array($stored['variants'] ?? null)) {
+            foreach ($stored['variants'] as $vk => $slots) {
+                $vk = (string)$vk;
+                if (!isset($validVariant[$vk]) || !is_array($slots)) {
+                    continue;
+                }
+                foreach ($slots as $sk => $optKey) {
+                    $sk = (string)$sk;
+                    if (!isset($validSlot[$sk])) {
+                        continue;
+                    }
+                    $optKey = (string)$optKey;
+                    if (!isset($cssByKey[$optKey])) {
+                        continue;
+                    }
+                    $decls .= '--btn-' . $vk . '-' . $sk . ':' . $cssByKey[$optKey] . ';';
+                }
+            }
+        }
+
+        return $decls !== '' ? '<style id="mytheme-buttons">:root{' . $decls . '}</style>' : '';
     }
 
     /** Re-validate a stored color before emitting (defense-in-depth vs CSS injection). */

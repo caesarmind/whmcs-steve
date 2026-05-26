@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choose a Domain — Order — WHMCS by Apple</title>
-    <link rel="stylesheet" href="css/apple-theme.css?v=2">
-    <link rel="stylesheet" href="css/apple-layout.css?v=2">
+    <link rel="stylesheet" href="css/apple-theme.css?v=12">
+    <link rel="stylesheet" href="css/apple-layout.css?v=12">
     <style>
         body { display: block; }
 
@@ -15,6 +15,9 @@
         /* ── 2-column split (matches store.html) ── */
         .dp-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
         @media (max-width: 880px) { .dp-split { grid-template-columns: 1fr; } }
+        /* Sub-nav Hide toggle (state-chip) — collapse the in-page sidebar */
+        body[data-subnav="off"] .dp-split { grid-template-columns: 1fr; }
+        body[data-subnav="off"] .dp-split > aside { display: none; }
 
         /* Shared sub-nav primitive */
         .subnav-card { padding: 8px; }
@@ -410,46 +413,6 @@
         .dp-panel { display: none; }
         .dp-panel.is-active { display: block; }
 
-        /* Continue footer */
-        .dp-footer {
-            display: flex; align-items: center; gap: 10px;
-            padding: 14px 22px;
-            border-top: 0.5px solid var(--color-border);
-            background: var(--color-surface-tertiary);
-            flex-wrap: wrap;
-        }
-        .dp-footer .spacer { flex: 1; }
-        .dp-footer .dp-footer-note {
-            font-size: 11.5px; color: var(--color-text-tertiary);
-            display: inline-flex; align-items: center; gap: 6px;
-            letter-spacing: -0.004em;
-        }
-        .dp-footer .dp-footer-note svg { width: 12px; height: 12px; color: var(--color-green-text); }
-        .dp-back {
-            height: 34px; padding: 0 16px;
-            border-radius: var(--radius-pill);
-            background: transparent;
-            border: 0.5px solid var(--color-border);
-            color: var(--color-text-primary);
-            font-size: 13px; font-weight: 500;
-            text-decoration: none;
-            display: inline-flex; align-items: center; gap: 4px;
-            cursor: pointer; font-family: inherit;
-            transition: all var(--transition-fast);
-        }
-        .dp-back:hover { border-color: var(--color-accent); color: var(--color-accent); }
-        .dp-continue {
-            height: 34px; padding: 0 20px;
-            border-radius: var(--radius-pill);
-            background: var(--color-accent); color: #fff;
-            border: 0;
-            font-size: 13px; font-weight: 500;
-            cursor: pointer; font-family: inherit;
-            display: inline-flex; align-items: center; gap: 4px;
-            transition: background var(--transition-fast);
-            text-decoration: none;
-        }
-        .dp-continue:hover { background: var(--color-accent-hover); }
     </style>
 </head>
 <body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="order" data-page-title="Choose a Domain">
@@ -677,22 +640,6 @@
                     </div>
                 </div>
 
-                <!-- Footer action bar -->
-                <div class="dp-footer">
-                    <span class="dp-footer-note">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                        Your domain details stay private — WHOIS privacy included on every TLD that supports it.
-                    </span>
-                    <span class="spacer"></span>
-                    <a href="store.html" class="dp-back">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                        Back
-                    </a>
-                    <a href="configureproduct.html" class="dp-continue">
-                        Continue
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                    </a>
-                </div>
             </div>
         </div>
     </div></div>
@@ -731,8 +678,8 @@
 </div><!-- /.ph-main-wrap -->
 <div data-include="partials/locale-modal.html"></div>
 
-<script src="js/apple-theme.js?v=2"></script>
-<script src="js/apple-layout.js?v=2"></script>
+<script src="js/apple-theme.js?v=12"></script>
+<script src="js/apple-layout.js?v=12"></script>
 <script>
 // Swap visible panel when an option radio changes
 (function () {
