@@ -73,9 +73,11 @@
                     <span class="topbar-cart-badge" aria-label="{$cartcount} {$LANG.cartItems|default:'items in cart'}">{$cartcount}</span>
                 {/if}
             </a>
+            {if $mtEnableDarkMode}
             <a href="#" onclick="toggleDarkMode && toggleDarkMode(); return false;" class="ph-side-iconbtn" aria-label="Toggle theme">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             </a>
+            {/if}
             {if $loggedin}
                 <div class="profile-dropdown-wrapper only-in" id="sideUserWrap">
                     <div class="topbar-avatar" onclick="togglePortalProfile && togglePortalProfile(event, 'side')" title="{$LANG.accounttab|default:'Account'}">{$user_initials|default:'U'}</div>
@@ -127,9 +129,10 @@
                             {$LANG.securitysettings|default:'Security Settings'}
                         </a>
 
+                        {* — Theme toggle — gated by admin "Enable Dark Mode". *}
+                        {if $mtEnableDarkMode}
                         <div class="profile-dropdown-divider"></div>
 
-                        {* — Theme toggle (small utility) — *}
                         <div class="theme-toggle-row">
                             <span class="theme-toggle-label">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -137,6 +140,7 @@
                             </span>
                             <div class="toggle-switch" onclick="toggleDarkMode && toggleDarkMode()"></div>
                         </div>
+                        {/if}
 
                         <div class="profile-dropdown-divider"></div>
 

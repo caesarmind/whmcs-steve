@@ -172,10 +172,15 @@ if (AddonHelper::isActive()) {
     // Also surfaces $mtTopnavShowIcons (boolean) — the admin Settings flag
     // that gates per-item icon rendering in the top-nav. Defaults to false,
     // so unconfigured installs get a clean text-only nav.
+    //
+    // $mtEnableDarkMode (boolean) gates the client-facing dark-mode toggles
+    // (the "Allow visitors to toggle dark mode" Settings flag). Defaults to
+    // true so the toggle shows unless an admin turns it off.
     add_hook('ClientAreaPage', 2, function ($vars) {
         return [
             'mtIcons'            => MyTheme\Menu\Icons::all(),
             'mtTopnavShowIcons'  => (bool)MyTheme\Models\Settings::getValue('topnav_show_icons', false),
+            'mtEnableDarkMode'   => (bool)MyTheme\Models\Settings::getValue('enable_dark_mode', true),
         ];
     });
 

@@ -160,6 +160,7 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                             {$LANG.navemailshistory|default:'Email History'}
                         </a>
+                        {if $mtEnableDarkMode}
                         <div class="profile-dropdown-divider"></div>
                         <div class="theme-toggle-row">
                             <span class="theme-toggle-label">
@@ -168,6 +169,7 @@
                             </span>
                             <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div>
                         </div>
+                        {/if}
                         <div class="profile-dropdown-divider"></div>
                         <a href="{$WEB_ROOT}/logout.php" class="profile-dropdown-item danger">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>

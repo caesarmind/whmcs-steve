@@ -245,9 +245,11 @@
                         {$LANG.securitysettings|default:'Security Settings'}
                     </a>
 
+                    {* — Theme toggle (small utility) — gated by the admin
+                       "Enable Dark Mode" Settings flag ($mtEnableDarkMode). *}
+                    {if $mtEnableDarkMode}
                     <div class="profile-dropdown-divider"></div>
 
-                    {* — Theme toggle (small utility) — *}
                     <div class="theme-toggle-row">
                         <span class="theme-toggle-label">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -255,6 +257,7 @@
                         </span>
                         <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode && toggleDarkMode()"></div>
                     </div>
+                    {/if}
 
                     <div class="profile-dropdown-divider"></div>
 
@@ -267,9 +270,11 @@
             </div>
         {else}
             <a href="{$WEB_ROOT}/login.php" class="nav-signin only-out">{$LANG.login|default:'Sign in'}</a>
+            {if $mtEnableDarkMode}
             <a href="#" onclick="toggleDarkMode && toggleDarkMode(); return false;" class="topbar-btn only-out" aria-label="Toggle theme">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             </a>
+            {/if}
         {/if}
     </div>
 </nav>
