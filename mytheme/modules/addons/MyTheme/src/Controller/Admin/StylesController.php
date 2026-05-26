@@ -406,12 +406,26 @@ final class StylesController extends AbstractController
             $optionByKey[(string)$o['key']] = $o;
         }
 
-        // Sizes — effective value = stored override or default.
-        $sizeGroups = [];
-        foreach (($cfg['sizeGroups'] ?? []) as $group => $items) {
-            foreach ($items as $it) {
-                $it['value'] = (int)($sizesStored[$it['var']] ?? $it['default']);
-                $sizeGroups[(string)$group][] = $it;
+        // Sizes — px fields carry an int 'value'; scale fields carry the current
+        // scale 'key' + that scale's 'options' (for the dropdown). Effective
+        // value = stored override or default.
+        $scales    = $cfg['scales'] ?? [];
+        $sizeTiers = [];
+        foreach (($cfg['sizeTiers'] ?? []) as $tier => $fields) {
+            foreach ($fields as $f) {
+                if (($f['type'] ?? 'px') === 'scale') {
+                    $opts  = $scales[(string)($f['scale'] ?? '')] ?? [];
+                    $cur   = (string)($sizesStored[$f['var']] ?? $f['default']);
+                    $valid = false;
+                    foreach ($opts as $o) {
+                        if ((string)$o['key'] === $cur) { $valid = true; break; }
+                    }
+                    $f['current'] = $valid ? $cur : (string)$f['default'];
+                    $f['options'] = $opts;
+                } else {
+                    $f['value'] = (int)($sizesStored[$f['var']] ?? $f['default']);
+                }
+                $sizeTiers[(string)$tier][] = $f;
             }
         }
 
@@ -440,11 +454,10 @@ final class StylesController extends AbstractController
         }
 
         return [
-            'optionGroups'  => $optionGroups,
-            'sizeGroups'    => $sizeGroups,
-            'variants'      => $variants,
-            'slots'         => $slots,
-            'weightOptions' => $cfg['weightOptions'] ?? [400, 500, 600, 700],
+            'optionGroups' => $optionGroups,
+            'sizeTiers'    => $sizeTiers,
+            'variants'     => $variants,
+            'slots'        => $slots,
         ];
     }
 
@@ -455,10 +468,9 @@ final class StylesController extends AbstractController
      */
     private function saveButtonsAction($template): string
     {
-        $cfg            = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/buttons.php');
-        $min            = (int)($cfg['sizeMin'] ?? 0);
-        $max            = (int)($cfg['sizeMax'] ?? 999);
-        $allowedWeights = array_map('intval', $cfg['weightOptions'] ?? [400, 500, 600, 700]);
+        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/buttons.php');
+        $min = (int)($cfg['sizeMin'] ?? 0);
+        $max = (int)($cfg['sizeMax'] ?? 999);
 
         $validKeys = [];
         foreach (($cfg['colorOptions'] ?? []) as $o) {
@@ -467,26 +479,34 @@ final class StylesController extends AbstractController
 
         $out = [];
 
-        // Sizes — keep only in-bounds values that differ from default.
+        // Sizes — px fields: in-bounds int differing from default. scale fields:
+        // a key present in that field's scale and differing from default.
+        $scales  = $cfg['scales'] ?? [];
         $sizesIn = is_array($_POST['size'] ?? null) ? $_POST['size'] : [];
         $sizes   = [];
-        foreach (($cfg['sizeGroups'] ?? []) as $items) {
-            foreach ($items as $it) {
-                $var = (string)$it['var'];
+        foreach (($cfg['sizeTiers'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $var = (string)$f['var'];
                 if (!isset($sizesIn[$var]) || $sizesIn[$var] === '') {
                     continue;
                 }
-                $val = (int)$sizesIn[$var];
-                if ($val < $min || $val > $max) {
-                    continue;
+                if (($f['type'] ?? 'px') === 'scale') {
+                    $key = (string)$sizesIn[$var];
+                    $ok  = false;
+                    foreach (($scales[(string)($f['scale'] ?? '')] ?? []) as $o) {
+                        if ((string)$o['key'] === $key) { $ok = true; break; }
+                    }
+                    if (!$ok || $key === (string)$f['default']) {
+                        continue;
+                    }
+                    $sizes[$var] = $key;
+                } else {
+                    $val = (int)$sizesIn[$var];
+                    if ($val < $min || $val > $max || $val === (int)$f['default']) {
+                        continue;
+                    }
+                    $sizes[$var] = $val;
                 }
-                if (($it['type'] ?? 'px') === 'weight' && !in_array($val, $allowedWeights, true)) {
-                    continue;
-                }
-                if ($val === (int)$it['default']) {
-                    continue;
-                }
-                $sizes[$var] = $val;
             }
         }
         if ($sizes !== []) {

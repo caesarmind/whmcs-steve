@@ -355,15 +355,16 @@ final class Hooks
         foreach (($cfg['colorOptions'] ?? []) as $o) {
             $cssByKey[(string)$o['key']] = (string)$o['css'];
         }
-        // size var -> type (weight emits unitless; everything else px) + bounds
-        $sizeType = [];
-        foreach (($cfg['sizeGroups'] ?? []) as $items) {
-            foreach ($items as $it) {
-                $sizeType[(string)$it['var']] = (string)($it['type'] ?? 'px');
+        // size var -> field meta (type + scale) from the tiers; + scales + bounds
+        $sizeMeta = [];
+        foreach (($cfg['sizeTiers'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $sizeMeta[(string)$f['var']] = $f;
             }
         }
-        $min = (int)($cfg['sizeMin'] ?? 0);
-        $max = (int)($cfg['sizeMax'] ?? 999);
+        $scales = $cfg['scales'] ?? [];
+        $min    = (int)($cfg['sizeMin'] ?? 0);
+        $max    = (int)($cfg['sizeMax'] ?? 999);
         // valid variant + slot keys
         $validVariant = [];
         foreach (($cfg['variants'] ?? []) as $v) {
@@ -379,15 +380,30 @@ final class Hooks
         if (is_array($stored['sizes'] ?? null)) {
             foreach ($stored['sizes'] as $var => $val) {
                 $var = (string)$var;
-                if (!isset($sizeType[$var])) {
+                if (!isset($sizeMeta[$var])) {
                     continue;
                 }
-                $num = (int)$val;
-                if ($num < $min || $num > $max) {
-                    continue;
+                $f = $sizeMeta[$var];
+                if (($f['type'] ?? 'px') === 'scale') {
+                    // map the stored scale key back to its css value
+                    $css = null;
+                    foreach (($scales[(string)($f['scale'] ?? '')] ?? []) as $o) {
+                        if ((string)$o['key'] === (string)$val) {
+                            $css = (string)$o['css'];
+                            break;
+                        }
+                    }
+                    if ($css === null) {
+                        continue;
+                    }
+                    $decls .= $var . ':' . $css . ';';
+                } else {
+                    $num = (int)$val;
+                    if ($num < $min || $num > $max) {
+                        continue;
+                    }
+                    $decls .= $var . ':' . $num . 'px;';
                 }
-                $unit  = $sizeType[$var] === 'weight' ? '' : 'px';
-                $decls .= $var . ':' . $num . $unit . ';';
             }
         }
 

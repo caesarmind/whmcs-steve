@@ -21,21 +21,21 @@
 
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Sizes</h2></header>
-        {foreach $buttons.sizeGroups as $groupName => $items}
-        <div class="mt-typo-group-label">{$groupName|escape}</div>
+        {foreach $buttons.sizeTiers as $tierName => $fields}
+        <div class="mt-typo-group-label">{$tierName|escape}</div>
         <div class="mt-typo-grid">
-            {foreach $items as $it}
+            {foreach $fields as $f}
             <div class="mt-typo-field">
-                <label class="mt-typo-field-label" for="sz{$it.var|replace:'--':'_'}">{$it.label|escape}</label>
-                {if $it.type == 'weight'}
-                <select id="sz{$it.var|replace:'--':'_'}" name="size[{$it.var}]" class="mt-select mt-input-compact" data-default="{$it.default}">
-                    {foreach $buttons.weightOptions as $w}
-                    <option value="{$w}"{if $w == $it.value} selected{/if}>{$w}</option>
+                <label class="mt-typo-field-label" for="sz{$f.var|replace:'--':'_'}">{$f.label|escape}</label>
+                {if $f.type == 'scale'}
+                <select id="sz{$f.var|replace:'--':'_'}" name="size[{$f.var}]" class="mt-select mt-input-compact" data-default="{$f.default}">
+                    {foreach $f.options as $o}
+                    <option value="{$o.key}"{if $o.key == $f.current} selected{/if}>{$o.label|escape}</option>
                     {/foreach}
                 </select>
                 {else}
                 <span class="mt-affix">
-                    <input type="number" id="sz{$it.var|replace:'--':'_'}" name="size[{$it.var}]" class="mt-input mt-input-compact" value="{$it.value}" data-default="{$it.default}" min="0" max="999" step="1" inputmode="numeric">
+                    <input type="number" id="sz{$f.var|replace:'--':'_'}" name="size[{$f.var}]" class="mt-input mt-input-compact" value="{$f.value}" data-default="{$f.default}" min="0" max="999" step="1" inputmode="numeric">
                     <span class="mt-affix-unit">px</span>
                 </span>
                 {/if}
@@ -43,7 +43,7 @@
             {/foreach}
         </div>
         {/foreach}
-        <p class="mt-field-help" style="margin-top:10px;">Radius <code>980</code> = full pill. Font size + weight follow the Typography scale by default.</p>
+        <p class="mt-field-help" style="margin-top:10px;">Height &amp; padding are exact pixels; font size, weight, line-height and radius reference the theme scale &mdash; defaults keep the Apple look (pill radius).</p>
     </section>
 
     <section class="mt-section">
