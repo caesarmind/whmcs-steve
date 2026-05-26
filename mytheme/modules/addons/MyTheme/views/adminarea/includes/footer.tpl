@@ -516,4 +516,27 @@
         });
     });
 })();
+
+/* Forms panel: colour <select>s drive their preview swatch; "Reset all" puts
+   every size + colour field back to default. Brace-safe for Smarty. */
+(function(){
+    var form = document.querySelector('.mt-forms');
+    if (!form) return;
+    function syncSelect(sel){
+        var opt = sel.options[sel.selectedIndex];
+        if (!opt) return;
+        var sw = form.querySelector('.mt-btn-cell-swatch[data-swatch-for="' + sel.getAttribute('data-var') + '"]');
+        if (sw) sw.style.background = opt.getAttribute('data-swatch') || 'transparent';
+    }
+    [].slice.call(form.querySelectorAll('select.mt-form-select')).forEach(function(sel){
+        sel.addEventListener('change', function(){ syncSelect(sel); });
+    });
+    var freset = form.querySelector('#mt-forms-reset');
+    if (freset) freset.addEventListener('click', function(){
+        [].slice.call(form.querySelectorAll('input[data-default], select[data-default]')).forEach(function(el){
+            el.value = el.getAttribute('data-default');
+            if (el.tagName === 'SELECT' && el.className.indexOf('mt-form-select') !== -1) syncSelect(el);
+        });
+    });
+})();
 </script>

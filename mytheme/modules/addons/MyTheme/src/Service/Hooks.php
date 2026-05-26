@@ -166,10 +166,11 @@ final class Hooks
         $colors  = $this->buildColorsHead($template);
         $typo    = $this->buildTypographyHead($template);
         $buttons = $this->buildButtonsHead($template);
+        $forms   = $this->buildFormsHead($template);
         $ext     = (string)$this->extensionOutput($template, $vars, slot: 'headOutput');
         $custom  = $this->buildCustomCss($template);
         // Custom CSS goes LAST so it can override the theme + token overrides.
-        $out     = $colors . $typo . $buttons . $ext . $custom;
+        $out     = $colors . $typo . $buttons . $forms . $ext . $custom;
         return $out !== '' ? $out : null;
     }
 
@@ -428,6 +429,86 @@ final class Hooks
         }
 
         return $decls !== '' ? '<style id="mytheme-buttons">:root{' . $decls . '}</style>' : '';
+    }
+
+    /**
+     * Emit the admin's Forms overrides (Styles -> Forms). GLOBAL, always into
+     * :root (referenced tokens are mode-aware). Sizes: px -> Npx, scale -> the
+     * scale option's css. Colours: option key -> css. Var names + keys are
+     * re-validated against core/config/forms.php; option css is authored here
+     * (never user input), so no injection surface. Mirrors buildButtonsHead.
+     */
+    private function buildFormsHead(Template $template): string
+    {
+        $stored = Settings::getValue($template->getName() . '_forms', null);
+        if (!is_array($stored) || $stored === []) {
+            return '';
+        }
+
+        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/forms.php');
+
+        $cssByKey = [];
+        foreach (($cfg['colorOptions'] ?? []) as $o) {
+            $cssByKey[(string)$o['key']] = (string)$o['css'];
+        }
+        $sizeMeta = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $sizeMeta[(string)$f['var']] = $f;
+            }
+        }
+        $colorVars = [];
+        foreach (($cfg['colorGroups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $colorVars[(string)$f['var']] = true;
+            }
+        }
+        $scales = $cfg['scales'] ?? [];
+        $min    = (int)($cfg['sizeMin'] ?? 0);
+        $max    = (int)($cfg['sizeMax'] ?? 999);
+
+        $decls = '';
+
+        if (is_array($stored['sizes'] ?? null)) {
+            foreach ($stored['sizes'] as $var => $val) {
+                $var = (string)$var;
+                if (!isset($sizeMeta[$var])) {
+                    continue;
+                }
+                $f = $sizeMeta[$var];
+                if (($f['type'] ?? 'px') === 'scale') {
+                    $css = null;
+                    foreach (($scales[(string)($f['scale'] ?? '')] ?? []) as $o) {
+                        if ((string)$o['key'] === (string)$val) {
+                            $css = (string)$o['css'];
+                            break;
+                        }
+                    }
+                    if ($css === null) {
+                        continue;
+                    }
+                    $decls .= $var . ':' . $css . ';';
+                } else {
+                    $num = (int)$val;
+                    if ($num < $min || $num > $max) {
+                        continue;
+                    }
+                    $decls .= $var . ':' . $num . 'px;';
+                }
+            }
+        }
+
+        if (is_array($stored['colors'] ?? null)) {
+            foreach ($stored['colors'] as $var => $key) {
+                $var = (string)$var;
+                if (!isset($colorVars[$var]) || !isset($cssByKey[(string)$key])) {
+                    continue;
+                }
+                $decls .= $var . ':' . $cssByKey[(string)$key] . ';';
+            }
+        }
+
+        return $decls !== '' ? '<style id="mytheme-forms">:root{' . $decls . '}</style>' : '';
     }
 
     /** Re-validate a stored color before emitting (defense-in-depth vs CSS injection). */

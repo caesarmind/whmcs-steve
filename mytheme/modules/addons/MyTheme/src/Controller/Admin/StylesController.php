@@ -62,6 +62,9 @@ final class StylesController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_buttons'])) {
             return $this->saveButtonsAction($template);
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_forms'])) {
+            return $this->saveFormsAction($template);
+        }
 
         $style  = (string)($_GET['style'] ?? 'default');
         $subcat = (string)($_GET['subcat'] ?? 'colors');
@@ -81,9 +84,11 @@ final class StylesController extends AbstractController
             'colors'      => $tab === 'variables' ? $this->buildColorsViewModel($template, $style) : null,
             'typography'  => $tab === 'variables' ? $this->buildTypographyViewModel($template) : null,
             'buttons'     => $tab === 'variables' ? $this->buildButtonsViewModel($template) : null,
+            'forms'       => $tab === 'variables' ? $this->buildFormsViewModel($template) : null,
             'saved'       => isset($_GET['saved']),
             'colorsSaved' => isset($_GET['colors_saved']),
             'buttonsSaved'=> isset($_GET['buttons_saved']),
+            'formsSaved'  => isset($_GET['forms_saved']),
             'customCss'   => (string)Settings::getValue($template->getName() . '_custom_css', ''),
             'cssSaved'    => isset($_GET['css_saved']),
         ]);
@@ -545,5 +550,150 @@ final class StylesController extends AbstractController
         Settings::setValue($template->getName() . '_buttons', $out, 'json');
         $style = (string)($_POST['style'] ?? 'default');
         $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=buttons&buttons_saved=1');
+    }
+
+    /**
+     * View-model for the Forms subcat. Loads core/config/forms.php and merges
+     * GLOBAL stored overrides onto the defaults: size fields show their px value
+     * or current scale key (+ options); colour fields show their current option
+     * key (+ preview swatch). Site-wide, so no per-style key. Mirrors
+     * buildButtonsViewModel.
+     */
+    private function buildFormsViewModel($template): array
+    {
+        $cfg    = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/forms.php');
+        $stored = Settings::getValue($template->getName() . '_forms', []);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+        $sizesStored  = is_array($stored['sizes'] ?? null)  ? $stored['sizes']  : [];
+        $colorsStored = is_array($stored['colors'] ?? null) ? $stored['colors'] : [];
+
+        // Colour options grouped for <optgroup>; key->option lookup for swatches.
+        $optionGroups = [];
+        $optionByKey  = [];
+        foreach (($cfg['colorOptions'] ?? []) as $o) {
+            $optionGroups[(string)($o['group'] ?? 'Other')][] = $o;
+            $optionByKey[(string)$o['key']] = $o;
+        }
+
+        // Size groups — px fields carry int 'value'; scale fields carry the
+        // current 'key' + that scale's 'options'.
+        $scales     = $cfg['scales'] ?? [];
+        $sizeGroups = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $group => $fields) {
+            foreach ($fields as $f) {
+                if (($f['type'] ?? 'px') === 'scale') {
+                    $opts  = $scales[(string)($f['scale'] ?? '')] ?? [];
+                    $cur   = (string)($sizesStored[$f['var']] ?? $f['default']);
+                    $valid = false;
+                    foreach ($opts as $o) {
+                        if ((string)$o['key'] === $cur) { $valid = true; break; }
+                    }
+                    $f['current'] = $valid ? $cur : (string)$f['default'];
+                    $f['options'] = $opts;
+                } else {
+                    $f['value'] = (int)($sizesStored[$f['var']] ?? $f['default']);
+                }
+                $sizeGroups[(string)$group][] = $f;
+            }
+        }
+
+        // Colour groups — resolve each field's current option key + preview swatch.
+        $colorGroups = [];
+        foreach (($cfg['colorGroups'] ?? []) as $group => $fields) {
+            foreach ($fields as $f) {
+                $defKey = (string)$f['default'];
+                $curKey = (string)($colorsStored[$f['var']] ?? $defKey);
+                if (!isset($optionByKey[$curKey])) {
+                    $curKey = $defKey;
+                }
+                $f['current'] = $curKey;
+                $f['swatch']  = (string)($optionByKey[$curKey]['swatch'] ?? '#000000');
+                $colorGroups[(string)$group][] = $f;
+            }
+        }
+
+        return [
+            'optionGroups' => $optionGroups,
+            'sizeGroups'   => $sizeGroups,
+            'colorGroups'  => $colorGroups,
+        ];
+    }
+
+    /**
+     * Validate + persist the Forms form (site-wide). Stores ONLY sizes/colours
+     * that differ from default; size scale keys must exist in their scale and
+     * colour keys must be known options. PRG redirect to the Forms subcat.
+     */
+    private function saveFormsAction($template): string
+    {
+        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/forms.php');
+        $min = (int)($cfg['sizeMin'] ?? 0);
+        $max = (int)($cfg['sizeMax'] ?? 999);
+
+        $validKeys = [];
+        foreach (($cfg['colorOptions'] ?? []) as $o) {
+            $validKeys[(string)$o['key']] = true;
+        }
+
+        $out = [];
+
+        // Sizes — px int or scale key, differing from default.
+        $scales  = $cfg['scales'] ?? [];
+        $sizesIn = is_array($_POST['size'] ?? null) ? $_POST['size'] : [];
+        $sizes   = [];
+        foreach (($cfg['sizeGroups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $var = (string)$f['var'];
+                if (!isset($sizesIn[$var]) || $sizesIn[$var] === '') {
+                    continue;
+                }
+                if (($f['type'] ?? 'px') === 'scale') {
+                    $key = (string)$sizesIn[$var];
+                    $ok  = false;
+                    foreach (($scales[(string)($f['scale'] ?? '')] ?? []) as $o) {
+                        if ((string)$o['key'] === $key) { $ok = true; break; }
+                    }
+                    if (!$ok || $key === (string)$f['default']) {
+                        continue;
+                    }
+                    $sizes[$var] = $key;
+                } else {
+                    $val = (int)$sizesIn[$var];
+                    if ($val < $min || $val > $max || $val === (int)$f['default']) {
+                        continue;
+                    }
+                    $sizes[$var] = $val;
+                }
+            }
+        }
+        if ($sizes !== []) {
+            $out['sizes'] = $sizes;
+        }
+
+        // Colours — option key differing from default + known.
+        $colorsIn = is_array($_POST['c'] ?? null) ? $_POST['c'] : [];
+        $colors   = [];
+        foreach (($cfg['colorGroups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $var = (string)$f['var'];
+                if (!isset($colorsIn[$var])) {
+                    continue;
+                }
+                $key = (string)$colorsIn[$var];
+                if (!isset($validKeys[$key]) || $key === (string)$f['default']) {
+                    continue;
+                }
+                $colors[$var] = $key;
+            }
+        }
+        if ($colors !== []) {
+            $out['colors'] = $colors;
+        }
+
+        Settings::setValue($template->getName() . '_forms', $out, 'json');
+        $style = (string)($_POST['style'] ?? 'default');
+        $this->redirect('?module=MyTheme&action=editStyle&style=' . urlencode($style) . '&subcat=forms&forms_saved=1');
     }
 }
