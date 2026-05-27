@@ -206,12 +206,23 @@
                 {/if}
 
                 <div class="form-group tk-attach-group">
-                    <label class="tk-drop">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-                        <span class="tk-drop-label">{$LANG.addattachments|default:'Add attachments…'}</span>
-                        <input type="file" id="tk-attachments" name="attachments[]" multiple>
-                    </label>
-                    <ul class="tk-attach-list" hidden></ul>
+                    <span class="form-label">{$LANG.supportticketsticketattachments|default:'Attachments'} <span style="opacity:0.5; font-weight:400;">({$LANG.optional|default:'optional'})</span></span>
+                    <div class="tk-attach-rows" id="tk-attach-rows">
+                        <div class="tk-attach-row">
+                            <label class="tk-drop">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                                <span class="tk-drop-label">{$LANG.addattachments|default:'Choose a file…'}</span>
+                                <input type="file" name="attachments[]">
+                            </label>
+                            <button type="button" class="tk-attach-remove" aria-label="{$LANG.orderForm.remove|default:'Remove'}" hidden>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="tk-attach-add" id="tk-attach-add">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        {$LANG.addmore|default:'Add another file'}
+                    </button>
                     <div class="tk-drop-hint">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                         {if isset($allowedfiletypes) && $allowedfiletypes}{$LANG.supportticketsallowedextensions|default:'Allowed extensions'}: {$allowedfiletypes}{if isset($uploadMaxFileSize) && $uploadMaxFileSize} &middot; {lang key="maxFileSize" fileSize=$uploadMaxFileSize}{/if}{else}{$LANG.attachmentsallowed|default:'Allowed: .jpg, .gif, .jpeg, .png, .txt, .pdf · Max 64MB'}{/if}
@@ -220,36 +231,75 @@
                 {literal}
                 <script>
                 (function () {
-                    var input = document.getElementById('tk-attachments');
-                    if (!input) return;
-                    var group = input.closest('.tk-attach-group');
-                    var list = group ? group.querySelector('.tk-attach-list') : null;
-                    var zone = group ? group.querySelector('.tk-drop') : null;
-                    if (!list) return;
-                    input.addEventListener('change', function () {
-                        list.innerHTML = '';
-                        var files = input.files;
-                        if (!files || !files.length) {
-                            list.hidden = true;
-                            if (zone) zone.classList.remove('has-files');
-                            return;
+                    var rows = document.getElementById('tk-attach-rows');
+                    var addBtn = document.getElementById('tk-attach-add');
+                    if (!rows || !addBtn) return;
+                    var firstLabel = rows.querySelector('.tk-drop-label');
+                    var defaultLabel = firstLabel ? firstLabel.textContent : '';
+
+                    function allRows() { return rows.querySelectorAll('.tk-attach-row'); }
+
+                    function refreshRemoveButtons() {
+                        var list = allRows();
+                        for (var i = 0; i < list.length; i++) {
+                            var input = list[i].querySelector('input[type=file]');
+                            var rm = list[i].querySelector('.tk-attach-remove');
+                            if (!rm) continue;
+                            var hasFile = input && input.files && input.files.length;
+                            rm.hidden = !(hasFile || list.length > 1);
                         }
-                        for (var i = 0; i < files.length; i++) {
-                            var li = document.createElement('li');
-                            li.className = 'tk-attach-item';
-                            var nm = document.createElement('span');
-                            nm.className = 'tk-attach-name';
-                            nm.textContent = files[i].name;
-                            var sz = document.createElement('span');
-                            sz.className = 'tk-attach-size';
-                            sz.textContent = Math.max(1, Math.round(files[i].size / 1024)) + ' KB';
-                            li.appendChild(nm);
-                            li.appendChild(sz);
-                            list.appendChild(li);
+                    }
+
+                    function resetRow(row) {
+                        var input = row.querySelector('input[type=file]');
+                        var labelEl = row.querySelector('.tk-drop-label');
+                        var drop = row.querySelector('.tk-drop');
+                        if (input) input.value = '';
+                        if (labelEl) labelEl.textContent = defaultLabel;
+                        if (drop) drop.classList.remove('has-file');
+                    }
+
+                    function wireRow(row) {
+                        var input = row.querySelector('input[type=file]');
+                        var labelEl = row.querySelector('.tk-drop-label');
+                        var drop = row.querySelector('.tk-drop');
+                        var rm = row.querySelector('.tk-attach-remove');
+                        if (input) {
+                            input.addEventListener('change', function () {
+                                if (input.files && input.files.length) {
+                                    var f = input.files[0];
+                                    var kb = Math.max(1, Math.round(f.size / 1024));
+                                    if (labelEl) labelEl.textContent = f.name + ' (' + kb + ' KB)';
+                                    if (drop) drop.classList.add('has-file');
+                                } else {
+                                    resetRow(row);
+                                }
+                                refreshRemoveButtons();
+                            });
                         }
-                        list.hidden = false;
-                        if (zone) zone.classList.add('has-files');
+                        if (rm) {
+                            rm.addEventListener('click', function () {
+                                if (allRows().length > 1) {
+                                    row.parentNode.removeChild(row);
+                                } else {
+                                    resetRow(row);
+                                }
+                                refreshRemoveButtons();
+                            });
+                        }
+                    }
+
+                    addBtn.addEventListener('click', function () {
+                        var clone = rows.querySelector('.tk-attach-row').cloneNode(true);
+                        resetRow(clone);
+                        rows.appendChild(clone);
+                        wireRow(clone);
+                        refreshRemoveButtons();
                     });
+
+                    var init = allRows();
+                    for (var i = 0; i < init.length; i++) wireRow(init[i]);
+                    refreshRemoveButtons();
                 })();
                 </script>
                 {/literal}
