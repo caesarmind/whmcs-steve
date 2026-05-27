@@ -205,17 +205,54 @@
                 {/foreach}
                 {/if}
 
-                <div class="form-group">
+                <div class="form-group tk-attach-group">
                     <label class="tk-drop">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-                        {$LANG.addattachments|default:'Add attachments…'}
-                        <input type="file" name="attachments[]" multiple style="display:none;">
+                        <span class="tk-drop-label">{$LANG.addattachments|default:'Add attachments…'}</span>
+                        <input type="file" id="tk-attachments" name="attachments[]" multiple>
                     </label>
+                    <ul class="tk-attach-list" hidden></ul>
                     <div class="tk-drop-hint">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                        {$LANG.attachmentsallowed|default:'Allowed: .jpg, .gif, .jpeg, .png, .txt, .pdf · Max 64MB'}
+                        {if isset($allowedfiletypes) && $allowedfiletypes}{$LANG.supportticketsallowedextensions|default:'Allowed extensions'}: {$allowedfiletypes}{if isset($uploadMaxFileSize) && $uploadMaxFileSize} &middot; {lang key="maxFileSize" fileSize=$uploadMaxFileSize}{/if}{else}{$LANG.attachmentsallowed|default:'Allowed: .jpg, .gif, .jpeg, .png, .txt, .pdf · Max 64MB'}{/if}
                     </div>
                 </div>
+                {literal}
+                <script>
+                (function () {
+                    var input = document.getElementById('tk-attachments');
+                    if (!input) return;
+                    var group = input.closest('.tk-attach-group');
+                    var list = group ? group.querySelector('.tk-attach-list') : null;
+                    var zone = group ? group.querySelector('.tk-drop') : null;
+                    if (!list) return;
+                    input.addEventListener('change', function () {
+                        list.innerHTML = '';
+                        var files = input.files;
+                        if (!files || !files.length) {
+                            list.hidden = true;
+                            if (zone) zone.classList.remove('has-files');
+                            return;
+                        }
+                        for (var i = 0; i < files.length; i++) {
+                            var li = document.createElement('li');
+                            li.className = 'tk-attach-item';
+                            var nm = document.createElement('span');
+                            nm.className = 'tk-attach-name';
+                            nm.textContent = files[i].name;
+                            var sz = document.createElement('span');
+                            sz.className = 'tk-attach-size';
+                            sz.textContent = Math.max(1, Math.round(files[i].size / 1024)) + ' KB';
+                            li.appendChild(nm);
+                            li.appendChild(sz);
+                            list.appendChild(li);
+                        }
+                        list.hidden = false;
+                        if (zone) zone.classList.add('has-files');
+                    });
+                })();
+                </script>
+                {/literal}
 
                 <div class="tk-form-foot">
                     <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.back|default:'Back'}</a>
