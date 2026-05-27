@@ -29,6 +29,8 @@ final class PagesController extends AbstractController
     private const VALID_VISIBILITY = ['public', 'auth', 'disabled'];
     /** @var list<string> */
     private const VALID_SUBNAV     = ['inherit', 'on', 'off'];
+    /** @var list<string> */
+    private const VALID_SVCLAYOUT  = ['inherit', 'inside', 'outside'];
 
     public function indexAction(): string
     {
@@ -147,6 +149,8 @@ final class PagesController extends AbstractController
             'indexing'         => $options['indexing'],
             'visibility'       => $options['visibility'],
             'subnav'           => $options['subnav'],
+            'svclayout'          => $options['svclayout'],
+            'svcLayoutApplicable' => in_array($page, Template::SVC_LAYOUT_PAGES, true),
             'seo'              => $options['seo'],
             'layoutChoices'    => [
                 'main-menu' => $this->layoutChoices($template, 'main-menu'),
@@ -183,9 +187,11 @@ final class PagesController extends AbstractController
         $indexing   = (string)($_POST['indexing']   ?? 'inherit');
         $visibility = (string)($_POST['visibility'] ?? 'public');
         $subnav     = (string)($_POST['subnav']     ?? 'inherit');
+        $svclayout  = (string)($_POST['svclayout']  ?? 'inherit');
         if (!in_array($indexing,   self::VALID_INDEXING,   true)) { $indexing   = 'inherit'; }
         if (!in_array($visibility, self::VALID_VISIBILITY, true)) { $visibility = 'public'; }
         if (!in_array($subnav,     self::VALID_SUBNAV,     true)) { $subnav     = 'inherit'; }
+        if (!in_array($svclayout,  self::VALID_SVCLAYOUT,  true)) { $svclayout  = 'inherit'; }
 
         // SEO — trim, length-cap, and decode WHMCS 9's POST-time htmlspecialchars
         // wrap so `AT&T` doesn't round-trip as `AT&amp;amp;T` after one save +
@@ -226,6 +232,7 @@ final class PagesController extends AbstractController
             'indexing'         => $indexing,
             'visibility'       => $visibility,
             'subnav'           => $subnav,
+            'svclayout'        => $svclayout,
             'seo'              => $seo,
             'options'          => $options,
             'layout_overrides' => $layoutOverrides,
@@ -258,6 +265,7 @@ final class PagesController extends AbstractController
             'indexing'   => (string)($stored['indexing']   ?? $seoDefaults['indexing'] ?? 'inherit'),
             'visibility' => (string)($stored['visibility'] ?? 'public'),
             'subnav'     => (string)($stored['subnav'] ?? 'inherit'),
+            'svclayout'  => (string)($stored['svclayout'] ?? 'inherit'),
             'seo' => [
                 'title'        => (string)($stored['seo']['title']        ?? $seoDefaults['title']        ?? ''),
                 'description'  => (string)($stored['seo']['description']  ?? $seoDefaults['description']  ?? ''),

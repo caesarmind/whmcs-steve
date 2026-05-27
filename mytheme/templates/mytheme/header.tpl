@@ -117,11 +117,15 @@
     {/if}
 {/if}
 
-{* services layout (inside/outside) *}
+{* services layout (inside/outside) — server-resolved from the admin "Service
+   List Controls" toggle / per-page override (Hooks::resolveSvcLayout). Only
+   'outside' emits an attribute; 'inside' is the CSS default (no attr), so the
+   live DOM is unchanged for the default case. ?svclayout= overrides in preview only. *}
 {assign var=mt_svcLayout value=''}
-{if isset($smarty.get.svclayout)}
+{if ($myTheme.svcLayout|default:'inside') == 'outside'}{assign var=mt_svcLayout value='outside'}{/if}
+{if $mt_preview && isset($smarty.get.svclayout)}
     {assign var=_q value=$smarty.get.svclayout}
-    {if $_q == 'inside' || $_q == 'outside'}{assign var=mt_svcLayout value=$_q}{/if}
+    {if $_q == 'outside'}{assign var=mt_svcLayout value='outside'}{elseif $_q == 'inside'}{assign var=mt_svcLayout value=''}{/if}
 {/if}
 
 {* data state *}

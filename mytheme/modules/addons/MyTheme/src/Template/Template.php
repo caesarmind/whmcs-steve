@@ -145,6 +145,25 @@ final class Template
         'fraudcheck'             => 'Fraud Check',
     ];
 
+    /**
+     * List-style client-area pages whose search/pagination controls can render
+     * inside the table card or float outside it (body[data-svc-layout]). These
+     * are the only pages the "Service List Controls" admin toggle + per-page
+     * override govern — the ones that ship the body[data-svc-layout="outside"]
+     * CSS in assets/css/pages/. Page slug (templatefile) list.
+     */
+    public const SVC_LAYOUT_PAGES = [
+        'clientareaproducts',
+        'clientareainvoices',
+        'clientareaquotes',
+        'viewinvoice',
+        'viewquote',
+        'clientareaaddfunds',
+        'supporttickets',
+        'clientareahome',
+        'affiliates',
+    ];
+
     public function getPages(): array
     {
         $declared   = $this->manifest['provides']['pages'] ?? [];

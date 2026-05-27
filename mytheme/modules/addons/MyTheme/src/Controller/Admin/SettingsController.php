@@ -39,6 +39,7 @@ final class SettingsController extends AbstractController
         'topnav_show_icons'      => ['Top-Nav Icons',            'Show icons next to menu items in the top navigation. Off by default.',  false, 'bool'],
         'cart_subnav'            => ['Order Category Sidebar',   'Show the Categories / Actions sidebar on order (cart) pages.',          true,  'bool'],
         'website_subnav'         => ['Website Section Sidebar',  'Show the per-page section sub-nav (Account, Domain Tools, etc.) on client-area pages.', true, 'bool'],
+        'service_controls_outside' => ['Service List Controls', 'Float search & pagination outside the white card on list pages (services, invoices, domains, etc.). Off keeps them inside the card.', false, 'bool'],
     ];
 
     /** Which Settings tab each flag renders on. Unlisted flags default to 'general'. */
@@ -84,6 +85,21 @@ final class SettingsController extends AbstractController
         if (!is_array($subnavOrderList))   { $subnavOrderList = []; }
         if (!is_array($subnavWebsiteList)) { $subnavWebsiteList = []; }
 
+        // Service-list-controls exception picker — only the list-style pages
+        // that actually ship body[data-svc-layout] CSS (Template::SVC_LAYOUT_PAGES),
+        // filtered to those registered on the active template.
+        $svcPages = [];
+        if ($template !== null) {
+            $registered = $template->getPages();
+            foreach (Template::SVC_LAYOUT_PAGES as $slug) {
+                if (!in_array($slug, $registered, true)) { continue; }
+                $meta = $template->getPageMeta($slug);
+                $svcPages[$slug] = (string)($meta['display_name'] ?? ucwords(str_replace(['-', '_'], ' ', $slug)));
+            }
+        }
+        $svcLayoutList = Settings::getValue('svc_layout_pages', []);
+        if (!is_array($svcLayoutList)) { $svcLayoutList = []; }
+
         return $this->view('settings/index', [
             'flags'              => self::FLAGS,
             'flagTabs'           => self::FLAG_TABS,
@@ -98,6 +114,8 @@ final class SettingsController extends AbstractController
             'websitePages'       => $websitePages,
             'subnavOrderList'    => $subnavOrderList,
             'subnavWebsiteList'  => $subnavWebsiteList,
+            'svcPages'           => $svcPages,
+            'svcLayoutList'      => $svcLayoutList,
         ]);
     }
 
@@ -144,6 +162,12 @@ final class SettingsController extends AbstractController
         }
         $this->saveSubnavList('subnav_pages_order', $orderKeys);
         $this->saveSubnavList('subnav_pages_website', $websiteKeys);
+
+        // Service-list-controls exception list — valid set is the fixed
+        // SVC_LAYOUT_PAGES const (a listed page flips the global inside<->outside).
+        $svcKeys = [];
+        foreach (Template::SVC_LAYOUT_PAGES as $slug) { $svcKeys[$slug] = true; }
+        $this->saveSubnavList('svc_layout_pages', $svcKeys);
     }
 
     /** Persist a sub-nav exception list, filtered to the given valid page set. */

@@ -182,7 +182,7 @@
         {foreach $flags as $key => $meta}
             {assign var=mtIsLangToggle value=($key == 'custom_language_list')}
             {assign var=mtFlagTab value=$flagTabs[$key]|default:'general'}
-            {assign var=mtHasSub value=($mtIsLangToggle || $key == 'cart_subnav' || $key == 'website_subnav' || $key == 'enable_dark_mode')}
+            {assign var=mtHasSub value=($mtIsLangToggle || $key == 'cart_subnav' || $key == 'website_subnav' || $key == 'service_controls_outside' || $key == 'enable_dark_mode')}
             <div class="mt-row{if $mtHasSub} mt-row-with-sub{/if}{if $mtFlagTab != $tab} mt-tab-off{/if}">
                 <div>
                     <div class="mt-row-label">{$meta[0]|escape}</div>
@@ -348,6 +348,41 @@
                                     <button type="button" class="mt-multi-option" data-code="{$wTf|escape}" data-label="{$wLabel|escape}" role="option" aria-selected="false">
                                         <span class="mt-multi-check" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg></span>
                                         <span>{$wLabel|escape}</span>
+                                    </button>
+                                {/foreach}
+                            </div>
+                            <div class="mt-multi-empty" hidden>No pages match.</div>
+                        </div>
+                    </div>
+                </div>
+            {/if}
+
+            {* Service-list-controls exception picker — renders under the
+               "Service List Controls" toggle (General tab). *}
+            {if $key == 'service_controls_outside'}
+                <div class="mt-row-sub{if $mtFlagTab != $tab} mt-tab-off{/if}">
+                    <header class="mt-row-sub-head">
+                        <h3 class="mt-row-sub-title">Per-page exceptions</h3>
+                    </header>
+                    <p class="mt-row-sub-help">Pages added here are <strong>exceptions</strong> — the controls layout is flipped on them (inside when the toggle above is On, outside when Off). A page's own setting in the Pages editor still wins.</p>
+                    <div class="mt-multi-wrap" data-chip-picker>
+                        <div class="mt-multi-inputs" hidden>
+                            {foreach $svcPages as $sTf => $sLabel}
+                                <input type="checkbox" name="svc_layout_pages[]" value="{$sTf|escape}"{if in_array($sTf, $svcLayoutList)} checked{/if}>
+                            {/foreach}
+                        </div>
+                        <div class="mt-multi" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                            <div class="mt-multi-chips"></div>
+                            <span class="mt-multi-placeholder">Click to add pages…</span>
+                            <span class="mt-multi-caret" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                        </div>
+                        <div class="mt-multi-panel" hidden role="listbox" aria-multiselectable="true">
+                            <div class="mt-multi-search-wrap"><input type="search" placeholder="Search pages…" autocomplete="off" aria-label="Search pages"></div>
+                            <div class="mt-multi-options">
+                                {foreach $svcPages as $sTf => $sLabel}
+                                    <button type="button" class="mt-multi-option" data-code="{$sTf|escape}" data-label="{$sLabel|escape}" role="option" aria-selected="false">
+                                        <span class="mt-multi-check" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg></span>
+                                        <span>{$sLabel|escape}</span>
                                     </button>
                                 {/foreach}
                             </div>

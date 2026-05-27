@@ -158,6 +158,23 @@
         </div>
     </section>
 
+    {if $svcLayoutApplicable}
+    <section class="mt-section">
+        <header class="mt-section-header"><h2 class="mt-section-title">Service list controls</h2></header>
+        <div class="mt-inline-row">
+            <div>
+                <div class="mt-row-label">Controls placement</div>
+                <div class="mt-row-help">Where this page's search &amp; pagination controls sit. <strong>Inside</strong> keeps them in the white card; <strong>Outside</strong> floats them on the page. <strong>Inherit</strong> follows the global toggle (Settings &rarr; Service List Controls).</div>
+            </div>
+            <select class="mt-select" name="svclayout">
+                <option value="inherit" {if $svclayout == 'inherit'}selected{/if}>Inherit (global default)</option>
+                <option value="inside"  {if $svclayout == 'inside'}selected{/if}>Inside the card</option>
+                <option value="outside" {if $svclayout == 'outside'}selected{/if}>Outside the card</option>
+            </select>
+        </div>
+    </section>
+    {/if}
+
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Visibility</h2></header>
         <div class="mt-inline-row">

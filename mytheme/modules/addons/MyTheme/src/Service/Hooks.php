@@ -90,6 +90,7 @@ final class Hooks
                 'layouts'       => $layouts,
                 'pages'         => $pages,
                 'subnav'        => $this->resolveSubnav($template, $vars, $pages),
+                'svcLayout'     => $this->resolveSvcLayout($template, $vars, $pages),
                 'license'       => [
                     'canRender' => true,
                     'devMode'   => $template->license()->isDevMode(),
@@ -1285,6 +1286,36 @@ final class Hooks
         ];
     }
 
+    /**
+     * Effective service-list controls placement ('inside'|'outside') for the
+     * current page. Precedence mirrors resolveSubnav: per-page editor field
+     * (inside/outside) > Settings exception-list (a listed page flips the
+     * global) > global toggle. Exposed as $myTheme.svcLayout.
+     *
+     * The global is read directly (default '0' = inside) rather than via
+     * settingFlag(), which defaults UNSET to true — that would flip the live
+     * default to 'outside' before the admin ever saves the Settings screen.
+     *
+     * @param array<string,mixed> $pages resolveCurrentPage() output
+     */
+    private function resolveSvcLayout(Template $template, array $vars, array $pages): string
+    {
+        $tf     = (string)($vars['templatefile'] ?? '');
+        $editor = (string)($pages[$tf]['svclayout'] ?? 'inherit');
+        if ($editor === 'inside')  { return 'inside'; }
+        if ($editor === 'outside') { return 'outside'; }
+
+        $list = Settings::getValue('svc_layout_pages', []);
+        if (!is_array($list)) { $list = []; }
+
+        $raw           = Settings::getValue('service_controls_outside', '0');
+        $globalOutside = $raw === '1' || $raw === 1 || $raw === true;
+        $inList        = in_array($tf, $list, true);
+        $effOutside    = $inList ? !$globalOutside : $globalOutside; // exception list flips the global
+
+        return $effOutside ? 'outside' : 'inside';
+    }
+
     /** A boolean addon flag — defaults to true (shown) when unset. */
     private function settingFlag(string $key): bool
     {
@@ -1442,6 +1473,8 @@ final class Hooks
             'options' => is_array($stored['options'] ?? null) ? $stored['options'] : [],
             'subnav'  => in_array((string)($stored['subnav'] ?? 'inherit'), ['inherit', 'on', 'off'], true)
                 ? (string)($stored['subnav'] ?? 'inherit') : 'inherit',
+            'svclayout' => in_array((string)($stored['svclayout'] ?? 'inherit'), ['inherit', 'inside', 'outside'], true)
+                ? (string)($stored['svclayout'] ?? 'inherit') : 'inherit',
             'layout_overrides' => [
                 'main-menu' => isset($stored['layout_overrides']['main-menu']) && is_string($stored['layout_overrides']['main-menu'])
                     ? $stored['layout_overrides']['main-menu'] : null,
