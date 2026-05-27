@@ -87,7 +87,7 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
     color: var(--color-text-primary);
     font-family: inherit;
 }
-.dt-search-input:focus { outline: none; }
+.dt-search-input:focus { outline: none; box-shadow: none; }
 .dt-search-input::placeholder { color: var(--color-text-quaternary); }
 .dt-transfer-btn {
     height: 44px; padding: 0 22px;
