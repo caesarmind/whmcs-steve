@@ -1,14 +1,18 @@
 {* Hostnodes — View Support Ticket (Apple-style).
 
    WHMCS standard variables on viewticket.php:
-     $tid, $c, $subject, $status, $priority, $department, $service,
+     $tid, $c, $id, $subject, $status, $priority, $department, $service,
      $lastreply, $date
      $invalidTicketId  — bool; true when the ticket isn't accessible
      $closedticket     — bool; true if the ticket is closed
-     $replies          — array of replies (name, requestor_type, date,
-                         message, attachments, attachments_removed,
-                         useremail, userid)
-     $attachments      — ticket-level attachments
+     $descreplies      — the WHOLE conversation (opening post + every reply),
+                         newest first. Each item: id, name, admin (bool),
+                         date, message, attachments (filename strings),
+                         attachments_removed (bool), email, requestor.
+                         The opening post is the last element (id empty).
+                         There is NO separate $message / top-level $attachments.
+     $id               — numeric ticket id, used for opening-post downloads
+                         (dl.php?type=a&id={$id}); replies use type=ar&id={$reply.id}
      $clientsdetails   — author bar (firstname, lastname, email)
 *}
 
@@ -72,61 +76,44 @@
             <h2 class="tk-section-title">{$LANG.conversation|default:'Conversation'}</h2>
             <div class="card tk-thread-card">
                 <div class="thread">
-                    {* Initial ticket post — author = the requester (clientsdetails or $name). *}
-                    {if isset($message) && $message}
-                    {assign var=openerName value=$name|default:''}
-                    {if !$openerName && isset($clientsdetails.firstname)}
-                        {assign var=openerName value="`$clientsdetails.firstname` `$clientsdetails.lastname`"}
-                    {/if}
-                    <div class="thread-message client">
-                        <div class="thread-sender">{$openerName|default:'Client'|escape}</div>
-                        <div class="thread-bubble">
-                            {$message}
-                            {if isset($attachments) && $attachments|@count > 0}
-                            <div class="thread-attachments">
-                                {foreach $attachments as $att}
-                                <a href="{$WEB_ROOT}/dl.php?type=at&id={$ticketid|default:$tid|escape}&i={$att@index}" class="thread-att">
-                                    <div class="thread-att-ico">{$att|default:''|substr:-3|upper|escape}</div>
-                                    <div class="thread-att-meta">
-                                        <div class="thread-att-name">{$att|escape}</div>
-                                    </div>
-                                    <div class="thread-att-dl" aria-label="{$LANG.download|default:'Download'}">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                    </div>
-                                </a>
-                                {/foreach}
-                            </div>
-                            {/if}
-                        </div>
-                        <div class="thread-time">{$date|default:''|escape}</div>
-                    </div>
-                    {/if}
-
-                    {* Follow-up replies. Use |@count for Collection-safe length
-                       (the plain count modifier silently returns 0 on Laravel Collections). *}
-                    {if isset($replies) && $replies|@count > 0}
-                        {foreach $replies as $reply}
-                        {if isset($reply.requestor_type) && $reply.requestor_type == 'admin'}
+                    {* The whole conversation — the opening post AND every reply —
+                       comes from $descreplies (newest first). All stock WHMCS themes
+                       (nexus, lagom, hostnodes-apple) iterate this single collection;
+                       there is no separate $message or top-level $attachments, which
+                       is why opening-post attachments were previously invisible.
+                       .thread is column-reverse (viewticket.css) so the opening post
+                       stays at the top. Use |@count for Collection-safe length. *}
+                    {if isset($descreplies) && $descreplies|@count > 0}
+                        {foreach from=$descreplies key=rnum item=reply}
+                        {if isset($reply.admin) && $reply.admin}
                             {assign var=msgClass value='staff'}
                         {else}
                             {assign var=msgClass value='client'}
                         {/if}
                         <div class="thread-message {$msgClass}">
-                            <div class="thread-sender">{$reply.name|default:''|escape}</div>
+                            <div class="thread-sender">{$reply.name|default:'Client'|escape}</div>
                             <div class="thread-bubble">
                                 {$reply.message}
                                 {if isset($reply.attachments) && $reply.attachments|@count > 0}
                                 <div class="thread-attachments">
-                                    {foreach $reply.attachments as $att}
-                                    <a href="{$WEB_ROOT}/dl.php?type=ar&id={$reply.id|default:0}&i={$att@index}" class="thread-att">
-                                        <div class="thread-att-ico">{$att|default:''|substr:-3|upper|escape}</div>
-                                        <div class="thread-att-meta">
-                                            <div class="thread-att-name">{$att|escape}</div>
-                                        </div>
+                                    {if isset($reply.attachments_removed) && $reply.attachments_removed}
+                                    <p class="thread-att-removed">{$LANG.attachmentsremoved|default:'Attachments were removed.'}</p>
+                                    {/if}
+                                    {foreach from=$reply.attachments key=anum item=attachment}
+                                    {if isset($reply.attachments_removed) && $reply.attachments_removed}
+                                    <span class="thread-att is-removed">
+                                        <div class="thread-att-ico">{$attachment|default:''|substr:-3|upper|escape}</div>
+                                        <div class="thread-att-meta"><div class="thread-att-name">{$attachment|escape}</div></div>
+                                    </span>
+                                    {else}
+                                    <a href="{$WEB_ROOT}/dl.php?type={if $reply.id}ar&id={$reply.id|escape}{else}a&id={$id|escape}{/if}&i={$anum}" class="thread-att">
+                                        <div class="thread-att-ico">{$attachment|default:''|substr:-3|upper|escape}</div>
+                                        <div class="thread-att-meta"><div class="thread-att-name">{$attachment|escape}</div></div>
                                         <div class="thread-att-dl" aria-label="{$LANG.download|default:'Download'}">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                                         </div>
                                     </a>
+                                    {/if}
                                     {/foreach}
                                 </div>
                                 {/if}
@@ -134,12 +121,7 @@
                             <div class="thread-time">{$reply.date|default:''|escape}</div>
                         </div>
                         {/foreach}
-                    {/if}
-
-                    {* Fallback empty-thread state — initial message gating in the
-                       page header should already prevent this, but cover the edge
-                       where the gate passes but neither $message nor $replies is set. *}
-                    {if (!isset($message) || !$message) && (!isset($replies) || $replies|@count == 0)}
+                    {else}
                     <div class="thread-empty">{$LANG.noticketreplies|default:'No conversation yet — be the first to reply.'}</div>
                     {/if}
                 </div>

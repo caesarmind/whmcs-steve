@@ -372,6 +372,16 @@ html[data-palette="slate"]   .tk-info-avatar { background: linear-gradient(135de
 }
 .thread-att:hover .thread-att-dl { background: var(--color-accent-light); color: var(--color-accent); }
 .thread-att-dl svg { width: 13px; height: 13px; }
+/* Conversation is iterated from $descreplies (newest first); reverse the visual
+   order so the opening post stays at the top while newest sits by the reply box. */
+.tk-thread-card .thread { flex-direction: column-reverse; }
+.thread-att-removed {
+    flex-basis: 100%;
+    margin: 0 0 2px;
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+}
+.thread-att.is-removed { opacity: 0.6; cursor: default; pointer-events: none; }
 
 /* Priority pill */
 .tk-prio-pill {
