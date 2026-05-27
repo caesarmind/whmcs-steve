@@ -140,7 +140,7 @@
                     {assign var=ft value=$download.type|default:''|lower}
                     <a href="{$download.link|default:'#'|escape}" class="dl-file-row">
                         {if $ft}
-                        <div class="dl-file-ico {$ft}">{$ft|upper|truncate:3:""}</div>
+                        <div class="dl-file-ico {$ft|escape}">{$ft|upper|truncate:3:""|escape}</div>
                         {else}
                         <div class="dl-file-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
                         {/if}
