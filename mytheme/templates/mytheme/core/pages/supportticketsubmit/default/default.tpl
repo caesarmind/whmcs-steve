@@ -3,14 +3,15 @@
    WHMCS standard variables on /submitticket.php:
      $departments        — array of departments (id, name, description)
      $step               — current step (1=dept picker, 2=form fields)
-     $deptid             — chosen department id (when step >= 2)
-     $deptname           — name of chosen department
+     $deptid             — chosen department id (when step >= 2); WHMCS has no
+                           $deptname, resolve the name from $departments yourself
+     $relatedservices    — client's services for the related-service dropdown
      $subject, $message  — submitted form values (preserved across errors)
      $errormessage       — array/string of validation errors (HTML)
-     $customfields       — array of custom fields for the dept
+     $customfields       — array of custom fields for the dept ($customfield.input)
      $clientsdetails     — for the name/email pre-fill on guest submits
      $loggedin           — bool
-     $kbarticles         — KB suggestions based on subject (step 2 ajax)
+     $captcha            — captcha widget if enabled (renders only when set)
 *}
 
 {assign var=hasDept value=(isset($deptid) && $deptid) || (isset($step) && $step >= 2)}
@@ -303,6 +304,12 @@
                 })();
                 </script>
                 {/literal}
+
+                {* Spam/CAPTCHA challenge — WHMCS provides $captcha only when enabled
+                   (and typically only for guest submissions); renders nothing otherwise. *}
+                {if isset($captcha) && $captcha}
+                <div class="form-group tk-captcha">{$captcha}</div>
+                {/if}
 
                 <div class="tk-form-foot">
                     <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.back|default:'Back'}</a>
