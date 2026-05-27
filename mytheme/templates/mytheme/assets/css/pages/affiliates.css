@@ -109,6 +109,7 @@ body[data-svc-layout="outside"] .aff-card > .aff-payout {
     padding: 0 20px;
     flex-shrink: 0;
     gap: 8px;
+    white-space: nowrap;
 }
 .aff-copy-btn svg { width: 15px; height: 15px; }
 .aff-copy-btn.copied { background: var(--color-green-text); border-color: var(--color-green-text); }
@@ -364,8 +365,8 @@ body[data-svc-layout="outside"] .aff-card > .aff-payout {
 }
 
 @media (max-width: 560px) {
-    .aff-link-row { flex-direction: column; }
-    .aff-copy-btn { width: 100%; justify-content: center; }
+    /* Referral row stays horizontal — a full-width stadium-pill Copy button
+       looks oversized, and column flex collapses the input height. */
     .aff-signup-card { padding: 40px 22px; }
     .aff-signup-title { font-size: var(--text-3xl); }
 }

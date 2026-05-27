@@ -23,7 +23,7 @@
         .aff-card-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 16px; max-width: 640px; }
         .aff-link-row { display: flex; gap: 10px; align-items: stretch; }
         .aff-link-row .form-input { flex: 1; min-width: 0; height: 44px; }
-        .aff-copy-btn { height: 44px; flex-shrink: 0; gap: 8px; }
+        .aff-copy-btn { height: 44px; flex-shrink: 0; gap: 8px; white-space: nowrap; }
         .aff-copy-btn svg { width: 15px; height: 15px; }
         .aff-copy-btn.copied { background: var(--color-green-text); border-color: var(--color-green-text); }
 
@@ -61,10 +61,8 @@
             .aff-withdraw-btn { width: 100%; justify-content: center; }
             .aff-min-hint { max-width: none; }
         }
-        @media (max-width: 560px) {
-            .aff-link-row { flex-direction: column; }
-            .aff-copy-btn { width: 100%; justify-content: center; }
-        }
+        /* Referral row stays horizontal even on mobile — a full-width stadium-pill
+           Copy button looks oversized, and column flex collapses the input height. */
         @media (max-width: 520px) {
             .aff-figures { grid-template-columns: 1fr; }
             .aff-figure { padding: 14px 0 0; border-left: 0; border-top: 0.5px solid var(--color-border-light); }
