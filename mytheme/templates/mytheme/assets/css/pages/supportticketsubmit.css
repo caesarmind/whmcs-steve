@@ -240,6 +240,52 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     line-height: 1.45;
 }
 
+/* Custom fields output WHMCS's own input markup ($customfield.input); style it to match the Apple form fields */
+.tk-submit-form .tk-customfield .form-control:not([type="checkbox"]):not([type="radio"]),
+.tk-submit-form .tk-customfield input[type="text"],
+.tk-submit-form .tk-customfield input[type="password"],
+.tk-submit-form .tk-customfield input[type="email"],
+.tk-submit-form .tk-customfield input[type="number"],
+.tk-submit-form .tk-customfield input[type="date"],
+.tk-submit-form .tk-customfield select,
+.tk-submit-form .tk-customfield textarea {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--color-border);
+    background: var(--color-surface);
+    font-size: var(--text-base);
+    font-family: inherit;
+    color: var(--color-text-primary);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.tk-submit-form .tk-customfield textarea {
+    height: auto;
+    min-height: 96px;
+    padding: 12px;
+    line-height: 1.55;
+    resize: vertical;
+}
+.tk-submit-form .tk-customfield .form-control:focus,
+.tk-submit-form .tk-customfield input:focus,
+.tk-submit-form .tk-customfield select:focus,
+.tk-submit-form .tk-customfield textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+.tk-submit-form .tk-cf-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    font-size: var(--text-base);
+    color: var(--color-text-primary);
+    line-height: 1.5;
+}
+.tk-submit-form .tk-cf-check input[type="checkbox"] { margin-top: 3px; flex-shrink: 0; }
+
 /* Attachment dropper */
 .tk-drop {
     display: flex;

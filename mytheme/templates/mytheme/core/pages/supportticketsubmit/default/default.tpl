@@ -20,6 +20,15 @@
     {assign var=dashIsEmpty value='empty'}
 {/if}
 
+{* WHMCS exposes $deptid + the $departments array on step 2, but no ready-made $deptname.
+   Resolve the chosen department's name by matching $deptid against $departments. *}
+{assign var=chosenDeptName value=''}
+{if isset($deptid) && $deptid && isset($departments)}
+    {foreach $departments as $d}
+        {if $d.id == $deptid}{assign var=chosenDeptName value=$d.name}{/if}
+    {/foreach}
+{/if}
+
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/supportticketsubmit.css?v={$myTheme.version|default:'1.0'}">
 
 <script>
@@ -125,8 +134,8 @@
             <div class="tk-intro">
                 <p class="tk-step">{$LANG.step2of2|default:'Step 2 of 2'}</p>
                 <h2>{$LANG.ticketdetails|default:'Ticket details'}</h2>
-                {if isset($deptname) && $deptname}
-                <p>{$LANG.replyingto|default:'Replying via'} <strong>{$deptname}</strong></p>
+                {if $chosenDeptName}
+                <p>{$LANG.replyingto|default:'Replying via'} <strong>{$chosenDeptName}</strong></p>
                 {/if}
             </div>
             <form method="post" action="{$WEB_ROOT}/submitticket.php?step=3" enctype="multipart/form-data" class="tk-submit-form">
@@ -156,18 +165,18 @@
                     <div class="form-group">
                         <label class="form-label" for="tk-priority">{$LANG.supportticketspriority|default:'Priority'}</label>
                         <select class="form-select" id="tk-priority" name="urgency">
-                            <option value="Low"{if isset($urgency) && $urgency == 'Low'} selected{/if}>{$LANG.supportticketspriorityLow|default:'Low'}</option>
-                            <option value="Medium"{if !isset($urgency) || $urgency == 'Medium'} selected{/if}>{$LANG.supportticketspriorityMedium|default:'Medium'}</option>
-                            <option value="High"{if isset($urgency) && $urgency == 'High'} selected{/if}>{$LANG.supportticketspriorityHigh|default:'High'}</option>
+                            <option value="Low"{if isset($urgency) && $urgency == 'Low'} selected{/if}>{$LANG.supportticketsticketurgencylow|default:'Low'}</option>
+                            <option value="Medium"{if !isset($urgency) || $urgency == 'Medium'} selected{/if}>{$LANG.supportticketsticketurgencymedium|default:'Medium'}</option>
+                            <option value="High"{if isset($urgency) && $urgency == 'High'} selected{/if}>{$LANG.supportticketsticketurgencyhigh|default:'High'}</option>
                         </select>
                     </div>
-                    {if isset($servicelist) && $servicelist|@count > 0}
+                    {if isset($relatedservices) && $relatedservices|@count > 0}
                     <div class="form-group">
-                        <label class="form-label" for="tk-service">{$LANG.supportticketsrelatedservice|default:'Related service'} <span style="opacity:0.5; font-weight:400;">({$LANG.optional|default:'optional'})</span></label>
+                        <label class="form-label" for="tk-service">{$LANG.relatedservice|default:'Related service'} <span style="opacity:0.5; font-weight:400;">({$LANG.optional|default:'optional'})</span></label>
                         <select class="form-select" id="tk-service" name="relatedservice">
                             <option value="">{$LANG.none|default:'None'}</option>
-                            {foreach $servicelist as $svc}
-                            <option value="{$svc.id|escape}"{if isset($relatedservice) && $relatedservice == $svc.id} selected{/if}>{$svc.name|default:$svc.product|escape}{if isset($svc.domain) && $svc.domain} — {$svc.domain|escape}{/if}</option>
+                            {foreach from=$relatedservices item=relatedservice}
+                            <option value="{$relatedservice.id}"{if isset($selectedservice) && $selectedservice == $relatedservice.id} selected{/if}>{if $relatedservice.groupName}{$relatedservice.groupName} - {/if}{$relatedservice.name}{if isset($relatedservice.status) && $relatedservice.status} ({$relatedservice.status}){/if}</option>
                             {/foreach}
                         </select>
                     </div>
@@ -180,15 +189,18 @@
                 </div>
 
                 {if isset($customfields) && $customfields|@count > 0}
-                {foreach $customfields as $cf}
-                <div class="form-group">
-                    <label class="form-label" for="tk-cf-{$cf.id|escape}">{$cf.name|escape|strip_tags}{if !empty($cf.required)} <span class="tk-req">*</span>{/if}</label>
-                    {if $cf.type == 'textarea'}
-                    <textarea class="form-input" id="tk-cf-{$cf.id|escape}" name="customfield[{$cf.id|escape}]" rows="4"{if !empty($cf.required)} required{/if}>{$cf.value|default:''|escape}</textarea>
+                {foreach from=$customfields item=customfield}
+                <div class="form-group tk-customfield">
+                    {if $customfield.type == 'tickbox'}
+                    <label class="tk-cf-check" for="customfield{$customfield.id}">
+                        {$customfield.input}
+                        <span>{$customfield.name|strip_tags}{if $customfield.required} <span class="tk-req">*</span>{/if}</span>
+                    </label>
                     {else}
-                    <input type="text" class="form-input" id="tk-cf-{$cf.id|escape}" name="customfield[{$cf.id|escape}]" value="{$cf.value|default:''|escape}"{if !empty($cf.required)} required{/if}>
+                    <label class="form-label" for="customfield{$customfield.id}">{$customfield.name|strip_tags}{if $customfield.required} <span class="tk-req">*</span>{/if}</label>
+                    {$customfield.input}
                     {/if}
-                    {if isset($cf.description) && $cf.description}<p class="form-help">{$cf.description|strip_tags|escape}</p>{/if}
+                    {if isset($customfield.description) && $customfield.description}<p class="form-help">{$customfield.description|strip_tags}</p>{/if}
                 </div>
                 {/foreach}
                 {/if}
