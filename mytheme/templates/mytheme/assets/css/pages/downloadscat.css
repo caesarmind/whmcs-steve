@@ -17,7 +17,11 @@
 
 /* 2-column split */
 .dl-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
-@media (max-width: 880px) { .dl-split { grid-template-columns: 1fr; } }
+/* On mobile the columns stack — show the files first, push the Support sub-nav below. */
+@media (max-width: 880px) {
+    .dl-split { grid-template-columns: 1fr; }
+    .dl-split > aside { order: 2; }
+}
 
 /* Shared sub-nav (page-local copy) */
 .subnav-card { padding: 8px; }
