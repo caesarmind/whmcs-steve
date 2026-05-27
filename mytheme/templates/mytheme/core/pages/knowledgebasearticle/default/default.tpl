@@ -74,17 +74,22 @@
         </article>
 
         <div class="card helpful-card">
-            <h3 class="helpful-title">{$LANG.helpfultitle|default:'Was this article helpful?'}</h3>
+            <h3 class="helpful-title">{$LANG.knowledgebasehelpful|default:'Was this article helpful?'}</h3>
+            {if isset($kbarticle.voted) && $kbarticle.voted}
+            <p class="helpful-thanks">{$LANG.knowledgebaseArticleRatingThanks|default:'Thanks for your feedback!'}</p>
+            {else}
             <form method="post" action="{$WEB_ROOT}/knowledgebase.php?action=displayarticle&id={$kbarticle.id|default:0}" class="helpful-actions">
-                <button type="submit" name="rate" value="useful" class="helpful-btn yes">
+                <input type="hidden" name="useful" value="vote">
+                <button type="submit" name="vote" value="yes" class="helpful-btn yes">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7L21.66 11A2 2 0 0019.72 9zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
-                    {$LANG.yes|default:'Yes'}
+                    {$LANG.knowledgebaseyes|default:'Yes'}
                 </button>
-                <button type="submit" name="rate" value="notuseful" class="helpful-btn no">
+                <button type="submit" name="vote" value="no" class="helpful-btn no">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3zm7-13h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17"/></svg>
-                    {$LANG.no|default:'No'}
+                    {$LANG.knowledgebaseno|default:'No'}
                 </button>
             </form>
+            {/if}
             {if isset($useful) && ($useful > 0 || (isset($notuseful) && $notuseful > 0))}
             <p class="helpful-stats">
                 <strong>{$useful|default:0|escape}</strong> {$LANG.helpfulvotes|default:'people found this helpful'}{if isset($notuseful) && $notuseful > 0}, <strong>{$notuseful|escape}</strong> {$LANG.didnt|default:"didn't"}{/if}

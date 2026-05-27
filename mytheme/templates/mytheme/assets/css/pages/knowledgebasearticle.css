@@ -236,6 +236,15 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     margin: 0;
 }
 .helpful-stats strong { color: var(--color-text-primary); font-weight: var(--fw-semibold); }
+.helpful-thanks {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--text-md);
+    font-weight: var(--fw-medium);
+    color: var(--color-green-text);
+    margin: 0;
+}
 
 /* Related articles */
 .related-head {
