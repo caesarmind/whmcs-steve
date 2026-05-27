@@ -78,7 +78,7 @@
             {if isset($kbarticle.voted) && $kbarticle.voted}
             <p class="helpful-thanks">{$LANG.knowledgebaseArticleRatingThanks|default:'Thanks for your feedback!'}</p>
             {else}
-            <form method="post" action="{$WEB_ROOT}/knowledgebase.php?action=displayarticle&id={$kbarticle.id|default:0}" class="helpful-actions">
+            <form method="post" action="{routePath('knowledgebase-article-view', $kbarticle.id, $kbarticle.urlfriendlytitle)}" class="helpful-actions">
                 <input type="hidden" name="useful" value="vote">
                 <button type="submit" name="vote" value="yes" class="helpful-btn yes">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7L21.66 11A2 2 0 0019.72 9zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
