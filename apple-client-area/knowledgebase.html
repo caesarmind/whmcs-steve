@@ -14,7 +14,10 @@
 
         /* Two-column split: sidebar + main */
         .kb-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
-        @media (max-width: 880px) { .kb-split { grid-template-columns: 1fr; } }
+        @media (max-width: 880px) {
+            .kb-split { grid-template-columns: 1fr; }
+            .kb-split > .kb-aside { order: 2; }
+        }
         .kb-aside { display: flex; flex-direction: column; gap: 16px; }
 
         /* Shared sub-nav (same pattern as Account / Announcements pages) */

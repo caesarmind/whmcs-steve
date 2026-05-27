@@ -195,6 +195,11 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     body[data-subnav-side="right"] .kb-split,
     body[data-subnav-side="outside"] .kb-split,
     body[data-subnav-side="outside-left"] .kb-split { grid-template-columns: 1fr; }
+    /* Stacked: show the content first, push the sub-nav below. */
+    .kb-split > .kb-main { order: 1; }
+    .kb-split > .kb-aside { order: 2; }
+    body[data-subnav-side="right"] .kb-split > .kb-main,
+    body[data-subnav-side="right"] .kb-split > .kb-aside { grid-column: auto; grid-row: auto; }
     .page-header h1 { font-size: var(--text-h3); }
 }
 

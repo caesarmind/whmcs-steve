@@ -15,7 +15,11 @@
 
         /* Two-column split: sidebar + main */
         .ann-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
-        @media (max-width: 880px) { .ann-split { grid-template-columns: 1fr; } }
+        @media (max-width: 880px) {
+            .ann-split { grid-template-columns: 1fr; }
+            .ann-split > .ann-main { order: 1; }
+            .ann-split > .ann-aside { order: 2; }
+        }
         .ann-aside { display: flex; flex-direction: column; gap: 16px; }
 
         /* Shared sidebar sub-nav (same rhythm as .subnav-item on Contacts / Account Details) */

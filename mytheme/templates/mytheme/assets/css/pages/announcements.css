@@ -165,6 +165,11 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     body[data-subnav-side="right"] .ann-split,
     body[data-subnav-side="outside"] .ann-split,
     body[data-subnav-side="outside-left"] .ann-split { grid-template-columns: 1fr; }
+    /* Stacked: show the announcements first, push the sub-nav below. */
+    .ann-split > .ann-main { order: 1; }
+    .ann-split > .ann-aside { order: 2; }
+    body[data-subnav-side="right"] .ann-split > .ann-main,
+    body[data-subnav-side="right"] .ann-split > .ann-aside { grid-column: auto; grid-row: auto; }
     .page-header h1 { font-size: var(--text-h3); }
 }
 
