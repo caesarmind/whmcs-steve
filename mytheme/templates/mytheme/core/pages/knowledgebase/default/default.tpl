@@ -1,12 +1,12 @@
 {* Hostnodes — Knowledgebase root (Apple-style).
 
    WHMCS standard variables expected:
-     $kbcategories     — array of top-level categories: id, name, description, numarticles
-     $kbarticles       — popular root articles: id, title, views
+     $kbcats     — array of top-level categories: id, name, description, numarticles
+     $kbmostviews       — popular root articles: id, title, views
      $kbsearchterm     — current search query (if any)
 *}
 
-{if isset($kbcategories) && $kbcategories|@count > 0}
+{if isset($kbcats) && $kbcats|@count > 0}
     {assign var=dashIsEmpty value='full'}
 {else}
     {assign var=dashIsEmpty value='empty'}
@@ -52,10 +52,10 @@
             </a>
         </div>
 
-        {if isset($kbarticles) && $kbarticles|@count > 0}
+        {if isset($kbmostviews) && $kbmostviews|@count > 0}
         <div class="card subnav-card">
             <div class="subnav-heading">{$LANG.knowledgebasepop|default:'Most popular'}</div>
-            {foreach $kbarticles as $art}
+            {foreach $kbmostviews as $art}
             {if $art@iteration <= 5}
             <a href="{$WEB_ROOT}/knowledgebase.php?action=displayarticle&id={$art.id}" class="pop-row">
                 <span class="pop-rank">{$art@iteration}</span>
@@ -83,9 +83,9 @@
                 </form>
             </div>
 
-            {if isset($kbcategories) && $kbcategories|@count > 0}
+            {if isset($kbcats) && $kbcats|@count > 0}
             <div class="kb-grid">
-                {foreach $kbcategories as $cat}
+                {foreach $kbcats as $cat}
                 <a href="{$WEB_ROOT}/knowledgebase.php?action=displaycat&catid={$cat.id}" class="kb-card">
                     <span class="tile-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>

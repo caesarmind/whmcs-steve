@@ -3,12 +3,12 @@
    WHMCS standard variables expected:
      $category         — current category: id, name, description, parent
      $kbarticles       — articles in this category: id, title, views
-     $kbcategories     — direct sub-categories
+     $kbcats     — direct sub-categories
      $kbsearchterm     — current search query (in-category)
      $kbpopulararticles — popular articles for sidebar
 *}
 
-{if (isset($kbarticles) && $kbarticles|@count > 0) || (isset($kbcategories) && $kbcategories|@count > 0)}
+{if (isset($kbarticles) && $kbarticles|@count > 0) || (isset($kbcats) && $kbcats|@count > 0)}
     {assign var=dashIsEmpty value='full'}
 {else}
     {assign var=dashIsEmpty value='empty'}
@@ -70,8 +70,8 @@
                 <input type="search" name="search" placeholder="{$LANG.searchincategory|default:'Search in this category…'}" value="{$kbsearchterm|default:''|escape}" autocomplete="off">
             </form>
 
-            {if isset($kbcategories) && $kbcategories|@count > 0}
-            {foreach $kbcategories as $cat}
+            {if isset($kbcats) && $kbcats|@count > 0}
+            {foreach $kbcats as $cat}
             <a href="{$WEB_ROOT}/knowledgebase.php?action=displaycat&catid={$cat.id}" class="kb-row">
                 <div class="kb-row-ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
