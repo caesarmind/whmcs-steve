@@ -3,28 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Affiliate Dashboard — WHMCS by Apple</title>
+    <title>Affiliates — Hostnodes</title>
     <link rel="stylesheet" href="css/apple-theme.css?v=12">
     <link rel="stylesheet" href="css/apple-layout.css?v=12">
     <style>
         body { display: block; }
 
-        /* Page header — eyebrow + title + subtitle */
-        .page-header { margin-bottom: 24px; }
-        .page-header .page-eyebrow {
-            font-size: 11px; font-weight: 600; color: var(--color-text-tertiary);
-            text-transform: uppercase; letter-spacing: 0.06em;
-            margin: 0 0 6px;
+        /* ---- Affiliates — page-specific styling. Shared .card / .card-header /
+                .card-body / .invoice-table / .btn / .status-pill chrome handles the rest. ---- */
+        .page-header { margin: 0 0 28px; }
+        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; line-height: 1.1; }
+        .page-header .page-subtitle { font-size: 14px; color: var(--color-text-secondary); letter-spacing: -0.008em; line-height: 1.5; margin: 0; max-width: 600px; }
+
+        .aff-tiles .tile { cursor: default; }
+        .tile-icon.violet { background: rgba(94, 92, 230, 0.12); color: #5e5ce6; }
+        [data-theme="dark"] .tile-icon.violet { background: rgba(125, 122, 255, 0.16); color: #7d7aff; }
+
+        /* Referral link row (inside a standard card-body) */
+        .aff-card-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 16px; max-width: 640px; }
+        .aff-link-row { display: flex; gap: 10px; align-items: stretch; }
+        .aff-link-row .form-input { flex: 1; min-width: 0; height: 44px; }
+        .aff-copy-btn { height: 44px; flex-shrink: 0; gap: 8px; }
+        .aff-copy-btn svg { width: 15px; height: 15px; }
+        .aff-copy-btn.copied { background: var(--color-green-text); border-color: var(--color-green-text); }
+
+        /* Commissions — divided figure strip */
+        .aff-figures { display: grid; grid-template-columns: repeat(3, 1fr); }
+        .aff-figure { display: flex; flex-direction: column; gap: 9px; padding: 2px 28px; border-left: 0.5px solid var(--color-border-light); }
+        .aff-figure:first-child { padding-left: 0; border-left: 0; }
+        .aff-figure-label { font-size: 11px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; line-height: 1.35; }
+        .aff-figure-value { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: var(--color-text-primary); font-variant-numeric: tabular-nums; line-height: 1; }
+        .aff-figure-value.accent { color: var(--color-green-text); }
+        .aff-payout-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 20px; padding-top: 18px; border-top: 0.5px solid var(--color-border-light); }
+        .aff-payout-footer form { margin: 0 0 0 auto; }
+        .aff-withdraw-btn { gap: 8px; white-space: nowrap; }
+        .aff-withdraw-btn svg { width: 16px; height: 16px; }
+        .aff-withdraw-btn:disabled { background: var(--color-surface-secondary); border-color: var(--color-border); color: var(--color-text-tertiary); box-shadow: none; cursor: not-allowed; pointer-events: none; }
+        .aff-min-hint { font-size: 12px; color: var(--color-text-tertiary); margin: 0; max-width: 460px; line-height: 1.45; }
+
+        /* Referrals table — shared .invoice-table + numeric/date helpers */
+        .invoice-table th.aff-num, .invoice-table td.aff-num { text-align: right; font-variant-numeric: tabular-nums; }
+        .invoice-table td.aff-date { color: var(--color-text-secondary); white-space: nowrap; }
+        .invoice-table td.aff-commission { font-weight: 600; }
+
+        /* Empty state */
+        .aff-empty { padding: 24px 24px 28px; text-align: center; }
+        .aff-empty-ico { width: 52px; height: 52px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+        .aff-empty-ico svg { width: 24px; height: 24px; }
+        .aff-empty-title { font-size: 17px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; letter-spacing: -0.01em; }
+        .aff-empty-sub { font-size: 14px; color: var(--color-text-tertiary); margin: 0 auto; max-width: 380px; line-height: 1.5; }
+
+        /* Responsive */
+        @media (max-width: 720px) {
+            .aff-figure { padding: 2px 18px; }
+            .aff-payout-footer { flex-direction: column; align-items: stretch; }
+            .aff-payout-footer form { margin: 0; display: flex; }
+            .aff-withdraw-btn { width: 100%; justify-content: center; }
+            .aff-min-hint { max-width: none; }
         }
-        .page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
-        .page-header .page-subtitle {
-            font-size: 14px; color: var(--color-text-secondary);
-            letter-spacing: -0.008em; line-height: 1.5;
-            margin: 0; max-width: 620px;
+        @media (max-width: 560px) {
+            .aff-link-row { flex-direction: column; }
+            .aff-copy-btn { width: 100%; justify-content: center; }
+        }
+        @media (max-width: 520px) {
+            .aff-figures { grid-template-columns: 1fr; }
+            .aff-figure { padding: 14px 0 0; border-left: 0; border-top: 0.5px solid var(--color-border-light); }
+            .aff-figure:first-child { padding-top: 0; border-top: 0; }
         }
     </style>
 </head>
-<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="affiliates" data-page-title="Affiliate Dashboard">
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="affiliates" data-page-title="Affiliates" data-data="full">
 
 <!-- Dev preview chip -->
 <div data-include="partials/state-chip.html"></div>
@@ -148,118 +196,145 @@
 <div class="content-area">
     <header class="page-header">
         <p class="page-eyebrow">AFFILIATES</p>
-        <h1>Affiliate Dashboard</h1>
-        <p class="page-subtitle">Track referrals, commissions, and payouts</p>
+        <h1>Affiliates</h1>
+        <p class="page-subtitle">Earn commission for every customer you refer to Hostnodes. Track your clicks, signups and payouts here.</p>
     </header>
 
-    <div class="when-full">
-        <div class="summary-tiles">
-            <div class="tile">
-                <div class="tile-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
-                <div class="tile-value">1,247</div>
-                <div class="tile-label">Visitors</div>
-            </div>
-            <div class="tile">
-                <div class="tile-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></div>
-                <div class="tile-value">38</div>
-                <div class="tile-label">Signups</div>
-            </div>
-            <div class="tile">
-                <div class="tile-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-                <div class="tile-value">12</div>
-                <div class="tile-label">Conversions</div>
-            </div>
-            <div class="tile">
-                <div class="tile-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-                <div class="tile-value">$324.50</div>
-                <div class="tile-label">Commission</div>
+    <!-- Summary tiles -->
+    <div class="summary-tiles aff-tiles">
+        <div class="tile">
+            <div class="tile-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+            <div class="tile-value"><span class="when-full">1,240</span><span class="when-empty">0</span></div>
+            <div class="tile-label">Visitors referred</div>
+        </div>
+        <div class="tile">
+            <div class="tile-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+            <div class="tile-value"><span class="when-full">38</span><span class="when-empty">0</span></div>
+            <div class="tile-label">Signups</div>
+        </div>
+        <div class="tile">
+            <div class="tile-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+            <div class="tile-value"><span class="when-full">3.1%</span><span class="when-empty">0%</span></div>
+            <div class="tile-label">Conversion rate</div>
+        </div>
+        <div class="tile">
+            <div class="tile-icon violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+            <div class="tile-value"><span class="when-full">$214.50</span><span class="when-empty">$0.00 USD</span></div>
+            <div class="tile-label">Available balance</div>
+        </div>
+    </div>
+
+    <!-- Referral link -->
+    <div class="card">
+        <div class="card-header"><h2 class="card-title">Your Unique Referral Link</h2></div>
+        <div class="card-body">
+            <p class="aff-card-desc">Share this link anywhere. When someone signs up through it, the referral is credited to you.</p>
+            <div class="aff-link-row">
+                <input type="text" id="affRefLink" class="form-input" readonly value="https://bill.hostnodes.com/aff.php?aff=1" onclick="this.select();">
+                <button type="button" class="btn-primary aff-copy-btn" onclick="affCopyLink(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    <span class="aff-copy-label">Copy</span>
+                </button>
             </div>
         </div>
+    </div>
 
-        <div class="card">
-            <div class="card-header"><h2 class="card-title">Your Referral Link</h2></div>
-            <div class="card-body">
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <input type="text" class="form-input" value="https://whmcs.com/?ref=alex-henderson" readonly style="flex: 1;">
-                    <button class="btn-primary" onclick="navigator.clipboard.writeText('https://whmcs.com/?ref=alex-henderson')">Copy</button>
+    <!-- Commissions -->
+    <div class="card">
+        <div class="card-header"><h2 class="card-title">Commissions</h2></div>
+        <div class="card-body">
+            <div class="aff-figures">
+                <div class="aff-figure">
+                    <span class="aff-figure-label">Commissions Pending Maturation</span>
+                    <span class="aff-figure-value"><span class="when-full">$48.00 USD</span><span class="when-empty">$0.00 USD</span></span>
+                </div>
+                <div class="aff-figure">
+                    <span class="aff-figure-label">Available Commissions Balance</span>
+                    <span class="aff-figure-value accent"><span class="when-full">$214.50 USD</span><span class="when-empty">$0.00 USD</span></span>
+                </div>
+                <div class="aff-figure">
+                    <span class="aff-figure-label">Total Amount Withdrawn</span>
+                    <span class="aff-figure-value"><span class="when-full">$560.00 USD</span><span class="when-empty">$0.00 USD</span></span>
                 </div>
             </div>
+            <div class="aff-payout-footer">
+                <p class="aff-min-hint when-empty">You will be able to request a withdrawal as soon as your balance reaches the minimum required amount of $25.00 USD.</p>
+                <form class="when-empty" method="post" action="#">
+                    <button type="submit" class="btn-primary aff-withdraw-btn" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                        Request Withdrawal
+                    </button>
+                </form>
+                <form class="when-full" method="post" action="#">
+                    <button type="submit" class="btn-primary aff-withdraw-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                        Request Withdrawal
+                    </button>
+                </form>
+            </div>
         </div>
+    </div>
 
-        <div class="card">
-            <div class="card-header"><h2 class="card-title">Recent Referrals</h2></div>
-            <div class="card-body">
+    <!-- Referrals -->
+    <div class="card">
+        <div class="card-header"><h2 class="card-title">Your Referrals</h2></div>
+        <div class="card-body">
+            <!-- Empty state -->
+            <div class="when-empty">
+                <div class="aff-empty">
+                    <div class="aff-empty-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                    </div>
+                    <p class="aff-empty-title">No referrals yet</p>
+                    <p class="aff-empty-sub">Share your referral link above to start earning commission. Every signup that comes through your link will appear here.</p>
+                </div>
+            </div>
+
+            <!-- Populated table -->
+            <div class="when-full">
                 <table class="invoice-table">
-                    <thead><tr><th>Date</th><th>Visitor</th><th>Status</th><th>Commission</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Product</th>
+                            <th class="aff-num">Amount</th>
+                            <th class="aff-num">Commission</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <tr>
-                            <td class="invoice-date">Apr 10, 2026</td>
-                            <td>visitor_8a3f</td>
-                            <td><span class="status-pill active">Converted</span></td>
-                            <td class="invoice-amount">$25.00</td>
+                            <td class="aff-date">May 18, 2026</td>
+                            <td>Cloud VPS — Standard 4GB</td>
+                            <td class="aff-num">$24.00</td>
+                            <td class="aff-num aff-commission">$2.40</td>
+                            <td><span class="status-pill active">Confirmed</span></td>
                         </tr>
                         <tr>
-                            <td class="invoice-date">Apr 8, 2026</td>
-                            <td>visitor_7b2e</td>
-                            <td><span class="status-pill unpaid">Pending</span></td>
-                            <td>&mdash;</td>
+                            <td class="aff-date">May 14, 2026</td>
+                            <td>Managed WordPress — Pro</td>
+                            <td class="aff-num">$59.00</td>
+                            <td class="aff-num aff-commission">$5.90</td>
+                            <td><span class="status-pill active">Confirmed</span></td>
                         </tr>
                         <tr>
-                            <td class="invoice-date">Apr 5, 2026</td>
-                            <td>visitor_6c1d</td>
-                            <td><span class="status-pill active">Converted</span></td>
-                            <td class="invoice-amount">$25.00</td>
+                            <td class="aff-date">May 11, 2026</td>
+                            <td>Dedicated Server — E-2388G</td>
+                            <td class="aff-num">$189.00</td>
+                            <td class="aff-num aff-commission">$18.90</td>
+                            <td><span class="status-pill pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td class="aff-date">May 03, 2026</td>
+                            <td>Cloud VPS — Standard 2GB</td>
+                            <td class="aff-num">$12.00</td>
+                            <td class="aff-num aff-commission">$1.20</td>
+                            <td><span class="status-pill cancelled">Cancelled</span></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
-        <div class="card">
-            <div class="card-header"><h2 class="card-title">Commission Rates</h2></div>
-            <div class="card-body">
-                <div class="settings-item">
-                    <div class="settings-item-content">
-                        <div class="settings-item-label">Hosting</div>
-                        <div class="settings-item-sublabel">Shared and cloud hosting plans</div>
-                    </div>
-                    <div class="settings-item-action">
-                        <span class="settings-item-value">$25 per signup</span>
-                    </div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content">
-                        <div class="settings-item-label">VPS</div>
-                        <div class="settings-item-sublabel">Virtual private servers</div>
-                    </div>
-                    <div class="settings-item-action">
-                        <span class="settings-item-value">$50 per signup</span>
-                    </div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-item-content">
-                        <div class="settings-item-label">Domains</div>
-                        <div class="settings-item-sublabel">Domain registrations and transfers</div>
-                    </div>
-                    <div class="settings-item-action">
-                        <span class="settings-item-value">10% of sale</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="page-actions">
-            <button class="btn-primary">Request Withdrawal</button>
-        </div>
-    </div>
-
-    <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
-        <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
-        </div>
-        <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">Not yet an affiliate</p>
-        <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">Sign up for the affiliate program to start earning.</p>
-        <a href="affiliatessignup.html" class="btn-primary">Sign up</a>
     </div>
 </div>
 
@@ -271,5 +346,26 @@
 
 <script src="js/apple-theme.js?v=12"></script>
 <script src="js/apple-layout.js?v=12"></script>
+<script>
+function affCopyLink(btn) {
+    var input = document.getElementById('affRefLink');
+    if (!input) return;
+    var label = btn.querySelector('.aff-copy-label');
+    var done = function () {
+        btn.classList.add('copied');
+        if (label) { var t = label.textContent; label.textContent = 'Copied'; setTimeout(function () { label.textContent = t; btn.classList.remove('copied'); }, 1600); }
+    };
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(input.value).then(done, function () { input.select(); document.execCommand('copy'); done(); });
+        } else {
+            input.select(); document.execCommand('copy'); done();
+        }
+    } catch (e) {
+        input.select();
+        try { document.execCommand('copy'); done(); } catch (e2) {}
+    }
+}
+</script>
 </body>
 </html>

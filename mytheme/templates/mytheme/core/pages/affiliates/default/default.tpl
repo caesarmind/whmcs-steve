@@ -167,8 +167,11 @@
                     <span class="aff-figure-value">{$affWithdrawn}</span>
                 </div>
             </div>
-            <div class="aff-payout-action">
-                {if !$withdrawrequestsent}
+            {if !$withdrawrequestsent}
+            <div class="aff-payout-footer">
+                {if !$affCanWithdraw && $affMin}
+                <p class="aff-min-hint">{lang key="affiliateWithdrawalSummary" amountForWithdrawal=$affMin}</p>
+                {/if}
                 <form method="post" action="{$WEB_ROOT}/affiliates.php">
                     <input type="hidden" name="action" value="withdrawrequest">
                     <button type="submit" class="btn-primary aff-withdraw-btn"{if !$affCanWithdraw} disabled{/if}>
@@ -176,11 +179,8 @@
                         {$LANG.affiliatesrequestwithdrawal|default:'Request withdrawal'}
                     </button>
                 </form>
-                {if !$affCanWithdraw && $affMin}
-                <p class="aff-min-hint">{$LANG.affiliatesminwithdrawal|default:'A minimum balance of'} {$affMin} {$LANG.affiliatesminwithdrawalafter|default:'is required to request a withdrawal.'}</p>
-                {/if}
-                {/if}
             </div>
+            {/if}
         </div>
     </div>
 
