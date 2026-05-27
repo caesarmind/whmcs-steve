@@ -26,6 +26,10 @@
 
 {assign var=currentFilter value=$stageFilter|default:''}
 
+{* Dynamic AJAX Loading toggle (admin Settings -> enable_dynamic_ajax). When on,
+   the table loads server-side in pages of 10 via dynamic-tables.js. *}
+{assign var=mtAjaxTables value=$myTheme.addonSettings.enable_dynamic_ajax|default:false}
+
 {* Tally delivered (awaiting acceptance) quotes for the banner. *}
 {assign var=deliveredCount value=0}
 {foreach $qtList as $_q}
@@ -41,6 +45,7 @@
 {* Lagom-style instant sort: jQuery 3.x + DataTables 1.x for client-side reorder. *}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
+{if $mtAjaxTables}<script src="{$WEB_ROOT}/templates/{$template}/assets/js/dynamic-tables.js?v={$myTheme.version|default:'1.0'}"></script>{/if}
 
 <script>
 (function () {
@@ -77,11 +82,12 @@
         {/if}
 
         <div class="filter-tabs when-full">
-            <a href="{$WEB_ROOT}/clientarea.php?action=quotes" class="filter-tab{if !$currentFilter} active{/if}">{$LANG.all|default:'All'}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Draft" class="filter-tab{if $currentFilter == 'Draft'} active{/if}">{$LANG.quotestagedraft|default:'Draft'}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Delivered" class="filter-tab{if $currentFilter == 'Delivered'} active{/if}">{$LANG.quotestagedelivered|default:'Delivered'}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Accepted" class="filter-tab{if $currentFilter == 'Accepted'} active{/if}">{$LANG.quotestageaccepted|default:'Accepted'}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Lost" class="filter-tab{if $currentFilter == 'Lost'} active{/if}">{$LANG.quotestagelost|default:'Lost'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=quotes" class="filter-tab{if !$currentFilter} active{/if}" data-mt-for="qtTable" data-mt-filter="">{$LANG.all|default:'All'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Draft" class="filter-tab{if $currentFilter == 'Draft'} active{/if}" data-mt-for="qtTable" data-mt-filter="Draft">{$LANG.quotestagedraft|default:'Draft'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Delivered" class="filter-tab{if $currentFilter == 'Delivered'} active{/if}" data-mt-for="qtTable" data-mt-filter="Delivered">{$LANG.quotestagedelivered|default:'Delivered'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Accepted" class="filter-tab{if $currentFilter == 'Accepted'} active{/if}" data-mt-for="qtTable" data-mt-filter="Accepted">{$LANG.quotestageaccepted|default:'Accepted'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Lost" class="filter-tab{if $currentFilter == 'Lost'} active{/if}" data-mt-for="qtTable" data-mt-filter="Lost">{$LANG.quotestagelost|default:'Lost'}</a>
+            {if $mtAjaxTables}<span class="mt-dt-search" style="margin-left:auto"><input type="search" placeholder="{$LANG.search|default:'Search'}…" aria-label="{$LANG.search|default:'Search'}" data-mt-search data-mt-for="qtTable"></span>{/if}
         </div>
 
         {* Sort: DataTables.js handles instant client-side sort on header click.
@@ -112,7 +118,7 @@
                 </div>
 
                 {if $qtCount > 0}
-                <table class="q-table when-full" id="qtTable">
+                <table class="q-table when-full" id="qtTable"{if $mtAjaxTables} data-mt-action="tableQuotes" data-mt-type="quotes" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="0:desc" data-mt-length="10"{/if}>
                     <colgroup>
                         <col class="q-col-quote">
                         <col class="q-col-date">
@@ -132,6 +138,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {if !$mtAjaxTables}
                         {foreach $qtList as $qt}
                         {assign var=qtStage value=$qt.stage|strip_tags}
                         {assign var=qtStageLower value=$qtStage|lower|replace:' ':'-'}
@@ -178,6 +185,7 @@
                             </td>
                         </tr>
                         {/foreach}
+                        {/if}
                     </tbody>
                 </table>
                 {/if}
@@ -186,7 +194,7 @@
             <div class="q-footer when-full">
                 <div class="q-page-size">
                     {$LANG.show|default:'Show'}
-                    <select aria-label="{$LANG.rowsperpage|default:'Rows per page'}">
+                    <select aria-label="{$LANG.rowsperpage|default:'Rows per page'}" data-dt-length data-mt-for="qtTable">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>
@@ -194,8 +202,8 @@
                     {$LANG.entries|default:'entries'}
                 </div>
                 <div class="spacer"></div>
-                <span>{$LANG.showing|default:'Showing'} 1–{$qtCount} {$LANG.of|default:'of'} {$numquotes|default:$qtCount}</span>
-                <div class="q-pages">
+                <span data-dt-info data-mt-for="qtTable">{$LANG.showing|default:'Showing'} 1–{$qtCount} {$LANG.of|default:'of'} {$numquotes|default:$qtCount}</span>
+                <div class="q-pages" data-dt-pager data-mt-for="qtTable">
                     <button type="button" disabled aria-label="{$LANG.previouspage|default:'Previous page'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
                     <button type="button" class="active">1</button>
                     <button type="button" disabled aria-label="{$LANG.nextpage|default:'Next page'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
@@ -234,6 +242,7 @@
     </aside>
 </div>{* /.q-split *}
 
+{if !$mtAjaxTables}
 <script>
 {literal}
 // Row navigation — clicking a row goes to viewquote
@@ -322,3 +331,4 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
 }
 {/literal}
 </script>
+{/if}

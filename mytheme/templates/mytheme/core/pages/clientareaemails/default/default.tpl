@@ -26,7 +26,15 @@
 
 {if $hasEmails}{assign var=dashIsEmpty value='full'}{else}{assign var=dashIsEmpty value='empty'}{/if}
 
+{* Dynamic AJAX Loading toggle (admin Settings -> enable_dynamic_ajax). *}
+{assign var=mtAjaxTables value=$myTheme.addonSettings.enable_dynamic_ajax|default:false}
+
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareaemails.css?v={$myTheme.version|default:'1.0'}">
+{if $mtAjaxTables}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
+<script src="{$WEB_ROOT}/templates/{$template}/assets/js/dynamic-tables.js?v={$myTheme.version|default:'1.0'}"></script>
+{/if}
 
 <script>
 (function () {
@@ -48,7 +56,7 @@
         {if $hasEmails}
         <div class="when-full">
             <div class="card" style="padding: 0; overflow: hidden;">
-                <table class="em-table">
+                <table class="em-table"{if $mtAjaxTables} id="emTable" data-mt-action="tableEmails" data-mt-type="emails" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="0:desc" data-mt-length="10"{/if}>
                     <thead>
                         <tr>
                             <th>{$LANG.clientareaemailsdate|default:'Date'}</th>
@@ -56,6 +64,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {if !$mtAjaxTables}
                         {foreach $emails as $email}
                         <tr data-href="{$WEB_ROOT}/viewemail.php?id={$email.id|escape}">
                             <td class="em-date">{$email.date|escape}</td>
@@ -67,9 +76,18 @@
                             </td>
                         </tr>
                         {/foreach}
+                        {/if}
                     </tbody>
                 </table>
             </div>
+            {if $mtAjaxTables}
+            <div class="mt-dt-foot">
+                <span class="mt-dt-search"><input type="search" placeholder="{$LANG.search|default:'Search'}…" aria-label="{$LANG.search|default:'Search'}" data-mt-search data-mt-for="emTable"></span>
+                <span class="spacer"></span>
+                <span data-dt-info data-mt-for="emTable"></span>
+                <div data-dt-pager data-mt-for="emTable"></div>
+            </div>
+            {/if}
         </div>
         {/if}
 
@@ -112,7 +130,7 @@
     </aside>
 </div>
 
-{if $hasEmails}
+{if $hasEmails && !$mtAjaxTables}
 <script>
 {literal}
 (function () {

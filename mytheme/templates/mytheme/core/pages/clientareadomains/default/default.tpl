@@ -33,8 +33,18 @@
     {/if}
 {/foreach}
 
+{* Dynamic AJAX Loading toggle (admin Settings -> enable_dynamic_ajax). When on,
+   the domain list renders as a server-side DataTable (the div-grid markup is
+   reused as table rows via the shared .domain-row / .dom-list-head-row grid). *}
+{assign var=mtAjaxTables value=$myTheme.addonSettings.enable_dynamic_ajax|default:false}
+
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareadomains.css?v={$myTheme.version|default:'1.0'}">
+{if $mtAjaxTables}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
+<script src="{$WEB_ROOT}/templates/{$template}/assets/js/dynamic-tables.js?v={$myTheme.version|default:'1.0'}"></script>
+{/if}
 
 {* Hand layout signals to body for CSS toggles *}
 <script>
@@ -80,15 +90,17 @@
         {/if}
 
         <div class="filter-tabs when-full">
-            <button class="filter-tab active">{$LANG.all|default:'All'}</button>
-            <button class="filter-tab">{$LANG.statusactive|default:'Active'}</button>
+            <button class="filter-tab active" data-mt-for="domTable" data-mt-filter="">{$LANG.all|default:'All'}</button>
+            <button class="filter-tab" data-mt-for="domTable" data-mt-filter="Active">{$LANG.statusactive|default:'Active'}</button>
             <button class="filter-tab">{$LANG.expiringsoon|default:'Expiring Soon'}</button>
-            <button class="filter-tab">{$LANG.transferredaway|default:'Transferred Away'}</button>
+            <button class="filter-tab" data-mt-for="domTable" data-mt-filter="Transferred Away">{$LANG.transferredaway|default:'Transferred Away'}</button>
+            {if $mtAjaxTables}<span class="mt-dt-search" style="margin-left:auto"><input type="search" placeholder="{$LANG.search|default:'Search'}…" aria-label="{$LANG.search|default:'Search'}" data-mt-search data-mt-for="domTable"></span>{/if}
         </div>
 
         {* Domains stack: "inside" = unified card; "outside" = card + floating head row + floating pager *}
         <div class="dom-stack">
 
+            {if !$mtAjaxTables}
             <div class="dom-list-head-row when-full">
                 <div>{$LANG.domain|default:'Domain'}</div>
                 <div>{$LANG.registered|default:'Registered'}</div>
@@ -97,12 +109,26 @@
                 <div>{$LANG.autorenew|default:'Auto-Renew'}</div>
                 <div></div>
             </div>
+            {/if}
 
             <div class="card dom-list-card">
 
                 {if $domCount > 0}
                 <div class="when-full">
                     <div class="card-body">
+                        {if $mtAjaxTables}
+                        <table id="domTable" class="dom-table" data-mt-action="tableDomains" data-mt-type="domains" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="0:asc" data-mt-length="10">
+                            <thead><tr class="dom-list-head-row">
+                                <th>{$LANG.domain|default:'Domain'}</th>
+                                <th>{$LANG.registered|default:'Registered'}</th>
+                                <th>{$LANG.expires|default:'Expires'}</th>
+                                <th>{$LANG.status|default:'Status'}</th>
+                                <th>{$LANG.autorenew|default:'Auto-Renew'}</th>
+                                <th aria-hidden="true"></th>
+                            </tr></thead>
+                            <tbody></tbody>
+                        </table>
+                        {else}
                         <div class="domain-list">
                             {foreach $domList as $d}
                             {assign var=statusLower value=$d.status|lower}
@@ -144,6 +170,7 @@
                             </div>
                             {/foreach}
                         </div>
+                        {/if}
                     </div>
                 </div>
                 {/if}
@@ -172,7 +199,7 @@
             <div class="dom-footer when-full">
                 <div class="dom-page-size">
                     {$LANG.show|default:'Show'}
-                    <select aria-label="{$LANG.rowsperpage|default:'Rows per page'}">
+                    <select aria-label="{$LANG.rowsperpage|default:'Rows per page'}" data-dt-length data-mt-for="domTable">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>
@@ -184,8 +211,8 @@
                 {assign var=startDisplay value=$startNum+1}
                 {assign var=endDisplay value=$startNum+$domCount}
                 {assign var=totalNum value=$numdomains|default:$domCount}
-                <span>{$LANG.showing|default:'Showing'} {$startDisplay}–{$endDisplay} {$LANG.of|default:'of'} {$totalNum}</span>
-                <div class="dom-pages">
+                <span data-dt-info data-mt-for="domTable">{$LANG.showing|default:'Showing'} {$startDisplay}–{$endDisplay} {$LANG.of|default:'of'} {$totalNum}</span>
+                <div class="dom-pages" data-dt-pager data-mt-for="domTable">
                     <button type="button" disabled aria-label="{$LANG.previouspage|default:'Previous page'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
                     <button type="button" class="active">1</button>
                     <button type="button" disabled aria-label="{$LANG.nextpage|default:'Next page'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>

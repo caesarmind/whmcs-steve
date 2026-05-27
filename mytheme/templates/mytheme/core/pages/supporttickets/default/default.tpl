@@ -34,12 +34,17 @@
     {/if}
 {/foreach}
 
+{* Dynamic AJAX Loading toggle (admin Settings -> enable_dynamic_ajax). When on,
+   the table loads server-side in pages of 10 via dynamic-tables.js. *}
+{assign var=mtAjaxTables value=$myTheme.addonSettings.enable_dynamic_ajax|default:false}
+
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/supporttickets.css?v={$myTheme.version|default:'1.0'}">
 
 {* Lagom-style instant sort: jQuery 3.x + DataTables 1.x for client-side reorder. *}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
+{if $mtAjaxTables}<script src="{$WEB_ROOT}/templates/{$template}/assets/js/dynamic-tables.js?v={$myTheme.version|default:'1.0'}"></script>{/if}
 
 <script>
 (function () {
@@ -81,11 +86,12 @@
         {/if}
 
         <div class="filter-tabs when-full">
-            <button type="button" class="filter-tab active" data-ticket-filter="all">{$LANG.all|default:'All'}</button>
-            <button type="button" class="filter-tab" data-ticket-filter="open">{$LANG.supportticketsstatusopen|default:'Open'}</button>
-            <button type="button" class="filter-tab" data-ticket-filter="answered">{$LANG.supportticketsstatusanswered|default:'Answered'}</button>
-            <button type="button" class="filter-tab" data-ticket-filter="customer-reply">{$LANG.supportticketsstatuscustomerreply|default:'Customer-reply'}</button>
-            <button type="button" class="filter-tab" data-ticket-filter="closed">{$LANG.supportticketsstatusclosed|default:'Closed'}</button>
+            <button type="button" class="filter-tab active" data-ticket-filter="all" data-mt-for="tkTable" data-mt-filter="">{$LANG.all|default:'All'}</button>
+            <button type="button" class="filter-tab" data-ticket-filter="open" data-mt-for="tkTable" data-mt-filter="Open">{$LANG.supportticketsstatusopen|default:'Open'}</button>
+            <button type="button" class="filter-tab" data-ticket-filter="answered" data-mt-for="tkTable" data-mt-filter="Answered">{$LANG.supportticketsstatusanswered|default:'Answered'}</button>
+            <button type="button" class="filter-tab" data-ticket-filter="customer-reply" data-mt-for="tkTable" data-mt-filter="Customer-Reply">{$LANG.supportticketsstatuscustomerreply|default:'Customer-reply'}</button>
+            <button type="button" class="filter-tab" data-ticket-filter="closed" data-mt-for="tkTable" data-mt-filter="Closed">{$LANG.supportticketsstatusclosed|default:'Closed'}</button>
+            {if $mtAjaxTables}<span class="mt-dt-search" style="margin-left:auto"><input type="search" placeholder="{$LANG.search|default:'Search'}…" aria-label="{$LANG.search|default:'Search'}" data-mt-search data-mt-for="tkTable"></span>{/if}
         </div>
 
         {* Sort: DataTables.js handles instant client-side sort on header click.
@@ -115,7 +121,7 @@
                 </div>
 
                 {if $tkCount > 0}
-                <table class="tk-table when-full" id="tkTable">
+                <table class="tk-table when-full" id="tkTable"{if $mtAjaxTables} data-mt-action="tableTickets" data-mt-type="tickets" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="3:desc" data-mt-length="10"{/if}>
                     <colgroup>
                         <col class="tk-col-subject">
                         <col class="tk-col-department">
@@ -131,6 +137,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {if !$mtAjaxTables}
                         {foreach $tkList as $tkt}
                         {assign var=tktStatusClass value=$tkt.statusClass|default:$tkt.statusclass|default:$tkt.status|lower|replace:' ':'-'|replace:'_':'-'}
                         {assign var=tktPriority value=$tkt.priority|default:$tkt.urgency|default:''|lower|replace:' ':'-'}
@@ -154,6 +161,7 @@
                             </td>
                         </tr>
                         {/foreach}
+                        {/if}
                     </tbody>
                 </table>
                 {/if}
@@ -162,7 +170,7 @@
             <div class="tk-footer when-full">
                 <div class="tk-page-size">
                     {$LANG.show|default:'Show'}
-                    <select aria-label="{$LANG.rowsperpage|default:'Rows per page'}">
+                    <select aria-label="{$LANG.rowsperpage|default:'Rows per page'}" data-dt-length data-mt-for="tkTable">
                         <option selected>10</option>
                         <option>25</option>
                         <option>50</option>
@@ -171,8 +179,8 @@
                     {$LANG.entries|default:'entries'}
                 </div>
                 <div class="spacer"></div>
-                <span>{$LANG.showing|default:'Showing'} 1–{$tkCount} {$LANG.of|default:'of'} {$tkCount}</span>
-                <div class="tk-pages">
+                <span data-dt-info data-mt-for="tkTable">{$LANG.showing|default:'Showing'} 1–{$tkCount} {$LANG.of|default:'of'} {$tkCount}</span>
+                <div class="tk-pages" data-dt-pager data-mt-for="tkTable">
                     <button type="button" disabled aria-label="{$LANG.previouspage|default:'Previous page'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
                     <button type="button" class="active">1</button>
                     <button type="button" disabled aria-label="{$LANG.nextpage|default:'Next page'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
@@ -215,6 +223,7 @@
     </aside>
 </div>{* /.tk-split *}
 
+{if !$mtAjaxTables}
 <script>
 {literal}
 // Row navigation — click a row to go to viewticket
@@ -290,3 +299,4 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
 }
 {/literal}
 </script>
+{/if}

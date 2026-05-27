@@ -28,6 +28,11 @@
 
 {assign var=currentFilter value=$statusFilter|default:''}
 
+{* Dynamic AJAX Loading toggle (admin Settings -> enable_dynamic_ajax). When on,
+   the table is loaded server-side in pages of 10 via dynamic-tables.js; when off,
+   the {foreach} below renders every row (current behavior). *}
+{assign var=mtAjaxTables value=$myTheme.addonSettings.enable_dynamic_ajax|default:false}
+
 {* Tally unpaid count. Use strip_tags because WHMCS sometimes returns
    $invoice.status wrapped in <span class="textred">...</span> markup. *}
 {assign var=unpaidCount value=0}
@@ -44,6 +49,7 @@
 {* Lagom-style instant sort: jQuery 3.x + DataTables 1.x for client-side reorder. *}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
+{if $mtAjaxTables}<script src="{$WEB_ROOT}/templates/{$template}/assets/js/dynamic-tables.js?v={$myTheme.version|default:'1.0'}"></script>{/if}
 
 <script>
 (function () {
@@ -87,10 +93,11 @@
         {/if}
 
         <div class="filter-tabs when-full">
-            <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="filter-tab{if !$currentFilter} active{/if}">{$LANG.all|default:'All'}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Unpaid" class="filter-tab{if $currentFilter == 'Unpaid'} active{/if}">{$LANG.invoiceunpaid|default:'Unpaid'}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Paid" class="filter-tab{if $currentFilter == 'Paid'} active{/if}">{$LANG.invoicepaid|default:'Paid'}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Cancelled" class="filter-tab{if $currentFilter == 'Cancelled'} active{/if}">{$LANG.invoicecancelled|default:'Cancelled'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="filter-tab{if !$currentFilter} active{/if}" data-mt-for="invTable" data-mt-filter="">{$LANG.all|default:'All'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Unpaid" class="filter-tab{if $currentFilter == 'Unpaid'} active{/if}" data-mt-for="invTable" data-mt-filter="Unpaid">{$LANG.invoiceunpaid|default:'Unpaid'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Paid" class="filter-tab{if $currentFilter == 'Paid'} active{/if}" data-mt-for="invTable" data-mt-filter="Paid">{$LANG.invoicepaid|default:'Paid'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Cancelled" class="filter-tab{if $currentFilter == 'Cancelled'} active{/if}" data-mt-for="invTable" data-mt-filter="Cancelled">{$LANG.invoicecancelled|default:'Cancelled'}</a>
+            {if $mtAjaxTables}<span class="mt-dt-search" style="margin-left:auto"><input type="search" placeholder="{$LANG.search|default:'Search'}…" aria-label="{$LANG.search|default:'Search'}" data-mt-search data-mt-for="invTable"></span>{/if}
         </div>
 
         {* Sort: DataTables.js handles instant client-side sort on header click (matches
@@ -123,7 +130,7 @@
                 </div>
 
                 {if $invCount > 0}
-                <table class="inv-table when-full" id="invTable">
+                <table class="inv-table when-full" id="invTable"{if $mtAjaxTables} data-mt-action="tableInvoices" data-mt-type="invoices" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="0:desc" data-mt-length="10"{/if}>
                     <colgroup>
                         <col class="inv-col-invoice">
                         <col class="inv-col-date">
@@ -143,6 +150,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {if !$mtAjaxTables}
                         {foreach $invList as $inv}
                         {* WHMCS returns $inv.status wrapped in <span class="textred">...</span>
                            when overdue — strip tags before using anywhere. *}
@@ -192,6 +200,7 @@
                             </td>
                         </tr>
                         {/foreach}
+                        {/if}
                     </tbody>
                 </table>
                 {/if}
@@ -200,7 +209,7 @@
             <div class="inv-footer when-full">
                 <div class="inv-page-size">
                     {$LANG.show|default:'Show'}
-                    <select aria-label="{$LANG.rowsperpage|default:'Rows per page'}">
+                    <select aria-label="{$LANG.rowsperpage|default:'Rows per page'}" data-dt-length data-mt-for="invTable">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>
@@ -212,8 +221,8 @@
                 {assign var=startDisplay value=$startNum+1}
                 {assign var=endDisplay value=$startNum+$invCount}
                 {assign var=totalNum value=$numinvoices|default:$invCount}
-                <span>{$LANG.showing|default:'Showing'} {$startDisplay}–{$endDisplay} {$LANG.of|default:'of'} {$totalNum}</span>
-                <div class="inv-pages">
+                <span data-dt-info data-mt-for="invTable">{$LANG.showing|default:'Showing'} {$startDisplay}–{$endDisplay} {$LANG.of|default:'of'} {$totalNum}</span>
+                <div class="inv-pages" data-dt-pager data-mt-for="invTable">
                     <button type="button" disabled aria-label="{$LANG.previouspage|default:'Previous page'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
                     <button type="button" class="active">1</button>
                     <button type="button" disabled aria-label="{$LANG.nextpage|default:'Next page'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
@@ -252,6 +261,7 @@
     </aside>
 </div>{* /.inv-split *}
 
+{if !$mtAjaxTables}
 <script>
 {literal}
 // Row navigation — clicking a row goes to viewinvoice
@@ -346,3 +356,4 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
 }
 {/literal}
 </script>
+{/if}

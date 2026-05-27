@@ -33,7 +33,7 @@ final class SettingsController extends AbstractController
         'capitalize_titles'      => ['Section Titles Capitalization', 'Apply uppercase to section titles.',                                 true,  'bool'],
         'disable_cms_cache'      => ['Disable CMS Menu Cache',   'Bypass the menu cache during development.',                             false, 'bool'],
         'hide_cycle_discounts'   => ['Hide Billing Cycle Discounts', 'Hide percentage savings shown next to billing cycles.',              false, 'bool'],
-        'enable_dynamic_ajax'    => ['Enable Dynamic AJAX Loading',  'Load some panels via AJAX after the page paints.',                   true,  'bool'],
+        'enable_dynamic_ajax'    => ['Enable Dynamic AJAX Loading',  'Load data tables (services, domains, invoices, tickets, quotes, emails) in pages of 10 via AJAX — fast first paint on large accounts.', false, 'bool'],
         'custom_language_list'   => ['Custom Language List',     'Override the language list shown to clients in the locale chooser.',    false, 'bool'],
         'enable_dark_mode'       => ['Enable Dark Mode',         'Allow visitors to toggle dark mode.',                                   true,  'bool'],
         'topnav_show_icons'      => ['Top-Nav Icons',            'Show icons next to menu items in the top navigation. Off by default.',  false, 'bool'],
