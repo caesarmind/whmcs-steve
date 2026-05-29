@@ -60,6 +60,8 @@
 
         <form method="post" action="{$smarty.server.PHP_SELF}" class="cr-form" id="frmRegister" role="form" name="orderfrm">
             <input type="hidden" name="register" value="true">
+            {* CSRF token WHMCS expects on POST forms (guarded so it's harmless if unset). *}
+            {if isset($token) && $token}<input type="hidden" name="token" value="{$token|escape}">{/if}
 
             <section class="cr-section">
                 <h2 class="cr-section-title">{$LANG.personalinformation|default:'Personal information'}</h2>
