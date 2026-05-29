@@ -69,6 +69,12 @@
                 <p class="page-subtitle">{$LANG.loginintro|default:'Use your account email and password.'}</p>
             </header>
 
+            {* The routed /index.php/login flow reports a failed login (and other
+               notices) through get_flash_message(), NOT the legacy $incorrect var. *}
+            {if $message = get_flash_message()}
+                <div class="auth-notice{if $message.type == 'success'} success{elseif $message.type == 'warning' || $message.type == 'info'} info{/if}">{$message.text}</div>
+            {/if}
+
             {if $logout}
                 <div class="auth-notice success">{$LANG.logoutsuccessful|default:'You have been logged out. See you next time.'}</div>
             {/if}
@@ -82,7 +88,7 @@
                 <div class="auth-notice success">{$LANG.pwresetsuccess|default:'Your password has been reset. Sign in with your new password.'}</div>
             {/if}
 
-            <form class="auth-form" method="post" action="{$WEB_ROOT}/dologin.php">
+            <form class="auth-form" method="post" action="{routePath('login-validate')}">
                 <input type="hidden" name="token" value="{$token}" />
 
                 <div class="form-group">
