@@ -40,15 +40,6 @@
             <a href="{$WEB_ROOT}/login" class="btn-primary pw-cta">{$LANG.backtologin|default:'Back to sign in'}</a>
 
         {else}
-            {* Step indicator: 1 email → 2 security (optional) → 3 new password. *}
-            <div class="pw-steps">
-                <span class="pw-step{if $pwStep == 'email-prompt'} pw-step-active{else} pw-step-done{/if}">1</span>
-                <span class="pw-step-bar"></span>
-                <span class="pw-step{if $pwStep == 'security-prompt'} pw-step-active{elseif $pwStep == 'change-prompt'} pw-step-done{/if}">2</span>
-                <span class="pw-step-bar"></span>
-                <span class="pw-step{if $pwStep == 'change-prompt'} pw-step-active{/if}">3</span>
-            </div>
-
             {if isset($errorMessage) && $errorMessage}
             <div class="pw-error" role="alert">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
