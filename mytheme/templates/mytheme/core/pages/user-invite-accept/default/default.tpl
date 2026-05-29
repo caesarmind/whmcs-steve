@@ -84,6 +84,19 @@
                             <div class="uia-field">
                                 <label class="uia-label" for="uia-pw">{$LANG.loginpassword|default:'Password'}</label>
                                 <input type="password" id="uia-pw" name="password" class="uia-input" autocomplete="new-password" required>
+                                <div class="uia-pw-tools">
+                                    <button type="button" class="uia-genpw" data-uia-genpw>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                                        {$LANG.generatePassword.btnLabel|default:'Generate password'}
+                                    </button>
+                                    <button type="button" class="uia-pw-reveal" data-uia-reveal aria-label="{$LANG.togglepasswordvisibility|default:'Show or hide password'}">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </div>
+                                <div class="uia-pwmeter" data-uia-pwmeter hidden>
+                                    <span class="uia-pwmeter-track"><span class="uia-pwmeter-fill"></span></span>
+                                    <span class="uia-pwmeter-label"></span>
+                                </div>
                             </div>
                             {if isset($accept_tos) && $accept_tos}
                             <label class="uia-tos">
@@ -110,3 +123,72 @@
         {/if}
     </div>
 </div>
+
+{* Create-account password helpers: "Generate password" (fills + reveals a strong
+   password) and a live strength meter. Self-contained — no jQuery / WHMCS JS. *}
+<script>{literal}
+(function () {
+    var pw = document.getElementById('uia-pw');
+    if (!pw) { return; }
+
+    function randInts(n) {
+        var c = window.crypto || window.msCrypto;
+        if (c && c.getRandomValues) { var a = new Uint32Array(n); c.getRandomValues(a); return a; }
+        var f = []; for (var i = 0; i < n; i++) { f.push(Math.floor(Math.random() * 4294967296)); } return f;
+    }
+    function generate(len) {
+        var lo = 'abcdefghijkmnopqrstuvwxyz', up = 'ABCDEFGHJKLMNPQRSTUVWXYZ', di = '23456789', sy = '!@#$%^&*()-_=+';
+        var all = lo + up + di + sy, r = randInts(len);
+        var o = [lo.charAt(r[0] % lo.length), up.charAt(r[1] % up.length), di.charAt(r[2] % di.length), sy.charAt(r[3] % sy.length)];
+        for (var i = 4; i < len; i++) { o.push(all.charAt(r[i] % all.length)); }
+        var s = randInts(len);
+        for (var j = o.length - 1; j > 0; j--) { var k = s[j] % (j + 1), t = o[j]; o[j] = o[k]; o[k] = t; }
+        return o.join('');
+    }
+
+    var meter = document.querySelector('[data-uia-pwmeter]');
+    var fill = meter ? meter.querySelector('.uia-pwmeter-fill') : null;
+    var label = meter ? meter.querySelector('.uia-pwmeter-label') : null;
+    var LABELS = ['Very weak', 'Weak', 'Fair', 'Good', 'Strong'];
+    var CLASSES = ['vweak', 'weak', 'fair', 'good', 'strong'];
+    var PCT = [16, 34, 56, 78, 100];
+    function level(v) {
+        var p = 0;
+        if (v.length >= 8) { p++; }
+        if (v.length >= 12) { p++; }
+        if (/[a-z]/.test(v) && /[A-Z]/.test(v)) { p++; }
+        if (/[0-9]/.test(v)) { p++; }
+        if (/[^A-Za-z0-9]/.test(v)) { p++; }
+        return p <= 1 ? 0 : (p >= 5 ? 4 : p - 1);
+    }
+    function updateMeter() {
+        if (!meter) { return; }
+        var v = pw.value || '';
+        if (!v) { meter.hidden = true; return; }
+        meter.hidden = false;
+        var lv = level(v);
+        meter.setAttribute('data-strength', CLASSES[lv]);
+        if (fill) { fill.style.width = PCT[lv] + '%'; }
+        if (label) { label.textContent = LABELS[lv]; }
+    }
+    pw.addEventListener('input', updateMeter);
+
+    var genBtn = document.querySelector('[data-uia-genpw]');
+    if (genBtn) {
+        genBtn.addEventListener('click', function () {
+            pw.value = generate(16);
+            pw.type = 'text';            /* reveal so the user can note it down */
+            var rb = document.querySelector('[data-uia-reveal]');
+            if (rb) { rb.classList.add('is-on'); }
+            updateMeter();
+        });
+    }
+    var revealBtn = document.querySelector('[data-uia-reveal]');
+    if (revealBtn) {
+        revealBtn.addEventListener('click', function () {
+            pw.type = (pw.type === 'password') ? 'text' : 'password';
+            revealBtn.classList.toggle('is-on', pw.type === 'text');
+        });
+    }
+})();
+{/literal}</script>
