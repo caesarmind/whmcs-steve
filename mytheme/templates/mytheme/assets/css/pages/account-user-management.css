@@ -125,5 +125,47 @@ html[data-palette="slate"]   .um-row-avatar { background: linear-gradient(135deg
 .um-empty-title { font-size: var(--text-lg); font-weight: var(--fw-medium); color: var(--color-text-primary); margin: 0 0 4px; }
 .um-empty-sub { font-size: var(--text-base); color: var(--color-text-tertiary); margin: 0 auto 18px; max-width: 380px; line-height: 1.45; }
 
+/* "Invite new user" header button — opens the modal */
+.um-invite-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 38px; padding: 0 16px;
+    background: var(--color-accent); color: #fff;
+    border: 0; border-radius: var(--radius-pill);
+    font-size: var(--text-md); font-weight: var(--fw-medium); font-family: inherit;
+    cursor: pointer; white-space: nowrap;
+    transition: filter var(--transition-fast);
+}
+.um-invite-btn:hover { filter: brightness(0.95); }
+.um-invite-btn svg { width: 15px; height: 15px; }
+
+.um-pending { margin-top: 10px; }
+.um-footnote { font-size: var(--text-sm); color: var(--color-text-tertiary); margin: 12px 4px 0; }
+
+/* Invite modal */
+body.um-modal-open { overflow: hidden; }
+.um-modal { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.um-modal[hidden] { display: none; }
+.um-modal-backdrop { position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(0, 0, 0, 0.45); }
+.um-modal-dialog {
+    position: relative; width: 100%; max-width: 520px; max-height: 90vh;
+    display: flex; flex-direction: column;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+    overflow: hidden;
+}
+.um-modal-form { display: flex; flex-direction: column; min-height: 0; }
+.um-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 22px; border-bottom: 0.5px solid var(--color-border); flex-shrink: 0; }
+.um-modal-title { margin: 0; font-size: var(--text-md); font-weight: var(--fw-semibold); color: var(--color-text-primary); }
+.um-modal-x { width: 28px; height: 28px; flex-shrink: 0; display: grid; place-items: center; border: 0; background: transparent; border-radius: 50%; color: var(--color-text-tertiary); cursor: pointer; }
+.um-modal-x:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+.um-modal-x svg { width: 16px; height: 16px; }
+.um-modal-body { padding: 18px 22px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.um-modal-body .um-invite-sub { margin: 0; }
+.um-modal-body .um-input { max-width: none; }
+.um-modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 22px; border-top: 0.5px solid var(--color-border); flex-shrink: 0; }
+.um-modal-foot .btn-primary, .um-modal-foot .btn-secondary { height: 38px; padding: 0 18px; font-size: var(--text-base); }
+
 @media (max-width: 880px) { .um-split { grid-template-columns: 1fr; } .page-header h1 { font-size: var(--text-h3); } }
 @media (max-width: 600px) { .um-row-actions { width: 100%; justify-content: flex-end; } }

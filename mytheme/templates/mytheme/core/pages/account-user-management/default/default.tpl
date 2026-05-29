@@ -1,32 +1,39 @@
-{* Hostnodes — User Management (Apple-style).
+{* Hostnodes — User Management (Apple-style), Lagom-parity UX.
 
-   WHMCS v9 data (verified against Nexus):
+   WHMCS v9 data (verified against Nexus + Lagom):
      $users        — Eloquent Collection of WHMCS\User\User models
                      properties: id, email, firstname, lastname
                      pivot:      owner (bool), hasLastLogin(), getLastLogin() (Carbon)
                      methods:    hasTwoFactorAuthEnabled()
-     $invites      — Eloquent Collection of pending invites
-                     properties: id, email, created_at (Carbon)
-     $permissions  — array of permission options (for invite form)
-                     each has .key, .title, .description
-     $formdata     — pre-filled invite-form data (e.g. $formdata.inviteemail)
+     $invites      — Eloquent Collection of pending invites (id, email, created_at)
+     $permissions  — array of permission options ( .key, .title, .description )
+     $formdata     — pre-filled invite-form data ($formdata.inviteemail)
      $token        — CSRF token
 
-   Do NOT read isOwner as a property — v9 makes that a relationship method
-   that needs an argument; the property read triggers ArgumentCountError.
-   Always use the v9 pivot field $user->pivot->owner instead.
+   UX (matches Lagom):
+     · "Invite new user" button opens a MODAL where the whole invite happens.
+     · A "Pending invites" list shows invitations awaiting acceptance (resend / cancel).
+
+   Do NOT read isOwner as a property — v9 makes that a relationship method that
+   needs an argument; use the pivot field $user->pivot->owner instead.
 *}
 
 {assign var=usCount value=0}
 {if isset($users)}{assign var=usCount value=$users->count()}{/if}
 {assign var=invCount value=0}
 {if isset($invites)}{assign var=invCount value=$invites->count()}{/if}
-{if $usCount > 0 || $invCount > 0}{assign var=dashIsEmpty value='full'}{else}{assign var=dashIsEmpty value='empty'}{/if}
+
+{* Capture the flash once (it's consumed on read). A failed invite re-renders with
+   $formdata.inviteemail set — in that case auto-open the modal and show the error
+   inside it; otherwise show the flash at the top of the page. *}
+{if $umFlash = get_flash_message()}{/if}
+{assign var=umAutoOpen value=false}
+{if isset($formdata.inviteemail) && $formdata.inviteemail}{assign var=umAutoOpen value=true}{/if}
 
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/account-user-management.css?v={$myTheme.version|default:'1.0'}">
 
 <script>
-(function () { var b = document.body; if (b) { b.setAttribute('data-data', '{$dashIsEmpty}'); b.setAttribute('data-subnav', 'on'); } })();
+(function () { var b = document.body; if (b) { b.setAttribute('data-data', '{if $usCount > 0 || $invCount > 0}full{else}empty{/if}'); b.setAttribute('data-subnav', 'on'); } })();
 </script>
 
 <header class="page-header">
@@ -35,24 +42,24 @@
             <h1>{$LANG.usermanagement|default:'User Management'}</h1>
             <p class="page-subtitle">{$LANG.usermanagementsub|default:'Invite people to access this account and choose what they can do.'}</p>
         </div>
-        <a href="#umInviteForm" class="page-header-action">
+        <button type="button" class="um-invite-btn" data-um-invite-open>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             {$LANG.userManagement.inviteNewUser|default:'Invite new user'}
-        </a>
+        </button>
     </div>
 </header>
 
 <div class="um-split">
     <div class="um-main">
 
-        {if $message = get_flash_message()}
-            <div class="um-alert um-alert-{if $message.type == 'error'}error{elseif $message.type == 'success'}success{elseif $message.type == 'warning'}warn{else}info{/if}">
-                {$message.text}
+        {if $umFlash && !$umAutoOpen}
+            <div class="um-alert um-alert-{if $umFlash.type == 'error'}error{elseif $umFlash.type == 'success'}success{elseif $umFlash.type == 'warning'}warn{else}info{/if}">
+                {$umFlash.text}
             </div>
         {/if}
 
-        {if $usCount > 0}
-        <div class="when-full um-list">
+        {* ── Users with access ── *}
+        <div class="um-list">
             {foreach $users as $user}
                 {assign var=uFirst value=$user->firstname|default:''}
                 {assign var=uLast  value=$user->lastname|default:''}
@@ -95,82 +102,38 @@
                     </div>
                 </div>
             {/foreach}
+        </div>
 
-            {if $invCount > 0}
-                <div class="um-section-label">{$LANG.userManagement.pendingInvites|default:'Pending invites'}</div>
-                {foreach $invites as $invite}
-                    <div class="um-row um-row-invite">
-                        <div class="um-row-avatar um-row-avatar-pending">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        </div>
-                        <div class="um-row-meta">
-                            <div class="um-row-name">{$invite->email|default:''|escape}</div>
-                            <div class="um-row-sub">
-                                {$LANG.userManagement.inviteSent|default:'Invited'}
-                                {if isset($invite->created_at)}{$invite->created_at->diffForHumans()}{/if}
-                            </div>
-                        </div>
-                        <div class="um-row-actions">
-                            <form method="post" action="{routePath('account-users-invite-resend')}" style="display:inline">
-                                <input type="hidden" name="token" value="{$token|default:''|escape}">
-                                <input type="hidden" name="inviteid" value="{$invite->id|escape}">
-                                <button type="submit" class="um-row-btn">{$LANG.userManagement.resendInvite|default:'Resend'}</button>
-                            </form>
-                            <button type="button" class="um-row-btn um-row-btn-danger" data-um-cancel-invite="{$invite->id|escape}">{$LANG.userManagement.cancelInvite|default:'Cancel'}</button>
+        {* ── Pending invites (#1) ── *}
+        {if $invCount > 0}
+        <div class="um-list um-pending">
+            <div class="um-section-label">{$LANG.userManagement.pendingInvites|default:'Pending invites'}</div>
+            {foreach $invites as $invite}
+                <div class="um-row um-row-invite">
+                    <div class="um-row-avatar um-row-avatar-pending">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div class="um-row-meta">
+                        <div class="um-row-name">{$invite->email|default:''|escape} <span class="um-tag um-tag-invited">{$LANG.userManagement.pending|default:'Pending'}</span></div>
+                        <div class="um-row-sub">
+                            {$LANG.userManagement.inviteSent|default:'Invited'}
+                            {if isset($invite->created_at)}{$invite->created_at->diffForHumans()}{/if}
                         </div>
                     </div>
-                {/foreach}
-            {/if}
+                    <div class="um-row-actions">
+                        <form method="post" action="{routePath('account-users-invite-resend')}" style="display:inline">
+                            <input type="hidden" name="token" value="{$token|default:''|escape}">
+                            <input type="hidden" name="inviteid" value="{$invite->id|escape}">
+                            <button type="submit" class="um-row-btn">{$LANG.userManagement.resendInvite|default:'Resend'}</button>
+                        </form>
+                        <button type="button" class="um-row-btn um-row-btn-danger" data-um-cancel-invite="{$invite->id|escape}">{$LANG.userManagement.cancelInvite|default:'Cancel'}</button>
+                    </div>
+                </div>
+            {/foreach}
         </div>
         {/if}
 
-        <div class="when-empty um-empty">
-            <div class="um-empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div>
-            <p class="um-empty-title">{$LANG.userManagement.noUsers|default:'No additional users'}</p>
-            <p class="um-empty-sub">{$LANG.userManagement.noUsersSub|default:'You are the only person with access to this account. Invite a teammate, accountant, or developer to collaborate.'}</p>
-        </div>
-
-        {* ───── Invite form ───── *}
-        <div class="card um-invite" id="umInviteForm">
-            <div class="um-invite-header">
-                <h2 class="um-invite-title">{$LANG.userManagement.inviteNewUser|default:'Invite a new user'}</h2>
-                <p class="um-invite-sub">{$LANG.userManagement.inviteNewUserDescription|default:'Send an invitation email. The user can sign up or sign in to their existing WHMCS account to accept.'}</p>
-            </div>
-            <form method="post" action="{routePath('account-users-invite')}" class="um-invite-form">
-                <input type="hidden" name="token" value="{$token|default:''|escape}">
-                <div class="um-form-row">
-                    <label class="um-label" for="umInviteEmail">{$LANG.emailaddress|default:'Email address'}</label>
-                    <input type="email" id="umInviteEmail" name="inviteemail" class="um-input" placeholder="name@example.com" value="{$formdata.inviteemail|default:''|escape}" required>
-                </div>
-                <div class="um-form-row">
-                    <span class="um-label">{$LANG.userManagement.permissions|default:'Permissions'}</span>
-                    <label class="um-radio">
-                        <input type="radio" name="permissions" value="all" checked>
-                        <span>{$LANG.userManagement.allPermissions|default:'All permissions'}</span>
-                    </label>
-                    <label class="um-radio">
-                        <input type="radio" name="permissions" value="choose">
-                        <span>{$LANG.userManagement.choosePermissions|default:'Choose individual permissions'}</span>
-                    </label>
-                </div>
-                {if isset($permissions) && $permissions|@count > 0}
-                <div class="um-perms" data-um-perms hidden>
-                    {foreach $permissions as $perm}
-                        <label class="um-perm">
-                            <input type="checkbox" name="perms[{$perm.key|escape}]" value="1">
-                            <span>
-                                <strong>{$perm.title|escape}</strong>
-                                <span class="um-perm-desc">{$perm.description|default:''|escape}</span>
-                            </span>
-                        </label>
-                    {/foreach}
-                </div>
-                {/if}
-                <div class="um-form-actions">
-                    <button type="submit" class="btn-primary">{$LANG.userManagement.sendInvite|default:'Send invitation'}</button>
-                </div>
-            </form>
-        </div>
+        <p class="um-footnote">* {$LANG.userManagement.accountOwnerPermissionsInfo|default:'The account owner always has full permissions and cannot be removed.'}</p>
 
     </div>
 
@@ -201,7 +164,63 @@
     </aside>
 </div>
 
-{* Hidden POST forms for remove + cancel-invite modals *}
+{* ── Invite-new-user modal (#2) — the whole invite happens here ── *}
+<div class="um-modal" id="umInviteModal" hidden{if $umAutoOpen} data-um-autoopen="1"{/if} role="dialog" aria-modal="true" aria-labelledby="umInviteTitle">
+    <div class="um-modal-backdrop" data-um-close></div>
+    <div class="um-modal-dialog" role="document">
+        <form method="post" action="{routePath('account-users-invite')}" class="um-modal-form">
+            <input type="hidden" name="token" value="{$token|default:''|escape}">
+            <div class="um-modal-head">
+                <h2 class="um-modal-title" id="umInviteTitle">{$LANG.userManagement.inviteNewUser|default:'Invite a new user'}</h2>
+                <button type="button" class="um-modal-x" data-um-close aria-label="{$LANG.close|default:'Close'}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="um-modal-body">
+                {if $umFlash && $umAutoOpen}
+                    <div class="um-alert um-alert-{if $umFlash.type == 'error'}error{elseif $umFlash.type == 'success'}success{elseif $umFlash.type == 'warning'}warn{else}info{/if}">
+                        {$umFlash.text}
+                    </div>
+                {/if}
+                <p class="um-invite-sub">{$LANG.userManagement.inviteNewUserDescription|default:'Send an invitation email. They can accept by signing in to — or creating — their WHMCS account.'}</p>
+                <div class="um-form-row">
+                    <label class="um-label" for="umInviteEmail">{$LANG.emailaddress|default:'Email address'}</label>
+                    <input type="email" id="umInviteEmail" name="inviteemail" class="um-input" placeholder="name@example.com" value="{$formdata.inviteemail|default:''|escape}" required>
+                </div>
+                <div class="um-form-row">
+                    <span class="um-label">{$LANG.userManagement.permissions|default:'Permissions'}</span>
+                    <label class="um-radio">
+                        <input type="radio" name="permissions" value="all" checked>
+                        <span>{$LANG.userManagement.allPermissions|default:'All permissions'}</span>
+                    </label>
+                    <label class="um-radio">
+                        <input type="radio" name="permissions" value="choose">
+                        <span>{$LANG.userManagement.choosePermissions|default:'Choose individual permissions'}</span>
+                    </label>
+                </div>
+                {if isset($permissions) && $permissions|@count > 0}
+                <div class="um-perms" data-um-perms hidden>
+                    {foreach $permissions as $perm}
+                        <label class="um-perm">
+                            <input type="checkbox" name="perms[{$perm.key|escape}]" value="1">
+                            <span>
+                                <strong>{$perm.title|escape}</strong>
+                                <span class="um-perm-desc">{$perm.description|default:''|escape}</span>
+                            </span>
+                        </label>
+                    {/foreach}
+                </div>
+                {/if}
+            </div>
+            <div class="um-modal-foot">
+                <button type="button" class="btn-secondary" data-um-close>{$LANG.cancel|default:'Cancel'}</button>
+                <button type="submit" class="btn-primary">{$LANG.userManagement.sendInvite|default:'Send invitation'}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{* Hidden POST forms for remove + cancel-invite confirmations *}
 <form method="post" action="{routePath('account-users-remove')}" id="umRemoveForm" style="display:none">
     <input type="hidden" name="token" value="{$token|default:''|escape}">
     <input type="hidden" name="userid" id="umRemoveUserId">
@@ -212,31 +231,63 @@
 </form>
 
 <script>{literal}
-(function(){
-    // Toggle individual-permissions section when "choose" radio is selected
-    var permsWrap = document.querySelector('[data-um-perms]');
-    document.querySelectorAll('input[name="permissions"]').forEach(function(r){
-        r.addEventListener('change', function(){
-            if (permsWrap) permsWrap.hidden = (r.value !== 'choose');
-        });
+(function () {
+    /* ── Invite modal open/close ── */
+    var modal = document.getElementById('umInviteModal');
+    function openModal() {
+        if (!modal) return;
+        modal.hidden = false;
+        document.body.classList.add('um-modal-open');
+        var f = document.getElementById('umInviteEmail');
+        if (f) { f.focus(); }
+    }
+    function closeModal() {
+        if (!modal) return;
+        modal.hidden = true;
+        document.body.classList.remove('um-modal-open');
+    }
+    var openers = document.querySelectorAll('[data-um-invite-open]');
+    for (var i = 0; i < openers.length; i++) {
+        openers[i].addEventListener('click', function (e) { e.preventDefault(); openModal(); });
+    }
+    if (modal) {
+        var closers = modal.querySelectorAll('[data-um-close]');
+        for (var c = 0; c < closers.length; c++) { closers[c].addEventListener('click', closeModal); }
+        if (modal.getAttribute('data-um-autoopen') === '1') { openModal(); }
+    }
+    document.addEventListener('keydown', function (e) {
+        if ((e.key === 'Escape' || e.keyCode === 27) && modal && !modal.hidden) { closeModal(); }
     });
-    // Remove-user confirm + submit
-    document.querySelectorAll('[data-um-remove]').forEach(function(b){
-        b.addEventListener('click', function(){
-            var id = b.getAttribute('data-um-remove');
-            if (!confirm('Remove this user’s access to your account?')) return;
+
+    /* ── Toggle individual-permissions list when "choose" is selected ── */
+    var permsWrap = document.querySelector('[data-um-perms]');
+    var radios = document.querySelectorAll('input[name="permissions"]');
+    for (var r = 0; r < radios.length; r++) {
+        radios[r].addEventListener('change', function () {
+            if (permsWrap) { permsWrap.hidden = (document.querySelector('input[name="permissions"]:checked') || {}).value !== 'choose'; }
+        });
+    }
+
+    /* ── Remove-user confirm + submit ── */
+    var rm = document.querySelectorAll('[data-um-remove]');
+    for (var m = 0; m < rm.length; m++) {
+        rm[m].addEventListener('click', function () {
+            var id = this.getAttribute('data-um-remove');
+            if (!confirm('Remove this user’s access to your account?')) { return; }
             document.getElementById('umRemoveUserId').value = id;
             document.getElementById('umRemoveForm').submit();
         });
-    });
-    // Cancel-invite confirm + submit
-    document.querySelectorAll('[data-um-cancel-invite]').forEach(function(b){
-        b.addEventListener('click', function(){
-            var id = b.getAttribute('data-um-cancel-invite');
-            if (!confirm('Cancel this pending invitation?')) return;
+    }
+
+    /* ── Cancel-invite confirm + submit ── */
+    var ci = document.querySelectorAll('[data-um-cancel-invite]');
+    for (var k = 0; k < ci.length; k++) {
+        ci[k].addEventListener('click', function () {
+            var id = this.getAttribute('data-um-cancel-invite');
+            if (!confirm('Cancel this pending invitation?')) { return; }
             document.getElementById('umCancelInviteId').value = id;
             document.getElementById('umCancelInviteForm').submit();
         });
-    });
+    }
 })();
 {/literal}</script>
