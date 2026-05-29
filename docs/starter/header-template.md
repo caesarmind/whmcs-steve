@@ -279,7 +279,7 @@ The KB article check prefixes the article title on KB pages for better SEO.
 - `{$headeroutput}` — Header-specific hooks/modules
 
 **Optional data attribute:**
-- `data-phone-cc-input` — Phone country code picker style
+- `data-phone-cc-input` — Phone country code picker style. See [Phone Number Fields](/components/forms.md#phone-number-fields) for the required field-submission contract (national number in `phonenumber` + hidden `country-calling-code-phonenumber`); a full `+E.164` value triggers "Your phone number is not valid".
 
 ### 3. Topbar (Logged-in Users)
 

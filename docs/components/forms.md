@@ -68,6 +68,46 @@
 {/if}
 ```
 
+### Phone Number Fields
+
+WHMCS does **not** store the full international number in `phonenumber`. When the
+country-code picker is enabled (`<body data-phone-cc-input="{$phoneNumberInputStyle}">`),
+WHMCS submits **two** values and recombines them server-side:
+
+- `phonenumber` — the **national** number only (no `+` country code)
+- `country-calling-code-phonenumber` — a **hidden** field holding the dial code (e.g. `44`)
+
+> ⚠️ Putting a full `+E.164` number (e.g. `+447911123456`) into `phonenumber`
+> makes WHMCS reject the submission with **"Your phone number is not valid."**
+> Keep `phonenumber` national and send the dial code in the hidden field.
+
+WHMCS's bundled `scripts.js` wires this up automatically — intl-tel-input in
+`separateDialCode` mode, plus an injected `country-calling-code-<fieldname>` hidden
+input (the same applies to `domaincontactphonenumber`). If your theme **doesn't**
+load WHMCS's `scripts.min.js` on the page, replicate the contract yourself:
+
+```smarty
+<input type="tel" name="phonenumber" id="inputPhone" class="form-control">
+```
+
+```javascript
+var phoneEl = document.getElementById('inputPhone');
+
+// Hidden dial-code field WHMCS expects alongside the national number.
+var cc = document.createElement('input');
+cc.type = 'hidden';
+cc.name = 'country-calling-code-' + phoneEl.name;   // -> country-calling-code-phonenumber
+phoneEl.parentNode.insertBefore(cc, phoneEl);
+
+var iti = window.intlTelInput(phoneEl, { separateDialCode: true /* …, utilsScript, etc. */ });
+function syncDialCode() { cc.value = iti.getSelectedCountryData().dialCode || ''; }
+syncDialCode();
+phoneEl.addEventListener('countrychange', syncDialCode);
+
+// Do NOT overwrite phoneEl.value with iti.getNumber() (E.164) on submit —
+// that is exactly what triggers the "not valid" error.
+```
+
 ### Input Group Pattern (Login)
 
 ```smarty
