@@ -1,5 +1,5 @@
 .page-header { margin: 8px 0 24px; }
-.page-header h1 { font-size: var(--text-h4); font-weight: var(--fw-semibold); letter-spacing: -0.025em; color: var(--color-text-primary); margin: 0 0 6px; line-height: 1.2; }
+.page-header h1 { font-size: var(--text-h4); font-weight: var(--fw-semibold); letter-spacing: -0.025em; color: var(--color-text-primary); margin: 0 0 6px; line-height: 1.2; overflow-wrap: anywhere; }
 .page-header .page-eyebrow { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 8px; }
 .page-header .page-subtitle { font-size: var(--text-md); color: var(--color-text-secondary); margin: 6px 0 0; }
 .page-header-row { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
