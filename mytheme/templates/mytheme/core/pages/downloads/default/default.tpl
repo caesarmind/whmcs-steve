@@ -145,15 +145,22 @@
                         <div class="dl-file-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
                         {/if}
                         <div class="dl-file-meta">
-                            <div class="dl-file-name">{$download.title|escape}{if $download.clientsonly} <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;opacity:0.5;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>{/if}</div>
+                            <div class="dl-file-name">{$download.title|escape}</div>
                             <div class="dl-file-sub">
+                                {if $download.clientsonly}<span class="dl-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>{if $loggedin}{$LANG.restricted|default:'Restricted'}{else}{$LANG.loginrequired|default:'Login required'}{/if}</span>{/if}
                                 {if $download.filesize}<span>{$download.filesize|escape}</span>{/if}
                                 {if $download.description}<span class="dot">·</span><span>{$download.description|strip_tags}</span>{/if}
                             </div>
                         </div>
+                        {if $download.clientsonly && !$loggedin}
+                        <span class="dl-file-action" title="{$LANG.loginrequired|default:'Login required'}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                        </span>
+                        {else}
                         <span class="dl-file-action" title="{$LANG.downloadbutton|default:'Download'}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         </span>
+                        {/if}
                     </a>
                 {/foreach}
             </div>

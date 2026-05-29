@@ -121,6 +121,8 @@
 .dl-file-name { font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-text-primary); letter-spacing: -0.008em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dl-file-sub { font-size: var(--text-sm); color: var(--color-text-tertiary); margin-top: 2px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .dl-file-sub .dot { opacity: 0.45; }
+.dl-lock { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: var(--radius-pill); background: var(--color-orange-bg); color: var(--color-orange-text); font-size: var(--text-xs); font-weight: var(--fw-medium); white-space: nowrap; }
+.dl-lock svg { width: 10px; height: 10px; }
 
 .dl-file-action {
     width: 32px; height: 32px; border-radius: 50%;
