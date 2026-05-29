@@ -19,6 +19,14 @@
 {assign var=hasProviders value=false}
 {if isset($linkableProviders) && $linkableProviders}{assign var=hasProviders value=true}{/if}
 
+{* Only offer 2FA when WHMCS reports it's available (admin has enabled at least one
+   2FA method) or it's already active. We only HIDE it when WHMCS explicitly says it's
+   unavailable, so an older WHMCS that omits the flag still shows the card. *}
+{assign var=tfaAvail value=true}
+{if isset($twoFactorAuthAvailable) && !$twoFactorAuthAvailable && !$tfaEnabled}{assign var=tfaAvail value=false}{/if}
+{assign var=anyOption value=false}
+{if $tfaAvail || $hasSso || $hasProviders}{assign var=anyOption value=true}{/if}
+
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareasecurity.css?v={$myTheme.version|default:'1.0'}">
 
 <script>
@@ -63,6 +71,7 @@
     {* ══ RIGHT: stacked cards ══ *}
     <div class="sec-main">
 
+        {if $tfaAvail}
         {* ── Two-factor authentication (real status from WHMCS) ── *}
         <div class="card sec-card-inner">
             <div class="sec-header">
@@ -97,6 +106,7 @@
                 </div>
             </div>
         </div>
+        {/if}
 
         {* ── Single Sign-On (only rendered when WHMCS offers it) ── *}
         {if $hasSso}
@@ -135,6 +145,18 @@
                 {foreach $linkableProviders as $provider}{$provider.code}{/foreach}
             </div>
             <div class="providerLinkingFeedback"></div>
+        </div>
+        {/if}
+
+        {* ── Nothing available — admin hasn't enabled any account-security options ── *}
+        {if !$anyOption}
+        <div class="card sec-card-inner">
+            <div class="sec-empty">
+                <div class="sec-empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <p class="sec-empty-title">{$LANG.securitynooptionstitle|default:'No additional security options available'}</p>
+                <p class="sec-empty-sub">{$LANG.securitynooptionssub|default:'Your administrator has not enabled any additional account-security features (such as two-factor authentication or single sign-on). Contact support if you would like extra protection added to your account.'}</p>
+                <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.contactsupport|default:'Contact support'}</a>
+            </div>
         </div>
         {/if}
 
