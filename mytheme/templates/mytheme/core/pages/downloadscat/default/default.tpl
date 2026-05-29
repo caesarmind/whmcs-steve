@@ -166,9 +166,9 @@
                         </div>
                         <div class="dl-file-actions">
                             {if $download.clientsonly && !$loggedin}
-                            <a href="{$download.link|default:'#'|escape}" class="dl-dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>{$LANG.login|default:'Log in'}</a>
+                            <a href="{$download.link|default:'#'}" class="dl-dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>{$LANG.login|default:'Log in'}</a>
                             {else}
-                            <a href="{$download.link|default:'#'|escape}" class="dl-dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>{$LANG.downloadbutton|default:'Download'}</a>
+                            <a href="{$download.link|default:'#'}" class="dl-dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>{$LANG.downloadbutton|default:'Download'}</a>
                             {/if}
                         </div>
                     </div>

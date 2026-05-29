@@ -138,7 +138,7 @@
             <div class="card dl-file-list">
                 {foreach $mostdownloads as $download}
                     {assign var=ft value=$download.type|default:''|lower}
-                    <a href="{$download.link|default:'#'|escape}" class="dl-file-row">
+                    <a href="{$download.link|default:'#'}" class="dl-file-row">
                         {if $ft}
                         <div class="dl-file-ico {$ft|escape}">{$ft|upper|truncate:3:""|escape}</div>
                         {else}
