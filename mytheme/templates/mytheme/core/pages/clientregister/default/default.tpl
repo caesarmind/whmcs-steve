@@ -32,6 +32,10 @@
    array so the in_array() required-field checks below never error. *}
 {if !isset($optionalFields) || !is_array($optionalFields)}{assign var=optionalFields value=[]}{/if}
 
+{* Phone country-code chooser (flag + dial code), same library/version as the
+   mytheme_cart checkout. Pinned to v18 because v19+ drops the auto-bundled utils.
+   Loaded BEFORE our page CSS so the Apple overrides below win specificity ties. *}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/css/intlTelInput.css">
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientregister.css?v={$myTheme.version|default:'1.0'}">
 
 <div class="cr-wrap">
@@ -53,9 +57,6 @@
             <div>{if is_array($errormessage)}{foreach $errormessage as $err}<div>{$err|strip_tags|escape}</div>{/foreach}{else}{$errormessage|strip_tags|escape}{/if}</div>
         </div>
         {/if}
-
-        {* #1 — a clear legend so users can see required vs optional at a glance. *}
-        <p class="cr-legend"><span class="cr-req" aria-hidden="true">*</span> {$LANG.orderForm.requiredField|default:'Required field'}</p>
 
         <form method="post" action="{$smarty.server.PHP_SELF}" class="cr-form" id="frmRegister" role="form" name="orderfrm">
             <input type="hidden" name="register" value="true">
@@ -378,6 +379,58 @@
     document.addEventListener('keydown', function (e) {
         if ((e.key === 'Escape' || e.keyCode === 27) && !modal.hidden) { close(); }
     });
+})();
+{/literal}</script>
+
+{* ── Phone country-code chooser ───────────────────────────────────────────
+   intl-tel-input adds a flag + dial-code dropdown to the phone field, mirroring
+   the mytheme_cart checkout. Wired with plain DOM (this page has no jQuery).
+   dropdownContainer:document.body keeps the country list out of the card's
+   overflow:hidden clip; on submit the value is normalised to E.164 for WHMCS. *}
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/js/intlTelInput.min.js"></script>
+<script>{literal}
+(function () {
+    var phoneEl = document.getElementById('cr-phone');
+    if (!phoneEl || typeof window.intlTelInput !== 'function') { return; }
+    var countryEl = document.getElementById('cr-country');
+    var iti = window.intlTelInput(phoneEl, {
+        separateDialCode: true,
+        dropdownContainer: document.body,
+        preferredCountries: ['us', 'gb', 'ca', 'au', 'de', 'fr', 'nl', 'es', 'it'],
+        initialCountry: (function () {
+            var c = countryEl ? (countryEl.value || '') : '';
+            return (c && c.length === 2) ? c.toLowerCase() : 'us';
+        })(),
+        utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/js/utils.js?onlyCountries=false'
+    });
+
+    /* Keep the dial-code country in step with the billing country the user
+       picks — but only while they haven't deliberately changed it in the
+       iti dropdown. */
+    var lastSynced = '';
+    if (countryEl) {
+        countryEl.addEventListener('change', function () {
+            var c = (this.value || '').toLowerCase();
+            if (!c || c.length !== 2) { return; }
+            var current = iti.getSelectedCountryData().iso2;
+            if (current === lastSynced || lastSynced === '') {
+                iti.setCountry(c);
+                lastSynced = c;
+            }
+        });
+    }
+
+    /* Normalise to the canonical E.164 number on submit (capture phase so we
+       run before any other submit handler). */
+    var form = document.getElementById('frmRegister');
+    if (form) {
+        form.addEventListener('submit', function () {
+            if (typeof iti.getNumber === 'function') {
+                var n = iti.getNumber();
+                if (n) { phoneEl.value = n; }
+            }
+        }, true);
+    }
 })();
 {/literal}</script>
 {/if}
