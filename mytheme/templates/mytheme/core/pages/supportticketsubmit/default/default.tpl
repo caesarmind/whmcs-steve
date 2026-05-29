@@ -305,15 +305,17 @@
                 </script>
                 {/literal}
 
-                {* Spam/CAPTCHA challenge — WHMCS provides $captcha only when enabled
-                   (and typically only for guest submissions); renders nothing otherwise. *}
-                {if isset($captcha) && $captcha}
-                <div class="form-group tk-captcha">{$captcha}</div>
+                {* Spam/CAPTCHA challenge — $captcha is an object; render via getMarkup()
+                   gated on the per-form admin setting (typically active only for guest
+                   submissions). The reCAPTCHA api.js is auto-injected by headoutput. *}
+                {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
+                <div class="form-group tk-captcha">{$captcha->getMarkup()}</div>
+                <script>{$captcha->getPageJs()}</script>
                 {/if}
 
                 <div class="tk-form-foot">
                     <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.back|default:'Back'}</a>
-                    <button type="submit" class="btn-primary">{$LANG.submitticket|default:'Submit ticket'}</button>
+                    <button type="submit" class="btn-primary{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.submitticket|default:'Submit ticket'}</button>
                 </div>
             </form>
         </div>

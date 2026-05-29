@@ -59,10 +59,13 @@
                     <label class="form-label" for="pw-email">{$LANG.clientareaemail|default:'Email address'}</label>
                     <input type="email" class="form-input" id="pw-email" name="email" value="{$email|default:''|escape}" autocomplete="email" required autofocus>
                 </div>
-                {if isset($captcha) && $captcha}
-                <div class="form-group">{$captcha}</div>
+                {* CAPTCHA — $captcha is an object; render via getMarkup() gated on the
+                   per-form admin setting. api.js is auto-injected by headoutput. *}
+                {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
+                <div class="form-group pw-captcha">{$captcha->getMarkup()}</div>
+                <script>{$captcha->getPageJs()}</script>
                 {/if}
-                <button type="submit" class="btn-primary pw-submit">{$LANG.pwresetsendlink|default:'Send reset link'}</button>
+                <button type="submit" class="btn-primary pw-submit{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.pwresetsendlink|default:'Send reset link'}</button>
             </form>
             <p class="pw-altlink"><a href="{$WEB_ROOT}/login">{$LANG.backtologin|default:'Back to sign in'}</a></p>
 

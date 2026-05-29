@@ -60,10 +60,14 @@
                     <label class="form-label" for="ct-message">{$LANG.contactmessage|default:'Message'}</label>
                     <textarea class="form-input ct-message-area" id="ct-message" name="message" rows="8" required>{$message|default:''|escape}</textarea>
                 </div>
-                {if isset($captcha) && $captcha}
-                <div class="form-group ct-captcha">{$captcha}</div>
+                {* CAPTCHA — $captcha is an object; render via getMarkup() gated on the
+                   per-form admin setting. The reCAPTCHA/hCaptcha api.js is auto-injected
+                   by headoutput in header.tpl, so no extra JS bundle is needed here. *}
+                {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
+                <div class="form-group ct-captcha">{$captcha->getMarkup()}</div>
+                <script>{$captcha->getPageJs()}</script>
                 {/if}
-                <button type="submit" class="btn-primary ct-submit">{$LANG.contactsend|default:'Send message'}</button>
+                <button type="submit" class="btn-primary ct-submit{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.contactsend|default:'Send message'}</button>
             </form>
         {/if}
     </div>

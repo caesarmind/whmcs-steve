@@ -11,6 +11,17 @@
     border-radius: var(--radius-sm); font-size: var(--text-base); line-height: 1.5;
 }
 .cr-error svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; }
+.cr-error a { color: inherit; font-weight: var(--fw-semibold); text-decoration: underline; }
+
+/* #1 — required/optional markers ---------------------------------------- */
+.cr-legend { font-size: var(--text-sm); color: var(--color-text-tertiary); margin: 0 0 20px; }
+.cr-req {
+    color: var(--color-red-text);
+    font-weight: var(--fw-semibold);
+    margin-left: 2px;
+}
+.cr-opt { opacity: 0.55; font-weight: var(--fw-normal); font-size: var(--text-sm); }
+
 .cr-form { display: flex; flex-direction: column; gap: 24px; }
 .cr-section { display: flex; flex-direction: column; gap: 14px; }
 .cr-section-title {
@@ -20,24 +31,36 @@
     padding-bottom: 8px;
     border-bottom: 0.5px solid var(--color-border);
 }
-.cr-opt { opacity: 0.55; font-weight: var(--fw-normal); font-size: var(--text-sm); }
 .cr-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .cr-form .form-group { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .cr-form .form-label { font-size: var(--text-base); font-weight: var(--fw-medium); color: var(--color-text-primary); }
 .cr-form .form-input,
-.cr-form .form-select {
+.cr-form .form-select,
+/* Raw WHMCS custom-field inputs ($customfield.input) carry no theme class —
+   match them to .form-input so admin-defined fields look native. */
+.cr-customfield input:not([type="checkbox"]):not([type="radio"]),
+.cr-customfield select,
+.cr-customfield textarea {
     height: 40px; padding: 0 12px;
+    width: 100%; box-sizing: border-box;
     border: 0.5px solid var(--color-border);
     border-radius: var(--radius-sm);
     background: var(--color-surface);
     font-size: var(--text-md); font-family: inherit;
     color: var(--color-text-primary);
 }
+.cr-customfield textarea { height: auto; min-height: 88px; padding: 10px 12px; line-height: 1.5; }
 .cr-form .form-input:focus,
-.cr-form .form-select:focus {
+.cr-form .form-select:focus,
+.cr-customfield input:focus,
+.cr-customfield select:focus,
+.cr-customfield textarea:focus {
     outline: none; border-color: var(--color-accent);
     box-shadow: 0 0 0 3px var(--color-accent-light);
 }
+.cr-help { font-size: var(--text-sm); color: var(--color-text-tertiary); margin: 2px 0 0; line-height: 1.45; }
+
+/* Checkboxes (TOS + tickbox custom fields) ------------------------------ */
 .cr-check {
     display: flex; align-items: flex-start; gap: 10px;
     font-size: var(--text-base); color: var(--color-text-primary);
@@ -51,8 +74,124 @@
 }
 .cr-check a { color: var(--color-accent); text-decoration: none; }
 .cr-check a:hover { text-decoration: underline; }
-.cr-marketing, .cr-terms { margin: 0; }
+.cr-terms { margin: 0; }
+
+/* #2 — Apple-style toggle switch for the marketing opt-in --------------- */
+.cr-marketing { gap: 12px; }
+.cr-marketing-msg { font-size: var(--text-base); color: var(--color-text-secondary); line-height: 1.55; margin: 0; }
+.cr-switch { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.cr-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.cr-switch-track {
+    flex-shrink: 0;
+    width: 46px; height: 28px;
+    border-radius: 999px;
+    background: var(--color-border);
+    transition: background 0.2s ease;
+    position: relative;
+}
+.cr-switch-thumb {
+    position: absolute; top: 2px; left: 2px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease;
+}
+.cr-switch input:checked + .cr-switch-track { background: var(--color-accent); }
+.cr-switch input:checked + .cr-switch-track .cr-switch-thumb { transform: translateX(18px); }
+.cr-switch input:focus-visible + .cr-switch-track { box-shadow: 0 0 0 3px var(--color-accent-light); }
+.cr-switch-text { font-size: var(--text-base); color: var(--color-text-primary); }
+
+/* #4 — captcha widget --------------------------------------------------- */
+.cr-captcha { align-items: center; }
+.cr-captcha .g-recaptcha,
+.cr-captcha .h-captcha { display: inline-block; }
+.cr-captcha img { border-radius: var(--radius-sm); border: 0.5px solid var(--color-border); }
+.cr-captcha input[type="text"] {
+    height: 40px; padding: 0 12px; max-width: 220px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    font-size: var(--text-md); font-family: inherit;
+    color: var(--color-text-primary);
+}
+.cr-captcha input[type="text"]:focus {
+    outline: none; border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+
 .cr-submit { width: 100%; height: 44px; font-size: var(--text-md); font-weight: var(--fw-medium); margin-top: 4px; }
+
+/* Generate-password helper + modal -------------------------------------- */
+.cr-gen-pw {
+    align-self: flex-start;
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 34px; padding: 0 14px;
+    background: transparent;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-accent);
+    font-size: var(--text-sm); font-weight: var(--fw-medium);
+    font-family: inherit; cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+.cr-gen-pw:hover { border-color: var(--color-accent); background: var(--color-accent-light); }
+.cr-gen-pw svg { width: 14px; height: 14px; }
+
+body.cr-gp-open { overflow: hidden; }
+.cr-gp-modal {
+    position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.cr-gp-modal[hidden] { display: none; }
+.cr-gp-backdrop { position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(0, 0, 0, 0.45); }
+.cr-gp-dialog {
+    position: relative; width: 100%; max-width: 420px;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+    overflow: hidden;
+}
+.cr-gp-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-bottom: 0.5px solid var(--color-border);
+}
+.cr-gp-title { margin: 0; font-size: var(--text-md); font-weight: var(--fw-semibold); color: var(--color-text-primary); }
+.cr-gp-x {
+    width: 28px; height: 28px; flex-shrink: 0;
+    display: grid; place-items: center;
+    border: 0; background: transparent; border-radius: 50%;
+    color: var(--color-text-tertiary); cursor: pointer;
+}
+.cr-gp-x:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+.cr-gp-x svg { width: 16px; height: 16px; }
+.cr-gp-body { padding: 18px 20px 6px; }
+.cr-gp-field { margin: 0 0 14px; }
+.cr-gp-field label { display: block; font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--color-text-secondary); margin: 0 0 6px; }
+.cr-gp-field input {
+    height: 40px; width: 100%; box-sizing: border-box; padding: 0 12px;
+    border: 0.5px solid var(--color-border); border-radius: var(--radius-sm);
+    background: var(--color-surface); font-size: var(--text-md); font-family: inherit;
+    color: var(--color-text-primary);
+}
+.cr-gp-field input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+#crGpLength { max-width: 120px; }
+#crGpOutput { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; letter-spacing: 0.02em; }
+.cr-gp-output-row { display: flex; gap: 8px; }
+.cr-gp-output-row input { flex: 1; min-width: 0; }
+.cr-gp-ghost {
+    flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
+    height: 40px; padding: 0 14px;
+    border: 0.5px solid var(--color-border); border-radius: var(--radius-sm);
+    background: var(--color-surface-secondary); color: var(--color-text-primary);
+    font-size: var(--text-sm); font-weight: var(--fw-medium); font-family: inherit; cursor: pointer;
+}
+.cr-gp-ghost:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.cr-gp-ghost svg { width: 14px; height: 14px; }
+.cr-gp-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 20px 18px; }
+.cr-gp-foot .btn-primary, .cr-gp-foot .btn-secondary { height: 38px; padding: 0 16px; font-size: var(--text-base); }
+
 @media (max-width: 600px) {
     .cr-card { padding: 28px 24px 24px; }
     .cr-form .form-row { grid-template-columns: 1fr; }
