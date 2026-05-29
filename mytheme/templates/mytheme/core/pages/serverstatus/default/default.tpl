@@ -304,43 +304,72 @@
 <script>
 {literal}
 (function () {
-    // Self-contained port checks against the standard WHMCS endpoint, rendered
-    // as Apple-style status dots (we set classes rather than injecting WHMCS's
-    // gif markup so the visual language stays consistent).
+    // Self-contained port + stats checks against the standard WHMCS serverstatus
+    // endpoints (same request params as WHMCS's own checkPort/getStats), rendered
+    // as Apple-style status dots. mytheme loads no jQuery/scripts.js, so the
+    // checkPort/getStats globals don't exist here -- reimplement them in vanilla JS.
+
+    // WHMCS's ping response varies by version (plain text, on/off gif, or a Font
+    // Awesome icon). Treat it as DOWN only on an explicit negative/empty signal;
+    // otherwise treat a returned response as UP (matches what the icon conveys).
+    function classifyUp(t) {
+        var s = (t || '').toLowerCase();
+        if (!s) { return false; }
+        if (/offline|unavailable|\bdown\b|fail|error|off\.gif|fa-times|fa-xmark|fa-circle-xmark|text-danger|label-danger/.test(s)) { return false; }
+        return true;
+    }
+
     function mtCheckPort(row, num, port) {
         var el = document.getElementById('port' + port + '_' + num);
-        if (!el) return;
+        if (!el) { return; }
         var done = function (up) {
             el.classList.remove('loading');
             el.classList.add(up ? 'up' : 'down');
             mtRollUp(row);
         };
-        try {
-            fetch('serverstatus.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'ping=1&num=' + encodeURIComponent(num) + '&port=' + encodeURIComponent(port),
-                credentials: 'same-origin'
-            })
-            .then(function (r) { return r.text(); })
-            .then(function (t) { done(/online/i.test(t)); })
-            .catch(function () { done(false); });
-        } catch (e) { done(false); }
+        fetch('serverstatus.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'ping=1&num=' + encodeURIComponent(num) + '&port=' + encodeURIComponent(port),
+            credentials: 'same-origin'
+        })
+        .then(function (r) { return r.text(); })
+        .then(function (t) { done(classifyUp(t)); })
+        .catch(function () { done(false); });
     }
 
     // Aggregate the row's port dots into the server's overall status dot.
     function mtRollUp(row) {
         var ports = row.querySelectorAll('.ss-server-ports .ss-port');
         var dot = row.querySelector('.ss-server-status');
-        if (!dot || !ports.length) return;
+        if (!dot || !ports.length) { return; }
         var pending = false, anyDown = false;
         ports.forEach(function (p) {
-            if (p.classList.contains('loading')) pending = true;
-            if (p.classList.contains('down')) anyDown = true;
+            if (p.classList.contains('loading')) { pending = true; }
+            if (p.classList.contains('down')) { anyDown = true; }
         });
-        if (pending) return;
+        if (pending) { return; }
         dot.classList.remove('loading');
         dot.classList.add(anyDown ? 'down' : 'up');
+    }
+
+    // Server load + uptime -- WHMCS returns JSON {load, uptime} for getstats=1.
+    function mtGetStats(num) {
+        fetch('serverstatus.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'getstats=1&num=' + encodeURIComponent(num),
+            credentials: 'same-origin'
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+            if (!d) { return; }
+            var load = document.getElementById('load' + num);
+            var uptime = document.getElementById('uptime' + num);
+            if (load && d.load) { load.textContent = d.load; load.classList.remove('ss-muted'); }
+            if (uptime && d.uptime) { uptime.textContent = d.uptime; uptime.classList.remove('ss-muted'); }
+        })
+        .catch(function () {});
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -349,11 +378,7 @@
             mtCheckPort(row, num, 80);
             mtCheckPort(row, num, 21);
             mtCheckPort(row, num, 110);
-            // Load + uptime: defer to WHMCS core getStats if present (fills
-            // #load{num} / #uptime{num}); otherwise the cells stay muted.
-            if (typeof getStats === 'function') {
-                try { getStats(num); } catch (e) {}
-            }
+            mtGetStats(num);
         });
     });
 })();
