@@ -1,8 +1,189 @@
-{* Hostnodes — User Security (Apple-style).
+{* Hostnodes — User Security / Two-Factor (Apple-style) — /user/security.
 
-   WHMCS 9 splits 'account-level' security (clientareasecurity) and
-   'user-level' security (user-security). They surface the same 2FA /
-   login-alerts / sessions controls — there's no UX reason to maintain
-   two distinct designs. Forward to clientareasecurity's tpl so the
-   page is identical regardless of which route WHMCS dispatches. *}
-{include file="`$template`/core/pages/clientareasecurity/default/default.tpl"}
+   This is the REAL account-security page (unlike clientarea.php?action=security,
+   which only carries SSO + linked accounts). WHMCS feeds 2FA + security-question
+   data here. Verified against nexus/user-security.tpl.
+
+   WHMCS variables:
+     $twoFactorAuthAvailable  — admin has enabled at least one 2FA method
+     $twoFactorAuthEnabled    — 2FA currently active on this account
+     $twoFactorAuthRequired   — admin requires 2FA for this account
+     $securityQuestions       — Collection of selectable security questions
+     $user                    — ->hasSecurityQuestion(), ->getSecurityQuestion()
+     $linkableProviders       — third-party sign-in providers (OAuth); .code = markup
+     $token                   — CSRF token
+   Enable/disable routes: account-security-two-factor-enable / -disable.
+   We reuse clientareasecurity.css for the shared .sec-* / .tfa-* styling.
+*}
+
+{assign var=tfaAvail value=false}
+{if isset($twoFactorAuthAvailable) && $twoFactorAuthAvailable}{assign var=tfaAvail value=true}{/if}
+{assign var=tfaOn value=false}
+{if isset($twoFactorAuthEnabled) && $twoFactorAuthEnabled}{assign var=tfaOn value=true}{/if}
+{assign var=tfaRequired value=false}
+{if isset($twoFactorAuthRequired) && $twoFactorAuthRequired}{assign var=tfaRequired value=true}{/if}
+{assign var=hasSq value=false}
+{if isset($securityQuestions) && $securityQuestions->count() > 0}{assign var=hasSq value=true}{/if}
+{assign var=hasProviders value=false}
+{if isset($linkableProviders) && $linkableProviders}{assign var=hasProviders value=true}{/if}
+{assign var=anyOption value=false}
+{if $tfaAvail || $hasSq || $hasProviders}{assign var=anyOption value=true}{/if}
+
+<link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareasecurity.css?v={$myTheme.version|default:'1.0'}">
+
+<script>
+(function () {
+    var b = document.body;
+    if (!b) return;
+    b.setAttribute('data-data', 'full');
+    b.setAttribute('data-subnav', 'on');
+})();
+</script>
+
+<header class="page-header">
+    <h1>{$LANG.securitysettings|default:'Security settings'}</h1>
+    <p class="page-subtitle">{$LANG.usersecuritysub|default:'Two-factor authentication and account-security options.'}</p>
+</header>
+
+<div class="sec-split">
+
+    {* ══ LEFT: Profile sub-nav ══ *}
+    <aside>
+        <div class="card subnav-card">
+            <div class="subnav-heading">{$LANG.yourprofile|default:'Your Profile'}</div>
+            <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                {$LANG.accountdetails|default:'Account Details'}
+            </a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=changepw" class="subnav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                {$LANG.clientareanavchangepassword|default:'Change Password'}
+            </a>
+            <a href="{$WEB_ROOT}/index.php/user/security" class="subnav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                {$LANG.securitysettings|default:'Security Settings'}
+            </a>
+            <a href="{$WEB_ROOT}/logout.php" class="subnav-item danger">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                {$LANG.logout|default:'Logout'}
+            </a>
+        </div>
+    </aside>
+
+    {* ══ RIGHT: stacked cards ══ *}
+    <div class="sec-main">
+
+        {if $message = get_flash_message()}
+            <div class="sec-alert sec-alert-{if $message.type == 'error'}error{elseif $message.type == 'success'}success{elseif $message.type == 'warning'}warn{else}info{/if}">{$message.text}</div>
+        {/if}
+
+        {* ── Two-factor authentication (real WHMCS 2FA management) ── *}
+        {if $tfaAvail}
+        <div class="card sec-card-inner">
+            <div class="sec-header">
+                <h2>{$LANG.twofactorauth|default:'Two-factor authentication'}</h2>
+                <div class="sec-header-sub">{$LANG.twofactorauthsub|default:'Require a second step to sign in to your account.'}</div>
+            </div>
+            <div class="tfa-body">
+                <div class="tfa-shield{if $tfaOn} enabled{/if}">
+                    {if $tfaOn}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                    {else}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    {/if}
+                </div>
+                <div class="tfa-copy">
+                    <div class="tfa-status-row">
+                        <span class="tfa-status-title">{$LANG.twofactorauth|default:'Two-factor authentication'}</span>
+                        <span class="tfa-status-pill{if $tfaOn} on{/if}">{if $tfaOn}{$LANG.enabled|default:'Enabled'}{else}{$LANG.disabled|default:'Disabled'}{/if}</span>
+                        {if $tfaRequired && !$tfaOn}<span class="tfa-status-pill">{$LANG.required|default:'Required'}</span>{/if}
+                    </div>
+                    <p class="tfa-desc">
+                        {if $tfaOn}
+                            {$LANG.twofactorenableddesc|default:'Two-factor authentication is active. Sign-ins require both your password and a code from your second factor.'}
+                        {elseif $tfaRequired}
+                            {$LANG.clientAreaSecurityTwoFactorAuthRequired|default:'Your administrator requires two-factor authentication on this account. Please enable it now to keep full access.'}
+                        {else}
+                            {$LANG.clientAreaSecurityTwoFactorAuthRecommendation|default:'Add an extra layer of security. After your password, you will be asked for a one-time code when you sign in.'}
+                        {/if}
+                    </p>
+                </div>
+                <div class="tfa-cta">
+                    {if $tfaOn}
+                    <a href="{routePath('account-security-two-factor-disable')}" class="btn-secondary">{$LANG.twofadisable|default:'Disable two-factor'}</a>
+                    {else}
+                    <a href="{routePath('account-security-two-factor-enable')}" class="btn-primary">{$LANG.twofaenable|default:'Enable two-factor'}</a>
+                    {/if}
+                </div>
+            </div>
+        </div>
+        {/if}
+
+        {* ── Security question ── *}
+        {if $hasSq}
+        <div class="card sec-card-inner">
+            <div class="sec-header">
+                <h2>{$LANG.clientareanavsecurityquestions|default:'Security question'}</h2>
+                <div class="sec-header-sub">{$LANG.securityquestionsub|default:'A backup verification step used when recovering your account.'}</div>
+            </div>
+            <div class="sec-card-body">
+                <form method="post" action="{routePath('user-security-question')}" class="sec-form">
+                    <input type="hidden" name="token" value="{$token|default:''|escape}">
+                    {if $user->hasSecurityQuestion()}
+                    <div class="sec-field">
+                        <label for="sec-curans">{$user->getSecurityQuestion()|escape}</label>
+                        <input type="password" name="currentsecurityqans" id="sec-curans" autocomplete="off">
+                    </div>
+                    {/if}
+                    <div class="sec-field">
+                        <label for="sec-qid">{$LANG.clientareasecurityquestion|default:'Security question'}</label>
+                        <select name="securityqid" id="sec-qid">
+                            {foreach $securityQuestions as $question}
+                                <option value="{$question->id}">{$question->question|escape}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="sec-field-row">
+                        <div class="sec-field">
+                            <label for="sec-ans1">{$LANG.clientareasecurityanswer|default:'Answer'}</label>
+                            <input type="password" name="securityqans" id="sec-ans1" autocomplete="off">
+                        </div>
+                        <div class="sec-field">
+                            <label for="sec-ans2">{$LANG.clientareasecurityconfanswer|default:'Confirm answer'}</label>
+                            <input type="password" name="securityqans2" id="sec-ans2" autocomplete="off">
+                        </div>
+                    </div>
+                    <button type="submit" name="submit" value="1" class="btn-primary">{$LANG.clientareasavechanges|default:'Save changes'}</button>
+                </form>
+            </div>
+        </div>
+        {/if}
+
+        {* ── Linked accounts — third-party OAuth providers ── *}
+        {if $hasProviders}
+        <div class="card sec-card-inner">
+            <div class="sec-header">
+                <h2>{$LANG.remoteAuthn.titleLinkedAccounts|default:'Linked accounts'}</h2>
+                <div class="sec-header-sub">{$LANG.remoteAuthn.mayHaveMultipleLinks|default:'Connect a third-party sign-in provider so you can log in with it.'}</div>
+            </div>
+            <div class="sec-providers">
+                {foreach $linkableProviders as $provider}{$provider.code}{/foreach}
+            </div>
+            <div class="providerLinkingFeedback"></div>
+        </div>
+        {/if}
+
+        {* ── Nothing enabled admin-side ── *}
+        {if !$anyOption}
+        <div class="card sec-card-inner">
+            <div class="sec-empty">
+                <div class="sec-empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <p class="sec-empty-title">{$LANG.securitynooptionstitle|default:'No additional security options available'}</p>
+                <p class="sec-empty-sub">{$LANG.securitynooptionssub|default:'Your administrator has not enabled any additional sign-in security features (such as two-factor authentication) for your account. Please contact support if you would like extra protection added.'}</p>
+                <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.contactsupport|default:'Contact support'}</a>
+            </div>
+        </div>
+        {/if}
+
+    </div>
+</div>
