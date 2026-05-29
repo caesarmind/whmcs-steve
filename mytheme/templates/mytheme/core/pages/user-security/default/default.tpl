@@ -108,11 +108,11 @@
                         {/if}
                     </p>
                 </div>
-                <div class="tfa-cta">
+                <div class="tfa-cta" data-tfa-token="{$token|default:''|escape}">
                     {if $tfaOn}
-                    <a href="{routePath('account-security-two-factor-disable')}" class="btn-secondary">{$LANG.twofadisable|default:'Disable two-factor'}</a>
+                    <button type="button" class="btn-secondary" data-tfa-open data-tfa-url="{routePath('account-security-two-factor-disable')}" data-tfa-title="{$LANG.twofadisable|default:'Disable two-factor'}">{$LANG.twofadisable|default:'Disable two-factor'}</button>
                     {else}
-                    <a href="{routePath('account-security-two-factor-enable')}" class="btn-primary">{$LANG.twofaenable|default:'Enable two-factor'}</a>
+                    <button type="button" class="btn-primary" data-tfa-open data-tfa-url="{routePath('account-security-two-factor-enable')}" data-tfa-title="{$LANG.twofaenable|default:'Enable two-factor'}">{$LANG.twofaenable|default:'Enable two-factor'}</button>
                     {/if}
                 </div>
             </div>
@@ -187,3 +187,83 @@
 
     </div>
 </div>
+
+{* Two-factor enable/disable runs through WHMCS's modal flow: the routes are POST-only
+   and return a modal fragment (not a full page). mytheme loads no jQuery/WHMCS modal
+   JS, so this is a self-contained vanilla modal that AJAX-loads the fragment with the
+   CSRF token, re-executes any inline scripts it carries, and drives its step forms. *}
+{if $tfaAvail}
+<script>{literal}
+(function () {
+    var triggers = document.querySelectorAll('[data-tfa-open]');
+    if (!triggers.length) { return; }
+    var holder = document.querySelector('[data-tfa-token]');
+    var token = holder ? (holder.getAttribute('data-tfa-token') || '') : '';
+    var modal, body, titleEl;
+
+    function build() {
+        modal = document.createElement('div');
+        modal.className = 'tfa-modal';
+        modal.innerHTML =
+            '<div class="tfa-modal-backdrop" data-tfa-close></div>' +
+            '<div class="tfa-modal-dialog" role="dialog" aria-modal="true">' +
+            '<div class="tfa-modal-head"><span class="tfa-modal-title"></span>' +
+            '<button type="button" class="tfa-modal-x" data-tfa-close aria-label="Close">&times;</button></div>' +
+            '<div class="tfa-modal-body"></div></div>';
+        document.body.appendChild(modal);
+        body = modal.querySelector('.tfa-modal-body');
+        titleEl = modal.querySelector('.tfa-modal-title');
+        modal.addEventListener('click', function (e) { if (e.target.closest('[data-tfa-close]')) { hide(); } });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { hide(); } });
+    }
+    function show(title) { if (!modal) { build(); } titleEl.textContent = title || ''; modal.classList.add('open'); }
+    function hide() { if (modal) { modal.classList.remove('open'); } }
+
+    // Injected <script> tags don't run on innerHTML assignment — re-create them so the
+    // fragment's own setup JS (QR rendering, validation) executes.
+    function runScripts(container) {
+        Array.prototype.forEach.call(container.querySelectorAll('script'), function (old) {
+            var s = document.createElement('script');
+            if (old.src) { s.src = old.src; } else { s.textContent = old.textContent; }
+            old.parentNode.replaceChild(s, old);
+        });
+    }
+    function inject(html) {
+        body.innerHTML = html;
+        runScripts(body);
+        bindForms();
+    }
+    function bindForms() {
+        var forms = body.querySelectorAll('form');
+        Array.prototype.forEach.call(forms, function (f) {
+            f.addEventListener('submit', function (e) {
+                e.preventDefault();
+                post(f.getAttribute('action') || window.location.href, new URLSearchParams(new FormData(f)).toString());
+            });
+        });
+        // No further form + a success/end signal => the flow is done; refresh status.
+        if (!forms.length && /success|enabled|disabled|complete|backup code|turned on|turned off/i.test(body.textContent)) {
+            setTimeout(function () { window.location.reload(); }, 1800);
+        }
+    }
+    function post(url, data) {
+        body.innerHTML = '<div class="tfa-modal-loading">' + '…' + '</div>';
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+            body: data,
+            credentials: 'same-origin'
+        })
+        .then(function (r) { if (r.redirected) { window.location.reload(); return null; } return r.text(); })
+        .then(function (html) { if (html !== null) { inject(html); } })
+        .catch(function () { body.innerHTML = '<p class="tfa-modal-err">Something went wrong — please try again.</p>'; });
+    }
+    Array.prototype.forEach.call(triggers, function (t) {
+        t.addEventListener('click', function () {
+            show(t.getAttribute('data-tfa-title'));
+            post(t.getAttribute('data-tfa-url'), 'token=' + encodeURIComponent(token));
+        });
+    });
+})();
+{/literal}</script>
+{/if}
