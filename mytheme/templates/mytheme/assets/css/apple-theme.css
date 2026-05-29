@@ -3567,3 +3567,39 @@ body .iti__country:hover,
 body .iti__country.iti__highlight { background: var(--color-surface-secondary); }
 body .iti__dial-code { color: var(--color-text-tertiary); font-variant-numeric: tabular-nums; margin-left: auto; font-size: var(--text-sm); }
 body .iti__divider { border-bottom: 0.5px solid var(--color-border); margin: 4px 0; }
+
+/* ── Email-verification banner (includes/verifyemail.tpl) — top of the content area ── */
+.mt-verify-banner {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; margin: 0 0 18px;
+    background: var(--color-orange-bg, rgba(255, 159, 10, 0.10));
+    color: var(--color-orange-text, #c27400);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base); line-height: 1.45;
+}
+.mt-verify-ico { display: inline-flex; flex-shrink: 0; }
+.mt-verify-ico svg { width: 18px; height: 18px; }
+.mt-verify-text { flex: 1; min-width: 0; }
+.mt-verify-resend {
+    flex-shrink: 0; height: 30px; padding: 0 14px;
+    background: var(--color-orange-text, #c27400); color: #fff;
+    border: 0; border-radius: var(--radius-pill);
+    font-size: var(--text-sm); font-weight: var(--fw-medium); font-family: inherit; cursor: pointer;
+    transition: filter var(--transition-fast);
+}
+.mt-verify-resend:hover { filter: brightness(0.95); }
+.mt-verify-resend:disabled { opacity: 0.65; cursor: default; }
+.mt-verify-close {
+    flex-shrink: 0; width: 28px; height: 28px;
+    display: grid; place-items: center;
+    background: transparent; border: 0; border-radius: 50%;
+    color: inherit; cursor: pointer; opacity: 0.65;
+    transition: opacity var(--transition-fast), background var(--transition-fast);
+}
+.mt-verify-close:hover { opacity: 1; background: rgba(0, 0, 0, 0.06); }
+.mt-verify-close svg { width: 15px; height: 15px; }
+@media (max-width: 600px) {
+    .mt-verify-banner { flex-wrap: wrap; }
+    .mt-verify-text { flex-basis: calc(100% - 42px); }
+    .mt-verify-resend { margin-left: 30px; }
+}

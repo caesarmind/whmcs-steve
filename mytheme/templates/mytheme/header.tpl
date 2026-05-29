@@ -363,5 +363,7 @@
     {/if}
 
     <div class="content-area">
+    {* Email-verification banner (renders only when WHMCS flags the email unverified). *}
+    {include file="`$template`/includes/verifyemail.tpl"}
     {/if}{* end portal chrome (skipped when fullPage) *}
 {/if}
