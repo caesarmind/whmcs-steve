@@ -1,31 +1,28 @@
-{* Hostnodes — Security Settings (Apple-style).
+{* Hostnodes — Security Settings (Apple-style) — clientarea.php?action=security.
 
-   clientarea.php?action=security. In WHMCS 9 this page carries the REAL security
-   options only — we render exactly what WHMCS exposes, with no invented features:
+   In WHMCS 9 this page carries ONLY Single Sign-On + third-party linked accounts
+   (verified: nexus/clientareasecurity.tpl renders SSO only; lagom2 adds linked
+   accounts). Two-factor authentication is managed on its own page (/user/security),
+   NOT here — clientareasecurity is not given 2FA vars and ?tfaEnable=true is a no-op,
+   so we do not show a 2FA card on this page (that was invented/non-functional).
 
-     $twoFactorEnabled   — bool, two-factor currently active on the account
-     $showSsoSetting      — bool, the Single Sign-On toggle is available
-     $isSsoEnabled        — bool, SSO currently on
-     $linkableProviders   — array of third-party sign-in providers (OAuth); each
-                            entry's .code is WHMCS-rendered button markup. Present
-                            only when a Remote Authn provider is configured.
-     $token               — CSRF token
-   Verified against nexus/clientareasecurity.tpl + lagom2 (SSO + linkedaccounts).
+   Variables WHMCS exposes here:
+     $showSsoSetting     — bool, the Single Sign-On toggle is available
+     $isSsoEnabled       — bool, SSO currently on
+     $linkableProviders  — array of third-party sign-in providers (OAuth); each
+                           entry's .code is WHMCS-rendered button markup. Present
+                           only when a Remote Authn provider is configured.
+     $token              — CSRF token
+   When none of these is available we show a "nothing enabled — contact support"
+   empty state (mirrors lagom's no-records state).
 *}
 
-{assign var=tfaEnabled value=$twoFactorEnabled|default:false}
 {assign var=hasSso value=false}
 {if isset($showSsoSetting) && $showSsoSetting}{assign var=hasSso value=true}{/if}
 {assign var=hasProviders value=false}
 {if isset($linkableProviders) && $linkableProviders}{assign var=hasProviders value=true}{/if}
-
-{* Only offer 2FA when WHMCS reports it's available (admin has enabled at least one
-   2FA method) or it's already active. We only HIDE it when WHMCS explicitly says it's
-   unavailable, so an older WHMCS that omits the flag still shows the card. *}
-{assign var=tfaAvail value=true}
-{if isset($twoFactorAuthAvailable) && !$twoFactorAuthAvailable && !$tfaEnabled}{assign var=tfaAvail value=false}{/if}
 {assign var=anyOption value=false}
-{if $tfaAvail || $hasSso || $hasProviders}{assign var=anyOption value=true}{/if}
+{if $hasSso || $hasProviders}{assign var=anyOption value=true}{/if}
 
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareasecurity.css?v={$myTheme.version|default:'1.0'}">
 
@@ -40,7 +37,7 @@
 
 <header class="page-header">
     <h1>{$LANG.securitysettings|default:'Security settings'}</h1>
-    <p class="page-subtitle">{$LANG.securitysettingssub|default:'Two-factor authentication and connected sign-in options for your account.'}</p>
+    <p class="page-subtitle">{$LANG.securitysettingssub|default:'Single sign-on and connected third-party accounts for your login.'}</p>
 </header>
 
 <div class="sec-split">
@@ -70,43 +67,6 @@
 
     {* ══ RIGHT: stacked cards ══ *}
     <div class="sec-main">
-
-        {if $tfaAvail}
-        {* ── Two-factor authentication (real status from WHMCS) ── *}
-        <div class="card sec-card-inner">
-            <div class="sec-header">
-                <h2>{$LANG.twofactorauth|default:'Two-factor authentication'}</h2>
-                <div class="sec-header-sub">{$LANG.twofactorauthsub|default:'Require a second step to sign in to your account.'}</div>
-            </div>
-            <div class="tfa-body">
-                <div class="tfa-shield{if $tfaEnabled} enabled{/if}">
-                    {if $tfaEnabled}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-                    {else}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                    {/if}
-                </div>
-                <div class="tfa-copy">
-                    <div class="tfa-status-row">
-                        <span class="tfa-status-title">{$LANG.twofactorauth|default:'Two-factor authentication'}</span>
-                        <span class="tfa-status-pill{if $tfaEnabled} on{/if}">{if $tfaEnabled}{$LANG.enabled|default:'Enabled'}{else}{$LANG.disabled|default:'Disabled'}{/if}</span>
-                    </div>
-                    <p class="tfa-desc">
-                        {if $tfaEnabled}
-                            {$LANG.twofactorenableddesc|default:'Two-factor authentication is currently active on your account. Sign-ins require both your password and a code from your second factor.'}
-                        {else}
-                            {$LANG.twofactordisableddesc|default:'Add an extra layer of security. After your password, you will be asked for a one-time code when you sign in.'}
-                        {/if}
-                    </p>
-                </div>
-                <div class="tfa-cta">
-                    <a href="{$WEB_ROOT}/clientarea.php?action=security{if $tfaEnabled}&tfaDisable=true{else}&tfaEnable=true{/if}" class="btn-primary">
-                        {if $tfaEnabled}{$LANG.disabletwofactor|default:'Disable two-factor'}{else}{$LANG.enabletwofactor|default:'Enable two-factor'}{/if}
-                    </a>
-                </div>
-            </div>
-        </div>
-        {/if}
 
         {* ── Single Sign-On (only rendered when WHMCS offers it) ── *}
         {if $hasSso}
@@ -148,13 +108,13 @@
         </div>
         {/if}
 
-        {* ── Nothing available — admin hasn't enabled any account-security options ── *}
+        {* ── Nothing enabled — admin hasn't turned on SSO or any linked-account provider ── *}
         {if !$anyOption}
         <div class="card sec-card-inner">
             <div class="sec-empty">
                 <div class="sec-empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
                 <p class="sec-empty-title">{$LANG.securitynooptionstitle|default:'No additional security options available'}</p>
-                <p class="sec-empty-sub">{$LANG.securitynooptionssub|default:'Your administrator has not enabled any additional account-security features (such as two-factor authentication or single sign-on). Contact support if you would like extra protection added to your account.'}</p>
+                <p class="sec-empty-sub">{$LANG.securitynooptionssub|default:'Your administrator has not enabled any additional sign-in security features (such as single sign-on, linked accounts, or two-factor authentication) for your account. Please contact support if you would like extra protection added.'}</p>
                 <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.contactsupport|default:'Contact support'}</a>
             </div>
         </div>
