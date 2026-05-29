@@ -114,7 +114,14 @@
                     <a href="{$WEB_ROOT}/pwreset.php" class="auth-link">{$LANG.loginforgotten|default:'Forgot password?'}</a>
                 </div>
 
-                <button type="submit" class="btn-primary btn-lg btn-full">{$LANG.loginbutton|default:'Sign In'}</button>
+                {* CAPTCHA — renders only when enabled for the login form in admin.
+                   getMarkup() emits the widget; reCAPTCHA api.js is auto-injected by {$headoutput}. *}
+                {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
+                <div class="form-group auth-captcha">{$captcha->getMarkup()}</div>
+                <script>{$captcha->getPageJs()}</script>
+                {/if}
+
+                <button type="submit" class="btn-primary btn-lg btn-full{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.loginbutton|default:'Sign In'}</button>
             </form>
 
             {if $ssoProviders|default:false && $ssoProviders|@count > 0}

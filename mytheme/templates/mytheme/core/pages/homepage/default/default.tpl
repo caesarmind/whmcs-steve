@@ -26,8 +26,16 @@
             <div class="ph-domain-box">
                 <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input type="text" name="domain" placeholder="{$LANG.homepageherodomainplaceholder|default:'eg. example.com'}" autocapitalize="none" autocomplete="off">
-                <button type="submit" id="domainCta">{$LANG.search|default:'Search'}</button>
+                <button type="submit" id="domainCta" class="{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.search|default:'Search'}</button>
             </div>
+
+            {* Domain-checker CAPTCHA — renders only when enabled for this form in
+               admin (typically logged-out visitors). getMarkup() emits the widget;
+               reCAPTCHA api.js is auto-injected by {$headoutput}. *}
+            {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
+            <div class="ph-captcha">{$captcha->getMarkup()}</div>
+            <script>{$captcha->getPageJs()}</script>
+            {/if}
 
             <div class="ph-domain-footer">
                 <span>{$LANG.homepageherodomainsubtitle|default:'Find the perfect name for your project.'}</span>
