@@ -382,6 +382,17 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .tfa-modal-x:hover { color: var(--color-text-primary); }
 .tfa-modal-body { padding: 20px; }
 .tfa-modal-loading, .tfa-modal-err { text-align: center; color: var(--color-text-secondary); padding: 24px; }
+/* WHMCS 2FA fragment elements rendered inside the modal */
+.tfa-modal-body p { font-size: var(--text-base); color: var(--color-text-secondary); line-height: 1.55; margin: 0 0 14px; }
+.tfa-modal-body .twofa-module { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); margin-bottom: 10px; cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast); }
+.tfa-modal-body .twofa-module.active { border-color: var(--color-accent); background: var(--color-accent-light); }
+.tfa-modal-body .twofa-module .col-radio input { accent-color: var(--color-accent); }
+.tfa-modal-body .twofa-module .col-logo img { width: 32px; height: 32px; object-fit: contain; display: block; }
+.tfa-modal-body .twofa-module .col-description { font-size: var(--text-base); color: var(--color-text-secondary); line-height: 1.4; }
+.tfa-modal-body .twofa-module .col-description strong { color: var(--color-text-primary); font-weight: var(--fw-semibold); }
+.tfa-modal-body img { max-width: 100%; height: auto; }
+.tfa-modal-body input[type="text"], .tfa-modal-body input[type="number"], .tfa-modal-body input[type="tel"] { height: 38px; padding: 0 12px; border: 0.5px solid var(--color-border); border-radius: var(--radius-sm); font-size: var(--text-md); font-family: inherit; width: 100%; box-sizing: border-box; }
+.tfa-modal-body .btn, .tfa-modal-body .btn-primary, .tfa-modal-body input[type="button"], .tfa-modal-body input[type="submit"] { display: inline-flex; align-items: center; justify-content: center; height: 38px; padding: 0 18px; margin-top: 4px; }
 
 @media (max-width: 1100px) {
     body[data-subnav-side="outside"] .sec-split,

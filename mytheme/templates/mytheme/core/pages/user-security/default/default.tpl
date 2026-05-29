@@ -219,19 +219,38 @@
     function show(title) { if (!modal) { build(); } titleEl.textContent = title || ''; modal.classList.add('open'); }
     function hide() { if (modal) { modal.classList.remove('open'); } }
 
-    // Injected <script> tags don't run on innerHTML assignment — re-create them so the
-    // fragment's own setup JS (QR rendering, validation) executes.
+    // WHMCS's 2FA fragments call dialogSubmit()/dialogClose() (provided by WHMCS's modal
+    // JS, which we don't load) — supply vanilla equivalents that drive our AJAX flow.
+    window.dialogSubmit = function () {
+        var f = body ? body.querySelector('form') : null;
+        if (!f) { return false; }
+        post(f.getAttribute('action') || window.location.href, new URLSearchParams(new FormData(f)).toString());
+        return false;
+    };
+    window.dialogClose = function () { hide(); window.location.reload(); };
+
+    // Run non-jQuery inline scripts; skip jQuery-based ones (their only job here is
+    // module switching, which we replicate vanilla in bindModules — avoids "$ undefined").
     function runScripts(container) {
         Array.prototype.forEach.call(container.querySelectorAll('script'), function (old) {
+            if (old.src) { return; }
+            if (/jquery|\$\(/.test(old.textContent || '')) { old.parentNode.removeChild(old); return; }
             var s = document.createElement('script');
-            if (old.src) { s.src = old.src; } else { s.textContent = old.textContent; }
+            s.textContent = old.textContent;
             old.parentNode.replaceChild(s, old);
         });
     }
-    function inject(html) {
-        body.innerHTML = html;
-        runScripts(body);
-        bindForms();
+    // Method picker: clicking a .twofa-module selects it + checks its radio.
+    function bindModules() {
+        var mods = body.querySelectorAll('.twofa-module');
+        Array.prototype.forEach.call(mods, function (mod) {
+            mod.addEventListener('click', function () {
+                Array.prototype.forEach.call(mods, function (m) { m.classList.remove('active'); });
+                mod.classList.add('active');
+                var radio = mod.querySelector('input[type="radio"]');
+                if (radio) { radio.checked = true; }
+            });
+        });
     }
     function bindForms() {
         var forms = body.querySelectorAll('form');
@@ -241,10 +260,16 @@
                 post(f.getAttribute('action') || window.location.href, new URLSearchParams(new FormData(f)).toString());
             });
         });
-        // No further form + a success/end signal => the flow is done; refresh status.
+        // No further form + an end signal => the flow is done; refresh the status card.
         if (!forms.length && /success|enabled|disabled|complete|backup code|turned on|turned off/i.test(body.textContent)) {
             setTimeout(function () { window.location.reload(); }, 1800);
         }
+    }
+    function inject(html) {
+        body.innerHTML = html;
+        runScripts(body);
+        bindModules();
+        bindForms();
     }
     function post(url, data) {
         body.innerHTML = '<div class="tfa-modal-loading">' + '…' + '</div>';
@@ -255,7 +280,20 @@
             credentials: 'same-origin'
         })
         .then(function (r) { if (r.redirected) { window.location.reload(); return null; } return r.text(); })
-        .then(function (html) { if (html !== null) { inject(html); } })
+        .then(function (text) {
+            if (text === null) { return; }
+            // WHMCS returns JSON ({body, title}) for these modal steps; fall back to raw HTML.
+            var html = text, title = null;
+            try {
+                var j = JSON.parse(text);
+                if (j && typeof j === 'object') {
+                    html = (j.body != null) ? j.body : ((j.modalbody != null) ? j.modalbody : text);
+                    title = j.title || j.modaltitle || null;
+                }
+            } catch (e) { /* not JSON — treat as raw HTML */ }
+            if (title) { titleEl.textContent = title; }
+            inject(html);
+        })
         .catch(function () { body.innerHTML = '<p class="tfa-modal-err">Something went wrong — please try again.</p>'; });
     }
     Array.prototype.forEach.call(triggers, function (t) {
