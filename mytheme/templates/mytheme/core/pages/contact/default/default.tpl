@@ -64,8 +64,7 @@
                    per-form admin setting. The reCAPTCHA/hCaptcha api.js is auto-injected
                    by headoutput in header.tpl, so no extra JS bundle is needed here. *}
                 {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
-                <div class="form-group ct-captcha">{$captcha->getMarkup()}</div>
-                <script>{$captcha->getPageJs()}</script>
+                <div class="form-group ct-captcha">{include file="`$template`/includes/captcha.tpl"}</div>
                 {/if}
                 <button type="submit" class="btn-primary ct-submit{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.contactsend|default:'Send message'}</button>
             </form>

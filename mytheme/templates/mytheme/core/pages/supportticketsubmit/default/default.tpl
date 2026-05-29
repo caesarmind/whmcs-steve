@@ -309,8 +309,7 @@
                    gated on the per-form admin setting (typically active only for guest
                    submissions). The reCAPTCHA api.js is auto-injected by headoutput. *}
                 {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
-                <div class="form-group tk-captcha">{$captcha->getMarkup()}</div>
-                <script>{$captcha->getPageJs()}</script>
+                <div class="form-group tk-captcha">{include file="`$template`/includes/captcha.tpl"}</div>
                 {/if}
 
                 <div class="tk-form-foot">

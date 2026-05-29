@@ -238,9 +238,8 @@
                in header.tpl, and getPageJs() wires up the callbacks. *}
             {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
             <section class="cr-section cr-captcha">
-                {$captcha->getMarkup()}
+                {include file="`$template`/includes/captcha.tpl"}
             </section>
-            <script>{$captcha->getPageJs()}</script>
             {/if}
 
             {* #3 — native Terms of Service. Renders only when TOS acceptance is

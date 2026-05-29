@@ -3527,6 +3527,10 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .vc-step.active { color: var(--color-text-primary); font-weight: var(--fw-medium); }
 .vc-step-sep { color: var(--color-text-quaternary, #c7c7cc); }
 
+/* Built-in image CAPTCHA label (shared includes/captcha.tpl). The image + code
+   box are styled by each page's own .X-captcha container rules. */
+.mt-captcha-verify { font-size: var(--text-sm); color: var(--color-text-secondary); margin: 0; text-align: center; line-height: 1.4; }
+
 /* ── CAPTCHA: reCAPTCHA/hCaptcha ship a fixed 304px widget that can crowd very
    narrow phones. Scale it down on small screens so it sits comfortably inside
    the auth/register cards (whose overflow:hidden contains any residual box). ── */

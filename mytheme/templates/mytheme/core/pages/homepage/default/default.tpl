@@ -33,8 +33,7 @@
                admin (typically logged-out visitors). getMarkup() emits the widget;
                reCAPTCHA api.js is auto-injected by {$headoutput}. *}
             {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
-            <div class="ph-captcha">{$captcha->getMarkup()}</div>
-            <script>{$captcha->getPageJs()}</script>
+            <div class="ph-captcha">{include file="`$template`/includes/captcha.tpl"}</div>
             {/if}
 
             <div class="ph-domain-footer">

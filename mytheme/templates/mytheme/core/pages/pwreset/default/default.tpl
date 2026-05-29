@@ -91,8 +91,7 @@
                     </div>
                     {* Captcha only kicks in after repeated attempts ($showCaptchaAfterLimit). *}
                     {if isset($captcha) && $captcha && $captcha->isEnabled() && (isset($showCaptchaAfterLimit) && $showCaptchaAfterLimit) && $captcha->isEnabledForForm($captchaForm)}
-                    <div class="form-group pw-captcha">{$captcha->getMarkup()}</div>
-                    <script>{$captcha->getPageJs()}</script>
+                    <div class="form-group pw-captcha">{include file="`$template`/includes/captcha.tpl"}</div>
                     {/if}
                     <button type="submit" class="btn-primary pw-submit{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.pwresetsubmit|default:'Send reset link'}</button>
                 </form>
