@@ -31,7 +31,7 @@ declare(strict_types=1);
 return [
     'secret_key'   => 'REPLACE_WITH_64_HEX_CHARS_BEFORE_ENCODING_FOR_PRODUCTION',
     'display_name' => 'MyTheme',
-    'version'      => '1.1.52',
+    'version'      => '1.1.53',
     'description'  => 'A modern WHMCS client area theme',
     'preview'      => 'core/thumb.svg',
     'dev_mode'     => true,                  // ← FLIP TO false BEFORE PRODUCTION

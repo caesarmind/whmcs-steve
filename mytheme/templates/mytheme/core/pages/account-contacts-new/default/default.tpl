@@ -15,6 +15,7 @@
 {assign var=dashIsEmpty value='full'}
 
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/account-contacts-new.css?v={$myTheme.version|default:'1.0'}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/css/intlTelInput.css">
 
 <script>
 (function () {
@@ -159,3 +160,59 @@
         </div>
     </aside>
 </div>
+
+{* Phone country-code picker — same as registration (national number in
+   phonenumber + dial code in the hidden country-calling-code field). *}
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/js/intlTelInput.min.js"></script>
+<script>{literal}
+(function () {
+    var phoneEl = document.getElementById('ct-phone');
+    if (!phoneEl || typeof window.intlTelInput !== 'function') { return; }
+    var form = phoneEl.form;
+    var countryEl = form ? form.querySelector('select[name="country"]') : document.querySelector('select[name="country"]');
+    var fieldName = phoneEl.getAttribute('name') || 'phonenumber';
+
+    var cc = document.createElement('input');
+    cc.type = 'hidden';
+    cc.name = 'country-calling-code-' + fieldName;
+    cc.id = 'populatedCountryCode' + fieldName;
+    phoneEl.parentNode.insertBefore(cc, phoneEl);
+
+    var iti = window.intlTelInput(phoneEl, {
+        separateDialCode: true,
+        dropdownContainer: document.body,
+        preferredCountries: ['us', 'gb', 'ca', 'au', 'de', 'fr', 'nl', 'es', 'it'],
+        initialCountry: (function () {
+            var c = countryEl ? (countryEl.value || '') : '';
+            return (c && c.length === 2) ? c.toLowerCase() : 'us';
+        })(),
+        utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/js/utils.js?onlyCountries=false'
+    });
+
+    function syncDialCode() {
+        var d = iti.getSelectedCountryData();
+        cc.value = (d && d.dialCode) ? d.dialCode : '';
+    }
+    syncDialCode();
+    phoneEl.addEventListener('countrychange', syncDialCode);
+    phoneEl.addEventListener('blur', function () {
+        if (typeof iti.getNumber !== 'function') { return; }
+        var number = iti.getNumber();
+        var d = iti.getSelectedCountryData();
+        var prefix = '+' + ((d && d.dialCode) ? d.dialCode : '');
+        if (number && number.indexOf(prefix) === 0 && (number.match(/\+/g) || []).length > 1) {
+            iti.setNumber(number.substr(prefix.length));
+        }
+        syncDialCode();
+    });
+    if (countryEl) {
+        countryEl.addEventListener('change', function () {
+            if (phoneEl.value.trim() !== '') { return; }
+            var c = (this.value || '').toLowerCase();
+            if (!c || c.length !== 2) { return; }
+            try { iti.setCountry(c); } catch (e) {}
+            syncDialCode();
+        });
+    }
+})();
+{/literal}</script>
