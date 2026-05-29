@@ -97,7 +97,7 @@
             <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Unpaid" class="filter-tab{if $currentFilter == 'Unpaid'} active{/if}" data-mt-for="invTable" data-mt-filter="Unpaid">{$LANG.invoiceunpaid|default:'Unpaid'}</a>
             <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Paid" class="filter-tab{if $currentFilter == 'Paid'} active{/if}" data-mt-for="invTable" data-mt-filter="Paid">{$LANG.invoicepaid|default:'Paid'}</a>
             <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Cancelled" class="filter-tab{if $currentFilter == 'Cancelled'} active{/if}" data-mt-for="invTable" data-mt-filter="Cancelled">{$LANG.invoicecancelled|default:'Cancelled'}</a>
-            {if $mtAjaxTables}<span class="mt-dt-search" style="margin-left:auto"><input type="search" placeholder="{$LANG.search|default:'Search'}…" aria-label="{$LANG.search|default:'Search'}" data-mt-search data-mt-for="invTable"></span>{/if}
+            <span class="inv-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" placeholder="{$LANG.search|default:'Search'}…" aria-label="{$LANG.search|default:'Search'}" data-mt-search data-mt-for="invTable"></span>
         </div>
 
         {* Sort: DataTables.js handles instant client-side sort on header click (matches
@@ -324,20 +324,51 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
     jQuery(function ($) {
         var $tbl = $('#invTable');
         if (!$tbl.length) return;
+        var TID = 'invTable';
+        function ctrl(attr) { return document.querySelector('[' + attr + '][data-mt-for="' + TID + '"]'); }
+        function buildPager(el, info) {
+            var page = info.page, pages = info.pages, html = '';
+            var L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+            var R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+            html += '<button type="button" data-page="' + (page - 1) + '"' + (page <= 0 ? ' disabled' : '') + ' aria-label="Previous page">' + L + '</button>';
+            if (pages > 0) {
+                var win = 5, start = Math.max(0, page - 2), end = Math.min(pages - 1, start + win - 1);
+                start = Math.max(0, Math.min(start, end - win + 1));
+                for (var p = start; p <= end; p++) { html += '<button type="button" data-page="' + p + '"' + (p === page ? ' class="active"' : '') + '>' + (p + 1) + '</button>'; }
+            } else { html += '<button type="button" class="active">1</button>'; }
+            html += '<button type="button" data-page="' + (page + 1) + '"' + (page >= pages - 1 ? ' disabled' : '') + ' aria-label="Next page">' + R + '</button>';
+            el.innerHTML = html;
+        }
+        function updateControls(api) {
+            var info = api.page.info();
+            var infoEl = ctrl('data-dt-info');
+            if (infoEl) { var from = info.recordsDisplay ? info.start + 1 : 0; infoEl.textContent = 'Showing ' + from + '–' + info.end + ' of ' + info.recordsDisplay; }
+            var pagerEl = ctrl('data-dt-pager');
+            if (pagerEl) { buildPager(pagerEl, info); }
+        }
         var table = $tbl.DataTable({
-            paging:    false,
-            searching: false,
+            paging:    true,
+            searching: true,
             info:      false,
             autoWidth: false,
             ordering:  true,
+            pageLength: 10,
+            dom:       'rt',
 {/literal}
             order:     [[{$sortColIdx}, '{$sortDir|lower}']],
 {literal}
-            columnDefs: [
-                { orderable: false, targets: -1 }
-            ]
+            columnDefs: [ { orderable: false, targets: -1 } ],
+            drawCallback: function () { updateControls(this.api()); }
         });
-        // Map column index → URL param key so we can sync ?orderby=… after each sort.
+        // Wire the Apple footer controls (search / Show-N / pager / info) to the
+        // client-side DataTable — same hooks the AJAX path (dynamic-tables.js) uses.
+        var searchEl = ctrl('data-mt-search');
+        if (searchEl) { searchEl.addEventListener('input', function () { table.search(this.value || '').draw(); }); }
+        var lenEl = ctrl('data-dt-length');
+        if (lenEl) { lenEl.value = String(table.page.len()); lenEl.addEventListener('change', function () { var n = parseInt(this.value, 10); if (n > 0) { table.page.len(n).draw(); } }); }
+        var pagerEl = ctrl('data-dt-pager');
+        if (pagerEl) { pagerEl.addEventListener('click', function (e) { var b = e.target.closest('button[data-page]'); if (!b || b.disabled) return; var p = parseInt(b.getAttribute('data-page'), 10); if (!isNaN(p) && p >= 0) { table.page(p).draw(false); } }); }
+        // Sync ?orderby=…&sort=… on header sort.
         var keyByCol = { 0: 'id', 1: 'date', 2: 'due', 3: 'amount', 4: 'status' };
         table.on('order.dt', function () {
             var ord = table.order();
