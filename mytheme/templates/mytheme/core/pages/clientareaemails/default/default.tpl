@@ -55,18 +55,31 @@
     <div class="em-main">
         {if $hasEmails}
         <div class="when-full">
+            {if !$mtAjaxTables}
+            <div class="em-toolbar">
+                <div class="em-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="search" id="emSearch" placeholder="{$LANG.search|default:'Search'}…" autocomplete="off" aria-label="{$LANG.search|default:'Search'}">
+                </div>
+            </div>
+            {/if}
             <div class="card" style="padding: 0; overflow: hidden;">
-                <table class="em-table"{if $mtAjaxTables} id="emTable" data-mt-action="tableEmails" data-mt-type="emails" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="0:desc" data-mt-length="10"{/if}>
+                <table class="em-table" id="emTable"{if $mtAjaxTables} data-mt-action="tableEmails" data-mt-type="emails" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="0:desc" data-mt-length="10"{/if}>
                     <thead>
                         <tr>
-                            <th>{$LANG.clientareaemailsdate|default:'Date'}</th>
-                            <th>{$LANG.clientareaemailssubject|default:'Subject'}</th>
+                            {if !$mtAjaxTables}
+                            <th><button type="button" class="em-sort" data-sort="date" data-dir="">{$LANG.clientareaemailsdate|default:'Date Sent'} <span class="em-sort-ico"></span></button></th>
+                            <th><button type="button" class="em-sort" data-sort="subject" data-dir="">{$LANG.clientareaemailssubject|default:'Message Subject'} <span class="em-sort-ico"></span></button></th>
+                            {else}
+                            <th>{$LANG.clientareaemailsdate|default:'Date Sent'}</th>
+                            <th>{$LANG.clientareaemailssubject|default:'Message Subject'}</th>
+                            {/if}
                         </tr>
                     </thead>
                     <tbody>
                         {if !$mtAjaxTables}
                         {foreach $emails as $email}
-                        <tr data-href="{$WEB_ROOT}/viewemail.php?id={$email.id|escape}">
+                        <tr data-href="{$WEB_ROOT}/viewemail.php?id={$email.id|escape}" data-date="{$email.normalisedDate|default:''|escape}" data-subject="{$email.subject|strip_tags|escape}">
                             <td class="em-date">{$email.date|escape}</td>
                             <td>
                                 <div class="em-subject">
@@ -86,6 +99,21 @@
                 <span class="spacer"></span>
                 <span data-dt-info data-mt-for="emTable"></span>
                 <div data-dt-pager data-mt-for="emTable"></div>
+            </div>
+            {else}
+            <div class="em-footer">
+                <div class="em-page-size">
+                    {$LANG.show|default:'Show'}
+                    <select id="emLength" aria-label="{$LANG.show|default:'Show'} {$LANG.entries|default:'entries'}">
+                        <option>10</option>
+                        <option>25</option>
+                        <option>50</option>
+                    </select>
+                    {$LANG.entries|default:'entries'}
+                </div>
+                <div class="spacer"></div>
+                <span class="em-info" id="emInfo"></span>
+                <div class="em-pages" id="emPages"></div>
             </div>
             {/if}
         </div>
@@ -134,12 +162,135 @@
 <script>
 {literal}
 (function () {
-    document.querySelectorAll('.em-table tr[data-href]').forEach(function (row) {
+    var table = document.getElementById('emTable');
+    if (!table) { return; }
+    var tbody = table.querySelector('tbody');
+    var allRows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+    allRows.forEach(function (r, i) { r.setAttribute('data-idx', String(i)); });
+
+    var searchInp = document.getElementById('emSearch');
+    var lengthSel = document.getElementById('emLength');
+    var info = document.getElementById('emInfo');
+    var pagesEl = document.getElementById('emPages');
+    var L = { showing: 'Showing', to: '–', of: 'of', none: 'No matching emails', filtered: 'filtered from' };
+
+    var state = { q: '', pageSize: 10, page: 1, sortKey: '', sortDir: '' };
+
+    function filtered() {
+        var q = state.q.trim().toLowerCase();
+        if (!q) { return allRows.slice(); }
+        return allRows.filter(function (r) {
+            var subj = (r.getAttribute('data-subject') || '').toLowerCase();
+            var dateCell = r.querySelector('.em-date');
+            var date = dateCell ? dateCell.textContent.toLowerCase() : '';
+            return subj.indexOf(q) > -1 || date.indexOf(q) > -1;
+        });
+    }
+    function sorted(rows) {
+        if (!state.sortDir) {
+            return rows.slice().sort(function (a, b) { return (+a.getAttribute('data-idx')) - (+b.getAttribute('data-idx')); });
+        }
+        var mul = state.sortDir === 'asc' ? 1 : -1;
+        var key = state.sortKey;
+        return rows.slice().sort(function (a, b) {
+            var va, vb;
+            if (key === 'date') {
+                va = a.getAttribute('data-date') || ''; vb = b.getAttribute('data-date') || '';
+                var na = parseFloat(va), nb = parseFloat(vb);
+                if (!isNaN(na) && !isNaN(nb)) { return (na - nb) * mul; }
+            } else {
+                va = (a.getAttribute('data-subject') || '').toLowerCase();
+                vb = (b.getAttribute('data-subject') || '').toLowerCase();
+            }
+            return va < vb ? -mul : va > vb ? mul : 0;
+        });
+    }
+    function pageWindow(cur, total) {
+        var out = [];
+        if (total <= 7) { for (var i = 1; i <= total; i++) { out.push(i); } return out; }
+        out.push(1);
+        var s = Math.max(2, cur - 1), e = Math.min(total - 1, cur + 1);
+        if (s > 2) { out.push('…'); }
+        for (var j = s; j <= e; j++) { out.push(j); }
+        if (e < total - 1) { out.push('…'); }
+        out.push(total);
+        return out;
+    }
+    function mkBtn(html, opts) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.innerHTML = html;
+        if (opts.disabled) { b.disabled = true; }
+        if (opts.active) { b.className = 'active'; }
+        if (!opts.disabled && !opts.active && typeof opts.go === 'number') {
+            b.addEventListener('click', function () { state.page = opts.go; render(); });
+        }
+        return b;
+    }
+    var PREV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+    var NEXT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+
+    function render() {
+        var rows = sorted(filtered());
+        var total = rows.length;
+        var pages = Math.max(1, Math.ceil(total / state.pageSize));
+        if (state.page > pages) { state.page = pages; }
+        if (state.page < 1) { state.page = 1; }
+        var start = total ? (state.page - 1) * state.pageSize : 0;
+        var end = Math.min(start + state.pageSize, total);
+
+        allRows.forEach(function (r) { r.style.display = 'none'; });
+        for (var i = start; i < end; i++) { rows[i].style.display = ''; tbody.appendChild(rows[i]); }
+
+        if (info) {
+            if (total === 0) {
+                info.textContent = L.none;
+            } else {
+                var base = L.showing + ' ' + (start + 1) + L.to + end + ' ' + L.of + ' ' + total;
+                info.textContent = (state.q && total !== allRows.length) ? (base + ' (' + L.filtered + ' ' + allRows.length + ')') : base;
+            }
+        }
+        if (pagesEl) {
+            pagesEl.innerHTML = '';
+            pagesEl.appendChild(mkBtn(PREV, { disabled: state.page <= 1, go: state.page - 1 }));
+            pageWindow(state.page, pages).forEach(function (p) {
+                if (p === '…') {
+                    var s = document.createElement('span');
+                    s.className = 'em-ellipsis'; s.textContent = '…';
+                    pagesEl.appendChild(s);
+                } else {
+                    pagesEl.appendChild(mkBtn(String(p), { active: p === state.page, go: p }));
+                }
+            });
+            pagesEl.appendChild(mkBtn(NEXT, { disabled: state.page >= pages, go: state.page + 1 }));
+        }
+    }
+
+    if (searchInp) { searchInp.addEventListener('input', function () { state.q = this.value; state.page = 1; render(); }); }
+    if (lengthSel) { lengthSel.addEventListener('change', function () { state.pageSize = parseInt(this.value, 10) || 10; state.page = 1; render(); }); }
+
+    table.querySelectorAll('.em-sort').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var dir = btn.getAttribute('data-dir');
+            var next = dir === '' ? 'asc' : dir === 'asc' ? 'desc' : '';
+            table.querySelectorAll('.em-sort').forEach(function (b) { b.setAttribute('data-dir', ''); b.classList.remove('active'); });
+            btn.setAttribute('data-dir', next);
+            if (next) { btn.classList.add('active'); }
+            state.sortKey = btn.getAttribute('data-sort');
+            state.sortDir = next;
+            state.page = 1;
+            render();
+        });
+    });
+
+    allRows.forEach(function (row) {
         row.addEventListener('click', function (e) {
-            if (e.target.tagName === 'A') return;
+            if (e.target.closest('a')) { return; }
             window.open(row.getAttribute('data-href'), 'emailWin', 'width=680,height=520,scrollbars=yes');
         });
     });
+
+    render();
 })();
 {/literal}
 </script>
