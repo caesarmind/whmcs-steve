@@ -41,6 +41,25 @@
             <div class="ct-alert ct-alert-error">{$errorMessageHtml}</div>
         {/if}
 
+        {* ── Contact picker ── switch to an existing contact, or stay on "Add new".
+           Same native WHMCS selector as account-contacts-manage (posts contactid to
+           the account-contacts route); "new" is selected here. *}
+        <form method="post" action="{routePath('account-contacts')}" class="card ct-picker">
+            <input type="hidden" name="token" value="{$token|default:''|escape}">
+            <label for="ct-contactid" class="ct-label">{$LANG.clientareachoosecontact|default:'Choose a contact'}</label>
+            <div class="ct-picker-row">
+                <select name="contactid" id="ct-contactid" class="ct-input ct-select" onchange="this.form.submit()">
+                    {if isset($contacts)}
+                        {foreach $contacts as $contact}
+                            <option value="{$contact.id|escape}">{$contact.name|escape} — {$contact.email|escape}</option>
+                        {/foreach}
+                    {/if}
+                    <option value="new" selected>+ {$LANG.clientareanavaddcontact|default:'Add new contact'}</option>
+                </select>
+                <button type="submit" class="btn-secondary ct-picker-go">{$LANG.go|default:'Go'}</button>
+            </div>
+        </form>
+
         <form method="post" action="{routePath('account-contacts-save')}" class="ct-form">
             <input type="hidden" name="token" value="{$token|default:''|escape}">
             <input type="hidden" name="contactid" value="new">
