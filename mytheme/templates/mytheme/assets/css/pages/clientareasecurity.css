@@ -338,6 +338,13 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 }
 .sec-footer-row a:hover { background: var(--color-red-text); color: var(--color-surface); text-decoration: none; }
 
+/* Linked accounts — third-party OAuth provider buttons (WHMCS-rendered markup) */
+.sec-providers { display: flex; flex-wrap: wrap; gap: 10px; padding: 18px 24px 20px; }
+.sec-providers:empty { display: none; }
+.sec-providers a, .sec-providers button { max-width: 100%; }
+.providerLinkingFeedback { padding: 0 24px; font-size: var(--text-sm); color: var(--color-text-secondary); }
+.providerLinkingFeedback:empty { display: none; }
+
 @media (max-width: 1100px) {
     body[data-subnav-side="outside"] .sec-split,
     body[data-subnav-side="outside-left"] .sec-split { grid-template-columns: 240px 1fr; gap: 24px; position: static; }

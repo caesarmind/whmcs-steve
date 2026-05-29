@@ -1,16 +1,24 @@
 {* Hostnodes — Security Settings (Apple-style).
 
-   WHMCS standard variables expected:
-     $twoFactorEnabled    — bool, true if 2FA is currently active
-     $twoFactorEnforced   — bool, admin requires 2FA
-     $clientsdetails.email — recipient for login-alert emails
+   clientarea.php?action=security. In WHMCS 9 this page carries the REAL security
+   options only — we render exactly what WHMCS exposes, with no invented features:
+
+     $twoFactorEnabled   — bool, two-factor currently active on the account
+     $showSsoSetting      — bool, the Single Sign-On toggle is available
+     $isSsoEnabled        — bool, SSO currently on
+     $linkableProviders   — array of third-party sign-in providers (OAuth); each
+                            entry's .code is WHMCS-rendered button markup. Present
+                            only when a Remote Authn provider is configured.
+     $token               — CSRF token
+   Verified against nexus/clientareasecurity.tpl + lagom2 (SSO + linkedaccounts).
 *}
 
 {assign var=tfaEnabled value=$twoFactorEnabled|default:false}
-{assign var=tfaEnforced value=$twoFactorEnforced|default:false}
-{assign var=alertEmail value=$clientsdetails.email|default:''}
+{assign var=hasSso value=false}
+{if isset($showSsoSetting) && $showSsoSetting}{assign var=hasSso value=true}{/if}
+{assign var=hasProviders value=false}
+{if isset($linkableProviders) && $linkableProviders}{assign var=hasProviders value=true}{/if}
 
-{* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareasecurity.css?v={$myTheme.version|default:'1.0'}">
 
 <script>
@@ -24,7 +32,7 @@
 
 <header class="page-header">
     <h1>{$LANG.securitysettings|default:'Security settings'}</h1>
-    <p class="page-subtitle">{$LANG.securitysettingssub|default:'Two-factor authentication, sign-in devices, and login alerts.'}</p>
+    <p class="page-subtitle">{$LANG.securitysettingssub|default:'Two-factor authentication and connected sign-in options for your account.'}</p>
 </header>
 
 <div class="sec-split">
@@ -55,7 +63,7 @@
     {* ══ RIGHT: stacked cards ══ *}
     <div class="sec-main">
 
-        {* Two-factor authentication card *}
+        {* ── Two-factor authentication (real status from WHMCS) ── *}
         <div class="card sec-card-inner">
             <div class="sec-header">
                 <h2>{$LANG.twofactorauth|default:'Two-factor authentication'}</h2>
@@ -78,7 +86,7 @@
                         {if $tfaEnabled}
                             {$LANG.twofactorenableddesc|default:'Two-factor authentication is currently active on your account. Sign-ins require both your password and a code from your second factor.'}
                         {else}
-                            {$LANG.twofactordisableddesc|default:'Two-factor authentication is currently disabled. We recommend enabling two-factor authentication to provide an extra layer of security to your account.'}
+                            {$LANG.twofactordisableddesc|default:'Add an extra layer of security. After your password, you will be asked for a one-time code when you sign in.'}
                         {/if}
                     </p>
                 </div>
@@ -88,98 +96,66 @@
                     </a>
                 </div>
             </div>
-
-            {* Available methods grid *}
-            <div class="tfa-methods">
-                <div class="tfa-method">
-                    <div class="tfa-method-ico">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                    </div>
-                    <div class="tfa-method-title">{$LANG.tfamethodapp|default:'Authenticator app'}</div>
-                    <div class="tfa-method-sub">{$LANG.tfamethodappsub|default:'Generate codes with 1Password, Authy, or Google Authenticator.'}</div>
-                    <span class="tfa-method-rec">{$LANG.recommended|default:'Recommended'}</span>
-                </div>
-                <div class="tfa-method">
-                    <div class="tfa-method-ico">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
-                    </div>
-                    <div class="tfa-method-title">{$LANG.tfamethodemail|default:'Email codes'}</div>
-                    <div class="tfa-method-sub">{$LANG.tfamethodemailsub|default:'Receive a one-time code at'} {$alertEmail|escape}.</div>
-                </div>
-                <div class="tfa-method">
-                    <div class="tfa-method-ico">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><line x1="2" y1="20" x2="22" y2="20"/><line x1="12" y1="16" x2="12" y2="20"/></svg>
-                    </div>
-                    <div class="tfa-method-title">{$LANG.tfamethodkey|default:'Security key'}</div>
-                    <div class="tfa-method-sub">{$LANG.tfamethodkeysub|default:'Use a hardware key (YubiKey, Passkey-compatible device).'}</div>
-                </div>
-            </div>
         </div>
 
-        {* Login alerts card *}
+        {* ── Single Sign-On (only rendered when WHMCS offers it) ── *}
+        {if $hasSso}
         <div class="card sec-card-inner">
             <div class="sec-header">
-                <h2>{$LANG.loginalerts|default:'Login alerts'}</h2>
-                <div class="sec-header-sub">{$LANG.loginalertssub|default:'Get notified about sign-ins and sensitive account changes.'}</div>
+                <h2>{$LANG.sso.title|default:'Single Sign-On'}</h2>
+                <div class="sec-header-sub">{$LANG.sso.summary|default:'Move between connected areas without signing in again.'}</div>
             </div>
-            <div class="sec-row">
-                <div class="sec-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>
-                <div class="sec-row-meta">
-                    <div class="sec-row-title">{$LANG.alertnewdevice|default:'Email me when a new device signs in'}</div>
-                    <div class="sec-row-sub">{$LANG.alertssentto|default:'Alerts sent to'} {$alertEmail|escape}</div>
+            <form id="frmSingleSignOn" method="post" action="{$WEB_ROOT}/clientarea.php?action=security">
+                <input type="hidden" name="token" value="{$token|default:''|escape}">
+                <input type="hidden" name="action" value="security">
+                <input type="hidden" name="toggle_sso" value="1">
+                <div class="sec-row">
+                    <div class="sec-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></div>
+                    <div class="sec-row-meta">
+                        <div class="sec-row-title">{$LANG.sso.title|default:'Single Sign-On'}</div>
+                        <div class="sec-row-sub">{$LANG.sso.disablenotice|default:'You can turn this off at any time.'}</div>
+                    </div>
+                    <button type="button" class="sec-toggle{if $isSsoEnabled} on{/if}" role="switch" aria-checked="{if $isSsoEnabled}true{else}false{/if}" data-sso-toggle aria-label="{$LANG.sso.title|default:'Single Sign-On'}"></button>
+                    <input type="checkbox" name="allow_sso" id="inputAllowSso" hidden{if $isSsoEnabled} checked{/if}>
                 </div>
-                <button type="button" class="sec-toggle on" role="switch" aria-checked="true" aria-label="{$LANG.alertnewdevice|default:'Toggle new-device alerts'}"></button>
-            </div>
-            <div class="sec-row">
-                <div class="sec-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div>
-                <div class="sec-row-meta">
-                    <div class="sec-row-title">{$LANG.alertpwchange|default:'Email me when my password changes'}</div>
-                    <div class="sec-row-sub">{$LANG.alertssentto|default:'Alerts sent to'} {$alertEmail|escape}</div>
-                </div>
-                <button type="button" class="sec-toggle on" role="switch" aria-checked="true" aria-label="{$LANG.alertpwchange|default:'Toggle password-change alerts'}"></button>
-            </div>
-            <div class="sec-row">
-                <div class="sec-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
-                <div class="sec-row-meta">
-                    <div class="sec-row-title">{$LANG.alertpaymentchange|default:'Email me when a payment method changes'}</div>
-                    <div class="sec-row-sub">{$LANG.alertssentto|default:'Alerts sent to'} {$alertEmail|escape}</div>
-                </div>
-                <button type="button" class="sec-toggle" role="switch" aria-checked="false" aria-label="{$LANG.alertpaymentchange|default:'Toggle payment-method alerts'}"></button>
-            </div>
+            </form>
         </div>
+        {/if}
 
-        {* Active sessions card *}
+        {* ── Linked accounts — third-party sign-in providers (OAuth). Only when a
+              Remote Authn provider is configured ($linkableProviders populated). The
+              provider buttons are WHMCS-rendered markup, output verbatim. ── *}
+        {if $hasProviders}
         <div class="card sec-card-inner">
             <div class="sec-header">
-                <h2>{$LANG.activesessions|default:'Active sessions'}</h2>
-                <div class="sec-header-sub">{$LANG.activesessionssub|default:'Devices currently signed in to your account.'}</div>
+                <h2>{$LANG.remoteAuthn.titleLinkedAccounts|default:'Linked accounts'}</h2>
+                <div class="sec-header-sub">{$LANG.remoteAuthn.mayHaveMultipleLinks|default:'Connect a third-party sign-in provider so you can log in with it.'}</div>
             </div>
-            <div class="sec-row">
-                <div class="sec-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
-                <div class="sec-row-meta">
-                    <div class="sec-row-title">{$LANG.currentsession|default:'Current session'} <span class="sec-row-chip">{$LANG.thisdevice|default:'This device'}</span></div>
-                    <div class="sec-row-sub">{$LANG.activenow|default:'Active now'}</div>
-                </div>
+            <div class="sec-providers">
+                {foreach $linkableProviders as $provider}{$provider.code}{/foreach}
             </div>
-            <div class="sec-footer-row">
-                <span class="sec-footer-note">{$LANG.signoutallnote|default:'Sign out of every other device except this one.'}</span>
-                <a href="{$WEB_ROOT}/logout.php?all=true">{$LANG.signoutall|default:'Sign out all other sessions'}</a>
-            </div>
+            <div class="providerLinkingFeedback"></div>
         </div>
+        {/if}
 
     </div>
 </div>
 
 <script>
 {literal}
-// Toggle button visual state — purely cosmetic for now (login-alert preferences
-// don't have a WHMCS-native endpoint). If we add server-side persistence later,
-// post the new state on toggle.
-document.addEventListener('click', function (e) {
-    var btn = e.target.closest('.sec-toggle');
-    if (!btn) return;
-    var on = btn.classList.toggle('on');
-    btn.setAttribute('aria-checked', on ? 'true' : 'false');
-});
+// Single Sign-On toggle: reflect the switch state into the hidden checkbox and
+// submit the form so WHMCS toggles SSO (no jQuery / WHMCS scripts on this theme).
+(function () {
+    var toggle = document.querySelector('[data-sso-toggle]');
+    if (!toggle) { return; }
+    var cb = document.getElementById('inputAllowSso');
+    var form = document.getElementById('frmSingleSignOn');
+    toggle.addEventListener('click', function () {
+        var on = toggle.classList.toggle('on');
+        toggle.setAttribute('aria-checked', on ? 'true' : 'false');
+        if (cb) { cb.checked = on; }
+        if (form) { form.submit(); }
+    });
+})();
 {/literal}
 </script>
