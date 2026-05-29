@@ -386,13 +386,29 @@
    intl-tel-input adds a flag + dial-code dropdown to the phone field, mirroring
    the mytheme_cart checkout. Wired with plain DOM (this page has no jQuery).
    dropdownContainer:document.body keeps the country list out of the card's
-   overflow:hidden clip; on submit the value is normalised to E.164 for WHMCS. *}
+   overflow:hidden clip.
+
+   IMPORTANT: this reproduces WHMCS's own submission contract (see WHMCS
+   scripts.js). The visible `phonenumber` field keeps the NATIONAL number
+   (separateDialCode mode), and a hidden `country-calling-code-phonenumber`
+   field carries the dial code; the server recombines + validates them.
+   Submitting a full +E.164 in `phonenumber` instead is what makes WHMCS
+   answer "Your phone number is not valid". *}
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/js/intlTelInput.min.js"></script>
 <script>{literal}
 (function () {
     var phoneEl = document.getElementById('cr-phone');
     if (!phoneEl || typeof window.intlTelInput !== 'function') { return; }
     var countryEl = document.getElementById('cr-country');
+    var fieldName = phoneEl.getAttribute('name') || 'phonenumber';
+
+    /* Hidden dial-code field WHMCS expects alongside the national number. */
+    var ccField = document.createElement('input');
+    ccField.type = 'hidden';
+    ccField.name = 'country-calling-code-' + fieldName;
+    ccField.id = 'populatedCountryCode' + fieldName;
+    phoneEl.parentNode.insertBefore(ccField, phoneEl);
+
     var iti = window.intlTelInput(phoneEl, {
         separateDialCode: true,
         dropdownContainer: document.body,
@@ -404,33 +420,41 @@
         utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/js/utils.js?onlyCountries=false'
     });
 
-    /* Keep the dial-code country in step with the billing country the user
-       picks — but only while they haven't deliberately changed it in the
-       iti dropdown. */
-    var lastSynced = '';
+    function syncDialCode() {
+        var d = iti.getSelectedCountryData();
+        ccField.value = (d && d.dialCode) ? d.dialCode : '';
+    }
+    syncDialCode();
+    phoneEl.addEventListener('countrychange', syncDialCode);
+
+    /* If the user pastes a full international number, strip the duplicated
+       dial-code prefix so the field stays the national number (mirrors WHMCS). */
+    phoneEl.addEventListener('blur', function () {
+        if (typeof iti.getNumber !== 'function') { return; }
+        var number = iti.getNumber();
+        var d = iti.getSelectedCountryData();
+        var prefix = '+' + ((d && d.dialCode) ? d.dialCode : '');
+        if (number && number.indexOf(prefix) === 0 && (number.match(/\+/g) || []).length > 1) {
+            iti.setNumber(number.substr(prefix.length));
+        }
+        syncDialCode();
+    });
+
+    /* While the phone field is still empty, follow the billing country. */
     if (countryEl) {
         countryEl.addEventListener('change', function () {
+            if (phoneEl.value.trim() !== '') { return; }
             var c = (this.value || '').toLowerCase();
             if (!c || c.length !== 2) { return; }
-            var current = iti.getSelectedCountryData().iso2;
-            if (current === lastSynced || lastSynced === '') {
-                iti.setCountry(c);
-                lastSynced = c;
-            }
+            try { iti.setCountry(c); } catch (e) {}
+            syncDialCode();
         });
     }
 
-    /* Normalise to the canonical E.164 number on submit (capture phase so we
-       run before any other submit handler). */
+    /* Make sure the dial code is current at submit — but do NOT rewrite
+       `phonenumber`; it must stay the national number. */
     var form = document.getElementById('frmRegister');
-    if (form) {
-        form.addEventListener('submit', function () {
-            if (typeof iti.getNumber === 'function') {
-                var n = iti.getNumber();
-                if (n) { phoneEl.value = n; }
-            }
-        }, true);
-    }
+    if (form) { form.addEventListener('submit', syncDialCode, true); }
 })();
 {/literal}</script>
 {/if}
