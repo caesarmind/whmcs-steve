@@ -31,6 +31,15 @@
 <div class="auth-card-wrap">
     <div class="auth-card">
 
+        {* The routed /index.php/login flow reports a failed login (and other
+           notices) through get_flash_message(), NOT the legacy $incorrect var —
+           render it so failed sign-ins actually surface an error. *}
+        {if $message = get_flash_message()}
+            <div class="auth-notice{if $message.type == 'success'} success{elseif $message.type == 'warning' || $message.type == 'info'} info{/if}">
+                {$message.text}
+            </div>
+        {/if}
+
         {if $logout}
             <div class="auth-notice success">
                 {$LANG.logoutsuccessful|default:'You have been logged out. See you next time.'}
@@ -55,7 +64,7 @@
             </div>
         {/if}
 
-        <form class="auth-form" method="post" action="{$WEB_ROOT}/dologin.php">
+        <form class="auth-form" method="post" action="{routePath('login-validate')}">
             <input type="hidden" name="token" value="{$token}" />
 
             <div class="form-group">
