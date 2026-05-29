@@ -115,7 +115,7 @@
                             <label class="ct-pref">
                                 <input type="hidden" name="email_preferences[{$emailType|escape}]" value="0">
                                 <input type="checkbox" name="email_preferences[{$emailType|escape}]" value="1"{if $value} checked{/if}>
-                                <span>{$emailType|escape}</span>
+                                <span>{lang key="emailPreferences."|cat:$emailType}</span>
                             </label>
                         {/foreach}
                     </div>
