@@ -59,7 +59,7 @@
                                 {if $acIsOwner}<span class="sw-tag sw-tag-owner">{$LANG.clientOwner|default:'Owner'}</span>{/if}
                                 {if $acClosed}<span class="sw-tag sw-tag-closed">{$acStatus|escape}</span>{/if}
                             </span>
-                            <span class="sw-row-sub">#{$account->id|escape}</span>
+                            <span class="sw-row-sub">{if $account->email}{$account->email|escape}{else}#{$account->id|escape}{/if}</span>
                         </span>
                         <span class="sw-row-action">
                             {if $acClosed}
