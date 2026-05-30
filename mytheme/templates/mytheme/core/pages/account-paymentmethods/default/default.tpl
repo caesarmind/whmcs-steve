@@ -90,13 +90,13 @@
                     </div>
                     <div class="pm-row-actions">
                         {if !$pmIsDefault && !$pmExpired}
-                            <a href="{routePath('account-paymentmethods-setdefault', $payMethod->id)}" class="pm-row-btn">{$LANG.paymentMethods.setAsDefault|default:'Set default'}</a>
+                            <a href="{routePath('account-paymentmethods-setdefault', $payMethod->id)}" class="pm-row-btn" data-pm-setdefault>{$LANG.paymentMethods.setAsDefault|default:'Set default'}</a>
                         {/if}
                         {if $pmType != 'RemoteBankAccount'}
                             <a href="{routePath('account-paymentmethods-view', $payMethod->id)}" class="pm-row-btn">{$LANG.paymentMethods.edit|default:'Edit'}</a>
                         {/if}
                         {if !empty($allowDelete)}
-                            <a href="{routePath('account-paymentmethods-delete', $payMethod->id)}" class="pm-row-btn pm-row-btn-danger" data-pm-confirm-delete>{$LANG.paymentMethods.delete|default:'Delete'}</a>
+                            <a href="{routePath('account-paymentmethods-delete', $payMethod->id)}" class="pm-row-btn pm-row-btn-danger" data-pm-delete>{$LANG.paymentMethods.delete|default:'Delete'}</a>
                         {/if}
                     </div>
                 </div>
@@ -156,11 +156,30 @@
     </aside>
 </div>
 
+{* Set-default + delete change state, so they must POST — those routes are POST-only
+   (a plain GET link 405s). Keep the already-styled <a> as the trigger and submit a
+   hidden POST form to its href, mirroring nexus's frmSetDefault/frmDelete approach. *}
+<form method="post" id="pmSetDefaultForm" style="display:none"><input type="hidden" name="token" value="{$token|default:''|escape}"></form>
+<form method="post" id="pmDeleteForm" style="display:none"><input type="hidden" name="token" value="{$token|default:''|escape}"></form>
 <script>{literal}
 (function(){
-    document.querySelectorAll('[data-pm-confirm-delete]').forEach(function(a){
+    function postTo(formId, action){
+        var f = document.getElementById(formId);
+        if (!f || !action) { return; }
+        f.setAttribute('action', action);
+        f.submit();
+    }
+    document.querySelectorAll('[data-pm-setdefault]').forEach(function(a){
         a.addEventListener('click', function(e){
-            if (!confirm('Remove this payment method? This cannot be undone.')) e.preventDefault();
+            e.preventDefault();
+            postTo('pmSetDefaultForm', a.getAttribute('href'));
+        });
+    });
+    document.querySelectorAll('[data-pm-delete]').forEach(function(a){
+        a.addEventListener('click', function(e){
+            e.preventDefault();
+            if (!confirm('Remove this payment method? This cannot be undone.')) { return; }
+            postTo('pmDeleteForm', a.getAttribute('href'));
         });
     });
 })();
