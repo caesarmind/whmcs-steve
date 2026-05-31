@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details — WHMCS by Apple</title>
     <link rel="stylesheet" href="css/apple-theme.css?v=12">
-    <link rel="stylesheet" href="css/apple-layout.css?v=12">
+    <link rel="stylesheet" href="css/apple-layout.css?v=17">
     <style>
         body { display: block; }
 
@@ -600,13 +600,15 @@
 
 <!-- ═══════════ PAGE CONTENT ═══════════ -->
 <div class="content-area">
-    <!-- Hero: product name + domain + status pill -->
-    <div class="pd3-hero">
-        <div class="pd3-hero-info">
-            <h1 class="pd3-hero-name">Business Cloud Pro</h1>
-            <p class="pd3-hero-domain">hendersondesign.com</p>
+    <!-- Service header: product name + domain + status pill -->
+    <div class="page-header">
+        <div class="page-header-row">
+            <div>
+                <h1 class="page-title">Business Cloud Pro</h1>
+                <p class="page-subtitle">hendersondesign.com</p>
+            </div>
+            <span class="status-pill active">Active</span>
         </div>
-        <span class="status-pill active">Active</span>
     </div>
 
     <!-- Overdue invoice banner (Apple-faithful: muted surface, tinted icon well, pill secondary CTA) -->
@@ -619,131 +621,104 @@
         <a href="viewinvoice.html" class="btn-secondary">Pay invoice</a>
     </div>
 
-    <!-- Stack: "inside" = unified card; "outside" = separate cards -->
-    <div class="pd3-stack">
-
     <!-- Service information -->
-    <div class="card pd3-section">
-        <div class="pd3-section-heading">Service Information</div>
-        <div class="pd3-info-list">
-            <div class="pd3-info-row"><div class="pd3-info-label">Plan</div><div class="pd3-info-value">Business Cloud Pro</div></div>
-            <div class="pd3-info-row"><div class="pd3-info-label">Domain</div><div class="pd3-info-value">hendersondesign.com</div></div>
-            <div class="pd3-info-row"><div class="pd3-info-label">Server</div><div class="pd3-info-value">server42.hosting.apple.com</div></div>
-            <div class="pd3-info-row"><div class="pd3-info-label">IP Address</div><div class="pd3-info-value">172.64.32.18</div></div>
-            <div class="pd3-info-row"><div class="pd3-info-label">Nameservers</div><div class="pd3-info-value">ns1.hosting.apple.com<br>ns2.hosting.apple.com</div></div>
-            <div class="pd3-info-row"><div class="pd3-info-label">Registration Date</div><div class="pd3-info-value">Jan 15, 2024</div></div>
-            <div class="pd3-info-row"><div class="pd3-info-label">Next Due Date</div><div class="pd3-info-value">May 15, 2026</div></div>
-            <div class="pd3-info-row"><div class="pd3-info-label">Billing Cycle</div><div class="pd3-info-value">Monthly — $29.00/mo</div></div>
-        </div>
+    <div class="settings-group">
+        <div class="settings-group-header"><div class="settings-group-title">Service Information</div></div>
+        <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">Plan</div></div><div class="settings-item-action"><span class="settings-item-value">Business Cloud Pro</span></div></div>
+        <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">Domain</div></div><div class="settings-item-action"><span class="settings-item-value">hendersondesign.com</span></div></div>
+        <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">Server</div></div><div class="settings-item-action"><span class="settings-item-value">server42.hosting.apple.com</span></div></div>
+        <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">IP Address</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">172.64.32.18</span></div></div>
+        <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">Nameservers</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-size:13px;">ns1.hosting.apple.com<br>ns2.hosting.apple.com</span></div></div>
+        <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">Registration Date</div></div><div class="settings-item-action"><span class="settings-item-value">Jan 15, 2024</span></div></div>
+        <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">Next Due Date</div></div><div class="settings-item-action"><span class="settings-item-value">May 15, 2026</span></div></div>
+        <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">Billing Cycle</div></div><div class="settings-item-action"><span class="settings-item-value">Monthly — $29.00/mo</span></div></div>
     </div>
 
     <!-- Resource usage -->
-    <div class="card pd3-section">
-        <h2 class="pd3-section-title">Resource Usage</h2>
-        <div class="pd3-usage-list">
-            <div class="pd3-usage-row">
-                <div class="pd3-usage-top">
-                    <span class="pd3-usage-label">Disk Space</span>
-                    <span class="pd3-usage-value">12.4 GB of 100 GB</span>
-                </div>
-                <div class="pd3-usage-bar"><div class="pd3-usage-fill blue" style="width: 12%"></div></div>
+    <div class="card">
+        <div class="card-header"><h2 class="card-title">Resource Usage</h2></div>
+        <div class="card-body">
+            <div class="usage-bar-container">
+                <div class="usage-bar-header"><span class="usage-bar-label">Disk Space</span><span class="usage-bar-value">12.4 GB of 100 GB</span></div>
+                <div class="usage-bar"><div class="usage-bar-fill blue" style="width: 12%;"></div></div>
             </div>
-            <div class="pd3-usage-row">
-                <div class="pd3-usage-top">
-                    <span class="pd3-usage-label">Bandwidth</span>
-                    <span class="pd3-usage-value">84.2 GB of 2 TB</span>
-                </div>
-                <div class="pd3-usage-bar"><div class="pd3-usage-fill green" style="width: 4.1%"></div></div>
+            <div class="usage-bar-container">
+                <div class="usage-bar-header"><span class="usage-bar-label">Bandwidth</span><span class="usage-bar-value">84.2 GB of 2 TB</span></div>
+                <div class="usage-bar"><div class="usage-bar-fill green" style="width: 4.1%;"></div></div>
             </div>
-            <div class="pd3-usage-row">
-                <div class="pd3-usage-top">
-                    <span class="pd3-usage-label">Email Accounts</span>
-                    <span class="pd3-usage-value">8 of 25</span>
-                </div>
-                <div class="pd3-usage-bar"><div class="pd3-usage-fill orange" style="width: 32%"></div></div>
+            <div class="usage-bar-container">
+                <div class="usage-bar-header"><span class="usage-bar-label">Email Accounts</span><span class="usage-bar-value">8 of 25</span></div>
+                <div class="usage-bar"><div class="usage-bar-fill orange" style="width: 32%;"></div></div>
             </div>
         </div>
     </div>
 
     <!-- Quick actions -->
-    <div class="card pd3-section">
-        <div class="pd3-section-heading">Quick Actions</div>
-        <div class="pd3-action-list">
-            <a href="#" class="pd3-action">
-                <div class="pd3-action-info">
-                    <div class="pd3-action-title">Login to cPanel</div>
-                    <div class="pd3-action-sub">Access your hosting control panel</div>
+    <div class="settings-group">
+        <div class="settings-group-header"><div class="settings-group-title">Quick Actions</div></div>
+        <a href="#" class="settings-item" style="text-decoration:none;color:inherit;">
+            <div class="settings-item-content"><div class="settings-item-label">Login to cPanel</div><div class="settings-item-sublabel">Access your hosting control panel</div></div>
+            <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+        </a>
+        <a href="clientareadomaindns.html" class="settings-item" style="text-decoration:none;color:inherit;">
+            <div class="settings-item-content"><div class="settings-item-label">Manage DNS</div><div class="settings-item-sublabel">Configure DNS records for your domain</div></div>
+            <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+        </a>
+        <a href="managessl.html" class="settings-item" style="text-decoration:none;color:inherit;">
+            <div class="settings-item-content"><div class="settings-item-label">SSL Certificates</div><div class="settings-item-sublabel">Manage SSL for hendersondesign.com</div></div>
+            <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+        </a>
+        <a href="#" class="settings-item" style="text-decoration:none;color:inherit;">
+            <div class="settings-item-content"><div class="settings-item-label">Backups</div><div class="settings-item-sublabel">Download or restore from backups</div></div>
+            <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+        </a>
+        <a href="upgrade.html" class="settings-item" style="text-decoration:none;color:inherit;">
+            <div class="settings-item-content"><div class="settings-item-label">Upgrade/Downgrade</div><div class="settings-item-sublabel">Change your hosting plan</div></div>
+            <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+        </a>
+    </div>
+
+    <!-- Quick create email account -->
+    <div class="card">
+        <div class="card-header"><h2 class="card-title">Quick create email account</h2></div>
+        <div class="card-body">
+            <form class="pd3-form-row" onsubmit="event.preventDefault();">
+                <div class="pd3-form-group">
+                    <label class="pd3-form-label" for="pd3-em-addr">Email address</label>
+                    <div class="pd3-email-split">
+                        <input type="text" id="pd3-em-addr" placeholder="yourname" autocapitalize="none" autocomplete="off">
+                        <span class="pd3-email-domain">@hendersondesign.com</span>
+                    </div>
                 </div>
-                <svg class="pd3-action-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </a>
-            <a href="clientareadomaindns.html" class="pd3-action">
-                <div class="pd3-action-info">
-                    <div class="pd3-action-title">Manage DNS</div>
-                    <div class="pd3-action-sub">Configure DNS records for your domain</div>
+                <div class="pd3-form-group">
+                    <label class="pd3-form-label" for="pd3-em-pw">Password</label>
+                    <input type="password" class="pd3-form-input" id="pd3-em-pw" placeholder="Desired password" autocomplete="new-password">
                 </div>
-                <svg class="pd3-action-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </a>
-            <a href="managessl.html" class="pd3-action">
-                <div class="pd3-action-info">
-                    <div class="pd3-action-title">SSL Certificates</div>
-                    <div class="pd3-action-sub">Manage SSL for hendersondesign.com</div>
-                </div>
-                <svg class="pd3-action-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </a>
-            <a href="#" class="pd3-action">
-                <div class="pd3-action-info">
-                    <div class="pd3-action-title">Backups</div>
-                    <div class="pd3-action-sub">Download or restore from backups</div>
-                </div>
-                <svg class="pd3-action-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </a>
-            <a href="upgrade.html" class="pd3-action">
-                <div class="pd3-action-info">
-                    <div class="pd3-action-title">Upgrade/Downgrade</div>
-                    <div class="pd3-action-sub">Change your hosting plan</div>
-                </div>
-                <svg class="pd3-action-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </a>
+                <button type="submit" class="btn-primary">Create</button>
+            </form>
         </div>
     </div>
 
-    </div><!-- /.pd3-stack -->
-
-    <!-- Quick create email account -->
-    <div class="card pd3-section">
-        <div class="pd3-section-heading">Quick create email account</div>
-        <form class="pd3-form-row" onsubmit="event.preventDefault();">
-            <div class="pd3-form-group">
-                <label class="pd3-form-label" for="pd3-em-addr">Email address</label>
-                <div class="pd3-email-split">
-                    <input type="text" id="pd3-em-addr" placeholder="yourname" autocapitalize="none" autocomplete="off">
-                    <span class="pd3-email-domain">@hendersondesign.com</span>
-                </div>
-            </div>
-            <div class="pd3-form-group">
-                <label class="pd3-form-label" for="pd3-em-pw">Password</label>
-                <input type="password" class="pd3-form-input" id="pd3-em-pw" placeholder="Desired password" autocomplete="new-password">
-            </div>
-            <button type="submit" class="btn-primary">Create</button>
-        </form>
-    </div>
-
     <!-- Addons & extras -->
-    <div class="card pd3-section">
-        <div class="pd3-section-heading">Addons &amp; extras</div>
-        <div class="pd3-addons-row">
-            <select class="pd3-select" aria-label="Choose an addon">
-                <option value="weebly" selected>Weebly Website Builder — Free</option>
-                <option value="codeguard">CodeGuard Backup — $2.99/mo</option>
-                <option value="sitelock">SiteLock Security — $3.99/mo</option>
-                <option value="marketgoo">Marketgoo SEO — $5.99/mo</option>
-            </select>
-            <a href="cart.html" class="btn-primary">Purchase &amp; activate</a>
+    <div class="card">
+        <div class="card-header"><h2 class="card-title">Addons &amp; extras</h2></div>
+        <div class="card-body">
+            <div class="pd3-addons-row">
+                <select class="pd3-select" aria-label="Choose an addon">
+                    <option value="weebly" selected>Weebly Website Builder — Free</option>
+                    <option value="codeguard">CodeGuard Backup — $2.99/mo</option>
+                    <option value="sitelock">SiteLock Security — $3.99/mo</option>
+                    <option value="marketgoo">Marketgoo SEO — $5.99/mo</option>
+                </select>
+                <a href="cart.html" class="btn-primary">Purchase &amp; activate</a>
+            </div>
         </div>
     </div>
 
     <!-- Billing / Domain tabs -->
-    <div class="card pd3-section">
+    <div class="card">
+        <div class="card-header"><h2 class="card-title">Billing &amp; Domain</h2></div>
+        <div class="card-body">
         <div class="pd3-tabs" role="tablist">
             <button type="button" class="pd3-tab active" data-pd3-tab="billing" role="tab" aria-selected="true">Billing overview</button>
             <button type="button" class="pd3-tab" data-pd3-tab="domain" role="tab" aria-selected="false">Domain</button>
@@ -794,11 +769,12 @@
                 <div class="pd3-billing-value">Enabled</div>
             </div>
         </div>
+        </div>
     </div>
 
     <!-- Cancel service -->
-    <div class="pd3-footer-actions">
-        <a href="clientareacancelrequest.html" class="pd3-cancel-btn" role="button">Cancel Service</a>
+    <div style="margin-top: 24px;">
+        <a href="clientareacancelrequest.html" class="btn-danger" role="button">Cancel Service</a>
     </div>
 </div>
 
@@ -835,7 +811,7 @@
 <div data-include="partials/locale-modal.html"></div>
 
 <script src="js/apple-theme.js?v=12"></script>
-<script src="js/apple-layout.js?v=12"></script>
+<script src="js/apple-layout.js?v=17"></script>
 <script>
 document.addEventListener('apple-layout:ready', function () {
     // Usage rings — convert data-pct on each .fg circle into stroke-dashoffset

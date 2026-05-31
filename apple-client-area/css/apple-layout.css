@@ -869,6 +869,108 @@ body[data-layout="side"] .ph-section:last-of-type { padding-bottom: 48px; }
 body[data-data="empty"] .when-full { display: none !important; }
 body:not([data-data="empty"]) .when-empty { display: none !important; }
 
+/* --- Controls inside / outside: generic card treatment (data-svc-layout) ---
+   Universal form of the services "Controls outside" toggle, so EVERY standard
+   card page responds -- not just bespoke list pages. Scoped via :has(> .card-body)
+   to the .card > .card-header + .card-body convention, so list table-cards
+   (.svc-table-card etc.) keep their own tuned rules and are left untouched.
+     inside  (default): one unified white card -- title + body share a surface.
+     outside: the .card-header title floats on the page background ABOVE a flat
+              .card-body that keeps the white surface -- Apple section style. */
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body) {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+    margin-bottom: 26px;
+}
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body) > .card-header {
+    padding: 2px 6px 11px;
+}
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body) > .card-body {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+/* Header-less cards (no .card-header) have nothing to float, so the rule above
+   would leave them looking unchanged. For these, "outside" instead flattens the
+   card onto the page background as a plain divided list -- visible even with no
+   title to lift out. Multi-card groups (announcements, emails, downloads, KB...)
+   read as an Apple plain list; a lone card reads as flat content on the page.
+   :not(:has(> .card-header)) makes this win over the rule above. */
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body):not(:has(> .card-header)) {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    border-bottom: 0.5px solid var(--color-border);
+}
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body):not(:has(> .card-header)):last-child {
+    border-bottom: 0;
+}
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body):not(:has(> .card-header)) > .card-body {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+/* Bare content cards -- a .card with NEITHER .card-header NOR .card-body, where the
+   content sits directly inside (payment-method tiles .pm-card-row, choice tiles
+   .mp-choice, article cards, ticket cards, billing-contact rows, etc.). "outside"
+   flattens them onto the page background as a plain divided list, same as the
+   header-less case. Excludes .subnav-card so the sidebar nav stays boxed. */
+body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(:has(> .card-header)):not(:has(> .card-body)) {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    border-bottom: 0.5px solid var(--color-border);
+}
+body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(:has(> .card-header)):not(:has(> .card-body)):last-child {
+    border-bottom: 0;
+}
+/* Bespoke surface wrappers on non-.card pages -- the shared .settings-group
+   table/section wrapper (account users, domain management, usage, pricing, whois),
+   the domain bulk-manager group, the email-view cards, and domain-search results.
+   "outside" strips their card chrome so the content sits on the page background,
+   matching every other page. */
+body[data-svc-layout="outside"] .content-area .settings-group,
+body[data-svc-layout="outside"] .content-area .bdm-group,
+body[data-svc-layout="outside"] .content-area .email-card,
+body[data-svc-layout="outside"] .content-area .email-summary,
+body[data-svc-layout="outside"] .content-area .ds-suggested-list,
+body[data-svc-layout="outside"] .content-area .hp-feature-card {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+/* Row-based settings-groups (label/value or link rows -- e.g. the service page):
+   in "outside", don't leave rows bare on the page background. Keep them in a white
+   card with the section title floated above, consistent with the header'd .card
+   treatment. Table-based settings-groups have no direct > .settings-item children,
+   so they're unaffected and keep the flat treatment above. */
+body[data-svc-layout="outside"] .content-area .settings-group > .settings-group-header {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+body[data-svc-layout="outside"] .content-area .settings-group > .settings-item {
+    background: var(--color-surface);
+    border-left: 0.5px solid var(--color-border);
+    border-right: 0.5px solid var(--color-border);
+}
+body[data-svc-layout="outside"] .content-area .settings-group > .settings-item:first-child,
+body[data-svc-layout="outside"] .content-area .settings-group > .settings-group-header + .settings-item {
+    border-top: 0.5px solid var(--color-border);
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+}
+body[data-svc-layout="outside"] .content-area .settings-group > .settings-item:last-child {
+    border-bottom: 0.5px solid var(--color-border);
+    border-bottom-left-radius: var(--radius-lg);
+    border-bottom-right-radius: var(--radius-lg);
+}
+
 /* ── Responsive sidebar drawer (≤900px, side layout) ──────── */
 /* On narrow viewports the fixed 260px sidebar would crowd content,
    so we convert it to a slide-in drawer. The hamburger toggle lives

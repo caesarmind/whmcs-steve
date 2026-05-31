@@ -338,8 +338,11 @@
             btn.addEventListener('click', function () { applySvcLayout(this.dataset.svcLayoutSet); });
         });
 
-        // Hide the Services chip on pages without a stack that uses this toggle.
-        if (!document.querySelector('.svc-table-card, .dom-list-card, .inv-table-card, .tk-table-card, .pd3-stack')) {
+        // Hide the Services (inside/outside) chip on pages where the toggle does
+        // nothing. It now responds wherever there's a content card, a settings-group,
+        // or a known bespoke surface wrapper (see apple-layout.css svc-layout rules) --
+        // so show it on any such page, not just the legacy table-card/.pd3-stack pages.
+        if (!document.querySelector('.content-area .card:not(.subnav-card), .content-area .settings-group, .content-area .bdm-group, .content-area .email-card, .content-area .ds-suggested-list, .content-area .hp-feature-card, .svc-table-card, .dom-list-card, .inv-table-card, .tk-table-card, .pd3-stack')) {
             var svcLayoutGroup = svcLayoutButtons[0] && svcLayoutButtons[0].closest('.chip-group');
             if (svcLayoutGroup) svcLayoutGroup.style.display = 'none';
         }
