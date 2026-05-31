@@ -100,13 +100,14 @@
 </div>
 
 {* ── Resource usage ──────────────────────────────────────────────────
-   Server-module usage. Gated on $lastupdate (set when the module last
-   reported usage) -- matches stock nexus/lagom. Bar width uses the real
-   $diskpercent / $bwpercent (e.g. "12%"); values are in MB. *}
-{if $lastupdate}
+   Header ALWAYS renders (unlike stock nexus/lagom, which hide it). The
+   disk/bandwidth bars show only when the server module has reported usage
+   ($lastupdate, set on the last sync); otherwise a short note. Bar width
+   uses the real $diskpercent / $bwpercent (e.g. "12%"); values are in MB. *}
 <div class="card">
     <div class="card-header"><h2 class="card-title">{$LANG.usagestats|default:'Resource Usage'}</h2></div>
     <div class="card-body">
+        {if $lastupdate}
         <div class="usage-bar-container">
             <div class="usage-bar-header"><span class="usage-bar-label">{$LANG.diskSpace|default:'Disk space'}</span><span class="usage-bar-value">{$diskusage|escape}MB / {$disklimit|escape}MB</span></div>
             <div class="usage-bar"><div class="usage-bar-fill blue" style="width:{$diskpercent|default:'0%'};"></div></div>
@@ -116,9 +117,11 @@
             <div class="usage-bar"><div class="usage-bar-fill green" style="width:{$bwpercent|default:'0%'};"></div></div>
         </div>
         <p style="font-size:12px;color:var(--color-text-tertiary);margin:14px 0 0;">{$LANG.clientarealastupdated|default:'Last updated'}: {$lastupdate|escape}</p>
+        {else}
+        <p style="font-size:13px;color:var(--color-text-tertiary);margin:0;padding:4px 0;">{$LANG.usagenotavailable|default:'Usage statistics are not available for this service yet.'}</p>
+        {/if}
     </div>
 </div>
-{/if}
 
 {* ── Login / control panel info ────────────────────────────────────── *}
 {if !empty($username)}
