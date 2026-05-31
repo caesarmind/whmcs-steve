@@ -80,3 +80,29 @@ body[data-subnav="off"] .pd-split > .pd-aside { display: none; }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); }
 
 @media (max-width: 880px) { .pd-split { grid-template-columns: 1fr; } .pd-info-grid { grid-template-columns: 1fr; } .pd-info-row:nth-child(even) { padding-left: 0; } .page-header h1 { font-size: var(--text-h4); } }
+
+/* Module client area -- the server module's raw output ($moduleclientarea):
+   the "Login to control panel" SSO button, change-password form, etc. The
+   module emits Bootstrap-ish markup, so map its buttons to the Apple look. */
+.module-client-area { font-size: var(--text-base); color: var(--color-text-secondary); line-height: 1.5; }
+.module-client-area .btn,
+.module-client-area input[type="submit"],
+.module-client-area input[type="button"],
+.module-client-area button,
+.module-client-area a.modulebutton {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 36px; padding: 0 18px; margin: 0 8px 10px 0;
+    border-radius: var(--radius-pill); border: 0;
+    background: var(--color-accent); color: #fff;
+    font-size: var(--text-base); font-weight: 500;
+    text-decoration: none; cursor: pointer; transition: opacity var(--transition-fast);
+}
+.module-client-area .btn:hover,
+.module-client-area input[type="submit"]:hover,
+.module-client-area button:hover,
+.module-client-area a.modulebutton:hover { opacity: 0.85; color: #fff; text-decoration: none; }
+.module-client-area .btn-default,
+.module-client-area .btn-secondary,
+.module-client-area .btn-light { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+.module-client-area table { width: 100%; border-collapse: collapse; }
+.module-client-area .alert { border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 12px; }

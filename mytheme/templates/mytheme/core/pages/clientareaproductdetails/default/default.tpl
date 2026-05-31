@@ -128,9 +128,21 @@
     {if !empty($password)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.password|default:'Password'}</div></div><div class="settings-item-action"><span class="settings-item-value pd-mono" data-pd-secret>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span><button type="button" class="btn-secondary pd-cred-toggle" data-pd-reveal="{$password|escape}" style="margin-left:10px;height:28px;padding:0 12px;font-size:12px;">{$LANG.show|default:'Show'}</button></div></div>
     {/if}
-    {if !empty($loginButton)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.login|default:'Control panel'}</div></div><div class="settings-item-action">{$loginButton}</div></div>
-    {/if}
+</div>
+{/if}
+
+{* ── Module client area ──────────────────────────────────────────────
+   The server module's own rendered output -- this is where the real
+   "Login to cPanel" SSO button + module controls live ($moduleclientarea,
+   the canonical WHMCS var, verified vs nexus/lagom). The old template used
+   an invented $loginButton, which is why no cPanel button ever showed.
+   Empty when the product has no provisioning module behind it. *}
+{if !empty($moduleclientarea)}
+<div class="card">
+    <div class="card-header"><h2 class="card-title">{$LANG.moduleManagement|default:'Control panel'}</h2></div>
+    <div class="card-body">
+        <div class="module-client-area module-{$module|default:''|escape}">{$moduleclientarea}</div>
+    </div>
 </div>
 {/if}
 
