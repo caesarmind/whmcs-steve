@@ -9,12 +9,18 @@
      $regdate, $nextduedate                    — formatted dates
      $firstpaymentamount, $recurringamount    — money strings
      $billingcycle, $paymentmethodname        — billing meta
-     $dedicatedip, $assignedips                — IP info
-     $ns1, $ns2                                — nameservers
-     $serverhostname, $serverip                — server info
-     $diskusage, $disklimit, $bwusage, $bwlimit — usage stats
+     $dedicatedip, $assignedips                — IP info (top-level)
+     $ns1, $ns2                                — domain nameservers (top-level)
+     $serverdata.hostname / .ipaddress /
+       .nameserver1..5 (+ .nameserver1ip..)    — SERVER info (NESTED object;
+                                                 NOT $serverhostname/$serverip!)
+     $diskusage/$disklimit/$bwusage/$bwlimit   — usage in MB
+     $diskpercent, $bwpercent ("12%")          — usage % for the bar width
+     $lastupdate                               — gates the usage block (set when
+                                                 the server module last reported)
      $username, $password                      — control panel creds
-     $loginButton                              — pre-rendered login URL
+     $loginButton                              — MyTheme-provided login URL (NOT a
+                                                 stock WHMCS var; absent w/o module)
      $pendingcancellation                      — bool, cancellation pending
      $upgrades                                 — array of available upgrade IDs
 
@@ -60,14 +66,21 @@
     {if !empty($domain)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.domain|default:'Domain'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$domain|escape}</span></div></div>
     {/if}
-    {if !empty($serverhostname)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.serverhostname|default:'Server'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">{$serverhostname|escape}</span></div></div>
+    {if $serverdata && !empty($serverdata.hostname)}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.servername|default:'Server'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">{$serverdata.hostname|escape}</span></div></div>
     {/if}
     {if !empty($dedicatedip)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.dedicatedip|default:'IP address'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">{$dedicatedip|escape}</span></div></div>
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.primaryIP|default:'IP address'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">{$dedicatedip|escape}</span></div></div>
+    {elseif $serverdata && !empty($serverdata.ipaddress)}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.primaryIP|default:'IP address'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">{$serverdata.ipaddress|escape}</span></div></div>
     {/if}
-    {if !empty($ns1) || !empty($ns2)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.nameservers|default:'Nameservers'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-size:13px;">{$ns1|default:''|escape}{if !empty($ns2)}<br>{$ns2|escape}{/if}</span></div></div>
+    {if !empty($assignedips)}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.assignedIPs|default:'Assigned IPs'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">{$assignedips|nl2br}</span></div></div>
+    {/if}
+    {if $serverdata && ($serverdata.nameserver1 || $serverdata.nameserver2)}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.domainnameservers|default:'Nameservers'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-size:13px;">{if $serverdata.nameserver1}{$serverdata.nameserver1|escape}{/if}{if $serverdata.nameserver2}<br>{$serverdata.nameserver2|escape}{/if}</span></div></div>
+    {elseif !empty($ns1) || !empty($ns2)}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.domainnameservers|default:'Nameservers'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-size:13px;">{$ns1|default:''|escape}{if !empty($ns2)}<br>{$ns2|escape}{/if}</span></div></div>
     {/if}
     {if !empty($regdate)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.registrationdate|default:'Registration date'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$regdate|escape}</span></div></div>
@@ -86,21 +99,23 @@
     {/if}
 </div>
 
-{* ── Resource usage ────────────────────────────────────────────────── *}
-{if !empty($disklimit) && !empty($diskusage)}
+{* ── Resource usage ──────────────────────────────────────────────────
+   Server-module usage. Gated on $lastupdate (set when the module last
+   reported usage) -- matches stock nexus/lagom. Bar width uses the real
+   $diskpercent / $bwpercent (e.g. "12%"); values are in MB. *}
+{if $lastupdate}
 <div class="card">
     <div class="card-header"><h2 class="card-title">{$LANG.usagestats|default:'Resource Usage'}</h2></div>
     <div class="card-body">
         <div class="usage-bar-container">
-            <div class="usage-bar-header"><span class="usage-bar-label">{$LANG.diskspace|default:'Disk space'}</span><span class="usage-bar-value">{$diskusage|escape} / {$disklimit|escape}</span></div>
-            <div class="usage-bar"><div class="usage-bar-fill blue" style="width:50%;"></div></div>
+            <div class="usage-bar-header"><span class="usage-bar-label">{$LANG.diskSpace|default:'Disk space'}</span><span class="usage-bar-value">{$diskusage|escape}MB / {$disklimit|escape}MB</span></div>
+            <div class="usage-bar"><div class="usage-bar-fill blue" style="width:{$diskpercent|default:'0%'};"></div></div>
         </div>
-        {if !empty($bwlimit) && !empty($bwusage)}
         <div class="usage-bar-container">
-            <div class="usage-bar-header"><span class="usage-bar-label">{$LANG.bandwidth|default:'Bandwidth'}</span><span class="usage-bar-value">{$bwusage|escape} / {$bwlimit|escape}</span></div>
-            <div class="usage-bar"><div class="usage-bar-fill green" style="width:50%;"></div></div>
+            <div class="usage-bar-header"><span class="usage-bar-label">{$LANG.bandwidth|default:'Bandwidth'}</span><span class="usage-bar-value">{$bwusage|escape}MB / {$bwlimit|escape}MB</span></div>
+            <div class="usage-bar"><div class="usage-bar-fill green" style="width:{$bwpercent|default:'0%'};"></div></div>
         </div>
-        {/if}
+        <p style="font-size:12px;color:var(--color-text-tertiary);margin:14px 0 0;">{$LANG.clientarealastupdated|default:'Last updated'}: {$lastupdate|escape}</p>
     </div>
 </div>
 {/if}
