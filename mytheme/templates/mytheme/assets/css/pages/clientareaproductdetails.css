@@ -116,10 +116,12 @@ body[data-subnav="off"] .pd-split > .pd-aside { display: none; }
 
 /* hairline separator above each row-level block in the card */
 .pd-manage-card > .pd-manage-upgrade,
+.pd-manage-card > .pd-manage-renew,
 .pd-manage-card > details.pd-manage-changepw,
 .pd-manage-card > .pd-manage-cancel { border-top: 0.5px solid var(--color-border); }
 
 .pd-manage-upgrade-ico { background: var(--color-blue-bg); color: var(--color-blue-text); }
+.pd-manage-renew-ico { background: var(--color-green-bg); color: var(--color-green-text); }
 .pd-manage-pw-ico { background: var(--color-orange-bg); color: var(--color-orange-text); }
 .pd-manage-cancel-ico { background: var(--color-red-bg); color: var(--color-red-text); }
 .pd-manage-cancel-label { color: var(--color-red-text); }
