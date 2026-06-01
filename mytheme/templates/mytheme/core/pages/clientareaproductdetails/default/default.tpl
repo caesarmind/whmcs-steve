@@ -61,14 +61,6 @@
 {/if}
 
 {* ── Service information ───────────────────────────────────────────── *}
-{* Two-column split: when WHMCS populates the secondary sidebar (the service
-   menu -- core + ClientAreaSecondarySidebar hooks), render it as a right-hand
-   subnav-card; otherwise the page stays single-column (graceful, no change).
-   .pd-split / .pd-aside CSS already lives in the page stylesheet. *}
-{assign var=pdHasAside value=false}
-{if isset($secondarySidebar) && $secondarySidebar->hasChildren()}{assign var=pdHasAside value=true}{/if}
-{if $pdHasAside}<div class="pd-split"><div class="pd-main">{/if}
-
 <div class="settings-group">
     <div class="settings-group-header"><div class="settings-group-title">{$LANG.productdetails|default:'Service Information'}</div></div>
     {if !empty($domain)}
@@ -295,20 +287,5 @@
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.firstpaymentamount|default:'First payment'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$firstpaymentamount|escape}</span></div></div>
     {/if}
 </div>
-{/if}
-
-{* close .pd-main and render the WHMCS secondary sidebar as a subnav-card aside *}
-{if $pdHasAside}
-</div>{* /.pd-main *}
-<aside class="pd-aside">
-    {foreach $secondarySidebar as $sbItem}
-    <div class="card subnav-card">
-        {if $sbItem->getLabel()}<div class="subnav-heading">{$sbItem->getLabel()}</div>{/if}
-        {if $sbItem->hasChildren()}{foreach $sbItem->getChildren() as $sbChild}{if $sbChild->getUri()}<a href="{$sbChild->getUri()}" class="subnav-item{if $sbChild->isCurrent()} active{/if}"{if $sbChild->getAttribute('target')} target="{$sbChild->getAttribute('target')}" rel="noopener"{/if}>{if $sbChild->hasIcon()}<i class="{$sbChild->getIcon()}"></i>{/if}<span class="subnav-label">{$sbChild->getLabel()}</span>{if $sbChild->hasBadge()}<span class="subnav-badge">{$sbChild->getBadge()}</span>{/if}</a>{else}<div class="subnav-item subnav-static">{if $sbChild->hasIcon()}<i class="{$sbChild->getIcon()}"></i>{/if}<span class="subnav-label">{$sbChild->getLabel()}</span></div>{/if}{/foreach}{/if}
-        {if $sbItem->hasBodyHtml()}<div class="subnav-body">{$sbItem->getBodyHtml()}</div>{/if}
-    </div>
-    {/foreach}
-</aside>
-</div>{* /.pd-split *}
 {/if}
 
