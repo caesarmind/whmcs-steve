@@ -128,9 +128,6 @@
 <div class="settings-group">
     <div class="settings-group-header"><div class="settings-group-title">{$LANG.loginsection|default:'Login info'}</div></div>
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.username|default:'Username'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">{$username|escape}</span></div></div>
-    {if !empty($password)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.password|default:'Password'}</div></div><div class="settings-item-action"><span class="settings-item-value pd-mono" data-pd-secret>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span><button type="button" class="btn-secondary pd-cred-toggle" data-pd-reveal="{$password|escape}" style="margin-left:10px;height:28px;padding:0 12px;font-size:12px;">{$LANG.show|default:'Show'}</button></div></div>
-    {/if}
 </div>
 {/if}
 
@@ -289,19 +286,3 @@
 {* Quick actions folded into the Manage card (Upgrade / Downgrade); the
    standalone Back-to-services + Renew rows were retired to match the mockup. *}
 
-<script>
-{literal}
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.pd-cred-toggle').forEach(function (btn) {
-        var secret = btn.getAttribute('data-pd-reveal');
-        btn.addEventListener('click', function () {
-            var span = btn.parentElement.querySelector('[data-pd-secret]');
-            if (!span) return;
-            var hidden = span.textContent.indexOf('•') !== -1;
-            span.textContent = hidden ? secret : '••••••••';
-            btn.textContent = hidden ? 'Hide' : 'Show';
-        });
-    });
-});
-{/literal}
-</script>

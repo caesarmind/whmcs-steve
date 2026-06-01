@@ -59,13 +59,6 @@ body[data-subnav="off"] .pd-split > .pd-aside { display: none; }
 .pd-meter-label { font-size: var(--text-sm); color: var(--color-text-secondary); margin-bottom: 6px; }
 .pd-meter-bar { height: 6px; background: var(--color-surface-secondary); border-radius: 3px; overflow: hidden; }
 .pd-meter-fill { height: 100%; background: var(--color-accent); border-radius: 3px; transition: width var(--transition-fast); }
-
-.pd-credential-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 0.5px solid var(--color-border); flex-wrap: wrap; }
-.pd-credential-row:last-of-type { border-bottom: 0; }
-.pd-cred-label { font-size: var(--text-base); font-weight: var(--fw-medium); color: var(--color-text-tertiary); width: 120px; flex-shrink: 0; }
-.pd-cred-value { font-size: var(--text-md); color: var(--color-text-primary); flex: 1; min-width: 0; }
-.pd-cred-toggle { height: 28px; padding: 0 12px; background: transparent; border: 0.5px solid var(--color-border); border-radius: var(--radius-pill); color: var(--color-text-secondary); font-size: var(--text-sm); font-family: inherit; cursor: pointer; }
-.pd-cred-toggle:hover { color: var(--color-text-primary); border-color: var(--color-text-secondary); }
 .pd-login-btn { margin-top: 18px; display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 18px; font-size: var(--text-md); }
 .pd-login-btn svg { width: 14px; height: 14px; }
 
