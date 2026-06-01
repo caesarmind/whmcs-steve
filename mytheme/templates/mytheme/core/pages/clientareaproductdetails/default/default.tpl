@@ -85,21 +85,6 @@
     {elseif !empty($ns1) || !empty($ns2)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.domainnameservers|default:'Nameservers'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-size:13px;">{$ns1|default:''|escape}{if !empty($ns2)}<br>{$ns2|escape}{/if}</span></div></div>
     {/if}
-    {if !empty($regdate)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.registrationdate|default:'Registration date'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$regdate|escape}</span></div></div>
-    {/if}
-    {if !empty($nextduedate)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.invoicedatedue|default:'Next due date'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$nextduedate|escape}</span></div></div>
-    {/if}
-    {if !empty($recurringamount)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.recurringamount|default:'Billing'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$recurringamount|escape}{if !empty($billingcycle)} / {$billingcycle|escape}{/if}</span></div></div>
-    {/if}
-    {if !empty($paymentmethodname)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.paymentmethod|default:'Payment method'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$paymentmethodname|escape}</span></div></div>
-    {/if}
-    {if !empty($firstpaymentamount)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.firstpaymentamount|default:'First payment'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$firstpaymentamount|escape}</span></div></div>
-    {/if}
 </div>
 
 {* ── Resource usage ──────────────────────────────────────────────────
@@ -280,4 +265,27 @@
 
 {* Quick actions folded into the Manage card (Upgrade / Downgrade); the
    standalone Back-to-services + Renew rows were retired to match the mockup. *}
+
+{* Billing overview -- the money fields, split out of Service Information into
+   their own section at the end (matches Lagom's Billing Overview). *}
+{if !empty($regdate) || !empty($nextduedate) || !empty($recurringamount) || !empty($paymentmethodname) || !empty($firstpaymentamount)}
+<div class="settings-group">
+    <div class="settings-group-header"><div class="settings-group-title">{$LANG.billingOverview|default:'Billing Overview'}</div></div>
+    {if !empty($regdate)}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.registrationdate|default:'Registration date'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$regdate|escape}</span></div></div>
+    {/if}
+    {if !empty($nextduedate)}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.invoicedatedue|default:'Next due date'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$nextduedate|escape}</span></div></div>
+    {/if}
+    {if !empty($recurringamount)}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.recurringamount|default:'Billing'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$recurringamount|escape}{if !empty($billingcycle)} / {$billingcycle|escape}{/if}</span></div></div>
+    {/if}
+    {if !empty($paymentmethodname)}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.paymentmethod|default:'Payment method'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$paymentmethodname|escape}</span></div></div>
+    {/if}
+    {if !empty($firstpaymentamount)}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.firstpaymentamount|default:'First payment'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$firstpaymentamount|escape}</span></div></div>
+    {/if}
+</div>
+{/if}
 
