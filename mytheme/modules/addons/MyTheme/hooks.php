@@ -429,6 +429,48 @@ if (AddonHelper::isActive()) {
         }
     });
 
+    // Secondary sidebar — populate the service-details page's right-hand
+    // sub-nav (the productdetails template renders $secondarySidebar inside its
+    // .pd-aside). WHMCS leaves this empty by default, so we add a "Service"
+    // section here. Registered globally; no-op unless action=productdetails.
+    add_hook('ClientAreaSecondarySidebar', 100, function (WHMCS\View\Menu\Item $secondarySidebar) {
+        try {
+            $action = isset($_GET['action']) ? (string) $_GET['action'] : '';
+            if ($action !== 'productdetails') {
+                return;
+            }
+            $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+            if ($id <= 0) {
+                return;
+            }
+
+            $secondarySidebar->addChild('mt-service-nav', ['label' => 'Service', 'order' => 10]);
+            $panel = $secondarySidebar->getChild('mt-service-nav');
+            if ($panel === null) {
+                return;
+            }
+
+            $links = [
+                ['overview', 'Overview',            'clientarea.php?action=productdetails&id=' . $id, 'fas fa-info-circle'],
+                ['upgrade',  'Upgrade / Downgrade', 'upgrade.php?type=package&id=' . $id,             'fas fa-arrow-up'],
+                ['order',    'Order New Services',  'cart.php',                                        'fas fa-shopping-cart'],
+                ['services', 'All Services',        'clientarea.php?action=services',                  'fas fa-arrow-left'],
+            ];
+            $order = 1;
+            foreach ($links as $link) {
+                $panel->addChild($link[0], ['label' => $link[1], 'uri' => $link[2], 'order' => $order++]);
+                $child = $panel->getChild($link[0]);
+                if ($child !== null) {
+                    try { $child->setIcon($link[3]); } catch (\Throwable $e) {}
+                }
+            }
+        } catch (\Throwable $e) {
+            if (function_exists('logActivity')) {
+                logActivity('MyTheme secondary sidebar failed: ' . $e->getMessage());
+            }
+        }
+    });
+
     add_hook('ClientAreaPageHome', 1, function ($vars) {
         return HookService::instance()->dispatch('ClientAreaPageHome', $vars);
     });
