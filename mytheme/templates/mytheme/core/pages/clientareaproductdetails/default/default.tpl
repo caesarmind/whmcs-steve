@@ -81,6 +81,12 @@
 {if isset($upgrades) && $upgrades|@count > 0}{assign var=pdHasUpgrades value=true}{/if}
 {assign var=pdHasActions value=false}
 {if $pdIsCpanel || $pdHasUpgrades || $modulechangepassword || $pdCanCancel}{assign var=pdHasActions value=true}{/if}
+{* This page emits a <base href="…/"> (header.tpl), so a bare "#anchor" link
+   resolves against the SITE ROOT (→ homepage), not this page. Build an absolute
+   self URL so in-page section links land here; JS also intercepts the click for
+   smooth, no-reload scrolling. *}
+{assign var=pdSid value=$id|default:0}
+{assign var=pdSelfUrl value=$WEB_ROOT|cat:'/clientarea.php?action=productdetails&id='|cat:$pdSid}
 
 {* ── Service details (Lagom-parity sidebar: Overview + Actions groups) ─── *}
 <div class="pd-split">
@@ -108,9 +114,9 @@
                 {assign var=sbMapped value=false}
                 {assign var=sbTab value=false}
                 {assign var=sbDanger value=false}
-                {if $sbName|strstr:'information' || $sbName|strstr:'overview'}{assign var=sbHref value='#pd-service-info'}{assign var=sbMapped value=true}
-                {elseif $sbName|strstr:'addon'}{assign var=sbHref value='#pd-addons'}{assign var=sbMapped value=true}
-                {elseif $sbName|strstr:'password'}{assign var=sbHref value='#pd-changepw'}{assign var=sbMapped value=true}{assign var=sbTab value=true}
+                {if $sbName|strstr:'information' || $sbName|strstr:'overview'}{assign var=sbHref value=$pdSelfUrl|cat:'#pd-service-info'}{assign var=sbMapped value=true}
+                {elseif $sbName|strstr:'addon'}{assign var=sbHref value=$pdSelfUrl|cat:'#pd-addons'}{assign var=sbMapped value=true}
+                {elseif $sbName|strstr:'password'}{assign var=sbHref value=$pdSelfUrl|cat:'#pd-changepw'}{assign var=sbMapped value=true}{assign var=sbTab value=true}
                 {elseif $sbName|strstr:'cancel'}{assign var=sbDanger value=true}
                 {/if}
                 {assign var=sbIsHash value=false}
@@ -141,23 +147,23 @@
     {* Overview — in-page section jumps (mirrors Lagom's "Service Details Overview") *}
     <div class="card subnav-card">
         <div class="subnav-heading">{$LANG.overview|default:'Overview'}</div>
-        <a class="subnav-item active" href="#pd-service-info">
+        <a class="subnav-item active" href="{$pdSelfUrl}#pd-service-info">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             {$LANG.information|default:'Information'}
         </a>
         {if $lastupdate}
-        <a class="subnav-item" href="#pd-usage">
+        <a class="subnav-item" href="{$pdSelfUrl}#pd-usage">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12A10 10 0 1112 2"/><path d="M12 12l5-3"/><path d="M12 2a10 10 0 0110 10"/></svg>
             {$LANG.usagestats|default:'Resource Usage'}
         </a>
         {/if}
         {if $pdHasAddons}
-        <a class="subnav-item" href="#pd-addons">
+        <a class="subnav-item" href="{$pdSelfUrl}#pd-addons">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11H19V7a2 2 0 00-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4a2 2 0 00-2 2v3.8h1.5a2.7 2.7 0 010 5.4H2V20a2 2 0 002 2h3.8v-1.5a2.7 2.7 0 015.4 0V22H17a2 2 0 002-2v-4h1.5a2.5 2.5 0 000-5z"/></svg>
             {$LANG.clientareahostingaddons|default:'Addons'}
         </a>
         {/if}
-        <a class="subnav-item" href="#pd-billing">
+        <a class="subnav-item" href="{$pdSelfUrl}#pd-billing">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             {$LANG.billingOverview|default:'Billing'}
         </a>
@@ -184,7 +190,7 @@
         </a>
         {/if}
         {if $modulechangepassword}
-        <a class="subnav-item" href="#pd-changepw" data-pd-open>
+        <a class="subnav-item" href="{$pdSelfUrl}#pd-changepw" data-pd-open>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
             {$LANG.serverchangepassword|default:'Change Password'}
         </a>
@@ -466,33 +472,43 @@
 </div>{* /.pd-main *}
 </div>{* /.pd-split *}
 
-{* Sidebar behaviour: open the Change Password expander when its rail link is
-   clicked, and highlight the Overview item for the section currently in view.
-   Wrapped in a literal block so Smarty doesn't parse the JS braces. *}
+{* Sidebar behaviour: intercept in-page section links (they carry ABSOLUTE
+   hrefs because the page has a <base href>, which would otherwise send a bare
+   "#id" to the site root → homepage) and scroll smoothly without navigating —
+   the same no-reload feel as Lagom's tab toggles. Also opens the Change
+   Password expander and runs a scrollspy. Wrapped in a literal block so Smarty
+   doesn't parse the JS braces. *}
 <script>
 {literal}
 (function () {
-    document.querySelectorAll('a[data-pd-open]').forEach(function (a) {
-        a.addEventListener('click', function () {
-            var el = document.querySelector(a.getAttribute('href'));
-            if (el && el.tagName === 'DETAILS') { el.open = true; }
+    var anchors = Array.prototype.slice.call(
+        document.querySelectorAll('.pd-aside a.subnav-item')
+    ).filter(function (a) {
+        return a.hash && a.hash.indexOf('#pd-') === 0 && document.querySelector(a.hash);
+    });
+
+    anchors.forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            var el = document.querySelector(a.hash);
+            if (!el) { return; }
+            e.preventDefault();
+            if (a.hasAttribute('data-pd-open') && el.tagName === 'DETAILS') { el.open = true; }
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (window.history && history.replaceState) { history.replaceState(null, '', a.hash); }
         });
     });
 
-    var links = Array.prototype.slice.call(
-        document.querySelectorAll('.pd-aside .subnav-item[href^="#"]')
-    );
     var map = {};
     var targets = [];
-    links.forEach(function (l) {
-        var sec = document.getElementById(l.getAttribute('href').slice(1));
-        if (sec) { map[sec.id] = l; targets.push(sec); }
+    anchors.forEach(function (a) {
+        var el = document.querySelector(a.hash);
+        if (el && !map[el.id]) { map[el.id] = a; targets.push(el); }
     });
     if ('IntersectionObserver' in window && targets.length) {
         var spy = new IntersectionObserver(function (entries) {
             entries.forEach(function (e) {
                 if (e.isIntersecting && map[e.target.id]) {
-                    links.forEach(function (l) { l.classList.remove('active'); });
+                    anchors.forEach(function (l) { l.classList.remove('active'); });
                     map[e.target.id].classList.add('active');
                 }
             });
