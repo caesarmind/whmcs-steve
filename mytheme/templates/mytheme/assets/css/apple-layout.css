@@ -937,6 +937,28 @@ body[data-svc-layout="outside"] .content-area .settings-group > .settings-item:l
     border-bottom-right-radius: var(--radius-lg);
 }
 
+/* The product-details "Manage" card mixes a .card-body (login CTAs) with trailing
+   .settings-item action rows (Change Password, Request Cancellation, ...) as direct
+   .card children. The generic "outside" rule above floats the header and restores
+   the white surface only on .card-body, leaving those rows transparent on the page
+   background. This card can't split into a single floating body box, so opt it out:
+   keep it one unified white card in "outside" too (header stays inside). */
+body[data-svc-layout="outside"] .content-area .card.pd-manage-card:has(> .card-body) {
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+body[data-svc-layout="outside"] .content-area .card.pd-manage-card:has(> .card-body) > .card-header {
+    padding: 20px 24px 0;
+}
+body[data-svc-layout="outside"] .content-area .card.pd-manage-card:has(> .card-body) > .card-body {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+
 /* -- Responsive sidebar drawer (<=900px, side layout) -------- */
 /* On narrow viewports the fixed 260px sidebar would crowd content,
    so we convert it to a slide-in drawer. The hamburger toggle lives

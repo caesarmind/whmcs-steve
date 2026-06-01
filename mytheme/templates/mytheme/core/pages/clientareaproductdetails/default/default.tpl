@@ -134,48 +134,150 @@
 </div>
 {/if}
 
-{* ── Module client area ──────────────────────────────────────────────
-   The server module's own rendered output -- this is where the real
-   "Login to cPanel" SSO button + module controls live ($moduleclientarea,
-   the canonical WHMCS var, verified vs nexus/lagom). The old template used
-   an invented $loginButton, which is why no cPanel button ever showed.
-   Empty when the product has no provisioning module behind it. *}
-{if !empty($moduleclientarea)}
-<div class="card">
-    <div class="card-header"><h2 class="card-title">{$LANG.moduleManagement|default:'Control panel'}</h2></div>
-    <div class="card-body">
-        <div class="module-client-area module-{$module|default:''|escape}">{$moduleclientarea}</div>
-    </div>
-</div>
-{/if}
+{* ── Manage (control-panel actions + lifecycle) ──────────────────────
+   Option C (login CTAs + rows), native. cPanel / Webmail use WHMCS single
+   sign-on (dosinglesignon=1 -- the same mechanism the cPanel module's own
+   overview emits; see modules/servers/cpanel/overview.tpl), shown only for
+   cPanel services ($module == 'cpanel') and requiring SSO to be enabled
+   for the account. Change Password is the real module POST form
+   (modulechangepassword=true, fields newpw/confirmpw, gated on
+   $modulechangepassword). Request Cancellation is the core cancel action.
+   Replaces the old raw $moduleclientarea dump. *}
+{assign var=pdCanCancel value=false}
+{if (!isset($pendingcancellation) || !$pendingcancellation) && $svcStatusLower == 'active'}{assign var=pdCanCancel value=true}{/if}
+{assign var=pdIsCpanel value=false}
+{if $module == 'cpanel' && !empty($moduleclientarea)}{assign var=pdIsCpanel value=true}{/if}
+{if $pdIsCpanel || $modulechangepassword || $pdCanCancel || (isset($upgrades) && $upgrades|@count > 0)}
+<div class="card pd-manage-card">
+    <div class="card-header"><h2 class="card-title">{$LANG.manage|default:'Manage'}</h2></div>
 
-{* ── Quick actions ─────────────────────────────────────────────────── *}
-<div class="settings-group">
-    <div class="settings-group-header"><div class="settings-group-title">{$LANG.actions|default:'Quick Actions'}</div></div>
-    <a href="{$WEB_ROOT}/clientarea.php?action=services" class="settings-item" style="text-decoration:none;color:inherit;">
-        <div class="settings-item-content"><div class="settings-item-label">{$LANG.backtoservices|default:'Back to services'}</div></div>
-        <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
-    </a>
-    {if !empty($id)}
-    <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|escape}&modop=custom&a=Renew" class="settings-item" style="text-decoration:none;color:inherit;">
-        <div class="settings-item-content"><div class="settings-item-label">{$LANG.renew|default:'Renew now'}</div></div>
-        <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
-    </a>
+    {if $pdIsCpanel}
+    <div class="card-body">
+        <div class="pd-manage-cta">
+            <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1" target="_blank" rel="noopener" class="btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                Log in to cPanel
+            </a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Email_Accounts" target="_blank" rel="noopener" class="btn-secondary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+                Log in to Webmail
+            </a>
+        </div>
+    </div>
     {/if}
+
     {if isset($upgrades) && $upgrades|@count > 0}
-    <a href="{$WEB_ROOT}/upgrade.php?type=package&id={$id|default:0|escape}" class="settings-item" style="text-decoration:none;color:inherit;">
+    <a href="{$WEB_ROOT}/upgrade.php?type=package&id={$id|default:0|escape}" class="settings-item pd-manage-upgrade" style="text-decoration:none;color:inherit;">
+        <div class="settings-item-icon pd-manage-upgrade-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="8 8 12 4 16 8"/><polyline points="8 16 12 20 16 16"/></svg>
+        </div>
         <div class="settings-item-content"><div class="settings-item-label">{$LANG.upgrade|default:'Upgrade / Downgrade'}</div><div class="settings-item-sublabel">{$LANG.upgradeavailable|default:'Change your hosting plan'}</div></div>
         <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
     </a>
     {/if}
-</div>
 
-{* ── Cancel service ────────────────────────────────────────────────── *}
-{if (!isset($pendingcancellation) || !$pendingcancellation) && $svcStatusLower == 'active'}
-<div style="margin-top:24px;">
-    <a href="{$WEB_ROOT}/clientarea.php?action=cancel&id={$id|default:0|escape}" class="btn-danger">{$LANG.requestcancellation|default:'Request cancellation'}</a>
+    {if $modulechangepassword}
+    <details class="pd-manage-changepw">
+        <summary class="settings-item">
+            <div class="settings-item-icon pd-manage-pw-ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </div>
+            <div class="settings-item-content"><div class="settings-item-label">{$LANG.serverchangepassword|default:'Change Password'}</div><div class="settings-item-sublabel">Set a new control-panel password</div></div>
+            <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+        </summary>
+        <div class="pd-manage-changepw-body">
+            {if $modulechangepwresult == 'success'}
+            <div class="pd-alert pd-alert-success">{$modulechangepasswordmessage|default:''}</div>
+            {elseif $modulechangepwresult == 'error'}
+            <div class="pd-alert pd-alert-error">{$modulechangepasswordmessage|strip_tags}</div>
+            {/if}
+            <form method="post" action="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}">
+                <input type="hidden" name="id" value="{$id|default:0|escape}">
+                <input type="hidden" name="modulechangepassword" value="true">
+                <label class="pd-field-label" for="pdNewPw">{$LANG.newpassword|default:'New password'}</label>
+                <input type="password" class="pd-field-input" id="pdNewPw" name="newpw" autocomplete="new-password">
+                <label class="pd-field-label" for="pdConfirmPw">{$LANG.confirmnewpassword|default:'Confirm new password'}</label>
+                <input type="password" class="pd-field-input" id="pdConfirmPw" name="confirmpw" autocomplete="new-password">
+                <button type="submit" class="btn-primary pd-field-submit">{$LANG.clientareasavechanges|default:'Save changes'}</button>
+            </form>
+        </div>
+    </details>
+    {/if}
+
+    {if $pdCanCancel}
+    <a href="{$WEB_ROOT}/clientarea.php?action=cancel&id={$id|default:0|escape}" class="settings-item pd-manage-cancel" style="text-decoration:none;color:inherit;">
+        <div class="settings-item-icon pd-manage-cancel-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        </div>
+        <div class="settings-item-content"><div class="settings-item-label pd-manage-cancel-label">{$LANG.requestcancellation|default:'Request Cancellation'}</div><div class="settings-item-sublabel">Schedule this service to be cancelled</div></div>
+        <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
+    </a>
+    {/if}
 </div>
 {/if}
+
+{* ── Quick Shortcuts (cPanel feature launchpad) ──────────────────────
+   Native Apple-styled grid of cPanel feature deep-links via WHMCS single
+   sign-on app tokens (dosinglesignon=1&app=<token>), the same tokens the
+   cPanel module's own overview.tpl emits. Shown only for active cPanel
+   services. Labels are hardcoded English -- the cPanel module's
+   $LANG.cPanel.* keys are not reliably loaded on the theme's product page. *}
+{if $pdIsCpanel && $svcStatusLower == 'active'}
+<div class="card pd-shortcuts-card">
+    <div class="card-header"><h2 class="card-title">{$LANG.quickShortcuts|default:'Quick Shortcuts'}</h2></div>
+    <div class="card-body">
+        <div class="pd-shortcuts">
+            <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Email_Accounts" target="_blank" rel="noopener">
+                <span class="pd-shortcut-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+                <span class="pd-shortcut-label">Email Accounts</span>
+            </a>
+            <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Email_Forwarders" target="_blank" rel="noopener">
+                <span class="pd-shortcut-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 17 20 12 15 7"/><path d="M4 18v-2a4 4 0 014-4h12"/></svg></span>
+                <span class="pd-shortcut-label">Forwarders</span>
+            </a>
+            <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Email_AutoResponders" target="_blank" rel="noopener">
+                <span class="pd-shortcut-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 00-4-4H4"/></svg></span>
+                <span class="pd-shortcut-label">Autoresponders</span>
+            </a>
+            <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=FileManager_Home" target="_blank" rel="noopener">
+                <span class="pd-shortcut-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></span>
+                <span class="pd-shortcut-label">File Manager</span>
+            </a>
+            <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Backups_Home" target="_blank" rel="noopener">
+                <span class="pd-shortcut-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8v11a1 1 0 001 1h14a1 1 0 001-1V8"/><rect x="2" y="4" width="20" height="4" rx="1"/><line x1="10" y1="12" x2="14" y2="12"/></svg></span>
+                <span class="pd-shortcut-label">Backup</span>
+            </a>
+            <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Domains_SubDomains" target="_blank" rel="noopener">
+                <span class="pd-shortcut-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3c2.5 2.5 4 5.7 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.7-4-9s1.5-6.5 4-9z"/></svg></span>
+                <span class="pd-shortcut-label">Subdomains</span>
+            </a>
+            <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Domains_AddonDomains" target="_blank" rel="noopener">
+                <span class="pd-shortcut-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
+                <span class="pd-shortcut-label">Addon Domains</span>
+            </a>
+            <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Cron_Home" target="_blank" rel="noopener">
+                <span class="pd-shortcut-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></span>
+                <span class="pd-shortcut-label">Cron Jobs</span>
+            </a>
+            <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Database_MySQL" target="_blank" rel="noopener">
+                <span class="pd-shortcut-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></span>
+                <span class="pd-shortcut-label">MySQL Databases</span>
+            </a>
+            <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Database_phpMyAdmin" target="_blank" rel="noopener">
+                <span class="pd-shortcut-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/></svg></span>
+                <span class="pd-shortcut-label">phpMyAdmin</span>
+            </a>
+            <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Stats_AWStats" target="_blank" rel="noopener">
+                <span class="pd-shortcut-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v15a1 1 0 001 1h15"/><polyline points="7 14 11 10 14 13 19 7"/></svg></span>
+                <span class="pd-shortcut-label">Awstats</span>
+            </a>
+        </div>
+    </div>
+</div>
+{/if}
+
+{* Quick actions folded into the Manage card (Upgrade / Downgrade); the
+   standalone Back-to-services + Renew rows were retired to match the mockup. *}
 
 <script>
 {literal}
