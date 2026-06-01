@@ -61,6 +61,32 @@
 {/if}
 
 {* ── Service information ───────────────────────────────────────────── *}
+<div class="pd-split">
+<aside class="pd-aside">
+    <div class="card subnav-card">
+        <div class="subnav-heading">{$LANG.productdetails|default:'Service'}</div>
+        <a class="subnav-item active" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+            {$LANG.overview|default:'Overview'}
+        </a>
+        {if isset($upgrades) && $upgrades|@count > 0}
+        <a class="subnav-item" href="{$WEB_ROOT}/upgrade.php?type=package&id={$id|default:0|escape}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="8 8 12 4 16 8"/><polyline points="8 16 12 20 16 16"/></svg>
+            {$LANG.upgrade|default:'Upgrade / Downgrade'}
+        </a>
+        {/if}
+        <a class="subnav-item" href="{$WEB_ROOT}/cart.php">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+            {$LANG.ordernew|default:'Order New Services'}
+        </a>
+        <a class="subnav-item" href="{$WEB_ROOT}/clientarea.php?action=services">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            {$LANG.clientareanavservices|default:'My Services'}
+        </a>
+    </div>
+</aside>
+<div class="pd-main">
+
 <div class="settings-group">
     <div class="settings-group-header"><div class="settings-group-title">{$LANG.productdetails|default:'Service Information'}</div></div>
     {if !empty($domain)}
@@ -311,4 +337,7 @@
     {/if}
 </div>
 {/if}
+
+</div>{* /.pd-main *}
+</div>{* /.pd-split *}
 

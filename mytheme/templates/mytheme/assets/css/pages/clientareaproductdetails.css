@@ -6,7 +6,7 @@
 .page-header-row { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
 .page-header-row .status-pill { align-self: center; }
 
-.pd-split { display: grid; grid-template-columns: 1fr 240px; gap: 24px; align-items: start; }
+.pd-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
 .pd-main { min-width: 0; }
 .pd-aside { display: flex; flex-direction: column; gap: 16px; }
 body[data-subnav="off"] .pd-split { grid-template-columns: 1fr; }
