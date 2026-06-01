@@ -60,34 +60,96 @@
 </div>
 {/if}
 
-{* ── Service information ───────────────────────────────────────────── *}
+{* Service-status gating — computed ONCE here, consumed by the sidebar AND the
+   Manage / Quick Shortcuts cards below (so keep this above .pd-split):
+     $pdIsCpanelSvc = cPanel module regardless of status (keeps cards visible,
+                      with a notice, for suspended/pending — matches Lagom)
+     $pdIsActive    = service is active
+     $pdCanCancel   = cancellation is allowed
+     $pdIsCpanel    = control-panel area actually available (active cPanel w/ output) *}
+{assign var=pdIsCpanelSvc value=false}
+{if $module == 'cpanel'}{assign var=pdIsCpanelSvc value=true}{/if}
+{assign var=pdIsActive value=false}
+{if $svcStatusLower == 'active'}{assign var=pdIsActive value=true}{/if}
+{assign var=pdCanCancel value=false}
+{if (!isset($pendingcancellation) || !$pendingcancellation) && ($pdIsActive || $svcStatusLower == 'suspended')}{assign var=pdCanCancel value=true}{/if}
+{assign var=pdIsCpanel value=false}
+{if $pdIsCpanelSvc && !empty($moduleclientarea)}{assign var=pdIsCpanel value=true}{/if}
+{assign var=pdHasAddons value=false}
+{if isset($addons) && $addons}{assign var=pdHasAddons value=true}{/if}
+{assign var=pdHasUpgrades value=false}
+{if isset($upgrades) && $upgrades|@count > 0}{assign var=pdHasUpgrades value=true}{/if}
+{assign var=pdHasActions value=false}
+{if $pdIsCpanel || $pdHasUpgrades || $modulechangepassword || $pdCanCancel}{assign var=pdHasActions value=true}{/if}
+
+{* ── Service details (Lagom-parity sidebar: Overview + Actions groups) ─── *}
 <div class="pd-split">
 <aside class="pd-aside">
+
+    {* Overview — in-page section jumps (mirrors Lagom's "Service Details Overview") *}
     <div class="card subnav-card">
-        <div class="subnav-heading">{$LANG.productdetails|default:'Service'}</div>
-        <a class="subnav-item active" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-            {$LANG.overview|default:'Overview'}
+        <div class="subnav-heading">{$LANG.overview|default:'Overview'}</div>
+        <a class="subnav-item active" href="#pd-service-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            {$LANG.information|default:'Information'}
         </a>
-        {if isset($upgrades) && $upgrades|@count > 0}
+        {if $lastupdate}
+        <a class="subnav-item" href="#pd-usage">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12A10 10 0 1112 2"/><path d="M12 12l5-3"/><path d="M12 2a10 10 0 0110 10"/></svg>
+            {$LANG.usagestats|default:'Resource Usage'}
+        </a>
+        {/if}
+        {if $pdHasAddons}
+        <a class="subnav-item" href="#pd-addons">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11H19V7a2 2 0 00-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4a2 2 0 00-2 2v3.8h1.5a2.7 2.7 0 010 5.4H2V20a2 2 0 002 2h3.8v-1.5a2.7 2.7 0 015.4 0V22H17a2 2 0 002-2v-4h1.5a2.5 2.5 0 000-5z"/></svg>
+            {$LANG.clientareahostingaddons|default:'Addons'}
+        </a>
+        {/if}
+        <a class="subnav-item" href="#pd-billing">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            {$LANG.billingOverview|default:'Billing'}
+        </a>
+    </div>
+
+    {* Actions — control-panel + lifecycle (mirrors Lagom's "Service Details Actions") *}
+    {if $pdHasActions}
+    <div class="card subnav-card">
+        <div class="subnav-heading">{$LANG.actions|default:'Actions'}</div>
+        {if $pdIsCpanel}
+        <a class="subnav-item" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            Log in to cPanel
+        </a>
+        <a class="subnav-item" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Email_Accounts" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            Log in to Webmail
+        </a>
+        {/if}
+        {if $pdHasUpgrades}
         <a class="subnav-item" href="{$WEB_ROOT}/upgrade.php?type=package&id={$id|default:0|escape}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="8 8 12 4 16 8"/><polyline points="8 16 12 20 16 16"/></svg>
             {$LANG.upgrade|default:'Upgrade / Downgrade'}
         </a>
         {/if}
-        <a class="subnav-item" href="{$WEB_ROOT}/cart.php">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-            {$LANG.ordernew|default:'Order New Services'}
+        {if $modulechangepassword}
+        <a class="subnav-item" href="#pd-changepw" data-pd-open>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            {$LANG.serverchangepassword|default:'Change Password'}
         </a>
-        <a class="subnav-item" href="{$WEB_ROOT}/clientarea.php?action=services">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            {$LANG.clientareanavservices|default:'My Services'}
+        {/if}
+        {if $pdCanCancel}
+        <a class="subnav-item subnav-item-danger" href="{$WEB_ROOT}/clientarea.php?action=cancel&id={$id|default:0|escape}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            {$LANG.requestcancellation|default:'Request Cancellation'}
         </a>
+        {/if}
     </div>
+    {/if}
+
 </aside>
 <div class="pd-main">
 
-<div class="settings-group">
+<div class="settings-group" id="pd-service-info">
     <div class="settings-group-header"><div class="settings-group-title">{$LANG.productdetails|default:'Service Information'}</div></div>
     {if !empty($domain)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.domain|default:'Domain'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$domain|escape}</span></div></div>
@@ -118,7 +180,7 @@
    disk/bandwidth bars show only when the server module has reported usage
    ($lastupdate, set on the last sync); otherwise a short note. Bar width
    uses the real $diskpercent / $bwpercent (e.g. "12%"); values are in MB. *}
-<div class="card">
+<div class="card" id="pd-usage">
     <div class="card-header"><h2 class="card-title">{$LANG.usagestats|default:'Resource Usage'}</h2></div>
     <div class="card-body">
         {if $lastupdate}
@@ -145,20 +207,10 @@
    for the account. Change Password is the real module POST form
    (modulechangepassword=true, fields newpw/confirmpw, gated on
    $modulechangepassword). Request Cancellation is the core cancel action.
-   Replaces the old raw $moduleclientarea dump. *}
-{assign var=pdIsCpanelSvc value=false}
-{if $module == 'cpanel'}{assign var=pdIsCpanelSvc value=true}{/if}
-{assign var=pdIsActive value=false}
-{if $svcStatusLower == 'active'}{assign var=pdIsActive value=true}{/if}
-{assign var=pdCanCancel value=false}
-{if (!isset($pendingcancellation) || !$pendingcancellation) && ($pdIsActive || $svcStatusLower == 'suspended')}{assign var=pdCanCancel value=true}{/if}
-{* $pdIsCpanel = control-panel area actually available (active cPanel w/ module output).
-   $pdIsCpanelSvc = cPanel service regardless of status — used to keep the cards
-   visible for suspended/pending services (with a notice), matching Lagom. *}
-{assign var=pdIsCpanel value=false}
-{if $pdIsCpanelSvc && !empty($moduleclientarea)}{assign var=pdIsCpanel value=true}{/if}
-{if $pdIsCpanelSvc || $modulechangepassword || $pdCanCancel || (isset($upgrades) && $upgrades|@count > 0)}
-<div class="card pd-manage-card">
+   Replaces the old raw $moduleclientarea dump. Status vars ($pdIsCpanelSvc,
+   $pdIsActive, $pdCanCancel, $pdIsCpanel) are computed once at the top. *}
+{if $pdIsCpanelSvc || $modulechangepassword || $pdCanCancel || $pdHasUpgrades}
+<div class="card pd-manage-card" id="pd-manage">
     <div class="card-header"><h2 class="card-title">{$LANG.manage|default:'Manage'}</h2></div>
 
     {if $pdIsCpanel}
@@ -206,7 +258,7 @@
     {/if}
 
     {if $modulechangepassword}
-    <details class="pd-manage-changepw">
+    <details class="pd-manage-changepw" id="pd-changepw">
         <summary class="settings-item">
             <div class="settings-item-icon pd-manage-pw-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
@@ -315,10 +367,30 @@
 {* Quick actions folded into the Manage card (Upgrade / Downgrade); the
    standalone Back-to-services + Renew rows were retired to match the mockup. *}
 
+{* ── Addons ──────────────────────────────────────────────────────────
+   Lagom surfaces product addons in its sidebar Overview + an Addons tab.
+   mytheme renders them as a compact section, only when the service has addons.
+   Standard WHMCS productdetails addon vars: name / status / pricing /
+   regdate / nextduedate / managementActions. *}
+{if $pdHasAddons}
+<div class="settings-group" id="pd-addons">
+    <div class="settings-group-header"><div class="settings-group-title">{$LANG.clientareahostingaddons|default:'Addons'}</div></div>
+    {foreach from=$addons item=addon}
+    <div class="settings-item">
+        <div class="settings-item-content">
+            <div class="settings-item-label">{$addon.name|escape}</div>
+            <div class="settings-item-sublabel">{if !empty($addon.status)}{$addon.status|strip_tags|escape}{/if}{if !empty($addon.nextduedate)} &middot; {$LANG.clientareahostingnextduedate|default:'Next due'}: {$addon.nextduedate|escape}{/if}</div>
+        </div>
+        {if !empty($addon.pricing)}<div class="settings-item-action"><span class="settings-item-value">{$addon.pricing}</span></div>{/if}
+    </div>
+    {/foreach}
+</div>
+{/if}
+
 {* Billing overview -- the money fields, split out of Service Information into
    their own section at the end (matches Lagom's Billing Overview). *}
 {if !empty($regdate) || !empty($nextduedate) || !empty($recurringamount) || !empty($paymentmethodname) || !empty($firstpaymentamount)}
-<div class="settings-group">
+<div class="settings-group" id="pd-billing">
     <div class="settings-group-header"><div class="settings-group-title">{$LANG.billingOverview|default:'Billing Overview'}</div></div>
     {if !empty($regdate)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.registrationdate|default:'Registration date'}</div></div><div class="settings-item-action"><span class="settings-item-value">{$regdate|escape}</span></div></div>
@@ -340,4 +412,41 @@
 
 </div>{* /.pd-main *}
 </div>{* /.pd-split *}
+
+{* Sidebar behaviour: open the Change Password expander when its rail link is
+   clicked, and highlight the Overview item for the section currently in view.
+   Wrapped in a literal block so Smarty doesn't parse the JS braces. *}
+<script>
+{literal}
+(function () {
+    document.querySelectorAll('a[data-pd-open]').forEach(function (a) {
+        a.addEventListener('click', function () {
+            var el = document.querySelector(a.getAttribute('href'));
+            if (el && el.tagName === 'DETAILS') { el.open = true; }
+        });
+    });
+
+    var links = Array.prototype.slice.call(
+        document.querySelectorAll('.pd-aside .subnav-item[href^="#"]')
+    );
+    var map = {};
+    var targets = [];
+    links.forEach(function (l) {
+        var sec = document.getElementById(l.getAttribute('href').slice(1));
+        if (sec) { map[sec.id] = l; targets.push(sec); }
+    });
+    if ('IntersectionObserver' in window && targets.length) {
+        var spy = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting && map[e.target.id]) {
+                    links.forEach(function (l) { l.classList.remove('active'); });
+                    map[e.target.id].classList.add('active');
+                }
+            });
+        }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+        targets.forEach(function (t) { spy.observe(t); });
+    }
+})();
+{/literal}
+</script>
 

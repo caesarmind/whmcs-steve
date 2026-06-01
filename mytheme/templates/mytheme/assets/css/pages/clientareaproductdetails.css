@@ -78,6 +78,17 @@ body[data-subnav="off"] .pd-split > .pd-aside { display: none; }
 .pd-aside .subnav-body { padding: 6px 12px 10px; font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.5; }
 .pd-aside .subnav-static { cursor: default; }
 
+/* Lagom-parity rail: Overview + Actions groups. Rail sticks while the long
+   content column scrolls; section anchors clear the sticky top nav. */
+.pd-aside { position: sticky; top: 16px; align-self: start; }
+.pd-aside .subnav-card + .subnav-card { margin-top: 4px; }
+html { scroll-behavior: smooth; }
+#pd-service-info, #pd-usage, #pd-addons, #pd-manage, #pd-billing, #pd-changepw { scroll-margin-top: 96px; }
+/* Request Cancellation — destructive accent (icon red, label reddens on hover) */
+.subnav-item-danger svg { color: var(--color-red-text); }
+.subnav-item-danger:hover { background: var(--color-red-bg); color: var(--color-red-text); }
+.subnav-item-danger:hover svg { color: var(--color-red-text); }
+
 @media (max-width: 880px) { .pd-split { grid-template-columns: 1fr; } .pd-info-grid { grid-template-columns: 1fr; } .pd-info-row:nth-child(even) { padding-left: 0; } .page-header h1 { font-size: var(--text-h4); } }
 
 /* Module client area -- the server module's raw output ($moduleclientarea):
