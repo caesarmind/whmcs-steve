@@ -69,6 +69,9 @@
     {if $serverdata && !empty($serverdata.hostname)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.servername|default:'Server'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">{$serverdata.hostname|escape}</span></div></div>
     {/if}
+    {if !empty($username)}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.serverusername|default:'Server username'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">{$username|escape}</span></div></div>
+    {/if}
     {if !empty($dedicatedip)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.primaryIP|default:'IP address'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">{$dedicatedip|escape}</span></div></div>
     {elseif $serverdata && !empty($serverdata.ipaddress)}
@@ -122,14 +125,6 @@
         {/if}
     </div>
 </div>
-
-{* ── Login / control panel info ────────────────────────────────────── *}
-{if !empty($username)}
-<div class="settings-group">
-    <div class="settings-group-header"><div class="settings-group-title">{$LANG.loginsection|default:'Login info'}</div></div>
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.username|default:'Username'}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-family:var(--font-mono);font-size:13px;">{$username|escape}</span></div></div>
-</div>
-{/if}
 
 {* ── Manage (control-panel actions + lifecycle) ──────────────────────
    Option C (login CTAs + rows), native. cPanel / Webmail use WHMCS single
