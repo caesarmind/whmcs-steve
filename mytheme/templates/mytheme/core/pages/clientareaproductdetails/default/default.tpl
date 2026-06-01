@@ -85,6 +85,58 @@
 {* ── Service details (Lagom-parity sidebar: Overview + Actions groups) ─── *}
 <div class="pd-split">
 <aside class="pd-aside">
+{* "Wire it like Lagom": render WHMCS's NATIVE product-details sidebar menus.
+   On this page WHMCS populates $primarySidebar with "Service Details Overview"
+   (Information / Addons / Change Password / Downloads) and "Service Details
+   Actions" (Login to cPanel / Webmail, Change Password, Cancel, Upgrade,
+   Renew) — the exact menus Lagom iterates in includes/sidebar.tpl. We render
+   them Apple-styled; WHMCS's tab-toggle items (built for a tabbed page) are
+   remapped to mytheme's stacked-section anchors. If the theme context doesn't
+   expose a populated $primarySidebar, we fall back to the hand-coded rail so
+   the sidebar is never empty. *}
+{if isset($primarySidebar) && $primarySidebar && $primarySidebar->hasChildren()}
+    <!-- pd-sidebar:whmcs -->
+    {foreach $primarySidebar->getChildren() as $sbGroup}
+        {if $sbGroup->hasChildren()}
+        {assign var=sbGroupName value=$sbGroup->getName()|lower}
+        <div class="card subnav-card">
+            <div class="subnav-heading">{if $sbGroupName|strstr:'action'}{$LANG.actions|default:'Actions'}{elseif $sbGroupName|strstr:'overview'}{$LANG.overview|default:'Overview'}{else}{$sbGroup->getLabel()}{/if}</div>
+            {foreach $sbGroup->getChildren() as $sbItem}
+                {assign var=sbName value=$sbItem->getName()|lower}
+                {assign var=sbUri value=$sbItem->getUri()}
+                {assign var=sbHref value=$sbUri}
+                {assign var=sbMapped value=false}
+                {assign var=sbTab value=false}
+                {assign var=sbDanger value=false}
+                {if $sbName|strstr:'information' || $sbName|strstr:'overview'}{assign var=sbHref value='#pd-service-info'}{assign var=sbMapped value=true}
+                {elseif $sbName|strstr:'addon'}{assign var=sbHref value='#pd-addons'}{assign var=sbMapped value=true}
+                {elseif $sbName|strstr:'password'}{assign var=sbHref value='#pd-changepw'}{assign var=sbMapped value=true}{assign var=sbTab value=true}
+                {elseif $sbName|strstr:'cancel'}{assign var=sbDanger value=true}
+                {/if}
+                {assign var=sbIsHash value=false}
+                {if $sbUri|substr:0:1 == '#'}{assign var=sbIsHash value=true}{/if}
+                {if $sbUri && (!$sbIsHash || $sbMapped)}
+                <a class="subnav-item{if $sbItem->isCurrent()} active{/if}{if $sbDanger} subnav-item-danger{/if}" href="{$sbHref}"{if $sbItem->getAttribute('target')} target="{$sbItem->getAttribute('target')}" rel="noopener"{/if}{if $sbTab} data-pd-open{/if}>
+                    {if $sbName|strstr:'cpanel' || $sbName|strstr:'control' || $sbName|strstr:'whm' || $sbName|strstr:'plesk' || $sbName|strstr:'manage' || ($sbName|strstr:'login' && !($sbName|strstr:'webmail'))}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    {elseif $sbName|strstr:'webmail' || $sbName|strstr:'mail'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+                    {elseif $sbName|strstr:'password'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    {elseif $sbName|strstr:'cancel'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                    {elseif $sbName|strstr:'upgrade' || $sbName|strstr:'downgrade'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="8 8 12 4 16 8"/><polyline points="8 16 12 20 16 16"/></svg>
+                    {elseif $sbName|strstr:'renew'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                    {elseif $sbName|strstr:'addon'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11H19V7a2 2 0 00-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4a2 2 0 00-2 2v3.8h1.5a2.7 2.7 0 010 5.4H2V20a2 2 0 002 2h3.8v-1.5a2.7 2.7 0 015.4 0V22H17a2 2 0 002-2v-4h1.5a2.5 2.5 0 000-5z"/></svg>
+                    {elseif $sbName|strstr:'download'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    {elseif $sbName|strstr:'information' || $sbName|strstr:'overview'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    {else}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>
+                    {/if}
+                    {$sbItem->getLabel()}
+                </a>
+                {/if}
+            {/foreach}
+        </div>
+        {/if}
+    {/foreach}
+{else}
+    <!-- pd-sidebar:handcoded -->
 
     {* Overview — in-page section jumps (mirrors Lagom's "Service Details Overview") *}
     <div class="card subnav-card">
@@ -145,6 +197,7 @@
         {/if}
     </div>
     {/if}
+{/if}{* /sidebar source (whmcs $primarySidebar | hand-coded fallback) *}
 
 </aside>
 <div class="pd-main">
