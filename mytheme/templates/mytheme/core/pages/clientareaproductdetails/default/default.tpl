@@ -154,7 +154,7 @@
     <div class="card-body">
         <div class="pd-alert pd-alert-warn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <div>{if !empty($suspendreason)}<strong>{$suspendreason|escape}</strong> &mdash; {/if}Control-panel access (cPanel / Webmail) is unavailable while this service is {$svcStatusText|escape}.{if isset($unpaidInvoice) && $unpaidInvoice} Pay the overdue invoice to reactivate it.{/if}</div>
+            <div>{if !empty($suspendreason)}<strong>{$suspendreason|escape}</strong> &mdash; {/if}{if $svcStatusLower == 'pending'}This service is still being set up &mdash; control-panel access will be available once it goes active.{elseif $svcStatusLower == 'terminated' || $svcStatusLower == 'cancelled'}This service has been {$svcStatusText|escape}; control-panel access is no longer available.{else}Control-panel access (cPanel / Webmail) is unavailable while this service is {$svcStatusText|escape}.{if $svcStatusLower == 'suspended' && isset($unpaidInvoice) && $unpaidInvoice} Pay the overdue invoice to reactivate it.{/if}{/if}</div>
         </div>
     </div>
     {/if}
@@ -279,7 +279,7 @@
         {else}
         <div class="pd-alert pd-alert-warn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <div>{if !empty($suspendreason)}<strong>{$suspendreason|escape}</strong> &mdash; {/if}cPanel shortcuts are unavailable while this service is {$svcStatusText|escape}.</div>
+            <div>{if $svcStatusLower == 'pending'}Shortcuts will be available once this service is active.{else}cPanel shortcuts are unavailable while this service is {$svcStatusText|escape}.{/if}</div>
         </div>
         {/if}
     </div>
