@@ -120,11 +120,18 @@
    (modulechangepassword=true, fields newpw/confirmpw, gated on
    $modulechangepassword). Request Cancellation is the core cancel action.
    Replaces the old raw $moduleclientarea dump. *}
+{assign var=pdIsCpanelSvc value=false}
+{if $module == 'cpanel'}{assign var=pdIsCpanelSvc value=true}{/if}
+{assign var=pdIsActive value=false}
+{if $svcStatusLower == 'active'}{assign var=pdIsActive value=true}{/if}
 {assign var=pdCanCancel value=false}
-{if (!isset($pendingcancellation) || !$pendingcancellation) && $svcStatusLower == 'active'}{assign var=pdCanCancel value=true}{/if}
+{if (!isset($pendingcancellation) || !$pendingcancellation) && ($pdIsActive || $svcStatusLower == 'suspended')}{assign var=pdCanCancel value=true}{/if}
+{* $pdIsCpanel = control-panel area actually available (active cPanel w/ module output).
+   $pdIsCpanelSvc = cPanel service regardless of status — used to keep the cards
+   visible for suspended/pending services (with a notice), matching Lagom. *}
 {assign var=pdIsCpanel value=false}
-{if $module == 'cpanel' && !empty($moduleclientarea)}{assign var=pdIsCpanel value=true}{/if}
-{if $pdIsCpanel || $modulechangepassword || $pdCanCancel || (isset($upgrades) && $upgrades|@count > 0)}
+{if $pdIsCpanelSvc && !empty($moduleclientarea)}{assign var=pdIsCpanel value=true}{/if}
+{if $pdIsCpanelSvc || $modulechangepassword || $pdCanCancel || (isset($upgrades) && $upgrades|@count > 0)}
 <div class="card pd-manage-card">
     <div class="card-header"><h2 class="card-title">{$LANG.manage|default:'Manage'}</h2></div>
 
@@ -139,6 +146,15 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
                 Log in to Webmail
             </a>
+        </div>
+    </div>
+    {/if}
+
+    {if $pdIsCpanelSvc && !$pdIsActive}
+    <div class="card-body">
+        <div class="pd-alert pd-alert-warn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div>{if !empty($suspendreason)}<strong>{$suspendreason|escape}</strong> &mdash; {/if}Control-panel access (cPanel / Webmail) is unavailable while this service is {$svcStatusText|escape}.{if isset($unpaidInvoice) && $unpaidInvoice} Pay the overdue invoice to reactivate it.{/if}</div>
         </div>
     </div>
     {/if}
@@ -209,10 +225,11 @@
    cPanel module's own overview.tpl emits. Shown only for active cPanel
    services. Labels are hardcoded English -- the cPanel module's
    $LANG.cPanel.* keys are not reliably loaded on the theme's product page. *}
-{if $pdIsCpanel && $svcStatusLower == 'active'}
+{if $pdIsCpanelSvc}
 <div class="card pd-shortcuts-card">
     <div class="card-header"><h2 class="card-title">{$LANG.quickShortcuts|default:'Quick Shortcuts'}</h2></div>
     <div class="card-body">
+        {if $pdIsActive}
         <div class="pd-shortcuts">
             <a class="pd-shortcut" href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|default:0|escape}&dosinglesignon=1&app=Email_Accounts" target="_blank" rel="noopener">
                 <span class="pd-shortcut-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
@@ -259,6 +276,12 @@
                 <span class="pd-shortcut-label">Awstats</span>
             </a>
         </div>
+        {else}
+        <div class="pd-alert pd-alert-warn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div>{if !empty($suspendreason)}<strong>{$suspendreason|escape}</strong> &mdash; {/if}cPanel shortcuts are unavailable while this service is {$svcStatusText|escape}.</div>
+        </div>
+        {/if}
     </div>
 </div>
 {/if}
