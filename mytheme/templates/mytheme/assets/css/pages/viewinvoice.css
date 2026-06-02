@@ -46,19 +46,9 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 /* Sentinel — keep state-chip Services pill compatible */
 .svc-table-card { display: none !important; }
 
-/* Controls outside — strip wrapper card chrome */
-body[data-svc-layout="outside"] .inv-main > .card {
-    background: transparent;
-    border: 0;
-    box-shadow: none;
-}
-body[data-svc-layout="outside"] .inv-main .card > .card-header { padding: 2px 4px 10px; }
-body[data-svc-layout="outside"] .inv-main .card > .card-body {
-    background: var(--color-surface);
-    border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: 16px 24px 20px;
-}
+/* Invoice cards are always rendered "inside". The body script forces
+   data-svc-layout=inside (like clientareainvoices) because the bespoke
+   .inv-main cards have no .card-body for an "outside" treatment to use. */
 
 /* Invoice summary header card */
 .inv-head {
