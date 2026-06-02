@@ -672,6 +672,37 @@ var _localLang = {
     font-weight: 500;
 }
 
+/* Inline validation / promo banner (#cpInlineBanner) — Apple-style alert:
+   variant icon + tinted card + comfortable list spacing. Colors inherit via
+   currentColor so the icon + bullets + text all match the variant. */
+.cp-alert {
+    display: flex;
+    gap: 11px;
+    align-items: flex-start;
+    margin: 0 0 16px;
+    padding: 13px 15px;
+    border: 0.5px solid;
+    border-radius: var(--radius-md, 12px);
+    font-size: 13px;
+    line-height: 1.5;
+}
+.cp-alert-ico { flex: 0 0 auto; width: 18px; height: 18px; margin-top: 0.5px; }
+.cp-alert-ico svg { display: block; width: 100%; height: 100%; }
+.cp-alert-content { flex: 1 1 auto; min-width: 0; }
+.cp-alert-title { font-weight: 600; letter-spacing: -0.01em; }
+.cp-alert-body { margin-top: 3px; }
+.cp-alert-body:first-child { margin-top: 0; }
+.cp-alert-body p { margin: 0 0 4px; }
+.cp-alert-body p:last-child { margin-bottom: 0; }
+.cp-alert-body ul { margin: 4px 0 0; padding-left: 18px; list-style: disc; }
+.cp-alert-body ul:first-child { margin-top: 0; }
+.cp-alert-body li { margin: 3px 0; }
+.cp-alert-body li::marker { color: currentColor; }
+.cp-alert-body a { color: inherit; font-weight: 500; text-decoration: underline; }
+.cp-alert-error   { background: var(--color-red-bg, rgba(255,59,48,0.08));   border-color: var(--color-red-border, rgba(255,59,48,0.22));   color: var(--color-red-text, #d70015); }
+.cp-alert-success { background: var(--color-green-bg, rgba(52,199,89,0.10)); border-color: var(--color-green-border, rgba(52,199,89,0.30)); color: var(--color-green-text, #248a3d); }
+.cp-alert-info    { background: var(--color-blue-bg, rgba(0,122,255,0.10));  border-color: var(--color-blue-border, rgba(0,122,255,0.30));  color: var(--color-blue-text, #0040dd); }
+
 .cp-opt-radios { display: flex; gap: 10px; flex-wrap: wrap; }
 .cp-opt-radio {
     display: inline-flex; align-items: center; gap: 6px;
@@ -1024,29 +1055,46 @@ var _localLang = {
         function showInlineError(arg) {
             var opts = (typeof arg === 'string') ? { bodyHtml: arg } : (arg || {});
             var variant = opts.variant || 'error';
-            var palettes = {
-                error:   { bg: 'var(--color-red-bg, rgba(255,59,48,0.08))',    fg: 'var(--color-red-text, #d70015)' },
-                success: { bg: 'var(--color-green-bg, rgba(52,199,89,0.10))',  fg: 'var(--color-green-text, #248a3d)' },
-                info:    { bg: 'var(--color-blue-bg, rgba(0,122,255,0.10))',   fg: 'var(--color-blue-text, #0040dd)' }
+            // Variant icon (Apple-style): triangle / check-circle / info-circle.
+            // Stroke inherits the alert's currentColor via CSS.
+            var icons = {
+                error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+                success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+                info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
             };
-            var p = palettes[variant] || palettes.error;
+            if (!icons[variant]) variant = 'error';
             var existing = document.getElementById('cpInlineBanner');
             if (existing) existing.parentNode.removeChild(existing);
+
             var box = document.createElement('div');
             box.id = 'cpInlineBanner';
-            box.style.cssText = 'margin: 0 0 16px; padding: 12px 16px; background: ' + p.bg + '; color: ' + p.fg + '; border: 0.5px solid ' + p.fg + '; border-radius: 10px; font-size: 13px; line-height: 1.5;';
+            box.className = 'cp-alert cp-alert-' + variant;
+            box.setAttribute('role', 'alert');
+
+            var ico = document.createElement('span');
+            ico.className = 'cp-alert-ico';
+            ico.setAttribute('aria-hidden', 'true');
+            ico.innerHTML = icons[variant];
+            box.appendChild(ico);
+
+            var content = document.createElement('div');
+            content.className = 'cp-alert-content';
+
             var defaultTitle = (variant === 'error') ? 'Please correct the following:' : '';
             var titleText = (typeof opts.title === 'string') ? opts.title : defaultTitle;
             if (titleText) {
-                var title = document.createElement('strong');
+                var title = document.createElement('div');
+                title.className = 'cp-alert-title';
                 title.textContent = titleText;
-                box.appendChild(title);
+                content.appendChild(title);
             }
             var body = document.createElement('div');
-            if (titleText) body.style.marginTop = '4px';
+            body.className = 'cp-alert-body';
             if (typeof opts.bodyText === 'string') body.textContent = opts.bodyText;
             else if (typeof opts.bodyHtml === 'string') body.innerHTML = opts.bodyHtml;
-            box.appendChild(body);
+            content.appendChild(body);
+
+            box.appendChild(content);
             form.parentNode.insertBefore(box, form);
             box.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
