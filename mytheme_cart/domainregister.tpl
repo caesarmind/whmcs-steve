@@ -37,8 +37,8 @@
  * .dr-results-full` in style.min.css so it only fires when the state-
  * chip explicitly picks Empty.
  *
- * Element ids preserved verbatim (scripts.min.js + multiselect plugin
- * + recaptcha integration all bind to these):
+ * Element ids preserved verbatim (scripts.min.js + recaptcha
+ * integration all bind to these):
  *   #frmDomainChecker (one of the two forms), #message OR #inputDomain
  *   (only on the WHMCS-chosen mode), #btnCheckAvailability,
  *   #DomainSearchResults, #primarySuggestionHeading, #primaryExactHeading,
@@ -62,8 +62,14 @@
  * .suggested-domains, .domain-suggestion, .promo, .sales-group-*,
  * .more-suggestions, .domain-suggestions-warning, .tld-filters, .tld-row,
  * .tld-pricing-header, .tld-column, .featured-tlds-container, .featured-tld,
- * .domain-promo-box, .multiselect, .multiselect-filter, .no-icheck,
- * .recaptcha-container, .default-captcha, .field-error-msg.
+ * .domain-promo-box, .no-icheck, .recaptcha-container,
+ * .default-captcha, .field-error-msg.
+ *
+ * Filters (TLDs / max length / safe search) are now an Apple-styled
+ * dropdown (.dr-filters / .dr-tld-option / .dr-length-pill / .dr-switch)
+ * that mirrors the hidden native <select>s WHMCS serializes; the old
+ * bootstrap-multiselect widgets were removed. The captcha is rendered
+ * once as a shared block below both forms (see "Shared captcha" below).
  *}
 
 {include file="orderforms/$carttpl/common.tpl"}
@@ -84,7 +90,7 @@
         {include file="orderforms/$carttpl/sidebar-categories.tpl"}
 
         {* RIGHT: search + results *}
-        <div class="dr-main" style="min-width: 0;">
+        <div class="dr-main" data-search-mode="{if $showAdvancedSearchOptions}ai{else}classic{/if}" style="min-width: 0;">
 
             {* sidebar-categories-collapsed.tpl is deliberately NOT included
                here. Its <select>-based output relies on Bootstrap responsive
@@ -140,51 +146,74 @@
                             </button>
                         </div>
 
-                        {* TLD multi-select + max length + safe-search --
-                           rendered for AI mode regardless of which form is
-                           the WHMCS-active one, but multiselect plugin only
-                           wires up on the active form (see init JS at the
-                           bottom which keys off `data-search-mode`). *}
+                        {* ---- Filters: Apple-styled dropdown ----
+                           Functional parity with Lagom's modern filters
+                           dropdown, Apple visual. The two hidden native
+                           <select>s below stay the source of truth that
+                           WHMCS reads via frmDomainChecker.serialize(); the
+                           panel UI just mirrors them (see filter JS at the
+                           bottom). AI mode only -- hidden in Classic mode by
+                           the .dr-search-form[data-mode-form="ai"] rule. *}
                         <div class="dr-filters-row">
-                            <select name="tlds[]"
-                                    class="multiselect multiselect-filter dr-filter-multiselect"
-                                    multiple="multiple"
-                                    data-placeholder="{lang key='domainSearch.tlds'}"
-                                    data-min-selection="1">
-                                {foreach $tlds as $tld}
-                                    <option{if in_array($tld, $selectedTlds)} selected {if count($selectedTlds) <= 1}disabled="disabled"{/if}{/if} value="{$tld}">{$tld}</option>
-                                {/foreach}
-                            </select>
-                            <select name="maxLength" class="multiselect dr-filter-multiselect" data-placeholder="{lang key='domainSearch.maxLength'}">
-                                {foreach $searchLengths as $len}
-                                    <option value="{$len}" {if $maxLength === $len}selected{/if}>{$len}</option>
-                                {/foreach}
-                            </select>
-                            <label class="dr-filter-safesearch">
-                                <input type="checkbox" class="no-icheck" name="filter" {if $safeSearchSelected}checked{/if}>
-                                <span>{lang key="domainSearch.safeSearch"}</span>
-                            </label>
-                        </div>
 
-                        {* Captcha (only rendered for the WHMCS-active form
-                           so the captcha widget JS doesn't get confused) *}
-                        {if $showAdvancedSearchOptions && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm) && !$captcha->recaptcha->isInvisible()}
-                            <div class="captcha-container" id="captchaContainer">
-                                {if $captcha->recaptcha->isEnabled()}
-                                    <div class="text-center">
-                                        <div class="form-group recaptcha-container"></div>
-                                    </div>
-                                {else}
-                                    <div class="default-captcha default-captcha-register-margin">
-                                        <p>{lang key="cartSimpleCaptcha"}</p>
-                                        <div>
-                                            <img id="inputCaptchaImage" src="{$systemurl}includes/verifyimage.php" align="middle" />
-                                            <input id="inputCaptcha" type="text" name="code" maxlength="6" class="form-control input-sm" data-toggle="tooltip" data-placement="right" data-trigger="manual" title="{lang key='orderForm.required'}" />
+                            <select name="tlds[]" class="dr-tld-source" multiple="multiple" data-min-selection="1" hidden aria-hidden="true">
+                                {foreach $tlds as $tld}
+                                    <option{if in_array($tld, $selectedTlds)} selected{/if} value="{$tld}">{$tld}</option>
+                                {/foreach}
+                            </select>
+                            <select name="maxLength" class="dr-length-source" hidden aria-hidden="true">
+                                {foreach $searchLengths as $len}
+                                    <option value="{$len}"{if $maxLength === $len} selected{/if}>{$len}</option>
+                                {/foreach}
+                            </select>
+
+                            <div class="dr-filters" data-dr-filters>
+                                <button type="button" class="dr-filters-toggle" data-dr-filters-toggle aria-expanded="false" aria-haspopup="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+                                    <span>Filters</span>
+                                    <span class="dr-filters-count" data-dr-tld-count>{$selectedTlds|count}</span>
+                                    <svg class="dr-filters-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                </button>
+
+                                <div class="dr-filters-panel" data-dr-filters-panel hidden>
+
+                                    <div class="dr-filters-group">
+                                        <div class="dr-filters-label">{lang key='domainSearch.tlds'}</div>
+                                        <div class="dr-tld-search">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                            <input type="text" class="dr-tld-search-input" placeholder="{lang key='search'}" data-dr-tld-search>
+                                        </div>
+                                        <div class="dr-tld-list" data-dr-tld-list>
+                                            {foreach $tlds as $tld}
+                                                <button type="button" class="dr-tld-option{if in_array($tld, $selectedTlds)} active{/if}" data-tld="{$tld}" role="checkbox" aria-checked="{if in_array($tld, $selectedTlds)}true{else}false{/if}">
+                                                    <span class="dr-check"></span>
+                                                    <span class="dr-tld-name">{$tld}</span>
+                                                </button>
+                                            {/foreach}
+                                            <div class="dr-tld-empty" hidden>No matches</div>
                                         </div>
                                     </div>
-                                {/if}
+
+                                    <div class="dr-filters-group">
+                                        <div class="dr-filters-label">{lang key='domainSearch.maxLength'}</div>
+                                        <div class="dr-length-pills" data-dr-length-list>
+                                            {foreach $searchLengths as $len}
+                                                <button type="button" class="dr-length-pill{if $maxLength === $len} active{/if}" data-len="{$len}">{$len}</button>
+                                            {/foreach}
+                                        </div>
+                                    </div>
+
+                                    <label class="dr-safesearch">
+                                        <span class="dr-safesearch-text">{lang key="domainSearch.safeSearch"}</span>
+                                        <span class="dr-switch">
+                                            <input type="checkbox" class="no-icheck" name="filter"{if $safeSearchSelected} checked{/if}>
+                                            <span class="dr-switch-track"><span class="dr-switch-thumb"></span></span>
+                                        </span>
+                                    </label>
+
+                                </div>
                             </div>
-                        {/if}
+                        </div>
                     </form>
 
                     {* ---- Classic form (single-input / Classic Search mode) ---- *}
@@ -214,24 +243,34 @@
                             </button>
                         </div>
 
-                        {if !$showAdvancedSearchOptions && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm) && !$captcha->recaptcha->isInvisible()}
-                            <div class="captcha-container" id="captchaContainer">
-                                {if $captcha->recaptcha->isEnabled()}
-                                    <div class="text-center">
-                                        <div class="form-group recaptcha-container"></div>
-                                    </div>
-                                {else}
-                                    <div class="default-captcha default-captcha-register-margin">
-                                        <p>{lang key="cartSimpleCaptcha"}</p>
-                                        <div>
-                                            <img id="inputCaptchaImage" src="{$systemurl}includes/verifyimage.php" align="middle" />
-                                            <input id="inputCaptcha" type="text" name="code" maxlength="6" class="form-control input-sm" data-toggle="tooltip" data-placement="right" data-trigger="manual" title="{lang key='orderForm.required'}" />
-                                        </div>
-                                    </div>
-                                {/if}
-                            </div>
-                        {/if}
                     </form>
+
+                    {* ---- Shared captcha (visible on BOTH tabs) ----
+                       Lives outside the two mode-forms so it doesn't vanish
+                       when you switch tabs. The image-captcha input carries
+                       form="frmDomainChecker" so it still serializes with
+                       whichever form WHMCS made active -- validate_captcha()
+                       posts that form's .serialize(). NOTE: a reCAPTCHA
+                       #g-recaptcha-response can't be relocated this way, so
+                       if you switch the domain-search captcha to reCAPTCHA
+                       this block must move back inside the active form. *}
+                    {if $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm) && !$captcha->recaptcha->isInvisible()}
+                        <div class="captcha-container dr-captcha-shared" id="captchaContainer">
+                            {if $captcha->recaptcha->isEnabled()}
+                                <div class="text-center">
+                                    <div class="form-group recaptcha-container"></div>
+                                </div>
+                            {else}
+                                <div class="default-captcha default-captcha-register-margin">
+                                    <p>{lang key="cartSimpleCaptcha"}</p>
+                                    <div>
+                                        <img id="inputCaptchaImage" src="{$systemurl}includes/verifyimage.php" align="middle" />
+                                        <input id="inputCaptcha" type="text" name="code" maxlength="6" form="frmDomainChecker" class="form-control input-sm" data-toggle="tooltip" data-placement="right" data-trigger="manual" title="{lang key='orderForm.required'}" />
+                                    </div>
+                                </div>
+                            {/if}
+                        </div>
+                    {/if}
 
                 </div>
             </div>
@@ -586,6 +625,9 @@ jQuery(document).ready(function() {
         $tabs.find('.dr-mode-tab').removeClass('active').attr('aria-selected', 'false');
         $btn.addClass('active').attr('aria-selected', 'true');
         $card.attr('data-search-mode', mode);
+        // mirror the mode onto .dr-main so result-area CSS (e.g. hiding the
+        // AI suggestion list in Classic mode) can react to the active tab
+        $card.closest('.dr-main').attr('data-search-mode', mode);
 
         // Focus the visible mode's primary input so typing continues
         // naturally after the user swaps.
@@ -629,35 +671,69 @@ jQuery(document).ready(function() {
 });
 
 {if $showAdvancedSearchOptions}
-    // Multi-select TLD picker -- only initialize on the WHMCS-active
-    // (#frmDomainChecker) form. The alt-mode form's <select multiple>
-    // (if it had one) would stay as the native browser control.
-    $(document).ready(function() {
-        jQuery('#frmDomainChecker .multiselect').each(function () {
-            const enableFiltering = $(this).hasClass('multiselect-filter');
-            const minSelection = jQuery(this).data('min-selection');
-            $(this).multiselect({
-                onChange: function (element) {
-                    const closestSelect = element.closest('select');
-                    const selectedOptions = closestSelect.find('option:selected');
-                    if (minSelection === undefined) {
-                        return;
-                    }
-                    const atMinOptions = selectedOptions.length <= minSelection;
-                    const targetOptions = atMinOptions ? selectedOptions : closestSelect.find('option');
-                    targetOptions.each(function () {
-                        const inputElement = jQuery('input[value="' + jQuery(this).val() + '"]');
-                        inputElement.prop('disabled', atMinOptions ? 'disabled' : false);
-                    });
-                },
-                buttonText: function(options, select) {
-                    return select.data('placeholder');
-                },
-                maxHeight: 200,
-                includeFilterClearBtn: false,
-                enableCaseInsensitiveFiltering: enableFiltering,
-            });
+    // --- Apple Filters dropdown ---
+    // Mirrors the panel UI into the hidden native <select>s WHMCS reads via
+    // frmDomainChecker.serialize() (tlds[] + maxLength). Safe Search is the
+    // real <input name="filter"> living inside the panel. Replaces the old
+    // bootstrap-multiselect widgets.
+    $(document).ready(function () {
+        var $wrap = jQuery('[data-dr-filters]');
+        if (!$wrap.length) { return; }
+        var $toggle = $wrap.find('[data-dr-filters-toggle]');
+        var $panel  = $wrap.find('[data-dr-filters-panel]');
+        var $tldSrc = jQuery('.dr-tld-source');
+        var $lenSrc = jQuery('.dr-length-source');
+        var $count  = $wrap.find('[data-dr-tld-count]');
+        var minTld  = parseInt($tldSrc.attr('data-min-selection'), 10) || 1;
+
+        function refreshCount() { $count.text($tldSrc.find('option:selected').length); }
+        function openPanel()  { $panel.prop('hidden', false); $toggle.attr('aria-expanded', 'true'); }
+        function closePanel() { $panel.prop('hidden', true);  $toggle.attr('aria-expanded', 'false'); }
+
+        $toggle.on('click', function () {
+            if ($panel.prop('hidden')) { openPanel(); } else { closePanel(); }
         });
+        jQuery(document).on('click', function (e) {
+            if (!jQuery(e.target).closest('[data-dr-filters]').length) { closePanel(); }
+        });
+        jQuery(document).on('keydown', function (e) { if (e.key === 'Escape') { closePanel(); } });
+
+        // TLD rows <-> hidden multi-select options
+        $wrap.on('click', '.dr-tld-option', function () {
+            var $row = jQuery(this);
+            var tld  = String($row.attr('data-tld'));
+            var $opt = $tldSrc.find('option').filter(function () { return jQuery(this).val() === tld; });
+            if ($row.hasClass('active') && $tldSrc.find('option:selected').length <= minTld) {
+                return; // keep at least the minimum selected
+            }
+            $row.toggleClass('active');
+            var on = $row.hasClass('active');
+            $opt.prop('selected', on);
+            $row.attr('aria-checked', on ? 'true' : 'false');
+            refreshCount();
+        });
+
+        // Max-length pills <-> hidden select
+        $wrap.on('click', '.dr-length-pill', function () {
+            $wrap.find('.dr-length-pill').removeClass('active');
+            jQuery(this).addClass('active');
+            $lenSrc.val(String(jQuery(this).attr('data-len')));
+        });
+
+        // Live-filter the TLD list
+        $wrap.on('input', '[data-dr-tld-search]', function () {
+            var q = jQuery(this).val().trim().toLowerCase().replace(/^\./, '');
+            var any = false;
+            $wrap.find('.dr-tld-option').each(function () {
+                var name = String(jQuery(this).attr('data-tld')).toLowerCase().replace(/^\./, '');
+                var match = !q || name.indexOf(q) !== -1;
+                jQuery(this).toggle(match);
+                if (match) { any = true; }
+            });
+            $wrap.find('.dr-tld-empty').prop('hidden', any);
+        });
+
+        refreshCount();
     });
 {/if}
 </script>
