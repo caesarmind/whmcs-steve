@@ -213,7 +213,7 @@ body[data-svc-layout="outside"] .inv-stack > .inv-footer { padding: 12px 4px; bo
 .inv-table td.amount { font-variant-numeric: tabular-nums; font-weight: var(--fw-medium); color: var(--color-text-primary); }
 .inv-table td.amount.due { color: var(--color-red-text); }
 .inv-table td.date { color: var(--color-text-secondary); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
-.inv-table td.actions { text-align: center; padding: 16px 12px; position: relative; }
+.inv-table td.actions { text-align: center; padding: 16px 12px; position: relative; overflow: visible; }
 .inv-id-cell { display: inline-flex; align-items: center; gap: 10px; }
 .inv-id-ico {
     width: 30px;
