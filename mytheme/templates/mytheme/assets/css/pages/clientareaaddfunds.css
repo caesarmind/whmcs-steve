@@ -20,9 +20,8 @@ body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"
 body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(132px); }
 
 .svc-table-card { display: none !important; }
-body[data-svc-layout="outside"] .af-main > .card { background: transparent; border: 0; box-shadow: none; }
-body[data-svc-layout="outside"] .af-main .card > .card-header { padding: 2px 4px 10px; }
-body[data-svc-layout="outside"] .af-main .card > .card-body { background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: var(--radius-md); padding: 16px 24px 20px; }
+/* Cards always render "inside": the body script forces data-svc-layout=inside,
+   and the af-* cards have no .card-body for an "outside" treatment to fall back to. */
 
 .subnav-card { padding: 8px; }
 .subnav-heading { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }

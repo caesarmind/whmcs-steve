@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareaaddfunds.css?v={$myTheme.version|default:'1.0'}">
 
 <script>
-(function () { var b = document.body; if (b) { b.setAttribute('data-data', 'full'); b.setAttribute('data-subnav', 'on'); } })();
+(function () { var b = document.body; if (b) { b.setAttribute('data-data', 'full'); b.setAttribute('data-subnav', 'on'); b.setAttribute('data-svc-layout', 'inside'); } })();
 </script>
 
 <header class="page-header">
