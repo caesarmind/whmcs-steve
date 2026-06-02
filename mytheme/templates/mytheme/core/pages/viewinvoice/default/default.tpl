@@ -34,6 +34,7 @@
     b.setAttribute('data-svc-layout', 'inside');
 })();
 </script>
+{* touch 2026-06-02: force WHMCS to recompile this template (recover from a poisoned compiled-template cache) *}
 
 <header class="page-header">
     <div class="page-header-row">
