@@ -120,28 +120,43 @@
         </form>
 
     {else}
-        {* ---- Package selection ---- *}
-        <div class="up-pkgs">
+        {* ---- Package selection — same card design as the mytheme_cart store
+             grid (.st-pricing / .st-plan). The .st-* CSS lives in upgrade.css
+             (mytheme_cart's stylesheet isn't loaded on client-area pages). Each
+             card stays the upgrade POST form; the billing-cycle picker, current-
+             plan state, and free/onetime/recurring variants are preserved. ---- *}
+        <div class="st-pricing up-st-pricing" data-count="{$upgradepackages|@count}">
         {foreach $upgradepackages as $pkg}
             {assign var=isCurrent value=false}
             {if isset($productname) && $pkg.name == $productname}{assign var=isCurrent value=true}{/if}
-            <form class="up-pkg{if $isCurrent} current{/if}" method="post" action="{$WEB_ROOT}/upgrade.php">
+            <form class="st-plan up-st-plan{if $isCurrent} current{/if}" method="post" action="{$WEB_ROOT}/upgrade.php">
                 <input type="hidden" name="step" value="2">
                 <input type="hidden" name="type" value="package">
                 <input type="hidden" name="id" value="{$id|default:''|escape}">
                 <input type="hidden" name="pid" value="{$pkg.pid|escape}">
-                <div class="up-pkg-head">
-                    <span class="up-pkg-name">{$pkg.name|escape}</span>
-                    {if $isCurrent}<span class="plan-badge">{$LANG.upgradecurrentconfig|default:'Current'}</span>{/if}
-                </div>
+                {if $isCurrent}<span class="st-plan-badge up-st-badge-current">{$LANG.upgradecurrentconfig|default:'Current'}</span>{/if}
+                <h3 class="st-plan-name">{$pkg.name|escape}</h3>
+                <p class="st-plan-tag">{if isset($pkg.groupname) && $pkg.groupname}{$pkg.groupname|escape}{else}&nbsp;{/if}</p>
+
                 {if $pkg.pricing.type == 'free'}
                     <input type="hidden" name="billingcycle" value="free">
-                    <div class="up-pkg-price"><span class="amt">{$LANG.orderfree|default:'Free'}</span></div>
+                    <div class="st-plan-price"><span class="amount">{$LANG.orderfree|default:'Free'}</span></div>
                 {elseif $pkg.pricing.type == 'onetime'}
                     <input type="hidden" name="billingcycle" value="onetime">
-                    <div class="up-pkg-price"><span class="amt">{$pkg.pricing.onetime}</span> <span style="font-size:13px;color:var(--color-text-secondary);">{$LANG.orderpaymenttermonetime|default:'one time'}</span></div>
+                    <div class="st-plan-price"><span class="amount">{$pkg.pricing.onetime}</span> <span class="period">{$LANG.orderpaymenttermonetime|default:'one time'}</span></div>
                 {else}
-                    <select name="billingcycle" class="form-select up-pkg-cycle">
+                    {* Headline = first available cycle (monthly preferred); the select
+                       below lets the client change the term before choosing. *}
+                    <div class="st-plan-price">
+                        {if $pkg.pricing.monthly}<span class="amount">{$pkg.pricing.monthly}</span><span class="period">/{$LANG.monthly|default:'mo'}</span>
+                        {elseif $pkg.pricing.quarterly}<span class="amount">{$pkg.pricing.quarterly}</span><span class="period">/{$LANG.quarterly|default:'qtr'}</span>
+                        {elseif $pkg.pricing.semiannually}<span class="amount">{$pkg.pricing.semiannually}</span><span class="period">/{$LANG.semiannually|default:'6 mo'}</span>
+                        {elseif $pkg.pricing.annually}<span class="amount">{$pkg.pricing.annually}</span><span class="period">/{$LANG.annually|default:'yr'}</span>
+                        {elseif $pkg.pricing.biennially}<span class="amount">{$pkg.pricing.biennially}</span><span class="period">/{$LANG.biennially|default:'2 yr'}</span>
+                        {elseif $pkg.pricing.triennially}<span class="amount">{$pkg.pricing.triennially}</span><span class="period">/{$LANG.triennially|default:'3 yr'}</span>
+                        {/if}
+                    </div>
+                    <select name="billingcycle" class="form-select st-plan-cycle">
                         {if $pkg.pricing.monthly}<option value="monthly">{$pkg.pricing.monthly} / {$LANG.monthly|default:'mo'}</option>{/if}
                         {if $pkg.pricing.quarterly}<option value="quarterly">{$pkg.pricing.quarterly} / {$LANG.quarterly|default:'qtr'}</option>{/if}
                         {if $pkg.pricing.semiannually}<option value="semiannually">{$pkg.pricing.semiannually} / {$LANG.semiannually|default:'6 mo'}</option>{/if}
@@ -150,11 +165,16 @@
                         {if $pkg.pricing.triennially}<option value="triennially">{$pkg.pricing.triennially} / {$LANG.triennially|default:'3 yr'}</option>{/if}
                     </select>
                 {/if}
-                <div class="up-pkg-features">{if isset($pkg.description) && $pkg.description}{$pkg.description}{/if}</div>
+
+                {* Admin writes <ul><li>..</li></ul> in the WHMCS product description;
+                   strip WHMCS's auto-nl2br <br> so the list renders clean (same as
+                   the store's products.tpl). *}
+                <div class="st-plan-features">{if isset($pkg.description) && $pkg.description}{$pkg.description|regex_replace:'/<br\s*\/?>/i':''}{/if}</div>
+
                 {if $isCurrent}
-                    <button type="button" class="btn-secondary" disabled style="opacity:0.5;">{$LANG.upgradecurrentplan|default:'Current plan'}</button>
+                    <button type="button" class="st-plan-cta secondary" disabled>{$LANG.upgradecurrentplan|default:'Current plan'}</button>
                 {else}
-                    <button type="submit" class="btn-primary">{$LANG.upgradedowngradechooseproduct|default:'Choose this plan'}</button>
+                    <button type="submit" class="st-plan-cta">{$LANG.upgradedowngradechooseproduct|default:'Choose this plan'}</button>
                 {/if}
             </form>
         {/foreach}
