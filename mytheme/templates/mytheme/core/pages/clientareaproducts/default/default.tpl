@@ -174,10 +174,17 @@
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
                                                 {$LANG.manageproduct|default:'Manage Product'}
                                             </a>
+                                            {* Gate Upgrade like productdetails: WHMCS sets $product.packagesupgrade
+                                               per row on native service data (true only when this service has
+                                               package upgrade/downgrade paths). If the flag is absent (localAPI
+                                               fallback rows that don't carry it), keep showing it so a real
+                                               upgrade option is never hidden. *}
+                                            {if !isset($product.packagesupgrade) || $product.packagesupgrade}
                                             <a href="{$WEB_ROOT}/upgrade.php?type=package&id={$product.id}" class="svc-menu-item" role="menuitem">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
                                                 Upgrade / Downgrade
                                             </a>
+                                            {/if}
                                             <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$product.id}&modop=custom&a=Addons" class="svc-menu-item" role="menuitem">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                                 {$LANG.viewavailableaddons|default:'View Addons'}
