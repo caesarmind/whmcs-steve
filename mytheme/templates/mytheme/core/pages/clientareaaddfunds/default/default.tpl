@@ -41,22 +41,25 @@
                 <div class="af-balance-sub">{$LANG.creditappliesnext|default:'Applied automatically to new invoices'}</div>
             </div>
             <div class="af-rules">
+                {* $minimumamount / $maximumamount / $maximumbalance arrive ALREADY
+                   currency-formatted by WHMCS (e.g. "$10.00 USD") - output raw, do
+                   NOT prepend $afCurPrefix or you get a double "$$". *}
                 {if !empty($minimumamount)}
                 <div>
                     <div class="af-rule-label">{$LANG.minamount|default:'Minimum deposit'}</div>
-                    <div class="af-rule-value">{$afCurPrefix|escape}{$minimumamount|escape}</div>
+                    <div class="af-rule-value">{$minimumamount|escape}</div>
                 </div>
                 {/if}
                 {if !empty($maximumamount)}
                 <div>
                     <div class="af-rule-label">{$LANG.maxamount|default:'Maximum deposit'}</div>
-                    <div class="af-rule-value">{$afCurPrefix|escape}{$maximumamount|escape}</div>
+                    <div class="af-rule-value">{$maximumamount|escape}</div>
                 </div>
                 {/if}
                 {if !empty($maximumbalance)}
                 <div>
                     <div class="af-rule-label">{$LANG.maxbalance|default:'Maximum balance'}</div>
-                    <div class="af-rule-value">{$afCurPrefix|escape}{$maximumbalance|escape}</div>
+                    <div class="af-rule-value">{$maximumbalance|escape}</div>
                 </div>
                 {/if}
             </div>
@@ -92,10 +95,8 @@
                     <label class="af-form-label" for="af-amount">{$LANG.amounttoadd|default:'Amount to add'}</label>
                     <div class="af-amount">
                         <span class="af-amount-prefix">{$afCurPrefix|escape}</span>
-                        <input id="af-amount" name="amount" type="number" step="0.01"
-                               min="{$minimumamount|default:0|escape}"
-                               {if !empty($maximumamount)}max="{$maximumamount|escape}"{/if}
-                               value="{$minimumamount|default:'10.00'|escape}"
+                        <input id="af-amount" name="amount" type="number" step="0.01" min="0"
+                               value="{$amount|default:'10.00'|escape}"
                                class="af-input" inputmode="decimal" required>
                     </div>
                     <div class="af-presets" role="group" aria-label="Preset amounts" data-af-presets>
@@ -113,7 +114,7 @@
                     </div>
                     <div class="af-summary-row">
                         <span class="lbl">{$LANG.deposit|default:'Deposit'}</span>
-                        <span class="amt" data-af-deposit>{$afCurPrefix|escape}{$minimumamount|default:'10.00'|escape}</span>
+                        <span class="amt" data-af-deposit>{$afCurPrefix|escape}10.00</span>
                     </div>
                     <div class="af-summary-row af-summary-total">
                         <span class="lbl">{$LANG.newbalance|default:'New balance'}</span>

@@ -194,7 +194,7 @@ body[data-svc-layout="outside"] .q-stack > .q-footer { padding: 12px 4px; border
 }
 .q-table td.amount { font-variant-numeric: tabular-nums; font-weight: var(--fw-medium); color: var(--color-text-primary); }
 .q-table td.date { color: var(--color-text-secondary); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
-.q-table td.actions { text-align: center; padding: 16px 12px; position: relative; }
+.q-table td.actions { text-align: center; padding: 16px 12px; position: relative; overflow: visible; }
 
 .q-id-cell { display: inline-flex; align-items: center; gap: 10px; max-width: 100%; }
 .q-id-ico {
