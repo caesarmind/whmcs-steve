@@ -307,12 +307,12 @@
     </a>
     {/if}
 
-    {if $svcStatusLower == 'active'}
-    <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|escape}&modop=custom&a=Renew" class="settings-item pd-manage-renew" style="text-decoration:none;color:inherit;">
+    {if $showRenewServiceButton === true}
+    <a href="{routePath('service-renewals-service', $id)}" class="settings-item pd-manage-renew" style="text-decoration:none;color:inherit;">
         <div class="settings-item-icon pd-manage-renew-ico">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
         </div>
-        <div class="settings-item-content"><div class="settings-item-label">{$LANG.renew|default:'Renew now'}</div><div class="settings-item-sublabel">Extend your service term</div></div>
+        <div class="settings-item-content"><div class="settings-item-label">{$LANG.renewService.titleSingular|default:'Renew now'}</div><div class="settings-item-sublabel">Extend your service term</div></div>
         <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
     </a>
     {/if}
