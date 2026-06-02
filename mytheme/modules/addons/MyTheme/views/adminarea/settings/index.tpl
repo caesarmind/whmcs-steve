@@ -404,6 +404,10 @@
         .mt-input { width: 100%; padding: 9px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 8px; background: #fff; color: var(--mt-text); }
         .mt-input:focus { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 3px rgba(0,113,227,0.15); }
         .mt-input--sm { max-width: 140px; }
+        /* .mt-field resolves to display:flex from the admin stylesheet, which
+           overrides the UA [hidden]{display:none}; re-assert it so the group
+           picker actually hides in "All Products" mode (and when off). */
+        .mt-field[hidden] { display: none !important; }
         .mt-hostname-grid { display: grid; grid-template-columns: 1fr 140px 1fr; gap: 12px; max-width: 520px; }
         @media (max-width: 640px) { .mt-hostname-grid { grid-template-columns: 1fr; } }
         </style>{/literal}
