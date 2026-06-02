@@ -113,9 +113,9 @@
             {* Column titles (floating outside in "outside" mode, part of the card in "inside") *}
             <div class="svc-table-head-row">
                 <div class="hl-cell hl-name"><button type="button" class="svc-sort" data-sort="name" data-dir="">Name <span class="svc-sort-ico"></span></button></div>
-                <div class="hl-cell hl-pricing"><button type="button" class="svc-sort" data-sort="price" data-dir="">{$LANG.pricing|default:'Pricing'} <span class="svc-sort-ico"></span></button></div>
-                <div class="hl-cell hl-due"><button type="button" class="svc-sort" data-sort="due" data-dir="">{$LANG.nextduedate|default:'Next due'} <span class="svc-sort-ico"></span></button></div>
-                <div class="hl-cell hl-status"><button type="button" class="svc-sort" data-sort="status" data-dir="">{$LANG.status|default:'Status'} <span class="svc-sort-ico"></span></button></div>
+                <div class="hl-cell hl-pricing"><button type="button" class="svc-sort" data-sort="price" data-dir="">Pricing <span class="svc-sort-ico"></span></button></div>
+                <div class="hl-cell hl-due"><button type="button" class="svc-sort" data-sort="due" data-dir="">Next due <span class="svc-sort-ico"></span></button></div>
+                <div class="hl-cell hl-status"><button type="button" class="svc-sort" data-sort="status" data-dir="">Status <span class="svc-sort-ico"></span></button></div>
                 <div class="hl-cell hl-actions"></div>
             </div>
 
@@ -132,10 +132,10 @@
                         </colgroup>
                         <thead>
                             <tr>
-                                <th scope="col"><button type="button" class="svc-sort" data-sort="product" data-dir="">{$LANG.productservice|default:'Product / Service'} <span class="svc-sort-ico"></span></button></th>
-                                <th scope="col"><button type="button" class="svc-sort" data-sort="price" data-dir="">{$LANG.pricing|default:'Pricing'} <span class="svc-sort-ico"></span></button></th>
-                                <th scope="col"><button type="button" class="svc-sort" data-sort="due" data-dir="">{$LANG.nextduedate|default:'Next due'} <span class="svc-sort-ico"></span></button></th>
-                                <th scope="col"><button type="button" class="svc-sort" data-sort="status" data-dir="">{$LANG.status|default:'Status'} <span class="svc-sort-ico"></span></button></th>
+                                <th scope="col"><button type="button" class="svc-sort" data-sort="product" data-dir="">Product / Service <span class="svc-sort-ico"></span></button></th>
+                                <th scope="col"><button type="button" class="svc-sort" data-sort="price" data-dir="">Pricing <span class="svc-sort-ico"></span></button></th>
+                                <th scope="col"><button type="button" class="svc-sort" data-sort="due" data-dir="">Next due <span class="svc-sort-ico"></span></button></th>
+                                <th scope="col"><button type="button" class="svc-sort" data-sort="status" data-dir="">Status <span class="svc-sort-ico"></span></button></th>
                                 <th scope="col" aria-label="Actions"></th>
                             </tr>
                         </thead>
