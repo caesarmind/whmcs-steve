@@ -257,31 +257,129 @@ var _localLang = {
                         </div>
                     {/if}
 
-                    {* ── Server info (only for product type=server) ── *}
+                    {* ── Server info (only for product type=server) ──
+                       Lagom-parity Order Process controls (admin Settings →
+                       Order Process), read from $myTheme.addonSettings:
+                         - op_hide_nameservers / op_hide_hostname: off|all|selected
+                           (+ *_groups GID list) hide the ns / hostname+rootpw
+                           fields, keeping hidden-but-submitted inputs so the
+                           WHMCS POST contract holds.
+                         - op_custom_hostname (+ prefix/interfix/suffix/chars):
+                           auto-generates the hidden hostname; the root pw is
+                           auto-randomised.
+                         - op_root_pw_strength: a strength meter on the visible
+                           root-pw field (server-enforced in hooks.php).
+                       Everything falls back to "off"/show when unset, so an
+                       un-configured install renders exactly as before. *}
                     {if $productinfo.type eq "server"}
-                        <div class="card cp-section">
+                        {assign var=opNs value=$myTheme.addonSettings.op_hide_nameservers|default:'off'}
+                        {assign var=opHost value=$myTheme.addonSettings.op_hide_hostname|default:'off'}
+                        {assign var=mtHideNs value=false}
+                        {assign var=mtHideHost value=false}
+                        {if $opNs == 'all'}
+                            {assign var=mtHideNs value=true}
+                        {elseif $opNs == 'selected'}
+                            {assign var=nsGroups value=$myTheme.addonSettings.op_hide_nameservers_groups|default:[]}
+                            {if is_array($nsGroups) && $productinfo.gid|in_array:$nsGroups}{assign var=mtHideNs value=true}{/if}
+                        {/if}
+                        {if $opHost == 'all'}
+                            {assign var=mtHideHost value=true}
+                        {elseif $opHost == 'selected'}
+                            {assign var=hostGroups value=$myTheme.addonSettings.op_hide_hostname_groups|default:[]}
+                            {if is_array($hostGroups) && $productinfo.gid|in_array:$hostGroups}{assign var=mtHideHost value=true}{/if}
+                        {/if}
+                        {assign var=mtPwStrength value=$myTheme.addonSettings.op_root_pw_strength|default:false}
+
+                        <div class="card cp-section"{if $mtHideNs && $mtHideHost} style="display:none"{/if}>
                             <div class="cp-section-head">
                                 <h2 class="cp-section-title">{$LANG.cartconfigserver}</h2>
                                 <div class="cp-section-sub">Set the hostname, root password, and nameserver prefixes for your server.</div>
                             </div>
                             <div class="cp-section-body">
                                 <div class="cp-form-grid">
-                                    <div class="cp-field">
-                                        <label for="inputHostname">{$LANG.serverhostname}</label>
-                                        <input type="text" name="hostname" id="inputHostname" class="cp-input" value="{$server.hostname}" placeholder="servername.example.com">
-                                    </div>
-                                    <div class="cp-field">
-                                        <label for="inputRootpw">{$LANG.serverrootpw}</label>
-                                        <input type="password" name="rootpw" id="inputRootpw" class="cp-input" value="{$server.rootpw}">
-                                    </div>
-                                    <div class="cp-field">
-                                        <label for="inputNs1prefix">{$LANG.serverns1prefix}</label>
-                                        <input type="text" name="ns1prefix" id="inputNs1prefix" class="cp-input" value="{$server.ns1prefix}" placeholder="ns1">
-                                    </div>
-                                    <div class="cp-field">
-                                        <label for="inputNs2prefix">{$LANG.serverns2prefix}</label>
-                                        <input type="text" name="ns2prefix" id="inputNs2prefix" class="cp-input" value="{$server.ns2prefix}" placeholder="ns2">
-                                    </div>
+                                    {if $mtHideHost}
+                                        {* Hostname + root pw hidden — auto-filled + still submitted. *}
+                                        {assign var=hnInterfix  value=$myTheme.addonSettings.op_custom_hostname_interfix|default:20}
+                                        {assign var=hnPrefixRaw value=$myTheme.addonSettings.op_custom_hostname_prefix|default:''}
+                                        {assign var=hnSuffix    value=$myTheme.addonSettings.op_custom_hostname_suffix|default:''}
+                                        {assign var=hnCustom    value=$myTheme.addonSettings.op_custom_hostname|default:false}
+                                        {assign var=hnCharsSet  value=$myTheme.addonSettings.op_custom_hostname_chars|default:[]}
+                                        {if $hnPrefixRaw != ''}{assign var=hnPrefix value=".`$hnPrefixRaw`"}{else}{assign var=hnPrefix value=""}{/if}
+                                        {assign var=hnTail value="`$hnPrefix``$hnSuffix`"}
+                                        {if $hnTail == ''}
+                                            {assign var=hnSlug value=$companyname|default:''|lower|regex_replace:'/[^a-z0-9]/':''}
+                                            {if $hnSlug == ''}{assign var=hnSlug value='host'}{/if}
+                                            {assign var=hnTail value=".`$hnSlug`.com"}
+                                        {/if}
+                                        {assign var=hnUpper value="ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
+                                        {assign var=hnLower value="abcdefghijklmnopqrstuvwxyz"}
+                                        {assign var=hnNum   value="0123456789"}
+                                        {if !$hnCustom || !is_array($hnCharsSet) || $hnCharsSet|@count == 0 || $hnCharsSet|@count == 3}
+                                            {assign var=hnChars value="`$hnUpper``$hnLower``$hnNum`"}
+                                        {else}
+                                            {assign var=hnChars value=""}
+                                            {if "upper"|in_array:$hnCharsSet}{assign var=hnChars value="`$hnChars``$hnUpper`"}{/if}
+                                            {if "lower"|in_array:$hnCharsSet}{assign var=hnChars value="`$hnChars``$hnLower`"}{/if}
+                                            {if "numbers"|in_array:$hnCharsSet}{assign var=hnChars value="`$hnChars``$hnNum`"}{/if}
+                                            {if $hnChars == ''}{assign var=hnChars value="`$hnUpper``$hnLower``$hnNum`"}{/if}
+                                        {/if}
+                                        <div style="display:none">
+                                            <input type="text" name="hostname" id="inputHostname" value="{$server.hostname}">
+                                            <input type="text" name="rootpw" id="inputRootpw" value="{$server.rootpw}">
+                                        </div>
+                                        {literal}<script>
+                                        (function () {
+                                            function mtMakeId(len){var c='{/literal}{$hnChars|escape:'javascript'}{literal}',r='',i;for(i=0;i<len;i++){r+=c.charAt(Math.floor(Math.random()*c.length));}return r;}
+                                            function mtGenPass(n){var a='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',d='123456789',s='@#$%^&*-+=?',p='',h=Math.ceil(n/2)-1,sp=n-2*h,i;for(i=0;i<h;i++){p+=a.charAt(Math.floor(Math.random()*a.length));p+=d.charAt(Math.floor(Math.random()*d.length));}for(i=0;i<sp;i++){p+=s.charAt(Math.floor(Math.random()*s.length));}return p.split('').sort(function(){return 0.5-Math.random();}).join('');}
+                                            function mtFill(){var hh=document.getElementById('inputHostname');if(hh&&!hh.value){hh.value=mtMakeId(parseInt('{/literal}{$hnInterfix}{literal}',10)||20)+'{/literal}{$hnTail|escape:'javascript'}{literal}';}var pp=document.getElementById('inputRootpw');if(pp&&!pp.value){pp.value=mtGenPass(14);}}
+                                            if(window.jQuery){jQuery(mtFill);}else if(document.readyState!=='loading'){mtFill();}else{document.addEventListener('DOMContentLoaded',mtFill);}
+                                        })();
+                                        </script>{/literal}
+                                    {else}
+                                        <div class="cp-field">
+                                            <label for="inputHostname">{$LANG.serverhostname}</label>
+                                            <input type="text" name="hostname" id="inputHostname" class="cp-input" value="{$server.hostname}" placeholder="servername.example.com">
+                                        </div>
+                                        {if $mtPwStrength}
+                                            <div class="cp-field">
+                                                <label for="inputRootpw">{$LANG.serverrootpw}</label>
+                                                <input type="password" name="rootpw" id="inputRootpw" class="cp-input" value="{$server.rootpw}">
+                                                <input type="hidden" name="rootpwstrength" value="true">
+                                                <div class="cp-pw-meter" id="cpPwMeter" aria-hidden="true"><span class="cp-pw-meter-bar" id="cpPwBar"></span></div>
+                                                <div class="cp-pw-label" id="cpPwLabel"></div>
+                                            </div>
+                                            {literal}<script>
+                                            (function () {
+                                                var inp=document.getElementById('inputRootpw'),bar=document.getElementById('cpPwBar'),lab=document.getElementById('cpPwLabel'),meter=document.getElementById('cpPwMeter');
+                                                if(!inp||!bar||!lab||!meter)return;
+                                                function score(pw){var l=Math.min(pw.length,5),n=Math.min((pw.match(/[0-9]/g)||[]).length,3),s=Math.min((pw.match(/\W/g)||[]).length,3),u=Math.min((pw.match(/[A-Z]/g)||[]).length,3),v=(l*10-20)+(n*10)+(s*15)+(u*10);return Math.max(0,Math.min(100,v));}
+                                                function upd(){var pw=inp.value||'';if(!pw.length){meter.style.opacity=0;lab.textContent='';return;}meter.style.opacity=1;var v=score(pw),c,t;if(v<50){c='var(--color-red,#ff3b30)';t='Weak';}else if(v<75){c='var(--color-orange,#ff9500)';t='Moderate';}else{c='var(--color-green,#34c759)';t='Strong';}bar.style.width=v+'%';bar.style.background=c;lab.textContent=t;lab.style.color=c;}
+                                                inp.addEventListener('input',upd);inp.addEventListener('keyup',upd);upd();
+                                            })();
+                                            </script>{/literal}
+                                        {else}
+                                            <div class="cp-field">
+                                                <label for="inputRootpw">{$LANG.serverrootpw}</label>
+                                                <input type="password" name="rootpw" id="inputRootpw" class="cp-input" value="{$server.rootpw}">
+                                            </div>
+                                        {/if}
+                                    {/if}
+
+                                    {if $mtHideNs}
+                                        <div style="display:none">
+                                            <input type="text" name="ns1prefix" id="inputNs1prefix" value="{if $server.ns1prefix}{$server.ns1prefix}{else}ns1{/if}">
+                                            <input type="text" name="ns2prefix" id="inputNs2prefix" value="{if $server.ns2prefix}{$server.ns2prefix}{else}ns2{/if}">
+                                        </div>
+                                    {else}
+                                        <div class="cp-field">
+                                            <label for="inputNs1prefix">{$LANG.serverns1prefix}</label>
+                                            <input type="text" name="ns1prefix" id="inputNs1prefix" class="cp-input" value="{$server.ns1prefix}" placeholder="ns1">
+                                        </div>
+                                        <div class="cp-field">
+                                            <label for="inputNs2prefix">{$LANG.serverns2prefix}</label>
+                                            <input type="text" name="ns2prefix" id="inputNs2prefix" class="cp-input" value="{$server.ns2prefix}" placeholder="ns2">
+                                        </div>
+                                    {/if}
                                 </div>
                             </div>
                         </div>
@@ -549,6 +647,29 @@ var _localLang = {
     font-size: 11.5px;
     color: var(--color-text-tertiary);
     line-height: 1.4;
+}
+
+/* Root-password strength meter (Order Process → Enable Password Strength). */
+.cp-pw-meter {
+    height: 4px;
+    margin-top: 8px;
+    border-radius: 999px;
+    background: var(--color-border);
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+.cp-pw-meter-bar {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    transition: width var(--transition-fast), background var(--transition-fast);
+}
+.cp-pw-label {
+    margin-top: 4px;
+    font-size: 11.5px;
+    font-weight: 500;
 }
 
 .cp-opt-radios { display: flex; gap: 10px; flex-wrap: wrap; }

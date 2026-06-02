@@ -951,7 +951,22 @@
                                     <div class="ct-product-eyebrow">{$product.productinfo.groupname}</div>
                                     <h2 class="ct-product-title">{$product.productinfo.name}</h2>
                                     {if $product.domain}
-                                        <div class="ct-product-domain">{$product.domain}</div>
+                                        {* Order Process → Hide Hostname → "Hide on Checkout": drop the
+                                           hostname/domain subtitle for products whose group has hostname
+                                           hiding enabled (mirrors Lagom's summary-table gating). *}
+                                        {assign var=mtHideDomain value=false}
+                                        {if $myTheme.addonSettings.op_hide_hostname_checkout|default:false}
+                                            {assign var=opHostVc value=$myTheme.addonSettings.op_hide_hostname|default:'off'}
+                                            {if $opHostVc == 'all'}
+                                                {assign var=mtHideDomain value=true}
+                                            {elseif $opHostVc == 'selected'}
+                                                {assign var=hostGroupsVc value=$myTheme.addonSettings.op_hide_hostname_groups|default:[]}
+                                                {if is_array($hostGroupsVc) && $product.productinfo.gid|in_array:$hostGroupsVc}{assign var=mtHideDomain value=true}{/if}
+                                            {/if}
+                                        {/if}
+                                        {if !$mtHideDomain}
+                                            <div class="ct-product-domain">{$product.domain}</div>
+                                        {/if}
                                     {/if}
                                 </div>
                                 <button type="button" class="ct-product-remove" onclick="removeItem('p','{$num}')" title="{$LANG.orderForm.remove}">
