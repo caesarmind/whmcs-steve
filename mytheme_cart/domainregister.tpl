@@ -140,8 +140,9 @@
                                       data-trigger="manual"
                                       placeholder="{lang key='domainSearch.domainOrAiInstruction'}">{if $showAdvancedSearchOptions}{$message}{/if}</textarea>
                             {* ---- Filters: Apple-styled dropdown, INSIDE the
-                               search bar (sits between the input and the Search
-                               button). Functional parity with Lagom's filters
+                               search bar -- between the input and the Search
+                               button, divided by a hairline. Functional parity
+                               with Lagom's filters
                                dropdown, Apple visual. The two hidden native
                                <select>s are the source of truth WHMCS reads via
                                frmDomainChecker.serialize(); the panel UI mirrors

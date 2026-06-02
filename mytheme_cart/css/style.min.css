@@ -3239,8 +3239,8 @@ textarea.dr-search-input {
 .dr-tld-source, .dr-length-source { display: none !important; }
 
 /* Filters live INSIDE the search bar, between the input and the Search
-   button. The bar is the positioning context so the panel drops straight
-   down below the whole bar. */
+   button, separated by a left hairline divider. The bar is the
+   positioning context so the panel drops straight down below it. */
 .dr-search-box { position: relative; }
 .dr-filters { position: static; display: inline-flex; align-items: center; flex-shrink: 0; }
 .dr-filters-toggle {
