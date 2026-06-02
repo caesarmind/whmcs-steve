@@ -96,7 +96,7 @@
                     <div class="af-amount">
                         <span class="af-amount-prefix">{$afCurPrefix|escape}</span>
                         <input id="af-amount" name="amount" type="number" step="0.01" min="0"
-                               value="{$amount|default:'10.00'|escape}"
+                               value="{if $amount > 0}{$amount|escape}{else}10.00{/if}"
                                class="af-input" inputmode="decimal" required>
                     </div>
                     <div class="af-presets" role="group" aria-label="Preset amounts" data-af-presets>
