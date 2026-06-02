@@ -117,6 +117,9 @@ final class SettingsController extends AbstractController
             'values'             => $values,
             'darkModeDisplay'    => (string)Settings::getValue('dark_mode_display', 'switcher'),
             'darkModeDefault'    => (string)Settings::getValue('dark_mode_default', 'light'),
+            'cookieBoxMessage'   => (string)Settings::getValue('cookie_box_message', ''),
+            'cookieBoxPosition'  => (string)Settings::getValue('cookie_box_position', 'bottom-left'),
+            'cookieBoxButton'    => (string)Settings::getValue('cookie_box_button', 'Continue'),
             'tab'                => $_GET['tab'] ?? 'general',
             'installedLanguages' => $installedLanguages,
             'selectedLanguages'  => $selectedLanguages,
@@ -160,6 +163,15 @@ final class SettingsController extends AbstractController
         Settings::setValue('dark_mode_display', in_array($display, ['switcher', 'forced'], true) ? $display : 'switcher', 'string');
         $defaultMode = (string)($_POST['dark_mode_default'] ?? 'light');
         Settings::setValue('dark_mode_default', in_array($defaultMode, ['light', 'dark'], true) ? $defaultMode : 'light', 'string');
+
+        // Cookie Box sub-fields (revealed under the cookie_box toggle). Message
+        // allows basic admin-authored HTML; position is validated; button label
+        // falls back to "Continue".
+        Settings::setValue('cookie_box_message', (string)($_POST['cookie_box_message'] ?? ''), 'string');
+        $cookiePos = (string)($_POST['cookie_box_position'] ?? 'bottom-left');
+        Settings::setValue('cookie_box_position', in_array($cookiePos, ['bottom-left', 'bottom-right', 'bottom'], true) ? $cookiePos : 'bottom-left', 'string');
+        $cookieBtn = trim((string)($_POST['cookie_box_button'] ?? ''));
+        Settings::setValue('cookie_box_button', $cookieBtn !== '' ? $cookieBtn : 'Continue', 'string');
 
         // Custom language picker — POST sends an array of checked codes under
         // <key>[] (or nothing when the picker is hidden). Filter against the

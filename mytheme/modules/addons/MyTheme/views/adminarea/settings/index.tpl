@@ -182,14 +182,14 @@
         {foreach $flags as $key => $meta}
             {assign var=mtIsLangToggle value=($key == 'custom_language_list')}
             {assign var=mtFlagTab value=$flagTabs[$key]|default:'general'}
-            {assign var=mtHasSub value=($mtIsLangToggle || $key == 'cart_subnav' || $key == 'website_subnav' || $key == 'service_controls_outside' || $key == 'enable_dark_mode')}
+            {assign var=mtHasSub value=($mtIsLangToggle || $key == 'cart_subnav' || $key == 'website_subnav' || $key == 'service_controls_outside' || $key == 'enable_dark_mode' || $key == 'cookie_box')}
             <div class="mt-row{if $mtHasSub} mt-row-with-sub{/if}{if $mtFlagTab != $tab} mt-tab-off{/if}">
                 <div>
                     <div class="mt-row-label">{$meta[0]|escape}</div>
                     <div class="mt-row-help">{$meta[1]|escape}</div>
                 </div>
                 <label class="mt-toggle">
-                    <input type="checkbox" name="{$key|escape}" {if $mtIsLangToggle}data-toggle-target="mt-language-picker" {/if}{if $key == 'enable_dark_mode'}data-toggle-target="mt-darkmode-sub" {/if}{if $values[$key]}checked{/if}>
+                    <input type="checkbox" name="{$key|escape}" {if $mtIsLangToggle}data-toggle-target="mt-language-picker" {/if}{if $key == 'enable_dark_mode'}data-toggle-target="mt-darkmode-sub" {/if}{if $key == 'cookie_box'}data-toggle-target="mt-cookiebox-sub" {/if}{if $values[$key]}checked{/if}>
                     <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
                 </label>
             </div>
@@ -283,6 +283,31 @@
                             <option value="dark"{if $darkModeDefault == 'dark'} selected{/if}>Dark</option>
                         </select>
                         <p class="mt-field-help">The mode the site loads in (no OS auto-detect).</p>
+                    </div>
+                </div>
+            {/if}
+
+            {* Cookie Box options — Lagom-style sub-field revealed under the
+               "Cookie Box" toggle. Message (HTML allowed), screen position,
+               and the dismiss button label. *}
+            {if $key == 'cookie_box'}
+                <div class="mt-row-sub{if $mtFlagTab != $tab} mt-tab-off{/if}" id="mt-cookiebox-sub"{if !$values[$key]} hidden{/if}>
+                    <div class="mt-field">
+                        <label class="mt-field-label" for="mt-cookie-msg">Message</label>
+                        <textarea class="mt-input" id="mt-cookie-msg" name="cookie_box_message" rows="3" placeholder="We use cookies to improve your experience...">{$cookieBoxMessage|escape}</textarea>
+                        <p class="mt-field-help">Shown in the cookie bar. Basic HTML (e.g. a privacy-policy link) is allowed.</p>
+                    </div>
+                    <div class="mt-field">
+                        <label class="mt-field-label" for="mt-cookie-pos">Position</label>
+                        <select class="mt-select" id="mt-cookie-pos" name="cookie_box_position">
+                            <option value="bottom-left"{if $cookieBoxPosition == 'bottom-left'} selected{/if}>Bottom left</option>
+                            <option value="bottom-right"{if $cookieBoxPosition == 'bottom-right'} selected{/if}>Bottom right</option>
+                            <option value="bottom"{if $cookieBoxPosition == 'bottom'} selected{/if}>Bottom (full width)</option>
+                        </select>
+                    </div>
+                    <div class="mt-field" style="margin-bottom:0;">
+                        <label class="mt-field-label" for="mt-cookie-btn">Button label</label>
+                        <input class="mt-input" type="text" id="mt-cookie-btn" name="cookie_box_button" value="{$cookieBoxButton|escape}" placeholder="Continue" style="max-width:200px;">
                     </div>
                 </div>
             {/if}

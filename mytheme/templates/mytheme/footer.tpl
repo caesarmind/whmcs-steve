@@ -50,6 +50,11 @@
 {include file="`$template`/includes/partials/locale-modal.tpl"}
     {/if}{* end portal chrome close (skipped when fullPage) *}
 
+{* Cookie consent bar — fixed overlay, rendered on every page (incl. cart +
+   full-bleed) since it sits outside the portal-chrome gate. No-op unless the
+   admin enabled the Cookie Box setting. *}
+{include file="`$template`/includes/partials/cookie-box.tpl"}
+
 {$footeroutput}
 
 <script src="{$WEB_ROOT}/templates/{$template}/assets/js/apple-theme.js?v={$myTheme.version|default:'1.1'}"></script>
