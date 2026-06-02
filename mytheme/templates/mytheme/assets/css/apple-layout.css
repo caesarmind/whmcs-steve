@@ -885,15 +885,22 @@ body[data-svc-layout="outside"] .content-area .card:has(> .card-body):not(:has(>
 /* Bare content cards -- a .card with NEITHER .card-header NOR .card-body, where the
    content sits directly inside (payment-method tiles, choice tiles, article cards,
    ticket cards, etc.). "outside" flattens them onto the page background as a plain
-   divided list, same as the header-less case. Excludes .subnav-card. */
-body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(:has(> .card-header)):not(:has(> .card-body)) {
+   divided list, same as the header-less case.
+   Excludes .subnav-card AND the bespoke list table-cards (.svc/.inv/.q/.tk-table-card):
+   those are themselves bare .card wrappers (no .card-header/.card-body), so this rule
+   would otherwise win on specificity (0,6,1) over each page's own
+   `[data-svc-layout="outside"] .X-stack > .X-table-card { background: surface }` rule
+   (0,3,1) and strip the table's white surface, leaving the rows on the bare page
+   background. Per design, these list table-cards keep their own page CSS. Add any new
+   `*-table-card` list wrapper here too. */
+body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(.svc-table-card):not(.inv-table-card):not(.q-table-card):not(.tk-table-card):not(:has(> .card-header)):not(:has(> .card-body)) {
     background: transparent;
     border: 0;
     border-radius: 0;
     box-shadow: none;
     border-bottom: 0.5px solid var(--color-border);
 }
-body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(:has(> .card-header)):not(:has(> .card-body)):last-child {
+body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(.svc-table-card):not(.inv-table-card):not(.q-table-card):not(.tk-table-card):not(:has(> .card-header)):not(:has(> .card-body)):last-child {
     border-bottom: 0;
 }
 /* Bespoke surface wrappers on non-.card pages -- the shared .settings-group

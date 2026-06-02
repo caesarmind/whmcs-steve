@@ -22,7 +22,10 @@
      $loginButton                              — MyTheme-provided login URL (NOT a
                                                  stock WHMCS var; absent w/o module)
      $pendingcancellation                      — bool, cancellation pending
-     $upgrades                                 — array of available upgrade IDs
+     $packagesupgrade                          — bool; true when package upgrade /
+                                                 downgrade paths are configured for
+                                                 this service (NOT $upgrades — that
+                                                 array only exists on upgradesummary)
 
    Layout: single stacked column of standard settings-group / card sections
    (parity with the apple-client-area mockup). settings-group + card respond
@@ -77,8 +80,13 @@
 {if $pdIsCpanelSvc && !empty($moduleclientarea)}{assign var=pdIsCpanel value=true}{/if}
 {assign var=pdHasAddons value=false}
 {if isset($addons) && $addons}{assign var=pdHasAddons value=true}{/if}
+{* WHMCS sets $packagesupgrade (bool) on the productdetails page when this service
+   has package upgrade/downgrade paths configured AND is in an upgradeable state
+   — the same var nexus/lagom gate their Upgrade button on. (The $upgrades array
+   only exists on upgradesummary.tpl, so the old $upgrades|@count check here was
+   always false → the button never showed.) *}
 {assign var=pdHasUpgrades value=false}
-{if isset($upgrades) && $upgrades|@count > 0}{assign var=pdHasUpgrades value=true}{/if}
+{if isset($packagesupgrade) && $packagesupgrade}{assign var=pdHasUpgrades value=true}{/if}
 {assign var=pdHasActions value=false}
 {if $pdIsCpanel || $pdHasUpgrades || $modulechangepassword || $pdCanCancel}{assign var=pdHasActions value=true}{/if}
 {* This page emits a <base href="…/"> (header.tpl), so a bare "#anchor" link
@@ -297,7 +305,7 @@
     </div>
     {/if}
 
-    {if isset($upgrades) && $upgrades|@count > 0}
+    {if $pdHasUpgrades}
     <a href="{$WEB_ROOT}/upgrade.php?type=package&id={$id|default:0|escape}" class="settings-item pd-manage-upgrade" style="text-decoration:none;color:inherit;">
         <div class="settings-item-icon pd-manage-upgrade-ico">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="8 8 12 4 16 8"/><polyline points="8 16 12 20 16 16"/></svg>
