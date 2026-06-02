@@ -167,6 +167,27 @@
             {/if}
         </div>
 
+        {* Apply account credit. WHMCS sets $manualapplycredit only when the
+           client is allowed to choose credit use ("Clients Choose Credit Use"
+           in Setup -> General -> Credit) and credit is available. Posts
+           applycredit=true + creditamount, like stock nexus. *}
+        {if $manualapplycredit}
+        <div class="card inv-lines-card">
+            <div class="card-header"><h2>{$LANG.invoiceaddcreditapply|default:'Apply credit'}</h2></div>
+            <div class="inv-pay">
+                <p style="margin:0 0 14px;font-size:var(--text-base);color:var(--color-text-secondary);letter-spacing:-0.008em;line-height:1.5;">{$LANG.invoiceaddcreditdesc1|default:'You have an available credit balance of'} <strong style="color:var(--color-text-primary);font-weight:var(--fw-semibold);">{$totalcredit}</strong>. {$LANG.invoiceaddcreditdesc2|default:'Enter how much to apply to this invoice'}.</p>
+                <form method="post" action="{$WEB_ROOT}/viewinvoice.php?id={$invoiceid}">
+                    <input type="hidden" name="applycredit" value="true">
+                    <input type="hidden" name="token" value="{$token|default:''|escape}">
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <input type="text" name="creditamount" value="{$creditamount|default:''|escape}" inputmode="decimal" aria-label="{$LANG.invoiceaddcreditamount|default:'Amount'}" style="flex:1;min-width:0;height:44px;padding:0 14px;font-family:inherit;font-size:var(--text-base);color:var(--color-text-primary);background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:var(--radius-md);letter-spacing:-0.008em;">
+                        <button type="submit" class="btn-primary inv-pay-btn" style="width:auto;">{$LANG.invoiceaddcreditapply|default:'Apply credit'}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {/if}
+
         {* Payment *}
         {if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'}
         <div class="card inv-lines-card">
