@@ -118,8 +118,5 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 /* Sentinel so the state-chip Services pill stays available (matches viewinvoice) */
 .svc-table-card { display: none !important; }
 
-/* Controls outside chip toggle — strip wrapper card chrome from .vq-main cards */
-body[data-svc-layout="outside"] .vq-main > .card { background: transparent; border: 0; box-shadow: none; }
-body[data-svc-layout="outside"] .vq-main .card > .card-header { padding: 2px 4px 10px; }
-body[data-svc-layout="outside"] .vq-main .card > .vq-head,
-body[data-svc-layout="outside"] .vq-main .card > .vq-addr { background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: var(--radius-md); }
+/* Quote cards are always rendered "inside" (the body script forces
+   data-svc-layout=inside, like viewinvoice/clientareainvoices). */

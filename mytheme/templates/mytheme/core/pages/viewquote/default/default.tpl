@@ -66,6 +66,8 @@
     var b = document.body;
     if (!b) return;
     b.setAttribute('data-data', '{$dashIsEmpty}');
+    b.setAttribute('data-subnav', 'on');
+    b.setAttribute('data-svc-layout', 'inside');
 })();
 </script>
 
