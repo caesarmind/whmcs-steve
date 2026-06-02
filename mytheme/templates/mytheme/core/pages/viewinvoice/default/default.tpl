@@ -138,33 +138,41 @@
             </div>
         </div>
 
-        {* Transactions (history) *}
+        {* Ledger - transactions, adjustments and credit/debit notes with the
+           closing balance. Mirrors stock nexus: $transactions carries .typeLabel,
+           .referenceId/.referenceHref and .isCreditNote/.isDebitNote; $balance is
+           the closing balance. Output raw (not |escape) to match nexus and avoid
+           double-escaping the prebuilt reference links. *}
         <div class="card inv-lines-card">
             <div class="card-header"><h2>{$LANG.invoicestransactions|default:'Transactions'}</h2></div>
-            {if isset($transactions) && $transactions|@count > 0}
             <table class="inv-lines">
                 <thead>
                     <tr>
                         <th scope="col">{$LANG.invoicestransdate|default:'Date'}</th>
-                        <th scope="col">{$LANG.invoicestransgateway|default:'Gateway'}</th>
-                        <th scope="col">{$LANG.invoicestranstransid|default:'Transaction ID'}</th>
+                        <th scope="col">{$LANG.invoicestype|default:'Type'}</th>
+                        <th scope="col">{$LANG.invoicesrefnum|default:'Reference'}</th>
                         <th scope="col" style="text-align: right;">{$LANG.amount|default:'Amount'}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {foreach $transactions as $tx}
                     <tr>
-                        <td class="period">{$tx.date|default:''|escape}</td>
-                        <td class="period">{$tx.gateway|default:''|escape}</td>
-                        <td class="period">{$tx.transid|default:''|escape}</td>
-                        <td class="amount">{$tx.amount|default:''|escape}</td>
+                        <td class="period">{$tx.date}</td>
+                        <td class="period">{if $tx.gateway}{$tx.gateway} &mdash; {/if}{$tx.typeLabel}</td>
+                        <td class="period">{if $tx.referenceHref}<a href="{$tx.referenceHref}" target="_blank" rel="noopener">{/if}{if $tx.isCreditNote}Credit Note {elseif $tx.isDebitNote}Debit Note {/if}{$tx.referenceId|truncate:24:"...":false:true}{if $tx.referenceHref}</a>{/if}</td>
+                        <td class="amount">{$tx.amount}</td>
+                    </tr>
+                    {foreachelse}
+                    <tr>
+                        <td colspan="4" style="text-align:center;color:var(--color-text-tertiary);">{$LANG.invoicesnotrans|default:'No transactions have been recorded for this invoice yet.'}</td>
                     </tr>
                     {/foreach}
+                    <tr>
+                        <td colspan="3" style="text-align:right;font-weight:var(--fw-semibold);color:var(--color-text-primary);border-top:0.5px solid var(--color-border);">{$LANG.invoicesbalance|default:'Balance'}</td>
+                        <td class="amount" style="font-weight:var(--fw-semibold);border-top:0.5px solid var(--color-border);">{$balance}</td>
+                    </tr>
                 </tbody>
             </table>
-            {else}
-            <div class="inv-tx-empty">{$LANG.invoicesnotrans|default:'No payments have been recorded for this invoice yet.'}</div>
-            {/if}
         </div>
 
         {* Apply account credit. WHMCS sets $manualapplycredit only when the
