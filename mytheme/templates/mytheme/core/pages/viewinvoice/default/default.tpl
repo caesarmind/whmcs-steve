@@ -166,30 +166,35 @@
             {/if}
         </div>
 
-        {* Payment *}
+        {* Payment — WHMCS builds the real pay button/form in $paymentbutton; the
+           gateway switcher posts back to regenerate it for the chosen gateway. *}
         {if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'}
         <div class="card inv-lines-card">
             <div class="card-header"><h2>{$LANG.invoicemakepayment|default:'Make a payment'}</h2></div>
-            <form method="post" action="{$WEB_ROOT}/viewinvoice.php?id={$invoiceid}">
-                <input type="hidden" name="token" value="{$token|default:''|escape}">
-                <input type="hidden" name="paynow" value="true">
-                <div class="inv-pay">
-                    <div class="inv-pay-method-list">
-                        {if isset($paymentmethods) && $paymentmethods|@count > 0}
-                            {foreach $paymentmethods as $pm}
-                            <label class="inv-pay-method">
-                                <input type="radio" name="paymentmethod" value="{$pm.module|default:''|escape}"{if $pm@first} checked{/if}>
-                                <span class="inv-pay-method-logo">{$pm.shortname|default:'PAY'|escape|truncate:4:""}</span>
-                                <div class="inv-pay-method-meta">
-                                    <div class="inv-pay-method-name">{$pm.displayname|default:$pm.module|escape}</div>
-                                </div>
-                            </label>
-                            {/foreach}
-                        {/if}
-                    </div>
-                    <button type="submit" class="btn-primary inv-pay-btn">{$LANG.invoicepay|default:'Pay'} {if isset($total)}{$total|escape}{/if}</button>
+            <div class="inv-pay">
+                {if $allowchangegateway && isset($availableGateways) && $availableGateways}
+                <form method="post" action="{$WEB_ROOT}/viewinvoice.php?id={$invoiceid}" class="inv-pay-gateway-form">
+                    <input type="hidden" name="token" value="{$token|default:''|escape}">
+                    <label class="inv-pay-gateway-label" for="inv-pay-gateway">{$LANG.paymentmethod|default:'Payment method'}</label>
+                    <select name="gateway" id="inv-pay-gateway" class="inv-pay-gateway-select" onchange="this.form.submit()">
+                        {foreach $availableGateways as $gatewayModule => $gatewayName}
+                        <option value="{$gatewayModule|escape}"{if $gatewayModule == $selectedGateway} selected{/if}>{$gatewayName|escape}</option>
+                        {/foreach}
+                    </select>
+                </form>
+                {elseif isset($paymentmethod) && $paymentmethod}
+                <div class="inv-pay-method-current">
+                    <span class="inv-pay-method-current-label">{$LANG.paymentmethod|default:'Payment method'}</span>
+                    <span class="inv-pay-method-current-value">{$paymentmethod}{if $paymethoddisplayname} ({$paymethoddisplayname}){/if}</span>
                 </div>
-            </form>
+                {/if}
+
+                {if $paymentbutton}
+                <div class="inv-pay-btn-container">{$paymentbutton}</div>
+                {else}
+                <p class="inv-pay-empty">No online payment method is currently available for this invoice. Please contact support to arrange payment.</p>
+                {/if}
+            </div>
         </div>
         {/if}
     </div>
