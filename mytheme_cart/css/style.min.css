@@ -3248,7 +3248,8 @@ textarea.dr-search-input {
    52px bar. Un-clip this box so the panel can drop below it; the pill still
    renders cleanly since its children fit within the radius. Specificity
    (1,3,0) beats the apple-layout rule (1,2,0); !important is needed to also
-   beat bootstrap-multiselect.min.css's input-group overflow rule. */
+   beat bootstrap-multiselect.min.css's input-group overflow rule (it is
+   CORS-loaded so it out-specifies a plain selector; confirmed live). */
 #order-standard_cart .domain-checker-bg .input-group-box.dr-search-box { overflow: visible !important; }
 .dr-filters { position: static; display: inline-flex; align-items: center; flex-shrink: 0; }
 .dr-filters-toggle {
