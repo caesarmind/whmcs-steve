@@ -392,6 +392,178 @@
                 </div>
             {/if}
         {/foreach}
+
+        {* ════════════════════════════════════════════════════════════════
+           ORDER PROCESS (Lagom-parity) — Configure Server step controls.
+           These render on the 'order' tab only (CSS-hidden elsewhere) but
+           their inputs are always present, so a Save from any tab preserves
+           them. $myTheme.addonSettings carries the values to the cart at
+           runtime (mytheme_cart/configureproduct.tpl).
+           ════════════════════════════════════════════════════════════════ *}
+        {literal}<style>
+        .mt-input { width: 100%; padding: 9px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 8px; background: #fff; color: var(--mt-text); }
+        .mt-input:focus { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 3px rgba(0,113,227,0.15); }
+        .mt-input--sm { max-width: 140px; }
+        .mt-hostname-grid { display: grid; grid-template-columns: 1fr 140px 1fr; gap: 12px; max-width: 520px; }
+        @media (max-width: 640px) { .mt-hostname-grid { grid-template-columns: 1fr; } }
+        </style>{/literal}
+
+        {* ── 1. Hide Product Nameservers ─────────────────────────────── *}
+        <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}">
+            <div>
+                <div class="mt-row-label">Hide Product Nameservers</div>
+                <div class="mt-row-help">Hide the NS1 Prefix and NS2 Prefix fields shown in the Configure Server section during the product configuration step.</div>
+            </div>
+            <label class="mt-toggle">
+                <input type="checkbox" name="op_hide_nameservers_enabled" data-toggle-target="op-ns-sub"{if $opHideNs != 'off'} checked{/if}>
+                <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
+            </label>
+        </div>
+        <div class="mt-row-sub{if $tab != 'order'} mt-tab-off{/if}" id="op-ns-sub"{if $opHideNs == 'off'} hidden{/if}>
+            <div class="mt-field">
+                <label class="mt-field-label" for="op-ns-mode">Apply to</label>
+                <select class="mt-select" id="op-ns-mode" name="op_hide_nameservers_mode" data-reveal-when="selected" data-reveal-when-target="op-ns-groups">
+                    <option value="all"{if $opHideNs != 'selected'} selected{/if}>All Products</option>
+                    <option value="selected"{if $opHideNs == 'selected'} selected{/if}>Selected Product Groups</option>
+                </select>
+            </div>
+            <div class="mt-field" id="op-ns-groups"{if $opHideNs != 'selected'} hidden{/if}>
+                <label class="mt-field-label">Product groups</label>
+                <div class="mt-multi-wrap" data-chip-picker>
+                    <div class="mt-multi-inputs" hidden>
+                        {foreach $productGroups as $pg}
+                            <input type="checkbox" name="op_hide_nameservers_groups[]" value="{$pg.id}"{if in_array($pg.id, $opHideNsGroups)} checked{/if}>
+                        {/foreach}
+                    </div>
+                    <div class="mt-multi" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                        <div class="mt-multi-chips"></div>
+                        <span class="mt-multi-placeholder">Click to add product groups…</span>
+                        <span class="mt-multi-caret" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                    </div>
+                    <div class="mt-multi-panel" hidden role="listbox" aria-multiselectable="true">
+                        <div class="mt-multi-search-wrap"><input type="search" placeholder="Search groups…" autocomplete="off" aria-label="Search product groups"></div>
+                        <div class="mt-multi-options">
+                            {foreach $productGroups as $pg}
+                                <button type="button" class="mt-multi-option" data-code="{$pg.id}" data-label="{$pg.name|escape}" role="option" aria-selected="false">
+                                    <span class="mt-multi-check" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg></span>
+                                    <span>{$pg.name|escape}</span>
+                                </button>
+                            {/foreach}
+                        </div>
+                        <div class="mt-multi-empty" hidden>No groups match.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {* ── 2. Hide Product Hostname (+ custom hostname + hide-on-checkout) ── *}
+        <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}">
+            <div>
+                <div class="mt-row-label">Hide Product Hostname</div>
+                <div class="mt-row-help">Hide the Hostname and Root Password fields shown in the Configure Server section during the product configuration step.</div>
+            </div>
+            <label class="mt-toggle">
+                <input type="checkbox" name="op_hide_hostname_enabled" data-toggle-target="op-host-sub"{if $opHideHost != 'off'} checked{/if}>
+                <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
+            </label>
+        </div>
+        <div class="mt-row-sub{if $tab != 'order'} mt-tab-off{/if}" id="op-host-sub"{if $opHideHost == 'off'} hidden{/if}>
+            <div class="mt-field">
+                <label class="mt-field-label" for="op-host-mode">Apply to</label>
+                <select class="mt-select" id="op-host-mode" name="op_hide_hostname_mode" data-reveal-when="selected" data-reveal-when-target="op-host-groups">
+                    <option value="all"{if $opHideHost != 'selected'} selected{/if}>All Products</option>
+                    <option value="selected"{if $opHideHost == 'selected'} selected{/if}>Selected Product Groups</option>
+                </select>
+            </div>
+            <div class="mt-field" id="op-host-groups"{if $opHideHost != 'selected'} hidden{/if}>
+                <label class="mt-field-label">Product groups</label>
+                <div class="mt-multi-wrap" data-chip-picker>
+                    <div class="mt-multi-inputs" hidden>
+                        {foreach $productGroups as $pg}
+                            <input type="checkbox" name="op_hide_hostname_groups[]" value="{$pg.id}"{if in_array($pg.id, $opHideHostGroups)} checked{/if}>
+                        {/foreach}
+                    </div>
+                    <div class="mt-multi" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                        <div class="mt-multi-chips"></div>
+                        <span class="mt-multi-placeholder">Click to add product groups…</span>
+                        <span class="mt-multi-caret" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                    </div>
+                    <div class="mt-multi-panel" hidden role="listbox" aria-multiselectable="true">
+                        <div class="mt-multi-search-wrap"><input type="search" placeholder="Search groups…" autocomplete="off" aria-label="Search product groups"></div>
+                        <div class="mt-multi-options">
+                            {foreach $productGroups as $pg}
+                                <button type="button" class="mt-multi-option" data-code="{$pg.id}" data-label="{$pg.name|escape}" role="option" aria-selected="false">
+                                    <span class="mt-multi-check" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg></span>
+                                    <span>{$pg.name|escape}</span>
+                                </button>
+                            {/foreach}
+                        </div>
+                        <div class="mt-multi-empty" hidden>No groups match.</div>
+                    </div>
+                </div>
+            </div>
+
+            {* Use Custom Hostname — nested toggle revealing the pattern fields. *}
+            <div class="mt-row mt-row-with-sub" style="border-top:1px solid var(--mt-border); padding-top:14px; margin-top:6px;">
+                <div>
+                    <div class="mt-row-label">Use Custom Hostname</div>
+                    <div class="mt-row-help">The hostname is required by WHMCS even when hidden. Off: a random string is used. On: build it from the fields below — <code>&lt;random&gt;&lt;prefix&gt;&lt;suffix&gt;</code> (e.g. <code>a1b2c3.example.com</code>).</div>
+                </div>
+                <label class="mt-toggle">
+                    <input type="checkbox" name="op_custom_hostname" data-toggle-target="op-customhost-fields"{if $opCustomHostname} checked{/if}>
+                    <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
+                </label>
+            </div>
+            <div class="mt-row-sub" id="op-customhost-fields"{if !$opCustomHostname} hidden{/if}>
+                <div class="mt-hostname-grid">
+                    <div>
+                        <label class="mt-field-label" for="op-host-prefix">Prefix</label>
+                        <input class="mt-input" type="text" id="op-host-prefix" name="op_custom_hostname_prefix" value="{$opCustomHostnamePrefix|escape}" placeholder="(none)">
+                    </div>
+                    <div>
+                        <label class="mt-field-label" for="op-host-interfix">Random length</label>
+                        <input class="mt-input mt-input--sm" type="number" id="op-host-interfix" name="op_custom_hostname_interfix" min="8" max="50" value="{$opCustomHostnameInterfix}">
+                    </div>
+                    <div>
+                        <label class="mt-field-label" for="op-host-suffix">Suffix</label>
+                        <input class="mt-input" type="text" id="op-host-suffix" name="op_custom_hostname_suffix" value="{$opCustomHostnameSuffix|escape}" placeholder=".example.com">
+                    </div>
+                </div>
+                <p class="mt-field-help" style="margin:8px 0 14px;">Random length is the count of random characters at the start (8–50).</p>
+                <div class="mt-field" style="margin-bottom:0;">
+                    <label class="mt-field-label">Random character set</label>
+                    <div class="mt-subnav-checks">
+                        <label class="mt-subnav-check"><input type="checkbox" name="op_custom_hostname_chars[]" value="upper"{if in_array('upper', $opCustomHostnameChars)} checked{/if}> Uppercase (A–Z)</label>
+                        <label class="mt-subnav-check"><input type="checkbox" name="op_custom_hostname_chars[]" value="lower"{if in_array('lower', $opCustomHostnameChars)} checked{/if}> Lowercase (a–z)</label>
+                        <label class="mt-subnav-check"><input type="checkbox" name="op_custom_hostname_chars[]" value="numbers"{if in_array('numbers', $opCustomHostnameChars)} checked{/if}> Numbers (0–9)</label>
+                    </div>
+                </div>
+            </div>
+
+            {* Hide on Checkout — nested toggle, no sub-fields. *}
+            <div class="mt-row" style="border-top:1px solid var(--mt-border); padding-top:14px; margin-top:6px;">
+                <div>
+                    <div class="mt-row-label">Hide on Checkout page</div>
+                    <div class="mt-row-help">Also hide the hostname shown under each product in the cart summary on the checkout step.</div>
+                </div>
+                <label class="mt-toggle">
+                    <input type="checkbox" name="op_hide_hostname_checkout"{if $opHideHostnameCheckout} checked{/if}>
+                    <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
+                </label>
+            </div>
+        </div>
+
+        {* ── 3. Enable Password Strength for Root Password Field ──────── *}
+        <div class="mt-row{if $tab != 'order'} mt-tab-off{/if}">
+            <div>
+                <div class="mt-row-label">Enable Password Strength For Root Password Field</div>
+                <div class="mt-row-help">Show a password-strength meter on the Root Password field during the product configuration step. Weak passwords are rejected server-side.</div>
+            </div>
+            <label class="mt-toggle">
+                <input type="checkbox" name="op_root_pw_strength"{if $opRootPwStrength} checked{/if}>
+                <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
+            </label>
+        </div>
     </section>
 
     <div style="margin-top:16px;display:flex;justify-content:flex-end">
@@ -726,5 +898,24 @@
     });
 })();
 </script>
+
+{literal}
+<script>
+// Order Process: a [data-reveal-when] <select> shows its target element only
+// when its value matches (e.g. the product-group picker appears only when the
+// "Apply to" select is "Selected Product Groups"). Complements the checkbox
+// [data-toggle-target] reveal handler above.
+(function () {
+    document.querySelectorAll('[data-reveal-when]').forEach(function (sel) {
+        var target = document.getElementById(sel.getAttribute('data-reveal-when-target'));
+        if (!target) return;
+        var match = sel.getAttribute('data-reveal-when');
+        function sync() { target.hidden = (sel.value !== match); }
+        sel.addEventListener('change', sync);
+        sync();
+    });
+})();
+</script>
+{/literal}
 
 {include file="includes/footer.tpl"}

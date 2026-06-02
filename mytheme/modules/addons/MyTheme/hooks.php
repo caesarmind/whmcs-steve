@@ -459,6 +459,38 @@ if (AddonHelper::isActive()) {
         return HookService::instance()->dispatch('ClientAreaPageQuotes', $vars);
     });
 
+    // ── Order Process: server-side root-password strength enforcement ──────
+    // The cart's Configure Server step (mytheme_cart/configureproduct.tpl)
+    // posts a hidden rootpwstrength=true alongside the root password when the
+    // "Enable Password Strength" order-process setting is on. Re-score it here
+    // with the SAME algorithm as the client meter (ported from Lagom's
+    // PasswordStrength.js) so a weak password can't slip through with JS off
+    // or tampered. Returning a non-empty array blocks the cart update.
+    // Mirrors Lagom's ShoppingCartValidateProductUpdate hook.
+    add_hook('ShoppingCartValidateProductUpdate', 1, function ($vars) {
+        $flag = (string)($vars['rootpwstrength'] ?? $_POST['rootpwstrength'] ?? '');
+        if ($flag !== 'true') {
+            return;
+        }
+        if (!(bool)MyTheme\Models\Settings::getValue('op_root_pw_strength', false)) {
+            return;
+        }
+        $pw = (string)($vars['rootpw'] ?? $_POST['rootpw'] ?? '');
+        if ($pw === '') {
+            return; // empty hostname/pw handling is WHMCS's own concern
+        }
+        // getPasswordStrength() parity: length(<=5)*10-20 + numeric(<=3)*10
+        // + symbols(<=3)*15 + upper(<=3)*10, clamped 0-100. <50 = "weak".
+        $len     = min(strlen($pw), 5);
+        $numeric = min((int)preg_match_all('/[0-9]/', $pw), 3);
+        $symbols = min((int)preg_match_all('/\W/', $pw), 3);
+        $upper   = min((int)preg_match_all('/[A-Z]/', $pw), 3);
+        $score   = max(0, min(100, ($len * 10 - 20) + ($numeric * 10) + ($symbols * 15) + ($upper * 10)));
+        if ($score < 50) {
+            return ['The root password is too weak. Please choose a stronger password (mix upper & lowercase letters, numbers and symbols).'];
+        }
+    });
+
     // AJAX dispatch (front-side)
     if (isset($_POST['mtAction'])) {
         \MyTheme\Service\AjaxService::handle($_POST['mtAction'], $_POST);

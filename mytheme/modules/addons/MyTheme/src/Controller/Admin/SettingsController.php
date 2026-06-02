@@ -100,6 +100,17 @@ final class SettingsController extends AbstractController
         $svcLayoutList = Settings::getValue('svc_layout_pages', []);
         if (!is_array($svcLayoutList)) { $svcLayoutList = []; }
 
+        // ── Order Process (Lagom-parity) settings ──────────────────────────
+        // Hide Nameservers / Hide Hostname are enum (off|all|selected) + a json
+        // GID list; Use Custom Hostname carries prefix/interfix/suffix/chars.
+        // All three features render on the 'order' tab.
+        $opNsGroups   = Settings::getValue('op_hide_nameservers_groups', []);
+        $opHostGroups = Settings::getValue('op_hide_hostname_groups', []);
+        $opChars      = Settings::getValue('op_custom_hostname_chars', ['upper', 'lower', 'numbers']);
+        if (!is_array($opNsGroups))   { $opNsGroups = []; }
+        if (!is_array($opHostGroups)) { $opHostGroups = []; }
+        if (!is_array($opChars))      { $opChars = ['upper', 'lower', 'numbers']; }
+
         return $this->view('settings/index', [
             'flags'              => self::FLAGS,
             'flagTabs'           => self::FLAG_TABS,
@@ -116,6 +127,19 @@ final class SettingsController extends AbstractController
             'subnavWebsiteList'  => $subnavWebsiteList,
             'svcPages'           => $svcPages,
             'svcLayoutList'      => $svcLayoutList,
+            // Order Process
+            'productGroups'           => $this->fetchProductGroups(),
+            'opHideNs'                => (string)Settings::getValue('op_hide_nameservers', 'off'),
+            'opHideNsGroups'          => array_map('strval', $opNsGroups),
+            'opHideHost'              => (string)Settings::getValue('op_hide_hostname', 'off'),
+            'opHideHostGroups'        => array_map('strval', $opHostGroups),
+            'opCustomHostname'        => (bool)Settings::getValue('op_custom_hostname', false),
+            'opCustomHostnamePrefix'  => (string)Settings::getValue('op_custom_hostname_prefix', ''),
+            'opCustomHostnameInterfix'=> (int)Settings::getValue('op_custom_hostname_interfix', 20),
+            'opCustomHostnameSuffix'  => (string)Settings::getValue('op_custom_hostname_suffix', ''),
+            'opCustomHostnameChars'   => array_values(array_map('strval', $opChars)),
+            'opHideHostnameCheckout'  => (bool)Settings::getValue('op_hide_hostname_checkout', false),
+            'opRootPwStrength'        => (bool)Settings::getValue('op_root_pw_strength', false),
         ]);
     }
 
@@ -168,6 +192,8 @@ final class SettingsController extends AbstractController
         $svcKeys = [];
         foreach (Template::SVC_LAYOUT_PAGES as $slug) { $svcKeys[$slug] = true; }
         $this->saveSubnavList('svc_layout_pages', $svcKeys);
+
+        $this->saveOrderProcess();
     }
 
     /** Persist a sub-nav exception list, filtered to the given valid page set. */
@@ -180,5 +206,84 @@ final class SettingsController extends AbstractController
             static fn($p) => $p !== '' && isset($validSet[$p])
         )));
         Settings::setValue($key, $clean, 'json');
+    }
+
+    /**
+     * Product groups for the Order Process hide pickers.
+     *
+     * @return list<array{id:int,name:string}>
+     */
+    private function fetchProductGroups(): array
+    {
+        try {
+            $rows = \WHMCS\Database\Capsule::table('tblproductgroups')
+                ->orderBy('order')->orderBy('name')->get(['id', 'name']);
+            $out = [];
+            foreach ($rows as $r) {
+                $out[] = ['id' => (int)$r->id, 'name' => (string)$r->name];
+            }
+            return $out;
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Persist the Lagom-parity Order Process settings (Configure Server step).
+     *
+     * Hide Nameservers / Hide Hostname store an enum (off|all|selected) plus a
+     * json GID list — the runtime hides the fields when the value is 'all', or
+     * 'selected' and the product's group is in the list. "All" stays "all" (not
+     * frozen to current GIDs), so groups added later are still covered.
+     * Custom-hostname + the two toggles round out the feature set. All inputs
+     * are always present in the form (tab visibility is CSS-only), so reading
+     * $_POST here works regardless of which tab the admin saved from.
+     */
+    private function saveOrderProcess(): void
+    {
+        $validGids = [];
+        foreach ($this->fetchProductGroups() as $g) {
+            $validGids[(string)$g['id']] = true;
+        }
+
+        foreach ([
+            'op_hide_nameservers' => 'op_hide_nameservers_groups',
+            'op_hide_hostname'    => 'op_hide_hostname_groups',
+        ] as $modeKey => $groupsKey) {
+            $enabled = isset($_POST[$modeKey . '_enabled']);
+            $mode    = (string)($_POST[$modeKey . '_mode'] ?? 'all');
+            if (!in_array($mode, ['all', 'selected'], true)) { $mode = 'all'; }
+            Settings::setValue($modeKey, $enabled ? $mode : 'off', 'string');
+
+            $posted = $_POST[$groupsKey] ?? [];
+            if (!is_array($posted)) { $posted = []; }
+            $clean = array_values(array_unique(array_filter(
+                array_map('strval', $posted),
+                static fn($id) => isset($validGids[$id])
+            )));
+            Settings::setValue($groupsKey, $clean, 'json');
+        }
+
+        // Use Custom Hostname (+ sub-fields). Interfix clamped 8-50, suffix
+        // normalized with a leading dot (mirrors Lagom's SettingsProcessor).
+        Settings::setValue('op_custom_hostname', isset($_POST['op_custom_hostname']) ? '1' : '0', 'bool');
+        Settings::setValue('op_custom_hostname_prefix', trim((string)($_POST['op_custom_hostname_prefix'] ?? '')), 'string');
+
+        $interfix = (int)($_POST['op_custom_hostname_interfix'] ?? 20);
+        if ($interfix < 8)  { $interfix = 8; }
+        if ($interfix > 50) { $interfix = 50; }
+        Settings::setValue('op_custom_hostname_interfix', (string)$interfix, 'int');
+
+        $suffix = trim((string)($_POST['op_custom_hostname_suffix'] ?? ''));
+        if ($suffix !== '' && $suffix[0] !== '.') { $suffix = '.' . $suffix; }
+        Settings::setValue('op_custom_hostname_suffix', $suffix, 'string');
+
+        $chars = $_POST['op_custom_hostname_chars'] ?? [];
+        if (!is_array($chars)) { $chars = []; }
+        $chars = array_values(array_intersect(array_map('strval', $chars), ['upper', 'lower', 'numbers']));
+        Settings::setValue('op_custom_hostname_chars', $chars, 'json');
+
+        Settings::setValue('op_hide_hostname_checkout', isset($_POST['op_hide_hostname_checkout']) ? '1' : '0', 'bool');
+        Settings::setValue('op_root_pw_strength', isset($_POST['op_root_pw_strength']) ? '1' : '0', 'bool');
     }
 }
