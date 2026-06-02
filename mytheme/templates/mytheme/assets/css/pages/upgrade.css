@@ -12,6 +12,30 @@
 .up-callout.warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
 .up-callout svg { width: 17px; height: 17px; flex-shrink: 0; margin-top: 1px; }
 
+/* Section split — main flow + Services sub-nav aside. The wrapper ends in "-split"
+   so apple-layout.css's global website-sidebar toggle (body[data-subnav-website="off"]
+   [class$="-split"]) hides the aside and collapses to one column site-wide. Collapses
+   to a single column on its own below 1024px (aside stacks under the cards). */
+.up-split { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 24px; align-items: start; }
+.up-main { min-width: 0; }
+@media (max-width: 1024px) { .up-split { grid-template-columns: 1fr; } }
+
+/* Sub-nav card (page-local — these .subnav-* rules are NOT global; mirror of the
+   services-list aside). */
+.subnav-card { padding: 8px; }
+.subnav-heading { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }
+.subnav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: var(--text-base); letter-spacing: -0.008em; text-decoration: none; transition: background var(--transition-fast); }
+.subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+.subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
+.subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+.subnav-item.active svg { color: var(--color-accent); }
+
+/* Back-out link (bottom of the package flow) */
+.up-back { margin-top: 28px; }
+.up-back-link { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 18px; border-radius: var(--radius-pill); border: 0.5px solid var(--color-border); background: var(--color-surface); color: var(--color-text-primary); font-size: var(--text-base); font-weight: var(--fw-medium); letter-spacing: -0.008em; text-decoration: none; transition: all var(--transition-fast); }
+.up-back-link:hover { border-color: var(--color-accent); color: var(--color-text-primary); text-decoration: none; }
+.up-back-link svg { width: 15px; height: 15px; }
+
 /* Package cards (type=package) — same design as the mytheme_cart store grid
    (.st-pricing / .st-plan). Ported here because mytheme_cart's stylesheet is NOT
    loaded on client-area pages; tokenized to mytheme's --text- and --fw- scale. Each
