@@ -272,6 +272,7 @@
 <div class="card pd-manage-card" id="pd-manage">
     <div class="card-header"><h2 class="card-title">{$LANG.manage|default:'Manage'}</h2></div>
 
+    <div class="card-body pd-manage-body">
     {if $pdIsCpanel}
     <div class="card-body">
         <div class="pd-manage-cta">
@@ -353,6 +354,7 @@
         <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
     </a>
     {/if}
+    </div><!-- /.pd-manage-body -->
 </div>
 {/if}
 
