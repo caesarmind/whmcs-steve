@@ -12,6 +12,20 @@
 body[data-subnav="off"] .pd-split { grid-template-columns: 1fr; }
 body[data-subnav="off"] .pd-split > .pd-aside { display: none; }
 
+/* Grouped-list title parity: render the card sections' titles (Resource Usage,
+   Manage, Quick Shortcuts) as the 13px uppercase caption (settings-group-title
+   style) so every section title on the page matches the settings-group sections
+   (Service Information, Addons, Billing Overview). Markup stays .card/.card-header
+   so the Controls-outside toggle still floats each caption. */
+.content-area .card > .card-header { padding: 16px 24px 8px; }
+.content-area .card > .card-header > .card-title {
+    font-size: var(--text-base);
+    font-weight: var(--fw-semibold);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
 /* Banner alerts (pending cancellation, unpaid invoice) */
 .pd-alert {
     display: flex;
