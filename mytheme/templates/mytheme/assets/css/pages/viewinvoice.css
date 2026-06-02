@@ -333,6 +333,43 @@ body[data-svc-layout="outside"] .inv-main .card > .card-body {
     font-weight: var(--fw-semibold);
 }
 
+/* Billing sub-nav (page-local - omitting this block renders the nav icons at full size) */
+.subnav-card { padding: 8px; }
+.subnav-heading {
+    font-size: var(--text-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 12px 8px;
+}
+.subnav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    font-size: var(--text-base);
+    letter-spacing: -0.008em;
+    text-decoration: none;
+    transition: background var(--transition-fast);
+}
+.subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+.subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
+.subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
+.subnav-item.active svg { color: var(--color-accent); }
+.subnav-count {
+    margin-left: auto;
+    font-size: var(--text-xs);
+    font-weight: var(--fw-medium);
+    padding: 1px 7px;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-secondary);
+    color: var(--color-text-tertiary);
+}
+.subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
+
 @media (max-width: 1100px) {
     body[data-subnav-side="outside"] .inv-split,
     body[data-subnav-side="outside-left"] .inv-split { grid-template-columns: 1fr 260px; gap: 24px; position: static; }
