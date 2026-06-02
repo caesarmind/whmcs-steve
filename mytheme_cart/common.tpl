@@ -34,3 +34,28 @@
    -- it lives at templates/orderforms/standard_cart/js/scripts.min.js
    on the server regardless of which orderform is active. *}
 <script src="{$WEB_ROOT}/templates/orderforms/standard_cart/js/scripts.min.js?v={$myTheme.assetVersion|default:'18'}"></script>
+
+{* ── Opt the whole order form OUT of the client-area "controls outside"
+      card treatment ──────────────────────────────────────────────────
+   mytheme's header emits data-svc-layout (Hooks::resolveSvcLayout runs on
+   EVERY page, cart pages included) and defaults it to "outside". The
+   apple-layout.css "outside" rules flatten any bare .card that lacks a
+   .card-header/.card-body child -- transparent bg, no border/radius/shadow
+   -- which is right for client-area service/billing LIST cards but wrong
+   for the cart, whose cards (.cp-section, .ct-product, .st-guarantee,
+   .cd-domain-card, …) are bespoke solid panels. Left as "outside" the cart
+   loses every card background (see configureproduct / viewcart).
+
+   The order form is never a controls-outside list, so force "inside" for
+   all cart pages here -- common.tpl is included at the top of every
+   order-form template, so document.body already exists and the cards below
+   paint with the corrected attribute (no flash). Same idiom viewinvoice /
+   viewquote / clientareainvoices use for their bespoke (no .card-body)
+   cards. We deliberately don't touch data-subnav-* -- the cart manages its
+   own sub-nav scope (data-subnav-order). *}
+<script>
+(function () {
+    var b = document.body;
+    if (b) b.setAttribute('data-svc-layout', 'inside');
+})();
+</script>
