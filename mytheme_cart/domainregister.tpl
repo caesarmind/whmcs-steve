@@ -139,23 +139,14 @@
                                       data-placement="top"
                                       data-trigger="manual"
                                       placeholder="{lang key='domainSearch.domainOrAiInstruction'}">{if $showAdvancedSearchOptions}{$message}{/if}</textarea>
-                            <button type="submit"
-                                    class="dr-generate-btn{if $showAdvancedSearchOptions} domain-check-availability{$captcha->getButtonClass($captchaForm)}{/if}"
-                                    {if $showAdvancedSearchOptions}id="btnCheckAvailability"{else}id="dr-alt-btnAi"{/if}>
-                                {lang key='search'}
-                            </button>
-                        </div>
-
-                        {* ---- Filters: Apple-styled dropdown ----
-                           Functional parity with Lagom's modern filters
-                           dropdown, Apple visual. The two hidden native
-                           <select>s below stay the source of truth that
-                           WHMCS reads via frmDomainChecker.serialize(); the
-                           panel UI just mirrors them (see filter JS at the
-                           bottom). AI mode only -- hidden in Classic mode by
-                           the .dr-search-form[data-mode-form="ai"] rule. *}
-                        <div class="dr-filters-row">
-
+                            {* ---- Filters: Apple-styled dropdown, INSIDE the
+                               search bar (sits between the input and the Search
+                               button). Functional parity with Lagom's filters
+                               dropdown, Apple visual. The two hidden native
+                               <select>s are the source of truth WHMCS reads via
+                               frmDomainChecker.serialize(); the panel UI mirrors
+                               them (see filter JS at the bottom). AI mode only --
+                               the whole AI form is hidden in Classic mode. *}
                             <select name="tlds[]" class="dr-tld-source" multiple="multiple" data-min-selection="1" hidden aria-hidden="true">
                                 {foreach $tlds as $tld}
                                     <option{if in_array($tld, $selectedTlds)} selected{/if} value="{$tld}">{$tld}</option>
@@ -213,6 +204,11 @@
 
                                 </div>
                             </div>
+                            <button type="submit"
+                                    class="dr-generate-btn{if $showAdvancedSearchOptions} domain-check-availability{$captcha->getButtonClass($captchaForm)}{/if}"
+                                    {if $showAdvancedSearchOptions}id="btnCheckAvailability"{else}id="dr-alt-btnAi"{/if}>
+                                {lang key='search'}
+                            </button>
                         </div>
                     </form>
 

@@ -3236,20 +3236,28 @@ textarea.dr-search-input {
    Replaces the old bootstrap-multiselect widgets. The hidden native
    <select>s (.dr-tld-source / .dr-length-source) are the source of
    truth WHMCS serializes; this panel just mirrors them via filter JS. */
-.dr-filters-row { display: flex; justify-content: flex-end; }
 .dr-tld-source, .dr-length-source { display: none !important; }
 
-.dr-filters { position: relative; }
+/* Filters live INSIDE the search bar, between the input and the Search
+   button. The bar is the positioning context so the panel drops straight
+   down below the whole bar. */
+.dr-search-box { position: relative; }
+.dr-filters { position: static; display: inline-flex; align-items: center; flex-shrink: 0; }
 .dr-filters-toggle {
-    display: inline-flex; align-items: center; gap: 7px;
-    height: 34px; padding: 0 12px;
-    background: var(--color-surface); color: var(--color-text-secondary);
-    border: 0.5px solid var(--color-border); border-radius: var(--radius-pill);
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 30px; padding: 0 14px;
+    background: transparent; color: var(--color-text-tertiary);
+    border: 0; border-left: 1px solid var(--color-border); border-radius: 0;
     font-size: 12.5px; font-weight: 500; font-family: inherit;
-    letter-spacing: -0.008em; cursor: pointer;
-    transition: all var(--transition-fast);
+    letter-spacing: -0.008em; cursor: pointer; white-space: nowrap;
+    transition: color var(--transition-fast);
 }
-.dr-filters-toggle:hover { color: var(--color-text-primary); border-color: var(--color-text-quaternary); }
+.dr-filters-toggle:hover { color: var(--color-text-primary); }
+/* On narrow screens drop the "Filters" word, keep the icon + count badge */
+@media (max-width: 560px) {
+    .dr-filters-toggle { padding: 0 10px; gap: 5px; }
+    .dr-filters-toggle > span:not(.dr-filters-count) { display: none; }
+}
 .dr-filters-toggle svg { width: 14px; height: 14px; flex-shrink: 0; }
 .dr-filters-toggle .dr-filters-caret { width: 12px; height: 12px; transition: transform var(--transition-fast); }
 .dr-filters-toggle[aria-expanded="true"] .dr-filters-caret { transform: rotate(180deg); }
