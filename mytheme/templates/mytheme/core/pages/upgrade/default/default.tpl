@@ -145,17 +145,10 @@
                     <input type="hidden" name="billingcycle" value="onetime">
                     <div class="st-plan-price"><span class="amount">{$pkg.pricing.onetime}</span> <span class="period">{$LANG.orderpaymenttermonetime|default:'one time'}</span></div>
                 {else}
-                    {* Headline = first available cycle (monthly preferred); the select
-                       below lets the client change the term before choosing. *}
-                    <div class="st-plan-price">
-                        {if $pkg.pricing.monthly}<span class="amount">{$pkg.pricing.monthly}</span><span class="period">/{$LANG.monthly|default:'mo'}</span>
-                        {elseif $pkg.pricing.quarterly}<span class="amount">{$pkg.pricing.quarterly}</span><span class="period">/{$LANG.quarterly|default:'qtr'}</span>
-                        {elseif $pkg.pricing.semiannually}<span class="amount">{$pkg.pricing.semiannually}</span><span class="period">/{$LANG.semiannually|default:'6 mo'}</span>
-                        {elseif $pkg.pricing.annually}<span class="amount">{$pkg.pricing.annually}</span><span class="period">/{$LANG.annually|default:'yr'}</span>
-                        {elseif $pkg.pricing.biennially}<span class="amount">{$pkg.pricing.biennially}</span><span class="period">/{$LANG.biennially|default:'2 yr'}</span>
-                        {elseif $pkg.pricing.triennially}<span class="amount">{$pkg.pricing.triennially}</span><span class="period">/{$LANG.triennially|default:'3 yr'}</span>
-                        {/if}
-                    </div>
+                    {* Recurring: the billing-cycle <select> IS the price control — each
+                       option already shows its per-term price (e.g. "$50.00 USD Monthly
+                       / mo"), so there's no separate price headline above it (that line
+                       just duplicated the amount + cycle). *}
                     <select name="billingcycle" class="form-select st-plan-cycle">
                         {if $pkg.pricing.monthly}<option value="monthly">{$pkg.pricing.monthly} / {$LANG.monthly|default:'mo'}</option>{/if}
                         {if $pkg.pricing.quarterly}<option value="quarterly">{$pkg.pricing.quarterly} / {$LANG.quarterly|default:'qtr'}</option>{/if}
