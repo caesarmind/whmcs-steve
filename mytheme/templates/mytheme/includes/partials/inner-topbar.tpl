@@ -35,13 +35,27 @@
                 <div class="notification-wrapper only-in" id="sideNotifyWrap">
                     <button type="button" class="ph-side-iconbtn" aria-label="{$LANG.notifications|default:'Notifications'}" onclick="togglePortalNotifications && togglePortalNotifications(event, 'side')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-                        {if isset($publishedAnnouncements) && $publishedAnnouncements|count > 0}<div class="topbar-notification-dot"></div>{/if}
+                        {if (isset($clientAlerts) && $clientAlerts|count > 0) || (isset($publishedAnnouncements) && $publishedAnnouncements|count > 0)}<div class="topbar-notification-dot"></div>{/if}
                     </button>
                     <div class="notification-dropdown" id="notificationDropdownSide">
                         <div class="notification-dropdown-header">
                             <span class="notification-dropdown-title">{$LANG.notifications|default:'Notifications'}</span>
                         </div>
-                        {if isset($publishedAnnouncements) && $publishedAnnouncements|count > 0}
+                        {assign var=naHasAlerts value=false}
+                        {if isset($clientAlerts) && $clientAlerts|count > 0}{assign var=naHasAlerts value=true}{/if}
+                        {assign var=naHasAnns value=false}
+                        {if isset($publishedAnnouncements) && $publishedAnnouncements|count > 0}{assign var=naHasAnns value=true}{/if}
+                        {if $naHasAlerts}
+                            {foreach $clientAlerts as $alert}
+                                <a href="{$alert->getLink()}" class="notification-item">
+                                    <div class="notification-dot-indicator {if $alert->getSeverity() == 'danger'}red{elseif $alert->getSeverity() == 'warning'}orange{elseif $alert->getSeverity() == 'info'}blue{else}green{/if}"></div>
+                                    <div class="notification-content">
+                                        <div class="notification-text">{$alert->getMessage()}</div>
+                                    </div>
+                                </a>
+                            {/foreach}
+                        {/if}
+                        {if $naHasAnns}
                             {foreach $publishedAnnouncements as $ann}
                                 <a href="{$WEB_ROOT}/announcements.php?id={$ann.id}" class="notification-item">
                                     <div class="notification-dot-indicator blue"></div>
@@ -52,7 +66,8 @@
                                 </a>
                                 {if $ann@iteration >= 5}{break}{/if}
                             {/foreach}
-                        {else}
+                        {/if}
+                        {if !$naHasAlerts && !$naHasAnns}
                             <div class="notification-item" style="justify-content:center;color:var(--color-text-tertiary);font-size:13px;">
                                 {$LANG.nonotifications|default:'No notifications'}
                             </div>
