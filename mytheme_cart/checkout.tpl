@@ -722,7 +722,7 @@
 }
 #applyCreditContainer .radio {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     padding: 13px 16px;
     margin: 0 0 8px;
@@ -753,7 +753,6 @@
 #applyCreditContainer .ac-radio {
     width: 18px;
     height: 18px;
-    margin-top: 1px;
     border-radius: 50%;
     border: 1.5px solid var(--color-border);
     background: var(--color-surface);
@@ -949,6 +948,32 @@
 }
 #creditCardInputFields .stripe-cards-inputs,
 .co-payment-card .stripe-cards-inputs { padding: 0 !important; }
+/* Each Stripe card Element renders its iframe flush to the top of the 42px
+   field; equal vertical padding centres it. */
+#creditCardInputFields .stripe-cards-inputs .StripeElement,
+.co-payment-card .stripe-cards-inputs .StripeElement {
+    height: 42px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    box-sizing: border-box;
+}
+
+/* -- Existing-account picker (#containerExistingAccountSelect) --
+   The picker doubles as a Bootstrap .row, so its -12px row margins fight the
+   card padding (uneven inset, a big empty gap at the bottom) and it floats too
+   far below the "Choose Account" heading. Reset to a clean, evenly-padded card
+   and drop the last account card's trailing margin. */
+#order-standard_cart #containerExistingAccountSelect.account-select-container {
+    margin: 8px 0 0;
+    padding: 14px;
+}
+#order-standard_cart #containerExistingAccountSelect > [class*="col-"] {
+    padding-left: 0;
+    padding-right: 0;
+}
+#order-standard_cart #containerExistingAccountSelect > [class*="col-"]:last-child .account {
+    margin-bottom: 0;
+}
 
 /* TOS + complete-order footer */
 .checkout-footer { margin: 22px 0 16px; padding: 0; }
@@ -956,6 +981,38 @@
 .checkout-footer .checkbox { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--color-text-secondary); margin: 0 0 16px; cursor: pointer; letter-spacing: -0.008em; }
 .checkout-footer label input,
 .checkout-footer .checkbox input { margin-top: 3px; accent-color: var(--color-accent); flex-shrink: 0; }
+/* The cart's scripts.min.js iCheck-wraps the TOS checkbox in
+   .icheckbox_square-blue, whose sprite 404s on this install -- leaving NO
+   visible checkbox. Style the wrapper as an Apple checkbox; iCheck keeps its
+   .checked class in sync so the tick reflects state (clicks still toggle via
+   iCheck's label/overlay, untouched). */
+.checkout-footer .icheckbox_square-blue {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin: 1px 0 0;
+    border: 1.5px solid var(--color-border);
+    border-radius: 5px;
+    background: var(--color-surface);
+    background-image: none;
+    transition: background 0.15s, border-color 0.15s;
+}
+.checkout-footer .icheckbox_square-blue.checked {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+}
+.checkout-footer .icheckbox_square-blue.checked::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 4px;
+    height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
 #btnCompleteOrder {
     width: 100%;
     height: 48px;
