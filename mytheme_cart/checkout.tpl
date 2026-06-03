@@ -728,6 +728,7 @@
     margin: 0 0 8px;
     border: 0.5px solid var(--color-border);
     border-radius: 12px;
+    box-sizing: border-box;
     background: var(--color-surface);
     font-size: 13px;
     line-height: 1.5;

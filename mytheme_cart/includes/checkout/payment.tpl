@@ -28,6 +28,8 @@
     {$LANG.ordertotalduetoday}: &nbsp; <strong id="totalCartPrice">{$total}</strong>
 </div>
 
+{* Apply-credit choice -- rendered as Apple option cards (.ac-radio circle +
+   .ac-text); the visual lives in #applyCreditContainer CSS in checkout.tpl. *}
 <div id="applyCreditContainer" class="apply-credit-container{if !$canUseCreditOnCheckout} w-hidden{/if}" data-apply-credit="{$applyCredit}">
     <p>{lang key='cart.availableCreditBalance' amount=$creditBalance}</p>
 
