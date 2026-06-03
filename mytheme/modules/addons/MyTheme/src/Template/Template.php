@@ -166,8 +166,12 @@ final class Template
 
     public function getPages(): array
     {
+        // ensure() (not read()) so a page added under core/pages/* surfaces on the
+        // next admin visit without a theme-version bump — the cache auto-rebuilds
+        // when its directory fingerprint changes (Lagom parity). Admin-only path;
+        // ensure() memoizes per request so repeated calls don't re-scan.
         $declared   = $this->manifest['provides']['pages'] ?? [];
-        $discovered = PagesCache::read($this) ?? [];
+        $discovered = PagesCache::ensure($this);
         $order      = array_keys(self::ORDER_PAGES);
 
         $seen = [];

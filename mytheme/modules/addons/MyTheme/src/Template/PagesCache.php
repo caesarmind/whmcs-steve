@@ -11,18 +11,29 @@ use MyTheme\Models\Settings;
  * Built at addon activation and on explicit admin action (Tools tab → Rebuild,
  * or first visit to the Pages tab when the cache is missing). Adheres to the
  * HYBRID-STRUCTURE.md hard rule "no runtime filesystem scans" — scans happen
- * only on admin actions, never during client-area request handling.
+ * only on admin actions, never during client-area request handling. (getPages()
+ * — the sole consumer — is admin-only; the client-area path resolves a single
+ * known page via Template::getPageMeta(), never the discovery list.)
  *
  * Storage: one mytheme_settings row per template, keyed `<slug>_pages_discovered`.
  * Payload shape (JSON):
- *   ['version' => '<theme version>', 'pages' => ['login', …], 'generated_at' => 'ISO8601']
+ *   ['version' => '<theme version>', 'signature' => '<dir fingerprint>',
+ *    'pages' => ['login', …], 'generated_at' => 'ISO8601']
  *
- * Invalidation: stored version != current $template->getVersion() → treated as
- * stale, ensure() will rebuild. Bumping the theme.json version triggers a
- * fresh scan on the next admin visit.
+ * Invalidation (Lagom parity — a newly added page must appear without a manual
+ * version bump): the cache is stale when EITHER
+ *   - stored version   != current $template->getVersion(), OR
+ *   - stored signature != signature() — a cheap fingerprint of the core/pages
+ *     directory (root mtime + each subdir name:mtime). Adding/removing a page
+ *     dir, or an existing dir gaining its first page.php, changes the fingerprint
+ *     and triggers a rebuild on the next admin visit.
+ * Bumping the theme.json version still forces a fresh scan as a secondary trigger.
  */
 final class PagesCache
 {
+    /** In-process memo: settingsKey => list<string>|null, valid for one request. */
+    private static array $memo = [];
+
     public static function settingsKey(Template $template): string
     {
         return $template->getName() . '_pages_discovered';
@@ -36,15 +47,23 @@ final class PagesCache
      */
     public static function read(Template $template): ?array
     {
-        $raw = Settings::getValue(self::settingsKey($template), null);
+        $key = self::settingsKey($template);
+        if (array_key_exists($key, self::$memo)) {
+            return self::$memo[$key];
+        }
+
+        $raw = Settings::getValue($key, null);
         if (!is_array($raw) || empty($raw['pages']) || !is_array($raw['pages'])) {
-            return null;
+            return self::$memo[$key] = null;
         }
         if (($raw['version'] ?? '') !== $template->getVersion()) {
-            return null;
+            return self::$memo[$key] = null;
+        }
+        if (($raw['signature'] ?? null) !== self::signature($template)) {
+            return self::$memo[$key] = null;
         }
         $pages = array_values(array_filter($raw['pages'], 'is_string'));
-        return $pages;
+        return self::$memo[$key] = $pages;
     }
 
     /**
@@ -71,12 +90,38 @@ final class PagesCache
     public static function rebuild(Template $template): array
     {
         $pages = self::scan($template);
-        Settings::setValue(self::settingsKey($template), [
+        $key   = self::settingsKey($template);
+        Settings::setValue($key, [
             'version'      => $template->getVersion(),
+            'signature'    => self::signature($template),
             'pages'        => $pages,
             'generated_at' => date('c'),
         ], 'json');
-        return $pages;
+        return self::$memo[$key] = $pages;
+    }
+
+    /**
+     * Cheap fingerprint of the core/pages directory used to detect added/removed
+     * pages without a full qualifying scan. Combines the root dir mtime with each
+     * immediate subdir's name and mtime: adding or removing a page dir changes the
+     * root mtime + entry set, and an existing dir gaining its first page.php
+     * changes that subdir's mtime. One scandir + N filemtime stats — admin-only,
+     * so it does not breach the "no runtime filesystem scans" rule.
+     */
+    private static function signature(Template $template): string
+    {
+        $root = $template->getFullPath() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'pages';
+        if (!is_dir($root)) {
+            return '0';
+        }
+        $parts = ['root:' . (string)(@filemtime($root) ?: 0)];
+        foreach (scandir($root) ?: [] as $entry) {
+            if ($entry === '.' || $entry === '..') continue;
+            $dir = $root . DIRECTORY_SEPARATOR . $entry;
+            if (!is_dir($dir)) continue;
+            $parts[] = $entry . ':' . (string)(@filemtime($dir) ?: 0);
+        }
+        return hash('crc32b', implode('|', $parts));
     }
 
     /**
