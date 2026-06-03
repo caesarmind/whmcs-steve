@@ -119,22 +119,14 @@
                 {include file="orderforms/$carttpl/includes/existing-paymethods.tpl"}
             </div>
         {/if}
-        <div class="row cvv-input" id="existingCardInfo">
-            <div class="col-lg-3 col-sm-4">
-                <div class="form-group prepend-icon">
-                    <label for="inputCardCVV2" class="field-icon">
-                        <i class="fas fa-barcode"></i>
-                    </label>
-                    <div class="input-group">
-                        <input type="tel" name="cccvv" id="inputCardCVV2" class="field form-control" placeholder="{$LANG.creditcardcvvnumbershort}" autocomplete="cc-cvc">
-                        <span class="input-group-btn input-group-append">
-                            <button type="button" class="btn btn-default" data-toggle="popover" data-placement="bottom" data-content="<img src='{$BASE_PATH_IMG}/ccv.gif' width='210' />">
-                                ?
-                            </button>
-                        </span>
-                    </div>
-                    <span class="field-error-msg">{lang key="paymentMethodsManage.cvcNumberNotValid"}</span>
+        <div class="cvv-input" id="existingCardInfo">
+            <div class="pm-cvc">
+                <label class="pm-cvc-label" for="inputCardCVV2">{$LANG.creditcardcvvnumber}</label>
+                <div class="pm-cvc-row">
+                    <input type="tel" inputmode="numeric" maxlength="4" name="cccvv" id="inputCardCVV2" class="field form-control" placeholder="{$LANG.creditcardcvvnumbershort}" autocomplete="cc-csc">
+                    <button type="button" class="pm-cvc-help" data-toggle="popover" data-placement="bottom" data-content="<img src='{$BASE_PATH_IMG}/ccv.gif' width='210' />">?</button>
                 </div>
+                <span class="field-error-msg pm-cvc-error">{lang key="paymentMethodsManage.cvcNumberNotValid"}</span>
             </div>
         </div>
 

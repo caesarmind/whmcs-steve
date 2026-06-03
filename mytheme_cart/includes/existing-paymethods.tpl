@@ -62,17 +62,21 @@
             {* Best-effort brand detection -- $payMethod->payment->getDisplayName()
                typically starts with "Visa •••• 4242" so we sniff the prefix.
                Falls back to .bank gradient if no match. *}
+            {* Brand sniff -- $displayName is the haystack (e.g. "MasterCard-5933"),
+               so $displayName|strpos:"Master" => strpos($displayName, "Master").
+               (The args used to be swapped, which never matched -> every card
+               fell back to a grey "CARD".) *}
             {assign "displayName" $payMethod->payment->getDisplayName()}
-            {if "Visa"|strpos:$displayName !== false}
+            {if $displayName|strpos:"Visa" !== false}
                 {assign "brandClass" "visa"}
                 {assign "brandLabel" "VISA"}
-            {elseif "Master"|strpos:$displayName !== false || "MasterCard"|strpos:$displayName !== false}
+            {elseif $displayName|strpos:"Master" !== false}
                 {assign "brandClass" "mc"}
                 {assign "brandLabel" "MC"}
-            {elseif "Amex"|strpos:$displayName !== false || "American Express"|strpos:$displayName !== false}
+            {elseif $displayName|strpos:"Amex" !== false || $displayName|strpos:"American Express" !== false}
                 {assign "brandClass" "amex"}
                 {assign "brandLabel" "AMEX"}
-            {elseif "Discover"|strpos:$displayName !== false}
+            {elseif $displayName|strpos:"Discover" !== false}
                 {assign "brandClass" "disc"}
                 {assign "brandLabel" "DISC"}
             {else}
@@ -103,8 +107,7 @@
 
         {* Cell 2: Apple mini-card visual (was a FontAwesome icon) *}
         <div class="paymethod-info paymethod-info-brand{if $payMethodExpired} is-expired{/if}"
-             data-paymethod-id="{$payMethod->id}"
-             onclick="var r=document.getElementById('ccinfo-{$payMethod->id}'); if(r && !r.disabled){literal}{{/literal} r.checked=true; r.dispatchEvent(new Event('change',{literal}{{/literal}bubbles:true{literal}}{/literal})); {literal}}{/literal}">
+             data-paymethod-id="{$payMethod->id}">
             <div class="pm-card-visual {$brandClass}">{$brandLabel}</div>
         </div>
 

@@ -916,6 +916,165 @@
 }
 #creditCardInputFields > ul .radio-inline input { margin: 0; accent-color: var(--color-accent); }
 
+/* -- Saved payment methods (#existingCardsContainer) --
+   5 sibling .paymethod-info cells per card (radio | brand | name | desc |
+   expiry -- order is fixed; scripts.min.js iterates them by index, so no
+   wrapper is allowed). Lay them out as one selectable Apple row via grid; the
+   init() JS toggles .pm-selected on the 5 cells sharing the chosen card's
+   data-paymethod-id so the whole row highlights. The ccinfo radio is
+   iCheck-wrapped (sprite 404s), so the visible dot is drawn on the
+   .iradio_square-blue wrapper (which iCheck keeps in sync). */
+#existingCardsContainer.existing-cc-grid {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+    align-items: stretch;
+    row-gap: 8px;
+    margin: 0 0 14px;
+}
+#existingCardsContainer .paymethod-info {
+    display: flex;
+    align-items: center;
+    min-height: 58px;
+    padding: 11px 0;
+    background: var(--color-surface);
+    border-top: 0.5px solid var(--color-border);
+    border-bottom: 0.5px solid var(--color-border);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+#existingCardsContainer .paymethod-info.radio-inline {
+    padding-left: 15px;
+    padding-right: 13px;
+    border-left: 0.5px solid var(--color-border);
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+#existingCardsContainer .paymethod-info-brand { padding-right: 13px; }
+#existingCardsContainer .paymethod-info-id { flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; }
+#existingCardsContainer .paymethod-info-desc { padding-right: 10px; }
+#existingCardsContainer .paymethod-info-exp {
+    padding-left: 13px;
+    padding-right: 15px;
+    justify-content: flex-end;
+    gap: 8px;
+    border-right: 0.5px solid var(--color-border);
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+#existingCardsContainer .paymethod-info.pm-selected {
+    background: var(--color-accent-light);
+    border-color: var(--color-accent);
+}
+/* iCheck radio wrapper -> Apple dot */
+#existingCardsContainer .iradio_square-blue {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border: 1.5px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-surface) !important;
+    background-image: none !important;
+}
+#existingCardsContainer .iradio_square-blue.checked {
+    border-color: var(--color-accent);
+    background: var(--color-accent) !important;
+}
+#existingCardsContainer .iradio_square-blue.checked::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    transform: translate(-50%, -50%);
+}
+/* brand chip (replaces the FontAwesome icon) */
+#existingCardsContainer .pm-card-visual {
+    width: 42px;
+    height: 27px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.25);
+}
+#existingCardsContainer .pm-card-visual.mc { background: linear-gradient(135deg, #eb001b 0%, #f79e1b 100%); }
+#existingCardsContainer .pm-card-visual.visa { background: linear-gradient(135deg, #1a1f71 0%, #2557d6 100%); }
+#existingCardsContainer .pm-card-visual.amex { background: linear-gradient(135deg, #2e77bb 0%, #1a4d8f 100%); }
+#existingCardsContainer .pm-card-visual.disc { background: linear-gradient(135deg, #f47216 0%, #ffa94d 100%); }
+#existingCardsContainer .pm-card-visual.cc { background: #3a3a3c; }
+#existingCardsContainer .pm-card-visual.bank { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+/* identifier + description + expiry */
+#existingCardsContainer .pm-card-name,
+#existingCardsContainer .pm-card-type,
+#existingCardsContainer .pm-card-num { font-size: 13.5px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; font-variant-numeric: tabular-nums; }
+#existingCardsContainer .paymethod-info-desc { font-size: 11.5px; color: var(--color-text-tertiary); letter-spacing: -0.004em; }
+#existingCardsContainer .pm-card-exp { font-size: 11.5px; color: var(--color-text-tertiary); font-variant-numeric: tabular-nums; }
+#existingCardsContainer .pm-expired-pill {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-red-text, #d70015);
+    background: var(--color-red-bg, rgba(255, 59, 48, 0.08));
+    border-radius: 999px;
+    padding: 3px 8px;
+}
+
+/* -- CVC for a selected saved card (#existingCardInfo) -- */
+#existingCardInfo { margin: 4px 0 2px; }
+#existingCardInfo .pm-cvc { display: flex; flex-direction: column; gap: 6px; }
+#existingCardInfo .pm-cvc-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: -0.004em; }
+#existingCardInfo .pm-cvc-row { display: flex; align-items: center; gap: 8px; }
+#existingCardInfo #inputCardCVV2 {
+    width: 120px;
+    height: 40px;
+    padding: 0 14px;
+    border: 0.5px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+    box-sizing: border-box;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+#existingCardInfo #inputCardCVV2::placeholder { color: var(--color-text-quaternary, #c7c7cc); letter-spacing: -0.008em; }
+#existingCardInfo #inputCardCVV2:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+#existingCardInfo .pm-cvc-help {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 0.5px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-tertiary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s, color 0.15s;
+}
+#existingCardInfo .pm-cvc-help:hover { border-color: var(--color-accent); color: var(--color-accent); }
+/* error hidden until validation flags it (WHMCS/Bootstrap adds .has-error) */
+#existingCardInfo .field-error-msg { display: none; font-size: 11.5px; color: var(--color-red-text, #d70015); letter-spacing: -0.004em; }
+#existingCardInfo.has-error .field-error-msg,
+#existingCardInfo .has-error .field-error-msg { display: block; }
+#existingCardInfo.has-error #inputCardCVV2,
+#existingCardInfo .has-error #inputCardCVV2 { border-color: var(--color-red-text, #d70015); box-shadow: 0 0 0 3px var(--color-red-bg, rgba(255, 59, 48, 0.08)); }
+
 /* -- Gateway-injected card fields (#paymentGatewayInput) --
    Stripe (and other remote-input gateways) inject their Card Number /
    Expiry / CVC / cardholder-name fields into #paymentGatewayInput at
@@ -1819,6 +1978,30 @@ button.generate-password:hover {
             var cb = this.querySelector('input[type="checkbox"]');
             if (cb && !cb.disabled) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', {bubbles: true})); e.preventDefault(); }
         });
+
+        /* Saved-card picker: make the whole .paymethod-info row selectable and
+           mirror the chosen card's selection onto its 5 sibling cells (they share
+           data-paymethod-id) so the entire row highlights. iCheck owns the ccinfo
+           radios, so check via its API to keep the wrapper .checked + radio-group
+           exclusivity intact. */
+        function syncPayMethodSelection() {
+            var checked = document.querySelector('#existingCardsContainer input.existing-card:checked');
+            var id = checked ? checked.value : null;
+            document.querySelectorAll('#existingCardsContainer .paymethod-info').forEach(function (cell) {
+                cell.classList.toggle('pm-selected', id !== null && cell.getAttribute('data-paymethod-id') === id);
+            });
+        }
+        $(document).off('click.pmRow').on('click.pmRow', '#existingCardsContainer .paymethod-info', function (e) {
+            if (e.target.tagName === 'INPUT') return; /* iCheck overlay handles its own click */
+            var id = this.getAttribute('data-paymethod-id');
+            var $radio = $('#ccinfo-' + id);
+            if (!$radio.length || $radio.prop('disabled')) return;
+            if ($radio.data('iCheck')) { $radio.iCheck('check'); }
+            else { $radio.prop('checked', true).trigger('change'); }
+        });
+        $(document).off('ifChanged.pmRow change.pmRow', 'input[name="ccinfo"]')
+                   .on('ifChanged.pmRow change.pmRow', 'input[name="ccinfo"]', syncPayMethodSelection);
+        syncPayMethodSelection();
 
         var login = $('#containerExistingUserSignin');
         var signup = $('#containerNewUserSignup');
