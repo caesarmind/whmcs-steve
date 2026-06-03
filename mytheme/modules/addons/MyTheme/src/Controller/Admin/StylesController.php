@@ -190,6 +190,28 @@ final class StylesController extends AbstractController
             $weights[] = $it;
         }
 
+        // Effective "how it's written" stack per mode: the stored override for the
+        // active mode, else a freshly-derived stack from that mode's pick. The
+        // editable field pre-fills with this; on save it becomes the stored value.
+        $fallback    = (string)($cfg['fontFamily']['fallback'] ?? 'system-ui, sans-serif');
+        $applePrefix = (string)($cfg['fontFamily']['applePrefix'] ?? '-apple-system, BlinkMacSystemFont');
+        $ffMode      = (string)($ff['mode'] ?? 'default');
+        $storedStack = (string)($ff['stack'] ?? '');
+        $bundledFam  = 'Inter';
+        foreach (($cfg['bundledFonts'] ?? []) as $bf) {
+            if (($bf['file'] ?? '') === (string)($ff['bundled'] ?? '')) {
+                $bundledFam = (string)($bf['family'] ?? $bundledFam);
+                break;
+            }
+        }
+        $stacks = [
+            'system'  => ($ffMode === 'system'  && $storedStack !== '') ? $storedStack : (string)($cfg['fontFamily']['system'] ?? $fallback),
+            'google'  => ($ffMode === 'google'  && $storedStack !== '') ? $storedStack : ((string)($ff['google'] ?? '') !== '' ? "'" . (string)$ff['google'] . "', " . $fallback : ''),
+            'folder'  => ($ffMode === 'folder'  && $storedStack !== '') ? $storedStack : ((string)($ff['folder'] ?? '') !== '' ? '"' . pathinfo((string)$ff['folder'], PATHINFO_FILENAME) . '", ' . $fallback : ''),
+            'bundled' => ($ffMode === 'bundled' && $storedStack !== '') ? $storedStack : '"' . $bundledFam . '", ' . $fallback,
+        ];
+        $leadsApple = static fn (string $s): bool => (bool)preg_match('/^\s*(-apple-system|BlinkMacSystemFont)/', $s);
+
         return [
             'sizeGroups'    => $sizeGroups,
             'weights'       => $weights,
@@ -198,11 +220,17 @@ final class StylesController extends AbstractController
             'sizeMin'       => (int)($cfg['sizeMin'] ?? 8),
             'sizeMax'       => (int)($cfg['sizeMax'] ?? 160),
             'folderFonts'   => $folderFonts,
+            'bundledFonts'  => $cfg['bundledFonts'] ?? [],
+            'stacks'        => $stacks,
+            'ffFallback'    => $fallback,
+            'ffApplePrefix' => $applePrefix,
             'fontFamily'    => [
-                'mode'   => (string)($ff['mode']   ?? 'default'),
-                'google' => (string)($ff['google'] ?? ''),
-                'custom' => (string)($ff['custom'] ?? ''),
-                'folder' => (string)($ff['folder'] ?? ''),
+                'mode'         => $ffMode,
+                'google'       => (string)($ff['google']  ?? ''),
+                'folder'       => (string)($ff['folder']  ?? ''),
+                'bundled'      => (string)($ff['bundled'] ?? ''),
+                'folderApple'  => $leadsApple($stacks['folder']),
+                'bundledApple' => $leadsApple($stacks['bundled']),
             ],
         ];
     }
@@ -257,18 +285,33 @@ final class StylesController extends AbstractController
             $out['weights'] = $weights;
         }
 
-        // Font family
-        $mode = (string)($_POST['ff_mode'] ?? 'default');
-        if ($mode === 'google' && trim((string)($_POST['ff_google'] ?? '')) !== '') {
-            $out['fontFamily'] = ['mode' => 'google', 'google' => trim((string)$_POST['ff_google'])];
-        } elseif ($mode === 'custom' && trim((string)($_POST['ff_custom'] ?? '')) !== '') {
-            $out['fontFamily'] = ['mode' => 'custom', 'custom' => trim((string)$_POST['ff_custom'])];
+        // Font family. The admin-editable "stack" string (the exact value written to
+        // --font-family) is the source of truth for what's EMITTED; the picked font
+        // drives what's LOADED. Apple-first is encoded directly in the stack string
+        // (a leading -apple-system/BlinkMacSystemFont), so no separate flag is kept.
+        $mode      = (string)($_POST['ff_mode'] ?? 'default');
+        $stackKey  = ['system' => 'ff_system', 'google' => 'ff_google_stack', 'folder' => 'ff_folder_stack', 'bundled' => 'ff_bundled_stack'][$mode] ?? '';
+        $stack     = $stackKey !== '' ? trim((string)($_POST[$stackKey] ?? '')) : '';
+        $withStack = static fn (array $base): array => $base + ($stack !== '' ? ['stack' => $stack] : []);
+        if ($mode === 'system') {
+            $out['fontFamily'] = $withStack(['mode' => 'system']);
+        } elseif ($mode === 'google' && trim((string)($_POST['ff_google'] ?? '')) !== '') {
+            $out['fontFamily'] = $withStack(['mode' => 'google', 'google' => trim((string)$_POST['ff_google'])]);
         } elseif ($mode === 'folder' && trim((string)($_POST['ff_folder'] ?? '')) !== '') {
             // Only accept a filename that's actually present in the scanned folder.
             $file = basename(trim((string)$_POST['ff_folder']));
             foreach ($this->scanFontFolder($template) as $f) {
                 if ($f['file'] === $file) {
-                    $out['fontFamily'] = ['mode' => 'folder', 'folder' => $file];
+                    $out['fontFamily'] = $withStack(['mode' => 'folder', 'folder' => $file]);
+                    break;
+                }
+            }
+        } elseif ($mode === 'bundled' && trim((string)($_POST['ff_bundled'] ?? '')) !== '') {
+            // Only accept a filename registered in core/config/typography.php.
+            $file = basename(trim((string)$_POST['ff_bundled']));
+            foreach (($cfg['bundledFonts'] ?? []) as $bf) {
+                if (($bf['file'] ?? '') === $file) {
+                    $out['fontFamily'] = $withStack(['mode' => 'bundled', 'bundled' => $file]);
                     break;
                 }
             }

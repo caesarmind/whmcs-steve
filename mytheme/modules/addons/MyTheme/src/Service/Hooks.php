@@ -255,10 +255,18 @@ final class Hooks
         $links    = '';
         $fontFace = '';
 
-        // Font family
-        $ff   = is_array($stored['fontFamily'] ?? null) ? $stored['fontFamily'] : [];
-        $mode = (string)($ff['mode'] ?? 'default');
-        if ($mode === 'google' && !empty($ff['google'])) {
+        // Font family. The admin-editable "stack" string is the source of truth for
+        // what's EMITTED to --font-family (Apple-first is encoded as a leading
+        // -apple-system/BlinkMacSystemFont right in that string); the picked font
+        // (google/folder/bundled) still drives what's LOADED. With no stored override
+        // we derive a sensible stack from the pick.
+        $ff    = is_array($stored['fontFamily'] ?? null) ? $stored['fontFamily'] : [];
+        $mode  = (string)($ff['mode'] ?? 'default');
+        $stack = trim((string)preg_replace('/[^A-Za-z0-9 ,\'"\-]/', '', (string)($ff['stack'] ?? '')));
+        if ($mode === 'system') {
+            // Each visitor's OS font; no link, no @font-face, nothing downloads.
+            $decls['--font-family'] = $stack !== '' ? $stack : (string)($cfg['fontFamily']['system'] ?? $fallback);
+        } elseif ($mode === 'google' && !empty($ff['google'])) {
             $name = trim((string)preg_replace('/[^A-Za-z0-9 ]/', '', (string)$ff['google']));
             if ($name !== '') {
                 $href  = 'https://fonts.googleapis.com/css2?family=' . rawurlencode($name)
@@ -266,12 +274,7 @@ final class Hooks
                 $links = '<link rel="preconnect" href="https://fonts.googleapis.com">'
                        . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
                        . '<link rel="stylesheet" href="' . htmlspecialchars($href, ENT_QUOTES) . '">';
-                $decls['--font-family'] = "'{$name}', {$fallback}";
-            }
-        } elseif ($mode === 'custom' && !empty($ff['custom'])) {
-            $custom = trim((string)preg_replace('/[^A-Za-z0-9 ,\'"\-]/', '', (string)$ff['custom']));
-            if ($custom !== '') {
-                $decls['--font-family'] = $custom;
+                $decls['--font-family'] = $stack !== '' ? $stack : "'{$name}', {$fallback}";
             }
         } elseif ($mode === 'folder' && !empty($ff['folder'])) {
             // A font dropped into assets/fonts/custom (scanned by StylesController).
@@ -286,7 +289,31 @@ final class Hooks
                 $url      = $webRoot . '/templates/' . $template->getName() . '/assets/fonts/custom/' . $file;
                 $fontFace = '@font-face{font-family:"' . $famName . '";font-style:normal;font-weight:100 900;'
                           . 'font-display:swap;src:url("' . $url . '") format("' . $fmt . '");}';
-                $decls['--font-family'] = '"' . $famName . '", ' . $fallback;
+                $decls['--font-family'] = $stack !== '' ? $stack : '"' . $famName . '", ' . $fallback;
+            }
+        } elseif ($mode === 'bundled' && !empty($ff['bundled'])) {
+            // A theme-shipped self-hosted font (config: bundledFonts) — zero external
+            // request. Resolve the family + optional @font-face from the registry by
+            // filename. Bundled Inter + apple === the legacy "default" mix exactly.
+            $file = basename((string)$ff['bundled']);
+            foreach ((array)($cfg['bundledFonts'] ?? []) as $bf) {
+                if (($bf['file'] ?? '') !== $file) {
+                    continue;
+                }
+                $family = (string)($bf['family'] ?? pathinfo($file, PATHINFO_FILENAME));
+                if (!empty($bf['face'])
+                    && preg_match('/^[A-Za-z0-9._-]+\.(woff2|woff|ttf|otf)$/i', $file)
+                    && is_file($template->getFullPath() . '/assets/fonts/' . $file)) {
+                    $ext     = strtolower((string)pathinfo($file, PATHINFO_EXTENSION));
+                    $fmt     = ['woff2' => 'woff2', 'woff' => 'woff', 'ttf' => 'truetype', 'otf' => 'opentype'][$ext] ?? 'woff2';
+                    $webRoot = defined('WEB_ROOT') ? rtrim((string)WEB_ROOT, '/') : '';
+                    $url     = $webRoot . '/templates/' . $template->getName() . '/assets/fonts/' . $file;
+                    $wght    = (string)($bf['weight'] ?? '100 900');
+                    $fontFace = '@font-face{font-family:"' . $family . '";font-style:normal;font-weight:' . $wght . ';'
+                              . 'font-display:swap;src:url("' . $url . '") format("' . $fmt . '");}';
+                }
+                $decls['--font-family'] = $stack !== '' ? $stack : '"' . $family . '", ' . $fallback;
+                break;
             }
         }
 

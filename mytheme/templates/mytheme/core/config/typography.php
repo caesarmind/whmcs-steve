@@ -14,8 +14,21 @@ return [
     'fontFamily' => [
         'var'      => '--font-family',
         'default'  => "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif",
-        // Appended after a chosen Google font so glyph coverage degrades gracefully.
-        'fallback' => "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        // Appended after a chosen Google/bundled/uploaded font so glyph coverage
+        // degrades gracefully. Short + clean: `system-ui` (the visitor's OS font)
+        // then the generic family. No BlinkMacSystemFont.
+        'fallback' => "system-ui, sans-serif",
+        // "System fonts" mode: each visitor's OWN OS font, no webfont loaded
+        // (Segoe UI on Windows, San Francisco on Apple, system default on Linux).
+        // Uses the modern `system-ui` keyword (the OS UI font) rather than the
+        // legacy `-apple-system, BlinkMacSystemFont` incantation; `-apple-system`
+        // stays only as a Safari backstop. No BlinkMacSystemFont.
+        'system'   => "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+        // "Apple-first mix": prepended to a chosen font so San Francisco wins on
+        // Apple while the font loads only on the other platforms. This is exactly
+        // what 'default' does (SF on Apple, bundled Inter elsewhere), generalized
+        // to any Google/bundled/uploaded font via the per-source "apple" flag.
+        'applePrefix' => "-apple-system, BlinkMacSystemFont",
     ],
 
     // Font-size tokens (px), grouped for the admin form. var === the CSS custom property.
@@ -65,5 +78,14 @@ return [
     'googleFonts' => [
         'Inter', 'Roboto', 'Open Sans', 'Lato', 'Poppins', 'Montserrat',
         'Nunito Sans', 'Work Sans', 'Manrope', 'DM Sans', 'Source Sans 3', 'Plus Jakarta Sans',
+    ],
+
+    // Theme-shipped, self-hosted fonts (zero external request) the configurator
+    // can offer alongside buyer uploads. Combined with the "apple" flag this
+    // reproduces 'default' exactly: Bundled Inter + Apple-first === SF on Apple,
+    // bundled Inter elsewhere. 'face' = emit an @font-face at render; Inter's is
+    // already declared in apple-theme.css, so it stays false (no duplicate).
+    'bundledFonts' => [
+        ['file' => 'InterVariable.woff2', 'family' => 'Inter', 'label' => 'Inter (bundled)', 'weight' => '100 900', 'face' => false],
     ],
 ];

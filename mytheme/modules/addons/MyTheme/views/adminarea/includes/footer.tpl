@@ -323,6 +323,13 @@
 .mt-typo-radio em { font-style: normal; color: var(--mt-text-3); font-weight: 400; }
 .mt-typo-radio input:disabled ~ span { opacity: 0.5; }
 .mt-typo-dep { margin: 0 0 6px 24px; max-width: 420px; }
+.mt-typo-check { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 12px; max-width: 520px; line-height: 1.4; }
+.mt-typo-check input { margin-top: 2px; flex: none; }
+.mt-typo-check em { font-style: normal; color: var(--mt-text-3); font-weight: 400; }
+.mt-typo-check strong { font-weight: 600; color: var(--mt-text-2); }
+.mt-typo-check input:disabled ~ span { opacity: 0.5; }
+.mt-typo-sublabel { font-size: 11px; font-weight: 600; color: var(--mt-text-3); text-transform: uppercase; letter-spacing: 0.04em; margin: 10px 0 5px; }
+.mt-typo-check-inline { margin: 8px 0 2px; font-weight: 400; }
 .mt-typo-group-label { font-size: 11px; font-weight: 600; color: var(--mt-text-3); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 10px; }
 .mt-typo-group-label:first-of-type { margin-top: 0; }
 .mt-typo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px 14px; }
@@ -408,15 +415,44 @@
 (function(){
     var form = document.querySelector('.mt-typography');
     if (!form) return;
-    var gsel = form.querySelector('select[name="ff_google"]');
-    var ccustom = form.querySelector('input[name="ff_custom"]');
-    var fsel = form.querySelector('select[name="ff_folder"]');
+    var fonts = form.querySelector('.mt-typo-fonts');
+    var FALLBACK = (fonts && fonts.getAttribute('data-ff-fallback')) || 'system-ui, sans-serif';
+    var APPLE    = (fonts && fonts.getAttribute('data-ff-apple')) || '-apple-system, BlinkMacSystemFont';
+    function q(n){ return form.querySelector('[name="' + n + '"]'); }
+    var gsel = q('ff_google'),  gstk = q('ff_google_stack');
+    var fsel = q('ff_folder'),  fstk = q('ff_folder_stack'),  fapp = q('ff_folder_apple');
+    var bsel = q('ff_bundled'), bstk = q('ff_bundled_stack'), bapp = q('ff_bundled_apple');
+
     function mode() { var c = form.querySelector('input[name="ff_mode"]:checked'); return c ? c.value : 'default'; }
-    function sync() { var m = mode(); if (gsel) gsel.disabled = m !== 'google'; if (ccustom) ccustom.disabled = m !== 'custom'; if (fsel) fsel.disabled = m !== 'folder'; }
+    function sync() {
+        var m = mode();
+        if (gsel) gsel.disabled = m !== 'google';
+        if (fsel) fsel.disabled = m !== 'folder';
+        if (bsel) bsel.disabled = m !== 'bundled';
+        if (fapp) fapp.disabled = m !== 'folder';
+        if (bapp) bapp.disabled = m !== 'bundled';
+    }
+    function selectMode(m) { var r = form.querySelector('input[name="ff_mode"][value="' + m + '"]'); if (r) { r.checked = true; sync(); } }
+    /* family token: Google = the option value; self-hosted = data-family or the filename minus extension. */
+    function famOf(sel, quote) {
+        if (!sel || !sel.value) return '';
+        var opt = sel.options[sel.selectedIndex];
+        var name = (opt && opt.getAttribute('data-family')) || sel.value.replace(/\.(woff2?|ttf|otf)$/i, '');
+        return quote + name + quote;
+    }
+    /* Rebuild a "how it's written" field from its picked font + Apple-first flag. */
+    function build(stk, sel, apple, quote) {
+        if (!stk || !sel) return;
+        var fam = famOf(sel, quote);
+        if (!fam) return;
+        stk.value = (apple ? APPLE + ', ' : '') + fam + ', ' + FALLBACK;
+    }
+    if (gsel) gsel.addEventListener('change', function(){ build(gstk, gsel, false, "'"); selectMode('google'); });
+    if (fsel) fsel.addEventListener('change', function(){ build(fstk, fsel, fapp && fapp.checked, '"'); selectMode('folder'); });
+    if (fapp) fapp.addEventListener('change', function(){ build(fstk, fsel, fapp.checked, '"'); });
+    if (bsel) bsel.addEventListener('change', function(){ build(bstk, bsel, bapp && bapp.checked, '"'); selectMode('bundled'); });
+    if (bapp) bapp.addEventListener('change', function(){ build(bstk, bsel, bapp.checked, '"'); });
     [].slice.call(form.querySelectorAll('input[name="ff_mode"]')).forEach(function(r){ r.addEventListener('change', sync); });
-    if (gsel) gsel.addEventListener('focus', function(){ var g = form.querySelector('input[name="ff_mode"][value="google"]'); if (g) { g.checked = true; sync(); } });
-    if (ccustom) ccustom.addEventListener('focus', function(){ var c = form.querySelector('input[name="ff_mode"][value="custom"]'); if (c) { c.checked = true; sync(); } });
-    if (fsel) fsel.addEventListener('focus', function(){ var f = form.querySelector('input[name="ff_mode"][value="folder"]'); if (f) { f.checked = true; sync(); } });
     sync();
 })();
 
