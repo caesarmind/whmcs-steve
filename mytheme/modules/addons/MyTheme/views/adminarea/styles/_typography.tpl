@@ -60,18 +60,12 @@
             </div>
             {/if}
 
-            {if $typography.folderFonts}
             <label class="mt-typo-radio">
                 <input type="radio" name="ff_mode" value="folder"{if $typography.fontFamily.mode == 'folder'} checked{/if}>
-                <span>Self-hosted font <em>(dropped into /assets/fonts/custom)</em></span>
+                <span>Self-hosted font <em>(type the face name; drop the matching file into /assets/fonts/custom)</em></span>
             </label>
             <div class="mt-typo-dep">
-                <select name="ff_folder" class="mt-select">
-                    <option value="">&mdash; select a font &mdash;</option>
-                    {foreach $typography.folderFonts as $ffont}
-                        <option value="{$ffont.file|escape}"{if $ffont.file == $typography.fontFamily.folder} selected{/if}>{$ffont.name|escape}</option>
-                    {/foreach}
-                </select>
+                <input type="text" name="ff_folder" class="mt-input" value="{$typography.fontFamily.folder|escape}" placeholder="Font face name, e.g. BrandSans">
                 <label class="mt-typo-check mt-typo-check-inline">
                     <input type="checkbox" name="ff_folder_apple" value="1"{if $typography.fontFamily.folderApple} checked{/if}>
                     <span>Keep the device's system font on Apple <em>(San Francisco on Apple, this font on the rest)</em></span>
@@ -79,7 +73,6 @@
                 <div class="mt-typo-sublabel">How it's written into the system</div>
                 <input type="text" name="ff_folder_stack" class="mt-input" value="{$typography.stacks.folder|escape}" placeholder='"BrandSans", system-ui, sans-serif'>
             </div>
-            {/if}
         </div>
     </section>
 

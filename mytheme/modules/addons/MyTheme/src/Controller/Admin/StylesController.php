@@ -298,13 +298,11 @@ final class StylesController extends AbstractController
         } elseif ($mode === 'google' && trim((string)($_POST['ff_google'] ?? '')) !== '') {
             $out['fontFamily'] = $withStack(['mode' => 'google', 'google' => trim((string)$_POST['ff_google'])]);
         } elseif ($mode === 'folder' && trim((string)($_POST['ff_folder'] ?? '')) !== '') {
-            // Only accept a filename that's actually present in the scanned folder.
-            $file = basename(trim((string)$_POST['ff_folder']));
-            foreach ($this->scanFontFolder($template) as $f) {
-                if ($f['file'] === $file) {
-                    $out['fontFamily'] = $withStack(['mode' => 'folder', 'folder' => $file]);
-                    break;
-                }
+            // Self-hosted: the admin types the font-face NAME; Hooks @font-faces a
+            // matching file in assets/fonts/custom. Allow letters/digits/space/_/-.
+            $name = trim((string)preg_replace('/[^A-Za-z0-9 _-]/', '', (string)$_POST['ff_folder']));
+            if ($name !== '') {
+                $out['fontFamily'] = $withStack(['mode' => 'folder', 'folder' => $name]);
             }
         } elseif ($mode === 'bundled' && trim((string)($_POST['ff_bundled'] ?? '')) !== '') {
             // Only accept a filename registered in core/config/typography.php.

@@ -277,19 +277,22 @@ final class Hooks
                 $decls['--font-family'] = $stack !== '' ? $stack : "'{$name}', {$fallback}";
             }
         } elseif ($mode === 'folder' && !empty($ff['folder'])) {
-            // A font dropped into assets/fonts/custom (scanned by StylesController).
-            // Sanitize hard: basename + extension allowlist + must exist on disk.
-            $file = basename((string)$ff['folder']);
-            if (preg_match('/^[A-Za-z0-9._-]+\.(woff2|woff|ttf|otf)$/i', $file)
-                && is_file($template->getFullPath() . '/assets/fonts/custom/' . $file)) {
-                $famName  = pathinfo($file, PATHINFO_FILENAME);
-                $ext      = strtolower((string)pathinfo($file, PATHINFO_EXTENSION));
-                $fmt      = ['woff2' => 'woff2', 'woff' => 'woff', 'ttf' => 'truetype', 'otf' => 'opentype'][$ext] ?? 'woff2';
-                $webRoot  = defined('WEB_ROOT') ? rtrim((string)WEB_ROOT, '/') : '';
-                $url      = $webRoot . '/templates/' . $template->getName() . '/assets/fonts/custom/' . $file;
-                $fontFace = '@font-face{font-family:"' . $famName . '";font-style:normal;font-weight:100 900;'
-                          . 'font-display:swap;src:url("' . $url . '") format("' . $fmt . '");}';
-                $decls['--font-family'] = $stack !== '' ? $stack : '"' . $famName . '", ' . $fallback;
+            // Self-hosted: the stored value is the typed font-face NAME. Look for a
+            // matching file (name.woff2/woff/ttf/otf) in assets/fonts/custom to
+            // @font-face it; the family + emitted stack use the typed name.
+            $name = trim((string)preg_replace('/[^A-Za-z0-9 _-]/', '', (string)$ff['folder']));
+            if ($name !== '') {
+                $dir = $template->getFullPath() . '/assets/fonts/custom';
+                foreach (['woff2' => 'woff2', 'woff' => 'woff', 'ttf' => 'truetype', 'otf' => 'opentype'] as $ext => $fmt) {
+                    if (is_file($dir . '/' . $name . '.' . $ext)) {
+                        $webRoot  = defined('WEB_ROOT') ? rtrim((string)WEB_ROOT, '/') : '';
+                        $url      = $webRoot . '/templates/' . $template->getName() . '/assets/fonts/custom/' . $name . '.' . $ext;
+                        $fontFace = '@font-face{font-family:"' . $name . '";font-style:normal;font-weight:100 900;'
+                                  . 'font-display:swap;src:url("' . $url . '") format("' . $fmt . '");}';
+                        break;
+                    }
+                }
+                $decls['--font-family'] = $stack !== '' ? $stack : '"' . $name . '", ' . $fallback;
             }
         } elseif ($mode === 'bundled' && !empty($ff['bundled'])) {
             // A theme-shipped self-hosted font (config: bundledFonts) — zero external
