@@ -50,6 +50,15 @@ final class PagesController extends AbstractController
         $allGroups = [];
         foreach ($template->getPages() as $page) {
             $meta    = $template->getPageMeta($page);
+            // Honor the page.php `listDisplay` flag (Lagom parity). Pages that opt
+            // out (e.g. the include-only password-reset step dispatchers, which all
+            // forward to the shared pwreset implementation) are hidden from the grid
+            // so it isn't cluttered with near-duplicate, non-configurable rows. They
+            // still render normally and stay reachable via a direct ?sub=edit&page=
+            // URL — this only affects listing.
+            if (($meta['listDisplay'] ?? true) === false) {
+                continue;
+            }
             $group   = (string)($meta['group'] ?? 'Other');
             $allGroups[$group] = true;
 

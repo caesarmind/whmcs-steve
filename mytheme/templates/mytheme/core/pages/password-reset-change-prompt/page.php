@@ -11,7 +11,10 @@ return [
     'display_name'   => 'Password reset — Step 3: new password',
     'group'          => 'Authentication',
     'type'           => 'public',
-    'listDisplay'    => true,
+    // Hidden from the admin Pages grid — include-only step dispatcher that forwards
+    // to the shared pwreset implementation. The single "Password Reset" (pwreset)
+    // row represents the whole flow. Still renders + editable via direct edit URL.
+    'listDisplay'    => false,
     'description'    => 'Step 3 of the password reset flow — visitor picks a new password.',
     'defaultVariant' => 'default',
     'seoDefaults'    => [
