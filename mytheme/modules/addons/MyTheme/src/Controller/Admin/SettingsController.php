@@ -24,6 +24,7 @@ final class SettingsController extends AbstractController
         'sticky_sidebars'        => ['Sticky Sidebars',          'Keep sidebars visible while scrolling.',                                  true,  'bool'],
         'gravatar'               => ['Gravatar',                 'Show Gravatar avatars next to user details.',                            true,  'bool'],
         'affixed_navigation'     => ['Affixed Navigation',       'Pin the navbar on scroll.',                                              false, 'bool'],
+        'hide_breadcrumb'        => ['Hide Breadcrumb',          'Hide the breadcrumb above the page title on every layout (the "Portal Home" back-link on top nav, and the "Home / Page" trail on the sidebar and icon-rail layouts).', false, 'bool'],
         'cookie_box'             => ['Cookie Box',               'Show a cookie consent banner on first visit.',                          false, 'bool'],
         'free_label'             => ['"0.00" → "Free"',          'Display free items as "Free" instead of "$0.00".',                       true,  'bool'],
         'show_status_icon'       => ['Show Status Icon',         'Use status icons in product/service lists.',                            false, 'bool'],

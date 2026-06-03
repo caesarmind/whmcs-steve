@@ -482,6 +482,16 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .ph-breadcrumb-inner a.ph-back-link svg { width: 15px; height: 15px; margin-left: -3px; }
 .ph-breadcrumb-inner a.ph-back-link:hover { color: var(--color-accent); text-decoration: none; opacity: 0.7; }
 
+/* -- Hide Breadcrumb (admin "Hide Breadcrumb" toggle) ------- */
+/* One rule covers every main-menu layout: the top-layout "Portal Home"
+   back-link AND the sidebar/rail topbar "Home / Page" trail. Driven by
+   body[data-hide-breadcrumb] (emitted from $myTheme.addonSettings.hide_breadcrumb). */
+body[data-hide-breadcrumb="1"] .ph-breadcrumb,
+body[data-hide-breadcrumb="1"] .ph-side-crumbs { display: none; }
+/* The side/rail topbar row is justify-content:space-between; with the trail
+   gone, keep the actions group pinned right instead of sliding to the left. */
+body[data-hide-breadcrumb="1"] .ph-side-topbar-actions { margin-left: auto; }
+
 /* =============================================================
    RAIL LAYOUT -- icon rail (80px) + flyout panel (240px)
    ============================================================= */
