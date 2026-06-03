@@ -31,8 +31,8 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.clientareaservices}</p>
-    <h1>{$LANG.upgradeconfigure}</h1>
+    <p class="page-eyebrow">{$LANG.clientareaservices|default:'Services'}</p>
+    <h1>{$LANG.upgradeconfigure|default:'Configure upgrade'}</h1>
     <p class="page-subtitle">{$hadrianLang.services.upgradeConfigureIntro}</p>
 </header>
 
@@ -105,7 +105,7 @@
             </div>
             <p class="up-empty-title">{$hadrianLang.services.upgradePickFirstTitle}</p>
             <p class="up-empty-sub">{$hadrianLang.services.upgradePickFirstSub}</p>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'View my services'}</a>
         </div>
     </div>
 </div>

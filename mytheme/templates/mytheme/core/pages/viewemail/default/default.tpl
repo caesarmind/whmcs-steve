@@ -40,7 +40,7 @@
             </div>
             {/if}
         {else}
-            <div class="vem-empty">{$LANG.clientareaemailsnone}</div>
+            <div class="vem-empty">{$LANG.clientareaemailsnone|default:'Messages we send to your account email will be listed here.'}</div>
         {/if}
     </div>
 </body>

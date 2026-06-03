@@ -39,7 +39,7 @@
         <div class="mt-ls-news">
             <div class="mt-ls-news-head">
                 <h3>{$hadrianLang.auth.latestAnnouncements}</h3>
-                <a href="{$WEB_ROOT}/announcements.php">{$LANG.viewall}
+                <a href="{$WEB_ROOT}/announcements.php">{$LANG.viewall|default:'View All'}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
             </div>

@@ -20,7 +20,7 @@
 
     <div class="sidebar-search">
         <form action="{$WEB_ROOT}/knowledgebase.php" method="get">
-            <input type="text" name="search" class="sidebar-search-input" placeholder="{$LANG.searchbutton}">
+            <input type="text" name="search" class="sidebar-search-input" placeholder="{$LANG.searchbutton|default:'Search'}">
         </form>
     </div>
 
@@ -29,10 +29,10 @@
             <div class="sidebar-item-icon blue">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             </div>
-            {$LANG.clientareanavhome}
+            {$LANG.clientareanavhome|default:'Go to dashboard'}
         </a>
 
-        <div class="sidebar-section-label">{$LANG.servicestab}</div>
+        <div class="sidebar-section-label">{$LANG.servicestab|default:'Services'}</div>
 
         <a href="{$WEB_ROOT}/clientarea.php?action=services" class="sidebar-item {if $templatefile|strstr:'clientareaproducts'}active{/if}">
             <div class="sidebar-item-icon purple">
@@ -50,7 +50,7 @@
             {if $clientsstats.numactivedomains > 0}<span class="sidebar-item-badge">{$clientsstats.numactivedomains}</span>{/if}
         </a>
 
-        <div class="sidebar-section-label">{$LANG.invoicestab}</div>
+        <div class="sidebar-section-label">{$LANG.invoicestab|default:'Billing'}</div>
 
         <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="sidebar-item {if $templatefile == 'clientareainvoices'}active{/if}">
             <div class="sidebar-item-icon orange">
@@ -67,7 +67,7 @@
             {$LANG.paymentMethods.title}
         </a>
 
-        <div class="sidebar-section-label">{$LANG.supporttickets}</div>
+        <div class="sidebar-section-label">{$LANG.supporttickets|default:'Support'}</div>
 
         <a href="{$WEB_ROOT}/supporttickets.php" class="sidebar-item {if $templatefile|strstr:'supportticket'}active{/if}">
             <div class="sidebar-item-icon red">
@@ -91,20 +91,20 @@
             {$LANG.announcementstitle}
         </a>
 
-        <div class="sidebar-section-label">{$LANG.accounttab}</div>
+        <div class="sidebar-section-label">{$LANG.accounttab|default:'Account'}</div>
 
         <a href="{$WEB_ROOT}/clientarea.php?action=details" class="sidebar-item {if $templatefile == 'clientareadetails'}active{/if}">
             <div class="sidebar-item-icon gray">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
-            {$LANG.navchangedetails}
+            {$LANG.navchangedetails|default:'My Details'}
         </a>
 
         <a href="{$WEB_ROOT}/clientarea.php?action=security" class="sidebar-item {if $templatefile == 'clientareasecurity'}active{/if}">
             <div class="sidebar-item-icon gray">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </div>
-            {$LANG.navsecurity}
+            {$LANG.navsecurity|default:'Security Settings'}
         </a>
     </nav>
 
@@ -142,7 +142,7 @@
 
             {if $loggedin}
                 <div class="profile-dropdown-wrapper">
-                    <div class="topbar-avatar" onclick="toggleProfileDropdown(event)" title="{$LANG.accounttab}">{$user_initials|default:'U'}</div>
+                    <div class="topbar-avatar" onclick="toggleProfileDropdown(event)" title="{$LANG.accounttab|default:'Account'}">{$user_initials|default:'U'}</div>
                     <div class="profile-dropdown" id="profileDropdown">
                         <div class="profile-dropdown-header">
                             <div class="profile-dropdown-name">{$user_fullname|escape}</div>
@@ -150,15 +150,15 @@
                         </div>
                         <a href="{$WEB_ROOT}/clientarea.php?action=details" class="profile-dropdown-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            {$LANG.navchangedetails}
+                            {$LANG.navchangedetails|default:'My Details'}
                         </a>
                         <a href="{$WEB_ROOT}/clientarea.php?action=security" class="profile-dropdown-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                            {$LANG.navsecurity}
+                            {$LANG.navsecurity|default:'Security Settings'}
                         </a>
                         <a href="{$WEB_ROOT}/clientarea.php?action=emails" class="profile-dropdown-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                            {$LANG.navemailshistory}
+                            {$LANG.navemailshistory|default:'Email History'}
                         </a>
                         {if $mtShowDarkToggle}
                         <div class="profile-dropdown-divider"></div>
@@ -173,7 +173,7 @@
                         <div class="profile-dropdown-divider"></div>
                         <a href="{$WEB_ROOT}/logout.php" class="profile-dropdown-item danger">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                            {$LANG.logout}
+                            {$LANG.logout|default:'Sign Out'}
                         </a>
                     </div>
                 </div>

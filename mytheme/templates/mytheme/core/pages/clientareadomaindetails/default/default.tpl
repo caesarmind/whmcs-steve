@@ -27,7 +27,7 @@
 <header class="page-header">
     <div class="page-header-row">
         <div style="flex:1; min-width:0;">
-            <p class="page-eyebrow">{$LANG.domain}</p>
+            <p class="page-eyebrow">{$LANG.domain|default:'Domain'}</p>
             <h1>{$domain|default:'Domain'|escape}</h1>
             {if !empty($registrationdate)}<p class="page-subtitle">{$LANG.clientareahostingregdate} · {$registrationdate|escape}</p>{/if}
         </div>
@@ -279,7 +279,7 @@
                 <div class="dd-status-row">
                     <span class="dd-info-label">{$LANG.domainreglockstatus}</span>
                     <span class="dd-status-tag {if $lockstatus == 'locked'}dd-tag-on{else}dd-tag-off{/if}">
-                        {if $lockstatus == 'locked'}{$LANG.locked}{else}{$LANG.unlocked}{/if}
+                        {if $lockstatus == 'locked'}{$LANG.locked|default:'Locked'}{else}{$LANG.unlocked|default:'Unlocked'}{/if}
                     </span>
                 </div>
 
@@ -388,7 +388,7 @@
 
     <aside class="dd-aside">
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.domain}</div>
+            <div class="subnav-heading">{$LANG.domain|default:'Domain'}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=domains" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 {$hadrianLang.domains.allDomains}
@@ -408,7 +408,7 @@
             {if isset($managementoptions.registerns) && $managementoptions.registerns}
             <a href="{$WEB_ROOT}/clientarea.php?action=registerns&id={$domainid|escape}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-                {$LANG.privatenameservers}
+                {$LANG.privatenameservers|default:'Glue records'}
             </a>
             {/if}
             {if isset($managementoptions.epp) && $managementoptions.epp}

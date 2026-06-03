@@ -67,7 +67,7 @@
 <header class="page-header">
     <div class="page-header-row">
         <div style="flex: 1; min-width: 0;">
-            <h1>{$LANG.productsservices}</h1>
+            <h1>{$LANG.productsservices|default:'Products & Services'}</h1>
             <p class="page-subtitle">{$hadrianLang.services.productsServicesSub}</p>
         </div>
         <a href="{$WEB_ROOT}/cart.php" class="page-header-action">
@@ -89,7 +89,7 @@
             </span>
             <span><strong>{$count_all}</strong> {if $count_all == 1}{$hadrianLang.services.serviceLower}{else}{$hadrianLang.services.servicesLower}{/if} {$hadrianLang.services.onThisAccount}.</span>
             <span class="spacer"></span>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-secondary">{$LANG.viewall}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-secondary">{$LANG.viewall|default:'View All'}</a>
         </div>
 
         {* Filter tabs (pill-group, outside the card) *}
@@ -172,7 +172,7 @@
                                         <div class="svc-menu" role="menu">
                                             <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$product.id}" class="svc-menu-item" role="menuitem">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-                                                {$LANG.manageproduct}
+                                                {$LANG.manageproduct|default:'Manage Product'}
                                             </a>
                                             {* Gate Upgrade like productdetails: WHMCS sets $product.packagesupgrade
                                                per row on native service data (true only when this service has
@@ -187,11 +187,11 @@
                                             {/if}
                                             <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$product.id}&modop=custom&a=Addons" class="svc-menu-item" role="menuitem">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                                {$LANG.viewavailableaddons}
+                                                {$LANG.viewavailableaddons|default:'View Available Addons'}
                                             </a>
                                             <a href="{$WEB_ROOT}/clientarea.php?action=cancel&id={$product.id}" class="svc-menu-item" role="menuitem">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-                                                {$LANG.cancellationrequest}
+                                                {$LANG.cancellationrequest|default:'Request Cancellation'}
                                             </a>
                                         </div>
                                     </div>
@@ -207,16 +207,16 @@
             {* Pagination footer — floats outside in "outside" mode, part of the card in "inside" *}
             <div class="svc-footer">
                 <div class="svc-page-size">
-                    {$LANG.show}
+                    {$LANG.show|default:'Show'}
                     <select aria-label="{$hadrianLang.services.rowsPerPage}" data-dt-length data-mt-for="svcTable">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>
                     </select>
-                    {$LANG.entries}
+                    {$LANG.entries|default:'entries'}
                 </div>
                 <div class="spacer"></div>
-                <span data-dt-info data-mt-for="svcTable">{$LANG.showing} 1&ndash;{$count_all} {$LANG.of} {$count_all}</span>
+                <span data-dt-info data-mt-for="svcTable">{$LANG.showing|default:'Showing'} 1&ndash;{$count_all} {$LANG.of|default:'of'} {$count_all}</span>
                 <div class="svc-pages" data-dt-pager data-mt-for="svcTable">
                     <button type="button" disabled aria-label="{$hadrianLang.common.previousPage}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
                     <button type="button" class="active">1</button>
@@ -248,19 +248,19 @@
     {* ══ RIGHT: Services sub-nav ══ *}
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.services}</div>
+            <div class="subnav-heading">{$LANG.services|default:'Services'}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=services" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
-                {$LANG.myservices}
+                {$LANG.myservices|default:'My Services'}
                 <span class="subnav-count">{$count_all}</span>
             </a>
             <a href="{$WEB_ROOT}/cart.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-                {$LANG.ordernewservices}
+                {$LANG.ordernewservices|default:'Order New Services'}
             </a>
             <a href="{$WEB_ROOT}/cart.php?gid=addons" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                {$LANG.viewavailableaddons}
+                {$LANG.viewavailableaddons|default:'View Available Addons'}
             </a>
             <a href="{$WEB_ROOT}/upgrade.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>

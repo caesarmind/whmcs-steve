@@ -75,9 +75,9 @@
                     <form method="post" action="{if $pmHas}{routePath('account-paymentmethods-view', $payMethod->id)}{else}{routePath('account-paymentmethods-add')}{/if}">
                         <input type="hidden" name="token" value="{$token|default:''|escape}">
 
-                        <h3 class="pm-section-title">{$LANG.creditcardenterdetails}</h3>
+                        <h3 class="pm-section-title">{$LANG.creditcardenterdetails|default:'Card'}</h3>
                         <div class="form-group">
-                            <label class="form-label" for="pm-cardname">{$LANG.creditcardcardholdername}</label>
+                            <label class="form-label" for="pm-cardname">{$LANG.creditcardcardholdername|default:'Cardholder name'}</label>
                             <input type="text" class="form-input" id="pm-cardname" name="ccname" autocomplete="cc-name" value="{$ccinfo.cardnum|default:''|escape}">
                         </div>
                         <div class="form-group">
@@ -167,10 +167,10 @@
 
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.accounttab}</div>
+            <div class="subnav-heading">{$LANG.accounttab|default:'Account'}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.accountdetails}
+                {$LANG.accountdetails|default:'Account Details'}
             </a>
             <a href="{routePath('account-paymentmethods')}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
@@ -182,7 +182,7 @@
             </a>
             <a href="{routePath('account-contacts')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.contacts}
+                {$LANG.contacts|default:'Contacts'}
             </a>
         </div>
     </aside>

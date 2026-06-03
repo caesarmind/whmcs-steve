@@ -19,7 +19,7 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.supporttab}</p>
+    <p class="page-eyebrow">{$LANG.supporttab|default:'Support'}</p>
     <h1>{$LANG.supportticketsticketcreated}</h1>
 </header>
 

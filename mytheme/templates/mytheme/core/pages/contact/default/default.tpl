@@ -44,7 +44,7 @@
                 </div>
                 {if isset($departments) && $departments|@count > 0}
                 <div class="form-group">
-                    <label class="form-label" for="ct-dept">{$LANG.contactdepartment}</label>
+                    <label class="form-label" for="ct-dept">{$LANG.contactdepartment|default:'Department'}</label>
                     <select class="form-select" id="ct-dept" name="department">
                         {foreach $departments as $dept}
                         <option value="{$dept.id|escape}">{$dept.name|escape}</option>

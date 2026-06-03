@@ -38,7 +38,7 @@
         <h2>{$hadrianLang.support.downloadDeniedHeading}</h2>
         <p>{if isset($errormessage) && $errormessage}{$errormessage|strip_tags}{else}{$hadrianLang.support.downloadDeniedBody}{/if}</p>
         <div class="denied-actions">
-            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'View my services'}</a>
             <a href="{$WEB_ROOT}/supporttickets.php" class="btn-secondary">{$LANG.contactus}</a>
         </div>
     </div>

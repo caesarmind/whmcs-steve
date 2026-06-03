@@ -73,7 +73,7 @@
 </script>
 
 <header class="page-header">
-    <h1>{$LANG.affiliatestitle}</h1>
+    <h1>{$LANG.affiliatestitle|default:'Affiliates'}</h1>
     <p class="page-subtitle">{$hadrianLang.account.affiliatesSub}</p>
 </header>
 
@@ -128,7 +128,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
             </div>
             <div class="tile-value">{$affBalance}</div>
-            <div class="tile-label">{$LANG.affiliatesbalance}</div>
+            <div class="tile-label">{$LANG.affiliatesbalance|default:'Available balance'}</div>
         </div>
     </div>
 
@@ -136,7 +136,7 @@
     <div class="card aff-card">
         <div class="aff-card-head">
             <h2 class="aff-card-title">{$LANG.affiliatesreferallink}</h2>
-            <p class="aff-card-desc">{$LANG.affiliateslinktousexplanation}</p>
+            <p class="aff-card-desc">{$LANG.affiliateslinktousexplanation|default:'Share this link anywhere. When someone signs up through it, the referral is credited to you.'}</p>
         </div>
         <div class="aff-link-row">
             <input type="text" id="affRefLink" class="aff-link-input" readonly value="{$affLink|escape}" onclick="this.select();">
@@ -150,7 +150,7 @@
     {* ---- Commissions / payout ---- *}
     <div class="card aff-card">
         <div class="aff-card-head">
-            <h2 class="aff-card-title">{$LANG.affiliatescommissions}</h2>
+            <h2 class="aff-card-title">{$LANG.affiliatescommissions|default:'Commissions'}</h2>
         </div>
         <div class="aff-payout">
             <div class="aff-figures">
@@ -236,7 +236,7 @@
     <div class="card aff-card">
         <div class="aff-card-head">
             <h2 class="aff-card-title">{$LANG.affiliateslinktous}</h2>
-            <p class="aff-card-desc">{$LANG.affiliateslinktoussub}</p>
+            <p class="aff-card-desc">{$LANG.affiliateslinktoussub|default:'Paste one of these snippets on your site to link back with your referral code embedded.'}</p>
         </div>
         <div class="aff-banner-code">{$affiliatelinkscode}</div>
     </div>

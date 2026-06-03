@@ -19,7 +19,7 @@
 </script>
 
 <header class="page-header">
-    <h1>{$LANG.affiliatestitle}</h1>
+    <h1>{$LANG.affiliatestitle|default:'Affiliates'}</h1>
     <p class="page-subtitle">{$hadrianLang.account.affiliatesSub}</p>
 </header>
 

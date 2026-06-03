@@ -74,7 +74,7 @@
 
     <aside class="ef-aside">
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.domain}</div>
+            <div class="subnav-heading">{$LANG.domain|default:'Domain'}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 {$hadrianLang.domains.domainDetails}

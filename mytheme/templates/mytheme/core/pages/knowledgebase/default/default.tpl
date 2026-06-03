@@ -33,10 +33,10 @@
     {* ══ LEFT: Support sub-nav + popular ══ *}
     <aside class="kb-aside">
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.supporttab}</div>
+            <div class="subnav-heading">{$LANG.supporttab|default:'Support'}</div>
             <a href="{$WEB_ROOT}/supporttickets.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                {$LANG.mytickets}
+                {$LANG.mytickets|default:'My support tickets'}
             </a>
             <a href="{$WEB_ROOT}/announcements.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>

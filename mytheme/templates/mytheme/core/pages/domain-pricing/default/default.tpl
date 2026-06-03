@@ -45,7 +45,7 @@
 
 <header class="page-header">
     <p class="page-eyebrow">{$LANG.navdomains}</p>
-    <h1>{$LANG.domainpricing}</h1>
+    <h1>{$LANG.domainpricing|default:'Domain Pricing'}</h1>
     <p class="page-subtitle">{$hadrianLang.domains.pricingIntro}</p>
 </header>
 

@@ -41,7 +41,7 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.domainssloptions}</p>
+    <p class="page-eyebrow">{$LANG.domainssloptions|default:'SSL Certificates'}</p>
     <h1>{$hadrianLang.ssl.verifyTitle}</h1>
     <p class="page-subtitle">{$hadrianLang.ssl.validationIntro}</p>
 </header>

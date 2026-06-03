@@ -57,7 +57,7 @@
        that path triggers "An invalid request was made". *}
     <a href="{$WEB_ROOT}/viewticket.php?tid={$tid|escape}{if isset($c) && $c}&c={$c|escape}{/if}&closeticket=true"
        class="tk-close-btn"
-       onclick="return confirm('{$LANG.confirmcloseticket}');">
+       onclick="return confirm('{$LANG.confirmcloseticket|default:'Close this ticket?'}');">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
         {$LANG.supportticketsclose}
     </a>
@@ -109,7 +109,7 @@
                                     <a href="{$WEB_ROOT}/dl.php?type={if $reply.id}ar&id={$reply.id|escape}{else}a&id={$id|escape}{/if}&i={$anum}" class="thread-att">
                                         <div class="thread-att-ico">{$attachment|default:''|substr:-3|upper|escape}</div>
                                         <div class="thread-att-meta"><div class="thread-att-name">{$attachment|escape}</div></div>
-                                        <div class="thread-att-dl" aria-label="{$LANG.download}">
+                                        <div class="thread-att-dl" aria-label="{$LANG.download|default:'Download'}">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                                         </div>
                                     </a>
@@ -298,7 +298,7 @@
                 <div class="tk-info-row">
                     <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
                     <div class="tk-info-body">
-                        <div class="tk-info-label">{$LANG.supportticketssubmitted}</div>
+                        <div class="tk-info-label">{$LANG.supportticketssubmitted|default:'Submitted'}</div>
                         <div class="tk-info-value">{$date|escape}</div>
                     </div>
                 </div>

@@ -68,7 +68,7 @@
         </div>
         <p class="cr-notice-title">{$hadrianLang.billing.cancelInvalidTitle}</p>
         <p class="cr-notice-sub">{$LANG.clientareacancelinvalid}</p>
-        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
+        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'View my services'}</a>
     </div>
 </div>
 

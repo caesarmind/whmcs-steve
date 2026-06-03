@@ -41,7 +41,7 @@
 
 <header class="page-header">
     <p class="page-eyebrow">{$LANG.navdomains}</p>
-    <h1>{$LANG.domainbulkmanagement}</h1>
+    <h1>{$LANG.domainbulkmanagement|default:'Bulk domain management'}</h1>
     <p class="page-subtitle">{$hadrianLang.domains.bulkIntro}</p>
 </header>
 

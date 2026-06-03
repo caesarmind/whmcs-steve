@@ -10,7 +10,7 @@
 
 <div class="ip-wrap">
     <div class="card ip-card">
-        <h1 class="ip-title">{$LANG.invoicepay}</h1>
+        <h1 class="ip-title">{$LANG.invoicepay|default:'Pay Invoice'}</h1>
         <p class="ip-sub">{$LANG.invoicestitle} #{$invoicenum|default:$invoiceid|escape}</p>
 
         {if isset($errormessage) && $errormessage}
@@ -42,7 +42,7 @@
             </div>
             {/if}
 
-            <button type="submit" class="btn-primary ip-submit">{$LANG.paynow}</button>
+            <button type="submit" class="btn-primary ip-submit">{$LANG.paynow|default:'Pay now'}</button>
             <a href="{$WEB_ROOT}/viewinvoice.php?id={$invoiceid|default:0|escape}" class="btn-secondary ip-cancel">{$LANG.cancel}</a>
         </form>
     </div>

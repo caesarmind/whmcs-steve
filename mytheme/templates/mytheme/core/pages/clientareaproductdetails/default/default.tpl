@@ -157,12 +157,12 @@
         <div class="subnav-heading">{$LANG.overview}</div>
         <a class="subnav-item active" href="{$pdSelfUrl}#pd-service-info">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            {$LANG.information}
+            {$LANG.information|default:'Information'}
         </a>
         {if $lastupdate}
         <a class="subnav-item" href="{$pdSelfUrl}#pd-usage">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12A10 10 0 1112 2"/><path d="M12 12l5-3"/><path d="M12 2a10 10 0 0110 10"/></svg>
-            {$LANG.usagestats}
+            {$LANG.usagestats|default:'Resource Usage'}
         </a>
         {/if}
         {if $pdHasAddons}
@@ -206,7 +206,7 @@
         {if $pdCanCancel}
         <a class="subnav-item subnav-item-danger" href="{$WEB_ROOT}/clientarea.php?action=cancel&id={$id|default:0|escape}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-            {$LANG.requestcancellation}
+            {$LANG.requestcancellation|default:'Request Cancellation'}
         </a>
         {/if}
     </div>
@@ -217,7 +217,7 @@
 <div class="pd-main">
 
 <div class="settings-group" id="pd-service-info">
-    <div class="settings-group-header"><div class="settings-group-title">{$LANG.productdetails}</div></div>
+    <div class="settings-group-header"><div class="settings-group-title">{$LANG.productdetails|default:'Service Information'}</div></div>
     {if !empty($domain)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.clientareahostingdomain}</div></div><div class="settings-item-action"><span class="settings-item-value">{$domain|escape}</span></div></div>
     {/if}
@@ -248,7 +248,7 @@
    ($lastupdate, set on the last sync); otherwise a short note. Bar width
    uses the real $diskpercent / $bwpercent (e.g. "12%"); values are in MB. *}
 <div class="card" id="pd-usage">
-    <div class="card-header"><h2 class="card-title">{$LANG.usagestats}</h2></div>
+    <div class="card-header"><h2 class="card-title">{$LANG.usagestats|default:'Resource Usage'}</h2></div>
     <div class="card-body">
         {if $lastupdate}
         <div class="usage-bar-container">
@@ -358,7 +358,7 @@
         <div class="settings-item-icon pd-manage-cancel-ico">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
         </div>
-        <div class="settings-item-content"><div class="settings-item-label pd-manage-cancel-label">{$LANG.requestcancellation}</div><div class="settings-item-sublabel">{$hadrianLang.services.cancelSublabel}</div></div>
+        <div class="settings-item-content"><div class="settings-item-label pd-manage-cancel-label">{$LANG.requestcancellation|default:'Request Cancellation'}</div><div class="settings-item-sublabel">{$hadrianLang.services.cancelSublabel}</div></div>
         <div class="settings-item-action"><span class="settings-item-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span></div>
     </a>
     {/if}

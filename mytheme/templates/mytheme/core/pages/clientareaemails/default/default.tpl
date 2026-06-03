@@ -46,8 +46,8 @@
 </script>
 
 <header class="page-header">
-    <p class="eyebrow">{$LANG.accounttab}</p>
-    <h1>{$LANG.emailstitle}</h1>
+    <p class="eyebrow">{$LANG.accounttab|default:'Account'}</p>
+    <h1>{$LANG.emailstitle|default:'Email History'}</h1>
     <p class="page-subtitle">{$hadrianLang.account.emailsIntro}</p>
 </header>
 
@@ -128,7 +128,7 @@
                     </div>
                     <p class="em-empty-title">{$hadrianLang.account.emailsEmptyTitle}</p>
                     <p class="em-empty-sub">{$hadrianLang.account.emailsEmptySub}</p>
-                    <a href="{$WEB_ROOT}/clientarea.php?action=details" class="btn-primary">{$LANG.accountdetails}</a>
+                    <a href="{$WEB_ROOT}/clientarea.php?action=details" class="btn-primary">{$LANG.accountdetails|default:'Account Details'}</a>
                 </div>
             </div>
         </div>
@@ -137,22 +137,22 @@
 
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.accounttab}</div>
+            <div class="subnav-heading">{$LANG.accounttab|default:'Account'}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.accountdetails}
+                {$LANG.accountdetails|default:'Account Details'}
             </a>
             <a href="{routePath('account-contacts')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.contacts}
+                {$LANG.contacts|default:'Contacts'}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=emails" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
-                {$LANG.emailstitle}
+                {$LANG.emailstitle|default:'Email History'}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=security" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                {$LANG.security}
+                {$LANG.security|default:'Security'}
             </a>
         </div>
     </aside>

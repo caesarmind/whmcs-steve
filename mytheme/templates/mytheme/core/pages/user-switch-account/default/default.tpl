@@ -84,10 +84,10 @@
 
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.yourprofile}</div>
+            <div class="subnav-heading">{$LANG.yourprofile|default:'Your Profile'}</div>
             <a href="{routePath('user-profile')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 14a4 4 0 100-8 4 4 0 000 8z"/><path d="M19.5 19a8 8 0 00-15 0"/></svg>
-                {$LANG.yourprofile}
+                {$LANG.yourprofile|default:'Your Profile'}
             </a>
             <a href="{routePath('user-accounts')}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
@@ -95,11 +95,11 @@
             </a>
             <a href="{routePath('user-password')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                {$LANG.clientareanavchangepassword}
+                {$LANG.clientareanavchangepassword|default:'Change Password'}
             </a>
             <a href="{routePath('user-security')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                {$LANG.securitysettings}
+                {$LANG.securitysettings|default:'Security settings'}
             </a>
         </div>
     </aside>

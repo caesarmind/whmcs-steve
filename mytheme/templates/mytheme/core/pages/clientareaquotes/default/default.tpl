@@ -62,7 +62,7 @@
 <header class="page-header">
     <div class="page-header-row">
         <div style="flex: 1; min-width: 0;">
-            <h1>{$LANG.navquotes}</h1>
+            <h1>{$LANG.navquotes|default:'Quotes'}</h1>
             <p class="page-subtitle">{$hadrianLang.billing.quotesSubtitle}</p>
         </div>
     </div>
@@ -83,7 +83,7 @@
 
         <div class="filter-tabs when-full">
             <a href="{$WEB_ROOT}/clientarea.php?action=quotes" class="filter-tab{if !$currentFilter} active{/if}" data-mt-for="qtTable" data-mt-filter="">{$hadrianLang.common.filterAll}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Draft" class="filter-tab{if $currentFilter == 'Draft'} active{/if}" data-mt-for="qtTable" data-mt-filter="Draft">{$LANG.quotestagedraft}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Draft" class="filter-tab{if $currentFilter == 'Draft'} active{/if}" data-mt-for="qtTable" data-mt-filter="Draft">{$LANG.quotestagedraft|default:'Draft'}</a>
             <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Delivered" class="filter-tab{if $currentFilter == 'Delivered'} active{/if}" data-mt-for="qtTable" data-mt-filter="Delivered">{$LANG.quotestagedelivered}</a>
             <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Accepted" class="filter-tab{if $currentFilter == 'Accepted'} active{/if}" data-mt-for="qtTable" data-mt-filter="Accepted">{$LANG.quotestageaccepted}</a>
             <a href="{$WEB_ROOT}/clientarea.php?action=quotes&stage=Lost" class="filter-tab{if $currentFilter == 'Lost'} active{/if}" data-mt-for="qtTable" data-mt-filter="Lost">{$LANG.quotestagelost}</a>
@@ -223,7 +223,7 @@
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=quotes" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-                {$LANG.navquotes}
+                {$LANG.navquotes|default:'Quotes'}
                 <span class="subnav-count">{$qtCount}</span>
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=masspay&all=true" class="subnav-item">

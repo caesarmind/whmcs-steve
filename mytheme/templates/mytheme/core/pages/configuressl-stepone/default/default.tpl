@@ -43,7 +43,7 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.domainssloptions}</p>
+    <p class="page-eyebrow">{$LANG.domainssloptions|default:'SSL Certificates'}</p>
     <h1>{$hadrianLang.ssl.configureTitle}</h1>
     <p class="page-subtitle">{$hadrianLang.ssl.configIntro}</p>
 </header>
@@ -192,11 +192,11 @@
         {if isset($status) && $status && $status != 'Awaiting Configuration'}
             <p class="ssl-notice-title">{$LANG.sslnoconfigurationpossible}</p>
             <p class="ssl-notice-sub">{$hadrianLang.ssl.noConfigPossibleSub}</p>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'View my services'}</a>
         {else}
             <p class="ssl-notice-title">{$LANG.sslinvalidlink}</p>
             <p class="ssl-notice-sub">{$hadrianLang.ssl.invalidLinkSub}</p>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'View my services'}</a>
         {/if}
     </div>
 </div>

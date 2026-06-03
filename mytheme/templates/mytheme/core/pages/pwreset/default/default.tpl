@@ -30,7 +30,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div>{$LANG.noPasswordResetWhenLoggedIn}</div>
             </div>
-            <a href="{$WEB_ROOT}/clientarea.php" class="btn-primary pw-cta">{$LANG.clientareanavhome}</a>
+            <a href="{$WEB_ROOT}/clientarea.php" class="btn-primary pw-cta">{$LANG.clientareanavhome|default:'Go to dashboard'}</a>
 
         {elseif isset($successMessage) && $successMessage}
             {* Success — "check your email" after step 1, or "password changed" at the end. *}

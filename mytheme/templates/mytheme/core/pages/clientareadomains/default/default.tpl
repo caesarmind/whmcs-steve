@@ -67,7 +67,7 @@
             <p class="page-subtitle">{$hadrianLang.domains.manageSub}</p>
         </div>
         <a href="{$WEB_ROOT}/cart.php?a=add&domain=register" class="page-header-action">
-            {$LANG.registeradomain}
+            {$LANG.registeradomain|default:'registering a domain'}
             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
     </div>
@@ -91,7 +91,7 @@
 
         <div class="filter-tabs when-full">
             <button class="filter-tab active" data-mt-for="domTable" data-mt-filter="">{$LANG.all}</button>
-            <button class="filter-tab" data-mt-for="domTable" data-mt-filter="Active">{$LANG.statusactive}</button>
+            <button class="filter-tab" data-mt-for="domTable" data-mt-filter="Active">{$LANG.statusactive|default:'Active'}</button>
             <button class="filter-tab">{$LANG.expiringsoon}</button>
             <button class="filter-tab" data-mt-for="domTable" data-mt-filter="Transferred Away">{$hadrianLang.domains.transferredAway}</button>
             {if $mtAjaxTables}<span class="mt-dt-search" style="margin-left:auto"><input type="search" placeholder="{$LANG.search}…" aria-label="{$LANG.search}" data-mt-search data-mt-for="domTable"></span>{/if}
@@ -102,7 +102,7 @@
 
             {if !$mtAjaxTables}
             <div class="dom-list-head-row when-full">
-                <div>{$LANG.domain}</div>
+                <div>{$LANG.domain|default:'Domain'}</div>
                 <div>{$LANG.registered}</div>
                 <div>{$hadrianLang.domains.expires}</div>
                 <div>{$LANG.domainstatus}</div>
@@ -119,7 +119,7 @@
                         {if $mtAjaxTables}
                         <table id="domTable" class="dom-table" data-mt-action="tableDomains" data-mt-type="domains" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="0:asc" data-mt-length="10">
                             <thead><tr class="dom-list-head-row">
-                                <th>{$LANG.domain}</th>
+                                <th>{$LANG.domain|default:'Domain'}</th>
                                 <th>{$LANG.registered}</th>
                                 <th>{$hadrianLang.domains.expires}</th>
                                 <th>{$LANG.domainstatus}</th>
@@ -163,7 +163,7 @@
                                         </a>
                                         <a href="{$WEB_ROOT}/cart.php?gid=renewals" class="dom-menu-item" role="menuitem">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-                                            {$LANG.renew}
+                                            {$LANG.renew|default:'Renew'}
                                         </a>
                                     </div>
                                 </div>
@@ -198,20 +198,20 @@
             {* Pagination footer *}
             <div class="dom-footer when-full">
                 <div class="dom-page-size">
-                    {$LANG.show}
+                    {$LANG.show|default:'Show'}
                     <select aria-label="{$hadrianLang.common.rowsPerPage}" data-dt-length data-mt-for="domTable">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>
                     </select>
-                    {$LANG.entries}
+                    {$LANG.entries|default:'entries'}
                 </div>
                 <div class="spacer"></div>
                 {assign var=startNum value=$startnumber|default:0}
                 {assign var=startDisplay value=$startNum+1}
                 {assign var=endDisplay value=$startNum+$domCount}
                 {assign var=totalNum value=$numdomains|default:$domCount}
-                <span data-dt-info data-mt-for="domTable">{$LANG.showing} {$startDisplay}–{$endDisplay} {$LANG.of} {$totalNum}</span>
+                <span data-dt-info data-mt-for="domTable">{$LANG.showing|default:'Showing'} {$startDisplay}–{$endDisplay} {$LANG.of|default:'of'} {$totalNum}</span>
                 <div class="dom-pages" data-dt-pager data-mt-for="domTable">
                     <button type="button" disabled aria-label="{$hadrianLang.common.previousPage}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
                     <button type="button" class="active">1</button>
@@ -233,11 +233,11 @@
             </a>
             <a href="{$WEB_ROOT}/cart.php?a=add&domain=register" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                {$LANG.registeradomain}
+                {$LANG.registeradomain|default:'registering a domain'}
             </a>
             <a href="{$WEB_ROOT}/cart.php?a=add&domain=transfer" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
-                {$LANG.transferadomain}
+                {$LANG.transferadomain|default:'Transfer a Domain'}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=bulkdomainmanagement" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>

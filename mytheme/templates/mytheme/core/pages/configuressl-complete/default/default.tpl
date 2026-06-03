@@ -37,7 +37,7 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.domainssloptions}</p>
+    <p class="page-eyebrow">{$LANG.domainssloptions|default:'SSL Certificates'}</p>
     <h1>{$hadrianLang.ssl.requestSubmittedTitle}</h1>
     <p class="page-subtitle">{$hadrianLang.ssl.completeIntro}</p>
 </header>
@@ -157,7 +157,7 @@
     {/if}
 
     <div class="btn-group" style="justify-content: center; margin-top: 24px;">
-        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
+        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'View my services'}</a>
         <a href="{$WEB_ROOT}/supporttickets.php" class="btn-secondary">{$LANG.contactus}</a>
     </div>
 
@@ -172,7 +172,7 @@
         </div>
         <p class="ssl-notice-title">{$hadrianLang.ssl.configFailed}</p>
         <p class="ssl-notice-sub">{if isset($errormessage) && $errormessage}{$errormessage|strip_tags}{else}{$hadrianLang.ssl.configFailedSub}{/if}</p>
-        <a href="{$WEB_ROOT}/configuressl.php" class="btn-primary">{$LANG.tryagain}</a>
+        <a href="{$WEB_ROOT}/configuressl.php" class="btn-primary">{$LANG.tryagain|default:'Try again'}</a>
     </div>
 </div>
 {/if}

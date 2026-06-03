@@ -38,7 +38,7 @@
 
             <div class="ph-domain-footer">
                 <span>{$hadrianLang.dashboard.heroDomainSubtitle}</span>
-                <a href="{$WEB_ROOT}/cart.php?gid=domain">{$LANG.viewallpricing} &rarr;</a>
+                <a href="{$WEB_ROOT}/cart.php?gid=domain">{$LANG.viewallpricing|default:'View all pricing'} &rarr;</a>
             </div>
         </form>
     </div>
@@ -121,7 +121,7 @@
 {* ═══════════ YOUR ACCOUNT ═══════════ *}
 <section class="ph-section" style="padding-bottom: 72px;">
     <div class="ph-section-head">
-        <div class="eyebrow">{$LANG.accounttab}</div>
+        <div class="eyebrow">{$LANG.accounttab|default:'Account'}</div>
         <h2>{$LANG.homepage.yourAccount}</h2>
     </div>
     <div class="ph-action-grid">

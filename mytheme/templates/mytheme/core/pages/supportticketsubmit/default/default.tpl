@@ -51,7 +51,7 @@
     {* ══ LEFT: Support sub-nav ══ *}
     <aside class="tk-aside">
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.supporttab}</div>
+            <div class="subnav-heading">{$LANG.supporttab|default:'Support'}</div>
             <a href="{$WEB_ROOT}/supporttickets.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                 {$hadrianLang.support.myTickets}
@@ -70,7 +70,7 @@
             </a>
             <a href="{$WEB_ROOT}/serverstatus.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/></svg>
-                {$LANG.networkstatus}
+                {$LANG.networkstatus|default:'Network status'}
             </a>
         </div>
     </aside>

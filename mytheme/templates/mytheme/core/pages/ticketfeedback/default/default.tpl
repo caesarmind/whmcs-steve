@@ -46,7 +46,7 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.supporttab}</p>
+    <p class="page-eyebrow">{$LANG.supporttab|default:'Support'}</p>
     <h1>{$hadrianLang.support.feedbackTitle}</h1>
 </header>
 

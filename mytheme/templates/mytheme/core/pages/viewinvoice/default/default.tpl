@@ -147,10 +147,10 @@
                 <div class="inv-total-row muted"><span>{$LANG.invoicessubtotal}</span><span>{$subtotal|escape}</span></div>
                 {/if}
                 {if isset($taxrate) && $taxrate}
-                <div class="inv-total-row muted"><span>{$LANG.invoicestax} ({$taxrate|escape}%)</span><span>{$tax|escape}</span></div>
+                <div class="inv-total-row muted"><span>{$LANG.invoicestax|default:'Tax'} ({$taxrate|escape}%)</span><span>{$tax|escape}</span></div>
                 {/if}
                 {if isset($taxrate2) && $taxrate2}
-                <div class="inv-total-row muted"><span>{$LANG.invoicestax} 2 ({$taxrate2|escape}%)</span><span>{$tax2|escape}</span></div>
+                <div class="inv-total-row muted"><span>{$LANG.invoicestax|default:'Tax'} 2 ({$taxrate2|escape}%)</span><span>{$tax2|escape}</span></div>
                 {/if}
                 {if isset($credit) && $credit}
                 <div class="inv-total-row muted"><span>{$LANG.invoicescredit}</span><span>−{$credit|escape}</span></div>
@@ -199,7 +199,7 @@
         {* Payment *}
         {if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'}
         <div class="card inv-lines-card">
-            <div class="card-header"><h2>{$LANG.invoicemakepayment}</h2></div>
+            <div class="card-header"><h2>{$LANG.invoicemakepayment|default:'Make a payment'}</h2></div>
             <form method="post" action="{$WEB_ROOT}/viewinvoice.php?id={$invoiceid}">
                 <input type="hidden" name="token" value="{$token|default:''|escape}">
                 <input type="hidden" name="paynow" value="true">
@@ -217,7 +217,7 @@
                             {/foreach}
                         {/if}
                     </div>
-                    <button type="submit" class="btn-primary inv-pay-btn">{$LANG.invoicepay} {if isset($total)}{$total|escape}{/if}</button>
+                    <button type="submit" class="btn-primary inv-pay-btn">{$LANG.invoicepay|default:'Pay Invoice'} {if isset($total)}{$total|escape}{/if}</button>
                 </div>
             </form>
         </div>
@@ -261,7 +261,7 @@
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=quotes" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-                {$LANG.navquotes}
+                {$LANG.navquotes|default:'Quotes'}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=masspay&all=true" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>

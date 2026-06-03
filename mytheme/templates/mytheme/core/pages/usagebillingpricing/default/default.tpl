@@ -42,7 +42,7 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.clientareaservices}</p>
+    <p class="page-eyebrow">{$LANG.clientareaservices|default:'Services'}</p>
     <h1>{$LANG.metrics.pricing}</h1>
     <p class="page-subtitle">{$hadrianLang.services.usagePricingIntro}</p>
 </header>
@@ -111,7 +111,7 @@
             </div>
             <p class="ub-empty-title">{$hadrianLang.services.usagePricingNoneTitle}</p>
             <p class="ub-empty-sub">{$hadrianLang.services.usagePricingNoneSub}</p>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'View my services'}</a>
         </div>
     </div>
 </div>

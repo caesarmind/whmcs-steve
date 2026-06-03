@@ -44,7 +44,7 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.clientareaservices}</p>
+    <p class="page-eyebrow">{$LANG.clientareaservices|default:'Services'}</p>
     <h1>{$LANG.ordersummary}</h1>
     <p class="page-subtitle">{$hadrianLang.services.upgradeSummaryIntro}</p>
 </header>
@@ -158,7 +158,7 @@
             </div>
             <p class="up-empty-title">{$hadrianLang.services.upgradeNoSummaryTitle}</p>
             <p class="up-empty-sub">{$hadrianLang.services.upgradeNoSummarySub}</p>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'View my services'}</a>
         </div>
     </div>
 </div>

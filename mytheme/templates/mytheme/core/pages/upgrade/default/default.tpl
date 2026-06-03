@@ -58,8 +58,8 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.clientareaservices}</p>
-    <h1>{$LANG.upgradedowngrade}</h1>
+    <p class="page-eyebrow">{$LANG.clientareaservices|default:'Services'}</p>
+    <h1>{$LANG.upgradedowngrade|default:'Upgrade or downgrade'}</h1>
     <p class="page-subtitle">{$hadrianLang.services.upgradeIntro}</p>
 </header>
 
@@ -173,7 +173,7 @@
                 <div class="st-plan-features">{if isset($pkg.description) && $pkg.description}{$pkg.description|regex_replace:'/<br\s*\/?>/i':''}{/if}</div>
 
                 {if $isCurrent}
-                    <button type="button" class="st-plan-cta secondary" disabled>{$LANG.upgradecurrentplan}</button>
+                    <button type="button" class="st-plan-cta secondary" disabled>{$LANG.upgradecurrentplan|default:'Current plan'}</button>
                 {else}
                     <button type="submit" class="st-plan-cta">{$LANG.upgradedowngradechooseproduct}</button>
                 {/if}
@@ -198,18 +198,18 @@
        (body[data-subnav-website="off"] [class$="-split"] in apple-layout.css). *}
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.services}</div>
+            <div class="subnav-heading">{$LANG.services|default:'Services'}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=services" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
-                {$LANG.myservices}
+                {$LANG.myservices|default:'My Services'}
             </a>
             <a href="{$WEB_ROOT}/cart.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-                {$LANG.ordernewservices}
+                {$LANG.ordernewservices|default:'Order New Services'}
             </a>
             <a href="{$WEB_ROOT}/cart.php?gid=addons" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                {$LANG.viewavailableaddons}
+                {$LANG.viewavailableaddons|default:'View Available Addons'}
             </a>
             <a href="{$WEB_ROOT}/upgrade.php{if isset($id) && $id}?type=package&id={$id|escape}{/if}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
@@ -232,15 +232,15 @@
             {if isset($overdueinvoice) && $overdueinvoice}
                 <p class="up-empty-title">{$hadrianLang.services.upgradeNotAvailTitle}</p>
                 <p class="up-empty-sub">{$LANG.upgradeerroroverdueinvoice}</p>
-                <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-primary">{$LANG.invoices}</a>
+                <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-primary">{$LANG.invoices|default:'My invoices'}</a>
             {elseif isset($existingupgradeinvoice) && $existingupgradeinvoice}
                 <p class="up-empty-title">{$hadrianLang.services.upgradeNotAvailTitle}</p>
                 <p class="up-empty-sub">{$LANG.upgradeexistingupgradeinvoice}</p>
-                <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-primary">{$LANG.invoices}</a>
+                <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-primary">{$LANG.invoices|default:'My invoices'}</a>
             {else}
                 <p class="up-empty-title">{$hadrianLang.services.noUpgradeTitle}</p>
                 <p class="up-empty-sub">{$LANG.upgradeNotPossible}</p>
-                <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
+                <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'View my services'}</a>
             {/if}
         </div>
     </div>
