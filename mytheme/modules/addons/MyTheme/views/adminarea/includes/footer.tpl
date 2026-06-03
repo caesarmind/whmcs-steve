@@ -421,16 +421,13 @@
     function q(n){ return form.querySelector('[name="' + n + '"]'); }
     var gsel = q('ff_google'),  gstk = q('ff_google_stack');
     var fname = q('ff_folder'), fstk = q('ff_folder_stack'),  fapp = q('ff_folder_apple');
-    var bsel = q('ff_bundled'), bstk = q('ff_bundled_stack'), bapp = q('ff_bundled_apple');
 
     function mode() { var c = form.querySelector('input[name="ff_mode"]:checked'); return c ? c.value : 'default'; }
     function sync() {
         var m = mode();
         if (gsel) gsel.disabled = m !== 'google';
         if (fname) fname.disabled = m !== 'folder';
-        if (bsel) bsel.disabled = m !== 'bundled';
         if (fapp) fapp.disabled = m !== 'folder';
-        if (bapp) bapp.disabled = m !== 'bundled';
     }
     function selectMode(m) { var r = form.querySelector('input[name="ff_mode"][value="' + m + '"]'); if (r) { r.checked = true; sync(); } }
     /* family token: Google = the option value; self-hosted = data-family or the filename minus extension. */
@@ -450,8 +447,6 @@
     if (gsel) gsel.addEventListener('change', function(){ build(gstk, gsel, false, "'"); selectMode('google'); });
     if (fname) fname.addEventListener('input', function(){ build(fstk, fname, fapp && fapp.checked, '"'); });
     if (fapp) fapp.addEventListener('change', function(){ build(fstk, fname, fapp.checked, '"'); });
-    if (bsel) bsel.addEventListener('change', function(){ build(bstk, bsel, bapp && bapp.checked, '"'); selectMode('bundled'); });
-    if (bapp) bapp.addEventListener('change', function(){ build(bstk, bsel, bapp.checked, '"'); });
     [].slice.call(form.querySelectorAll('input[name="ff_mode"]')).forEach(function(r){ r.addEventListener('change', sync); });
     sync();
 })();

@@ -294,30 +294,6 @@ final class Hooks
                 }
                 $decls['--font-family'] = $stack !== '' ? $stack : '"' . $name . '", ' . $fallback;
             }
-        } elseif ($mode === 'bundled' && !empty($ff['bundled'])) {
-            // A theme-shipped self-hosted font (config: bundledFonts) — zero external
-            // request. Resolve the family + optional @font-face from the registry by
-            // filename. Bundled Inter + apple === the legacy "default" mix exactly.
-            $file = basename((string)$ff['bundled']);
-            foreach ((array)($cfg['bundledFonts'] ?? []) as $bf) {
-                if (($bf['file'] ?? '') !== $file) {
-                    continue;
-                }
-                $family = (string)($bf['family'] ?? pathinfo($file, PATHINFO_FILENAME));
-                if (!empty($bf['face'])
-                    && preg_match('/^[A-Za-z0-9._-]+\.(woff2|woff|ttf|otf)$/i', $file)
-                    && is_file($template->getFullPath() . '/assets/fonts/' . $file)) {
-                    $ext     = strtolower((string)pathinfo($file, PATHINFO_EXTENSION));
-                    $fmt     = ['woff2' => 'woff2', 'woff' => 'woff', 'ttf' => 'truetype', 'otf' => 'opentype'][$ext] ?? 'woff2';
-                    $webRoot = defined('WEB_ROOT') ? rtrim((string)WEB_ROOT, '/') : '';
-                    $url     = $webRoot . '/templates/' . $template->getName() . '/assets/fonts/' . $file;
-                    $wght    = (string)($bf['weight'] ?? '100 900');
-                    $fontFace = '@font-face{font-family:"' . $family . '";font-style:normal;font-weight:' . $wght . ';'
-                              . 'font-display:swap;src:url("' . $url . '") format("' . $fmt . '");}';
-                }
-                $decls['--font-family'] = $stack !== '' ? $stack : '"' . $family . '", ' . $fallback;
-                break;
-            }
         }
 
         // Sizes (px) + weights (numeric). Each stored bucket holds only overrides.

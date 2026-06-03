@@ -40,26 +40,6 @@
                 <input type="text" name="ff_google_stack" class="mt-input" value="{$typography.stacks.google|escape}" placeholder="'Roboto', system-ui, sans-serif">
             </div>
 
-            {if $typography.bundledFonts}
-            <label class="mt-typo-radio">
-                <input type="radio" name="ff_mode" value="bundled"{if $typography.fontFamily.mode == 'bundled'} checked{/if}>
-                <span>Bundled font <em>(self-hosted, ships with the theme &mdash; no external request)</em></span>
-            </label>
-            <div class="mt-typo-dep">
-                <select name="ff_bundled" class="mt-select">
-                    {foreach $typography.bundledFonts as $bf}
-                        <option value="{$bf.file|escape}" data-family="{$bf.family|escape}"{if $bf.file == $typography.fontFamily.bundled} selected{/if}>{$bf.label|escape}</option>
-                    {/foreach}
-                </select>
-                <label class="mt-typo-check mt-typo-check-inline">
-                    <input type="checkbox" name="ff_bundled_apple" value="1"{if $typography.fontFamily.bundledApple} checked{/if}>
-                    <span>Keep the device's system font on Apple <em>(San Francisco on Apple, this font on the rest)</em></span>
-                </label>
-                <div class="mt-typo-sublabel">How it's written into the system</div>
-                <input type="text" name="ff_bundled_stack" class="mt-input" value="{$typography.stacks.bundled|escape}" placeholder='"Inter", system-ui, sans-serif'>
-            </div>
-            {/if}
-
             <label class="mt-typo-radio">
                 <input type="radio" name="ff_mode" value="folder"{if $typography.fontFamily.mode == 'folder'} checked{/if}>
                 <span>Self-hosted font <em>(type the face name; drop the matching file into /assets/fonts/custom)</em></span>
