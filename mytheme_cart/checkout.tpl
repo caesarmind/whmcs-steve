@@ -929,6 +929,27 @@
     box-sizing: border-box;
 }
 
+/* -- Stripe card Elements grid (#creditCardInputFields .stripe-cards-inputs) --
+   The WHMCS Stripe module mounts its Card Number / Expiry / CVC Elements in a
+   squeezed Bootstrap grid: .stripe-cards-inputs.col-md-8.col-md-offset-2 -> a
+   6/3/3 row. Inside our ~460px payment card that left the number field ~142px
+   and the expiry col ~83px, so the "1234 1234 1234 1234" / "MM / YY" placeholders
+   clipped on the right. The card-name field likewise sits in its own
+   .col-md-6.col-md-offset-3 (~219px), clipping "...(Optional)". Un-squeeze both
+   to full width so the Elements get room. !important to reliably beat Bootstrap's
+   .col-md-* / offset utilities (verified live against the deployed page). */
+#creditCardInputFields .stripe-cards-inputs,
+.co-payment-card .stripe-cards-inputs,
+#creditCardInputFields #inputDescriptionContainer,
+.co-payment-card #inputDescriptionContainer {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    flex: 0 0 100% !important;
+}
+#creditCardInputFields .stripe-cards-inputs,
+.co-payment-card .stripe-cards-inputs { padding: 0 !important; }
+
 /* TOS + complete-order footer */
 .checkout-footer { margin: 22px 0 16px; padding: 0; }
 .checkout-footer label,
