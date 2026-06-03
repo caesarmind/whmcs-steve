@@ -791,7 +791,7 @@
     padding: 13px 16px;
     margin: 0 0 8px;
 }
-#order-standard_cart #applyCreditContainer label.radio:last-child { margin-bottom: 0; } /* card-style apply-credit rows */
+#order-standard_cart #applyCreditContainer label.radio:last-child { margin-bottom: 0; }
 
 /* Payment method radios -- matches apple-client-area/checkout.html while
    preserving WHMCS's native paymentmethod radio contract. */
