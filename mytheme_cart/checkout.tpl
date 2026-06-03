@@ -777,6 +777,21 @@
 }
 #applyCreditContainer .radio:has(input:checked) .ac-radio::after { transform: scale(1); }
 #applyCreditContainer .ac-text { flex: 1; min-width: 0; }
+/* apple-layout.css carries `#order-standard_cart #applyCreditContainer
+   label.radio` (specificity 2,1,1, inside a @media block) setting
+   `padding: 6px 0; gap: 8px; align-items: flex-start` -- which outranks the
+   plain `#applyCreditContainer .radio` rule above, leaving the radio jammed to
+   the left edge and top-aligned. Re-assert the card layout at matching
+   specificity; this inline <style> loads after apple-layout.css, so equal
+   specificity wins on source order. (border/bg/:has selected-state are not set
+   here, so they keep coming from the lower-specificity rules above.) */
+#order-standard_cart #applyCreditContainer label.radio {
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    margin: 0 0 8px;
+}
+#order-standard_cart #applyCreditContainer label.radio:last-child { margin-bottom: 0; }
 
 /* Payment method radios -- matches apple-client-area/checkout.html while
    preserving WHMCS's native paymentmethod radio contract. */
@@ -1005,13 +1020,13 @@
 .checkout-footer .icheckbox_square-blue.checked::after {
     content: "";
     position: absolute;
-    left: 5px;
-    top: 1px;
+    left: 50%;
+    top: 50%;
     width: 4px;
-    height: 9px;
+    height: 8px;
     border: solid #fff;
     border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+    transform: translate(-50%, -60%) rotate(45deg);
 }
 #btnCompleteOrder {
     width: 100%;
