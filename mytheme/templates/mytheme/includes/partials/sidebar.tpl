@@ -108,13 +108,13 @@
         {* Close button — only visible when the sidebar is a mobile drawer
            (<=900px). data-nav-toggle closes the open drawer via apple-layout.js.
            Hidden on desktop where the sidebar is a permanent column. *}
-        <button type="button" class="sidebar-close" aria-label="{$LANG.close|default:'Close menu'}" data-nav-toggle>
+        <button type="button" class="sidebar-close" aria-label="{$LANG.close}" data-nav-toggle>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
     </div>
     <div class="sidebar-search">
         <form action="{$WEB_ROOT}/knowledgebase.php" method="get">
-            <input type="text" name="search" class="sidebar-search-input" placeholder="{$LANG.searchbutton|default:'Search'}">
+            <input type="text" name="search" class="sidebar-search-input" placeholder="{$LANG.searchbutton}">
         </form>
     </div>
 
@@ -134,13 +134,13 @@
             {/foreach}
         {else}
             {* Fallback if menu manager is empty / errored — never blank *}
-            <a href="{$WEB_ROOT}/" class="sidebar-item"><div class="sidebar-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg></div>{$LANG.home|default:'Home'}</a>
+            <a href="{$WEB_ROOT}/" class="sidebar-item"><div class="sidebar-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg></div>{$LANG.home}</a>
             {if $loggedin}
-                <a href="{$WEB_ROOT}/clientarea.php" class="sidebar-item"><div class="sidebar-item-icon indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>{$LANG.clientareanavhome|default:'Dashboard'}</a>
+                <a href="{$WEB_ROOT}/clientarea.php" class="sidebar-item"><div class="sidebar-item-icon indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>{$LANG.clientareanavhome}</a>
             {/if}
             <a href="/admin/addonmodules.php?module=MyTheme&action=menu" class="sidebar-item" style="margin-top:auto;opacity:.6">
                 <div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></div>
-                Configure menu…
+                {$hadrianLang.nav.configureMenu}
             </a>
         {/if}
     </nav>
@@ -158,8 +158,8 @@
             </div>
         {else}
             <div class="only-out" style="padding:12px;display:flex;flex-direction:column;gap:8px">
-                <a href="{$WEB_ROOT}/login.php" style="padding:9px 14px;border-radius:10px;background:var(--color-accent);color:#fff;text-align:center;font-size:13px;font-weight:500;text-decoration:none">{$LANG.login|default:'Sign in'}</a>
-                <a href="{$WEB_ROOT}/register.php" style="padding:9px 14px;border-radius:10px;background:var(--color-surface-secondary);color:var(--color-text-primary);text-align:center;font-size:13px;font-weight:500;text-decoration:none">{$LANG.createaccount|default:'Create account'}</a>
+                <a href="{$WEB_ROOT}/login.php" style="padding:9px 14px;border-radius:10px;background:var(--color-accent);color:#fff;text-align:center;font-size:13px;font-weight:500;text-decoration:none">{$LANG.login}</a>
+                <a href="{$WEB_ROOT}/register.php" style="padding:9px 14px;border-radius:10px;background:var(--color-surface-secondary);color:var(--color-text-primary);text-align:center;font-size:13px;font-weight:500;text-decoration:none">{$LANG.createaccount}</a>
             </div>
         {/if}
     </div>

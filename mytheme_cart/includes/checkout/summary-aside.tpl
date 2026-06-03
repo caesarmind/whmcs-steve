@@ -21,7 +21,7 @@
 <aside>
     <div class="co-summary-card">
         <div class="co-summary-head">
-            <h2>{$LANG.ordersummary|default:'Order summary'}</h2>
+            <h2>{$LANG.ordersummary}</h2>
         </div>
         <div class="co-summary-list">
             {foreach $products as $num => $product}
@@ -68,12 +68,12 @@
         </div>
 
         <div class="co-summary-total">
-            <span class="label">{$LANG.ordertotalduetoday|default:'Total due today'}</span>
+            <span class="label">{$LANG.ordertotalduetoday}</span>
             <span class="value" id="totalDueToday">{$total}</span>
         </div>
 
         {if $totalrecurring}
-            <p class="co-summary-cycle">{$LANG.orderForm.recurringTotal|default:'Recurring'}: <strong id="totalCartPrice">{$totalrecurring}</strong></p>
+            <p class="co-summary-cycle">{$hadrianLang.cart.recurringTotal}: <strong id="totalCartPrice">{$totalrecurring}</strong></p>
         {/if}
 
         {* Complete Order lives inside the sticky summary card (mirrors
@@ -92,13 +92,13 @@
             </button>
             <a href="{$WEB_ROOT}/cart.php?a=view" class="co-back-link">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                {$LANG.orderForm.backToCart|default:'Back to cart'}
+                {$hadrianLang.cart.backToCart}
             </a>
         </div>
 
         <div class="co-trust-strip">
-            <span class="item"><i class="fas fa-lock"></i> {$LANG.cartsecured|default:'256-bit SSL &middot; PCI-DSS Level 1'}</span>
-            <span class="item"><i class="fas fa-check"></i> {$LANG.cartmoneyback|default:'30-day money-back guarantee'}</span>
+            <span class="item"><i class="fas fa-lock"></i> {$hadrianLang.cart.trustSsl}</span>
+            <span class="item"><i class="fas fa-check"></i> {$hadrianLang.cart.trustMoneyBack}</span>
         </div>
     </div>
 </aside>

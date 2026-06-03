@@ -44,8 +44,8 @@
        to live here produced double padding. *}
 
     <header class="st-page-header">
-        <h1>{$LANG.domaincheckerchoosedomain|default:'Choose a domain'}</h1>
-        <p class="page-subtitle">{$LANG.choosedomainsubtitle|default:'Register something new, transfer one you already own, or point an existing domain at our nameservers.'}</p>
+        <h1>{$LANG.domaincheckerchoosedomain}</h1>
+        <p class="page-subtitle">{$hadrianLang.cart.chooseDomainSubtitle}</p>
     </header>
 
     <div class="dp-split">
@@ -64,16 +64,16 @@
                         <span class="dp-step-num">
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         </span>
-                        Choose plan
+                        {$hadrianLang.cart.stepChoosePlan}
                     </span>
                     <span class="dp-step-sep">›</span>
-                    <span class="dp-step active"><span class="dp-step-num">2</span>Choose a domain</span>
+                    <span class="dp-step active"><span class="dp-step-num">2</span>{$hadrianLang.cart.stepChooseDomain}</span>
                     <span class="dp-step-sep">›</span>
-                    <span class="dp-step"><span class="dp-step-num">3</span>Configure</span>
+                    <span class="dp-step"><span class="dp-step-num">3</span>{$hadrianLang.cart.stepConfigure}</span>
                     <span class="dp-step-sep">›</span>
-                    <span class="dp-step"><span class="dp-step-num">4</span>Cart</span>
+                    <span class="dp-step"><span class="dp-step-num">4</span>{$hadrianLang.cart.stepCart}</span>
                     <span class="dp-step-sep">›</span>
-                    <span class="dp-step"><span class="dp-step-num">5</span>Checkout</span>
+                    <span class="dp-step"><span class="dp-step-num">5</span>{$hadrianLang.cart.stepCheckout}</span>
                 </div>
 
                 <form id="frmProductDomain"
@@ -88,7 +88,7 @@
                     <div class="card" style="padding: 0;">
 
                         {* ─── Option radio cards ─── *}
-                        <div class="dp-options" role="radiogroup" aria-label="How you'll provide a domain">
+                        <div class="dp-options" role="radiogroup" aria-label="{$hadrianLang.cart.domainOptionGroupLabel}">
 
                             {if $incartdomains}
                                 {$_chk = ($domainoption eq "incart")}
@@ -101,7 +101,7 @@
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
                                     </span>
                                     <span class="dp-option-title">{$LANG.cartproductdomainuseincart}</span>
-                                    <span class="dp-option-desc">Use a domain that's already in your cart.</span>
+                                    <span class="dp-option-desc">{$hadrianLang.cart.useIncartDesc}</span>
                                 </label>
                             {/if}
 
@@ -116,7 +116,7 @@
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
                                     </span>
                                     <span class="dp-option-title">{$LANG.cartregisterdomainchoice|sprintf2:$companyname}</span>
-                                    <span class="dp-option-desc">Search and register a brand-new domain name.</span>
+                                    <span class="dp-option-desc">{$hadrianLang.cart.registerDesc}</span>
                                 </label>
                             {/if}
 
@@ -131,7 +131,7 @@
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
                                     </span>
                                     <span class="dp-option-title">{$LANG.carttransferdomainchoice|sprintf2:$companyname}</span>
-                                    <span class="dp-option-desc">Move your domain to us — usually includes a free year extension.</span>
+                                    <span class="dp-option-desc">{$hadrianLang.cart.transferDesc}</span>
                                 </label>
                             {/if}
 
@@ -146,7 +146,7 @@
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                                     </span>
                                     <span class="dp-option-title">{$LANG.cartexistingdomainchoice|sprintf2:$companyname}</span>
-                                    <span class="dp-option-desc">Keep it with your current registrar and point DNS at us.</span>
+                                    <span class="dp-option-desc">{$hadrianLang.cart.owndomainDesc}</span>
                                 </label>
                             {/if}
 
@@ -161,7 +161,7 @@
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 22 9 12 15 12 15 22"/><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
                                     </span>
                                     <span class="dp-option-title">{$LANG.cartsubdomainchoice|sprintf2:$companyname}</span>
-                                    <span class="dp-option-desc">Use a subdomain on one of our shared domains.</span>
+                                    <span class="dp-option-desc">{$hadrianLang.cart.subdomainDesc}</span>
                                 </label>
                             {/if}
 
@@ -171,7 +171,7 @@
 
                         {if $incartdomains}
                             <div class="dp-panel{if $domainoption eq "incart"} is-active{/if}" data-panel="incart">
-                                <p class="dp-panel-hint">Pick from the domains already in your cart.</p>
+                                <p class="dp-panel-hint">{$hadrianLang.cart.incartPanelHint}</p>
                                 <div class="dp-search-row">
                                     <select class="dp-input no-ico" data-input="incartsld">
                                         {foreach $incartdomains as $incartdomain}
@@ -185,11 +185,11 @@
 
                         {if $registerdomainenabled}
                             <div class="dp-panel{if !$domainoption || $domainoption eq "register"} is-active{/if}" data-panel="register">
-                                <p class="dp-panel-hint"><strong>Search by domain.</strong> We'll check availability across our registrar partners.</p>
+                                <p class="dp-panel-hint">{$hadrianLang.cart.registerPanelHint}</p>
                                 <div class="dp-search-row">
                                     <div class="dp-input-wrap">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="example" autocomplete="off" autocapitalize="none">
+                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.registerSldPlaceholder}" autocomplete="off" autocapitalize="none">
                                     </div>
                                     <select class="dp-input no-ico" data-input="tld" style="flex: 0 0 130px;">
                                         {foreach from=$registertlds item=listtld}
@@ -203,7 +203,7 @@
                                 </div>
                                 {if $freedomaintlds}
                                     <p class="dp-example">
-                                        <strong>Free domain on:</strong> {$freedomaintlds}
+                                        <strong>{$hadrianLang.cart.freeDomainOn}</strong> {$freedomaintlds}
                                     </p>
                                 {/if}
                             </div>
@@ -211,11 +211,11 @@
 
                         {if $transferdomainenabled}
                             <div class="dp-panel{if $domainoption eq "transfer"} is-active{/if}" data-panel="transfer">
-                                <p class="dp-panel-hint"><strong>Transfer your domain from another registrar.</strong> Most transfers add a <strong>free extra year</strong> to your registration.</p>
+                                <p class="dp-panel-hint">{$hadrianLang.cart.transferPanelHint}</p>
                                 <div class="dp-search-row">
                                     <div class="dp-input-wrap">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="mydomain" autocomplete="off" autocapitalize="none">
+                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.transferSldPlaceholder}" autocomplete="off" autocapitalize="none">
                                     </div>
                                     <select class="dp-input no-ico" data-input="tld" style="flex: 0 0 130px;">
                                         {foreach from=$transfertlds item=listtld}
@@ -225,7 +225,7 @@
                                     <button type="submit" class="dp-search-cta">{$LANG.orderForm.transfer}</button>
                                 </div>
                                 <p class="dp-example">
-                                    Before transferring: domain must be <strong>unlocked</strong>, registered for at least <strong>60 days</strong>, and you'll need the <strong>auth / EPP code</strong> from your current registrar.
+                                    {$hadrianLang.cart.transferRequirements}
                                 </p>
                             </div>
                         {/if}
@@ -238,13 +238,13 @@
                                flows are restricted to TLDs we actually sell.
                                JS submit handler joins sld + '.' + tld into resultDomain. *}
                             <div class="dp-panel{if $domainoption eq "owndomain"} is-active{/if}" data-panel="owndomain">
-                                <p class="dp-panel-hint"><strong>I'll use my existing domain and update my nameservers.</strong> Tell us which domain you'd like to use - after checkout we'll email you the nameservers to set at your current registrar.</p>
+                                <p class="dp-panel-hint">{$hadrianLang.cart.owndomainPanelHint}</p>
                                 <div class="dp-search-row">
                                     <div class="dp-input-wrap">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{$LANG.yourdomainplaceholder|default:'mysite'}" autocomplete="off" autocapitalize="none">
+                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{lang key='yourdomainplaceholder'}" autocomplete="off" autocapitalize="none">
                                     </div>
-                                    <input type="text" class="dp-input no-ico" data-input="tld" value="{$tld|substr:1}" placeholder="{$LANG.yourtldplaceholder|default:'com'}" autocomplete="off" autocapitalize="none" style="flex: 0 0 130px;">
+                                    <input type="text" class="dp-input no-ico" data-input="tld" value="{$tld|substr:1}" placeholder="{$LANG.yourtldplaceholder}" autocomplete="off" autocapitalize="none" style="flex: 0 0 130px;">
                                     <button type="submit" class="dp-search-cta">{$LANG.orderForm.use}</button>
                                 </div>
                             </div>
@@ -252,9 +252,9 @@
 
                         {if $subdomains}
                             <div class="dp-panel{if $domainoption eq "subdomain"} is-active{/if}" data-panel="subdomain">
-                                <p class="dp-panel-hint"><strong>Use a subdomain.</strong> Pick a parent domain and enter the prefix you'd like.</p>
+                                <p class="dp-panel-hint">{$hadrianLang.cart.subdomainPanelHint}</p>
                                 <div class="dp-search-row">
-                                    <input type="text" class="dp-input no-ico" data-input="sld" value="{$sld}" placeholder="yourname" autocomplete="off" autocapitalize="none">
+                                    <input type="text" class="dp-input no-ico" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.subdomainSldPlaceholder}" autocomplete="off" autocapitalize="none">
                                     <select class="dp-input no-ico" data-input="tld" style="flex: 0 0 200px;">
                                         {foreach $subdomains as $subid => $subdomain}
                                             <option value="{$subdomain}">.{$subdomain}</option>
@@ -269,12 +269,12 @@
                         <div class="dp-footer">
                             <span class="dp-footer-note">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                                Your domain details stay private — WHOIS privacy included on every TLD that supports it.
+                                {$hadrianLang.cart.whoisPrivacyNote}
                             </span>
                             <span class="spacer"></span>
                             <a href="{$WEB_ROOT}/cart.php" class="dp-back">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                                Back
+                                {$LANG.goback}
                             </a>
                             <button type="submit" class="dp-continue">
                                 {$LANG.continue}
@@ -290,6 +290,15 @@
 
 {include file="orderforms/$carttpl/recommendations-modal.tpl"}
 
+{* Smarty-to-JS lang seed for the own-domain validator below. That script runs
+   inside a Smarty literal block and cannot read Smarty vars directly. *}
+<script>
+var _localLang = {
+    ownDomainNeedBoth: '{$hadrianLang.cart.ownDomainNeedBoth|escape:"javascript"}',
+    domainChecking: '{$hadrianLang.cart.domainChecking|escape:"javascript"}',
+    domainInvalid: '{$LANG.cartdomaininvalid|escape:"javascript"}'
+};
+</script>
 <script>
 {literal}
 (function () {
@@ -404,7 +413,7 @@
             var tld = readInput(panel, 'tld').toLowerCase().replace(/^\./, '');
             if (!sld || !tld) {
                 ev.preventDefault();
-                showOwndomainError(panel, 'Please enter both the domain name and the TLD.');
+                showOwndomainError(panel, _localLang.ownDomainNeedBoth);
                 return;
             }
 
@@ -412,7 +421,7 @@
             clearOwndomainError(panel);
             var btn = panel.querySelector('button.dp-search-cta');
             var btnOriginalText = btn ? btn.textContent : null;
-            if (btn) { btn.disabled = true; btn.textContent = 'Checking...'; }
+            if (btn) { btn.disabled = true; btn.textContent = _localLang.domainChecking; }
 
             var pid = (form.querySelector('input[name="pid"]') || {}).value || '';
             var csrfMeta = document.querySelector('meta[name="csrf-token"]');
@@ -458,7 +467,7 @@
                         if (typeof first === 'string') msg = first;
                         else if (first && first.message) msg = first.message;
                     }
-                    showOwndomainError(panel, msg || 'The domain you entered is not valid.');
+                    showOwndomainError(panel, msg || _localLang.domainInvalid);
                 }
             });
             (window.jQuery && doRequest.fail ? doRequest.fail.bind(doRequest) : doRequest.catch.bind(doRequest))(function () {

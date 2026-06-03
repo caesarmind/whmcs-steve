@@ -35,9 +35,9 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.supporttab|default:'Support'}</p>
-    <h1>{$LANG.kbsuggestions|default:'Before you submit'}</h1>
-    <p class="page-subtitle">{$LANG.kbsuggestionsexplanation|default:'These knowledgebase articles match your question and might resolve it instantly.'}</p>
+    <p class="page-eyebrow">{$LANG.supporttab}</p>
+    <h1>{$LANG.kbsuggestions}</h1>
+    <p class="page-subtitle">{$LANG.kbsuggestionsexplanation}</p>
 </header>
 
 <div class="tk-wrap">
@@ -55,7 +55,7 @@
             {/foreach}
         </div>
         <div class="page-actions" style="margin-top:16px;display:flex;gap:10px;">
-            <a href="{$WEB_ROOT}/submitticket.php?step=2" class="btn-primary">{$LANG.kbsuggestionscontinue|default:'None of these helped, continue'}</a>
+            <a href="{$WEB_ROOT}/submitticket.php?step=2" class="btn-primary">{$hadrianLang.support.kbSuggestionsContinue}</a>
         </div>
     </div>
     {/if}
@@ -67,9 +67,9 @@
                 <div class="tk-empty-ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
                 </div>
-                <p class="tk-empty-title">{$LANG.kbnosuggestions|default:'No matching articles'}</p>
-                <p class="tk-empty-sub">{$LANG.kbnosuggestionssub|default:"We couldn't find a related article. Go ahead and open your ticket."}</p>
-                <a href="{$WEB_ROOT}/submitticket.php" class="btn-primary">{$LANG.opennewticket|default:'Open a ticket'}</a>
+                <p class="tk-empty-title">{$hadrianLang.support.kbNoSuggestionsTitle}</p>
+                <p class="tk-empty-sub">{$hadrianLang.support.kbNoSuggestionsSub}</p>
+                <a href="{$WEB_ROOT}/submitticket.php" class="btn-primary">{$LANG.opennewticket}</a>
             </div>
         </div>
     </div>

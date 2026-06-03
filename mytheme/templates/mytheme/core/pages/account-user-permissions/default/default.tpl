@@ -47,9 +47,9 @@
 </script>
 
 <header class="page-header">
-    <p class="eyebrow">{$LANG.accounttab|default:'Account'}</p>
-    <h1>{$LANG.userManagement.permissions|default:'User permissions'}</h1>
-    <p class="page-subtitle">{$LANG.userManagement.managePermissions|default:'Choose what this user can see and do on the account.'}</p>
+    <p class="eyebrow">{$LANG.accounttab}</p>
+    <h1>{$LANG.userManagement.permissions}</h1>
+    <p class="page-subtitle">{$hadrianLang.account.managePermissionsSub}</p>
 </header>
 
 <div class="perm-split">
@@ -60,14 +60,14 @@
                 <div class="perm-user-avatar">{$permEmail|truncate:1:""|escape}</div>
                 <div>
                     <div class="perm-user-email">{$permEmail|escape}</div>
-                    <div class="perm-user-sub">{$LANG.userManagement.permissions|default:'Permissions'}</div>
+                    <div class="perm-user-sub">{$LANG.userManagement.permissions}</div>
                 </div>
             </div>
 
             <form method="post" action="{if $permDemo}#{else}{routePath('account-users-permissions-save', $user->id)}{/if}">
                 <input type="hidden" name="token" value="{$token|default:''|escape}">
                 <div class="card">
-                    <div class="perm-card-header"><span class="perm-card-title">{$LANG.userManagement.permissions|default:'Permissions'}</span></div>
+                    <div class="perm-card-header"><span class="perm-card-title">{$LANG.userManagement.permissions}</span></div>
                     {if $permDemo}
                         {foreach $permList as $perm}
                         <div class="perm-row">
@@ -98,8 +98,8 @@
                 </div>
 
                 <div class="perm-actions">
-                    <button type="submit" class="btn-primary">{$LANG.clientareasavechanges|default:'Save permissions'}</button>
-                    <a href="{routePath('account-users')}" class="btn-secondary">{$LANG.cancel|default:'Cancel'}</a>
+                    <button type="submit" class="btn-primary">{$LANG.clientareasavechanges}</button>
+                    <a href="{routePath('account-users')}" class="btn-secondary">{$LANG.cancel}</a>
                 </div>
             </form>
         </div>
@@ -112,9 +112,9 @@
                     <div class="perm-empty-ico">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
                     </div>
-                    <p class="perm-empty-title">{$LANG.userManagement.noUserSelected|default:'No user selected'}</p>
-                    <p class="perm-empty-sub">{$LANG.userManagement.selectUserSub|default:'Choose a user from user management to edit their permissions.'}</p>
-                    <a href="{routePath('account-users')}" class="btn-primary">{$LANG.usermanagement|default:'User management'}</a>
+                    <p class="perm-empty-title">{$hadrianLang.account.noUserSelected}</p>
+                    <p class="perm-empty-sub">{$hadrianLang.account.selectUserSub}</p>
+                    <a href="{routePath('account-users')}" class="btn-primary">{$LANG.usermanagement}</a>
                 </div>
             </div>
         </div>
@@ -123,22 +123,22 @@
 
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.accounttab|default:'Account'}</div>
+            <div class="subnav-heading">{$LANG.accounttab}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.accountdetails|default:'Account Details'}
+                {$LANG.accountdetails}
             </a>
             <a href="{routePath('account-users')}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                {$LANG.usermanagement|default:'User Management'}
+                {$LANG.usermanagement}
             </a>
             <a href="{routePath('account-paymentmethods')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                {$LANG.paymentmethods|default:'Payment Methods'}
+                {$LANG.paymentMethods.title}
             </a>
             <a href="{routePath('account-contacts')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.contacts|default:'Contacts'}
+                {$LANG.contacts}
             </a>
         </div>
     </aside>

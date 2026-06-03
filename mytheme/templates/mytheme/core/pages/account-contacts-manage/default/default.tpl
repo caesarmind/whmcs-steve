@@ -30,8 +30,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/css/intlTelInput.css">
 
 <header class="page-header">
-    <h1>{$LANG.contacts|default:'Contacts'}</h1>
-    <p class="page-subtitle">{$LANG.contactsSub|default:'Additional people authorised to manage parts of this account.'}</p>
+    <h1>{$LANG.contacts}</h1>
+    <p class="page-subtitle">{$hadrianLang.account.contactsSub}</p>
 </header>
 
 <div class="ct-split">
@@ -49,7 +49,7 @@
         {* ── Contact picker ── *}
         <form method="post" action="{routePath('account-contacts')}" class="card ct-picker">
             <input type="hidden" name="token" value="{$token|default:''|escape}">
-            <label for="ct-contactid" class="ct-label">{$LANG.clientareachoosecontact|default:'Choose a contact'}</label>
+            <label for="ct-contactid" class="ct-label">{$LANG.clientareachoosecontact}</label>
             <div class="ct-picker-row">
                 <select name="contactid" id="ct-contactid" class="ct-input ct-select" onchange="this.form.submit()">
                     {if isset($contacts)}
@@ -57,9 +57,9 @@
                             <option value="{$contact.id|escape}"{if isset($contactid) && $contact.id eq $contactid} selected{/if}>{$contact.name|escape} — {$contact.email|escape}</option>
                         {/foreach}
                     {/if}
-                    <option value="new"{if $contactid eq 'new'} selected{/if}>+ {$LANG.clientareanavaddcontact|default:'Add new contact'}</option>
+                    <option value="new"{if $contactid eq 'new'} selected{/if}>+ {$LANG.clientareanavaddcontact}</option>
                 </select>
-                <button type="submit" class="btn-secondary ct-picker-go">{$LANG.go|default:'Go'}</button>
+                <button type="submit" class="btn-secondary ct-picker-go">{$LANG.go}</button>
             </div>
         </form>
 
@@ -69,29 +69,29 @@
             <input type="hidden" name="contactid" value="{$contactid|default:''|escape}">
 
             <div class="card ct-card">
-                <div class="ct-card-header"><h2 class="ct-card-title">{$LANG.contactDetails|default:'Contact details'}</h2></div>
+                <div class="ct-card-header"><h2 class="ct-card-title">{$LANG.contactDetails}</h2></div>
                 <div class="ct-card-body">
                     <div class="ct-form-grid">
                         {* Left col *}
                         <div class="ct-form-col">
                             <div class="ct-form-row">
-                                <label class="ct-label" for="ct-first">{$LANG.clientareafirstname|default:'First name'}</label>
+                                <label class="ct-label" for="ct-first">{$LANG.clientareafirstname}</label>
                                 <input type="text" name="firstname" id="ct-first" class="ct-input" value="{$formdata.firstname|default:''|escape}" autocomplete="given-name">
                             </div>
                             <div class="ct-form-row">
-                                <label class="ct-label" for="ct-last">{$LANG.clientarealastname|default:'Last name'}</label>
+                                <label class="ct-label" for="ct-last">{$LANG.clientarealastname}</label>
                                 <input type="text" name="lastname" id="ct-last" class="ct-input" value="{$formdata.lastname|default:''|escape}" autocomplete="family-name">
                             </div>
                             <div class="ct-form-row">
-                                <label class="ct-label" for="ct-company">{$LANG.clientareacompanyname|default:'Company'}</label>
+                                <label class="ct-label" for="ct-company">{$LANG.clientareacompanyname}</label>
                                 <input type="text" name="companyname" id="ct-company" class="ct-input" value="{$formdata.companyname|default:''|escape}" autocomplete="organization">
                             </div>
                             <div class="ct-form-row">
-                                <label class="ct-label" for="ct-email">{$LANG.clientareaemail|default:'Email address'}</label>
+                                <label class="ct-label" for="ct-email">{$LANG.clientareaemail}</label>
                                 <input type="email" name="email" id="ct-email" class="ct-input" value="{$formdata.email|default:''|escape}" autocomplete="email">
                             </div>
                             <div class="ct-form-row">
-                                <label class="ct-label" for="ct-phone">{$LANG.clientareaphonenumber|default:'Phone number'}</label>
+                                <label class="ct-label" for="ct-phone">{$LANG.clientareaphonenumber}</label>
                                 <input type="tel" name="phonenumber" id="ct-phone" class="ct-input" value="{$formdata.phonenumber|default:''|escape}" autocomplete="tel">
                             </div>
                             {if isset($taxIdLabel)}
@@ -104,27 +104,27 @@
                         {* Right col *}
                         <div class="ct-form-col">
                             <div class="ct-form-row">
-                                <label class="ct-label" for="ct-addr1">{$LANG.clientareaaddress1|default:'Address 1'}</label>
+                                <label class="ct-label" for="ct-addr1">{$LANG.clientareaaddress1}</label>
                                 <input type="text" name="address1" id="ct-addr1" class="ct-input" value="{$formdata.address1|default:''|escape}" autocomplete="address-line1">
                             </div>
                             <div class="ct-form-row">
-                                <label class="ct-label" for="ct-addr2">{$LANG.clientareaaddress2|default:'Address 2'}</label>
+                                <label class="ct-label" for="ct-addr2">{$LANG.clientareaaddress2}</label>
                                 <input type="text" name="address2" id="ct-addr2" class="ct-input" value="{$formdata.address2|default:''|escape}" autocomplete="address-line2">
                             </div>
                             <div class="ct-form-row">
-                                <label class="ct-label" for="ct-city">{$LANG.clientareacity|default:'City'}</label>
+                                <label class="ct-label" for="ct-city">{$LANG.clientareacity}</label>
                                 <input type="text" name="city" id="ct-city" class="ct-input" value="{$formdata.city|default:''|escape}" autocomplete="address-level2">
                             </div>
                             <div class="ct-form-row">
-                                <label class="ct-label" for="ct-state">{$LANG.clientareastate|default:'State / region'}</label>
+                                <label class="ct-label" for="ct-state">{$LANG.clientareastate}</label>
                                 <input type="text" name="state" id="ct-state" class="ct-input" value="{$formdata.state|default:''|escape}" autocomplete="address-level1">
                             </div>
                             <div class="ct-form-row">
-                                <label class="ct-label" for="ct-zip">{$LANG.clientareapostcode|default:'ZIP / postal code'}</label>
+                                <label class="ct-label" for="ct-zip">{$LANG.clientareapostcode}</label>
                                 <input type="text" name="postcode" id="ct-zip" class="ct-input" value="{$formdata.postcode|default:''|escape}" autocomplete="postal-code">
                             </div>
                             <div class="ct-form-row">
-                                <label class="ct-label">{$LANG.clientareacountry|default:'Country'}</label>
+                                <label class="ct-label">{$LANG.clientareacountry}</label>
                                 <div class="ct-countries">{if isset($countriesdropdown)}{$countriesdropdown}{/if}</div>
                             </div>
                         </div>
@@ -134,7 +134,7 @@
 
             {if isset($formdata.emailPreferences)}
             <div class="card ct-card">
-                <div class="ct-card-header"><h2 class="ct-card-title">{$LANG.clientareacontactsemails|default:'Email preferences'}</h2></div>
+                <div class="ct-card-header"><h2 class="ct-card-title">{$LANG.clientareacontactsemails}</h2></div>
                 <div class="ct-card-body">
                     <div class="ct-prefs">
                         {foreach $formdata.emailPreferences as $emailType => $value}
@@ -151,11 +151,11 @@
 
             <div class="ct-actions">
                 {if $contactid && $contactid neq 'new'}
-                    <button type="button" class="btn-secondary ct-delete-btn" data-ct-delete>{$LANG.clientareadeletecontact|default:'Delete contact'}</button>
+                    <button type="button" class="btn-secondary ct-delete-btn" data-ct-delete>{$LANG.clientareadeletecontact}</button>
                 {/if}
                 <div class="ct-actions-right">
-                    <button type="reset" class="btn-secondary">{$LANG.cancel|default:'Cancel'}</button>
-                    <button type="submit" name="save" value="1" class="btn-primary">{$LANG.clientareasavechanges|default:'Save changes'}</button>
+                    <button type="reset" class="btn-secondary">{$LANG.cancel}</button>
+                    <button type="submit" name="save" value="1" class="btn-primary">{$LANG.clientareasavechanges}</button>
                 </div>
             </div>
         </form>
@@ -164,26 +164,26 @@
 
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.accounttab|default:'Account'}</div>
+            <div class="subnav-heading">{$LANG.accounttab}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.accountdetails|default:'Account Details'}
+                {$LANG.accountdetails}
             </a>
             <a href="{routePath('account-users')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                {$LANG.usermanagement|default:'User Management'}
+                {$LANG.usermanagement}
             </a>
             <a href="{routePath('account-paymentmethods')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                {$LANG.paymentmethods|default:'Payment Methods'}
+                {$LANG.paymentMethods.title}
             </a>
             <a href="{routePath('account-contacts')}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.contacts|default:'Contacts'}
+                {$LANG.contacts}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=emails" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
-                {$LANG.emailstitle|default:'Email History'}
+                {$LANG.emailstitle}
             </a>
         </div>
     </aside>
@@ -195,12 +195,17 @@
     <input type="hidden" name="contactid" value="{$contactid|default:''|escape}">
 </form>
 
+<script>
+var _localLang = {
+    'deleteContactConfirm': '{$LANG.clientareadeletecontactareyousure|escape:"javascript"}'
+};
+</script>
 <script>{literal}
 (function(){
     var btn = document.querySelector('[data-ct-delete]');
     if (!btn) return;
     btn.addEventListener('click', function(){
-        if (!confirm('Delete this contact? This cannot be undone.')) return;
+        if (!confirm(_localLang.deleteContactConfirm)) return;
         document.getElementById('ctDeleteForm').submit();
     });
 })();

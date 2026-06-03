@@ -35,7 +35,7 @@
     <meta charset="{$charset|default:'utf-8'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theme License Required</title>
+    <title>{$hadrianLang.common.licenseRequiredTitle}</title>
     <style>
         body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f7; color: #1d1d1f; }
         .mt-license-required { min-height: 100vh; display: grid; place-items: center; padding: 32px; box-sizing: border-box; }
@@ -356,7 +356,7 @@
         <div class="ph-breadcrumb-inner">
             <a href="{$WEB_ROOT}/" class="ph-back-link">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                {$LANG.home|default:'Home'}
+                {$LANG.home}
             </a>
         </div>
     </nav>

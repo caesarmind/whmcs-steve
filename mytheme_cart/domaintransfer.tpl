@@ -286,8 +286,8 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
 <div id="order-standard_cart">
 
     <header class="st-page-header">
-        <h1>{$LANG.transferdomain|default:'Transfer a Domain'}</h1>
-        <p class="page-subtitle">{$LANG.orderForm.transferExtend|default:'Move your domain from another registrar to us. Your registration is extended by one year on successful transfer.'}*</p>
+        <h1>{$LANG.transferdomain}</h1>
+        <p class="page-subtitle">{$LANG.orderForm.transferExtend}*</p>
     </header>
 
     <div class="st-split">
@@ -318,9 +318,9 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                                    id="inputTransferDomain"
                                    name="domain"
                                    value="{$lookupTerm|escape}"
-                                   placeholder="{$LANG.yourdomainplaceholder|default:'yourdomain'}.{$LANG.yourtldplaceholder|default:'com'}"
+                                   placeholder="{$LANG.yourdomainplaceholder}.{$LANG.yourtldplaceholder}"
                                    data-toggle="tooltip" data-placement="left" data-trigger="manual"
-                                   title="{$LANG.orderForm.enterDomain|default:'Enter the domain you want to transfer'}"
+                                   title="{$LANG.orderForm.enterDomain}"
                                    autocomplete="off" />
                             <button type="submit"
                                     id="btnTransferDomain"
@@ -328,7 +328,7 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                                 <span class="loader w-hidden" id="addTransferLoader" aria-hidden="true">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
                                 </span>
-                                <span id="addToCart">{$LANG.orderForm.addToCart|default:'Transfer'}</span>
+                                <span id="addToCart">{$LANG.orderForm.addToCart}</span>
                             </button>
                         </div>
 
@@ -337,33 +337,33 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                             {* Authorization code (EPP) -- required by WHMCS *}
                             <div class="dt-field">
                                 <label for="inputAuthCode">
-                                    <span>{$LANG.orderForm.authCode|default:'Authorization code (EPP)'}</span>
+                                    <span>{$LANG.orderForm.authCode}</span>
                                     <a class="dt-field-help"
                                        data-toggle="tooltip" data-placement="left"
-                                       title="{$LANG.orderForm.authCodeTooltip|default:'Your current registrar will provide this code. It authorizes the transfer of your domain to us.'}">
+                                       title="{$LANG.orderForm.authCodeTooltip}">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                        {$LANG.orderForm.help|default:'What is this?'}
+                                        {$LANG.orderForm.help}
                                     </a>
                                 </label>
                                 <input type="text"
                                        class="dt-input"
                                        id="inputAuthCode"
                                        name="epp"
-                                       placeholder="{$LANG.orderForm.authCodePlaceholder|default:'Paste your transfer code here'}"
+                                       placeholder="{$LANG.orderForm.authCodePlaceholder}"
                                        data-toggle="tooltip" data-placement="left" data-trigger="manual"
-                                       title="{$LANG.orderForm.required|default:'Required'}"
+                                       title="{$LANG.orderForm.required}"
                                        autocomplete="off" />
                             </div>
 
                             {* Captcha -- simple-captcha image variant *}
                             {if $captcha->isEnabled() && !$captcha->recaptcha->isEnabled()}
                                 <div class="dt-captcha" id="captchaContainer">
-                                    <p>{$LANG.cartSimpleCaptcha|default:'Enter the characters shown below'}</p>
+                                    <p>{$LANG.cartSimpleCaptcha}</p>
                                     <img id="inputCaptchaImage" src="{$systemurl}includes/verifyimage.php" alt="captcha" />
                                     <input id="inputCaptcha"
                                            type="text" name="code" maxlength="6"
                                            data-toggle="tooltip" data-placement="right" data-trigger="manual"
-                                           title="{$LANG.orderForm.required|default:'Required'}"
+                                           title="{$LANG.orderForm.required}"
                                            autocomplete="off" />
                                 </div>
                             {elseif $captcha->isEnabled() && $captcha->recaptcha->isEnabled() && !$captcha->recaptcha->isInvisible()}
@@ -382,30 +382,30 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                 {* ───── Transfer in 3 steps ───── *}
                 <div class="dt-section">
                     <div class="dt-section-head">
-                        <h2>{$LANG.dt.howittitle|default:'Transfer in 3 steps'}</h2>
-                        <p>{$LANG.dt.howitdesc|default:"Simple, fast, and we'll guide you through each step."}</p>
+                        <h2>{$hadrianLang.domains.transferStepsTitle}</h2>
+                        <p>{$hadrianLang.domains.transferStepsDesc}</p>
                     </div>
                     <div class="dt-steps">
                         <div class="dt-step">
                             <div class="dt-step-ico blue" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                             </div>
-                            <h4>{$LANG.dt.step1title|default:'1. Unlock your domain'}</h4>
-                            <p>{$LANG.dt.step1desc|default:'At your current registrar, disable the transfer lock so we can pull it over.'}</p>
+                            <h4>{$hadrianLang.domains.transferStep1Title}</h4>
+                            <p>{$hadrianLang.domains.transferStep1Desc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico green" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
                             </div>
-                            <h4>{$LANG.dt.step2title|default:'2. Get your auth code'}</h4>
-                            <p>{$LANG.dt.step2desc|default:'Your current registrar will email you a transfer authorization (EPP) code.'}</p>
+                            <h4>{$hadrianLang.domains.transferStep2Title}</h4>
+                            <p>{$hadrianLang.domains.transferStep2Desc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico orange" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
                             </div>
-                            <h4>{$LANG.dt.step3title|default:'3. Submit and done'}</h4>
-                            <p>{$LANG.dt.step3desc|default:"Enter the domain and code above. We handle the rest -- you'll see confirmation within 24 hours."}</p>
+                            <h4>{$hadrianLang.domains.transferStep3Title}</h4>
+                            <p>{$hadrianLang.domains.transferStep3Desc}</p>
                         </div>
                     </div>
                 </div>
@@ -413,34 +413,34 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                 {* ───── Why transfer to us ───── *}
                 <div class="dt-section">
                     <div class="dt-section-head">
-                        <h2>{$LANG.dt.whytitle|default:'Why transfer to us'}</h2>
+                        <h2>{$hadrianLang.domains.transferWhyTitle}</h2>
                     </div>
                     <div class="dt-steps">
                         <div class="dt-step">
                             <div class="dt-step-ico purple" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                             </div>
-                            <h4>{$LANG.dt.whyextendtitle|default:'+1 free year'}</h4>
-                            <p>{$LANG.dt.whyextenddesc|default:'Every transfer includes an additional year of registration at no extra cost.'}</p>
+                            <h4>{$hadrianLang.domains.transferWhyExtendTitle}</h4>
+                            <p>{$hadrianLang.domains.transferWhyExtendDesc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico blue" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                             </div>
-                            <h4>{$LANG.dt.why24title|default:'24-hour transfer'}</h4>
-                            <p>{$LANG.dt.why24desc|default:'Most transfers complete within 24 hours -- no downtime for your site.'}</p>
+                            <h4>{$hadrianLang.domains.transferWhy24Title}</h4>
+                            <p>{$hadrianLang.domains.transferWhy24Desc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico green" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                             </div>
-                            <h4>{$LANG.dt.whyprivacytitle|default:'Free WHOIS privacy'}</h4>
-                            <p>{$LANG.dt.whyprivacydesc|default:'Included with every transfer, on every eligible TLD. Keep your info private.'}</p>
+                            <h4>{$hadrianLang.domains.transferWhyPrivacyTitle}</h4>
+                            <p>{$hadrianLang.domains.transferWhyPrivacyDesc}</p>
                         </div>
                     </div>
                 </div>
 
-                <p class="dt-footnote">* {$LANG.orderForm.extendExclusions|default:'Some TLDs are excluded from the free year extension. See the registrar\'s transfer policy for details.'}</p>
+                <p class="dt-footnote">* {$LANG.orderForm.extendExclusions}</p>
 
             </div>{* /.dt-when-full *}
 
@@ -454,10 +454,10 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                     <div class="dt-empty-ico" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h13"/><polyline points="11 7 16 12 11 17"/><path d="M19 5v14"/></svg>
                     </div>
-                    <h2>{$LANG.dt.emptytitle|default:'Enter a domain to transfer'}</h2>
-                    <p>{$LANG.dt.emptydesc|default:"Type your existing domain above and we'll start the transfer flow."}</p>
+                    <h2>{$hadrianLang.domains.transferEmptyTitle}</h2>
+                    <p>{$hadrianLang.domains.transferEmptyDesc}</p>
                     <a href="{$WEB_ROOT}/cart.php?a=add&domain=transfer" class="btn-primary">
-                        {$LANG.dt.emptycta|default:'Start a transfer'}
+                        {$hadrianLang.domains.transferEmptyCta}
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                     </a>
                 </div>

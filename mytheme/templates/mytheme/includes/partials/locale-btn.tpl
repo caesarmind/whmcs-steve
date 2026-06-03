@@ -4,7 +4,7 @@
    exposed $currencies on this page yet); single-currency installs get a
    language-only button. *}
 {assign var=mtShowCurrencyInLocale value=(!isset($currencies) || $currencies|@count > 1)}
-<button type="button" class="locale-btn" aria-label="Choose language{if $mtShowCurrencyInLocale} and currency{/if}" data-locale-open>
+<button type="button" class="locale-btn" aria-label="{$hadrianLang.common.localeChoose}" data-locale-open>
     <span class="flag">{$myTheme.localeFlag|default:'&#127482;&#127480;'}</span>
     <span>{$language|default:'english'|capitalize}</span>
     {if $mtShowCurrencyInLocale}

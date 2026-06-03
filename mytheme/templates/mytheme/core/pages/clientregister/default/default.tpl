@@ -40,14 +40,14 @@
 
 <div class="cr-wrap">
     <div class="card cr-card">
-        <h1 class="cr-title">{$LANG.createaccount|default:'Create your account'}</h1>
-        <p class="cr-sub">{$LANG.createaccountsub|default:'Already have an account?'} <a href="{$WEB_ROOT}/login">{$LANG.signin|default:'Sign in'}</a></p>
+        <h1 class="cr-title">{$hadrianLang.auth.createAccountTitle}</h1>
+        <p class="cr-sub">{$hadrianLang.auth.alreadyHaveAccount} <a href="{$WEB_ROOT}/login">{$hadrianLang.auth.signIn}</a></p>
 
         {if $registrationDisabled}
         {* Admin has disabled standalone registration — point users at the order form. *}
         <div class="cr-error" role="alert">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <div>{$LANG.registerCreateAccount|default:'New accounts can only be created during checkout.'} <a href="{$WEB_ROOT}/cart.php">{$LANG.registerCreateAccountOrder|default:'Place an order'}</a></div>
+            <div>{$LANG.registerCreateAccount} <a href="{$WEB_ROOT}/cart.php">{$LANG.registerCreateAccountOrder}</a></div>
         </div>
         {else}
 
@@ -64,66 +64,66 @@
             {if isset($token) && $token}<input type="hidden" name="token" value="{$token|escape}">{/if}
 
             <section class="cr-section">
-                <h2 class="cr-section-title">{$LANG.personalinformation|default:'Personal information'}</h2>
+                <h2 class="cr-section-title">{$LANG.orderForm.personalInformation}</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="cr-first">{$LANG.clientareafirstname|default:'First name'}{if !in_array('firstname', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.optional|default:'optional'})</span>{/if}</label>
+                        <label class="form-label" for="cr-first">{$LANG.clientareafirstname}{if !in_array('firstname', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.orderForm.optional})</span>{/if}</label>
                         <input type="text" class="form-input" id="cr-first" name="firstname" value="{$clientfirstname|default:''|escape}" autocomplete="given-name"{if !in_array('firstname', $optionalFields)} required{/if} autofocus>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="cr-last">{$LANG.clientarealastname|default:'Last name'}{if !in_array('lastname', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.optional|default:'optional'})</span>{/if}</label>
+                        <label class="form-label" for="cr-last">{$LANG.clientarealastname}{if !in_array('lastname', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.orderForm.optional})</span>{/if}</label>
                         <input type="text" class="form-input" id="cr-last" name="lastname" value="{$clientlastname|default:''|escape}" autocomplete="family-name"{if !in_array('lastname', $optionalFields)} required{/if}>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="cr-email">{$LANG.clientareaemail|default:'Email address'}<span class="cr-req" aria-hidden="true">*</span></label>
+                        <label class="form-label" for="cr-email">{$LANG.clientareaemail}<span class="cr-req" aria-hidden="true">*</span></label>
                         <input type="email" class="form-input" id="cr-email" name="email" value="{$clientemail|default:''|escape}" autocomplete="email" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="cr-phone">{$LANG.clientareaphonenumber|default:'Phone number'}{if !in_array('phonenumber', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.optional|default:'optional'})</span>{/if}</label>
+                        <label class="form-label" for="cr-phone">{$LANG.clientareaphonenumber}{if !in_array('phonenumber', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.orderForm.optional})</span>{/if}</label>
                         <input type="tel" class="form-input" id="cr-phone" name="phonenumber" value="{$clientphonenumber|default:''|escape}" autocomplete="tel"{if !in_array('phonenumber', $optionalFields)} required{/if}>
                     </div>
                 </div>
             </section>
 
             <section class="cr-section">
-                <h2 class="cr-section-title">{$LANG.billingaddress|default:'Billing address'}</h2>
+                <h2 class="cr-section-title">{$LANG.orderForm.billingAddress}</h2>
                 <div class="form-group">
-                    <label class="form-label" for="cr-company">{$LANG.clientareacompanyname|default:'Company name'} <span class="cr-opt">({$LANG.optional|default:'optional'})</span></label>
+                    <label class="form-label" for="cr-company">{$LANG.clientareacompanyname} <span class="cr-opt">({$LANG.orderForm.optional})</span></label>
                     <input type="text" class="form-input" id="cr-company" name="companyname" value="{$clientcompanyname|default:''|escape}" autocomplete="organization">
                 </div>
                 {if $showTaxIdField}
                 <div class="form-group">
-                    <label class="form-label" for="cr-taxid">{$taxLabel|default:'Tax ID'} <span class="cr-opt">({$LANG.optional|default:'optional'})</span></label>
+                    <label class="form-label" for="cr-taxid">{$taxLabel|default:'Tax ID'} <span class="cr-opt">({$LANG.orderForm.optional})</span></label>
                     <input type="text" class="form-input" id="cr-taxid" name="tax_id" value="{$clientTaxId|default:''|escape}">
                 </div>
                 {/if}
                 <div class="form-group">
-                    <label class="form-label" for="cr-addr1">{$LANG.clientareaaddress1|default:'Address line 1'}{if !in_array('address1', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.optional|default:'optional'})</span>{/if}</label>
+                    <label class="form-label" for="cr-addr1">{$LANG.clientareaaddress1}{if !in_array('address1', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.orderForm.optional})</span>{/if}</label>
                     <input type="text" class="form-input" id="cr-addr1" name="address1" value="{$clientaddress1|default:''|escape}" autocomplete="address-line1"{if !in_array('address1', $optionalFields)} required{/if}>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="cr-addr2">{$LANG.clientareaaddress2|default:'Address line 2'} <span class="cr-opt">({$LANG.optional|default:'optional'})</span></label>
+                    <label class="form-label" for="cr-addr2">{$LANG.clientareaaddress2} <span class="cr-opt">({$LANG.orderForm.optional})</span></label>
                     <input type="text" class="form-input" id="cr-addr2" name="address2" value="{$clientaddress2|default:''|escape}" autocomplete="address-line2">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="cr-city">{$LANG.clientareacity|default:'City'}{if !in_array('city', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.optional|default:'optional'})</span>{/if}</label>
+                        <label class="form-label" for="cr-city">{$LANG.clientareacity}{if !in_array('city', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.orderForm.optional})</span>{/if}</label>
                         <input type="text" class="form-input" id="cr-city" name="city" value="{$clientcity|default:''|escape}" autocomplete="address-level2"{if !in_array('city', $optionalFields)} required{/if}>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="cr-state">{$LANG.clientareastate|default:'State / region'}{if !in_array('state', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.optional|default:'optional'})</span>{/if}</label>
+                        <label class="form-label" for="cr-state">{$LANG.clientareastate}{if !in_array('state', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.orderForm.optional})</span>{/if}</label>
                         <input type="text" class="form-input" id="cr-state" name="state" value="{$clientstate|default:''|escape}" autocomplete="address-level1"{if !in_array('state', $optionalFields)} required{/if}>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="cr-zip">{$LANG.clientareapostcode|default:'Zip / postal code'}{if !in_array('postcode', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.optional|default:'optional'})</span>{/if}</label>
+                        <label class="form-label" for="cr-zip">{$LANG.clientareapostcode}{if !in_array('postcode', $optionalFields)}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.orderForm.optional})</span>{/if}</label>
                         <input type="text" class="form-input" id="cr-zip" name="postcode" value="{$clientpostcode|default:''|escape}" autocomplete="postal-code"{if !in_array('postcode', $optionalFields)} required{/if}>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="cr-country">{$LANG.clientareacountry|default:'Country'}<span class="cr-req" aria-hidden="true">*</span></label>
+                        <label class="form-label" for="cr-country">{$LANG.clientareacountry}<span class="cr-req" aria-hidden="true">*</span></label>
                         <select class="form-select" id="cr-country" name="country" autocomplete="country" required>
                             {if isset($clientcountries) && $clientcountries|@count > 0}
                                 {foreach $clientcountries as $code => $name}
@@ -137,17 +137,17 @@
 
             {if (isset($customfields) && $customfields) || (isset($currencies) && $currencies)}
             <section class="cr-section">
-                <h2 class="cr-section-title">{$LANG.orderadditionalrequiredinfo|default:'Additional information'}</h2>
+                <h2 class="cr-section-title">{$LANG.orderadditionalrequiredinfo}</h2>
                 {if isset($customfields) && $customfields}
                     {foreach from=$customfields item=customfield}
                     <div class="form-group cr-customfield">
                         {if $customfield.type == 'tickbox'}
                         <label class="cr-check" for="customfield{$customfield.id}">
                             {$customfield.input}
-                            <span>{$customfield.name|strip_tags}{if $customfield.required}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.optional|default:'optional'})</span>{/if}</span>
+                            <span>{$customfield.name|strip_tags}{if $customfield.required}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.orderForm.optional})</span>{/if}</span>
                         </label>
                         {else}
-                        <label class="form-label" for="customfield{$customfield.id}">{$customfield.name|strip_tags}{if $customfield.required}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.optional|default:'optional'})</span>{/if}</label>
+                        <label class="form-label" for="customfield{$customfield.id}">{$customfield.name|strip_tags}{if $customfield.required}<span class="cr-req" aria-hidden="true">*</span>{else} <span class="cr-opt">({$LANG.orderForm.optional})</span>{/if}</label>
                         {$customfield.input}
                         {/if}
                         {if isset($customfield.description) && $customfield.description}<p class="cr-help">{$customfield.description|strip_tags}</p>{/if}
@@ -156,7 +156,7 @@
                 {/if}
                 {if isset($currencies) && $currencies}
                 <div class="form-group">
-                    <label class="form-label" for="cr-currency">{$LANG.choosecurrency|default:'Preferred currency'}<span class="cr-req" aria-hidden="true">*</span></label>
+                    <label class="form-label" for="cr-currency">{$LANG.choosecurrency}<span class="cr-req" aria-hidden="true">*</span></label>
                     <select class="form-select" id="cr-currency" name="currency">
                         {foreach from=$currencies item=curr}
                         <option value="{$curr.id}"{if (!$smarty.post.currency && $curr.default) || $smarty.post.currency == $curr.id} selected{/if}>{$curr.code}</option>
@@ -169,7 +169,7 @@
 
             {if isset($accountDetailsExtraFields) && !empty($accountDetailsExtraFields)}
             <section class="cr-section">
-                <h2 class="cr-section-title">{$LANG.orderForm.additionalInformation|default:'Additional information'}</h2>
+                <h2 class="cr-section-title">{$LANG.orderForm.additionalInformation}</h2>
                 {foreach $accountDetailsExtraFields as $field}
                 <div class="form-group cr-customfield">{$field.input}</div>
                 {/foreach}
@@ -177,14 +177,14 @@
             {/if}
 
             <section class="cr-section">
-                <h2 class="cr-section-title">{$LANG.accountsecurity|default:'Account security'}</h2>
+                <h2 class="cr-section-title">{$LANG.orderForm.accountSecurity}</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="cr-pw1">{$LANG.password|default:'Password'}<span class="cr-req" aria-hidden="true">*</span></label>
+                        <label class="form-label" for="cr-pw1">{$LANG.clientareapassword}<span class="cr-req" aria-hidden="true">*</span></label>
                         <input type="password" class="form-input" id="cr-pw1" name="password" autocomplete="new-password" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="cr-pw2">{$LANG.confirmpassword|default:'Confirm password'}<span class="cr-req" aria-hidden="true">*</span></label>
+                        <label class="form-label" for="cr-pw2">{$LANG.clientareaconfirmpassword}<span class="cr-req" aria-hidden="true">*</span></label>
                         <input type="password" class="form-input" id="cr-pw2" name="password2" autocomplete="new-password" required>
                     </div>
                 </div>
@@ -193,21 +193,21 @@
                    flow but self-contained (no jQuery/Bootstrap/WHMCS JS on this page). *}
                 <button type="button" class="cr-gen-pw generate-password" data-targetfields="cr-pw1,cr-pw2">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-                    {$LANG.generatePassword.btnLabel|default:'Generate password'}
+                    {$LANG.generatePassword.btnLabel}
                 </button>
                 {if isset($securityquestions) && $securityquestions}
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="cr-secq">{$LANG.clientareasecurityquestion|default:'Security question'}<span class="cr-req" aria-hidden="true">*</span></label>
+                        <label class="form-label" for="cr-secq">{$LANG.clientareasecurityquestion}<span class="cr-req" aria-hidden="true">*</span></label>
                         <select class="form-select" id="cr-secq" name="securityqid">
-                            <option value="">{$LANG.clientareasecurityquestion|default:'Select a security question'}</option>
+                            <option value="">{$LANG.clientareasecurityquestion}</option>
                             {foreach $securityquestions as $question}
                             <option value="{$question.id}"{if $question.id == $securityqid} selected{/if}>{$question.question|escape}</option>
                             {/foreach}
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="cr-seca">{$LANG.clientareasecurityanswer|default:'Answer'}<span class="cr-req" aria-hidden="true">*</span></label>
+                        <label class="form-label" for="cr-seca">{$LANG.clientareasecurityanswer}<span class="cr-req" aria-hidden="true">*</span></label>
                         <input type="password" class="form-input" id="cr-seca" name="securityqans" autocomplete="off">
                     </div>
                 </div>
@@ -220,14 +220,14 @@
                The native field name is marketingoptin; styled as an Apple toggle. *}
             {if $showMarketingEmailOptIn}
             <section class="cr-section cr-marketing">
-                <h2 class="cr-section-title">{$LANG.emailMarketing.joinOurMailingList|default:'Join our mailing list'}</h2>
+                <h2 class="cr-section-title">{$LANG.emailMarketing.joinOurMailingList}</h2>
                 {if isset($marketingEmailOptInMessage) && $marketingEmailOptInMessage}
                 <p class="cr-marketing-msg">{$marketingEmailOptInMessage}</p>
                 {/if}
                 <label class="cr-switch">
                     <input type="checkbox" name="marketingoptin" value="1"{if $marketingEmailOptIn} checked{/if}>
                     <span class="cr-switch-track"><span class="cr-switch-thumb"></span></span>
-                    <span class="cr-switch-text">{$LANG.emailMarketing.optInLabel|default:'Yes, send me product news and special offers'}</span>
+                    <span class="cr-switch-text">{$hadrianLang.auth.marketingOptInLabel}</span>
                 </label>
             </section>
             {/if}
@@ -248,12 +248,12 @@
             <div class="cr-terms">
                 <label class="cr-check">
                     <input type="checkbox" name="accepttos" class="accepttos" required>
-                    <span>{$LANG.ordertosagreement|default:'I have read and agree to the'} <a href="{$tosurl}" target="_blank" rel="noopener">{$LANG.ordertos|default:'Terms of Service'}</a><span class="cr-req" aria-hidden="true">*</span></span>
+                    <span>{$LANG.ordertosagreement} <a href="{$tosurl}" target="_blank" rel="noopener">{$LANG.ordertos}</a><span class="cr-req" aria-hidden="true">*</span></span>
                 </label>
             </div>
             {/if}
 
-            <button type="submit" class="btn-primary cr-submit{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.clientregistertitle|default:'Create account'}</button>
+            <button type="submit" class="btn-primary cr-submit{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.clientregistertitle}</button>
         </form>
         {/if}
     </div>
@@ -270,30 +270,30 @@
     <div class="cr-gp-backdrop" data-gp-close></div>
     <div class="cr-gp-dialog" role="document">
         <div class="cr-gp-head">
-            <h3 class="cr-gp-title" id="crGpTitle">{$LANG.generatePassword.title|default:'Generate a password'}</h3>
-            <button type="button" class="cr-gp-x" data-gp-close aria-label="{$LANG.close|default:'Close'}">
+            <h3 class="cr-gp-title" id="crGpTitle">{$LANG.generatePassword.title}</h3>
+            <button type="button" class="cr-gp-x" data-gp-close aria-label="{$LANG.close}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
         <div class="cr-gp-body">
             <div class="cr-gp-field">
-                <label for="crGpLength">{$LANG.generatePassword.pwLength|default:'Password length'}</label>
+                <label for="crGpLength">{$LANG.generatePassword.pwLength}</label>
                 <input type="number" min="8" max="64" step="1" value="16" id="crGpLength">
             </div>
             <div class="cr-gp-field">
-                <label for="crGpOutput">{$LANG.generatePassword.generatedPw|default:'Generated password'}</label>
+                <label for="crGpOutput">{$LANG.generatePassword.generatedPw}</label>
                 <div class="cr-gp-output-row">
                     <input type="text" id="crGpOutput" readonly placeholder="—">
-                    <button type="button" class="cr-gp-ghost" id="crGpRegen" title="{$LANG.generatePassword.generateNew|default:'Generate new'}">
+                    <button type="button" class="cr-gp-ghost" id="crGpRegen" title="{$LANG.generatePassword.generateNew}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-                        <span>{$LANG.generatePassword.generateNew|default:'New'}</span>
+                        <span>{$hadrianLang.auth.generateNewShort}</span>
                     </button>
                 </div>
             </div>
         </div>
         <div class="cr-gp-foot">
-            <button type="button" class="btn-secondary" data-gp-close>{$LANG.close|default:'Cancel'}</button>
-            <button type="button" class="btn-primary" id="crGpInsert">{$LANG.generatePassword.copyAndInsert|default:'Copy &amp; insert'}</button>
+            <button type="button" class="btn-secondary" data-gp-close>{$hadrianLang.common.cancel}</button>
+            <button type="button" class="btn-primary" id="crGpInsert">{$LANG.generatePassword.copyAndInsert}</button>
         </div>
     </div>
 </div>

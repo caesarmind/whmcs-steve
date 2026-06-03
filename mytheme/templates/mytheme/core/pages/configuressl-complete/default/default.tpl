@@ -37,25 +37,25 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.domainssloptions|default:'SSL Certificate'}</p>
-    <h1>{$LANG.sslconfigured|default:'Certificate request submitted'}</h1>
-    <p class="page-subtitle">{$LANG.sslcompleteintro|default:'Complete the validation step below so the certificate authority can issue your certificate.'}</p>
+    <p class="page-eyebrow">{$LANG.domainssloptions}</p>
+    <h1>{$hadrianLang.ssl.requestSubmittedTitle}</h1>
+    <p class="page-subtitle">{$hadrianLang.ssl.completeIntro}</p>
 </header>
 
 <div class="ssl-steps">
     <div class="ssl-step done">
         <span class="ssl-step-num">1</span>
-        <span class="ssl-step-label">{$LANG.sslstepconfig|default:'Configuration'}</span>
+        <span class="ssl-step-label">{$hadrianLang.ssl.stepConfig}</span>
     </div>
     <span class="ssl-step-sep"></span>
     <div class="ssl-step done">
         <span class="ssl-step-num">2</span>
-        <span class="ssl-step-label">{$LANG.sslstepvalidate|default:'Validation'}</span>
+        <span class="ssl-step-label">{$hadrianLang.ssl.stepValidate}</span>
     </div>
     <span class="ssl-step-sep"></span>
     <div class="ssl-step active">
         <span class="ssl-step-num">3</span>
-        <span class="ssl-step-label">{$LANG.sslstepcomplete|default:'Complete'}</span>
+        <span class="ssl-step-label">{$hadrianLang.ssl.stepComplete}</span>
     </div>
 </div>
 
@@ -66,74 +66,74 @@
         <div class="ssl-success-ico">
             <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <h2>{$LANG.sslconfigcomplete|default:'Configuration complete'}</h2>
-        <p>{if isset($domain) && $domain}{$LANG.sslcompletedfor|default:'Your certificate request for'} {$domain|escape} {$LANG.sslcompletedissued|default:'has been submitted.'}{else}{$LANG.sslcompletegeneric|default:'Your certificate request has been submitted.'}{/if}</p>
+        <h2>{$LANG.sslconfigcomplete}</h2>
+        <p>{if isset($domain) && $domain}{$hadrianLang.ssl.completedForPrefix} {$domain|escape} {$hadrianLang.ssl.completedForSuffix}{else}{$hadrianLang.ssl.completedGeneric}{/if}</p>
     </div>
 
     {* ---- Validation instructions ---- *}
     {if isset($authData) && $authData}
         {if $authData->methodNameConstant() == 'emailauth'}
         <div class="card" style="max-width: 600px; margin: 0 auto;">
-            <div class="card-header"><h2 class="card-title">{$LANG.sslemailinformation|default:'Email validation'}</h2></div>
+            <div class="card-header"><h2 class="card-title">{$LANG.ssl.emailInformation}</h2></div>
             <div class="card-body">
                 <div class="ssl-alert info">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    <div>{$LANG.sslemailsteps|default:'A validation email has been sent. Click the link inside to approve issuance.'}</div>
+                    <div>{$LANG.ssl.emailSteps}</div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.email|default:'Email'}</label>
+                    <label class="form-label">{$LANG.email}</label>
                     <input type="text" class="form-input" value="{$authData->email|escape}" readonly>
                 </div>
             </div>
         </div>
         {elseif $authData->methodNameConstant() == 'dnsauth'}
         <div class="card" style="max-width: 600px; margin: 0 auto;">
-            <div class="card-header"><h2 class="card-title">{$LANG.ssldnsrecordinformation|default:'DNS record validation'}</h2></div>
+            <div class="card-header"><h2 class="card-title">{$LANG.ssl.dnsRecordInformation}</h2></div>
             <div class="card-body">
                 <div class="ssl-alert info">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    <div>{$LANG.ssldnssteps|default:'Add the following record to your domain DNS. Issuance completes automatically once it propagates.'}</div>
+                    <div>{$LANG.ssl.dnsSteps}</div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.ssltype|default:'Type'}</label>
+                    <label class="form-label">{$LANG.ssl.type}</label>
                     <input type="text" class="form-input" value="{$authData->type|escape}" readonly>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.sslhost|default:'Host'}</label>
+                    <label class="form-label">{$LANG.ssl.host}</label>
                     <div class="ssl-copy">
                         <input type="text" id="sslDnsHost" class="form-input" value="{$authData->host|escape}" readonly>
-                        <button type="button" data-copy="#sslDnsHost" title="{$LANG.copy|default:'Copy'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+                        <button type="button" data-copy="#sslDnsHost" title="{$LANG.copy}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.sslvalue|default:'Value'}</label>
+                    <label class="form-label">{$LANG.ssl.value}</label>
                     <div class="ssl-copy">
                         <input type="text" id="sslDnsValue" class="form-input" value="{$authData->value|escape}" readonly>
-                        <button type="button" data-copy="#sslDnsValue" title="{$LANG.copy|default:'Copy'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+                        <button type="button" data-copy="#sslDnsValue" title="{$LANG.copy}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
                     </div>
                 </div>
             </div>
         </div>
         {elseif $authData->methodNameConstant() == 'fileauth'}
         <div class="card" style="max-width: 600px; margin: 0 auto;">
-            <div class="card-header"><h2 class="card-title">{$LANG.sslfileinformation|default:'File validation'}</h2></div>
+            <div class="card-header"><h2 class="card-title">{$LANG.ssl.fileInformation}</h2></div>
             <div class="card-body">
                 <div class="ssl-alert info">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    <div>{$LANG.sslfilesteps|default:'Upload a file with the contents below to the URL shown on your web server.'}</div>
+                    <div>{$LANG.ssl.fileSteps}</div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.sslurl|default:'File URL'}</label>
+                    <label class="form-label">{$LANG.ssl.url}</label>
                     <div class="ssl-copy">
                         <input type="text" id="sslFileUrl" class="form-input" value="http://{$domain|default:''|escape}/{$authData->filePath()|escape}" readonly>
-                        <button type="button" data-copy="#sslFileUrl" title="{$LANG.copy|default:'Copy'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+                        <button type="button" data-copy="#sslFileUrl" title="{$LANG.copy}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.sslvalue|default:'File contents'}</label>
+                    <label class="form-label">{$LANG.ssl.value}</label>
                     <div class="ssl-copy">
                         <input type="text" id="sslFileVal" class="form-input" value="{$authData->contents|escape}" readonly>
-                        <button type="button" data-copy="#sslFileVal" title="{$LANG.copy|default:'Copy'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+                        <button type="button" data-copy="#sslFileVal" title="{$LANG.copy}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
                     </div>
                 </div>
             </div>
@@ -141,24 +141,24 @@
         {/if}
     {elseif $sslDemo}
         <div class="card" style="max-width: 600px; margin: 0 auto;">
-            <div class="card-header"><h2 class="card-title">{$LANG.ssldnsrecordinformation|default:'DNS record validation'}</h2></div>
+            <div class="card-header"><h2 class="card-title">{$LANG.ssl.dnsRecordInformation}</h2></div>
             <div class="card-body">
                 <div class="ssl-alert info">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    <div>{$LANG.ssldnssteps|default:'Add the following record to your domain DNS. Issuance completes automatically once it propagates.'}</div>
+                    <div>{$LANG.ssl.dnsSteps}</div>
                 </div>
                 <dl class="ssl-dl">
-                    <dt>{$LANG.ssltype|default:'Type'}</dt><dd>CNAME</dd>
-                    <dt>{$LANG.sslhost|default:'Host'}</dt><dd>_acme-challenge.hendersondesign.com</dd>
-                    <dt>{$LANG.sslvalue|default:'Value'}</dt><dd>a1b2c3d4e5f6.dcv.digicert.com</dd>
+                    <dt>{$LANG.ssl.type}</dt><dd>CNAME</dd>
+                    <dt>{$LANG.ssl.host}</dt><dd>_acme-challenge.hendersondesign.com</dd>
+                    <dt>{$LANG.ssl.value}</dt><dd>a1b2c3d4e5f6.dcv.digicert.com</dd>
                 </dl>
             </div>
         </div>
     {/if}
 
     <div class="btn-group" style="justify-content: center; margin-top: 24px;">
-        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'View my services'}</a>
-        <a href="{$WEB_ROOT}/supporttickets.php" class="btn-secondary">{$LANG.contactus|default:'Contact support'}</a>
+        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
+        <a href="{$WEB_ROOT}/supporttickets.php" class="btn-secondary">{$LANG.contactus}</a>
     </div>
 
 </div>{* /.when-full *}
@@ -170,9 +170,9 @@
         <div class="ssl-notice-ico">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         </div>
-        <p class="ssl-notice-title">{$LANG.sslconfigfailed|default:'Configuration could not be completed'}</p>
-        <p class="ssl-notice-sub">{if isset($errormessage) && $errormessage}{$errormessage|strip_tags}{else}{$LANG.sslconfigfailedsub|default:'Something went wrong while submitting your certificate request. Try again or contact support.'}{/if}</p>
-        <a href="{$WEB_ROOT}/configuressl.php" class="btn-primary">{$LANG.tryagain|default:'Try again'}</a>
+        <p class="ssl-notice-title">{$hadrianLang.ssl.configFailed}</p>
+        <p class="ssl-notice-sub">{if isset($errormessage) && $errormessage}{$errormessage|strip_tags}{else}{$hadrianLang.ssl.configFailedSub}{/if}</p>
+        <a href="{$WEB_ROOT}/configuressl.php" class="btn-primary">{$LANG.tryagain}</a>
     </div>
 </div>
 {/if}

@@ -1394,25 +1394,25 @@ button.generate-password:hover {
 
         <header class="co-page-header">
             <div>
-                <h1>{$LANG.orderForm.checkout|default:'Your cart'}</h1>
-                <p class="co-sub">{$LANG.orderForm.almostDone|default:'Almost there. Enter your details, choose how you\'d like to pay, and complete your order.'}</p>
+                <h1>{$LANG.orderForm.checkout}</h1>
+                <p class="co-sub">{$hadrianLang.cart.checkoutSubtitle}</p>
             </div>
             <a href="{$WEB_ROOT}/cart.php?a=view" class="co-back-cart">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                {$LANG.orderForm.backToCart|default:'Back to cart'}
+                {$hadrianLang.cart.backToCart}
             </a>
         </header>
 
-        <div class="co-steps" aria-label="Checkout progress">
-            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.orderForm.chooseProduct|default:'Choose plan'}</span>
+        <div class="co-steps" aria-label="{$hadrianLang.cart.checkoutProgress}">
+            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepChoosePlan}</span>
             <span class="co-step-sep">&rsaquo;</span>
-            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.cartdomain|default:'Domain'}</span>
+            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepDomain}</span>
             <span class="co-step-sep">&rsaquo;</span>
-            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$LANG.cartconfigure|default:'Configure'}</span>
+            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepConfigure}</span>
             <span class="co-step-sep">&rsaquo;</span>
-            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Cart</span>
+            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepCart}</span>
             <span class="co-step-sep">&rsaquo;</span>
-            <span class="co-step active"><span class="co-step-num">5</span>{$LANG.checkout|default:'Checkout'}</span>
+            <span class="co-step active"><span class="co-step-num">5</span>{$LANG.checkout}</span>
         </div>
 
         <div class="co-split">
@@ -1469,9 +1469,9 @@ button.generate-password:hover {
                 {if $hookOutput}
                     <div class="co-lastchance" style="margin-bottom: 16px;">
                         <div class="co-lastchance-head">
-                            <span class="co-lastchance-badge">{$LANG.lastchance|default:'Last chance'}</span>
-                            <span class="co-lastchance-title">{$LANG.lastchancetitle|default:'Protect your services and add value'}</span>
-                            <span class="co-lastchance-sub">{$LANG.oneclickadd|default:'One-click add. Remove anytime.'}</span>
+                            <span class="co-lastchance-badge">{$hadrianLang.cart.lastChance}</span>
+                            <span class="co-lastchance-title">{$hadrianLang.cart.lastChanceTitle}</span>
+                            <span class="co-lastchance-sub">{$hadrianLang.cart.oneClickAdd}</span>
                         </div>
                         <div class="co-lastchance-body">
                             {foreach $hookOutput as $output}
@@ -1511,7 +1511,7 @@ button.generate-password:hover {
                     <div class="co-notes" style="margin-bottom: 16px;">
                         <label class="co-notes-label" for="orderNotesTextarea">
                             {$LANG.orderForm.additionalNotes}
-                            <span class="hint">{$LANG.orderForm.optional|default:'Optional'} &mdash; {$LANG.includedwithyourorder|default:'included with your order'}</span>
+                            <span class="hint">{$LANG.orderForm.optional} &mdash; {$hadrianLang.cart.includedWithOrder}</span>
                         </label>
                         <textarea id="orderNotesTextarea" name="notes" class="co-notes-area" rows="3" placeholder="{$LANG.ordernotesdescription}">{$orderNotes}</textarea>
                     </div>

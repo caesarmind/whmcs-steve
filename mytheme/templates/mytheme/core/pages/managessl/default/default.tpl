@@ -48,11 +48,11 @@
 <header class="page-header">
     <div class="page-header-row">
         <div>
-            <p class="page-eyebrow">{$LANG.domainssloptions|default:'SSL Certificates'}</p>
-            <h1>{$LANG.nav_manage_ssl|default:'Manage SSL'}</h1>
-            <p class="page-subtitle">{$LANG.sslmanageintro|default:'View status, configure, or renew the certificates on your account.'}</p>
+            <p class="page-eyebrow">{$LANG.domainssloptions}</p>
+            <h1>{$LANG.nav_manage_ssl}</h1>
+            <p class="page-subtitle">{$hadrianLang.ssl.manageIntro}</p>
         </div>
-        {if $sslFull}<a href="{$WEB_ROOT}/cart.php?gid=ssl" class="btn-primary">{$LANG.sslordernew|default:'Order new certificate'}</a>{/if}
+        {if $sslFull}<a href="{$WEB_ROOT}/cart.php?gid=ssl" class="btn-primary">{$hadrianLang.ssl.orderNew}</a>{/if}
     </div>
 </header>
 
@@ -63,10 +63,10 @@
             <table class="ssl-table">
                 <thead>
                     <tr>
-                        <th>{$LANG.ssldomain|default:'Domain'}</th>
-                        <th>{$LANG.sslproduct|default:'Certificate'}</th>
-                        <th>{$LANG.invoicesstatus|default:'Status'}</th>
-                        <th>{$LANG.sslrenewaldate|default:'Renews'}</th>
+                        <th>{$LANG.ssldomain}</th>
+                        <th>{$LANG.sslproduct}</th>
+                        <th>{$LANG.invoicesstatus}</th>
+                        <th>{$LANG.sslrenewaldate}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -79,9 +79,9 @@
                         <td><span class="ssl-pill {$row.statusClass}">{$row.status|escape}</span></td>
                         <td class="ssl-date">{$row.expires|escape}</td>
                         <td class="ssl-actions-cell">
-                            {if $row.action == 'configure'}<a href="{$WEB_ROOT}/configuressl.php" class="ssl-action">{$LANG.sslconfigure|default:'Configure'}</a>
-                            {elseif $row.action == 'renew'}<a href="{$WEB_ROOT}/clientarea.php?action=services" class="ssl-action">{$LANG.renew|default:'Renew'}</a>
-                            {else}<a href="{$WEB_ROOT}/clientarea.php?action=services" class="ssl-action">{$LANG.manageproduct|default:'Manage'}</a>{/if}
+                            {if $row.action == 'configure'}<a href="{$WEB_ROOT}/configuressl.php" class="ssl-action">{$LANG.sslconfigure}</a>
+                            {elseif $row.action == 'renew'}<a href="{$WEB_ROOT}/clientarea.php?action=services" class="ssl-action">{$LANG.renew}</a>
+                            {else}<a href="{$WEB_ROOT}/clientarea.php?action=services" class="ssl-action">{$LANG.manageproduct}</a>{/if}
                         </td>
                     </tr>
                     {/foreach}
@@ -124,27 +124,27 @@
 
                         <tr>
                             <td>
-                                {if $awaitingConfig}<span class="ssl-pill info">{$LANG.sslawaitingconfig|default:'Awaiting configuration'}</span>
+                                {if $awaitingConfig}<span class="ssl-pill info">{$LANG.sslawaitingconfig}</span>
                                 {else}<span class="ssl-domain">{$sslDomain|escape}</span>{/if}
                             </td>
                             <td>{$sslName|escape}{if $vType} <span class="ssl-type {$vTypeClass}">{$vType|escape}</span>{/if}</td>
                             <td>
-                                {if $awaitingConfig}<span class="ssl-pill info">{$LANG.sslawaitingconfig|default:'Awaiting config'}</span>
-                                {elseif $awaitingIssuance}<span class="ssl-pill info">{$LANG.sslawaitingissuance|default:'Awaiting issuance'}</span>
-                                {elseif $isPast}<span class="ssl-pill expired">{$LANG.clientareaexpired|default:'Expired'}</span>
-                                {elseif $daysTill < 60}<span class="ssl-pill warn">{$LANG.expiringsoon|default:'Expiring soon'}</span>
-                                {else}<span class="ssl-pill active">{$LANG.clientareaactive|default:'Active'}</span>{/if}
+                                {if $awaitingConfig}<span class="ssl-pill info">{$LANG.sslawaitingconfig}</span>
+                                {elseif $awaitingIssuance}<span class="ssl-pill info">{$LANG.sslawaitingissuance}</span>
+                                {elseif $isPast}<span class="ssl-pill expired">{$LANG.clientareaexpired}</span>
+                                {elseif $daysTill < 60}<span class="ssl-pill warn">{$LANG.expiringsoon}</span>
+                                {else}<span class="ssl-pill active">{$LANG.clientareaactive}</span>{/if}
                             </td>
                             <td class="ssl-date">{if $sslRenews}{$sslRenews|escape}{else}-{/if}</td>
                             <td class="ssl-actions-cell">
-                                {if $awaitingConfig}<a href="{$sslProduct->getConfigurationUrl()}" class="ssl-action">{$LANG.sslconfigure|default:'Configure'}</a>{/if}
+                                {if $awaitingConfig}<a href="{$sslProduct->getConfigurationUrl()}" class="ssl-action">{$LANG.sslconfigure}</a>{/if}
                                 {if $isFuture && isset($sslProduct->id)}
                                 <form class="ssl-action-form" action="{$sslProduct->getUpgradeUrl()}" method="post">
                                     <input type="hidden" name="id" value="{$sslProduct->id}">
-                                    <button type="submit" class="ssl-action"{if $vType == 'EV'} disabled{/if}>{$LANG.upgrade|default:'Renew'}</button>
+                                    <button type="submit" class="ssl-action"{if $vType == 'EV'} disabled{/if}>{$LANG.upgrade}</button>
                                 </form>
                                 {/if}
-                                <a href="{$WEB_ROOT}/clientarea.php?action=services" class="ssl-action">{$LANG.manageproduct|default:'Manage'}</a>
+                                <a href="{$WEB_ROOT}/clientarea.php?action=services" class="ssl-action">{$LANG.manageproduct}</a>
                             </td>
                         </tr>
                     {/foreach}
@@ -163,9 +163,9 @@
             <div class="ssl-empty-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <p class="ssl-empty-title">{$LANG.sslnocertificates|default:'No certificates yet'}</p>
-            <p class="ssl-empty-sub">{$LANG.sslnocertificatessub|default:"Once you order an SSL certificate it'll show up here for management."}</p>
-            <a href="{$WEB_ROOT}/cart.php?gid=ssl" class="btn-primary">{$LANG.sslordernew|default:'Browse SSL'}</a>
+            <p class="ssl-empty-title">{$hadrianLang.ssl.noCertificates}</p>
+            <p class="ssl-empty-sub">{$hadrianLang.ssl.noCertificatesSub}</p>
+            <a href="{$WEB_ROOT}/cart.php?gid=ssl" class="btn-primary">{$hadrianLang.ssl.browse}</a>
         </div>
     </div>
 </div>

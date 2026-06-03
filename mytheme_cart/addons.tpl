@@ -24,7 +24,7 @@
 
             <div class="header-lined">
                 <h1 class="font-size-36">{$LANG.cartproductaddons}</h1>
-                <p>Add-ons extend an existing service. Pick the service you'd like to attach each one to.</p>
+                <p>{$hadrianLang.cart.addonsPageSubtitle}</p>
             </div>
 
             {include file="orderforms/$carttpl/sidebar-categories-collapsed.tpl"}

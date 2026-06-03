@@ -58,7 +58,7 @@
             <i class="fas fa-chevron-right rotate"
                data-toggle="tooltip"
                data-placement="right"
-               title="{lang key='recommendations.learnMore'|default:'Click to learn more'}"></i>
+               title="{lang key='recommendations.learnMore'}"></i>
         </div>
 
         <div class="icon mc-promo-icon">

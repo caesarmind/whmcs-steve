@@ -899,32 +899,32 @@
         {* ── Page header ── *}
         <header class="page-header">
             <div>
-                <h1>{$LANG.viewcart|default:'Your cart'}</h1>
+                <h1>{$LANG.cartreviewcheckout}</h1>
                 <p class="sub">
                     {if $cartitems > 0}
-                        <strong>{$cartitems} {if $cartitems == 1}item{else}items{/if}</strong>
+                        <strong>{$cartitems} {if $cartitems == 1}{$hadrianLang.cart.itemCount}{else}{$hadrianLang.cart.itemCountPlural}{/if}</strong>
                     {else}
-                        {$LANG.cartempty|default:'Your cart is empty'}
+                        {$LANG.cartempty}
                     {/if}
                 </p>
             </div>
             <a href="{$WEB_ROOT}/cart.php" class="btn-secondary" style="height: 36px; padding: 0 16px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; border-radius: 999px;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 5 12 12 19"/></svg>
-                {$LANG.orderForm.continueShopping|default:'Continue shopping'}
+                {$LANG.orderForm.continueShopping}
             </a>
         </header>
 
         {* ── Step strip (Cart = step 4 of 5) ── *}
-        <div class="ct-steps" aria-label="Checkout progress">
-            <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Choose plan</span>
+        <div class="ct-steps" aria-label="{$hadrianLang.cart.checkoutProgress}">
+            <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepChoosePlan}</span>
             <span class="ct-step-sep">&rsaquo;</span>
-            <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Domain</span>
+            <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepDomain}</span>
             <span class="ct-step-sep">&rsaquo;</span>
-            <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Configure</span>
+            <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepConfigure}</span>
             <span class="ct-step-sep">&rsaquo;</span>
-            <span class="ct-step active"><span class="ct-step-num">4</span>Cart</span>
+            <span class="ct-step active"><span class="ct-step-num">4</span>{$hadrianLang.cart.stepCart}</span>
             <span class="ct-step-sep">&rsaquo;</span>
-            <span class="ct-step"><span class="ct-step-num">5</span>Checkout</span>
+            <span class="ct-step"><span class="ct-step-num">5</span>{$hadrianLang.cart.stepCheckout}</span>
         </div>
 
         {* ═══════════════════════════════════════════════════════════════
@@ -975,7 +975,7 @@
                             </div>
 
                             {if $product.configoptions}
-                                <div class="ct-addons-head">{$LANG.orderForm.config|default:'Configuration'}</div>
+                                <div class="ct-addons-head">{$hadrianLang.cart.configuration}</div>
                                 {foreach key=confnum item=configoption from=$product.configoptions}
                                     <div class="ct-addon-row" style="grid-template-columns: 1fr auto;">
                                         <div class="ct-addon-meta">
@@ -989,7 +989,7 @@
                             {/if}
 
                             {if $product.addons}
-                                <div class="ct-addons-head">{$LANG.orderaddons|default:'Included addons'} &middot; {$product.addons|@count}</div>
+                                <div class="ct-addons-head">{$hadrianLang.cart.includedAddons} &middot; {$product.addons|@count}</div>
                                 {foreach $product.addons as $addonnum => $addon}
                                     <div class="ct-addon-row">
                                         <div class="ct-addon-ico">
@@ -1014,13 +1014,13 @@
                             <div class="ct-manage-addons">
                                 <a href="{$WEB_ROOT}/cart.php?a=confproduct&i={$num}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                    {$LANG.orderForm.edit|default:'Edit configuration'}
+                                    {$LANG.orderForm.edit}
                                 </a>
                             </div>
 
                             <div class="ct-product-foot">
                                 <div class="ct-cycle-row">
-                                    <span class="ct-cycle-label">{$LANG.cartbillingcycle|default:'Billing cycle'}</span>
+                                    <span class="ct-cycle-label">{$hadrianLang.cart.billingCycle}</span>
                                     <span class="ct-cycle-value">{$product.billingcyclefriendly}</span>
                                 </div>
                                 <div class="ct-product-price">
@@ -1060,7 +1060,7 @@
                             </div>
                             <div class="ct-product-foot">
                                 <div class="ct-cycle-row">
-                                    <span class="ct-cycle-label">{$LANG.cartbillingcycle|default:'Billing cycle'}</span>
+                                    <span class="ct-cycle-label">{$hadrianLang.cart.billingCycle}</span>
                                     <span class="ct-cycle-value">{$addon.billingcyclefriendly}</span>
                                 </div>
                                 <div class="ct-product-price">
@@ -1106,12 +1106,12 @@
                             <div class="ct-manage-addons">
                                 <a href="{$WEB_ROOT}/cart.php?a=confdomains">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                    {$LANG.orderForm.edit|default:'Edit'}
+                                    {$LANG.orderForm.edit}
                                 </a>
                             </div>
                             <div class="ct-product-foot">
                                 <div class="ct-cycle-row">
-                                    <span class="ct-cycle-label">{$LANG.orderForm.registrationPeriod|default:'Registration period'}</span>
+                                    <span class="ct-cycle-label">{$hadrianLang.cart.registrationPeriod}</span>
                                     {if count($domain.pricing) == 1 || $domain.type == 'transfer'}
                                         <span class="ct-cycle-value">{$domain.regperiod} {$domain.yearsLanguage}</span>
                                     {else}
@@ -1149,7 +1149,7 @@
                             </div>
                             <div class="ct-product-foot">
                                 <div class="ct-cycle-row">
-                                    <span class="ct-cycle-label">{$LANG.cartbillingcycle|default:'Billing cycle'}</span>
+                                    <span class="ct-cycle-label">{$hadrianLang.cart.billingCycle}</span>
                                     <span class="ct-cycle-value">{$service.billingCycle}</span>
                                 </div>
                                 <div class="ct-product-price"><span class="amount">{$service.recurringBeforeTax}</span></div>
@@ -1173,7 +1173,7 @@
                             </div>
                             <div class="ct-product-foot">
                                 <div class="ct-cycle-row">
-                                    <span class="ct-cycle-label">{$LANG.cartbillingcycle|default:'Billing cycle'}</span>
+                                    <span class="ct-cycle-label">{$hadrianLang.cart.billingCycle}</span>
                                     <span class="ct-cycle-value">{$service.billingCycle}</span>
                                 </div>
                                 <div class="ct-product-price"><span class="amount">{$service.recurringBeforeTax}</span></div>
@@ -1203,7 +1203,7 @@
                             </div>
                             <div class="ct-product-foot">
                                 <div class="ct-cycle-row">
-                                    <span class="ct-cycle-label">{$LANG.orderForm.registrationPeriod|default:'Period'}</span>
+                                    <span class="ct-cycle-label">{$hadrianLang.cart.registrationPeriod}</span>
                                     <span class="ct-cycle-value">{$domain.regperiod} {$LANG.orderyears}</span>
                                 </div>
                                 <div class="ct-product-price"><span class="amount">{$domain.price}</span></div>
@@ -1233,7 +1233,7 @@
                             </div>
                             <div class="ct-product-foot">
                                 <div class="ct-cycle-row">
-                                    <span class="ct-cycle-label">{$LANG.cartbillingcycle|default:'Billing cycle'}</span>
+                                    <span class="ct-cycle-label">{$hadrianLang.cart.billingCycle}</span>
                                     <span class="ct-cycle-value">{$upgrade->localisedNewCycle}</span>
                                 </div>
                                 <div class="ct-product-price"><span class="amount">{$upgrade->newRecurringAmount}</span></div>
@@ -1331,9 +1331,9 @@
                 {if $hookOutput}
                     <div class="card ct-recommend">
                         <div class="ct-recommend-head">
-                            <span class="ct-recommend-badge">{$LANG.lastchance|default:'Last chance'}</span>
-                            <span class="ct-recommend-title">{$LANG.lastchancetitle|default:'Protect your services and add value'}</span>
-                            <span class="ct-recommend-sub">{$LANG.oneclickadd|default:'One-click add. Remove anytime.'}</span>
+                            <span class="ct-recommend-badge">{$hadrianLang.cart.lastChance}</span>
+                            <span class="ct-recommend-title">{$hadrianLang.cart.lastChanceTitle}</span>
+                            <span class="ct-recommend-sub">{$hadrianLang.cart.oneClickAdd}</span>
                         </div>
                         <div class="ct-recommend-body">
                             {foreach $hookOutput as $output}
@@ -1371,7 +1371,7 @@
                     <div class="ct-summary-head">
                         <h2>{$LANG.ordersummary}</h2>
                         <span class="count">
-                            {$cartitems} {if $cartitems == 1}item{else}items{/if}
+                            {$cartitems} {if $cartitems == 1}{$hadrianLang.cart.itemCount}{else}{$hadrianLang.cart.itemCountPlural}{/if}
                             <span class="loader w-hidden" id="orderSummaryLoader" aria-hidden="true" style="margin-left: 6px;">
                                 <i class="fas fa-fw fa-sync fa-spin"></i>
                             </span>
@@ -1522,8 +1522,8 @@
                     </div>
 
                     <div class="ct-trust">
-                        <span class="ct-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>{$LANG.cartsecured|default:'256-bit SSL · PCI-DSS Level 1'}</span>
-                        <span class="ct-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>{$LANG.cartmoneyback|default:'30-day money-back guarantee'}</span>
+                        <span class="ct-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>{$hadrianLang.cart.trustSsl}</span>
+                        <span class="ct-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>{$hadrianLang.cart.trustMoneyBack}</span>
                     </div>
                 </div>
             </aside>
@@ -1537,16 +1537,16 @@
                 <div class="ct-empty-ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
                 </div>
-                <h2 class="ct-empty-title">{$LANG.cartempty|default:'Your cart is empty'}</h2>
-                <p class="ct-empty-desc">{$LANG.cartemptysub|default:'Browse our plans and add something to get started. Everything comes with a 30-day money-back guarantee.'}</p>
+                <h2 class="ct-empty-title">{$LANG.cartempty}</h2>
+                <p class="ct-empty-desc">{$hadrianLang.cart.emptySub}</p>
                 <div class="ct-empty-actions">
                     <a href="{$WEB_ROOT}/cart.php" class="btn-primary">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                        {$LANG.orderForm.continueShopping|default:'Browse plans'}
+                        {$LANG.orderForm.continueShopping}
                     </a>
                     <a href="{$WEB_ROOT}/cart.php?a=add&domain=register" class="btn-secondary">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                        {$LANG.cartregisterdomainchoice|default:'Register a domain'}
+                        {$hadrianLang.cart.registerDomain}
                     </a>
                 </div>
             </div>

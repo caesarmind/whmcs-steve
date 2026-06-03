@@ -16,21 +16,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{$LANG.clientareaemails|default:'Email'} - {$companyname|default:'Hostnodes'|escape}</title>
+    <title>{$LANG.clientareaemails} - {$companyname|default:'Hostnodes'|escape}</title>
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v={$myTheme.version|default:'1.0'}">
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/viewemail.css?v={$myTheme.version|default:'1.0'}">
 </head>
 <body class="vem-popup">
     <div class="vem-card">
         <div class="vem-header">
-            <p class="vem-eyebrow">{$LANG.clientareaemails|default:'Email'}</p>
+            <p class="vem-eyebrow">{$LANG.clientareaemails}</p>
             <h1 class="vem-title">{$companyname|default:'Hostnodes'|escape}</h1>
         </div>
         {if $vemMsg}
             <div class="vem-message">{$vemMsg}</div>
             {if isset($attachments) && $attachments|@count > 0}
             <div class="vem-attach">
-                <p class="vem-attach-title">{$LANG.supportticketsticketattachments|default:'Attachments'}</p>
+                <p class="vem-attach-title">{$LANG.supportticketsticketattachments}</p>
                 {foreach $attachments as $attachedFile}
                 <div class="vem-attach-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
@@ -40,7 +40,7 @@
             </div>
             {/if}
         {else}
-            <div class="vem-empty">{$LANG.clientareaemailsnone|default:'This email is no longer available.'}</div>
+            <div class="vem-empty">{$LANG.clientareaemailsnone}</div>
         {/if}
     </div>
 </body>

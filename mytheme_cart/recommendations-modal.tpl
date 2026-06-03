@@ -51,7 +51,7 @@
                 <button type="button"
                         class="close recommendations-modal-close"
                         data-dismiss="modal"
-                        aria-label="Close">
+                        aria-label="{$LANG.orderForm.close}">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="clearfix"></div>

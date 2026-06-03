@@ -44,9 +44,9 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.domains|default:'Domains'}</p>
-    <h1>{$LANG.domainpricing|default:'Domain pricing'}</h1>
-    <p class="page-subtitle">{$LANG.domainpricingintro|default:'Registration, transfer and renewal prices for every extension we offer.'}</p>
+    <p class="page-eyebrow">{$LANG.navdomains}</p>
+    <h1>{$LANG.domainpricing}</h1>
+    <p class="page-subtitle">{$hadrianLang.domains.pricingIntro}</p>
 </header>
 
 {if $hasPricing}
@@ -54,11 +54,11 @@
     <div class="dp-toolbar">
         <div class="dp-search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="search" id="dpSearch" placeholder="{$LANG.searchdomain|default:'Search extensions, e.g. .com'}" autocomplete="off">
+            <input type="search" id="dpSearch" placeholder="{$hadrianLang.domains.searchExtensions}" autocomplete="off">
         </div>
         {if isset($tldCategories) && $tldCategories|@count > 0}
-        <select class="dp-filter" id="dpFilter" aria-label="{$LANG.category|default:'Category'}">
-            <option value="All">{$LANG.all|default:'All categories'}</option>
+        <select class="dp-filter" id="dpFilter" aria-label="{$LANG.category}">
+            <option value="All">{$LANG.all}</option>
             {foreach $tldCategories as $category => $count}
                 <option value="{$category|escape}">{$category|escape} ({$count})</option>
             {/foreach}
@@ -70,11 +70,11 @@
         <table class="dp-table">
             <thead>
                 <tr>
-                    <th>{$LANG.domaintld|default:'Extension'}</th>
-                    <th>{$LANG.category|default:'Category'}</th>
-                    <th>{$LANG.pricingregister|default:'Register'}</th>
-                    <th>{$LANG.pricingtransfer|default:'Transfer'}</th>
-                    <th>{$LANG.pricingrenewal|default:'Renew'}</th>
+                    <th>{$LANG.domaintld}</th>
+                    <th>{$LANG.category}</th>
+                    <th>{$LANG.pricing.register}</th>
+                    <th>{$LANG.pricing.transfer}</th>
+                    <th>{$LANG.pricing.renewal}</th>
                 </tr>
             </thead>
             <tbody>
@@ -86,10 +86,10 @@
                             <span class="tld-name"><span>.</span>{$extension|escape}</span>
                             {if isset($data.group) && $data.group}<span class="dp-group {$data.group|escape}">{$data.group|escape}</span>{/if}
                         </td>
-                        <td class="dp-cat"><span class="dp-label">{$LANG.category|default:'Category'}: </span>{if isset($data.categories.0)}{$data.categories.0|escape}{else}-{/if}</td>
-                        <td><span class="dp-label">{$LANG.pricingregister|default:'Register'}: </span>{if isset($data.register)}{foreach $data.register as $years => $price}{$price}{break}{foreachelse}-{/foreach}{else}-{/if}</td>
-                        <td><span class="dp-label">{$LANG.pricingtransfer|default:'Transfer'}: </span>{if isset($data.transfer)}{foreach $data.transfer as $years => $price}{$price}{break}{foreachelse}-{/foreach}{else}-{/if}</td>
-                        <td><span class="dp-label">{$LANG.pricingrenewal|default:'Renew'}: </span>{if isset($data.renew)}{foreach $data.renew as $years => $price}{$price}{break}{foreachelse}-{/foreach}{else}-{/if}</td>
+                        <td class="dp-cat"><span class="dp-label">{$LANG.category}: </span>{if isset($data.categories.0)}{$data.categories.0|escape}{else}-{/if}</td>
+                        <td><span class="dp-label">{$LANG.pricing.register}: </span>{if isset($data.register)}{foreach $data.register as $years => $price}{$price}{break}{foreachelse}-{/foreach}{else}-{/if}</td>
+                        <td><span class="dp-label">{$LANG.pricing.transfer}: </span>{if isset($data.transfer)}{foreach $data.transfer as $years => $price}{$price}{break}{foreachelse}-{/foreach}{else}-{/if}</td>
+                        <td><span class="dp-label">{$LANG.pricing.renewal}: </span>{if isset($data.renew)}{foreach $data.renew as $years => $price}{$price}{break}{foreachelse}-{/foreach}{else}-{/if}</td>
                     </tr>
                 {/foreach}
             </tbody>
@@ -105,9 +105,9 @@
             <div class="dp-empty-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
             </div>
-            <p class="dp-empty-title">{$LANG.pricingnoextensions|default:'Pricing unavailable'}</p>
-            <p class="dp-empty-sub">{$LANG.pricingnoextensionssub|default:'Domain pricing could not be loaded right now. Please check back shortly.'}</p>
-            <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register" class="btn-primary">{$LANG.registerdomain|default:'Register a domain'}</a>
+            <p class="dp-empty-title">{$hadrianLang.domains.pricingEmptyTitle}</p>
+            <p class="dp-empty-sub">{$hadrianLang.domains.pricingEmptySub}</p>
+            <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register" class="btn-primary">{$LANG.registerdomain}</a>
         </div>
     </div>
 </div>

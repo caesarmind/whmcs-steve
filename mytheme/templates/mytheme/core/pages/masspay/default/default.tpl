@@ -23,8 +23,8 @@
 </script>
 
 <header class="page-header">
-    <h1>{$LANG.masspayment|default:'Mass payment'}</h1>
-    <p class="page-subtitle">{$LANG.masspaymentsub|default:'Pay multiple unpaid invoices in one transaction.'}</p>
+    <h1>{$LANG.masspaytitle}</h1>
+    <p class="page-subtitle">{$LANG.masspaydescription}</p>
 </header>
 
 <div class="mp-wrap">
@@ -34,6 +34,7 @@
 
     <div class="when-full">
         <form method="post" action="{$WEB_ROOT}/clientarea.php?action=masspay" class="mp-form">
+            <input type="hidden" name="token" value="{$token}" />
             <input type="hidden" name="paynow" value="true">
 
             <div class="card mp-table-card">
@@ -41,9 +42,9 @@
                     <thead>
                         <tr>
                             <th class="mp-col-check"><input type="checkbox" id="mp-all" checked></th>
-                            <th class="mp-col-invoice">{$LANG.invoicenum|default:'Invoice'}</th>
-                            <th class="mp-col-due">{$LANG.invoicedatedue|default:'Due date'}</th>
-                            <th class="mp-col-amount">{$LANG.amount|default:'Amount'}</th>
+                            <th class="mp-col-invoice">{$LANG.invoicestitle}</th>
+                            <th class="mp-col-due">{$LANG.invoicesdatedue}</th>
+                            <th class="mp-col-amount">{$LANG.invoicesamount}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -63,7 +64,7 @@
 
             <div class="mp-summary">
                 <div class="mp-summary-row">
-                    <span class="mp-summary-label">{$LANG.total|default:'Total'}</span>
+                    <span class="mp-summary-label">{$LANG.invoicestotaldue}</span>
                     <span class="mp-summary-value" data-mp-total>{$totalamount|default:''|escape}</span>
                 </div>
             </div>
@@ -71,7 +72,7 @@
             {if isset($paymentmethods) && $paymentmethods|@count > 0}
             <div class="card mp-pay-card">
                 <div class="card-body">
-                    <h2 class="mp-pay-title">{$LANG.paymentmethod|default:'Payment method'}</h2>
+                    <h2 class="mp-pay-title">{$LANG.orderpaymentmethod}</h2>
                     <div class="mp-methods">
                         {foreach $paymentmethods as $pm}
                         <label class="mp-method">
@@ -84,15 +85,15 @@
             </div>
             {/if}
 
-            <button type="submit" class="btn-primary mp-submit">{$LANG.paynow|default:'Pay now'}</button>
+            <button type="submit" class="btn-primary mp-submit">{$LANG.paynow}</button>
         </form>
     </div>
 
     <div class="when-empty mp-empty">
         <div class="mp-empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
-        <p class="mp-empty-title">{$LANG.nounpaidinvoices|default:'No unpaid invoices'}</p>
-        <p class="mp-empty-sub">{$LANG.nounpaidinvoicessub|default:'You are all caught up — no balance due.'}</p>
-        <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-secondary">{$LANG.viewinvoices|default:'View all invoices'}</a>
+        <p class="mp-empty-title">{$LANG.nounpaidinvoices}</p>
+        <p class="mp-empty-sub">{$hadrianLang.billing.noUnpaidInvoicesSub}</p>
+        <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-secondary">{$LANG.navinvoices}</a>
     </div>
 </div>
 

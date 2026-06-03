@@ -66,12 +66,12 @@
 <header class="page-header">
     <div class="page-header-row">
         <div style="flex: 1; min-width: 0;">
-            <h1>{$LANG.navinvoices|default:'Invoices'}</h1>
-            <p class="page-subtitle">{$LANG.invoicessub|default:'Pay unpaid invoices, download PDFs, and review past payments.'}</p>
+            <h1>{$LANG.navinvoices}</h1>
+            <p class="page-subtitle">{$hadrianLang.billing.invoicesSubtitle}</p>
         </div>
         {if $unpaidCount > 0}
         <a href="{$WEB_ROOT}/clientarea.php?action=masspay&all=true" class="page-header-action when-full">
-            {$LANG.payallunpaid|default:'Pay all unpaid'}
+            {$hadrianLang.billing.payAllUnpaid}
             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
         {/if}
@@ -86,18 +86,18 @@
             <span class="inv-banner-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </span>
-            <span><strong>{$unpaidCount} {if $unpaidCount == 1}{$LANG.unpaidinvoicesingular|default:'unpaid invoice'}{else}{$LANG.unpaidinvoicesplural|default:'unpaid invoices'}{/if}</strong>.</span>
+            <span><strong>{$unpaidCount} {if $unpaidCount == 1}{$hadrianLang.billing.unpaidInvoiceSingular}{else}{$hadrianLang.billing.unpaidInvoicePlural}{/if}</strong>.</span>
             <span class="spacer"></span>
-            <a href="{$WEB_ROOT}/clientarea.php?action=masspay&all=true" class="btn-secondary">{$LANG.paynow|default:'Pay now'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=masspay&all=true" class="btn-secondary">{$LANG.paynow}</a>
         </div>
         {/if}
 
         <div class="filter-tabs when-full">
-            <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="filter-tab{if !$currentFilter} active{/if}" data-mt-for="invTable" data-mt-filter="">{$LANG.all|default:'All'}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Unpaid" class="filter-tab{if $currentFilter == 'Unpaid'} active{/if}" data-mt-for="invTable" data-mt-filter="Unpaid">{$LANG.invoiceunpaid|default:'Unpaid'}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Paid" class="filter-tab{if $currentFilter == 'Paid'} active{/if}" data-mt-for="invTable" data-mt-filter="Paid">{$LANG.invoicepaid|default:'Paid'}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Cancelled" class="filter-tab{if $currentFilter == 'Cancelled'} active{/if}" data-mt-for="invTable" data-mt-filter="Cancelled">{$LANG.invoicecancelled|default:'Cancelled'}</a>
-            <span class="inv-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" placeholder="{$LANG.search|default:'Search'}…" aria-label="{$LANG.search|default:'Search'}" data-mt-search data-mt-for="invTable"></span>
+            <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="filter-tab{if !$currentFilter} active{/if}" data-mt-for="invTable" data-mt-filter="">{$hadrianLang.common.filterAll}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Unpaid" class="filter-tab{if $currentFilter == 'Unpaid'} active{/if}" data-mt-for="invTable" data-mt-filter="Unpaid">{$LANG.invoicesunpaid}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Paid" class="filter-tab{if $currentFilter == 'Paid'} active{/if}" data-mt-for="invTable" data-mt-filter="Paid">{$LANG.invoicespaid}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=invoices&status=Cancelled" class="filter-tab{if $currentFilter == 'Cancelled'} active{/if}" data-mt-for="invTable" data-mt-filter="Cancelled">{$LANG.invoicescancelled}</a>
+            <span class="inv-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" placeholder="{$LANG.search}…" aria-label="{$LANG.search}" data-mt-search data-mt-for="invTable"></span>
         </div>
 
         {* Sort: DataTables.js handles instant client-side sort on header click (matches
@@ -124,9 +124,9 @@
                     <div class="inv-empty-ico">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                     </div>
-                    <p class="inv-empty-title">{$LANG.noinvoices|default:'No invoices yet'}</p>
-                    <p class="inv-empty-sub">{$LANG.noinvoicessub|default:'When you purchase a service or a new billing cycle begins, your invoices will appear here.'}</p>
-                    <a href="{$WEB_ROOT}/cart.php" class="btn-secondary">{$LANG.browseservices|default:'Browse services'}</a>
+                    <p class="inv-empty-title">{$hadrianLang.billing.noInvoicesTitle}</p>
+                    <p class="inv-empty-sub">{$hadrianLang.billing.noInvoicesSub}</p>
+                    <a href="{$WEB_ROOT}/cart.php" class="btn-secondary">{$hadrianLang.billing.browseServices}</a>
                 </div>
 
                 {if $invCount > 0}
@@ -141,11 +141,11 @@
                     </colgroup>
                     <thead>
                         <tr>
-                            <th class="hl-invoice">{$LANG.invoicenum|default:'Invoice'} <span class="inv-sort-ico"></span></th>
-                            <th class="hl-date">{$LANG.invoicedatecreated|default:'Date'} <span class="inv-sort-ico"></span></th>
-                            <th class="hl-due">{$LANG.invoicedatedue|default:'Due date'} <span class="inv-sort-ico"></span></th>
-                            <th class="hl-amount">{$LANG.amount|default:'Amount'} <span class="inv-sort-ico"></span></th>
-                            <th class="hl-status">{$LANG.invoicesstatus|default:'Status'} <span class="inv-sort-ico"></span></th>
+                            <th class="hl-invoice">{$LANG.invoicestitle} <span class="inv-sort-ico"></span></th>
+                            <th class="hl-date">{$LANG.invoicesdatecreated} <span class="inv-sort-ico"></span></th>
+                            <th class="hl-due">{$LANG.invoicesdatedue} <span class="inv-sort-ico"></span></th>
+                            <th class="hl-amount">{$LANG.invoicesamount} <span class="inv-sort-ico"></span></th>
+                            <th class="hl-status">{$LANG.invoicesstatus} <span class="inv-sort-ico"></span></th>
                             <th class="hl-actions" data-orderable="false" aria-hidden="true"></th>
                         </tr>
                     </thead>
@@ -177,22 +177,22 @@
                             <td data-order="{$invStatusLower|escape:'html'}"><span class="status-pill {$invStatusLower}">{$invStatus|escape}</span></td>
                             <td class="actions">
                                 <div class="inv-menu-wrap" onclick="event.stopPropagation();">
-                                    <button type="button" class="inv-menu-btn" aria-label="{$LANG.actions|default:'Actions'}" aria-haspopup="true" aria-expanded="false" onclick="toggleInvMenu(this, event)">
+                                    <button type="button" class="inv-menu-btn" aria-label="{$LANG.actions}" aria-haspopup="true" aria-expanded="false" onclick="toggleInvMenu(this, event)">
                                         <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
                                     </button>
                                     <div class="inv-menu" role="menu">
                                         <a href="{$WEB_ROOT}/viewinvoice.php?id={$inv.id}" class="inv-menu-item" role="menuitem">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                            {$LANG.invoiceview|default:'View Invoice'}
+                                            {$hadrianLang.billing.viewInvoice}
                                         </a>
                                         <a href="{$WEB_ROOT}/dl.php?type=i&id={$inv.id}" class="inv-menu-item" role="menuitem">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                            {$LANG.invoicedownload|default:'Download PDF'}
+                                            {$LANG.invoicesdownload}
                                         </a>
                                         {if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'}
                                         <a href="{$WEB_ROOT}/viewinvoice.php?id={$inv.id}" class="inv-menu-item" role="menuitem">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                                            {$LANG.invoicepay|default:'Pay Invoice'}
+                                            {$hadrianLang.billing.payInvoice}
                                         </a>
                                         {/if}
                                     </div>
@@ -208,24 +208,24 @@
 
             <div class="inv-footer when-full">
                 <div class="inv-page-size">
-                    {$LANG.show|default:'Show'}
-                    <select aria-label="{$LANG.rowsperpage|default:'Rows per page'}" data-dt-length data-mt-for="invTable">
+                    {$hadrianLang.common.tableShow}
+                    <select aria-label="{$hadrianLang.common.rowsPerPage}" data-dt-length data-mt-for="invTable">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>
                     </select>
-                    {$LANG.entries|default:'entries'}
+                    {$hadrianLang.common.tableEntries}
                 </div>
                 <div class="spacer"></div>
                 {assign var=startNum value=$startnumber|default:0}
                 {assign var=startDisplay value=$startNum+1}
                 {assign var=endDisplay value=$startNum+$invCount}
                 {assign var=totalNum value=$numinvoices|default:$invCount}
-                <span data-dt-info data-mt-for="invTable">{$LANG.showing|default:'Showing'} {$startDisplay}–{$endDisplay} {$LANG.of|default:'of'} {$totalNum}</span>
+                <span data-dt-info data-mt-for="invTable">{$hadrianLang.common.tableShowing} {$startDisplay}–{$endDisplay} {$hadrianLang.common.tableOf} {$totalNum}</span>
                 <div class="inv-pages" data-dt-pager data-mt-for="invTable">
-                    <button type="button" disabled aria-label="{$LANG.previouspage|default:'Previous page'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+                    <button type="button" disabled aria-label="{$hadrianLang.common.previousPage}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
                     <button type="button" class="active">1</button>
-                    <button type="button" disabled aria-label="{$LANG.nextpage|default:'Next page'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                    <button type="button" disabled aria-label="{$hadrianLang.common.nextPage}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
                 </div>
             </div>
 
@@ -235,33 +235,34 @@
     {* ══ RIGHT: Billing sub-nav ══ *}
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">Billing</div>
+            <div class="subnav-heading">{$hadrianLang.billing.sidebarHeading}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                {$LANG.myinvoices|default:'My Invoices'}
+                {$LANG.navinvoices}
                 <span class="subnav-count">{$invCount}</span>
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=quotes" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-                {$LANG.myquotes|default:'My Quotes'}
+                {$LANG.navquotes}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=masspay&all=true" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
-                {$LANG.masspayment|default:'Mass Payment'}
+                {$LANG.masspaytitle}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=addfunds" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                {$LANG.addfunds|default:'Add Funds'}
+                {$LANG.addfunds}
             </a>
             <a href="{routePath('account-paymentmethods')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                {$LANG.paymentmethods|default:'Payment Methods'}
+                {$LANG.paymentMethods.title}
             </a>
         </div>
     </aside>
 </div>{* /.inv-split *}
 
 {if !$mtAjaxTables}
+<script>var _localLang = { previousPage: '{$hadrianLang.common.previousPage|escape:"javascript"}', nextPage: '{$hadrianLang.common.nextPage|escape:"javascript"}', showingRange: '{$hadrianLang.common.tableShowingRange|escape:"javascript"}' };</script>
 <script>
 {literal}
 // Row navigation — clicking a row goes to viewinvoice
@@ -330,19 +331,19 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
             var page = info.page, pages = info.pages, html = '';
             var L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
             var R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-            html += '<button type="button" data-page="' + (page - 1) + '"' + (page <= 0 ? ' disabled' : '') + ' aria-label="Previous page">' + L + '</button>';
+            html += '<button type="button" data-page="' + (page - 1) + '"' + (page <= 0 ? ' disabled' : '') + ' aria-label="' + _localLang.previousPage + '">' + L + '</button>';
             if (pages > 0) {
                 var win = 5, start = Math.max(0, page - 2), end = Math.min(pages - 1, start + win - 1);
                 start = Math.max(0, Math.min(start, end - win + 1));
                 for (var p = start; p <= end; p++) { html += '<button type="button" data-page="' + p + '"' + (p === page ? ' class="active"' : '') + '>' + (p + 1) + '</button>'; }
             } else { html += '<button type="button" class="active">1</button>'; }
-            html += '<button type="button" data-page="' + (page + 1) + '"' + (page >= pages - 1 ? ' disabled' : '') + ' aria-label="Next page">' + R + '</button>';
+            html += '<button type="button" data-page="' + (page + 1) + '"' + (page >= pages - 1 ? ' disabled' : '') + ' aria-label="' + _localLang.nextPage + '">' + R + '</button>';
             el.innerHTML = html;
         }
         function updateControls(api) {
             var info = api.page.info();
             var infoEl = ctrl('data-dt-info');
-            if (infoEl) { var from = info.recordsDisplay ? info.start + 1 : 0; infoEl.textContent = 'Showing ' + from + '–' + info.end + ' of ' + info.recordsDisplay; }
+            if (infoEl) { var from = info.recordsDisplay ? info.start + 1 : 0; infoEl.textContent = _localLang.showingRange.replace('%s', from).replace('%s', info.end).replace('%s', info.recordsDisplay); }
             var pagerEl = ctrl('data-dt-pager');
             if (pagerEl) { buildPager(pagerEl, info); }
         }

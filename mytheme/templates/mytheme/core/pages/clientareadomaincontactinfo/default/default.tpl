@@ -13,21 +13,21 @@
 
 <header class="page-header">
     <p class="page-eyebrow">{$domain|default:''|escape}</p>
-    <h1>{$LANG.domaincontactinfo|default:'WHOIS contact information'}</h1>
-    <p class="page-subtitle">{$LANG.whoisContactWarning|default:'Update the contact details that appear in the public WHOIS database for this domain.'}</p>
+    <h1>{$LANG.domaincontactinfo}</h1>
+    <p class="page-subtitle">{$LANG.whoisContactWarning}</p>
 </header>
 
 {if !empty($successful)}
 <div class="ci-alert ci-alert-success">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    <div>{$LANG.changessavedsuccessfully|default:'Changes saved successfully.'}</div>
+    <div>{$LANG.changessavedsuccessfully}</div>
 </div>
 {/if}
 
 {if !empty($pending)}
 <div class="ci-alert ci-alert-info">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <div>{$pendingMessage|default:'A contact change is pending registry confirmation.'}</div>
+    <div>{$pendingMessage|default:$hadrianLang.domains.contactPending}</div>
 </div>
 {/if}
 
@@ -59,18 +59,18 @@
                     <div class="ci-source-row">
                         <label class="ci-radio">
                             <input type="radio" name="wc[{$category|escape}]" value="contact" data-ci-source="contact" data-ci-cat="{$category|escape}">
-                            <span>{$LANG.domaincontactusexisting|default:'Use an existing contact'}</span>
+                            <span>{$LANG.domaincontactusexisting}</span>
                         </label>
                         <label class="ci-radio">
                             <input type="radio" name="wc[{$category|escape}]" value="custom" data-ci-source="custom" data-ci-cat="{$category|escape}" checked>
-                            <span>{$LANG.domaincontactusecustom|default:'Use the details below'}</span>
+                            <span>{$LANG.domaincontactusecustom}</span>
                         </label>
                     </div>
 
                     <div class="ci-contact-select" data-ci-cat-select="{$category|escape}" hidden>
-                        <label class="ci-label">{$LANG.domaincontactchoose|default:'Choose contact'}</label>
+                        <label class="ci-label">{$LANG.domaincontactchoose}</label>
                         <select name="sel[{$category|escape}]" class="ci-input">
-                            <option value="u{$clientsdetails.userid|escape}">{$LANG.domaincontactprimary|default:'Primary account holder'}</option>
+                            <option value="u{$clientsdetails.userid|escape}">{$LANG.domaincontactprimary}</option>
                             {if isset($contacts) && $contacts|@count > 0}
                                 {foreach $contacts as $contact}
                                     <option value="c{$contact.id|escape}">{$contact.name|default:''|escape}</option>
@@ -93,11 +93,11 @@
             {/foreach}
 
             <div class="ci-actions">
-                <button type="submit" class="btn-primary">{$LANG.clientareasavechanges|default:'Save changes'}</button>
-                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="btn-secondary">{$LANG.clientareacancel|default:'Cancel'}</a>
+                <button type="submit" class="btn-primary">{$LANG.clientareasavechanges}</button>
+                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="btn-secondary">{$LANG.clientareacancel}</a>
             </div>
             {else}
-                <p class="ci-empty">{$LANG.nocontactdetails|default:'No contact details available for this domain.'}</p>
+                <p class="ci-empty">{$hadrianLang.domains.noContactDetails}</p>
             {/if}
         </form>
 
@@ -105,14 +105,14 @@
 
     <aside class="ci-aside">
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.domain|default:'Domain'}</div>
+            <div class="subnav-heading">{$LANG.domain}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                {$LANG.domaindetails|default:'Domain details'}
+                {$hadrianLang.domains.domainDetails}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=domaincontacts&domainid={$domainid|escape}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.whoismodify|default:'WHOIS contact'}
+                {$hadrianLang.domains.whoisContact}
             </a>
         </div>
     </aside>

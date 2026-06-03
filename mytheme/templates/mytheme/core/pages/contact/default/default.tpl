@@ -14,12 +14,12 @@
     <div class="card ct-card">
         {if isset($sent) && $sent}
             <div class="ct-ico ct-ico-success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <h1 class="ct-title">{$LANG.contactsent|default:'Message sent'}</h1>
-            <p class="ct-sub">{$LANG.contactsentsub|default:'Thanks — our team will reply by email as soon as possible.'}</p>
-            <a href="{$WEB_ROOT}/" class="btn-primary">{$LANG.backtohome|default:'Back to home'}</a>
+            <h1 class="ct-title">{$LANG.contactsent}</h1>
+            <p class="ct-sub">{$hadrianLang.support.contactSentSub}</p>
+            <a href="{$WEB_ROOT}/" class="btn-primary">{$LANG.errorPage.404.home}</a>
         {else}
-            <h1 class="ct-title">{$LANG.contactus|default:'Contact us'}</h1>
-            <p class="ct-sub">{$LANG.contactsub|default:'Send us a message and our team will follow up.'}</p>
+            <h1 class="ct-title">{$LANG.contactus}</h1>
+            <p class="ct-sub">{$hadrianLang.support.contactSubtitle}</p>
 
             {if isset($errormessage) && $errormessage}
             <div class="ct-error">
@@ -34,17 +34,17 @@
                 <input type="hidden" name="send" value="true">
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="ct-name">{$LANG.contactname|default:'Your name'}</label>
+                        <label class="form-label" for="ct-name">{$LANG.supportticketsclientname}</label>
                         <input type="text" class="form-input" id="ct-name" name="name" value="{$name|default:''|escape}" autocomplete="name" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="ct-email">{$LANG.contactemail|default:'Email address'}</label>
+                        <label class="form-label" for="ct-email">{$LANG.supportticketsclientemail}</label>
                         <input type="email" class="form-input" id="ct-email" name="email" value="{$email|default:''|escape}" autocomplete="email" required>
                     </div>
                 </div>
                 {if isset($departments) && $departments|@count > 0}
                 <div class="form-group">
-                    <label class="form-label" for="ct-dept">{$LANG.contactdepartment|default:'Department'}</label>
+                    <label class="form-label" for="ct-dept">{$LANG.contactdepartment}</label>
                     <select class="form-select" id="ct-dept" name="department">
                         {foreach $departments as $dept}
                         <option value="{$dept.id|escape}">{$dept.name|escape}</option>
@@ -53,11 +53,11 @@
                 </div>
                 {/if}
                 <div class="form-group">
-                    <label class="form-label" for="ct-subject">{$LANG.contactsubject|default:'Subject'}</label>
+                    <label class="form-label" for="ct-subject">{$LANG.supportticketsticketsubject}</label>
                     <input type="text" class="form-input" id="ct-subject" name="subject" value="{$subject|default:''|escape}" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="ct-message">{$LANG.contactmessage|default:'Message'}</label>
+                    <label class="form-label" for="ct-message">{$LANG.contactmessage}</label>
                     <textarea class="form-input ct-message-area" id="ct-message" name="message" rows="8" required>{$message|default:''|escape}</textarea>
                 </div>
                 {* CAPTCHA — $captcha is an object; render via getMarkup() gated on the
@@ -66,7 +66,7 @@
                 {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
                 <div class="form-group ct-captcha">{include file="`$template`/includes/captcha.tpl"}</div>
                 {/if}
-                <button type="submit" class="btn-primary ct-submit{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.contactsend|default:'Send message'}</button>
+                <button type="submit" class="btn-primary ct-submit{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.contactsend}</button>
             </form>
         {/if}
     </div>

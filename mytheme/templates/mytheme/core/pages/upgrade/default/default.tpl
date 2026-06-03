@@ -58,9 +58,9 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.clientareaservices|default:'Services'}</p>
-    <h1>{$LANG.upgradedowngrade|default:'Upgrade or downgrade'}</h1>
-    <p class="page-subtitle">{$LANG.upgradeintro|default:'Change your plan size or feature tier. Changes are prorated.'}</p>
+    <p class="page-eyebrow">{$LANG.clientareaservices}</p>
+    <h1>{$LANG.upgradedowngrade}</h1>
+    <p class="page-subtitle">{$hadrianLang.services.upgradeIntro}</p>
 </header>
 
 {if $upFull}
@@ -69,7 +69,7 @@
     {if isset($groupname) || isset($productname)}
     <div class="up-callout">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        <div>{$LANG.upgradecurrentconfig|default:'Current plan'}: <strong>{$groupname|default:''|escape}{if isset($productname)} - {$productname|escape}{/if}</strong>{if isset($domain) && $domain} ({$domain|escape}){/if}</div>
+        <div>{$LANG.upgradecurrentconfig}: <strong>{$groupname|default:''|escape}{if isset($productname)} - {$productname|escape}{/if}</strong>{if isset($domain) && $domain} ({$domain|escape}){/if}</div>
     </div>
     {/if}
 
@@ -94,17 +94,17 @@
                     <div class="up-cfg-name">{$cfg.optionname|escape}</div>
                     <div class="up-cfg-cols">
                         <div>
-                            <div class="up-cfg-col-label">{$LANG.upgradecurrentconfig|default:'Current'}</div>
+                            <div class="up-cfg-col-label">{$LANG.upgradecurrentconfig}</div>
                             {if $cfg.optiontype == 1 || $cfg.optiontype == 2}
                                 <input class="form-input" type="text" value="{$cfg.selectedname|default:''|escape}" disabled>
                             {elseif $cfg.optiontype == 3}
-                                <input class="form-input" type="text" value="{if $cfg.selectedqty}{$LANG.yes|default:'Enabled'}{else}{$LANG.no|default:'Disabled'}{/if}" disabled>
+                                <input class="form-input" type="text" value="{if $cfg.selectedqty}{$hadrianLang.services.enabledState}{else}{$hadrianLang.services.disabledState}{/if}" disabled>
                             {elseif $cfg.optiontype == 4}
                                 <input class="form-input" type="text" value="{$cfg.selectedqty|default:0|escape}" disabled>
                             {/if}
                         </div>
                         <div>
-                            <div class="up-cfg-col-label">{$LANG.upgradenewconfig|default:'New'}</div>
+                            <div class="up-cfg-col-label">{$LANG.upgradenewconfig}</div>
                             {if $cfg.optiontype == 1 || $cfg.optiontype == 2}
                                 <select name="configoption[{$cfg.id}]" class="form-select">
                                     {foreach $cfg.options as $opt}
@@ -112,7 +112,7 @@
                                     {/foreach}
                                 </select>
                             {elseif $cfg.optiontype == 3}
-                                <label style="display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer;"><input type="checkbox" name="configoption[{$cfg.id}]" value="1"{if $cfg.selectedqty} checked{/if}> <span>{$LANG.enable|default:'Enable this option'}</span></label>
+                                <label style="display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer;"><input type="checkbox" name="configoption[{$cfg.id}]" value="1"{if $cfg.selectedqty} checked{/if}> <span>{$LANG.enable}</span></label>
                             {elseif $cfg.optiontype == 4}
                                 <input class="form-input" type="number" name="configoption[{$cfg.id}]" value="{$cfg.selectedqty|default:0|escape}" min="{$cfg.qtyminimum|default:0|escape}"{if isset($cfg.qtymaximum) && $cfg.qtymaximum > 0} max="{$cfg.qtymaximum|escape}"{/if}>
                             {/if}
@@ -122,8 +122,8 @@
             {/foreach}
             </div>
             <div class="page-actions">
-                <button type="submit" class="btn-primary">{$LANG.ordercontinuebutton|default:'Continue'}</button>
-                <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&amp;id={$id|default:''|escape}" class="btn-secondary">{$LANG.cancel|default:'Cancel'}</a>
+                <button type="submit" class="btn-primary">{$LANG.ordercontinuebutton}</button>
+                <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&amp;id={$id|default:''|escape}" class="btn-secondary">{$LANG.cancel}</a>
             </div>
         </form>
 
@@ -142,28 +142,28 @@
                 <input type="hidden" name="type" value="package">
                 <input type="hidden" name="id" value="{$id|default:''|escape}">
                 <input type="hidden" name="pid" value="{$pkg.pid|escape}">
-                {if $isCurrent}<span class="st-plan-badge up-st-badge-current">{$LANG.upgradecurrentconfig|default:'Current'}</span>{/if}
+                {if $isCurrent}<span class="st-plan-badge up-st-badge-current">{$LANG.upgradecurrentconfig}</span>{/if}
                 <h3 class="st-plan-name">{$pkg.name|escape}</h3>
                 <p class="st-plan-tag">{if isset($pkg.groupname) && $pkg.groupname}{$pkg.groupname|escape}{else}&nbsp;{/if}</p>
 
                 {if $pkg.pricing.type == 'free'}
                     <input type="hidden" name="billingcycle" value="free">
-                    <div class="st-plan-price"><span class="amount">{$LANG.orderfree|default:'Free'}</span></div>
+                    <div class="st-plan-price"><span class="amount">{$LANG.orderfree}</span></div>
                 {elseif $pkg.pricing.type == 'onetime'}
                     <input type="hidden" name="billingcycle" value="onetime">
-                    <div class="st-plan-price"><span class="amount">{$pkg.pricing.onetime}</span> <span class="period">{$LANG.orderpaymenttermonetime|default:'one time'}</span></div>
+                    <div class="st-plan-price"><span class="amount">{$pkg.pricing.onetime}</span> <span class="period">{$LANG.orderpaymenttermonetime}</span></div>
                 {else}
                     {* Recurring: the billing-cycle <select> IS the price control — each
                        option already shows its per-term price (e.g. "$50.00 USD Monthly
                        / mo"), so there's no separate price headline above it (that line
                        just duplicated the amount + cycle). *}
                     <select name="billingcycle" class="form-select st-plan-cycle">
-                        {if $pkg.pricing.monthly}<option value="monthly">{$pkg.pricing.monthly} / {$LANG.monthly|default:'mo'}</option>{/if}
-                        {if $pkg.pricing.quarterly}<option value="quarterly">{$pkg.pricing.quarterly} / {$LANG.quarterly|default:'qtr'}</option>{/if}
-                        {if $pkg.pricing.semiannually}<option value="semiannually">{$pkg.pricing.semiannually} / {$LANG.semiannually|default:'6 mo'}</option>{/if}
-                        {if $pkg.pricing.annually}<option value="annually">{$pkg.pricing.annually} / {$LANG.annually|default:'yr'}</option>{/if}
-                        {if $pkg.pricing.biennially}<option value="biennially">{$pkg.pricing.biennially} / {$LANG.biennially|default:'2 yr'}</option>{/if}
-                        {if $pkg.pricing.triennially}<option value="triennially">{$pkg.pricing.triennially} / {$LANG.triennially|default:'3 yr'}</option>{/if}
+                        {if $pkg.pricing.monthly}<option value="monthly">{$pkg.pricing.monthly} / {$hadrianLang.services.cycleMonthlyShort}</option>{/if}
+                        {if $pkg.pricing.quarterly}<option value="quarterly">{$pkg.pricing.quarterly} / {$hadrianLang.services.cycleQuarterlyShort}</option>{/if}
+                        {if $pkg.pricing.semiannually}<option value="semiannually">{$pkg.pricing.semiannually} / {$hadrianLang.services.cycleSemiannuallyShort}</option>{/if}
+                        {if $pkg.pricing.annually}<option value="annually">{$pkg.pricing.annually} / {$hadrianLang.services.cycleAnnuallyShort}</option>{/if}
+                        {if $pkg.pricing.biennially}<option value="biennially">{$pkg.pricing.biennially} / {$hadrianLang.services.cycleBienniallyShort}</option>{/if}
+                        {if $pkg.pricing.triennially}<option value="triennially">{$pkg.pricing.triennially} / {$hadrianLang.services.cycleTrienniallyShort}</option>{/if}
                     </select>
                 {/if}
 
@@ -173,9 +173,9 @@
                 <div class="st-plan-features">{if isset($pkg.description) && $pkg.description}{$pkg.description|regex_replace:'/<br\s*\/?>/i':''}{/if}</div>
 
                 {if $isCurrent}
-                    <button type="button" class="st-plan-cta secondary" disabled>{$LANG.upgradecurrentplan|default:'Current plan'}</button>
+                    <button type="button" class="st-plan-cta secondary" disabled>{$LANG.upgradecurrentplan}</button>
                 {else}
-                    <button type="submit" class="st-plan-cta">{$LANG.upgradedowngradechooseproduct|default:'Choose this plan'}</button>
+                    <button type="submit" class="st-plan-cta">{$LANG.upgradedowngradechooseproduct}</button>
                 {/if}
             </form>
         {/foreach}
@@ -186,7 +186,7 @@
         <div class="up-back">
             <a href="{if isset($id) && $id}{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|escape}{else}{$WEB_ROOT}/clientarea.php?action=services{/if}" class="up-back-link">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                {if isset($id) && $id}Back to my service{else}Back to services{/if}
+                {if isset($id) && $id}{$hadrianLang.services.backToMyService}{else}{$hadrianLang.services.backToServices}{/if}
             </a>
         </div>
     {/if}
@@ -198,22 +198,22 @@
        (body[data-subnav-website="off"] [class$="-split"] in apple-layout.css). *}
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.services|default:'Services'}</div>
+            <div class="subnav-heading">{$LANG.services}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=services" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
-                {$LANG.myservices|default:'My Services'}
+                {$LANG.myservices}
             </a>
             <a href="{$WEB_ROOT}/cart.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-                {$LANG.ordernewservices|default:'Order New Services'}
+                {$LANG.ordernewservices}
             </a>
             <a href="{$WEB_ROOT}/cart.php?gid=addons" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                {$LANG.viewavailableaddons|default:'View Available Addons'}
+                {$LANG.viewavailableaddons}
             </a>
             <a href="{$WEB_ROOT}/upgrade.php{if isset($id) && $id}?type=package&id={$id|escape}{/if}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
-                Upgrade / Downgrade
+                {$LANG.upgrade}
             </a>
         </div>
     </aside>
@@ -230,17 +230,17 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>
             </div>
             {if isset($overdueinvoice) && $overdueinvoice}
-                <p class="up-empty-title">{$LANG.upgradenotavailabletitle|default:'Upgrade not available'}</p>
-                <p class="up-empty-sub">{$LANG.upgradeerroroverdueinvoice|default:'You have an overdue invoice. Please settle it before upgrading.'}</p>
-                <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-primary">{$LANG.invoices|default:'My invoices'}</a>
+                <p class="up-empty-title">{$hadrianLang.services.upgradeNotAvailTitle}</p>
+                <p class="up-empty-sub">{$LANG.upgradeerroroverdueinvoice}</p>
+                <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-primary">{$LANG.invoices}</a>
             {elseif isset($existingupgradeinvoice) && $existingupgradeinvoice}
-                <p class="up-empty-title">{$LANG.upgradenotavailabletitle|default:'Upgrade not available'}</p>
-                <p class="up-empty-sub">{$LANG.upgradeexistingupgradeinvoice|default:'There is already a pending upgrade invoice for this service.'}</p>
-                <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-primary">{$LANG.invoices|default:'My invoices'}</a>
+                <p class="up-empty-title">{$hadrianLang.services.upgradeNotAvailTitle}</p>
+                <p class="up-empty-sub">{$LANG.upgradeexistingupgradeinvoice}</p>
+                <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-primary">{$LANG.invoices}</a>
             {else}
-                <p class="up-empty-title">{$LANG.upgradenotavailabletitle|default:'No upgrade available'}</p>
-                <p class="up-empty-sub">{$LANG.upgradeNotPossible|default:"This service doesn't have higher tiers, or upgrades are paused."}</p>
-                <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'All services'}</a>
+                <p class="up-empty-title">{$hadrianLang.services.noUpgradeTitle}</p>
+                <p class="up-empty-sub">{$LANG.upgradeNotPossible}</p>
+                <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
             {/if}
         </div>
     </div>

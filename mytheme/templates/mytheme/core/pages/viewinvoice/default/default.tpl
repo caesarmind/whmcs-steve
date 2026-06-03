@@ -39,11 +39,11 @@
 <header class="page-header">
     <div class="page-header-row">
         <div style="flex: 1; min-width: 0;">
-            <p class="page-eyebrow">{$LANG.invoicenum|default:'Invoice'}</p>
-            <h1>{$LANG.invoicenum|default:'Invoice'} #{$invDisplayNum|escape}</h1>
+            <p class="page-eyebrow">{$LANG.invoicestitle}</p>
+            <h1>{$LANG.invoicestitle} #{$invDisplayNum|escape}</h1>
             <p class="page-subtitle">
-                {if isset($datecreated)}{$LANG.invoicedatecreated|default:'Issued'} {$datecreated|escape}{/if}
-                {if isset($datedue)} · {$LANG.invoicedatedue|default:'Due'} {$datedue|escape}{/if}
+                {if isset($datecreated)}{$hadrianLang.billing.issuedOn} {$datecreated|escape}{/if}
+                {if isset($datedue)} · {$hadrianLang.billing.dueOn} {$datedue|escape}{/if}
             </p>
         </div>
         {if $status}<span class="status-pill {$invStatusLower}">{$status|escape}</span>{/if}
@@ -61,15 +61,15 @@
         <div class="card">
             <div class="inv-head">
                 <div class="inv-head-block">
-                    <div class="label">{if $invStatusLower == 'paid'}{$LANG.invoicestotal|default:'Total'}{else}{$LANG.amountdue|default:'Amount due'}{/if}</div>
+                    <div class="label">{if $invStatusLower == 'paid'}{$LANG.invoicestotal}{else}{$hadrianLang.billing.amountDue}{/if}</div>
                     <div class="value big{if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'} due{/if}">{if isset($total)}{$total|escape}{/if}</div>
                 </div>
                 <div class="inv-head-block">
-                    <div class="label">{$LANG.invoicedatedue|default:'Due date'}</div>
+                    <div class="label">{$LANG.invoicesdatedue}</div>
                     <div class="value">{$datedue|default:'-'|escape}</div>
                 </div>
                 <div class="inv-head-block">
-                    <div class="label">{$LANG.invoicedatecreated|default:'Invoice date'}</div>
+                    <div class="label">{$LANG.invoicesdatecreated}</div>
                     <div class="value">{$datecreated|default:'-'|escape}</div>
                     <div class="sub">#{$invDisplayNum|escape}</div>
                 </div>
@@ -82,15 +82,15 @@
            applycredit=true + creditamount, like stock nexus. *}
         {if $manualapplycredit}
         <div class="card inv-lines-card" style="background:var(--color-accent-light);border:1px solid var(--color-accent);">
-            <div class="card-header" style="border-bottom-color:var(--color-accent);"><h2 style="color:var(--color-accent);">{$LANG.invoiceaddcreditapply|default:'Apply credit'}</h2></div>
+            <div class="card-header" style="border-bottom-color:var(--color-accent);"><h2 style="color:var(--color-accent);">{$LANG.invoiceaddcreditapply}</h2></div>
             <div class="inv-pay">
-                <p style="margin:0 0 14px;font-size:var(--text-base);color:var(--color-text-secondary);letter-spacing:-0.008em;line-height:1.5;">{$LANG.invoiceaddcreditdesc1|default:'You have an available credit balance of'} <strong style="color:var(--color-text-primary);font-weight:var(--fw-semibold);">{$totalcredit}</strong>. {$LANG.invoiceaddcreditdesc2|default:'Enter how much to apply to this invoice'}.</p>
+                <p style="margin:0 0 14px;font-size:var(--text-base);color:var(--color-text-secondary);letter-spacing:-0.008em;line-height:1.5;">{$LANG.invoiceaddcreditdesc1} <strong style="color:var(--color-text-primary);font-weight:var(--fw-semibold);">{$totalcredit}</strong>. {$LANG.invoiceaddcreditdesc2}.</p>
                 <form method="post" action="{$WEB_ROOT}/viewinvoice.php?id={$invoiceid}">
                     <input type="hidden" name="applycredit" value="true">
                     <input type="hidden" name="token" value="{$token|default:''|escape}">
                     <div style="display:flex;gap:10px;align-items:center;">
-                        <input type="text" name="creditamount" value="{$creditamount|default:''|escape}" inputmode="decimal" aria-label="{$LANG.invoiceaddcreditamount|default:'Amount'}" style="flex:1;min-width:0;height:44px;padding:0 14px;font-family:inherit;font-size:var(--text-base);color:var(--color-text-primary);background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:var(--radius-md);letter-spacing:-0.008em;">
-                        <button type="submit" class="btn-primary inv-pay-btn" style="width:auto;">{$LANG.invoiceaddcreditapply|default:'Apply credit'}</button>
+                        <input type="text" name="creditamount" value="{$creditamount|default:''|escape}" inputmode="decimal" aria-label="{$LANG.invoiceaddcreditamount}" style="flex:1;min-width:0;height:44px;padding:0 14px;font-family:inherit;font-size:var(--text-base);color:var(--color-text-primary);background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:var(--radius-md);letter-spacing:-0.008em;">
+                        <button type="submit" class="btn-primary inv-pay-btn" style="width:auto;">{$LANG.invoiceaddcreditapply}</button>
                     </div>
                 </form>
             </div>
@@ -101,13 +101,13 @@
         <div class="card">
             <div class="inv-addr">
                 <div>
-                    <div class="inv-addr-label">{$LANG.invoicefrom|default:'From'}</div>
+                    <div class="inv-addr-label">{$LANG.invoicespayto}</div>
                     <div class="inv-addr-text">
                         <strong>{$companyname|default:''|escape}</strong>
                     </div>
                 </div>
                 <div>
-                    <div class="inv-addr-label">{$LANG.invoicebillto|default:'Bill to'}</div>
+                    <div class="inv-addr-label">{$LANG.invoicesinvoicedto}</div>
                     <div class="inv-addr-text">
                         {if isset($clientsdetails.firstname)}<strong>{$clientsdetails.firstname|escape} {$clientsdetails.lastname|escape}</strong><br>{/if}
                         {if isset($clientsdetails.companyname) && $clientsdetails.companyname}{$clientsdetails.companyname|escape}<br>{/if}
@@ -122,12 +122,12 @@
 
         {* Line items *}
         <div class="card inv-lines-card">
-            <div class="card-header"><h2>{$LANG.invoicedetails|default:'Invoice details'}</h2></div>
+            <div class="card-header"><h2>{$LANG.invoicelineitems}</h2></div>
             <table class="inv-lines">
                 <thead>
                     <tr>
-                        <th scope="col" style="width: 70%;">{$LANG.invoicesdescription|default:'Description'}</th>
-                        <th scope="col" style="text-align: right;">{$LANG.amount|default:'Amount'}</th>
+                        <th scope="col" style="width: 70%;">{$LANG.invoicesdescription}</th>
+                        <th scope="col" style="text-align: right;">{$LANG.invoicesamount}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -144,18 +144,18 @@
 
             <div class="inv-totals">
                 {if isset($subtotal)}
-                <div class="inv-total-row muted"><span>{$LANG.invoicessubtotal|default:'Subtotal'}</span><span>{$subtotal|escape}</span></div>
+                <div class="inv-total-row muted"><span>{$LANG.invoicessubtotal}</span><span>{$subtotal|escape}</span></div>
                 {/if}
                 {if isset($taxrate) && $taxrate}
-                <div class="inv-total-row muted"><span>{$LANG.invoicestax|default:'Tax'} ({$taxrate|escape}%)</span><span>{$tax|escape}</span></div>
+                <div class="inv-total-row muted"><span>{$LANG.invoicestax} ({$taxrate|escape}%)</span><span>{$tax|escape}</span></div>
                 {/if}
                 {if isset($taxrate2) && $taxrate2}
-                <div class="inv-total-row muted"><span>{$LANG.invoicestax|default:'Tax'} 2 ({$taxrate2|escape}%)</span><span>{$tax2|escape}</span></div>
+                <div class="inv-total-row muted"><span>{$LANG.invoicestax} 2 ({$taxrate2|escape}%)</span><span>{$tax2|escape}</span></div>
                 {/if}
                 {if isset($credit) && $credit}
-                <div class="inv-total-row muted"><span>{$LANG.invoicescredit|default:'Credit applied'}</span><span>−{$credit|escape}</span></div>
+                <div class="inv-total-row muted"><span>{$LANG.invoicescredit}</span><span>−{$credit|escape}</span></div>
                 {/if}
-                <div class="inv-total-row grand"><span>{if $invStatusLower == 'paid'}{$LANG.invoicestotal|default:'Total'}{else}{$LANG.totaldue|default:'Total due'}{/if}</span><span class="amt">{if isset($total)}{$total|escape}{/if}</span></div>
+                <div class="inv-total-row grand"><span>{if $invStatusLower == 'paid'}{$LANG.invoicestotal}{else}{$LANG.invoicestotaldue}{/if}</span><span class="amt">{if isset($total)}{$total|escape}{/if}</span></div>
             </div>
         </div>
 
@@ -165,14 +165,14 @@
            the closing balance. Output raw (not |escape) to match nexus and avoid
            double-escaping the prebuilt reference links. *}
         <div class="card inv-lines-card">
-            <div class="card-header"><h2>{$LANG.invoicestransactions|default:'Transactions'}</h2></div>
+            <div class="card-header"><h2>{$LANG.billing.ledger.title}</h2></div>
             <table class="inv-lines">
                 <thead>
                     <tr>
-                        <th scope="col">{$LANG.invoicestransdate|default:'Date'}</th>
-                        <th scope="col">{$LANG.invoicestype|default:'Type'}</th>
-                        <th scope="col">{$LANG.invoicesrefnum|default:'Reference'}</th>
-                        <th scope="col" style="text-align: right;">{$LANG.amount|default:'Amount'}</th>
+                        <th scope="col">{$LANG.billing.ledger.date}</th>
+                        <th scope="col">{$LANG.billing.ledger.type}</th>
+                        <th scope="col">{$LANG.billing.ledger.reference}</th>
+                        <th scope="col" style="text-align: right;">{$LANG.invoicestransamount}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -180,16 +180,16 @@
                     <tr>
                         <td class="period">{$tx.date}</td>
                         <td class="period">{if $tx.gateway}{$tx.gateway} &mdash; {/if}{$tx.typeLabel}</td>
-                        <td class="period">{if $tx.referenceHref}<a href="{$tx.referenceHref}" target="_blank" rel="noopener">{/if}{if $tx.isCreditNote}Credit Note {elseif $tx.isDebitNote}Debit Note {/if}{$tx.referenceId|truncate:24:"...":false:true}{if $tx.referenceHref}</a>{/if}</td>
+                        <td class="period">{if $tx.referenceHref}<a href="{$tx.referenceHref}" target="_blank" rel="noopener">{/if}{if $tx.isCreditNote}{$LANG.billing.creditnote} {elseif $tx.isDebitNote}{$LANG.billing.debitnote} {/if}{$tx.referenceId|truncate:24:"...":false:true}{if $tx.referenceHref}</a>{/if}</td>
                         <td class="amount">{$tx.amount}</td>
                     </tr>
                     {foreachelse}
                     <tr>
-                        <td colspan="4" style="text-align:center;color:var(--color-text-tertiary);">{$LANG.invoicesnotrans|default:'No transactions have been recorded for this invoice yet.'}</td>
+                        <td colspan="4" style="text-align:center;color:var(--color-text-tertiary);">{$LANG.invoicestransnonefound}</td>
                     </tr>
                     {/foreach}
                     <tr>
-                        <td colspan="3" style="text-align:right;font-weight:var(--fw-semibold);color:var(--color-text-primary);border-top:0.5px solid var(--color-border);">{$LANG.invoicesbalance|default:'Balance'}</td>
+                        <td colspan="3" style="text-align:right;font-weight:var(--fw-semibold);color:var(--color-text-primary);border-top:0.5px solid var(--color-border);">{$LANG.invoicesbalance}</td>
                         <td class="amount" style="font-weight:var(--fw-semibold);border-top:0.5px solid var(--color-border);">{$balance}</td>
                     </tr>
                 </tbody>
@@ -199,7 +199,7 @@
         {* Payment *}
         {if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'}
         <div class="card inv-lines-card">
-            <div class="card-header"><h2>{$LANG.invoicemakepayment|default:'Make a payment'}</h2></div>
+            <div class="card-header"><h2>{$LANG.invoicemakepayment}</h2></div>
             <form method="post" action="{$WEB_ROOT}/viewinvoice.php?id={$invoiceid}">
                 <input type="hidden" name="token" value="{$token|default:''|escape}">
                 <input type="hidden" name="paynow" value="true">
@@ -217,7 +217,7 @@
                             {/foreach}
                         {/if}
                     </div>
-                    <button type="submit" class="btn-primary inv-pay-btn">{$LANG.invoicepay|default:'Pay'} {if isset($total)}{$total|escape}{/if}</button>
+                    <button type="submit" class="btn-primary inv-pay-btn">{$LANG.invoicepay} {if isset($total)}{$total|escape}{/if}</button>
                 </div>
             </form>
         </div>
@@ -227,53 +227,53 @@
     {* ══ RIGHT: Actions sidebar ══ *}
     <aside class="inv-aside">
         <div class="card inv-aside-card">
-            <div class="inv-aside-heading">{$LANG.summary|default:'Summary'}</div>
+            <div class="inv-aside-heading">{$hadrianLang.billing.summary}</div>
             <div class="inv-aside-summary-row">
-                <div class="inv-aside-summary-label">{$LANG.invoicesstatus|default:'Status'}</div>
+                <div class="inv-aside-summary-label">{$LANG.invoicesstatus}</div>
                 <div class="inv-aside-summary-value"><span class="status-pill {$invStatusLower}">{$status|escape}</span></div>
             </div>
             <div class="inv-aside-summary-row">
-                <div class="inv-aside-summary-label">{if $invStatusLower == 'paid'}{$LANG.invoicestotal|default:'Total'}{else}{$LANG.amountdue|default:'Amount due'}{/if}</div>
+                <div class="inv-aside-summary-label">{if $invStatusLower == 'paid'}{$LANG.invoicestotal}{else}{$hadrianLang.billing.amountDue}{/if}</div>
                 <div class="inv-aside-summary-value{if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'} due{/if}">{if isset($total)}{$total|escape}{/if}</div>
             </div>
             <div class="inv-aside-summary-row">
-                <div class="inv-aside-summary-label">{$LANG.invoicedatedue|default:'Due date'}</div>
+                <div class="inv-aside-summary-label">{$LANG.invoicesdatedue}</div>
                 <div class="inv-aside-summary-value">{$datedue|default:'-'|escape}</div>
             </div>
         </div>
 
         <div class="card inv-aside-card">
-            <div class="inv-aside-heading">{$LANG.actions|default:'Actions'}</div>
+            <div class="inv-aside-heading">{$LANG.actions}</div>
             <div class="inv-actions-card-inner">
                 <a href="{$WEB_ROOT}/dl.php?type=i&id={$invoiceid}" class="inv-action" download>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    {$LANG.invoicedownload|default:'Download'}
+                    {$LANG.invoicesdownload}
                 </a>
             </div>
         </div>
 
         {* Billing sub-nav *}
         <div class="card subnav-card">
-            <div class="subnav-heading">Billing</div>
+            <div class="subnav-heading">{$hadrianLang.billing.sidebarHeading}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                {$LANG.myinvoices|default:'My Invoices'}
+                {$LANG.navinvoices}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=quotes" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-                {$LANG.myquotes|default:'My Quotes'}
+                {$LANG.navquotes}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=masspay&all=true" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
-                {$LANG.masspayment|default:'Mass Payment'}
+                {$LANG.masspaytitle}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=addfunds" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                {$LANG.addfunds|default:'Add Funds'}
+                {$LANG.addfunds}
             </a>
             <a href="{routePath('account-paymentmethods')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                {$LANG.paymentmethods|default:'Payment Methods'}
+                {$LANG.paymentMethods.title}
             </a>
         </div>
     </aside>
@@ -285,7 +285,7 @@
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
         </svg>
     </div>
-    <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">{$LANG.invoicenotfound|default:'Invoice not found'}</p>
-    <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">{$LANG.invoicenotfoundsub|default:"This invoice doesn't exist or has been removed from your account."}</p>
-    <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-primary">{$LANG.allinvoices|default:'All invoices'}</a>
+    <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">{$hadrianLang.billing.invoiceNotFoundTitle}</p>
+    <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">{$hadrianLang.billing.invoiceNotFoundSub}</p>
+    <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-primary">{$LANG.navinvoices}</a>
 </div>

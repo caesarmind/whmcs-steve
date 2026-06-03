@@ -105,7 +105,7 @@ final class Hooks
                     'languages' => LocaleHelper::effectiveList(),
                 ],
             ],
-            'rslang' => $this->loadLanguage($template, $vars['language'] ?? 'english'),
+            'hadrianLang' => $this->loadLanguage($template, $vars['language'] ?? 'english'),
             // Convenience root alias — templates that just want "the logo"
             // can read $mtLogo directly without walking $myTheme.branding.
             // Resolves to the light-surface logo (best default for the

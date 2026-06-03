@@ -10,8 +10,8 @@
 <div class="tfabc-wrap">
     <div class="card tfabc-card">
         <div class="tfabc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div>
-        <h1 class="tfabc-title">{$LANG.twofabackupcodes|default:'Backup codes'}</h1>
-        <p class="tfabc-sub">{$LANG.twofabackupcodessub|default:'Save these codes somewhere safe. Each one can be used once to sign in if you lose access to your authenticator device.'}</p>
+        <h1 class="tfabc-title">{$hadrianLang.auth.backupCodesTitle}</h1>
+        <p class="tfabc-sub">{$hadrianLang.auth.backupCodesSub}</p>
 
         <div class="tfabc-codes" data-copy-source>
             {if isset($backupCodes) && $backupCodes|@count > 0}
@@ -26,18 +26,19 @@
         <div class="tfabc-actions">
             <button type="button" class="btn-secondary" data-copy-btn>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                {$LANG.copy|default:'Copy'}
+                {$LANG.copy}
             </button>
-            <a href="{$WEB_ROOT}/clientarea.php?action=security" class="btn-primary">{$LANG.done|default:'Done'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=security" class="btn-primary">{$hadrianLang.auth.done}</a>
         </div>
 
         <p class="tfabc-warn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            {$LANG.twofabackupwarn|default:'These codes will not be shown again. Once you leave this page they are gone.'}
+            {$hadrianLang.auth.backupCodesWarn}
         </p>
     </div>
 </div>
 
+<script>var _localLang = { copied: '{$hadrianLang.auth.copied|escape:"javascript"}' };</script>
 <script>
 {literal}
 document.addEventListener('click', function (e) {
@@ -49,7 +50,7 @@ document.addEventListener('click', function (e) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(function () {
             var orig = btn.innerHTML;
-            btn.textContent = 'Copied';
+            btn.textContent = _localLang.copied;
             setTimeout(function () { btn.innerHTML = orig; }, 1600);
         });
     }

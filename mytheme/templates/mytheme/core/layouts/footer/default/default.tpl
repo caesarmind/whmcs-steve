@@ -6,7 +6,7 @@
 <footer class="hp-footer hp-footer-slim">
     <div class="hp-footer-inner">
         <div class="hp-footer-bottom">
-            <span class="hp-footer-copyright">&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$LANG.allrightsreserved|default:'All rights reserved.'}</span>
+            <span class="hp-footer-copyright">&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$hadrianLang.footer.allRightsReserved}</span>
             {if isset($mtFooterSecondaryItems) && $mtFooterSecondaryItems}
                 <div class="hp-footer-bottom-links">
                     {foreach $mtFooterSecondaryItems as $item}

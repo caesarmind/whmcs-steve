@@ -42,9 +42,9 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.clientareaservices|default:'Services'}</p>
-    <h1>{$LANG.metrics.pricing|default:'Usage pricing'}</h1>
-    <p class="page-subtitle">{$LANG.usagepricingintro|default:"What you'll pay per unit beyond your included quotas."}</p>
+    <p class="page-eyebrow">{$LANG.clientareaservices}</p>
+    <h1>{$LANG.metrics.pricing}</h1>
+    <p class="page-subtitle">{$hadrianLang.services.usagePricingIntro}</p>
 </header>
 
 {if $ubFull}
@@ -53,9 +53,9 @@
         <table class="ub-table">
             <thead>
                 <tr>
-                    <th>{$LANG.metrics.resource|default:'Resource'}</th>
-                    <th>{$LANG.metrics.includedInBase|default:'Included'}</th>
-                    <th>{$LANG.metrics.overagerate|default:'Overage rate'}</th>
+                    <th>{$hadrianLang.services.metricResource}</th>
+                    <th>{$LANG.metrics.includedInBase}</th>
+                    <th>{$hadrianLang.services.metricOverageRate}</th>
                 </tr>
             </thead>
             <tbody>
@@ -80,7 +80,7 @@
                         <td class="ub-rate">
                             {if isset($metric.pricing) && $metric.pricing|@count > 0}
                                 {foreach $metric.pricing as $tier}
-                                    <span class="ub-rate-tier">{$tier.price_per_unit|escape}{if isset($metric.unitName) && $metric.unitName} / {$metric.unitName|escape}{/if}{if isset($tier.from) && $tier.from > 0} (from {$tier.from|escape}){/if}</span>
+                                    <span class="ub-rate-tier">{$tier.price_per_unit|escape}{if isset($metric.unitName) && $metric.unitName} / {$metric.unitName|escape}{/if}{if isset($tier.from) && $tier.from > 0} ({$hadrianLang.services.metricFrom|replace:'%s':$tier.from|escape}){/if}</span>
                                 {/foreach}
                             {else}-{/if}
                         </td>
@@ -92,12 +92,12 @@
     </div>
 
     <div class="ub-info">
-        <strong>{$LANG.usagepricinghowtitle|default:'How billing works.'}</strong>
-        {$LANG.usagepricinghow|default:'Usage is metered continuously and totaled at the end of each billing cycle. Overages appear as line items on your next invoice.'}
+        <strong>{$hadrianLang.services.usagePricingHowTitle}</strong>
+        {$hadrianLang.services.usagePricingHow}
     </div>
 
     <div class="ub-actions">
-        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.metrics.viewusage|default:'View my usage'}</a>
+        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$hadrianLang.services.metricViewUsage}</a>
     </div>
 </div>
 {/if}
@@ -109,9 +109,9 @@
             <div class="ub-empty-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
             </div>
-            <p class="ub-empty-title">{$LANG.usagepricingnone|default:'Pricing unavailable'}</p>
-            <p class="ub-empty-sub">{$LANG.usagepricingnonesub|default:"We couldn't load usage tiers for this product right now."}</p>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'All services'}</a>
+            <p class="ub-empty-title">{$hadrianLang.services.usagePricingNoneTitle}</p>
+            <p class="ub-empty-sub">{$hadrianLang.services.usagePricingNoneSub}</p>
+            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
         </div>
     </div>
 </div>

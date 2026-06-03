@@ -41,8 +41,8 @@
 </script>
 
 <header class="page-header">
-    <h1>{$LANG.securitysettings|default:'Security settings'}</h1>
-    <p class="page-subtitle">{$LANG.usersecuritysub|default:'Two-factor authentication and account-security options.'}</p>
+    <h1>{$LANG.securitysettings}</h1>
+    <p class="page-subtitle">{$hadrianLang.account.securitySettingsSub}</p>
 </header>
 
 <div class="sec-split">
@@ -50,22 +50,22 @@
     {* ══ LEFT: Profile sub-nav ══ *}
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.yourprofile|default:'Your Profile'}</div>
+            <div class="subnav-heading">{$LANG.yourprofile}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.accountdetails|default:'Account Details'}
+                {$LANG.accountdetails}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=changepw" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                {$LANG.clientareanavchangepassword|default:'Change Password'}
+                {$LANG.clientareanavchangepassword}
             </a>
             <a href="{$WEB_ROOT}/index.php/user/security" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                {$LANG.securitysettings|default:'Security Settings'}
+                {$LANG.securitysettings}
             </a>
             <a href="{$WEB_ROOT}/logout.php" class="subnav-item danger">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                {$LANG.logout|default:'Logout'}
+                {$LANG.logout}
             </a>
         </div>
     </aside>
@@ -81,8 +81,8 @@
         {if $tfaAvail}
         <div class="card sec-card-inner">
             <div class="sec-header">
-                <h2>{$LANG.twofactorauth|default:'Two-factor authentication'}</h2>
-                <div class="sec-header-sub">{$LANG.twofactorauthsub|default:'Require a second step to sign in to your account.'}</div>
+                <h2>{$LANG.twofactorauth}</h2>
+                <div class="sec-header-sub">{$hadrianLang.account.twoFactorSub}</div>
             </div>
             <div class="tfa-body">
                 <div class="tfa-shield{if $tfaOn} enabled{/if}">
@@ -94,25 +94,25 @@
                 </div>
                 <div class="tfa-copy">
                     <div class="tfa-status-row">
-                        <span class="tfa-status-title">{$LANG.twofactorauth|default:'Two-factor authentication'}</span>
-                        <span class="tfa-status-pill{if $tfaOn} on{/if}">{if $tfaOn}{$LANG.enabled|default:'Enabled'}{else}{$LANG.disabled|default:'Disabled'}{/if}</span>
-                        {if $tfaRequired && !$tfaOn}<span class="tfa-status-pill">{$LANG.required|default:'Required'}</span>{/if}
+                        <span class="tfa-status-title">{$LANG.twofactorauth}</span>
+                        <span class="tfa-status-pill{if $tfaOn} on{/if}">{if $tfaOn}{$LANG.enabled}{else}{$LANG.disabled}{/if}</span>
+                        {if $tfaRequired && !$tfaOn}<span class="tfa-status-pill">{$LANG.required}</span>{/if}
                     </div>
                     <p class="tfa-desc">
                         {if $tfaOn}
-                            {$LANG.twofactorenableddesc|default:'Two-factor authentication is active. Sign-ins require both your password and a code from your second factor.'}
+                            {$hadrianLang.account.twoFactorEnabledDesc}
                         {elseif $tfaRequired}
-                            {$LANG.clientAreaSecurityTwoFactorAuthRequired|default:'Your administrator requires two-factor authentication on this account. Please enable it now to keep full access.'}
+                            {$LANG.clientAreaSecurityTwoFactorAuthRequired}
                         {else}
-                            {$LANG.clientAreaSecurityTwoFactorAuthRecommendation|default:'Add an extra layer of security. After your password, you will be asked for a one-time code when you sign in.'}
+                            {$LANG.clientAreaSecurityTwoFactorAuthRecommendation}
                         {/if}
                     </p>
                 </div>
                 <div class="tfa-cta" data-tfa-token="{$token|default:''|escape}">
                     {if $tfaOn}
-                    <button type="button" class="btn-secondary" data-tfa-open data-tfa-url="{routePath('account-security-two-factor-disable')}" data-tfa-title="{$LANG.twofadisable|default:'Disable two-factor'}">{$LANG.twofadisable|default:'Disable two-factor'}</button>
+                    <button type="button" class="btn-secondary" data-tfa-open data-tfa-url="{routePath('account-security-two-factor-disable')}" data-tfa-title="{$LANG.twofadisable}">{$LANG.twofadisable}</button>
                     {else}
-                    <button type="button" class="btn-primary" data-tfa-open data-tfa-url="{routePath('account-security-two-factor-enable')}" data-tfa-title="{$LANG.twofaenable|default:'Enable two-factor'}">{$LANG.twofaenable|default:'Enable two-factor'}</button>
+                    <button type="button" class="btn-primary" data-tfa-open data-tfa-url="{routePath('account-security-two-factor-enable')}" data-tfa-title="{$LANG.twofaenable}">{$LANG.twofaenable}</button>
                     {/if}
                 </div>
             </div>
@@ -123,8 +123,8 @@
         {if $hasSq}
         <div class="card sec-card-inner">
             <div class="sec-header">
-                <h2>{$LANG.clientareanavsecurityquestions|default:'Security question'}</h2>
-                <div class="sec-header-sub">{$LANG.securityquestionsub|default:'A backup verification step used when recovering your account.'}</div>
+                <h2>{$LANG.clientareanavsecurityquestions}</h2>
+                <div class="sec-header-sub">{$hadrianLang.account.securityQuestionSub}</div>
             </div>
             <div class="sec-card-body">
                 <form method="post" action="{routePath('user-security-question')}" class="sec-form">
@@ -136,7 +136,7 @@
                     </div>
                     {/if}
                     <div class="sec-field">
-                        <label for="sec-qid">{$LANG.clientareasecurityquestion|default:'Security question'}</label>
+                        <label for="sec-qid">{$LANG.clientareasecurityquestion}</label>
                         <select name="securityqid" id="sec-qid">
                             {foreach $securityQuestions as $question}
                                 <option value="{$question->id}">{$question->question|escape}</option>
@@ -145,15 +145,15 @@
                     </div>
                     <div class="sec-field-row">
                         <div class="sec-field">
-                            <label for="sec-ans1">{$LANG.clientareasecurityanswer|default:'Answer'}</label>
+                            <label for="sec-ans1">{$LANG.clientareasecurityanswer}</label>
                             <input type="password" name="securityqans" id="sec-ans1" autocomplete="off">
                         </div>
                         <div class="sec-field">
-                            <label for="sec-ans2">{$LANG.clientareasecurityconfanswer|default:'Confirm answer'}</label>
+                            <label for="sec-ans2">{$LANG.clientareasecurityconfanswer}</label>
                             <input type="password" name="securityqans2" id="sec-ans2" autocomplete="off">
                         </div>
                     </div>
-                    <button type="submit" name="submit" value="1" class="btn-primary">{$LANG.clientareasavechanges|default:'Save changes'}</button>
+                    <button type="submit" name="submit" value="1" class="btn-primary">{$LANG.clientareasavechanges}</button>
                 </form>
             </div>
         </div>
@@ -163,8 +163,8 @@
         {if $hasProviders}
         <div class="card sec-card-inner">
             <div class="sec-header">
-                <h2>{$LANG.remoteAuthn.titleLinkedAccounts|default:'Linked accounts'}</h2>
-                <div class="sec-header-sub">{$LANG.remoteAuthn.mayHaveMultipleLinks|default:'Connect a third-party sign-in provider so you can log in with it.'}</div>
+                <h2>{$LANG.remoteAuthn.titleLinkedAccounts}</h2>
+                <div class="sec-header-sub">{$hadrianLang.account.linkedAccountsSub}</div>
             </div>
             <div class="sec-providers">
                 {foreach $linkableProviders as $provider}{$provider.code}{/foreach}
@@ -178,9 +178,9 @@
         <div class="card sec-card-inner">
             <div class="sec-empty">
                 <div class="sec-empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-                <p class="sec-empty-title">{$LANG.securitynooptionstitle|default:'No additional security options available'}</p>
-                <p class="sec-empty-sub">{$LANG.securitynooptionssub|default:'Your administrator has not enabled any additional sign-in security features (such as two-factor authentication) for your account. Please contact support if you would like extra protection added.'}</p>
-                <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.contactsupport|default:'Contact support'}</a>
+                <p class="sec-empty-title">{$hadrianLang.account.securityNoOptionsTitle}</p>
+                <p class="sec-empty-sub">{$hadrianLang.account.securityNoOptionsSub}</p>
+                <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.contactus}</a>
             </div>
         </div>
         {/if}
@@ -193,6 +193,7 @@
    JS, so this is a self-contained vanilla modal that AJAX-loads the fragment with the
    CSRF token, re-executes any inline scripts it carries, and drives its step forms. *}
 {if $tfaAvail}
+<script>var _localLang = {'close': '{$LANG.close|escape:"javascript"}', 'tfaError': '{$hadrianLang.account.tfaModalError|escape:"javascript"}'};</script>
 <script>{literal}
 (function () {
     var triggers = document.querySelectorAll('[data-tfa-open]');
@@ -208,7 +209,7 @@
             '<div class="tfa-modal-backdrop" data-tfa-close></div>' +
             '<div class="tfa-modal-dialog" role="dialog" aria-modal="true">' +
             '<div class="tfa-modal-head"><span class="tfa-modal-title"></span>' +
-            '<button type="button" class="tfa-modal-x" data-tfa-close aria-label="Close">&times;</button></div>' +
+            '<button type="button" class="tfa-modal-x" data-tfa-close aria-label="' + _localLang.close + '">&times;</button></div>' +
             '<div class="tfa-modal-body"></div></div>';
         document.body.appendChild(modal);
         body = modal.querySelector('.tfa-modal-body');
@@ -294,7 +295,7 @@
             if (title) { titleEl.textContent = title; }
             inject(html);
         })
-        .catch(function () { body.innerHTML = '<p class="tfa-modal-err">Something went wrong — please try again.</p>'; });
+        .catch(function () { body.innerHTML = '<p class="tfa-modal-err">' + _localLang.tfaError + '</p>'; });
     }
     Array.prototype.forEach.call(triggers, function (t) {
         t.addEventListener('click', function () {

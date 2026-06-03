@@ -14,18 +14,18 @@
 {assign var=addonPrice value=''}
 {assign var=addonIcon value='shield'}
 {if $addon eq 'dnsmanagement'}
-    {assign var=addonName  value=$LANG.domainaddonsdnsmanagement|default:'DNS management'}
-    {assign var=addonDesc  value=$LANG.domainaddonsdnsmanagementinfo|default:'Edit DNS records (A, MX, CNAME, TXT) directly from your client area.'}
+    {assign var=addonName  value=$LANG.domainaddonsdnsmanagement}
+    {assign var=addonDesc  value=$LANG.domainaddonsdnsmanagementinfo}
     {assign var=addonPrice value=$addonspricing.dnsmanagement|default:''}
     {assign var=addonIcon  value='globe'}
 {elseif $addon eq 'emailfwd'}
-    {assign var=addonName  value=$LANG.domainemailforwarding|default:'Email forwarding'}
-    {assign var=addonDesc  value=$LANG.domainaddonsemailforwardinginfo|default:'Forward mail sent to your domain to a real inbox elsewhere.'}
+    {assign var=addonName  value=$LANG.domainemailforwarding}
+    {assign var=addonDesc  value=$LANG.domainaddonsemailforwardinginfo}
     {assign var=addonPrice value=$addonspricing.emailforwarding|default:''}
     {assign var=addonIcon  value='envelope'}
 {elseif $addon eq 'idprotect'}
-    {assign var=addonName  value=$LANG.domainidprotection|default:'ID Protection'}
-    {assign var=addonDesc  value=$LANG.domainaddonsidprotectioninfo|default:'Hide your contact details from public WHOIS lookups.'}
+    {assign var=addonName  value=$LANG.domainidprotection}
+    {assign var=addonDesc  value=$LANG.domainaddonsidprotectioninfo}
     {assign var=addonPrice value=$addonspricing.idprotection|default:''}
     {assign var=addonIcon  value='shield'}
 {/if}
@@ -53,20 +53,20 @@
 
         {if !empty($addonPrice) && $action eq 'buy'}
             <div class="da-price-row">
-                <span class="da-price-label">{$LANG.domainaddonsbuynow|default:'Price'}</span>
-                <span class="da-price-value">{$addonPrice|escape} <span class="da-price-cycle">{$LANG.domainaddonsperyear|default:'/yr'}</span></span>
+                <span class="da-price-label">{$LANG.domainaddonsbuynow}</span>
+                <span class="da-price-value">{$addonPrice|escape} <span class="da-price-cycle">{$LANG.domainaddonsperyear}</span></span>
             </div>
         {/if}
 
         {if !empty($success)}
             <div class="da-alert da-alert-success">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <div>{$LANG.domainaddonscancelsuccess|default:'The addon has been cancelled successfully.'}</div>
+                <div>{$LANG.domainaddonscancelsuccess}</div>
             </div>
         {elseif !empty($error)}
             <div class="da-alert da-alert-error">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
-                <div>{$LANG.domainaddonscancelfailed|default:'Action failed. Please contact support.'}</div>
+                <div>{$LANG.domainaddonscancelfailed}</div>
             </div>
         {else}
             <form method="post" action="{$smarty.server.PHP_SELF}?action=domainaddons" class="da-form">
@@ -75,13 +75,13 @@
                 <input type="hidden" name="confirm" value="1">
                 {if $action eq 'buy'}
                     <input type="hidden" name="buy" value="{$addon|escape}">
-                    <button type="submit" name="enable" value="1" class="btn-primary da-cta">{$LANG.domainaddonsbuynow|default:'Buy now'}</button>
+                    <button type="submit" name="enable" value="1" class="btn-primary da-cta">{$LANG.domainaddonsbuynow}</button>
                 {elseif $action eq 'disable'}
                     <input type="hidden" name="disable" value="{$addon|escape}">
-                    <p class="da-confirm">{$LANG.domainaddonscancelareyousure|default:'Are you sure you want to disable this addon?'}</p>
-                    <button type="submit" name="enable" value="1" class="btn-secondary da-cta da-danger-btn">{$LANG.domainaddonsconfirm|default:'Confirm cancellation'}</button>
+                    <p class="da-confirm">{$LANG.domainaddonscancelareyousure}</p>
+                    <button type="submit" name="enable" value="1" class="btn-secondary da-cta da-danger-btn">{$LANG.domainaddonsconfirm}</button>
                 {/if}
-                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="da-back">{$LANG.clientareabacklink|default:'Back to domain'}</a>
+                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="da-back">{$LANG.clientareabacklink}</a>
             </form>
         {/if}
     </div>

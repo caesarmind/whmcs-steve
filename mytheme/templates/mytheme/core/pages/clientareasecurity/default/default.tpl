@@ -36,8 +36,8 @@
 </script>
 
 <header class="page-header">
-    <h1>{$LANG.securitysettings|default:'Security settings'}</h1>
-    <p class="page-subtitle">{$LANG.securitysettingssub|default:'Single sign-on and connected third-party accounts for your login.'}</p>
+    <h1>{$LANG.securitysettings}</h1>
+    <p class="page-subtitle">{$hadrianLang.account.securitySettingsSsoSub}</p>
 </header>
 
 <div class="sec-split">
@@ -45,22 +45,22 @@
     {* ══ LEFT: Profile sub-nav ══ *}
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.yourprofile|default:'Your Profile'}</div>
+            <div class="subnav-heading">{$LANG.yourprofile}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.accountdetails|default:'Account Details'}
+                {$LANG.accountdetails}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=changepw" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                {$LANG.clientareanavchangepassword|default:'Change Password'}
+                {$LANG.clientareanavchangepassword}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=security" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                {$LANG.securitysettings|default:'Security Settings'}
+                {$LANG.securitysettings}
             </a>
             <a href="{$WEB_ROOT}/logout.php" class="subnav-item danger">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                {$LANG.logout|default:'Logout'}
+                {$LANG.logout}
             </a>
         </div>
     </aside>
@@ -72,8 +72,8 @@
         {if $hasSso}
         <div class="card sec-card-inner">
             <div class="sec-header">
-                <h2>{$LANG.sso.title|default:'Single Sign-On'}</h2>
-                <div class="sec-header-sub">{$LANG.sso.summary|default:'Move between connected areas without signing in again.'}</div>
+                <h2>{$LANG.sso.title}</h2>
+                <div class="sec-header-sub">{$hadrianLang.account.ssoSummary}</div>
             </div>
             <form id="frmSingleSignOn" method="post" action="{$WEB_ROOT}/clientarea.php?action=security">
                 <input type="hidden" name="token" value="{$token|default:''|escape}">
@@ -82,10 +82,10 @@
                 <div class="sec-row">
                     <div class="sec-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></div>
                     <div class="sec-row-meta">
-                        <div class="sec-row-title">{$LANG.sso.title|default:'Single Sign-On'}</div>
-                        <div class="sec-row-sub">{$LANG.sso.disablenotice|default:'You can turn this off at any time.'}</div>
+                        <div class="sec-row-title">{$LANG.sso.title}</div>
+                        <div class="sec-row-sub">{$hadrianLang.account.ssoDisableNotice}</div>
                     </div>
-                    <button type="button" class="sec-toggle{if $isSsoEnabled} on{/if}" role="switch" aria-checked="{if $isSsoEnabled}true{else}false{/if}" data-sso-toggle aria-label="{$LANG.sso.title|default:'Single Sign-On'}"></button>
+                    <button type="button" class="sec-toggle{if $isSsoEnabled} on{/if}" role="switch" aria-checked="{if $isSsoEnabled}true{else}false{/if}" data-sso-toggle aria-label="{$LANG.sso.title}"></button>
                     <input type="checkbox" name="allow_sso" id="inputAllowSso" hidden{if $isSsoEnabled} checked{/if}>
                 </div>
             </form>
@@ -98,8 +98,8 @@
         {if $hasProviders}
         <div class="card sec-card-inner">
             <div class="sec-header">
-                <h2>{$LANG.remoteAuthn.titleLinkedAccounts|default:'Linked accounts'}</h2>
-                <div class="sec-header-sub">{$LANG.remoteAuthn.mayHaveMultipleLinks|default:'Connect a third-party sign-in provider so you can log in with it.'}</div>
+                <h2>{$LANG.remoteAuthn.titleLinkedAccounts}</h2>
+                <div class="sec-header-sub">{$hadrianLang.account.linkedAccountsSub}</div>
             </div>
             <div class="sec-providers">
                 {foreach $linkableProviders as $provider}{$provider.code}{/foreach}
@@ -113,9 +113,9 @@
         <div class="card sec-card-inner">
             <div class="sec-empty">
                 <div class="sec-empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-                <p class="sec-empty-title">{$LANG.securitynooptionstitle|default:'No additional security options available'}</p>
-                <p class="sec-empty-sub">{$LANG.securitynooptionssub|default:'Your administrator has not enabled any additional sign-in security features (such as single sign-on, linked accounts, or two-factor authentication) for your account. Please contact support if you would like extra protection added.'}</p>
-                <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.contactsupport|default:'Contact support'}</a>
+                <p class="sec-empty-title">{$hadrianLang.account.securityNoOptionsTitle}</p>
+                <p class="sec-empty-sub">{$hadrianLang.account.securityNoOptionsSsoSub}</p>
+                <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.contactus}</a>
             </div>
         </div>
         {/if}

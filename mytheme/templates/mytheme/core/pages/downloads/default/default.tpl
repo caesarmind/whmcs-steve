@@ -59,8 +59,8 @@
 </script>
 
 <header class="page-header">
-    <h1>{$LANG.downloadstitle|default:'Downloads'}</h1>
-    <p class="page-subtitle">{$LANG.downloadsintro|default:'Software, guides and templates for your Hostnodes account. Browse by category or search.'}</p>
+    <h1>{$LANG.downloadstitle}</h1>
+    <p class="page-subtitle">{$hadrianLang.support.downloadsIntro}</p>
 </header>
 
 {* ============================ FULL / POPULATED STATE ============================ *}
@@ -71,30 +71,30 @@
     {* ---- LEFT: Support sub-nav ---- *}
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.supporttab|default:'Support'}</div>
+            <div class="subnav-heading">{$LANG.supporttab}</div>
             <a href="{$WEB_ROOT}/supporttickets.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                {$LANG.mytickets|default:'My support tickets'}
+                {$LANG.mytickets}
             </a>
             <a href="{$WEB_ROOT}/announcements.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-                {$LANG.announcementstitle|default:'Announcements'}
+                {$LANG.announcementstitle}
             </a>
             <a href="{$WEB_ROOT}/knowledgebase.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-                {$LANG.knowledgebasetitle|default:'Knowledgebase'}
+                {$LANG.knowledgebasetitle}
             </a>
             <a href="{$WEB_ROOT}/downloads.php" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                {$LANG.downloadstitle|default:'Downloads'}
+                {$LANG.downloadstitle}
             </a>
             <a href="{$WEB_ROOT}/serverstatus.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/><line x1="6" y1="7.5" x2="6.01" y2="7.5"/><line x1="6" y1="16.5" x2="6.01" y2="16.5"/></svg>
-                {$LANG.networkstatus|default:'Server status'}
+                {$LANG.networkstatus}
             </a>
             <a href="{$WEB_ROOT}/submitticket.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                {$LANG.opennewticket|default:'Open ticket'}
+                {$LANG.opennewticket}
             </a>
         </div>
     </aside>
@@ -106,14 +106,14 @@
         <div class="card" style="padding: 0;">
             <form method="post" action="{routePath('download-search')}" class="dl-searchbar">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="search" name="search" placeholder="{$LANG.downloadssearch|default:'Search downloads...'}" autocomplete="off">
+                <input type="search" name="search" placeholder="{$LANG.downloadssearch}" autocomplete="off">
             </form>
         </div>
 
         {* Categories *}
         {if isset($dlcats) && $dlcats|@count > 0}
         <div>
-            <h2 class="dl-section-title">{$LANG.downloadscategories|default:'Browse by category'}</h2>
+            <h2 class="dl-section-title">{$LANG.downloadscategories}</h2>
             <div class="dl-cats">
                 {foreach $dlcats as $dlcat}
                     <a href="{routePath('download-by-cat', $dlcat.id, $dlcat.urlfriendlyname)}" class="card dl-cat">
@@ -123,7 +123,7 @@
                         <div class="dl-cat-meta">
                             <div class="dl-cat-title">{$dlcat.name|escape} <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
                             {if $dlcat.description}<div class="dl-cat-desc">{$dlcat.description|strip_tags}</div>{/if}
-                            <div class="dl-cat-count">{$dlcat.numarticles|default:0} {$LANG.downloadsfiles|default:'files'}</div>
+                            <div class="dl-cat-count">{$dlcat.numarticles|default:0} {$LANG.downloadsfiles}</div>
                         </div>
                     </a>
                 {/foreach}
@@ -134,7 +134,7 @@
         {* Most popular *}
         {if isset($mostdownloads) && $mostdownloads|@count > 0}
         <div>
-            <h2 class="dl-section-title">{$LANG.downloadspopular|default:'Most popular'}</h2>
+            <h2 class="dl-section-title">{$LANG.downloadspopular}</h2>
             <div class="card dl-file-list">
                 {foreach $mostdownloads as $download}
                     {assign var=ft value=$download.type|default:''|lower}
@@ -147,17 +147,17 @@
                         <div class="dl-file-meta">
                             <div class="dl-file-name">{$download.title|escape}</div>
                             <div class="dl-file-sub">
-                                {if $download.clientsonly}<span class="dl-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>{if $loggedin}{$LANG.restricted|default:'Restricted'}{else}{$LANG.loginrequired|default:'Login required'}{/if}</span>{/if}
+                                {if $download.clientsonly}<span class="dl-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>{if $loggedin}{$LANG.restricted}{else}{$hadrianLang.support.loginRequired}{/if}</span>{/if}
                                 {if $download.filesize}<span>{$download.filesize|escape}</span>{/if}
                                 {if $download.description}<span class="dot">·</span><span>{$download.description|strip_tags}</span>{/if}
                             </div>
                         </div>
                         {if $download.clientsonly && !$loggedin}
-                        <span class="dl-file-action" title="{$LANG.loginrequired|default:'Login required'}">
+                        <span class="dl-file-action" title="{$hadrianLang.support.loginRequired}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                         </span>
                         {else}
-                        <span class="dl-file-action" title="{$LANG.downloadbutton|default:'Download'}">
+                        <span class="dl-file-action" title="{$LANG.downloadbutton}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         </span>
                         {/if}
@@ -180,9 +180,9 @@
             <div class="dl-empty-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </div>
-            <p class="dl-empty-title">{$LANG.downloadsnone|default:'No downloads available'}</p>
-            <p class="dl-empty-sub">{$LANG.downloadsnonesub|default:'There are no downloads in your account at this time. Check back later.'}</p>
-            <a href="{$WEB_ROOT}/knowledgebase.php" class="btn-primary">{$LANG.knowledgebasetitle|default:'Open knowledge base'}</a>
+            <p class="dl-empty-title">{$LANG.downloadsnone}</p>
+            <p class="dl-empty-sub">{$hadrianLang.support.downloadsEmptySub}</p>
+            <a href="{$WEB_ROOT}/knowledgebase.php" class="btn-primary">{$LANG.knowledgebasetitle}</a>
         </div>
     </div>
 </div>

@@ -20,9 +20,9 @@
 </script>
 
 <header class="page-header">
-    <div class="eyebrow">{$LANG.downloadstitle|default:'Downloads'}</div>
-    <h1>{$LANG.downloaddeniedtitle|default:'Download denied'}</h1>
-    <p class="page-subtitle">{$LANG.downloaddeniedsub|default:"You don't have access to this download."}</p>
+    <div class="eyebrow">{$LANG.downloadstitle}</div>
+    <h1>{$hadrianLang.support.downloadDeniedTitle}</h1>
+    <p class="page-subtitle">{$hadrianLang.support.downloadDeniedSub}</p>
 </header>
 
 <div class="when-full">
@@ -35,11 +35,11 @@
                 <line x1="4" y1="4" x2="20" y2="20" stroke-width="2"/>
             </svg>
         </div>
-        <h2>{$LANG.downloaddeniedheading|default:"You don't have permission to download this file"}</h2>
-        <p>{if isset($errormessage) && $errormessage}{$errormessage|strip_tags}{else}{$LANG.downloaddeniedbody|default:'It may require an active service subscription, or your account may not have the required role. Contact support if you believe this is an error.'}{/if}</p>
+        <h2>{$hadrianLang.support.downloadDeniedHeading}</h2>
+        <p>{if isset($errormessage) && $errormessage}{$errormessage|strip_tags}{else}{$hadrianLang.support.downloadDeniedBody}{/if}</p>
         <div class="denied-actions">
-            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'View my services'}</a>
-            <a href="{$WEB_ROOT}/supporttickets.php" class="btn-secondary">{$LANG.contactus|default:'Contact support'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
+            <a href="{$WEB_ROOT}/supporttickets.php" class="btn-secondary">{$LANG.contactus}</a>
         </div>
     </div>
 </div>
@@ -49,8 +49,8 @@
         <div class="denied-empty-ico">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
         </div>
-        <p class="denied-empty-title">{$LANG.downloaddeniednonetitle|default:'No download in progress'}</p>
-        <p class="denied-empty-sub">{$LANG.downloaddeniednonesub|default:"There's no protected download to deny right now."}</p>
-        <a href="{$WEB_ROOT}/downloads.php" class="btn-primary">{$LANG.downloadsall|default:'All downloads'}</a>
+        <p class="denied-empty-title">{$hadrianLang.support.downloadDeniedNoneTitle}</p>
+        <p class="denied-empty-sub">{$hadrianLang.support.downloadDeniedNoneSub}</p>
+        <a href="{$WEB_ROOT}/downloads.php" class="btn-primary">{$hadrianLang.support.allDownloads}</a>
     </div>
 </div>

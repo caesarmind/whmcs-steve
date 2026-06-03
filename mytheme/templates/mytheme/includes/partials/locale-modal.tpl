@@ -6,8 +6,8 @@
 <div class="locale-modal" id="localeModal" role="dialog" aria-modal="true" aria-labelledby="localeModalTitle" data-current-lang="{$language|default:''|escape}" data-current-currency-id="{$activeCurrency.id|default:''|escape}">
     <div class="locale-modal-panel">
         <div class="locale-modal-header">
-            <h3 id="localeModalTitle">{$LANG.localechoose|default:'Choose language &amp; currency'}</h3>
-            <button type="button" class="locale-modal-close" id="localeModalClose" aria-label="{$LANG.close|default:'Close'}">
+            <h3 id="localeModalTitle">{$hadrianLang.common.localeChoose}</h3>
+            <button type="button" class="locale-modal-close" id="localeModalClose" aria-label="{$LANG.close}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
@@ -22,8 +22,8 @@
             {else}
                 {assign var=mtLangList value=[]}
             {/if}
-            <div class="locale-modal-section-label">{$LANG.languagechoose|default:'Language'}</div>
-            <div class="locale-grid" role="radiogroup" aria-label="{$LANG.languagechoose|default:'Language'}">
+            <div class="locale-modal-section-label">{$LANG.chooselanguage}</div>
+            <div class="locale-grid" role="radiogroup" aria-label="{$LANG.chooselanguage}">
                 {if $mtLangList|@count > 0}
                     {foreach $mtLangList as $lang}
                         <button type="button" data-lang="{$lang|escape}"{if isset($language) && $language == $lang} class="active"{/if}>{$lang|escape|capitalize}</button>
@@ -61,8 +61,8 @@
                currency configured. We keep it visible when $currencies isn't
                populated on a page so the modal still feels complete. *}
             {if !isset($currencies) || $currencies|@count > 1}
-            <div class="locale-modal-section-label">{$LANG.currencychoose|default:'Currency'}</div>
-            <div class="locale-grid" role="radiogroup" aria-label="{$LANG.currencychoose|default:'Currency'}">
+            <div class="locale-modal-section-label">{$LANG.choosecurrency}</div>
+            <div class="locale-grid" role="radiogroup" aria-label="{$LANG.choosecurrency}">
                 {if isset($currencies) && $currencies|@count > 0}
                     {foreach $currencies as $cur}
                         <button type="button" data-currency="{$cur.code|lower|escape}" data-currency-id="{$cur.id|escape}"{if isset($activeCurrency.id) && isset($cur.id) && $activeCurrency.id == $cur.id} class="active"{/if}>{$cur.prefix|default:''|escape} {$cur.code|escape}</button>
@@ -79,7 +79,7 @@
             {/if}
         </div>
         <div class="locale-modal-footer">
-            <button type="button" class="apply" id="localeApply">{$LANG.apply|default:'Apply'}</button>
+            <button type="button" class="apply" id="localeApply">{$LANG.apply}</button>
         </div>
     </div>
 </div>

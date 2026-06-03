@@ -79,7 +79,7 @@
     {* Page header banner -- eyebrow + H1 + subtitle, matches store
        layout's .st-page-header. *}
     <header class="st-page-header">
-        <p class="page-eyebrow">{$LANG.cart.order|default:'Order'}</p>
+        <p class="page-eyebrow">{$hadrianLang.cart.order}</p>
         <h1>{$LANG.registerdomain}</h1>
         <p class="page-subtitle">{if $showAdvancedSearchOptions}{$LANG.orderForm.findNewDomainAi}{else}{$LANG.orderForm.findNewDomain}{/if}</p>
     </header>
@@ -104,18 +104,18 @@
             <div class="dr-search domain-checker-container{if $showAdvancedSearchOptions} domain-checker-advanced{/if}"
                  data-search-mode="{if $showAdvancedSearchOptions}ai{else}classic{/if}">
 
-                <div class="dr-mode-tabs" role="tablist" aria-label="Search mode">
+                <div class="dr-mode-tabs" role="tablist" aria-label="{$hadrianLang.cart.searchModeLabel}">
                     <button type="button" class="dr-mode-tab{if $showAdvancedSearchOptions} active{/if}"
                             role="tab" data-mode="ai"
                             aria-selected="{if $showAdvancedSearchOptions}true{else}false{/if}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>
-                        AI Generator
+                        {$hadrianLang.cart.aiGenerator}
                     </button>
                     <button type="button" class="dr-mode-tab{if !$showAdvancedSearchOptions} active{/if}"
                             role="tab" data-mode="classic"
                             aria-selected="{if !$showAdvancedSearchOptions}true{else}false{/if}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        Classic Search
+                        {$hadrianLang.cart.classicSearch}
                     </button>
                 </div>
 
@@ -162,7 +162,7 @@
                             <div class="dr-filters" data-dr-filters>
                                 <button type="button" class="dr-filters-toggle" data-dr-filters-toggle aria-expanded="false" aria-haspopup="true">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
-                                    <span>Filters</span>
+                                    <span>{$hadrianLang.cart.filters}</span>
                                     <span class="dr-filters-count" data-dr-tld-count>{$selectedTlds|count}</span>
                                     <svg class="dr-filters-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                                 </button>
@@ -182,7 +182,7 @@
                                                     <span class="dr-tld-name">{$tld}</span>
                                                 </button>
                                             {/foreach}
-                                            <div class="dr-tld-empty" hidden>No matches</div>
+                                            <div class="dr-tld-empty" hidden>{$hadrianLang.cart.noMatches}</div>
                                         </div>
                                     </div>
 
@@ -339,8 +339,8 @@
                     {if $spotlightTlds}
                         <div class="dr-section">
                             <div class="dr-section-head">
-                                <h2>{$LANG.orderForm.mostPopular|default:'Most popular'}</h2>
-                                <p>{$LANG.orderForm.popularTldsHint|default:'A handful of the best-known extensions for your domain.'}</p>
+                                <h2>{$hadrianLang.cart.mostPopularTlds}</h2>
+                                <p>{$hadrianLang.cart.popularTldsHint}</p>
                             </div>
                             <div id="spotlightTlds" class="spotlight-tlds dr-popular-grid clearfix">
                                 {foreach $spotlightTlds as $key => $data}
@@ -385,7 +385,7 @@
                     <div class="dr-section suggested-domains{if !$showSuggestionsContainer} w-hidden{/if}">
                         <div class="dr-section-head panel-heading card-header">
                             <h2>{lang key='orderForm.suggestedDomains'}</h2>
-                            <p>{$LANG.orderForm.suggestedDomainsHint|default:'Availability is checked in real time when you add to the cart.'}</p>
+                            <p>{$hadrianLang.cart.suggestedDomainsHint}</p>
                         </div>
                         <div id="suggestionsLoader" class="panel-body card-body domain-lookup-loader domain-lookup-suggestions-loader">
                             <i class="fas fa-spinner fa-spin"></i> {lang key='orderForm.generatingSuggestions'}
@@ -568,8 +568,8 @@
                 <div class="dr-empty-ico">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                 </div>
-                <p class="dr-empty-title">{$LANG.orderForm.searchDomain|default:'Search a domain'}</p>
-                <p class="dr-empty-desc">{$LANG.orderForm.searchDomainHint|default:'Type a domain name in the search box above to check availability.'}</p>
+                <p class="dr-empty-title">{$hadrianLang.cart.searchDomainTitle}</p>
+                <p class="dr-empty-desc">{$hadrianLang.cart.searchDomainHint}</p>
             </div>
 
         </div>

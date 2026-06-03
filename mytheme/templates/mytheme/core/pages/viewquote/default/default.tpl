@@ -74,12 +74,12 @@
 <header class="page-header">
     <div class="page-header-row">
         <div style="flex: 1; min-width: 0;">
-            <p class="page-eyebrow">{$LANG.quotetitle|default:'Quote'}</p>
-            <h1>{$LANG.quotenumber|default:'Quote #'}{$qDisplayNum|escape}</h1>
+            <p class="page-eyebrow">{$LANG.quotenumber}</p>
+            <h1>{$LANG.quotenumber}{$qDisplayNum|escape}</h1>
             {if $qFull}
             <p class="page-subtitle">
-                {if isset($datecreated)}{$LANG.quotedatecreated|default:'Issued'} {$datecreated|escape}{/if}
-                {if isset($validuntil)} &middot; {$LANG.quotevaliduntil|default:'Valid until'} {$validuntil|escape}{/if}
+                {if isset($datecreated)}{$LANG.quotedatecreated} {$datecreated|escape}{/if}
+                {if isset($validuntil)} &middot; {$LANG.quotevaliduntil} {$validuntil|escape}{/if}
             </p>
             {/if}
         </div>
@@ -98,7 +98,7 @@
 
             {if isset($agreetosrequired) && $agreetosrequired}
             <div style="background: var(--color-orange-bg); color: var(--color-orange-text); display:flex; gap:10px; padding:12px 16px; border-radius: var(--radius-md); font-size:13px; margin-bottom:16px;">
-                {$LANG.ordererroraccepttos|default:'You must accept the terms of service to accept this quote.'}
+                {$LANG.ordererroraccepttos}
             </div>
             {/if}
 
@@ -106,17 +106,17 @@
             <div class="card">
                 <div class="vq-head">
                     <div class="vq-head-block">
-                        <div class="label">{$LANG.invoicestotal|default:'Total'}</div>
+                        <div class="label">{$LANG.invoicestotal}</div>
                         <div class="value big">{$total|default:''|escape}</div>
                     </div>
                     <div class="vq-head-block">
-                        <div class="label">{$LANG.quotevaliduntil|default:'Valid until'}</div>
+                        <div class="label">{$LANG.quotevaliduntil}</div>
                         <div class="value">{$validuntil|default:'-'|escape}</div>
                     </div>
                     <div class="vq-head-block">
-                        <div class="label">{$LANG.quotedatecreated|default:'Issued'}</div>
+                        <div class="label">{$LANG.quotedatecreated}</div>
                         <div class="value">{$datecreated|default:'-'|escape}</div>
-                        <div class="sub">{$LANG.quotenumber|default:'#'}{$qDisplayNum|escape}</div>
+                        <div class="sub">{$LANG.quotenumber}{$qDisplayNum|escape}</div>
                     </div>
                 </div>
             </div>
@@ -125,11 +125,11 @@
             <div class="card">
                 <div class="vq-addr">
                     <div>
-                        <div class="vq-addr-label">{$LANG.invoicespayto|default:'From'}</div>
+                        <div class="vq-addr-label">{$LANG.invoicespayto}</div>
                         <div class="vq-addr-text">{if isset($payto) && $payto}{$payto}{else}{$companyname|default:''|escape}{/if}</div>
                     </div>
                     <div>
-                        <div class="vq-addr-label">{$LANG.quoterecipient|default:'Quote for'}</div>
+                        <div class="vq-addr-label">{$LANG.quoterecipient}</div>
                         <div class="vq-addr-text">
                             {if isset($clientsdetails)}
                                 {if $clientsdetails.companyname}<strong>{$clientsdetails.companyname|escape}</strong><br>{/if}
@@ -152,7 +152,7 @@
             {if isset($proposal) && $proposal}
             <div class="card">
                 <div class="vq-prose">
-                    <div class="vq-addr-label">{$LANG.quoteproposal|default:'Proposal'}</div>
+                    <div class="vq-addr-label">{$LANG.quoteproposal}</div>
                     {$proposal}
                 </div>
             </div>
@@ -160,13 +160,13 @@
 
             {* Line items + totals + actions *}
             <div class="card vq-lines-card">
-                <div class="card-header"><h2>{$LANG.quotelineitems|default:'Quote details'}</h2></div>
+                <div class="card-header"><h2>{$LANG.quotelineitems}</h2></div>
                 <table class="vq-lines">
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 60%;">{$LANG.invoicesdescription|default:'Description'}</th>
-                            <th scope="col">{$LANG.quotediscountheading|default:'Discount'}</th>
-                            <th scope="col" style="text-align: right;">{$LANG.invoicesamount|default:'Amount'}</th>
+                            <th scope="col" style="width: 60%;">{$LANG.invoicesdescription}</th>
+                            <th scope="col">{$LANG.quotediscountheading}</th>
+                            <th scope="col" style="text-align: right;">{$LANG.invoicesamount}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -181,15 +181,15 @@
                 </table>
 
                 <div class="vq-totals">
-                    <div class="vq-total-row muted"><span>{$LANG.invoicessubtotal|default:'Subtotal'}</span><span>{$subtotal|default:''|escape}</span></div>
+                    <div class="vq-total-row muted"><span>{$LANG.invoicessubtotal}</span><span>{$subtotal|default:''|escape}</span></div>
                     {if isset($taxrate) && $taxrate}<div class="vq-total-row muted"><span>{$taxrate|escape}% {$taxname|default:''|escape}</span><span>{$tax|default:''|escape}</span></div>{/if}
                     {if isset($taxrate2) && $taxrate2}<div class="vq-total-row muted"><span>{$taxrate2|escape}% {$taxname2|default:''|escape}</span><span>{$tax2|default:''|escape}</span></div>{/if}
-                    <div class="vq-total-row grand"><span>{$LANG.quotelinetotal|default:'Total'}</span><span>{$total|default:''|escape}</span></div>
+                    <div class="vq-total-row grand"><span>{$LANG.quotelinetotal}</span><span>{$total|default:''|escape}</span></div>
                 </div>
-                {if isset($taxrate) && $taxrate}<p style="padding: 0 24px 14px; margin: 0; font-size: 12px; color: var(--color-text-tertiary);">* {$LANG.invoicestaxindicator|default:'Indicates taxable item'}</p>{/if}
+                {if isset($taxrate) && $taxrate}<p style="padding: 0 24px 14px; margin: 0; font-size: 12px; color: var(--color-text-tertiary);">* {$LANG.invoicestaxindicator}</p>{/if}
 
                 <div class="vq-actions">
-                    {if isset($quoteid)}<a href="{$WEB_ROOT}/dl.php?type=q&amp;id={$quoteid|escape}" class="btn-secondary">{$LANG.invoicesdownload|default:'Download PDF'}</a>{/if}
+                    {if isset($quoteid)}<a href="{$WEB_ROOT}/dl.php?type=q&amp;id={$quoteid|escape}" class="btn-secondary">{$LANG.invoicesdownload}</a>{/if}
                     <span class="spacer"></span>
                 </div>
 
@@ -199,10 +199,10 @@
                         {if isset($tosurl) && $tosurl}
                         <label class="vq-tos">
                             <input type="checkbox" name="agreetos" value="1"{if isset($agreetosrequired) && $agreetosrequired} required{/if}>
-                            <span>{$LANG.ordertosagreement|default:'I have read and agree to the'} <a href="{$tosurl|escape}" target="_blank" rel="noopener">{$LANG.ordertos|default:'Terms of Service'}</a></span>
+                            <span>{$LANG.ordertosagreement} <a href="{$tosurl|escape}" target="_blank" rel="noopener">{$LANG.ordertos}</a></span>
                         </label>
                         {else}<span class="spacer"></span>{/if}
-                        <button type="submit" class="btn-primary">{$LANG.quoteacceptbtn|default:'Accept quote'}</button>
+                        <button type="submit" class="btn-primary">{$LANG.quoteacceptbtn}</button>
                     </div>
                 </form>
                 {/if}
@@ -212,7 +212,7 @@
             {if isset($notes) && $notes}
             <div class="card">
                 <div class="vq-prose">
-                    <div class="vq-addr-label">{$LANG.invoicesnotes|default:'Notes'}</div>
+                    <div class="vq-addr-label">{$LANG.invoicesnotes}</div>
                     {$notes}
                 </div>
             </div>
@@ -228,9 +228,9 @@
                 <div class="vq-empty-ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
                 </div>
-                <h2 class="vq-empty-title">{$LANG.quoteunavailable|default:'Quote unavailable'}</h2>
-                <p class="vq-empty-sub">{$LANG.quoteunavailablesub|default:'This quote has expired or is no longer available. Visit My Quotes to see your active proposals.'}</p>
-                <a href="{$WEB_ROOT}/clientarea.php?action=quotes" class="btn-secondary">{$LANG.quotesnav|default:'Back to quotes'}</a>
+                <h2 class="vq-empty-title">{$hadrianLang.billing.quoteUnavailableTitle}</h2>
+                <p class="vq-empty-sub">{$hadrianLang.billing.quoteUnavailableSub}</p>
+                <a href="{$WEB_ROOT}/clientarea.php?action=quotes" class="btn-secondary">{$hadrianLang.billing.backToQuotes}</a>
             </div>
         </div>
         {/if}
@@ -240,43 +240,43 @@
     <aside class="vq-aside">
         {if $qFull}
         <div class="card vq-aside-card">
-            <div class="vq-aside-heading">{$LANG.summary|default:'Summary'}</div>
+            <div class="vq-aside-heading">{$hadrianLang.billing.summary}</div>
             <div class="vq-aside-summary-row">
-                <div class="vq-aside-summary-label">{$LANG.invoicesstatus|default:'Status'}</div>
+                <div class="vq-aside-summary-label">{$LANG.invoicesstatus}</div>
                 <div class="vq-aside-summary-value">{if $qStage}<span class="status-pill {$qStageClass}">{$qStage|escape}</span>{/if}</div>
             </div>
             <div class="vq-aside-summary-row">
-                <div class="vq-aside-summary-label">{$LANG.invoicestotal|default:'Total'}</div>
+                <div class="vq-aside-summary-label">{$LANG.invoicestotal}</div>
                 <div class="vq-aside-summary-value">{$total|default:''|escape}</div>
             </div>
             <div class="vq-aside-summary-row">
-                <div class="vq-aside-summary-label">{$LANG.quotevaliduntil|default:'Valid until'}</div>
+                <div class="vq-aside-summary-label">{$LANG.quotevaliduntil}</div>
                 <div class="vq-aside-summary-value">{$validuntil|default:'-'|escape}</div>
             </div>
         </div>
         {/if}
 
         <div class="card subnav-card">
-            <div class="subnav-heading">Billing</div>
+            <div class="subnav-heading">{$hadrianLang.billing.sidebarHeading}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                {$LANG.invoices|default:'My Invoices'}
+                {$LANG.navinvoices}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=quotes" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                {$LANG.quotestitle|default:'My Quotes'}
+                {$LANG.navquotes}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=masspay&all=true" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
-                {$LANG.masspaytitle|default:'Mass Payment'}
+                {$LANG.masspaytitle}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=addfunds" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                {$LANG.addfunds|default:'Add Funds'}
+                {$LANG.addfunds}
             </a>
             <a href="{routePath('account-paymentmethods')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                {$LANG.paymentMethods.title|default:'Payment Methods'}
+                {$LANG.paymentMethods.title}
             </a>
         </div>
     </aside>

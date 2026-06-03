@@ -43,7 +43,17 @@
 <script>
 var _localLang = {
     'addToCart': '{$LANG.orderForm.addToCart|escape}',
-    'addedToCartRemove': '{$LANG.orderForm.addedToCartRemove|escape}'
+    'addedToCartRemove': '{$LANG.orderForm.addedToCartRemove|escape}',
+    'pwWeak': '{$hadrianLang.cart.pwWeak|escape:"javascript"}',
+    'pwModerate': '{$hadrianLang.cart.pwModerate|escape:"javascript"}',
+    'pwStrong': '{$hadrianLang.cart.pwStrong|escape:"javascript"}',
+    'savePercent': '{$hadrianLang.cart.savePercent|escape:"javascript"}',
+    'recalculatingPromo': '{$hadrianLang.cart.recalculatingPromo|escape:"javascript"}',
+    'promoNoLongerApplies': '{$hadrianLang.cart.promoNoLongerApplies|escape:"javascript"}',
+    'promoCodeTitle': '{$hadrianLang.cart.promoCodeTitle|escape:"javascript"}',
+    'promoApplied': '{$hadrianLang.cart.promoApplied|escape:"javascript"}',
+    'networkError': '{$hadrianLang.cart.networkError|escape:"javascript"}',
+    'correctErrors': '{$LANG.orderForm.correctErrors|escape:"javascript"}'
 };
 </script>
 
@@ -56,8 +66,8 @@ var _localLang = {
        latter). *}
 
     <header class="st-page-header">
-        <h1>{$LANG.orderconfigure|default:'Configure your plan'}</h1>
-        <p class="page-subtitle">{$LANG.cartconfigsubtitle|default:"Pick your billing cycle, server region and any add-ons — we'll total it up on the right."}</p>
+        <h1>{$LANG.orderconfigure}</h1>
+        <p class="page-subtitle">{$hadrianLang.cart.configSubtitle}</p>
     </header>
 
         <div class="cp-steps" aria-label="Order progress">
@@ -65,21 +75,21 @@ var _localLang = {
                 <span class="cp-step-num">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </span>
-                Choose plan
+                {$hadrianLang.cart.stepChoosePlan}
             </span>
             <span class="cp-step-sep">›</span>
             <span class="cp-step done">
                 <span class="cp-step-num">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </span>
-                Choose a domain
+                {$LANG.domaincheckerchoosedomain}
             </span>
             <span class="cp-step-sep">›</span>
-            <span class="cp-step active"><span class="cp-step-num">3</span>Configure</span>
+            <span class="cp-step active"><span class="cp-step-num">3</span>{$hadrianLang.cart.stepConfigure}</span>
             <span class="cp-step-sep">›</span>
-            <span class="cp-step"><span class="cp-step-num">4</span>Cart</span>
+            <span class="cp-step"><span class="cp-step-num">4</span>{$hadrianLang.cart.stepCart}</span>
             <span class="cp-step-sep">›</span>
-            <span class="cp-step"><span class="cp-step-num">5</span>Checkout</span>
+            <span class="cp-step"><span class="cp-step-num">5</span>{$hadrianLang.cart.stepCheckout}</span>
         </div>
 
         <form id="frmConfigureProduct">
@@ -112,14 +122,14 @@ var _localLang = {
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                             </div>
                             <div class="cp-plan-hero-meta">
-                                <div class="cp-plan-hero-eyebrow">{$LANG.cartselectedplan|default:'Selected plan'}</div>
+                                <div class="cp-plan-hero-eyebrow">{$hadrianLang.cart.selectedPlan}</div>
                                 <div class="cp-plan-hero-name">{$productinfo.name}</div>
                                 {if $productinfo.description}
                                     <div class="cp-plan-hero-desc">{$productinfo.description|strip_tags|truncate:120}</div>
                                 {/if}
                             </div>
                             <a href="{$WEB_ROOT}/cart.php{if $productinfo.gid}?gid={$productinfo.gid}{/if}" class="cp-plan-hero-change">
-                                {$LANG.cartchangeplan|default:'Change plan'}
+                                {$hadrianLang.cart.changePlan}
                             </a>
                         </div>
 
@@ -127,11 +137,11 @@ var _localLang = {
                             <div class="cp-plan-hero-domain">
                                 <svg class="cp-plan-hero-domain-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
                                 <div class="cp-plan-hero-domain-meta">
-                                    <div class="cp-plan-hero-domain-label">{$LANG.domain|default:'Domain'}</div>
+                                    <div class="cp-plan-hero-domain-label">{$LANG.domain}</div>
                                     <div class="cp-plan-hero-domain-value">
                                         <span class="cp-plan-hero-domain-name">{$domain}</span>
                                         {if $domainoption eq "owndomain" || $domainoption eq "subdomain"}
-                                            <span class="cp-plan-hero-domain-badge">{$LANG.cartdomainincluded|default:'Included'}</span>
+                                            <span class="cp-plan-hero-domain-badge">{$hadrianLang.cart.domainIncluded}</span>
                                         {/if}
                                     </div>
                                 </div>
@@ -142,7 +152,7 @@ var _localLang = {
                                    cart.php?a=add&pid=X to the friendly URL /store/<group>/<plan>
                                    and re-enters the domain picker. *}
                                 <a href="{$WEB_ROOT}/cart.php?a=add&pid={$productinfo.pid}" class="cp-plan-hero-change">
-                                    {$LANG.cartchangedomain|default:'Change'}
+                                    {$hadrianLang.cart.changeDomain}
                                 </a>
                             </div>
                         {/if}
@@ -152,8 +162,8 @@ var _localLang = {
                     {if $pricing.type eq "recurring"}
                         <div class="card cp-section">
                             <div class="cp-section-head">
-                                <h2 class="cp-section-title">{$LANG.cartbillingcycle|default:'Billing cycle'}</h2>
-                                <div class="cp-section-sub">{$LANG.cartbillingcyclesub|default:'Longer commitments = bigger discounts. You can upgrade or switch later.'}</div>
+                                <h2 class="cp-section-title">{$hadrianLang.cart.billingCycle}</h2>
+                                <div class="cp-section-sub">{$hadrianLang.cart.billingCycleSub}</div>
                             </div>
                             <div class="cp-section-body">
                                 {* ── Billing-cycle cards ──
@@ -173,7 +183,7 @@ var _localLang = {
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="monthly"{if $billingcycle eq "monthly"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermmonthly}</div>
-                                            <div class="cp-cycle-sub">{$LANG.cartbilledmonthly|default:'Billed every month'}</div>
+                                            <div class="cp-cycle-sub">{$hadrianLang.cart.billedMonthly}</div>
                                             <div class="cp-cycle-price">{$pricing.monthly}</div>
                                         </label>
                                     {/if}
@@ -181,7 +191,7 @@ var _localLang = {
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="quarterly"{if $billingcycle eq "quarterly"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermquarterly}</div>
-                                            <div class="cp-cycle-sub">{$LANG.cartbilledquarterly|default:'Billed every 3 months'}</div>
+                                            <div class="cp-cycle-sub">{$hadrianLang.cart.billedQuarterly}</div>
                                             <div class="cp-cycle-price">{$pricing.quarterly}</div>
                                         </label>
                                     {/if}
@@ -189,7 +199,7 @@ var _localLang = {
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="semiannually"{if $billingcycle eq "semiannually"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermsemiannually}</div>
-                                            <div class="cp-cycle-sub">{$LANG.cartbilledsemiannually|default:'Billed every 6 months'}</div>
+                                            <div class="cp-cycle-sub">{$hadrianLang.cart.billedSemiannually}</div>
                                             <div class="cp-cycle-price">{$pricing.semiannually}</div>
                                         </label>
                                     {/if}
@@ -197,7 +207,7 @@ var _localLang = {
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="annually"{if $billingcycle eq "annually"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermannually}</div>
-                                            <div class="cp-cycle-sub">{$LANG.cartbilledannually|default:'Billed once per year'}</div>
+                                            <div class="cp-cycle-sub">{$hadrianLang.cart.billedAnnually}</div>
                                             <div class="cp-cycle-price">{$pricing.annually}</div>
                                         </label>
                                     {/if}
@@ -205,7 +215,7 @@ var _localLang = {
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="biennially"{if $billingcycle eq "biennially"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermbiennially}</div>
-                                            <div class="cp-cycle-sub">{$LANG.cartbilledbiennially|default:'Billed every 2 years'}</div>
+                                            <div class="cp-cycle-sub">{$hadrianLang.cart.billedBiennially}</div>
                                             <div class="cp-cycle-price">{$pricing.biennially}</div>
                                         </label>
                                     {/if}
@@ -213,7 +223,7 @@ var _localLang = {
                                         <label class="cp-cycle-opt">
                                             <input type="radio" name="billingcycle" value="triennially"{if $billingcycle eq "triennially"} checked{/if} onchange="updateConfigurableOptions({$i}, this.value); return false;">
                                             <div class="cp-cycle-title">{$LANG.orderpaymenttermtriennially}</div>
-                                            <div class="cp-cycle-sub">{$LANG.cartbilledtriennially|default:'Billed every 3 years'}</div>
+                                            <div class="cp-cycle-sub">{$hadrianLang.cart.billedTriennially}</div>
                                             <div class="cp-cycle-price">{$pricing.triennially}</div>
                                         </label>
                                     {/if}
@@ -293,7 +303,7 @@ var _localLang = {
                         <div class="card cp-section"{if $mtHideNs && $mtHideHost} style="display:none"{/if}>
                             <div class="cp-section-head">
                                 <h2 class="cp-section-title">{$LANG.cartconfigserver}</h2>
-                                <div class="cp-section-sub">Set the hostname, root password, and nameserver prefixes for your server.</div>
+                                <div class="cp-section-sub">{$hadrianLang.cart.serverInfoSub}</div>
                             </div>
                             <div class="cp-section-body">
                                 <div class="cp-form-grid">
@@ -353,7 +363,7 @@ var _localLang = {
                                                 var inp=document.getElementById('inputRootpw'),bar=document.getElementById('cpPwBar'),lab=document.getElementById('cpPwLabel'),meter=document.getElementById('cpPwMeter');
                                                 if(!inp||!bar||!lab||!meter)return;
                                                 function score(pw){var l=Math.min(pw.length,5),n=Math.min((pw.match(/[0-9]/g)||[]).length,3),s=Math.min((pw.match(/\W/g)||[]).length,3),u=Math.min((pw.match(/[A-Z]/g)||[]).length,3),v=(l*10-20)+(n*10)+(s*15)+(u*10);return Math.max(0,Math.min(100,v));}
-                                                function upd(){var pw=inp.value||'';if(!pw.length){meter.style.opacity=0;lab.textContent='';return;}meter.style.opacity=1;var v=score(pw),c,t;if(v<50){c='var(--color-red,#ff3b30)';t='Weak';}else if(v<75){c='var(--color-orange,#ff9500)';t='Moderate';}else{c='var(--color-green,#34c759)';t='Strong';}bar.style.width=v+'%';bar.style.background=c;lab.textContent=t;lab.style.color=c;}
+                                                function upd(){var pw=inp.value||'';if(!pw.length){meter.style.opacity=0;lab.textContent='';return;}meter.style.opacity=1;var v=score(pw),c,t;if(v<50){c='var(--color-red,#ff3b30)';t=_localLang.pwWeak;}else if(v<75){c='var(--color-orange,#ff9500)';t=_localLang.pwModerate;}else{c='var(--color-green,#34c759)';t=_localLang.pwStrong;}bar.style.width=v+'%';bar.style.background=c;lab.textContent=t;lab.style.color=c;}
                                                 inp.addEventListener('input',upd);inp.addEventListener('keyup',upd);upd();
                                             })();
                                             </script>{/literal}
@@ -390,7 +400,7 @@ var _localLang = {
                         <div class="card cp-section">
                             <div class="cp-section-head">
                                 <h2 class="cp-section-title">{$LANG.orderconfigpackage}</h2>
-                                <div class="cp-section-sub">Customize storage, CPU, region, and other options for this plan.</div>
+                                <div class="cp-section-sub">{$hadrianLang.cart.configOptionsSub}</div>
                             </div>
                             <div class="cp-section-body" id="productConfigurableOptions">
                                 {foreach $configurableoptions as $num => $configoption}
@@ -498,7 +508,7 @@ var _localLang = {
                         <div class="card cp-section" id="productAddonsContainer">
                             <div class="cp-section-head">
                                 <h2 class="cp-section-title">{$LANG.cartavailableaddons}</h2>
-                                <div class="cp-section-sub">Optional extras to enhance your plan. Add or remove anytime.</div>
+                                <div class="cp-section-sub">{$hadrianLang.cart.addonsSub}</div>
                             </div>
                             <div class="cp-section-body">
                                 {foreach $addonsPromoOutput as $output}
@@ -544,7 +554,7 @@ var _localLang = {
                            so it picks up the 14px h2 sizing from the mockup
                            rather than the 15px global .cp-section-title. *}
                         <div class="cp-summary-head">
-                            <h2>{$LANG.ordersummary|default:'Order summary'}</h2>
+                            <h2>{$LANG.ordersummary}</h2>
                             <div class="loader w-hidden" id="orderSummaryLoader" aria-hidden="true">
                                 <i class="fas fa-fw fa-sync fa-spin"></i>
                             </div>
@@ -561,16 +571,16 @@ var _localLang = {
                            text is hardcoded here as a static reassurance
                            line (mockup-faithful); WHMCS doesn't expose a
                            ready-made 'Renews $X every year' string. *}
-                        <p class="cp-summary-cycle">{$LANG.cartsummarycycle|default:'Cancel anytime - 30-day money-back guarantee.'}</p>
+                        <p class="cp-summary-cycle">{$hadrianLang.cart.summaryReassurance}</p>
 
                         <div class="cp-promo-row">
-                            <input type="text" class="cp-promo-input" id="promocode" name="promocode" placeholder="{$LANG.promotioncode|default:'Promo code'}" value="{if $promocode}{$promocode|escape}{/if}">
-                            <button type="button" class="cp-promo-apply" onclick="applyPromoCode();">{$LANG.applypromo|default:'Apply'}</button>
+                            <input type="text" class="cp-promo-input" id="promocode" name="promocode" placeholder="{lang key="orderPromoCodePlaceholder"}" value="{if $promocode}{$promocode|escape}{/if}">
+                            <button type="button" class="cp-promo-apply" onclick="applyPromoCode();">{$LANG.orderpromovalidatebutton}</button>
                         </div>
 
                         <div class="cp-summary-footer">
                             <button type="submit" id="btnCompleteProductConfig" class="cp-checkout-btn">
-                                {$LANG.cartreviewcart|default:'Review cart'}
+                                {$hadrianLang.cart.reviewCart}
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                             </button>
                             {* Same URL strategy as .cp-plan-hero-change above:
@@ -579,13 +589,13 @@ var _localLang = {
                                on the configureproductdomain step for THIS specific plan. *}
                             <a href="{$WEB_ROOT}/cart.php?a=add&pid={$productinfo.pid}" class="cp-back-link">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                                {$LANG.cartbacktodomain|default:'Back to domain'}
+                                {$hadrianLang.cart.backToDomain}
                             </a>
                         </div>
 
                         <div class="cp-guarantees">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            {$LANG.cartsecured|default:'Secured by 256-bit SSL - PCI-DSS Level 1'}
+                            {$hadrianLang.cart.securedNote}
                         </div>
                     </div>
                 </aside>
@@ -839,7 +849,7 @@ var _localLang = {
         if (savings < 0.005) continue;
         var badge = document.createElement('span');
         badge.className = 'cp-cycle-save';
-        badge.textContent = 'Save ' + Math.round(savings * 100) + '%';
+        badge.textContent = _localLang.savePercent.replace('%s', Math.round(savings * 100)).replace('%%', '%');
         r.label.insertBefore(badge, r.label.firstChild);
     }
 })();
@@ -957,7 +967,7 @@ var _localLang = {
             }
             row.setAttribute('data-promo-state', 'pending');
             row.style.opacity = '0.55';
-            row.querySelector('.pull-left').textContent = 'Recalculating promo…';
+            row.querySelector('.pull-left').textContent = _localLang.recalculatingPromo;
             row.querySelector('.pull-right').textContent = '—';
         }
 
@@ -1003,8 +1013,8 @@ var _localLang = {
                             if (row && row.parentNode) row.parentNode.removeChild(row);
                             showInlineError({
                                 variant: 'info',
-                                title: 'Promo code',
-                                bodyText: 'Promotion no longer applies to this configuration.'
+                                title: _localLang.promoCodeTitle,
+                                bodyText: _localLang.promoNoLongerApplies
                             });
                         }
                     })
@@ -1080,7 +1090,7 @@ var _localLang = {
             var content = document.createElement('div');
             content.className = 'cp-alert-content';
 
-            var defaultTitle = (variant === 'error') ? 'Please correct the following:' : '';
+            var defaultTitle = (variant === 'error') ? _localLang.correctErrors : '';
             var titleText = (typeof opts.title === 'string') ? opts.title : defaultTitle;
             if (titleText) {
                 var title = document.createElement('div');
@@ -1113,7 +1123,7 @@ var _localLang = {
                     if (!data) resolve(true);
                     else reject(data);
                 };
-                xhr.onerror = function () { reject('Network error -- please try again.'); };
+                xhr.onerror = function () { reject(_localLang.networkError); };
                 xhr.send(buildBody(false));
             });
         }
@@ -1193,7 +1203,7 @@ var _localLang = {
                     if (promoErr) {
                         showInlineError({
                             variant: 'error',
-                            title: 'Promo code',
+                            title: _localLang.promoCodeTitle,
                             bodyText: promoErr.textContent.trim()
                         });
                         promoInput.focus();
@@ -1213,7 +1223,7 @@ var _localLang = {
                     var promoLabelEl = doc.querySelector('.ct-totals-row.discount .label');
                     var newDiscount = discountEl ? discountEl.textContent.trim() : '';
                     var newTotal = totalEl ? totalEl.textContent.trim() : '';
-                    var newDesc = promoLabelEl ? promoLabelEl.textContent.trim() : ('Promo: ' + code);
+                    var newDesc = promoLabelEl ? promoLabelEl.textContent.trim() : _localLang.promoApplied.replace('%s', code);
 
                     if (newTotal) {
                         promoState = {
@@ -1227,10 +1237,10 @@ var _localLang = {
                     var variant = promoOk ? 'success' : (promoInfo ? 'info' : 'success');
                     var baseMsg = promoOk ? promoOk.textContent.trim()
                                  : promoInfo ? promoInfo.textContent.trim()
-                                 : ('Promo code "' + code + '" applied.');
+                                 : _localLang.promoApplied.replace('%s', code);
                     showInlineError({
                         variant: variant,
-                        title: 'Promo code',
+                        title: _localLang.promoCodeTitle,
                         bodyText: baseMsg
                     });
                 }).catch(function (err) {
@@ -1239,8 +1249,8 @@ var _localLang = {
                         showInlineError(err);
                     } else {
                         showInlineError({
-                            title: 'Promo code',
-                            bodyText: 'Network error -- please try again.'
+                            title: _localLang.promoCodeTitle,
+                            bodyText: _localLang.networkError
                         });
                     }
                 });

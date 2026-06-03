@@ -43,9 +43,9 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.clientareaservices|default:'Service'}</p>
-    <h1>{$LANG.clientareacancellationrequest|default:'Request cancellation'}</h1>
-    <p class="page-subtitle">{$LANG.clientareacancelintro|default:'Tell us how and when you want this service cancelled.'}</p>
+    <p class="page-eyebrow">{$LANG.clientareacancelproduct}</p>
+    <h1>{$hadrianLang.billing.cancelRequestTitle}</h1>
+    <p class="page-subtitle">{$hadrianLang.billing.cancelRequestSubtitle}</p>
 </header>
 
 {if $crRequested}
@@ -54,9 +54,9 @@
         <div class="cr-notice-ico ok">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
-        <p class="cr-notice-title">{$LANG.clientareacancelconfirmation|default:'Cancellation requested'}</p>
-        <p class="cr-notice-sub">{$LANG.clientareacancelconfirmationsub|default:'Your cancellation request has been received. The service will be cancelled as scheduled.'}</p>
-        <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&amp;id={$id|default:''|escape}" class="btn-primary">{$LANG.clientareabacklink|default:'Back to service'}</a>
+        <p class="cr-notice-title">{$LANG.clientareacancelconfirmation}</p>
+        <p class="cr-notice-sub">{$hadrianLang.billing.cancelConfirmationSub}</p>
+        <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&amp;id={$id|default:''|escape}" class="btn-primary">{$LANG.clientareabacklink}</a>
     </div>
 </div>
 
@@ -66,9 +66,9 @@
         <div class="cr-notice-ico">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
         </div>
-        <p class="cr-notice-title">{$LANG.clientareacancelinvalid|default:'Nothing to cancel'}</p>
-        <p class="cr-notice-sub">{$LANG.clientareacancelinvalidsub|default:'This service is not valid for cancellation, or it could not be found.'}</p>
-        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'My services'}</a>
+        <p class="cr-notice-title">{$hadrianLang.billing.cancelInvalidTitle}</p>
+        <p class="cr-notice-sub">{$LANG.clientareacancelinvalid}</p>
+        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
     </div>
 </div>
 
@@ -78,13 +78,13 @@
 
     <div class="cr-callout">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <div class="cr-callout-text">{$LANG.clientareacancelwarning|default:'Cancelling this service permanently removes all associated data including files, databases, and email accounts.'}</div>
+        <div class="cr-callout-text">{$hadrianLang.billing.cancelWarning}</div>
     </div>
 
     {if isset($error) && $error}
     <div class="cr-callout" style="background: var(--color-red-bg); color: var(--color-red-text);">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <div class="cr-callout-text">{$LANG.clientareacancelreasonrequired|default:'Please provide a reason for cancellation.'}</div>
+        <div class="cr-callout-text">{$LANG.clientareacancelreasonrequired}</div>
     </div>
     {/if}
 
@@ -94,7 +94,7 @@
                 <input type="hidden" name="sub" value="submit">
 
                 <div class="form-group">
-                    <label class="form-label">{$LANG.clientareacancelproduct|default:'Service'}</label>
+                    <label class="form-label">{$LANG.clientareacancelproduct}</label>
                     <div class="cr-service">
                         <div class="cr-service-ico">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
@@ -108,30 +108,30 @@
 
                 {if isset($domainid) && $domainid}
                 <div class="form-group">
-                    <label class="form-label">{$LANG.cancelrequestdomain|default:'Associated domain'}</label>
+                    <label class="form-label">{$LANG.cancelrequestdomain}</label>
                     <label class="cr-check">
                         <input type="checkbox" name="canceldomain" id="canceldomain" value="1">
-                        <span>{$LANG.cancelrequestdomainconfirm|default:'Also cancel the domain registered with this service.'}{if isset($domainnextduedate)} <span style="color:var(--color-text-tertiary);">({$domainnextduedate|escape})</span>{/if}</span>
+                        <span>{$LANG.cancelrequestdomainconfirm}{if isset($domainnextduedate)} <span style="color:var(--color-text-tertiary);">({$domainnextduedate|escape})</span>{/if}</span>
                     </label>
                 </div>
                 {/if}
 
                 <div class="form-group">
-                    <label class="form-label" for="type">{$LANG.clientareacancellationtype|default:'Cancellation type'}</label>
+                    <label class="form-label" for="type">{$LANG.clientareacancellationtype}</label>
                     <select name="type" id="type" class="form-select">
-                        <option value="End of Billing Period">{$LANG.clientareacancellationendofbillingperiod|default:'At end of billing period'}</option>
-                        <option value="Immediate">{$LANG.clientareacancellationimmediate|default:'Immediately'}</option>
+                        <option value="End of Billing Period">{$LANG.clientareacancellationendofbillingperiod}</option>
+                        <option value="Immediate">{$LANG.clientareacancellationimmediate}</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="cancellationreason">{$LANG.clientareacancelreason|default:'Reason for cancellation'}</label>
-                    <textarea name="cancellationreason" id="cancellationreason" class="form-textarea" rows="5" placeholder="{$LANG.clientareacancelreasonplaceholder|default:'Let us know why you are cancelling...'}"></textarea>
+                    <label class="form-label" for="cancellationreason">{$LANG.clientareacancelreason}</label>
+                    <textarea name="cancellationreason" id="cancellationreason" class="form-textarea" rows="5" placeholder="{$hadrianLang.billing.cancelReasonPlaceholder}"></textarea>
                 </div>
 
                 <div class="btn-group">
-                    <button type="submit" class="btn-danger">{$LANG.clientareacancelrequestbutton|default:'Request cancellation'}</button>
-                    <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&amp;id={$id|default:''|escape}" class="btn-secondary">{$LANG.clientareacancelkeep|default:'Keep service'}</a>
+                    <button type="submit" class="btn-danger">{$LANG.clientareacancelrequestbutton}</button>
+                    <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&amp;id={$id|default:''|escape}" class="btn-secondary">{$hadrianLang.billing.keepService}</a>
                 </div>
             </form>
         </div>

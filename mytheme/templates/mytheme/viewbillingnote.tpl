@@ -47,9 +47,9 @@
     </div>
 
     <header class="page-header">
-        <p class="page-eyebrow">{$itemTableTitle|default:'Billing note'|escape}</p>
+        <p class="page-eyebrow">{$itemTableTitle|default:$hadrianLang.billing.billingNoteEyebrow|escape}</p>
         <h1>{$pagetitle|escape}</h1>
-        {if isset($dateIssued) && $dateIssued}<p class="page-subtitle">{$LANG.billingissuedate|default:'Issued'} {$dateIssued|escape}</p>{/if}
+        {if isset($dateIssued) && $dateIssued}<p class="page-subtitle">{$LANG.billing.issuedate} {$dateIssued|escape}</p>{/if}
     </header>
 
     <div class="vbn-stack">
@@ -58,15 +58,15 @@
         <div class="card">
             <div class="inv-addr">
                 <div>
-                    <div class="inv-addr-label">{$LANG.invoicefrom|default:'Issued by'}</div>
+                    <div class="inv-addr-label">{$LANG.billing.issuedby}</div>
                     <div class="inv-addr-text">
                         <strong>{$companyname|default:''|escape}</strong>
                         {if isset($issuedBy) && $issuedBy}<br>{$issuedBy}{/if}
-                        {if isset($taxCode) && $taxCode}<br>{$taxIdLabel|default:'Tax ID'|escape}: {$taxCode|escape}{/if}
+                        {if isset($taxCode) && $taxCode}<br>{$taxIdLabel|default:$hadrianLang.billing.taxIdFallback|escape}: {$taxCode|escape}{/if}
                     </div>
                 </div>
                 <div>
-                    <div class="inv-addr-label">{$LANG.invoicebillto|default:'Issued to'}</div>
+                    <div class="inv-addr-label">{$LANG.billing.issuedto}</div>
                     <div class="inv-addr-text">
                         {if isset($clientsdetails.companyname) && $clientsdetails.companyname}{$clientsdetails.companyname|escape}<br>{/if}
                         {if isset($clientsdetails.firstname)}<strong>{$clientsdetails.firstname|escape} {$clientsdetails.lastname|escape}</strong><br>{/if}
@@ -81,12 +81,12 @@
 
         {* Line items + totals *}
         <div class="card inv-lines-card">
-            <div class="card-header"><h2>{$itemTableTitle|default:'Details'|escape}</h2></div>
+            <div class="card-header"><h2>{$itemTableTitle|default:$hadrianLang.billing.detailsFallback|escape}</h2></div>
             <table class="inv-lines">
                 <thead>
                     <tr>
-                        <th scope="col" style="width: 70%;">{$LANG.invoicesdescription|default:'Description'}</th>
-                        <th scope="col" style="text-align: right;">{$LANG.amount|default:'Amount'}</th>
+                        <th scope="col" style="width: 70%;">{$LANG.invoicesdescription}</th>
+                        <th scope="col" style="text-align: right;">{$LANG.invoicesamount}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -99,24 +99,24 @@
                 </tbody>
             </table>
             <div class="inv-totals">
-                <div class="inv-total-row muted"><span>{$LANG.invoicessubtotal|default:'Subtotal'}</span><span>{$billingNote->subTotal}</span></div>
+                <div class="inv-total-row muted"><span>{$LANG.invoicessubtotal}</span><span>{$billingNote->subTotal}</span></div>
                 {foreach $billingNote->taxes as $tax}
                 <div class="inv-total-row muted"><span>{$tax->rate} {$tax->name}</span><span>{$tax->price}</span></div>
                 {/foreach}
-                <div class="inv-total-row grand"><span>{$LANG.invoicestotal|default:'Total'}</span><span class="amt">{$billingNote->total}</span></div>
+                <div class="inv-total-row grand"><span>{$LANG.invoicestotal}</span><span class="amt">{$billingNote->total}</span></div>
             </div>
         </div>
 
         {* Ledger *}
         <div class="card inv-lines-card">
-            <div class="card-header"><h2>{$LANG.invoicestransactions|default:'Transactions'}</h2></div>
+            <div class="card-header"><h2>{$LANG.billing.ledger.title}</h2></div>
             <table class="inv-lines">
                 <thead>
                     <tr>
-                        <th scope="col">{$LANG.invoicestransdate|default:'Date'}</th>
-                        <th scope="col">{$LANG.invoicestype|default:'Type'}</th>
-                        <th scope="col">{$LANG.invoicesrefnum|default:'Reference'}</th>
-                        <th scope="col" style="text-align: right;">{$LANG.amount|default:'Amount'}</th>
+                        <th scope="col">{$LANG.billing.ledger.date}</th>
+                        <th scope="col">{$LANG.billing.ledger.type}</th>
+                        <th scope="col">{$LANG.billing.ledger.reference}</th>
+                        <th scope="col" style="text-align: right;">{$LANG.invoicestransamount}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -129,11 +129,11 @@
                     </tr>
                     {foreachelse}
                     <tr>
-                        <td colspan="4" style="text-align:center;color:var(--color-text-tertiary);">{$LANG.invoicestransnonefound|default:'No transactions found.'}</td>
+                        <td colspan="4" style="text-align:center;color:var(--color-text-tertiary);">{$LANG.invoicestransnonefound}</td>
                     </tr>
                     {/foreach}
                     <tr>
-                        <td colspan="3" style="text-align:right;font-weight:var(--fw-semibold);color:var(--color-text-primary);border-top:0.5px solid var(--color-border);">{$LANG.invoicesbalance|default:'Balance'}</td>
+                        <td colspan="3" style="text-align:right;font-weight:var(--fw-semibold);color:var(--color-text-primary);border-top:0.5px solid var(--color-border);">{$LANG.invoicesbalance}</td>
                         <td class="amount" style="font-weight:var(--fw-semibold);border-top:0.5px solid var(--color-border);">{$billingNote->balance}</td>
                     </tr>
                 </tbody>
@@ -147,8 +147,8 @@
     </div>
 
     <div class="vbn-actions">
-        <a href="javascript:window.print()" class="btn-secondary">{$LANG.print|default:'Print'}</a>
-        <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-secondary">{$LANG.invoicesbacktoclientarea|default:'Back to billing'}</a>
+        <a href="javascript:window.print()" class="btn-secondary">{$LANG.print}</a>
+        <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-secondary">{$LANG.invoicesbacktoclientarea}</a>
     </div>
 
 </div>

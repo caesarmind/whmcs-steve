@@ -20,13 +20,13 @@
 {if $myTheme.addonSettings.cookie_box}
     {assign var=mtCookiePos value=$myTheme.addonSettings.cookie_box_position|default:'bottom-left'}
     {assign var=mtCookieMsg value=$myTheme.addonSettings.cookie_box_message|default:''}
-    {assign var=mtCookieBtn value=$myTheme.addonSettings.cookie_box_button|default:'Continue'}
-    <div class="mt-cookie-bar mt-cookie-bar--{$mtCookiePos}" id="mtCookieBar" role="dialog" aria-label="Cookie notice" data-cookie-name="mt_cookie_consent" data-exp-days="365" data-delay="1500" hidden>
+    {assign var=mtCookieBtn value=$myTheme.addonSettings.cookie_box_button|default:$LANG.continue}
+    <div class="mt-cookie-bar mt-cookie-bar--{$mtCookiePos}" id="mtCookieBar" role="dialog" aria-label="{$hadrianLang.common.cookieNotice}" data-cookie-name="mt_cookie_consent" data-exp-days="365" data-delay="1500" hidden>
         <div class="mt-cookie-bar__inner">
             <span class="mt-cookie-bar__icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/><path d="M11 17v.01"/><path d="M7 14v.01"/></svg>
             </span>
-            <div class="mt-cookie-bar__msg">{if $mtCookieMsg != ''}{$mtCookieMsg}{else}We use cookies to improve your experience. By continuing to browse, you agree to our use of cookies.{/if}</div>
+            <div class="mt-cookie-bar__msg">{if $mtCookieMsg != ''}{$mtCookieMsg}{else}{$hadrianLang.common.cookieMessage}{/if}</div>
             <button type="button" class="mt-cookie-bar__btn" data-cookie-accept>{$mtCookieBtn|escape}</button>
         </div>
     </div>

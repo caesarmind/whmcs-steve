@@ -20,14 +20,14 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.invoices|default:'Payment'}</p>
-    <h1>{$LANG.creditcard3dsecuretitle|default:'Verify your payment'}</h1>
+    <p class="page-eyebrow">{$hadrianLang.billing.paymentEyebrow}</p>
+    <h1>{$hadrianLang.billing.verifyPaymentTitle}</h1>
 </header>
 
 <div class="tds-wrap">
     <div class="tds-info">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        <div>{$LANG.creditcard3dsecure|default:'Your bank requires an extra verification step. Complete the challenge below to finish your payment.'}</div>
+        <div>{$LANG.creditcard3dsecure}</div>
     </div>
 
     <div class="card tds-frame-card">
@@ -37,7 +37,7 @@
         {else}
             <div class="tds-spinner">
                 <span class="dot"></span>
-                <span>{$LANG.creditcard3dsecureloading|default:'Waiting for the verification challenge...'}</span>
+                <span>{$hadrianLang.billing.verifyLoading}</span>
             </div>
         {/if}
     </div>

@@ -11,8 +11,8 @@
 
 <header class="page-header">
     <p class="page-eyebrow">{$domain|default:''|escape}</p>
-    <h1>{$LANG.domainemailforwarding|default:'Email forwarding'}</h1>
-    <p class="page-subtitle">{$LANG.domainemailforwardingdesc|default:'Forward mail sent to any address at your domain to a real inbox elsewhere.'}</p>
+    <h1>{$LANG.domainemailforwarding}</h1>
+    <p class="page-subtitle">{$LANG.domainemailforwardingdesc}</p>
 </header>
 
 {if !empty($error)}
@@ -38,9 +38,9 @@
                 <table class="ef-table">
                     <thead>
                         <tr>
-                            <th class="ef-col-prefix">{$LANG.domainemailforwardingprefix|default:'Prefix'}</th>
-                            <th class="ef-col-at">{$LANG.at|default:'At'}</th>
-                            <th class="ef-col-fwd">{$LANG.domainemailforwardingforwardto|default:'Forward to'}</th>
+                            <th class="ef-col-prefix">{$LANG.domainemailforwardingprefix}</th>
+                            <th class="ef-col-at">{$hadrianLang.domains.emailAt}</th>
+                            <th class="ef-col-fwd">{$LANG.domainemailforwardingforwardto}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -64,8 +64,8 @@
             </div>
 
             <div class="ef-actions">
-                <button type="submit" class="btn-primary">{$LANG.clientareasavechanges|default:'Save changes'}</button>
-                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="btn-secondary">{$LANG.clientareacancel|default:'Cancel'}</a>
+                <button type="submit" class="btn-primary">{$LANG.clientareasavechanges}</button>
+                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="btn-secondary">{$LANG.clientareacancel}</a>
             </div>
         </form>
 
@@ -74,18 +74,18 @@
 
     <aside class="ef-aside">
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.domain|default:'Domain'}</div>
+            <div class="subnav-heading">{$LANG.domain}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                {$LANG.domaindetails|default:'Domain details'}
+                {$hadrianLang.domains.domainDetails}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=domaindns&domainid={$domainid|escape}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-                {$LANG.dnsmanagement|default:'DNS records'}
+                {$LANG.domaindnsmanagement}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=domainemailforwarding&domainid={$domainid|escape}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                {$LANG.emailforwarding|default:'Email forwarders'}
+                {$LANG.domainemailforwarding}
             </a>
         </div>
     </aside>

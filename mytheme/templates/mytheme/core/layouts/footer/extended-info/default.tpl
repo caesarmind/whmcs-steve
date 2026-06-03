@@ -27,7 +27,7 @@
                     <span>{$companyname|escape}</span>
                 {/if}
             </div>
-            <p class="hp-footer-tagline">{if !empty($mtBrand.description)}{$mtBrand.description|escape}{else}{$LANG.footertagline|default:'Premium web hosting on Google Cloud. A genuinely free plan, isolated environments, no cPanel clutter.'}{/if}</p>
+            <p class="hp-footer-tagline">{if !empty($mtBrand.description)}{$mtBrand.description|escape}{else}{$hadrianLang.footer.tagline}{/if}</p>
             {if !empty($mtBrand.socials)}
                 <div class="hp-footer-socials">
                     {if !empty($mtBrand.socials.x)}<a class="hp-footer-social" href="{$mtBrand.socials.x|escape}" target="_blank" rel="noopener" aria-label="X (Twitter)" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>{/if}
@@ -63,7 +63,7 @@
         {/if}
         </div>{* /.hp-footer-top *}
         <div class="hp-footer-bottom">
-            <span class="hp-footer-copyright">&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$LANG.allrightsreserved|default:'All rights reserved.'}</span>
+            <span class="hp-footer-copyright">&copy; {$smarty.now|date_format:"%Y"} {$companyname|escape}. {$hadrianLang.footer.allRightsReserved}</span>
             {if isset($mtFooterSecondaryItems) && $mtFooterSecondaryItems}
                 <div class="hp-footer-bottom-links">
                     {foreach $mtFooterSecondaryItems as $item}

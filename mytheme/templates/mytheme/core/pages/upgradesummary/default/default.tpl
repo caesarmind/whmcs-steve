@@ -44,9 +44,9 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.clientareaservices|default:'Services'}</p>
-    <h1>{$LANG.ordersummary|default:'Review your upgrade'}</h1>
-    <p class="page-subtitle">{$LANG.upgradesummaryintro|default:'Confirm the changes and amount due before checkout.'}</p>
+    <p class="page-eyebrow">{$LANG.clientareaservices}</p>
+    <h1>{$LANG.ordersummary}</h1>
+    <p class="page-subtitle">{$hadrianLang.services.upgradeSummaryIntro}</p>
 </header>
 
 {if $hasUpgrades}
@@ -56,7 +56,7 @@
     {* ==== MAIN ==== *}
     <div class="up-main">
         <div class="card">
-            <div class="card-header"><h2 class="card-title">{$LANG.orderdesc|default:'Changes'}</h2></div>
+            <div class="card-header"><h2 class="card-title">{$LANG.orderdesc}</h2></div>
             <div class="card-body">
                 {foreach $upgrades as $upg}
                 <div class="up-line">
@@ -69,7 +69,7 @@
                 {/foreach}
                 {if $upType == 'package' && isset($upgrades.0.daysuntilrenewal)}
                 <p style="margin: 14px 0 0; font-size: 12.5px; color: var(--color-text-tertiary); line-height: 1.5;">
-                    {$LANG.upgradeproductlogic|default:'The price reflects the remaining time until renewal'} ({$upgrades.0.daysuntilrenewal|escape} {$LANG.days|default:'days'}).
+                    {$LANG.upgradeproductlogic} ({$upgrades.0.daysuntilrenewal|escape} {$LANG.days}).
                 </p>
                 {/if}
             </div>
@@ -77,7 +77,7 @@
 
         {* Promo code *}
         <div class="card">
-            <div class="card-header"><h2 class="card-title">{$LANG.orderpromotioncode|default:'Promotion code'}</h2></div>
+            <div class="card-header"><h2 class="card-title">{$LANG.orderpromotioncode}</h2></div>
             <div class="card-body">
                 <form method="post" action="{$WEB_ROOT}/upgrade.php" class="up-promo">
                     <input type="hidden" name="step" value="2">
@@ -88,11 +88,11 @@
                         <input type="hidden" name="billingcycle" value="{$upgrades.0.newproductbillingcycle|default:''|escape}">
                     {/if}
                     {if isset($configoptions)}{foreach $configoptions as $cid => $cval}<input type="hidden" name="configoption[{$cid}]" value="{$cval|escape}">{/foreach}{/if}
-                    <input class="form-input" type="text" name="promocode" placeholder="{$LANG.orderpromotioncode|default:'Promotion code'}"{if isset($promocode) && $promocode} value="{$promocode|escape}" disabled{/if}>
+                    <input class="form-input" type="text" name="promocode" placeholder="{$LANG.orderpromotioncode}"{if isset($promocode) && $promocode} value="{$promocode|escape}" disabled{/if}>
                     {if isset($promocode) && $promocode}
-                        <button type="submit" name="removepromo" value="1" class="btn-secondary">{$LANG.orderdontusepromo|default:'Remove'}</button>
+                        <button type="submit" name="removepromo" value="1" class="btn-secondary">{$LANG.orderdontusepromo}</button>
                     {else}
-                        <button type="submit" class="btn-secondary">{$LANG.orderpromovalidatebutton|default:'Apply'}</button>
+                        <button type="submit" class="btn-secondary">{$LANG.orderpromovalidatebutton}</button>
                     {/if}
                 </form>
             </div>
@@ -100,7 +100,7 @@
 
         {* Payment + checkout *}
         <div class="card">
-            <div class="card-header"><h2 class="card-title">{$LANG.orderpaymentmethod|default:'Payment method'}</h2></div>
+            <div class="card-header"><h2 class="card-title">{$LANG.orderpaymentmethod}</h2></div>
             <div class="card-body">
                 <form method="post" action="{$WEB_ROOT}/upgrade.php">
                     <input type="hidden" name="step" value="3">
@@ -114,9 +114,9 @@
                     {if isset($promocode) && $promocode}<input type="hidden" name="promocode" value="{$promocode|escape}">{/if}
                     {if isset($gateways) && $gateways|@count > 0}
                     <div class="form-group">
-                        <label class="form-label" for="inputPaymentMethod">{$LANG.orderpaymentmethod|default:'Payment method'}</label>
+                        <label class="form-label" for="inputPaymentMethod">{$LANG.orderpaymentmethod}</label>
                         <select name="paymentmethod" id="inputPaymentMethod" class="form-select">
-                            {if isset($allowgatewayselection) && $allowgatewayselection}<option value="none">{$LANG.paymentmethoddefault|default:'Default'}</option>{/if}
+                            {if isset($allowgatewayselection) && $allowgatewayselection}<option value="none">{$LANG.paymentmethoddefault}</option>{/if}
                             {foreach $gateways as $gateway}
                                 <option value="{$gateway.sysname|escape}"{if isset($selectedgateway) && $gateway.sysname == $selectedgateway} selected{/if}>{$gateway.name|escape}</option>
                             {/foreach}
@@ -124,8 +124,8 @@
                     </div>
                     {/if}
                     <div class="page-actions" style="margin-top: 8px;">
-                        <button type="submit" class="btn-primary">{$LANG.orderForm.checkout|default:'Confirm &amp; checkout'}</button>
-                        <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&amp;id={$id|default:''|escape}" class="btn-secondary">{$LANG.cancel|default:'Cancel'}</a>
+                        <button type="submit" class="btn-primary">{$LANG.orderForm.checkout}</button>
+                        <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&amp;id={$id|default:''|escape}" class="btn-secondary">{$LANG.cancel}</a>
                     </div>
                 </form>
             </div>
@@ -135,13 +135,13 @@
     {* ==== ASIDE: order summary ==== *}
     <aside class="up-aside">
         <div class="card">
-            <div class="card-header"><h2 class="card-title">{$LANG.ordersummary|default:'Order summary'}</h2></div>
+            <div class="card-header"><h2 class="card-title">{$LANG.ordersummary}</h2></div>
             <div class="card-body">
-                <div class="summary-row"><span>{$LANG.ordersubtotal|default:'Subtotal'}</span><span>{$subtotal|default:''}</span></div>
+                <div class="summary-row"><span>{$LANG.ordersubtotal}</span><span>{$subtotal|default:''}</span></div>
                 {if isset($taxrate) && $taxrate}<div class="summary-row"><span>{$taxname|default:''|escape} @ {$taxrate|escape}%</span><span>{$taxtotal|default:''}</span></div>{/if}
                 {if isset($taxrate2) && $taxrate2}<div class="summary-row"><span>{$taxname2|default:''|escape} @ {$taxrate2|escape}%</span><span>{$taxtotal2|default:''}</span></div>{/if}
-                {if isset($promocode) && $promocode}<div class="summary-row"><span>{$promodesc|default:'Promo'|escape}</span><span class="summary-credit">{$discount|default:''}</span></div>{/if}
-                <div class="summary-row total"><span>{$LANG.ordertotalduetoday|default:'Due today'}</span><span>{$total|default:''}</span></div>
+                {if isset($promocode) && $promocode}<div class="summary-row"><span>{$promodesc|default:$hadrianLang.services.promoFallback|escape}</span><span class="summary-credit">{$discount|default:''}</span></div>{/if}
+                <div class="summary-row total"><span>{$LANG.ordertotalduetoday}</span><span>{$total|default:''}</span></div>
             </div>
         </div>
     </aside>
@@ -156,9 +156,9 @@
             <div class="up-empty-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>
             </div>
-            <p class="up-empty-title">{$LANG.upgradenosummary|default:'Nothing to confirm'}</p>
-            <p class="up-empty-sub">{$LANG.upgradenosummarysub|default:'Start an upgrade from one of your services to see the summary here.'}</p>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'My services'}</a>
+            <p class="up-empty-title">{$hadrianLang.services.upgradeNoSummaryTitle}</p>
+            <p class="up-empty-sub">{$hadrianLang.services.upgradeNoSummarySub}</p>
+            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
         </div>
     </div>
 </div>

@@ -10,8 +10,8 @@
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/user-password.css?v={$myTheme.version|default:'1.0'}">
 
 <header class="page-header">
-    <h1>{$LANG.clientareanavchangepassword|default:'Change password'}</h1>
-    <p class="page-subtitle">{$LANG.changepasswordsub|default:'Pick a strong new password — minimum 8 characters with mixed case and numbers.'}</p>
+    <h1>{$LANG.clientareanavchangepassword}</h1>
+    <p class="page-subtitle">{$hadrianLang.account.changePasswordSub}</p>
 </header>
 
 <div class="cp-split">
@@ -19,18 +19,18 @@
     {* ══ LEFT: Profile sub-nav ══ *}
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.yourprofile|default:'Your Profile'}</div>
+            <div class="subnav-heading">{$LANG.yourprofile}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.accountdetails|default:'Account Details'}
+                {$LANG.accountdetails}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=changepw" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                {$LANG.clientareanavchangepassword|default:'Change Password'}
+                {$LANG.clientareanavchangepassword}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=security" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                {$LANG.securitysettings|default:'Security Settings'}
+                {$LANG.securitysettings}
             </a>
         </div>
     </aside>
@@ -41,7 +41,7 @@
             {if !empty($successful)}
             <div class="cp-alert cp-alert-success">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                {$LANG.changessavedsuccessfully|default:'Password updated successfully.'}
+                {$LANG.changessavedsuccessfully}
             </div>
             {/if}
 
@@ -56,28 +56,28 @@
                 <input type="hidden" name="token" value="{$token|default:''|escape}">
 
                 <div class="cp-form-row">
-                    <label class="cp-form-label" for="cp-existing">{$LANG.currentpassword|default:'Current password'}</label>
+                    <label class="cp-form-label" for="cp-existing">{$LANG.currentpassword}</label>
                     <input type="password" class="cp-input" id="cp-existing" name="existingpw" autocomplete="current-password" required autofocus>
                 </div>
 
                 <div class="cp-form-row">
-                    <label class="cp-form-label" for="cp-new">{$LANG.newpassword|default:'New password'}</label>
+                    <label class="cp-form-label" for="cp-new">{$LANG.newpassword}</label>
                     <input type="password" class="cp-input" id="cp-new" name="newpw" autocomplete="new-password" required>
                     <div class="cp-strength" data-strength-wrap>
                         <div class="cp-strength-bar"><div class="cp-strength-fill" data-strength-fill></div></div>
-                        <span class="cp-strength-label" data-strength-label>{$LANG.pwstrength|default:'Password strength'}</span>
+                        <span class="cp-strength-label" data-strength-label>{$LANG.pwstrength}</span>
                     </div>
                 </div>
 
                 <div class="cp-form-row">
-                    <label class="cp-form-label" for="cp-confirm">{$LANG.confirmnewpassword|default:'Confirm new password'}</label>
+                    <label class="cp-form-label" for="cp-confirm">{$LANG.confirmnewpassword}</label>
                     <input type="password" class="cp-input" id="cp-confirm" name="confirmpw" autocomplete="new-password" required>
                     <div class="cp-match" data-match-msg></div>
                 </div>
 
                 <div class="cp-actions">
-                    <a href="{$WEB_ROOT}/clientarea.php?action=details" class="btn-secondary">{$LANG.cancel|default:'Cancel'}</a>
-                    <button type="submit" class="btn-primary">{$LANG.changepassword|default:'Change password'}</button>
+                    <a href="{$WEB_ROOT}/clientarea.php?action=details" class="btn-secondary">{$LANG.cancel}</a>
+                    <button type="submit" class="btn-primary">{$LANG.clientareanavchangepassword}</button>
                 </div>
             </form>
         </div>
@@ -85,6 +85,17 @@
 
 </div>
 
+<script>
+var _localLang = {
+    'pwTooWeak': '{$hadrianLang.account.pwStrengthTooWeak|escape:"javascript"}',
+    'pwWeak': '{$hadrianLang.account.pwStrengthWeak|escape:"javascript"}',
+    'pwFair': '{$hadrianLang.account.pwStrengthFair|escape:"javascript"}',
+    'pwGood': '{$hadrianLang.account.pwStrengthGood|escape:"javascript"}',
+    'pwStrong': '{$hadrianLang.account.pwStrengthStrong|escape:"javascript"}',
+    'passwordsMatch': '{$hadrianLang.account.passwordsMatch|escape:"javascript"}',
+    'passwordsNoMatch': '{$hadrianLang.account.passwordsNoMatch|escape:"javascript"}'
+};
+</script>
 <script>
 {literal}
 document.addEventListener('DOMContentLoaded', function () {
@@ -110,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var s = scorePassword(newPw.value);
         var pct = (s / 4) * 100;
         strengthFill.style.width = pct + '%';
-        var labels = ['Too weak', 'Weak', 'Fair', 'Good', 'Strong'];
+        var labels = [_localLang.pwTooWeak, _localLang.pwWeak, _localLang.pwFair, _localLang.pwGood, _localLang.pwStrong];
         var levels = ['weak', 'weak', 'fair', 'good', 'strong'];
         strengthFill.className = 'cp-strength-fill ' + 'cp-strength-' + (levels[s] || 'weak');
         if (strengthLabel) strengthLabel.textContent = labels[s] || labels[0];
@@ -124,10 +135,10 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         if (newPw.value === confirmPw.value) {
-            matchMsg.textContent = 'Passwords match';
+            matchMsg.textContent = _localLang.passwordsMatch;
             matchMsg.className = 'cp-match cp-match-ok';
         } else {
-            matchMsg.textContent = 'Passwords do not match';
+            matchMsg.textContent = _localLang.passwordsNoMatch;
             matchMsg.className = 'cp-match cp-match-bad';
         }
     }

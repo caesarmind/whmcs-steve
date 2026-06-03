@@ -24,8 +24,8 @@
 </script>
 
 <header class="page-header">
-    <h1>{$LANG.knowledgebasetitle|default:'Knowledgebase'}</h1>
-    <p class="page-subtitle">{$LANG.knowledgebasesub|default:'Setup guides, troubleshooting and answers to frequently asked questions.'}</p>
+    <h1>{$LANG.knowledgebasetitle}</h1>
+    <p class="page-subtitle">{$hadrianLang.support.kbSubtitle}</p>
 </header>
 
 <div class="kb-split">
@@ -33,35 +33,35 @@
     {* ══ LEFT: Support sub-nav + popular ══ *}
     <aside class="kb-aside">
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.supporttab|default:'Support'}</div>
+            <div class="subnav-heading">{$LANG.supporttab}</div>
             <a href="{$WEB_ROOT}/supporttickets.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                {$LANG.mytickets|default:'My support tickets'}
+                {$LANG.mytickets}
             </a>
             <a href="{$WEB_ROOT}/announcements.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-                {$LANG.announcementstitle|default:'Announcements'}
+                {$LANG.announcementstitle}
             </a>
             <a href="{$WEB_ROOT}/knowledgebase.php" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-                {$LANG.knowledgebasetitle|default:'Knowledgebase'}
+                {$LANG.knowledgebasetitle}
             </a>
             <a href="{$WEB_ROOT}/submitticket.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                {$LANG.opennewticket|default:'Open ticket'}
+                {$LANG.opennewticket}
             </a>
         </div>
 
         {if isset($kbmostviews) && $kbmostviews|@count > 0}
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.knowledgebasepop|default:'Most popular'}</div>
+            <div class="subnav-heading">{$LANG.knowledgebasepopular}</div>
             {foreach $kbmostviews as $art}
             {if $art@iteration <= 5}
             <a href="{$WEB_ROOT}/knowledgebase.php?action=displayarticle&id={$art.id}" class="pop-row">
                 <span class="pop-rank">{$art@iteration}</span>
                 <div class="pop-row-info">
                     <div class="pop-row-title">{$art.title|escape}</div>
-                    {if isset($art.views)}<div class="pop-row-meta">{$art.views|escape} {$LANG.views|default:'views'}</div>{/if}
+                    {if isset($art.views)}<div class="pop-row-meta">{$art.views|escape} {$hadrianLang.support.views}</div>{/if}
                 </div>
             </a>
             {/if}
@@ -75,11 +75,11 @@
 
         <div class="card when-full">
             <div class="kb-hero">
-                <h2 class="kb-hero-title">{$LANG.kbherotitle|default:'How can we help?'}</h2>
-                <p class="kb-hero-sub">{$LANG.kbherosub|default:'Search the knowledgebase or browse by category below.'}</p>
+                <h2 class="kb-hero-title">{$LANG.howcanwehelp}</h2>
+                <p class="kb-hero-sub">{$hadrianLang.support.kbHeroSub}</p>
                 <form class="kb-hero-search" method="get" action="{$WEB_ROOT}/knowledgebase.php">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="search" name="search" placeholder="{$LANG.kbsearchplaceholder|default:'Search guides, troubleshooting, billing…'}" value="{$kbsearchterm|default:''|escape}" autocomplete="off">
+                    <input type="search" name="search" placeholder="{$LANG.clientHomeSearchKb}" value="{$kbsearchterm|default:''|escape}" autocomplete="off">
                 </form>
             </div>
 
@@ -91,7 +91,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
                     </span>
                     <div class="kb-card-title">{$cat.name|escape}</div>
-                    {if isset($cat.numarticles)}<div class="kb-card-count">{$cat.numarticles|escape} {$LANG.kbarticles|default:'articles'}</div>{/if}
+                    {if isset($cat.numarticles)}<div class="kb-card-count">{$cat.numarticles|escape} {$hadrianLang.support.articlesCount}</div>{/if}
                 </a>
                 {/foreach}
             </div>
@@ -104,9 +104,9 @@
                 <div class="kb-empty-ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
                 </div>
-                <p class="kb-empty-title">{$LANG.kbempty|default:'No articles yet'}</p>
-                <p class="kb-empty-sub">{$LANG.kbemptysub|default:'When our team publishes setup guides and troubleshooting articles, they will appear here.'}</p>
-                <a href="{$WEB_ROOT}/submitticket.php" class="btn-primary">{$LANG.opennewticket|default:'Open a ticket instead'}</a>
+                <p class="kb-empty-title">{$LANG.knowledgebasenoarticles}</p>
+                <p class="kb-empty-sub">{$hadrianLang.support.kbEmptySub}</p>
+                <a href="{$WEB_ROOT}/submitticket.php" class="btn-primary">{$LANG.opennewticket}</a>
             </div>
         </div>
     </div>

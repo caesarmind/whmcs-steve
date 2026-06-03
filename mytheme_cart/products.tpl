@@ -116,8 +116,8 @@
        Sits above the 2-column split.
        ────────────────────────────────────────────────────────── *}
     <header class="st-page-header">
-        <h1>{$LANG.ordernewservices|default:'Order new services'}</h1>
-        <p class="page-subtitle">{$LANG.ordernewservicestagline|default:'Browse our plans and add the ones you need to your cart. All plans come with a 30-day money-back guarantee.'}</p>
+        <h1>{$LANG.ordernewservices}</h1>
+        <p class="page-subtitle">{$hadrianLang.cart.orderServicesTagline}</p>
     </header>
 
 
@@ -178,7 +178,7 @@
                                 {if $_headline}{$_headline}
                                 {elseif $_groupName}{$_groupName|escape}
                                 {elseif $pagetitle}{$pagetitle|escape}
-                                {else}{$LANG.cart.plansheading|default:'Available plans'}{/if}
+                                {else}{$hadrianLang.cart.plansHeading}{/if}
                             </h2>
                             {if $_tagline}
                                 <p class="st-cat-head-desc" id="cat-desc">{$_tagline}</p>
@@ -189,9 +189,9 @@
                            Pills render unconditionally; the JS click handler is
                            a no-op when no card has data for the picked cycle. *}
                         <div class="st-cycle" role="tablist" aria-label="Billing cycle" data-cycle-switcher>
-                            <button type="button" data-cycle="monthly">Monthly</button>
-                            <button type="button" data-cycle="annually" class="active">Annual <span class="st-cycle-saving">Save 20%</span></button>
-                            <button type="button" data-cycle="biennially">Biennial</button>
+                            <button type="button" data-cycle="monthly">{$hadrianLang.cart.cycleMonthly}</button>
+                            <button type="button" data-cycle="annually" class="active">{$hadrianLang.cart.cycleAnnual} <span class="st-cycle-saving">{$hadrianLang.cart.cycleSaving}</span></button>
+                            <button type="button" data-cycle="biennially">{$hadrianLang.cart.cycleBiennial}</button>
                         </div>
                     </div>
                 </div>
@@ -226,7 +226,7 @@
                                 {if $product@index == $featuredIndex}{$isFeatured = true}{/if}
                                 <div class="st-plan{if $isFeatured} featured{/if}" id="{$idPrefix}">
                                     {if $isFeatured}
-                                        <span class="st-plan-badge">Most popular</span>
+                                        <span class="st-plan-badge">{$hadrianLang.cart.mostPopular}</span>
                                     {/if}
                                     <h3 class="st-plan-name" id="{$idPrefix}-name">{$product.name}</h3>
                                     {if $product.featuresdesc}
@@ -258,7 +258,7 @@
                                                 <span class="period" style="margin-right: 4px;">{$LANG.startingfrom}</span>
                                             {/if}
                                             <span class="amount" data-price-display>{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}</span>
-                                            <span class="period" data-period-display>{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}</span>
+                                            <span class="period" data-period-display>{if $product.pricing.minprice.cycle eq "monthly"}{$hadrianLang.cart.cycleShortMonthly}{elseif $product.pricing.minprice.cycle eq "quarterly"}{$hadrianLang.cart.cycleShortQuarterly}{elseif $product.pricing.minprice.cycle eq "semiannually"}{$hadrianLang.cart.cycleShortSemiannually}{elseif $product.pricing.minprice.cycle eq "annually"}{$hadrianLang.cart.cycleShortAnnually}{elseif $product.pricing.minprice.cycle eq "biennially"}{$hadrianLang.cart.cycleShortBiennially}{elseif $product.pricing.minprice.cycle eq "triennially"}{$hadrianLang.cart.cycleShortTriennially}{/if}</span>
                                         {/if}
                                     </div>
                                     {if $product.pricing.minprice.setupFee}
@@ -322,7 +322,7 @@
                                          {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
                                          {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
                                         <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
-                                        <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
+                                        <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}{$hadrianLang.cart.cycleShortMonthly}{elseif $product.pricing.minprice.cycle eq "quarterly"}{$hadrianLang.cart.cycleShortQuarterly}{elseif $product.pricing.minprice.cycle eq "semiannually"}{$hadrianLang.cart.cycleShortSemiannually}{elseif $product.pricing.minprice.cycle eq "annually"}{$hadrianLang.cart.cycleShortAnnually}{elseif $product.pricing.minprice.cycle eq "biennially"}{$hadrianLang.cart.cycleShortBiennially}{elseif $product.pricing.minprice.cycle eq "triennially"}{$hadrianLang.cart.cycleShortTriennially}{/if}{/if}</span>
                                     </div>
                                     {* Description body — see Variant A note. Same admin-authored
                                        HTML, smaller scale per Variant B's denser card chrome. *}
@@ -377,7 +377,7 @@
                                          {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
                                          {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
                                         <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
-                                        <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
+                                        <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}{$hadrianLang.cart.cycleShortMonthly}{elseif $product.pricing.minprice.cycle eq "quarterly"}{$hadrianLang.cart.cycleShortQuarterly}{elseif $product.pricing.minprice.cycle eq "semiannually"}{$hadrianLang.cart.cycleShortSemiannually}{elseif $product.pricing.minprice.cycle eq "annually"}{$hadrianLang.cart.cycleShortAnnually}{elseif $product.pricing.minprice.cycle eq "biennially"}{$hadrianLang.cart.cycleShortBiennially}{elseif $product.pricing.minprice.cycle eq "triennially"}{$hadrianLang.cart.cycleShortTriennially}{/if}{/if}</span>
                                     </div>
                                     <a href="{$product.productUrl}" class="st-row-cta">{$LANG.ordernowbutton}</a>
                                 </div>
@@ -423,7 +423,7 @@
                                                      {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
                                                      {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
                                                     <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
-                                                    <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
+                                                    <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}{$hadrianLang.cart.cycleShortMonthly}{elseif $product.pricing.minprice.cycle eq "quarterly"}{$hadrianLang.cart.cycleShortQuarterly}{elseif $product.pricing.minprice.cycle eq "semiannually"}{$hadrianLang.cart.cycleShortSemiannually}{elseif $product.pricing.minprice.cycle eq "annually"}{$hadrianLang.cart.cycleShortAnnually}{elseif $product.pricing.minprice.cycle eq "biennially"}{$hadrianLang.cart.cycleShortBiennially}{elseif $product.pricing.minprice.cycle eq "triennially"}{$hadrianLang.cart.cycleShortTriennially}{/if}{/if}</span>
                                                 </div>
                                             </th>
                                         {/foreach}
@@ -477,7 +477,7 @@
                                 {$idPrefix = ($product.bid) ? ("bundle"|cat:$product.bid) : ("product"|cat:$product.pid)}
                                 {if $product@first}
                                     <div class="st-bento-hero">
-                                        <span class="st-plan-badge">Most popular</span>
+                                        <span class="st-plan-badge">{$hadrianLang.cart.mostPopular}</span>
                                         <div>
                                             <h3 class="st-bento-hero-name">{$product.name}</h3>
                                             {if $product.featuresdesc}
@@ -504,7 +504,7 @@
                                                  {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
                                                  {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
                                                 <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
-                                                <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
+                                                <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}{$hadrianLang.cart.cycleShortMonthly}{elseif $product.pricing.minprice.cycle eq "quarterly"}{$hadrianLang.cart.cycleShortQuarterly}{elseif $product.pricing.minprice.cycle eq "semiannually"}{$hadrianLang.cart.cycleShortSemiannually}{elseif $product.pricing.minprice.cycle eq "annually"}{$hadrianLang.cart.cycleShortAnnually}{elseif $product.pricing.minprice.cycle eq "biennially"}{$hadrianLang.cart.cycleShortBiennially}{elseif $product.pricing.minprice.cycle eq "triennially"}{$hadrianLang.cart.cycleShortTriennially}{/if}{/if}</span>
                                             </div>
                                             <a href="{$product.productUrl}" class="st-bento-hero-cta">{$LANG.ordernowbutton}</a>
                                         </div>
@@ -525,7 +525,7 @@
                                              {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
                                              {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
                                             <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
-                                            <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
+                                            <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}{$hadrianLang.cart.cycleShortMonthly}{elseif $product.pricing.minprice.cycle eq "quarterly"}{$hadrianLang.cart.cycleShortQuarterly}{elseif $product.pricing.minprice.cycle eq "semiannually"}{$hadrianLang.cart.cycleShortSemiannually}{elseif $product.pricing.minprice.cycle eq "annually"}{$hadrianLang.cart.cycleShortAnnually}{elseif $product.pricing.minprice.cycle eq "biennially"}{$hadrianLang.cart.cycleShortBiennially}{elseif $product.pricing.minprice.cycle eq "triennially"}{$hadrianLang.cart.cycleShortTriennially}{/if}{/if}</span>
                                         </div>
                                         {if $product.features}
                                             <ul class="st-bento-mini-specs">
@@ -569,7 +569,7 @@
                                          {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
                                          {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
                                         <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
-                                        <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
+                                        <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}{$hadrianLang.cart.cycleShortMonthly}{elseif $product.pricing.minprice.cycle eq "quarterly"}{$hadrianLang.cart.cycleShortQuarterly}{elseif $product.pricing.minprice.cycle eq "semiannually"}{$hadrianLang.cart.cycleShortSemiannually}{elseif $product.pricing.minprice.cycle eq "annually"}{$hadrianLang.cart.cycleShortAnnually}{elseif $product.pricing.minprice.cycle eq "biennially"}{$hadrianLang.cart.cycleShortBiennially}{elseif $product.pricing.minprice.cycle eq "triennially"}{$hadrianLang.cart.cycleShortTriennially}{/if}{/if}</span>
                                     </div>
                                     {if $product.features}
                                         <ul class="st-seg-specs">
@@ -599,7 +599,7 @@
                                 {$isFeatured = ($product@index == $featuredIndex)}
                                 <div class="st-matrix-card{if $isFeatured} featured{/if}">
                                     <div class="st-matrix-head">
-                                        {if $isFeatured}<div class="st-matrix-eyebrow">Most popular</div>{/if}
+                                        {if $isFeatured}<div class="st-matrix-eyebrow">{$hadrianLang.cart.mostPopular}</div>{/if}
                                         <h3 class="st-matrix-name">{$product.name}</h3>
                                     </div>
                                     {* Description body — see Variant A note. Was previously a
@@ -620,7 +620,7 @@
                                              {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
                                              {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
                                             <span class="amount" data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
-                                            <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
+                                            <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}{$hadrianLang.cart.cycleShortMonthly}{elseif $product.pricing.minprice.cycle eq "quarterly"}{$hadrianLang.cart.cycleShortQuarterly}{elseif $product.pricing.minprice.cycle eq "semiannually"}{$hadrianLang.cart.cycleShortSemiannually}{elseif $product.pricing.minprice.cycle eq "annually"}{$hadrianLang.cart.cycleShortAnnually}{elseif $product.pricing.minprice.cycle eq "biennially"}{$hadrianLang.cart.cycleShortBiennially}{elseif $product.pricing.minprice.cycle eq "triennially"}{$hadrianLang.cart.cycleShortTriennially}{/if}{/if}</span>
                                         </div>
                                         <a href="{$product.productUrl}" class="st-matrix-cta">{$LANG.ordernowbutton}</a>
                                     </div>
@@ -681,7 +681,7 @@
                                              {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
                                              {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
                                             <span data-price-display>{if $product.bid && $product.displayprice}{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}{else}{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}{/if}</span>
-                                            <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}/mo{elseif $product.pricing.minprice.cycle eq "quarterly"}/qtr{elseif $product.pricing.minprice.cycle eq "semiannually"}/6mo{elseif $product.pricing.minprice.cycle eq "annually"}/yr{elseif $product.pricing.minprice.cycle eq "biennially"}/2yr{elseif $product.pricing.minprice.cycle eq "triennially"}/3yr{/if}{/if}</span>
+                                            <span class="period" data-period-display>{if $product.bid}{$LANG.bundledeal}{else}{if $product.pricing.minprice.cycle eq "monthly"}{$hadrianLang.cart.cycleShortMonthly}{elseif $product.pricing.minprice.cycle eq "quarterly"}{$hadrianLang.cart.cycleShortQuarterly}{elseif $product.pricing.minprice.cycle eq "semiannually"}{$hadrianLang.cart.cycleShortSemiannually}{elseif $product.pricing.minprice.cycle eq "annually"}{$hadrianLang.cart.cycleShortAnnually}{elseif $product.pricing.minprice.cycle eq "biennially"}{$hadrianLang.cart.cycleShortBiennially}{elseif $product.pricing.minprice.cycle eq "triennially"}{$hadrianLang.cart.cycleShortTriennially}{/if}{/if}</span>
                                         </div>
                                     </label>
                                 </div>
@@ -694,10 +694,10 @@
 
                     {* ── Compare bar (fine print) ────────────────── *}
                     <div class="st-compare">
-                        <span>{$LANG.cart.compareplans|default:'Not sure which plan is right for you?'}</span>
-                        <a href="#" id="cart-compare-link">{$LANG.cart.compareall|default:'Compare all features'}</a>
+                        <span>{$hadrianLang.cart.comparePlans}</span>
+                        <a href="#" id="cart-compare-link">{$hadrianLang.cart.compareAll}</a>
                         <span class="spacer"></span>
-                        <span>{$LANG.cart.pricesin|default:'Prices in'} {$currency.code|default:'USD'} · <a href="#" data-currency-toggle>{$LANG.changecurrency|default:'Change currency'}</a></span>
+                        <span>{$hadrianLang.cart.pricesIn} {$currency.code|default:'USD'} · <a href="#" data-currency-toggle>{$LANG.changecurrency}</a></span>
                     </div>
 
                 </div>{* /.cart-plans-grid *}
@@ -715,16 +715,16 @@
                     <div class="st-empty-ico" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
                     </div>
-                    <h3 class="st-empty-title">{$LANG.cart.emptygroup|default:'No packages in this category yet'}</h3>
-                    <p class="st-empty-desc">{$LANG.cart.emptygroupdesc|default:"We're preparing plans for this service. Browse another category or get in touch — our team can put together a custom quote for you."}</p>
+                    <h3 class="st-empty-title">{$hadrianLang.cart.emptyGroupTitle}</h3>
+                    <p class="st-empty-desc">{$hadrianLang.cart.emptyGroupDesc}</p>
                     <div class="st-empty-actions">
                         <a href="{$WEB_ROOT}/submitticket.php" class="btn-primary">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                            {$LANG.cart.requestquote|default:'Request a quote'}
+                            {$hadrianLang.cart.requestQuote}
                         </a>
                         <a href="{$WEB_ROOT}/cart.php" class="btn-secondary">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                            {$LANG.cart.browseall|default:'Browse all categories'}
+                            {$hadrianLang.cart.browseAll}
                         </a>
                     </div>
                 </div>
@@ -741,8 +741,8 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4h22v16H1z"/><path d="M1 12h22"/><path d="M15 4v16"/></svg>
                         </div>
                         <div>
-                            <div class="st-guarantee-title">{$LANG.cart.moneyback|default:'30-day money back'}</div>
-                            <div class="st-guarantee-sub">{$LANG.cart.moneybacksub|default:"Full refund if you're not happy — no questions asked."}</div>
+                            <div class="st-guarantee-title">{$hadrianLang.cart.moneyBack}</div>
+                            <div class="st-guarantee-sub">{$hadrianLang.cart.moneyBackSub}</div>
                         </div>
                     </div>
                     <div class="card st-guarantee">
@@ -750,8 +750,8 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                         </div>
                         <div>
-                            <div class="st-guarantee-title">{$LANG.cart.support247|default:'24/7 support'}</div>
-                            <div class="st-guarantee-sub">{$LANG.cart.support247sub|default:'Reach a human engineer any time via chat or ticket.'}</div>
+                            <div class="st-guarantee-title">{$hadrianLang.cart.support247}</div>
+                            <div class="st-guarantee-sub">{$hadrianLang.cart.support247Sub}</div>
                         </div>
                     </div>
                     <div class="card st-guarantee">
@@ -759,8 +759,8 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                         </div>
                         <div>
-                            <div class="st-guarantee-title">{$LANG.cart.uptime|default:'99.99% uptime SLA'}</div>
-                            <div class="st-guarantee-sub">{$LANG.cart.uptimesub|default:'Backed by global anycast and redundant power.'}</div>
+                            <div class="st-guarantee-title">{$hadrianLang.cart.uptime}</div>
+                            <div class="st-guarantee-sub">{$hadrianLang.cart.uptimeSub}</div>
                         </div>
                     </div>
                 </div>
@@ -777,8 +777,8 @@
                     <div class="st-pick-ico" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                     </div>
-                    <h2 class="st-pick-title">{$LANG.cart.pickcategorytitle|default:'Choose a category to get started'}</h2>
-                    <p class="st-pick-desc">{$LANG.cart.pickcategorydesc|default:'Browse our plans by service. All plans come with a 30-day money-back guarantee.'}</p>
+                    <h2 class="st-pick-title">{$hadrianLang.cart.pickCategoryTitle}</h2>
+                    <p class="st-pick-desc">{$hadrianLang.cart.pickCategoryDesc}</p>
 
                     {if $productgroups}
                         <div class="st-pick-grid">
@@ -793,7 +793,7 @@
                                     <div class="st-pick-tile-name">{$_cName|escape}</div>
                                     {if $_cTag}<div class="st-pick-tile-tag">{$_cTag|escape}</div>{/if}
                                     <span class="st-pick-tile-cta">
-                                        {$LANG.cart.viewplans|default:'View plans'}
+                                        {$hadrianLang.cart.viewPlans}
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                                     </span>
                                 </a>
@@ -822,12 +822,12 @@
 <script>
 (function () {
     var CYCLE_LABEL = {
-        monthly:      '/mo',
-        quarterly:    '/qtr',
-        semiannually: '/6mo',
-        annually:     '/yr',
-        biennially:   '/2yr',
-        triennially:  '/3yr'
+        monthly:      '{$hadrianLang.cart.cycleShortMonthly|escape:"javascript"}',
+        quarterly:    '{$hadrianLang.cart.cycleShortQuarterly|escape:"javascript"}',
+        semiannually: '{$hadrianLang.cart.cycleShortSemiannually|escape:"javascript"}',
+        annually:     '{$hadrianLang.cart.cycleShortAnnually|escape:"javascript"}',
+        biennially:   '{$hadrianLang.cart.cycleShortBiennially|escape:"javascript"}',
+        triennially:  '{$hadrianLang.cart.cycleShortTriennially|escape:"javascript"}'
     };
 
     var switcher = document.querySelector('[data-cycle-switcher]');

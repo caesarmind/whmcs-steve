@@ -12,8 +12,8 @@
 
 <header class="page-header">
     <p class="page-eyebrow">{$domain|default:''|escape}</p>
-    <h1>{$LANG.domaindnsmanagement|default:'DNS records'}</h1>
-    <p class="page-subtitle">{$LANG.domaindnsmanagementdesc|default:'Add, edit and remove DNS records for this domain. Changes propagate within a few minutes.'}</p>
+    <h1>{$LANG.domaindnsmanagement}</h1>
+    <p class="page-subtitle">{$LANG.domaindnsmanagementdesc}</p>
 </header>
 
 {if !empty($error)}
@@ -28,7 +28,7 @@
 
         {if !empty($external)}
             <div class="card dns-external">
-                <p class="dns-external-note">{$LANG.dnsexternalmanagement|default:'DNS for this domain is managed externally by the registrar.'}</p>
+                <p class="dns-external-note">{$hadrianLang.domains.dnsExternal}</p>
                 <div class="dns-external-body">{$code}</div>
             </div>
         {else}
@@ -42,10 +42,10 @@
                 <table class="dns-table">
                     <thead>
                         <tr>
-                            <th class="dns-col-host">{$LANG.domaindnshostname|default:'Host'}</th>
-                            <th class="dns-col-type">{$LANG.domaindnsrecordtype|default:'Type'}</th>
-                            <th class="dns-col-addr">{$LANG.domaindnsaddress|default:'Value'}</th>
-                            <th class="dns-col-prio">{$LANG.domaindnspriority|default:'Priority'}</th>
+                            <th class="dns-col-host">{$LANG.domaindnshostname}</th>
+                            <th class="dns-col-type">{$LANG.domaindnsrecordtype}</th>
+                            <th class="dns-col-addr">{$LANG.domaindnsaddress}</th>
+                            <th class="dns-col-prio">{$LANG.domaindnspriority}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -103,11 +103,11 @@
                 </table>
             </div>
 
-            <p class="dns-note">* {$LANG.domaindnsmxonly|default:'Priority only applies to MX records.'}</p>
+            <p class="dns-note">* {$LANG.domaindnsmxonly}</p>
 
             <div class="dns-actions">
-                <button type="submit" class="btn-primary">{$LANG.clientareasavechanges|default:'Save changes'}</button>
-                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="btn-secondary">{$LANG.clientareacancel|default:'Cancel'}</a>
+                <button type="submit" class="btn-primary">{$LANG.clientareasavechanges}</button>
+                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="btn-secondary">{$LANG.clientareacancel}</a>
             </div>
         </form>
 
@@ -117,28 +117,28 @@
 
     <aside class="dns-aside">
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.domain|default:'Domain'}</div>
+            <div class="subnav-heading">{$LANG.domain}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                {$LANG.domaindetails|default:'Domain details'}
+                {$hadrianLang.domains.domainDetails}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=domaindns&domainid={$domainid|escape}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                {$LANG.dnsmanagement|default:'DNS records'}
+                {$LANG.domaindnsmanagement}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=domainemailforwarding&domainid={$domainid|escape}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                {$LANG.emailforwarding|default:'Email forwarders'}
+                {$LANG.domainemailforwarding}
             </a>
         </div>
         <div class="card dns-help">
-            <h4 class="dns-help-title">{$LANG.help|default:'Common record types'}</h4>
+            <h4 class="dns-help-title">{$hadrianLang.domains.dnsHelpTitle}</h4>
             <dl class="dns-help-list">
-                <dt>A</dt><dd>IPv4 address (e.g. 192.0.2.1)</dd>
-                <dt>AAAA</dt><dd>IPv6 address (e.g. 2001:db8::1)</dd>
-                <dt>CNAME</dt><dd>Alias to another hostname</dd>
-                <dt>MX</dt><dd>Mail server with priority</dd>
-                <dt>TXT</dt><dd>Verification / SPF / DKIM strings</dd>
+                <dt>A</dt><dd>{$hadrianLang.domains.dnsHelpA}</dd>
+                <dt>AAAA</dt><dd>{$hadrianLang.domains.dnsHelpAaaa}</dd>
+                <dt>CNAME</dt><dd>{$hadrianLang.domains.dnsHelpCname}</dd>
+                <dt>MX</dt><dd>{$hadrianLang.domains.dnsHelpMx}</dd>
+                <dt>TXT</dt><dd>{$hadrianLang.domains.dnsHelpTxt}</dd>
             </dl>
         </div>
     </aside>

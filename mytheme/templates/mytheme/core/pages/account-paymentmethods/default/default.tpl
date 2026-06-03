@@ -36,8 +36,8 @@
 <header class="page-header">
     <div class="page-header-row">
         <div style="flex:1; min-width:0;">
-            <h1>{$LANG.paymentMethods.title|default:'Payment Methods'}</h1>
-            <p class="page-subtitle">{$LANG.paymentMethods.intro|default:'Cards and bank accounts you have saved for fast checkout.'}</p>
+            <h1>{$LANG.paymentMethods.title}</h1>
+            <p class="page-subtitle">{$LANG.paymentMethods.intro}</p>
         </div>
     </div>
 </header>
@@ -50,14 +50,14 @@
                 {$message.text}
             </div>
         {/if}
-        {if !empty($createSuccess)}<div class="pm-alert pm-alert-success">{$LANG.paymentMethods.addedSuccess|default:'Payment method added.'}</div>{/if}
-        {if !empty($createFailed)}<div class="pm-alert pm-alert-warn">{$LANG.paymentMethods.addFailed|default:'Could not add the payment method.'}</div>{/if}
-        {if !empty($saveSuccess)}<div class="pm-alert pm-alert-success">{$LANG.paymentMethods.updateSuccess|default:'Payment method updated.'}</div>{/if}
-        {if !empty($saveFailed)}<div class="pm-alert pm-alert-warn">{$LANG.paymentMethods.saveFailed|default:'Could not save the changes.'}</div>{/if}
-        {if isset($setDefaultResult) && $setDefaultResult === true}<div class="pm-alert pm-alert-success">{$LANG.paymentMethods.defaultUpdateSuccess|default:'Default payment method updated.'}</div>{/if}
-        {if isset($setDefaultResult) && $setDefaultResult === false}<div class="pm-alert pm-alert-warn">{$LANG.paymentMethods.defaultUpdateFailed|default:'Could not change the default.'}</div>{/if}
-        {if isset($deleteResult) && $deleteResult === true}<div class="pm-alert pm-alert-success">{$LANG.paymentMethods.deleteSuccess|default:'Payment method removed.'}</div>{/if}
-        {if isset($deleteResult) && $deleteResult === false}<div class="pm-alert pm-alert-warn">{$LANG.paymentMethods.deleteFailed|default:'Could not remove the payment method.'}</div>{/if}
+        {if !empty($createSuccess)}<div class="pm-alert pm-alert-success">{$LANG.paymentMethods.addedSuccess}</div>{/if}
+        {if !empty($createFailed)}<div class="pm-alert pm-alert-warn">{$LANG.paymentMethods.addFailed}</div>{/if}
+        {if !empty($saveSuccess)}<div class="pm-alert pm-alert-success">{$LANG.paymentMethods.updateSuccess}</div>{/if}
+        {if !empty($saveFailed)}<div class="pm-alert pm-alert-warn">{$LANG.paymentMethods.saveFailed}</div>{/if}
+        {if isset($setDefaultResult) && $setDefaultResult === true}<div class="pm-alert pm-alert-success">{$LANG.paymentMethods.defaultUpdateSuccess}</div>{/if}
+        {if isset($setDefaultResult) && $setDefaultResult === false}<div class="pm-alert pm-alert-warn">{$LANG.paymentMethods.defaultUpdateFailed}</div>{/if}
+        {if isset($deleteResult) && $deleteResult === true}<div class="pm-alert pm-alert-success">{$LANG.paymentMethods.deleteSuccess}</div>{/if}
+        {if isset($deleteResult) && $deleteResult === false}<div class="pm-alert pm-alert-warn">{$LANG.paymentMethods.deleteFailed}</div>{/if}
 
         {assign var=pmList value=null}
         {if isset($client) && isset($client->payMethods)}{assign var=pmList value=$client->payMethods->validateGateways()}{/if}
@@ -81,8 +81,8 @@
                     <div class="pm-row-meta">
                         <div class="pm-row-title">
                             {$payMethod->payment->getDisplayName()|default:$pmType|escape}
-                            {if $pmIsDefault}<span class="pm-tag pm-tag-default">{$LANG.paymentMethods.default|default:'Default'}</span>{/if}
-                            {if $pmExpired}<span class="pm-tag pm-tag-expired">{$LANG.paymentMethods.expired|default:'Expired'}</span>{/if}
+                            {if $pmIsDefault}<span class="pm-tag pm-tag-default">{$LANG.paymentMethods.default}</span>{/if}
+                            {if $pmExpired}<span class="pm-tag pm-tag-expired">{$hadrianLang.billing.pmExpired}</span>{/if}
                         </div>
                         <div class="pm-row-sub">
                             {if $payMethod->description}{$payMethod->description|escape}{else}<span class="pm-row-status">{$payMethod->getStatus()|default:''|escape}</span>{/if}
@@ -90,13 +90,13 @@
                     </div>
                     <div class="pm-row-actions">
                         {if !$pmIsDefault && !$pmExpired}
-                            <a href="{routePath('account-paymentmethods-setdefault', $payMethod->id)}" class="pm-row-btn" data-pm-setdefault>{$LANG.paymentMethods.setAsDefault|default:'Set default'}</a>
+                            <a href="{routePath('account-paymentmethods-setdefault', $payMethod->id)}" class="pm-row-btn" data-pm-setdefault>{$LANG.paymentMethods.setAsDefault}</a>
                         {/if}
                         {if $pmType != 'RemoteBankAccount'}
-                            <a href="{routePath('account-paymentmethods-view', $payMethod->id)}" class="pm-row-btn">{$LANG.paymentMethods.edit|default:'Edit'}</a>
+                            <a href="{routePath('account-paymentmethods-view', $payMethod->id)}" class="pm-row-btn">{$LANG.paymentMethods.edit}</a>
                         {/if}
                         {if !empty($allowDelete)}
-                            <a href="{routePath('account-paymentmethods-delete', $payMethod->id)}" class="pm-row-btn pm-row-btn-danger" data-pm-delete>{$LANG.paymentMethods.delete|default:'Delete'}</a>
+                            <a href="{routePath('account-paymentmethods-delete', $payMethod->id)}" class="pm-row-btn pm-row-btn-danger" data-pm-delete>{$LANG.paymentMethods.delete}</a>
                         {/if}
                     </div>
                 </div>
@@ -108,13 +108,13 @@
             {if !empty($allowCreditCard)}
                 <a href="{routePath('account-paymentmethods-add')}" class="btn-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    {$LANG.paymentMethods.addNewCC|default:'Add new credit card'}
+                    {$LANG.paymentMethods.addNewCC}
                 </a>
             {/if}
             {if !empty($allowBankDetails)}
                 <a href="{routePathWithQuery('account-paymentmethods-add', null, 'type=bankacct')}" class="btn-secondary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3"/><path d="M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
-                    {$LANG.paymentMethods.addNewBank|default:'Add bank account'}
+                    {$LANG.paymentMethods.addNewBank}
                 </a>
             {/if}
         </div>
@@ -122,8 +122,8 @@
         {if $pmCount == 0}
         <div class="pm-empty when-empty">
             <div class="pm-empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
-            <p class="pm-empty-title">{$LANG.paymentMethods.noPaymentMethodsCreated|default:'No payment methods yet'}</p>
-            <p class="pm-empty-sub">{$LANG.paymentMethods.intro|default:'Add a card or bank account for faster checkout next time you pay an invoice.'}</p>
+            <p class="pm-empty-title">{$LANG.paymentMethods.noPaymentMethodsCreated}</p>
+            <p class="pm-empty-sub">{$LANG.paymentMethods.intro}</p>
         </div>
         {/if}
 
@@ -131,26 +131,26 @@
 
     <aside class="pm-aside">
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.accounttab|default:'Account'}</div>
+            <div class="subnav-heading">{$LANG.accounttab}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.accountdetails|default:'Account Details'}
+                {$LANG.accountdetails}
             </a>
             <a href="{routePath('account-users')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                {$LANG.usermanagement|default:'User Management'}
+                {$LANG.usermanagement}
             </a>
             <a href="{routePath('account-paymentmethods')}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                {$LANG.paymentmethods|default:'Payment Methods'}
+                {$LANG.paymentMethods.title}
             </a>
             <a href="{routePath('account-contacts')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                {$LANG.contacts|default:'Contacts'}
+                {$LANG.contacts}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=security" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                {$LANG.securitysettings|default:'Security'}
+                {$LANG.securitysettings}
             </a>
         </div>
     </aside>
@@ -161,6 +161,7 @@
    hidden POST form to its href, mirroring nexus's frmSetDefault/frmDelete approach. *}
 <form method="post" id="pmSetDefaultForm" style="display:none"><input type="hidden" name="token" value="{$token|default:''|escape}"></form>
 <form method="post" id="pmDeleteForm" style="display:none"><input type="hidden" name="token" value="{$token|default:''|escape}"></form>
+<script>var _localLang = { pmDeleteConfirm: '{$hadrianLang.billing.pmDeleteConfirm|escape:"javascript"}' };</script>
 <script>{literal}
 (function(){
     function postTo(formId, action){
@@ -178,7 +179,7 @@
     document.querySelectorAll('[data-pm-delete]').forEach(function(a){
         a.addEventListener('click', function(e){
             e.preventDefault();
-            if (!confirm('Remove this payment method? This cannot be undone.')) { return; }
+            if (!confirm(_localLang.pmDeleteConfirm)) { return; }
             postTo('pmDeleteForm', a.getAttribute('href'));
         });
     });

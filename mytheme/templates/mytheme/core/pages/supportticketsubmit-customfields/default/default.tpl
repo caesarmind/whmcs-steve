@@ -36,9 +36,9 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.supporttab|default:'Support'}</p>
-    <h1>{$LANG.supportticketsadditionalinfo|default:'Additional details'}</h1>
-    <p class="page-subtitle">{$LANG.supportticketscustomfieldsintro|default:'A few department-specific details to help us route and resolve your ticket faster.'}</p>
+    <p class="page-eyebrow">{$LANG.supporttab}</p>
+    <h1>{$hadrianLang.support.additionalInfoTitle}</h1>
+    <p class="page-subtitle">{$hadrianLang.support.customFieldsIntro}</p>
 </header>
 
 <div class="tk-wrap">
@@ -72,9 +72,9 @@
                 <div class="tk-empty-ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 </div>
-                <p class="tk-empty-title">{$LANG.supportticketsnocustomfields|default:'No additional fields'}</p>
-                <p class="tk-empty-sub">{$LANG.supportticketsnocustomfieldssub|default:'This department has no extra fields. Continue with your ticket.'}</p>
-                <a href="{$WEB_ROOT}/submitticket.php" class="btn-primary">{$LANG.opennewticket|default:'Open a ticket'}</a>
+                <p class="tk-empty-title">{$hadrianLang.support.noCustomFieldsTitle}</p>
+                <p class="tk-empty-sub">{$hadrianLang.support.noCustomFieldsSub}</p>
+                <a href="{$WEB_ROOT}/submitticket.php" class="btn-primary">{$LANG.opennewticket}</a>
             </div>
         </div>
     </div>

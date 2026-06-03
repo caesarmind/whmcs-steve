@@ -46,9 +46,9 @@
 </script>
 
 <header class="page-header">
-    <p class="eyebrow">{$LANG.accounttab|default:'Account'}</p>
-    <h1>{$LANG.emailstitle|default:'Email history'}</h1>
-    <p class="page-subtitle">{$LANG.emailsintro|default:'Messages we have sent to your account email address.'}</p>
+    <p class="eyebrow">{$LANG.accounttab}</p>
+    <h1>{$LANG.emailstitle}</h1>
+    <p class="page-subtitle">{$hadrianLang.account.emailsIntro}</p>
 </header>
 
 <div class="em-split">
@@ -59,7 +59,7 @@
             <div class="em-toolbar">
                 <div class="em-search">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="search" id="emSearch" placeholder="{$LANG.search|default:'Search'}…" autocomplete="off" aria-label="{$LANG.search|default:'Search'}">
+                    <input type="search" id="emSearch" placeholder="{$LANG.search}…" autocomplete="off" aria-label="{$LANG.search}">
                 </div>
             </div>
             {/if}
@@ -68,11 +68,11 @@
                     <thead>
                         <tr>
                             {if !$mtAjaxTables}
-                            <th><button type="button" class="em-sort" data-sort="date" data-dir="">{$LANG.clientareaemailsdate|default:'Date Sent'} <span class="em-sort-ico"></span></button></th>
-                            <th><button type="button" class="em-sort" data-sort="subject" data-dir="">{$LANG.clientareaemailssubject|default:'Message Subject'} <span class="em-sort-ico"></span></button></th>
+                            <th><button type="button" class="em-sort" data-sort="date" data-dir="">{$LANG.clientareaemailsdate} <span class="em-sort-ico"></span></button></th>
+                            <th><button type="button" class="em-sort" data-sort="subject" data-dir="">{$LANG.clientareaemailssubject} <span class="em-sort-ico"></span></button></th>
                             {else}
-                            <th>{$LANG.clientareaemailsdate|default:'Date Sent'}</th>
-                            <th>{$LANG.clientareaemailssubject|default:'Message Subject'}</th>
+                            <th>{$LANG.clientareaemailsdate}</th>
+                            <th>{$LANG.clientareaemailssubject}</th>
                             {/if}
                         </tr>
                     </thead>
@@ -95,7 +95,7 @@
             </div>
             {if $mtAjaxTables}
             <div class="mt-dt-foot">
-                <span class="mt-dt-search"><input type="search" placeholder="{$LANG.search|default:'Search'}…" aria-label="{$LANG.search|default:'Search'}" data-mt-search data-mt-for="emTable"></span>
+                <span class="mt-dt-search"><input type="search" placeholder="{$LANG.search}…" aria-label="{$LANG.search}" data-mt-search data-mt-for="emTable"></span>
                 <span class="spacer"></span>
                 <span data-dt-info data-mt-for="emTable"></span>
                 <div data-dt-pager data-mt-for="emTable"></div>
@@ -103,13 +103,13 @@
             {else}
             <div class="em-footer">
                 <div class="em-page-size">
-                    {$LANG.show|default:'Show'}
-                    <select id="emLength" aria-label="{$LANG.show|default:'Show'} {$LANG.entries|default:'entries'}">
+                    {$hadrianLang.account.showEntries}
+                    <select id="emLength" aria-label="{$hadrianLang.account.showEntriesAria}">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>
                     </select>
-                    {$LANG.entries|default:'entries'}
+                    {$hadrianLang.account.entries}
                 </div>
                 <div class="spacer"></div>
                 <span class="em-info" id="emInfo"></span>
@@ -126,9 +126,9 @@
                     <div class="em-empty-ico">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
                     </div>
-                    <p class="em-empty-title">{$LANG.clientareaemailsnonetitle|default:'No emails yet'}</p>
-                    <p class="em-empty-sub">{$LANG.clientareaemailsnone|default:'Messages we send to your account email will be listed here.'}</p>
-                    <a href="{$WEB_ROOT}/clientarea.php?action=details" class="btn-primary">{$LANG.accountdetails|default:'Account details'}</a>
+                    <p class="em-empty-title">{$hadrianLang.account.emailsEmptyTitle}</p>
+                    <p class="em-empty-sub">{$hadrianLang.account.emailsEmptySub}</p>
+                    <a href="{$WEB_ROOT}/clientarea.php?action=details" class="btn-primary">{$LANG.accountdetails}</a>
                 </div>
             </div>
         </div>
@@ -137,28 +137,36 @@
 
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.accounttab|default:'Account'}</div>
+            <div class="subnav-heading">{$LANG.accounttab}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.accountdetails|default:'Account Details'}
+                {$LANG.accountdetails}
             </a>
             <a href="{routePath('account-contacts')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.contacts|default:'Contacts'}
+                {$LANG.contacts}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=emails" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
-                {$LANG.emailstitle|default:'Email History'}
+                {$LANG.emailstitle}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=security" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                {$LANG.security|default:'Security'}
+                {$LANG.security}
             </a>
         </div>
     </aside>
 </div>
 
 {if $hasEmails && !$mtAjaxTables}
+<script>
+var _localLang = {
+    'dtShowing': '{$hadrianLang.account.dtShowing|escape:"javascript"}',
+    'dtOf': '{$hadrianLang.account.dtOf|escape:"javascript"}',
+    'dtNoMatch': '{$hadrianLang.account.dtNoMatch|escape:"javascript"}',
+    'dtFiltered': '{$hadrianLang.account.dtFiltered|escape:"javascript"}'
+};
+</script>
 <script>
 {literal}
 (function () {
@@ -172,7 +180,7 @@
     var lengthSel = document.getElementById('emLength');
     var info = document.getElementById('emInfo');
     var pagesEl = document.getElementById('emPages');
-    var L = { showing: 'Showing', to: '–', of: 'of', none: 'No matching emails', filtered: 'filtered from' };
+    var L = { showing: _localLang.dtShowing, to: '–', of: _localLang.dtOf, none: _localLang.dtNoMatch, filtered: _localLang.dtFiltered };
 
     var state = { q: '', pageSize: 10, page: 1, sortKey: '', sortDir: '' };
 

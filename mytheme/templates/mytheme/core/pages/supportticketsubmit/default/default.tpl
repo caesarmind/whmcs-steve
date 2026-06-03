@@ -42,8 +42,8 @@
 </script>
 
 <header class="page-header">
-    <h1>{$LANG.opennewticket|default:'Open a ticket'}</h1>
-    <p class="page-subtitle">{$LANG.submitticketsub|default:'Tell us what you need help with — our team will reply by email.'}</p>
+    <h1>{$LANG.opennewticket}</h1>
+    <p class="page-subtitle">{$hadrianLang.support.submitSub}</p>
 </header>
 
 <div class="tk-split">
@@ -51,26 +51,26 @@
     {* ══ LEFT: Support sub-nav ══ *}
     <aside class="tk-aside">
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.supporttab|default:'Support'}</div>
+            <div class="subnav-heading">{$LANG.supporttab}</div>
             <a href="{$WEB_ROOT}/supporttickets.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                {$LANG.mytickets|default:'My tickets'}
+                {$hadrianLang.support.myTickets}
             </a>
             <a href="{$WEB_ROOT}/submitticket.php" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                {$LANG.opennewticket|default:'Open a ticket'}
+                {$LANG.opennewticket}
             </a>
             <a href="{$WEB_ROOT}/announcements.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-                {$LANG.announcementstitle|default:'Announcements'}
+                {$LANG.announcementstitle}
             </a>
             <a href="{$WEB_ROOT}/knowledgebase.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-                {$LANG.knowledgebasetitle|default:'Knowledgebase'}
+                {$LANG.knowledgebasetitle}
             </a>
             <a href="{$WEB_ROOT}/serverstatus.php" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/></svg>
-                {$LANG.networkstatus|default:'Network status'}
+                {$LANG.networkstatus}
             </a>
         </div>
     </aside>
@@ -89,9 +89,9 @@
         {* ── STEP 1: Department picker ── *}
         <div class="card">
             <div class="tk-intro">
-                <p class="tk-step">{$LANG.step1of2|default:'Step 1 of 2'}</p>
-                <h2>{$LANG.choosedepartment|default:'Choose a department'}</h2>
-                <p>{$LANG.choosedepartmentsub|default:'Pick the team best suited to help — your message reaches them directly.'}</p>
+                <p class="tk-step">{$hadrianLang.support.step1of2}</p>
+                <h2>{$hadrianLang.support.chooseDepartment}</h2>
+                <p>{$hadrianLang.support.chooseDepartmentSub}</p>
             </div>
             <form method="post" action="{$WEB_ROOT}/submitticket.php?step=2">
                 <input type="hidden" name="step" value="2">
@@ -124,8 +124,8 @@
                     {/foreach}
                 </div>
                 <div class="tk-form-foot">
-                    <a href="{$WEB_ROOT}/supporttickets.php" class="btn-secondary">{$LANG.cancel|default:'Cancel'}</a>
-                    <button type="submit" class="btn-primary">{$LANG.continue|default:'Continue'}</button>
+                    <a href="{$WEB_ROOT}/supporttickets.php" class="btn-secondary">{$LANG.cancel}</a>
+                    <button type="submit" class="btn-primary">{$LANG.continue}</button>
                 </div>
             </form>
         </div>
@@ -133,10 +133,10 @@
         {* ── STEP 2: Subject / message / attachments ── *}
         <div class="card">
             <div class="tk-intro">
-                <p class="tk-step">{$LANG.step2of2|default:'Step 2 of 2'}</p>
-                <h2>{$LANG.ticketdetails|default:'Ticket details'}</h2>
+                <p class="tk-step">{$hadrianLang.support.step2of2}</p>
+                <h2>{$hadrianLang.support.ticketDetails}</h2>
                 {if $chosenDeptName}
-                <p>{$LANG.replyingto|default:'Replying via'} <strong>{$chosenDeptName}</strong></p>
+                <p>{$hadrianLang.support.replyingVia} <strong>{$chosenDeptName}</strong></p>
                 {/if}
             </div>
             <form method="post" action="{$WEB_ROOT}/submitticket.php?step=3" enctype="multipart/form-data" class="tk-submit-form">
@@ -147,35 +147,35 @@
                 {if !$loggedin}
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="tk-name">{$LANG.clientareafirstname|default:'Your name'}</label>
+                        <label class="form-label" for="tk-name">{$LANG.clientareafirstname}</label>
                         <input type="text" class="form-input" id="tk-name" name="name" value="{$name|default:''|escape}" autocomplete="name" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="tk-email">{$LANG.clientareaemail|default:'Email address'}</label>
+                        <label class="form-label" for="tk-email">{$LANG.clientareaemail}</label>
                         <input type="email" class="form-input" id="tk-email" name="email" value="{$email|default:''|escape}" autocomplete="email" required>
                     </div>
                 </div>
                 {/if}
 
                 <div class="form-group">
-                    <label class="form-label" for="tk-subject">{$LANG.supportticketssubject|default:'Subject'}</label>
+                    <label class="form-label" for="tk-subject">{$LANG.supportticketsticketsubject}</label>
                     <input type="text" class="form-input" id="tk-subject" name="subject" value="{$subject|default:''|escape}" required>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="tk-priority">{$LANG.supportticketspriority|default:'Priority'}</label>
+                        <label class="form-label" for="tk-priority">{$LANG.supportticketspriority}</label>
                         <select class="form-select" id="tk-priority" name="urgency">
-                            <option value="Low"{if isset($urgency) && $urgency == 'Low'} selected{/if}>{$LANG.supportticketsticketurgencylow|default:'Low'}</option>
-                            <option value="Medium"{if !isset($urgency) || $urgency == 'Medium'} selected{/if}>{$LANG.supportticketsticketurgencymedium|default:'Medium'}</option>
-                            <option value="High"{if isset($urgency) && $urgency == 'High'} selected{/if}>{$LANG.supportticketsticketurgencyhigh|default:'High'}</option>
+                            <option value="Low"{if isset($urgency) && $urgency == 'Low'} selected{/if}>{$LANG.supportticketsticketurgencylow}</option>
+                            <option value="Medium"{if !isset($urgency) || $urgency == 'Medium'} selected{/if}>{$LANG.supportticketsticketurgencymedium}</option>
+                            <option value="High"{if isset($urgency) && $urgency == 'High'} selected{/if}>{$LANG.supportticketsticketurgencyhigh}</option>
                         </select>
                     </div>
                     {if isset($relatedservices) && $relatedservices|@count > 0}
                     <div class="form-group">
-                        <label class="form-label" for="tk-service">{$LANG.relatedservice|default:'Related service'} <span style="opacity:0.5; font-weight:400;">({$LANG.optional|default:'optional'})</span></label>
+                        <label class="form-label" for="tk-service">{$LANG.relatedservice} <span style="opacity:0.5; font-weight:400;">({$hadrianLang.support.optional})</span></label>
                         <select class="form-select" id="tk-service" name="relatedservice">
-                            <option value="">{$LANG.none|default:'None'}</option>
+                            <option value="">{$LANG.none}</option>
                             {foreach from=$relatedservices item=relatedservice}
                             <option value="{$relatedservice.id}"{if isset($selectedservice) && $selectedservice == $relatedservice.id} selected{/if}>{if $relatedservice.groupName}{$relatedservice.groupName} - {/if}{$relatedservice.name}{if isset($relatedservice.status) && $relatedservice.status} ({$relatedservice.status}){/if}</option>
                             {/foreach}
@@ -185,7 +185,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="tk-message">{$LANG.contactmessage|default:'Message'}</label>
+                    <label class="form-label" for="tk-message">{$LANG.contactmessage}</label>
                     <textarea class="form-input tk-message-area" id="tk-message" name="message" rows="9" required>{$message|default:''|escape}</textarea>
                 </div>
 
@@ -207,26 +207,26 @@
                 {/if}
 
                 <div class="form-group tk-attach-group">
-                    <span class="form-label">{$LANG.supportticketsticketattachments|default:'Attachments'} <span style="opacity:0.5; font-weight:400;">({$LANG.optional|default:'optional'})</span></span>
+                    <span class="form-label">{$LANG.supportticketsticketattachments} <span style="opacity:0.5; font-weight:400;">({$hadrianLang.support.optional})</span></span>
                     <div class="tk-attach-rows" id="tk-attach-rows">
                         <div class="tk-attach-row">
                             <label class="tk-drop">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-                                <span class="tk-drop-label">{$LANG.addattachments|default:'Choose a file…'}</span>
+                                <span class="tk-drop-label">{$LANG.chooseFile}</span>
                                 <input type="file" name="attachments[]">
                             </label>
-                            <button type="button" class="tk-attach-remove" aria-label="{$LANG.orderForm.remove|default:'Remove'}" hidden>
+                            <button type="button" class="tk-attach-remove" aria-label="{$LANG.orderForm.remove}" hidden>
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                             </button>
                         </div>
                     </div>
                     <button type="button" class="tk-attach-add" id="tk-attach-add">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        {$LANG.addmore|default:'Add another file'}
+                        {$LANG.addmore}
                     </button>
                     <div class="tk-drop-hint">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                        {if isset($allowedfiletypes) && $allowedfiletypes}{$LANG.supportticketsallowedextensions|default:'Allowed extensions'}: {$allowedfiletypes}{if isset($uploadMaxFileSize) && $uploadMaxFileSize} &middot; {lang key="maxFileSize" fileSize=$uploadMaxFileSize}{/if}{else}{$LANG.attachmentsallowed|default:'Allowed: .jpg, .gif, .jpeg, .png, .txt, .pdf · Max 64MB'}{/if}
+                        {if isset($allowedfiletypes) && $allowedfiletypes}{$LANG.supportticketsallowedextensions}: {$allowedfiletypes}{if isset($uploadMaxFileSize) && $uploadMaxFileSize} &middot; {lang key="maxFileSize" fileSize=$uploadMaxFileSize}{/if}{else}{$hadrianLang.support.attachmentsAllowedFallback}{/if}
                     </div>
                 </div>
                 {literal}
@@ -313,8 +313,8 @@
                 {/if}
 
                 <div class="tk-form-foot">
-                    <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.back|default:'Back'}</a>
-                    <button type="submit" class="btn-primary{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.submitticket|default:'Submit ticket'}</button>
+                    <a href="{$WEB_ROOT}/submitticket.php" class="btn-secondary">{$LANG.back}</a>
+                    <button type="submit" class="btn-primary{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.supportticketsticketsubmit}</button>
                 </div>
             </form>
         </div>
@@ -329,9 +329,9 @@
                 <div class="tk-empty-ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 </div>
-                <p class="tk-empty-title">{$LANG.nodepartments|default:'No departments available'}</p>
-                <p class="tk-empty-sub">{$LANG.nodepartmentssub|default:'No support departments have been configured. Please contact the site administrator.'}</p>
-                <a href="{$WEB_ROOT}/contact.php" class="btn-secondary">{$LANG.contactus|default:'Contact us'}</a>
+                <p class="tk-empty-title">{$hadrianLang.support.noDepartmentsTitle}</p>
+                <p class="tk-empty-sub">{$hadrianLang.support.noDepartmentsSub}</p>
+                <a href="{$WEB_ROOT}/contact.php" class="btn-secondary">{$LANG.contactus}</a>
             </div>
         </div>
     </div>

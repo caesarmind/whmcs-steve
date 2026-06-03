@@ -19,8 +19,8 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.supporttab|default:'Support'}</p>
-    <h1>{$LANG.supportticketsticketcreated|default:'Ticket created'}</h1>
+    <p class="page-eyebrow">{$LANG.supporttab}</p>
+    <h1>{$LANG.supportticketsticketcreated}</h1>
 </header>
 
 <div class="card tk-wrap" style="margin: 0 auto;">
@@ -28,12 +28,12 @@
         <div class="tk-notice-ico ok">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <p class="tk-notice-title">{$LANG.supportticketsticketcreated|default:'Ticket created'}{if $tkTid} #{$tkTid|escape}{/if}</p>
-        <p class="tk-notice-sub">{$LANG.supportticketsticketcreateddesc|default:'Your ticket has been submitted. Our team will reply by email and you can follow the conversation in your client area.'}</p>
+        <p class="tk-notice-title">{$LANG.supportticketsticketcreated}{if $tkTid} #{$tkTid|escape}{/if}</p>
+        <p class="tk-notice-sub">{$LANG.supportticketsticketcreateddesc}</p>
         {if $tkTid}
-        <a href="{$WEB_ROOT}/viewticket.php?tid={$tkTid|escape}{if isset($c)}&amp;c={$c|escape}{/if}" class="btn-primary">{$LANG.viewticket|default:'View ticket'}</a>
+        <a href="{$WEB_ROOT}/viewticket.php?tid={$tkTid|escape}{if isset($c)}&amp;c={$c|escape}{/if}" class="btn-primary">{$hadrianLang.support.viewTicketBtn}</a>
         {else}
-        <a href="{$WEB_ROOT}/supporttickets.php" class="btn-primary">{$LANG.mytickets|default:'My tickets'}</a>
+        <a href="{$WEB_ROOT}/supporttickets.php" class="btn-primary">{$hadrianLang.support.myTickets}</a>
         {/if}
     </div>
 </div>

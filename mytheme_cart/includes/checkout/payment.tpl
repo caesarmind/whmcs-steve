@@ -21,7 +21,7 @@
 
 <div class="co-payment-card">
 <div class="sub-heading">
-    <span class="primary-bg-color">{$LANG.orderpaymentmethod|default:'Payment method'}</span>
+    <span class="primary-bg-color">{$LANG.orderpaymentmethod}</span>
 </div>
 
 <div class="alert alert-success text-center large-text" role="alert" id="totalDueToday">
@@ -84,15 +84,15 @@
                         <span class="co-pay-name">{$gateway.name|escape}</span>
                         <span class="co-pay-sub">
                             {if $gatewayKey|strstr:"stripe" || $gatewayNameLower|strstr:"stripe"}
-                                Cards are processed securely by Stripe.
+                                {$hadrianLang.cart.gatewaySubStripe}
                             {elseif $gateway.type eq "CC"}
-                                Visa &middot; Mastercard &middot; Amex — processed securely.
+                                {$hadrianLang.cart.gatewaySubCard}
                             {elseif $gatewayKey|strstr:"paypal" || $gatewayNameLower|strstr:"paypal"}
-                                You'll be redirected to authorise the charge.
+                                {$hadrianLang.cart.gatewaySubPaypal}
                             {elseif $gatewayKey|strstr:"bank" || $gatewayNameLower|strstr:"bank" || $gatewayKey|strstr:"ach" || $gatewayNameLower|strstr:"ach"}
-                                Direct debit or bank transfer, depending on gateway setup.
+                                {$hadrianLang.cart.gatewaySubBank}
                             {else}
-                                Pay securely using this gateway.
+                                {$hadrianLang.cart.gatewaySubGeneric}
                             {/if}
                         </span>
                     </span>

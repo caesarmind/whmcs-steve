@@ -15,7 +15,7 @@
     {if $_capPageJs}<script>{$_capPageJs}</script>{/if}
 {else}
     {* WHMCS built-in image CAPTCHA — distorted-text image + the answer box. *}
-    <p class="mt-captcha-verify">{$LANG.captchaverify|default:'Type the characters shown in the image'}</p>
+    <p class="mt-captcha-verify">{$LANG.captchaverify}</p>
     <img class="mt-captcha-img" src="{$WEB_ROOT}/includes/verifyimage.php" alt="CAPTCHA">
     <input class="mt-captcha-code" type="text" name="code" maxlength="6" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" required>
 {/if}

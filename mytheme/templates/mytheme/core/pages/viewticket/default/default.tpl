@@ -57,9 +57,9 @@
        that path triggers "An invalid request was made". *}
     <a href="{$WEB_ROOT}/viewticket.php?tid={$tid|escape}{if isset($c) && $c}&c={$c|escape}{/if}&closeticket=true"
        class="tk-close-btn"
-       onclick="return confirm('{$LANG.confirmcloseticket|default:'Close this ticket?'}');">
+       onclick="return confirm('{$LANG.confirmcloseticket}');">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-        {$LANG.supportticketsclose|default:'Close Ticket'}
+        {$LANG.supportticketsclose}
     </a>
     {/if}
 </header>
@@ -73,7 +73,7 @@
            WHMCS keeps the original post in $message (separate from $replies),
            so we render it as the first client bubble before iterating replies. *}
         <div>
-            <h2 class="tk-section-title">{$LANG.conversation|default:'Conversation'}</h2>
+            <h2 class="tk-section-title">{$hadrianLang.support.conversation}</h2>
             <div class="card tk-thread-card">
                 <div class="thread">
                     {* The whole conversation — the opening post AND every reply —
@@ -97,7 +97,7 @@
                                 {if isset($reply.attachments) && $reply.attachments|@count > 0}
                                 <div class="thread-attachments">
                                     {if isset($reply.attachments_removed) && $reply.attachments_removed}
-                                    <p class="thread-att-removed">{$LANG.attachmentsremoved|default:'Attachments were removed.'}</p>
+                                    <p class="thread-att-removed">{$LANG.support.attachmentsRemoved}</p>
                                     {/if}
                                     {foreach from=$reply.attachments key=anum item=attachment}
                                     {if isset($reply.attachments_removed) && $reply.attachments_removed}
@@ -109,7 +109,7 @@
                                     <a href="{$WEB_ROOT}/dl.php?type={if $reply.id}ar&id={$reply.id|escape}{else}a&id={$id|escape}{/if}&i={$anum}" class="thread-att">
                                         <div class="thread-att-ico">{$attachment|default:''|substr:-3|upper|escape}</div>
                                         <div class="thread-att-meta"><div class="thread-att-name">{$attachment|escape}</div></div>
-                                        <div class="thread-att-dl" aria-label="{$LANG.download|default:'Download'}">
+                                        <div class="thread-att-dl" aria-label="{$LANG.download}">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                                         </div>
                                     </a>
@@ -122,7 +122,7 @@
                         </div>
                         {/foreach}
                     {else}
-                    <div class="thread-empty">{$LANG.noticketreplies|default:'No conversation yet — be the first to reply.'}</div>
+                    <div class="thread-empty">{$hadrianLang.support.noTicketReplies}</div>
                     {/if}
                 </div>
             </div>
@@ -131,12 +131,12 @@
         {* Ticket Settings card with tabs *}
         {if $tktStatusLower != 'closed'}
         <div>
-            <h2 class="tk-section-title">{$LANG.ticketsettings|default:'Ticket Settings'}</h2>
+            <h2 class="tk-section-title">{$hadrianLang.support.ticketSettings}</h2>
             <div class="card" style="padding: 0;">
                 <div class="tk-tabs" role="tablist">
                     <button type="button" class="tk-tab active" data-tab="reply" role="tab" aria-selected="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 00-4-4H4"/></svg>
-                        {$LANG.supportticketsreply|default:'Reply'}
+                        {$LANG.supportticketsreply}
                     </button>
                 </div>
 
@@ -155,7 +155,7 @@
                     <form method="post" action="{$WEB_ROOT}/viewticket.php?tid={$tid|escape}{if isset($c) && $c}&c={$c|escape}{/if}&postreply=true" enctype="multipart/form-data">
                         <input type="hidden" name="token" value="{$token|default:''|escape}">
                         <div class="tk-editor">
-                            <textarea class="tk-editor-area" name="replymessage" placeholder="{$LANG.writeyourreply|default:'Write your reply…'}" required></textarea>
+                            <textarea class="tk-editor-area" name="replymessage" placeholder="{$hadrianLang.support.writeYourReply}" required></textarea>
                         </div>
 
                         <div class="tk-attach-group">
@@ -163,21 +163,21 @@
                                 <div class="tk-attach-row">
                                     <label class="tk-drop">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-                                        <span class="tk-drop-label">{$LANG.addattachments|default:'Choose a file…'}</span>
+                                        <span class="tk-drop-label">{$LANG.chooseFile}</span>
                                         <input type="file" name="attachments[]">
                                     </label>
-                                    <button type="button" class="tk-attach-remove" aria-label="{$LANG.orderForm.remove|default:'Remove'}" hidden>
+                                    <button type="button" class="tk-attach-remove" aria-label="{$LANG.orderForm.remove}" hidden>
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                     </button>
                                 </div>
                             </div>
                             <button type="button" class="tk-attach-add" id="tk-attach-add">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                {$LANG.addmore|default:'Add another file'}
+                                {$LANG.addmore}
                             </button>
                             <div class="tk-drop-hint">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                                {if isset($allowedfiletypes) && $allowedfiletypes}{$LANG.supportticketsallowedextensions|default:'Allowed extensions'}: {$allowedfiletypes}{if isset($uploadMaxFileSize) && $uploadMaxFileSize} &middot; {lang key="maxFileSize" fileSize=$uploadMaxFileSize}{/if}{else}{$LANG.attachmentsallowed|default:'Allowed extensions: .jpg, .gif, .jpeg, .png, .txt, .pdf · Max file size: 64MB'}{/if}
+                                {if isset($allowedfiletypes) && $allowedfiletypes}{$LANG.supportticketsallowedextensions}: {$allowedfiletypes}{if isset($uploadMaxFileSize) && $uploadMaxFileSize} &middot; {lang key="maxFileSize" fileSize=$uploadMaxFileSize}{/if}{else}{$hadrianLang.support.attachmentsAllowedFallback}{/if}
                             </div>
                         </div>
                         {literal}
@@ -246,8 +246,8 @@
                         {/literal}
 
                         <div class="tk-reply-foot">
-                            <button type="submit" name="save" value="1" class="btn-primary">{$LANG.sendmessage|default:'Send Message'}</button>
-                            <a href="{$WEB_ROOT}/supporttickets.php" class="btn-secondary">{$LANG.cancel|default:'Cancel'}</a>
+                            <button type="submit" name="save" value="1" class="btn-primary">{$hadrianLang.support.sendMessage}</button>
+                            <a href="{$WEB_ROOT}/supporttickets.php" class="btn-secondary">{$LANG.cancel}</a>
                         </div>
                     </form>
                 </div>
@@ -260,12 +260,12 @@
     {* ══ RIGHT: Ticket information ══ *}
     <aside class="tk-view-aside">
         <div>
-            <h2 class="tk-section-title">{$LANG.ticketinformation|default:'Ticket Information'}</h2>
+            <h2 class="tk-section-title">{$LANG.ticketinfo}</h2>
             <div class="card tk-info-card">
                 <div class="tk-info-row">
                     <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
                     <div class="tk-info-body">
-                        <div class="tk-info-label">{$LANG.supportticketsstatus|default:'Status'}</div>
+                        <div class="tk-info-label">{$LANG.supportticketsstatus}</div>
                         <div class="tk-info-value"><span class="status-pill {$tktStatusLower}">{$tktStatusText|escape}</span></div>
                     </div>
                 </div>
@@ -273,7 +273,7 @@
                 <div class="tk-info-row">
                     <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
                     <div class="tk-info-body">
-                        <div class="tk-info-label">{$LANG.requestor|default:'Requestor'}</div>
+                        <div class="tk-info-label">{$hadrianLang.support.requestor}</div>
                         <div class="tk-info-value">
                             <div class="tk-info-user">
                                 <div class="tk-info-avatar">{$clientsdetails.firstname|default:'?'|escape|substr:0:1|upper}</div>
@@ -289,7 +289,7 @@
                 <div class="tk-info-row">
                     <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
                     <div class="tk-info-body">
-                        <div class="tk-info-label">{$LANG.supportticketsdepartment|default:'Department'}</div>
+                        <div class="tk-info-label">{$LANG.supportticketsdepartment}</div>
                         <div class="tk-info-value">{$department|escape}</div>
                     </div>
                 </div>
@@ -298,7 +298,7 @@
                 <div class="tk-info-row">
                     <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
                     <div class="tk-info-body">
-                        <div class="tk-info-label">{$LANG.supportticketssubmitted|default:'Submitted'}</div>
+                        <div class="tk-info-label">{$LANG.supportticketssubmitted}</div>
                         <div class="tk-info-value">{$date|escape}</div>
                     </div>
                 </div>
@@ -307,7 +307,7 @@
                 <div class="tk-info-row">
                     <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
                     <div class="tk-info-body">
-                        <div class="tk-info-label">{$LANG.supportticketslastupdated|default:'Last Updated'}</div>
+                        <div class="tk-info-label">{$LANG.supportticketsticketlastupdated}</div>
                         <div class="tk-info-value">{$lastreply|escape}</div>
                     </div>
                 </div>
@@ -316,7 +316,7 @@
                 <div class="tk-info-row">
                     <div class="tk-info-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
                     <div class="tk-info-body">
-                        <div class="tk-info-label">{$LANG.supportticketspriority|default:'Priority'}</div>
+                        <div class="tk-info-label">{$LANG.supportticketspriority}</div>
                         <div class="tk-info-value"><span class="tk-prio-pill {$tktPriorityLower}">{$priority|escape}</span></div>
                     </div>
                 </div>
@@ -332,7 +332,7 @@
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
     </div>
-    <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">{$LANG.ticketnotavailable|default:'Ticket not available'}</p>
-    <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">{$LANG.ticketnotavailablesub|default:'This ticket may be closed, archived, or no longer accessible.'}</p>
-    <a href="{$WEB_ROOT}/supporttickets.php" class="btn-primary">{$LANG.alltickets|default:'All tickets'}</a>
+    <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">{$hadrianLang.support.ticketNotAvailableTitle}</p>
+    <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">{$hadrianLang.support.ticketNotAvailableSub}</p>
+    <a href="{$WEB_ROOT}/supporttickets.php" class="btn-primary">{$hadrianLang.support.allTickets}</a>
 </div>

@@ -19,8 +19,8 @@
 </script>
 
 <header class="page-header">
-    <h1>{$LANG.affiliatestitle|default:'Affiliates'}</h1>
-    <p class="page-subtitle">{$LANG.affiliatessub|default:'Earn commission for every customer you refer to Hostnodes.'}</p>
+    <h1>{$LANG.affiliatestitle}</h1>
+    <p class="page-subtitle">{$hadrianLang.account.affiliatesSub}</p>
 </header>
 
 {if $affEnabled}
@@ -28,27 +28,27 @@
     <div class="aff-signup-ico">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 7.65l.77.78L12 21l7.65-8.99.77-.78a5.4 5.4 0 000-7.65z"/></svg>
     </div>
-    <h2 class="aff-signup-title">{$LANG.affiliatesignuptitle|default:'Become a Hostnodes affiliate'}</h2>
-    <p class="aff-signup-intro">{$LANG.affiliatesignupintro|default:'Join the affiliate program and earn commission for every customer you send our way. It is free to join and takes one click to activate.'}</p>
+    <h2 class="aff-signup-title">{$LANG.affiliatesignuptitle}</h2>
+    <p class="aff-signup-intro">{$LANG.affiliatesignupintro}</p>
 
     <ul class="aff-benefits">
         <li>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>{$LANG.affiliatesignupinfo1|default:'Earn commission on every referred sale'}</span>
+            <span>{$LANG.affiliatesignupinfo1}</span>
         </li>
         <li>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>{$LANG.affiliatesignupinfo2|default:'Track your clicks, signups and conversion rate in real time'}</span>
+            <span>{$LANG.affiliatesignupinfo2}</span>
         </li>
         <li>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>{$LANG.affiliatesignupinfo3|default:'Request a payout once you reach the minimum balance'}</span>
+            <span>{$LANG.affiliatesignupinfo3}</span>
         </li>
     </ul>
 
     <form method="post" action="{$WEB_ROOT}/affiliates.php" class="aff-signup-form">
         <input type="hidden" name="activate" value="true">
-        <button type="submit" class="btn-primary aff-signup-btn">{$LANG.affiliatesactivate|default:'Activate affiliate account'}</button>
+        <button type="submit" class="btn-primary aff-signup-btn">{$LANG.affiliatesactivate}</button>
     </form>
 </div>
 {else}
@@ -57,8 +57,8 @@
         <div class="aff-disabled-ico">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         </div>
-        <p class="aff-disabled-title">{$LANG.affiliatesdisabled|default:'The affiliate program is currently unavailable'}</p>
-        <p class="aff-disabled-sub">{$LANG.affiliatesdisabledsub|default:'Please check back later or contact support if you believe this is an error.'}</p>
+        <p class="aff-disabled-title">{$LANG.affiliatesdisabled}</p>
+        <p class="aff-disabled-sub">{$hadrianLang.account.affiliatesDisabledSub}</p>
     </div>
 </div>
 {/if}

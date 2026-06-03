@@ -31,23 +31,23 @@
 </script>
 
 <header class="page-header">
-    <p class="page-eyebrow">{$LANG.clientareaservices|default:'Services'}</p>
-    <h1>{$LANG.upgradeconfigure|default:'Configure upgrade'}</h1>
-    <p class="page-subtitle">{$LANG.upgradeconfigureintro|default:'Pick your new plan and review the prorated amount before confirming.'}</p>
+    <p class="page-eyebrow">{$LANG.clientareaservices}</p>
+    <h1>{$LANG.upgradeconfigure}</h1>
+    <p class="page-subtitle">{$hadrianLang.services.upgradeConfigureIntro}</p>
 </header>
 
 {if $ucFull}
 <div class="when-full">
 
     <div class="card">
-        <div class="card-header"><h2 class="card-title">{$LANG.upgradenewconfig|default:'Choose your new plan'}</h2></div>
+        <div class="card-header"><h2 class="card-title">{$LANG.upgradenewconfig}</h2></div>
         <div class="card-body">
             <div class="plan-cards">
                 {if $ucDemo}
                     <label class="plan-card current" data-selectable>
                         <input type="radio" name="uc_plan" value="pro" hidden>
                         <span class="plan-radio"></span>
-                        <span class="plan-info"><span class="plan-name">Pro <span class="plan-badge">{$LANG.upgradecurrentconfig|default:'Current'}</span></span><span class="plan-features">100 GB SSD, 2 TB bandwidth</span></span>
+                        <span class="plan-info"><span class="plan-name">Pro <span class="plan-badge">{$LANG.upgradecurrentconfig}</span></span><span class="plan-features">100 GB SSD, 2 TB bandwidth</span></span>
                         <span class="plan-price">$20.33<span class="plan-price-period">/mo</span></span>
                     </label>
                     <label class="plan-card selected" data-selectable>
@@ -78,19 +78,19 @@
 
     {if $ucDemo}
     <div class="card">
-        <div class="card-header"><h2 class="card-title">{$LANG.ordersummary|default:'Upgrade summary'}</h2></div>
+        <div class="card-header"><h2 class="card-title">{$LANG.ordersummary}</h2></div>
         <div class="card-body">
-            <div class="summary-row"><span>{$LANG.upgradecurrentconfig|default:'Current plan'}</span><span>Pro ($20.33/mo)</span></div>
-            <div class="summary-row"><span>{$LANG.upgradenewconfig|default:'New plan'}</span><span>Business ($41.58/mo)</span></div>
-            <div class="summary-row"><span>{$LANG.proratedcredit|default:'Prorated credit'}</span><span class="summary-credit">-$12.50</span></div>
-            <div class="summary-row total"><span>{$LANG.ordertotalduetoday|default:'Amount due today'}</span><span>$29.08</span></div>
+            <div class="summary-row"><span>{$LANG.upgradecurrentconfig}</span><span>Pro ($20.33/mo)</span></div>
+            <div class="summary-row"><span>{$LANG.upgradenewconfig}</span><span>Business ($41.58/mo)</span></div>
+            <div class="summary-row"><span>{$hadrianLang.services.proratedCredit}</span><span class="summary-credit">-$12.50</span></div>
+            <div class="summary-row total"><span>{$LANG.ordertotalduetoday}</span><span>$29.08</span></div>
         </div>
     </div>
     {/if}
 
     <div class="page-actions">
-        <a href="{$WEB_ROOT}/upgrade.php" class="btn-primary">{$LANG.ordercontinuebutton|default:'Continue to confirm'}</a>
-        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-secondary">{$LANG.cancel|default:'Cancel'}</a>
+        <a href="{$WEB_ROOT}/upgrade.php" class="btn-primary">{$LANG.ordercontinuebutton}</a>
+        <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-secondary">{$LANG.cancel}</a>
     </div>
 
 </div>
@@ -103,9 +103,9 @@
             <div class="up-empty-ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
             </div>
-            <p class="up-empty-title">{$LANG.upgradepickfirst|default:'Start an upgrade'}</p>
-            <p class="up-empty-sub">{$LANG.upgradepickfirstsub|default:'Choose a service and a target plan to configure your upgrade.'}</p>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices|default:'My services'}</a>
+            <p class="up-empty-title">{$hadrianLang.services.upgradePickFirstTitle}</p>
+            <p class="up-empty-sub">{$hadrianLang.services.upgradePickFirstSub}</p>
+            <a href="{$WEB_ROOT}/clientarea.php?action=services" class="btn-primary">{$LANG.clientareanavservices}</a>
         </div>
     </div>
 </div>

@@ -121,7 +121,7 @@
         {if !empty($renewableItem.addons)}
             <div class="addon-renewals"
                  {if $renewableItem.renewableCount <= 0}style="display: none;" data-is-renewable="false"{else}data-is-renewable="true"{/if}>
-                <h4 class="font-size-22 addon-renewals-heading">{lang key='cartproductaddons'|default:'Addons'}</h4>
+                <h4 class="font-size-22 addon-renewals-heading">{lang key='cartproductaddons'}</h4>
                 <div class="addon-renewals-list">
                     {include file="orderforms/$carttpl/service-renewal-item.tpl" renewableItems=$renewableItem.addons prefix='a-'}
                 </div>

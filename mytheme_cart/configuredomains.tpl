@@ -362,8 +362,8 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
 <div id="order-standard_cart">
 
     <header class="st-page-header">
-        <h1>{$LANG.cartdomainsconfig|default:'Domains Configuration'}</h1>
-        <p class="page-subtitle">{$LANG.orderForm.reviewDomainAndAddons|default:'Please review your domain name selections and any addons that are available for them.'}</p>
+        <h1>{$LANG.cartdomainsconfig}</h1>
+        <p class="page-subtitle">{$LANG.orderForm.reviewDomainAndAddons}</p>
     </header>
 
     <div class="cd-split">
@@ -409,7 +409,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
 
                     {if $errormessage}
                         <div class="alert alert-danger" role="alert" style="margin-bottom: 16px;">
-                            <p style="margin: 0 0 6px;">{$LANG.orderForm.correctErrors|default:'Please correct the following errors'}:</p>
+                            <p style="margin: 0 0 6px;">{$LANG.orderForm.correctErrors}:</p>
                             <ul style="margin: 0; padding-left: 20px;">
                                 {$errormessage}
                             </ul>
@@ -432,21 +432,21 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
                                 {* Registration period + Hosting status — read-only display *}
                                 <div class="cd-form-grid">
                                     <div class="cd-field">
-                                        <span class="cd-field-label">{$LANG.orderregperiod|default:'Registration Period'}</span>
-                                        <div class="cd-field-static">{$domain.regperiod} {$LANG.orderyears|default:'Year/s'}</div>
+                                        <span class="cd-field-label">{$LANG.orderregperiod}</span>
+                                        <div class="cd-field-static">{$domain.regperiod} {$LANG.orderyears}</div>
                                     </div>
                                     <div class="cd-field">
-                                        <span class="cd-field-label">{$LANG.hosting|default:'Hosting'}</span>
+                                        <span class="cd-field-label">{$LANG.hosting}</span>
                                         <div class="cd-field-static">
                                             {if $domain.hosting}
                                                 <span class="badge-ok">
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                                    {$LANG.cartdomainshashosting|default:'Includes hosting'}
+                                                    {$LANG.cartdomainshashosting}
                                                 </span>
                                             {else}
                                                 <a href="{$WEB_ROOT}/cart.php" class="badge-warn">
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                                    {$LANG.cartdomainsnohosting|default:'No Hosting! Click to Add'}
+                                                    {$LANG.cartdomainsnohosting}
                                                 </a>
                                             {/if}
                                         </div>
@@ -456,7 +456,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
                                 {* EPP transfer code (transfer flow only) *}
                                 {if $domain.eppenabled}
                                     <div class="cd-field">
-                                        <label for="inputEppcode{$num}">{$LANG.domaineppcode|default:'EPP Code'}</label>
+                                        <label for="inputEppcode{$num}">{$LANG.domaineppcode}</label>
                                         <input type="text" name="epp[{$num}]" id="inputEppcode{$num}" value="{$domain.eppvalue}" class="cd-input" />
                                         <span class="cd-help">{$LANG.domaineppcodedesc}</span>
                                     </div>
@@ -477,12 +477,12 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
                                                 <div class="panel-body">
                                                     <label>
                                                         <input type="checkbox" name="dnsmanagement[{$num}]"{if $domain.dnsmanagementselected} checked{/if} />
-                                                        <span class="addon-name">{$LANG.domaindnsmanagement|default:'DNS Management'}</span>
+                                                        <span class="addon-name">{$LANG.domaindnsmanagement}</span>
                                                     </label>
                                                     <div class="addon-description">{$LANG.domainaddonsdnsmanagementinfo}</div>
                                                 </div>
-                                                <div class="panel-price">{$domain.dnsmanagementprice} / {$domain.regperiod} {$LANG.orderyears|default:'Year/s'}</div>
-                                                <div class="panel-add">+ {$LANG.orderForm.addToCart|default:'Add to cart'}</div>
+                                                <div class="panel-price">{$domain.dnsmanagementprice} / {$domain.regperiod} {$LANG.orderyears}</div>
+                                                <div class="panel-add">+ {$LANG.orderForm.addToCart}</div>
                                             </div>
                                         {/if}
 
@@ -491,12 +491,12 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
                                                 <div class="panel-body">
                                                     <label>
                                                         <input type="checkbox" name="idprotection[{$num}]"{if $domain.idprotectionselected} checked{/if} />
-                                                        <span class="addon-name">{$LANG.domainidprotection|default:'ID Protection'}</span>
+                                                        <span class="addon-name">{$LANG.domainidprotection}</span>
                                                     </label>
                                                     <div class="addon-description">{$LANG.domainaddonsidprotectioninfo}</div>
                                                 </div>
-                                                <div class="panel-price">{$domain.idprotectionprice} / {$domain.regperiod} {$LANG.orderyears|default:'Year/s'}</div>
-                                                <div class="panel-add">+ {$LANG.orderForm.addToCart|default:'Add to cart'}</div>
+                                                <div class="panel-price">{$domain.idprotectionprice} / {$domain.regperiod} {$LANG.orderyears}</div>
+                                                <div class="panel-add">+ {$LANG.orderForm.addToCart}</div>
                                             </div>
                                         {/if}
 
@@ -505,12 +505,12 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
                                                 <div class="panel-body">
                                                     <label>
                                                         <input type="checkbox" name="emailforwarding[{$num}]"{if $domain.emailforwardingselected} checked{/if} />
-                                                        <span class="addon-name">{$LANG.domainemailforwarding|default:'Email Forwarding'}</span>
+                                                        <span class="addon-name">{$LANG.domainemailforwarding}</span>
                                                     </label>
                                                     <div class="addon-description">{$LANG.domainaddonsemailforwardinginfo}</div>
                                                 </div>
-                                                <div class="panel-price">{$domain.emailforwardingprice} / {$domain.regperiod} {$LANG.orderyears|default:'Year/s'}</div>
-                                                <div class="panel-add">+ {$LANG.orderForm.addToCart|default:'Add to cart'}</div>
+                                                <div class="panel-price">{$domain.emailforwardingprice} / {$domain.regperiod} {$LANG.orderyears}</div>
+                                                <div class="panel-add">+ {$LANG.orderForm.addToCart}</div>
                                             </div>
                                         {/if}
 
@@ -537,29 +537,29 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
                     {if $atleastonenohosting}
                         <div class="card cd-nameservers-card">
                             <div class="cd-section-head">
-                                <h2>{$LANG.domainnameservers|default:'Nameservers'}</h2>
-                                <p>{$LANG.cartnameserversdesc|default:'If you want to use custom nameservers then enter them below. By default, new domains will use our nameservers for hosting on our network.'}</p>
+                                <h2>{$LANG.domainnameservers}</h2>
+                                <p>{$LANG.cartnameserversdesc}</p>
                             </div>
                             <div class="cd-nameservers-body">
                                 <div class="cd-nameservers-grid">
                                     <div class="cd-field">
-                                        <label for="inputNs1">{$LANG.domainnameserver1|default:'Nameserver 1'}</label>
+                                        <label for="inputNs1">{$LANG.domainnameserver1}</label>
                                         <input type="text" class="cd-input" id="inputNs1" name="domainns1" value="{$domainns1}" placeholder="ns1.example.com" />
                                     </div>
                                     <div class="cd-field">
-                                        <label for="inputNs2">{$LANG.domainnameserver2|default:'Nameserver 2'}</label>
+                                        <label for="inputNs2">{$LANG.domainnameserver2}</label>
                                         <input type="text" class="cd-input" id="inputNs2" name="domainns2" value="{$domainns2}" placeholder="ns2.example.com" />
                                     </div>
                                     <div class="cd-field">
-                                        <label for="inputNs3">{$LANG.domainnameserver3|default:'Nameserver 3'}</label>
+                                        <label for="inputNs3">{$LANG.domainnameserver3}</label>
                                         <input type="text" class="cd-input" id="inputNs3" name="domainns3" value="{$domainns3}" />
                                     </div>
                                     <div class="cd-field">
-                                        <label for="inputNs4">{$LANG.domainnameserver4|default:'Nameserver 4'}</label>
+                                        <label for="inputNs4">{$LANG.domainnameserver4}</label>
                                         <input type="text" class="cd-input" id="inputNs4" name="domainns4" value="{$domainns4}" />
                                     </div>
                                     <div class="cd-field">
-                                        <label for="inputNs5">{$LANG.domainnameserver5|default:'Nameserver 5'}</label>
+                                        <label for="inputNs5">{$LANG.domainnameserver5}</label>
                                         <input type="text" class="cd-input" id="inputNs5" name="domainns5" value="{$domainns5}" />
                                     </div>
                                 </div>
@@ -569,7 +569,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
 
                     <div class="cd-footer">
                         <button type="submit" class="btn-primary">
-                            {$LANG.continue|default:'Continue'}
+                            {$LANG.continue}
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                         </button>
                     </div>
@@ -588,10 +588,10 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
                     <div class="cd-empty-ico" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
                     </div>
-                    <h2>{$LANG.cart.nodomainstoconfigure|default:'No domains to configure'}</h2>
-                    <p>{$LANG.cart.nodomainstoconfiguredesc|default:'It looks like you haven\'t added any domains to your cart yet. Pick a plan and choose a domain to continue.'}</p>
+                    <h2>{$hadrianLang.cart.noDomainsToConfigure}</h2>
+                    <p>{$hadrianLang.cart.noDomainsToConfigureDesc}</p>
                     <a href="{$WEB_ROOT}/cart.php" class="btn-primary" style="height: 42px; padding: 0 24px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
-                        {$LANG.cart.browseplans|default:'Browse plans'}
+                        {$hadrianLang.cart.browsePlans}
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                     </a>
                 </div>

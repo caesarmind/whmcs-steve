@@ -39,12 +39,12 @@
 <header class="page-header">
     <div class="page-header-row">
         <div style="flex:1; min-width:0;">
-            <h1>{$LANG.usermanagement|default:'User Management'}</h1>
-            <p class="page-subtitle">{$LANG.usermanagementsub|default:'Invite people to access this account and choose what they can do.'}</p>
+            <h1>{$LANG.usermanagement}</h1>
+            <p class="page-subtitle">{$hadrianLang.account.userManagementSub}</p>
         </div>
         <button type="button" class="um-invite-btn" data-um-invite-open>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            {$LANG.userManagement.inviteNewUser|default:'Invite new user'}
+            {$LANG.userManagement.inviteNewUser}
         </button>
     </div>
 </header>
@@ -75,29 +75,29 @@
                     <div class="um-row-meta">
                         <div class="um-row-name">
                             {$uName|escape}
-                            {if $isOwner}<span class="um-tag um-tag-owner">{$LANG.clientOwner|default:'Owner'}</span>{/if}
+                            {if $isOwner}<span class="um-tag um-tag-owner">{$LANG.clientOwner}</span>{/if}
                         </div>
                         <div class="um-row-sub">
                             {$user->email|default:''|escape}
                             {if $user->hasTwoFactorAuthEnabled()}
-                                <span class="um-2fa" title="{$LANG.twoFactor.enabled|default:'Two-factor enabled'}">
+                                <span class="um-2fa" title="{$LANG.twoFactor.enabled}">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                                 </span>
                             {/if}
                         </div>
                         {if isset($user->pivot)}
                             <div class="um-row-meta-extra">
-                                {$LANG.userManagement.lastLogin|default:'Last login'}:
-                                {if $user->pivot->hasLastLogin()}{$user->pivot->getLastLogin()->diffForHumans()}{else}{$LANG.never|default:'Never'}{/if}
+                                {$LANG.userManagement.lastLogin}:
+                                {if $user->pivot->hasLastLogin()}{$user->pivot->getLastLogin()->diffForHumans()}{else}{$LANG.never}{/if}
                             </div>
                         {/if}
                     </div>
                     <div class="um-row-actions">
                         <a href="{if $isOwner}#{else}{routePath('account-users-permissions', $user->id)}{/if}" class="um-row-btn{if $isOwner} um-row-btn-disabled{/if}"{if $isOwner} aria-disabled="true"{/if}>
-                            {$LANG.userManagement.managePermissions|default:'Permissions'}
+                            {$LANG.userManagement.managePermissions}
                         </a>
                         {if !$isOwner}
-                            <button type="button" class="um-row-btn um-row-btn-danger" data-um-remove="{$user->id|escape}">{$LANG.userManagement.removeAccess|default:'Remove'}</button>
+                            <button type="button" class="um-row-btn um-row-btn-danger" data-um-remove="{$user->id|escape}">{$LANG.userManagement.removeAccess}</button>
                         {/if}
                     </div>
                 </div>
@@ -107,16 +107,16 @@
         {* ── Pending invites (#1) ── *}
         {if $invCount > 0}
         <div class="um-list um-pending">
-            <div class="um-section-label">{$LANG.userManagement.pendingInvites|default:'Pending invites'}</div>
+            <div class="um-section-label">{$LANG.userManagement.pendingInvites}</div>
             {foreach $invites as $invite}
                 <div class="um-row um-row-invite">
                     <div class="um-row-avatar um-row-avatar-pending">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     </div>
                     <div class="um-row-meta">
-                        <div class="um-row-name">{$invite->email|default:''|escape} <span class="um-tag um-tag-invited">{$LANG.userManagement.pending|default:'Pending'}</span></div>
+                        <div class="um-row-name">{$invite->email|default:''|escape} <span class="um-tag um-tag-invited">{$hadrianLang.account.invitePending}</span></div>
                         <div class="um-row-sub">
-                            {$LANG.userManagement.inviteSent|default:'Invited'}
+                            {$LANG.userManagement.inviteSent}
                             {if isset($invite->created_at)}{$invite->created_at->diffForHumans()}{/if}
                         </div>
                     </div>
@@ -124,41 +124,41 @@
                         <form method="post" action="{routePath('account-users-invite-resend')}" style="display:inline">
                             <input type="hidden" name="token" value="{$token|default:''|escape}">
                             <input type="hidden" name="inviteid" value="{$invite->id|escape}">
-                            <button type="submit" class="um-row-btn">{$LANG.userManagement.resendInvite|default:'Resend'}</button>
+                            <button type="submit" class="um-row-btn">{$LANG.userManagement.resendInvite}</button>
                         </form>
-                        <button type="button" class="um-row-btn um-row-btn-danger" data-um-cancel-invite="{$invite->id|escape}">{$LANG.userManagement.cancelInvite|default:'Cancel'}</button>
+                        <button type="button" class="um-row-btn um-row-btn-danger" data-um-cancel-invite="{$invite->id|escape}">{$LANG.userManagement.cancelInvite}</button>
                     </div>
                 </div>
             {/foreach}
         </div>
         {/if}
 
-        <p class="um-footnote">* {$LANG.userManagement.accountOwnerPermissionsInfo|default:'The account owner always has full permissions and cannot be removed.'}</p>
+        <p class="um-footnote">* {$LANG.userManagement.accountOwnerPermissionsInfo}</p>
 
     </div>
 
     <aside>
         <div class="card subnav-card">
-            <div class="subnav-heading">{$LANG.accounttab|default:'Account'}</div>
+            <div class="subnav-heading">{$LANG.accounttab}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.accountdetails|default:'Account Details'}
+                {$LANG.accountdetails}
             </a>
             <a href="{routePath('account-users')}" class="subnav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                {$LANG.usermanagement|default:'User Management'}
+                {$LANG.usermanagement}
             </a>
             <a href="{routePath('account-paymentmethods')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                {$LANG.paymentmethods|default:'Payment Methods'}
+                {$LANG.paymentMethods.title}
             </a>
             <a href="{routePath('account-contacts')}" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                {$LANG.contacts|default:'Contacts'}
+                {$LANG.contacts}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=emails" class="subnav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
-                {$LANG.emailstitle|default:'Email History'}
+                {$LANG.emailstitle}
             </a>
         </div>
     </aside>
@@ -171,8 +171,8 @@
         <form method="post" action="{routePath('account-users-invite')}" class="um-modal-form">
             <input type="hidden" name="token" value="{$token|default:''|escape}">
             <div class="um-modal-head">
-                <h2 class="um-modal-title" id="umInviteTitle">{$LANG.userManagement.inviteNewUser|default:'Invite a new user'}</h2>
-                <button type="button" class="um-modal-x" data-um-close aria-label="{$LANG.close|default:'Close'}">
+                <h2 class="um-modal-title" id="umInviteTitle">{$LANG.userManagement.inviteNewUser}</h2>
+                <button type="button" class="um-modal-x" data-um-close aria-label="{$LANG.close}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
@@ -182,20 +182,20 @@
                         {$umFlash.text}
                     </div>
                 {/if}
-                <p class="um-invite-sub">{$LANG.userManagement.inviteNewUserDescription|default:'Send an invitation email. They can accept by signing in to — or creating — their WHMCS account.'}</p>
+                <p class="um-invite-sub">{$LANG.userManagement.inviteNewUserDescription}</p>
                 <div class="um-form-row">
-                    <label class="um-label" for="umInviteEmail">{$LANG.emailaddress|default:'Email address'}</label>
+                    <label class="um-label" for="umInviteEmail">{$LANG.userManagement.emailAddress}</label>
                     <input type="email" id="umInviteEmail" name="inviteemail" class="um-input" placeholder="name@example.com" value="{$formdata.inviteemail|default:''|escape}" required>
                 </div>
                 <div class="um-form-row">
-                    <span class="um-label">{$LANG.userManagement.permissions|default:'Permissions'}</span>
+                    <span class="um-label">{$LANG.userManagement.permissions}</span>
                     <label class="um-radio">
                         <input type="radio" name="permissions" value="all" checked>
-                        <span>{$LANG.userManagement.allPermissions|default:'All permissions'}</span>
+                        <span>{$LANG.userManagement.allPermissions}</span>
                     </label>
                     <label class="um-radio">
                         <input type="radio" name="permissions" value="choose">
-                        <span>{$LANG.userManagement.choosePermissions|default:'Choose individual permissions'}</span>
+                        <span>{$LANG.userManagement.choosePermissions}</span>
                     </label>
                 </div>
                 {if isset($permissions) && $permissions|@count > 0}
@@ -213,8 +213,8 @@
                 {/if}
             </div>
             <div class="um-modal-foot">
-                <button type="button" class="btn-secondary" data-um-close>{$LANG.cancel|default:'Cancel'}</button>
-                <button type="submit" class="btn-primary">{$LANG.userManagement.sendInvite|default:'Send invitation'}</button>
+                <button type="button" class="btn-secondary" data-um-close>{$LANG.cancel}</button>
+                <button type="submit" class="btn-primary">{$LANG.userManagement.sendInvite}</button>
             </div>
         </form>
     </div>
@@ -230,6 +230,12 @@
     <input type="hidden" name="inviteid" id="umCancelInviteId">
 </form>
 
+<script>
+var _localLang = {
+    'removeAccessSure': '{$LANG.userManagement.removeAccessSure|escape:"javascript"}',
+    'cancelInviteSure': '{$LANG.userManagement.cancelInviteSure|escape:"javascript"}'
+};
+</script>
 <script>{literal}
 (function () {
     /* ── Invite modal open/close ── */
@@ -273,7 +279,7 @@
     for (var m = 0; m < rm.length; m++) {
         rm[m].addEventListener('click', function () {
             var id = this.getAttribute('data-um-remove');
-            if (!confirm('Remove this user’s access to your account?')) { return; }
+            if (!confirm(_localLang.removeAccessSure)) { return; }
             document.getElementById('umRemoveUserId').value = id;
             document.getElementById('umRemoveForm').submit();
         });
@@ -284,7 +290,7 @@
     for (var k = 0; k < ci.length; k++) {
         ci[k].addEventListener('click', function () {
             var id = this.getAttribute('data-um-cancel-invite');
-            if (!confirm('Cancel this pending invitation?')) { return; }
+            if (!confirm(_localLang.cancelInviteSure)) { return; }
             document.getElementById('umCancelInviteId').value = id;
             document.getElementById('umCancelInviteForm').submit();
         });
