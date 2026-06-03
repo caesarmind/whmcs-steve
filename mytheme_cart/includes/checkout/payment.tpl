@@ -33,16 +33,20 @@
 
     <label class="radio">
         <input id="useCreditOnCheckout" type="radio" name="applycredit" value="1"{if $applyCredit} checked{/if}>
-        <span id="spanFullCredit"{if !($creditBalance->toNumeric() >= $total->toNumeric())} class="w-hidden"{/if}>
-            {lang key='cart.applyCreditAmountNoFurtherPayment' amount=$total}
-        </span>
-        <span id="spanUseCredit"{if $creditBalance->toNumeric() >= $total->toNumeric()} class="w-hidden"{/if}>
-            {lang key='cart.applyCreditAmount' amount=$creditBalance}
+        <span class="ac-radio" aria-hidden="true"></span>
+        <span class="ac-text">
+            <span id="spanFullCredit"{if !($creditBalance->toNumeric() >= $total->toNumeric())} class="w-hidden"{/if}>
+                {lang key='cart.applyCreditAmountNoFurtherPayment' amount=$total}
+            </span>
+            <span id="spanUseCredit"{if $creditBalance->toNumeric() >= $total->toNumeric()} class="w-hidden"{/if}>
+                {lang key='cart.applyCreditAmount' amount=$creditBalance}
+            </span>
         </span>
     </label>
     <label class="radio">
         <input id="skipCreditOnCheckout" type="radio" name="applycredit" value="0"{if !$applyCredit} checked{/if}>
-        {lang key='cart.applyCreditSkip' amount=$creditBalance}
+        <span class="ac-radio" aria-hidden="true"></span>
+        <span class="ac-text">{lang key='cart.applyCreditSkip' amount=$creditBalance}</span>
     </label>
 </div>
 

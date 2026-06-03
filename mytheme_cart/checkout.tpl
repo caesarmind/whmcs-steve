@@ -700,11 +700,83 @@
 }
 #totalDueToday.alert-success #totalCartPrice { font-size: 18px; font-weight: 600; letter-spacing: -0.012em; }
 
-/* Apply-credit radio group */
-#applyCreditContainer { padding: 12px 0 4px; }
-#applyCreditContainer p { font-size: 12px; color: var(--color-text-tertiary); margin: 0 0 8px; }
-#applyCreditContainer .radio { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 13px; color: var(--color-text-primary); cursor: pointer; margin: 0; }
-#applyCreditContainer .radio input { margin-top: 3px; accent-color: var(--color-accent); }
+/* -- Apply account credit choice --
+   Two options: spend available credit on this order, or skip it. WHMCS
+   renders these as bare <label class="radio"> rows; left unstyled they
+   read as plain, low-contrast paragraphs with no visible selector, so
+   the choice looks like static fine-print rather than a control (and
+   feels non-functional). Restyle as Apple option cards with a CSS-drawn
+   radio (the .ac-radio span) driven by :has(input:checked) -- the same
+   iCheck-proof pattern the .co-pay gateway radios use above. The native
+   input is hidden (and any iCheck sprite wrapper neutralised) so the
+   visible control is always our own circle, whether or not the cart's
+   scripts.min.js iCheck-wraps it; clicking the label still toggles the
+   native input natively, so the live-total recalc keeps firing. */
+#applyCreditContainer { padding: 4px 0 0; }
+#applyCreditContainer p {
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    margin: 0 0 10px;
+    letter-spacing: -0.004em;
+    line-height: 1.5;
+}
+#applyCreditContainer .radio {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    margin: 0 0 8px;
+    border: 0.5px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    letter-spacing: -0.004em;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+#applyCreditContainer .radio:last-child { margin-bottom: 0; }
+#applyCreditContainer .radio:hover { border-color: var(--color-accent); }
+#applyCreditContainer .radio:has(input:checked) {
+    border-color: var(--color-accent);
+    background: var(--color-accent-light);
+}
+#applyCreditContainer .radio input[type="radio"],
+#applyCreditContainer .radio .iradio_square-blue {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    margin: 0;
+}
+#applyCreditContainer .ac-radio {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-surface);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.15s, background 0.15s;
+}
+#applyCreditContainer .ac-radio::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    transform: scale(0);
+    transition: transform 0.15s;
+}
+#applyCreditContainer .radio:has(input:checked) .ac-radio {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+}
+#applyCreditContainer .radio:has(input:checked) .ac-radio::after { transform: scale(1); }
+#applyCreditContainer .ac-text { flex: 1; min-width: 0; }
 
 /* Payment method radios -- matches apple-client-area/checkout.html while
    preserving WHMCS's native paymentmethod radio contract. */
@@ -828,6 +900,33 @@
     margin: 0;
 }
 #creditCardInputFields > ul .radio-inline input { margin: 0; accent-color: var(--color-accent); }
+
+/* -- Gateway-injected card fields (#paymentGatewayInput) --
+   Stripe (and other remote-input gateways) inject their Card Number /
+   Expiry / CVC / cardholder-name fields into #paymentGatewayInput at
+   runtime. Those fields have NO prepend icon, but the blanket
+   `.co-left .field / .form-control` rule above reserves 38px of left
+   padding for the absolute .field-icon -- which here just narrows the
+   usable field box so longer values clip on the right ("1234 1234 1234
+   1", "MM /", the card-name placeholder). Reset to symmetric padding
+   (id-scoped so it outranks `.co-left .field`) and give Stripe's
+   .StripeElement vertical padding so its iframe text centres in the
+   42px field. */
+#paymentGatewayInput .form-control,
+#paymentGatewayInput .field,
+#paymentGatewayInput input[type="text"],
+#paymentGatewayInput input[type="tel"] {
+    padding-left: 14px;
+    padding-right: 14px;
+    box-sizing: border-box;
+}
+#paymentGatewayInput input[type="text"],
+#paymentGatewayInput input[type="tel"] { height: 42px; }
+#paymentGatewayInput .StripeElement {
+    height: 42px;
+    padding: 13px 14px;
+    box-sizing: border-box;
+}
 
 /* TOS + complete-order footer */
 .checkout-footer { margin: 22px 0 16px; padding: 0; }
