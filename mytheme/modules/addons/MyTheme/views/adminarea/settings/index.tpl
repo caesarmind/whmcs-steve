@@ -293,9 +293,28 @@
             {if $key == 'cookie_box'}
                 <div class="mt-row-sub{if $mtFlagTab != $tab} mt-tab-off{/if}" id="mt-cookiebox-sub"{if !$values[$key]} hidden{/if}>
                     <div class="mt-field">
-                        <label class="mt-field-label" for="mt-cookie-msg">Message</label>
-                        <textarea class="mt-input" id="mt-cookie-msg" name="cookie_box_message" rows="3" placeholder="We use cookies to improve your experience...">{$cookieBoxMessage|escape}</textarea>
-                        <p class="mt-field-help">Shown in the cookie bar. Basic HTML (e.g. a privacy-policy link) is allowed.</p>
+                        <label class="mt-field-label" for="mt-cookie-lang">Message</label>
+                        {if $installedLanguages}
+                            {* Per-language ("translate") control, Lagom-parity. The
+                               switcher picks which language's textarea is visible;
+                               every language's textarea stays in the DOM so they all
+                               submit together as cookie_box_message[<code>]. *}
+                            <div class="mt-cookie-msg-i18n" data-cookie-msg-i18n>
+                                <select class="mt-select" id="mt-cookie-lang" data-cookie-msg-switch style="max-width:240px;margin-bottom:10px;">
+                                    {foreach $installedLanguages as $code}
+                                        <option value="{$code|escape}"{if $code == $defaultLanguage} selected{/if}>{$code|escape|capitalize}{if $code == $defaultLanguage} (default){/if}{if isset($cookieBoxMessages[$code]) && $cookieBoxMessages[$code] != ''} &bull;{/if}</option>
+                                    {/foreach}
+                                </select>
+                                {foreach $installedLanguages as $code}
+                                    <textarea class="mt-input mt-cookie-msg-pane" data-cookie-msg-pane="{$code|escape}" name="cookie_box_message[{$code|escape}]" rows="3" placeholder="We use cookies to improve your experience..."{if $code != $defaultLanguage} hidden{/if}>{if isset($cookieBoxMessages[$code])}{$cookieBoxMessages[$code]|escape}{/if}</textarea>
+                                {/foreach}
+                            </div>
+                            <p class="mt-field-help">Shown in the cookie bar, per language. Visitors see their active language; if it has no message, the site default language is used, then a built-in fallback. Basic HTML (e.g. a privacy-policy link) is allowed. A <strong>&bull;</strong> marks languages that already have a message.</p>
+                        {else}
+                            {* No language files detected under /lang/ — fall back to a single English box. *}
+                            <textarea class="mt-input" id="mt-cookie-msg" name="cookie_box_message[english]" rows="3" placeholder="We use cookies to improve your experience...">{if isset($cookieBoxMessages['english'])}{$cookieBoxMessages['english']|escape}{/if}</textarea>
+                            <p class="mt-field-help">Shown in the cookie bar. Basic HTML (e.g. a privacy-policy link) is allowed.</p>
+                        {/if}
                     </div>
                     <div class="mt-field">
                         <label class="mt-field-label" for="mt-cookie-pos">Position</label>
@@ -942,6 +961,30 @@
         function sync() { target.hidden = (sel.value !== match); }
         sel.addEventListener('change', sync);
         sync();
+    });
+})();
+</script>
+{/literal}
+
+{literal}
+<script>
+// Cookie Box message: per-language ("translate") switcher. The <select> picks
+// which language's textarea is visible; all textareas stay in the DOM so every
+// language submits together. Hidden panes still post, so a cleared box deletes
+// that translation server-side.
+(function () {
+    var wraps = document.querySelectorAll('[data-cookie-msg-i18n]');
+    Array.prototype.forEach.call(wraps, function (wrap) {
+        var select = wrap.querySelector('[data-cookie-msg-switch]');
+        var panes  = wrap.querySelectorAll('[data-cookie-msg-pane]');
+        if (!select) { return; }
+        function show(code) {
+            Array.prototype.forEach.call(panes, function (pane) {
+                pane.hidden = (pane.getAttribute('data-cookie-msg-pane') !== code);
+            });
+        }
+        select.addEventListener('change', function () { show(select.value); });
+        show(select.value);
     });
 })();
 </script>

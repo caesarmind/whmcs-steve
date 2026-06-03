@@ -111,13 +111,33 @@ final class SettingsController extends AbstractController
         if (!is_array($opHostGroups)) { $opHostGroups = []; }
         if (!is_array($opChars))      { $opChars = ['upper', 'lower', 'numbers']; }
 
+        // Cookie Box message — stored per-language (Lagom-parity). Surface it as
+        // a lang-code => message map for the per-language editor. Tolerate a
+        // legacy flat string by tucking it under the system default language so
+        // the admin sees existing copy and a re-save normalises it to a map.
+        $defaultLanguage   = $this->systemDefaultLanguage();
+        $rawCookieMessage  = Settings::getValue('cookie_box_message', []);
+        $cookieBoxMessages = [];
+        if (is_string($rawCookieMessage)) {
+            if (trim($rawCookieMessage) !== '') {
+                $cookieBoxMessages[$defaultLanguage] = $rawCookieMessage;
+            }
+        } elseif (is_array($rawCookieMessage)) {
+            foreach ($rawCookieMessage as $code => $msg) {
+                if (is_string($code) && is_string($msg)) {
+                    $cookieBoxMessages[strtolower($code)] = $msg;
+                }
+            }
+        }
+
         return $this->view('settings/index', [
             'flags'              => self::FLAGS,
             'flagTabs'           => self::FLAG_TABS,
             'values'             => $values,
             'darkModeDisplay'    => (string)Settings::getValue('dark_mode_display', 'switcher'),
             'darkModeDefault'    => (string)Settings::getValue('dark_mode_default', 'light'),
-            'cookieBoxMessage'   => (string)Settings::getValue('cookie_box_message', ''),
+            'cookieBoxMessages'  => $cookieBoxMessages,
+            'defaultLanguage'    => $defaultLanguage,
             'cookieBoxPosition'  => (string)Settings::getValue('cookie_box_position', 'bottom-left'),
             'cookieBoxButton'    => (string)Settings::getValue('cookie_box_button', 'Continue'),
             'tab'                => $_GET['tab'] ?? 'general',
@@ -167,7 +187,27 @@ final class SettingsController extends AbstractController
         // Cookie Box sub-fields (revealed under the cookie_box toggle). Message
         // allows basic admin-authored HTML; position is validated; button label
         // falls back to "Continue".
-        Settings::setValue('cookie_box_message', (string)($_POST['cookie_box_message'] ?? ''), 'string');
+        //
+        // Message is per-language (Lagom-parity): inputs arrive as
+        // cookie_box_message[<langcode>]. Keep only installed languages with
+        // non-empty content and store as a JSON map. A stale form that posts a
+        // flat string is tucked under the system default language so nothing is
+        // lost, and an empty box for a language drops that translation.
+        $postedCookieMsgs = $_POST['cookie_box_message'] ?? [];
+        $cookieMsgs = [];
+        if (is_array($postedCookieMsgs)) {
+            $installedLangs = array_flip(LocaleHelper::detectInstalled());
+            foreach ($postedCookieMsgs as $code => $msg) {
+                $code = strtolower((string)$code);
+                if (!isset($installedLangs[$code])) { continue; }
+                $msg = trim((string)$msg);
+                if ($msg === '') { continue; }
+                $cookieMsgs[$code] = $msg;
+            }
+        } elseif (is_string($postedCookieMsgs) && trim($postedCookieMsgs) !== '') {
+            $cookieMsgs[$this->systemDefaultLanguage()] = trim($postedCookieMsgs);
+        }
+        Settings::setValue('cookie_box_message', $cookieMsgs, 'json');
         $cookiePos = (string)($_POST['cookie_box_position'] ?? 'bottom-left');
         Settings::setValue('cookie_box_position', in_array($cookiePos, ['bottom-left', 'bottom-right', 'bottom'], true) ? $cookiePos : 'bottom-left', 'string');
         $cookieBtn = trim((string)($_POST['cookie_box_button'] ?? ''));
@@ -218,6 +258,17 @@ final class SettingsController extends AbstractController
             static fn($p) => $p !== '' && isset($validSet[$p])
         )));
         Settings::setValue($key, $clean, 'json');
+    }
+
+    /** WHMCS system default language (lowercased), e.g. "english". */
+    private function systemDefaultLanguage(): string
+    {
+        try {
+            $lang = strtolower((string)\WHMCS\Config\Setting::getValue('Language'));
+            return $lang !== '' ? $lang : 'english';
+        } catch (\Throwable $e) {
+            return 'english';
+        }
     }
 
     /**

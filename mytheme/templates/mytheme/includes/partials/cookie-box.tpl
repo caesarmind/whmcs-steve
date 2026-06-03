@@ -9,7 +9,11 @@
  *
  * Settings (admin → Settings → General → Cookie Box):
  *   cookie_box           bool    master toggle
- *   cookie_box_message   string  HTML allowed (privacy link etc.); has a default
+ *   cookie_box_message   per-language map ({english:..,spanish:..}); Hooks
+ *                        resolves it to the active language's string before
+ *                        render (active → system-default-language → '', which
+ *                        falls back to $hadrianLang.common.cookieMessage below).
+ *                        HTML allowed (privacy link etc.).
  *   cookie_box_position  enum    bottom-left | bottom-right | bottom
  *   cookie_box_button    string  dismiss label (default "Continue")
  *

@@ -95,7 +95,7 @@ final class Hooks
                     'canRender' => true,
                     'devMode'   => $template->license()->isDevMode(),
                 ],
-                'addonSettings' => Settings::all(),
+                'addonSettings' => $this->addonSettingsForRender((string)($vars['language'] ?? 'english')),
                 'branding'      => $branding,
                 // Effective language list for the locale chooser. Respects the
                 // admin's "Custom Language List" toggle + curated codes from
@@ -1492,6 +1492,64 @@ final class Hooks
             $out[$original] = $entry;
         }
         return $out;
+    }
+
+    /**
+     * All theme settings for the front-end payload, with request-time
+     * resolution applied where a stored value is language-keyed.
+     *
+     * Today that's only cookie_box_message: it's stored as a per-language map
+     * ({"english": "...", "spanish": "..."}, Lagom-parity), but the cookie bar
+     * shows exactly ONE message, so we collapse it to the right string for the
+     * active request language here. Resolving in PHP (not the template) keeps it
+     * robust across the client area, the order form, and full-bleed login pages
+     * — none of which reliably expose $activeLocale in the footer include scope.
+     *
+     * @return array<string, mixed>
+     */
+    private function addonSettingsForRender(string $currentLang): array
+    {
+        $settings = Settings::all();
+        if (array_key_exists('cookie_box_message', $settings)) {
+            $settings['cookie_box_message'] = $this->resolveCookieMessage($settings['cookie_box_message'], $currentLang);
+        }
+        return $settings;
+    }
+
+    /**
+     * Pick the cookie-bar message from the stored per-language map:
+     * active language → WHMCS system default language → '' (the template then
+     * falls back to the built-in $hadrianLang.common.cookieMessage).
+     *
+     * Tolerates a legacy flat string (pre per-language storage) by returning it
+     * unchanged, so an install that saved a message before this change keeps
+     * showing it until the admin re-saves and normalises it to a map.
+     */
+    private function resolveCookieMessage(mixed $stored, string $currentLang): string
+    {
+        if (is_string($stored)) {
+            return $stored; // legacy single-string storage
+        }
+        if (!is_array($stored) || $stored === []) {
+            return '';
+        }
+
+        $current = strtolower($currentLang);
+        if (isset($stored[$current]) && is_string($stored[$current]) && $stored[$current] !== '') {
+            return $stored[$current];
+        }
+
+        $default = '';
+        try {
+            $default = strtolower((string)\WHMCS\Config\Setting::getValue('Language'));
+        } catch (\Throwable $e) {
+            // Setting unavailable (CLI/test) — fall through to empty.
+        }
+        if ($default !== '' && isset($stored[$default]) && is_string($stored[$default]) && $stored[$default] !== '') {
+            return $stored[$default];
+        }
+
+        return '';
     }
 
     private function loadLanguage(Template $template, string $lang): array
