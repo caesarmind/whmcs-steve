@@ -298,7 +298,7 @@
                             {* Per-language ("translate") control, Lagom-parity. The
                                switcher picks which language's textarea is visible;
                                every language's textarea stays in the DOM so they all
-                               submit together as cookie_box_message[<code>]. *}
+                               submit together as cookie_box_message[<code>] on save. *}
                             <div class="mt-cookie-msg-i18n" data-cookie-msg-i18n>
                                 <select class="mt-select" id="mt-cookie-lang" data-cookie-msg-switch style="max-width:240px;margin-bottom:10px;">
                                     {foreach $installedLanguages as $code}

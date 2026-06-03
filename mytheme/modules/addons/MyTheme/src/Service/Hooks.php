@@ -1523,7 +1523,7 @@ final class Hooks
      *
      * Tolerates a legacy flat string (pre per-language storage) by returning it
      * unchanged, so an install that saved a message before this change keeps
-     * showing it until the admin re-saves and normalises it to a map.
+     * showing it until the admin re-saves and normalises it to a per-language map.
      */
     private function resolveCookieMessage(mixed $stored, string $currentLang): string
     {
