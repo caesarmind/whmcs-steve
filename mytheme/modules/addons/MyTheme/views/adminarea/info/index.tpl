@@ -51,9 +51,6 @@
     <div style="margin-top:16px">
         <a href="{$viewHelper->url('license')}" class="mt-btn mt-btn-primary mt-btn-sm" style="color:#fff">Manage license key</a>
     </div>
-    <p class="mt-card-meta" style="margin-top:10px">
-        Handled by the Licensing Manager (<code>modules/servers/licensing</code> + the <code>hostnodes_theme_license</code> hook).
-    </p>
 </section>
 
 {include file="includes/footer.tpl"}
