@@ -23,14 +23,17 @@
     <dl class="mt-deflist">
         <dt>Status</dt>
         <dd>
-            {if $license.status == 'Active'}<span class="mt-badge mt-badge-success">Active</span>
+            {if $license.active}<span class="mt-badge mt-badge-success">Active</span>
             {elseif $license.status == 'No key'}<span class="mt-badge mt-badge-neutral">No key set</span>
-            {elseif $license.status == 'Hook not installed'}<span class="mt-badge mt-badge-warning">Hook not installed</span>
-            {else}<span class="mt-badge mt-badge-danger">{$license.status|escape}</span>{/if}
+            {elseif $license.status == 'Unreachable' || $license.status == 'Unknown'}<span class="mt-badge mt-badge-warning">Unverified</span>
+            {else}<span class="mt-badge mt-badge-danger">Not active</span>{/if}
         </dd>
 
         <dt>License Key</dt>
         <dd>{if $license.key}<code>{$license.key|escape}</code>{else}<span class="mt-text-3">Not set</span>{/if}</dd>
+
+        <dt>Support &amp; Updates</dt>
+        <dd>{if $license.active}<span class="mt-badge mt-badge-success">Active</span>{else}<span class="mt-badge mt-badge-warning">Inactive</span>{/if}</dd>
 
         {if $license.data.productname}<dt>Product</dt>
         <dd>{$license.data.productname|escape}</dd>{/if}
