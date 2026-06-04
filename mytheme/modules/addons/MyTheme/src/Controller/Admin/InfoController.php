@@ -5,6 +5,7 @@ namespace MyTheme\Controller\Admin;
 
 use MyTheme\Controller\AbstractController;
 use MyTheme\Helpers\AddonHelper;
+use MyTheme\Models\Configuration;
 
 final class InfoController extends AbstractController
 {
@@ -12,21 +13,41 @@ final class InfoController extends AbstractController
     {
         $template = AddonHelper::getTemplate();
 
-        $info = [
-            'version'           => $template?->getVersion() ?? 'unknown',
-            'displayName'       => $template?->getDisplayName() ?? 'Hostnodes',
-            'newVersion'        => null,                  // TODO: wire to update-check endpoint
-            'registrationDate'  => null,                  // TODO: from license server
-            'nextDueDate'       => null,                  // TODO: from license server
-            'firstPaymentAmount'=> null,
-            'recurringAmount'   => null,
-            'paymentMethod'     => null,
-            'supportExpired'    => false,
-            'licenseKey'        => $template?->license()->getLicenseKey() ?? '',
-            'licenseStatus'     => $template?->canActivate() ? 'Active' : 'Inactive',
-            'devMode'           => $template?->license()->isDevMode() ?? false,
-        ];
+        // License key is managed in the admin (tblconfiguration 'mytheme_license_key');
+        // status + details come from whmcs-licensing-modern's hook, which reads that key.
+        $key         = (string) Configuration::getValue('mytheme_license_key');
+        $hookPresent = function_exists('hostnodes_license_check');
+        $status      = 'Unknown';
+        $data        = [];
 
-        return $this->view('info/index', ['info' => $info]);
+        if (!$hookPresent) {
+            $status = 'Hook not installed';
+        } elseif ($key === '') {
+            $status = 'No key';
+        } else {
+            $res    = hostnodes_license_check($key);
+            $status = !empty($res['ok']) ? 'Active' : (string) ($res['status'] ?? 'Invalid');
+
+            // The hook caches the full verified payload (regdate, nextduedate, etc.).
+            $cache = sys_get_temp_dir() . '/hn_theme_license.json';
+            if (is_file($cache)) {
+                $c = json_decode((string) file_get_contents($cache), true);
+                if (is_array($c) && isset($c['data']) && is_array($c['data'])) {
+                    $data = $c['data'];
+                }
+            }
+        }
+
+        return $this->view('info/index', [
+            'info'    => [
+                'version'    => $template?->getVersion() ?? 'unknown',
+                'newVersion' => null, // TODO: wire to an update-check endpoint
+            ],
+            'license' => [
+                'key'    => $key,
+                'status' => $status,
+                'data'   => $data,
+            ],
+        ]);
     }
 }
