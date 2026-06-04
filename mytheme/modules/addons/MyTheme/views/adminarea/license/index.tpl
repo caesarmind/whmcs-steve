@@ -1,34 +1,17 @@
 {include file="includes/header.tpl"}
 
 <header class="mt-page-header">
+    <div class="mt-page-eyebrow">Theme</div>
     <h1 class="mt-page-title">License</h1>
-    <p class="mt-page-subtitle">
-        License status for <strong>{$template|escape}</strong>.
-    </p>
+    <p class="mt-page-subtitle">Enter this site's Hadrian theme license key. Validation is handled by the Licensing Manager.</p>
 </header>
 
-{if $devMode}
-    <div class="mt-alert mt-alert-warning">
-        <strong>Development mode is active.</strong>
-        License checks are bypassed; the theme renders as if licensed. To enable real license validation:
-        <ol>
-            <li>Edit <code>templates/{$template|escape}/core/{$template|escape}.php</code></li>
-            <li>Set <code>'dev_mode' =&gt; false</code></li>
-            <li>Replace <code>secret_key</code> with 64 random hex characters</li>
-            <li>In <code>modules/addons/MyTheme/src/Template/License.php</code>, replace
-                <code>LICENSE_SERVER_PUBLIC_KEY</code> and <code>$licenseServerUrl</code></li>
-        </ol>
-    </div>
-{elseif $isActive}
-    <div class="mt-alert mt-alert-success">
-        <strong>License is active.</strong>
-        Theme is rendering normally.
-    </div>
+{if !$hookPresent}
+    <div class="mt-alert mt-alert-danger"><strong>License hook not installed.</strong> {$detail|escape}</div>
+{elseif $status == 'Active'}
+    <div class="mt-alert mt-alert-success"><strong>License active.</strong> {$detail|escape}</div>
 {else}
-    <div class="mt-alert mt-alert-danger">
-        <strong>License is not active.</strong>
-        Enter your license key below or contact support.
-    </div>
+    <div class="mt-alert mt-alert-warning"><strong>{$status|escape}.</strong> {$detail|escape}</div>
 {/if}
 
 <section class="mt-section" style="max-width:560px">
@@ -39,20 +22,11 @@
         <div class="mt-field">
             <label class="mt-field-label" for="mt-license-key">Key</label>
             <input id="mt-license-key" class="mt-input" type="text" name="license_key"
-                   value="{$key|escape}"
-                   {if $devMode}disabled{/if}
-                   placeholder="Paste your license key…">
-            <div class="mt-field-help">
-                {if $devMode}
-                    Form is disabled while <code>dev_mode</code> is active.
-                {else}
-                    Find your key in your customer portal.
-                {/if}
-            </div>
+                   value="{$key|escape}" placeholder="hadrian-XXXXX-XXXXX-XXXXX">
+            <div class="mt-field-help">The key issued for this domain (from your order / service Domain field).</div>
         </div>
         <div class="mt-form-actions">
-            <button type="submit" class="mt-btn mt-btn-primary" {if $devMode}disabled{/if}>Save and check</button>
-            <button type="submit" name="refresh" value="1" class="mt-btn mt-btn-secondary" {if $devMode}disabled{/if}>Refresh now</button>
+            <button type="submit" class="mt-btn mt-btn-primary">Save &amp; check</button>
         </div>
     </form>
 </section>

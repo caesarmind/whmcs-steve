@@ -92,68 +92,15 @@ if (
 }
 
 // ============================================================================
-// License enforcement: kill ?systpl= override of disabled templates
+// Licensing is handled externally by whmcs-licensing-modern
+// (modules/servers/licensing + includes/hooks/hostnodes_theme_license.php).
+//
+// The MyTheme addon's own license enforcement, admin dashboard banner, and
+// "hide disabled templates" hooks are intentionally DISABLED so the two
+// systems don't conflict — and so the dev-mode nag (which steers you to flip
+// dev_mode, re-activating this dormant path) never appears. The License*
+// classes remain under src/Template/ but are now unused.
 // ============================================================================
-add_hook('ClientAreaPage', 1, function ($vars) {
-    $disabled = AddonHelper::getNotActiveTemplates();
-    if (empty($disabled)) {
-        return null;
-    }
-
-    $activeTemplate = AddonHelper::getActiveTemplateName();
-
-    if (isset($_SESSION['Template']) && in_array($_SESSION['Template'], $disabled, true)) {
-        unset($_SESSION['Template']);
-    }
-    if (isset($_SESSION['OrderFormTemplate']) && in_array($_SESSION['OrderFormTemplate'], $disabled, true)) {
-        unset($_SESSION['OrderFormTemplate']);
-    }
-    if (isset($_GET['systpl']) && in_array($_GET['systpl'], $disabled, true)) {
-        http_response_code(403);
-        exit('Template license is not active');
-    }
-
-    if (in_array($activeTemplate, $disabled, true)) {
-        if (Configuration::getValue('Template') === $activeTemplate) {
-            Configuration::setValue('Template', 'six');
-        }
-        if (Configuration::getValue('OrderFormTemplate') === $activeTemplate) {
-            Configuration::setValue('OrderFormTemplate', 'standard_cart');
-        }
-
-        if (!headers_sent() && !AddonHelper::isCli()) {
-            header('Location: ' . ($_SERVER['REQUEST_URI'] ?? '/'), true, 302);
-            exit;
-        }
-
-        http_response_code(403);
-        exit('Template license is not active');
-    }
-});
-
-// ============================================================================
-// Admin homepage: show license-expiry / license-error banner
-// ============================================================================
-add_hook('AdminHomepage', 1, function () {
-    $template = AddonHelper::getTemplate();
-    if ($template === null) {
-        return null;
-    }
-    return $template->license()->getDashboardBanner();
-});
-
-// ============================================================================
-// Admin head: hide license-disabled templates from the WHMCS template picker
-// ============================================================================
-add_hook('AdminAreaHeadOutput', 1, function () {
-    $disabled = AddonHelper::getNotActiveTemplates();
-    if (empty($disabled)) {
-        return null;
-    }
-    $url = (new MyTheme\View\ViewHelper())->script('hide-disabled-templates.js');
-    $list = implode(',', $disabled);
-    return '<script src="' . htmlspecialchars($url, ENT_QUOTES) . '" data-mytheme-disabled="' . htmlspecialchars($list, ENT_QUOTES) . '"></script>';
-});
 
 // ============================================================================
 // The main client-area dispatch — ONE hook → HookDispatcher
