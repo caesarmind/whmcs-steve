@@ -1,41 +1,32 @@
 <?php
 /**
- * Per-variant settings for homepage/default.
+ * Per-variant settings for homepage/default (the marketing landing).
+ *
+ * Apple "Hosting, redesigned" public homepage: marketing hero with a working
+ * domain search, then stats, cPanel comparison, isolation, OpenPanel spotlight,
+ * data centers, white-label/dev tools, audience columns, pricing, reviews, CTA.
+ * (The previous domain-search portal homepage is preserved as the 'portal'
+ * variant — switch to it in the admin Pages tab.)
  *
  * Read at runtime as $myTheme.pages.homepage.config.<key>
  */
 return [
-    'display_name' => 'Default',
-    'description'  => 'Hero heading + sign-in / open-account CTAs and quick-link grid.',
-    'preview'      => 'thumb.png',
+    'display_name' => 'Marketing landing',
+    'description'  => 'Apple-style hosting marketing homepage (hero + domain search, pricing, reviews).',
     'settings'     => [
         'heroTitle' => [
             'type'    => 'text',
             'name'    => 'heroTitle',
             'label'   => 'Hero title',
             'default' => '',
-            'tooltip' => 'Override the hero heading. Leave blank to fall back to the company name.',
+            'tooltip' => 'Override the big hero heading. Leave blank to use the default ("Hosting, redesigned.").',
         ],
         'heroSubtitle' => [
             'type'    => 'text',
             'name'    => 'heroSubtitle',
             'label'   => 'Hero subtitle',
-            'default' => 'Manage your services, domains and billing in one place.',
-            'tooltip' => 'Short tagline rendered under the hero title.',
-        ],
-        'showQuickLinks' => [
-            'type'    => 'checkbox',
-            'name'    => 'showQuickLinks',
-            'label'   => 'Show quick-link grid',
-            'default' => true,
-            'tooltip' => 'Renders the four-tile quick-link grid below the hero (Services / Support / Knowledgebase / Network status).',
-        ],
-        'showAnnouncements' => [
-            'type'    => 'checkbox',
-            'name'    => 'showAnnouncements',
-            'label'   => 'Show recent announcements',
-            'default' => true,
-            'tooltip' => 'Lists up to three latest announcements at the bottom of the page.',
+            'default' => '',
+            'tooltip' => 'Override the tagline under the hero heading. Leave blank to use the default.',
         ],
     ],
 ];
