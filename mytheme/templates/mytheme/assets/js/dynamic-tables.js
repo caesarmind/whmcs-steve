@@ -665,7 +665,8 @@
             +   'tbody [data-mt-kebab]{position:static !important}'
             // Keep the kebab on the row's top-right (left of the chevron) so actions are
             // reachable without expanding; pull it out of the per-page grid flow.
-            +   'tbody td:has([data-mt-kebab]){position:absolute !important;top:7px;right:46px;padding:0 !important;margin:0 !important;width:auto !important;height:auto !important;justify-self:auto !important;z-index:3}'
+            +   'tbody td:has([data-mt-kebab]){position:absolute !important;top:10px;right:48px;height:30px !important;display:flex !important;align-items:center !important;justify-content:center !important;padding:0 !important;margin:0 !important;width:auto !important;justify-self:auto !important;z-index:3}'
+            +   'tbody td:has([data-mt-kebab])>[data-mt-kebab]{height:30px;display:inline-flex;align-items:center}'
             +   '[data-mt-kebab] [role="menu"]{right:0 !important;left:auto !important;min-width:0 !important;width:max-content;max-width:calc(100vw - 40px)}'
             // 2) Search box: drop it to its own full-width row below the filter chips,
             //    instead of stranding it off the end of the scrolling chip row.
