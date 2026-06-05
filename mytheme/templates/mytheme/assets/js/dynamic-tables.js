@@ -473,7 +473,7 @@
             // Use this.api() — during the initial (synchronous) client-side draw the
             // outer `dt` var is not yet assigned, so referencing it would throw and
             // leave the info text / pager empty.
-            drawCallback: function () { updateControls(cfg.id, this.api()); }
+            drawCallback: function () { updateControls(cfg.id, this.api()); addExpanders(cfg.id, cfg.type); }
         });
 
         wireControls(cfg.id, dt, { mode: 'server', state: state, filterCol: cfg.filterCol });
@@ -513,7 +513,7 @@
             // Use this.api() — during the initial (synchronous) client-side draw the
             // outer `dt` var is not yet assigned, so referencing it would throw and
             // leave the info text / pager empty.
-            drawCallback: function () { updateControls(cfg.id, this.api()); }
+            drawCallback: function () { updateControls(cfg.id, this.api()); addExpanders(cfg.id, cfg.type); }
         });
 
         wireControls(cfg.id, dt, { mode: 'client', filterCol: cfg.filterCol });
@@ -547,6 +547,27 @@
         });
     }
 
+    function isMobileTable() {
+        return !!(window.matchMedia && window.matchMedia('(max-width: 720px)').matches);
+    }
+
+    /** Lagom-style expandable rows: add a chevron to each row's first cell (skips the
+     *  2-column emails list). Idempotent — safe to call after every DataTables draw. */
+    function addExpanders(id, type) {
+        if (type === 'emails') { return; }
+        document.querySelectorAll('#' + id + ' tbody tr').forEach(function (tr) {
+            var first = tr.children[0];
+            if (first && !first.querySelector('.mt-expander')) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'mt-expander';
+                btn.setAttribute('aria-label', 'Show details');
+                btn.innerHTML = SVG.chevR;
+                first.appendChild(btn);
+            }
+        });
+    }
+
     function initDelegation() {
         document.addEventListener('click', function (e) {
             var kebabBtn = e.target.closest('[data-mt-kebab-btn]');
@@ -562,14 +583,24 @@
                 }
                 return;
             }
+            // Disclosure chevron (mobile) — expand/collapse the row's details.
+            var expander = e.target.closest('.mt-expander');
+            if (expander) {
+                e.preventDefault();
+                e.stopPropagation();
+                var exRow = expander.closest('tr');
+                if (exRow) { exRow.classList.toggle('mt-expanded'); }
+                return;
+            }
             // Click inside an open menu (a link) — let it navigate, don't close early.
             if (e.target.closest('[data-mt-kebab]')) { return; }
 
-            // Row navigation — any list table, not when clicking a control.
+            // Row tap — navigate on desktop; on mobile expand the card (Lagom-style).
             if (!e.target.closest('a, button, input, select, label')) {
                 var tr = e.target.closest('table[data-mt-type] tbody tr[data-href]');
                 if (tr) {
-                    window.location.href = tr.getAttribute('data-href');
+                    if (isMobileTable()) { tr.classList.toggle('mt-expanded'); }
+                    else { window.location.href = tr.getAttribute('data-href'); }
                     return;
                 }
             }
@@ -582,7 +613,8 @@
                 var tr = e.target.closest ? e.target.closest('table[data-mt-type] tbody tr[data-href]') : null;
                 if (tr && e.target === tr) {
                     e.preventDefault();
-                    window.location.href = tr.getAttribute('data-href');
+                    if (isMobileTable()) { tr.classList.toggle('mt-expanded'); }
+                    else { window.location.href = tr.getAttribute('data-href'); }
                 }
             }
         });
@@ -619,6 +651,11 @@
             // --- Mobile (<=720px) shared fixes for every list table ---
             // 1) Kebab menus: anchor to the card's right edge so they never run off
             //    the left of the screen once a row collapses to a single column.
+            // Lagom-style disclosure chevron — sits top-right of each row; hidden on
+            // desktop, shown on mobile where it toggles .mt-expanded.
+            + '.mt-expander{display:none;position:absolute;top:10px;right:10px;width:30px;height:30px;align-items:center;justify-content:center;border:0;border-radius:50%;background:transparent;color:var(--color-text-tertiary,#86868b);cursor:pointer;padding:0;z-index:3}'
+            + '.mt-expander:hover{background:var(--color-surface-secondary,rgba(0,0,0,.05))}'
+            + '.mt-expander svg{width:18px;height:18px;transition:transform .2s ease}'
             // !important because on the live WHMCS page the per-page CSS <link> sits in
             // the body, so it loads AFTER this injected <style> and wins specificity ties
             // (e.g. `.svc-main .filter-tabs{flex-wrap:nowrap}`). !important keeps these
@@ -631,6 +668,12 @@
             //    instead of stranding it off the end of the scrolling chip row.
             +   '.filter-tabs:has([data-mt-search]){flex-wrap:wrap !important;row-gap:8px}'
             +   '.filter-tabs>:has(>[data-mt-search]){flex:1 0 100% !important;max-width:none !important;margin-left:0 !important;order:2}'
+            // 3) Expandable rows: collapse each row to its first cell (identity) + the
+            //    chevron; .mt-expanded reveals the rest (the existing card layout).
+            +   '.mt-expander{display:inline-flex !important}'
+            +   'table[data-mt-type] tbody tr:not(.mt-expanded):has(.mt-expander)>td:not(:first-child){display:none !important}'
+            +   'table[data-mt-type] tbody tr:has(.mt-expander)>td:first-child{padding-right:46px !important}'
+            +   'table[data-mt-type] tbody tr.mt-expanded .mt-expander svg{transform:rotate(90deg)}'
             + '}';
         var s = document.createElement('style');
         s.id = 'mt-dt-styles';
