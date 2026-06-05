@@ -62,6 +62,10 @@
             <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><path d="M5 2.5h7l3 3v12a1 1 0 01-1 1H5a1 1 0 01-1-1v-14a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 2.5v3h3" stroke="currentColor" stroke-width="1.4"/></svg>
             Pages
         </a>
+        <a class="mt-topnav-item {if $mt_nav == 'sitemap'}is-active{/if}" href="{$viewHelper->url('sitemap')}">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><rect x="8" y="2.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="3" y="13.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="13" y="13.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M10 6.5v3M10 9.5H5v4M10 9.5h5v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Sitemap
+        </a>
         <a class="mt-topnav-item {if $mt_nav == 'menu'}is-active{/if}" href="{$viewHelper->url('menu')}">
             <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
             Menu

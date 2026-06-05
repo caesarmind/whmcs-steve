@@ -89,6 +89,10 @@ final class Hooks
                 'styles'        => $this->resolveActiveStyle($template),
                 'layouts'       => $layouts,
                 'pages'         => $pages,
+                // Computed SEO context (canonical, og:url/type, hreflang) for the
+                // document <head> in header.tpl. Built in PHP so the query-param
+                // stripping + locale resolution stays consistent and testable.
+                'seo'           => $this->resolveSeoContext($vars),
                 'subnav'        => $this->resolveSubnav($template, $vars, $pages),
                 'svcLayout'     => $this->resolveSvcLayout($template, $vars, $pages),
                 'license'       => [
@@ -1442,10 +1446,16 @@ final class Hooks
         }
 
         $pageMeta = $template->getPageMeta($page);
-        $variant  = (string)Settings::getValue(
-            $template->getName() . '_page_variant_' . $page,
-            (string)($pageMeta['defaultVariant'] ?? 'default')
-        );
+
+        // Per-page config now lives in the mytheme_pages registry. Read the row
+        // (read-only on this client path — the admin Pages tab seeds/maintains
+        // the table) and resolve the active variant; $stored is rebuilt from the
+        // row below in the legacy shape so the rest of this method is unchanged.
+        $row         = \MyTheme\Models\Page::get($template->getName(), $page) ?? [];
+        $rowSettings = is_array($row['settings'] ?? null) ? $row['settings'] : [];
+        $variant     = (string)($row['variant'] ?? '') !== ''
+            ? (string)$row['variant']
+            : (string)($pageMeta['defaultVariant'] ?? 'default');
 
         // Overwrites escape hatch — Lagom-style buyer override. If a customer
         // dropped core/pages/<page>/overwrites/overwrites.tpl in their theme,
@@ -1465,9 +1475,29 @@ final class Hooks
                 : null;
         }
 
-        $stored = Settings::getValue($template->getName() . '_page_options_' . $page, null);
-        if (!is_array($stored)) {
-            $stored = [];
+        // Rebuild the legacy $stored shape from the registry row. SEO title/
+        // description resolve to the request language; empty values are OMITTED
+        // so the seoDefaults fallback in $entry still applies (keeps page.php
+        // defaults live for pages the admin never customised).
+        $stored = [];
+        if ($row !== []) {
+            $lang = (string)($vars['language'] ?? 'english');
+            $stored = [
+                'indexing'         => $row['indexing'] ?? null,
+                'visibility'       => $row['visibility'] ?? null,
+                'subnav'           => $rowSettings['subnav'] ?? null,
+                'svclayout'        => $rowSettings['svclayout'] ?? null,
+                'options'          => is_array($rowSettings['options'] ?? null) ? $rowSettings['options'] : [],
+                'layout_overrides' => is_array($rowSettings['layout_overrides'] ?? null) ? $rowSettings['layout_overrides'] : [],
+            ];
+            $title = \MyTheme\Models\Page::lang($row['seo_title'] ?? null, $lang);
+            $desc  = \MyTheme\Models\Page::lang($row['seo_description'] ?? null, $lang);
+            $img   = (string)($row['seo_image'] ?? '');
+            $seo = [];
+            if ($title !== '') { $seo['title'] = $title; }
+            if ($desc  !== '') { $seo['description'] = $desc; }
+            if ($img   !== '') { $seo['social_image'] = $img; }
+            $stored['seo'] = $seo;
         }
         $seoDefaults = is_array($pageMeta['seoDefaults'] ?? null) ? $pageMeta['seoDefaults'] : [];
 
@@ -1515,6 +1545,71 @@ final class Hooks
             $out[$original] = $entry;
         }
         return $out;
+    }
+
+    /**
+     * Computed SEO context for the document <head> (exposed as $myTheme.seo).
+     * Centralises the bits that are awkward or error-prone in Smarty:
+     *   - canonical / og:url — the absolute current URL with the volatile
+     *     `currency` and `language` query params stripped, so paginated or
+     *     localised variants don't fragment into duplicate-content URLs.
+     *   - og:type — "website" for the home/index, "article" otherwise.
+     *   - hreflang — the alternate-language link set, emitted only when the
+     *     "Enable Alternate Links" flag is on (Lagom's enable_hreflang_links
+     *     parity) and a language's ISO code resolves; unmappable languages are
+     *     skipped rather than emitting a broken tag.
+     *
+     * URLs are built from $_SERVER the same way header.tpl builds its <base>
+     * tag (scheme + host + REQUEST_URI). When no host is resolvable (CLI/test)
+     * canonical is left empty so the template omits the tag.
+     *
+     * @return array{canonical:string, ogType:string, hreflang:list<array{code:string,url:string}>}
+     */
+    private function resolveSeoContext(array $vars): array
+    {
+        $https  = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        $scheme = (string)($_SERVER['REQUEST_SCHEME'] ?? ($https ? 'https' : 'http'));
+        $host   = (string)($_SERVER['HTTP_HOST'] ?? '');
+        $base   = $host !== '' ? $scheme . '://' . $host : '';
+
+        // Split REQUEST_URI into path + query, then drop the volatile params.
+        $uri   = (string)($_SERVER['REQUEST_URI'] ?? '');
+        $split = explode('?', $uri, 2);
+        $path  = $split[0];
+        parse_str($split[1] ?? '', $params);
+        unset($params['currency'], $params['language']);
+        $clean = $path . ($params !== [] ? '?' . http_build_query($params) : '');
+
+        $page   = (string)($vars['templatefile'] ?? '');
+        $ogType = in_array($page, ['', 'index', 'homepage', 'clientareahome'], true) ? 'website' : 'article';
+
+        $hreflang = [];
+        if ($base !== '' && $this->settingFlag('enable_alternate_links')) {
+            // x-default → the site default (no language param).
+            $hreflang[] = ['code' => 'x-default', 'url' => $base . $clean];
+            foreach (LocaleHelper::effectiveList() as $name) {
+                $code = LocaleHelper::codeFor($name);
+                if ($code === null) {
+                    continue;
+                }
+                $langParams = $params;
+                $langParams['language'] = $name;
+                $hreflang[] = [
+                    'code' => $code,
+                    'url'  => $base . $path . '?' . http_build_query($langParams),
+                ];
+            }
+            // Only x-default resolved (no per-language codes) → emit nothing.
+            if (count($hreflang) === 1) {
+                $hreflang = [];
+            }
+        }
+
+        return [
+            'canonical' => $base !== '' ? $base . $clean : '',
+            'ogType'    => $ogType,
+            'hreflang'  => $hreflang,
+        ];
     }
 
     /**

@@ -237,18 +237,44 @@
        chrome below — nav, sidebar/rail, breadcrumb and footer. *}
     {assign var=mt_fullPage value=false}
     {if $mt_pageEntry && !empty($mt_pageEntry.fullPage)}{assign var=mt_fullPage value=true}{/if}
-    <title>{if $mt_pageEntry && !empty($mt_pageEntry.seo.title)}{$mt_pageEntry.seo.title|escape}{else}{if $pagetitle}{$pagetitle} — {/if}{$companyname|escape}{/if}</title>
-    {if $mt_pageEntry && !empty($mt_pageEntry.seo.description)}
-        <meta name="description" content="{$mt_pageEntry.seo.description|escape}">
-    {elseif $tagline}
-        <meta name="description" content="{$tagline|escape}">
-    {/if}
-    {if $mt_pageEntry && $mt_pageEntry.indexing == 'disallow'}
-        <meta name="robots" content="noindex, nofollow">
-    {/if}
-    {if $mt_pageEntry && !empty($mt_pageEntry.seo.social_image)}
-        <meta property="og:image" content="{$mt_pageEntry.seo.social_image|escape}">
-        <meta name="twitter:card" content="summary_large_image">
+    {* ── SEO / social meta ───────────────────────────────────────────────
+       Per-page title/description/robots/social image come from the admin
+       Pages tab ($mt_pageEntry); canonical, og:url, og:type and the hreflang
+       set are computed server-side in Hooks::resolveSeoContext ($myTheme.seo).
+       Title + description are captured ONCE and reused across <title>, OG and
+       Twitter so the three can never drift apart. The <title> keeps its prior
+       behaviour: a custom SEO title renders verbatim; otherwise it's the WHMCS
+       page title + company name. *}
+    {capture name="mtTitle"}{if $mt_pageEntry && !empty($mt_pageEntry.seo.title)}{$mt_pageEntry.seo.title}{else}{if $pagetitle}{$pagetitle} — {/if}{$companyname}{/if}{/capture}
+    {capture name="mtDesc"}{if $mt_pageEntry && !empty($mt_pageEntry.seo.description)}{$mt_pageEntry.seo.description}{elseif $tagline}{$tagline}{/if}{/capture}
+    {assign var=mt_titleTag value=$smarty.capture.mtTitle}
+    {assign var=mt_metaDesc value=$smarty.capture.mtDesc}
+
+    <title>{$mt_titleTag|escape}</title>
+    {if $mt_metaDesc}<meta name="description" content="{$mt_metaDesc|escape}">{/if}
+    {if $mt_pageEntry && $mt_pageEntry.indexing == 'disallow'}<meta name="robots" content="noindex, nofollow">{/if}
+    {if $myTheme.seo.canonical}<link rel="canonical" href="{$myTheme.seo.canonical|escape}">{/if}
+
+    {* Open Graph *}
+    <meta property="og:type" content="{$myTheme.seo.ogType|default:'website'}">
+    <meta property="og:site_name" content="{$companyname|escape}">
+    <meta property="og:title" content="{$mt_titleTag|escape}">
+    {if $mt_metaDesc}<meta property="og:description" content="{$mt_metaDesc|escape}">{/if}
+    {if $myTheme.seo.canonical}<meta property="og:url" content="{$myTheme.seo.canonical|escape}">{/if}
+    {if $mt_pageEntry && !empty($mt_pageEntry.seo.social_image)}<meta property="og:image" content="{$mt_pageEntry.seo.social_image|escape}">{/if}
+
+    {* Twitter Card *}
+    <meta name="twitter:card" content="{if $mt_pageEntry && !empty($mt_pageEntry.seo.social_image)}summary_large_image{else}summary{/if}">
+    <meta name="twitter:title" content="{$mt_titleTag|escape}">
+    {if $mt_metaDesc}<meta name="twitter:description" content="{$mt_metaDesc|escape}">{/if}
+    {if $mt_pageEntry && !empty($mt_pageEntry.seo.social_image)}<meta name="twitter:image" content="{$mt_pageEntry.seo.social_image|escape}">{/if}
+
+    {* hreflang alternate links — emitted only when "Enable Alternate Links" is
+       on AND at least one language code resolves (see resolveSeoContext). *}
+    {if $myTheme.seo.hreflang}
+        {foreach $myTheme.seo.hreflang as $mt_alt}
+        <link rel="alternate" hreflang="{$mt_alt.code|escape}" href="{$mt_alt.url|escape}">
+        {/foreach}
     {/if}
     {* Admin-uploaded favicon (from Branding tab). When absent the browser
        falls back to its default; we deliberately do NOT emit a stale

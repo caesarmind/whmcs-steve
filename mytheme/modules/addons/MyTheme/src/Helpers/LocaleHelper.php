@@ -84,4 +84,34 @@ final class LocaleHelper
         // De-dupe while keeping the admin-chosen order.
         return array_values(array_unique($out));
     }
+
+    /**
+     * Map a WHMCS language name (the lowercased /lang/<name>.php filename, e.g.
+     * "english", "portuguese-br") to a BCP-47 / ISO-639 hreflang code. Returns
+     * null for names we don't recognise, so callers skip them rather than emit
+     * a broken hreflang attribute.
+     *
+     * Covers WHMCS's shipped language set; extend as new files are added.
+     */
+    public static function codeFor(string $name): ?string
+    {
+        static $map = [
+            'arabic' => 'ar', 'azerbaijani' => 'az', 'bulgarian' => 'bg',
+            'bengali' => 'bn', 'bosnian' => 'bs', 'catalan' => 'ca',
+            'chinese' => 'zh-cn', 'chinese-traditional' => 'zh-tw', 'croatian' => 'hr',
+            'czech' => 'cs', 'danish' => 'da', 'dutch' => 'nl', 'english' => 'en',
+            'estonian' => 'et', 'farsi' => 'fa', 'persian' => 'fa', 'finnish' => 'fi',
+            'french' => 'fr', 'georgian' => 'ka', 'german' => 'de', 'greek' => 'el',
+            'hebrew' => 'he', 'hindi' => 'hi', 'hungarian' => 'hu', 'indonesian' => 'id',
+            'italian' => 'it', 'japanese' => 'ja', 'kazakh' => 'kk', 'khmer' => 'km',
+            'korean' => 'ko', 'latvian' => 'lv', 'lithuanian' => 'lt', 'macedonian' => 'mk',
+            'malay' => 'ms', 'mongolian' => 'mn', 'norwegian' => 'nb', 'polish' => 'pl',
+            'portuguese' => 'pt', 'portuguese-br' => 'pt-br', 'brazilian-portuguese' => 'pt-br',
+            'romanian' => 'ro', 'russian' => 'ru', 'serbian' => 'sr', 'slovak' => 'sk',
+            'slovenian' => 'sl', 'spanish' => 'es', 'spanish-co' => 'es-co', 'swedish' => 'sv',
+            'thai' => 'th', 'turkish' => 'tr', 'ukrainian' => 'uk', 'vietnamese' => 'vi',
+            'albanian' => 'sq', 'armenian' => 'hy', 'belarusian' => 'be', 'icelandic' => 'is',
+        ];
+        return $map[strtolower(trim($name))] ?? null;
+    }
 }

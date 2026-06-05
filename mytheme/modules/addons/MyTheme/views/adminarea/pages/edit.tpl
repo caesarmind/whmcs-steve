@@ -92,24 +92,41 @@
         </div>
 
         <div class="mt-field" style="margin-top:16px">
-            <div class="mt-field-row">
-                <label class="mt-field-label" for="seo-title">SEO title</label>
-                <div class="mt-field-tools">
-                    <span class="mt-charcount">{$seo.title|strlen}/64</span>
-                </div>
-            </div>
-            <input id="seo-title" class="mt-input" type="text" name="seo_title" maxlength="64" value="{$seo.title|escape}" placeholder="{$pageLabel|escape}">
+            <label class="mt-field-label" for="seo-url">Public URL</label>
+            <div class="mt-row-help">Path relative to your site root, used in the sitemap (e.g. <code>announcements.php</code>). Leave blank to keep this page out of the sitemap.</div>
+            <input id="seo-url" class="mt-input" type="text" name="url" maxlength="255" value="{$seoUrl|escape}" placeholder="page.php">
         </div>
 
-        <div class="mt-field">
-            <div class="mt-field-row">
-                <label class="mt-field-label" for="seo-desc">SEO description</label>
-                <div class="mt-field-tools">
-                    <span class="mt-charcount">{$seo.description|strlen}/160</span>
+        {* Per-language SEO. A single-language install shows one title +
+           description; multi-language installs repeat the pair per language.
+           Stored + submitted as seo_title[<lang>] / seo_description[<lang>]. *}
+        {assign var=titleMap value=$seo.title}
+        {assign var=descMap value=$seo.description}
+        {foreach $seoLanguages as $lng}
+            {assign var=lcode value=$lng.name}
+            {if $seoLanguages|count > 1}
+                <div style="margin-top:16px;font-size:12px;font-weight:600;color:var(--mt-text-3);text-transform:uppercase;letter-spacing:.04em;">{$lng.label|escape}</div>
+            {/if}
+            <div class="mt-field"{if $seoLanguages|count <= 1} style="margin-top:16px"{/if}>
+                <div class="mt-field-row">
+                    <label class="mt-field-label" for="seo-title-{$lcode|escape}">SEO title</label>
+                    <div class="mt-field-tools">
+                        <span class="mt-charcount">{$titleMap[$lcode]|default:''|strlen}/64</span>
+                    </div>
                 </div>
+                <input id="seo-title-{$lcode|escape}" class="mt-input" type="text" name="seo_title[{$lcode|escape}]" maxlength="64" value="{$titleMap[$lcode]|default:''|escape}" placeholder="{$pageLabel|escape}">
             </div>
-            <textarea id="seo-desc" class="mt-textarea" name="seo_description" rows="3" maxlength="160">{$seo.description|escape}</textarea>
-        </div>
+
+            <div class="mt-field">
+                <div class="mt-field-row">
+                    <label class="mt-field-label" for="seo-desc-{$lcode|escape}">SEO description</label>
+                    <div class="mt-field-tools">
+                        <span class="mt-charcount">{$descMap[$lcode]|default:''|strlen}/160</span>
+                    </div>
+                </div>
+                <textarea id="seo-desc-{$lcode|escape}" class="mt-textarea" name="seo_description[{$lcode|escape}]" rows="3" maxlength="160">{$descMap[$lcode]|default:''|escape}</textarea>
+            </div>
+        {/foreach}
 
         <div class="mt-field">
             <label class="mt-field-label" for="seo-social">Social image URL</label>

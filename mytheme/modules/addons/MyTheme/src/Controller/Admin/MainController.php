@@ -16,6 +16,7 @@ use MyTheme\Controller\AbstractController;
  *   ?action=editStyle        → style editor (color groups, typography, etc.)
  *   ?action=layouts          → layout picker
  *   ?action=pages            → pages list (default sub=index, ?sub=edit, ?sub=save)
+ *   ?action=sitemap          → sitemap.xml + robots.txt (sub=save|generate|preview)
  *   ?action=menu             → menu list
  *   ?action=editMenu         → menu editor (drag-drop tree)
  *   ?action=branding         → logo / favicon uploads
@@ -42,6 +43,17 @@ final class MainController extends AbstractController
             'edit' => $ctl->editAction(),
             'save' => $ctl->saveAction(),
             default => $ctl->indexAction(),
+        };
+    }
+    public function sitemapAction(): string
+    {
+        $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');
+        $ctl = new SitemapController();
+        return match ($sub) {
+            'save'     => $ctl->saveAction(),
+            'generate' => $ctl->generateAction(),
+            'preview'  => $ctl->previewAction(),
+            default    => $ctl->indexAction(),
         };
     }
     public function menuAction(): string

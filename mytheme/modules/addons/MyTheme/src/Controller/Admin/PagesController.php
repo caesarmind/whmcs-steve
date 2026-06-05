@@ -4,8 +4,11 @@ declare(strict_types=1);
 namespace MyTheme\Controller\Admin;
 
 use MyTheme\Controller\AbstractController;
+use MyTheme\Database\Migrator;
 use MyTheme\Helpers\AddonHelper;
-use MyTheme\Models\Settings;
+use MyTheme\Helpers\LocaleHelper;
+use MyTheme\Models\Page;
+use MyTheme\Service\PageRegistry;
 use MyTheme\Template\PagesCache;
 use MyTheme\Template\Template;
 
@@ -15,11 +18,13 @@ use MyTheme\Template\Template;
  * Routing — MainController::pagesAction reads ?sub= and dispatches:
  *   index   → grouped page list (?tab=Public|Authentication|… filters group)
  *   edit    → editor for one page (?page=login)
- *   save    → POST handler that writes mytheme_settings rows
+ *   save    → POST handler that writes the mytheme_pages registry row
  *
- * Storage:
- *   mytheme_<slug>_page_variant_<page>    string  — active variant name
- *   mytheme_<slug>_page_options_<page>    json    — see savedOptionsShape() below
+ * Storage: one row per (template, page) in the mytheme_pages table (see
+ * Models\Page). PagesController self-heals on the index hit — Migrator creates
+ * the table and PageRegistry::sync seeds a row per filesystem page, importing
+ * any legacy mytheme_settings `<tpl>_page_options_<page>` /
+ * `<tpl>_page_variant_<page>` rows (kept untouched as a rollback path).
  */
 final class PagesController extends AbstractController
 {
@@ -46,6 +51,16 @@ final class PagesController extends AbstractController
         // client-area path while still surfacing every page in the editor.
         PagesCache::ensure($template);
 
+        // Self-heal: create/upgrade the mytheme_pages table and seed a row for
+        // every discovered page (importing any legacy mytheme_settings page
+        // config). Idempotent + admin-only — never runs on the client-area path.
+        try {
+            (new Migrator(dirname(__DIR__, 3)))->migrate();
+            PageRegistry::sync($template);
+        } catch (\Throwable $e) {
+            error_log('MyTheme pages self-heal failed: ' . $e->getMessage());
+        }
+
         $rows = [];
         $allGroups = [];
         foreach ($template->getPages() as $page) {
@@ -62,11 +77,8 @@ final class PagesController extends AbstractController
             $group   = (string)($meta['group'] ?? 'Other');
             $allGroups[$group] = true;
 
-            $variant = (string)Settings::getValue(
-                $template->getName() . '_page_variant_' . $page,
-                (string)($meta['defaultVariant'] ?? 'default')
-            );
             $options = $this->readPageOptions($template, $page, $meta);
+            $variant = $options['variant'];
 
             $rows[] = [
                 'name'         => $page,
@@ -75,7 +87,7 @@ final class PagesController extends AbstractController
                 'description'  => (string)($meta['description'] ?? ''),
                 'variant'      => $variant,
                 'variantLabel' => ucfirst(str_replace(['-', '_'], ' ', $variant)),
-                'hasSeo'       => $options['seo']['title'] !== '' || $options['seo']['description'] !== '',
+                'hasSeo'       => $options['hasSeo'],
                 'indexing'     => $options['indexing'],
                 'visibility'   => $options['visibility'],
             ];
@@ -124,14 +136,17 @@ final class PagesController extends AbstractController
 
         $meta          = $template->getPageMeta($page);
         $variants      = $template->getPageVariants($page);
-        $defaultVar    = (string)($meta['defaultVariant'] ?? 'default');
-        $activeVariant = (string)Settings::getValue(
-            $template->getName() . '_page_variant_' . $page,
-            $defaultVar
-        );
 
         $options          = $this->readPageOptions($template, $page, $meta);
+        $activeVariant    = $options['variant'];
         $supportedOptions = is_array($meta['supportedOptions'] ?? null) ? $meta['supportedOptions'] : [];
+
+        // Languages for the multi-language SEO fields (one field per language;
+        // a single-language install renders exactly one, as before).
+        $seoLanguages = array_map(
+            fn (string $l) => ['name' => $l, 'label' => ucwords(str_replace(['-', '_'], ' ', $l))],
+            LocaleHelper::effectiveList()
+        );
 
         // Project each declared option onto a uniform row the view can iterate.
         $optionRows = [];
@@ -161,6 +176,8 @@ final class PagesController extends AbstractController
             'svclayout'          => $options['svclayout'],
             'svcLayoutApplicable' => in_array($page, Template::SVC_LAYOUT_PAGES, true),
             'seo'              => $options['seo'],
+            'seoUrl'           => $options['url'],
+            'seoLanguages'     => $seoLanguages,
             'layoutChoices'    => [
                 'main-menu' => $this->layoutChoices($template, 'main-menu'),
                 'footer'    => $this->layoutChoices($template, 'footer'),
@@ -190,7 +207,6 @@ final class PagesController extends AbstractController
         $submittedVariant = (string)($_POST['variant'] ?? '');
         $validNames       = array_column($variants, 'name');
         $chosenVariant    = in_array($submittedVariant, $validNames, true) ? $submittedVariant : $defaultVar;
-        Settings::setValue($template->getName() . '_page_variant_' . $page, $chosenVariant);
 
         // Indexing & visibility — whitelist.
         $indexing   = (string)($_POST['indexing']   ?? 'inherit');
@@ -202,14 +218,27 @@ final class PagesController extends AbstractController
         if (!in_array($subnav,     self::VALID_SUBNAV,     true)) { $subnav     = 'inherit'; }
         if (!in_array($svclayout,  self::VALID_SVCLAYOUT,  true)) { $svclayout  = 'inherit'; }
 
-        // SEO — trim, length-cap, and decode WHMCS 9's POST-time htmlspecialchars
-        // wrap so `AT&T` doesn't round-trip as `AT&amp;amp;T` after one save +
-        // one render (same fix the menu builder applies to its JSON fields).
-        $seo = [
-            'title'        => substr(htmlspecialchars_decode(trim((string)($_POST['seo_title']        ?? '')), ENT_QUOTES), 0, 200),
-            'description'  => substr(htmlspecialchars_decode(trim((string)($_POST['seo_description']  ?? '')), ENT_QUOTES), 0, 400),
-            'social_image' => substr(htmlspecialchars_decode(trim((string)($_POST['seo_social_image'] ?? '')), ENT_QUOTES), 0, 500),
-        ];
+        // SEO title/description are per-language maps keyed by WHMCS language
+        // name; the editor submits seo_title[<lang>] / seo_description[<lang>].
+        // Trim, length-cap, and decode WHMCS 9's POST-time htmlspecialchars wrap
+        // so `AT&T` doesn't round-trip as `AT&amp;amp;T` (same fix the menu
+        // builder applies). Only non-empty languages are stored; an all-empty
+        // field becomes null so the reader falls back to the page seoDefault.
+        $titleIn  = self::postLangMap('seo_title');
+        $descIn   = self::postLangMap('seo_description');
+        $titleMap = [];
+        $descMap  = [];
+        foreach (LocaleHelper::effectiveList() as $lang) {
+            $t = substr(htmlspecialchars_decode(trim((string)($titleIn[$lang] ?? '')), ENT_QUOTES), 0, 200);
+            $d = substr(htmlspecialchars_decode(trim((string)($descIn[$lang]  ?? '')), ENT_QUOTES), 0, 400);
+            if ($t !== '') { $titleMap[$lang] = $t; }
+            if ($d !== '') { $descMap[$lang]  = $d; }
+        }
+        $socialImage = substr(htmlspecialchars_decode(trim((string)($_POST['seo_social_image'] ?? '')), ENT_QUOTES), 0, 500);
+
+        // Public URL — relative to the system URL; blank = not crawlable (null).
+        $urlRaw = trim((string)($_POST['url'] ?? ''));
+        $url    = $urlRaw === '' ? null : ltrim(substr($urlRaw, 0, 255), '/');
 
         // Supported options — type-coerce per page.php spec.
         $supportedOptions = is_array($meta['supportedOptions'] ?? null) ? $meta['supportedOptions'] : [];
@@ -237,57 +266,130 @@ final class PagesController extends AbstractController
             }
         }
 
-        $payload = [
-            'indexing'         => $indexing,
-            'visibility'       => $visibility,
-            'subnav'           => $subnav,
-            'svclayout'        => $svclayout,
-            'seo'              => $seo,
-            'options'          => $options,
-            'layout_overrides' => $layoutOverrides,
-        ];
-        Settings::setValue($template->getName() . '_page_options_' . $page, $payload, 'json');
+        // Single source of truth: write the mytheme_pages row. Only the keys
+        // present here are touched, so seeded columns (seo_enabled/published)
+        // are preserved. The legacy mytheme_settings keys are intentionally
+        // left untouched as a rollback path.
+        Page::upsert($template->getName(), $page, [
+            'url'             => $url,
+            'page_group'      => (string)($meta['group'] ?? 'Other'),
+            'indexing'        => $indexing,
+            'visibility'      => $visibility,
+            'variant'         => $chosenVariant,
+            'seo_title'       => $titleMap !== [] ? $titleMap : null,
+            'seo_description' => $descMap  !== [] ? $descMap  : null,
+            'seo_image'       => $socialImage,
+            'settings'        => [
+                'options'          => $options,
+                'layout_overrides' => $layoutOverrides,
+                'subnav'           => $subnav,
+                'svclayout'        => $svclayout,
+            ],
+        ]);
 
         $this->redirect('?module=MyTheme&action=pages&sub=edit&page=' . urlencode($page) . '&flash=saved');
     }
 
     /**
-     * Read stored options and merge with page.php seoDefaults.
+     * Read a page's config from the mytheme_pages registry for the admin editor,
+     * merged with page.php seoDefaults. SEO title/description come back as
+     * per-language field maps (keyed by WHMCS language name) for the
+     * multi-language editor; when nothing is stored in any language the
+     * default-language field is pre-filled with the page seoDefault (so the
+     * editor shows the effective value, matching the prior single-field UX).
      *
+     * @param array<string,mixed> $meta
      * @return array{
+     *   variant: string,
+     *   url: string,
      *   indexing: string,
      *   visibility: string,
-     *   seo: array{title:string,description:string,social_image:string},
+     *   subnav: string,
+     *   svclayout: string,
+     *   seo: array{title: array<string,string>, description: array<string,string>, social_image: string},
+     *   hasSeo: bool,
      *   options: array<string,bool|int|string>,
      *   layout_overrides: array{main-menu: ?string, footer: ?string},
      * }
      */
     private function readPageOptions(Template $template, string $page, array $meta): array
     {
-        $stored = Settings::getValue($template->getName() . '_page_options_' . $page, null);
-        if (!is_array($stored)) {
-            $stored = [];
-        }
+        $row         = Page::get($template->getName(), $page) ?? [];
+        $settings    = is_array($row['settings'] ?? null) ? $row['settings'] : [];
         $seoDefaults = is_array($meta['seoDefaults'] ?? null) ? $meta['seoDefaults'] : [];
+        $langs       = LocaleHelper::effectiveList();
+        if ($langs === []) { $langs = ['english']; }
+        $defaultLang = $langs[0];
+
+        $titleFields = self::seoFieldMap($row['seo_title'] ?? null, $langs);
+        $descFields  = self::seoFieldMap($row['seo_description'] ?? null, $langs);
+        // Pre-fill the default-language field with the page seoDefault when the
+        // admin hasn't set anything in any language.
+        if (trim(implode('', $titleFields)) === '' && (string)($seoDefaults['title'] ?? '') !== '') {
+            $titleFields[$defaultLang] = (string)$seoDefaults['title'];
+        }
+        if (trim(implode('', $descFields)) === '' && (string)($seoDefaults['description'] ?? '') !== '') {
+            $descFields[$defaultLang] = (string)$seoDefaults['description'];
+        }
+
+        $lo = is_array($settings['layout_overrides'] ?? null) ? $settings['layout_overrides'] : [];
 
         return [
-            'indexing'   => (string)($stored['indexing']   ?? $seoDefaults['indexing'] ?? 'inherit'),
-            'visibility' => (string)($stored['visibility'] ?? 'public'),
-            'subnav'     => (string)($stored['subnav'] ?? 'inherit'),
-            'svclayout'  => (string)($stored['svclayout'] ?? 'inherit'),
+            'variant'    => (string)($row['variant'] ?? '') !== ''
+                ? (string)$row['variant'] : (string)($meta['defaultVariant'] ?? 'default'),
+            'url'        => (string)($row['url'] ?? ''),
+            'indexing'   => (string)($row['indexing'] ?? $seoDefaults['indexing'] ?? 'inherit'),
+            'visibility' => (string)($row['visibility'] ?? 'public'),
+            'subnav'     => (string)($settings['subnav'] ?? 'inherit'),
+            'svclayout'  => (string)($settings['svclayout'] ?? 'inherit'),
             'seo' => [
-                'title'        => (string)($stored['seo']['title']        ?? $seoDefaults['title']        ?? ''),
-                'description'  => (string)($stored['seo']['description']  ?? $seoDefaults['description']  ?? ''),
-                'social_image' => (string)($stored['seo']['social_image'] ?? ''),
+                'title'        => $titleFields,
+                'description'  => $descFields,
+                'social_image' => (string)($row['seo_image'] ?? ''),
             ],
-            'options' => is_array($stored['options'] ?? null) ? $stored['options'] : [],
+            'hasSeo'  => trim(implode('', $titleFields)) !== '' || trim(implode('', $descFields)) !== '',
+            'options' => is_array($settings['options'] ?? null) ? $settings['options'] : [],
             'layout_overrides' => [
-                'main-menu' => isset($stored['layout_overrides']['main-menu']) && is_string($stored['layout_overrides']['main-menu'])
-                    ? $stored['layout_overrides']['main-menu'] : null,
-                'footer'    => isset($stored['layout_overrides']['footer']) && is_string($stored['layout_overrides']['footer'])
-                    ? $stored['layout_overrides']['footer'] : null,
+                'main-menu' => isset($lo['main-menu']) && is_string($lo['main-menu']) ? $lo['main-menu'] : null,
+                'footer'    => isset($lo['footer']) && is_string($lo['footer']) ? $lo['footer'] : null,
             ],
         ];
+    }
+
+    /**
+     * Project a stored per-language value (map | string | null) onto an editor
+     * field map: one entry per effective language, '' when unset. A legacy plain
+     * string binds to the first language only.
+     *
+     * @param list<string> $langs
+     * @return array<string,string>
+     */
+    private static function seoFieldMap(mixed $raw, array $langs): array
+    {
+        $first = $langs[0] ?? 'english';
+        $out   = [];
+        foreach ($langs as $l) {
+            $out[$l] = is_array($raw)
+                ? (string)($raw[$l] ?? '')
+                : ($l === $first ? (string)($raw ?? '') : '');
+        }
+        return $out;
+    }
+
+    /**
+     * Read a per-language form field (seo_title[<lang>]) as a map, tolerating a
+     * legacy plain-string POST by binding it to the first effective language.
+     *
+     * @return array<string,string>
+     */
+    private static function postLangMap(string $field): array
+    {
+        $raw = $_POST[$field] ?? [];
+        if (is_string($raw)) {
+            $langs = LocaleHelper::effectiveList();
+            return [($langs[0] ?? 'english') => $raw];
+        }
+        return is_array($raw) ? $raw : [];
     }
 
     /** Canonical ordering of page groups; unknown groups bucket at the end. */
