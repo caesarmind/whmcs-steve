@@ -756,7 +756,24 @@ final class Hooks
             return [];
         }
         $list = $this->fetchAllProducts($clientId);
-        return ['mtProducts' => $list];
+
+        // Per-status counts across ALL the client's services (direct DB group-by,
+        // independent of any ?status filter or localAPI row limit) so the template
+        // renders only the status tabs that actually have services.
+        $counts = [];
+        try {
+            $rows = \WHMCS\Database\Capsule::table('tblhosting')
+                ->where('userid', $clientId)
+                ->groupBy('domainstatus')
+                ->get(['domainstatus', \WHMCS\Database\Capsule::raw('COUNT(*) as cnt')]);
+            foreach ($rows as $r) {
+                $counts[(string)$r->domainstatus] = (int)$r->cnt;
+            }
+        } catch (\Throwable) {
+            // leave empty — the template falls back to its in-page tally
+        }
+
+        return ['mtProducts' => $list, 'mtServiceStatusCounts' => $counts];
     }
 
     /** Tickets list — populates $mtTickets on /supporttickets.php. */

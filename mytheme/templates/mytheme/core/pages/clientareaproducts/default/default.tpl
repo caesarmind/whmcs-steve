@@ -90,16 +90,33 @@
         </div>
 
         {* Filter tabs (pill-group, outside the card) *}
+        {* Status tabs: show ALL + only statuses that have >=1 service. Prefer the
+           reliable per-status counts from Hooks::clientAreaPageProductsServices
+           (all services, independent of any ?status filter); fall back to the
+           in-page tally if they're unavailable. *}
+        {if isset($mtServiceStatusCounts)}
+            {assign var=avActive value=$mtServiceStatusCounts.Active|default:0}
+            {assign var=avPending value=$mtServiceStatusCounts.Pending|default:0}
+            {assign var=avSuspended value=$mtServiceStatusCounts.Suspended|default:0}
+            {assign var=avTerminated value=$mtServiceStatusCounts.Terminated|default:0}
+            {assign var=avCancelled value=$mtServiceStatusCounts.Cancelled|default:0}
+            {assign var=avFraud value=$mtServiceStatusCounts.Fraud|default:0}
+        {else}
+            {assign var=avActive value=$count_active}
+            {assign var=avPending value=$count_pending}
+            {assign var=avSuspended value=$count_suspended}
+            {assign var=avTerminated value=$count_terminated}
+            {assign var=avCancelled value=$count_cancelled}
+            {assign var=avFraud value=$count_fraud}
+        {/if}
         <div class="filter-tabs">
             <a href="{$WEB_ROOT}/clientarea.php?action=services" class="filter-tab{if !$currentFilter} active{/if}" data-mt-for="svcTable" data-mt-filter="">{$LANG.all}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services&status=Active" class="filter-tab{if $currentFilter == 'Active'} active{/if}" data-mt-for="svcTable" data-mt-filter="Active">{$LANG.clientareaactive}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services&status=Pending" class="filter-tab{if $currentFilter == 'Pending'} active{/if}" data-mt-for="svcTable" data-mt-filter="Pending">{$LANG.clientareapending}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services&status=Suspended" class="filter-tab{if $currentFilter == 'Suspended'} active{/if}" data-mt-for="svcTable" data-mt-filter="Suspended">{$LANG.clientareasuspended}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services&status=Terminated" class="filter-tab{if $currentFilter == 'Terminated'} active{/if}" data-mt-for="svcTable" data-mt-filter="Terminated">{$LANG.clientareaterminated}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=services&status=Cancelled" class="filter-tab{if $currentFilter == 'Cancelled'} active{/if}" data-mt-for="svcTable" data-mt-filter="Cancelled">{$LANG.clientareacancelled}</a>
-            {if $count_fraud > 0}
-            <a href="{$WEB_ROOT}/clientarea.php?action=services&status=Fraud" class="filter-tab{if $currentFilter == 'Fraud'} active{/if}" data-mt-for="svcTable" data-mt-filter="Fraud">{$LANG.clientareafraud}</a>
-            {/if}
+            {if $avActive > 0}<a href="{$WEB_ROOT}/clientarea.php?action=services&status=Active" class="filter-tab{if $currentFilter == 'Active'} active{/if}" data-mt-for="svcTable" data-mt-filter="Active">{$LANG.clientareaactive}</a>{/if}
+            {if $avPending > 0}<a href="{$WEB_ROOT}/clientarea.php?action=services&status=Pending" class="filter-tab{if $currentFilter == 'Pending'} active{/if}" data-mt-for="svcTable" data-mt-filter="Pending">{$LANG.clientareapending}</a>{/if}
+            {if $avSuspended > 0}<a href="{$WEB_ROOT}/clientarea.php?action=services&status=Suspended" class="filter-tab{if $currentFilter == 'Suspended'} active{/if}" data-mt-for="svcTable" data-mt-filter="Suspended">{$LANG.clientareasuspended}</a>{/if}
+            {if $avTerminated > 0}<a href="{$WEB_ROOT}/clientarea.php?action=services&status=Terminated" class="filter-tab{if $currentFilter == 'Terminated'} active{/if}" data-mt-for="svcTable" data-mt-filter="Terminated">{$LANG.clientareaterminated}</a>{/if}
+            {if $avCancelled > 0}<a href="{$WEB_ROOT}/clientarea.php?action=services&status=Cancelled" class="filter-tab{if $currentFilter == 'Cancelled'} active{/if}" data-mt-for="svcTable" data-mt-filter="Cancelled">{$LANG.clientareacancelled}</a>{/if}
+            {if $avFraud > 0}<a href="{$WEB_ROOT}/clientarea.php?action=services&status=Fraud" class="filter-tab{if $currentFilter == 'Fraud'} active{/if}" data-mt-for="svcTable" data-mt-filter="Fraud">{$LANG.clientareafraud}</a>{/if}
             <span class="mt-list-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" placeholder="{$LANG.search}…" aria-label="{$LANG.search}" data-mt-search data-mt-for="svcTable"></span>
         </div>
 
