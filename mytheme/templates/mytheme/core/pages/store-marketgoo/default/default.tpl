@@ -15,7 +15,7 @@
    stylesheet rule), so its markup is kept verbatim. *}
 
 {assign var=_mgCount value=0}
-{if isset($plans) && is_array($plans)}{assign var=_mgCount value=$plans|@count}{/if}
+{if isset($plans)}{assign var=_mgCount value=$plans|@count}{/if}
 {assign var=_mgI value=0}
 {if $_mgCount > 0}
     {foreach $plans as $_mgPlan}

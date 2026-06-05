@@ -13,7 +13,7 @@
    testimonials are kept verbatim. *}
 
 {assign var=_nvCount value=0}
-{if isset($plans) && is_array($plans)}{assign var=_nvCount value=$plans|@count}{/if}
+{if isset($plans)}{assign var=_nvCount value=$plans|@count}{/if}
 {assign var=_nvFrom value='$8.99'}
 {assign var=_nvPid value=0}
 {if $_nvCount > 0}

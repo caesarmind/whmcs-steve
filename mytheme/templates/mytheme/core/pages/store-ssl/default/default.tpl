@@ -16,7 +16,7 @@
 {* Resolve data state: full when we have a real certificate to sell (or are
    in admin preview), else the graceful "marketing offline" empty state. *}
 {assign var=_sslCount value=0}
-{if isset($certificates) && is_array($certificates)}
+{if isset($certificates)}
     {foreach $certificates as $_type => $_certProducts}
         {assign var=_sslCount value=$_sslCount+($_certProducts|@count)}
     {/foreach}

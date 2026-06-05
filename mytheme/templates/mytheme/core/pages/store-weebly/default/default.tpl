@@ -13,7 +13,7 @@
    the theme's styled .hp-stat. *}
 
 {assign var=_wblCount value=0}
-{if isset($products) && is_array($products)}{assign var=_wblCount value=$products|@count}{/if}
+{if isset($products)}{assign var=_wblCount value=$products|@count}{/if}
 {assign var=_wblI value=0}
 {if $_wblCount > 0}
     {foreach $products as $_wblProduct}

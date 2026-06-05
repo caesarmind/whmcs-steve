@@ -13,7 +13,7 @@
    blocks and testimonials are kept verbatim. *}
 
 {assign var=_oxCount value=0}
-{if isset($plans) && is_array($plans)}{assign var=_oxCount value=$plans|@count}{/if}
+{if isset($plans)}{assign var=_oxCount value=$plans|@count}{/if}
 {assign var=_oxI value=0}
 {if $_oxCount > 0}
     {foreach $plans as $_oxPlan}

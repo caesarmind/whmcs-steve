@@ -16,7 +16,7 @@
    the theme avoids fabricated announcement labels. *}
 
 {assign var=_sbCount value=0}
-{if isset($planComparisonData) && is_array($planComparisonData)}{assign var=_sbCount value=$planComparisonData|@count}{/if}
+{if isset($planComparisonData)}{assign var=_sbCount value=$planComparisonData|@count}{/if}
 {assign var=_sbI value=0}
 {if $_sbCount > 0}
     {foreach $planComparisonData as $_sbPlan}

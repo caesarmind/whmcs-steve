@@ -13,7 +13,7 @@
    SVG/illustration blocks and testimonial social-proof are kept verbatim. *}
 
 {assign var=_cgCount value=0}
-{if isset($products) && is_array($products)}{assign var=_cgCount value=$products|@count}{/if}
+{if isset($products)}{assign var=_cgCount value=$products|@count}{/if}
 {if $_cgCount > 0 || (isset($inPreview) && $inPreview)}
     {assign var=storeIsEmpty value='full'}
 {else}

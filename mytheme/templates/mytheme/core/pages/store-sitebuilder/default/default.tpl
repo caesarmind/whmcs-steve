@@ -13,7 +13,7 @@
    which is not in apple-theme.css, so we use the theme's styled .hp-stat. *}
 
 {assign var=_sibCount value=0}
-{if isset($plans) && is_array($plans)}{assign var=_sibCount value=$plans|@count}{/if}
+{if isset($plans)}{assign var=_sibCount value=$plans|@count}{/if}
 {assign var=_sibI value=0}
 {if $_sibCount > 0}
     {foreach $plans as $_sibPlan}
