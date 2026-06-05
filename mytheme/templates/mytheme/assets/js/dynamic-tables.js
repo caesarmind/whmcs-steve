@@ -619,14 +619,18 @@
             // --- Mobile (<=720px) shared fixes for every list table ---
             // 1) Kebab menus: anchor to the card's right edge so they never run off
             //    the left of the screen once a row collapses to a single column.
+            // !important because on the live WHMCS page the per-page CSS <link> sits in
+            // the body, so it loads AFTER this injected <style> and wins specificity ties
+            // (e.g. `.svc-main .filter-tabs{flex-wrap:nowrap}`). !important keeps these
+            // mobile overrides winning regardless of stylesheet order.
             + '@media (max-width:720px){'
-            +   'table[data-mt-type] tbody tr{position:relative}'
-            +   'tbody [data-mt-kebab],tbody td:has([data-mt-kebab]){position:static}'
-            +   '[data-mt-kebab] [role="menu"]{right:12px;left:auto;min-width:0;width:max-content;max-width:calc(100vw - 40px)}'
+            +   'table[data-mt-type] tbody tr{position:relative !important}'
+            +   'tbody [data-mt-kebab],tbody td:has([data-mt-kebab]){position:static !important}'
+            +   '[data-mt-kebab] [role="menu"]{right:12px !important;left:auto !important;min-width:0 !important;width:max-content;max-width:calc(100vw - 40px)}'
             // 2) Search box: drop it to its own full-width row below the filter chips,
             //    instead of stranding it off the end of the scrolling chip row.
-            +   '.filter-tabs:has([data-mt-search]){flex-wrap:wrap;row-gap:8px}'
-            +   '.filter-tabs>:has(>[data-mt-search]){flex:1 0 100%;max-width:none;margin-left:0;order:2}'
+            +   '.filter-tabs:has([data-mt-search]){flex-wrap:wrap !important;row-gap:8px}'
+            +   '.filter-tabs>:has(>[data-mt-search]){flex:1 0 100% !important;max-width:none !important;margin-left:0 !important;order:2}'
             + '}';
         var s = document.createElement('style');
         s.id = 'mt-dt-styles';
