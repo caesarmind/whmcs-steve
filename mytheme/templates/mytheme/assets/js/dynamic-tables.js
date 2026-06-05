@@ -1,21 +1,40 @@
-/* MyTheme — Dynamic AJAX Loading for Data Tables.
+/* MyTheme — Unified list-table engine (Lagom-parity Dynamic AJAX Loading).
  *
- * Server-side DataTables for the client-area list pages. When the admin enables
- * "Enable Dynamic AJAX Loading", each list template renders a table skeleton with
- *   <table id="..." data-mt-action="tableInvoices" data-mt-type="invoices"
- *          data-mt-endpoint="/clientarea.php" data-mt-order="0:desc" data-mt-length="10">
- * plus controls tagged data-mt-for="<tableId>". This script:
- *   - inits DataTables in serverSide mode (paging/search/sort done at the DB),
- *   - POSTs mtAction + DataTables params to the endpoint (hooks.php dispatch),
- *   - rebuilds the Apple row markup from the JSON via per-type render functions,
- *   - drives the existing Apple search box / pager / info text and the row-click
- *     navigation + kebab menus through event delegation.
+ * ONE engine drives every client-area list table (services, domains, invoices,
+ * quotes, tickets, emails) in BOTH modes, chosen per <table> by whether the
+ * admin "Enable Dynamic AJAX Loading" setting tagged it with data-mt-action:
  *
- * Row markup here mirrors the Smarty {foreach} fallback in each template. All
- * dynamic values pass through esc() before hitting innerHTML.
+ *   • SERVER-SIDE (data-mt-action present): DataTables runs serverSide — paging,
+ *     search, sort, and status-filter happen at the DB. The <tbody> ships empty
+ *     and rows are rebuilt from JSON by the per-type render fns in COLUMNS. The
+ *     request POSTs `mtAction` + DataTables params to the endpoint (hooks.php →
+ *     AjaxService → TableData).
  *
- * Loaded only when the feature is on. Requires jQuery + DataTables (loaded by the
- * list template). If either is missing it no-ops.
+ *   • CLIENT-SIDE (data-mt-type only, no data-mt-action): the page server-renders
+ *     ALL rows into the <tbody>; DataTables enhances that static table for
+ *     client-side paging/search/sort/filter. No network calls.
+ *
+ * Either way the SAME Apple chrome is driven through controls tagged
+ * data-mt-for="<tableId>": the search box (data-mt-search), page-size <select>
+ * (data-dt-length), pager (data-dt-pager), info text (data-dt-info) and the
+ * filter tabs (data-mt-filter). Row-click navigation (tr[data-href]) and kebab
+ * menus (data-mt-kebab / data-mt-kebab-btn) are handled by one global delegation
+ * for both modes.
+ *
+ * Per-table config rides on the <table> as data-attributes:
+ *   data-mt-type        list type — keys COLUMNS / TYPE_META          (required)
+ *   data-mt-order       initial "<colIdx>:<asc|desc>"                  (default 0:desc)
+ *   data-mt-length      initial page size                             (default 10)
+ *   data-mt-filter-col  status column index for client-side filtering (optional; TYPE_META fallback)
+ *   data-mt-action      server-side mtAction — its presence selects serverSide mode
+ *   data-mt-endpoint    server-side POST URL                          (default clientarea.php)
+ * Non-sortable headers are marked with th[data-mt-noorder].
+ *
+ * All user copy comes from window.MyThemeTablesLang (English fallback below) and
+ * every dynamic value passes through esc() before hitting innerHTML.
+ *
+ * Loaded on every list page (both modes). Requires jQuery + DataTables; no-ops if
+ * either is missing.
  */
 (function () {
     'use strict';
@@ -29,6 +48,21 @@
     // a blocking alert; leave the table empty instead.
     $.fn.dataTable.ext.errMode = 'none';
 
+    // ------------------------------------------------------------------ i18n
+
+    var LANG_FALLBACK = {
+        showing: 'Showing', to: '–', of: 'of',
+        previousPage: 'Previous page', nextPage: 'Next page', viewAll: 'View all'
+    };
+    function lang(key) {
+        var L = window.MyThemeTablesLang || {};
+        var v = L[key];
+        return (v === undefined || v === null || v === '') ? LANG_FALLBACK[key] : v;
+    }
+
+    // How long the client-side tables remember sort / page / search / filter (seconds).
+    var STATE_DURATION = 60 * 60 * 2;
+
     // ---------------------------------------------------------------- helpers
 
     var ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -36,7 +70,9 @@
         if (s === null || s === undefined) { return ''; }
         return String(s).replace(/[&<>"']/g, function (c) { return ESC_MAP[c]; });
     }
-
+    function escRegex(s) {
+        return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
     function debounce(fn, ms) {
         var t;
         return function () {
@@ -94,7 +130,23 @@
 
     function textCell(d) { return esc(d); }
 
+    // ------------------------------------------------------------- type meta
+
+    // Per-type metadata: the status column used for client-side filter tabs, and
+    // the column→WHMCS-orderby-key map used to mirror sort state into the URL
+    // (?orderby=&sort=) so a refresh keeps the order. Types without an orderKeys
+    // map simply skip URL sync (sort still works client-side).
+    var TYPE_META = {
+        invoices: { filterCol: 4, orderKeys: { 0: 'id', 1: 'date', 2: 'due', 3: 'amount', 4: 'status' } },
+        quotes:   { filterCol: 4, orderKeys: { 0: 'id', 1: 'date', 2: 'valid', 3: 'amount', 4: 'status' } },
+        tickets:  { filterCol: 2, orderKeys: { 0: 'subject', 1: 'department', 2: 'status', 3: 'updated' }, forceStringSort: true },
+        services: { filterCol: 3, orderKeys: null },
+        domains:  { filterCol: 3, orderKeys: null },
+        emails:   { filterCol: null, orderKeys: null }
+    };
+
     // ---------------------------------------------------------- column defs
+    // (server-side mode only — client-side mode reuses the server-rendered DOM)
 
     var COLUMNS = {
         invoices: [
@@ -207,7 +259,7 @@
     function buildPager(el, info) {
         var page = info.page, pages = info.pages, html = '';
         html += '<button type="button" data-page="' + (page - 1) + '"' + (page <= 0 ? ' disabled' : '')
-              + ' aria-label="Previous page">' + SVG.chevL + '</button>';
+              + ' aria-label="' + esc(lang('previousPage')) + '">' + SVG.chevL + '</button>';
         if (pages > 0) {
             var win = 5,
                 start = Math.max(0, page - Math.floor(win / 2)),
@@ -220,7 +272,7 @@
             html += '<button type="button" class="active">1</button>';
         }
         html += '<button type="button" data-page="' + (page + 1) + '"' + (page >= pages - 1 ? ' disabled' : '')
-              + ' aria-label="Next page">' + SVG.chevR + '</button>';
+              + ' aria-label="' + esc(lang('nextPage')) + '">' + SVG.chevR + '</button>';
         el.innerHTML = html;
     }
 
@@ -229,7 +281,7 @@
         var infoEl = ctrl('data-dt-info', id);
         if (infoEl) {
             var from = info.recordsDisplay ? info.start + 1 : 0;
-            infoEl.textContent = 'Showing ' + from + '–' + info.end + ' of ' + info.recordsDisplay;
+            infoEl.textContent = lang('showing') + ' ' + from + lang('to') + info.end + ' ' + lang('of') + ' ' + info.recordsDisplay;
         }
         var pagerEl = ctrl('data-dt-pager', id);
         if (pagerEl) { buildPager(pagerEl, info); }
@@ -237,8 +289,9 @@
 
     // --------------------------------------------------------------- wiring
 
-    function wireControls(id, dt, state) {
-        // Search
+    /** Wire the Apple footer/search/filter controls to a DataTable (either mode). */
+    function wireControls(id, dt, opts) {
+        // Search box
         var search = ctrl('data-mt-search', id);
         if (search) {
             search.addEventListener('input', debounce(function () {
@@ -252,8 +305,13 @@
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 Array.prototype.forEach.call(filters, function (b) { b.classList.toggle('active', b === btn); });
-                state.filter = btn.getAttribute('data-mt-filter') || '';
-                dt.ajax.reload();
+                var value = btn.getAttribute('data-mt-filter') || '';
+                if (opts.mode === 'server') {
+                    opts.state.filter = value;
+                    dt.ajax.reload();
+                } else {
+                    applyClientFilter(dt, opts.filterCol, value);
+                }
             });
         });
 
@@ -263,7 +321,7 @@
             lenSel.value = String(dt.page.len());
             lenSel.addEventListener('change', function () {
                 var n = parseInt(this.value, 10);
-                if (n > 0) { dt.page.len(n).draw(); }
+                if (n > 0 || n === -1) { dt.page.len(n).draw(); }
             });
         }
 
@@ -279,32 +337,129 @@
         }
     }
 
-    function buildTable(tableEl) {
-        var id = tableEl.id;
-        var type = tableEl.getAttribute('data-mt-type');
-        var cols = COLUMNS[type];
-        if (!id || !cols) { return; }
+    /** Client-side status filter on a column, anchored so "Paid" ≠ "Unpaid". */
+    function applyClientFilter(dt, col, value) {
+        if (col === null || col === undefined || col < 0) { dt.draw(); return; }
+        if (!value || value.toLowerCase() === 'all') {
+            dt.column(col).search('').draw();
+        } else {
+            dt.column(col).search('^\\s*' + escRegex(value) + '\\s*$', true, false).draw();
+        }
+    }
 
+    /** Add a "View all" (-1) page-size option — client mode only (server mode caps rows). */
+    function injectViewAllOption(id) {
+        var sel = ctrl('data-dt-length', id);
+        if (!sel || sel.querySelector('option[value="-1"]')) { return; }
+        var opt = document.createElement('option');
+        opt.value = '-1';
+        opt.textContent = lang('viewAll');
+        sel.appendChild(opt);
+    }
+
+    /** Highlight the filter tab matching the table's current column filter (after a state restore). */
+    function syncFilterTabs(id, dt, filterCol) {
+        if (filterCol === null || filterCol === undefined || filterCol < 0) { return; }
+        var current = dt.column(filterCol).search();
+        var tabs = ctrlAll('data-mt-filter', id);
+        Array.prototype.forEach.call(tabs, function (btn) {
+            var v = btn.getAttribute('data-mt-filter') || '';
+            var expected = v ? ('^\\s*' + escRegex(v) + '\\s*$') : '';
+            btn.classList.toggle('active', expected === current);
+        });
+    }
+
+    /** Reflect the table's current sort column/direction on the Apple header buttons. */
+    function reflectSortHeader(thead, dt) {
+        if (!thead) { return; }
+        thead.querySelectorAll('[data-sort], .svc-sort, [data-dir]').forEach(function (b) {
+            b.setAttribute('data-dir', '');
+            b.classList.remove('active');
+        });
+        var ord = dt.order();
+        if (!ord || !ord.length) { return; }
+        var th = (thead.rows.length ? thead.rows[0].cells : [])[ord[0][0]];
+        if (th) {
+            var b = th.querySelector('[data-sort], .svc-sort') || th;
+            if (b.setAttribute) { b.setAttribute('data-dir', ord[0][1] || 'asc'); }
+            if (b.classList) { b.classList.add('active'); }
+        }
+    }
+
+    /** Mirror sort state into ?orderby=&sort= and reflect it on the Apple header. */
+    function wireSortSync(id, dt, type) {
+        var meta = TYPE_META[type] || {};
+        var thead = document.getElementById(id);
+        thead = thead ? thead.tHead : null;
+        dt.on('order.dt', function () {
+            reflectSortHeader(thead, dt);
+            // URL sync (only for types with a known orderby key map).
+            if (meta.orderKeys) {
+                var ord = dt.order();
+                if (!ord || !ord.length) { return; }
+                var key = meta.orderKeys[ord[0][0]];
+                if (!key) { return; }
+                try {
+                    var url = new URL(window.location.href);
+                    url.searchParams.set('orderby', key);
+                    url.searchParams.set('sort', (ord[0][1] || 'asc').toUpperCase());
+                    window.history.replaceState({}, '', url.toString());
+                } catch (err) { /* old browsers — ignore */ }
+            }
+        });
+        // Reflect the restored / initial sort on first paint (a stateSave restore
+        // fires order.dt during construction, before this listener is attached).
+        reflectSortHeader(thead, dt);
+    }
+
+    // ------------------------------------------------------- table init (modes)
+
+    function readConfig(tableEl) {
         var orderParts = (tableEl.getAttribute('data-mt-order') || '0:desc').split(':');
-        var orderIdx = parseInt(orderParts[0], 10) || 0;
-        var orderDir = orderParts[1] === 'asc' ? 'asc' : 'desc';
-        var len = parseInt(tableEl.getAttribute('data-mt-length'), 10) || 10;
+        var meta = TYPE_META[tableEl.getAttribute('data-mt-type')] || {};
+        var filterCol = tableEl.hasAttribute('data-mt-filter-col')
+            ? parseInt(tableEl.getAttribute('data-mt-filter-col'), 10)
+            : (meta.filterCol === undefined ? null : meta.filterCol);
+        return {
+            id:       tableEl.id,
+            type:     tableEl.getAttribute('data-mt-type'),
+            orderIdx: parseInt(orderParts[0], 10) || 0,
+            orderDir: orderParts[1] === 'asc' ? 'asc' : 'desc',
+            len:      parseInt(tableEl.getAttribute('data-mt-length'), 10) || 10,
+            filterCol: filterCol
+        };
+    }
+
+    /** Column indices whose header carries data-mt-noorder → not sortable. */
+    function noOrderTargets(tableEl) {
+        var targets = [];
+        var ths = tableEl.tHead ? tableEl.querySelectorAll('thead th') : [];
+        Array.prototype.forEach.call(ths, function (th, i) {
+            if (th.hasAttribute('data-mt-noorder')) { targets.push(i); }
+        });
+        return targets;
+    }
+
+    function initServerSide(tableEl) {
+        var cfg = readConfig(tableEl);
+        var cols = COLUMNS[cfg.type];
+        if (!cfg.id || !cols) { return; }
+
         var action = tableEl.getAttribute('data-mt-action');
         var endpoint = tableEl.getAttribute('data-mt-endpoint') || 'clientarea.php';
-
         var state = { filter: '' };
-        var activeFilter = document.querySelector('[data-mt-filter].active[data-mt-for="' + id + '"]');
+        var activeFilter = document.querySelector('[data-mt-filter].active[data-mt-for="' + cfg.id + '"]');
         if (activeFilter) { state.filter = activeFilter.getAttribute('data-mt-filter') || ''; }
 
-        var dt = $('#' + id).DataTable({
+        var dt = $('#' + cfg.id).DataTable({
             serverSide: true,
             processing: true,
             ordering: true,
             autoWidth: false,
             deferRender: true,
             dom: 'rt',
-            pageLength: len,
-            order: [[orderIdx, orderDir]],
+            pageLength: cfg.len,
+            order: [[cfg.orderIdx, cfg.orderDir]],
             ajax: {
                 url: endpoint,
                 type: 'POST',
@@ -315,10 +470,71 @@
                 row.setAttribute('role', 'link');
                 row.setAttribute('tabindex', '0');
             },
-            drawCallback: function () { updateControls(id, dt); }
+            // Use this.api() — during the initial (synchronous) client-side draw the
+            // outer `dt` var is not yet assigned, so referencing it would throw and
+            // leave the info text / pager empty.
+            drawCallback: function () { updateControls(cfg.id, this.api()); }
         });
 
-        wireControls(id, dt, state);
+        wireControls(cfg.id, dt, { mode: 'server', state: state, filterCol: cfg.filterCol });
+        wireSortSync(cfg.id, dt, cfg.type);
+    }
+
+    function initClientSide(tableEl) {
+        var cfg = readConfig(tableEl);
+        if (!cfg.id) { return; }
+
+        var meta = TYPE_META[cfg.type] || {};
+        var columnDefs = [{ orderable: false, targets: noOrderTargets(tableEl) }];
+        if (meta.forceStringSort) {
+            // Force string sort on every column — auto-detection picks "num"/"date"
+            // when a data-order value looks numeric, which breaks alphabetic sort on
+            // text columns (e.g. ticket subject). ISO dates still sort chronologically.
+            columnDefs.push({ type: 'string', targets: '_all' });
+        }
+
+        // Client mode keeps every row in the DOM, so offer a "View all" page size.
+        injectViewAllOption(cfg.id);
+
+        var dt = $('#' + cfg.id).DataTable({
+            paging: true,
+            searching: true,
+            info: false,
+            ordering: true,
+            autoWidth: false,
+            dom: 'rt',
+            pageLength: cfg.len,
+            order: [[cfg.orderIdx, cfg.orderDir]],
+            columnDefs: columnDefs,
+            // Remember sort / page / search / filter across reloads (client mode only;
+            // server mode re-queries each load, and Lagom likewise skips state there).
+            stateSave: true,
+            stateDuration: STATE_DURATION,
+            // Use this.api() — during the initial (synchronous) client-side draw the
+            // outer `dt` var is not yet assigned, so referencing it would throw and
+            // leave the info text / pager empty.
+            drawCallback: function () { updateControls(cfg.id, this.api()); }
+        });
+
+        wireControls(cfg.id, dt, { mode: 'client', filterCol: cfg.filterCol });
+        wireSortSync(cfg.id, dt, cfg.type);
+
+        // Reconcile the Apple controls with whatever stateSave restored: a restored
+        // column filter wins; otherwise honour the server-rendered active tab (the
+        // ?status= initial filter) on first paint.
+        var restoredFilter = (cfg.filterCol !== null && cfg.filterCol >= 0) ? dt.column(cfg.filterCol).search() : '';
+        if (restoredFilter) {
+            syncFilterTabs(cfg.id, dt, cfg.filterCol);
+        } else {
+            var activeFilter = document.querySelector('[data-mt-filter].active[data-mt-for="' + cfg.id + '"]');
+            if (activeFilter) {
+                var v = activeFilter.getAttribute('data-mt-filter') || '';
+                if (v) { applyClientFilter(dt, cfg.filterCol, v); }
+            }
+        }
+        // Restore the search box text to match a stateSave-restored global search.
+        var searchInput = ctrl('data-mt-search', cfg.id);
+        if (searchInput) { searchInput.value = dt.search() || ''; }
     }
 
     // ------------------------------------------------- global delegation
@@ -349,9 +565,9 @@
             // Click inside an open menu (a link) — let it navigate, don't close early.
             if (e.target.closest('[data-mt-kebab]')) { return; }
 
-            // Row navigation — only for our AJAX tables, and not when clicking a control.
+            // Row navigation — any list table, not when clicking a control.
             if (!e.target.closest('a, button, input, select, label')) {
-                var tr = e.target.closest('table[data-mt-action] tbody tr[data-href]');
+                var tr = e.target.closest('table[data-mt-type] tbody tr[data-href]');
                 if (tr) {
                     window.location.href = tr.getAttribute('data-href');
                     return;
@@ -363,7 +579,7 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') { closeKebabs(); return; }
             if (e.key === 'Enter' || e.key === ' ') {
-                var tr = e.target.closest ? e.target.closest('table[data-mt-action] tbody tr[data-href]') : null;
+                var tr = e.target.closest ? e.target.closest('table[data-mt-type] tbody tr[data-href]') : null;
                 if (tr && e.target === tr) {
                     e.preventDefault();
                     window.location.href = tr.getAttribute('data-href');
@@ -379,7 +595,7 @@
             + '.mt-dt-search input{font:inherit;color:inherit;padding:8px 12px;border:1px solid var(--border,rgba(0,0,0,.12));'
             + 'border-radius:10px;background:var(--surface,#fff);min-width:200px;outline:none}'
             + '.mt-dt-search input:focus{border-color:var(--accent,#0071e3);box-shadow:0 0 0 3px rgba(0,113,227,.15)}'
-            + 'table[data-mt-action] tbody tr[data-href]{cursor:pointer}'
+            + 'table[data-mt-type] tbody tr[data-href]{cursor:pointer}'
             + 'div.dataTables_processing{position:absolute;top:0;right:0;padding:6px 10px;font-size:13px;'
             + 'color:var(--text-secondary,#6e6e73);background:transparent;z-index:2}'
             // Generic footer used by pages that have no bespoke pager (e.g. emails).
@@ -394,7 +610,7 @@
             + '.mt-dt-foot [data-dt-pager] button.active{background:var(--accent,#0071e3);color:#fff;border-color:transparent}'
             + '.mt-dt-foot [data-dt-pager] button:disabled{opacity:.4;cursor:default}'
             + '.mt-dt-foot [data-dt-pager] svg{width:16px;height:16px}'
-            // Domains AJAX table reuses the existing .domain-row / .dom-list-head-row
+            // Domains table reuses the existing .domain-row / .dom-list-head-row
             // CSS grid; reset the <table> to block so those grid rules drive layout.
             + '.dom-table,.dom-table thead,.dom-table tbody{display:block}'
             + '.dom-table{width:100%}'
@@ -409,12 +625,17 @@
     // ------------------------------------------------------------- bootstrap
 
     function init() {
-        var tables = document.querySelectorAll('table[data-mt-action][data-mt-type]');
+        var tables = document.querySelectorAll('table[data-mt-type]');
         if (!tables.length) { return; }
         injectStyles();
         initDelegation();
         Array.prototype.forEach.call(tables, function (t) {
-            try { buildTable(t); } catch (err) { if (window.console) { console.error('MyTheme table init failed', err); } }
+            try {
+                if (t.hasAttribute('data-mt-action')) { initServerSide(t); }
+                else { initClientSide(t); }
+            } catch (err) {
+                if (window.console) { console.error('MyTheme table init failed', err); }
+            }
         });
     }
 
@@ -425,5 +646,5 @@
     }
 
     // Expose the registry so later phases / overrides can add table types.
-    window.MyThemeTables = { columns: COLUMNS, esc: esc, pill: pill, kebab: kebab, SVG: SVG };
+    window.MyThemeTables = { columns: COLUMNS, meta: TYPE_META, esc: esc, pill: pill, kebab: kebab, SVG: SVG };
 })();

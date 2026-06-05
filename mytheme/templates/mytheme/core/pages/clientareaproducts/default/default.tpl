@@ -48,11 +48,8 @@
 
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareaproducts.css?v={$myTheme.version|default:'1.0'}">
-{if $mtAjaxTables}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
-<script src="{$WEB_ROOT}/templates/{$template}/assets/js/dynamic-tables.js?v={$myTheme.version|default:'1.0'}"></script>
-{/if}
+{* Unified list-table engine (client-side + Dynamic AJAX Loading) — loaded once. *}
+{include file="`$template`/includes/partials/list-table-assets.tpl"}
 
 
 {* Hand layout signals to body for CSS toggles *}
@@ -103,7 +100,7 @@
             {if $count_fraud > 0}
             <a href="{$WEB_ROOT}/clientarea.php?action=services&status=Fraud" class="filter-tab{if $currentFilter == 'Fraud'} active{/if}" data-mt-for="svcTable" data-mt-filter="Fraud">{$LANG.clientareafraud}</a>
             {/if}
-            {if $mtAjaxTables}<span class="mt-dt-search" style="margin-left:auto"><input type="search" placeholder="{$LANG.search}…" aria-label="{$LANG.search}" data-mt-search data-mt-for="svcTable"></span>{/if}
+            <span class="mt-list-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" placeholder="{$LANG.search}…" aria-label="{$LANG.search}" data-mt-search data-mt-for="svcTable"></span>
         </div>
 
         {* Services stack: in "inside" mode it renders as one unified white card;
@@ -122,7 +119,7 @@
             {* Services card — wraps the table *}
             <div class="card svc-table-card">
                 <div>
-                    <table class="svc-table"{if $mtAjaxTables} id="svcTable" data-mt-action="tableServices" data-mt-type="services" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="0:asc" data-mt-length="10"{/if}>
+                    <table class="svc-table" id="svcTable" data-mt-type="services" data-mt-order="0:asc" data-mt-length="10" data-mt-filter-col="3"{if $mtAjaxTables} data-mt-action="tableServices" data-mt-endpoint="{$WEB_ROOT}/clientarea.php"{/if}>
                         <colgroup>
                             <col class="svc-col-product">
                             <col class="svc-col-pricing">
@@ -136,7 +133,7 @@
                                 <th scope="col"><button type="button" class="svc-sort" data-sort="price" data-dir="">{$LANG.clientareaaddonpricing} <span class="svc-sort-ico"></span></button></th>
                                 <th scope="col"><button type="button" class="svc-sort" data-sort="due" data-dir="">{$LANG.clientareahostingnextduedate} <span class="svc-sort-ico"></span></button></th>
                                 <th scope="col"><button type="button" class="svc-sort" data-sort="status" data-dir="">{$LANG.clientareastatus} <span class="svc-sort-ico"></span></button></th>
-                                <th scope="col" aria-label="{$LANG.actions}"></th>
+                                <th scope="col" aria-label="{$LANG.actions}" data-mt-noorder></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -151,7 +148,7 @@
                                         <div class="svc-cell-product-domain">{$product.domain|default:'—'|escape}</div>
                                     </div>
                                 </td>
-                                <td>
+                                <td data-order="{if $product.recurringamount}{$product.recurringamount|regex_replace:'/[^0-9.\-]/':''}{elseif $product.firstpaymentamount}{$product.firstpaymentamount|regex_replace:'/[^0-9.\-]/':''}{else}0{/if}">
                                     <div class="svc-cell-price-main">
                                         {if $product.recurringamount}{$product.recurringamount}{elseif $product.firstpaymentamount}{$product.firstpaymentamount}{else}—{/if}
                                         {if $product.billingcycle}<span class="cycle">/{$product.billingcycle|escape}</span>{/if}
@@ -165,8 +162,8 @@
                                 {assign var=svcStatusClass value=$product.statusClass|default:$svcStatus|lower}
                                 <td><span class="status-pill {$svcStatusClass|escape}">{$svcStatus|escape}</span></td>
                                 <td class="svc-cell-actions">
-                                    <div class="svc-menu-wrap" onclick="event.stopPropagation();">
-                                        <button type="button" class="svc-menu-btn" aria-label="{$LANG.actions}" aria-haspopup="true" aria-expanded="false" onclick="toggleSvcMenu(this, event)">
+                                    <div class="svc-menu-wrap" data-mt-kebab>
+                                        <button type="button" class="svc-menu-btn" aria-label="{$LANG.actions}" aria-haspopup="true" aria-expanded="false" data-mt-kebab-btn>
                                             <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
                                         </button>
                                         <div class="svc-menu" role="menu">
@@ -270,73 +267,3 @@
     </aside>
 </div>
 
-{if !$mtAjaxTables}
-<script>
-// Row-level navigation — the whole .svc-table row is clickable to its data-href,
-// while nested <a>/<button> elements keep their own behavior.
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.svc-table tbody tr[data-href]').forEach(function (row) {
-        row.setAttribute('tabindex', '0');
-        row.setAttribute('role', 'link');
-        row.addEventListener('click', function (e) {
-            if (e.target.closest('a, button, input, select, .svc-menu-wrap')) return;
-            window.location.href = row.dataset.href;
-        });
-        row.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                window.location.href = row.dataset.href;
-            }
-        });
-    });
-});
-
-// Kebab menu toggle for each service row
-function toggleSvcMenu(btn, e) {
-    if (e) { e.preventDefault(); e.stopPropagation(); }
-    var wrap = btn.closest('.svc-menu-wrap');
-    var wasOpen = wrap.classList.contains('open');
-    document.querySelectorAll('.svc-menu-wrap.open').forEach(function (w) {
-        w.classList.remove('open');
-        var b = w.querySelector('.svc-menu-btn');
-        if (b) b.setAttribute('aria-expanded', 'false');
-    });
-    if (!wasOpen) {
-        wrap.classList.add('open');
-        btn.setAttribute('aria-expanded', 'true');
-    }
-}
-// Click outside / Escape closes any open menu
-document.addEventListener('click', function (e) {
-    if (e.target.closest('.svc-menu-wrap')) return;
-    document.querySelectorAll('.svc-menu-wrap.open').forEach(function (w) {
-        w.classList.remove('open');
-        var b = w.querySelector('.svc-menu-btn');
-        if (b) b.setAttribute('aria-expanded', 'false');
-    });
-});
-document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-        document.querySelectorAll('.svc-menu-wrap.open').forEach(function (w) {
-            w.classList.remove('open');
-            var b = w.querySelector('.svc-menu-btn');
-            if (b) b.setAttribute('aria-expanded', 'false');
-        });
-    }
-});
-
-// Sort cycle — click a header to toggle none → asc → desc → none
-(function () {
-    var sorts = document.querySelectorAll('.svc-sort');
-    sorts.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            var dir = btn.getAttribute('data-dir');
-            var next = dir === '' ? 'asc' : dir === 'asc' ? 'desc' : '';
-            sorts.forEach(function (b) { b.setAttribute('data-dir', ''); b.classList.remove('active'); });
-            btn.setAttribute('data-dir', next);
-            if (next) btn.classList.add('active');
-        });
-    });
-})();
-</script>
-{/if}

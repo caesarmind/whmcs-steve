@@ -40,11 +40,8 @@
 
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareadomains.css?v={$myTheme.version|default:'1.0'}">
-{if $mtAjaxTables}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
-<script src="{$WEB_ROOT}/templates/{$template}/assets/js/dynamic-tables.js?v={$myTheme.version|default:'1.0'}"></script>
-{/if}
+{* Unified list-table engine (client-side + Dynamic AJAX Loading) — loaded once. *}
+{include file="`$template`/includes/partials/list-table-assets.tpl"}
 
 {* Hand layout signals to body for CSS toggles *}
 <script>
@@ -94,83 +91,70 @@
             <button class="filter-tab" data-mt-for="domTable" data-mt-filter="Active">{$LANG.statusactive|default:'Active'}</button>
             <button class="filter-tab">{$LANG.expiringsoon}</button>
             <button class="filter-tab" data-mt-for="domTable" data-mt-filter="Transferred Away">{$hadrianLang.domains.transferredAway}</button>
-            {if $mtAjaxTables}<span class="mt-dt-search" style="margin-left:auto"><input type="search" placeholder="{$LANG.search}…" aria-label="{$LANG.search}" data-mt-search data-mt-for="domTable"></span>{/if}
+            <span class="mt-list-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" placeholder="{$LANG.search}…" aria-label="{$LANG.search}" data-mt-search data-mt-for="domTable"></span>
         </div>
 
         {* Domains stack: "inside" = unified card; "outside" = card + floating head row + floating pager *}
         <div class="dom-stack">
-
-            {if !$mtAjaxTables}
-            <div class="dom-list-head-row when-full">
-                <div>{$LANG.domain|default:'Domain'}</div>
-                <div>{$LANG.registered}</div>
-                <div>{$hadrianLang.domains.expires}</div>
-                <div>{$LANG.domainstatus}</div>
-                <div>{$LANG.domainsautorenew}</div>
-                <div></div>
-            </div>
-            {/if}
 
             <div class="card dom-list-card">
 
                 {if $domCount > 0}
                 <div class="when-full">
                     <div class="card-body">
-                        {if $mtAjaxTables}
-                        <table id="domTable" class="dom-table" data-mt-action="tableDomains" data-mt-type="domains" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="0:asc" data-mt-length="10">
+                        <table id="domTable" class="dom-table" data-mt-type="domains" data-mt-order="0:asc" data-mt-length="10" data-mt-filter-col="3"{if $mtAjaxTables} data-mt-action="tableDomains" data-mt-endpoint="{$WEB_ROOT}/clientarea.php"{/if}>
                             <thead><tr class="dom-list-head-row">
                                 <th>{$LANG.domain|default:'Domain'}</th>
                                 <th>{$LANG.registered}</th>
                                 <th>{$hadrianLang.domains.expires}</th>
                                 <th>{$LANG.domainstatus}</th>
-                                <th>{$LANG.domainsautorenew}</th>
-                                <th aria-hidden="true"></th>
+                                <th data-mt-noorder>{$LANG.domainsautorenew}</th>
+                                <th data-mt-noorder aria-hidden="true"></th>
                             </tr></thead>
-                            <tbody></tbody>
+                            <tbody>
+                                {if !$mtAjaxTables}
+                                {foreach $domList as $d}
+                                {assign var=statusLower value=$d.status|lower}
+                                <tr class="domain-row" data-href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}">
+                                    <td><span class="domain-name">{$d.domain|escape}</span></td>
+                                    <td class="domain-date">{$d.registrationdate|escape}</td>
+                                    <td class="domain-date">{$d.expirydate|escape}</td>
+                                    <td><span class="status-pill {$statusLower}">{$d.status|escape}</span></td>
+                                    <td><span class="toggle-switch{if isset($d.autorenew) && $d.autorenew} active{/if}" aria-hidden="true"></span></td>
+                                    <td class="dom-cell-actions">
+                                        <div class="dom-menu-wrap" data-mt-kebab>
+                                            <button type="button" class="dom-menu-btn" aria-label="{$LANG.actions}" aria-haspopup="true" aria-expanded="false" data-mt-kebab-btn>
+                                                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                            </button>
+                                            <div class="dom-menu" role="menu">
+                                                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}" class="dom-menu-item" role="menuitem">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                                    {$LANG.managedomain}
+                                                </a>
+                                                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}&modop=custom&a=nameservers" class="dom-menu-item" role="menuitem">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="8" rx="1"/><rect x="2" y="13" width="20" height="8" rx="1"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/></svg>
+                                                    {$LANG.domainmanagens}
+                                                </a>
+                                                <a href="{$WEB_ROOT}/clientarea.php?action=domaincontacts&domainid={$d.id}" class="dom-menu-item" role="menuitem">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                                    {$LANG.domaincontactinfoedit}
+                                                </a>
+                                                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}" class="dom-menu-item" role="menuitem">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/></svg>
+                                                    {$LANG.domainautorenewstatus}
+                                                </a>
+                                                <a href="{$WEB_ROOT}/cart.php?gid=renewals" class="dom-menu-item" role="menuitem">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                                                    {$LANG.renew|default:'Renew'}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {/foreach}
+                                {/if}
+                            </tbody>
                         </table>
-                        {else}
-                        <div class="domain-list">
-                            {foreach $domList as $d}
-                            {assign var=statusLower value=$d.status|lower}
-                            <div class="domain-row" data-href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}" role="link" tabindex="0">
-                                <div class="domain-name">{$d.domain|escape}</div>
-                                <div class="domain-date">{$d.registrationdate|escape}</div>
-                                <div class="domain-date">{$d.expirydate|escape}</div>
-                                <div><span class="status-pill {$statusLower}">{$d.status|escape}</span></div>
-                                <div>
-                                    <div class="toggle-switch{if isset($d.autorenew) && $d.autorenew} active{/if}" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('active')"></div>
-                                </div>
-                                <div class="dom-menu-wrap" onclick="event.preventDefault(); event.stopPropagation();">
-                                    <button type="button" class="dom-menu-btn" aria-label="{$LANG.actions}" aria-haspopup="true" aria-expanded="false" onclick="toggleDomMenu(this)">
-                                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-                                    </button>
-                                    <div class="dom-menu" role="menu">
-                                        <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}" class="dom-menu-item" role="menuitem">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-                                            {$LANG.managedomain}
-                                        </a>
-                                        <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}&modop=custom&a=nameservers" class="dom-menu-item" role="menuitem">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="8" rx="1"/><rect x="2" y="13" width="20" height="8" rx="1"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/></svg>
-                                            {$LANG.domainmanagens}
-                                        </a>
-                                        <a href="{$WEB_ROOT}/clientarea.php?action=domaincontacts&domainid={$d.id}" class="dom-menu-item" role="menuitem">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                            {$LANG.domaincontactinfoedit}
-                                        </a>
-                                        <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}" class="dom-menu-item" role="menuitem">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/></svg>
-                                            {$LANG.domainautorenewstatus}
-                                        </a>
-                                        <a href="{$WEB_ROOT}/cart.php?gid=renewals" class="dom-menu-item" role="menuitem">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-                                            {$LANG.renew|default:'Renew'}
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            {/foreach}
-                        </div>
-                        {/if}
                     </div>
                 </div>
                 {/if}

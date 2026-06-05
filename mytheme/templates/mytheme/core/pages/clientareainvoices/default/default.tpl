@@ -46,10 +46,8 @@
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareainvoices.css?v={$myTheme.version|default:'1.0'}">
 
-{* Lagom-style instant sort: jQuery 3.x + DataTables 1.x for client-side reorder. *}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
-{if $mtAjaxTables}<script src="{$WEB_ROOT}/templates/{$template}/assets/js/dynamic-tables.js?v={$myTheme.version|default:'1.0'}"></script>{/if}
+{* Unified list-table engine (client-side + Dynamic AJAX Loading) — loaded once. *}
+{include file="`$template`/includes/partials/list-table-assets.tpl"}
 
 <script>
 (function () {
@@ -130,7 +128,7 @@
                 </div>
 
                 {if $invCount > 0}
-                <table class="inv-table when-full" id="invTable"{if $mtAjaxTables} data-mt-action="tableInvoices" data-mt-type="invoices" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="0:desc" data-mt-length="10"{/if}>
+                <table class="inv-table when-full" id="invTable" data-mt-type="invoices" data-mt-order="{$sortColIdx}:{$sortDir|lower}" data-mt-length="10" data-mt-filter-col="4"{if $mtAjaxTables} data-mt-action="tableInvoices" data-mt-endpoint="{$WEB_ROOT}/clientarea.php"{/if}>
                     <colgroup>
                         <col class="inv-col-invoice">
                         <col class="inv-col-date">
@@ -146,7 +144,7 @@
                             <th class="hl-due">{$LANG.invoicesdatedue} <span class="inv-sort-ico"></span></th>
                             <th class="hl-amount">{$LANG.invoicesamount} <span class="inv-sort-ico"></span></th>
                             <th class="hl-status">{$LANG.invoicesstatus} <span class="inv-sort-ico"></span></th>
-                            <th class="hl-actions" data-orderable="false" aria-hidden="true"></th>
+                            <th class="hl-actions" data-mt-noorder aria-hidden="true"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -176,8 +174,8 @@
                             <td class="amount{if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'} due{/if}" data-order="{$sortAmount}">{$inv.total|escape}</td>
                             <td data-order="{$invStatusLower|escape:'html'}"><span class="status-pill {$invStatusLower}">{$invStatus|escape}</span></td>
                             <td class="actions">
-                                <div class="inv-menu-wrap" onclick="event.stopPropagation();">
-                                    <button type="button" class="inv-menu-btn" aria-label="{$LANG.actions}" aria-haspopup="true" aria-expanded="false" onclick="toggleInvMenu(this, event)">
+                                <div class="inv-menu-wrap" data-mt-kebab>
+                                    <button type="button" class="inv-menu-btn" aria-label="{$LANG.actions}" aria-haspopup="true" aria-expanded="false" data-mt-kebab-btn>
                                         <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
                                     </button>
                                     <div class="inv-menu" role="menu">
@@ -260,132 +258,3 @@
         </div>
     </aside>
 </div>{* /.inv-split *}
-
-{if !$mtAjaxTables}
-<script>var _localLang = { previousPage: '{$hadrianLang.common.previousPage|escape:"javascript"}', nextPage: '{$hadrianLang.common.nextPage|escape:"javascript"}', showingRange: '{$hadrianLang.common.tableShowingRange|escape:"javascript"}' };</script>
-<script>
-{literal}
-// Row navigation — clicking a row goes to viewinvoice
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.inv-table tbody tr[data-href]').forEach(function (row) {
-        row.setAttribute('tabindex', '0');
-        row.setAttribute('role', 'link');
-        row.addEventListener('click', function (e) {
-            if (e.target.closest('a, button, input, select, .inv-menu-wrap')) return;
-            window.location.href = row.dataset.href;
-        });
-        row.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                window.location.href = row.dataset.href;
-            }
-        });
-    });
-});
-
-// Kebab menu — open/close per row, close on outside-click / Escape
-function toggleInvMenu(btn, e) {
-    if (e) { e.preventDefault(); e.stopPropagation(); }
-    var wrap = btn.closest('.inv-menu-wrap');
-    var wasOpen = wrap.classList.contains('open');
-    document.querySelectorAll('.inv-menu-wrap.open').forEach(function (w) {
-        w.classList.remove('open');
-        var b = w.querySelector('.inv-menu-btn');
-        if (b) b.setAttribute('aria-expanded', 'false');
-    });
-    if (!wasOpen) {
-        wrap.classList.add('open');
-        btn.setAttribute('aria-expanded', 'true');
-    }
-}
-document.addEventListener('click', function (e) {
-    if (e.target.closest('.inv-menu-wrap')) return;
-    document.querySelectorAll('.inv-menu-wrap.open').forEach(function (w) {
-        w.classList.remove('open');
-        var b = w.querySelector('.inv-menu-btn');
-        if (b) b.setAttribute('aria-expanded', 'false');
-    });
-});
-document.addEventListener('keydown', function (e) {
-    if (e.key !== 'Escape') return;
-    document.querySelectorAll('.inv-menu-wrap.open').forEach(function (w) {
-        w.classList.remove('open');
-        var b = w.querySelector('.inv-menu-btn');
-        if (b) b.setAttribute('aria-expanded', 'false');
-    });
-});
-
-{/literal}
-
-// DataTables init — Lagom-style instant sort (no page reload, no custom JS engine).
-// Initial sort column + direction come from the server-side URL params so the
-// active-column indicator matches the data on first paint.
-{literal}
-if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
-    jQuery(function ($) {
-        var $tbl = $('#invTable');
-        if (!$tbl.length) return;
-        var TID = 'invTable';
-        function ctrl(attr) { return document.querySelector('[' + attr + '][data-mt-for="' + TID + '"]'); }
-        function buildPager(el, info) {
-            var page = info.page, pages = info.pages, html = '';
-            var L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
-            var R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-            html += '<button type="button" data-page="' + (page - 1) + '"' + (page <= 0 ? ' disabled' : '') + ' aria-label="' + _localLang.previousPage + '">' + L + '</button>';
-            if (pages > 0) {
-                var win = 5, start = Math.max(0, page - 2), end = Math.min(pages - 1, start + win - 1);
-                start = Math.max(0, Math.min(start, end - win + 1));
-                for (var p = start; p <= end; p++) { html += '<button type="button" data-page="' + p + '"' + (p === page ? ' class="active"' : '') + '>' + (p + 1) + '</button>'; }
-            } else { html += '<button type="button" class="active">1</button>'; }
-            html += '<button type="button" data-page="' + (page + 1) + '"' + (page >= pages - 1 ? ' disabled' : '') + ' aria-label="' + _localLang.nextPage + '">' + R + '</button>';
-            el.innerHTML = html;
-        }
-        function updateControls(api) {
-            var info = api.page.info();
-            var infoEl = ctrl('data-dt-info');
-            if (infoEl) { var from = info.recordsDisplay ? info.start + 1 : 0; infoEl.textContent = _localLang.showingRange.replace('%s', from).replace('%s', info.end).replace('%s', info.recordsDisplay); }
-            var pagerEl = ctrl('data-dt-pager');
-            if (pagerEl) { buildPager(pagerEl, info); }
-        }
-        var table = $tbl.DataTable({
-            paging:    true,
-            searching: true,
-            info:      false,
-            autoWidth: false,
-            ordering:  true,
-            pageLength: 10,
-            dom:       'rt',
-{/literal}
-            order:     [[{$sortColIdx}, '{$sortDir|lower}']],
-{literal}
-            columnDefs: [ { orderable: false, targets: -1 } ],
-            drawCallback: function () { updateControls(this.api()); }
-        });
-        // Wire the Apple footer controls (search / Show-N / pager / info) to the
-        // client-side DataTable — same hooks the AJAX path (dynamic-tables.js) uses.
-        var searchEl = ctrl('data-mt-search');
-        if (searchEl) { searchEl.addEventListener('input', function () { table.search(this.value || '').draw(); }); }
-        var lenEl = ctrl('data-dt-length');
-        if (lenEl) { lenEl.value = String(table.page.len()); lenEl.addEventListener('change', function () { var n = parseInt(this.value, 10); if (n > 0) { table.page.len(n).draw(); } }); }
-        var pagerEl = ctrl('data-dt-pager');
-        if (pagerEl) { pagerEl.addEventListener('click', function (e) { var b = e.target.closest('button[data-page]'); if (!b || b.disabled) return; var p = parseInt(b.getAttribute('data-page'), 10); if (!isNaN(p) && p >= 0) { table.page(p).draw(false); } }); }
-        // Sync ?orderby=…&sort=… on header sort.
-        var keyByCol = { 0: 'id', 1: 'date', 2: 'due', 3: 'amount', 4: 'status' };
-        table.on('order.dt', function () {
-            var ord = table.order();
-            if (!ord || !ord.length) return;
-            var key = keyByCol[ord[0][0]];
-            var dir = (ord[0][1] || 'asc').toUpperCase();
-            if (!key) return;
-            try {
-                var url = new URL(window.location.href);
-                url.searchParams.set('orderby', key);
-                url.searchParams.set('sort', dir);
-                window.history.replaceState({}, '', url.toString());
-            } catch (err) { /* old browsers — ignore */ }
-        });
-    });
-}
-{/literal}
-</script>
-{/if}

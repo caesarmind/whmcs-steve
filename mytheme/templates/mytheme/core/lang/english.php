@@ -108,6 +108,7 @@ return [
         'rowsPerPage'      => 'Rows per page',
         'previousPage'     => 'Previous page',
         'nextPage'         => 'Next page',
+        'tableViewAll'     => 'View all',
 
         // Sort controls (B13b downloadscat).
         'sortBy'     => 'Sort by',

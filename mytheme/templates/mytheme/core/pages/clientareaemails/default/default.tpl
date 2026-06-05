@@ -30,11 +30,8 @@
 {assign var=mtAjaxTables value=$myTheme.addonSettings.enable_dynamic_ajax|default:false}
 
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareaemails.css?v={$myTheme.version|default:'1.0'}">
-{if $mtAjaxTables}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
-<script src="{$WEB_ROOT}/templates/{$template}/assets/js/dynamic-tables.js?v={$myTheme.version|default:'1.0'}"></script>
-{/if}
+{* Unified list-table engine (client-side + Dynamic AJAX Loading) — loaded once. *}
+{include file="`$template`/includes/partials/list-table-assets.tpl"}
 
 <script>
 (function () {
@@ -55,32 +52,25 @@
     <div class="em-main">
         {if $hasEmails}
         <div class="when-full">
-            {if !$mtAjaxTables}
             <div class="em-toolbar">
                 <div class="em-search">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="search" id="emSearch" placeholder="{$LANG.search}…" autocomplete="off" aria-label="{$LANG.search}">
+                    <input type="search" placeholder="{$LANG.search}…" autocomplete="off" aria-label="{$LANG.search}" data-mt-search data-mt-for="emTable">
                 </div>
             </div>
-            {/if}
             <div class="card" style="padding: 0; overflow: hidden;">
-                <table class="em-table" id="emTable"{if $mtAjaxTables} data-mt-action="tableEmails" data-mt-type="emails" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="0:desc" data-mt-length="10"{/if}>
+                <table class="em-table" id="emTable" data-mt-type="emails" data-mt-order="0:desc" data-mt-length="10"{if $mtAjaxTables} data-mt-action="tableEmails" data-mt-endpoint="{$WEB_ROOT}/clientarea.php"{/if}>
                     <thead>
                         <tr>
-                            {if !$mtAjaxTables}
                             <th><button type="button" class="em-sort" data-sort="date" data-dir="">{$LANG.clientareaemailsdate} <span class="em-sort-ico"></span></button></th>
                             <th><button type="button" class="em-sort" data-sort="subject" data-dir="">{$LANG.clientareaemailssubject} <span class="em-sort-ico"></span></button></th>
-                            {else}
-                            <th>{$LANG.clientareaemailsdate}</th>
-                            <th>{$LANG.clientareaemailssubject}</th>
-                            {/if}
                         </tr>
                     </thead>
                     <tbody>
                         {if !$mtAjaxTables}
                         {foreach $emails as $email}
                         <tr data-href="{$WEB_ROOT}/viewemail.php?id={$email.id|escape}" data-date="{$email.normalisedDate|default:''|escape}" data-subject="{$email.subject|strip_tags|escape}">
-                            <td class="em-date">{$email.date|escape}</td>
+                            <td class="em-date" data-order="{$email.normalisedDate|default:''|escape}">{$email.date|escape}</td>
                             <td>
                                 <div class="em-subject">
                                     {if $email.attachmentCount > 0}<svg class="em-clip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>{/if}
@@ -93,18 +83,10 @@
                     </tbody>
                 </table>
             </div>
-            {if $mtAjaxTables}
-            <div class="mt-dt-foot">
-                <span class="mt-dt-search"><input type="search" placeholder="{$LANG.search}…" aria-label="{$LANG.search}" data-mt-search data-mt-for="emTable"></span>
-                <span class="spacer"></span>
-                <span data-dt-info data-mt-for="emTable"></span>
-                <div data-dt-pager data-mt-for="emTable"></div>
-            </div>
-            {else}
             <div class="em-footer">
                 <div class="em-page-size">
                     {$hadrianLang.account.showEntries}
-                    <select id="emLength" aria-label="{$hadrianLang.account.showEntriesAria}">
+                    <select aria-label="{$hadrianLang.account.showEntriesAria}" data-dt-length data-mt-for="emTable">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>
@@ -112,10 +94,9 @@
                     {$hadrianLang.account.entries}
                 </div>
                 <div class="spacer"></div>
-                <span class="em-info" id="emInfo"></span>
-                <div class="em-pages" id="emPages"></div>
+                <span class="em-info" data-dt-info data-mt-for="emTable"></span>
+                <div class="em-pages" data-dt-pager data-mt-for="emTable"></div>
             </div>
-            {/if}
         </div>
         {/if}
 
@@ -158,148 +139,3 @@
     </aside>
 </div>
 
-{if $hasEmails && !$mtAjaxTables}
-<script>
-var _localLang = {
-    'dtShowing': '{$hadrianLang.account.dtShowing|escape:"javascript"}',
-    'dtOf': '{$hadrianLang.account.dtOf|escape:"javascript"}',
-    'dtNoMatch': '{$hadrianLang.account.dtNoMatch|escape:"javascript"}',
-    'dtFiltered': '{$hadrianLang.account.dtFiltered|escape:"javascript"}'
-};
-</script>
-<script>
-{literal}
-(function () {
-    var table = document.getElementById('emTable');
-    if (!table) { return; }
-    var tbody = table.querySelector('tbody');
-    var allRows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
-    allRows.forEach(function (r, i) { r.setAttribute('data-idx', String(i)); });
-
-    var searchInp = document.getElementById('emSearch');
-    var lengthSel = document.getElementById('emLength');
-    var info = document.getElementById('emInfo');
-    var pagesEl = document.getElementById('emPages');
-    var L = { showing: _localLang.dtShowing, to: '–', of: _localLang.dtOf, none: _localLang.dtNoMatch, filtered: _localLang.dtFiltered };
-
-    var state = { q: '', pageSize: 10, page: 1, sortKey: '', sortDir: '' };
-
-    function filtered() {
-        var q = state.q.trim().toLowerCase();
-        if (!q) { return allRows.slice(); }
-        return allRows.filter(function (r) {
-            var subj = (r.getAttribute('data-subject') || '').toLowerCase();
-            var dateCell = r.querySelector('.em-date');
-            var date = dateCell ? dateCell.textContent.toLowerCase() : '';
-            return subj.indexOf(q) > -1 || date.indexOf(q) > -1;
-        });
-    }
-    function sorted(rows) {
-        if (!state.sortDir) {
-            return rows.slice().sort(function (a, b) { return (+a.getAttribute('data-idx')) - (+b.getAttribute('data-idx')); });
-        }
-        var mul = state.sortDir === 'asc' ? 1 : -1;
-        var key = state.sortKey;
-        return rows.slice().sort(function (a, b) {
-            var va, vb;
-            if (key === 'date') {
-                va = a.getAttribute('data-date') || ''; vb = b.getAttribute('data-date') || '';
-                var na = parseFloat(va), nb = parseFloat(vb);
-                if (!isNaN(na) && !isNaN(nb)) { return (na - nb) * mul; }
-            } else {
-                va = (a.getAttribute('data-subject') || '').toLowerCase();
-                vb = (b.getAttribute('data-subject') || '').toLowerCase();
-            }
-            return va < vb ? -mul : va > vb ? mul : 0;
-        });
-    }
-    function pageWindow(cur, total) {
-        var out = [];
-        if (total <= 7) { for (var i = 1; i <= total; i++) { out.push(i); } return out; }
-        out.push(1);
-        var s = Math.max(2, cur - 1), e = Math.min(total - 1, cur + 1);
-        if (s > 2) { out.push('…'); }
-        for (var j = s; j <= e; j++) { out.push(j); }
-        if (e < total - 1) { out.push('…'); }
-        out.push(total);
-        return out;
-    }
-    function mkBtn(html, opts) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.innerHTML = html;
-        if (opts.disabled) { b.disabled = true; }
-        if (opts.active) { b.className = 'active'; }
-        if (!opts.disabled && !opts.active && typeof opts.go === 'number') {
-            b.addEventListener('click', function () { state.page = opts.go; render(); });
-        }
-        return b;
-    }
-    var PREV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
-    var NEXT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-
-    function render() {
-        var rows = sorted(filtered());
-        var total = rows.length;
-        var pages = Math.max(1, Math.ceil(total / state.pageSize));
-        if (state.page > pages) { state.page = pages; }
-        if (state.page < 1) { state.page = 1; }
-        var start = total ? (state.page - 1) * state.pageSize : 0;
-        var end = Math.min(start + state.pageSize, total);
-
-        allRows.forEach(function (r) { r.style.display = 'none'; });
-        for (var i = start; i < end; i++) { rows[i].style.display = ''; tbody.appendChild(rows[i]); }
-
-        if (info) {
-            if (total === 0) {
-                info.textContent = L.none;
-            } else {
-                var base = L.showing + ' ' + (start + 1) + L.to + end + ' ' + L.of + ' ' + total;
-                info.textContent = (state.q && total !== allRows.length) ? (base + ' (' + L.filtered + ' ' + allRows.length + ')') : base;
-            }
-        }
-        if (pagesEl) {
-            pagesEl.innerHTML = '';
-            pagesEl.appendChild(mkBtn(PREV, { disabled: state.page <= 1, go: state.page - 1 }));
-            pageWindow(state.page, pages).forEach(function (p) {
-                if (p === '…') {
-                    var s = document.createElement('span');
-                    s.className = 'em-ellipsis'; s.textContent = '…';
-                    pagesEl.appendChild(s);
-                } else {
-                    pagesEl.appendChild(mkBtn(String(p), { active: p === state.page, go: p }));
-                }
-            });
-            pagesEl.appendChild(mkBtn(NEXT, { disabled: state.page >= pages, go: state.page + 1 }));
-        }
-    }
-
-    if (searchInp) { searchInp.addEventListener('input', function () { state.q = this.value; state.page = 1; render(); }); }
-    if (lengthSel) { lengthSel.addEventListener('change', function () { state.pageSize = parseInt(this.value, 10) || 10; state.page = 1; render(); }); }
-
-    table.querySelectorAll('.em-sort').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            var dir = btn.getAttribute('data-dir');
-            var next = dir === '' ? 'asc' : dir === 'asc' ? 'desc' : '';
-            table.querySelectorAll('.em-sort').forEach(function (b) { b.setAttribute('data-dir', ''); b.classList.remove('active'); });
-            btn.setAttribute('data-dir', next);
-            if (next) { btn.classList.add('active'); }
-            state.sortKey = btn.getAttribute('data-sort');
-            state.sortDir = next;
-            state.page = 1;
-            render();
-        });
-    });
-
-    allRows.forEach(function (row) {
-        row.addEventListener('click', function (e) {
-            if (e.target.closest('a')) { return; }
-            window.open(row.getAttribute('data-href'), 'emailWin', 'width=680,height=520,scrollbars=yes');
-        });
-    });
-
-    render();
-})();
-{/literal}
-</script>
-{/if}

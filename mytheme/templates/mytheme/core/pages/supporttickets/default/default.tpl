@@ -41,10 +41,8 @@
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/supporttickets.css?v={$myTheme.version|default:'1.0'}">
 
-{* Lagom-style instant sort: jQuery 3.x + DataTables 1.x for client-side reorder. *}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
-{if $mtAjaxTables}<script src="{$WEB_ROOT}/templates/{$template}/assets/js/dynamic-tables.js?v={$myTheme.version|default:'1.0'}"></script>{/if}
+{* Unified list-table engine (client-side + Dynamic AJAX Loading) — loaded once. *}
+{include file="`$template`/includes/partials/list-table-assets.tpl"}
 
 <script>
 (function () {
@@ -121,7 +119,7 @@
                 </div>
 
                 {if $tkCount > 0}
-                <table class="tk-table when-full" id="tkTable"{if $mtAjaxTables} data-mt-action="tableTickets" data-mt-type="tickets" data-mt-endpoint="{$WEB_ROOT}/clientarea.php" data-mt-order="3:desc" data-mt-length="10"{/if}>
+                <table class="tk-table when-full" id="tkTable" data-mt-type="tickets" data-mt-order="{$sortColIdx}:{$sortDir|lower}" data-mt-length="10" data-mt-filter-col="2"{if $mtAjaxTables} data-mt-action="tableTickets" data-mt-endpoint="{$WEB_ROOT}/clientarea.php"{/if}>
                     <colgroup>
                         <col class="tk-col-subject">
                         <col class="tk-col-department">
@@ -222,109 +220,3 @@
         </div>
     </aside>
 </div>{* /.tk-split *}
-
-{if !$mtAjaxTables}
-<script>var _localLang = { previousPage: '{$LANG.previouspage|escape:"javascript"}', nextPage: '{$LANG.nextpage|escape:"javascript"}', tableShowingRange: '{$hadrianLang.common.tableShowingRange|escape:"javascript"}' };</script>
-<script>
-{literal}
-// Row navigation — click a row to go to viewticket
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.tk-table tbody tr[data-href]').forEach(function (row) {
-        row.setAttribute('tabindex', '0');
-        row.setAttribute('role', 'link');
-        row.addEventListener('click', function (e) {
-            if (e.target.closest('a, button, input, select')) return;
-            window.location.href = row.dataset.href;
-        });
-        row.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                window.location.href = row.dataset.href;
-            }
-        });
-    });
-
-    // Status filter — hide rows whose data-status doesn't match the active tab.
-    // DataTables keeps the rows in DOM but [hidden] CSS rule removes them visually.
-    document.querySelectorAll('[data-ticket-filter]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            var filter = btn.dataset.ticketFilter || 'all';
-            document.querySelectorAll('[data-ticket-filter]').forEach(function (tab) {
-                tab.classList.toggle('active', tab === btn);
-            });
-            document.querySelectorAll('.tk-table tbody tr').forEach(function (row) {
-                var status = (row.getAttribute('data-status') || '').toLowerCase().replace(/\s+/g, '-');
-                row.hidden = filter !== 'all' && status !== filter;
-            });
-        });
-    });
-});
-{/literal}
-
-// DataTables init — Lagom-style instant sort (no page reload).
-{literal}
-if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
-    jQuery(function ($) {
-        var $tbl = $('#tkTable');
-        if (!$tbl.length) return;
-        var TID = 'tkTable';
-        function ctrl(attr) { return document.querySelector('[' + attr + '][data-mt-for="' + TID + '"]'); }
-        function buildPager(el, info) {
-            var page = info.page, pages = info.pages, html = '';
-            var L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
-            var R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-            html += '<button type="button" data-page="' + (page - 1) + '"' + (page <= 0 ? ' disabled' : '') + ' aria-label="' + _localLang.previousPage + '">' + L + '</button>';
-            if (pages > 0) { var win = 5, start = Math.max(0, page - 2), end = Math.min(pages - 1, start + win - 1); start = Math.max(0, Math.min(start, end - win + 1)); for (var p = start; p <= end; p++) { html += '<button type="button" data-page="' + p + '"' + (p === page ? ' class="active"' : '') + '>' + (p + 1) + '</button>'; } } else { html += '<button type="button" class="active">1</button>'; }
-            html += '<button type="button" data-page="' + (page + 1) + '"' + (page >= pages - 1 ? ' disabled' : '') + ' aria-label="' + _localLang.nextPage + '">' + R + '</button>';
-            el.innerHTML = html;
-        }
-        function updateControls(api) {
-            var info = api.page.info();
-            var infoEl = ctrl('data-dt-info');
-            if (infoEl) { var from = info.recordsDisplay ? info.start + 1 : 0; var n = 0; infoEl.textContent = _localLang.tableShowingRange.replace(/%s/g, function () { return [from, info.end, info.recordsDisplay][n++]; }); }
-            var pagerEl = ctrl('data-dt-pager');
-            if (pagerEl) { buildPager(pagerEl, info); }
-        }
-        var table = $tbl.DataTable({
-            paging:    true,
-            searching: true,
-            info:      false,
-            autoWidth: false,
-            ordering:  true,
-            pageLength: 10,
-            dom:       'rt',
-{/literal}
-            order:     [[{$sortColIdx}, '{$sortDir|lower}']],
-{literal}
-            // Force string type on every column — auto-detection picks "num" or
-            // "date" when the first row's data-order value looks numeric/date,
-            // which silently breaks alphabetic sort on text columns (subject).
-            // ISO date strings still sort chronologically under string-asc.
-            columnDefs: [{ type: 'string', targets: '_all' }],
-            drawCallback: function () { updateControls(this.api()); }
-        });
-        var searchEl = ctrl('data-mt-search');
-        if (searchEl) { searchEl.addEventListener('input', function () { table.search(this.value || '').draw(); }); }
-        var lenEl = ctrl('data-dt-length');
-        if (lenEl) { lenEl.value = String(table.page.len()); lenEl.addEventListener('change', function () { var n = parseInt(this.value, 10); if (n > 0) { table.page.len(n).draw(); } }); }
-        var pagerEl = ctrl('data-dt-pager');
-        if (pagerEl) { pagerEl.addEventListener('click', function (e) { var b = e.target.closest('button[data-page]'); if (!b || b.disabled) return; var p = parseInt(b.getAttribute('data-page'), 10); if (!isNaN(p) && p >= 0) { table.page(p).draw(false); } }); }
-        var keyByCol = { 0: 'subject', 1: 'department', 2: 'status', 3: 'updated' };
-        table.on('order.dt', function () {
-            var ord = table.order();
-            if (!ord || !ord.length) return;
-            var key = keyByCol[ord[0][0]];
-            var dir = (ord[0][1] || 'asc').toUpperCase();
-            if (!key) return;
-            try {
-                var url = new URL(window.location.href);
-                url.searchParams.set('orderby', key);
-                url.searchParams.set('sort', dir);
-                window.history.replaceState({}, '', url.toString());
-            } catch (err) {}
-        });
-    });
-}
-{/literal}
-</script>
-{/if}
