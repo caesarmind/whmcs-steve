@@ -662,8 +662,11 @@
             // mobile overrides winning regardless of stylesheet order.
             + '@media (max-width:720px){'
             +   'table[data-mt-type] tbody tr{position:relative !important}'
-            +   'tbody [data-mt-kebab],tbody td:has([data-mt-kebab]){position:static !important}'
-            +   '[data-mt-kebab] [role="menu"]{right:12px !important;left:auto !important;min-width:0 !important;width:max-content;max-width:calc(100vw - 40px)}'
+            +   'tbody [data-mt-kebab]{position:static !important}'
+            // Keep the kebab on the row's top-right (left of the chevron) so actions are
+            // reachable without expanding; pull it out of the per-page grid flow.
+            +   'tbody td:has([data-mt-kebab]){position:absolute !important;top:7px;right:46px;padding:0 !important;margin:0 !important;width:auto !important;height:auto !important;justify-self:auto !important;z-index:3}'
+            +   '[data-mt-kebab] [role="menu"]{right:0 !important;left:auto !important;min-width:0 !important;width:max-content;max-width:calc(100vw - 40px)}'
             // 2) Search box: drop it to its own full-width row below the filter chips,
             //    instead of stranding it off the end of the scrolling chip row.
             +   '.filter-tabs:has([data-mt-search]){flex-wrap:wrap !important;row-gap:8px}'
@@ -671,8 +674,8 @@
             // 3) Expandable rows: collapse each row to its first cell (identity) + the
             //    chevron; .mt-expanded reveals the rest (the existing card layout).
             +   '.mt-expander{display:inline-flex !important}'
-            +   'table[data-mt-type] tbody tr:not(.mt-expanded):has(.mt-expander)>td:not(:first-child){display:none !important}'
-            +   'table[data-mt-type] tbody tr:has(.mt-expander)>td:first-child{padding-right:46px !important}'
+            +   'table[data-mt-type] tbody tr:not(.mt-expanded):has(.mt-expander)>td:not(:first-child):not(:has([data-mt-kebab])){display:none !important}'
+            +   'table[data-mt-type] tbody tr:has(.mt-expander)>td:first-child{padding-right:82px !important}'
             +   'table[data-mt-type] tbody tr.mt-expanded .mt-expander svg{transform:rotate(90deg)}'
             + '}';
         var s = document.createElement('style');
