@@ -77,6 +77,16 @@ final class SitemapController extends AbstractController
     {
         $cfg      = SitemapGenerator::config();
         $template = AddonHelper::getTemplate();
+        if ($template !== null) {
+            // Self-heal: ensure the mytheme_pages table exists + is seeded, so the
+            // sitemap works even if this is the admin's first MyTheme tab visit.
+            try {
+                (new \MyTheme\Database\Migrator(dirname(__DIR__, 3)))->migrate();
+                \MyTheme\Service\PageRegistry::sync($template);
+            } catch (\Throwable $e) {
+                error_log('MyTheme sitemap self-heal failed: ' . $e->getMessage());
+            }
+        }
         $pageCount = $template !== null ? count(Page::forSitemap($template->getName())) : 0;
 
         $rootWritable  = defined('ROOTDIR') && is_writable(ROOTDIR);

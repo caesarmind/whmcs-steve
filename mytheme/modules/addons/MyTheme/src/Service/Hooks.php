@@ -1451,11 +1451,22 @@ final class Hooks
         // (read-only on this client path — the admin Pages tab seeds/maintains
         // the table) and resolve the active variant; $stored is rebuilt from the
         // row below in the legacy shape so the rest of this method is unchanged.
-        $row         = \MyTheme\Models\Page::get($template->getName(), $page) ?? [];
-        $rowSettings = is_array($row['settings'] ?? null) ? $row['settings'] : [];
-        $variant     = (string)($row['variant'] ?? '') !== ''
-            ? (string)$row['variant']
-            : (string)($pageMeta['defaultVariant'] ?? 'default');
+        $row = \MyTheme\Models\Page::get($template->getName(), $page);
+        if ($row !== null) {
+            $rowSettings = is_array($row['settings'] ?? null) ? $row['settings'] : [];
+            $variant     = (string)($row['variant'] ?? '') !== ''
+                ? (string)$row['variant']
+                : (string)($pageMeta['defaultVariant'] ?? 'default');
+        } else {
+            // Registry row/table absent — the table is created lazily by the
+            // admin Pages-tab self-heal. Fall back to the legacy mytheme_settings
+            // store so SEO + variant keep working before the first import.
+            $rowSettings = [];
+            $variant     = (string)Settings::getValue(
+                $template->getName() . '_page_variant_' . $page,
+                (string)($pageMeta['defaultVariant'] ?? 'default')
+            );
+        }
 
         // Overwrites escape hatch — Lagom-style buyer override. If a customer
         // dropped core/pages/<page>/overwrites/overwrites.tpl in their theme,
@@ -1479,8 +1490,7 @@ final class Hooks
         // description resolve to the request language; empty values are OMITTED
         // so the seoDefaults fallback in $entry still applies (keeps page.php
         // defaults live for pages the admin never customised).
-        $stored = [];
-        if ($row !== []) {
+        if ($row !== null) {
             $lang = (string)($vars['language'] ?? 'english');
             $stored = [
                 'indexing'         => $row['indexing'] ?? null,
@@ -1498,6 +1508,12 @@ final class Hooks
             if ($desc  !== '') { $seo['description'] = $desc; }
             if ($img   !== '') { $seo['social_image'] = $img; }
             $stored['seo'] = $seo;
+        } else {
+            // Legacy fallback (see above): the raw mytheme_settings page options
+            // in their original shape. The $entry build below applies the same
+            // seoDefaults fallback the pre-registry code did.
+            $legacy = Settings::getValue($template->getName() . '_page_options_' . $page, null);
+            $stored = is_array($legacy) ? $legacy : [];
         }
         $seoDefaults = is_array($pageMeta['seoDefaults'] ?? null) ? $pageMeta['seoDefaults'] : [];
 

@@ -22,17 +22,27 @@ final class Page
     /** @return array<string,mixed>|null */
     public static function get(string $template, string $page): ?array
     {
-        $row = \WHMCS\Database\Capsule::table(self::TABLE)
-            ->where('template', $template)
-            ->where('page', $page)
-            ->first();
-        return $row ? self::hydrate($row) : null;
+        try {
+            $row = \WHMCS\Database\Capsule::table(self::TABLE)
+                ->where('template', $template)
+                ->where('page', $page)
+                ->first();
+            return $row ? self::hydrate($row) : null;
+        } catch (\Throwable $e) {
+            // Table not created yet (it's seeded lazily by the admin Pages-tab
+            // self-heal) or a transient DB error — callers fall back gracefully.
+            return null;
+        }
     }
 
     public static function exists(string $template, string $page): bool
     {
-        return \WHMCS\Database\Capsule::table(self::TABLE)
-            ->where('template', $template)->where('page', $page)->exists();
+        try {
+            return \WHMCS\Database\Capsule::table(self::TABLE)
+                ->where('template', $template)->where('page', $page)->exists();
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     /**
@@ -65,10 +75,14 @@ final class Page
     /** @return list<array<string,mixed>> */
     public static function all(string $template): array
     {
-        return \WHMCS\Database\Capsule::table(self::TABLE)
-            ->where('template', $template)
-            ->orderBy('sort')->orderBy('page')
-            ->get()->map(fn ($r) => self::hydrate($r))->all();
+        try {
+            return \WHMCS\Database\Capsule::table(self::TABLE)
+                ->where('template', $template)
+                ->orderBy('sort')->orderBy('page')
+                ->get()->map(fn ($r) => self::hydrate($r))->all();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     /**
@@ -80,15 +94,19 @@ final class Page
      */
     public static function forSitemap(string $template): array
     {
-        return \WHMCS\Database\Capsule::table(self::TABLE)
-            ->where('template', $template)
-            ->where('seo_enabled', 1)
-            ->where('indexing', '<>', 'disallow')
-            ->where('visibility', 'public')
-            ->where('published', 1)
-            ->whereNotNull('url')
-            ->orderBy('sort')->orderBy('page')
-            ->get()->map(fn ($r) => self::hydrate($r))->all();
+        try {
+            return \WHMCS\Database\Capsule::table(self::TABLE)
+                ->where('template', $template)
+                ->where('seo_enabled', 1)
+                ->where('indexing', '<>', 'disallow')
+                ->where('visibility', 'public')
+                ->where('published', 1)
+                ->whereNotNull('url')
+                ->orderBy('sort')->orderBy('page')
+                ->get()->map(fn ($r) => self::hydrate($r))->all();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     /**
