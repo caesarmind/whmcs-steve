@@ -615,7 +615,19 @@
             + '.dom-table,.dom-table thead,.dom-table tbody{display:block}'
             + '.dom-table{width:100%}'
             + '.dom-table thead tr,.dom-table tbody tr{box-sizing:border-box}'
-            + '.dom-table th{font:inherit;text-align:left}';
+            + '.dom-table th{font:inherit;text-align:left}'
+            // --- Mobile (<=720px) shared fixes for every list table ---
+            // 1) Kebab menus: anchor to the card's right edge so they never run off
+            //    the left of the screen once a row collapses to a single column.
+            + '@media (max-width:720px){'
+            +   'table[data-mt-type] tbody tr{position:relative}'
+            +   'tbody [data-mt-kebab],tbody td:has([data-mt-kebab]){position:static}'
+            +   '[data-mt-kebab] [role="menu"]{right:12px;left:auto;min-width:0;width:max-content;max-width:calc(100vw - 40px)}'
+            // 2) Search box: drop it to its own full-width row below the filter chips,
+            //    instead of stranding it off the end of the scrolling chip row.
+            +   '.filter-tabs:has([data-mt-search]){flex-wrap:wrap;row-gap:8px}'
+            +   '.filter-tabs>:has(>[data-mt-search]){flex:1 0 100%;max-width:none;margin-left:0;order:2}'
+            + '}';
         var s = document.createElement('style');
         s.id = 'mt-dt-styles';
         s.textContent = css;
