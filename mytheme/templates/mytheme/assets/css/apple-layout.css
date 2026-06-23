@@ -95,6 +95,32 @@ body[data-layout="top"] .ph-main-wrap .content-area {
 /* Rail panel overlays content on hover -- does NOT shift main wrap */
 body:not([data-layout="top"]) { background: var(--color-bg); }
 
+/* -- Full-bleed marketing pages (store landings) ----------- */
+/* The hp-* marketing sections are built to span the viewport with their
+   backgrounds reaching the screen edges, each capping its own inner content
+   (like the apple-client-area mockups, where <body> is display:block). The
+   standard .content-area (max-width + 48px gutter) traps them at the column
+   width, so on wide screens a section's coloured background stops short of
+   both edges. For these pages drop the cap + side gutter so backgrounded
+   sections bleed edge-to-edge; re-cap the non-section blocks (the theme
+   page-header + the when-empty card) that still want the centred column.
+   data-bleed is emitted server-side for store pages EXCEPT order/not-found
+   (header.tpl) -- those keep the normal boxed content column. */
+body[data-bleed="1"] .ph-main-wrap .content-area {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+body[data-bleed="1"] .content-area > .page-header,
+body[data-bleed="1"] .content-area > .when-empty {
+    max-width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 22px;
+    padding-right: 22px;
+    box-sizing: border-box;
+}
+
 /* -- Dev preview chip / options tab ------------------------- */
 /* Top-center floating, draggable. Drag by the "preview" tag on
    the left; double-click the tag to snap back to default. */
