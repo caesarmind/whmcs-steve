@@ -370,7 +370,13 @@ final class MenuController extends AbstractController
 
     public function seedAction(): string
     {
-        $seeded = (new Seeder())->run();
+        // ?force=1 re-seeds items for menus that ALREADY exist too, re-syncing
+        // the live menus to the current presets (e.g. after the shipped store
+        // menu changes). Without it, seeding only fills in missing preset menus
+        // and never overwrites an existing one. Overwrites preset items, so the
+        // UI gates it behind a confirm.
+        $force  = !empty($_GET['force']);
+        $seeded = (new Seeder())->run($force);
         $this->redirect('?module=MyTheme&action=menu&flash=seeded-' . $seeded);
     }
 
