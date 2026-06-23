@@ -27,11 +27,6 @@
     {assign var=storeIsEmpty value='empty'}
 {/if}
 
-<header class="page-header">
-    <p class="page-eyebrow">{$hadrianLang.store.sibEyebrow}</p>
-    <h1>{$hadrianLang.store.sibPageTitle}</h1>
-    <p class="page-subtitle">{$hadrianLang.store.sibPageSubtitle}</p>
-</header>
 
 <script>
 (function () {

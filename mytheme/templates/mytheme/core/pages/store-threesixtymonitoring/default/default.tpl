@@ -88,11 +88,6 @@
 </style>
 {/literal}
 
-<header class="page-header">
-    <p class="page-eyebrow">{$hadrianLang.store.monEyebrow}</p>
-    <h1>{$hadrianLang.store.monPageTitle}</h1>
-    <p class="page-subtitle">{$hadrianLang.store.monPageSubtitle}</p>
-</header>
 
 <script>
 (function () {

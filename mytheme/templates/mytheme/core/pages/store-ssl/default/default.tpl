@@ -27,11 +27,6 @@
     {assign var=storeIsEmpty value='empty'}
 {/if}
 
-<header class="page-header">
-    <p class="page-eyebrow">{$hadrianLang.store.sslEyebrow}</p>
-    <h1>{$hadrianLang.store.sslPageTitle}</h1>
-    <p class="page-subtitle">{$hadrianLang.store.sslPageSubtitle}</p>
-</header>
 
 {* Hand the resolved data state to the body - the global rule in
    apple-layout.css (body[data-data="empty"] .when-full / .when-empty)

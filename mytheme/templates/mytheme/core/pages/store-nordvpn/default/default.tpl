@@ -39,11 +39,6 @@
     {assign var=storeIsEmpty value='empty'}
 {/if}
 
-<header class="page-header">
-    <p class="page-eyebrow">{$hadrianLang.store.nvEyebrow}</p>
-    <h1>{$hadrianLang.store.nvPageTitle}</h1>
-    <p class="page-subtitle">{$hadrianLang.store.nvPageSubtitle}</p>
-</header>
 
 <script>
 (function () {
