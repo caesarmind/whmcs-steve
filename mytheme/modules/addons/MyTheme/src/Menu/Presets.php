@@ -442,7 +442,6 @@ final class Presets
                     ['type' => ItemTypes::WHMCS_PAGE,
                      'label' => self::label('', '360 Monitoring'),
                      'config' => ['page' => 'store-threesixtymonitoring']],
-                    self::whmcsPage('store-sitelockvpn'),
                     ['type' => ItemTypes::WHMCS_PAGE,
                      'label' => self::label('', 'NordVPN'),
                      'config' => ['page' => 'store-nordvpn']],
