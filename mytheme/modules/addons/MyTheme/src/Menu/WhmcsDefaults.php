@@ -82,6 +82,7 @@ final class WhmcsDefaults
             'store-ox'                   => ['lang_key' => '', 'default_label' => 'Professional Email',        'url' => 'store/ox'],
             'store-sitebuilder'          => ['lang_key' => '', 'default_label' => 'Site Builder',              'url' => 'store/sitebuilder'],
             'store-marketgoo'            => ['lang_key' => '', 'default_label' => 'SEO Tools',                 'url' => 'store/marketgoo'],
+            'store-xovinow'              => ['lang_key' => '', 'default_label' => 'XOVI Now',                  'url' => 'store/xovinow'],
             'store-codeguard'            => ['lang_key' => '', 'default_label' => 'Website Backup',            'url' => 'store/codeguard'],
             'store-weebly'               => ['lang_key' => '', 'default_label' => 'Website Builder',           'url' => 'store/weebly'],
             'store-order'                => ['lang_key' => '', 'default_label' => 'Order summary',             'url' => 'store/order'],
