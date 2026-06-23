@@ -1982,7 +1982,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-testimonials-scroll .carousel-arrow svg { width: 16px; height: 16px; stroke-width: 2.4; }
 
 /* Testimonials — Masonry Wall */
-.hp-testi-masonry { max-width: 1200px; margin: 0 auto; padding: 80px 22px; }
+.hp-testi-masonry { max-width: 1024px; margin: 0 auto; padding: 80px 22px; }
 .hp-testi-masonry h2 { font-size: var(--text-h1); font-weight: var(--fw-semibold); letter-spacing: -0.02em; text-align: center; margin: 0 0 10px; color: var(--color-text-primary); }
 .hp-testi-masonry .hp-testi-masonry-sub { font-size: var(--text-xl); color: var(--color-text-secondary); text-align: center; margin: 0 0 48px; }
 .hp-testi-masonry-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 220px; grid-auto-flow: dense; gap: 16px; }
@@ -2174,7 +2174,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-seg-col.highlight .buy:hover { background: var(--color-accent-hover); }
 
 /* === Pricing — Compare Table (full feature matrix) === */
-.hp-pricing-compare-table { max-width: 1200px; margin: 0 auto; padding: 80px 22px; }
+.hp-pricing-compare-table { max-width: 1024px; margin: 0 auto; padding: 80px 22px; }
 .hp-pricing-compare-table .cmp-header { text-align: center; margin-bottom: 40px; }
 .hp-pricing-compare-table .cmp-header h2 { font-size: var(--text-h1); font-weight: var(--fw-semibold); letter-spacing: -0.025em; margin: 0 0 10px; color: var(--color-text-primary); }
 .hp-pricing-compare-table .cmp-sub { font-size: var(--text-xl); color: var(--color-text-secondary); margin: 0; }
@@ -2579,7 +2579,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-chip-copy .chip-meta strong { display: block; color: var(--color-text-primary); font-weight: var(--fw-semibold); margin-bottom: 2px; }
 
 /* === Intelligence + Privacy Duo === */
-.hp-intel-duo { max-width: 1200px; margin: 0 auto; padding: 48px 22px; display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: stretch; }
+.hp-intel-duo { max-width: 1024px; margin: 0 auto; padding: 48px 22px; display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: stretch; }
 .hp-intel-big { background: var(--color-text-primary); color: var(--color-surface-secondary); border-radius: 24px; padding: 48px 48px 0; display: flex; flex-direction: column; min-height: 560px; overflow: hidden; }
 .hp-intel-big .eyebrow { font-size: var(--text-base); font-weight: var(--fw-semibold); letter-spacing: 0.02em; color: #0a84ff; margin-bottom: 12px; }
 .hp-intel-big h2 { font-size: var(--text-h2); font-weight: var(--fw-semibold); letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 18px; color: var(--color-surface-secondary); }

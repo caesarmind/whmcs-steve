@@ -191,7 +191,7 @@
     <div style="background: var(--color-surface-secondary);">
     <section class="hp-features-section" style="padding: 72px 22px;">
         <h2>{$hadrianLang.store.sslFeaturesTitle}</h2>
-        <div class="hp-feature-cards" style="margin-top: 40px; max-width: 1100px; margin-left: auto; margin-right: auto; grid-template-columns: repeat(5, 1fr);">
+        <div class="hp-feature-cards" style="margin-top: 40px; max-width: 1024px; margin-left: auto; margin-right: auto; grid-template-columns: repeat(5, 1fr);">
             <div class="hp-feature-card">
                 <div class="feat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
                 <h4>{$hadrianLang.store.sslFeat1Title}</h4>
@@ -291,7 +291,7 @@
     </div>
 
     {* 6. Pricing - real $certificates looped into the mockup's row markup *}
-    <section id="pricing" style="padding: 72px 22px; max-width: 1100px; margin: 0 auto;">
+    <section id="pricing" style="padding: 72px 22px; max-width: 1024px; margin: 0 auto;">
         <h2 style="text-align: center; margin-bottom: 8px;">{$hadrianLang.store.sslPricingTitle}</h2>
         <p style="text-align: center; color: #86868b; margin-bottom: 40px;">{$hadrianLang.store.sslPricingSubtitle}</p>
         <div class="hp-billing-toggle" style="justify-content: center; margin-bottom: 32px; display: flex; gap: 8px;"><button class="active">{$hadrianLang.store.sslFilterAll}</button><button>{$hadrianLang.store.sslFilterDv}</button><button>{$hadrianLang.store.sslFilterOv}</button><button>{$hadrianLang.store.sslFilterEv}</button><button>{$hadrianLang.store.sslFilterWildcard}</button></div>

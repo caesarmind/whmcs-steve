@@ -40,6 +40,9 @@
 
 {literal}
 <style>
+/* Unify content column - align every major block to the 1024px theme width */
+.hp-intel-duo,
+.hp-testi-masonry { max-width: 1024px; }
 .mon-mode-toggle { display: inline-flex; background: #f5f5f7; border-radius: 980px; padding: 3px; }
 .mon-mode-toggle button { border: none; background: none; padding: 8px 22px; font-size: 14px; font-weight: 500; border-radius: 980px; cursor: pointer; color: #6e6e73; transition: all 0.2s ease; font-family: inherit; }
 .mon-mode-toggle button.active { background: #fff; color: #1d1d1f; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
@@ -325,7 +328,7 @@
             <button data-cycle="server">{$hadrianLang.store.monModeServer}</button>
         </div>
         <div class="mon-pane active" data-pricepane="site">
-            <div class="hp-pricing-grid" style="grid-template-columns: repeat(4, 1fr); max-width: 1200px;">
+            <div class="hp-pricing-grid" style="grid-template-columns: repeat(4, 1fr);">
                 <div class="hp-price-card dim">
                     <div class="label">{if isset($_ws0)}{$_ws0->name|escape}{else}Lite{/if}</div>
                     <h3>{$hadrianLang.store.monSitePlan1Tagline}</h3>
@@ -357,7 +360,7 @@
             </div>
         </div>
         <div class="mon-pane" data-pricepane="server">
-            <div class="hp-pricing-grid" style="grid-template-columns: repeat(3, 1fr); max-width: 960px;">
+            <div class="hp-pricing-grid" style="grid-template-columns: repeat(3, 1fr);">
                 <div class="hp-price-card dim">
                     <div class="label">{if isset($_sv0)}{$_sv0->name|escape}{else}Pro{/if}</div>
                     <h3>{$hadrianLang.store.monSrvPlan1Tagline}</h3>

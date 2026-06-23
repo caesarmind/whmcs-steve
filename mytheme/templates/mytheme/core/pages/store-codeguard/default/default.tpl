@@ -123,7 +123,7 @@
     </section>
 
     {* 3. Big stat callout (hp-stat-callout - inline styled in the mockup) *}
-    <section class="hp-stat-callout" style="padding: 72px 22px; max-width: 1100px; margin: 0 auto;">
+    <section class="hp-stat-callout" style="padding: 72px 22px; max-width: 1024px; margin: 0 auto;">
         <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center;">
             <div>
                 <div class="hp-eyebrow">{$hadrianLang.store.cgWhyEyebrow}</div>

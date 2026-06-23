@@ -79,7 +79,7 @@
     </section>
 
     {* 2. 3-step onboarding (hp-onboarding-steps - inline styled in the mockup) *}
-    <section class="hp-onboarding-steps" style="padding: 72px 22px; max-width: 1100px; margin: 0 auto;">
+    <section class="hp-onboarding-steps" style="padding: 72px 22px; max-width: 1024px; margin: 0 auto;">
         <div style="text-align: center; color: var(--color-accent); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">{$hadrianLang.store.mgStepsEyebrow}</div>
         <h2 style="text-align: center; font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 48px;">{$hadrianLang.store.mgStepsTitle}</h2>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; position: relative;">

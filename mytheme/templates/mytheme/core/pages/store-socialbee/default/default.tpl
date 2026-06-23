@@ -61,7 +61,7 @@
     </section>
 
     {* Dashboard mock under hero (decorative) *}
-    <section style="padding: 48px 22px 72px; max-width: 1100px; margin: 0 auto;">
+    <section style="padding: 48px 22px 72px; max-width: 1024px; margin: 0 auto;">
         <div style="background: #fff; border: 1px solid #e8e8ed; border-radius: 24px; padding: 14px; box-shadow: 0 24px 60px rgba(0,0,0,0.08);">
             <div style="display: flex; gap: 6px; margin-bottom: 12px; padding: 4px 10px;">
                 <span style="width: 9px; height: 9px; background: #ff453a; border-radius: 50%;"></span>
@@ -167,7 +167,7 @@
 
     {* 3. Feature tab-switcher (hp-tab-switcher - inline styled; tabs decorative as in the mockup) *}
     <div style="background: var(--color-surface-secondary);">
-    <section class="hp-tab-switcher" style="padding: 72px 22px; max-width: 1100px; margin: 0 auto;">
+    <section class="hp-tab-switcher" style="padding: 72px 22px; max-width: 1024px; margin: 0 auto;">
         <div style="text-align: center; color: var(--color-accent); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">{$hadrianLang.store.sbWhyEyebrow}</div>
         <h2 style="text-align: center; font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 32px;">{$hadrianLang.store.sbWhyTitle}</h2>
         <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 40px; flex-wrap: wrap;">
