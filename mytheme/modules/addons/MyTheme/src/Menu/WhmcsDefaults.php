@@ -73,7 +73,6 @@ final class WhmcsDefaults
             // templates/nexus/store/<slug>/ directory naming so WHMCS routes
             // /store/<slug> straight to our index.tpl dispatcher.
             'store-sitelock'             => ['lang_key' => '', 'default_label' => 'Website Security',          'url' => 'store/sitelock'],
-            'store-sitelockvpn'          => ['lang_key' => '', 'default_label' => 'SiteLock VPN',              'url' => 'store/sitelockvpn'],
             'store-socialbee'            => ['lang_key' => '', 'default_label' => 'SocialBee',                 'url' => 'store/socialbee'],
             'store-ssl'                  => ['lang_key' => '', 'default_label' => 'SSL Certificates',          'url' => 'store/ssl-certificates'],
             'store-threesixtymonitoring' => ['lang_key' => '', 'default_label' => 'Site & Server Monitoring', 'url' => 'store/360monitoring'],
@@ -82,9 +81,7 @@ final class WhmcsDefaults
             'store-ox'                   => ['lang_key' => '', 'default_label' => 'Professional Email',        'url' => 'store/professional-email'],
             'store-sitebuilder'          => ['lang_key' => '', 'default_label' => 'Site Builder',              'url' => 'store/site-builder'],
             'store-marketgoo'            => ['lang_key' => '', 'default_label' => 'SEO Tools',                 'url' => 'store/marketgoo'],
-            'store-xovinow'              => ['lang_key' => '', 'default_label' => 'XOVI Now',                  'url' => 'store/xovinow'],
             'store-codeguard'            => ['lang_key' => '', 'default_label' => 'Website Backup',            'url' => 'store/codeguard'],
-            'store-weebly'               => ['lang_key' => '', 'default_label' => 'Website Builder',           'url' => 'store/website-builder'],
             'store-order'                => ['lang_key' => '', 'default_label' => 'Order summary',             'url' => 'store/order'],
             'store-not-found'            => ['lang_key' => '', 'default_label' => 'Store page not found',      'url' => 'store/not-found'],
         ];
