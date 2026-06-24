@@ -6,6 +6,7 @@
     <p class="mt-page-subtitle">Optional theme add-ons (module integrations, custom widgets, etc.).</p>
 </header>
 
+<div class="mt-panel pad">
 <section class="mt-section">
     {if $extensions|count}
         <div class="mt-grid">
@@ -34,5 +35,6 @@
         </div>
     {/if}
 </section>
+</div>
 
 {include file="includes/footer.tpl"}

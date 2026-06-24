@@ -6,6 +6,7 @@
     <p class="mt-page-subtitle">Version and license information for this theme.</p>
 </header>
 
+<div class="mt-panel">
 <section class="mt-section">
     <header class="mt-section-header">
         <h2 class="mt-section-title">Theme Information</h2>
@@ -25,6 +26,8 @@
         <dd>
             {if $license.active}<span class="mt-badge mt-badge-success">Active</span>
             {elseif $license.status == 'No key'}<span class="mt-badge mt-badge-neutral">No key set</span>
+            {elseif $license.status == 'Suspended' || $license.status == 'Expired'}<span class="mt-badge mt-badge-warning">{$license.status|escape} &middot; theme running</span>
+            {elseif $license.status == 'Banned' || $license.status == 'Cancelled' || $license.status == 'Revoked'}<span class="mt-badge mt-badge-danger">Revoked</span>
             {elseif $license.status == 'Unreachable' || $license.status == 'Unknown'}<span class="mt-badge mt-badge-warning">Unverified</span>
             {else}<span class="mt-badge mt-badge-danger">Not active</span>{/if}
         </dd>
@@ -33,7 +36,7 @@
         <dd>{if $license.key}<code>{$license.key|escape}</code>{else}<span class="mt-text-3">Not set</span>{/if}</dd>
 
         <dt>Support &amp; Updates</dt>
-        <dd>{if $license.active}<span class="mt-badge mt-badge-success">Active</span>{else}<span class="mt-badge mt-badge-warning">Inactive</span>{/if}</dd>
+        <dd>{if $license.active}<span class="mt-badge mt-badge-success">Entitled</span>{else}<span class="mt-badge mt-badge-warning">Paused &middot; renew to update</span>{/if}</dd>
 
         {if $license.data.productname}<dt>Product</dt>
         <dd>{$license.data.productname|escape}</dd>{/if}
@@ -55,5 +58,6 @@
         <a href="{$viewHelper->url('license')}" class="mt-btn mt-btn-primary mt-btn-sm" style="color:#fff">Manage license key</a>
     </div>
 </section>
+</div>
 
 {include file="includes/footer.tpl"}

@@ -25,10 +25,12 @@
 .mt-tab-pill { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:999px; background:var(--mt-border); color:var(--mt-text-3); font-size:11px; font-weight:500; line-height:1.6; min-width:18px; text-align:center; }
 .mt-tab.is-active .mt-tab-pill { background:var(--mt-primary-tint); color:var(--mt-primary); }
 .mt-pages-section[hidden] { display:none !important; }
+.mt-pages-panel:has(> .mt-pages-section[hidden]) { display:none !important; }
 </style>
 
 {foreach $groups as $g}
     {assign var=groupRows value=$pagesByGroup[$g]}
+    <div class="mt-panel pad mt-pages-panel" data-group-panel="{$g|escape}">
     <section class="mt-section mt-pages-section" data-group-section="{$g|escape}">
         <header class="mt-section-header">
             <h2 class="mt-section-title">{$g|escape} pages</h2>
@@ -98,6 +100,7 @@
             </div>
         {/if}
     </section>
+    </div>
 {/foreach}
 
 <script>

@@ -5,6 +5,7 @@
     <p class="mt-page-subtitle">Manage installed themes. Pick one to configure styles, layouts and pages.</p>
 </header>
 
+<div class="mt-panel pad">
 <section class="mt-section">
     <header class="mt-section-header">
         <h2 class="mt-section-title">Installed</h2>
@@ -49,5 +50,6 @@
         {/if}
     </div>
 </section>
+</div>
 
 {include file="includes/footer.tpl"}

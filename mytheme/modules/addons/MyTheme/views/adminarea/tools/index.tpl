@@ -12,6 +12,7 @@
     </div>
 {/if}
 
+<div class="mt-panel">
 <section class="mt-section">
     <form method="post" action="">
         <div class="mt-row">
@@ -58,5 +59,6 @@
         </div>
     </form>
 </section>
+</div>
 
 {include file="includes/footer.tpl"}

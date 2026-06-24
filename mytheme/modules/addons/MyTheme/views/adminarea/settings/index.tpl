@@ -29,7 +29,7 @@
     .mt-field:last-child { margin-bottom: 0; }
     .mt-field-label { display: block; font-size: 13px; font-weight: 500; color: var(--mt-text); margin-bottom: 6px; }
     .mt-field-help { font-size: 12px; color: var(--mt-text-3); margin: 6px 0 0; }
-    .mt-select { width: 100%; padding: 9px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 8px; background: #fff; color: var(--mt-text); cursor: pointer; }
+    .mt-select { width: 100%; padding: 9px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 8px; background: var(--mt-surface); color: var(--mt-text); cursor: pointer; }
     .mt-select:focus { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 3px rgba(0,113,227,0.15); }
 
     /* Chip multi-select — single field with removable chips + dropdown picker.
@@ -43,7 +43,7 @@
         padding: 5px 32px 5px 8px;
         border: 1px solid var(--mt-input-border);
         border-radius: 8px;
-        background: #fff;
+        background: var(--mt-surface);
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -92,7 +92,7 @@
     .mt-multi-panel {
         position: absolute;
         left: 0; right: 0; top: calc(100% + 4px);
-        background: #fff;
+        background: var(--mt-surface);
         border: 1px solid var(--mt-border);
         border-radius: 8px;
         box-shadow: 0 8px 24px rgba(0,0,0,0.08);
@@ -105,7 +105,7 @@
     .mt-multi-panel[hidden] { display: none; }
     .mt-multi-panel--up { top: auto; bottom: calc(100% + 4px); }
     .mt-multi-search-wrap { padding: 8px; border-bottom: 1px solid var(--mt-border); }
-    .mt-multi-search-wrap input { width: 100%; padding: 6px 10px; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 6px; background: #fff; font: inherit; }
+    .mt-multi-search-wrap input { width: 100%; padding: 6px 10px; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 6px; background: var(--mt-surface); font: inherit; }
     .mt-multi-search-wrap input:focus { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 2px rgba(0,113,227,0.15); }
     .mt-multi-options { padding: 4px; overflow-y: auto; flex: 1; }
     .mt-multi-option {
@@ -133,7 +133,7 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        background: #fff;
+        background: var(--mt-surface);
     }
     .mt-multi-option.is-checked .mt-multi-check { background: var(--mt-primary, #0071e3); border-color: var(--mt-primary, #0071e3); }
     .mt-multi-option .mt-multi-check svg { width: 10px; height: 10px; opacity: 0; }
@@ -171,6 +171,7 @@
 </style>
 
 <form method="post" action="" novalidate>
+    <div class="mt-panel">
     <section class="mt-section">
         <header class="mt-section-header">
             <h2 class="mt-section-title">{if $tab == 'order'}Order Process{else}General{/if} Settings</h2>
@@ -445,7 +446,7 @@
            runtime (mytheme_cart/configureproduct.tpl).
            ════════════════════════════════════════════════════════════════ *}
         {literal}<style>
-        .mt-input { width: 100%; padding: 9px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 8px; background: #fff; color: var(--mt-text); }
+        .mt-input { width: 100%; padding: 9px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 8px; background: var(--mt-surface); color: var(--mt-text); }
         .mt-input:focus { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 3px rgba(0,113,227,0.15); }
         .mt-input--sm { max-width: 140px; }
         /* .mt-field resolves to display:flex from the admin stylesheet, which
@@ -613,6 +614,7 @@
             </label>
         </div>
     </section>
+    </div>
 
     <div style="margin-top:16px;display:flex;justify-content:flex-end">
         <button type="submit" class="mt-btn mt-btn-primary">Save changes</button>

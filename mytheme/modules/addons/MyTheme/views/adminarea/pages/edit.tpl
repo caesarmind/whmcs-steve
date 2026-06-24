@@ -23,6 +23,7 @@
 <form id="page-edit-form" method="post" action="?module=MyTheme&action=pages&sub=save">
     <input type="hidden" name="page" value="{$page|escape}">
 
+    <div class="mt-panel pad">
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Template variant</h2></header>
         {if $variants|count}
@@ -50,8 +51,10 @@
             </div>
         {/if}
     </section>
+    </div>
 
     {if $hasOptions}
+        <div class="mt-panel pad">
         <section class="mt-section">
             <header class="mt-section-header"><h2 class="mt-section-title">Page options</h2></header>
             {foreach $optionRows as $opt}
@@ -77,8 +80,10 @@
                 {/if}
             {/foreach}
         </section>
+        </div>
     {/if}
 
+    <div class="mt-panel pad">
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">SEO</h2></header>
 
@@ -133,7 +138,9 @@
             <input id="seo-social" class="mt-input" type="text" name="seo_social_image" maxlength="500" value="{$seo.social_image|escape}" placeholder="/path/to/og-image.jpg (recommended 1200×630)">
         </div>
     </section>
+    </div>
 
+    <div class="mt-panel pad">
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Layout overrides</h2></header>
         <div class="mt-inline-row">
@@ -159,7 +166,9 @@
             </select>
         </div>
     </section>
+    </div>
 
+    <div class="mt-panel pad">
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Sub-navigation</h2></header>
         <div class="mt-inline-row">
@@ -174,8 +183,10 @@
             </select>
         </div>
     </section>
+    </div>
 
     {if $svcLayoutApplicable}
+    <div class="mt-panel pad">
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Service list controls</h2></header>
         <div class="mt-inline-row">
@@ -190,8 +201,10 @@
             </select>
         </div>
     </section>
+    </div>
     {/if}
 
+    <div class="mt-panel pad">
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Visibility</h2></header>
         <div class="mt-inline-row">
@@ -206,6 +219,7 @@
             </select>
         </div>
     </section>
+    </div>
 </form>
 
 {literal}

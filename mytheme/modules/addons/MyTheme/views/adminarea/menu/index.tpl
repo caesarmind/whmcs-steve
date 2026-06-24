@@ -24,7 +24,8 @@
 {* Runtime diagnostic — what the frontend will actually render for each
    audience right now. If "Items: 0" or "Picked: (none)" shows below,
    that's why the sidebar looks empty on the public site. *}
-<section class="mt-section" style="margin-bottom:18px">
+<div class="mt-panel pad" style="margin-bottom:18px">
+<section class="mt-section">
     <header class="mt-section-header">
         <h2 class="mt-section-title">Live state</h2>
         <span class="mt-table-muted" style="font-size:12px">What the frontend renders right now for each audience.</span>
@@ -48,7 +49,9 @@
         {/foreach}
     </div>
 </section>
+</div>
 
+<div class="mt-panel pad">
 <section class="mt-section">
     <header class="mt-section-header">
         <h2 class="mt-section-title">{if $tab == 'footer-secondary'}Footer Secondary Menu{elseif $tab == 'footer'}Footer Menu{elseif $tab == 'secondary'}Secondary Menu{else}Main Menu{/if}</h2>
@@ -104,5 +107,6 @@
     </div>
     {/if}
 </section>
+</div>
 
 {include file="includes/footer.tpl"}

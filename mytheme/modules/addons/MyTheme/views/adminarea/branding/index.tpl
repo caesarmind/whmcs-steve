@@ -28,6 +28,7 @@
 
 <form method="post" action="?module=MyTheme&action=branding" enctype="multipart/form-data" class="mt-branding-form" id="mt-branding-form">
 
+<div class="mt-panel">
 {foreach $sections as $sectionKey => $section}
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">{$section.title|escape}</h2></header>
@@ -74,6 +75,7 @@
         {/foreach}
     </div>
 </section>
+</div>{* .mt-panel *}
 
     {* The Save button is only useful for no-JS fallback. JS hides it via
        the .is-ajax class added on load -- under JS, every pick auto-uploads.

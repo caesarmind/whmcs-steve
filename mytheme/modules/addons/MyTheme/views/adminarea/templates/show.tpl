@@ -8,7 +8,8 @@
     <p class="mt-page-subtitle">Configure styles, layouts, and pages for this template.</p>
 </header>
 
-<div class="mt-detail-grid">
+<div class="mt-panel pad">
+    <div class="mt-detail-grid">
     <section class="mt-section">
         <header class="mt-section-header">
             <h2 class="mt-section-title">Styles</h2>
@@ -50,20 +51,23 @@
             </div>
         </div>
     </section>
+    </div>
 </div>
 
-<section class="mt-section">
-    <header class="mt-section-header">
-        <h2 class="mt-section-title">Pages</h2>
-        <span class="mt-section-count">{$template.pages|count} declared</span>
-    </header>
-    <div class="mt-section-body">
-        <ul class="mt-detail-list">
-            {foreach $template.pages as $p}
-                <li><span>{$p|escape}</span></li>
-            {/foreach}
-        </ul>
-    </div>
-</section>
+<div class="mt-panel pad">
+    <section class="mt-section">
+        <header class="mt-section-header">
+            <h2 class="mt-section-title">Pages</h2>
+            <span class="mt-section-count">{$template.pages|count} declared</span>
+        </header>
+        <div class="mt-section-body">
+            <ul class="mt-detail-list">
+                {foreach $template.pages as $p}
+                    <li><span>{$p|escape}</span></li>
+                {/foreach}
+            </ul>
+        </div>
+    </section>
+</div>
 
 {include file="includes/footer.tpl"}

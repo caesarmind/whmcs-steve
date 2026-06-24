@@ -11,7 +11,7 @@
 <style>
 {literal}
     .mt-lay-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-    .mt-lay-card{border:1.5px solid var(--mt-line2,#d2d2d7);border-radius:14px;background:#fff;display:flex;flex-direction:column;overflow:hidden}
+    .mt-lay-card{border:1.5px solid var(--mt-input-border,#d2d2d7);border-radius:14px;background:var(--mt-surface,#fff);display:flex;flex-direction:column;overflow:hidden}
     .mt-lay-card.is-on{border-color:var(--mt-primary,#0071e3);box-shadow:0 0 0 3px rgba(0,113,227,.10)}
     .mt-lay-thumb{height:96px;background:var(--mt-surface-2,#f5f5f7);border-bottom:1px solid var(--mt-border,#e5e5ea);display:flex;align-items:center;justify-content:center}
     .mt-lay-thumb svg{width:122px;height:78px;display:block}
@@ -24,7 +24,7 @@
     .mt-lay-opt-lbl{font-size:11.5px;font-weight:600;color:var(--mt-text-2,#6e6e73);display:block;margin-bottom:6px}
     .mt-seg{display:inline-flex;background:var(--mt-surface-2,#f2f2f4);border-radius:9px;padding:3px;gap:2px;width:100%;border:0;margin:0}
     .mt-seg button{flex:1;border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;color:var(--mt-text-2,#6e6e73);padding:6px 0;border-radius:7px;cursor:pointer}
-    .mt-seg button.on{background:#fff;color:var(--mt-text,#1d1d1f);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+    .mt-seg button.on{background:var(--mt-surface,#fff);color:var(--mt-text,#1d1d1f);box-shadow:0 1px 2px rgba(0,0,0,.12)}
     .mt-lay-optnone{border-top:1px dashed var(--mt-border,#e5e5ea);padding-top:11px;font-size:11.5px;color:var(--mt-text-3,#86868b);font-style:italic}
 {/literal}
 </style>
@@ -36,6 +36,7 @@
        class="mt-tab {if $activeKind == 'footer'}is-active{/if}" data-kind-tab="footer">Footer</a>
 </div>
 
+<div class="mt-panel pad">
 {foreach $groups as $k => $list}
     <section class="mt-section" data-kind-panel="{$k}"{if $k != $activeKind} hidden{/if}>
         <header class="mt-section-header">
@@ -117,6 +118,7 @@
         </div>
     </section>
 {/foreach}
+</div>
 
 <script>
 {literal}

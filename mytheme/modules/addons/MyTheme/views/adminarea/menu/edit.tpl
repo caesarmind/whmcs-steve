@@ -126,6 +126,7 @@
                 <span class="mt-section-count" id="mtItemCount">0 items</span>
             </header>
 
+            <div class="mt-panel pad">
             <div class="mt-menu-tree" id="mtMenuTree" data-tree-root>
                 {if empty($tree)}
                     <div class="mt-empty mt-menu-empty" data-empty-state>
@@ -230,6 +231,7 @@
                     </select>
                     <button type="button" class="mt-btn mt-btn-ghost mt-btn-sm" id="mtAddBtn">+ Add item</button>
                 </div>
+            </div>
             </div>
         </section>
 
@@ -631,6 +633,20 @@
 .mt-menu-type-tag-login_button     { background: rgba(236,72,153,0.10); color: #be185d; }
 .mt-menu-type-tag-account_dropdown { background: rgba(20,184,166,0.12); color: #0f766e; }
 .mt-menu-type-tag-whmcs_default    { background: rgba(100,116,139,0.12); color: #475569; }
+
+/* Dark mode: brighten the type-tag text so the category badges stay legible
+   on a dark surface (the faint rgba tints carry over unchanged). */
+.mt-wrap[data-theme="dark"] .mt-menu-type-tag                  { color: #a8a29e; }
+.mt-wrap[data-theme="dark"] .mt-menu-type-tag-whmcs_page       { color: #6cb0ff; }
+.mt-wrap[data-theme="dark"] .mt-menu-type-tag-custom_link      { color: #ffb143; }
+.mt-wrap[data-theme="dark"] .mt-menu-type-tag-dropdown_parent  { color: #5ddf7a; }
+.mt-wrap[data-theme="dark"] .mt-menu-type-tag-header           { color: #c5bfb7; }
+.mt-wrap[data-theme="dark"] .mt-menu-type-tag-divider          { color: #a8a29e; }
+.mt-wrap[data-theme="dark"] .mt-menu-type-tag-language         { color: #a5b4fc; }
+.mt-wrap[data-theme="dark"] .mt-menu-type-tag-currency         { color: #d8b4fe; }
+.mt-wrap[data-theme="dark"] .mt-menu-type-tag-login_button     { color: #f9a8d4; }
+.mt-wrap[data-theme="dark"] .mt-menu-type-tag-account_dropdown { color: #4fd1c5; }
+.mt-wrap[data-theme="dark"] .mt-menu-type-tag-whmcs_default    { color: #94a3b8; }
 
 .mt-menu-name {
     flex: 1;

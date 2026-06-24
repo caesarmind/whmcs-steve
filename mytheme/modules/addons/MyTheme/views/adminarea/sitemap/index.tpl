@@ -19,6 +19,8 @@
 
 <form id="sitemap-form" method="post" action="?module=MyTheme&action=sitemap&sub=save">
 
+    <div class="mt-panel">
+
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Sitemap</h2></header>
 
@@ -109,7 +111,11 @@
             </label>
         </div>
     </section>
+
+    </div>
 </form>
+
+<div class="mt-panel">
 
 <section class="mt-section">
     <header class="mt-section-header"><h2 class="mt-section-title">Generate</h2></header>
@@ -129,5 +135,7 @@
     <pre style="margin:0; padding:14px; background:var(--mt-surface-2); border:1px solid var(--mt-border); border-radius:var(--mt-radius); font-size:12px; line-height:1.5; overflow:auto; max-height:460px; white-space:pre;">{$previewXml|escape}</pre>
 </section>
 {/if}
+
+</div>
 
 {include file="includes/footer.tpl"}

@@ -21,6 +21,7 @@
 
 {if $tab == 'variables'}
 <div class="mt-split">
+  <div class="mt-panel pad">
     <nav class="mt-subcats">
         <a class="mt-subcat {if $subcat == 'colors'}is-active{/if}"     data-subcat="colors"     href="?module=MyTheme&action=editStyle&style={$style|escape}&subcat=colors">Colors</a>
         <a class="mt-subcat {if $subcat == 'typography'}is-active{/if}" data-subcat="typography" href="?module=MyTheme&action=editStyle&style={$style|escape}&subcat=typography">Typography</a>
@@ -32,9 +33,11 @@
         <a class="mt-subcat {if $subcat == 'elements'}is-active{/if}"   data-subcat="elements"   href="?module=MyTheme&action=editStyle&style={$style|escape}&subcat=elements">Elements</a>
         <a class="mt-subcat {if $subcat == 'site'}is-active{/if}"       data-subcat="site"       href="?module=MyTheme&action=editStyle&style={$style|escape}&subcat=site">Site</a>
     </nav>
+  </div>
 
     {* All panels render so the JS in includes/footer.tpl can switch tabs with
        no page reload; the <a> hrefs above remain a no-JS fallback. *}
+  <div class="mt-panel pad">
     <div class="mt-subcat-content" data-subcats>
         <div class="mt-subcat-panel" data-panel="colors"{if $subcat != 'colors'} hidden{/if}>
             {include file="styles/_colors.tpl"}
@@ -69,13 +72,16 @@
         </div>
         {/foreach}
     </div>
+  </div>
 </div>
 {/if}{* /variables tab *}
 
 {if $tab == 'settings'}
+<div class="mt-panel pad">
 <div class="mt-empty">
     <div class="mt-empty-title">Style Settings</div>
     <p>This panel isn&rsquo;t available yet.</p>
+</div>
 </div>
 {/if}
 
@@ -84,11 +90,13 @@
         <input type="hidden" name="mt_custom_css_save" value="1">
         <input type="hidden" name="style" value="{$style|escape}">
         {if $cssSaved}<div class="mt-alert mt-alert-success">Custom CSS saved.</div>{/if}
+        <div class="mt-panel">
         <section class="mt-section">
             <header class="mt-section-header"><h2 class="mt-section-title">Custom CSS</h2></header>
             <p class="mt-field-help">Injected into every client-area page <em>after</em> the theme styles, so it overrides them. Applies site-wide (regardless of active style).</p>
             <textarea name="custom_css" class="mt-textarea mt-code" rows="18" spellcheck="false" placeholder="/* Your CSS — e.g. */&#10;.card { border-radius: 18px; }">{$customCss|escape}</textarea>
         </section>
+        </div>
         <div class="mt-typo-actions"><button type="submit" class="mt-btn mt-btn-primary">Save CSS</button></div>
     </form>
 {/if}
