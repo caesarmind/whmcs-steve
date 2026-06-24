@@ -16,6 +16,39 @@
 <div class="mt-wrap" id="mt-admin-root" data-theme="light">
 {literal}<script>(function(){try{var w=document.getElementById('mt-admin-root');var t=localStorage.getItem('mytheme-admin-theme');if(w&&(t==='dark'||t==='light'))w.setAttribute('data-theme',t);}catch(e){}})();</script>{/literal}
 
+{* Full-width admin: hide the WHMCS left sidebar and let our panel use the whole
+   content column. Scoped automatically -- this markup only loads on MyTheme
+   addon pages, so other admin pages keep their sidebar. *}
+{literal}<style id="mt-fullwidth-admin">
+#sidebar { display: none !important; }
+#content { margin-left: 0 !important; }
+[class*="col-"]:has(#mt-admin-root) { flex: 0 0 100% !important; max-width: 100% !important; width: 100% !important; }
+</style>
+<script>
+(function () {
+    var root = document.getElementById('mt-admin-root');
+    if (!root) { return; }
+    function hideEl(el) { if (el && !el.contains(root)) { el.style.setProperty('display', 'none', 'important'); } }
+    // Blend-style floated/fixed sidebar (id="sidebar").
+    hideEl(document.getElementById('sidebar'));
+    // Bootstrap-grid layouts: widen our content column, hide its sibling columns.
+    var col = root.closest('[class*="col-"]');
+    if (col) {
+        var p = col.parentElement;
+        if (p) { Array.prototype.forEach.call(p.children, function (s) { if (s !== col && /\bcol-\w/.test(s.className || '')) { hideEl(s); } }); }
+        col.style.setProperty('flex', '0 0 100%', 'important');
+        col.style.setProperty('max-width', '100%', 'important');
+        col.style.setProperty('width', '100%', 'important');
+    }
+    // Generic fallback: clear left margins on ancestors so freed space is reclaimed.
+    var node = root.parentElement, guard = 0;
+    while (node && node !== document.body && guard++ < 14) {
+        if (parseFloat(getComputedStyle(node).marginLeft) > 0) { node.style.setProperty('margin-left', '0', 'important'); }
+        node = node.parentElement;
+    }
+})();
+</script>{/literal}
+
     <header class="mt-brandbar">
         <div class="mt-brandbar-inner">
             <div class="mt-brandbar-left">
