@@ -16,15 +16,13 @@
 <div class="mt-wrap" id="mt-admin-root" data-theme="light">
 {literal}<script>(function(){try{var w=document.getElementById('mt-admin-root');var t=localStorage.getItem('mytheme-admin-theme');if(w&&(t==='dark'||t==='light'))w.setAttribute('data-theme',t);}catch(e){}})();</script>{/literal}
 
-{* Full-width admin: hide the WHMCS left sidebar and let our panel use the whole
-   content column. Scoped automatically -- this markup only loads on MyTheme
-   addon pages, so other admin pages keep their sidebar. *}
-{literal}<style id="mt-fullwidth-admin">
-#sidebar { display: none !important; }
-#content { margin-left: 0 !important; }
-[class*="col-"]:has(#mt-admin-root) { flex: 0 0 100% !important; max-width: 100% !important; width: 100% !important; }
-</style>
-<script>
+{* Full-width admin fallback. The sidebar/title-hiding CSS is injected into the
+   admin <head> by the AdminAreaHeadOutput hook (hooks.php) so it applies before
+   first paint -- no sidebar flash. This script is a structural belt-and-braces
+   for admin layouts whose sidebar/content ids differ from the CSS selectors;
+   the head CSS has already hidden the common case, so this never reintroduces a
+   flash -- it only widens the column / clears margins where CSS could not. *}
+{literal}<script>
 (function () {
     var root = document.getElementById('mt-admin-root');
     if (!root) { return; }

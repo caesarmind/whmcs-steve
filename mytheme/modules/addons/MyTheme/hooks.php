@@ -92,6 +92,35 @@ if (
 }
 
 // ============================================================================
+// Admin addon page: full-width canvas (no sidebar flash).
+//
+// Inject the sidebar/title-hiding CSS into the admin <head> so it applies
+// before first paint. The WHMCS left sidebar then never renders on our page,
+// so there's no fade/flash on refresh -- unlike hiding it from the addon's own
+// body output (which runs after the sidebar has already painted). Registered
+// unconditionally (admin chrome shouldn't depend on license state) but the
+// CSS is only emitted on the MyTheme addon page; every other admin page keeps
+// its sidebar. Mirrors how themes like Lagom style the admin via *HeadOutput.
+// ============================================================================
+add_hook('AdminAreaHeadOutput', 1, function ($vars) {
+    if (($_GET['module'] ?? '') !== 'MyTheme') {
+        return '';
+    }
+    return <<<'HTML'
+<style id="mt-admin-fullwidth">
+/* Hide the WHMCS admin left sidebar and reclaim its horizontal space. */
+#sidebar { display: none !important; }
+#content, #main-content, .main-content { margin-left: 0 !important; }
+/* Bootstrap-grid admin layouts: widen the column that holds our panel. */
+[class*="col-"]:has(#mt-admin-root) { flex: 0 0 100% !important; max-width: 100% !important; width: 100% !important; }
+/* Hide the WHMCS-rendered addon page title shown above our panel; keep ours. */
+#content > h1, #main-content > h1, .page-header, .pageheader { display: none !important; }
+body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
+</style>
+HTML;
+});
+
+// ============================================================================
 // Licensing is handled externally by whmcs-licensing-modern
 // (modules/servers/licensing + includes/hooks/hostnodes_theme_license.php).
 //
