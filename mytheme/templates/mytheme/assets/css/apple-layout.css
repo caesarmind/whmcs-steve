@@ -119,6 +119,15 @@ body[data-bleed="1"] .content-area > .when-empty {
     padding-right: 22px;
     box-sizing: border-box;
 }
+/* Content alignment "Left" -- on full-bleed store pages, anchor the content as a
+   capped column on the left (under the sidebar) instead of running it full-bleed
+   + centred. Only meaningful in sidebar/rail layouts; the top nav has no sidebar
+   to anchor against, so those stay full-bleed + centred. */
+body[data-bleed="1"][data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area {
+    max-width: 1024px;
+    margin-left: 0;
+    margin-right: auto;
+}
 
 /* -- Dev preview chip / options tab ------------------------- */
 /* Top-center floating, draggable. Drag by the "preview" tag on
