@@ -439,6 +439,7 @@ final class Presets
                      'config' => ['page' => 'store-ox']],
                     self::whmcsPage('store-codeguard'),
                     self::whmcsPage('store-sitebuilder'),
+                    self::whmcsPage('store-weebly'),
                     self::whmcsPage('store-marketgoo'),
                     ['type' => ItemTypes::WHMCS_PAGE,
                      'label' => self::label('', '360 Monitoring'),

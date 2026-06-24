@@ -80,6 +80,7 @@ final class WhmcsDefaults
             'store-spamexperts'          => ['lang_key' => '', 'default_label' => 'E-mail Services',           'url' => 'store/email-services'],
             'store-ox'                   => ['lang_key' => '', 'default_label' => 'Professional Email',        'url' => 'store/professional-email'],
             'store-sitebuilder'          => ['lang_key' => '', 'default_label' => 'Site Builder',              'url' => 'store/site-builder'],
+            'store-weebly'               => ['lang_key' => '', 'default_label' => 'Website Builder',           'url' => 'store/website-builder'],
             'store-marketgoo'            => ['lang_key' => '', 'default_label' => 'SEO Tools',                 'url' => 'store/marketgoo'],
             'store-codeguard'            => ['lang_key' => '', 'default_label' => 'Website Backup',            'url' => 'store/codeguard'],
             'store-order'                => ['lang_key' => '', 'default_label' => 'Order summary',             'url' => 'store/order'],
