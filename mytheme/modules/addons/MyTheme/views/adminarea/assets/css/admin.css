@@ -111,8 +111,12 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-brandbar { background: var(--mt-surface); border-bottom: 1px solid var(--mt-border); }
 .mt-brandbar-inner { max-width: 1180px; margin: 0 auto; padding: 13px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .mt-brandbar-left { display: flex; align-items: center; gap: 12px; }
-.mt-brandmark { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, #6366F1 0%, #0071E3 100%); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 16px; letter-spacing: -0.02em; position: relative; overflow: hidden; flex-shrink: 0; }
-.mt-brandmark::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent 60%); }
+/* Hadrian mark (Caesar bust). Theme-aware: the tile uses --mt-text and the
+   figure uses --mt-bg, so it shows a dark tile in light mode and inverts to a
+   light tile in dark mode -- same adaptive treatment as the reference. */
+.mt-brandmark { width: 34px; height: 34px; display: block; flex-shrink: 0; }
+.mt-brandmark .mt-bm-tile { fill: var(--mt-text); }
+.mt-brandmark .mt-bm-fig { fill: var(--mt-bg); }
 .mt-brand-text { display: flex; flex-direction: column; line-height: 1.3; }
 .mt-brandname { font-weight: 600; font-size: 16px; letter-spacing: -0.015em; color: var(--mt-text); }
 .mt-brandversion { font-size: 12px; color: var(--mt-text-3); }
