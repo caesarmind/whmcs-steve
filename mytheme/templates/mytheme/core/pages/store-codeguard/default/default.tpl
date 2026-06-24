@@ -45,16 +45,16 @@
         </div>
         <div class="hp-split-visual">
             <div class="visual-box" style="background: linear-gradient(135deg, #eef5ff 0%, #dbeafe 100%); padding: 28px;">
-                <div style="background: #fff; border-radius: 14px; padding: 14px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                <div style="background: var(--color-surface); border-radius: 14px; padding: 14px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <div style="font-size: 11px; font-weight: 600; color: #1d1d1f;">Backup history</div>
+                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary);">Backup history</div>
                         <span style="font-size: 10px; color: #30d158; font-weight: 600;">&bull; Active</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 6px;">
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><span style="font-size: 11px; color: #1a7f37;">Today &middot; 03:00 AM</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #f5f5f7; border-radius: 8px;"><span style="font-size: 11px; color: #1d1d1f;">Yesterday &middot; 03:00 AM</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #f5f5f7; border-radius: 8px;"><span style="font-size: 11px; color: #1d1d1f;">2 days ago &middot; 03:00 AM</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #f5f5f7; border-radius: 8px;"><span style="font-size: 11px; color: #1d1d1f;">3 days ago &middot; 03:00 AM</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">Yesterday &middot; 03:00 AM</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">2 days ago &middot; 03:00 AM</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">3 days ago &middot; 03:00 AM</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
                     </div>
                 </div>
             </div>
@@ -114,7 +114,7 @@
                 </div>
             {/if}
         </div>
-        <p style="text-align: center; font-size: 14px; color: #6e6e73; margin-top: 32px;">{$hadrianLang.store.cgNeedMore}</p>
+        <p style="text-align: center; font-size: 14px; color: var(--color-text-secondary); margin-top: 32px;">{$hadrianLang.store.cgNeedMore}</p>
     </section>
 
     {* 3. Big stat callout (hp-stat-callout - inline styled in the mockup) *}
@@ -123,16 +123,16 @@
             <div>
                 <div class="hp-eyebrow">{$hadrianLang.store.cgWhyEyebrow}</div>
                 <h2 style="font-size: 56px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin: 0 0 20px;"><span style="color: #ff453a;">{$hadrianLang.store.cgWhyHighlight}</span>{$hadrianLang.store.cgWhyTitle}</h2>
-                <p style="font-size: 17px; color: #6e6e73; line-height: 1.55; margin: 0;">{$hadrianLang.store.cgWhyText}</p>
+                <p style="font-size: 17px; color: var(--color-text-secondary); line-height: 1.55; margin: 0;">{$hadrianLang.store.cgWhyText}</p>
             </div>
             <div style="position: relative;">
                 <div style="background: linear-gradient(135deg, #fff0ef, #ffefec); border-radius: 24px; padding: 40px; min-height: 320px; display: flex; align-items: center; justify-content: center;">
-                    <div style="background: #fff; border-radius: 14px; padding: 20px; width: 100%; max-width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); position: relative;">
+                    <div style="background: var(--color-surface); border-radius: 14px; padding: 20px; width: 100%; max-width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); position: relative;">
                         <div style="display: flex; gap: 4px; margin-bottom: 14px;"><span style="width: 8px; height: 8px; background: #ff453a; border-radius: 50%;"></span><span style="width: 8px; height: 8px; background: #ff9f0a; border-radius: 50%;"></span><span style="width: 8px; height: 8px; background: #30d158; border-radius: 50%;"></span></div>
                         <div style="background: #ffefec; border-radius: 10px; padding: 14px; text-align: center;">
                             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="2" style="margin-bottom: 8px;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                             <div style="font-size: 13px; font-weight: 600; color: #ff453a;">Malware detected</div>
-                            <div style="font-size: 11px; color: #86868b; margin-top: 4px;">wp-config.php</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px;">wp-config.php</div>
                         </div>
                         <div style="margin-top: 12px; padding: 10px; background: #e8f8ed; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -153,17 +153,17 @@
                 <p>{$hadrianLang.store.cgWhatText}</p>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
-                    <div style="width: 100%; max-width: 300px; background: #fff; border-radius: 14px; padding: 16px;">
-                        <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 10px;">One-click restore</div>
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
+                    <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 16px;">
+                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px;">One-click restore</div>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #0071e3, #5ac8fa); border-radius: 12px; display: flex; align-items: center; justify-content: center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></div>
                             <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 600; color: #1d1d1f;">Restore to yesterday</div>
-                                <div style="font-size: 11px; color: #86868b;">Estimated time: 3 min</div>
+                                <div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Restore to yesterday</div>
+                                <div style="font-size: 11px; color: var(--color-text-tertiary);">Estimated time: 3 min</div>
                             </div>
                         </div>
-                        <button style="width: 100%; margin-top: 12px; padding: 10px; background: #0071e3; color: #fff; border: 0; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;">Start restore</button>
+                        <button style="width: 100%; margin-top: 12px; padding: 10px; background: var(--color-accent); color: #fff; border: 0; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;">Start restore</button>
                     </div>
                 </div>
             </div>
@@ -176,8 +176,8 @@
             </div>
             <div class="hp-alt-visual">
                 <div class="visual-box" style="background: #eaf4ff; padding: 24px;">
-                    <div style="width: 100%; max-width: 300px; background: #fff; border-radius: 14px; padding: 14px;">
-                        <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 10px;">Snapshot timeline</div>
+                    <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 14px;">
+                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px;">Snapshot timeline</div>
                         <svg viewBox="0 0 260 80" style="width: 100%; height: 80px;">
                             <line x1="10" y1="40" x2="250" y2="40" stroke="#e8e8ed" stroke-width="2"/>
                             <circle cx="20" cy="40" r="8" fill="#30d158"/>

@@ -62,22 +62,22 @@
         </div>
         <div class="hp-split-visual">
             <div class="visual-box" style="background: linear-gradient(135deg, #eef5ff 0%, #dbeafe 100%); padding: 28px;">
-                <div style="background: #fff; border-radius: 14px; padding: 14px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                <div style="background: var(--color-surface); border-radius: 14px; padding: 14px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <span style="font-size: 11px; font-weight: 600; color: #1d1d1f;">Site protected</span>
+                        <span style="font-size: 11px; font-weight: 600; color: var(--color-text-primary);">Site protected</span>
                         <span style="font-size: 10px; color: #30d158; font-weight: 600;">&bull; CLEAN</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #30d158, #5cdb79); border-radius: 14px; display: flex; align-items: center; justify-content: center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
                         <div style="flex: 1;">
-                            <div style="font-size: 13px; font-weight: 600; color: #1d1d1f;">No threats found</div>
-                            <div style="font-size: 11px; color: #86868b;">Last scan: 2h ago</div>
+                            <div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">No threats found</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary);">Last scan: 2h ago</div>
                         </div>
                     </div>
                     <div style="margin-top: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                        <div style="padding: 8px; background: #f5f5f7; border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: #1d1d1f;">2,847</div><div style="font-size: 9px; color: #86868b;">Files</div></div>
-                        <div style="padding: 8px; background: #f5f5f7; border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: #30d158;">0</div><div style="font-size: 9px; color: #86868b;">Threats</div></div>
-                        <div style="padding: 8px; background: #f5f5f7; border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: var(--color-accent);">99%</div><div style="font-size: 9px; color: #86868b;">Score</div></div>
+                        <div style="padding: 8px; background: var(--color-surface-secondary); border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: var(--color-text-primary);">2,847</div><div style="font-size: 9px; color: var(--color-text-tertiary);">Files</div></div>
+                        <div style="padding: 8px; background: var(--color-surface-secondary); border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: #30d158;">0</div><div style="font-size: 9px; color: var(--color-text-tertiary);">Threats</div></div>
+                        <div style="padding: 8px; background: var(--color-surface-secondary); border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: var(--color-accent);">99%</div><div style="font-size: 9px; color: var(--color-text-tertiary);">Score</div></div>
                     </div>
                 </div>
             </div>
@@ -153,9 +153,9 @@
                 <p>{$hadrianLang.store.slWhatText}</p>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
-                    <div style="width: 100%; max-width: 300px; background: #fff; border-radius: 14px; padding: 14px;">
-                        <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 10px;">Threats blocked &middot; Last 7 days</div>
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
+                    <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 14px;">
+                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px;">Threats blocked &middot; Last 7 days</div>
                         <div style="display: flex; align-items: end; gap: 6px; height: 80px;">
                             <div style="flex: 1; background: linear-gradient(180deg, #ff453a, #ff9f0a); border-radius: 4px 4px 0 0; height: 60%;"></div>
                             <div style="flex: 1; background: linear-gradient(180deg, #ff453a, #ff9f0a); border-radius: 4px 4px 0 0; height: 45%;"></div>
@@ -177,7 +177,7 @@
             </div>
             <div class="hp-alt-visual">
                 <div class="visual-box" style="background: #eaf4ff; padding: 24px;">
-                    <div style="width: 100%; max-width: 300px; background: #fff; border-radius: 14px; padding: 14px;">
+                    <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 14px;">
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 600;">WordPress core &middot; clean</span></div>
                             <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 600;">All plugins &middot; verified</span></div>
@@ -282,39 +282,39 @@
     <section class="hp-step-flow" style="padding: 72px 22px; max-width: 1024px; margin: 0 auto;">
         <div style="text-align: center; color: var(--color-accent); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">{$hadrianLang.store.slEmergencyEyebrow}</div>
         <h2 style="text-align: center; font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 12px;">{$hadrianLang.store.slEmergencyTitle}</h2>
-        <p style="text-align: center; color: #6e6e73; font-size: 16px; max-width: 720px; margin: 0 auto 48px;">{$hadrianLang.store.slEmergencySub}</p>
+        <p style="text-align: center; color: var(--color-text-secondary); font-size: 16px; max-width: 720px; margin: 0 auto 48px;">{$hadrianLang.store.slEmergencySub}</p>
         <div class="step-flow-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
-            <div style="background: #fff; border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
+            <div style="background: var(--color-surface); border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
                 <div style="width: 44px; height: 44px; margin: 0 auto 16px; background: linear-gradient(135deg, #0071e3, #5ac8fa); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">1</div>
-                <h4 style="font-size: 15px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">{$hadrianLang.store.slStep1Title}</h4>
-                <p style="font-size: 13px; color: #6e6e73; margin: 0;">{$hadrianLang.store.slStep1Text}</p>
+                <h4 style="font-size: 15px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.slStep1Title}</h4>
+                <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.slStep1Text}</p>
             </div>
-            <div style="background: #fff; border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
+            <div style="background: var(--color-surface); border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
                 <div style="width: 44px; height: 44px; margin: 0 auto 16px; background: linear-gradient(135deg, #0071e3, #5ac8fa); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">2</div>
-                <h4 style="font-size: 15px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">{$hadrianLang.store.slStep2Title}</h4>
-                <p style="font-size: 13px; color: #6e6e73; margin: 0;">{$hadrianLang.store.slStep2Text}</p>
+                <h4 style="font-size: 15px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.slStep2Title}</h4>
+                <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.slStep2Text}</p>
             </div>
-            <div style="background: #fff; border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
+            <div style="background: var(--color-surface); border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
                 <div style="width: 44px; height: 44px; margin: 0 auto 16px; background: linear-gradient(135deg, #0071e3, #5ac8fa); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">3</div>
-                <h4 style="font-size: 15px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">{$hadrianLang.store.slStep3Title}</h4>
-                <p style="font-size: 13px; color: #6e6e73; margin: 0;">{$hadrianLang.store.slStep3Text}</p>
+                <h4 style="font-size: 15px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.slStep3Title}</h4>
+                <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.slStep3Text}</p>
             </div>
         </div>
         <div class="step-flow-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-            <div style="background: #fff; border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
+            <div style="background: var(--color-surface); border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
                 <div style="width: 44px; height: 44px; margin: 0 auto 16px; background: linear-gradient(135deg, #0071e3, #5ac8fa); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">4</div>
-                <h4 style="font-size: 15px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">{$hadrianLang.store.slStep4Title}</h4>
-                <p style="font-size: 13px; color: #6e6e73; margin: 0;">{$hadrianLang.store.slStep4Text}</p>
+                <h4 style="font-size: 15px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.slStep4Title}</h4>
+                <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.slStep4Text}</p>
             </div>
-            <div style="background: #fff; border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
+            <div style="background: var(--color-surface); border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
                 <div style="width: 44px; height: 44px; margin: 0 auto 16px; background: linear-gradient(135deg, #0071e3, #5ac8fa); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">5</div>
-                <h4 style="font-size: 15px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">{$hadrianLang.store.slStep5Title}</h4>
-                <p style="font-size: 13px; color: #6e6e73; margin: 0;">{$hadrianLang.store.slStep5Text}</p>
+                <h4 style="font-size: 15px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.slStep5Title}</h4>
+                <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.slStep5Text}</p>
             </div>
-            <div style="background: #fff; border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
+            <div style="background: var(--color-surface); border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
                 <div style="width: 44px; height: 44px; margin: 0 auto 16px; background: linear-gradient(135deg, #0071e3, #5ac8fa); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">6</div>
-                <h4 style="font-size: 15px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">{$hadrianLang.store.slStep6Title}</h4>
-                <p style="font-size: 13px; color: #6e6e73; margin: 0;">{$hadrianLang.store.slStep6Text}</p>
+                <h4 style="font-size: 15px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.slStep6Title}</h4>
+                <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.slStep6Text}</p>
             </div>
         </div>
         <div style="text-align: center; margin-top: 40px;">

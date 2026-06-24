@@ -43,26 +43,26 @@
 /* Unify content column - align every major block to the 1024px theme width */
 .hp-intel-duo,
 .hp-testi-masonry { max-width: 1024px; }
-.mon-mode-toggle { display: inline-flex; background: #f5f5f7; border-radius: 980px; padding: 3px; }
-.mon-mode-toggle button { border: none; background: none; padding: 8px 22px; font-size: 14px; font-weight: 500; border-radius: 980px; cursor: pointer; color: #6e6e73; transition: all 0.2s ease; font-family: inherit; }
-.mon-mode-toggle button.active { background: #fff; color: #1d1d1f; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.mon-mode-toggle { display: inline-flex; background: var(--color-surface-secondary); border-radius: 980px; padding: 3px; }
+.mon-mode-toggle button { border: none; background: none; padding: 8px 22px; font-size: 14px; font-weight: 500; border-radius: 980px; cursor: pointer; color: var(--color-text-secondary); transition: all 0.2s ease; font-family: inherit; }
+.mon-mode-toggle button.active { background: var(--color-surface); color: var(--color-text-primary); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 [data-theme="dark"] .mon-mode-toggle { background: #2a2a2c; }
 [data-theme="dark"] .mon-mode-toggle button { color: #a1a1a6; }
 [data-theme="dark"] .mon-mode-toggle button.active { background: #3a3a3c; color: #f5f5f7; }
 .mon-check-form { display: grid; grid-template-columns: 1fr 220px auto; gap: 8px; margin-top: 20px; max-width: 620px; }
 .mon-check-form .ds-search-box { grid-column: 1 / 2; }
-.mon-check-form .mon-location { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #e8e8ed; border-radius: 16px; padding: 0 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.06); }
+.mon-check-form .mon-location { display: flex; align-items: center; gap: 8px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 0 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.06); }
 .mon-check-form .mon-location svg { width: 16px; height: 16px; color: var(--color-accent); flex-shrink: 0; }
-.mon-check-form .mon-location select { flex: 1; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: #1d1d1f; padding: 14px 0; appearance: none; cursor: pointer; -webkit-appearance: none; }
-.mon-check-form .mon-check-btn { background: #0071e3; color: #fff; border: 0; border-radius: 16px; padding: 0 22px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.15s; }
+.mon-check-form .mon-location select { flex: 1; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: var(--color-text-primary); padding: 14px 0; appearance: none; cursor: pointer; -webkit-appearance: none; }
+.mon-check-form .mon-check-btn { background: var(--color-accent); color: #fff; border: 0; border-radius: 16px; padding: 0 22px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.15s; }
 .mon-check-form .mon-check-btn:hover { background: #0077ed; }
 [data-theme="dark"] .mon-check-form .mon-location { background: #1c1c1e; border-color: #3a3a3c; }
 [data-theme="dark"] .mon-check-form .mon-location select { color: #f5f5f7; }
 [data-theme="dark"] .mon-check-form .mon-location svg { color: #2997ff; }
 @media (max-width: 720px) { .mon-check-form { grid-template-columns: 1fr; } }
 .mon-subtabs { display: flex; justify-content: center; gap: 6px; margin: 8px 0 40px; }
-.mon-subtabs button { border: none; background: transparent; padding: 10px 22px; font-size: 14px; font-weight: 500; border-radius: 980px; cursor: pointer; color: #6e6e73; transition: all 0.2s ease; font-family: inherit; }
-.mon-subtabs button.active { background: #0071e3; color: #fff; }
+.mon-subtabs button { border: none; background: transparent; padding: 10px 22px; font-size: 14px; font-weight: 500; border-radius: 980px; cursor: pointer; color: var(--color-text-secondary); transition: all 0.2s ease; font-family: inherit; }
+.mon-subtabs button.active { background: var(--color-accent); color: #fff; }
 [data-theme="dark"] .mon-subtabs button { color: #a1a1a6; }
 [data-theme="dark"] .mon-subtabs button.active { background: #2997ff; color: #fff; }
 .mon-pane { display: none; }
@@ -71,18 +71,18 @@
 @media (max-width: 900px) { .mon-alerts-grid { grid-template-columns: repeat(5, 1fr); } }
 @media (max-width: 560px) { .mon-alerts-grid { grid-template-columns: repeat(4, 1fr); } }
 .mon-alert-cell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.mon-alert-ico { width: 56px; height: 56px; background: #fff; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+.mon-alert-ico { width: 56px; height: 56px; background: var(--color-surface); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
 .mon-alert-ico svg { width: 24px; height: 24px; }
 .mon-alert-label { font-size: 12px; font-weight: 500; color: var(--color-text-primary); text-align: center; }
 [data-theme="dark"] .mon-alert-ico { background: #2a2a2c; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
 .mon-uptime-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; max-width: 900px; margin: 32px auto 0; }
 @media (max-width: 720px) { .mon-uptime-row { grid-template-columns: repeat(2, 1fr); } }
-.mon-uptime-card { background: #fff; border: 1px solid #e8e8ed; border-radius: 18px; padding: 28px 20px; text-align: center; }
-.mon-uptime-card .up { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: #1d1d1f; }
-.mon-uptime-card .up-lbl { font-size: 11px; color: #86868b; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 14px; }
-.mon-uptime-card .eq { font-size: 16px; color: #86868b; margin: 8px 0; }
+.mon-uptime-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 18px; padding: 28px 20px; text-align: center; }
+.mon-uptime-card .up { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: var(--color-text-primary); }
+.mon-uptime-card .up-lbl { font-size: 11px; color: var(--color-text-tertiary); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 14px; }
+.mon-uptime-card .eq { font-size: 16px; color: var(--color-text-tertiary); margin: 8px 0; }
 .mon-uptime-card .cost { font-size: 26px; font-weight: 600; color: #ff3b30; letter-spacing: -0.02em; }
-.mon-uptime-card .cost-lbl { font-size: 11px; color: #86868b; margin-top: 4px; }
+.mon-uptime-card .cost-lbl { font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px; }
 [data-theme="dark"] .mon-uptime-card { background: #2a2a2c; border-color: #3a3a3c; }
 [data-theme="dark"] .mon-uptime-card .up { color: #f5f5f7; }
 </style>
@@ -130,7 +130,7 @@
                         {$hadrianLang.store.monCheckNow}
                     </button>
                 </form>
-                <p style="font-size: 12px; color: #86868b; margin-top: 10px;">{$hadrianLang.store.monCheckNote}</p>
+                <p style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 10px;">{$hadrianLang.store.monCheckNote}</p>
             </div>
             <div class="mon-mode-pane mon-pane" data-pane="server">
                 <h1>{$hadrianLang.store.monServerHeroTitle}</h1>
@@ -143,9 +143,9 @@
         </div>
         <div class="hp-split-visual">
             <div class="visual-box" style="background: linear-gradient(135deg, #eef5ff 0%, #dbeafe 100%); padding: 28px;">
-                <div style="background: #fff; border-radius: 14px; padding: 16px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                <div style="background: var(--color-surface); border-radius: 14px; padding: 16px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <div style="font-size: 11px; font-weight: 600; color: #1d1d1f;">Monitor &middot; 24h</div>
+                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary);">Monitor &middot; 24h</div>
                         <span style="font-size: 10px; color: #30d158; font-weight: 600;">&bull; ONLINE</span>
                     </div>
                     <svg viewBox="0 0 240 80" style="width: 100%; height: 80px;">
@@ -154,9 +154,9 @@
                         <path d="M0,60 L24,45 L48,52 L72,30 L96,38 L120,22 L144,28 L168,18 L192,25 L216,12 L240,20" fill="none" stroke="#0071e3" stroke-width="2"/>
                     </svg>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px;">
-                        <div style="padding: 8px; background: #f5f5f7; border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: #1d1d1f;">99.98%</div><div style="font-size: 9px; color: #86868b;">Uptime</div></div>
-                        <div style="padding: 8px; background: #f5f5f7; border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: #1d1d1f;">187ms</div><div style="font-size: 9px; color: #86868b;">Response</div></div>
-                        <div style="padding: 8px; background: #f5f5f7; border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: #30d158;">0</div><div style="font-size: 9px; color: #86868b;">Incidents</div></div>
+                        <div style="padding: 8px; background: var(--color-surface-secondary); border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: var(--color-text-primary);">99.98%</div><div style="font-size: 9px; color: var(--color-text-tertiary);">Uptime</div></div>
+                        <div style="padding: 8px; background: var(--color-surface-secondary); border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: var(--color-text-primary);">187ms</div><div style="font-size: 9px; color: var(--color-text-tertiary);">Response</div></div>
+                        <div style="padding: 8px; background: var(--color-surface-secondary); border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: #30d158;">0</div><div style="font-size: 9px; color: var(--color-text-tertiary);">Incidents</div></div>
                     </div>
                 </div>
             </div>
@@ -243,15 +243,15 @@
                 <a href="#pricing" class="hp-buy-btn" style="margin-top: 20px; display: inline-block;">{$hadrianLang.store.monAlt1Cta}</a>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px; flex-direction: column; gap: 14px;">
-                    <div style="width: 100%; max-width: 300px; background: #fff; border-radius: 12px; padding: 14px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;"><span style="font-size: 11px; font-weight: 600; color: #1d1d1f;">Website Performance</span><span style="font-size: 10px; color: #30d158;">&bull; Healthy</span></div>
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px; flex-direction: column; gap: 14px;">
+                    <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 12px; padding: 14px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;"><span style="font-size: 11px; font-weight: 600; color: var(--color-text-primary);">Website Performance</span><span style="font-size: 10px; color: #30d158;">&bull; Healthy</span></div>
                         <svg viewBox="0 0 240 60" style="width: 100%; height: 60px;"><path d="M0,40 L30,30 L60,35 L90,20 L120,25 L150,15 L180,22 L210,10 L240,18" fill="none" stroke="#0071e3" stroke-width="2"/></svg>
                     </div>
                     <div style="display: flex; gap: 10px; width: 100%; max-width: 300px;">
-                        <div style="flex: 1; background: #fff; padding: 10px; border-radius: 10px;"><div style="display: flex; align-items: start; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" style="flex-shrink: 0; margin-top: 2px;"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1d1d1f;">Detect outages fast</span></div></div>
-                        <div style="flex: 1; background: #fff; padding: 10px; border-radius: 10px;"><div style="display: flex; align-items: start; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" style="flex-shrink: 0; margin-top: 2px;"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1d1d1f;">Protect revenue</span></div></div>
-                        <div style="flex: 1; background: #fff; padding: 10px; border-radius: 10px;"><div style="display: flex; align-items: start; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" style="flex-shrink: 0; margin-top: 2px;"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1d1d1f;">Diagnose issues</span></div></div>
+                        <div style="flex: 1; background: var(--color-surface); padding: 10px; border-radius: 10px;"><div style="display: flex; align-items: start; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" style="flex-shrink: 0; margin-top: 2px;"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: var(--color-text-primary);">Detect outages fast</span></div></div>
+                        <div style="flex: 1; background: var(--color-surface); padding: 10px; border-radius: 10px;"><div style="display: flex; align-items: start; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" style="flex-shrink: 0; margin-top: 2px;"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: var(--color-text-primary);">Protect revenue</span></div></div>
+                        <div style="flex: 1; background: var(--color-surface); padding: 10px; border-radius: 10px;"><div style="display: flex; align-items: start; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" style="flex-shrink: 0; margin-top: 2px;"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: var(--color-text-primary);">Diagnose issues</span></div></div>
                     </div>
                 </div>
             </div>
@@ -264,12 +264,12 @@
                 <a href="#pricing" class="hp-buy-btn" style="margin-top: 20px; display: inline-block;">{$hadrianLang.store.monAlt2Cta}</a>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
-                    <div style="width: 100%; max-width: 300px; background: #fff; border-radius: 12px; padding: 14px;">
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
+                    <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 12px; padding: 14px;">
                         <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                            <div style="flex: 1;"><div style="font-size: 10px; color: #86868b; margin-bottom: 4px;">CPU</div><div style="font-size: 18px; font-weight: 700; color: #1d1d1f;">47%</div><div style="height: 4px; background: #f5f5f7; border-radius: 2px; margin-top: 4px;"><div style="width: 47%; height: 100%; background: #0071e3; border-radius: 2px;"></div></div></div>
-                            <div style="flex: 1;"><div style="font-size: 10px; color: #86868b; margin-bottom: 4px;">Memory</div><div style="font-size: 18px; font-weight: 700; color: #1d1d1f;">62%</div><div style="height: 4px; background: #f5f5f7; border-radius: 2px; margin-top: 4px;"><div style="width: 62%; height: 100%; background: #30d158; border-radius: 2px;"></div></div></div>
-                            <div style="flex: 1;"><div style="font-size: 10px; color: #86868b; margin-bottom: 4px;">Disk</div><div style="font-size: 18px; font-weight: 700; color: #1d1d1f;">38%</div><div style="height: 4px; background: #f5f5f7; border-radius: 2px; margin-top: 4px;"><div style="width: 38%; height: 100%; background: #ff9f0a; border-radius: 2px;"></div></div></div>
+                            <div style="flex: 1;"><div style="font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 4px;">CPU</div><div style="font-size: 18px; font-weight: 700; color: var(--color-text-primary);">47%</div><div style="height: 4px; background: var(--color-surface-secondary); border-radius: 2px; margin-top: 4px;"><div style="width: 47%; height: 100%; background: #0071e3; border-radius: 2px;"></div></div></div>
+                            <div style="flex: 1;"><div style="font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 4px;">Memory</div><div style="font-size: 18px; font-weight: 700; color: var(--color-text-primary);">62%</div><div style="height: 4px; background: var(--color-surface-secondary); border-radius: 2px; margin-top: 4px;"><div style="width: 62%; height: 100%; background: #30d158; border-radius: 2px;"></div></div></div>
+                            <div style="flex: 1;"><div style="font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 4px;">Disk</div><div style="font-size: 18px; font-weight: 700; color: var(--color-text-primary);">38%</div><div style="height: 4px; background: var(--color-surface-secondary); border-radius: 2px; margin-top: 4px;"><div style="width: 38%; height: 100%; background: #ff9f0a; border-radius: 2px;"></div></div></div>
                         </div>
                         <svg viewBox="0 0 240 50" style="width: 100%; height: 50px;"><path d="M0,30 Q30,15 60,25 T120,22 T180,18 T240,15" fill="none" stroke="#0071e3" stroke-width="2"/><path d="M0,38 Q30,32 60,36 T120,30 T180,34 T240,28" fill="none" stroke="#30d158" stroke-width="2"/></svg>
                     </div>
@@ -284,13 +284,13 @@
                 <a href="#pricing" class="hp-buy-btn" style="margin-top: 20px; display: inline-block;">{$hadrianLang.store.monAlt3Cta}</a>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
                     <div style="width: 100%; max-width: 300px;">
-                        <div style="background: #fff; border-radius: 12px; padding: 14px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f5f5f7;"><div style="display: flex; align-items: center; gap: 10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 12px; color: #1d1d1f;">SSL Certificate</span></div><span style="font-size: 10px; color: #30d158; font-weight: 600;">Valid</span></div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f5f5f7;"><div style="display: flex; align-items: center; gap: 10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 12px; color: #1d1d1f;">DNS Records</span></div><span style="font-size: 10px; color: #30d158; font-weight: 600;">OK</span></div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f5f5f7;"><div style="display: flex; align-items: center; gap: 10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span style="font-size: 12px; color: #1d1d1f;">Broken Links</span></div><span style="font-size: 10px; color: #ff9f0a; font-weight: 600;">2 found</span></div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;"><div style="display: flex; align-items: center; gap: 10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 12px; color: #1d1d1f;">Page Speed</span></div><span style="font-size: 10px; color: #30d158; font-weight: 600;">A+</span></div>
+                        <div style="background: var(--color-surface); border-radius: 12px; padding: 14px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f5f5f7;"><div style="display: flex; align-items: center; gap: 10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 12px; color: var(--color-text-primary);">SSL Certificate</span></div><span style="font-size: 10px; color: #30d158; font-weight: 600;">Valid</span></div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f5f5f7;"><div style="display: flex; align-items: center; gap: 10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 12px; color: var(--color-text-primary);">DNS Records</span></div><span style="font-size: 10px; color: #30d158; font-weight: 600;">OK</span></div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f5f5f7;"><div style="display: flex; align-items: center; gap: 10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span style="font-size: 12px; color: var(--color-text-primary);">Broken Links</span></div><span style="font-size: 10px; color: #ff9f0a; font-weight: 600;">2 found</span></div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;"><div style="display: flex; align-items: center; gap: 10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 12px; color: var(--color-text-primary);">Page Speed</span></div><span style="font-size: 10px; color: #30d158; font-weight: 600;">A+</span></div>
                         </div>
                     </div>
                 </div>
@@ -310,7 +310,7 @@
                 <div class="mon-uptime-card"><div class="up-lbl">{$hadrianLang.store.monUptimeLabel}</div><div class="up">99.7%</div><div class="eq">=</div><div class="cost">$1,500</div><div class="cost-lbl">{$hadrianLang.store.monUptimeLost}</div></div>
                 <div class="mon-uptime-card"><div class="up-lbl">{$hadrianLang.store.monUptimeLabel}</div><div class="up">98.0%</div><div class="eq">=</div><div class="cost">$10,000</div><div class="cost-lbl">{$hadrianLang.store.monUptimeLost}</div></div>
             </div>
-            <p style="font-size: 12px; color: #86868b; margin-top: 18px;">{$hadrianLang.store.monUptimeFootnote}</p>
+            <p style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 18px;">{$hadrianLang.store.monUptimeFootnote}</p>
         </div>
     </section>
 
@@ -389,15 +389,15 @@
             <p><strong>{$hadrianLang.store.monSupportStrong}</strong> {$hadrianLang.store.monSupportText}</p>
             <a href="{$WEB_ROOT}/submitticket.php" class="link">{$hadrianLang.store.monSupportLink} &rsaquo;</a>
             <div class="intel-visual" style="display: flex; align-items: center; justify-content: center; padding: 48px; min-height: 300px;">
-                <div style="background: #fff; border-radius: 18px; padding: 24px; width: 100%; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.08);">
+                <div style="background: var(--color-surface); border-radius: 18px; padding: 24px; width: 100%; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.08);">
                     <div style="display: flex; gap: 10px; margin-bottom: 18px;">
                         <div style="width: 52px; height: 52px; border-radius: 50%; background-image: url('https://i.pravatar.cc/96?u=amelia'); background-size: cover; border: 2px solid #fff; box-shadow: 0 0 0 2px #e8e8ed;"></div>
                         <div style="width: 52px; height: 52px; border-radius: 50%; background-image: url('https://i.pravatar.cc/96?u=james2'); background-size: cover; border: 2px solid #fff; box-shadow: 0 0 0 2px #e8e8ed;"></div>
                         <div style="width: 52px; height: 52px; border-radius: 50%; background-image: url('https://i.pravatar.cc/96?u=sophia'); background-size: cover; border: 2px solid #fff; box-shadow: 0 0 0 2px #e8e8ed;"></div>
-                        <div style="width: 52px; height: 52px; border-radius: 50%; background: #f5f5f7; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #86868b; border: 2px solid #fff; box-shadow: 0 0 0 2px #e8e8ed;">+12</div>
+                        <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--color-surface-secondary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--color-text-tertiary); border: 2px solid #fff; box-shadow: 0 0 0 2px #e8e8ed;">+12</div>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div style="padding: 14px; background: #f5f5f7; border-radius: 12px;"><div style="font-size: 10px; color: #86868b;">Response time</div><div style="font-size: 26px; font-weight: 700; color: #1d1d1f;">&lt; 15m</div></div>
+                        <div style="padding: 14px; background: var(--color-surface-secondary); border-radius: 12px;"><div style="font-size: 10px; color: var(--color-text-tertiary);">Response time</div><div style="font-size: 26px; font-weight: 700; color: var(--color-text-primary);">&lt; 15m</div></div>
                         <div style="padding: 14px; background: #e8f8ed; border-radius: 12px;"><div style="font-size: 10px; color: #1a7f37;">Online now</div><div style="font-size: 26px; font-weight: 700; color: #1a7f37;">24/7</div></div>
                     </div>
                 </div>
@@ -405,10 +405,10 @@
         </div>
         <div class="hp-intel-small">
             <div class="intel-small-shot" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #eaf4ff, #dbeafe); padding: 40px;">
-                <div style="background: #fff; border-radius: 14px; padding: 16px; width: 100%; max-width: 280px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
-                    <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 10px;">Support ticket &middot; #4821</div>
-                    <div style="padding: 10px; background: #f5f5f7; border-radius: 8px; margin-bottom: 8px;"><div style="font-size: 10px; color: #86868b; margin-bottom: 2px;">You &middot; 2 min ago</div><div style="font-size: 11px; color: #1d1d1f;">Uptime dropped below 99% overnight</div></div>
-                    <div style="padding: 10px; background: #e8f0ff; border-radius: 8px;"><div style="font-size: 10px; color: var(--color-accent); margin-bottom: 2px;">Amelia &middot; 14 min ago</div><div style="font-size: 11px; color: #1d1d1f;">Investigated the probe logs &mdash; DNS hiccup at the LA edge. Patched. Monitoring now.</div></div>
+                <div style="background: var(--color-surface); border-radius: 14px; padding: 16px; width: 100%; max-width: 280px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                    <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px;">Support ticket &middot; #4821</div>
+                    <div style="padding: 10px; background: var(--color-surface-secondary); border-radius: 8px; margin-bottom: 8px;"><div style="font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 2px;">You &middot; 2 min ago</div><div style="font-size: 11px; color: var(--color-text-primary);">Uptime dropped below 99% overnight</div></div>
+                    <div style="padding: 10px; background: #e8f0ff; border-radius: 8px;"><div style="font-size: 10px; color: var(--color-accent); margin-bottom: 2px;">Amelia &middot; 14 min ago</div><div style="font-size: 11px; color: var(--color-text-primary);">Investigated the probe logs &mdash; DNS hiccup at the LA edge. Patched. Monitoring now.</div></div>
                 </div>
             </div>
             <div class="intel-small-content">

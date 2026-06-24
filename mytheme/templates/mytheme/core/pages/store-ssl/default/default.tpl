@@ -55,10 +55,10 @@
         </div>
         <div class="hp-split-visual">
             <div class="visual-box" style="background: linear-gradient(135deg, #eef5ff 0%, #dbeafe 100%); padding: 28px;">
-                <div style="background: #fff; border-radius: 14px; padding: 16px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
-                    <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #f5f5f7; border-radius: 10px; margin-bottom: 14px;">
+                <div style="background: var(--color-surface); border-radius: 14px; padding: 16px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--color-surface-secondary); border-radius: 10px; margin-bottom: 14px;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                        <span style="font-size: 13px; color: #1d1d1f; font-weight: 500;">https://yourdomain.com</span>
+                        <span style="font-size: 13px; color: var(--color-text-primary); font-weight: 500;">https://yourdomain.com</span>
                     </div>
                     <div style="padding: 14px; background: linear-gradient(135deg, #0071e3, #5ac8fa); border-radius: 12px; color: #fff; text-align: center;">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" style="margin-bottom: 8px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
@@ -107,10 +107,10 @@
                 <p style="margin-top: 12px;">{$hadrianLang.store.sslWhatP2}</p>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
                     <div style="width: 100%; max-width: 300px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; border-radius: 12px; margin-bottom: 10px;">
-                            <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 12px; color: #1d1d1f;">Browser</span></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-surface); border-radius: 12px; margin-bottom: 10px;">
+                            <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 12px; color: var(--color-text-primary);">Browser</span></div>
                         </div>
                         <div style="display: flex; justify-content: center; margin: 6px 0;">
                             <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
@@ -122,8 +122,8 @@
                                 <div style="width: 2px; height: 12px; background: linear-gradient(180deg, #0071e3, transparent);"></div>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; border-radius: 12px;">
-                            <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg><span style="font-size: 12px; color: #1d1d1f;">Server</span></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-surface); border-radius: 12px;">
+                            <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg><span style="font-size: 12px; color: var(--color-text-primary);">Server</span></div>
                         </div>
                         <div style="margin-top: 12px; padding: 10px 12px; background: #e8f8ed; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -143,15 +143,15 @@
             </div>
             <div class="hp-alt-visual">
                 <div class="visual-box" style="background: #eaf4ff; padding: 24px;">
-                    <div style="width: 100%; max-width: 300px; background: #fff; border-radius: 14px; padding: 14px;">
-                        <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 12px;">SEO impact after HTTPS migration</div>
+                    <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 14px;">
+                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 12px;">SEO impact after HTTPS migration</div>
                         <svg viewBox="0 0 260 80" style="width: 100%; height: 80px;">
                             <defs><linearGradient id="seoGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#30d158" stop-opacity="0.3"/><stop offset="100%" stop-color="#30d158" stop-opacity="0"/></linearGradient></defs>
                             <path d="M0,65 L32,60 L64,62 L96,50 L128,45 L160,30 L192,22 L224,15 L260,10 L260,80 L0,80 Z" fill="url(#seoGrad)"/>
                             <path d="M0,65 L32,60 L64,62 L96,50 L128,45 L160,30 L192,22 L224,15 L260,10" fill="none" stroke="#30d158" stroke-width="2"/>
                             <line x1="96" y1="0" x2="96" y2="80" stroke="#86868b" stroke-width="1" stroke-dasharray="3"/>
                         </svg>
-                        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: #86868b;">
+                        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: var(--color-text-tertiary);">
                             <span>HTTP</span><span>&larr; migration &rarr;</span><span>HTTPS</span>
                         </div>
                         <div style="margin-top: 12px; padding: 10px; background: #e8f8ed; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
@@ -170,11 +170,11 @@
                 <p>{$hadrianLang.store.sslChooseP1}</p>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
                     <div style="width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: 8px;">
-                        <div style="background: #fff; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px;"><span style="width: 32px; height: 32px; background: #e8f0ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--color-accent); font-weight: 700; font-size: 11px;">DV</span><div><div style="font-size: 12px; font-weight: 600; color: #1d1d1f;">Domain Validation</div><div style="font-size: 10px; color: #86868b;">Instant issuance</div></div></div>
-                        <div style="background: #fff; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px;"><span style="width: 32px; height: 32px; background: #e8f8ed; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #30d158; font-weight: 700; font-size: 11px;">OV</span><div><div style="font-size: 12px; font-weight: 600; color: #1d1d1f;">Organization Validation</div><div style="font-size: 10px; color: #86868b;">1&ndash;3 day vetting</div></div></div>
-                        <div style="background: #fff; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px;"><span style="width: 32px; height: 32px; background: #f3ebff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #bf5af2; font-weight: 700; font-size: 11px;">EV</span><div><div style="font-size: 12px; font-weight: 600; color: #1d1d1f;">Extended Validation</div><div style="font-size: 10px; color: #86868b;">3&ndash;7 day vetting</div></div></div>
+                        <div style="background: var(--color-surface); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px;"><span style="width: 32px; height: 32px; background: #e8f0ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--color-accent); font-weight: 700; font-size: 11px;">DV</span><div><div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary);">Domain Validation</div><div style="font-size: 10px; color: var(--color-text-tertiary);">Instant issuance</div></div></div>
+                        <div style="background: var(--color-surface); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px;"><span style="width: 32px; height: 32px; background: #e8f8ed; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #30d158; font-weight: 700; font-size: 11px;">OV</span><div><div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary);">Organization Validation</div><div style="font-size: 10px; color: var(--color-text-tertiary);">1&ndash;3 day vetting</div></div></div>
+                        <div style="background: var(--color-surface); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px;"><span style="width: 32px; height: 32px; background: #f3ebff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #bf5af2; font-weight: 700; font-size: 11px;">EV</span><div><div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary);">Extended Validation</div><div style="font-size: 10px; color: var(--color-text-tertiary);">3&ndash;7 day vetting</div></div></div>
                     </div>
                 </div>
             </div>
@@ -230,7 +230,7 @@
                 <a href="#pricing" class="hp-buy-btn" style="margin-top: 20px; display: inline-block;">{$hadrianLang.store.sslHeroCta}</a>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
                     <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #0071e3, #5ac8fa); border-radius: 24px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 48px; font-weight: 700;">DV</div>
                 </div>
             </div>
@@ -258,7 +258,7 @@
                 <a href="#pricing" class="hp-buy-btn" style="margin-top: 20px; display: inline-block;">{$hadrianLang.store.sslHeroCta}</a>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
                     <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #bf5af2, #c678ff); border-radius: 24px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 48px; font-weight: 700;">EV</div>
                 </div>
             </div>
@@ -275,9 +275,9 @@
                 <div class="visual-box" style="background: #eaf4ff; padding: 24px;">
                     <div style="position: relative; width: 140px; height: 120px;">
                         <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; background: linear-gradient(135deg, #ff9f0a, #ffb843); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; font-weight: 700;">*</div>
-                        <div style="position: absolute; bottom: 0; left: 0; width: 40px; height: 40px; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">api</div>
-                        <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">app</div>
-                        <div style="position: absolute; bottom: 0; right: 0; width: 40px; height: 40px; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">cdn</div>
+                        <div style="position: absolute; bottom: 0; left: 0; width: 40px; height: 40px; background: var(--color-surface); border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">api</div>
+                        <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--color-surface); border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">app</div>
+                        <div style="position: absolute; bottom: 0; right: 0; width: 40px; height: 40px; background: var(--color-surface); border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">cdn</div>
                     </div>
                 </div>
             </div>
@@ -288,7 +288,7 @@
     {* 6. Pricing - real $certificates looped into the mockup's row markup *}
     <section id="pricing" style="padding: 72px 22px; max-width: 1024px; margin: 0 auto;">
         <h2 style="text-align: center; margin-bottom: 8px;">{$hadrianLang.store.sslPricingTitle}</h2>
-        <p style="text-align: center; color: #86868b; margin-bottom: 40px;">{$hadrianLang.store.sslPricingSubtitle}</p>
+        <p style="text-align: center; color: var(--color-text-tertiary); margin-bottom: 40px;">{$hadrianLang.store.sslPricingSubtitle}</p>
         <div class="hp-billing-toggle" style="justify-content: center; margin-bottom: 32px; display: flex; gap: 8px;"><button class="active">{$hadrianLang.store.sslFilterAll}</button><button>{$hadrianLang.store.sslFilterDv}</button><button>{$hadrianLang.store.sslFilterOv}</button><button>{$hadrianLang.store.sslFilterEv}</button><button>{$hadrianLang.store.sslFilterWildcard}</button></div>
         <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
             {if $_sslCount > 0}
@@ -298,15 +298,15 @@
                         <div style="width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; background: {if $_type == 'dv'}linear-gradient(135deg, #0071e3, #5ac8fa){elseif $_type == 'ov'}linear-gradient(135deg, #30d158, #5cdb79){elseif $_type == 'ev'}linear-gradient(135deg, #bf5af2, #c678ff){else}linear-gradient(135deg, #ff9f0a, #ffb843){/if};">{$_type|escape}</div>
                         <div>
                             <div style="font-weight: 600; color: var(--color-text-primary); font-size: 15px;">{$_cert->name|escape}</div>
-                            <p style="font-size: 13px; color: #6e6e73; margin: 4px 0 0;">{$_cert->description|escape}</p>
+                            <p style="font-size: 13px; color: var(--color-text-secondary); margin: 4px 0 0;">{$_cert->description|escape}</p>
                         </div>
-                        <div style="text-align: right;"><div style="font-size: 22px; font-weight: 700; color: var(--color-text-primary);">{$_cert->pricing()->best()->yearlyPrice()}</div><div style="font-size: 11px; color: #86868b;">{$hadrianLang.store.sslPerYear}</div></div>
+                        <div style="text-align: right;"><div style="font-size: 22px; font-weight: 700; color: var(--color-text-primary);">{$_cert->pricing()->best()->yearlyPrice()}</div><div style="font-size: 11px; color: var(--color-text-tertiary);">{$hadrianLang.store.sslPerYear}</div></div>
                         <a href="{$WEB_ROOT}/cart.php?a=add&amp;pid={$_cert->id}" style="text-align: center; padding: 10px 16px; background: #1d1d1f; color: #fff; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 500;">{$hadrianLang.store.sslOrderNow}</a>
                     </div>
                     {/foreach}
                 {/foreach}
             {else}
-                <p style="text-align:center; color:#86868b; padding: 24px;">{$hadrianLang.store.sslNoProducts}</p>
+                <p style="text-align:center; color:var(--color-text-tertiary); padding: 24px;">{$hadrianLang.store.sslNoProducts}</p>
             {/if}
         </div>
     </section>

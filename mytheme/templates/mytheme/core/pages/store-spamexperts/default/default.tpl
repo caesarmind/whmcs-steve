@@ -74,25 +74,25 @@
         </div>
         <div class="hp-split-visual">
             <div class="visual-box" style="background: linear-gradient(135deg, #eef5ff 0%, #dbeafe 100%); padding: 28px;">
-                <div style="background: #fff; border-radius: 14px; padding: 14px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                <div style="background: var(--color-surface); border-radius: 14px; padding: 14px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
                     <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #e8f8ed; border-radius: 10px; margin-bottom: 8px;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                         <div style="flex: 1;">
-                            <div style="font-size: 12px; font-weight: 600; color: #1d1d1f;">team@yoursite.com</div>
-                            <div style="font-size: 10px; color: #86868b;">Delivered &middot; Clean</div>
+                            <div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary);">team@yoursite.com</div>
+                            <div style="font-size: 10px; color: var(--color-text-tertiary);">Delivered &middot; Clean</div>
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #ffefec; border-radius: 10px; margin-bottom: 8px;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
                         <div style="flex: 1;">
-                            <div style="font-size: 12px; font-weight: 600; color: #1d1d1f;">Malware payload</div>
+                            <div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary);">Malware payload</div>
                             <div style="font-size: 10px; color: #ff453a;">Blocked &middot; Quarantined</div>
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #fff6e6; border-radius: 10px;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
                         <div style="flex: 1;">
-                            <div style="font-size: 12px; font-weight: 600; color: #1d1d1f;">Phishing attempt</div>
+                            <div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary);">Phishing attempt</div>
                             <div style="font-size: 10px; color: #ff9f0a;">Flagged &middot; Reviewed</div>
                         </div>
                     </div>
@@ -146,10 +146,10 @@
                 <p style="margin-top: 12px;">{$hadrianLang.store.seAlt1P2}</p>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
                     <div style="width: 100%; max-width: 300px;">
-                        <div style="background: #fff; border-radius: 14px; padding: 14px;">
-                            <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 12px;">Protection Summary &mdash; Last 7 days</div>
+                        <div style="background: var(--color-surface); border-radius: 14px; padding: 14px;">
+                            <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 12px;">Protection Summary &mdash; Last 7 days</div>
                             <div style="display: flex; align-items: end; gap: 6px; height: 80px; margin-bottom: 12px;">
                                 <div style="flex: 1; background: linear-gradient(180deg, #0071e3, #5ac8fa); border-radius: 4px 4px 0 0; height: 50%;"></div>
                                 <div style="flex: 1; background: linear-gradient(180deg, #0071e3, #5ac8fa); border-radius: 4px 4px 0 0; height: 70%;"></div>
@@ -160,9 +160,9 @@
                                 <div style="flex: 1; background: linear-gradient(180deg, #0071e3, #5ac8fa); border-radius: 4px 4px 0 0; height: 55%;"></div>
                             </div>
                             <div style="display: flex; gap: 10px; font-size: 10px;">
-                                <div style="flex: 1;"><div style="color: #86868b;">Blocked</div><div style="font-weight: 700; color: #1d1d1f; font-size: 14px;">28,471</div></div>
-                                <div style="flex: 1;"><div style="color: #86868b;">Delivered</div><div style="font-weight: 700; color: #1d1d1f; font-size: 14px;">52,883</div></div>
-                                <div style="flex: 1;"><div style="color: #86868b;">Accuracy</div><div style="font-weight: 700; color: #30d158; font-size: 14px;">99.9%</div></div>
+                                <div style="flex: 1;"><div style="color: var(--color-text-tertiary);">Blocked</div><div style="font-weight: 700; color: var(--color-text-primary); font-size: 14px;">28,471</div></div>
+                                <div style="flex: 1;"><div style="color: var(--color-text-tertiary);">Delivered</div><div style="font-weight: 700; color: var(--color-text-primary); font-size: 14px;">52,883</div></div>
+                                <div style="flex: 1;"><div style="color: var(--color-text-tertiary);">Accuracy</div><div style="font-weight: 700; color: #30d158; font-size: 14px;">99.9%</div></div>
                             </div>
                         </div>
                     </div>
@@ -179,11 +179,11 @@
             </div>
             <div class="hp-alt-visual">
                 <div class="visual-box" style="background: #eaf4ff; padding: 24px;">
-                    <div style="width: 100%; max-width: 300px; background: #fff; border-radius: 14px; padding: 14px;">
-                        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #f5f5f7; border-radius: 8px;">
+                    <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 14px;">
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
-                            <span style="font-size: 11px; color: #1d1d1f; flex: 1;">Incoming email</span>
-                            <span style="font-size: 10px; color: #86868b;">SMTP</span>
+                            <span style="font-size: 11px; color: var(--color-text-primary); flex: 1;">Incoming email</span>
+                            <span style="font-size: 10px; color: var(--color-text-tertiary);">SMTP</span>
                         </div>
                         <div style="display: flex; justify-content: center; margin: 8px 0;">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>

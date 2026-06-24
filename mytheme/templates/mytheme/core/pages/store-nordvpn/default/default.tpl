@@ -90,7 +90,7 @@
         <p class="feat-sub">{$hadrianLang.store.nvDevicesSub}</p>
         <div class="hp-feature-cards" style="margin-top: 40px; grid-template-columns: repeat(5, 1fr);">
             <div class="hp-feature-card" style="align-items: center; text-align: center;"><div class="feat-icon blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.48L10.93 4.4v7.74H3V5.48zM3 18.52l7.93 1.08v-7.68H3v6.6zM11.86 4.27L22.4 2.85v9.29H11.86V4.27zM11.86 19.73L22.4 21.15v-9.01H11.86v7.59z"/></svg></div><h4>Windows</h4><p style="font-size: 12px;">Windows 10, 11</p></div>
-            <div class="hp-feature-card" style="align-items: center; text-align: center;"><div class="feat-icon" style="background: #f5f5f7; color: #1d1d1f;"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21z"/></svg></div><h4>macOS</h4><p style="font-size: 12px;">macOS 11+</p></div>
+            <div class="hp-feature-card" style="align-items: center; text-align: center;"><div class="feat-icon" style="background: var(--color-surface-secondary); color: var(--color-text-primary);"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21z"/></svg></div><h4>macOS</h4><p style="font-size: 12px;">macOS 11+</p></div>
             <div class="hp-feature-card" style="align-items: center; text-align: center;"><div class="feat-icon green"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52z"/></svg></div><h4>Android</h4><p style="font-size: 12px;">Play Store</p></div>
             <div class="hp-feature-card" style="align-items: center; text-align: center;"><div class="feat-icon orange"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg></div><h4>Firefox</h4><p style="font-size: 12px;">Browser extension</p></div>
             <div class="hp-feature-card" style="align-items: center; text-align: center;"><div class="feat-icon red"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="#fff"/></svg></div><h4>Chrome</h4><p style="font-size: 12px;">Web Store</p></div>
@@ -107,19 +107,19 @@
                 <p style="margin-top: 12px;">{$hadrianLang.store.nvWhatP2}</p>
                 <div class="hp-cta-row" style="margin-top: 20px;">
                     <a href="{$_nvOrder|escape}" class="hp-buy-btn">{$hadrianLang.store.nvWhatCta}</a>
-                    <span style="font-size: 20px; font-weight: 600; color: #1d1d1f;">{$_nvFrom}</span>
+                    <span style="font-size: 20px; font-weight: 600; color: var(--color-text-primary);">{$_nvFrom}</span>
                 </div>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
                     <div style="width: 100%; max-width: 320px;">
-                        <div style="font-size: 12px; font-weight: 600; color: #1d1d1f; margin-bottom: 14px; display: flex; align-items: center; gap: 6px;"><span style="width: 6px; height: 6px; background: #30d158; border-radius: 50%;"></span> Secured Connection</div>
+                        <div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 14px; display: flex; align-items: center; gap: 6px;"><span style="width: 6px; height: 6px; background: #30d158; border-radius: 50%;"></span> Secured Connection</div>
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                            <div style="flex: 1; background: #fff; padding: 10px; border-radius: 10px; text-align: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div style="font-size: 10px; margin-top: 4px; color: #86868b;">Device</div></div>
+                            <div style="flex: 1; background: var(--color-surface); padding: 10px; border-radius: 10px; text-align: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div style="font-size: 10px; margin-top: 4px; color: var(--color-text-tertiary);">Device</div></div>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                             <div style="flex: 1; background: #0071e3; padding: 10px; border-radius: 10px; text-align: center; color: #fff;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><div style="font-size: 10px; margin-top: 4px;">NordVPN</div></div>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                            <div style="flex: 1; background: #fff; padding: 10px; border-radius: 10px; text-align: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><div style="font-size: 10px; margin-top: 4px; color: #86868b;">Internet</div></div>
+                            <div style="flex: 1; background: var(--color-surface); padding: 10px; border-radius: 10px; text-align: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><div style="font-size: 10px; margin-top: 4px; color: var(--color-text-tertiary);">Internet</div></div>
                         </div>
                         <div style="margin-top: 14px; padding: 10px 12px; background: #e8f8ed; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -157,7 +157,7 @@
     {* 6. More than just a VPN + duo cards *}
     <section style="padding: 72px 22px 24px; text-align: center;">
         <h2 style="font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 12px;">{$hadrianLang.store.nvMoreTitle}</h2>
-        <p style="font-size: 17px; color: #6e6e73; max-width: 700px; margin: 0 auto;">{$hadrianLang.store.nvMoreText}</p>
+        <p style="font-size: 17px; color: var(--color-text-secondary); max-width: 700px; margin: 0 auto;">{$hadrianLang.store.nvMoreText}</p>
     </section>
     <section class="hp-duo-feature">
         <div class="hp-duo-card">

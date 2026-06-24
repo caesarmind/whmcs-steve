@@ -54,14 +54,14 @@
         </div>
         <div class="hp-split-visual">
             <div class="visual-box" style="background: linear-gradient(135deg, #eef5ff 0%, #dbeafe 100%); padding: 28px;">
-                <div style="background: #fff; border-radius: 14px; padding: 14px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
-                    <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 10px;">SEO Score</div>
+                <div style="background: var(--color-surface); border-radius: 14px; padding: 14px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                    <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px;">SEO Score</div>
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                         <div style="width: 56px; height: 56px; background: conic-gradient(#30d158 0% 82%, #e8e8ed 82% 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <div style="width: 42px; height: 42px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #1d1d1f;">82</div>
+                            <div style="width: 42px; height: 42px; background: var(--color-surface); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--color-text-primary);">82</div>
                         </div>
                         <div style="flex: 1;">
-                            <div style="font-size: 11px; color: #86868b;">Organic traffic</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary);">Organic traffic</div>
                             <div style="font-size: 16px; font-weight: 700; color: #30d158;">+ 47%</div>
                         </div>
                     </div>
@@ -78,29 +78,29 @@
         <div style="text-align: center; color: var(--color-accent); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">{$hadrianLang.store.mgStepsEyebrow}</div>
         <h2 style="text-align: center; font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 48px;">{$hadrianLang.store.mgStepsTitle}</h2>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; position: relative;">
-            <div style="background: #fff; border: 1px solid #e8e8ed; border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
-                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: #0071e3; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">1</div>
+            <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
+                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">1</div>
                 <div style="width: 72px; height: 72px; margin: 8px auto 16px; background: linear-gradient(135deg, #eaf4ff, #dbeafe); border-radius: 18px; display: flex; align-items: center; justify-content: center;">
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                 </div>
-                <h4 style="font-size: 17px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">{$hadrianLang.store.mgStep1Title}</h4>
-                <p style="font-size: 14px; color: #6e6e73; margin: 0;">{$hadrianLang.store.mgStep1Text}</p>
+                <h4 style="font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.mgStep1Title}</h4>
+                <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.mgStep1Text}</p>
             </div>
-            <div style="background: #fff; border: 1px solid #e8e8ed; border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
-                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: #0071e3; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">2</div>
+            <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
+                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">2</div>
                 <div style="width: 72px; height: 72px; margin: 8px auto 16px; background: linear-gradient(135deg, #eaf8ee, #d4f0dc); border-radius: 18px; display: flex; align-items: center; justify-content: center;">
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 </div>
-                <h4 style="font-size: 17px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">{$hadrianLang.store.mgStep2Title}</h4>
-                <p style="font-size: 14px; color: #6e6e73; margin: 0;">{$hadrianLang.store.mgStep2Text}</p>
+                <h4 style="font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.mgStep2Title}</h4>
+                <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.mgStep2Text}</p>
             </div>
-            <div style="background: #fff; border: 1px solid #e8e8ed; border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
-                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: #0071e3; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">3</div>
+            <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
+                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">3</div>
                 <div style="width: 72px; height: 72px; margin: 8px auto 16px; background: linear-gradient(135deg, #faf0ff, #f0dbff); border-radius: 18px; display: flex; align-items: center; justify-content: center;">
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#bf5af2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
                 </div>
-                <h4 style="font-size: 17px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px;">{$hadrianLang.store.mgStep3Title}</h4>
-                <p style="font-size: 14px; color: #6e6e73; margin: 0;">{$hadrianLang.store.mgStep3Text}</p>
+                <h4 style="font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.mgStep3Title}</h4>
+                <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.mgStep3Text}</p>
             </div>
         </div>
         <div style="text-align: center; margin-top: 32px;">
@@ -117,21 +117,21 @@
                 <p>{$hadrianLang.store.mgHowText}</p>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
-                    <div style="width: 100%; max-width: 300px; background: #fff; border-radius: 14px; padding: 14px;">
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
+                    <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 14px;">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
                             <div style="width: 56px; height: 56px; background: conic-gradient(#0071e3 0% 62%, #e8e8ed 62% 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                <div style="width: 42px; height: 42px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--color-accent);">62%</div>
+                                <div style="width: 42px; height: 42px; background: var(--color-surface); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--color-accent);">62%</div>
                             </div>
                             <div style="flex: 1;">
-                                <div style="font-size: 11px; color: #86868b;">Plan progress</div>
-                                <div style="font-size: 13px; font-weight: 600; color: #1d1d1f;">16 of 26 tasks</div>
+                                <div style="font-size: 11px; color: var(--color-text-tertiary);">Plan progress</div>
+                                <div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">16 of 26 tasks</div>
                             </div>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 500;">Add meta descriptions</span></div>
-                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #f5f5f7; border-radius: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 11px; color: #1d1d1f;">Optimize images</span></div>
-                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #f5f5f7; border-radius: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 11px; color: #1d1d1f;">Add internal links</span></div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 11px; color: var(--color-text-primary);">Optimize images</span></div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 11px; color: var(--color-text-primary);">Add internal links</span></div>
                         </div>
                     </div>
                 </div>
@@ -146,12 +146,12 @@
             </div>
             <div class="hp-alt-visual">
                 <div class="visual-box" style="background: #eaf4ff; padding: 24px;">
-                    <div style="width: 100%; max-width: 300px; background: #fff; border-radius: 14px; padding: 14px;">
-                        <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 10px;">Keyword tracking</div>
+                    <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 14px;">
+                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px;">Keyword tracking</div>
                         <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #f5f5f7; border-radius: 8px;"><span style="font-size: 11px; color: #1d1d1f;">best hosting 2026</span><span style="display: flex; align-items: center; gap: 4px; color: #30d158; font-size: 11px; font-weight: 600;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>#3</span></div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #f5f5f7; border-radius: 8px;"><span style="font-size: 11px; color: #1d1d1f;">cloud hosting deals</span><span style="display: flex; align-items: center; gap: 4px; color: #30d158; font-size: 11px; font-weight: 600;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>#7</span></div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #f5f5f7; border-radius: 8px;"><span style="font-size: 11px; color: #1d1d1f;">vps server</span><span style="display: flex; align-items: center; gap: 4px; color: #ff9f0a; font-size: 11px; font-weight: 600;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>#12</span></div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">best hosting 2026</span><span style="display: flex; align-items: center; gap: 4px; color: #30d158; font-size: 11px; font-weight: 600;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>#3</span></div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">cloud hosting deals</span><span style="display: flex; align-items: center; gap: 4px; color: #30d158; font-size: 11px; font-weight: 600;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>#7</span></div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">vps server</span><span style="display: flex; align-items: center; gap: 4px; color: #ff9f0a; font-size: 11px; font-weight: 600;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>#12</span></div>
                         </div>
                     </div>
                 </div>
@@ -165,15 +165,15 @@
                 <p>{$hadrianLang.store.mgZeroText}</p>
                 <div class="hp-cta-row" style="margin-top: 20px;">
                     <a href="#pricing" class="hp-buy-btn">{$hadrianLang.store.mgHeroCta}</a>
-                    <span style="font-size: 21px; font-weight: 600; color: #1d1d1f;">{if isset($_mgLite) && !$_mgLite->isFree()}{$_mgLite->pricing()->first()->toPrefixedString()}{else}$4.99{/if}</span>
+                    <span style="font-size: 21px; font-weight: 600; color: var(--color-text-primary);">{if isset($_mgLite) && !$_mgLite->isFree()}{$_mgLite->pricing()->first()->toPrefixedString()}{else}$4.99{/if}</span>
                 </div>
             </div>
             <div class="hp-alt-visual">
-                <div class="visual-box" style="background: #f5f5f7; padding: 24px;">
-                    <div style="width: 100%; max-width: 300px; background: #fff; border-radius: 14px; padding: 20px; text-align: center;">
+                <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
+                    <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 20px; text-align: center;">
                         <div style="width: 80px; height: 80px; margin: 0 auto 12px; background: linear-gradient(135deg, #0071e3, #5ac8fa); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 32px; font-weight: 700;">SEO</div>
-                        <div style="font-size: 13px; font-weight: 600; color: #1d1d1f;">Report ready</div>
-                        <div style="font-size: 11px; color: #86868b; margin-top: 4px;">42 recommendations</div>
+                        <div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Report ready</div>
+                        <div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px;">42 recommendations</div>
                     </div>
                 </div>
             </div>
@@ -189,17 +189,17 @@
             <div class="hp-feature-card">
                 <div class="stars" style="color: #ffd60a; font-size: 18px; margin-bottom: 10px;">&starf;&starf;&starf;&starf;&starf;</div>
                 <p style="font-size: 14px; color: var(--color-text-primary);">marketgoo made me stand out in just 2 months. Traffic tripled. I worked through the plan tasks, followed every recommendation, and the rank-tracking dashboard is the cherry on top.</p>
-                <div style="display: flex; align-items: center; gap: 10px; margin-top: 16px;"><div style="width: 36px; height: 36px; border-radius: 50%; background-image: url('https://i.pravatar.cc/96?u=rachelkg'); background-size: cover;"></div><div><div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Rachel Kg</div><div style="font-size: 11px; color: #86868b;">Marketing Director</div></div></div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 16px;"><div style="width: 36px; height: 36px; border-radius: 50%; background-image: url('https://i.pravatar.cc/96?u=rachelkg'); background-size: cover;"></div><div><div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Rachel Kg</div><div style="font-size: 11px; color: var(--color-text-tertiary);">Marketing Director</div></div></div>
             </div>
             <div class="hp-feature-card">
                 <div class="stars" style="color: #ffd60a; font-size: 18px; margin-bottom: 10px;">&starf;&starf;&starf;&starf;&starf;</div>
                 <p style="font-size: 14px; color: var(--color-text-primary);">A simple, reliable plan that matched our own SEO tooling. We had it up and running in minutes, and the guide that shows me the next step to take is impressively straightforward.</p>
-                <div style="display: flex; align-items: center; gap: 10px; margin-top: 16px;"><div style="width: 36px; height: 36px; border-radius: 50%; background-image: url('https://i.pravatar.cc/96?u=simonjude'); background-size: cover;"></div><div><div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Simon Jude</div><div style="font-size: 11px; color: #86868b;">Founder, BrightStack</div></div></div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 16px;"><div style="width: 36px; height: 36px; border-radius: 50%; background-image: url('https://i.pravatar.cc/96?u=simonjude'); background-size: cover;"></div><div><div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Simon Jude</div><div style="font-size: 11px; color: var(--color-text-tertiary);">Founder, BrightStack</div></div></div>
             </div>
             <div class="hp-feature-card">
                 <div class="stars" style="color: #ffd60a; font-size: 18px; margin-bottom: 10px;">&starf;&starf;&starf;&starf;&starf;</div>
                 <p style="font-size: 14px; color: var(--color-text-primary);">marketgoo is excellent and easy to use for a non-technical team. I love the service and support. The fact that the plan re-generates after I complete tasks is the smartest SEO feature.</p>
-                <div style="display: flex; align-items: center; gap: 10px; margin-top: 16px;"><div style="width: 36px; height: 36px; border-radius: 50%; background-image: url('https://i.pravatar.cc/96?u=saraazzonger'); background-size: cover;"></div><div><div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Sara Azzonger</div><div style="font-size: 11px; color: #86868b;">Ecommerce Manager</div></div></div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 16px;"><div style="width: 36px; height: 36px; border-radius: 50%; background-image: url('https://i.pravatar.cc/96?u=saraazzonger'); background-size: cover;"></div><div><div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Sara Azzonger</div><div style="font-size: 11px; color: var(--color-text-tertiary);">Ecommerce Manager</div></div></div>
             </div>
         </div>
     </section>

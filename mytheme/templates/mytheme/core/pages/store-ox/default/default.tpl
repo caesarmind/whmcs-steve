@@ -58,12 +58,12 @@
                     <span class="dot" style="background: #28c840;"></span>
                 </div>
                 <div class="hp-dash-shot" style="padding: 0;">
-                    <div style="background: #fff; border-radius: 0 0 10px 10px; overflow: hidden;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #e8e8ed;">
+                    <div style="background: var(--color-surface); border-radius: 0 0 10px 10px; overflow: hidden;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--color-border);">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                <span style="font-size: 13px; font-weight: 600; color: #1d1d1f;">Inbox</span>
-                                <span style="font-size: 11px; color: #86868b; background: #f0f0f0; padding: 1px 7px; border-radius: 10px;">4</span>
+                                <span style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Inbox</span>
+                                <span style="font-size: 11px; color: var(--color-text-tertiary); background: #f0f0f0; padding: 1px 7px; border-radius: 10px;">4</span>
                             </div>
                             <div style="display: flex; gap: 12px;">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
@@ -73,33 +73,33 @@
                         <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #f0f0f0; background: #f0f5ff;">
                             <div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #0071e3, #40a0ff); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; flex-shrink: 0;">JC</div>
                             <div style="flex: 1; min-width: 0;">
-                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;"><span style="font-size: 13px; font-weight: 600; color: #1d1d1f;">James Chen</span><span style="font-size: 10px; color: #86868b; flex-shrink: 0;">10:42 AM</span></div>
-                                <div style="font-size: 12px; font-weight: 600; color: #1d1d1f; margin-bottom: 1px;">Q2 Brand Campaign Draft</div>
-                                <div style="font-size: 11px; color: #86868b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Hey team, I&rsquo;ve attached the latest mockups for the Q2 campaign. Let me know...</div>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;"><span style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">James Chen</span><span style="font-size: 10px; color: var(--color-text-tertiary); flex-shrink: 0;">10:42 AM</span></div>
+                                <div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 1px;">Q2 Brand Campaign Draft</div>
+                                <div style="font-size: 11px; color: var(--color-text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Hey team, I&rsquo;ve attached the latest mockups for the Q2 campaign. Let me know...</div>
                             </div>
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #f0f0f0; background: #f0f5ff;">
                             <div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #30d158, #5ae07a); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; flex-shrink: 0;">SL</div>
                             <div style="flex: 1; min-width: 0;">
-                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;"><span style="font-size: 13px; font-weight: 600; color: #1d1d1f;">Sara Lee</span><span style="font-size: 10px; color: #86868b; flex-shrink: 0;">9:15 AM</span></div>
-                                <div style="font-size: 12px; font-weight: 600; color: #1d1d1f; margin-bottom: 1px;">Invoice #4021 - Payment Received</div>
-                                <div style="font-size: 11px; color: #86868b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Hi, confirming we received the payment for invoice #4021. Thank you for...</div>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;"><span style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Sara Lee</span><span style="font-size: 10px; color: var(--color-text-tertiary); flex-shrink: 0;">9:15 AM</span></div>
+                                <div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 1px;">Invoice #4021 - Payment Received</div>
+                                <div style="font-size: 11px; color: var(--color-text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Hi, confirming we received the payment for invoice #4021. Thank you for...</div>
                             </div>
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #f0f0f0;">
                             <div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #ff9f0a, #ffb940); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; flex-shrink: 0;">MR</div>
                             <div style="flex: 1; min-width: 0;">
-                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;"><span style="font-size: 13px; font-weight: 500; color: #1d1d1f;">Mark Rivera</span><span style="font-size: 10px; color: #86868b; flex-shrink: 0;">Yesterday</span></div>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;"><span style="font-size: 13px; font-weight: 500; color: var(--color-text-primary);">Mark Rivera</span><span style="font-size: 10px; color: var(--color-text-tertiary); flex-shrink: 0;">Yesterday</span></div>
                                 <div style="font-size: 12px; font-weight: 500; color: #3a3a3c; margin-bottom: 1px;">Re: Meeting notes - Product sync</div>
-                                <div style="font-size: 11px; color: #86868b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Sounds good. I&rsquo;ll update the roadmap and share the revised timeline by...</div>
+                                <div style="font-size: 11px; color: var(--color-text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Sounds good. I&rsquo;ll update the roadmap and share the revised timeline by...</div>
                             </div>
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px;">
                             <div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #ff3b30, #ff6961); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; flex-shrink: 0;">DN</div>
                             <div style="flex: 1; min-width: 0;">
-                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;"><span style="font-size: 13px; font-weight: 500; color: #1d1d1f;">David Nguyen</span><span style="font-size: 10px; color: #86868b; flex-shrink: 0;">Apr 10</span></div>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;"><span style="font-size: 13px; font-weight: 500; color: var(--color-text-primary);">David Nguyen</span><span style="font-size: 10px; color: var(--color-text-tertiary); flex-shrink: 0;">Apr 10</span></div>
                                 <div style="font-size: 12px; font-weight: 500; color: #3a3a3c; margin-bottom: 1px;">DNS records updated</div>
-                                <div style="font-size: 11px; color: #86868b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">All MX and SPF records are live. DKIM signing is active. Deliverability...</div>
+                                <div style="font-size: 11px; color: var(--color-text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">All MX and SPF records are live. DKIM signing is active. Deliverability...</div>
                             </div>
                         </div>
                     </div>
@@ -262,10 +262,10 @@
             <div class="hp-alt-visual">
                 <div class="visual-box">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 280px;">
-                        <div style="background: #fff; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);"><div style="width: 48px; height: 48px; background: linear-gradient(135deg, #0078d4, #28a8ea); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 22px; font-weight: 700; color: #fff;">O</div><div style="font-size: 12px; font-weight: 600; color: #1d1d1f;">Outlook</div></div>
-                        <div style="background: #fff; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);"><div style="width: 48px; height: 48px; background: linear-gradient(135deg, #007aff, #5ac8fa); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 22px; font-weight: 700; color: #fff;">M</div><div style="font-size: 12px; font-weight: 600; color: #1d1d1f;">Apple Mail</div></div>
-                        <div style="background: #fff; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);"><div style="width: 48px; height: 48px; background: linear-gradient(135deg, #0a84ff, #1e5fc9); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 22px; font-weight: 700; color: #fff;">T</div><div style="font-size: 12px; font-weight: 600; color: #1d1d1f;">Thunderbird</div></div>
-                        <div style="background: #fff; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);"><div style="width: 48px; height: 48px; background: linear-gradient(135deg, #ea4335, #fbbc04); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 22px; font-weight: 700; color: #fff;">G</div><div style="font-size: 12px; font-weight: 600; color: #1d1d1f;">Gmail</div></div>
+                        <div style="background: var(--color-surface); border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);"><div style="width: 48px; height: 48px; background: linear-gradient(135deg, #0078d4, #28a8ea); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 22px; font-weight: 700; color: #fff;">O</div><div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary);">Outlook</div></div>
+                        <div style="background: var(--color-surface); border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);"><div style="width: 48px; height: 48px; background: linear-gradient(135deg, #007aff, #5ac8fa); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 22px; font-weight: 700; color: #fff;">M</div><div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary);">Apple Mail</div></div>
+                        <div style="background: var(--color-surface); border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);"><div style="width: 48px; height: 48px; background: linear-gradient(135deg, #0a84ff, #1e5fc9); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 22px; font-weight: 700; color: #fff;">T</div><div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary);">Thunderbird</div></div>
+                        <div style="background: var(--color-surface); border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);"><div style="width: 48px; height: 48px; background: linear-gradient(135deg, #ea4335, #fbbc04); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 22px; font-weight: 700; color: #fff;">G</div><div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary);">Gmail</div></div>
                     </div>
                 </div>
             </div>
@@ -301,10 +301,10 @@
     {* 5. Trust bar *}
     <section class="hp-trust-bar">
         <div class="trust-inner">
-            <div class="hp-hero-stat"><div class="stat-num" style="font-size: 48px; color: #1d1d1f;">50 GB</div><div class="stat-label">{$hadrianLang.store.oxTrust1}</div></div>
-            <div class="hp-hero-stat"><div class="stat-num" style="font-size: 48px; color: #1d1d1f;">99.9%</div><div class="stat-label">{$hadrianLang.store.oxTrust2}</div></div>
-            <div class="hp-hero-stat"><div class="stat-num" style="font-size: 48px; color: #1d1d1f;">Anti-spam</div><div class="stat-label">{$hadrianLang.store.oxTrust3}</div></div>
-            <div class="hp-hero-stat"><div class="stat-num" style="font-size: 48px; color: #1d1d1f;">IMAP &amp; POP3</div><div class="stat-label">{$hadrianLang.store.oxTrust4}</div></div>
+            <div class="hp-hero-stat"><div class="stat-num" style="font-size: 48px; color: var(--color-text-primary);">50 GB</div><div class="stat-label">{$hadrianLang.store.oxTrust1}</div></div>
+            <div class="hp-hero-stat"><div class="stat-num" style="font-size: 48px; color: var(--color-text-primary);">99.9%</div><div class="stat-label">{$hadrianLang.store.oxTrust2}</div></div>
+            <div class="hp-hero-stat"><div class="stat-num" style="font-size: 48px; color: var(--color-text-primary);">Anti-spam</div><div class="stat-label">{$hadrianLang.store.oxTrust3}</div></div>
+            <div class="hp-hero-stat"><div class="stat-num" style="font-size: 48px; color: var(--color-text-primary);">IMAP &amp; POP3</div><div class="stat-label">{$hadrianLang.store.oxTrust4}</div></div>
         </div>
     </section>
 
