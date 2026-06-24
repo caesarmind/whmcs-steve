@@ -24,15 +24,7 @@
     <header class="mt-brandbar">
         <div class="mt-brandbar-inner">
             <div class="mt-brandbar-left">
-                <svg class="mt-brandmark" viewBox="0 0 64 64" role="img" aria-label="Hadrian">
-                    <rect class="mt-bm-tile" width="64" height="64" rx="14"/>
-                    <g class="mt-bm-fig">
-                        <path d="M22 18.8c-3.4-.4-6-2.5-7.1-5.6 3.1.2 5.7 1.8 7.1 4.4z"/>
-                        <path d="M42 18.8c3.4-.4 6-2.5 7.1-5.6-3.1.2-5.7 1.8-7.1 4.4z"/>
-                        <path d="M32 14.6c6.4 0 10.8 4.8 10.8 11.1 0 4.1-1.8 7.6-4.5 9.4.6.8 1 1.7 1 2.7 0 .8-.6 1.5-1.4 1.6-.8 3.3-4 5.8-8 5.8s-7.2-2.5-7.9-5.8c-.8-.1-1.4-.8-1.4-1.6 0-1 .4-1.9 1-2.7-2.6-1.8-4.5-5.3-4.5-9.4 0-6.3 4.5-11.1 10.8-11.1z"/>
-                        <path d="M14.5 55c0-8.5 7.5-12.9 17.5-12.9S49.5 46.5 49.5 55z"/>
-                    </g>
-                </svg>
+                <span class="mt-brandmark" role="img" aria-label="Hadrian"></span>
                 <div class="mt-brand-text">
                     <div class="mt-brandname">Caesarthemes</div>
                     <div class="mt-brandversion">Hadrian &middot; Client Theme</div>
