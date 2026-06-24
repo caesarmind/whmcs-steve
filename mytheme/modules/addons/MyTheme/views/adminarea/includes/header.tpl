@@ -46,6 +46,16 @@
         if (parseFloat(getComputedStyle(node).marginLeft) > 0) { node.style.setProperty('margin-left', '0', 'important'); }
         node = node.parentElement;
     }
+
+    // Hide the WHMCS-rendered addon page title ("MyTheme") shown above our panel.
+    // Only headings OUTSIDE our panel and OUTSIDE the top navbar are hidden, so our
+    // own page titles and the WHMCS top menu are untouched.
+    var titles = document.querySelectorAll('h1, .page-header, .pageheader, .pageheading, .page-title');
+    Array.prototype.forEach.call(titles, function (h) {
+        if (root.contains(h)) { return; }
+        if (h.closest && h.closest('#header, .navbar, .top-nav, .navbar-default')) { return; }
+        h.style.setProperty('display', 'none', 'important');
+    });
 })();
 </script>{/literal}
 
