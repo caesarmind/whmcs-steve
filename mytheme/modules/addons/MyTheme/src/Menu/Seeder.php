@@ -35,9 +35,14 @@ final class Seeder
                 continue;
             }
             // Menu exists. Re-seed items only if it's empty (recover from
-            // a wipe) or if $force is set.
+            // a wipe) or if $force is set. When forcing, WIPE the existing
+            // items first so we replace rather than append -- otherwise every
+            // item duplicates on each force re-sync.
             $itemCount = $existing->items()->count();
             if ($force || $itemCount === 0) {
+                if ($force) {
+                    MenuItem::where('menu_id', $existing->id)->delete();
+                }
                 $this->seedItems($existing->id, $preset['items'] ?? [], null);
 
                 // For empty-menu recovery: also restore the preset's

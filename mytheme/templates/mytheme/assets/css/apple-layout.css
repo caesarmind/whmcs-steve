@@ -108,8 +108,7 @@ body:not([data-layout="top"]) { background: var(--color-bg); }
    (header.tpl) -- those keep the normal boxed content column. */
 body[data-bleed="1"] .ph-main-wrap .content-area {
     max-width: none;
-    padding-left: 0;
-    padding-right: 0;
+    padding: 0;
 }
 body[data-bleed="1"] .content-area > .page-header,
 body[data-bleed="1"] .content-area > .when-empty {
