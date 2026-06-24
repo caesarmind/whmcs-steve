@@ -16,46 +16,10 @@
 <div class="mt-wrap" id="mt-admin-root" data-theme="light">
 {literal}<script>(function(){try{var w=document.getElementById('mt-admin-root');var t=localStorage.getItem('mytheme-admin-theme');if(w&&(t==='dark'||t==='light'))w.setAttribute('data-theme',t);}catch(e){}})();</script>{/literal}
 
-{* Full-width admin fallback. The sidebar/title-hiding CSS is injected into the
-   admin <head> by the AdminAreaHeadOutput hook (hooks.php) so it applies before
-   first paint -- no sidebar flash. This script is a structural belt-and-braces
-   for admin layouts whose sidebar/content ids differ from the CSS selectors;
-   the head CSS has already hidden the common case, so this never reintroduces a
-   flash -- it only widens the column / clears margins where CSS could not. *}
-{literal}<script>
-(function () {
-    var root = document.getElementById('mt-admin-root');
-    if (!root) { return; }
-    function hideEl(el) { if (el && !el.contains(root)) { el.style.setProperty('display', 'none', 'important'); } }
-    // Blend-style floated/fixed sidebar (id="sidebar").
-    hideEl(document.getElementById('sidebar'));
-    // Bootstrap-grid layouts: widen our content column, hide its sibling columns.
-    var col = root.closest('[class*="col-"]');
-    if (col) {
-        var p = col.parentElement;
-        if (p) { Array.prototype.forEach.call(p.children, function (s) { if (s !== col && /\bcol-\w/.test(s.className || '')) { hideEl(s); } }); }
-        col.style.setProperty('flex', '0 0 100%', 'important');
-        col.style.setProperty('max-width', '100%', 'important');
-        col.style.setProperty('width', '100%', 'important');
-    }
-    // Generic fallback: clear left margins on ancestors so freed space is reclaimed.
-    var node = root.parentElement, guard = 0;
-    while (node && node !== document.body && guard++ < 14) {
-        if (parseFloat(getComputedStyle(node).marginLeft) > 0) { node.style.setProperty('margin-left', '0', 'important'); }
-        node = node.parentElement;
-    }
-
-    // Hide the WHMCS-rendered addon page title ("MyTheme") shown above our panel.
-    // Only headings OUTSIDE our panel and OUTSIDE the top navbar are hidden, so our
-    // own page titles and the WHMCS top menu are untouched.
-    var titles = document.querySelectorAll('h1, .page-header, .pageheader, .pageheading, .page-title');
-    Array.prototype.forEach.call(titles, function (h) {
-        if (root.contains(h)) { return; }
-        if (h.closest && h.closest('#header, .navbar, .top-nav, .navbar-default')) { return; }
-        h.style.setProperty('display', 'none', 'important');
-    });
-})();
-</script>{/literal}
+{* Full-width admin: all sidebar/title hiding is done by the AdminAreaHeadOutput
+   hook (hooks.php) as CSS in the admin <head>, so it applies before first paint
+   and nothing mutates after load -- no flash, no slide animation. No body JS
+   here on purpose: a post-load DOM change is exactly what produced the fade. *}
 
     <header class="mt-brandbar">
         <div class="mt-brandbar-inner">

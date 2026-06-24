@@ -108,13 +108,19 @@ add_hook('AdminAreaHeadOutput', 1, function ($vars) {
     }
     return <<<'HTML'
 <style id="mt-admin-fullwidth">
-/* Hide the WHMCS admin left sidebar and reclaim its horizontal space. */
+/* Hide the WHMCS admin left sidebar and reclaim its horizontal space. The real
+   content container on this install is #contentarea (not #content), so clear its
+   left margin too -- otherwise the gap where the sidebar was stays reserved. */
 #sidebar { display: none !important; }
-#content, #main-content, .main-content { margin-left: 0 !important; }
+#content, #contentarea, #main-content, .main-content { margin-left: 0 !important; }
+/* Kill the sidebar/content slide transition so nothing animates on load -- the
+   fade on refresh was #contentarea easing from its sidebar margin to zero. */
+#sidebar, #content, #contentarea, #contentarea > div, #main-content, .main-content,
+[class*="sidebar"] { transition: none !important; }
 /* Bootstrap-grid admin layouts: widen the column that holds our panel. */
 [class*="col-"]:has(#mt-admin-root) { flex: 0 0 100% !important; max-width: 100% !important; width: 100% !important; }
 /* Hide the WHMCS-rendered addon page title shown above our panel; keep ours. */
-#content > h1, #main-content > h1, .page-header, .pageheader { display: none !important; }
+#content > h1, #contentarea > h1, #main-content > h1, .page-header, .pageheader { display: none !important; }
 body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 </style>
 HTML;
