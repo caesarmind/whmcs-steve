@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve, basename } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const CSS_DIR = resolve(__dirname, '../templates/mytheme/assets/css');
+const CSS_DIR = resolve(__dirname, '../templates/hadrian/assets/css');
 
 const args = process.argv.slice(2);
 const WRITE = args.includes('--write');

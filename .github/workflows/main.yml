@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      - 'mytheme/modules/addons/MyTheme/**'
-      - 'mytheme/templates/mytheme/**'
-      - 'mytheme_cart/**'
+      - 'mytheme/modules/addons/Hadrian/**'
+      - 'mytheme/templates/hadrian/**'
+      - 'hadrian_cart/**'
       - '.github/workflows/main.yml'
   workflow_dispatch:
 
@@ -65,8 +65,8 @@ jobs:
             # SAFETY GUARD: only allow deletes inside the two intended subtrees.
             # Anything outside (e.g. mytheme/modules/autoload.php, mytheme/init.php)
             # is logged and SKIPPED so it can never reach `rm -f` on the server.
-            SAFE_MAIN=$(echo "$DELETED_MAIN" | grep -E '^mytheme/(modules/addons/MyTheme|templates/mytheme)/' || true)
-            BLOCKED=$(echo "$DELETED_MAIN" | grep -vE '^mytheme/(modules/addons/MyTheme|templates/mytheme)/' || true)
+            SAFE_MAIN=$(echo "$DELETED_MAIN" | grep -E '^mytheme/(modules/addons/(MyTheme|Hadrian)|templates/(mytheme|hadrian))/' || true)
+            BLOCKED=$(echo "$DELETED_MAIN" | grep -vE '^mytheme/(modules/addons/(MyTheme|Hadrian)|templates/(mytheme|hadrian))/' || true)
             if [ -n "$BLOCKED" ]; then
               echo "⚠️  BLOCKED from delete (outside allowed subtrees):"
               echo "$BLOCKED"
@@ -86,20 +86,20 @@ jobs:
           # PASS 2 is inherently safe — the sed hardcodes the destination
           # subtree, so deletes can ONLY happen inside templates/orderforms/mytheme_cart/.
           # ─────────────────────────────────────────────────────────────
-          CHANGED_CART=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'mytheme_cart/**' | grep -v '/\.' || true)
-          DELETED_CART=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'mytheme_cart/**' | grep -v '/\.' || true)
+          CHANGED_CART=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'hadrian_cart/**' | grep -v '/\.' || true)
+          DELETED_CART=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'hadrian_cart/**' | grep -v '/\.' || true)
 
           if [ -n "$CHANGED_CART" ]; then
-            echo "=== Uploading mytheme_cart/ changes ==="
+            echo "=== Uploading hadrian_cart/ changes ==="
             echo "$CHANGED_CART"
-            echo "$CHANGED_CART" | tar czf - --files-from=- --transform='s|^mytheme_cart/|templates/orderforms/mytheme_cart/|' \
+            echo "$CHANGED_CART" | tar czf - --files-from=- --transform='s|^hadrian_cart/|templates/orderforms/hadrian_cart/|' \
               | $SSH "tar xzpf - -C $REMOTE_BASE && echo '✅ mytheme_cart upload complete'"
           fi
 
           if [ -n "$DELETED_CART" ]; then
-            echo "=== Deleting removed mytheme_cart/ files ==="
+            echo "=== Deleting removed hadrian_cart/ files ==="
             echo "$DELETED_CART"
-            DEL=$(echo "$DELETED_CART" | sed "s|^mytheme_cart/|rm -f '$REMOTE_BASE/templates/orderforms/mytheme_cart/|; s|$|'|")
+            DEL=$(echo "$DELETED_CART" | sed "s|^hadrian_cart/|rm -f '$REMOTE_BASE/templates/orderforms/hadrian_cart/|; s|$|'|")
             echo "$DEL" | $SSH "bash -s"
           fi
 

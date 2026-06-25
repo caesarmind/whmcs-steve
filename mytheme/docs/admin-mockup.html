@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hadrian - Admin UI Mockup</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* ============================================================================
+   Page chrome (outside the .mt-wrap namespace, so it never leaks back into
+   the real addon when CSS is copied). Just enough to host the mockup.
+============================================================================ */
+html, body { margin: 0; padding: 0; background: #fbfbfd; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Open Sans", "Segoe UI", system-ui, sans-serif; color: #1d1d1f; }
+.mock-toolbar { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #e8e8ed; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.mock-toolbar-left { display: flex; align-items: center; gap: 10px; }
+.mock-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; background: #f5f5f7; color: #6e6e73; font-size: 12px; font-weight: 500; }
+.mock-pill strong { color: #1d1d1f; }
+.mock-toolbar-right { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.mock-jump { padding: 5px 12px; border: 1px solid #d2d2d7; border-radius: 6px; background: #fff; font: inherit; font-size: 13px; color: #1d1d1f; cursor: pointer; }
+.mock-note { font-size: 12px; color: #6e6e73; }
+
+/* ============================================================================
+   Hostnodes admin - Apple HIG / STYLEGUIDE.md aligned.
+   Verbatim from views/adminarea/includes/footer.tpl so this mockup is a
+   pixel-accurate stand-in for the live admin panel. Iterate here, paste
+   back to footer.tpl when done.
+============================================================================ */
+
+.mt-wrap, .mt-wrap * { box-sizing: border-box; }
+.mt-wrap {
+    --mt-bg:          #fbfbfd;
+    --mt-surface:     #ffffff;
+    --mt-surface-2:   #f5f5f7;
+    --mt-surface-3:   #fafafa;
+    --mt-text:        #1d1d1f;
+    --mt-text-2:      #6e6e73;
+    --mt-text-3:      #86868b;
+    --mt-text-4:      #aeaeb2;
+    --mt-border:      #e8e8ed;
+    --mt-border-2:    #f0f0f5;
+    --mt-input-border:#d2d2d7;
+    --mt-primary:     #0071e3;
+    --mt-primary-h:   #0077ed;
+    --mt-primary-tint: rgba(0,113,227,0.08);
+    --mt-link:        #0066cc;
+    --mt-success:     #30d158;
+    --mt-success-tint: rgba(48,209,88,0.10);
+    --mt-success-text: #248a3d;
+    --mt-warning:     #ff9f0a;
+    --mt-warning-tint: rgba(255,159,10,0.10);
+    --mt-warning-text: #c27400;
+    --mt-danger:      #ff3b30;
+    --mt-danger-tint: rgba(255,59,48,0.10);
+    --mt-danger-text: #d70015;
+    --mt-neutral-tint: rgba(142,142,147,0.12);
+    --mt-toggle-on:   #30d158;
+
+    --mt-radius-sm:   8px;
+    --mt-radius:      12px;
+    --mt-radius-card: 18px;
+    --mt-radius-pill: 980px;
+
+    --mt-shadow-card-hover: 0 2px 12px rgba(0,0,0,0.06);
+    --mt-shadow-dropdown:   0 4px 32px rgba(0,0,0,0.12), 0 0 1px rgba(0,0,0,0.08);
+
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+    background: var(--mt-bg);
+    color: var(--mt-text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Open Sans", "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+.mt-wrap a { color: var(--mt-primary); text-decoration: none; }
+.mt-wrap a:hover { color: var(--mt-primary-h); }
+.mt-wrap code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em; background: rgba(0,0,0,0.04); padding: 1px 6px; border-radius: 4px; }
+
+.mt-brandbar { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-card); padding: 18px 22px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.mt-brandbar-left { display: flex; align-items: center; gap: 12px; }
+.mt-brandmark { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #6366F1 0%, #0071E3 100%); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; position: relative; overflow: hidden; }
+.mt-brandmark::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent 60%); }
+.mt-brandname { font-weight: 600; font-size: 16px; letter-spacing: -0.015em; }
+.mt-brandversion { font-size: 12px; color: var(--mt-text-3); margin-top: 1px; }
+.mt-brandbar-right { display: flex; gap: 6px; }
+.mt-brandbar-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: var(--mt-radius-pill); color: var(--mt-text); background: transparent; border: 1.5px solid rgba(0,0,0,0.18); font-size: 13px; font-weight: 500; text-decoration: none; transition: background 0.2s ease, border-color 0.2s ease; }
+.mt-brandbar-link:hover { background: var(--mt-surface-2); border-color: rgba(0,0,0,0.25); text-decoration: none; }
+.mt-brandbar-link svg { width: 14px; height: 14px; }
+
+.mt-topnav { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-card); padding: 6px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 2px; }
+.mt-topnav-item { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: var(--mt-radius-pill); color: var(--mt-text-2); font-size: 14px; font-weight: 500; letter-spacing: -0.005em; text-decoration: none; transition: background 0.2s ease, color 0.2s ease; cursor: pointer; }
+.mt-topnav-item:hover { background: var(--mt-surface-2); color: var(--mt-text); text-decoration: none; }
+.mt-topnav-item.is-active { background: var(--mt-primary); color: #fff; }
+.mt-topnav-item.is-active:hover { background: var(--mt-primary-h); color: #fff; }
+.mt-topnav-icon { width: 16px; height: 16px; flex-shrink: 0; }
+
+.mt-card-outer { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-card); overflow: hidden; }
+.mt-card-inner { padding: 32px 36px; }
+
+.mt-page-header { margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--mt-border); }
+.mt-page-eyebrow { font-size: 12px; font-weight: 600; color: var(--mt-primary); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+.mt-page-title { font-size: 28px; font-weight: 600; letter-spacing: -0.025em; margin: 0 0 6px; line-height: 1.1; }
+.mt-page-subtitle { font-size: 15px; color: var(--mt-text-2); margin: 0; }
+.mt-page-meta { display: inline; color: var(--mt-text-3); font-weight: 400; font-size: 15px; margin-left: 6px; }
+
+.mt-section { margin-bottom: 32px; }
+.mt-section:last-child { margin-bottom: 0; }
+.mt-section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; gap: 16px; flex-wrap: wrap; }
+.mt-section-title { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.015em; }
+.mt-section-count { font-size: 13px; color: var(--mt-text-3); font-weight: 400; }
+.mt-section-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.mt-tabs { display: inline-flex; background: var(--mt-border); padding: 3px; border-radius: 9px; gap: 0; margin-bottom: 20px; }
+.mt-tab { padding: 5px 14px; border-radius: 6px; color: var(--mt-text-2); font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; transition: background 0.15s ease, color 0.15s ease; }
+.mt-tab:hover { color: var(--mt-text); text-decoration: none; }
+.mt-tab.is-active { background: var(--mt-surface); color: var(--mt-text); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+
+.mt-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: var(--mt-radius-pill); font-size: 12px; font-weight: 500; line-height: 1.6; white-space: nowrap; }
+.mt-badge-success { background: var(--mt-success-tint); color: var(--mt-success-text); }
+.mt-badge-warning { background: var(--mt-warning-tint); color: var(--mt-warning-text); }
+.mt-badge-danger  { background: var(--mt-danger-tint);  color: var(--mt-danger-text); }
+.mt-badge-primary { background: var(--mt-primary-tint); color: var(--mt-primary); }
+.mt-badge-neutral { background: var(--mt-neutral-tint); color: var(--mt-text-2); }
+
+.mt-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 24px; border-radius: var(--mt-radius-pill); border: 1px solid transparent; font-family: inherit; font-size: 14px; font-weight: 500; line-height: 1.2; letter-spacing: -0.005em; cursor: pointer; text-decoration: none; transition: background 0.2s ease, border-color 0.2s ease; user-select: none; }
+.mt-btn-primary { background: var(--mt-primary); color: #fff; }
+.mt-btn-primary:hover { background: var(--mt-primary-h); color: #fff; text-decoration: none; }
+.mt-btn-secondary { background: transparent; color: var(--mt-text); border: 1.5px solid rgba(0,0,0,0.2); }
+.mt-btn-secondary:hover { background: var(--mt-surface-2); color: var(--mt-text); text-decoration: none; }
+.mt-btn-ghost { background: transparent; color: var(--mt-link); padding: 6px 12px; }
+.mt-btn-ghost:hover { background: var(--mt-primary-tint); color: var(--mt-link); text-decoration: none; }
+.mt-btn-danger { background: var(--mt-danger); color: #fff; }
+.mt-btn-danger:hover { background: #c8231a; color: #fff; }
+.mt-btn-sm { padding: 6px 14px; font-size: 13px; }
+.mt-btn[disabled], .mt-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+.mt-input, .mt-select, .mt-textarea { width: 100%; padding: 12px 16px; border: 1px solid var(--mt-input-border); border-radius: var(--mt-radius); background: var(--mt-surface); color: var(--mt-text); font-family: inherit; font-size: 15px; line-height: 1.4; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.mt-input:focus, .mt-select:focus, .mt-textarea:focus { outline: none; border-color: var(--mt-primary); box-shadow: 0 0 0 4px rgba(0,113,227,0.15); }
+.mt-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.mt-field-label { font-size: 13px; font-weight: 500; color: var(--mt-text); }
+.mt-field-help { font-size: 12px; color: var(--mt-text-3); }
+.mt-form-actions { display: flex; gap: 8px; margin-top: 16px; }
+
+.mt-toggle { position: relative; display: inline-block; width: 40px; height: 24px; flex-shrink: 0; }
+.mt-toggle input { opacity: 0; width: 0; height: 0; }
+.mt-toggle-track { position: absolute; inset: 0; background: #E8E8ED; border-radius: 999px; transition: background 0.2s ease; cursor: pointer; }
+.mt-toggle-thumb { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; box-shadow: 0 1px 1px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.12); transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.mt-toggle input:checked ~ .mt-toggle-track { background: var(--mt-toggle-on); }
+.mt-toggle input:checked ~ .mt-toggle-track .mt-toggle-thumb { transform: translateX(16px); }
+
+.mt-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--mt-border); }
+.mt-row:last-child { border-bottom: 0; }
+.mt-row-label { font-size: 14px; font-weight: 500; }
+.mt-row-help { font-size: 12px; color: var(--mt-text-3); margin-top: 2px; }
+
+.mt-deflist { display: grid; grid-template-columns: 200px 1fr; gap: 8px 24px; }
+.mt-deflist dt { color: var(--mt-text-2); font-size: 13px; padding: 6px 0; }
+.mt-deflist dd { margin: 0; padding: 6px 0; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.mt-table-wrap { overflow: hidden; border: 1px solid var(--mt-border); border-radius: var(--mt-radius); }
+.mt-table { width: 100%; border-collapse: collapse; }
+.mt-table thead th { background: var(--mt-surface-2); border-bottom: 1px solid var(--mt-border); padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; color: var(--mt-text-2); text-transform: uppercase; letter-spacing: 0.04em; }
+.mt-table tbody td { padding: 12px 16px; border-bottom: 1px solid var(--mt-border); font-size: 13px; vertical-align: middle; }
+.mt-table tbody tr:last-child td { border-bottom: 0; }
+.mt-table tbody tr:hover { background: var(--mt-surface-2); }
+.mt-table tbody tr.is-active { background: var(--mt-primary-tint); }
+.mt-table .mt-table-name { font-weight: 500; }
+.mt-table .mt-table-actions { text-align: right; }
+.mt-table-muted { color: var(--mt-text-3); font-size: 12px; }
+
+.mt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.mt-card { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius); padding: 14px; transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; cursor: pointer; display: flex; flex-direction: column; gap: 10px; }
+.mt-card:hover { transform: translateY(-1px); box-shadow: var(--mt-shadow-card-hover); }
+.mt-card.is-active { border-color: var(--mt-primary); box-shadow: 0 0 0 2px var(--mt-primary-tint); }
+.mt-card-thumb { aspect-ratio: 16/10; background: linear-gradient(135deg, #F5F5F7 0%, #E8E8ED 100%); border-radius: var(--mt-radius-sm); display: grid; place-items: center; color: var(--mt-text-3); font-size: 24px; font-weight: 200; }
+.mt-card-title { font-size: 14px; font-weight: 600; margin: 0; }
+.mt-card-meta { font-size: 12px; color: var(--mt-text-3); margin: 0; }
+.mt-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+.mt-card label { cursor: pointer; }
+.mt-card input[type="radio"] { display: none; }
+
+.mt-upload { border: 2px dashed var(--mt-input-border); background: var(--mt-surface-2); border-radius: var(--mt-radius); padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease; min-height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.mt-upload:hover { border-color: var(--mt-primary); background: var(--mt-primary-tint); }
+.mt-upload-icon { color: var(--mt-text-3); }
+.mt-upload-text { font-size: 13px; font-weight: 500; }
+.mt-upload-hint { font-size: 11px; color: var(--mt-text-3); }
+.mt-upload-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mt-upload-caption { font-size: 12px; color: var(--mt-text-2); margin-top: 6px; text-align: center; }
+.mt-upload.is-dark { background: #1d1d1f; border-color: #3a3a3c; }
+.mt-upload.is-dark .mt-upload-icon { color: #86868b; }
+.mt-upload.is-dark .mt-upload-text { color: #f5f5f7; }
+.mt-upload.is-dark .mt-upload-hint { color: #86868b; }
+
+.mt-branding-tile { display: flex; flex-direction: column; gap: 8px; position: relative; }
+.mt-branding-current { position: relative; border: 1px solid var(--mt-border); border-radius: var(--mt-radius); background: var(--mt-surface); padding: 16px; display: flex; align-items: center; justify-content: center; min-height: 110px; overflow: hidden; }
+.mt-branding-current.is-dark { background: #1d1d1f; border-color: #3a3a3c; }
+.mt-branding-current img { max-width: 100%; max-height: 80px; display: block; object-fit: contain; }
+.mt-branding-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0; transition: opacity 0.15s ease; }
+.mt-branding-current:hover .mt-branding-overlay { opacity: 1; }
+.mt-branding-overlay .mt-btn { color: #fff; }
+.mt-branding-overlay .mt-btn-secondary { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.35); color: #fff; }
+.mt-branding-overlay .mt-btn-danger { background: var(--mt-danger); border-color: var(--mt-danger); color: #fff; }
+.mt-upload-file-meta { font-size: 11px; color: var(--mt-text-3); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; text-align: center; word-break: break-all; }
+.mt-brand-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.mt-brand-label { font-size: 13px; font-weight: 500; color: var(--mt-text); }
+.mt-brand-help { font-size: 12px; color: var(--mt-text-3); }
+.mt-brand-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 18px; margin-top: 4px; }
+.mt-brand-grid .mt-brand-field { margin-bottom: 0; }
+
+.mt-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.mt-back { display: inline-flex; align-items: center; gap: 6px; color: var(--mt-text-2); font-size: 13px; font-weight: 500; text-decoration: none; }
+.mt-back:hover { color: var(--mt-primary); text-decoration: none; }
+.mt-back svg { width: 14px; height: 14px; }
+
+.mt-menu-tree { display: flex; flex-direction: column; gap: 6px; }
+.mt-menu-tree ul.mt-menu-list, .mt-menu-tree ul.mt-menu-children { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.mt-menu-tree ul.mt-menu-children { margin: 4px 0 4px 22px; padding-left: 12px; border-left: 2px solid var(--mt-border); }
+.mt-menu-tree ul.mt-menu-children:empty { display: none; }
+.mt-menu-item { list-style: none; }
+.mt-menu-item-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-sm); cursor: grab; transition: border-color .12s; }
+.mt-menu-item-row:hover { border-color: var(--mt-primary); }
+.mt-menu-handle { color: var(--mt-text-3); flex-shrink: 0; }
+.mt-menu-handle svg { width: 14px; height: 14px; display: block; }
+.mt-menu-type-badge { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 7px; border-radius: 999px; background: var(--mt-primary-tint); color: var(--mt-primary); flex-shrink: 0; }
+.mt-menu-name { flex: 1; font-size: 13px; font-weight: 500; color: var(--mt-text); }
+.mt-menu-actions { display: flex; gap: 4px; flex-shrink: 0; opacity: 0; transition: opacity .15s; }
+.mt-menu-item-row:hover .mt-menu-actions { opacity: 1; }
+.mt-icon-btn { width: 26px; height: 26px; padding: 0; border: 0; background: transparent; color: var(--mt-text-3); border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.mt-icon-btn:hover { background: var(--mt-bg); color: var(--mt-text); }
+.mt-icon-btn svg { width: 14px; height: 14px; display: block; }
+.mt-menu-add-row { display: flex; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--mt-border); }
+.mt-menu-add-row .mt-input { flex: 1; }
+.mt-menu-split { display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; align-items: start; }
+@media (max-width: 1100px) { .mt-menu-split { grid-template-columns: 1fr; } }
+.mt-page-title-input { font: inherit; background: transparent; border: 0; border-bottom: 1px dashed var(--mt-border); padding: 0 2px; color: var(--mt-text); min-width: 200px; }
+.mt-page-title-input:focus { outline: 0; border-color: var(--mt-primary); }
+.mt-item-drawer { display: flex; flex-direction: column; gap: 14px; }
+.mt-drawer-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 6px; }
+.mt-drawer-eyebrow { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--mt-text-3); }
+.mt-drawer-title { font-size: 15px; font-weight: 600; color: var(--mt-text); margin: 0; }
+.mt-drawer-empty { color: var(--mt-text-3); font-size: 13px; padding: 14px 4px; text-align: center; }
+.mt-checkbox { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 0; margin-right: 12px; }
+.mt-divider { border: 0; border-top: 1px solid var(--mt-border); margin: 6px 0; }
+.mt-flash { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; margin-right: 8px; }
+.mt-flash-success { background: rgba(40, 167, 69, 0.15); color: #1e7e34; }
+.mt-section-note  { font-size: 12px; color: var(--mt-text-2); padding: 0 14px 8px; margin: 0; line-height: 1.5; }
+.mt-section-note em { font-style: normal; font-weight: 600; color: var(--mt-text); }
+
+.mt-diag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px; }
+.mt-diag-card { padding: 14px 16px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-sm); }
+.mt-diag-card.is-warn { background: rgba(255, 159, 10, 0.08); border-color: rgba(255, 159, 10, 0.3); }
+.mt-diag-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--mt-text-3); margin-bottom: 6px; }
+.mt-diag-title { font-size: 14px; font-weight: 600; color: var(--mt-text); margin-bottom: 4px; }
+.mt-diag-title em { font-style: normal; color: var(--mt-text-3); font-weight: 400; }
+.mt-diag-meta { font-size: 12px; color: var(--mt-text-2); line-height: 1.5; }
+.mt-diag-meta a { color: var(--mt-primary); text-decoration: underline; }
+@media (max-width: 880px) { .mt-diag-grid { grid-template-columns: 1fr; } }
+
+.mt-empty { text-align: center; padding: 40px 20px; color: var(--mt-text-2); }
+.mt-empty-icon { width: 40px; height: 40px; margin: 0 auto 12px; color: var(--mt-text-3); }
+.mt-empty-title { font-size: 15px; font-weight: 600; color: var(--mt-text); margin: 0 0 4px; }
+
+.mt-alert { padding: 12px 16px; border-radius: var(--mt-radius); margin-bottom: 18px; font-size: 13px; border: 1px solid transparent; }
+.mt-alert strong { font-weight: 600; }
+.mt-alert-info    { background: var(--mt-primary-tint); border-color: rgba(0,113,227,0.20);   color: #0040A0; }
+.mt-alert-success { background: var(--mt-success-tint); border-color: rgba(48,209,88,0.25);   color: var(--mt-success-text); }
+.mt-alert-warning { background: var(--mt-warning-tint); border-color: rgba(255,159,10,0.25);  color: var(--mt-warning-text); }
+.mt-alert-danger  { background: var(--mt-danger-tint);  border-color: rgba(255,59,48,0.25);   color: var(--mt-danger-text); }
+.mt-alert ol, .mt-alert ul { margin: 6px 0 0 18px; padding: 0; }
+
+/* Settings - sub-row + language chip grid */
+.mt-row-with-sub { border-bottom: 0; }
+.mt-row-sub { padding: 4px 0 18px; border-bottom: 1px solid var(--mt-border); }
+.mt-row-sub-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
+.mt-row-sub-title { font-size: 14px; font-weight: 500; margin: 0; }
+.mt-row-sub-help { font-size: 12px; color: var(--mt-text-3); margin: 0 0 14px; }
+.mt-row-sub-count { font-size: 13px; color: var(--mt-text-3); }
+.mt-chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 4px; }
+.mt-chip-check { position: relative; display: block; cursor: pointer; }
+.mt-chip-check input { position: absolute; opacity: 0; pointer-events: none; }
+.mt-chip-check .mt-chip-body { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--mt-border); border-radius: 8px; background: #fff; font-size: 13px; color: var(--mt-text); transition: border-color .15s ease, background .15s ease; }
+.mt-chip-check:hover .mt-chip-body { border-color: var(--mt-text-3); }
+.mt-chip-check input:checked + .mt-chip-body { border-color: var(--mt-primary); background: rgba(0, 113, 227, 0.06); }
+.mt-chip-check .mt-chip-tick { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--mt-border); border-radius: 4px; flex-shrink: 0; }
+.mt-chip-check input:checked + .mt-chip-body .mt-chip-tick { border-color: var(--mt-primary); background: var(--mt-primary); color: #fff; }
+.mt-chip-check .mt-chip-tick svg { width: 10px; height: 10px; opacity: 0; }
+.mt-chip-check input:checked + .mt-chip-body .mt-chip-tick svg { opacity: 1; }
+.mt-language-actions { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+.mt-link-btn { background: none; border: 0; padding: 0; color: var(--mt-primary); font: inherit; cursor: pointer; font-size: 13px; }
+.mt-link-btn:hover { text-decoration: underline; }
+
+/* Pages - tab pill count */
+.mt-tab-pill { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:999px; background:var(--mt-border); color:var(--mt-text-3); font-size:11px; font-weight:500; line-height:1.6; min-width:18px; text-align:center; }
+.mt-tab.is-active .mt-tab-pill { background:var(--mt-primary-tint); color:var(--mt-primary); }
+
+/* ----- Tab section switching (mockup-only, not in the real CSS) ----- */
+.mt-tab-pane { display: none; }
+.mt-tab-pane.is-active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="mock-toolbar">
+    <div class="mock-toolbar-left">
+        <span class="mock-pill">Mockup: <strong>Hadrian admin</strong></span>
+        <span class="mock-note">Mirrors <code>views/adminarea/*.tpl</code> &mdash; iterate here, paste back.</span>
+    </div>
+    <div class="mock-toolbar-right">
+        <label for="mock-state">State:</label>
+        <select id="mock-state" class="mock-jump">
+            <option value="normal">Normal</option>
+            <option value="dev">Dev mode</option>
+            <option value="empty">Empty (no menus / no templates)</option>
+            <option value="errors">With errors &amp; flash</option>
+        </select>
+    </div>
+</div>
+
+<div class="mt-wrap" id="mtWrap">
+    <header class="mt-brandbar">
+        <div class="mt-brandbar-left">
+            <div class="mt-brandmark">H</div>
+            <div>
+                <div class="mt-brandname">Hostnodes</div>
+                <div class="mt-brandversion">v1.2.0 &middot; WHMCS Client Theme</div>
+            </div>
+        </div>
+        <div class="mt-brandbar-right">
+            <a class="mt-brandbar-link" href="#" onclick="return false">
+                <svg viewBox="0 0 16 16" fill="none">
+                    <path d="M3 2.5h6.5L13 6v7.5a1 1 0 01-1 1H3a1 1 0 01-1-1v-10a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                    <path d="M9.5 2.5V6H13" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                    <path d="M5 9h6M5 11.5h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+                Docs
+            </a>
+            <a class="mt-brandbar-link" href="#" onclick="return false">
+                <svg viewBox="0 0 16 16" fill="none">
+                    <path d="M5 7c0-1.5 1.5-3 3-3s3 1.5 3 3v3a3 3 0 11-6 0V7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                    <path d="M2.5 8.5h3M10.5 8.5h3M3 5l1.5 1.5M13 5l-1.5 1.5M3 12l1.5-1.5M13 12l-1.5-1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                    <path d="M6.5 4.5L7 3.5h2l.5 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Report bug
+            </a>
+        </div>
+    </header>
+
+    <nav class="mt-topnav" aria-label="Hostnodes navigation">
+        <a class="mt-topnav-item is-active" data-tab="info">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 6.5v.01M10 9.5v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Info
+        </a>
+        <a class="mt-topnav-item" data-tab="settings">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Settings
+        </a>
+        <a class="mt-topnav-item" data-tab="styles">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.4"/><circle cx="10" cy="6" r="1.2" fill="currentColor"/><circle cx="6" cy="10" r="1.2" fill="currentColor"/><circle cx="14" cy="10" r="1.2" fill="currentColor"/></svg>
+            Styles
+        </a>
+        <a class="mt-topnav-item" data-tab="layouts">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><rect x="2.5" y="3" width="15" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 3v14M2.5 7h4.5" stroke="currentColor" stroke-width="1.4"/></svg>
+            Layouts
+        </a>
+        <a class="mt-topnav-item" data-tab="pages">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><path d="M5 2.5h7l3 3v12a1 1 0 01-1 1H5a1 1 0 01-1-1v-14a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 2.5v3h3" stroke="currentColor" stroke-width="1.4"/></svg>
+            Pages
+        </a>
+        <a class="mt-topnav-item" data-tab="menu">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Menu
+        </a>
+        <a class="mt-topnav-item" data-tab="branding">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><path d="M10 2.5l3 5 5 .8-3.5 3.5.8 5L10 14l-5 2.8.8-5L2.5 8.3l5-.8 2.5-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Branding
+        </a>
+        <a class="mt-topnav-item" data-tab="extensions">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><path d="M5 2.5h4v4H5zM11 2.5h4v4h-4zM5 8.5h4v4H5zM11 8.5h4a3 3 0 010 6h-4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Extensions
+        </a>
+        <a class="mt-topnav-item" data-tab="tools">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><path d="M13 2.5a3.5 3.5 0 011 6.8l-9 9-2 .5.5-2 9-9A3.5 3.5 0 0113 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Tools
+        </a>
+        <a class="mt-topnav-item" data-tab="license">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><rect x="4" y="8" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 8V6a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.4"/></svg>
+            License
+        </a>
+        <a class="mt-topnav-item" data-tab="menu-edit">
+            <svg class="mt-topnav-icon" viewBox="0 0 20 20" fill="none"><path d="M12 3l5 5L8 17l-5 1 1-5 8-10z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Menu Editor
+        </a>
+    </nav>
+
+    <div class="mt-card-outer">
+        <div class="mt-card-inner">
+
+            <!-- ============================================================ -->
+            <!-- INFO                                                          -->
+            <!-- ============================================================ -->
+            <section class="mt-tab-pane is-active" data-tab-content="info">
+                <header class="mt-page-header">
+                    <div class="mt-page-eyebrow">Theme</div>
+                    <h1 class="mt-page-title">Info</h1>
+                    <p class="mt-page-subtitle">Version, license, and subscription information for this theme.</p>
+                </header>
+
+                <div class="mt-alert mt-alert-warning mt-dev-only" hidden>
+                    <strong>Development mode is active.</strong>
+                    License checks are bypassed. To enable real license validation, edit
+                    <code>templates/hadrian/core/hadrian.php</code> and set <code>'dev_mode' =&gt; false</code>.
+                </div>
+
+                <section class="mt-section">
+                    <header class="mt-section-header">
+                        <h2 class="mt-section-title">Theme Information</h2>
+                    </header>
+                    <dl class="mt-deflist">
+                        <dt>Theme Version</dt>
+                        <dd>1.2.0 <span class="mt-badge mt-badge-primary">New version available</span></dd>
+
+                        <dt>Registration Date</dt>
+                        <dd>2025-08-12</dd>
+
+                        <dt>Next Due Date</dt>
+                        <dd>2026-08-12</dd>
+
+                        <dt>First Payment Amount</dt>
+                        <dd>$79.00 USD</dd>
+
+                        <dt>Recurring Amount</dt>
+                        <dd>$49.00 USD</dd>
+
+                        <dt>Payment Method</dt>
+                        <dd>Stripe (Visa &middot;&middot;&middot;&middot; 4242)</dd>
+
+                        <dt>Support &amp; Updates</dt>
+                        <dd><span class="mt-badge mt-badge-success">Active</span></dd>
+
+                        <dt>License Key</dt>
+                        <dd>
+                            <code>MT-XXXX-XXXX-AB12-CD34</code>
+                            <a href="#" onclick="mtSwitch('license');return false" class="mt-btn mt-btn-ghost mt-btn-sm">Change</a>
+                        </dd>
+
+                        <dt>License Status</dt>
+                        <dd><span class="mt-badge mt-badge-success">Active</span></dd>
+                    </dl>
+                </section>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- SETTINGS                                                      -->
+            <!-- ============================================================ -->
+            <section class="mt-tab-pane" data-tab-content="settings">
+                <header class="mt-page-header">
+                    <div class="mt-page-eyebrow">Theme</div>
+                    <h1 class="mt-page-title">Settings</h1>
+                    <p class="mt-page-subtitle">Theme-wide options. Save to apply.</p>
+                </header>
+
+                <div class="mt-tabs" role="tablist">
+                    <a class="mt-tab is-active" href="#">General</a>
+                    <a class="mt-tab" href="#">Order Process</a>
+                </div>
+
+                <form>
+                    <section class="mt-section">
+                        <header class="mt-section-header">
+                            <h2 class="mt-section-title">General Settings</h2>
+                            <div class="mt-section-tools">
+                                <button type="button" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
+                            </div>
+                        </header>
+
+                        <div class="mt-row">
+                            <div>
+                                <div class="mt-row-label">Show currency switcher</div>
+                                <div class="mt-row-help">Surface the currency dropdown in the top bar so visitors can switch.</div>
+                            </div>
+                            <label class="mt-toggle"><input type="checkbox" checked><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></label>
+                        </div>
+
+                        <div class="mt-row mt-row-with-sub">
+                            <div>
+                                <div class="mt-row-label">Custom language list</div>
+                                <div class="mt-row-help">Choose which languages appear in the locale chooser.</div>
+                            </div>
+                            <label class="mt-toggle"><input type="checkbox" id="lang-toggle" checked onchange="document.getElementById('lang-picker').hidden = !this.checked"><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></label>
+                        </div>
+                        <div class="mt-row-sub" id="lang-picker">
+                            <header class="mt-row-sub-head">
+                                <h3 class="mt-row-sub-title">Languages shown to clients</h3>
+                                <span class="mt-row-sub-count">3 of 12 selected</span>
+                            </header>
+                            <p class="mt-row-sub-help">Pick which languages appear in the locale chooser. Only languages installed in <code>/lang/</code> are shown.</p>
+                            <div class="mt-chip-grid">
+                                <label class="mt-chip-check"><input type="checkbox" checked><span class="mt-chip-body"><span class="mt-chip-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>English</span></span></label>
+                                <label class="mt-chip-check"><input type="checkbox" checked><span class="mt-chip-body"><span class="mt-chip-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Spanish</span></span></label>
+                                <label class="mt-chip-check"><input type="checkbox" checked><span class="mt-chip-body"><span class="mt-chip-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>German</span></span></label>
+                                <label class="mt-chip-check"><input type="checkbox"><span class="mt-chip-body"><span class="mt-chip-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>French</span></span></label>
+                                <label class="mt-chip-check"><input type="checkbox"><span class="mt-chip-body"><span class="mt-chip-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Italian</span></span></label>
+                                <label class="mt-chip-check"><input type="checkbox"><span class="mt-chip-body"><span class="mt-chip-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Portuguese-br</span></span></label>
+                                <label class="mt-chip-check"><input type="checkbox"><span class="mt-chip-body"><span class="mt-chip-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Russian</span></span></label>
+                                <label class="mt-chip-check"><input type="checkbox"><span class="mt-chip-body"><span class="mt-chip-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Japanese</span></span></label>
+                            </div>
+                            <div class="mt-language-actions">
+                                <button type="button" class="mt-link-btn">Select all</button>
+                                <span style="color: var(--mt-text-3)">&middot;</span>
+                                <button type="button" class="mt-link-btn">Clear</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-row">
+                            <div>
+                                <div class="mt-row-label">Enable client area search</div>
+                                <div class="mt-row-help">Adds a global search field to the header.</div>
+                            </div>
+                            <label class="mt-toggle"><input type="checkbox"><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></label>
+                        </div>
+
+                        <div class="mt-row">
+                            <div>
+                                <div class="mt-row-label">Sticky footer</div>
+                                <div class="mt-row-help">Footer stays at the bottom of the viewport on short pages.</div>
+                            </div>
+                            <label class="mt-toggle"><input type="checkbox" checked><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></label>
+                        </div>
+
+                        <div class="mt-row">
+                            <div>
+                                <div class="mt-row-label">Compact card spacing</div>
+                                <div class="mt-row-help">Reduces padding inside cards across the client area.</div>
+                            </div>
+                            <label class="mt-toggle"><input type="checkbox"><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></label>
+                        </div>
+                    </section>
+
+                    <div style="margin-top:16px;display:flex;justify-content:flex-end">
+                        <button type="button" class="mt-btn mt-btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- STYLES                                                        -->
+            <!-- ============================================================ -->
+            <section class="mt-tab-pane" data-tab-content="styles">
+                <header class="mt-page-header">
+                    <h1 class="mt-page-title">Styles</h1>
+                    <p class="mt-page-subtitle">
+                        Pick a style preset for <strong>hadrian</strong>. The selection is applied as
+                        <code>data-theme</code> on <code>&lt;body&gt;</code>.
+                    </p>
+                </header>
+
+                <section class="mt-section">
+                    <header class="mt-section-header">
+                        <h2 class="mt-section-title">Available styles</h2>
+                        <span class="mt-section-count">5</span>
+                    </header>
+
+                    <div class="mt-grid">
+                        <label class="mt-card is-active">
+                            <input type="radio" name="style" checked>
+                            <div class="mt-card-thumb">L</div>
+                            <div class="mt-card-body">
+                                <h3 class="mt-card-title">Light Default</h3>
+                                <p class="mt-card-meta">Style preset</p>
+                            </div>
+                            <div class="mt-card-footer">
+                                <span class="mt-badge mt-badge-success">Active</span>
+                            </div>
+                        </label>
+                        <label class="mt-card">
+                            <input type="radio" name="style">
+                            <div class="mt-card-thumb" style="background:linear-gradient(135deg,#1d1d1f 0%,#3a3a3c 100%);color:#fff">D</div>
+                            <div class="mt-card-body">
+                                <h3 class="mt-card-title">Dark Mode</h3>
+                                <p class="mt-card-meta">Style preset</p>
+                            </div>
+                            <div class="mt-card-footer">
+                                <span class="mt-badge mt-badge-primary">Click to activate</span>
+                            </div>
+                        </label>
+                        <label class="mt-card">
+                            <input type="radio" name="style">
+                            <div class="mt-card-thumb" style="background:linear-gradient(135deg,#FF6B6B 0%,#C9356B 100%);color:#fff">C</div>
+                            <div class="mt-card-body">
+                                <h3 class="mt-card-title">Coral</h3>
+                                <p class="mt-card-meta">Style preset</p>
+                            </div>
+                            <div class="mt-card-footer">
+                                <span class="mt-badge mt-badge-primary">Click to activate</span>
+                            </div>
+                        </label>
+                        <label class="mt-card">
+                            <input type="radio" name="style">
+                            <div class="mt-card-thumb" style="background:linear-gradient(135deg,#30D158 0%,#13a23e 100%);color:#fff">F</div>
+                            <div class="mt-card-body">
+                                <h3 class="mt-card-title">Forest</h3>
+                                <p class="mt-card-meta">Style preset</p>
+                            </div>
+                            <div class="mt-card-footer">
+                                <span class="mt-badge mt-badge-primary">Click to activate</span>
+                            </div>
+                        </label>
+                        <label class="mt-card">
+                            <input type="radio" name="style">
+                            <div class="mt-card-thumb" style="background:linear-gradient(135deg,#FF9F0A 0%,#c27400 100%);color:#fff">A</div>
+                            <div class="mt-card-body">
+                                <h3 class="mt-card-title">Amber</h3>
+                                <p class="mt-card-meta">Style preset</p>
+                            </div>
+                            <div class="mt-card-footer">
+                                <span class="mt-badge mt-badge-primary">Click to activate</span>
+                            </div>
+                        </label>
+                    </div>
+                </section>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- LAYOUTS                                                       -->
+            <!-- ============================================================ -->
+            <section class="mt-tab-pane" data-tab-content="layouts">
+                <header class="mt-page-header">
+                    <h1 class="mt-page-title">Layouts</h1>
+                    <p class="mt-page-subtitle">
+                        Pick the navigation and footer arrangement for <strong>hadrian</strong>.
+                        Each layout has two independent activations &mdash; one for guests (unauthenticated visitors) and one for existing clients (logged in).
+                    </p>
+                </header>
+
+                <div class="mt-tabs" role="tablist">
+                    <a class="mt-tab is-active" href="#">Main menu</a>
+                    <a class="mt-tab" href="#">Footer</a>
+                </div>
+
+                <section class="mt-section">
+                    <header class="mt-section-header">
+                        <h2 class="mt-section-title">Main menu layouts</h2>
+                        <span class="mt-section-count">3</span>
+                    </header>
+
+                    <div class="mt-table-wrap">
+                        <table class="mt-table">
+                            <thead>
+                                <tr>
+                                    <th>Layout</th>
+                                    <th>Guest client</th>
+                                    <th>Existing client</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="mt-table-name">
+                                        <strong>Classic top-bar</strong>
+                                        <div class="mt-table-muted">Logo left, menu center, account right. The familiar pattern.</div>
+                                    </td>
+                                    <td><span class="mt-badge mt-badge-success">Active</span></td>
+                                    <td><button class="mt-btn mt-btn-ghost mt-btn-sm">Activate for Existing</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="mt-table-name">
+                                        <strong>Mega menu</strong>
+                                        <div class="mt-table-muted">Wide dropdown with grouped child items and optional icons.</div>
+                                    </td>
+                                    <td><button class="mt-btn mt-btn-ghost mt-btn-sm">Activate for Guest</button></td>
+                                    <td><span class="mt-badge mt-badge-success">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="mt-table-name">
+                                        <strong>Apple-style center nav</strong>
+                                        <div class="mt-table-muted">Compact, centered, no icons. Closer to the apple.com header.</div>
+                                    </td>
+                                    <td><button class="mt-btn mt-btn-ghost mt-btn-sm">Activate for Guest</button></td>
+                                    <td><button class="mt-btn mt-btn-ghost mt-btn-sm">Activate for Existing</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- PAGES                                                         -->
+            <!-- ============================================================ -->
+            <section class="mt-tab-pane" data-tab-content="pages">
+                <header class="mt-page-header">
+                    <div class="mt-page-eyebrow">Theme</div>
+                    <h1 class="mt-page-title">Pages</h1>
+                    <p class="mt-page-subtitle">Configure template variant, SEO, options and layout overrides for each WHMCS page.</p>
+                </header>
+
+                <div class="mt-alert mt-alert-success mt-flash-only" hidden>Page settings saved.</div>
+
+                <div class="mt-tabs" role="tablist">
+                    <a class="mt-tab is-active" href="#">All <span class="mt-tab-pill">14</span></a>
+                    <a class="mt-tab" href="#">Account <span class="mt-tab-pill">4</span></a>
+                    <a class="mt-tab" href="#">Billing <span class="mt-tab-pill">3</span></a>
+                    <a class="mt-tab" href="#">Services <span class="mt-tab-pill">4</span></a>
+                    <a class="mt-tab" href="#">Support <span class="mt-tab-pill">3</span></a>
+                </div>
+
+                <section class="mt-section">
+                    <header class="mt-section-header">
+                        <h2 class="mt-section-title">Account pages</h2>
+                        <span class="mt-section-count">4</span>
+                    </header>
+                    <div class="mt-table-wrap">
+                        <table class="mt-table">
+                            <thead>
+                                <tr><th>Name</th><th>Variant</th><th>SEO</th><th>Indexing</th><th>Visibility</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="mt-table-name">
+                                        <div>Client area</div>
+                                        <div style="font-size:12px;color:var(--mt-text-3);margin-top:2px;">The logged-in dashboard.</div>
+                                    </td>
+                                    <td>Default</td>
+                                    <td><span class="mt-badge mt-badge-success">SEO</span></td>
+                                    <td><span class="mt-badge mt-badge-warning">Disallow</span></td>
+                                    <td><span class="mt-badge mt-badge-primary">Auth only</span></td>
+                                    <td class="mt-table-actions"><a href="#" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="mt-table-name">
+                                        <div>Login</div>
+                                    </td>
+                                    <td>Centered card</td>
+                                    <td><span class="mt-badge mt-badge-success">SEO</span></td>
+                                    <td><span class="mt-badge mt-badge-success">Allow</span></td>
+                                    <td><span class="mt-badge mt-badge-neutral">Public</span></td>
+                                    <td class="mt-table-actions"><a href="#" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="mt-table-name">
+                                        <div>Register</div>
+                                    </td>
+                                    <td>Two-column</td>
+                                    <td><span class="mt-badge mt-badge-neutral">&mdash;</span></td>
+                                    <td><span class="mt-badge mt-badge-neutral">Inherit</span></td>
+                                    <td><span class="mt-badge mt-badge-neutral">Public</span></td>
+                                    <td class="mt-table-actions"><a href="#" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="mt-table-name">
+                                        <div>Password reset</div>
+                                    </td>
+                                    <td>Centered card</td>
+                                    <td><span class="mt-badge mt-badge-neutral">&mdash;</span></td>
+                                    <td><span class="mt-badge mt-badge-warning">Disallow</span></td>
+                                    <td><span class="mt-badge mt-badge-warning">Disabled</span></td>
+                                    <td class="mt-table-actions"><a href="#" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="mt-section">
+                    <header class="mt-section-header">
+                        <h2 class="mt-section-title">Billing pages</h2>
+                        <span class="mt-section-count">3</span>
+                    </header>
+                    <div class="mt-table-wrap">
+                        <table class="mt-table">
+                            <thead>
+                                <tr><th>Name</th><th>Variant</th><th>SEO</th><th>Indexing</th><th>Visibility</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="mt-table-name">Invoices</td>
+                                    <td>Default</td>
+                                    <td><span class="mt-badge mt-badge-neutral">&mdash;</span></td>
+                                    <td><span class="mt-badge mt-badge-warning">Disallow</span></td>
+                                    <td><span class="mt-badge mt-badge-primary">Auth only</span></td>
+                                    <td class="mt-table-actions"><a href="#" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="mt-table-name">View invoice</td>
+                                    <td>PDF-style</td>
+                                    <td><span class="mt-badge mt-badge-neutral">&mdash;</span></td>
+                                    <td><span class="mt-badge mt-badge-warning">Disallow</span></td>
+                                    <td><span class="mt-badge mt-badge-primary">Auth only</span></td>
+                                    <td class="mt-table-actions"><a href="#" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="mt-table-name">Mass pay</td>
+                                    <td>Default</td>
+                                    <td><span class="mt-badge mt-badge-neutral">&mdash;</span></td>
+                                    <td><span class="mt-badge mt-badge-warning">Disallow</span></td>
+                                    <td><span class="mt-badge mt-badge-primary">Auth only</span></td>
+                                    <td class="mt-table-actions"><a href="#" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- MENU                                                          -->
+            <!-- ============================================================ -->
+            <section class="mt-tab-pane" data-tab-content="menu">
+                <header class="mt-page-header">
+                    <div class="mt-page-eyebrow">Theme</div>
+                    <h1 class="mt-page-title">Menu</h1>
+                    <p class="mt-page-subtitle">Build navigation menus and assign them to client / guest audiences.</p>
+                </header>
+
+                <div class="mt-tabs">
+                    <a class="mt-tab is-active" href="#">Main</a>
+                    <a class="mt-tab" href="#">Secondary</a>
+                    <a class="mt-tab" href="#">Footer</a>
+                    <a class="mt-tab" href="#">Footer secondary</a>
+                </div>
+
+                <section class="mt-section" style="margin-bottom:18px">
+                    <header class="mt-section-header">
+                        <h2 class="mt-section-title">Live state</h2>
+                        <span class="mt-table-muted" style="font-size:12px">What the frontend renders right now for each audience.</span>
+                    </header>
+                    <div class="mt-diag-grid">
+                        <div class="mt-diag-card">
+                            <div class="mt-diag-eyebrow">Client audience</div>
+                            <div class="mt-diag-title">Client Main</div>
+                            <div class="mt-diag-meta">7 items</div>
+                        </div>
+                        <div class="mt-diag-card is-warn">
+                            <div class="mt-diag-eyebrow">Guest audience</div>
+                            <div class="mt-diag-title"><em>(no active menu)</em></div>
+                            <div class="mt-diag-meta">Activate a menu for this audience, or click <a href="#">Re-seed presets</a>.</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mt-section">
+                    <header class="mt-section-header">
+                        <h2 class="mt-section-title">Main Menu</h2>
+                        <div class="mt-section-tools">
+                            <a class="mt-btn mt-btn-ghost mt-btn-sm" href="#" title="Re-seed any missing preset items">Re-seed presets</a>
+                            <a class="mt-btn mt-btn-ghost mt-btn-sm" href="#" title="Wipe and rebuild factory presets">Reset WHMCS Defaults</a>
+                            <button type="button" class="mt-btn mt-btn-primary mt-btn-sm">+ New menu</button>
+                        </div>
+                    </header>
+                    <p class="mt-section-note">
+                        Only one menu can be active per audience &mdash; activating a new <em>Client</em> menu automatically deactivates the previous Client menu, and the same for <em>Guest</em>. The other audience is unaffected.
+                    </p>
+
+                    <div class="mt-table-wrap mt-menu-list-table">
+                        <table class="mt-table">
+                            <thead>
+                                <tr><th>Name</th><th>Audience</th><th>Items</th><th>Status</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                                <tr class="is-active">
+                                    <td class="mt-table-name">
+                                        <a href="#" onclick="mtSwitch('menu-edit');return false">Client Main</a>
+                                    </td>
+                                    <td><span class="mt-badge mt-badge-neutral">Client</span></td>
+                                    <td>7 <span class="mt-table-muted">items</span></td>
+                                    <td><span class="mt-badge mt-badge-success">Active</span></td>
+                                    <td class="mt-table-actions"><a href="#" onclick="mtSwitch('menu-edit');return false" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="mt-table-name">
+                                        <a href="#">Guest Hosting</a>
+                                        <span class="mt-badge mt-badge-primary" title="Edited by you">edited</span>
+                                    </td>
+                                    <td><span class="mt-badge mt-badge-neutral">Guest</span></td>
+                                    <td>5 <span class="mt-table-muted">items</span></td>
+                                    <td><span class="mt-badge mt-badge-neutral">Disabled</span></td>
+                                    <td class="mt-table-actions"><a href="#" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="mt-table-name">
+                                        <a href="#">WHMCS Defaults &mdash; Domains</a>
+                                    </td>
+                                    <td><span class="mt-badge mt-badge-neutral">Guest</span></td>
+                                    <td>4 <span class="mt-table-muted">items</span></td>
+                                    <td><span class="mt-badge mt-badge-neutral">Disabled</span></td>
+                                    <td class="mt-table-actions"><a href="#" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="mt-table-name">
+                                        <a href="#">WHMCS Defaults &mdash; Services</a>
+                                    </td>
+                                    <td><span class="mt-badge mt-badge-neutral">Client</span></td>
+                                    <td>6 <span class="mt-table-muted">items</span></td>
+                                    <td><span class="mt-badge mt-badge-neutral">Disabled</span></td>
+                                    <td class="mt-table-actions"><a href="#" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-menu-empty-state" hidden>
+                        <div class="mt-empty">
+                            <p>No menus yet for this location.</p>
+                            <a class="mt-btn mt-btn-primary mt-btn-sm" href="#">Seed the 4 preset menus</a>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- MENU - EDIT                                                   -->
+            <!-- ============================================================ -->
+            <section class="mt-tab-pane" data-tab-content="menu-edit">
+                <div class="mt-toolbar">
+                    <a class="mt-back" href="#" onclick="mtSwitch('menu');return false">
+                        <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Back to menus
+                    </a>
+                    <div style="flex:1"></div>
+                    <span class="mt-flash mt-flash-success">Saved</span>
+                    <button type="button" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
+                </div>
+
+                <header class="mt-page-header">
+                    <h1 class="mt-page-title">
+                        <input type="text" class="mt-page-title-input" value="Client Main">
+                        <span class="mt-page-meta">/ Menu editor</span>
+                    </h1>
+                    <p class="mt-page-subtitle">Drag the handle to reorder. Click a row to edit it in the drawer on the right.</p>
+                </header>
+
+                <div class="mt-menu-split">
+                    <section class="mt-section">
+                        <header class="mt-section-header">
+                            <h2 class="mt-section-title">Menu Items</h2>
+                            <span class="mt-section-count">7 items</span>
+                        </header>
+
+                        <div class="mt-menu-tree">
+                            <ul class="mt-menu-list">
+                                <li class="mt-menu-item">
+                                    <div class="mt-menu-item-row">
+                                        <span class="mt-menu-handle"><svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="10" cy="12" r="1" fill="currentColor"/></svg></span>
+                                        <span class="mt-menu-type-badge">WHMCS</span>
+                                        <span class="mt-menu-name">Home</span>
+                                        <span class="mt-menu-actions">
+                                            <button type="button" class="mt-icon-btn" title="Edit"><svg viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
+                                            <button type="button" class="mt-icon-btn" title="Delete"><svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3.5 4l1 10h7l1-10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                        </span>
+                                    </div>
+                                </li>
+                                <li class="mt-menu-item">
+                                    <div class="mt-menu-item-row">
+                                        <span class="mt-menu-handle"><svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="10" cy="12" r="1" fill="currentColor"/></svg></span>
+                                        <span class="mt-menu-type-badge">Dropdown</span>
+                                        <span class="mt-menu-name">Services</span>
+                                        <span class="mt-menu-actions">
+                                            <button type="button" class="mt-icon-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
+                                            <button type="button" class="mt-icon-btn"><svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3.5 4l1 10h7l1-10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                        </span>
+                                    </div>
+                                    <ul class="mt-menu-children">
+                                        <li class="mt-menu-item">
+                                            <div class="mt-menu-item-row">
+                                                <span class="mt-menu-handle"><svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/></svg></span>
+                                                <span class="mt-menu-type-badge">WHMCS</span>
+                                                <span class="mt-menu-name">My Services</span>
+                                            </div>
+                                        </li>
+                                        <li class="mt-menu-item">
+                                            <div class="mt-menu-item-row">
+                                                <span class="mt-menu-handle"><svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/></svg></span>
+                                                <span class="mt-menu-type-badge">WHMCS</span>
+                                                <span class="mt-menu-name">Order new</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="mt-menu-item">
+                                    <div class="mt-menu-item-row">
+                                        <span class="mt-menu-handle"><svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/></svg></span>
+                                        <span class="mt-menu-type-badge">WHMCS</span>
+                                        <span class="mt-menu-name">Domains</span>
+                                    </div>
+                                </li>
+                                <li class="mt-menu-item">
+                                    <div class="mt-menu-item-row">
+                                        <span class="mt-menu-handle"><svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/></svg></span>
+                                        <span class="mt-menu-type-badge">WHMCS</span>
+                                        <span class="mt-menu-name">Billing</span>
+                                    </div>
+                                </li>
+                                <li class="mt-menu-item">
+                                    <div class="mt-menu-item-row">
+                                        <span class="mt-menu-handle"><svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/></svg></span>
+                                        <span class="mt-menu-type-badge">WHMCS</span>
+                                        <span class="mt-menu-name">Support</span>
+                                    </div>
+                                </li>
+                                <li class="mt-menu-item">
+                                    <div class="mt-menu-item-row">
+                                        <span class="mt-menu-handle"><svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="4" r="1" fill="currentColor"/><circle cx="10" cy="4" r="1" fill="currentColor"/><circle cx="6" cy="8" r="1" fill="currentColor"/><circle cx="10" cy="8" r="1" fill="currentColor"/></svg></span>
+                                        <span class="mt-menu-type-badge">Custom</span>
+                                        <span class="mt-menu-name">Status page</span>
+                                        <span class="mt-badge mt-badge-neutral">hidden</span>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <div class="mt-menu-add-row">
+                                <select class="mt-input">
+                                    <option>WHMCS page</option>
+                                    <option>Custom link</option>
+                                    <option>Dropdown</option>
+                                    <option>Mega menu</option>
+                                </select>
+                                <button type="button" class="mt-btn mt-btn-ghost mt-btn-sm">+ Add item</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="mt-section">
+                        <header class="mt-section-header"><h2 class="mt-section-title">Menu Settings</h2></header>
+
+                        <div class="mt-field">
+                            <label class="mt-field-label">Display Rule</label>
+                            <select class="mt-select">
+                                <option selected>Existing Client</option>
+                                <option>Guest Client</option>
+                                <option>All visitors</option>
+                            </select>
+                            <div class="mt-field-help">Decides for which audience this menu renders.</div>
+                        </div>
+
+                        <div class="mt-row">
+                            <div>
+                                <div class="mt-row-label">Status</div>
+                                <div class="mt-row-help">Active menus render on the matching pages.</div>
+                            </div>
+                            <label class="mt-toggle"><input type="checkbox" checked><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></label>
+                        </div>
+
+                        <hr class="mt-divider">
+
+                        <div class="mt-item-drawer">
+                            <div class="mt-drawer-head">
+                                <span class="mt-drawer-eyebrow">Editing</span>
+                                <h3 class="mt-drawer-title">Services (Dropdown)</h3>
+                            </div>
+
+                            <div class="mt-field">
+                                <label class="mt-field-label">Label</label>
+                                <input type="text" class="mt-input" value="Services">
+                            </div>
+
+                            <div class="mt-field">
+                                <label class="mt-field-label">URL</label>
+                                <input type="text" class="mt-input" value="#" disabled>
+                                <div class="mt-field-help">Dropdown items don't have their own URL.</div>
+                            </div>
+
+                            <div>
+                                <label class="mt-checkbox"><input type="checkbox" checked> Active</label>
+                                <label class="mt-checkbox"><input type="checkbox"> New tab</label>
+                                <label class="mt-checkbox"><input type="checkbox"> Show icon</label>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- BRANDING                                                      -->
+            <!-- ============================================================ -->
+            <section class="mt-tab-pane" data-tab-content="branding">
+                <header class="mt-page-header">
+                    <div class="mt-page-eyebrow">Theme</div>
+                    <h1 class="mt-page-title">Branding</h1>
+                    <p class="mt-page-subtitle">Upload your logo and favicon. Each file is saved the moment you pick it &mdash; no Save needed.</p>
+                </header>
+
+                <form>
+                    <section class="mt-section">
+                        <header class="mt-section-header"><h2 class="mt-section-title">Primary logo</h2></header>
+                        <div class="mt-upload-pair">
+                            <div class="mt-branding-tile">
+                                <div class="mt-branding-current">
+                                    <img src="data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 60%22&gt;&lt;rect width=%22200%22 height=%2260%22 fill=%22%23fff%22/&gt;&lt;text x=%22100%22 y=%2238%22 text-anchor=%22middle%22 font-family=%22-apple-system%22 font-size=%2226%22 font-weight=%22700%22 fill=%22%231d1d1f%22&gt;Hostnodes&lt;/text&gt;&lt;/svg&gt;" alt="Light logo">
+                                    <div class="mt-branding-overlay">
+                                        <button type="button" class="mt-btn mt-btn-secondary mt-btn-sm">Replace</button>
+                                        <button type="button" class="mt-btn mt-btn-danger mt-btn-sm">Remove</button>
+                                    </div>
+                                </div>
+                                <div class="mt-upload-file-meta">logo-light.svg</div>
+                                <div class="mt-upload-caption">Light surface</div>
+                            </div>
+                            <div class="mt-branding-tile">
+                                <div class="mt-branding-current is-dark">
+                                    <img src="data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 60%22&gt;&lt;rect width=%22200%22 height=%2260%22 fill=%22%231d1d1f%22/&gt;&lt;text x=%22100%22 y=%2238%22 text-anchor=%22middle%22 font-family=%22-apple-system%22 font-size=%2226%22 font-weight=%22700%22 fill=%22%23ffffff%22&gt;Hostnodes&lt;/text&gt;&lt;/svg&gt;" alt="Dark logo">
+                                    <div class="mt-branding-overlay">
+                                        <button type="button" class="mt-btn mt-btn-secondary mt-btn-sm">Replace</button>
+                                        <button type="button" class="mt-btn mt-btn-danger mt-btn-sm">Remove</button>
+                                    </div>
+                                </div>
+                                <div class="mt-upload-file-meta">logo-dark.svg</div>
+                                <div class="mt-upload-caption">Dark surface</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="mt-section">
+                        <header class="mt-section-header"><h2 class="mt-section-title">Square logo</h2></header>
+                        <div class="mt-upload-pair">
+                            <div class="mt-branding-tile">
+                                <label class="mt-upload">
+                                    <svg class="mt-upload-icon" width="32" height="32" viewBox="0 0 40 40" fill="none"><path d="M20 6v22M11 15l9-9 9 9M6 28v3a3 3 0 003 3h22a3 3 0 003-3v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    <div class="mt-upload-text">Click to upload</div>
+                                    <div class="mt-upload-hint">SVG, PNG &middot; max 1 MB</div>
+                                </label>
+                                <div class="mt-upload-caption">Light surface</div>
+                            </div>
+                            <div class="mt-branding-tile">
+                                <label class="mt-upload is-dark">
+                                    <svg class="mt-upload-icon" width="32" height="32" viewBox="0 0 40 40" fill="none"><path d="M20 6v22M11 15l9-9 9 9M6 28v3a3 3 0 003 3h22a3 3 0 003-3v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    <div class="mt-upload-text">Click to upload</div>
+                                    <div class="mt-upload-hint">SVG, PNG &middot; max 1 MB</div>
+                                </label>
+                                <div class="mt-upload-caption">Dark surface</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="mt-section">
+                        <header class="mt-section-header"><h2 class="mt-section-title">Favicon</h2></header>
+                        <div style="max-width:320px">
+                            <div class="mt-branding-tile">
+                                <div class="mt-branding-current">
+                                    <img src="data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22&gt;&lt;rect width=%2240%22 height=%2240%22 rx=%228%22 fill=%22%230071e3%22/&gt;&lt;text x=%2220%22 y=%2228%22 text-anchor=%22middle%22 font-family=%22-apple-system%22 font-size=%2224%22 font-weight=%22700%22 fill=%22white%22&gt;H&lt;/text&gt;&lt;/svg&gt;" alt="Favicon">
+                                    <div class="mt-branding-overlay">
+                                        <button type="button" class="mt-btn mt-btn-secondary mt-btn-sm">Replace</button>
+                                        <button type="button" class="mt-btn mt-btn-danger mt-btn-sm">Remove</button>
+                                    </div>
+                                </div>
+                                <div class="mt-upload-file-meta">favicon.svg</div>
+                                <div class="mt-upload-caption">Browser tab icon</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="mt-section">
+                        <header class="mt-section-header"><h2 class="mt-section-title">Brand Info</h2></header>
+
+                        <div class="mt-brand-field">
+                            <label class="mt-brand-label">Footer description</label>
+                            <textarea class="mt-textarea" rows="2" maxlength="240" placeholder="Premium web hosting on Google Cloud...">Premium web hosting on Google Cloud, with 24/7 support and a 30-day money-back guarantee.</textarea>
+                            <div class="mt-brand-help">Appears in the footer column under the brand mark.</div>
+                        </div>
+
+                        <div class="mt-brand-grid">
+                            <div class="mt-brand-field">
+                                <label class="mt-brand-label">Twitter / X URL</label>
+                                <input type="url" class="mt-input" value="https://twitter.com/hostnodes" placeholder="https://">
+                            </div>
+                            <div class="mt-brand-field">
+                                <label class="mt-brand-label">Facebook URL</label>
+                                <input type="url" class="mt-input" value="https://facebook.com/hostnodes" placeholder="https://">
+                            </div>
+                            <div class="mt-brand-field">
+                                <label class="mt-brand-label">Instagram URL</label>
+                                <input type="url" class="mt-input" placeholder="https://">
+                            </div>
+                            <div class="mt-brand-field">
+                                <label class="mt-brand-label">LinkedIn URL</label>
+                                <input type="url" class="mt-input" value="https://linkedin.com/company/hostnodes" placeholder="https://">
+                            </div>
+                            <div class="mt-brand-field">
+                                <label class="mt-brand-label">GitHub URL</label>
+                                <input type="url" class="mt-input" placeholder="https://">
+                            </div>
+                            <div class="mt-brand-field">
+                                <label class="mt-brand-label">YouTube URL</label>
+                                <input type="url" class="mt-input" placeholder="https://">
+                            </div>
+                        </div>
+                    </section>
+
+                    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+                        <button type="button" class="mt-btn mt-btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- EXTENSIONS                                                    -->
+            <!-- ============================================================ -->
+            <section class="mt-tab-pane" data-tab-content="extensions">
+                <header class="mt-page-header">
+                    <div class="mt-page-eyebrow">Theme</div>
+                    <h1 class="mt-page-title">Extensions</h1>
+                    <p class="mt-page-subtitle">Optional theme add-ons (module integrations, custom widgets, etc.).</p>
+                </header>
+
+                <section class="mt-section">
+                    <div class="mt-grid">
+                        <div class="mt-card">
+                            <div class="mt-card-thumb">B</div>
+                            <div>
+                                <h3 class="mt-card-title">blesta-bridge</h3>
+                                <p class="mt-card-meta">Theme extension</p>
+                            </div>
+                            <div class="mt-card-footer">
+                                <span class="mt-badge mt-badge-success">Enabled</span>
+                            </div>
+                        </div>
+                        <div class="mt-card">
+                            <div class="mt-card-thumb">S</div>
+                            <div>
+                                <h3 class="mt-card-title">status-widget</h3>
+                                <p class="mt-card-meta">Theme extension</p>
+                            </div>
+                            <div class="mt-card-footer">
+                                <span class="mt-badge mt-badge-success">Enabled</span>
+                            </div>
+                        </div>
+                        <div class="mt-card">
+                            <div class="mt-card-thumb">A</div>
+                            <div>
+                                <h3 class="mt-card-title">announcements-banner</h3>
+                                <p class="mt-card-meta">Theme extension</p>
+                            </div>
+                            <div class="mt-card-footer">
+                                <span class="mt-badge mt-badge-success">Enabled</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-extensions-empty" hidden>
+                        <div class="mt-empty">
+                            <svg class="mt-empty-icon" viewBox="0 0 40 40" fill="none">
+                                <rect x="6" y="6" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <rect x="22" y="6" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <rect x="6" y="22" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <h3 class="mt-empty-title">No extensions installed</h3>
+                            <p>Theme extensions appear here once added under <code>core/extensions/&lt;name&gt;/</code> and registered in <code>theme.json</code>.</p>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- TOOLS                                                         -->
+            <!-- ============================================================ -->
+            <section class="mt-tab-pane" data-tab-content="tools">
+                <header class="mt-page-header">
+                    <div class="mt-page-eyebrow">Theme</div>
+                    <h1 class="mt-page-title">Tools</h1>
+                    <p class="mt-page-subtitle">Operational utilities &mdash; cache flush, license refresh, htaccess generation.</p>
+                </header>
+
+                <div class="mt-alert mt-alert-success mt-flash-only" hidden>
+                    <strong>Template cache cleared.</strong>
+                </div>
+
+                <section class="mt-section">
+                    <form>
+                        <div class="mt-row">
+                            <div>
+                                <div class="mt-row-label">Clear template cache</div>
+                                <div class="mt-row-help">Recompile all Smarty templates on the next request.</div>
+                            </div>
+                            <button type="button" class="mt-btn mt-btn-secondary">Clear</button>
+                        </div>
+                        <div class="mt-row">
+                            <div>
+                                <div class="mt-row-label">Refresh menu cache</div>
+                                <div class="mt-row-help">Force the menu builder to re-read configuration.</div>
+                            </div>
+                            <button type="button" class="mt-btn mt-btn-secondary">Refresh</button>
+                        </div>
+                        <div class="mt-row">
+                            <div>
+                                <div class="mt-row-label">Rebuild pages discovery</div>
+                                <div class="mt-row-help">Re-scan <code>core/pages/</code> for new page directories so the Pages tab surfaces them. Runs automatically on activation and theme version bump.</div>
+                            </div>
+                            <button type="button" class="mt-btn mt-btn-secondary">Rebuild</button>
+                        </div>
+                        <div class="mt-row">
+                            <div>
+                                <div class="mt-row-label">Convert custom links to WHMCS pages</div>
+                                <div class="mt-row-help">Walk every menu and re-type <code>custom_link</code> items whose URL matches a known WHMCS page (Home, My Services, Tickets, etc.) &rarr; <code>whmcs_page</code>. Cart deeplinks and external URLs are skipped. Safe to re-run.</div>
+                            </div>
+                            <button type="button" class="mt-btn mt-btn-secondary">Convert</button>
+                        </div>
+                        <div class="mt-row">
+                            <div>
+                                <div class="mt-row-label">Refresh license</div>
+                                <div class="mt-row-help">Force a callback to the license server now.</div>
+                            </div>
+                            <button type="button" class="mt-btn mt-btn-secondary">Refresh</button>
+                        </div>
+                        <div class="mt-row">
+                            <div>
+                                <div class="mt-row-label">Generate Nginx / .htaccess rules</div>
+                                <div class="mt-row-help">Build SEO redirect rules for your hosting platform.</div>
+                            </div>
+                            <button type="button" class="mt-btn mt-btn-secondary">Generate</button>
+                        </div>
+                    </form>
+                </section>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- LICENSE                                                       -->
+            <!-- ============================================================ -->
+            <section class="mt-tab-pane" data-tab-content="license">
+                <header class="mt-page-header">
+                    <h1 class="mt-page-title">License</h1>
+                    <p class="mt-page-subtitle">License status for <strong>hadrian</strong>.</p>
+                </header>
+
+                <div class="mt-alert mt-alert-success mt-license-active">
+                    <strong>License is active.</strong>
+                    Theme is rendering normally.
+                </div>
+
+                <div class="mt-alert mt-alert-warning mt-dev-only" hidden>
+                    <strong>Development mode is active.</strong>
+                    License checks are bypassed; the theme renders as if licensed. To enable real license validation:
+                    <ol>
+                        <li>Edit <code>templates/hadrian/core/hadrian.php</code></li>
+                        <li>Set <code>'dev_mode' =&gt; false</code></li>
+                        <li>Replace <code>secret_key</code> with 64 random hex characters</li>
+                        <li>In <code>modules/addons/Hadrian/src/Template/License.php</code>, replace
+                            <code>LICENSE_SERVER_PUBLIC_KEY</code> and <code>$licenseServerUrl</code></li>
+                    </ol>
+                </div>
+
+                <div class="mt-alert mt-alert-danger mt-license-error" hidden>
+                    <strong>License is not active.</strong>
+                    Enter your license key below or contact support.
+                </div>
+
+                <section class="mt-section" style="max-width:560px">
+                    <header class="mt-section-header">
+                        <h2 class="mt-section-title">License key</h2>
+                    </header>
+                    <form>
+                        <div class="mt-field">
+                            <label class="mt-field-label">Key</label>
+                            <input class="mt-input" type="text" value="MT-XXXX-XXXX-AB12-CD34" placeholder="Paste your license key...">
+                            <div class="mt-field-help">Find your key in your customer portal.</div>
+                        </div>
+                        <div class="mt-form-actions">
+                            <button type="button" class="mt-btn mt-btn-primary">Save and check</button>
+                            <button type="button" class="mt-btn mt-btn-secondary">Refresh now</button>
+                        </div>
+                    </form>
+                </section>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<script>
+// ----------------------------------------------------------------------------
+// Tab switching - swap the visible .mt-tab-pane based on the clicked top-nav
+// pill (or programmatic call via mtSwitch).
+// ----------------------------------------------------------------------------
+function mtSwitch(name) {
+    var navItems = document.querySelectorAll('.mt-topnav-item');
+    var panes = document.querySelectorAll('.mt-tab-pane');
+    navItems.forEach(function (a) { a.classList.toggle('is-active', a.getAttribute('data-tab') === name); });
+    panes.forEach(function (p) { p.classList.toggle('is-active', p.getAttribute('data-tab-content') === name); });
+    try { history.replaceState(null, '', '#' + name); } catch (e) {}
+    window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+document.querySelectorAll('.mt-topnav-item').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+        e.preventDefault();
+        mtSwitch(a.getAttribute('data-tab'));
+    });
+});
+
+// Open the right tab on initial load (hash > default).
+(function () {
+    var hash = (location.hash || '').replace('#', '');
+    if (hash && document.querySelector('[data-tab-content="' + hash + '"]')) {
+        mtSwitch(hash);
+    }
+})();
+
+// ----------------------------------------------------------------------------
+// State picker - toggles mockup-only variants so the same page can demo
+// "normal", "dev mode", "empty data", and "errors / flash" without rebuilding.
+// ----------------------------------------------------------------------------
+document.getElementById('mock-state').addEventListener('change', function (e) {
+    var state = e.target.value;
+
+    var devOnly       = document.querySelectorAll('.mt-dev-only');
+    var flashOnly     = document.querySelectorAll('.mt-flash-only');
+    var licActive     = document.querySelector('.mt-license-active');
+    var licError      = document.querySelector('.mt-license-error');
+    var menuTable     = document.querySelector('.mt-menu-list-table');
+    var menuEmpty     = document.querySelector('.mt-menu-empty-state');
+    var extensionGrid = document.querySelector('[data-tab-content="extensions"] .mt-grid');
+    var extensionEmpty= document.querySelector('.mt-extensions-empty');
+
+    var dev    = state === 'dev';
+    var empty  = state === 'empty';
+    var errors = state === 'errors';
+
+    devOnly.forEach(function (el) { el.hidden = !dev; });
+    flashOnly.forEach(function (el) { el.hidden = !errors; });
+
+    if (licActive) licActive.hidden = dev || errors;
+    if (licError)  licError.hidden  = !errors;
+
+    if (menuTable && menuEmpty) {
+        menuTable.hidden = empty;
+        menuEmpty.hidden = !empty;
+    }
+    if (extensionGrid && extensionEmpty) {
+        extensionGrid.hidden  = empty;
+        extensionEmpty.hidden = !empty;
+    }
+});
+</script>
+
+</body>
+</html>

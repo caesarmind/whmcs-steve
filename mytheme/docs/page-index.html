@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hostnodes theme - page test index</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --border: #d2d2d7;
+    --border-soft: #e5e5ea;
+    --text: #1d1d1f;
+    --text-2: #6e6e73;
+    --text-3: #8e8e93;
+    --accent: #0071e3;
+    --accent-soft: #e8f1fd;
+    --ok: #1a8a3c;
+    --ok-soft: #e3f4e8;
+    --bug: #c4314b;
+    --bug-soft: #fbe7eb;
+    --warn: #9a6b00;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.04);
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  header.page-head { margin-bottom: 18px; }
+  header.page-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 4px; }
+  header.page-head p { margin: 0; color: var(--text-2); }
+
+  .panel {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+
+  /* Controls bar */
+  .controls { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--text-3); }
+  .field input[type=text] {
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 8px 11px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    min-width: 240px;
+  }
+  .field input[type=text]:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  #baseUrl { min-width: 320px; font-family: var(--mono); font-size: 13px; }
+  #search { min-width: 260px; }
+
+  .btn {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--text);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover { background: #f5f5f7; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: #0064cc; }
+  .btn.ghost { border-color: transparent; color: var(--accent); }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .toolbar .spacer { flex: 1; }
+
+  /* Segmented filter */
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .seg button {
+    border: 0; background: #fff; padding: 7px 14px; font-size: 13px; cursor: pointer; color: var(--text-2);
+    border-right: 1px solid var(--border-soft);
+  }
+  .seg button:last-child { border-right: 0; }
+  .seg button.active { background: var(--accent); color: #fff; }
+
+  /* Summary / progress */
+  .summary { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+  .stat { display: flex; flex-direction: column; }
+  .stat b { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .stat span { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-3); }
+  .stat.ok b { color: var(--ok); }
+  .stat.bug b { color: var(--bug); }
+  .progress { flex: 1; min-width: 200px; height: 8px; border-radius: 999px; background: var(--border-soft); overflow: hidden; }
+  .progress > i { display: block; height: 100%; background: var(--ok); width: 0; transition: width .25s ease; }
+
+  /* Groups */
+  .group { margin-top: 22px; }
+  .group > h2 {
+    font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+    color: var(--text-2); margin: 0 0 8px; display: flex; align-items: center; gap: 10px;
+  }
+  .group > h2 .gcount { font-weight: 500; color: var(--text-3); text-transform: none; letter-spacing: 0; }
+  .group > h2 .gtally { margin-left: auto; font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 12px; }
+  .group > h2 .gtally .t-ok { color: var(--ok); }
+  .group > h2 .gtally .t-bug { color: var(--bug); }
+
+  .rows { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .row {
+    display: grid;
+    grid-template-columns: 150px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 11px 16px;
+    border-top: 0.5px solid var(--border-soft);
+  }
+  .row:first-child { border-top: 0; }
+  .row.is-ok { background: var(--ok-soft); }
+  .row.is-bug { background: var(--bug-soft); }
+  .row.hidden { display: none; }
+
+  .row .meta { min-width: 0; }
+  .row .pname { font-weight: 600; font-size: 13.5px; }
+  .row .pname .build { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; padding: 1px 6px; border-radius: 6px; margin-left: 7px; vertical-align: middle; }
+  .row .pname .build.full { background: var(--ok-soft); color: var(--ok); }
+  .row .pname .build.scaffold { background: #fff4e0; color: var(--warn); }
+  .row .pname .build.entry { background: var(--accent-soft); color: var(--accent); }
+  .row .pname .build.midflow { background: #fff4e0; color: var(--warn); }
+  .row .pname .build.conditional { background: #ececf0; color: var(--text-2); }
+  .row .purl { font-family: var(--mono); font-size: 12px; color: var(--text-2); word-break: break-all; }
+  .row .purl a { color: var(--text-2); }
+  .row .purl a:hover { color: var(--accent); }
+  .row .purl .nourl { font-family: var(--sans); font-style: italic; color: var(--text-3); }
+  .row .phint { font-size: 11.5px; color: var(--text-3); margin-top: 3px; }
+  .row .phint code { font-family: var(--mono); background: #ececf0; padding: 0 5px; border-radius: 5px; color: var(--text-2); }
+
+  .row .actions { display: flex; align-items: center; gap: 6px; justify-self: end; }
+  .row .open { font-size: 12.5px; font-weight: 500; padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; }
+  .row .open:hover { background: #f5f5f7; text-decoration: none; }
+  .mark { border: 1px solid var(--border); background: #fff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 6px 11px; border-radius: 999px; color: var(--text-2); }
+  .mark.ok.on { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .mark.bug.on { background: var(--bug); border-color: var(--bug); color: #fff; }
+
+  .row .notewrap { grid-column: 1 / -1; }
+  .row .notewrap input {
+    width: 100%; font-family: var(--sans); font-size: 12.5px; padding: 6px 10px;
+    border: 1px dashed var(--border); border-radius: var(--radius-sm); background: transparent; color: var(--text);
+  }
+  .row .notewrap input:focus { outline: none; border-style: solid; border-color: var(--accent); background: #fff; }
+  .row .notewrap input::placeholder { color: var(--text-3); }
+
+  .note-banner { font-size: 12.5px; color: var(--text-2); background: #fffbe9; border: 1px solid #f0e3b8; border-radius: var(--radius-sm); padding: 9px 12px; margin-top: 10px; }
+  .foot { margin-top: 28px; color: var(--text-3); font-size: 12px; line-height: 1.6; }
+  .foot code { font-family: var(--mono); background: #ececf0; padding: 1px 5px; border-radius: 5px; color: var(--text-2); }
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: #1d1d1f; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 50; }
+  .toast.show { opacity: 1; }
+
+  .savemsg { font-size: 12px; display: inline-flex; align-items: center; gap: 7px; }
+  .savemsg::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+  .savemsg.file  { color: var(--ok); }
+  .savemsg.local { color: var(--warn); }
+  .savemsg.error { color: var(--bug); }
+
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 1fr; }
+    .row .actions { justify-self: start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page-head">
+    <h1>Hostnodes theme &mdash; page test index</h1>
+    <p>Every routable page in the theme, linked to the live site for manual QA. Mark each <b>OK</b> or <b>Bug</b> as you go &mdash; your progress is saved in this browser.</p>
+  </header>
+
+  <div class="panel">
+    <div class="controls">
+      <div class="field">
+        <label for="baseUrl">Base URL</label>
+        <input type="text" id="baseUrl" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="field" style="flex:1; min-width:240px;">
+        <label for="search">Filter pages</label>
+        <input type="text" id="search" placeholder="Search by name or URL..." autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Show</label>
+        <div class="seg" id="statusFilter">
+          <button data-f="all" class="active">All</button>
+          <button data-f="untested">Untested</button>
+          <button data-f="ok">OK</button>
+          <button data-f="bug">Bug</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="summary">
+      <div class="stat"><b id="cTotal">0</b><span>Pages</span></div>
+      <div class="stat"><b id="cTested">0</b><span>Tested</span></div>
+      <div class="stat ok"><b id="cOk">0</b><span>OK</span></div>
+      <div class="stat bug"><b id="cBug">0</b><span>Bug</span></div>
+      <div class="stat"><b id="cLeft">0</b><span>Remaining</span></div>
+      <div class="progress"><i id="bar"></i></div>
+    </div>
+    <div class="toolbar" style="margin-top:14px;">
+      <button class="btn primary" id="nextBtn">Open next untested</button>
+      <button class="btn" id="copyAll">Copy all URLs</button>
+      <button class="btn" id="copyUntested">Copy untested URLs</button>
+      <button class="btn" id="copyBugs">Copy bug list</button>
+      <button class="btn" id="linkFileBtn">Link save file</button>
+      <button class="btn" id="exportBtn">Export results (JSON)</button>
+      <span class="spacer"></span>
+      <button class="btn ghost" id="resetBtn">Reset all</button>
+    </div>
+    <div class="savemsg local" id="saveLoc" style="margin-top:10px;">Saving to this browser...</div>
+  </div>
+
+  <div class="note-banner" id="fsReconnect" style="display:none;"></div>
+
+  <div id="list"></div>
+
+  <div class="foot">
+    <p>Client-area routes come from <code>hadrian/scripts/pages.csv</code> (the route map used by <code>scripts/check-pages.sh</code>); build-status tags (<b>full</b> / <b>scaffold</b>) come from <code>hadrian/docs/PAGE-CHECKLIST.md</code> and are a hint only. The <b>Order form (cart)</b> section lists every standalone <code>hadrian_cart</code> template (which inherits <code>standard_cart</code>): <b>entry</b> = directly reachable, <b>mid-flow</b> = needs items in the cart, <b>conditional</b> = only renders under specific conditions (fraud, error, social-login) so it has no bookmarkable URL &mdash; verify those in-flow.</p>
+    <p>Most client-area pages require a logged-in session &mdash; sign in to <code>bill.hostnodes.com</code> first, then the links resolve. Detail pages use placeholder IDs (<code>id=1</code>); change the ID in the URL if needed. Cart links carry <code>?carttpl=hadrian_cart</code> to force the order-form theme, and mid-flow cart pages (view cart, checkout, complete) may redirect unless you have items in the cart.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+/* ---- 1. Page data: verbatim from hadrian/scripts/pages.csv ---------------- */
+const PAGES_CSV = `page,url,prefix
+clientareahome,/clientarea.php,dash
+clientareaproducts,/clientarea.php?action=services,svc
+clientareadomains,/clientarea.php?action=domains,dom
+clientareainvoices,/clientarea.php?action=invoices,inv
+clientareaquotes,/clientarea.php?action=quotes,q-
+clientareadetails,/clientarea.php?action=details,acct
+clientareasecurity,/clientarea.php?action=security,sec
+supporttickets,/supporttickets.php,tk
+supportticketslist,/supporttickets.php,tk
+supportticketsubmit,/submitticket.php,tk
+viewticket,/viewticket.php,tk-view
+viewinvoice,/viewinvoice.php,inv-view
+viewannouncement,/announcements.php,ann
+announcements,/announcements.php,ann
+knowledgebase,/knowledgebase.php,kb
+knowledgebasecat,/knowledgebase.php?action=displaycat&catid=1,kb
+knowledgebasearticle,/knowledgebase.php?action=displayarticle&id=1,kb
+login,/clientarea.php,login
+homepage,/index.php,hp
+contact,/contact.php,ct
+clientregister,/register,cr
+pwreset,/pwreset.php,pw
+clientareaproductdetails,/clientarea.php?action=productdetails&id=1,pd
+clientareaaddfunds,/clientarea.php?action=addfunds,af
+account-paymentmethods,/clientarea.php?action=paymentmethods,pm
+invoice-payment,/viewinvoice.php?id=1&paynow=true,ip
+masspay,/clientarea.php?action=masspay&all=true,mp
+user-verify-email,/clientarea.php?action=verify-email,uve
+user-invite-accept,/user-invite-accept,uia
+two-factor-challenge,/login,tfac
+two-factor-new-backup-code,/clientarea.php?action=twofactor&sub=backup,tfabc
+clientareadomaindetails,/clientarea.php?action=domaindetails&id=1,
+clientareadomaindns,/clientarea.php?action=domaindns&id=1,
+clientareadomainemailforwarding,/clientarea.php?action=emailforwarding&id=1,
+clientareadomainregisterns,/clientarea.php?action=registerns&id=1,
+clientareadomaingetepp,/clientarea.php?action=getepp&id=1,
+clientareadomainaddons,/clientarea.php?action=domainaddons&id=1,
+clientareadomaincontactinfo,/clientarea.php?action=contactinfo&id=1,
+bulkdomainmanagement,/clientarea.php?action=bulkdomainmanagement,bdm
+domain-pricing,/cart.php?a=add&domain=register,dp
+viewquote,/viewquote.php?id=1,vq
+clientareacancelrequest,/clientarea.php?action=cancel&id=1,cr
+subscription-manage,/clientarea.php?action=subscriptions,sm
+upgrade,/upgrade.php?type=package&id=1,up
+upgrade-configure,/upgrade.php?type=configoptions&id=1,up
+upgradesummary,/upgrade.php?type=summary,up
+usagebillingpricing,/usagebillingpricing.php,ub
+account-contacts-manage,/clientarea.php?action=contacts,
+account-contacts-new,/clientarea.php?action=contacts&sub=new,ct
+account-user-management,/clientarea.php?action=users,
+account-user-permissions,/clientarea.php?action=users&sub=permissions&id=1,perm
+account-paymentmethods-manage,/clientarea.php?action=paymentmethods&sub=manage,pm
+account-paymentmethods-billing-contacts,/clientarea.php?action=paymentmethods&sub=contacts,bc
+clientareaemails,/clientarea.php?action=emails,em
+viewemail,/clientarea.php?action=emails&id=1,vem
+configuressl-stepone,/configuressl.php,ssl
+configuressl-steptwo,/configuressl.php?step=2,ssl
+configuressl-complete,/configuressl.php?step=3,ssl
+managessl,/clientarea.php?action=ssl,ssl
+supportticketsubmit-customfields,/submitticket.php?step=2,tk
+supportticketsubmit-kbsuggestions,/submitticket.php?step=kb,tk
+supportticketsubmit-confirm,/submitticket.php?step=confirm,tk
+serverstatus,/serverstatus.php,
+downloads,/downloads.php,dl
+downloadscat,/downloads.php?action=displaycat&catid=1,dl
+access-denied,/access-denied,err
+banned,/banned,err
+3dsecure,/3dsecure,tds
+markdown-guide,/markdown-guide,md
+downloaddenied,/downloads.php?denied=true,denied
+ticketfeedback,/ticketfeedback.php?tid=1,tk
+user-profile,/account/profile,up
+user-security,/account/security,sec
+user-switch-account,/clientarea.php?action=switchaccount,sw
+user-password,/clientarea.php?action=changepw,cp`;
+
+/* ---- 2. Group membership (page name -> group), order of groups ----------- */
+const GROUP_ORDER = [
+  "Authentication & Onboarding",
+  "Client Area",
+  "Domains",
+  "Billing & Payments",
+  "Support",
+  "Content & Help",
+  "Upgrades & SSL",
+  "Account & Users",
+  "Utility & Error",
+  "Affiliates",
+  "Order form (cart)"
+];
+
+const GROUP_MEMBERS = {
+  "Authentication & Onboarding": ["login","homepage","clientregister","pwreset","two-factor-challenge","two-factor-new-backup-code","user-verify-email","user-invite-accept"],
+  "Client Area": ["clientareahome","clientareaproducts","clientareaproductdetails","clientareadetails","clientareasecurity"],
+  "Domains": ["clientareadomains","clientareadomaindetails","clientareadomaindns","clientareadomainemailforwarding","clientareadomainregisterns","clientareadomaingetepp","clientareadomainaddons","clientareadomaincontactinfo","bulkdomainmanagement","domain-pricing"],
+  "Billing & Payments": ["clientareainvoices","viewinvoice","invoice-payment","masspay","clientareaaddfunds","account-paymentmethods","account-paymentmethods-manage","account-paymentmethods-billing-contacts","clientareaquotes","viewquote","clientareacancelrequest","subscription-manage","usagebillingpricing"],
+  "Support": ["supporttickets","supportticketslist","supportticketsubmit","supportticketsubmit-customfields","supportticketsubmit-kbsuggestions","supportticketsubmit-confirm","viewticket","ticketfeedback"],
+  "Content & Help": ["announcements","viewannouncement","knowledgebase","knowledgebasecat","knowledgebasearticle","downloads","downloadscat","serverstatus","contact"],
+  "Upgrades & SSL": ["upgrade","upgrade-configure","upgradesummary","configuressl-stepone","configuressl-steptwo","configuressl-complete","managessl"],
+  "Account & Users": ["account-contacts-manage","account-contacts-new","account-user-management","account-user-permissions","clientareaemails","viewemail","user-profile","user-security","user-password","user-switch-account"],
+  "Utility & Error": ["access-denied","banned","3dsecure","markdown-guide","downloaddenied"]
+};
+
+/* Build-status hints from PAGE-CHECKLIST.md (a hint, not live truth). */
+const FULL = new Set(["clientareahome","clientareaproducts","clientareadomains","clientareainvoices","clientareaquotes","clientareadetails","clientareasecurity","supporttickets","supportticketslist","supportticketsubmit","viewticket","viewinvoice","clientareaaddfunds","invoice-payment","account-paymentmethods","masspay","announcements","viewannouncement","knowledgebase","knowledgebasecat","knowledgebasearticle","login","homepage","clientregister","pwreset","two-factor-challenge","two-factor-new-backup-code","user-verify-email","user-invite-accept","contact","clientareaproductdetails"]);
+
+/* ---- 3. Extra pages not in pages.csv -------------------------------------- */
+const EXTRA = [
+  { id:"affiliates", page:"affiliates", url:"/affiliates.php", group:"Affiliates" },
+
+  /* Order form (hadrian_cart -> inherits standard_cart). Reachable pages with a verified cart.php route. */
+  { id:"cart-store-home",  page:"Store home",                 tpl:"products.tpl",               url:"/index.php/store?carttpl=hadrian_cart",                group:"Order form (cart)", tag:"entry" },
+  { id:"cart-products",    page:"Product group",              tpl:"products.tpl",               url:"/cart.php?gid=1&carttpl=hadrian_cart",                 group:"Order form (cart)", tag:"entry",    hint:"gid = product group id" },
+  { id:"cart-domreg",      page:"Domain register",            tpl:"domainregister.tpl",         url:"/cart.php?a=add&domain=register&carttpl=hadrian_cart", group:"Order form (cart)", tag:"entry" },
+  { id:"cart-domtransfer", page:"Domain transfer",            tpl:"domaintransfer.tpl",         url:"/cart.php?a=add&domain=transfer&carttpl=hadrian_cart", group:"Order form (cart)", tag:"entry" },
+  { id:"cart-configprod",  page:"Configure product + domain", tpl:"configureproductdomain.tpl", url:"/cart.php?a=add&pid=1&carttpl=hadrian_cart",           group:"Order form (cart)", tag:"entry",    hint:"pid = product id; domain-selection step" },
+  { id:"cart-confproduct", page:"Configure product options",  tpl:"configureproduct.tpl",       url:"/cart.php?a=confproduct&i=0&carttpl=hadrian_cart",     group:"Order form (cart)", tag:"mid-flow", hint:"i = cart item index" },
+  { id:"cart-confdomains", page:"Configure domains",          tpl:"configuredomains.tpl",       url:"/cart.php?a=confdomains&carttpl=hadrian_cart",         group:"Order form (cart)", tag:"mid-flow", hint:"configures domains already in cart" },
+  { id:"cart-domrenewals", page:"Domain renewals",            tpl:"domain-renewals.tpl",        url:"/cart.php?a=domainrenewals&carttpl=hadrian_cart",      group:"Order form (cart)", tag:"entry",    hint:"friendly URL: /store/domain-renewals" },
+  { id:"cart-view",        page:"View cart",                  tpl:"viewcart.tpl",               url:"/cart.php?a=view&carttpl=hadrian_cart",                group:"Order form (cart)", tag:"mid-flow", hint:"needs items in cart" },
+  { id:"cart-checkout",    page:"Checkout",                   tpl:"checkout.tpl",               url:"/cart.php?a=checkout&carttpl=hadrian_cart",            group:"Order form (cart)", tag:"mid-flow", hint:"needs items in cart" },
+  { id:"cart-complete",    page:"Order complete",             tpl:"complete.tpl",               url:"/cart.php?a=complete&carttpl=hadrian_cart",            group:"Order form (cart)", tag:"mid-flow", hint:"shown after a completed order" },
+
+  /* Order form: conditional / flow-only templates - no reliable bookmarkable URL; verify in-flow. */
+  { id:"cart-domainoptions",   page:"Domain options",      tpl:"domainoptions.tpl",       url:"", group:"Order form (cart)", tag:"conditional", hint:"domain action chooser shown at the domain step" },
+  { id:"cart-addons",          page:"Addons",              tpl:"addons.tpl",              url:"", group:"Order form (cart)", tag:"conditional", hint:"addon ordering; reached from configure / cart" },
+  { id:"cart-servicerenewals", page:"Service renewals",    tpl:"service-renewals.tpl",    url:"", group:"Order form (cart)", tag:"conditional", hint:"service renewal flow; reached from client-area renew" },
+  { id:"cart-fraud",           page:"Fraud check",         tpl:"fraudcheck.tpl",          url:"", group:"Order form (cart)", tag:"conditional", hint:"shown only when an order is flagged for fraud" },
+  { id:"cart-error",           page:"Cart error",          tpl:"error.tpl",               url:"", group:"Order form (cart)", tag:"conditional", hint:"shown on cart error states" },
+  { id:"cart-linked",          page:"Linked accounts",     tpl:"linkedaccounts.tpl",      url:"", group:"Order form (cart)", tag:"conditional", hint:"shown at checkout when linking a social account" },
+  { id:"cart-marketconnect",   page:"MarketConnect promo", tpl:"marketconnect-promo.tpl", url:"", group:"Order form (cart)", tag:"conditional", hint:"MarketConnect upsell; shown conditionally" }
+];
+
+/* ---- 4. Build the master list -------------------------------------------- */
+function parseCsv(txt) {
+  const lines = txt.trim().split(/\r?\n/);
+  lines.shift(); // header
+  return lines.map(function (l) {
+    const i1 = l.indexOf(",");
+    const i2 = l.lastIndexOf(",");
+    return { page: l.slice(0, i1), url: l.slice(i1 + 1, i2), prefix: l.slice(i2 + 1) };
+  });
+}
+
+const groupOf = {};
+Object.keys(GROUP_MEMBERS).forEach(function (g) {
+  GROUP_MEMBERS[g].forEach(function (p) { groupOf[p] = g; });
+});
+
+const ALL = [];
+parseCsv(PAGES_CSV).forEach(function (r) {
+  ALL.push({
+    id: r.page,
+    page: r.page,
+    url: r.url,
+    group: groupOf[r.page] || "Uncategorized",
+    build: FULL.has(r.page) ? "full" : "scaffold"
+  });
+});
+EXTRA.forEach(function (e) {
+  ALL.push({ id: e.id, page: e.page, url: e.url, group: e.group, build: null, tpl: e.tpl || "", tag: e.tag || "", hint: e.hint || "" });
+});
+
+/* ---- 5. State (server file + localStorage fallback) ---------------------- */
+const LS_KEY = "hn-page-qa-v1";
+const DEFAULT_BASE = "https://bill.hostnodes.com";
+let state = { base: DEFAULT_BASE, status: {}, notes: {} };
+let apiAvailable = false;   // true when served by page-index-server (file persistence)
+let saveTimer = null;
+
+// Initial sync load from localStorage so the page renders immediately. The
+// server file (if reachable) takes over in initFileSync() right after.
+try {
+  const saved = JSON.parse(localStorage.getItem(LS_KEY) || "null");
+  if (saved && typeof saved === "object") {
+    state.base = saved.base || DEFAULT_BASE;
+    state.status = saved.status || {};
+    state.notes = saved.notes || {};
+  }
+} catch (e) {}
+
+function hasData(s) {
+  return !!s && ((s.status && Object.keys(s.status).length) || (s.notes && Object.keys(s.notes).length));
+}
+
+/* --- IndexedDB: remember the chosen file across reloads ------------------- */
+const IDB_NAME = "hn-page-qa", IDB_STORE = "kv";
+function idbOpen() {
+  return new Promise(function (res, rej) {
+    const r = indexedDB.open(IDB_NAME, 1);
+    r.onupgradeneeded = function () { r.result.createObjectStore(IDB_STORE); };
+    r.onsuccess = function () { res(r.result); };
+    r.onerror = function () { rej(r.error); };
+  });
+}
+function idbGet(key) {
+  return idbOpen().then(function (db) { return new Promise(function (res, rej) {
+    const t = db.transaction(IDB_STORE, "readonly").objectStore(IDB_STORE).get(key);
+    t.onsuccess = function () { res(t.result); }; t.onerror = function () { rej(t.error); };
+  }); });
+}
+function idbSet(key, val) {
+  return idbOpen().then(function (db) { return new Promise(function (res, rej) {
+    const t = db.transaction(IDB_STORE, "readwrite").objectStore(IDB_STORE).put(val, key);
+    t.onsuccess = function () { res(); }; t.onerror = function () { rej(t.error); };
+  }); });
+}
+
+/* --- File System Access API: write straight to a real file (never lost) --- */
+const fsSupported = (typeof window.showSaveFilePicker === "function");
+let fileHandle = null;
+let fsWriting = false, fsDirty = false;
+
+function ensureFsPermission(handle, request) {
+  const opts = { mode: "readwrite" };
+  return handle.queryPermission(opts).then(function (p) {
+    if (p === "granted") return true;
+    if (request) return handle.requestPermission(opts).then(function (p2) { return p2 === "granted"; });
+    return false;
+  });
+}
+async function writeFsFile() {
+  if (!fileHandle) return;
+  if (fsWriting) { fsDirty = true; return; }   // coalesce overlapping writes
+  fsWriting = true;
+  try {
+    const w = await fileHandle.createWritable();
+    await w.write(JSON.stringify(state, null, 2));
+    await w.close();
+  } catch (e) { setSaveStatus("error"); }
+  fsWriting = false;
+  if (fsDirty) { fsDirty = false; writeFsFile(); }
+}
+async function loadFromFs() {
+  try {
+    const file = await fileHandle.getFile();
+    const txt = (await file.text()).trim();
+    const data = txt ? JSON.parse(txt) : null;
+    if (hasData(data)) {
+      state.base = data.base || state.base;
+      state.status = data.status || {};
+      state.notes = data.notes || {};
+      render();
+    } else {
+      await writeFsFile();   // empty file -> seed with what we have
+    }
+    setSaveStatus("fs");
+    return true;
+  } catch (e) { return false; }
+}
+async function linkSaveFile() {
+  try {
+    const handle = await window.showSaveFilePicker({
+      suggestedName: "page-index-data.json",
+      types: [{ description: "JSON", accept: { "application/json": [".json"] } }]
+    });
+    fileHandle = handle;
+    await idbSet("fileHandle", handle);
+    // Adopt the file's existing data if it already has some (don't clobber it).
+    const file = await handle.getFile();
+    const txt = (await file.text()).trim();
+    let existing = null; try { existing = txt ? JSON.parse(txt) : null; } catch (e) {}
+    if (hasData(existing)) {
+      state.base = existing.base || state.base;
+      state.status = existing.status || {};
+      state.notes = existing.notes || {};
+      render();
+    } else {
+      await writeFsFile();
+    }
+    hideReconnect();
+    setSaveStatus("fs");
+    toast("Linked save file: " + (handle.name || "page-index-data.json"));
+  } catch (e) { /* user cancelled the picker */ }
+}
+function showReconnect(handle) {
+  const el = document.getElementById("fsReconnect");
+  if (!el) return;
+  el.style.display = "";
+  el.innerHTML = 'Save file <code>' + escapeHtml(handle.name || "page-index-data.json") +
+    '</code> needs permission to keep saving your progress. ' +
+    '<button class="btn" id="fsReconnectBtn" style="margin-left:8px;">Reconnect save file</button>';
+  document.getElementById("fsReconnectBtn").onclick = function () {
+    ensureFsPermission(handle, true).then(function (ok) {
+      if (ok) { fileHandle = handle; loadFromFs().then(hideReconnect); }
+    });
+  };
+}
+function hideReconnect() { const el = document.getElementById("fsReconnect"); if (el) el.style.display = "none"; }
+
+/* --- save(): write to every available store (localStorage + server + file) - */
+function save() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flush, 400);
+}
+function flush() {
+  if (fileHandle) { writeFsFile(); setSaveStatus("fs"); }
+  if (apiAvailable) { pushToFile(); }
+  if (!fileHandle && !apiAvailable) { setSaveStatus("local"); }
+}
+function pushToFile() {
+  fetch("/api/state", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(state) })
+    .then(function (r) { if (!fileHandle) setSaveStatus(r.ok ? "file" : "error"); })
+    .catch(function () { if (!fileHandle) setSaveStatus("error"); });
+}
+function setSaveStatus(mode) {
+  const el = document.getElementById("saveLoc");
+  if (!el) return;
+  el.className = "savemsg " + mode;
+  if (mode === "fs")          el.textContent = "Saving to your file" + (fileHandle && fileHandle.name ? ": " + fileHandle.name : "") + " - kept on disk, never lost";
+  else if (mode === "file")   el.textContent = "Saving to server file: page-index-data.json";
+  else if (mode === "local")  el.textContent = 'Saving to this browser only - click "Link save file" to save to a real file';
+  else                        el.textContent = "Save failed - check the linked file / server";
+}
+// Server-file sync. applyData=true => server/localStorage is the source; false => FS is master, just push for redundancy.
+function initFileSync(applyData) {
+  return fetch("/api/state", { headers: { "Accept": "application/json" } })
+    .then(function (r) { if (!r.ok) throw new Error("no api"); return r.json(); })
+    .then(function (fileState) {
+      apiAvailable = true;
+      if (applyData) {
+        if (hasData(fileState)) {
+          state.base = fileState.base || state.base;
+          state.status = fileState.status || {};
+          state.notes = fileState.notes || {};
+          render();
+        } else if (hasData(state)) {
+          pushToFile();   // migrate existing localStorage marks into the server file
+        }
+      } else {
+        pushToFile();     // FS is master; mirror to server for redundancy
+      }
+    })
+    .catch(function () { apiAvailable = false; });
+}
+// Decide where state comes from on load: linked file > server file > localStorage.
+async function initPersistence() {
+  let fsLoaded = false;
+  if (fsSupported) {
+    try {
+      const h = await idbGet("fileHandle");
+      if (h) {
+        if ((await h.queryPermission({ mode: "readwrite" })) === "granted") {
+          fileHandle = h; fsLoaded = await loadFromFs();
+        } else {
+          showReconnect(h);   // needs a click to regain write access
+        }
+      }
+    } catch (e) {}
+  }
+  await initFileSync(!fsLoaded);
+  if (fileHandle) setSaveStatus("fs");
+  else if (apiAvailable) setSaveStatus("file");
+  else setSaveStatus("local");
+}
+
+let filter = "all";
+let query = "";
+
+/* ---- 6. Helpers ----------------------------------------------------------- */
+function fullUrl(rel) { return state.base.replace(/\/+$/, "") + rel; }
+function statusOf(id) { return state.status[id] || ""; }
+function visible(item) {
+  const st = statusOf(item.id);
+  if (filter === "untested" && st) return false;
+  if (filter === "ok" && st !== "ok") return false;
+  if (filter === "bug" && st !== "bug") return false;
+  if (query) {
+    const hay = (item.page + " " + item.url + " " + (item.tpl || "") + " " + (item.hint || "")).toLowerCase();
+    if (hay.indexOf(query) === -1) return false;
+  }
+  return true;
+}
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function () { t.classList.remove("show"); }, 1600);
+}
+function copyText(txt, label) {
+  navigator.clipboard.writeText(txt).then(
+    function () { toast(label); },
+    function () { window.prompt("Copy the URLs below:", txt); }
+  );
+}
+
+/* ---- 7. Render ------------------------------------------------------------ */
+const listEl = document.getElementById("list");
+
+function render() {
+  document.getElementById("baseUrl").value = state.base;
+  listEl.innerHTML = "";
+  let visTotal = 0;
+
+  GROUP_ORDER.forEach(function (g) {
+    const items = ALL.filter(function (i) { return i.group === g; });
+    if (!items.length) return;
+    const shown = items.filter(visible);
+    if (!shown.length) return;
+    visTotal += shown.length;
+
+    let ok = 0, bug = 0;
+    items.forEach(function (i) { const s = statusOf(i.id); if (s === "ok") ok++; else if (s === "bug") bug++; });
+
+    const sec = document.createElement("section");
+    sec.className = "group";
+    const tally = (ok ? '<span class="t-ok">' + ok + ' OK</span>' : "") +
+                  (ok && bug ? " &middot; " : "") +
+                  (bug ? '<span class="t-bug">' + bug + ' bug</span>' : "");
+    sec.innerHTML = '<h2>' + g +
+      ' <span class="gcount">(' + items.length + ')</span>' +
+      '<span class="gtally">' + tally + '</span></h2>';
+
+    const rows = document.createElement("div");
+    rows.className = "rows";
+    shown.forEach(function (i) { rows.appendChild(rowEl(i)); });
+    sec.appendChild(rows);
+    listEl.appendChild(sec);
+  });
+
+  // Uncategorized safety net (any csv page missing from GROUP_MEMBERS).
+  const orphans = ALL.filter(function (i) { return i.group === "Uncategorized"; }).filter(visible);
+  if (orphans.length) {
+    const sec = document.createElement("section");
+    sec.className = "group";
+    sec.innerHTML = '<h2>Uncategorized <span class="gcount">(' + orphans.length + ')</span></h2>';
+    const rows = document.createElement("div"); rows.className = "rows";
+    orphans.forEach(function (i) { rows.appendChild(rowEl(i)); });
+    sec.appendChild(rows); listEl.appendChild(sec);
+  }
+
+  if (visTotal === 0) {
+    listEl.innerHTML = '<div class="panel" style="text-align:center;color:var(--text-3)">No pages match the current filter.</div>';
+  }
+  updateSummary();
+}
+
+function rowEl(item) {
+  const st = statusOf(item.id);
+  const row = document.createElement("div");
+  row.className = "row" + (st === "ok" ? " is-ok" : st === "bug" ? " is-bug" : "");
+
+  let tagHtml = "";
+  if (item.build) {
+    tagHtml = '<span class="build ' + item.build + '" title="Build status per PAGE-CHECKLIST.md (hint only)">' + item.build + '</span>';
+  } else if (item.tag) {
+    const cls = item.tag.replace(/[^a-z]/g, "");
+    tagHtml = '<span class="build ' + cls + '">' + escapeHtml(item.tag) + '</span>';
+  }
+
+  const urlLine = item.url
+    ? '<a href="' + fullUrl(item.url) + '" target="_blank" rel="noopener">' + escapeHtml(item.url) + '</a>'
+    : '<span class="nourl">no direct URL &mdash; reached in-flow</span>';
+
+  let hintLine = "";
+  if (item.tpl || item.hint) {
+    hintLine = '<div class="phint">' +
+      (item.tpl ? '<code>' + escapeHtml(item.tpl) + '</code>' : '') +
+      (item.tpl && item.hint ? ' &middot; ' : '') +
+      (item.hint ? escapeHtml(item.hint) : '') + '</div>';
+  }
+
+  const meta = document.createElement("div");
+  meta.className = "meta";
+  meta.innerHTML =
+    '<div class="pname">' + escapeHtml(item.page) + tagHtml + '</div>' +
+    '<div class="purl">' + urlLine + '</div>' + hintLine;
+
+  const actions = document.createElement("div");
+  actions.className = "actions";
+
+  let open = null;
+  if (item.url) {
+    open = document.createElement("a");
+    open.className = "open"; open.textContent = "Open"; open.href = fullUrl(item.url);
+    open.target = "_blank"; open.rel = "noopener";
+  }
+
+  const okBtn = document.createElement("button");
+  okBtn.className = "mark ok" + (st === "ok" ? " on" : ""); okBtn.textContent = "OK"; okBtn.title = "Mark working";
+  okBtn.onclick = function () { setStatus(item.id, st === "ok" ? "" : "ok"); };
+
+  const bugBtn = document.createElement("button");
+  bugBtn.className = "mark bug" + (st === "bug" ? " on" : ""); bugBtn.textContent = "Bug"; bugBtn.title = "Mark broken";
+  bugBtn.onclick = function () { setStatus(item.id, st === "bug" ? "" : "bug"); };
+
+  if (open) actions.appendChild(open);
+  actions.appendChild(okBtn); actions.appendChild(bugBtn);
+
+  const noteWrap = document.createElement("div");
+  noteWrap.className = "notewrap";
+  const note = document.createElement("input");
+  note.type = "text"; note.placeholder = "Notes (optional)..."; note.value = state.notes[item.id] || "";
+  note.oninput = function () { state.notes[item.id] = note.value; save(); };
+  noteWrap.appendChild(note);
+
+  row.appendChild(meta); row.appendChild(actions); row.appendChild(noteWrap);
+  return row;
+}
+
+function escapeHtml(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+function setStatus(id, val) {
+  if (val) state.status[id] = val; else delete state.status[id];
+  save(); render();
+}
+
+function updateSummary() {
+  const total = ALL.length;
+  let ok = 0, bug = 0;
+  ALL.forEach(function (i) { const s = statusOf(i.id); if (s === "ok") ok++; else if (s === "bug") bug++; });
+  const tested = ok + bug;
+  document.getElementById("cTotal").textContent = total;
+  document.getElementById("cTested").textContent = tested;
+  document.getElementById("cOk").textContent = ok;
+  document.getElementById("cBug").textContent = bug;
+  document.getElementById("cLeft").textContent = total - tested;
+  document.getElementById("bar").style.width = (total ? (tested / total * 100) : 0) + "%";
+}
+
+/* ---- 8. Toolbar wiring ---------------------------------------------------- */
+document.getElementById("baseUrl").addEventListener("input", function (e) {
+  state.base = e.target.value.trim() || DEFAULT_BASE; save();
+  render();
+});
+document.getElementById("search").addEventListener("input", function (e) {
+  query = e.target.value.trim().toLowerCase(); render();
+});
+document.getElementById("statusFilter").addEventListener("click", function (e) {
+  const b = e.target.closest("button"); if (!b) return;
+  filter = b.getAttribute("data-f");
+  this.querySelectorAll("button").forEach(function (x) { x.classList.toggle("active", x === b); });
+  render();
+});
+
+document.getElementById("nextBtn").addEventListener("click", function () {
+  const next = ALL.find(function (i) { return i.url && !statusOf(i.id); });
+  if (!next) { toast("No untested pages with a direct URL"); return; }
+  window.open(fullUrl(next.url), "_blank", "noopener");
+  toast("Opened: " + next.page);
+});
+document.getElementById("copyAll").addEventListener("click", function () {
+  const u = ALL.filter(function (i) { return i.url; });
+  copyText(u.map(function (i) { return fullUrl(i.url); }).join("\n"), "Copied " + u.length + " URLs");
+});
+document.getElementById("copyUntested").addEventListener("click", function () {
+  const u = ALL.filter(function (i) { return i.url && !statusOf(i.id); });
+  copyText(u.map(function (i) { return fullUrl(i.url); }).join("\n"), "Copied " + u.length + " untested URLs");
+});
+document.getElementById("copyBugs").addEventListener("click", function () {
+  const b = ALL.filter(function (i) { return statusOf(i.id) === "bug"; });
+  if (!b.length) { toast("No bugs marked"); return; }
+  const txt = b.map(function (i) {
+    const n = state.notes[i.id] ? " - " + state.notes[i.id] : "";
+    const loc = i.url ? fullUrl(i.url) : (i.tpl || "no direct URL");
+    return "[BUG] " + i.page + " (" + loc + ")" + n;
+  }).join("\n");
+  copyText(txt, "Copied " + b.length + " bug entries");
+});
+document.getElementById("exportBtn").addEventListener("click", function () {
+  const out = { base: state.base, exportedAt: new Date().toISOString(), results: [] };
+  ALL.forEach(function (i) {
+    const s = statusOf(i.id);
+    if (s || state.notes[i.id]) out.results.push({ page: i.page, url: i.url, status: s || "untested", notes: state.notes[i.id] || "" });
+  });
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "hostnodes-page-qa-" + new Date().toISOString().slice(0, 10) + ".json";
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  toast("Exported results");
+});
+document.getElementById("resetBtn").addEventListener("click", function () {
+  if (!confirm("Clear all OK/Bug marks and notes? Base URL is kept.")) return;
+  state.status = {}; state.notes = {}; save(); render(); toast("Reset");
+});
+
+// "Link save file" - File System Access API (Chromium). Hide if unsupported.
+(function () {
+  const btn = document.getElementById("linkFileBtn");
+  if (!btn) return;
+  if (fsSupported) { btn.addEventListener("click", linkSaveFile); }
+  else { btn.style.display = "none"; }
+})();
+
+render();
+initPersistence();
+</script>
+</body>
+</html>

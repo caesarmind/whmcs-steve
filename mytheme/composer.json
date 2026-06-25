@@ -1,6 +1,6 @@
 {
-  "name": "your-studio/mytheme-whmcs",
-  "description": "MyTheme — commercial WHMCS 9 client area theme",
+  "name": "your-studio/hadrian-whmcs",
+  "description": "Hadrian — commercial WHMCS 9 client area theme",
   "type": "whmcs-addon",
   "license": "proprietary",
   "require": {
@@ -18,13 +18,13 @@
   },
   "autoload": {
     "psr-4": {
-      "MyTheme\\": "modules/addons/MyTheme/src/",
-      "MyTheme\\Resources\\Migrations\\": "modules/addons/MyTheme/resources/migrations/"
+      "Hadrian\\": "modules/addons/Hadrian/src/",
+      "Hadrian\\Resources\\Migrations\\": "modules/addons/Hadrian/resources/migrations/"
     }
   },
   "scripts": {
     "test": "phpunit",
-    "stan": "phpstan analyse modules/addons/MyTheme/src --level=6",
-    "fix": "php-cs-fixer fix modules/addons/MyTheme/src"
+    "stan": "phpstan analyse modules/addons/Hadrian/src --level=6",
+    "fix": "php-cs-fixer fix modules/addons/Hadrian/src"
   }
 }

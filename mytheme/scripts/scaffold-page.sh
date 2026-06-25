@@ -9,11 +9,11 @@
 #   description  short one-line summary used in page.php
 #
 # Creates:
-#   templates/mytheme/<page-slug>.tpl                                       (dispatcher)
-#   templates/mytheme/core/pages/<page-slug>/page.php                       (metadata)
-#   templates/mytheme/core/pages/<page-slug>/default/default.tpl            (markup stub)
-#   templates/mytheme/core/pages/<page-slug>/default/pageoption.php         (variant settings)
-#   templates/mytheme/assets/css/pages/<page-slug>.css                      (empty page CSS)
+#   templates/hadrian/<page-slug>.tpl                                       (dispatcher)
+#   templates/hadrian/core/pages/<page-slug>/page.php                       (metadata)
+#   templates/hadrian/core/pages/<page-slug>/default/default.tpl            (markup stub)
+#   templates/hadrian/core/pages/<page-slug>/default/pageoption.php         (variant settings)
+#   templates/hadrian/assets/css/pages/<page-slug>.css                      (empty page CSS)
 #
 # Idempotent — if a file exists it's left alone.
 
@@ -43,16 +43,16 @@ write_if_missing() {
 }
 
 # 1. Dispatcher
-write_if_missing "$THEME_ROOT/templates/mytheme/$SLUG.tpl" <<EOF
-{if isset(\$myTheme.pages.$SLUG.fullPath) && \$myTheme.pages.$SLUG.fullPath && file_exists("templates/\`\$myTheme.pages.$SLUG.fullPath\`")}
-	{include file="\`\$myTheme.pages.$SLUG.fullPath\`"}
+write_if_missing "$THEME_ROOT/templates/hadrian/$SLUG.tpl" <<EOF
+{if isset(\$hadrian.pages.$SLUG.fullPath) && \$hadrian.pages.$SLUG.fullPath && file_exists("templates/\`\$hadrian.pages.$SLUG.fullPath\`")}
+	{include file="\`\$hadrian.pages.$SLUG.fullPath\`"}
 {else}
 	{include file="\`\$template\`/core/pages/$SLUG/default/default.tpl"}
 {/if}
 EOF
 
 # 2. page.php metadata
-write_if_missing "$THEME_ROOT/templates/mytheme/core/pages/$SLUG/page.php" <<EOF
+write_if_missing "$THEME_ROOT/templates/hadrian/core/pages/$SLUG/page.php" <<EOF
 <?php
 /**
  * Page-level metadata for $SLUG ($DISPLAY).
@@ -67,10 +67,10 @@ return [
 EOF
 
 # 3. default.tpl stub
-write_if_missing "$THEME_ROOT/templates/mytheme/core/pages/$SLUG/default/default.tpl" <<EOF
+write_if_missing "$THEME_ROOT/templates/hadrian/core/pages/$SLUG/default/default.tpl" <<EOF
 {* Hostnodes — $DISPLAY (Apple-style). Stub — fill in markup. *}
 
-<link rel="stylesheet" href="{\$WEB_ROOT}/templates/{\$template}/assets/css/pages/$SLUG.css?v={\$myTheme.version|default:'1.0'}">
+<link rel="stylesheet" href="{\$WEB_ROOT}/templates/{\$template}/assets/css/pages/$SLUG.css?v={\$hadrian.version|default:'1.0'}">
 
 <header class="page-header">
     <h1>$DISPLAY</h1>
@@ -82,7 +82,7 @@ write_if_missing "$THEME_ROOT/templates/mytheme/core/pages/$SLUG/default/default
 EOF
 
 # 4. pageoption.php variant settings
-write_if_missing "$THEME_ROOT/templates/mytheme/core/pages/$SLUG/default/pageoption.php" <<EOF
+write_if_missing "$THEME_ROOT/templates/hadrian/core/pages/$SLUG/default/pageoption.php" <<EOF
 <?php
 return [
     'display_name' => 'Default',
@@ -93,7 +93,7 @@ return [
 EOF
 
 # 5. CSS skeleton (page-prefixed)
-write_if_missing "$THEME_ROOT/templates/mytheme/assets/css/pages/$SLUG.css" <<EOF
+write_if_missing "$THEME_ROOT/templates/hadrian/assets/css/pages/$SLUG.css" <<EOF
 /* $DISPLAY — page CSS */
 
 .page-header { margin: 8px 0 24px; }

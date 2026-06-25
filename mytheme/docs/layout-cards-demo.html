@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layouts cards — row alignment demo</title>
+<style>
+  :root{
+    --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#86868b;
+    --line:#e5e5ea; --line2:#d2d2d7; --blue:#0071e3; --blue-soft:rgba(0,113,227,.10);
+    --green:#1d8a4e; --green-bg:#e7f6ed; --radius:16px;--shadow:0 1px 2px rgba(0,0,0,.04),0 8px 28px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.5;padding:40px 24px 80px}
+  .wrap{max-width:1040px;margin:0 auto}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+  h1{font-size:28px;letter-spacing:-.02em;margin:.2em 0 .15em}
+  .lede{color:var(--ink2);font-size:15px;margin:0 0 24px;max-width:70ch}
+  .toolbar{display:flex;align-items:center;gap:14px;margin:0 0 18px;font-size:13px;color:var(--ink2)}
+  .toolbar label{display:flex;align-items:center;gap:6px;cursor:pointer}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+
+  .tabs{display:inline-flex;background:#ececed;border-radius:10px;padding:3px;gap:2px;margin-bottom:18px}
+  .tabs button{font-size:13px;font-weight:500;color:var(--ink2);padding:6px 16px;border-radius:8px;border:0;background:0;cursor:pointer}
+  .tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .sec-head h3{font-size:18px;margin:0}.sec-head .count{color:var(--ink3);font-size:14px}
+
+  /* ---- cards ---- */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+  .card{border:1.5px solid var(--line2);border-radius:14px;background:#fff;display:flex;flex-direction:column;overflow:hidden}
+  .card.on{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  .card-thumb{height:96px;flex:none;background:var(--bg);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .card-thumb svg{width:122px;height:78px;display:block}
+  .card-b{padding:14px 15px;display:flex;flex-direction:column;flex:1}      /* fills card height */
+  .card-title{font-weight:600;font-size:14.5px;margin-bottom:5px}
+  .card-desc{font-size:12.5px;color:var(--ink3)}
+  /* the activation block is pushed to the BOTTOM, so it aligns across cards
+     no matter how tall the description is */
+  .card-acts{margin-top:auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;border-top:1px solid var(--line);padding-top:11px}
+  .act{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink2)}
+  .badge{font-size:11.5px;font-weight:600;color:var(--green);background:var(--green-bg);padding:2px 10px;border-radius:20px}
+  .link{background:0;border:0;font:inherit;font-size:12.5px;color:var(--blue);cursor:pointer;padding:0}
+  .card-opt{border-top:1px solid var(--line);padding-top:11px;margin-top:11px}
+  .opt-lbl{font-size:11.5px;font-weight:600;color:var(--ink2);display:block;margin-bottom:6px}
+  .seg{display:inline-flex;background:#f2f2f4;border-radius:9px;padding:3px;gap:2px;width:100%}
+  .seg button{flex:1;border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;color:var(--ink2);padding:6px 0;border-radius:7px;cursor:pointer}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+
+  /* optional fixed-height variant (toggle) — clamps the description to keep
+     EVERY row identical height, not just the bottom block */
+  body.fixed .card-desc{min-height:72px}
+  body.fixed .card-acts{min-height:24px}
+
+  [data-panel]{display:none}[data-panel].show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Hadrian · cards iteration</div>
+  <h1>Layouts cards — aligning the activation row</h1>
+  <p class="lede">Activations (Guest / Existing) are one inline row, pinned to the <b>bottom</b> of each card —
+  so they line up across a row even when descriptions differ in length (see the long "Extended + Info").
+  Toggle the option below to compare the bottom-pinned approach with a fixed description height.</p>
+
+  <div class="toolbar">
+    <label><input type="checkbox" id="fixed"> Also clamp description to a fixed height (uniform rows)</label>
+  </div>
+
+  <div class="tabs">
+    <button class="on" data-tab="mm">Main menu</button>
+    <button data-tab="ft">Footer</button>
+  </div>
+
+  <!-- MAIN MENU -->
+  <div class="panel" data-panel="mm">
+    <div class="sec-head"><h3>Main menu layouts</h3><span class="count">3</span></div>
+    <div class="cards">
+      <div class="card">
+        <div class="card-thumb"><svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="9" width="104" height="14" rx="3" fill="#9cc2f5"/><rect x="9" y="31" width="58" height="6" rx="3" fill="#dfe1e6"/><rect x="9" y="43" width="104" height="26" rx="4" fill="#f0f1f4"/></svg></div>
+        <div class="card-b">
+          <div class="card-title">Top Navigation</div>
+          <div class="card-desc">Horizontal navbar at the top, full-width content below.</div>
+          <div class="card-acts">
+            <div class="act"><span>Guest client</span><button class="link">Activate</button></div>
+            <div class="act"><span>Existing client</span><button class="link">Activate</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="card on">
+        <div class="card-thumb"><svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="9" width="32" height="60" rx="4" fill="#9cc2f5"/><rect x="49" y="13" width="48" height="6" rx="3" fill="#dfe1e6"/><rect x="49" y="27" width="64" height="42" rx="4" fill="#f0f1f4"/></svg></div>
+        <div class="card-b">
+          <div class="card-title">Sidebar</div>
+          <div class="card-desc">Fixed 260px sidebar on the left, content shifts right.</div>
+          <div class="card-acts">
+            <div class="act"><span>Guest client</span><span class="badge">Active</span></div>
+            <div class="act"><span>Existing client</span><span class="badge">Active</span></div>
+          </div>
+          <div class="card-opt"><span class="opt-lbl">Content alignment</span><div class="seg"><button class="on">Center</button><button>Left</button></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="9" width="14" height="60" rx="4" fill="#9cc2f5"/><rect x="31" y="13" width="48" height="6" rx="3" fill="#dfe1e6"/><rect x="31" y="27" width="82" height="42" rx="4" fill="#f0f1f4"/></svg></div>
+        <div class="card-b">
+          <div class="card-title">Icon Rail</div>
+          <div class="card-desc">Compact 80px icon rail with flyout panels on hover.</div>
+          <div class="card-acts">
+            <div class="act"><span>Guest client</span><button class="link">Activate</button></div>
+            <div class="act"><span>Existing client</span><button class="link">Activate</button></div>
+          </div>
+          <div class="card-opt"><span class="opt-lbl">Content alignment</span><div class="seg"><button class="on">Center</button><button>Left</button></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER (varying description lengths — the alignment stress test) -->
+  <div class="panel" data-panel="ft">
+    <div class="sec-head"><h3>Footer layouts</h3><span class="count">3</span></div>
+    <div class="cards">
+      <div class="card">
+        <div class="card-thumb"><svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="11" width="104" height="40" rx="4" fill="#f0f1f4"/><rect x="9" y="58" width="104" height="11" rx="3" fill="#9cc2f5"/></svg></div>
+        <div class="card-b">
+          <div class="card-title">Default Footer</div>
+          <div class="card-desc">Single-row footer with copyright and basic links.</div>
+          <div class="card-acts">
+            <div class="act"><span>Guest client</span><button class="link">Activate</button></div>
+            <div class="act"><span>Existing client</span><button class="link">Activate</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="9" width="104" height="30" rx="4" fill="#f0f1f4"/><rect x="9" y="45" width="22" height="24" rx="3" fill="#9cc2f5"/><rect x="36" y="45" width="22" height="24" rx="3" fill="#9cc2f5"/><rect x="63" y="45" width="22" height="24" rx="3" fill="#9cc2f5"/><rect x="90" y="45" width="22" height="24" rx="3" fill="#9cc2f5"/></svg></div>
+        <div class="card-b">
+          <div class="card-title">Extended Footer</div>
+          <div class="card-desc">Multi-column footer with menu links — columns are driven by the admin Footer Menu (Menu → Footer tab).</div>
+          <div class="card-acts">
+            <div class="act"><span>Guest client</span><button class="link">Activate</button></div>
+            <div class="act"><span>Existing client</span><button class="link">Activate</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="card on">
+        <div class="card-thumb"><svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="9" width="104" height="26" rx="4" fill="#f0f1f4"/><rect x="9" y="41" width="42" height="28" rx="3" fill="#bcd5f8"/><rect x="56" y="41" width="26" height="28" rx="3" fill="#9cc2f5"/><rect x="87" y="41" width="26" height="28" rx="3" fill="#9cc2f5"/></svg></div>
+        <div class="card-b">
+          <div class="card-title">Extended Footer + Info</div>
+          <div class="card-desc">Brand block (logo, description, socials) on the left + menu columns on the right. Driven by the admin Footer Menu, Branding tab (logo + description + socials), and Footer Secondary Menu (Privacy/Terms row).</div>
+          <div class="card-acts">
+            <div class="act"><span>Guest client</span><span class="badge">Active</span></div>
+            <div class="act"><span>Existing client</span><span class="badge">Active</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var tabs = document.querySelectorAll('[data-tab]'), panels = document.querySelectorAll('[data-panel]');
+  function show(t){ panels.forEach(function(p){ p.classList.toggle('show', p.getAttribute('data-panel')===t); });
+    tabs.forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-tab')===t); }); }
+  tabs.forEach(function(b){ b.addEventListener('click', function(){ show(b.getAttribute('data-tab')); }); });
+  show('mm');
+  document.getElementById('fixed').addEventListener('change', function(){ document.body.classList.toggle('fixed', this.checked); });
+})();
+</script>
+</body>
+</html>

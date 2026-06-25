@@ -1,20 +1,20 @@
 # Hybrid Structure: WHMCS 9 Native + Lagom-Style Management
 
-This is the target structure for MyTheme as a managed WHMCS 9 theme. It keeps the runtime close to WHMCS/Nexus and uses the addon for management, discovery, licensing, branding, and configuration.
+This is the target structure for Hadrian as a managed WHMCS 9 theme. It keeps the runtime close to WHMCS/Nexus and uses the addon for management, discovery, licensing, branding, and configuration.
 
 For the detailed visual theme layer review, see [TEMPLATE-STRUCTURE.md](TEMPLATE-STRUCTURE.md).
 
 ## Principle
 
-**WHMCS owns the data and native objects. MyTheme owns presentation and admin-selected options.**
+**WHMCS owns the data and native objects. Hadrian owns presentation and admin-selected options.**
 
-**Commercial rule:** MyTheme is a two-piece licensed product. The template must not be useful by itself. The addon/license layer is load-bearing and must be active before the theme renders.
+**Commercial rule:** Hadrian is a two-piece licensed product. The template must not be useful by itself. The addon/license layer is load-bearing and must be active before the theme renders.
 
 Use this rule whenever deciding whether to copy a Lagom system:
 
-| Area | Use WHMCS 9 native | Borrow from Lagom | MyTheme direction |
+| Area | Use WHMCS 9 native | Borrow from Lagom | Hadrian direction |
 |---|---|---|---|
-| Dashboard data | `$panels`, `ClientAreaHomepagePanels`, native `MenuItem` children | Nice cards, empty states, ordering controls | Render native panels with MyTheme cards; addon only controls visibility/order/style |
+| Dashboard data | `$panels`, `ClientAreaHomepagePanels`, native `MenuItem` children | Nice cards, empty states, ordering controls | Render native panels with Hadrian cards; addon only controls visibility/order/style |
 | Menus | `ClientAreaPrimaryNavbar`, `ClientAreaSecondaryNavbar`, native `MenuItem` API | Admin menu builder UX | Store menu rules in addon settings; apply through native menu hooks |
 | Sidebars | `ClientAreaPrimarySidebar`, `ClientAreaSecondarySidebar` | Sidebar assignment UI | Store sidebar rules in addon settings; apply through native sidebar hooks |
 | Page variants | WHMCS `templatefile` and Smarty entry points | Admin variant picker | Manifest declares variants; addon chooses active variant |
@@ -28,20 +28,20 @@ Use this rule whenever deciding whether to copy a Lagom system:
 The production package should be sold as:
 
 ```text
-modules/addons/MyTheme/   # encoded engine, license client, hooks, admin UI
-templates/mytheme/        # visual layer, guarded by addon-provided $myTheme.license
+modules/addons/Hadrian/   # encoded engine, license client, hooks, admin UI
+templates/hadrian/        # visual layer, guarded by addon-provided $hadrian.license
 ```
 
 Runtime licensing requirements:
 
-1. `templates/mytheme/core/mytheme.php` must ship with `dev_mode => false`.
+1. `templates/hadrian/core/hadrian.php` must ship with `dev_mode => false`.
 2. The addon must be active in WHMCS.
 3. A valid license cache or successful license server response must exist.
-4. `Hooks::clientAreaPage()` must expose `$myTheme.license.canRender = true`.
+4. `Hooks::clientAreaPage()` must expose `$hadrian.license.canRender = true`.
 5. If the addon is inactive or the license is missing/invalid, the template shows only the license-required screen and hides normal page output.
-6. If WHMCS is configured to use an unlicensed MyTheme template, the addon resets the client template to `six` and the order form to `standard_cart`.
+6. If WHMCS is configured to use an unlicensed Hadrian template, the addon resets the client template to `six` and the order form to `standard_cart`.
 
-This protects the commercial product from the easiest piracy path: copying only `templates/mytheme` without installing or licensing the addon.
+This protects the commercial product from the easiest piracy path: copying only `templates/hadrian` without installing or licensing the addon.
 
 Production license package checklist:
 
@@ -49,16 +49,16 @@ Production license package checklist:
 - Replace `License::$licenseServerUrl` with your real licensing endpoint.
 - Generate a unique 64-character per-template `secret_key`.
 - Set `dev_mode` to `false` before encoding.
-- Encode the addon engine and `core/mytheme.php` with ionCube.
+- Encode the addon engine and `core/hadrian.php` with ionCube.
 - Generate integrity hashes after final production edits.
 - Test three states before release: no addon, addon with no key, addon with valid key.
 
 ## Target folder structure
 
 ```text
-mytheme/
-├── modules/addons/MyTheme/                     # addon engine, encoded for production
-│   ├── MyTheme.php                             # WHMCS addon lifecycle
+hadrian/
+├── modules/addons/Hadrian/                     # addon engine, encoded for production
+│   ├── Hadrian.php                             # WHMCS addon lifecycle
 │   ├── hooks.php                               # one registration layer, native hooks only
 │   ├── adminHooks.php                          # admin-area helper hooks
 │   ├── config/
@@ -77,7 +77,7 @@ mytheme/
 │   │   │   └── ToolsController.php
 │   │   ├── Models/
 │   │   │   ├── Configuration.php               # WHMCS tblconfiguration bridge
-│   │   │   └── Settings.php                    # typed mytheme_settings key/value store
+│   │   │   └── Settings.php                    # typed hadrian_settings key/value store
 │   │   ├── Service/
 │   │   │   ├── Hooks.php                       # native hook runtime
 │   │   │   ├── HookDispatcher.php
@@ -85,11 +85,11 @@ mytheme/
 │   │   ├── Template/                           # manifest, license, template discovery
 │   │   ├── Helpers/
 │   │   └── View/
-│   └── views/adminarea/                        # Lagom-style admin UX, MyTheme internals
+│   └── views/adminarea/                        # Lagom-style admin UX, Hadrian internals
 │
-└── templates/mytheme/                          # visual layer, mostly plain files
+└── templates/hadrian/                          # visual layer, mostly plain files
     ├── theme.json                              # declared capabilities; no runtime scanning
-    ├── core/mytheme.php                        # per-template encoded config
+    ├── core/hadrian.php                        # per-template encoded config
     ├── *.tpl                                   # WHMCS entry files; tiny include dispatchers
     ├── core/
     │   ├── styles/<style>/style.php            # style preset metadata + variables
@@ -133,15 +133,15 @@ WHMCS request
   ↓
 Native WHMCS hooks run and create standard variables/panels/menus/sidebars
   ↓
-MyTheme hooks.php validates addon/template license and registers one native-first dispatch layer
+Hadrian hooks.php validates addon/template license and registers one native-first dispatch layer
   ↓
-Hooks::clientAreaPage() creates $myTheme from manifest + mytheme_settings + license render flag
+Hooks::clientAreaPage() creates $hadrian from manifest + hadrian_settings + license render flag
   ↓
-WHMCS header blocks rendering if $myTheme.license.canRender is missing
+WHMCS header blocks rendering if $hadrian.license.canRender is missing
   ↓
 WHMCS-named root tpl selects configured page variant when licensed
   ↓
-Variant renders native WHMCS objects with MyTheme markup
+Variant renders native WHMCS objects with Hadrian markup
 ```
 
 The template should never need to query WHMCS tables directly for normal page data. If a page needs fallback data, use `localAPI` in the addon and keep native objects as the first source.
@@ -157,21 +157,21 @@ Target flow:
 ```text
 Admin selects layout
   ↓
-mytheme_settings row: <slug>_active_layout_main-menu = sidebar
+hadrian_settings row: <slug>_active_layout_main-menu = sidebar
   ↓
-Hooks::resolveActiveLayout() builds $myTheme.layouts.main-menu.mediumPath
+Hooks::resolveActiveLayout() builds $hadrian.layouts.main-menu.mediumPath
   ↓
-header.tpl includes only $myTheme.layouts.main-menu.mediumPath
+header.tpl includes only $hadrian.layouts.main-menu.mediumPath
 ```
 
 Footer layouts follow the same rule:
 
 ```text
-mytheme_settings row: <slug>_active_layout_footer = default
+hadrian_settings row: <slug>_active_layout_footer = default
   ↓
-Hooks::resolveActiveLayout() builds $myTheme.layouts.footer.mediumPath
+Hooks::resolveActiveLayout() builds $hadrian.layouts.footer.mediumPath
   ↓
-footer.tpl includes only $myTheme.layouts.footer.mediumPath
+footer.tpl includes only $hadrian.layouts.footer.mediumPath
 ```
 
 Required production behavior:
@@ -182,7 +182,7 @@ Required production behavior:
 - Shared CSS may support all layouts, but inactive layout HTML should not be included.
 - Preview controls such as `?layout=top|side|rail` should be dev/admin-only and must not be the final production switching mechanism.
 
-This mirrors Lagom's `$RSThemes['layouts']['mediumPath']` and `$RSThemes['footer-layouts']['mediumPath']` pattern, but keeps MyTheme's implementation smaller and native-first through `$myTheme.layouts.*.mediumPath`.
+This mirrors Lagom's `$RSThemes['layouts']['mediumPath']` and `$RSThemes['footer-layouts']['mediumPath']` pattern, but keeps Hadrian's implementation smaller and native-first through `$hadrian.layouts.*.mediumPath`.
 
 ## Manifest contract
 
@@ -218,9 +218,9 @@ Future optional contract:
 
 ## Native hook mapping
 
-| MyTheme feature | WHMCS hook to use | Rule |
+| Hadrian feature | WHMCS hook to use | Rule |
 |---|---|---|
-| Global Smarty variables | `ClientAreaPage` | Build `$myTheme`; do not overwrite WHMCS core vars |
+| Global Smarty variables | `ClientAreaPage` | Build `$hadrian`; do not overwrite WHMCS core vars |
 | Head assets/snippets | `ClientAreaHeadOutput` | Output configured assets and custom CSS variables |
 | Footer scripts | `ClientAreaFooterOutput` | Output extension scripts and deferred JS |
 | Dashboard cards | `ClientAreaHomepagePanels` | Adjust native panels only when needed |
@@ -237,16 +237,16 @@ Keep the existing lightweight model:
 | Table/store | Use |
 |---|---|
 | `tblconfiguration` | WHMCS-native active template/order form template, addon activation, license interop |
-| `mytheme_settings` | All theme-specific settings as typed key/value rows |
+| `hadrian_settings` | All theme-specific settings as typed key/value rows |
 
 Avoid new tables until one setting row becomes too large or needs relational querying. Prefer JSON rows for admin-managed trees:
 
 ```text
-mytheme_navigation_primary      json
-mytheme_sidebar_primary         json
-mytheme_dashboard_panels        json
-mytheme_branding                json
-mytheme_extensions              json
+hadrian_navigation_primary      json
+hadrian_sidebar_primary         json
+hadrian_dashboard_panels        json
+hadrian_branding                json
+hadrian_extensions              json
 ```
 
 ## Implementation phases
@@ -260,16 +260,16 @@ mytheme_extensions              json
 
 ### Phase 2: Make existing admin screens real
 
-- Save page variants from `PagesController` into `mytheme_settings`.
-- Wire `header.tpl` and `footer.tpl` to include only selected `$myTheme.layouts.*.mediumPath` files.
+- Save page variants from `PagesController` into `hadrian_settings`.
+- Wire `header.tpl` and `footer.tpl` to include only selected `$hadrian.layouts.*.mediumPath` files.
 - Replace menu stub data with JSON-backed menu profiles.
 - Add native navbar/sidebar hook methods to apply configured rules.
-- Add branding upload/settings support and expose it through `$myTheme.branding`.
+- Add branding upload/settings support and expose it through `$hadrian.branding`.
 
 ### Phase 3: Add optional managed systems
 
 - Dashboard panel order/visibility controls that still render native panel children.
-- Import/export theme configuration from `mytheme_settings`.
+- Import/export theme configuration from `hadrian_settings`.
 - Extension registry for optional features.
 - Cache warming/manifest validation tools.
 
@@ -287,17 +287,17 @@ mytheme_extensions              json
 1. Do not replace WHMCS native data with custom duplicate queries unless it is a fallback.
 2. Do not copy Lagom's full widget engine; wrap native panels instead.
 3. Do not add runtime filesystem scans for styles/layouts/pages.
-4. Do not store presentation state across multiple tables when `mytheme_settings` is enough.
+4. Do not store presentation state across multiple tables when `hadrian_settings` is enough.
 5. Do not put large business logic in Smarty templates.
 6. Do not make buyer overrides edit encoded files.
 7. Do not remove WHMCS-native compatibility for menus, sidebars, panels, or order forms.
-8. Do not let `templates/mytheme` render normal pages when the addon/license layer is absent.
+8. Do not let `templates/hadrian` render normal pages when the addon/license layer is absent.
 9. Do not load all layout HTML versions in production; resolve one active layout and include only that file.
 
 ## Next code targets
 
 1. Build and test the real license server endpoint.
-2. Wire production layout includes to `$myTheme.layouts.main-menu.mediumPath` and `$myTheme.layouts.footer.mediumPath`.
+2. Wire production layout includes to `$hadrian.layouts.main-menu.mediumPath` and `$hadrian.layouts.footer.mediumPath`.
 3. Add save handling to `PagesController::editAction()`.
 4. Replace `MenuController` stub data with JSON-backed settings.
 5. Add `clientAreaPrimaryNavbar()`, `clientAreaSecondaryNavbar()`, `clientAreaPrimarySidebar()`, and `clientAreaSecondarySidebar()` methods to `Hooks`.

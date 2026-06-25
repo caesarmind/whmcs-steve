@@ -1,0 +1,2958 @@
+/* ============================================================
+   apple-layout.css -- Shared layout system for every page
+   ------------------------------------------------------------
+   Extracted from portal-home.html so every page can opt into
+   the three-way layout (top / sidebar / icon-rail), the palette
+   swatches, the dev preview chip (options tab), the locale modal
+   and the shared navigation chrome without copy-pasting a wall
+   of <style> into each file.
+
+   This file pairs with js/apple-layout.js and the partials in
+   ./partials/. Include ORDER matters:
+     <link rel="stylesheet" href="css/apple-theme.css">
+     <link rel="stylesheet" href="css/apple-layout.css">
+   apple-theme.css defines the base tokens (.sidebar, .topbar,
+   --color-*) this file references.
+   ============================================================ */
+
+/* -- State machine ------------------------------------------ */
+body[data-auth="out"] .only-in { display: none !important; }
+body[data-auth="in"]  .only-out { display: none !important; }
+body:not([data-layout="top"])  .only-top  { display: none !important; }
+body:not([data-layout="side"]) .only-side { display: none !important; }
+body:not([data-layout="rail"]) .only-rail { display: none !important; }
+/* `.only-inner` = show on sidebar OR rail, hide on top layout */
+body[data-layout="top"] .only-inner { display: none !important; }
+/* Layout-specific offsets for main content wrapper */
+body[data-layout="side"] .ph-main-wrap { margin-left: 260px; }
+body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
+
+/* Admin "Website Section Sidebar" toggle (Addons -> Hadrian -> Settings).
+   Hides the per-page section sub-nav and reflows the page to full width,
+   independent of the order/cart sidebar. header.tpl sets data-subnav-website
+   only on client-area (non-order) pages, so this never matches the cart's
+   *-split grids. Every client-area page grid uses a `*-split` wrapper + aside. */
+body[data-subnav-website="off"] [class$="-split"] { grid-template-columns: 1fr !important; }
+body[data-subnav-website="off"] [class$="-split"] > aside,
+body[data-subnav-website="off"] [class$="-split"] > [class$="-aside"] { display: none !important; }
+
+/* Topbar/footer stay within .ph-main-wrap (right of the sidebar/rail).
+   Earlier negative-margin trick was reverted because it covered the
+   sidebar header -- sidebar should own its full-height left column. */
+/* Flex column so footers stick to the bottom of the viewport on short pages */
+.ph-main-wrap {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* Fill the body's flex row remaining space. Without flex:1 the wrap
+       shrinks to its content's natural width (which is capped at the
+       .content-area max-width of 1120px), so .content-area's auto margins
+       have no remaining space to center against -- content sticks to the
+       left edge of the viewport. */
+    flex: 1;
+    min-width: 0;
+}
+/* Content-area centers horizontally and takes up the remaining vertical space */
+.ph-main-wrap .content-area {
+    margin-left: auto;
+    margin-right: auto;
+    flex: 1 0 auto;
+    width: 100%;
+}
+/* Align: Left -- preview chip toggle (body[data-align="left"]).
+   Only meaningful in sidebar/rail layouts where there's a fixed-width
+   sidebar to anchor against. In top layout the page-nav is sticky and
+   .ph-main-wrap is already full-width, so alignment has nothing to do --
+   any align value is a no-op. Footer follows: .hp-footer-inner has its
+   own `margin: 0 auto` for centering, so without overriding it the
+   footer would stay centered while the content shifted left. */
+body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area,
+body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .hp-footer-inner {
+    margin-left: 0;
+    margin-right: auto;
+}
+/* .content-area uses a 48px side gutter but .hp-footer's band uses 22px, so a
+   left-anchored footer-inner would sit 26px further left than the content
+   column. Match the content gutter so the footer columns line up beneath the
+   content. Scoped to >768px, where .content-area actually uses 48px; at or
+   below 768px its gutter drops to 20px and the sidebar has already collapsed
+   (margin-left:0 at <=900px), so the small residual offset is moot. */
+@media (min-width: 769px) {
+    body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .hp-footer {
+        padding-left: 48px;
+    }
+}
+
+/* Defensive centering in top layout -- overrides any align / subnav-side
+   rules that might otherwise leak in via stale cached CSS. Content-area
+   always centers horizontally when there's no sidebar to anchor against. */
+body[data-layout="top"] .ph-main-wrap .content-area {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    transform: none !important;
+}
+/* Footers sit as natural block children at the end of the flex column -- no extra rule needed */
+/* Rail panel overlays content on hover -- does NOT shift main wrap */
+body:not([data-layout="top"]) { background: var(--color-bg); }
+
+/* -- Full-bleed marketing pages (store landings) ----------- */
+/* The hp-* marketing sections are built to span the viewport with their
+   backgrounds reaching the screen edges, each capping its own inner content
+   (like the apple-client-area mockups, where <body> is display:block). The
+   standard .content-area (max-width + 48px gutter) traps them at the column
+   width, so on wide screens a section's coloured background stops short of
+   both edges. For these pages drop the cap + side gutter so backgrounded
+   sections bleed edge-to-edge; re-cap the non-section blocks (the theme
+   page-header + the when-empty card) that still want the centred column.
+   data-bleed is emitted server-side for store pages EXCEPT order/not-found
+   (header.tpl) -- those keep the normal boxed content column. */
+body[data-bleed="1"] .ph-main-wrap .content-area {
+    max-width: none;
+    padding: 0;
+}
+body[data-bleed="1"] .content-area > .page-header,
+body[data-bleed="1"] .content-area > .when-empty {
+    max-width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 22px;
+    padding-right: 22px;
+    box-sizing: border-box;
+}
+/* Content alignment "Left" -- on full-bleed store pages, anchor the content as a
+   capped column on the left (under the sidebar) instead of running it full-bleed
+   + centred. Only meaningful in sidebar/rail layouts; the top nav has no sidebar
+   to anchor against, so those stay full-bleed + centred. */
+body[data-bleed="1"][data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area {
+    max-width: 1024px;
+    margin-left: 0;
+    margin-right: auto;
+}
+
+/* -- Dev preview chip / options tab ------------------------- */
+/* Top-center floating, draggable. Drag by the "preview" tag on
+   the left; double-click the tag to snap back to default. */
+.state-chip {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+    z-index: 1000;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    max-width: 95vw;
+    background: rgba(28,28,30,0.78); color: var(--color-surface-secondary);
+    padding: 6px 8px; border-radius: 980px;
+    font-size: var(--text-sm); font-weight: var(--fw-medium);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    user-select: none;
+    transition: background 0.15s ease;
+}
+.state-chip:hover { background: rgba(28,28,30,0.86); }
+.state-chip.dragged { transform: none; transition: none; }
+.state-chip .dev-tag {
+    font-size: var(--text-xs); opacity: 0.55; letter-spacing: 0.05em;
+    text-transform: uppercase; margin-right: 2px;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    padding: 3px 8px 3px 6px; cursor: grab;
+    border-radius: 980px;
+    display: inline-flex; align-items: center; gap: 5px;
+}
+.state-chip .dev-tag::before {
+    content: ""; display: inline-block; width: 10px; height: 10px;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.55) 1.2px, transparent 1.4px);
+    background-size: 4px 4px; background-position: 0 0, 2px 2px;
+    opacity: 0.6;
+}
+.state-chip .dev-tag:hover { opacity: 0.85; background: rgba(255,255,255,0.08); }
+.state-chip .dev-tag:active { cursor: grabbing; }
+.state-chip.dragged .dev-tag { opacity: 0.9; }
+.state-chip .chip-group { display: inline-flex; align-items: center; gap: 6px; }
+.state-chip .label { opacity: 0.65; font-size: var(--text-xs); }
+.state-chip .pill-group {
+    display: flex; background: rgba(255,255,255,0.12);
+    border-radius: 980px; padding: 2px;
+}
+.state-chip .pill-group button {
+    border: 0; background: transparent; color: rgba(255,255,255,0.65);
+    font-size: var(--text-xs); font-weight: var(--fw-medium); padding: 4px 10px;
+    border-radius: 980px; cursor: pointer; font-family: inherit;
+}
+.state-chip .pill-group button.active { background: var(--color-surface-secondary); color: var(--color-text-primary); }
+.state-chip .swatch-group {
+    display: inline-flex; gap: 4px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 980px; padding: 3px;
+}
+.state-chip .swatch-group button {
+    width: 18px; height: 18px; min-width: 18px; padding: 0;
+    border-radius: 50%; border: 2px solid transparent;
+    cursor: pointer; background: currentColor; font-size: 0;
+    transition: transform 0.15s, border-color 0.15s;
+}
+.state-chip .swatch-group button:hover { transform: scale(1.12); }
+.state-chip .swatch-group button.active { border-color: var(--color-surface); }
+.state-chip .swatch-group button[data-palette="blue"]    { color: var(--color-accent); }
+.state-chip .swatch-group button[data-palette="emerald"] { color: #14b17d; }
+.state-chip .swatch-group button[data-palette="violet"]  { color: #8c5cff; }
+.state-chip .swatch-group button[data-palette="rose"]    { color: #ff2d6b; }
+.state-chip .swatch-group button[data-palette="amber"]   { color: #f08a00; }
+.state-chip .swatch-group button[data-palette="slate"]   { color: #64748b; }
+body[data-preview="off"] .state-chip,
+body.screenshot .state-chip { display: none !important; }
+
+/* -- Palette overrides -------------------------------------- */
+/* Each data-palette on <html> swaps the accent token chain so
+   buttons, links, hovers and dropdown highlights pick up the
+   new hue. Base colors still live in apple-theme.css. */
+html[data-palette="emerald"] {
+    --color-accent: #14b17d;
+    --color-accent-hover: #0fa370;
+    --color-accent-light: rgba(20, 177, 125, 0.10);
+    --color-link: #0fa370;
+    --color-link-hover: #14b17d;
+    --color-blue-bg: rgba(20, 177, 125, 0.10);
+    --color-blue-text: #0fa370;
+}
+html[data-palette="violet"] {
+    --color-accent: #8c5cff;
+    --color-accent-hover: #7a46ff;
+    --color-accent-light: rgba(140, 92, 255, 0.12);
+    --color-link: #7a46ff;
+    --color-link-hover: #8c5cff;
+    --color-blue-bg: rgba(140, 92, 255, 0.12);
+    --color-blue-text: #7a46ff;
+}
+html[data-palette="rose"] {
+    --color-accent: #ff2d6b;
+    --color-accent-hover: #e61f5b;
+    --color-accent-light: rgba(255, 45, 107, 0.10);
+    --color-link: #e61f5b;
+    --color-link-hover: #ff2d6b;
+    --color-blue-bg: rgba(255, 45, 107, 0.10);
+    --color-blue-text: #e61f5b;
+}
+html[data-palette="amber"] {
+    --color-accent: #f08a00;
+    --color-accent-hover: #d97a00;
+    --color-accent-light: rgba(240, 138, 0, 0.10);
+    --color-link: #d97a00;
+    --color-link-hover: #f08a00;
+    --color-blue-bg: rgba(240, 138, 0, 0.10);
+    --color-blue-text: #d97a00;
+}
+html[data-palette="slate"] {
+    --color-accent: #64748b;
+    --color-accent-hover: #475569;
+    --color-accent-light: rgba(100, 116, 139, 0.10);
+    --color-link: #475569;
+    --color-link-hover: #64748b;
+    --color-blue-bg: rgba(100, 116, 139, 0.10);
+    --color-blue-text: #475569;
+}
+/* Avatar / sidebar-avatar gradients use hard-coded hex --
+   nudge them per palette to match. */
+html[data-palette="emerald"] .topbar-avatar,
+html[data-palette="emerald"] .sidebar-avatar { background: linear-gradient(135deg, #14b17d, #5ac8a3); }
+html[data-palette="violet"]  .topbar-avatar,
+html[data-palette="violet"]  .sidebar-avatar { background: linear-gradient(135deg, #8c5cff, #c28cff); }
+html[data-palette="rose"]    .topbar-avatar,
+html[data-palette="rose"]    .sidebar-avatar { background: linear-gradient(135deg, #ff2d6b, #ff7fa8); }
+html[data-palette="amber"]   .topbar-avatar,
+html[data-palette="amber"]   .sidebar-avatar { background: linear-gradient(135deg, #f08a00, #ffb547); }
+html[data-palette="slate"]   .topbar-avatar,
+html[data-palette="slate"]   .sidebar-avatar { background: linear-gradient(135deg, #64748b, #94a3b8); }
+
+/* -- Auth strip (logged-in + top-layout) -------------------- */
+.ph-auth-strip {
+    background: var(--color-surface-secondary);
+    border-bottom: 1px solid var(--color-border);
+    padding: 4px 22px; font-size: var(--text-xs);
+}
+.ph-auth-strip-inner {
+    max-width: 1024px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; min-height: 22px;
+}
+.ph-auth-strip button,
+.ph-auth-strip a {
+    background: transparent; border: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs); font-weight: var(--fw-medium);
+    padding: 2px 4px; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: inherit; cursor: pointer;
+}
+.ph-auth-strip a:hover { color: var(--color-accent); text-decoration: none; }
+.ph-auth-strip .signed-in-as { color: var(--color-text-tertiary); }
+.ph-auth-strip .signed-in-as strong { color: var(--color-text-primary); font-weight: var(--fw-semibold); margin-left: 4px; }
+.ph-auth-strip .masq-chip {
+    background: #fef3c7; color: #92400e;
+    padding: 2px 8px; border-radius: 980px;
+    font-size: var(--text-xs); font-weight: var(--fw-semibold);
+    border: 1px solid #fde68a;
+}
+body[data-preview="off"] .ph-auth-strip .masq-chip,
+body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
+[data-theme="dark"] .ph-auth-strip .masq-chip {
+    background: #3a2f0a; color: #fbbf24; border-color: #54430a;
+}
+
+/* -- Homepage-nav adjustments (topbar-btn inside nav) ------- */
+/* apple-theme.css defines .topbar-btn with 34px box; when the
+   button is an <a> inside .homepage-nav the parent's <a> rules
+   sometimes clip it -- re-assert the box sizing here. */
+.homepage-nav .topbar-btn {
+    width: 34px; height: 34px; min-width: 34px;
+    flex-shrink: 0; opacity: 1;
+    color: var(--color-text-secondary);
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%; border: 0; background: transparent;
+}
+.homepage-nav .topbar-btn:hover {
+    opacity: 1; background: var(--sidebar-item-hover);
+    color: var(--color-text-primary);
+}
+.homepage-nav .topbar-btn svg { width: 18px; height: 18px; }
+.homepage-nav .topbar-avatar { width: 30px; height: 30px; font-size: var(--text-sm); flex-shrink: 0; }
+.homepage-nav .profile-dropdown-wrapper { position: relative; display: inline-flex; align-items: center; }
+.homepage-nav .profile-dropdown { top: calc(100% + 8px); right: 0; }
+.homepage-nav .notification-wrapper { position: relative; display: inline-flex; align-items: center; }
+.homepage-nav .notification-wrapper .topbar-btn { position: relative; }
+.homepage-nav .notification-wrapper .topbar-notification-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 8px; height: 8px; background: var(--color-red);
+    border-radius: 50%; border: 2px solid var(--color-surface);
+}
+.homepage-nav .notification-dropdown { top: calc(100% + 8px); right: 0; }
+.homepage-nav .nav-logo.text-logo {
+    font-size: var(--text-lg); font-weight: var(--fw-semibold); letter-spacing: -0.01em;
+    color: var(--color-text-primary); text-decoration: none;
+}
+.homepage-nav .nav-logo.text-logo:hover { color: var(--color-accent); text-decoration: none; }
+.homepage-nav-inner { gap: 14px; }
+.homepage-nav-inner > a,
+.homepage-nav-inner .nav-simple-trigger { font-size: var(--text-sm); }
+
+/* Mobile drawer toggle (top layout). Hidden on desktop; revealed <=900px. */
+.nav-mobile-toggle {
+    display: none;
+    align-items: center; justify-content: center;
+    width: 34px; height: 34px; min-width: 34px;
+    margin-right: 2px; padding: 0; flex-shrink: 0;
+    border: 0; background: transparent; cursor: pointer;
+    border-radius: 8px;
+    color: var(--color-text-primary); opacity: 0.85;
+}
+.nav-mobile-toggle:hover { opacity: 1; background: var(--sidebar-item-hover); }
+.nav-mobile-toggle svg { width: 20px; height: 20px; }
+
+/* -- Lightweight nav dropdowns (WHMCS-style, compact) ------- */
+.nav-simple-dropdown { position: relative; display: flex; align-items: center; align-self: stretch; }
+.nav-simple-trigger {
+    display: inline-flex; align-items: center; gap: 4px;
+    cursor: pointer; color: var(--color-text-primary);
+    opacity: 0.85; font-size: var(--text-sm); text-decoration: none;
+    height: 100%; transition: opacity 0.15s ease;
+}
+.nav-simple-trigger:hover { opacity: 1; text-decoration: none; }
+.nav-simple-trigger .chev {
+    width: 9px; height: 9px; opacity: 0.6;
+    transition: transform 0.2s ease;
+}
+.nav-simple-dropdown:hover .nav-simple-trigger .chev { transform: rotate(180deg); }
+.nav-simple-menu {
+    position: absolute; top: 44px; left: -8px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px; padding: 6px; min-width: 220px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+    opacity: 0; visibility: hidden; transform: translateY(-6px);
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    z-index: 49;
+}
+.nav-simple-dropdown:hover .nav-simple-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+.nav-simple-menu a {
+    display: block; padding: 7px 12px; font-size: var(--text-base);
+    color: var(--color-text-primary); text-decoration: none;
+    border-radius: 8px; white-space: nowrap; opacity: 0.85;
+}
+.nav-simple-menu a:hover {
+    background: var(--color-surface-secondary);
+    color: var(--color-accent); opacity: 1; text-decoration: none;
+}
+.nav-simple-menu .divider { height: 1px; background: var(--color-border); margin: 5px 0; }
+
+/* -- Promo slider (shared component -- auto-cycles store addons) ------------ */
+/* Default: vertical layout (sidebar-width-friendly). Container queries upgrade
+   to horizontal when the slider has enough room (dashboards, wide columns). */
+.promo-slider {
+    position: relative;
+    padding: 14px 16px 10px;
+    overflow: hidden;
+    container-type: inline-size;
+    container-name: promo;
+}
+.promo-slider-viewport { overflow: hidden; }
+.promo-slider-track {
+    display: flex;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+}
+.promo-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 10px;
+}
+.promo-slide-info { display: contents; }
+.promo-slide-label { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0; }
+.promo-slide-visual {
+    align-self: center;
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: var(--color-accent-light); color: var(--color-accent);
+    display: flex; align-items: center; justify-content: center;
+    margin: 2px 0 4px;
+    flex-shrink: 0;
+}
+.promo-slide-visual svg { width: 26px; height: 26px; }
+.promo-slide-copy { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.45; margin: 0; }
+.promo-slide-link {
+    font-size: var(--text-sm); font-weight: var(--fw-medium);
+    color: var(--color-accent); text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-top: 2px;
+}
+.promo-slide-link:hover { color: var(--color-accent-hover); text-decoration: none; }
+.promo-slide-link svg { width: 11px; height: 11px; transition: transform var(--transition-fast); }
+.promo-slide-link:hover svg { transform: translateX(2px); }
+.promo-slider-dots { display: flex; justify-content: center; gap: 5px; margin-top: 10px; }
+.promo-slider-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--color-border); border: 0; padding: 0; margin: 0;
+    cursor: pointer;
+    transition: background var(--transition-fast), width var(--transition-fast);
+}
+.promo-slider-dot:hover { background: var(--color-text-tertiary); }
+.promo-slider-dot.active { background: var(--color-accent); width: 16px; border-radius: 3px; }
+
+/* Wide containers (>= 420px inline-size) -- horizontal arrangement.
+   Visual on the left, text block on the right, link aligns bottom-right. */
+@container promo (min-width: 420px) {
+    .promo-slider { padding: 18px 22px 14px; }
+    .promo-slide {
+        flex-direction: row;
+        align-items: center;
+        gap: 18px;
+    }
+    .promo-slide-info {
+        display: flex; flex-direction: column;
+        gap: 4px; flex: 1; min-width: 0;
+    }
+    .promo-slide-visual { margin: 0; width: 68px; height: 68px; border-radius: 16px; }
+    .promo-slide-visual svg { width: 32px; height: 32px; }
+    .promo-slide-label { margin: 0; }
+    .promo-slide-copy { margin: 0; font-size: var(--text-base); }
+    .promo-slide-link { margin-top: 2px; font-size: var(--text-base); }
+    .promo-slide-link svg { width: 12px; height: 12px; }
+}
+
+/* -- Pill-tab group (shared across domain tabs, Register/Transfer, promo tabs) -- */
+.ph-domain-tabs {
+    display: inline-flex;
+    background: var(--color-surface-secondary);
+    border-radius: 980px;
+    padding: 3px;
+}
+.ph-domain-tabs button {
+    border: 0; background: transparent;
+    padding: 7px 18px; font-size: var(--text-base); font-weight: var(--fw-medium);
+    color: var(--color-text-secondary);
+    border-radius: 980px; cursor: pointer;
+    font-family: inherit; transition: all 0.15s;
+}
+.ph-domain-tabs button.active {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* -- Breadcrumb (top-layout) -------------------------------- */
+.ph-breadcrumb {
+    background: var(--color-surface-secondary);
+    border-bottom: 1px solid var(--color-border);
+    padding: 10px 22px;
+}
+.ph-breadcrumb-inner {
+    max-width: 1024px; margin: 0 auto;
+    display: flex; align-items: center; gap: 7px;
+    font-size: var(--text-sm); color: var(--color-text-tertiary);
+}
+.ph-breadcrumb-inner a {
+    color: var(--color-text-tertiary); text-decoration: none;
+    transition: color 0.15s;
+}
+.ph-breadcrumb-inner a:hover { color: var(--color-accent); text-decoration: none; }
+.ph-breadcrumb-inner .sep { opacity: 0.4; font-size: var(--text-xs); }
+.ph-breadcrumb-inner .current { color: var(--color-text-primary); font-weight: var(--fw-medium); }
+
+/* Back-link breadcrumb (top-layout): a single Apple-style "< Home" link in
+   place of a full trail. The band drops its grey fill + hairline so the link
+   reads as a content affordance, not a chrome bar. The current page is
+   carried by the large page title just below. */
+.ph-breadcrumb-back {
+    background: transparent;
+    border-bottom: 0;
+    padding-top: 14px;
+    padding-bottom: 0;
+}
+/* Selector carries .ph-breadcrumb-inner a so it outranks the trail rule
+   `.ph-breadcrumb-inner a { color: tertiary }` -- otherwise the back-link
+   renders grey instead of accent blue. */
+.ph-breadcrumb-inner a.ph-back-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--color-accent); font-size: var(--text-base); font-weight: var(--fw-normal);
+    text-decoration: none; transition: opacity 0.15s;
+}
+.ph-breadcrumb-inner a.ph-back-link svg { width: 15px; height: 15px; margin-left: -3px; }
+.ph-breadcrumb-inner a.ph-back-link:hover { color: var(--color-accent); text-decoration: none; opacity: 0.7; }
+
+/* -- Hide Breadcrumb (admin "Hide Breadcrumb" toggle) ------- */
+/* One rule covers every main-menu layout: the top-layout "Portal Home"
+   back-link AND the sidebar/rail topbar "Home / Page" trail. Driven by
+   body[data-hide-breadcrumb] (emitted from $hadrian.addonSettings.hide_breadcrumb). */
+body[data-hide-breadcrumb="1"] .ph-breadcrumb,
+body[data-hide-breadcrumb="1"] .ph-side-crumbs { display: none; }
+/* The side/rail topbar row is justify-content:space-between; with the trail
+   gone, keep the actions group pinned right instead of sliding to the left. */
+body[data-hide-breadcrumb="1"] .ph-side-topbar-actions { margin-left: auto; }
+
+/* =============================================================
+   RAIL LAYOUT -- icon rail (80px) + flyout panel (240px)
+   ============================================================= */
+.ph-rail {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 80px;
+    background: var(--sidebar-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-right: 0.5px solid var(--color-border);
+    display: flex; flex-direction: column; align-items: stretch;
+    padding: 12px 0; z-index: 100; overflow-y: auto;
+}
+.ph-rail-logo {
+    width: 44px; height: 44px; margin: 0 auto 10px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--color-accent);
+    transition: background var(--transition-fast);
+}
+.ph-rail-logo:hover { background: var(--sidebar-item-hover); }
+.ph-rail-logo svg { width: 24px; height: 24px; }
+.ph-rail-items { display: flex; flex-direction: column; gap: 2px; padding: 4px 8px; }
+.ph-rail-item {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 8px 4px; border: 0; background: transparent;
+    color: var(--color-text-primary);
+    font: inherit; font-size: var(--text-xs); font-weight: var(--fw-normal); letter-spacing: -0.008em;
+    line-height: 1.2; text-align: center; text-decoration: none;
+    cursor: pointer; border-radius: var(--radius-sm);
+    transition: background var(--transition-fast);
+}
+.ph-rail-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
+.ph-rail-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
+.ph-rail-item .rail-ico {
+    width: 26px; height: 26px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ph-rail-item .rail-ico svg { width: 15px; height: 15px; }
+.ph-rail-item .rail-ico.blue    { background: #007aff; color: var(--color-surface); }
+.ph-rail-item .rail-ico.purple  { background: #af52de; color: var(--color-surface); }
+.ph-rail-item .rail-ico.orange  { background: #ff9500; color: var(--color-surface); }
+.ph-rail-item .rail-ico.green   { background: #34c759; color: var(--color-surface); }
+.ph-rail-item .rail-ico.red     { background: var(--color-red); color: var(--color-surface); }
+.ph-rail-item .rail-ico.teal    { background: #5ac8fa; color: var(--color-surface); }
+.ph-rail-item .rail-ico.gray    { background: #8e8e93; color: var(--color-surface); }
+.ph-rail-item .rail-ico.indigo  { background: #5856d6; color: var(--color-surface); }
+.ph-rail-item .rail-ico.pink    { background: #ff2d55; color: var(--color-surface); }
+.ph-rail-spacer { flex: 1; }
+.ph-rail-user {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #007aff, #5856d6);
+    color: var(--color-surface); font-size: var(--text-base); font-weight: var(--fw-semibold);
+    display: flex; align-items: center; justify-content: center;
+    margin: 8px auto 4px; cursor: pointer;
+}
+
+/* Flyout panel -- overlays content on hover; content below doesn't shift */
+.ph-rail-panel {
+    position: fixed; top: 0; bottom: 0; left: 80px; width: 240px;
+    background: var(--color-surface);
+    border-right: 0.5px solid var(--color-border);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.08);
+    z-index: 99;
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: translateX(-10px); opacity: 0; visibility: hidden;
+    transition: transform var(--transition-fast),
+                opacity var(--transition-fast),
+                visibility var(--transition-fast);
+}
+[data-theme="dark"] .ph-rail-panel { box-shadow: 4px 0 24px rgba(0,0,0,0.4); }
+body[data-layout="rail"].rail-panel-open .ph-rail-panel {
+    transform: translateX(0); opacity: 1; visibility: visible;
+}
+.ph-rail-panel-header {
+    padding: 18px 20px 12px;
+    border-bottom: 0.5px solid var(--color-border);
+}
+.ph-rail-panel-header h3 {
+    font-size: var(--text-xl); font-weight: var(--fw-semibold); margin: 0;
+    color: var(--color-text-primary); letter-spacing: -0.01em;
+}
+.ph-rail-panel-items { padding: 8px; overflow-y: auto; flex: 1; }
+.ph-rail-panel-items a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: var(--radius-sm);
+    color: var(--color-text-primary); text-decoration: none;
+    font-size: var(--text-base); font-weight: var(--fw-normal); letter-spacing: -0.008em;
+    transition: background var(--transition-fast);
+}
+.ph-rail-panel-items a:hover {
+    background: var(--sidebar-item-hover);
+    text-decoration: none; color: var(--color-text-primary);
+}
+.ph-rail-panel-items a.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
+.ph-rail-panel-items svg.lead-ico {
+    width: 14px; height: 14px;
+    color: var(--color-text-tertiary); flex-shrink: 0;
+}
+.ph-rail-panel-group[data-panel] { display: none; flex-direction: column; }
+.ph-rail-panel-group.active { display: flex; }
+
+/* Rail content area */
+body[data-layout="rail"] .ph-hero,
+body[data-layout="rail"] .ph-section,
+body[data-layout="rail"] .ph-side-footer-inner {
+    max-width: 1120px; margin-left: auto; margin-right: auto;
+    padding-left: 48px; padding-right: 48px;
+}
+body[data-layout="rail"] .ph-hero { padding-top: 40px; padding-bottom: 40px; }
+body[data-layout="rail"] .ph-section { padding-top: 40px; padding-bottom: 24px; }
+body[data-layout="rail"] .ph-hero-inner { max-width: none; }
+@media (max-width: 760px) {
+    body[data-layout="rail"] .ph-hero,
+    body[data-layout="rail"] .ph-section { padding-left: 24px; padding-right: 24px; }
+}
+
+/* =============================================================
+   SIDEBAR LAYOUT -- collapsible groups + inner topbar + footer
+   ============================================================= */
+.sidebar-group { display: flex; flex-direction: column; }
+.sidebar-group-toggle {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: var(--radius-sm);
+    cursor: pointer; transition: background var(--transition-fast);
+    color: var(--color-text-primary);
+    font-size: var(--text-base); font-weight: var(--fw-normal); letter-spacing: -0.008em;
+    background: transparent; border: 0; font-family: inherit;
+    text-align: left; width: 100%;
+}
+.sidebar-group-toggle:hover { background: var(--sidebar-item-hover); }
+.sidebar-group-toggle .group-label { flex: 1; }
+.sidebar-group-toggle .group-chev {
+    width: 11px; height: 11px; color: var(--color-text-tertiary);
+    transition: transform var(--transition-fast); flex-shrink: 0;
+}
+.sidebar-group.open .sidebar-group-toggle .group-chev { transform: rotate(90deg); }
+.sidebar-group-items {
+    display: none; flex-direction: column;
+    margin: 2px 0 4px 32px; padding-left: 10px;
+    border-left: 1px solid var(--color-border);
+}
+.sidebar-group.open .sidebar-group-items { display: flex; }
+.sidebar-group-items a {
+    display: block; padding: 7px 10px; border-radius: var(--radius-sm);
+    color: var(--color-text-primary); text-decoration: none;
+    font-size: var(--text-base); font-weight: var(--fw-normal); letter-spacing: -0.008em;
+    transition: background var(--transition-fast);
+}
+.sidebar-group-items a:hover {
+    background: var(--sidebar-item-hover);
+    text-decoration: none; color: var(--color-text-primary);
+}
+.sidebar-group-items a.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
+
+/* Inner-layout topbar (shown on sidebar + rail) */
+.ph-side-topbar {
+    background: var(--topbar-bg);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky; top: 0; z-index: 50;
+}
+[data-theme="dark"] .ph-side-topbar { background: rgba(28,28,30,0.72); }
+.ph-side-topbar-inner {
+    padding: 10px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; min-height: 44px;
+}
+.ph-side-crumbs {
+    display: flex; align-items: center; gap: 7px;
+    font-size: var(--text-base); color: var(--color-text-tertiary);
+}
+.ph-side-crumbs a { color: var(--color-text-tertiary); text-decoration: none; }
+.ph-side-crumbs a:hover { color: var(--color-accent); }
+.ph-side-crumbs .sep { opacity: 0.4; font-size: var(--text-xs); }
+.ph-side-crumbs .current { color: var(--color-text-primary); font-weight: var(--fw-medium); }
+.ph-side-topbar-actions { display: flex; align-items: center; gap: 6px; font-size: var(--text-sm); }
+/* Mobile-only brand in the side/rail topbar — hidden on desktop, where the
+   sidebar/rail itself shows the logo. Revealed <=900px (see media block). */
+.ph-side-logo { display: none; align-items: center; flex-shrink: 0; text-decoration: none; color: var(--color-text-primary); font-weight: var(--fw-semibold); font-size: var(--text-lg); letter-spacing: -0.01em; }
+.ph-side-logo:hover { color: var(--color-accent); text-decoration: none; }
+.ph-side-logo.img-logo img { max-height: 24px; max-width: 140px; object-fit: contain; display: block; }
+.ph-side-iconbtn {
+    width: 32px; height: 32px; border-radius: 10px;
+    border: 0; background: transparent;
+    color: var(--color-text-secondary);
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; text-decoration: none;
+}
+.ph-side-iconbtn:hover {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+}
+.ph-side-signin {
+    padding: 6px 14px; border-radius: 980px;
+    background: var(--color-accent); color: var(--color-surface) !important;
+    font-size: var(--text-sm); font-weight: var(--fw-medium); text-decoration: none;
+}
+.ph-side-signin:hover { background: var(--color-accent-hover); text-decoration: none; }
+.ph-side-user { color: var(--color-text-tertiary); margin-left: 4px; }
+.ph-side-user strong { color: var(--color-text-primary); font-weight: var(--fw-semibold); margin-left: 4px; }
+/* Side-topbar notification + profile positioning */
+.ph-side-topbar .notification-wrapper { position: relative; display: inline-flex; align-items: center; }
+.ph-side-topbar .notification-wrapper .topbar-notification-dot {
+    position: absolute; top: 2px; right: 2px;
+    width: 7px; height: 7px; background: var(--color-red);
+    border-radius: 50%; border: 2px solid var(--color-surface);
+}
+.ph-side-topbar .notification-dropdown { top: calc(100% + 8px); right: 0; }
+.ph-side-topbar .profile-dropdown-wrapper {
+    position: relative; display: inline-flex; align-items: center;
+    margin-left: 4px;
+}
+.ph-side-topbar .topbar-avatar { width: 26px; height: 26px; font-size: var(--text-xs); flex-shrink: 0; }
+.ph-side-topbar .profile-dropdown { top: calc(100% + 8px); right: 0; }
+
+/* Inner-layout slim footer */
+.ph-side-footer {
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface-secondary);
+    padding: 14px 28px;
+}
+.ph-side-footer-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; font-size: var(--text-sm);
+    color: var(--color-text-secondary); flex-wrap: wrap;
+}
+
+/* Sidebar-layout content constraints */
+body[data-layout="side"] .ph-hero,
+body[data-layout="side"] .ph-section,
+body[data-layout="side"] .ph-side-footer-inner {
+    max-width: 1120px; margin-left: auto; margin-right: auto;
+    padding-left: 48px; padding-right: 48px;
+}
+body[data-layout="side"] .ph-hero { padding-top: 40px; padding-bottom: 40px; }
+body[data-layout="side"] .ph-section { padding-top: 40px; padding-bottom: 24px; }
+body[data-layout="side"] .ph-hero-inner { max-width: none; }
+body[data-layout="side"] .ph-section:last-of-type { padding-bottom: 48px; }
+@media (max-width: 760px) {
+    body[data-layout="side"] .ph-hero,
+    body[data-layout="side"] .ph-section,
+    body[data-layout="side"] .ph-side-footer-inner { padding-left: 24px; padding-right: 24px; }
+}
+
+/* -- Language / currency chooser ---------------------------- */
+.locale-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 12px; background: var(--color-surface);
+    border: 1px solid var(--color-border); border-radius: 980px;
+    color: var(--color-text-primary); font-size: var(--text-sm);
+    font-family: inherit; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+.locale-btn:hover {
+    background: var(--color-surface-secondary);
+    border-color: var(--color-border-card);
+}
+.locale-btn .flag { font-size: var(--text-base); line-height: 1; }
+.locale-btn .sep { opacity: 0.4; }
+.locale-btn svg { width: 10px; height: 10px; opacity: 0.5; }
+
+.locale-modal {
+    position: fixed; inset: 0; z-index: 1100;
+    display: none; align-items: flex-start; justify-content: center;
+    padding: 60px 22px 22px;
+    background: rgba(0,0,0,0.45); backdrop-filter: blur(6px);
+}
+.locale-modal.open { display: flex; }
+.locale-modal-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    width: 100%; max-width: 640px;
+    max-height: calc(100vh - 82px); overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+    display: flex; flex-direction: column;
+}
+.locale-modal-header {
+    padding: 18px 22px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--color-border);
+}
+.locale-modal-header h3 {
+    font-size: var(--text-xl); font-weight: var(--fw-semibold);
+    letter-spacing: -0.01em; margin: 0;
+    color: var(--color-text-primary);
+}
+.locale-modal-close {
+    border: 0; background: transparent;
+    color: var(--color-text-secondary);
+    width: 28px; height: 28px; border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.locale-modal-close:hover {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+}
+.locale-modal-body { padding: 18px 22px 22px; overflow-y: auto; }
+.locale-modal-section-label {
+    font-size: var(--text-xs); font-weight: var(--fw-semibold);
+    letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin: 6px 0 10px;
+}
+.locale-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 4px; margin-bottom: 18px;
+}
+@media (max-width: 520px) { .locale-grid { grid-template-columns: repeat(2, 1fr); } }
+.locale-grid button {
+    border: 0; background: transparent;
+    padding: 9px 12px; border-radius: 10px;
+    font-size: var(--text-base); color: var(--color-text-primary);
+    text-align: left; cursor: pointer; font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+}
+.locale-grid button:hover {
+    background: var(--color-surface-secondary);
+    color: var(--color-accent);
+}
+.locale-grid button.active {
+    background: rgba(0,113,227,0.1);
+    color: var(--color-accent); font-weight: var(--fw-semibold);
+}
+.locale-modal-footer {
+    padding: 14px 22px; border-top: 1px solid var(--color-border);
+    display: flex; justify-content: flex-end; gap: 8px;
+}
+.locale-modal-footer button {
+    border: 0; padding: 8px 18px; border-radius: 980px;
+    font-size: var(--text-base); font-weight: var(--fw-medium);
+    cursor: pointer; font-family: inherit;
+}
+.locale-modal-footer .apply { background: var(--color-accent); color: var(--color-surface); }
+.locale-modal-footer .apply:hover { background: var(--color-accent-hover); }
+
+/* -- Partial include placeholder ---------------------------- */
+/* Nodes with [data-include] are empty shells the JS fills via
+   fetch. Hide them until loaded to avoid a layout flash. */
+[data-include]:not([data-loaded]) { display: none; }
+
+/* -- .when-full / .when-empty toggle -------------------------------
+   Some page tpls render both states and rely on body[data-data] (set
+   by the page tpl's inline script) to pick which one is visible. The
+   preview chip in the apple-client-area mockups also relies on this
+   toggle to flip states without a reload. */
+body[data-data="empty"] .when-full       { display: none !important; }
+body:not([data-data="empty"]) .when-empty { display: none !important; }
+
+/* -- Controls inside / outside: generic card treatment (data-svc-layout) -----
+   Universal form of the "Service List Controls" (inside/outside) toggle, so
+   EVERY standard card page responds -- not just the bespoke list pages in
+   Template::SVC_LAYOUT_PAGES. Scoped via :has(> .card-body) to the
+   .card > .card-header + .card-body convention, so list table-cards keep
+   their own page-CSS rules and are left untouched. The global admin toggle
+   (service_controls_outside) already emits body[data-svc-layout] on every
+   page via Hooks::resolveSvcLayout, so this makes that toggle effective
+   site-wide.
+     inside  (default): one unified white card -- title + body share a surface.
+     outside: the .card-header title floats on the page background ABOVE a flat
+              .card-body that keeps the white surface -- Apple section style. */
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body) {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+    margin-bottom: 26px;
+}
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body) > .card-header {
+    padding: 2px 6px 11px;
+}
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body) > .card-body {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+/* Header-less cards (no .card-header) have nothing to float, so the rule above
+   would leave them looking unchanged. For these, "outside" instead flattens the
+   card onto the page background as a plain divided list -- visible even with no
+   title to lift out. Multi-card groups (announcements, emails, downloads, KB...)
+   read as an Apple plain list; a lone card reads as flat content on the page.
+   :not(:has(> .card-header)) makes this win over the rule above. */
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body):not(:has(> .card-header)) {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    border-bottom: 0.5px solid var(--color-border);
+}
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body):not(:has(> .card-header)):last-child {
+    border-bottom: 0;
+}
+body[data-svc-layout="outside"] .content-area .card:has(> .card-body):not(:has(> .card-header)) > .card-body {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+/* Bare content cards -- a .card with NEITHER .card-header NOR .card-body, where the
+   content sits directly inside (payment-method tiles, choice tiles, article cards,
+   ticket cards, etc.). "outside" flattens them onto the page background as a plain
+   divided list, same as the header-less case.
+   Excludes .subnav-card AND the bespoke list table-cards (.svc/.inv/.q/.tk-table-card):
+   those are themselves bare .card wrappers (no .card-header/.card-body), so this rule
+   would otherwise win on specificity (0,6,1) over each page's own
+   `[data-svc-layout="outside"] .X-stack > .X-table-card { background: surface }` rule
+   (0,3,1) and strip the table's white surface, leaving the rows on the bare page
+   background. Per design, these list table-cards keep their own page CSS. Add any new
+   `*-table-card` list wrapper here too. */
+body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(.svc-table-card):not(.inv-table-card):not(.q-table-card):not(.tk-table-card):not(:has(> .card-header)):not(:has(> .card-body)) {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    border-bottom: 0.5px solid var(--color-border);
+}
+body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(.svc-table-card):not(.inv-table-card):not(.q-table-card):not(.tk-table-card):not(:has(> .card-header)):not(:has(> .card-body)):last-child {
+    border-bottom: 0;
+}
+/* Bespoke surface wrappers on non-.card pages -- the shared .settings-group
+   table/section wrapper (account users, domain management, usage, pricing, whois),
+   the domain bulk-manager group, the email-view cards, and domain-search results.
+   "outside" strips their card chrome so the content sits on the page background. */
+body[data-svc-layout="outside"] .content-area .settings-group,
+body[data-svc-layout="outside"] .content-area .bdm-group,
+body[data-svc-layout="outside"] .content-area .email-card,
+body[data-svc-layout="outside"] .content-area .email-summary,
+body[data-svc-layout="outside"] .content-area .ds-suggested-list,
+body[data-svc-layout="outside"] .content-area .hp-feature-card {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+/* Row-based settings-groups (label/value or link rows -- e.g. the service page):
+   in "outside", don't leave rows bare on the page background. Keep them in a white
+   card with the section title floated above, consistent with the header'd .card
+   treatment. Table-based settings-groups have no direct > .settings-item children,
+   so they're unaffected and keep the flat treatment above. */
+body[data-svc-layout="outside"] .content-area .settings-group > .settings-group-header {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+body[data-svc-layout="outside"] .content-area .settings-group > .settings-item {
+    background: var(--color-surface);
+    border-left: 0.5px solid var(--color-border);
+    border-right: 0.5px solid var(--color-border);
+}
+body[data-svc-layout="outside"] .content-area .settings-group > .settings-item:first-child,
+body[data-svc-layout="outside"] .content-area .settings-group > .settings-group-header + .settings-item {
+    border-top: 0.5px solid var(--color-border);
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+}
+body[data-svc-layout="outside"] .content-area .settings-group > .settings-item:last-child {
+    border-bottom: 0.5px solid var(--color-border);
+    border-bottom-left-radius: var(--radius-lg);
+    border-bottom-right-radius: var(--radius-lg);
+}
+
+/* The product-details "Manage" card wraps its CTA/alert bodies + trailing
+   .settings-item action rows in a single .card-body (.pd-manage-body), so the
+   generic "outside" float above applies to it like every other card -- the global
+   Controls inside/outside toggle floats its caption and the wrapped body becomes
+   the white box. No opt-out needed. */
+
+/* -- Responsive sidebar drawer (<=900px, side layout) -------- */
+/* On narrow viewports the fixed 260px sidebar would crowd content,
+   so we convert it to a slide-in drawer. The hamburger toggle lives
+   in the inner-topbar (`.ph-mobile-toggle`); JS flips `body.nav-open`
+   to slide the sidebar in and reveal the backdrop. The inner-topbar
+   stays as the only nav chrome -- no homepage-nav fallback needed. */
+
+/* Backdrop overlay -- sits between content and drawer when open */
+.ph-nav-backdrop {
+    position: fixed; inset: 0; z-index: 99;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
+
+/* Hamburger toggle -- only visible on side/rail at narrow widths */
+.ph-mobile-toggle { display: none; }
+
+/* Drawer close (X) -- only shown when the sidebar is a mobile drawer (<=900px,
+   see media block). Hidden on desktop where the sidebar is a permanent column. */
+.sidebar-close {
+    display: none; align-items: center; justify-content: center;
+    margin-left: auto; flex-shrink: 0;
+    width: 32px; height: 32px; padding: 0;
+    border: 0; border-radius: 8px; background: transparent; cursor: pointer;
+    color: var(--color-text-secondary);
+}
+.sidebar-close:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); }
+.sidebar-close svg { width: 20px; height: 20px; }
+
+@media (max-width: 900px) {
+    /* Reset main content offset -- drawer overlays, doesn't push */
+    body[data-layout="side"] .ph-main-wrap,
+    body[data-layout="rail"] .ph-main-wrap { margin-left: 0; }
+
+    /* Sidebar becomes a slide-in drawer (overrides the legacy
+       `.sidebar { display: none }` rule at <=768px from apple-theme.css).
+       The TOP layout reuses this exact drawer chrome — its sidebar is
+       display:none above 900px (the .only-side gate) and only surfaces
+       here, as the hamburger drawer the top-nav opens. */
+    body[data-layout="side"] .sidebar,
+    body[data-layout="top"] .sidebar {
+        display: flex !important;
+        width: 280px;
+        max-width: 85vw;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        z-index: 110;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+    }
+    body[data-layout="side"].nav-open .sidebar,
+    body[data-layout="top"].nav-open .sidebar { transform: translateX(0); }
+
+    /* Rail also slides in as a drawer (panel hidden -- rail items are
+       self-contained on touch) */
+    body[data-layout="rail"] .ph-rail {
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        z-index: 110;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+    }
+    body[data-layout="rail"].nav-open .ph-rail { transform: translateX(0); }
+    body[data-layout="rail"] .ph-rail-panel { display: none !important; }
+
+    /* Show hamburger toggle -- only when in side/rail layout */
+    body:not([data-layout="top"]) .ph-mobile-toggle { display: inline-flex; }
+
+    /* Drawer close (X) -- visible whenever the sidebar is a mobile drawer
+       (applies to both side and top layouts; on rail the sidebar isn't rendered). */
+    .sidebar-close { display: inline-flex; }
+
+    /* ...and surface the brand logo here (the sidebar/rail logo is now in the
+       collapsed drawer); drop the breadcrumb to make room for it. */
+    body:not([data-layout="top"]) .ph-side-logo { display: inline-flex; margin-right: auto; }
+    body:not([data-layout="top"]) .ph-side-crumbs { display: none; }
+
+    /* Lock body scroll while drawer is open */
+    body.nav-open { overflow: hidden; }
+
+    /* The inner-topbar IS the nav chrome on side/rail mobile --
+       suppress the top-layout fallback so we don't double up. */
+    body[data-layout="side"] .only-top,
+    body[data-layout="rail"] .only-top { display: none !important; }
+
+    /* Top layout: collapse the inline link list into the hamburger drawer.
+       Logo + utility buttons (cart/notifications/profile) stay in the bar. */
+    body[data-layout="top"] .nav-mobile-toggle { display: inline-flex; }
+    body[data-layout="top"] .homepage-nav .nav-item,
+    body[data-layout="top"] .homepage-nav .nav-dropdown-wrap,
+    body[data-layout="top"] .homepage-nav .nav-cta,
+    body[data-layout="top"] .homepage-nav .nav-switcher,
+    body[data-layout="top"] .homepage-nav .nav-section,
+    body[data-layout="top"] .homepage-nav .nav-divider { display: none !important; }
+}
+
+[data-theme="dark"] .ph-nav-backdrop { background: rgba(0, 0, 0, 0.55); }
+
+@media (max-width: 768px) {
+    .homepage-nav { padding: 0 14px; }
+    .homepage-nav-inner {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        gap: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .homepage-nav-inner::-webkit-scrollbar { display: none; }
+    .homepage-nav .nav-logo.text-logo { flex: 0 0 auto; }
+    .homepage-nav .nav-spacer { flex: 1 0 12px; min-width: 12px; }
+    .homepage-nav-inner .nav-simple-dropdown { flex: 0 0 auto; }
+    .homepage-nav-inner > a,
+    .homepage-nav-inner .nav-simple-trigger { flex: 0 0 auto; }
+    .ph-breadcrumb { padding: 10px 16px; }
+    .ph-breadcrumb-inner {
+        max-width: none;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .ph-breadcrumb-inner::-webkit-scrollbar { display: none; }
+    .ph-side-topbar-inner { padding: 10px 16px; }
+    .ph-side-crumbs { min-width: 0; overflow-x: auto; white-space: nowrap; }
+    /* Anchor dropdowns to the viewport on mobile so they never run off-screen.
+       The absolute right:0 / 320px panel overflows when its trigger isn't at the
+       edge (e.g. the notifications bell sits left of cart + avatar). The nav bars
+       are full-width at top:0, so these fixed offsets resolve to viewport
+       coordinates even though the bar's backdrop-filter is the containing block. */
+    /* Scoped to the bar (.homepage-nav / .ph-side-topbar) so this beats the
+       existing `.<bar> .notification-dropdown { top: calc(100%+8px); right: 0 }`
+       rules on specificity. Those only looked OK because calc(100%) resolved
+       against the short bar; anchor explicitly to the viewport instead. The
+       vw-based width keeps symmetric 12px gutters regardless of the bar's
+       backdrop-filter containing block. */
+    .homepage-nav .notification-dropdown,
+    .homepage-nav .profile-dropdown,
+    .ph-side-topbar .notification-dropdown,
+    .ph-side-topbar .profile-dropdown {
+        position: fixed;
+        top: 54px;
+        left: 12px;
+        right: auto;
+        width: calc(100vw - 24px);
+        max-width: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .homepage-nav .icon-btn { display: none; }
+}
+
+/* ===============================================================
+   Cart-page wrapper integration
+   ---------------------------------------------------------------
+   When the client area renders ANY order-form template
+   (hadrian_cart, standard_cart, nexus_cart, ...) inside hadrian's
+   chrome, the order form ships its own navbar + container styling
+   that fights ours. These rules live HERE (in the client-area
+   theme) so they apply regardless of which cart template is
+   active -- switching templates from WHMCS admin doesn't break
+   the chrome.
+
+   $templatefile values WHMCS sets on cart-related pages:
+     cart, viewcart, configureproduct, configureproductdomain,
+     checkout, products, domainregister, domaintransfer,
+     domainoptions, ordersummary, complete, fraudcheck, addons,
+     configuredomains
+   =============================================================== */
+body[data-tpl="cart"],
+body[data-tpl="viewcart"],
+body[data-tpl="configureproduct"],
+body[data-tpl="configureproductdomain"],
+body[data-tpl="configuredomains"],
+body[data-tpl="checkout"],
+body[data-tpl="products"],
+body[data-tpl="domainregister"],
+body[data-tpl="domaintransfer"],
+body[data-tpl="domainoptions"],
+body[data-tpl="ordersummary"],
+body[data-tpl="addons"],
+body[data-tpl="complete"],
+body[data-tpl="fraudcheck"] {
+
+    /* WHMCS injects a generic .main-navbar-wrapper on order-form
+       pages -- hadrian's nav already handles auth + active state,
+       so hide the dupe whichever cart theme is rendering. */
+    .main-navbar-wrapper,
+    [data-target="#mainNavbar"],
+    nav.main-navbar,
+    nav#mainNavbar { display: none !important; }
+
+    /* Default WHMCS cart wrapper styling fights edge-to-edge
+       sections -- flatten the padding + background so the cart's
+       own card layout breathes inside hadrian's .content-area. */
+    section#main-body,
+    section.main-body,
+    #main-body { padding: 0 !important; background: transparent !important; }
+    section#main-body > .container,
+    section.main-body > .container,
+    #main-body > .container { max-width: none !important; padding: 0 !important; }
+
+    /* standard_cart wraps its content in #order-standard_cart with
+       its own padding -- flatten so .content-area handles it. */
+    #order-standard_cart { padding: 0 !important; background: transparent !important; }
+}
+
+/* ===============================================================
+   Bootstrap-grid + utilities shim for legacy cart templates
+   ---------------------------------------------------------------
+   standard_cart (and most classic-WHMCS order-form templates) use
+   Bootstrap 3/4 grid + utility classes (.row, .col-md-*, .panel,
+   .card, .list-group, .btn, .alert, ...). Their own all.min.css
+   doesn't include Bootstrap itself -- they expect the client-area
+   theme to load it. hadrian doesn't, so without this shim the
+   cart layout collapses to a single-column unstyled stack.
+
+   Scoped to body[data-tpl="cart-flow"] so the rules NEVER bleed
+   into the rest of the client area (which uses .ph-*, .ct-*, etc.
+   without any class overlap). Apple visual tokens used throughout
+   so the cart still feels native instead of like raw Bootstrap.
+   =============================================================== */
+body[data-tpl="cart"],
+body[data-tpl="viewcart"],
+body[data-tpl="configureproduct"],
+body[data-tpl="configureproductdomain"],
+body[data-tpl="configuredomains"],
+body[data-tpl="checkout"],
+body[data-tpl="products"],
+body[data-tpl="domainregister"],
+body[data-tpl="domaintransfer"],
+body[data-tpl="domainoptions"],
+body[data-tpl="ordersummary"],
+body[data-tpl="addons"],
+body[data-tpl="complete"],
+body[data-tpl="fraudcheck"] {
+
+    /* -- Grid -------------------------------------------- */
+    .row { display: flex; flex-wrap: wrap; margin-right: -12px; margin-left: -12px; }
+    .row-eq-height { display: flex; flex-wrap: wrap; }
+    .row > [class*="col-"] { position: relative; min-height: 1px; padding-right: 12px; padding-left: 12px; box-sizing: border-box; }
+
+    .col, .col-12, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 { flex: 0 0 100%; max-width: 100%; }
+    .col-md-1  { flex: 0 0 8.333%;  max-width: 8.333%; }
+    .col-md-2  { flex: 0 0 16.666%; max-width: 16.666%; }
+    .col-md-3, .col-sm-3, .col-xs-3 { flex: 0 0 25%; max-width: 25%; }
+    .col-md-4, .col-sm-4, .col-xs-4 { flex: 0 0 33.333%; max-width: 33.333%; }
+    .col-md-5, .col-xs-5 { flex: 0 0 41.666%; max-width: 41.666%; }
+    .col-md-6, .col-sm-6, .col-xs-6 { flex: 0 0 50%; max-width: 50%; }
+    .col-md-7, .col-xs-7 { flex: 0 0 58.333%; max-width: 58.333%; }
+    .col-md-8, .col-sm-8 { flex: 0 0 66.666%; max-width: 66.666%; }
+    .col-md-9, .col-sm-9, .col-xs-9 { flex: 0 0 75%; max-width: 75%; }
+    .col-md-10 { flex: 0 0 83.333%; max-width: 83.333%; }
+    .col-md-11 { flex: 0 0 91.666%; max-width: 91.666%; }
+    .col-sm-2, .col-xs-2 { flex: 0 0 16.666%; max-width: 16.666%; }
+    @media (max-width: 768px) {
+        .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6,
+        .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11 { flex: 0 0 100%; max-width: 100%; }
+    }
+    @media (max-width: 576px) {
+        .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-6, .col-sm-8, .col-sm-9, .col-sm-12 { flex: 0 0 100%; max-width: 100%; }
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 16px; box-sizing: border-box; }
+    .container-fluid { width: 100%; padding: 0 16px; box-sizing: border-box; }
+
+    /* -- Panels / cards (Bootstrap 3 + 4 + 5 aliases) ---- */
+    .panel, .card, .card-sidebar {
+        background: var(--color-surface, var(--color-surface));
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: var(--radius-md, 12px);
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+    .panel-heading, .card-header {
+        padding: 12px 16px;
+        border-bottom: 0.5px solid var(--color-border, var(--color-border));
+        background: var(--color-surface-tertiary, var(--color-surface-tertiary));
+        font-weight: var(--fw-semibold);
+        font-size: var(--text-md);
+    }
+    .panel-body, .card-body { padding: 16px; }
+    .panel-title { margin: 0; font-size: var(--text-md); font-weight: var(--fw-semibold); }
+    .panel-footer, .card-footer {
+        padding: 12px 16px;
+        border-top: 0.5px solid var(--color-border, var(--color-border));
+        background: var(--color-surface-tertiary, var(--color-surface-tertiary));
+    }
+
+    /* -- List groups ------------------------------------- */
+    .list-group { display: flex; flex-direction: column; }
+    .list-group-item {
+        padding: 10px 14px;
+        border-bottom: 0.5px solid var(--color-border, var(--color-border));
+        color: var(--color-text-primary, var(--color-text-primary));
+        text-decoration: none;
+        display: block;
+        background: transparent;
+        font-size: var(--text-base);
+        transition: background 150ms;
+    }
+    .list-group-item:last-child { border-bottom: 0; }
+    .list-group-item-action:hover { background: var(--color-surface-secondary, var(--color-surface-secondary)); }
+    .list-group-item.active {
+        background: var(--color-accent-light, var(--color-accent-light));
+        color: var(--color-accent, var(--color-accent));
+        font-weight: var(--fw-medium);
+    }
+    .list-group-item.disabled { color: var(--color-text-tertiary, var(--color-text-tertiary)); pointer-events: none; }
+
+    /* -- Buttons ----------------------------------------- */
+    .btn, button.btn, a.btn {
+        height: 38px;
+        padding: 0 18px;
+        border-radius: var(--radius-pill, 980px);
+        font-size: var(--text-md);
+        font-weight: var(--fw-medium);
+        border: 0.5px solid var(--color-border, var(--color-border));
+        background: var(--color-surface, var(--color-surface));
+        color: var(--color-text-primary, var(--color-text-primary));
+        cursor: pointer;
+        font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        line-height: 1;
+        transition: all 150ms;
+    }
+    .btn:hover, button.btn:hover, a.btn:hover { border-color: var(--color-accent, var(--color-accent)); color: var(--color-accent, var(--color-accent)); }
+    .btn-primary, .btn-checkout, .btn-add {
+        background: var(--color-accent, var(--color-accent));
+        color: var(--color-surface);
+        border-color: var(--color-accent, var(--color-accent));
+    }
+    .btn-primary:hover, .btn-checkout:hover, .btn-add:hover {
+        background: var(--color-accent-hover, var(--color-accent-hover));
+        color: var(--color-surface);
+        border-color: var(--color-accent-hover, var(--color-accent-hover));
+    }
+    .btn-success, .btn-info {
+        background: var(--color-green-text, var(--color-green-text));
+        color: var(--color-surface);
+        border-color: var(--color-green-text, var(--color-green-text));
+    }
+    .btn-default { background: var(--color-surface, var(--color-surface)); color: var(--color-text-primary, var(--color-text-primary)); }
+    .btn-danger, .btn-remove-from-cart {
+        background: transparent;
+        color: var(--color-red-text, var(--color-red-text));
+        border-color: var(--color-red-text, var(--color-red-text));
+    }
+    .btn-lg { height: 46px; padding: 0 24px; font-size: var(--text-lg); }
+    .btn-sm { height: 32px; padding: 0 14px; font-size: var(--text-base); }
+    .btn-group { display: inline-flex; gap: 6px; }
+
+    /* -- Forms ------------------------------------------- */
+    .form-control, .custom-select {
+        height: 40px;
+        padding: 0 14px;
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: var(--radius-md, 12px);
+        background: var(--color-surface, var(--color-surface));
+        font-size: var(--text-md);
+        color: var(--color-text-primary, var(--color-text-primary));
+        font-family: inherit;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .form-control:focus, .custom-select:focus {
+        outline: none;
+        border-color: var(--color-accent, var(--color-accent));
+        box-shadow: 0 0 0 3px var(--color-accent-light, var(--color-accent-light));
+    }
+    textarea.form-control { height: auto; min-height: 80px; padding: 10px 14px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label, .form-label { font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--color-text-secondary, var(--color-text-secondary)); display: block; margin-bottom: 6px; }
+    .input-group { display: flex; align-items: stretch; }
+    .input-group .form-control { border-radius: 0; }
+    .input-group .form-control:first-child { border-radius: var(--radius-md, 12px) 0 0 var(--radius-md, 12px); }
+    .input-group .form-control:last-child { border-radius: 0 var(--radius-md, 12px) var(--radius-md, 12px) 0; }
+
+    /* -- Alerts ------------------------------------------ */
+    .alert { padding: 12px 16px; border-radius: var(--radius-md, 12px); margin-bottom: 16px; font-size: var(--text-base); line-height: 1.5; }
+    .alert-info { background: var(--color-accent-light, var(--color-accent-light)); color: var(--color-accent, var(--color-accent)); }
+    .alert-danger, .alert-error { background: var(--color-red-bg, var(--color-red-bg)); color: var(--color-red-text, var(--color-red-text)); }
+    .alert-success { background: var(--color-green-bg, var(--color-green-bg)); color: var(--color-green-text, var(--color-green-text)); }
+    .alert-warning { background: var(--color-orange-bg, var(--color-orange-bg)); color: var(--color-orange-text, var(--color-orange-text)); }
+
+    /* -- Badges ------------------------------------------ */
+    .badge, .label {
+        display: inline-flex; align-items: center;
+        padding: 2px 8px;
+        border-radius: var(--radius-pill, 980px);
+        background: var(--color-surface-secondary, var(--color-surface-secondary));
+        color: var(--color-text-secondary, var(--color-text-secondary));
+        font-size: var(--text-xs);
+        font-weight: var(--fw-medium);
+        line-height: 1.4;
+    }
+    .label-primary, .badge-primary { background: var(--color-accent-light); color: var(--color-accent); }
+    .label-success, .badge-success { background: var(--color-green-bg); color: var(--color-green-text); }
+    .label-danger,  .badge-danger  { background: var(--color-red-bg);   color: var(--color-red-text); }
+    .label-warning, .badge-warning { background: var(--color-orange-bg); color: var(--color-orange-text); }
+
+    /* -- Utilities --------------------------------------- */
+    .pull-right, .float-right { float: right; }
+    .pull-left,  .float-left  { float: left; }
+    .text-right  { text-align: right; }
+    .text-center { text-align: center; }
+    .text-left   { text-align: left; }
+    .text-muted  { color: var(--color-text-tertiary, var(--color-text-tertiary)); }
+    .text-success { color: var(--color-green-text, var(--color-green-text)); }
+    .text-danger  { color: var(--color-red-text, var(--color-red-text)); }
+    .clearfix::after { content: ""; display: table; clear: both; }
+    .hidden, .hidden-xs, .hidden-sm { display: none !important; }
+    .d-none { display: none !important; }
+    @media (min-width: 768px) {
+        .d-md-block { display: block !important; }
+        .d-md-inline-block { display: inline-block !important; }
+        .d-md-flex { display: flex !important; }
+        .hidden-sm-up { display: none !important; }
+    }
+    @media (max-width: 767px) { .hidden-xs-down { display: none !important; } }
+    .mb-0 { margin-bottom: 0 !important; }
+    .mb-1 { margin-bottom: 4px !important; }
+    .mb-2 { margin-bottom: 8px !important; }
+    .mb-3 { margin-bottom: 16px !important; }
+    .mb-4 { margin-bottom: 24px !important; }
+    .mb-5 { margin-bottom: 32px !important; }
+    .mt-3 { margin-top: 16px !important; }
+    .mt-5 { margin-top: 32px !important; }
+    .my-3 { margin-top: 16px !important; margin-bottom: 16px !important; }
+    .p-3 { padding: 16px !important; }
+    .p-5 { padding: 32px !important; }
+    .px-5 { padding-left: 32px !important; padding-right: 32px !important; }
+    .w-100 { width: 100% !important; }
+    .font-size-36 { font-size: var(--text-h3); font-weight: var(--fw-semibold); letter-spacing: -0.022em; }
+
+    /* Heading rules moved OUTSIDE this body[data-tpl="..."] nested
+       block (see the flat :where()-wrapped rules at the bottom of this
+       file). Keeping them nested here gave them specificity (0,1,1)
+       even with :where(h2) because the parent body[data-tpl=...]
+       wrapper still contributed (0,1,0) via CSS nesting's implicit
+       `& <selector>` parent chain. The flat versions below use
+       :where(body[data-tpl=...]) on the OUTSIDE so the whole chain
+       drops to (0,0,1) and any class-based rule wins. */
+
+    /* -- standard_cart-specific helpers ------------------ */
+    .header-lined {
+        padding-bottom: 14px;
+        border-bottom: 0.5px solid var(--color-border, var(--color-border));
+        margin-bottom: 22px;
+    }
+    .product {
+        padding: 18px;
+        background: var(--color-surface, var(--color-surface));
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: var(--radius-md, 12px);
+        display: flex; flex-direction: column; gap: 14px;
+        height: 100%;
+        box-sizing: border-box;
+    }
+    .product header {
+        font-size: var(--text-xl);
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-primary, var(--color-text-primary));
+    }
+    .product-desc { color: var(--color-text-secondary, var(--color-text-secondary)); font-size: var(--text-base); }
+    .product-desc ul { padding-left: 18px; margin: 8px 0 0; }
+    .product-pricing { display: flex; flex-direction: column; gap: 4px; }
+    .product-pricing .price {
+        font-size: var(--text-3xl); font-weight: var(--fw-semibold);
+        color: var(--color-text-primary, var(--color-text-primary));
+        letter-spacing: -0.022em;
+    }
+    .product footer { margin-top: auto; }
+
+    /* Hide leftover Font Awesome carets from standard_cart (the
+       framework uses them as panel-minimize affordances; we don't
+       have FA loaded and the broken icon glyphs leak through). */
+    .card-minimise, .panel-minimise,
+    .fa, .fas, .far, .fab { display: none; }
+}
+
+/* ===============================================================
+   Apple-language overrides for standard_cart's cart-flow pages
+   ---------------------------------------------------------------
+   The base Bootstrap shim above gets standard_cart rendering at
+   all. These rules take that further: reshape the actual DOM
+   standard_cart emits so it matches the Apple visual language
+   from apple-client-area/store.html -- 240px sidebar + main grid,
+   .subnav-card-style sidebar items, .st-cat-head-style page
+   header, .st-plan-style product cards, and pill-shaped Apple
+   buttons. All achieved via CSS targeting standard_cart's
+   wrapper structure (no TPL changes -- forms keep working).
+   =============================================================== */
+body[data-tpl="cart"],
+body[data-tpl="viewcart"],
+body[data-tpl="configureproduct"],
+body[data-tpl="configureproductdomain"],
+body[data-tpl="configuredomains"],
+body[data-tpl="checkout"],
+body[data-tpl="products"],
+body[data-tpl="domainregister"],
+body[data-tpl="domaintransfer"],
+body[data-tpl="domainoptions"],
+body[data-tpl="ordersummary"],
+body[data-tpl="addons"],
+body[data-tpl="complete"],
+body[data-tpl="fraudcheck"] {
+
+    /* -- Root cart wrapper -- neutralize the default 14px font + padding -- */
+    #order-standard_cart {
+        font-size: var(--text-md);
+        color: var(--color-text-primary, var(--color-text-primary));
+        padding: 8px 0 32px !important;
+    }
+
+    /* -- 2-col split: 240px sidebar + flex main, like .st-split -- */
+    #order-standard_cart > .row {
+        display: grid !important;
+        grid-template-columns: 240px 1fr;
+        gap: 24px;
+        margin: 0 !important;
+        align-items: start;
+    }
+    @media (max-width: 880px) {
+        #order-standard_cart > .row { grid-template-columns: 1fr; }
+    }
+    #order-standard_cart .cart-sidebar,
+    #order-standard_cart .secondary-cart-sidebar {
+        float: none !important;
+        width: 100% !important;
+        max-width: 100%;
+        padding: 0 !important;
+    }
+    #order-standard_cart .cart-body,
+    #order-standard_cart .secondary-cart-body {
+        float: none !important;
+        width: 100% !important;
+        max-width: 100%;
+        padding: 0 !important;
+        min-width: 0;
+    }
+
+    /* -- Sidebar cards (.panel.card.card-sidebar) -- render as .subnav-card -- */
+    #order-standard_cart .cart-sidebar .panel,
+    #order-standard_cart .cart-sidebar .card,
+    #order-standard_cart .cart-sidebar .card-sidebar {
+        padding: 8px;
+        margin-bottom: 12px;
+        border-radius: var(--radius-lg, 14px);
+        border: 0.5px solid var(--color-border, var(--color-border));
+        background: var(--color-surface, var(--color-surface));
+    }
+    #order-standard_cart .cart-sidebar .panel-heading,
+    #order-standard_cart .cart-sidebar .card-header {
+        font-size: var(--text-xs);
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-tertiary, var(--color-text-tertiary));
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 10px 12px 8px !important;
+        background: transparent !important;
+        border-bottom: 0 !important;
+    }
+    #order-standard_cart .cart-sidebar .panel-title {
+        font-size: inherit;
+        font-weight: inherit;
+        color: inherit;
+        margin: 0;
+    }
+    #order-standard_cart .cart-sidebar .list-group {
+        background: transparent;
+        margin: 0;
+    }
+    #order-standard_cart .cart-sidebar .list-group-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px !important;
+        border-radius: var(--radius-sm, 8px);
+        border: 0 !important;
+        margin: 0 !important;
+        background: transparent;
+        color: var(--color-text-primary, var(--color-text-primary));
+        font-size: var(--text-base);
+        letter-spacing: -0.008em;
+        font-weight: var(--fw-normal);
+    }
+    #order-standard_cart .cart-sidebar .list-group-item:hover {
+        background: var(--color-border-card);
+    }
+    #order-standard_cart .cart-sidebar .list-group-item.active {
+        background: var(--sidebar-item-active);
+        color: var(--color-text-primary, var(--color-text-primary));
+        font-weight: var(--fw-medium);
+        border: 0 !important;
+    }
+    #order-standard_cart .cart-sidebar .badge {
+        margin-left: auto;
+        background: var(--color-accent-light, var(--color-accent-light));
+        color: var(--color-accent, var(--color-accent));
+        font-size: var(--text-xs);
+        font-weight: var(--fw-medium);
+    }
+
+    /* -- Page header (.header-lined) -- render as .st-cat-head -- */
+    #order-standard_cart .header-lined {
+        padding: 24px 28px 22px !important;
+        margin: 0 0 18px !important;
+        border-bottom: 0 !important;
+        background: var(--color-surface, var(--color-surface));
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: var(--radius-lg, 14px);
+    }
+    #order-standard_cart .header-lined h1,
+    #order-standard_cart .header-lined .font-size-36 {
+        font-size: var(--text-h4) !important;
+        font-weight: var(--fw-semibold) !important;
+        color: var(--color-text-primary, var(--color-text-primary)) !important;
+        letter-spacing: -0.02em !important;
+        margin: 0 0 4px !important;
+        line-height: 1.2 !important;
+    }
+    #order-standard_cart .header-lined p {
+        font-size: var(--text-md);
+        color: var(--color-text-secondary, var(--color-text-secondary));
+        letter-spacing: -0.008em;
+        line-height: 1.5;
+        max-width: 540px;
+        margin: 0;
+    }
+
+    /* -- Products grid (.products .row .col-md-6) -- render as .ds-pricing-grid -- */
+    #order-standard_cart .products,
+    #order-standard_cart #products {
+        margin: 18px 0;
+    }
+    #order-standard_cart .products .row {
+        margin: 0 !important;
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 14px;
+    }
+    @media (max-width: 560px) {
+        #order-standard_cart .products .row { grid-template-columns: 1fr; }
+    }
+    #order-standard_cart .products [class*="col-"] {
+        padding: 0 !important;
+        max-width: 100% !important;
+        flex: 1 !important;
+    }
+    #order-standard_cart .product {
+        padding: 24px 22px 22px !important;
+        border: 0.5px solid var(--color-border, var(--color-border)) !important;
+        border-radius: var(--radius-lg, 14px) !important;
+        background: var(--color-surface, var(--color-surface)) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 14px !important;
+        transition: all var(--transition-fast, 150ms);
+        height: 100%;
+    }
+    #order-standard_cart .product:hover {
+        box-shadow: 0 4px 20px var(--sidebar-item-active);
+        transform: translateY(-2px);
+    }
+    #order-standard_cart .product header {
+        font-size: var(--text-lg);
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-primary, var(--color-text-primary));
+        letter-spacing: -0.012em;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+    }
+    #order-standard_cart .product-desc {
+        font-size: var(--text-base);
+        color: var(--color-text-tertiary, var(--color-text-tertiary));
+        letter-spacing: -0.004em;
+        line-height: 1.5;
+    }
+    #order-standard_cart .product-desc ul {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: var(--text-base);
+        color: var(--color-text-secondary, var(--color-text-secondary));
+    }
+    #order-standard_cart .product-desc ul li {
+        position: relative;
+        padding-left: 18px;
+    }
+    #order-standard_cart .product-desc ul li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 7px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--color-green-text, var(--color-green-text));
+    }
+    #order-standard_cart .product-desc ul li .feature-value {
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-primary, var(--color-text-primary));
+        margin-right: 6px;
+    }
+    #order-standard_cart .product footer {
+        margin-top: auto !important;
+        padding-top: 14px !important;
+        border-top: 0.5px solid var(--color-border, var(--color-border));
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    #order-standard_cart .product-pricing {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+        font-variant-numeric: tabular-nums;
+    }
+    #order-standard_cart .product-pricing .price {
+        font-size: var(--text-h4) !important;
+        font-weight: var(--fw-semibold) !important;
+        color: var(--color-text-primary, var(--color-text-primary)) !important;
+        letter-spacing: -0.022em !important;
+        line-height: 1 !important;
+    }
+    #order-standard_cart .product footer .btn,
+    #order-standard_cart .product .btn-add {
+        width: 100%;
+        justify-content: center;
+        height: 40px;
+        background: var(--color-accent, var(--color-accent));
+        color: var(--color-surface);
+        border-color: var(--color-accent, var(--color-accent));
+    }
+    #order-standard_cart .product footer .btn:hover,
+    #order-standard_cart .product .btn-add:hover {
+        background: var(--color-accent-hover, var(--color-accent-hover));
+        border-color: var(--color-accent-hover, var(--color-accent-hover));
+        color: var(--color-surface);
+    }
+
+    /* -- Domain selection (.domain-selection-options) -- Apple radio cards -- */
+    #order-standard_cart .domain-selection-options {
+        background: var(--color-surface, var(--color-surface));
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: var(--radius-lg, 14px);
+        overflow: hidden;
+        margin-bottom: 18px;
+    }
+    #order-standard_cart .domain-selection-options .option {
+        padding: 18px 22px;
+        border-bottom: 0.5px solid var(--color-border, var(--color-border));
+        transition: background var(--transition-fast, 150ms);
+    }
+    #order-standard_cart .domain-selection-options .option:last-child {
+        border-bottom: 0;
+    }
+    #order-standard_cart .domain-selection-options .option:has(input[type="radio"]:checked) {
+        background: var(--color-accent-light, var(--color-accent-light));
+    }
+    #order-standard_cart .domain-selection-options .option > label {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: var(--text-lg);
+        font-weight: var(--fw-medium);
+        color: var(--color-text-primary, var(--color-text-primary));
+        letter-spacing: -0.008em;
+        margin: 0 0 12px;
+        cursor: pointer;
+    }
+    #order-standard_cart .domain-selection-options input[type="radio"] {
+        accent-color: var(--color-accent, var(--color-accent));
+        margin: 0;
+    }
+    #order-standard_cart .domain-input-group {
+        padding: 6px 0 0;
+    }
+    #order-standard_cart .domain-input-group .input-group {
+        display: flex;
+        align-items: stretch;
+        max-width: 480px;
+    }
+    #order-standard_cart .domain-input-group .input-group-addon,
+    #order-standard_cart .domain-input-group .input-group-prepend {
+        padding: 0 14px;
+        background: var(--color-surface-secondary, var(--color-surface-secondary));
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-right: 0;
+        border-radius: var(--radius-pill, 980px) 0 0 var(--radius-pill, 980px);
+        display: flex;
+        align-items: center;
+        font-size: var(--text-base);
+        color: var(--color-text-tertiary, var(--color-text-tertiary));
+        font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+    }
+    #order-standard_cart .domain-input-group .form-control {
+        height: 42px;
+        border-radius: 0;
+        border-color: var(--color-border, var(--color-border));
+    }
+    #order-standard_cart .domain-input-group .col-xs-9 .form-control,
+    #order-standard_cart .domain-input-group .col-9 .form-control {
+        border-right: 0;
+    }
+    #order-standard_cart .domain-input-group select.form-control {
+        border-radius: 0 var(--radius-pill, 980px) var(--radius-pill, 980px) 0;
+    }
+    #order-standard_cart .domain-input-group .btn-block {
+        height: 42px;
+        width: 100%;
+        background: var(--color-accent, var(--color-accent));
+        color: var(--color-surface);
+        border-color: var(--color-accent, var(--color-accent));
+        border-radius: var(--radius-pill, 980px);
+        justify-content: center;
+    }
+    #order-standard_cart .domain-input-group .btn-block:hover {
+        background: var(--color-accent-hover, var(--color-accent-hover));
+        border-color: var(--color-accent-hover, var(--color-accent-hover));
+        color: var(--color-surface);
+    }
+
+    /* -- Domain search results / availability messages --------- */
+    #order-standard_cart .domain-checker-available {
+        background: var(--color-green-bg, var(--color-green-bg));
+        color: var(--color-green-text, var(--color-green-text));
+        padding: 14px 18px;
+        border-radius: var(--radius-md, 12px);
+        margin: 14px 0;
+    }
+    #order-standard_cart .domain-checker-unavailable,
+    #order-standard_cart .domain-checker-invalid {
+        background: var(--color-red-bg, var(--color-red-bg));
+        color: var(--color-red-text, var(--color-red-text));
+        padding: 14px 18px;
+        border-radius: var(--radius-md, 12px);
+        margin: 14px 0;
+    }
+
+    /* -- Bottom action bar / continue / checkout buttons ------- */
+    #order-standard_cart .btn-continue-shopping,
+    #order-standard_cart .btn-checkout {
+        height: 44px;
+        padding: 0 24px;
+        border-radius: var(--radius-pill, 980px);
+        font-size: var(--text-md);
+        font-weight: var(--fw-medium);
+        letter-spacing: -0.008em;
+    }
+    #order-standard_cart .btn-checkout {
+        background: var(--color-accent, var(--color-accent));
+        color: var(--color-surface);
+        border-color: var(--color-accent, var(--color-accent));
+    }
+    #order-standard_cart .btn-checkout:hover {
+        background: var(--color-accent-hover, var(--color-accent-hover));
+        color: var(--color-surface);
+    }
+    #order-standard_cart .btn-continue-shopping {
+        background: transparent;
+        color: var(--color-text-primary, var(--color-text-primary));
+        border-color: var(--color-border, var(--color-border));
+    }
+    #order-standard_cart .btn-continue-shopping:hover {
+        border-color: var(--color-accent, var(--color-accent));
+        color: var(--color-accent, var(--color-accent));
+    }
+
+    /* -- View Cart / Order Summary table -- Apple style --------- */
+    #order-standard_cart .bordered-totals,
+    #order-standard_cart .checkout-summary,
+    #order-standard_cart .summary-container {
+        background: var(--color-surface, var(--color-surface));
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: var(--radius-lg, 14px);
+        padding: 18px 20px;
+        margin-bottom: 16px;
+    }
+    #order-standard_cart table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--text-md);
+    }
+    #order-standard_cart table th,
+    #order-standard_cart table td {
+        padding: 10px 14px;
+        border-bottom: 0.5px solid var(--color-border, var(--color-border));
+        text-align: left;
+    }
+    #order-standard_cart table th {
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-secondary, var(--color-text-secondary));
+        font-size: var(--text-sm);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    #order-standard_cart table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+    #order-standard_cart table tr.total td,
+    #order-standard_cart table .totals-row td {
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-primary, var(--color-text-primary));
+        font-size: var(--text-lg);
+    }
+
+    /* === Refinements for configureproductdomain to match the mockup ===
+       The .domain-selection-options rules above style the SECTION,
+       this section styles each radio option to look like a tappable
+       Apple card with a 20px radio circle and the accent-light
+       background flag when checked. ---------------------------- */
+    #order-standard_cart .domain-selection-options {
+        padding: 0;
+    }
+    #order-standard_cart .domain-selection-options .option {
+        position: relative;
+        padding: 22px 24px !important;
+        border: 0 !important;
+        border-bottom: 0.5px solid var(--color-border, var(--color-border)) !important;
+        background: transparent;
+        transition: background var(--transition-fast, 150ms);
+    }
+    #order-standard_cart .domain-selection-options .option:last-child {
+        border-bottom: 0 !important;
+    }
+    #order-standard_cart .domain-selection-options .option:has(input[type="radio"]:checked) {
+        background: var(--color-accent-light, var(--color-accent-light)) !important;
+    }
+    #order-standard_cart .domain-selection-options .option > label {
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 14px !important;
+        font-size: var(--text-lg) !important;
+        font-weight: var(--fw-medium);
+        color: var(--color-text-primary, var(--color-text-primary));
+        cursor: pointer;
+        user-select: none;
+    }
+    /* Custom-styled radio -- accent ring + filled center on check */
+    #order-standard_cart .domain-selection-options .option > label input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1.5px solid var(--color-border, var(--color-border));
+        background: var(--color-surface, var(--color-surface));
+        margin: 0;
+        flex-shrink: 0;
+        cursor: pointer;
+        position: relative;
+        transition: all 150ms;
+    }
+    #order-standard_cart .domain-selection-options .option > label input[type="radio"]:checked {
+        border-color: var(--color-accent, var(--color-accent));
+        background: var(--color-accent, var(--color-accent));
+    }
+    #order-standard_cart .domain-selection-options .option > label input[type="radio"]:checked::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--color-surface);
+    }
+    /* The whole option row hidden when its radio isn't the one with the input shown.
+       Standard_cart shows the .domain-input-group for ALL options unconditionally
+       (its scripts.min.js toggles visibility on radio change). Use :has() so the
+       CSS-only path also hides the inactive groups even without the JS firing. */
+    #order-standard_cart .domain-selection-options .option:not(:has(input[type="radio"]:checked)) .domain-input-group {
+        display: none;
+    }
+
+    /* AI-search textarea (advanced register mode) */
+    #order-standard_cart .domain-selection-options textarea#message {
+        width: 100%;
+        min-height: 100px;
+        padding: 14px 18px;
+        font-size: var(--text-md);
+        line-height: 1.55;
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: var(--radius-md, 12px);
+        background: var(--color-surface, var(--color-surface));
+        color: var(--color-text-primary, var(--color-text-primary));
+        font-family: inherit;
+        resize: vertical;
+        letter-spacing: -0.004em;
+    }
+    #order-standard_cart .domain-selection-options textarea#message:focus {
+        outline: 0;
+        border-color: var(--color-accent, var(--color-accent));
+        box-shadow: 0 0 0 3px var(--color-accent-light, var(--color-accent-light));
+    }
+    #order-standard_cart .domain-selection-options textarea#message::placeholder {
+        color: var(--color-text-tertiary, var(--color-text-tertiary));
+    }
+
+    /* -- Bootstrap-Multiselect plugin styling ------------------
+       The plugin wraps a <select> in:
+         .btn-group > button.multiselect + ul.multiselect-container.dropdown-menu
+       Without these rules the open dropdown shows raw browser radios + checkboxes
+       on a plain box -- exactly what the user's screenshot caught.
+       ---------------------------------------------------------- */
+    #order-standard_cart .btn-group.multiselect-native-select {
+        position: relative;
+        display: inline-block;
+    }
+    #order-standard_cart button.multiselect,
+    #order-standard_cart .multiselect.dropdown-toggle {
+        height: 40px !important;
+        padding: 0 36px 0 14px !important;
+        border: 0.5px solid var(--color-border, var(--color-border)) !important;
+        border-radius: var(--radius-pill, 980px) !important;
+        background: var(--color-surface, var(--color-surface)) !important;
+        color: var(--color-text-primary, var(--color-text-primary)) !important;
+        font-size: var(--text-base) !important;
+        font-weight: var(--fw-medium) !important;
+        letter-spacing: -0.008em;
+        font-family: inherit;
+        text-align: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        min-width: 160px;
+        position: relative;
+    }
+    #order-standard_cart button.multiselect::after {
+        content: "";
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        width: 10px;
+        height: 10px;
+        margin-top: -3px;
+        border-right: 1.5px solid var(--color-text-tertiary, var(--color-text-tertiary));
+        border-bottom: 1.5px solid var(--color-text-tertiary, var(--color-text-tertiary));
+        transform: rotate(45deg);
+    }
+    #order-standard_cart .multiselect-container.dropdown-menu {
+        margin-top: 4px !important;
+        padding: 6px !important;
+        border: 0.5px solid var(--color-border, var(--color-border)) !important;
+        border-radius: var(--radius-md, 12px) !important;
+        background: var(--color-surface, var(--color-surface)) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+        min-width: 240px !important;
+        max-height: 280px;
+        overflow-y: auto;
+        list-style: none;
+        font-size: var(--text-base);
+        z-index: 100;
+    }
+    #order-standard_cart .multiselect-container li { margin: 0; padding: 0; list-style: none; }
+    #order-standard_cart .multiselect-container li > a {
+        display: block;
+        padding: 0 !important;
+        border-radius: var(--radius-sm, 8px);
+        background: transparent !important;
+        color: var(--color-text-primary, var(--color-text-primary)) !important;
+        text-decoration: none !important;
+        transition: background 150ms;
+    }
+    #order-standard_cart .multiselect-container li > a:hover {
+        background: var(--color-border-card) !important;
+    }
+    #order-standard_cart .multiselect-container li > a > label {
+        display: flex !important;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px !important;
+        margin: 0 !important;
+        cursor: pointer;
+        font-weight: var(--fw-normal);
+        font-size: var(--text-base);
+        color: var(--color-text-primary, var(--color-text-primary));
+        line-height: 1.4;
+    }
+    /* Custom-styled checkbox + radio inside multiselect items */
+    #order-standard_cart .multiselect-container input[type="checkbox"],
+    #order-standard_cart .multiselect-container input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        flex-shrink: 0;
+        background: var(--color-surface, var(--color-surface));
+        border: 1.5px solid var(--color-border, var(--color-border));
+        cursor: pointer;
+        position: relative;
+    }
+    #order-standard_cart .multiselect-container input[type="checkbox"] { border-radius: 4px; }
+    #order-standard_cart .multiselect-container input[type="radio"] { border-radius: 50%; }
+    #order-standard_cart .multiselect-container input[type="checkbox"]:checked,
+    #order-standard_cart .multiselect-container input[type="radio"]:checked {
+        background: var(--color-accent, var(--color-accent));
+        border-color: var(--color-accent, var(--color-accent));
+    }
+    #order-standard_cart .multiselect-container input[type="checkbox"]:checked::after {
+        content: "";
+        position: absolute;
+        left: 4px;
+        top: 1px;
+        width: 5px;
+        height: 9px;
+        border-right: 2px solid var(--color-surface);
+        border-bottom: 2px solid var(--color-surface);
+        transform: rotate(45deg);
+    }
+    #order-standard_cart .multiselect-container input[type="radio"]:checked::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--color-surface);
+    }
+    #order-standard_cart .multiselect-container li.multiselect-item.multiselect-filter,
+    #order-standard_cart .multiselect-container li.multiselect-filter {
+        padding: 4px;
+    }
+    #order-standard_cart .multiselect-container .multiselect-search,
+    #order-standard_cart .multiselect-container input.multiselect-search {
+        height: 32px;
+        padding: 0 12px;
+        border-radius: var(--radius-sm, 8px);
+        border: 0.5px solid var(--color-border, var(--color-border));
+        font-size: var(--text-base);
+        width: 100%;
+        box-sizing: border-box;
+    }
+    /* The "Include TLDs" / "Length" inline label that overlaps the
+       dropdown panel in the screenshot -- let it flow underneath
+       cleanly instead of butting up against the button. */
+    #order-standard_cart .domain-selection-options .domains-row > .multiselect-native-select,
+    #order-standard_cart .domain-selection-options .domains-row > select.multiselect {
+        margin-right: 12px;
+        margin-bottom: 8px;
+        vertical-align: middle;
+    }
+
+    /* "Safe Search" inline checkbox label */
+    #order-standard_cart .domain-selection-options .domains-row > label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: var(--text-base);
+        color: var(--color-text-secondary, var(--color-text-secondary));
+        margin-left: 8px;
+    }
+    #order-standard_cart .domain-selection-options .domains-row > label input[type="checkbox"] {
+        accent-color: var(--color-accent, var(--color-accent));
+        width: 16px;
+        height: 16px;
+        margin: 0;
+    }
+
+    /* Page-bottom "Continue" / "Place Order" submit buttons -- make sure
+       any .btn at the form root is the filled accent CTA, not outline. */
+    #order-standard_cart form .text-center .btn,
+    #order-standard_cart form > .btn,
+    #order-standard_cart form > div > .btn-primary,
+    #order-standard_cart .btn-continue,
+    #order-standard_cart #btnContinueCheckout,
+    #order-standard_cart .domain-checkout-area .btn,
+    #order-standard_cart .domain-add-domain {
+        background: var(--color-accent, var(--color-accent)) !important;
+        color: var(--color-surface) !important;
+        border-color: var(--color-accent, var(--color-accent)) !important;
+        height: 44px;
+        padding: 0 24px;
+        font-size: var(--text-md);
+        font-weight: var(--fw-medium);
+        border-radius: var(--radius-pill, 980px) !important;
+    }
+    #order-standard_cart form .text-center .btn:hover,
+    #order-standard_cart form > .btn:hover,
+    #order-standard_cart form > div > .btn-primary:hover,
+    #order-standard_cart .btn-continue:hover,
+    #order-standard_cart #btnContinueCheckout:hover,
+    #order-standard_cart .domain-checkout-area .btn:hover,
+    #order-standard_cart .domain-add-domain:hover {
+        background: var(--color-accent-hover, var(--color-accent-hover)) !important;
+        border-color: var(--color-accent-hover, var(--color-accent-hover)) !important;
+        color: var(--color-surface) !important;
+    }
+
+    /* DomainSearchResults panel that appears after a search */
+    #order-standard_cart #DomainSearchResults {
+        margin-top: 22px;
+    }
+    #order-standard_cart .primary-domain-header {
+        font-size: var(--text-base);
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-tertiary, var(--color-text-tertiary));
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 12px;
+    }
+
+    /* === viewcart -- Apple empty state + trust strip + addon nesting ===
+       The view-cart-empty / .ct-empty markup lives inside the cart
+       items list when $cartitems == 0. Style it as an Apple "nothing
+       to see" panel with icon, headline, and 2-button action row.
+       ------------------------------------------------------------ */
+    #order-standard_cart .view-cart-empty {
+        padding: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+    }
+    #order-standard_cart .ct-empty {
+        padding: 72px 24px 64px;
+        text-align: center;
+    }
+    #order-standard_cart .ct-empty-ico {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: var(--color-surface-secondary, var(--color-surface-secondary));
+        color: var(--color-text-tertiary, var(--color-text-tertiary));
+        display: inline-flex; align-items: center; justify-content: center;
+        margin-bottom: 18px;
+        font-size: var(--text-3xl);
+    }
+    #order-standard_cart .ct-empty-title {
+        font-size: var(--text-2xl); font-weight: var(--fw-semibold);
+        color: var(--color-text-primary, var(--color-text-primary));
+        letter-spacing: -0.016em;
+        margin: 0 0 6px;
+    }
+    #order-standard_cart .ct-empty-desc {
+        font-size: var(--text-md); color: var(--color-text-tertiary, var(--color-text-tertiary));
+        max-width: 420px; margin: 0 auto 22px;
+        line-height: 1.55; letter-spacing: -0.008em;
+    }
+    #order-standard_cart .ct-empty-actions {
+        display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    }
+    #order-standard_cart .ct-empty-actions .btn {
+        height: 40px; padding: 0 20px; font-size: var(--text-md);
+        display: inline-flex; align-items: center; gap: 6px;
+        border-radius: var(--radius-pill, 980px);
+    }
+
+    /* Trust strip in the order-summary sidebar */
+    #order-standard_cart .ct-trust {
+        margin-top: 18px;
+        padding: 14px 0 4px;
+        border-top: 0.5px solid var(--color-border, var(--color-border));
+        display: flex; flex-direction: column; gap: 6px;
+        font-size: var(--text-sm); color: var(--color-text-tertiary, var(--color-text-tertiary));
+        letter-spacing: -0.004em;
+    }
+    #order-standard_cart .ct-trust-item {
+        display: inline-flex; align-items: center; gap: 6px;
+    }
+    #order-standard_cart .ct-trust-item .fas,
+    #order-standard_cart .ct-trust-item .far {
+        color: var(--color-green-text, #1d7a32);
+        font-size: var(--text-sm);
+    }
+
+    /* Visual nesting hint for addons attached to a product line.
+       The .item-addon class is added to product-attached addons (not
+       standalone $addons) -- gives them a slight inset + lighter title
+       so the parent product is the focal point. */
+    #order-standard_cart .item.item-addon {
+        padding-left: 36px;
+    }
+    #order-standard_cart .item.item-addon .item-title {
+        font-weight: var(--fw-normal);
+        color: var(--color-text-secondary, #424245);
+    }
+    #order-standard_cart .item.item-addon .item-title .fas.fa-plus-circle {
+        color: var(--color-text-quaternary, #b8b8c0);
+        font-size: var(--text-xs);
+        margin-right: 4px;
+    }
+
+    /* Promo-applied chip -- when a promotion is active the
+       .view-cart-promotion-code block shows the code + description. */
+    #order-standard_cart .view-cart-promotion-code {
+        display: flex; align-items: center; gap: 8px;
+        padding: 12px 14px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: var(--color-green-bg, #e6f4ea);
+        color: var(--color-green-text, #1d7a32);
+        font-size: var(--text-base);
+        letter-spacing: -0.004em;
+    }
+    #order-standard_cart .view-cart-promotion-code .fas {
+        font-size: var(--text-md);
+    }
+
+    /* Continue-shopping link styling in the order-summary */
+    #order-standard_cart .btn-continue-shopping {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px !important;
+        font-size: var(--text-base);
+        color: var(--color-text-tertiary, var(--color-text-tertiary)) !important;
+        margin-top: 6px;
+        text-decoration: none !important;
+    }
+    #order-standard_cart .btn-continue-shopping:hover {
+        color: var(--color-accent, var(--color-accent)) !important;
+    }
+    #order-standard_cart .btn-continue-shopping .fas {
+        font-size: var(--text-xs);
+    }
+
+    /* === configureproduct -- product header card + addon picker ===
+       The product-info block is the page-top intro card (icon + title
+       + description). Addons render as bordered cards that highlight
+       when checked (.panel-addon-selected class is toggled by JS). */
+    #order-standard_cart .product-info {
+        display: flex; gap: 16px; align-items: flex-start;
+        padding: 22px 22px 20px;
+        margin-bottom: 18px;
+        background: var(--color-surface-primary, var(--color-surface));
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: 14px;
+    }
+    #order-standard_cart .product-info-ico {
+        width: 48px; height: 48px; border-radius: 12px;
+        background: var(--color-accent-light, #e8f0fe);
+        color: var(--color-accent, var(--color-accent));
+        display: inline-flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        font-size: var(--text-2xl);
+    }
+    #order-standard_cart .product-info-meta {
+        flex: 1; min-width: 0;
+    }
+    #order-standard_cart .product-info .product-title {
+        font-size: var(--text-2xl); font-weight: var(--fw-semibold);
+        color: var(--color-text-primary, var(--color-text-primary));
+        letter-spacing: -0.016em;
+        margin: 0 0 4px;
+    }
+    #order-standard_cart .product-info p:not(.product-title) {
+        font-size: var(--text-base);
+        color: var(--color-text-tertiary, var(--color-text-tertiary));
+        margin: 0;
+        line-height: 1.5;
+        letter-spacing: -0.004em;
+    }
+
+    /* Section sub-heading (Server config, Configure package, Available
+       addons, Required info). Standard_cart uses a flat-color band; we
+       want a thin Apple eyebrow label. */
+    #order-standard_cart .sub-heading {
+        margin: 24px 0 12px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+    }
+    #order-standard_cart .sub-heading > span {
+        display: inline-block;
+        font-size: var(--text-xs);
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-tertiary, var(--color-text-tertiary)) !important;
+        background: transparent !important;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 0 !important;
+    }
+
+    /* Addon cards inside #productAddonsContainer */
+    #order-standard_cart .addon-products {
+        margin-left: -6px;
+        margin-right: -6px;
+    }
+    #order-standard_cart .addon-products > [class*="col-"] {
+        padding-left: 6px;
+        padding-right: 6px;
+        margin-bottom: 12px;
+    }
+    #order-standard_cart .panel-addon {
+        position: relative;
+        padding: 16px 18px;
+        background: var(--color-surface-primary, var(--color-surface));
+        border: 0.5px solid var(--color-border, var(--color-border)) !important;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        box-shadow: none !important;
+        margin: 0;
+    }
+    #order-standard_cart .panel-addon:hover {
+        border-color: var(--color-text-quaternary, #b8b8c0) !important;
+    }
+    #order-standard_cart .panel-addon .panel-body,
+    #order-standard_cart .panel-addon .card-body {
+        padding: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+    }
+    #order-standard_cart .panel-addon label {
+        display: flex; align-items: flex-start;
+        gap: 10px;
+        margin: 0;
+        font-weight: var(--fw-medium);
+        font-size: var(--text-md);
+        color: var(--color-text-primary, var(--color-text-primary));
+        letter-spacing: -0.008em;
+        cursor: pointer;
+    }
+    #order-standard_cart .panel-addon label input[type="checkbox"] {
+        margin: 3px 0 0;
+        flex-shrink: 0;
+        accent-color: var(--color-accent, var(--color-accent));
+    }
+    #order-standard_cart .panel-addon .addon-name {
+        flex: 1;
+        font-weight: var(--fw-medium);
+    }
+    #order-standard_cart .panel-addon .addon-description {
+        margin-top: 6px;
+        padding-left: 24px;
+        font-size: var(--text-base);
+        color: var(--color-text-tertiary, var(--color-text-tertiary));
+        line-height: 1.5;
+        letter-spacing: -0.004em;
+    }
+    #order-standard_cart .panel-addon .panel-price {
+        padding-left: 24px;
+        margin-top: 10px;
+        font-size: var(--text-base);
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-primary, var(--color-text-primary));
+        font-variant-numeric: tabular-nums;
+    }
+    #order-standard_cart .panel-addon .panel-add {
+        display: none;
+    }
+    #order-standard_cart .panel-addon-selected {
+        border-color: var(--color-accent, var(--color-accent)) !important;
+        background: var(--color-accent-light, #f0f7ff);
+    }
+    #order-standard_cart .panel-addon-selected:hover {
+        border-color: var(--color-accent, var(--color-accent)) !important;
+    }
+
+    /* Help / contact banner */
+    #order-standard_cart .info-text-sm {
+        padding: 14px 16px;
+        font-size: var(--text-base);
+        border-radius: 12px;
+        background: var(--color-surface-secondary, var(--color-surface-secondary)) !important;
+        color: var(--color-text-secondary, #424245) !important;
+        border: 0 !important;
+        margin-top: 22px;
+    }
+    #order-standard_cart .info-text-sm .fas {
+        color: var(--color-accent, var(--color-accent));
+        margin-right: 6px;
+    }
+    #order-standard_cart .info-text-sm .alert-link {
+        color: var(--color-accent, var(--color-accent)) !important;
+        font-weight: var(--fw-medium);
+        text-decoration: underline;
+    }
+
+    /* Configure-product Continue button (the big right-rail CTA) */
+    #order-standard_cart #btnCompleteProductConfig {
+        width: 100%;
+        height: 46px;
+        border-radius: var(--radius-pill, 980px);
+        font-weight: var(--fw-medium);
+        letter-spacing: -0.008em;
+    }
+
+    /* === checkout -- total-due banner, gateway picker, CC inputs ===
+       The big green "total due today" banner sits between the form
+       sections and the payment method picker. Apple-style: white
+       card with subtle accent border + large total. */
+    #order-standard_cart #totalDueToday {
+        background: linear-gradient(180deg, var(--color-surface-tertiary, #fafafd) 0%, var(--color-surface-primary, var(--color-surface)) 100%);
+        color: var(--color-text-primary, var(--color-text-primary)) !important;
+        border: 0.5px solid var(--color-border, var(--color-border)) !important;
+        border-radius: 14px !important;
+        padding: 22px 20px !important;
+        margin: 18px 0;
+        font-size: var(--text-md);
+        letter-spacing: -0.008em;
+        text-align: center;
+    }
+    #order-standard_cart #totalDueToday #totalCartPrice {
+        display: block;
+        margin-top: 4px;
+        font-size: var(--text-h4); font-weight: var(--fw-semibold);
+        color: var(--color-accent, var(--color-accent));
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.022em;
+    }
+
+    /* Credit-balance picker */
+    #order-standard_cart #applyCreditContainer {
+        padding: 16px 18px;
+        margin: 14px 0;
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: 12px;
+        background: var(--color-surface-secondary, var(--color-surface-secondary));
+    }
+    #order-standard_cart #applyCreditContainer p {
+        margin: 0 0 10px;
+        font-size: var(--text-base);
+        color: var(--color-text-secondary, #424245);
+    }
+    #order-standard_cart #applyCreditContainer label.radio {
+        display: flex; align-items: flex-start; gap: 8px;
+        margin: 6px 0;
+        font-size: var(--text-base);
+        color: var(--color-text-primary, var(--color-text-primary));
+        cursor: pointer;
+        padding: 6px 0;
+    }
+
+    /* Gateway radio picker -- wrap each one as a tappable card */
+    #order-standard_cart #paymentGatewaysContainer {
+        padding: 14px 0;
+    }
+    #order-standard_cart #paymentGatewaysContainer p.small {
+        text-align: center;
+        font-size: var(--text-sm) !important;
+        color: var(--color-text-tertiary, var(--color-text-tertiary)) !important;
+        margin-bottom: 14px;
+    }
+    #order-standard_cart #paymentGatewaysContainer .radio-inline {
+        display: inline-flex; align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        margin: 4px;
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: var(--radius-pill, 980px);
+        background: var(--color-surface-primary, var(--color-surface));
+        font-size: var(--text-base);
+        color: var(--color-text-primary, var(--color-text-primary));
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    #order-standard_cart #paymentGatewaysContainer .radio-inline:hover {
+        border-color: var(--color-accent, var(--color-accent));
+        color: var(--color-accent, var(--color-accent));
+    }
+    #order-standard_cart #paymentGatewaysContainer .payment-methods {
+        margin: 0;
+        accent-color: var(--color-accent, var(--color-accent));
+    }
+
+    /* CC input grid */
+    #order-standard_cart #creditCardInputFields {
+        padding: 18px;
+        margin-top: 14px;
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: 12px;
+        background: var(--color-surface-secondary, #f9f9fb);
+    }
+    #order-standard_cart #creditCardInputFields ul {
+        list-style: none;
+        padding: 0;
+        margin: 6px 0 14px;
+    }
+
+    /* TOS + complete-order footer */
+    #order-standard_cart .checkout-footer {
+        padding: 26px 0 8px;
+        border-top: 0.5px solid var(--color-border, var(--color-border));
+        margin-top: 26px;
+    }
+    #order-standard_cart .checkout-footer p {
+        font-size: var(--text-base);
+        color: var(--color-text-secondary, #424245);
+        margin-bottom: 14px;
+    }
+    #order-standard_cart #btnCompleteOrder {
+        min-width: 240px;
+        height: 50px;
+        padding: 0 28px;
+        border-radius: var(--radius-pill, 980px);
+        font-size: var(--text-lg);
+        font-weight: var(--fw-medium);
+        letter-spacing: -0.008em;
+        background: var(--color-accent, var(--color-accent)) !important;
+        border-color: var(--color-accent, var(--color-accent)) !important;
+    }
+    #order-standard_cart #btnCompleteOrder:hover {
+        background: var(--color-accent-hover, var(--color-accent-hover)) !important;
+        border-color: var(--color-accent-hover, var(--color-accent-hover)) !important;
+    }
+    #order-standard_cart .ct-trust-checkout {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 0;
+        align-items: center;
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    /* Already-registered / new-user toggle (top-right CTA on checkout) */
+    #order-standard_cart .already-registered {
+        padding: 14px 18px;
+        margin-bottom: 18px;
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: 12px;
+        background: var(--color-surface-secondary, var(--color-surface-secondary));
+    }
+    #order-standard_cart .already-registered p {
+        margin: 4px 0 !important;
+        font-size: var(--text-base);
+        color: var(--color-text-secondary, #424245);
+    }
+
+    /* Existing-account picker -- card-style radios */
+    #order-standard_cart .account-select-container .account {
+        padding: 16px 18px;
+        margin-bottom: 10px;
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: 12px;
+        background: var(--color-surface-primary, var(--color-surface));
+        transition: border-color 0.15s ease;
+    }
+    #order-standard_cart .account-select-container .account.active {
+        border-color: var(--color-accent, var(--color-accent));
+        background: var(--color-accent-light, #f0f7ff);
+    }
+    #order-standard_cart .account-select-container .account label {
+        display: flex; align-items: flex-start; gap: 10px;
+        margin: 0;
+        cursor: pointer;
+        font-size: var(--text-md);
+    }
+
+    /* Password-strength meter */
+    #order-standard_cart .password-strength-meter .progress {
+        height: 8px;
+        background: var(--color-surface-secondary, var(--color-surface-secondary));
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 6px;
+    }
+    #order-standard_cart .password-strength-meter #passwordStrengthMeterBar {
+        background-color: var(--color-accent, var(--color-accent)) !important;
+    }
+
+    /* === domainregister -- search hero + TLD pricing table === */
+    #order-standard_cart .domain-checker-container {
+        margin: 18px 0 24px;
+    }
+    #order-standard_cart .domain-checker-bg {
+        padding: 28px 24px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, var(--color-surface-secondary, var(--color-surface-secondary)) 0%, var(--color-surface-primary, var(--color-surface)) 100%);
+        border: 0.5px solid var(--color-border, var(--color-border));
+    }
+    #order-standard_cart .domain-checker-bg .input-group-box {
+        background: var(--color-surface-primary, var(--color-surface));
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: var(--radius-pill, 980px);
+        padding: 4px 4px 4px 18px;
+        display: flex; align-items: center;
+        gap: 6px;
+        overflow: hidden;
+    }
+    #order-standard_cart .domain-checker-bg .input-group-box .form-control {
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        font-size: var(--text-lg) !important;
+        padding: 12px 4px !important;
+        height: auto !important;
+    }
+    #order-standard_cart .domain-checker-bg .input-group-box textarea[name="message"] {
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        font-size: var(--text-lg) !important;
+        padding: 12px 4px !important;
+        resize: none !important;
+        min-height: 44px;
+        flex: 1;
+    }
+    #order-standard_cart .domain-checker-bg .input-group-box .domain-check-availability {
+        flex-shrink: 0;
+        height: 44px;
+        padding: 0 24px;
+        border-radius: var(--radius-pill, 980px);
+        font-weight: var(--fw-medium);
+        font-size: var(--text-md);
+        letter-spacing: -0.008em;
+        background: var(--color-accent, var(--color-accent)) !important;
+        border-color: var(--color-accent, var(--color-accent)) !important;
+    }
+    #order-standard_cart .domain-checker-bg .input-group-box .domain-check-availability:hover {
+        background: var(--color-accent-hover, var(--color-accent-hover)) !important;
+        border-color: var(--color-accent-hover, var(--color-accent-hover)) !important;
+    }
+
+    /* Featured TLDs row (logo + price card grid) */
+    #order-standard_cart .featured-tlds-container {
+        margin: 28px 0 14px;
+    }
+    #order-standard_cart .featured-tld {
+        background: var(--color-surface-primary, var(--color-surface));
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        text-align: center;
+        transition: border-color 0.15s ease;
+    }
+    #order-standard_cart .featured-tld:hover {
+        border-color: var(--color-accent, var(--color-accent));
+    }
+    #order-standard_cart .featured-tld .img-container img {
+        max-height: 40px;
+    }
+    #order-standard_cart .featured-tld .price {
+        margin-top: 10px;
+        font-size: var(--text-md);
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-primary, var(--color-text-primary));
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Category filter chips */
+    #order-standard_cart .tld-filters {
+        margin: 18px 0;
+        display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    #order-standard_cart .tld-filters a {
+        display: inline-flex; align-items: center;
+        padding: 5px 12px;
+        border-radius: var(--radius-pill, 980px);
+        background: var(--color-surface-secondary, var(--color-surface-secondary));
+        color: var(--color-text-secondary, #424245);
+        font-size: var(--text-sm);
+        font-weight: var(--fw-medium);
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+    #order-standard_cart .tld-filters a:hover {
+        background: var(--color-surface-tertiary, #ededf0);
+        color: var(--color-text-primary, var(--color-text-primary));
+    }
+    #order-standard_cart .tld-filters a.active,
+    #order-standard_cart .tld-filters a:focus {
+        background: var(--color-accent, var(--color-accent));
+        color: var(--color-surface);
+    }
+
+    /* TLD pricing table */
+    #order-standard_cart .domain-pricing .bg-white {
+        background: var(--color-surface-primary, var(--color-surface));
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    #order-standard_cart .tld-pricing-header {
+        padding: 14px 18px;
+        background: var(--color-surface-secondary, var(--color-surface-secondary));
+        font-size: var(--text-xs);
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-tertiary, var(--color-text-tertiary));
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin: 0;
+    }
+    #order-standard_cart .tld-row {
+        padding: 14px 18px;
+        border-top: 0.5px solid var(--color-border, var(--color-border));
+        font-size: var(--text-md);
+        color: var(--color-text-primary, var(--color-text-primary));
+        font-variant-numeric: tabular-nums;
+        margin: 0;
+    }
+    #order-standard_cart .tld-row strong {
+        font-size: var(--text-lg);
+        font-weight: var(--fw-semibold);
+        letter-spacing: -0.008em;
+    }
+    #order-standard_cart .tld-row small {
+        color: var(--color-text-tertiary, var(--color-text-tertiary));
+        font-size: var(--text-xs);
+    }
+    #order-standard_cart .tld-sale-group {
+        margin-left: 8px;
+        padding: 2px 8px;
+        border-radius: var(--radius-pill, 980px);
+        font-size: var(--text-xs);
+        font-weight: var(--fw-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    #order-standard_cart .tld-sale-group-hot {
+        background: var(--color-red-bg, #fee);
+        color: var(--color-red-text, #b00);
+    }
+    #order-standard_cart .tld-sale-group-new {
+        background: var(--color-green-bg, #e6f4ea);
+        color: var(--color-green-text, #1d7a32);
+    }
+    #order-standard_cart .tld-sale-group-sale {
+        background: var(--color-accent-light, #f0f7ff);
+        color: var(--color-accent, var(--color-accent));
+    }
+
+    /* Hosting / transfer promo cards at the bottom */
+    #order-standard_cart .domain-promo-box {
+        padding: 22px;
+        border-radius: 14px;
+        background: var(--color-surface-secondary, var(--color-surface-secondary));
+        margin-bottom: 14px;
+        min-height: 200px;
+    }
+    #order-standard_cart .domain-promo-box .fas {
+        color: var(--color-accent, var(--color-accent));
+        margin-bottom: 12px;
+        opacity: 0.9;
+    }
+    #order-standard_cart .domain-promo-box h3 {
+        margin: 0 0 8px;
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-primary, var(--color-text-primary));
+        letter-spacing: -0.012em;
+    }
+    #order-standard_cart .domain-promo-box p {
+        font-size: var(--text-md);
+        color: var(--color-text-secondary, #424245);
+        margin: 0 0 14px;
+        line-height: 1.5;
+    }
+
+    /* === domaintransfer -- single card on this page === */
+    #order-standard_cart .domain-transfer-card {
+        margin-top: 18px;
+        border: 0.5px solid var(--color-border, var(--color-border));
+        border-radius: 14px;
+        background: var(--color-surface-primary, var(--color-surface));
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        overflow: hidden;
+    }
+    #order-standard_cart .domain-transfer-card .card-header {
+        padding: 22px 22px 6px;
+        background: transparent;
+        border: 0;
+    }
+    #order-standard_cart .domain-transfer-card .card-header .panel-title {
+        margin: 0;
+        font-size: var(--text-h6);
+        font-weight: var(--fw-semibold);
+        color: var(--color-text-primary, var(--color-text-primary));
+        letter-spacing: -0.014em;
+    }
+    #order-standard_cart .domain-transfer-card .card-header .panel-title .fas {
+        color: var(--color-accent, var(--color-accent));
+        margin-right: 8px;
+    }
+    #order-standard_cart .domain-transfer-card .card-subtitle {
+        margin: 6px 0 0;
+        font-size: var(--text-base);
+        color: var(--color-text-tertiary, var(--color-text-tertiary));
+    }
+    #order-standard_cart .domain-transfer-card .card-body {
+        padding: 18px 22px;
+    }
+    #order-standard_cart .domain-transfer-card .card-footer {
+        padding: 14px 22px 22px;
+        background: transparent;
+        border: 0;
+    }
+    #order-standard_cart .domain-transfer-card #btnTransferDomain {
+        height: 44px;
+        padding: 0 22px;
+        border-radius: var(--radius-pill, 980px);
+        font-size: var(--text-md);
+        font-weight: var(--fw-medium);
+    }
+}
+
+/* ===============================================================
+   Cart-area heading defaults -- specificity (0,0,1) so any class
+   selector wins. The body[data-tpl=...] list is inside :where() so
+   it contributes 0 specificity; only the trailing h1/h2/h3 counts.
+   These define the Apple-style sizes for ANY heading in the cart
+   flow that doesn't have a more specific class rule attached.
+   =============================================================== */
+:where(
+    body[data-tpl="cart"],
+    body[data-tpl="viewcart"],
+    body[data-tpl="configureproduct"],
+    body[data-tpl="configureproductdomain"],
+    body[data-tpl="configuredomains"],
+    body[data-tpl="checkout"],
+    body[data-tpl="products"],
+    body[data-tpl="domainregister"],
+    body[data-tpl="domaintransfer"],
+    body[data-tpl="domainoptions"],
+    body[data-tpl="ordersummary"],
+    body[data-tpl="addons"],
+    body[data-tpl="complete"],
+    body[data-tpl="fraudcheck"]
+) h1 { font-size: var(--text-h3); font-weight: var(--fw-semibold); letter-spacing: -0.024em; margin-top: 0; }
+
+:where(
+    body[data-tpl="cart"],
+    body[data-tpl="viewcart"],
+    body[data-tpl="configureproduct"],
+    body[data-tpl="configureproductdomain"],
+    body[data-tpl="configuredomains"],
+    body[data-tpl="checkout"],
+    body[data-tpl="products"],
+    body[data-tpl="domainregister"],
+    body[data-tpl="domaintransfer"],
+    body[data-tpl="domainoptions"],
+    body[data-tpl="ordersummary"],
+    body[data-tpl="addons"],
+    body[data-tpl="complete"],
+    body[data-tpl="fraudcheck"]
+) h2 { font-size: var(--text-3xl); font-weight: var(--fw-semibold); letter-spacing: -0.018em; }
+
+:where(
+    body[data-tpl="cart"],
+    body[data-tpl="viewcart"],
+    body[data-tpl="configureproduct"],
+    body[data-tpl="configureproductdomain"],
+    body[data-tpl="configuredomains"],
+    body[data-tpl="checkout"],
+    body[data-tpl="products"],
+    body[data-tpl="domainregister"],
+    body[data-tpl="domaintransfer"],
+    body[data-tpl="domainoptions"],
+    body[data-tpl="ordersummary"],
+    body[data-tpl="addons"],
+    body[data-tpl="complete"],
+    body[data-tpl="fraudcheck"]
+) h3 { font-size: var(--text-h6); font-weight: var(--fw-semibold); letter-spacing: -0.014em; }

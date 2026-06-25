@@ -63,11 +63,11 @@ cmd_files() {
     mapfile -t pages < <(resolve_pages "$@")
 
     for page in "${pages[@]}"; do
-        local rel_dispatcher="templates/mytheme/${page}.tpl"
-        local rel_page="templates/mytheme/core/pages/${page}/page.php"
-        local rel_default="templates/mytheme/core/pages/${page}/default/default.tpl"
-        local rel_opt="templates/mytheme/core/pages/${page}/default/pageoption.php"
-        local rel_css="templates/mytheme/assets/css/pages/${page}.css"
+        local rel_dispatcher="templates/hadrian/${page}.tpl"
+        local rel_page="templates/hadrian/core/pages/${page}/page.php"
+        local rel_default="templates/hadrian/core/pages/${page}/default/default.tpl"
+        local rel_opt="templates/hadrian/core/pages/${page}/default/pageoption.php"
+        local rel_css="templates/hadrian/assets/css/pages/${page}.css"
 
         local entries=(
             "dispatcher|$rel_dispatcher"
@@ -107,8 +107,8 @@ cmd_lint() {
     mapfile -t pages < <(resolve_pages "$@")
 
     for page in "${pages[@]}"; do
-        local tpl="$THEME_ROOT/templates/mytheme/core/pages/${page}/default/default.tpl"
-        local css="$THEME_ROOT/templates/mytheme/assets/css/pages/${page}.css"
+        local tpl="$THEME_ROOT/templates/hadrian/core/pages/${page}/default/default.tpl"
+        local css="$THEME_ROOT/templates/hadrian/assets/css/pages/${page}.css"
 
         # Smarty: inline assignment {$x = y} (§3)
         if [[ -f "$tpl" ]] && grep -nE '\{\$[a-zA-Z_]+ *= [^}]+\}' "$tpl" >/dev/null 2>&1; then
@@ -154,8 +154,8 @@ cmd_lint() {
                 # Skip dynamic paths (containing template-var expressions like `$template`)
                 [[ "$ip" == *'`'* ]] && continue
                 [[ "$ip" == *'$'* ]] && continue
-                # Resolve relative to templates/mytheme/
-                local abs_inc="$THEME_ROOT/templates/mytheme/$ip"
+                # Resolve relative to templates/hadrian/
+                local abs_inc="$THEME_ROOT/templates/hadrian/$ip"
                 if [[ ! -f "$abs_inc" ]]; then
                     fail "$page · tpl includes missing partial '$ip' (Smarty drops the rest of the template silently)"
                 fi
@@ -207,14 +207,14 @@ cmd_lint() {
             [[ -f "$tpl" ]] && pass "$page · tpl · no hardcoded account-/user-level URLs (uses routePath)"
         fi
 
-        # Dispatcher: $myTheme.pages.<hyphenated-name>.fullPath in templates/mytheme/<page>.tpl
+        # Dispatcher: $hadrian.pages.<hyphenated-name>.fullPath in templates/hadrian/<page>.tpl
         # — Smarty parses dot-notation with hyphens as SUBTRACTION, silently produces empty
-        #   content-area. Must use bracket form: $myTheme.pages['hyphenated-name'].fullPath.
+        #   content-area. Must use bracket form: $hadrian.pages['hyphenated-name'].fullPath.
         if [[ "$page" == *-* ]]; then
-            local dispatcher="$THEME_ROOT/templates/mytheme/${page}.tpl"
-            if [[ -f "$dispatcher" ]] && grep -nE '\$myTheme\.pages\.[a-zA-Z0-9_-]+-[a-zA-Z0-9_-]+\.fullPath' "$dispatcher" >/dev/null 2>&1; then
-                fail "$page · dispatcher uses \$myTheme.pages.${page}.fullPath (Smarty parses hyphens as subtraction; use \$myTheme.pages['${page}'].fullPath)"
-                grep -nE '\$myTheme\.pages\.[a-zA-Z0-9_-]+-[a-zA-Z0-9_-]+\.fullPath' "$dispatcher" | head -2 | sed 's/^/      /'
+            local dispatcher="$THEME_ROOT/templates/hadrian/${page}.tpl"
+            if [[ -f "$dispatcher" ]] && grep -nE '\$hadrian\.pages\.[a-zA-Z0-9_-]+-[a-zA-Z0-9_-]+\.fullPath' "$dispatcher" >/dev/null 2>&1; then
+                fail "$page · dispatcher uses \$hadrian.pages.${page}.fullPath (Smarty parses hyphens as subtraction; use \$hadrian.pages['${page}'].fullPath)"
+                grep -nE '\$hadrian\.pages\.[a-zA-Z0-9_-]+-[a-zA-Z0-9_-]+\.fullPath' "$dispatcher" | head -2 | sed 's/^/      /'
             else
                 [[ -f "$dispatcher" ]] && pass "$page · dispatcher · hyphenated page key uses bracket notation"
             fi
@@ -246,7 +246,7 @@ cmd_lint() {
     done
 
     # Lint hooks.php for the register hook pattern bugs.
-    local hooks_php="$THEME_ROOT/modules/addons/MyTheme/hooks.php"
+    local hooks_php="$THEME_ROOT/modules/addons/Hadrian/hooks.php"
     if [[ -f "$hooks_php" ]]; then
         if grep -nE 'ClientAreaPage[A-Za-z]+' "$hooks_php" >/dev/null 2>&1; then
             pass "hooks.php · has ClientAreaPage hook registrations"
@@ -332,8 +332,8 @@ cmd_assets() {
     mapfile -t pages < <(resolve_pages "$@")
 
     for page in "${pages[@]}"; do
-        local local_css="$THEME_ROOT/templates/mytheme/assets/css/pages/${page}.css"
-        local remote_url="$BASE_URL/templates/mytheme/assets/css/pages/${page}.css"
+        local local_css="$THEME_ROOT/templates/hadrian/assets/css/pages/${page}.css"
+        local remote_url="$BASE_URL/templates/hadrian/assets/css/pages/${page}.css"
 
         if [[ ! -f "$local_css" ]]; then
             warn "$page · local css missing ($local_css) — skip asset check"

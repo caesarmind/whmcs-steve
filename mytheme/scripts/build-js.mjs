@@ -10,7 +10,7 @@ import { existsSync, mkdirSync } from 'node:fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
-const themeDir = resolve(root, 'templates/mytheme');
+const themeDir = resolve(root, 'templates/hadrian');
 const srcDir = `${themeDir}/assets/js/src`;
 const distDir = `${themeDir}/assets/js/dist`;
 
@@ -32,7 +32,7 @@ const config = {
 };
 
 if (config.entryPoints.length === 0) {
-  console.log('No JS entry points yet — create templates/mytheme/assets/js/src/theme.js to start.');
+  console.log('No JS entry points yet — create templates/hadrian/assets/js/src/theme.js to start.');
   process.exit(0);
 }
 

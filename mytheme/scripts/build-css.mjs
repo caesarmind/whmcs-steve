@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
-const themeDir = resolve(root, 'templates/mytheme');
+const themeDir = resolve(root, 'templates/hadrian');
 
 const ENTRIES = [
   { src: `${themeDir}/assets/scss/theme.scss`,     out: `${themeDir}/assets/css/theme.css` },

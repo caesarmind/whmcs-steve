@@ -9,7 +9,7 @@ Sources: Lagom 2.3.0 (`templates/lagom2/*.tpl`), Nexus / WHMCS 9.0.2 official (`
 - ⚠️ **Scaffold** — 5-file skeleton in place, default.tpl renders a real H1 + page-prefix div, but real WHMCS variable wiring is pending
 - ❌ **Missing** — no dispatcher, no skeleton, WHMCS falls back to error or Six's tpl
 
-The **URL** column shows the user-visible path. The **Templatefile** column shows WHMCS's internal name (sometimes differs from the URL slug — see §10 trap in PAGE-CHECKLIST). The dispatcher tpl in `templates/mytheme/` matches the templatefile name.
+The **URL** column shows the user-visible path. The **Templatefile** column shows WHMCS's internal name (sometimes differs from the URL slug — see §10 trap in PAGE-CHECKLIST). The dispatcher tpl in `templates/hadrian/` matches the templatefile name.
 
 ---
 
@@ -161,7 +161,7 @@ All four `password-reset-*` dispatchers forward to a single shared `pwreset/defa
 
 | Page | Why excluded |
 |---|---|
-| `cart.php` and the entire order-form funnel | Lives in `templates/orderforms/<style>/` not `templates/mytheme/`. Requires a separate theme directory hierarchy; the apple-style funnel is planned but not part of the client-area scope. |
+| `cart.php` and the entire order-form funnel | Lives in `templates/orderforms/<style>/` not `templates/hadrian/`. Requires a separate theme directory hierarchy; the apple-style funnel is planned but not part of the client-area scope. |
 | Admin area templates | Admin theme is separate from client-area theme. |
 | Email templates (`templates/emails/*.tpl`) | WHMCS handles transactional emails through its own template system. |
 

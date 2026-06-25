@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hadrian - Admin UI Mockup v3 (Lagom)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* ============================================================================
+   v3 "LAGOM" — full-width setting rows, checkmark-toggle, chip multi-select.
+   Signature Lagom DNA:
+     - row-style settings cards: title + info(i) on left, control on right
+     - toggle has a tiny checkmark inside the thumb when active
+     - sub-sections reveal under a toggled-on parent (with a thin divider)
+     - chip multi-select with × remove + icon prefix
+     - clean blue accent on soft off-white surface
+============================================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+:root {
+    --bg:          #f5f7fa;
+    --surface:     #ffffff;
+    --surface-2:  #f9fafb;
+    --surface-3:  #f3f4f6;
+    --border:      #e5e7eb;
+    --border-2:   #f0f1f3;
+    --input-border:#d1d5db;
+
+    --text:        #1f2937;
+    --text-2:      #4b5563;
+    --text-3:      #6b7280;
+    --text-4:      #9ca3af;
+    --text-5:      #d1d5db;
+
+    --primary:     #3b82f6;
+    --primary-h:   #2563eb;
+    --primary-d:   #1d4ed8;
+    --primary-tint:#eff6ff;
+    --primary-tint2:#dbeafe;
+
+    --success:     #10b981;
+    --success-tint:#d1fae5;
+    --success-text:#047857;
+    --warning:     #f59e0b;
+    --warning-tint:#fef3c7;
+    --warning-text:#b45309;
+    --danger:      #ef4444;
+    --danger-tint: #fee2e2;
+    --danger-text: #b91c1c;
+
+    --r-sm: 6px;
+    --r:    8px;
+    --r-md: 10px;
+    --r-lg: 12px;
+    --r-pill: 999px;
+
+    --shadow-1: 0 1px 2px rgba(17,24,39,0.05);
+    --shadow-2: 0 4px 12px rgba(17,24,39,0.06);
+    --shadow-3: 0 8px 24px rgba(17,24,39,0.10);
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { color: var(--primary-h); }
+code { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 0.88em; background: var(--surface-3); padding: 1px 6px; border-radius: 4px; color: var(--text-2); }
+button { font-family: inherit; }
+
+/* ============================================================================
+   SHELL — narrow header + horizontal tab nav (Lagom convention)
+============================================================================ */
+.lg-app { max-width: 1180px; margin: 0 auto; padding: 18px 24px 60px; }
+
+.lg-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding: 0 4px;
+}
+.lg-topline-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.lg-brand {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 15px;
+    box-shadow: 0 2px 5px rgba(59,130,246,0.25);
+}
+.lg-title-stack { line-height: 1.15; }
+.lg-title-stack .t { font-weight: 600; font-size: 15px; }
+.lg-title-stack .s { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+.lg-title-stack .s b { color: var(--success-text); font-weight: 500; }
+.lg-topline-right { display: flex; align-items: center; gap: 8px; }
+
+.lg-nav {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 4px;
+    margin-bottom: 18px;
+    display: flex;
+    gap: 1px;
+    overflow-x: auto;
+    box-shadow: var(--shadow-1);
+}
+.lg-nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: var(--r-sm);
+    color: var(--text-3);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color .15s, background .15s;
+}
+.lg-nav-item:hover { color: var(--text); background: var(--surface-2); }
+.lg-nav-item.is-active { background: var(--primary); color: #fff; }
+.lg-nav-item.is-active:hover { background: var(--primary-h); color: #fff; }
+.lg-nav-item svg { width: 16px; height: 16px; }
+.lg-nav-item .lg-nav-count {
+    background: rgba(255,255,255,0.25);
+    padding: 0 6px;
+    border-radius: var(--r-pill);
+    font-size: 11px;
+    font-weight: 600;
+}
+.lg-nav-item:not(.is-active) .lg-nav-count {
+    background: var(--surface-3);
+    color: var(--text-3);
+}
+
+/* ============================================================================
+   PAGE HEADER
+============================================================================ */
+.lg-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.lg-head-title { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 4px; }
+.lg-head-sub { font-size: 13.5px; color: var(--text-3); margin: 0; }
+.lg-head-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ============================================================================
+   CARD — the Lagom signature element
+============================================================================ */
+.lg-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+.lg-card-h {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.lg-card-h-text { min-width: 0; }
+.lg-card-h-title { font-size: 14.5px; font-weight: 600; margin: 0; }
+.lg-card-h-sub { font-size: 12.5px; color: var(--text-3); margin: 1px 0 0; }
+.lg-card-h-actions { display: flex; gap: 6px; align-items: center; }
+.lg-card-body { padding: 18px 20px; }
+.lg-card-body.flush { padding: 0; }
+
+/* ============================================================================
+   SETTING ROW — the Lagom signature interaction
+============================================================================ */
+.lg-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-2);
+}
+.lg-row:last-child { border-bottom: 0; }
+.lg-row-text { min-width: 0; flex: 1; }
+.lg-row-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.3;
+}
+.lg-row-help {
+    font-size: 12.5px;
+    color: var(--text-3);
+    margin-top: 4px;
+    max-width: 580px;
+    line-height: 1.5;
+}
+.lg-row-help a { color: var(--primary); }
+.lg-row-ctrl { flex-shrink: 0; }
+
+/* Sub-section revealed under a toggled-on row (no border on parent row) */
+.lg-row.has-sub { border-bottom: 0; }
+.lg-row-sub {
+    padding: 4px 20px 18px;
+    border-bottom: 1px solid var(--border-2);
+}
+.lg-row-sub[hidden] { display: none; }
+.lg-row-sub-label { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+.lg-row-sub-help { font-size: 12px; color: var(--text-3); margin-bottom: 10px; }
+
+/* ============================================================================
+   INFO ICON (the (i) tooltip trigger)
+============================================================================ */
+.lg-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--text-4);
+    color: var(--text-4);
+    font-size: 9.5px;
+    font-weight: 700;
+    font-style: italic;
+    font-family: Georgia, serif;
+    cursor: help;
+    line-height: 1;
+    background: var(--surface);
+    flex-shrink: 0;
+}
+.lg-info:hover { color: var(--primary); border-color: var(--primary); }
+
+/* ============================================================================
+   TOGGLE — checkmark inside thumb (Lagom signature)
+============================================================================ */
+.lg-toggle {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 24px;
+    flex-shrink: 0;
+}
+.lg-toggle input { opacity: 0; width: 0; height: 0; }
+.lg-toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #cbd5e1;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background .18s ease;
+}
+.lg-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.18), 0 0 0 0.5px rgba(0,0,0,0.06);
+    transition: transform .18s cubic-bezier(0.4, 0, 0.2, 1);
+    display: grid;
+    place-items: center;
+}
+.lg-toggle-thumb::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%233b82f6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 8 7 12 13 4'/></svg>") center/contain no-repeat;
+    opacity: 0;
+    transition: opacity .15s;
+}
+.lg-toggle input:checked ~ .lg-toggle-track { background: var(--primary); }
+.lg-toggle input:checked ~ .lg-toggle-track .lg-toggle-thumb { transform: translateX(18px); }
+.lg-toggle input:checked ~ .lg-toggle-track .lg-toggle-thumb::after { opacity: 1; }
+
+/* ============================================================================
+   BUTTONS
+============================================================================ */
+.lg-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: var(--r);
+    border: 1px solid transparent;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1;
+    transition: background .15s, border-color .15s, color .15s;
+}
+.lg-btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.lg-btn-primary:hover { background: var(--primary-h); border-color: var(--primary-h); color: #fff; }
+.lg-btn-outline { background: var(--surface); color: var(--text); border-color: var(--border); }
+.lg-btn-outline:hover { background: var(--surface-2); border-color: var(--input-border); }
+.lg-btn-ghost { background: transparent; color: var(--primary); }
+.lg-btn-ghost:hover { background: var(--primary-tint); }
+.lg-btn-danger { background: transparent; color: var(--danger); }
+.lg-btn-danger:hover { background: var(--danger-tint); }
+.lg-btn-sm { height: 28px; padding: 0 10px; font-size: 12.5px; }
+.lg-btn svg { width: 14px; height: 14px; }
+
+/* ============================================================================
+   BADGE / status dot
+============================================================================ */
+.lg-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    border-radius: var(--r-pill);
+    font-size: 11.5px;
+    font-weight: 500;
+    line-height: 1.7;
+}
+.lg-badge-success { background: var(--success-tint); color: var(--success-text); }
+.lg-badge-warning { background: var(--warning-tint); color: var(--warning-text); }
+.lg-badge-danger  { background: var(--danger-tint);  color: var(--danger-text); }
+.lg-badge-primary { background: var(--primary-tint); color: var(--primary-d); }
+.lg-badge-neutral { background: var(--surface-3); color: var(--text-2); }
+
+.lg-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; vertical-align: middle; }
+.lg-dot-success { background: var(--success); }
+.lg-dot-warning { background: var(--warning); }
+.lg-dot-danger  { background: var(--danger); }
+.lg-dot-muted   { background: var(--text-4); }
+
+/* ============================================================================
+   FIELDS — multi-select chip dropdown is the headline Lagom widget
+============================================================================ */
+.lg-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.lg-field:last-child { margin-bottom: 0; }
+.lg-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.lg-help { font-size: 12px; color: var(--text-3); }
+.lg-input, .lg-select, .lg-textarea {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--r);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 13.5px;
+    line-height: 1.4;
+    transition: border-color .15s, box-shadow .15s;
+}
+.lg-textarea { height: auto; padding: 10px 12px; resize: vertical; }
+.lg-input:focus, .lg-select:focus, .lg-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-tint2);
+}
+
+/* Multi-select chip field (the screenshot's Language Display) */
+.lg-multi {
+    width: 100%;
+    min-height: 38px;
+    padding: 5px 32px 5px 8px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--r);
+    background: var(--surface);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    cursor: pointer;
+}
+.lg-multi:hover { border-color: var(--text-4); }
+.lg-multi-caret {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-4);
+    pointer-events: none;
+}
+.lg-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 4px 0 8px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    font-size: 12.5px;
+    color: var(--text);
+}
+.lg-chip-icon {
+    width: 14px;
+    height: 14px;
+    color: var(--text-3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.lg-chip-x {
+    color: var(--primary);
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 3px;
+}
+.lg-chip-x:hover { background: var(--primary-tint); }
+.lg-chip-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.lg-chip-flag::before {
+    content: '';
+    width: 14px;
+    height: 10px;
+    display: inline-block;
+    border-radius: 2px;
+    background: var(--text-5);
+}
+
+/* ============================================================================
+   TABLES
+============================================================================ */
+.lg-table { width: 100%; border-collapse: collapse; }
+.lg-table thead th {
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+    padding: 11px 16px;
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.lg-table tbody td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border-2);
+    font-size: 13.5px;
+    vertical-align: middle;
+}
+.lg-table tbody tr:last-child td { border-bottom: 0; }
+.lg-table tbody tr:hover { background: var(--surface-2); }
+.lg-table tbody tr.is-active { background: var(--primary-tint); }
+.lg-table-name { font-weight: 500; color: var(--text); }
+.lg-table-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.lg-table-actions { text-align: right; white-space: nowrap; }
+
+/* ============================================================================
+   SUB-TABS (within a page)
+============================================================================ */
+.lg-subtabs {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px;
+    border-radius: var(--r);
+    gap: 1px;
+    margin-bottom: 14px;
+}
+.lg-subtab {
+    padding: 6px 14px;
+    border-radius: var(--r-sm);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-3);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.lg-subtab:hover { color: var(--text); }
+.lg-subtab.is-active { background: var(--primary-tint); color: var(--primary-d); }
+.lg-subtab-count {
+    background: var(--surface-3);
+    color: var(--text-3);
+    font-size: 11px;
+    padding: 0 6px;
+    border-radius: var(--r-pill);
+    font-weight: 500;
+}
+.lg-subtab.is-active .lg-subtab-count { background: var(--primary-tint2); color: var(--primary-d); }
+
+/* ============================================================================
+   STATS (dashboard tiles)
+============================================================================ */
+.lg-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+.lg-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 16px 18px;
+}
+.lg-stat-label {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.lg-stat-val { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; color: var(--text); }
+.lg-stat-val small { font-size: 13px; font-weight: 500; color: var(--text-3); margin-left: 4px; }
+.lg-stat-foot { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+.lg-stat-foot b { color: var(--text); font-weight: 500; }
+@media (max-width: 980px) { .lg-stat-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ============================================================================
+   ALERT
+============================================================================ */
+.lg-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: var(--r-md);
+    font-size: 13px;
+    margin-bottom: 16px;
+    border: 1px solid transparent;
+}
+.lg-alert strong { font-weight: 600; }
+.lg-alert-icon { flex-shrink: 0; margin-top: 1px; }
+.lg-alert-icon svg { width: 16px; height: 16px; }
+.lg-alert-success { background: var(--success-tint); border-color: rgba(16,185,129,0.25); color: var(--success-text); }
+.lg-alert-warning { background: var(--warning-tint); border-color: rgba(245,158,11,0.30); color: var(--warning-text); }
+.lg-alert-danger  { background: var(--danger-tint);  border-color: rgba(239,68,68,0.30); color: var(--danger-text); }
+.lg-alert-info    { background: var(--primary-tint); border-color: rgba(59,130,246,0.25); color: var(--primary-d); }
+
+/* ============================================================================
+   GRIDS (presets, brand tiles)
+============================================================================ */
+.lg-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 780px) { .lg-grid-2 { grid-template-columns: 1fr; } }
+.lg-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+@media (max-width: 980px) { .lg-grid-3 { grid-template-columns: repeat(2, 1fr); } }
+
+.lg-preset {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+.lg-preset:hover { transform: translateY(-1px); box-shadow: var(--shadow-2); border-color: var(--text-5); }
+.lg-preset.is-active { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-tint2); }
+.lg-preset-preview {
+    aspect-ratio: 16/10;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+}
+.lg-preset-preview-bar { height: 6px; border-radius: 999px; }
+.lg-preset-preview-card { flex: 1; border-radius: 4px; }
+.lg-preset-foot {
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.lg-preset-name { font-size: 13.5px; font-weight: 600; }
+.lg-preset-meta { font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
+
+/* Branding tile */
+.lg-tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 16px;
+}
+.lg-tile-preview {
+    aspect-ratio: 16/8;
+    border-radius: var(--r);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+.lg-tile-preview.light { background: #fff; border: 1px solid var(--border); }
+.lg-tile-preview.dark  { background: #111827; }
+.lg-tile-preview img { max-width: 70%; max-height: 70%; }
+.lg-tile-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.lg-tile-meta-name { font-size: 13px; font-weight: 600; }
+.lg-tile-meta-file { font-size: 11.5px; color: var(--text-4); font-family: ui-monospace, Menlo, monospace; }
+.lg-tile-actions { display: flex; gap: 6px; }
+.lg-tile-actions .lg-btn { flex: 1; }
+
+.lg-upload {
+    aspect-ratio: 16/8;
+    border: 1.5px dashed var(--input-border);
+    background: var(--surface-2);
+    border-radius: var(--r);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    margin-bottom: 12px;
+}
+.lg-upload:hover { border-color: var(--primary); background: var(--primary-tint); }
+.lg-upload svg { color: var(--text-3); }
+.lg-upload-t { font-size: 13px; font-weight: 500; }
+.lg-upload-h { font-size: 11.5px; color: var(--text-3); }
+.lg-upload.dark { background: #111827; border-color: #374151; }
+.lg-upload.dark .lg-upload-t { color: #f9fafb; }
+.lg-upload.dark .lg-upload-h { color: #9ca3af; }
+
+/* ============================================================================
+   MENU EDITOR — flat hairline sectioning, grip-based drag-and-drop, minimal
+   chevron, left accent bar on open items. Deliberately distanced from Lagom:
+   no circular blue chev, no blue side-stripe inside expanded panel, no
+   nested gray section cards, no "Expand" link text.
+============================================================================ */
+
+/* Compact toggle (used in row + props sub-rows) */
+.lg-toggle-sm { width: 32px; height: 18px; }
+.lg-toggle-sm .lg-toggle-thumb { width: 14px; height: 14px; top: 2px; left: 2px; }
+.lg-toggle-sm input:checked ~ .lg-toggle-track .lg-toggle-thumb { transform: translateX(14px); }
+.lg-toggle-sm .lg-toggle-thumb::after { width: 8px; height: 8px; }
+
+/* Top split: Menu Items (left) | Menu Settings (right sticky) */
+.lg-menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+}
+@media (max-width: 1000px) { .lg-menu-grid { grid-template-columns: 1fr; } }
+
+.lg-menu-paneh {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 4px 4px 12px;
+}
+.lg-menu-paneh-t {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.lg-docs-link {
+    font-size: 11px;
+    color: var(--text-4);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+.lg-docs-link:hover { color: var(--primary); }
+
+/* Items list — flat, no surrounding card */
+.lg-mi-list { display: flex; flex-direction: column; gap: 0; }
+
+/* Item container */
+.lg-mi-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top-width: 1px;
+    border-radius: 0;
+    transition: border-color .15s;
+    position: relative;
+}
+.lg-mi-list > .lg-mi-item:first-child { border-top-left-radius: 8px; border-top-right-radius: 8px; }
+.lg-mi-list > .lg-mi-item:last-child  { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+.lg-mi-list > .lg-mi-item + .lg-mi-item { border-top: 0; }
+
+/* Open state: left accent bar (replaces Lagom's blue side-stripe inside panel) */
+.lg-mi-item.is-open {
+    box-shadow: inset 3px 0 0 var(--primary);
+    border-color: var(--primary-tint2);
+    z-index: 1;
+}
+.lg-mi-item.is-open + .lg-mi-item { border-top: 1px solid var(--primary-tint2); }
+.lg-mi-item.is-hidden > .lg-mi-row > .lg-mi-name { color: var(--text-4); }
+.lg-mi-item.is-separator > .lg-mi-row > .lg-mi-name {
+    color: var(--text-4);
+    font-family: ui-monospace, Menlo, monospace;
+    letter-spacing: 0.18em;
+}
+
+/* Drag-over indicators (top/bottom insertion lines) */
+.lg-mi-item.is-drop-before::before,
+.lg-mi-item.is-drop-after::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--primary);
+    pointer-events: none;
+    z-index: 5;
+}
+.lg-mi-item.is-drop-before::before { top: -1px; }
+.lg-mi-item.is-drop-after::after   { bottom: -1px; }
+.lg-mi-item.is-dragging { opacity: 0.4; }
+
+/* The row itself */
+.lg-mi-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px 8px 6px;
+    min-height: 42px;
+}
+
+/* Drag grip — 6-dot, hover-revealed cursor:grab */
+.lg-mi-grip {
+    display: inline-flex;
+    width: 18px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-4);
+    cursor: grab;
+    flex-shrink: 0;
+    opacity: 0.4;
+    transition: opacity .15s, color .15s;
+}
+.lg-mi-row:hover > .lg-mi-grip { opacity: 1; }
+.lg-mi-grip:active { cursor: grabbing; }
+.lg-mi-grip:hover { color: var(--text-2); }
+.lg-mi-grip svg { width: 12px; height: 16px; }
+
+/* Minimal chevron — plain arrow, no circle bg */
+.lg-mi-chev {
+    width: 22px;
+    height: 22px;
+    border: 0;
+    background: transparent;
+    color: var(--text-3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: color .15s, background .15s;
+}
+.lg-mi-chev:hover { background: var(--surface-2); color: var(--text); }
+.lg-mi-chev svg { width: 11px; height: 11px; transition: transform .2s ease; }
+.lg-mi-item.is-open > .lg-mi-row > .lg-mi-chev { color: var(--primary); }
+.lg-mi-item.is-open > .lg-mi-row > .lg-mi-chev svg { transform: rotate(90deg); }
+
+/* Name */
+.lg-mi-name {
+    flex: 1;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-left: 4px;
+}
+
+/* Right-side cluster — flatter, no hover bg by default */
+.lg-mi-ctrls { display: flex; align-items: center; gap: 1px; flex-shrink: 0; }
+.lg-mi-btn {
+    width: 26px;
+    height: 26px;
+    border: 0;
+    background: transparent;
+    color: var(--text-4);
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: color .15s, background .15s;
+}
+.lg-mi-btn:hover { background: var(--surface-2); color: var(--text); }
+.lg-mi-btn:disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
+.lg-mi-btn svg { width: 13px; height: 13px; display: block; }
+.lg-mi-btn-add:hover { background: var(--primary-tint); color: var(--primary); }
+.lg-mi-btn-del:hover { background: var(--danger-tint); color: var(--danger); }
+.lg-mi-ctrls .lg-toggle-sm { margin: 0 6px; }
+
+/* ----- Expanded property panel — flat, no nested cards, no side stripe ----- */
+.lg-mi-props {
+    border-top: 1px solid var(--border-2);
+    padding: 4px 0 4px;
+    background: var(--surface);
+}
+.lg-mi-props[hidden] { display: none; }
+.lg-mi-props-eyebrow { display: none; }
+.lg-mi-props-body { padding: 0; }
+
+/* Each property is a two-column row: label (120px) | control */
+.lg-mi-sect {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: start;
+    gap: 14px;
+    padding: 12px 16px 12px 32px;
+    border-top: 1px solid var(--border-2);
+    background: var(--surface);
+}
+.lg-mi-sect:first-child { border-top: 0; }
+.lg-mi-sect-label {
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding-top: 9px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.lg-mi-sect-control { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.lg-mi-sect > :not(.lg-mi-sect-label) { grid-column: 2; min-width: 0; }
+.lg-mi-radio-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.lg-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text);
+}
+.lg-radio input { position: absolute; opacity: 0; pointer-events: none; }
+.lg-radio-mark {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--input-border);
+    border-radius: 50%;
+    background: var(--surface);
+    position: relative;
+    flex-shrink: 0;
+}
+.lg-radio input:checked + .lg-radio-mark { border-color: var(--primary); background: var(--primary); }
+.lg-radio input:checked + .lg-radio-mark::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: #fff;
+    border-radius: 50%;
+}
+.lg-translate-link {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+}
+.lg-translate-link:hover { color: var(--primary); cursor: pointer; text-decoration: none; }
+
+/* Icon tile (inline, no enclosing card) */
+.lg-mi-icon-tile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+}
+.lg-mi-icon-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: var(--surface-2);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+}
+.lg-mi-icon-thumb svg { width: 28px; height: 28px; }
+.lg-mi-icon-name { flex: 1; font-size: 12.5px; color: var(--text-2); font-family: ui-monospace, Menlo, monospace; }
+.lg-mi-icon-actions { display: flex; gap: 2px; }
+
+/* Collapsible sub-section — flat, hairline divider, chev-only (no "Expand" text) */
+.lg-mi-sub {
+    border-top: 1px solid var(--border-2);
+    background: var(--surface);
+}
+.lg-mi-sub-h {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 16px 11px 32px;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+}
+.lg-mi-sub-h:hover { background: var(--surface-2); }
+.lg-mi-sub-expand {
+    color: var(--text-4);
+    font-size: 0;
+    display: inline-flex;
+    align-items: center;
+}
+.lg-mi-sub-expand svg { width: 12px; height: 12px; transition: transform .2s; }
+.lg-mi-sub.is-open .lg-mi-sub-expand svg { transform: rotate(90deg); color: var(--primary); }
+.lg-mi-sub.is-open .lg-mi-sub-expand { color: var(--primary); }
+.lg-mi-sub-body {
+    padding: 4px 16px 14px 32px;
+    border-top: 1px solid var(--border-2);
+    padding-top: 12px;
+}
+.lg-mi-sub-body[hidden] { display: none; }
+.lg-mi-sub-body .lg-field { margin-bottom: 10px; }
+.lg-mi-sub-body .lg-field:last-child { margin-bottom: 0; }
+
+/* Children container — left indent matches the open accent bar */
+.lg-mi-children {
+    background: var(--surface-2);
+    border-top: 1px solid var(--border-2);
+    padding: 10px 12px 10px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+.lg-mi-children > .lg-mi-item { border-radius: 6px; border: 1px solid var(--border); }
+.lg-mi-children > .lg-mi-item + .lg-mi-item { margin-top: 6px; border-top: 1px solid var(--border); }
+
+/* "+ Add New Item" footer */
+.lg-mi-add-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px;
+    margin-top: 8px;
+    background: transparent;
+    border: 1px dashed var(--input-border);
+    border-radius: 6px;
+    color: var(--text-3);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.lg-mi-add-row:hover { border-color: var(--primary); color: var(--primary); background: var(--surface); }
+.lg-mi-add-row svg { width: 12px; height: 12px; }
+
+/* Menu Settings sidebar card */
+.lg-menu-settings {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 16px;
+    position: sticky;
+    top: 16px;
+}
+.lg-menu-settings .lg-field:last-child { margin-bottom: 0; }
+.lg-menu-settings .lg-multi-status {
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--r);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    cursor: pointer;
+    font-size: 13.5px;
+}
+.lg-menu-settings .lg-multi-status .lg-multi-caret { right: 12px; }
+
+@media (max-width: 640px) {
+    .lg-mi-children { padding-left: 14px; }
+    .lg-mi-sect { grid-template-columns: 1fr; gap: 6px; padding-left: 16px; }
+    .lg-mi-sub-h { padding-left: 16px; }
+    .lg-mi-sub-body { padding-left: 16px; }
+    .lg-mi-row { gap: 2px; padding: 10px 8px 10px 4px; }
+    .lg-mi-btn { width: 30px; height: 30px; }
+    .lg-mi-grip { display: none; } /* hide grip on touch — up/down buttons handle reorder */
+}
+
+/* Live diagnostic card (menu live state) */
+.lg-diag {
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    background: var(--surface);
+}
+.lg-diag.is-warn { background: var(--warning-tint); border-color: rgba(245,158,11,0.3); color: var(--warning-text); }
+.lg-diag-eyebrow { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-3); margin-bottom: 6px; }
+.lg-diag.is-warn .lg-diag-eyebrow { color: var(--warning-text); opacity: 0.85; }
+.lg-diag-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.lg-diag-meta { font-size: 12px; color: var(--text-3); }
+.lg-diag.is-warn .lg-diag-meta { color: var(--warning-text); }
+.lg-diag-meta a { text-decoration: underline; }
+
+/* ============================================================================
+   EMPTY STATE
+============================================================================ */
+.lg-empty { text-align: center; padding: 40px 20px; color: var(--text-3); }
+.lg-empty-icon { width: 44px; height: 44px; margin: 0 auto 12px; color: var(--text-4); }
+.lg-empty-title { font-size: 14px; font-weight: 600; color: var(--text); margin: 0 0 4px; }
+
+/* ============================================================================
+   META LIST (key/value pairs)
+============================================================================ */
+.lg-kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 28px; }
+.lg-kv-k { font-size: 12px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; margin-bottom: 3px; }
+.lg-kv-v { font-size: 14px; color: var(--text); font-weight: 500; }
+
+/* ============================================================================
+   PANE SWITCHING
+============================================================================ */
+.lg-pane { display: none; }
+.lg-pane.is-active { display: block; }
+
+/* ============================================================================
+   MOCKUP STATE PICKER
+============================================================================ */
+.mock-state {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: rgba(31,41,55,0.94);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    padding: 6px 8px;
+    border-radius: var(--r);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    box-shadow: var(--shadow-3);
+}
+.mock-state label { color: #9ca3af; padding: 0 6px; }
+.mock-state select {
+    background: #374151;
+    color: #fff;
+    border: 0;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="lg-app">
+
+    <!-- ====================== TOP LINE ====================== -->
+    <div class="lg-topline">
+        <div class="lg-topline-left">
+            <div class="lg-brand">H</div>
+            <div class="lg-title-stack">
+                <div class="t">Hostnodes Theme</div>
+                <div class="s">v1.2.0 &middot; <b>License active</b></div>
+            </div>
+        </div>
+        <div class="lg-topline-right">
+            <button class="lg-btn lg-btn-outline lg-btn-sm">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M6 2.5h-2a1 1 0 00-1 1v9a1 1 0 001 1h8a1 1 0 001-1v-2M10 2.5h3.5V6M13.5 2.5L7 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                View site
+            </button>
+            <button class="lg-btn lg-btn-outline lg-btn-sm">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M3 2.5h6.5L13 6v7.5a1 1 0 01-1 1H3a1 1 0 01-1-1v-10a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9.5 2.5V6H13" stroke="currentColor" stroke-width="1.4"/></svg>
+                Docs
+            </button>
+        </div>
+    </div>
+
+    <!-- ====================== TAB NAV ====================== -->
+    <nav class="lg-nav">
+        <a class="lg-nav-item is-active" data-pane="dashboard">
+            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="8.5" y="2" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="8.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+            Dashboard
+        </a>
+        <a class="lg-nav-item" data-pane="settings">
+            <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Settings
+        </a>
+        <a class="lg-nav-item" data-pane="styles">
+            <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="5" r="1" fill="currentColor"/><circle cx="5" cy="8" r="1" fill="currentColor"/><circle cx="11" cy="8" r="1" fill="currentColor"/></svg>
+            Styles <span class="lg-nav-count">5</span>
+        </a>
+        <a class="lg-nav-item" data-pane="layouts">
+            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 2.5v11M2 6h4" stroke="currentColor" stroke-width="1.4"/></svg>
+            Layouts <span class="lg-nav-count">3</span>
+        </a>
+        <a class="lg-nav-item" data-pane="pages">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M4 2h6l2.5 2.5V14a.5.5 0 01-.5.5H4a.5.5 0 01-.5-.5V2.5a.5.5 0 01.5-.5z" stroke="currentColor" stroke-width="1.4"/></svg>
+            Pages <span class="lg-nav-count">14</span>
+        </a>
+        <a class="lg-nav-item" data-pane="menu">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2.5 4h11M2.5 8h11M2.5 12h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Menu <span class="lg-nav-count">4</span>
+        </a>
+        <a class="lg-nav-item" data-pane="branding">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M8 2l2.4 4 4 .6-2.8 2.8.6 4L8 11.5 3.8 13.4l.6-4-2.8-2.8 4-.6L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Branding
+        </a>
+        <a class="lg-nav-item" data-pane="extensions">
+            <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="5" height="5" rx="2" stroke="currentColor" stroke-width="1.4"/></svg>
+            Extensions <span class="lg-nav-count">3</span>
+        </a>
+        <a class="lg-nav-item" data-pane="tools">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M10.5 2a2.5 2.5 0 012 4.2L4 14.5l-2 .5.5-2L11.3 4.3A2.5 2.5 0 0110.5 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Tools
+        </a>
+        <a class="lg-nav-item" data-pane="license">
+            <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.4"/></svg>
+            License
+        </a>
+    </nav>
+
+    <!-- ====================== DASHBOARD ====================== -->
+    <section class="lg-pane is-active" data-pane-content="dashboard">
+        <div class="lg-head">
+            <div>
+                <h1 class="lg-head-title">Dashboard</h1>
+                <p class="lg-head-sub">Theme status at a glance: license, subscription, and recent activity.</p>
+            </div>
+            <div class="lg-head-actions">
+                <button class="lg-btn lg-btn-outline">Activity log</button>
+            </div>
+        </div>
+
+        <div class="lg-alert lg-alert-warning lg-dev-only" hidden>
+            <span class="lg-alert-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1L1 14h14L8 1zM8 6v3.5M8 11v.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div>
+                <strong>Development mode is active.</strong>
+                License checks are bypassed. Set <code>dev_mode =&gt; false</code> in <code>templates/hadrian/core/hadrian.php</code> to enable real validation.
+            </div>
+        </div>
+
+        <div class="lg-stat-grid">
+            <div class="lg-stat">
+                <div class="lg-stat-label"><span class="lg-dot lg-dot-success"></span> License</div>
+                <div class="lg-stat-val">Active</div>
+                <div class="lg-stat-foot">Renews <b>2026-08-12</b></div>
+            </div>
+            <div class="lg-stat">
+                <div class="lg-stat-label">Theme version</div>
+                <div class="lg-stat-val">1.2.0 <small>/ 1.2.1</small></div>
+                <div class="lg-stat-foot"><a href="#">Update available</a></div>
+            </div>
+            <div class="lg-stat">
+                <div class="lg-stat-label">Subscription</div>
+                <div class="lg-stat-val">$49<small>/yr</small></div>
+                <div class="lg-stat-foot">Stripe &middot;&middot;&middot;&middot; <b>4242</b></div>
+            </div>
+            <div class="lg-stat">
+                <div class="lg-stat-label">Active template</div>
+                <div class="lg-stat-val">hadrian</div>
+                <div class="lg-stat-foot"><b>3</b> installed</div>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h">
+                <div class="lg-card-h-text">
+                    <h2 class="lg-card-h-title">License details</h2>
+                    <p class="lg-card-h-sub">Subscription and key information</p>
+                </div>
+                <div class="lg-card-h-actions">
+                    <button class="lg-btn lg-btn-ghost lg-btn-sm">Refresh now</button>
+                    <button class="lg-btn lg-btn-outline lg-btn-sm" onclick="lgSwitch('license')">Change key</button>
+                </div>
+            </div>
+            <div class="lg-card-body">
+                <div class="lg-kv-grid">
+                    <div><div class="lg-kv-k">Registered</div><div class="lg-kv-v">2025-08-12</div></div>
+                    <div><div class="lg-kv-k">Next due</div><div class="lg-kv-v">2026-08-12</div></div>
+                    <div><div class="lg-kv-k">First payment</div><div class="lg-kv-v">$79.00</div></div>
+                    <div><div class="lg-kv-k">Recurring</div><div class="lg-kv-v">$49.00 / yr</div></div>
+                    <div><div class="lg-kv-k">Support &amp; updates</div><div class="lg-kv-v"><span class="lg-badge lg-badge-success"><span class="lg-dot lg-dot-success"></span> Active</span></div></div>
+                    <div><div class="lg-kv-k">License key</div><div class="lg-kv-v"><code>MT-XXXX-XXXX-AB12-CD34</code></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h">
+                <div class="lg-card-h-text"><h2 class="lg-card-h-title">Live state</h2><p class="lg-card-h-sub">What the frontend renders right now</p></div>
+            </div>
+            <div class="lg-card-body">
+                <div class="lg-grid-2">
+                    <div class="lg-diag">
+                        <div class="lg-diag-eyebrow">Client audience</div>
+                        <div class="lg-diag-title">Client Main</div>
+                        <div class="lg-diag-meta">7 items &middot; <a href="#" onclick="lgSwitch('menu');return false">Open</a></div>
+                    </div>
+                    <div class="lg-diag is-warn">
+                        <div class="lg-diag-eyebrow">Guest audience</div>
+                        <div class="lg-diag-title">No active menu</div>
+                        <div class="lg-diag-meta"><a href="#">Re-seed presets</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====================== SETTINGS — the headline pane ====================== -->
+    <section class="lg-pane" data-pane-content="settings">
+        <div class="lg-head">
+            <div>
+                <h1 class="lg-head-title">Settings</h1>
+                <p class="lg-head-sub">Theme-wide options. Changes apply immediately.</p>
+            </div>
+            <div class="lg-head-actions">
+                <button class="lg-btn lg-btn-outline">Reset to defaults</button>
+                <button class="lg-btn lg-btn-primary">Save changes</button>
+            </div>
+        </div>
+
+        <div class="lg-subtabs">
+            <a class="lg-subtab is-active">General</a>
+            <a class="lg-subtab">Order Process</a>
+            <a class="lg-subtab">Email</a>
+            <a class="lg-subtab">Advanced</a>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Display</h2></div></div>
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Show currency switcher <span class="lg-info" title="Adds a currency dropdown to the header.">i</span></div>
+                    <div class="lg-row-help">Surface a currency dropdown in the top bar so visitors can switch.</div>
+                </div>
+                <label class="lg-toggle"><input type="checkbox" checked><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+            </div>
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Sticky footer <span class="lg-info" title="Pin the footer to the bottom of the viewport on short pages.">i</span></div>
+                    <div class="lg-row-help">Footer stays at the bottom of the viewport on short pages.</div>
+                </div>
+                <label class="lg-toggle"><input type="checkbox" checked><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+            </div>
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Compact card spacing</div>
+                    <div class="lg-row-help">Reduces padding inside cards across the client area.</div>
+                </div>
+                <label class="lg-toggle"><input type="checkbox"><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Localization</h2></div></div>
+
+            <!-- Lagom's signature pattern: toggle row with revealed sub-section -->
+            <div class="lg-row has-sub">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Custom Language List <span class="lg-info" title="Restrict the locale switcher to a curated subset of installed languages.">i</span></div>
+                    <div class="lg-row-help">Pick which languages appear in the locale chooser. Only languages installed in <code>/lang/</code> are shown.</div>
+                </div>
+                <label class="lg-toggle">
+                    <input type="checkbox" id="lgLangToggle" checked onchange="document.getElementById('lgLangSub').hidden = !this.checked">
+                    <span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span>
+                </label>
+            </div>
+            <div class="lg-row-sub" id="lgLangSub">
+                <div class="lg-field">
+                    <label class="lg-label">Language Display</label>
+                    <div class="lg-multi">
+                        <span class="lg-chip">
+                            <span class="lg-chip-icon"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1"/><path d="M1.5 7h11M7 1.5c2 1.5 2 9.5 0 11M7 1.5c-2 1.5-2 9.5 0 11" stroke="currentColor" stroke-width="1"/></svg></span>
+                            All
+                            <span class="lg-chip-x">&times;</span>
+                        </span>
+                        <span class="lg-multi-caret">
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        </span>
+                    </div>
+                    <div class="lg-help">Select languages to limit the picker, or keep "All" to show every installed language.</div>
+                </div>
+            </div>
+
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Default language</div>
+                    <div class="lg-row-help">Used when a visitor's preferred language isn't installed.</div>
+                </div>
+                <select class="lg-select" style="width:auto;min-width:160px"><option>English</option><option>Spanish</option><option>German</option></select>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Header &amp; navigation</h2></div></div>
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Enable global search <span class="lg-info" title="Adds a search field to the header that queries products, KB, tickets.">i</span></div>
+                    <div class="lg-row-help">Adds a search field to the header that queries products, KB articles, and tickets.</div>
+                </div>
+                <label class="lg-toggle"><input type="checkbox"><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+            </div>
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Show announcement bar</div>
+                    <div class="lg-row-help">Site-wide bar above the navigation for promos or maintenance notices.</div>
+                </div>
+                <label class="lg-toggle"><input type="checkbox" checked><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+            </div>
+            <div class="lg-row has-sub">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Show menu icons</div>
+                    <div class="lg-row-help">Render small icons next to top-nav items.</div>
+                </div>
+                <label class="lg-toggle">
+                    <input type="checkbox" onchange="document.getElementById('lgIconSub').hidden = !this.checked">
+                    <span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span>
+                </label>
+            </div>
+            <div class="lg-row-sub" id="lgIconSub" hidden>
+                <div class="lg-field">
+                    <label class="lg-label">Icon style</label>
+                    <select class="lg-select" style="max-width:280px"><option>Outline</option><option>Solid</option><option>Duotone</option></select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====================== STYLES ====================== -->
+    <section class="lg-pane" data-pane-content="styles">
+        <div class="lg-head">
+            <div>
+                <h1 class="lg-head-title">Styles</h1>
+                <p class="lg-head-sub">Pick a style preset for <strong>hadrian</strong>. Applied as <code>data-theme</code> on <code>&lt;body&gt;</code>.</p>
+            </div>
+        </div>
+
+        <div class="lg-grid-3">
+            <label class="lg-preset is-active">
+                <div class="lg-preset-preview" style="background:#f9fafb">
+                    <div class="lg-preset-preview-bar" style="background:#1f2937"></div>
+                    <div class="lg-preset-preview-card" style="background:#fff;border:1px solid #e5e7eb"></div>
+                </div>
+                <div class="lg-preset-foot">
+                    <div><div class="lg-preset-name">Light Default</div><div class="lg-preset-meta">Apple HIG &middot; light surfaces</div></div>
+                    <span class="lg-badge lg-badge-success"><span class="lg-dot lg-dot-success"></span> Active</span>
+                </div>
+            </label>
+            <label class="lg-preset">
+                <div class="lg-preset-preview" style="background:#111827">
+                    <div class="lg-preset-preview-bar" style="background:#fff"></div>
+                    <div class="lg-preset-preview-card" style="background:#1f2937"></div>
+                </div>
+                <div class="lg-preset-foot">
+                    <div><div class="lg-preset-name">Dark Mode</div><div class="lg-preset-meta">Deep neutrals &middot; OLED-friendly</div></div>
+                    <button class="lg-btn lg-btn-ghost lg-btn-sm">Activate</button>
+                </div>
+            </label>
+            <label class="lg-preset">
+                <div class="lg-preset-preview" style="background:linear-gradient(135deg,#ffe5ea,#fff1f2)">
+                    <div class="lg-preset-preview-bar" style="background:#ff6b6b"></div>
+                    <div class="lg-preset-preview-card" style="background:#fff"></div>
+                </div>
+                <div class="lg-preset-foot">
+                    <div><div class="lg-preset-name">Coral</div><div class="lg-preset-meta">Warm pink-red accent</div></div>
+                    <button class="lg-btn lg-btn-ghost lg-btn-sm">Activate</button>
+                </div>
+            </label>
+            <label class="lg-preset">
+                <div class="lg-preset-preview" style="background:linear-gradient(135deg,#dcfce7,#f0fdf4)">
+                    <div class="lg-preset-preview-bar" style="background:#10b981"></div>
+                    <div class="lg-preset-preview-card" style="background:#fff"></div>
+                </div>
+                <div class="lg-preset-foot">
+                    <div><div class="lg-preset-name">Forest</div><div class="lg-preset-meta">Calm greens &middot; nature</div></div>
+                    <button class="lg-btn lg-btn-ghost lg-btn-sm">Activate</button>
+                </div>
+            </label>
+            <label class="lg-preset">
+                <div class="lg-preset-preview" style="background:linear-gradient(135deg,#fef3c7,#fffbeb)">
+                    <div class="lg-preset-preview-bar" style="background:#f59e0b"></div>
+                    <div class="lg-preset-preview-card" style="background:#fff"></div>
+                </div>
+                <div class="lg-preset-foot">
+                    <div><div class="lg-preset-name">Amber</div><div class="lg-preset-meta">Warm amber accent</div></div>
+                    <button class="lg-btn lg-btn-ghost lg-btn-sm">Activate</button>
+                </div>
+            </label>
+        </div>
+    </section>
+
+    <!-- ====================== LAYOUTS ====================== -->
+    <section class="lg-pane" data-pane-content="layouts">
+        <div class="lg-head">
+            <div>
+                <h1 class="lg-head-title">Layouts</h1>
+                <p class="lg-head-sub">Each layout has independent activations for guests and logged-in clients.</p>
+            </div>
+        </div>
+
+        <div class="lg-subtabs">
+            <a class="lg-subtab is-active">Main menu</a>
+            <a class="lg-subtab">Footer</a>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Main menu layouts</h2><p class="lg-card-h-sub">3 available</p></div></div>
+            <div class="lg-card-body flush">
+                <table class="lg-table">
+                    <thead>
+                        <tr><th>Layout</th><th style="width:140px">Guest</th><th style="width:140px">Client</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="is-active">
+                            <td>
+                                <div class="lg-table-name">Classic top-bar</div>
+                                <div class="lg-table-sub">Logo left, menu center, account right.</div>
+                            </td>
+                            <td><span class="lg-badge lg-badge-success"><span class="lg-dot lg-dot-success"></span> Active</span></td>
+                            <td><button class="lg-btn lg-btn-ghost lg-btn-sm">Activate</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="lg-table-name">Mega menu</div>
+                                <div class="lg-table-sub">Wide dropdown with grouped children + icons.</div>
+                            </td>
+                            <td><button class="lg-btn lg-btn-ghost lg-btn-sm">Activate</button></td>
+                            <td><span class="lg-badge lg-badge-success"><span class="lg-dot lg-dot-success"></span> Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="lg-table-name">Apple-style center nav</div>
+                                <div class="lg-table-sub">Compact, centered, no icons.</div>
+                            </td>
+                            <td><button class="lg-btn lg-btn-ghost lg-btn-sm">Activate</button></td>
+                            <td><button class="lg-btn lg-btn-ghost lg-btn-sm">Activate</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====================== PAGES ====================== -->
+    <section class="lg-pane" data-pane-content="pages">
+        <div class="lg-head">
+            <div>
+                <h1 class="lg-head-title">Pages</h1>
+                <p class="lg-head-sub">Configure template variant, SEO, indexing and visibility for each WHMCS page.</p>
+            </div>
+            <div class="lg-head-actions">
+                <button class="lg-btn lg-btn-outline">Rebuild discovery</button>
+            </div>
+        </div>
+
+        <div class="lg-subtabs">
+            <a class="lg-subtab is-active">All <span class="lg-subtab-count">14</span></a>
+            <a class="lg-subtab">Account <span class="lg-subtab-count">4</span></a>
+            <a class="lg-subtab">Billing <span class="lg-subtab-count">3</span></a>
+            <a class="lg-subtab">Services <span class="lg-subtab-count">4</span></a>
+            <a class="lg-subtab">Support <span class="lg-subtab-count">3</span></a>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-body flush">
+                <table class="lg-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Group</th>
+                            <th>Variant</th>
+                            <th>SEO</th>
+                            <th>Indexing</th>
+                            <th>Visibility</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="lg-table-name">Client area</div>
+                                <div class="lg-table-sub">The logged-in dashboard.</div>
+                            </td>
+                            <td><span class="lg-badge lg-badge-neutral">Account</span></td>
+                            <td>Default</td>
+                            <td><span class="lg-dot lg-dot-success"></span></td>
+                            <td><span class="lg-badge lg-badge-warning">Disallow</span></td>
+                            <td><span class="lg-badge lg-badge-primary">Auth only</span></td>
+                            <td class="lg-table-actions"><a class="lg-btn lg-btn-ghost lg-btn-sm" href="#">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td><div class="lg-table-name">Login</div></td>
+                            <td><span class="lg-badge lg-badge-neutral">Account</span></td>
+                            <td>Centered card</td>
+                            <td><span class="lg-dot lg-dot-success"></span></td>
+                            <td><span class="lg-badge lg-badge-success">Allow</span></td>
+                            <td><span class="lg-badge lg-badge-neutral">Public</span></td>
+                            <td class="lg-table-actions"><a class="lg-btn lg-btn-ghost lg-btn-sm" href="#">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td><div class="lg-table-name">Register</div></td>
+                            <td><span class="lg-badge lg-badge-neutral">Account</span></td>
+                            <td>Two-column</td>
+                            <td><span class="lg-dot lg-dot-muted"></span></td>
+                            <td><span class="lg-badge lg-badge-neutral">Inherit</span></td>
+                            <td><span class="lg-badge lg-badge-neutral">Public</span></td>
+                            <td class="lg-table-actions"><a class="lg-btn lg-btn-ghost lg-btn-sm" href="#">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td><div class="lg-table-name">Password reset</div></td>
+                            <td><span class="lg-badge lg-badge-neutral">Account</span></td>
+                            <td>Centered card</td>
+                            <td><span class="lg-dot lg-dot-muted"></span></td>
+                            <td><span class="lg-badge lg-badge-warning">Disallow</span></td>
+                            <td><span class="lg-badge lg-badge-warning">Disabled</span></td>
+                            <td class="lg-table-actions"><a class="lg-btn lg-btn-ghost lg-btn-sm" href="#">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td><div class="lg-table-name">Invoices</div></td>
+                            <td><span class="lg-badge lg-badge-neutral">Billing</span></td>
+                            <td>Default</td>
+                            <td><span class="lg-dot lg-dot-muted"></span></td>
+                            <td><span class="lg-badge lg-badge-warning">Disallow</span></td>
+                            <td><span class="lg-badge lg-badge-primary">Auth only</span></td>
+                            <td class="lg-table-actions"><a class="lg-btn lg-btn-ghost lg-btn-sm" href="#">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td><div class="lg-table-name">Cart</div></td>
+                            <td><span class="lg-badge lg-badge-neutral">Services</span></td>
+                            <td>Apple Cart</td>
+                            <td><span class="lg-dot lg-dot-success"></span></td>
+                            <td><span class="lg-badge lg-badge-warning">Disallow</span></td>
+                            <td><span class="lg-badge lg-badge-neutral">Public</span></td>
+                            <td class="lg-table-actions"><a class="lg-btn lg-btn-ghost lg-btn-sm" href="#">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td><div class="lg-table-name">Tickets</div></td>
+                            <td><span class="lg-badge lg-badge-neutral">Support</span></td>
+                            <td>Default</td>
+                            <td><span class="lg-dot lg-dot-muted"></span></td>
+                            <td><span class="lg-badge lg-badge-warning">Disallow</span></td>
+                            <td><span class="lg-badge lg-badge-primary">Auth only</span></td>
+                            <td class="lg-table-actions"><a class="lg-btn lg-btn-ghost lg-btn-sm" href="#">Edit</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====================== MENU ====================== -->
+    <section class="lg-pane" data-pane-content="menu">
+        <div class="lg-head">
+            <div>
+                <h1 class="lg-head-title">Menu</h1>
+                <p class="lg-head-sub">Build navigation menus and assign them to client / guest audiences.</p>
+            </div>
+            <div class="lg-head-actions">
+                <button class="lg-btn lg-btn-outline">Re-seed presets</button>
+                <button class="lg-btn lg-btn-primary" onclick="lgSwitch('menu-edit')">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    New menu
+                </button>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h">
+                <div class="lg-card-h-text"><h2 class="lg-card-h-title">Live state</h2><p class="lg-card-h-sub">What the frontend renders right now for each audience.</p></div>
+            </div>
+            <div class="lg-card-body">
+                <div class="lg-grid-2">
+                    <div class="lg-diag">
+                        <div class="lg-diag-eyebrow">Client audience</div>
+                        <div class="lg-diag-title">Client Main</div>
+                        <div class="lg-diag-meta">7 items</div>
+                    </div>
+                    <div class="lg-diag is-warn">
+                        <div class="lg-diag-eyebrow">Guest audience</div>
+                        <div class="lg-diag-title">No active menu</div>
+                        <div class="lg-diag-meta"><a href="#">Re-seed presets</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg-subtabs">
+            <a class="lg-subtab is-active">Main</a>
+            <a class="lg-subtab">Secondary</a>
+            <a class="lg-subtab">Footer</a>
+            <a class="lg-subtab">Footer 2</a>
+        </div>
+
+        <div class="lg-card lg-menu-table">
+            <div class="lg-card-body flush">
+                <table class="lg-table">
+                    <thead><tr><th>Name</th><th>Audience</th><th>Items</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                        <tr class="is-active">
+                            <td><div class="lg-table-name"><a href="#" onclick="lgSwitch('menu-edit');return false">Client Main</a></div></td>
+                            <td><span class="lg-badge lg-badge-neutral">Client</span></td>
+                            <td>7</td>
+                            <td><span class="lg-badge lg-badge-success"><span class="lg-dot lg-dot-success"></span> Active</span></td>
+                            <td class="lg-table-actions"><a class="lg-btn lg-btn-ghost lg-btn-sm" href="#" onclick="lgSwitch('menu-edit');return false">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td><div class="lg-table-name"><a href="#">Guest Hosting</a> <span class="lg-badge lg-badge-primary">edited</span></div></td>
+                            <td><span class="lg-badge lg-badge-neutral">Guest</span></td>
+                            <td>5</td>
+                            <td><span class="lg-badge lg-badge-neutral">Disabled</span></td>
+                            <td class="lg-table-actions"><a class="lg-btn lg-btn-ghost lg-btn-sm" href="#">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td><div class="lg-table-name"><a href="#">WHMCS Defaults &mdash; Domains</a></div></td>
+                            <td><span class="lg-badge lg-badge-neutral">Guest</span></td>
+                            <td>4</td>
+                            <td><span class="lg-badge lg-badge-neutral">Disabled</span></td>
+                            <td class="lg-table-actions"><a class="lg-btn lg-btn-ghost lg-btn-sm" href="#">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td><div class="lg-table-name"><a href="#">WHMCS Defaults &mdash; Services</a></div></td>
+                            <td><span class="lg-badge lg-badge-neutral">Client</span></td>
+                            <td>6</td>
+                            <td><span class="lg-badge lg-badge-neutral">Disabled</span></td>
+                            <td class="lg-table-actions"><a class="lg-btn lg-btn-ghost lg-btn-sm" href="#">Edit</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="lg-card lg-menu-empty" hidden>
+            <div class="lg-empty">
+                <svg class="lg-empty-icon" viewBox="0 0 32 32" fill="none"><path d="M6 9h20M6 16h20M6 23h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <h3 class="lg-empty-title">No menus yet</h3>
+                <p>Seed the 4 preset menus to get started.</p>
+                <button class="lg-btn lg-btn-primary lg-btn-sm" style="margin-top:8px">Seed preset menus</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====================== MENU EDITOR ====================== -->
+    <section class="lg-pane" data-pane-content="menu-edit">
+        <div class="lg-head">
+            <div>
+                <div style="font-size:11.5px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-3);font-weight:600;margin-bottom:4px">
+                    <a href="#" onclick="lgSwitch('menu');return false" style="color:inherit">&larr; Menus</a> / Client &middot; Main
+                </div>
+                <h1 class="lg-head-title">Editing menu</h1>
+                <p class="lg-head-sub">Expand a row to configure it. Use the toggle to hide an item from the frontend without deleting it.</p>
+            </div>
+            <div class="lg-head-actions">
+                <span class="lg-badge lg-badge-success"><span class="lg-dot lg-dot-success"></span> Saved 3m ago</span>
+                <button class="lg-btn lg-btn-outline">Discard</button>
+                <button class="lg-btn lg-btn-primary">Save changes</button>
+            </div>
+        </div>
+
+        <div class="lg-menu-grid">
+
+            <!-- ============ LEFT: Menu Items ============ -->
+            <div>
+                <div class="lg-menu-paneh">
+                    <h2 class="lg-menu-paneh-t">Menu Items <a class="lg-docs-link">docs</a></h2>
+                    <button class="lg-btn lg-btn-primary lg-btn-sm">
+                        <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                        Add New
+                    </button>
+                </div>
+
+                <div class="lg-mi-list" id="lgMiList">
+
+                    <!-- Dashboard (closed) -->
+                    <div class="lg-mi-item" draggable="true">
+                        <div class="lg-mi-row">
+                            <span class="lg-mi-grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="4" cy="13" r="1" fill="currentColor"/><circle cx="8" cy="13" r="1" fill="currentColor"/></svg></span><button class="lg-mi-chev" data-act="edit" title="Edit"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            <span class="lg-mi-name">Dashboard</span>
+                            <div class="lg-mi-ctrls">
+                                <button class="lg-mi-btn lg-mi-btn-add" data-act="add-child" title="Add child"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+                                <button class="lg-mi-btn lg-mi-btn-del" data-act="delete" title="Delete"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                <label class="lg-toggle lg-toggle-sm" title="Visible on frontend"><input type="checkbox" checked data-vis><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+                                <button class="lg-mi-btn" data-act="up" title="Move up"><svg viewBox="0 0 14 14" fill="none"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                <button class="lg-mi-btn" data-act="down" title="Move down"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Services (OPEN — demos the sectioned-properties pattern + children) -->
+                    <div class="lg-mi-item is-open" draggable="true">
+                        <div class="lg-mi-row">
+                            <span class="lg-mi-grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="4" cy="13" r="1" fill="currentColor"/><circle cx="8" cy="13" r="1" fill="currentColor"/></svg></span><button class="lg-mi-chev" data-act="edit" title="Collapse"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            <span class="lg-mi-name">Services</span>
+                            <div class="lg-mi-ctrls">
+                                <button class="lg-mi-btn lg-mi-btn-add" data-act="add-child" title="Add child"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+                                <button class="lg-mi-btn lg-mi-btn-del" data-act="delete"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                <label class="lg-toggle lg-toggle-sm"><input type="checkbox" checked data-vis><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+                                <button class="lg-mi-btn" data-act="up"><svg viewBox="0 0 14 14" fill="none"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                <button class="lg-mi-btn" data-act="down"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            </div>
+                        </div>
+
+                        <div class="lg-mi-props">
+                            <h3 class="lg-mi-props-eyebrow">Menu Item</h3>
+                            <div class="lg-mi-props-body">
+
+                                <div class="lg-mi-sect">
+                                    <div class="lg-mi-sect-label">Type <span class="lg-info" title="What kind of menu item this is.">i</span></div>
+                                    <select class="lg-select">
+                                        <option>WHMCS Page</option>
+                                        <option>Custom Link</option>
+                                        <option>Dropdown</option>
+                                        <option>Mega Menu</option>
+                                        <option>Separator</option>
+                                    </select>
+                                </div>
+
+                                <div class="lg-mi-sect">
+                                    <div class="lg-mi-sect-label">Page <span class="lg-info" title="The WHMCS page this item links to.">i</span></div>
+                                    <select class="lg-select">
+                                        <option>Services</option>
+                                        <option>My Services</option>
+                                        <option>Order new</option>
+                                    </select>
+                                </div>
+
+                                <div class="lg-mi-sect">
+                                    <div class="lg-mi-sect-label">Name <span class="lg-info" title="Label shown in the navigation.">i</span></div>
+                                    <div class="lg-mi-radio-row">
+                                        <label class="lg-radio"><input type="radio" name="srv-name-mode"><span class="lg-radio-mark"></span> Custom String <span class="lg-info" title="A literal piece of text.">i</span></label>
+                                        <label class="lg-radio"><input type="radio" name="srv-name-mode" checked><span class="lg-radio-mark"></span> Language Variable <span class="lg-info" title="Pulls from /lang/ language files.">i</span></label>
+                                        <a class="lg-translate-link">Translate</a>
+                                    </div>
+                                    <input type="text" class="lg-input" value="navservices">
+                                </div>
+
+                                <div class="lg-mi-sect">
+                                    <div class="lg-mi-sect-label">Icon <span class="lg-info" title="Icon shown next to the label.">i</span></div>
+                                    <div class="lg-mi-icon-tile">
+                                        <div class="lg-mi-icon-thumb">
+                                            <svg viewBox="0 0 32 32" fill="none">
+                                                <path d="M16 4l11 5v9l-11 5L5 18V9l11-5z" fill="#3b82f6" opacity="0.85"/>
+                                                <path d="M16 4v18M5 9l11 5 11-5M5 9v9l11 5L27 18V9" stroke="#1e3a8a" stroke-width="1" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
+                                        <span class="lg-mi-icon-name">web-hosting.tpl</span>
+                                        <div class="lg-mi-icon-actions">
+                                            <button class="lg-mi-btn" title="Edit"><svg viewBox="0 0 14 14" fill="none"><path d="M10 1l3 3-8 8-3.5 1L3 9.5l8-8z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
+                                            <button class="lg-mi-btn lg-mi-btn-del" title="Remove"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="lg-mi-sub">
+                                    <button class="lg-mi-sub-h" data-act="sub-toggle">Menu Item Label <span class="lg-mi-sub-expand">Expand <svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
+                                    <div class="lg-mi-sub-body" hidden>
+                                        <div class="lg-field"><label class="lg-label">Tooltip</label><input type="text" class="lg-input" placeholder="Shown on hover"></div>
+                                        <div class="lg-field"><label class="lg-label">Badge text</label><input type="text" class="lg-input" placeholder="e.g. New"></div>
+                                    </div>
+                                </div>
+
+                                <div class="lg-mi-sub">
+                                    <button class="lg-mi-sub-h" data-act="sub-toggle">Sub-Menu Settings <span class="lg-mi-sub-expand">Expand <svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
+                                    <div class="lg-mi-sub-body" hidden>
+                                        <div class="lg-field"><label class="lg-label">Columns</label><select class="lg-select"><option>1</option><option>2</option><option selected>3</option></select></div>
+                                        <div class="lg-field"><label class="lg-label">Width</label><select class="lg-select"><option>Auto</option><option>Full width</option></select></div>
+                                    </div>
+                                </div>
+
+                                <div class="lg-mi-sub">
+                                    <button class="lg-mi-sub-h" data-act="sub-toggle">Menu Item Display Settings <span class="lg-mi-sub-expand">Expand <svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
+                                    <div class="lg-mi-sub-body" hidden>
+                                        <div class="lg-field"><label class="lg-label">Visible to</label><select class="lg-select"><option>Everyone</option><option>Logged-in clients</option><option>Guests only</option></select></div>
+                                        <div class="lg-field"><label class="lg-label">CSS class</label><input type="text" class="lg-input" placeholder="custom-class"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Children of Services -->
+                        <div class="lg-mi-children">
+                            <div class="lg-mi-item" draggable="true">
+                                <div class="lg-mi-row">
+                                    <span class="lg-mi-grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="4" cy="13" r="1" fill="currentColor"/><circle cx="8" cy="13" r="1" fill="currentColor"/></svg></span><button class="lg-mi-chev" data-act="edit"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                    <span class="lg-mi-name">My Services</span>
+                                    <div class="lg-mi-ctrls">
+                                        <button class="lg-mi-btn lg-mi-btn-del" data-act="delete"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                        <label class="lg-toggle lg-toggle-sm"><input type="checkbox" checked data-vis><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+                                        <button class="lg-mi-btn" data-act="up"><svg viewBox="0 0 14 14" fill="none"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                        <button class="lg-mi-btn" data-act="down"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lg-mi-item is-separator" draggable="true">
+                                <div class="lg-mi-row">
+                                    <span class="lg-mi-grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="4" cy="13" r="1" fill="currentColor"/><circle cx="8" cy="13" r="1" fill="currentColor"/></svg></span><button class="lg-mi-chev" data-act="edit"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                    <span class="lg-mi-name">- - - - -</span>
+                                    <div class="lg-mi-ctrls">
+                                        <button class="lg-mi-btn lg-mi-btn-del" data-act="delete"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                        <label class="lg-toggle lg-toggle-sm"><input type="checkbox" checked data-vis><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+                                        <button class="lg-mi-btn" data-act="up"><svg viewBox="0 0 14 14" fill="none"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                        <button class="lg-mi-btn" data-act="down"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lg-mi-item" draggable="true">
+                                <div class="lg-mi-row">
+                                    <span class="lg-mi-grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="4" cy="13" r="1" fill="currentColor"/><circle cx="8" cy="13" r="1" fill="currentColor"/></svg></span><button class="lg-mi-chev" data-act="edit"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                    <span class="lg-mi-name">Order New Services</span>
+                                    <div class="lg-mi-ctrls">
+                                        <button class="lg-mi-btn lg-mi-btn-del" data-act="delete"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                        <label class="lg-toggle lg-toggle-sm"><input type="checkbox" checked data-vis><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+                                        <button class="lg-mi-btn" data-act="up"><svg viewBox="0 0 14 14" fill="none"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                        <button class="lg-mi-btn" data-act="down"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lg-mi-item is-hidden" draggable="true">
+                                <div class="lg-mi-row">
+                                    <span class="lg-mi-grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="4" cy="13" r="1" fill="currentColor"/><circle cx="8" cy="13" r="1" fill="currentColor"/></svg></span><button class="lg-mi-chev" data-act="edit"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                    <span class="lg-mi-name">View Available Addons</span>
+                                    <div class="lg-mi-ctrls">
+                                        <button class="lg-mi-btn lg-mi-btn-del" data-act="delete"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                        <label class="lg-toggle lg-toggle-sm" title="Hidden on frontend"><input type="checkbox" data-vis><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+                                        <button class="lg-mi-btn" data-act="up"><svg viewBox="0 0 14 14" fill="none"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                        <button class="lg-mi-btn" data-act="down"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lg-mi-item is-hidden" draggable="true">
+                                <div class="lg-mi-row">
+                                    <span class="lg-mi-grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="4" cy="13" r="1" fill="currentColor"/><circle cx="8" cy="13" r="1" fill="currentColor"/></svg></span><button class="lg-mi-chev" data-act="edit"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                    <span class="lg-mi-name">Renew Services</span>
+                                    <div class="lg-mi-ctrls">
+                                        <button class="lg-mi-btn lg-mi-btn-del" data-act="delete"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                        <label class="lg-toggle lg-toggle-sm" title="Hidden on frontend"><input type="checkbox" data-vis><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+                                        <button class="lg-mi-btn" data-act="up"><svg viewBox="0 0 14 14" fill="none"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                        <button class="lg-mi-btn" data-act="down"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="lg-mi-add-row" data-act="add-sibling">
+                                <svg viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                                Add New Item
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Domains (closed) -->
+                    <div class="lg-mi-item" draggable="true">
+                        <div class="lg-mi-row">
+                            <span class="lg-mi-grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="4" cy="13" r="1" fill="currentColor"/><circle cx="8" cy="13" r="1" fill="currentColor"/></svg></span><button class="lg-mi-chev" data-act="edit"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            <span class="lg-mi-name">Domains</span>
+                            <div class="lg-mi-ctrls">
+                                <button class="lg-mi-btn lg-mi-btn-add" data-act="add-child"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+                                <button class="lg-mi-btn lg-mi-btn-del" data-act="delete"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                <label class="lg-toggle lg-toggle-sm"><input type="checkbox" checked data-vis><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+                                <button class="lg-mi-btn" data-act="up"><svg viewBox="0 0 14 14" fill="none"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                <button class="lg-mi-btn" data-act="down"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Billing -->
+                    <div class="lg-mi-item" draggable="true">
+                        <div class="lg-mi-row">
+                            <span class="lg-mi-grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="4" cy="13" r="1" fill="currentColor"/><circle cx="8" cy="13" r="1" fill="currentColor"/></svg></span><button class="lg-mi-chev" data-act="edit"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            <span class="lg-mi-name">Billing</span>
+                            <div class="lg-mi-ctrls">
+                                <button class="lg-mi-btn lg-mi-btn-add" data-act="add-child"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+                                <button class="lg-mi-btn lg-mi-btn-del" data-act="delete"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                <label class="lg-toggle lg-toggle-sm"><input type="checkbox" checked data-vis><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+                                <button class="lg-mi-btn" data-act="up"><svg viewBox="0 0 14 14" fill="none"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                <button class="lg-mi-btn" data-act="down"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Support (last top-level — Down disabled) -->
+                    <div class="lg-mi-item" draggable="true">
+                        <div class="lg-mi-row">
+                            <span class="lg-mi-grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="4" cy="13" r="1" fill="currentColor"/><circle cx="8" cy="13" r="1" fill="currentColor"/></svg></span><button class="lg-mi-chev" data-act="edit"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            <span class="lg-mi-name">Support</span>
+                            <div class="lg-mi-ctrls">
+                                <button class="lg-mi-btn lg-mi-btn-add" data-act="add-child"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+                                <button class="lg-mi-btn lg-mi-btn-del" data-act="delete"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+                                <label class="lg-toggle lg-toggle-sm"><input type="checkbox" checked data-vis><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>
+                                <button class="lg-mi-btn" data-act="up"><svg viewBox="0 0 14 14" fill="none"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                <button class="lg-mi-btn" data-act="down" disabled><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ============ RIGHT: Menu Settings ============ -->
+            <div>
+                <div class="lg-menu-paneh">
+                    <h2 class="lg-menu-paneh-t">Menu Settings <a class="lg-docs-link">docs</a></h2>
+                </div>
+                <div class="lg-menu-settings">
+                    <div class="lg-field">
+                        <label class="lg-label">Name <span class="lg-info" title="Internal name for this menu.">i</span></label>
+                        <input type="text" class="lg-input" value="Client Main Menu">
+                    </div>
+                    <div class="lg-field">
+                        <label class="lg-label">Display Rule <span class="lg-info" title="Who sees this menu.">i</span></label>
+                        <div class="lg-multi">
+                            <span class="lg-chip">
+                                Existing Client
+                                <span class="lg-chip-x">&times;</span>
+                            </span>
+                            <span class="lg-multi-caret"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                        </div>
+                    </div>
+                    <div class="lg-field">
+                        <label class="lg-label">Status <span class="lg-info" title="Activate or deactivate this menu.">i</span></label>
+                        <div class="lg-multi-status">
+                            <span class="lg-dot lg-dot-success"></span>
+                            <span style="flex:1">Active</span>
+                            <span class="lg-multi-caret"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ====================== BRANDING ====================== -->
+    <section class="lg-pane" data-pane-content="branding">
+        <div class="lg-head">
+            <div>
+                <h1 class="lg-head-title">Branding</h1>
+                <p class="lg-head-sub">Upload your logo and favicon. Each file is saved the moment you pick it.</p>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Primary logo</h2><p class="lg-card-h-sub">Light + dark variants for adaptive surfaces</p></div></div>
+            <div class="lg-card-body">
+                <div class="lg-grid-2">
+                    <div class="lg-tile">
+                        <div class="lg-tile-preview light">
+                            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 60'><text x='100' y='38' text-anchor='middle' font-family='-apple-system' font-size='26' font-weight='700' fill='%231f2937'>Hostnodes</text></svg>" alt="Light">
+                        </div>
+                        <div class="lg-tile-meta"><span class="lg-tile-meta-name">Light surface</span><span class="lg-tile-meta-file">logo-light.svg</span></div>
+                        <div class="lg-tile-actions"><button class="lg-btn lg-btn-outline lg-btn-sm">Replace</button><button class="lg-btn lg-btn-danger lg-btn-sm">Remove</button></div>
+                    </div>
+                    <div class="lg-tile">
+                        <div class="lg-tile-preview dark">
+                            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 60'><text x='100' y='38' text-anchor='middle' font-family='-apple-system' font-size='26' font-weight='700' fill='%23fff'>Hostnodes</text></svg>" alt="Dark">
+                        </div>
+                        <div class="lg-tile-meta"><span class="lg-tile-meta-name">Dark surface</span><span class="lg-tile-meta-file">logo-dark.svg</span></div>
+                        <div class="lg-tile-actions"><button class="lg-btn lg-btn-outline lg-btn-sm">Replace</button><button class="lg-btn lg-btn-danger lg-btn-sm">Remove</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Square logo</h2></div></div>
+            <div class="lg-card-body">
+                <div class="lg-grid-2">
+                    <div class="lg-tile">
+                        <label class="lg-upload">
+                            <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><path d="M16 6v18M9 13l7-7 7 7M6 22v3a3 3 0 003 3h14a3 3 0 003-3v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div class="lg-upload-t">Click to upload</div>
+                            <div class="lg-upload-h">SVG, PNG &middot; max 1 MB</div>
+                        </label>
+                        <div class="lg-tile-meta"><span class="lg-tile-meta-name">Light surface</span><span class="lg-tile-meta-file">not set</span></div>
+                    </div>
+                    <div class="lg-tile">
+                        <label class="lg-upload dark">
+                            <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><path d="M16 6v18M9 13l7-7 7 7M6 22v3a3 3 0 003 3h14a3 3 0 003-3v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div class="lg-upload-t">Click to upload</div>
+                            <div class="lg-upload-h">SVG, PNG &middot; max 1 MB</div>
+                        </label>
+                        <div class="lg-tile-meta"><span class="lg-tile-meta-name">Dark surface</span><span class="lg-tile-meta-file">not set</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Favicon</h2></div></div>
+            <div class="lg-card-body">
+                <div style="max-width:360px">
+                    <div class="lg-tile">
+                        <div class="lg-tile-preview light">
+                            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='8' fill='%233b82f6'/><text x='20' y='28' text-anchor='middle' font-family='-apple-system' font-size='24' font-weight='700' fill='%23fff'>H</text></svg>" alt="Favicon" style="width:48px;max-width:none;max-height:48px">
+                        </div>
+                        <div class="lg-tile-meta"><span class="lg-tile-meta-name">Browser tab icon</span><span class="lg-tile-meta-file">favicon.svg</span></div>
+                        <div class="lg-tile-actions"><button class="lg-btn lg-btn-outline lg-btn-sm">Replace</button><button class="lg-btn lg-btn-danger lg-btn-sm">Remove</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Brand info</h2></div></div>
+            <div class="lg-card-body">
+                <div class="lg-field">
+                    <label class="lg-label">Footer description</label>
+                    <textarea class="lg-textarea" rows="2" maxlength="240">Premium web hosting on Google Cloud, with 24/7 support and a 30-day money-back guarantee.</textarea>
+                    <div class="lg-help">Appears in the footer column under the brand mark.</div>
+                </div>
+                <div class="lg-grid-2">
+                    <div class="lg-field"><label class="lg-label">Twitter / X</label><input type="url" class="lg-input" value="https://twitter.com/hostnodes"></div>
+                    <div class="lg-field"><label class="lg-label">Facebook</label><input type="url" class="lg-input" value="https://facebook.com/hostnodes"></div>
+                    <div class="lg-field"><label class="lg-label">Instagram</label><input type="url" class="lg-input" placeholder="https://"></div>
+                    <div class="lg-field"><label class="lg-label">LinkedIn</label><input type="url" class="lg-input" value="https://linkedin.com/company/hostnodes"></div>
+                    <div class="lg-field"><label class="lg-label">GitHub</label><input type="url" class="lg-input" placeholder="https://"></div>
+                    <div class="lg-field"><label class="lg-label">YouTube</label><input type="url" class="lg-input" placeholder="https://"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====================== EXTENSIONS ====================== -->
+    <section class="lg-pane" data-pane-content="extensions">
+        <div class="lg-head">
+            <div>
+                <h1 class="lg-head-title">Extensions</h1>
+                <p class="lg-head-sub">Optional theme add-ons. Each integrates with a different part of WHMCS.</p>
+            </div>
+        </div>
+
+        <div class="lg-card lg-ext-list">
+            <div class="lg-card-body flush">
+                <table class="lg-table">
+                    <thead><tr><th>Name</th><th>Type</th><th>Version</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><div class="lg-table-name">blesta-bridge</div><div class="lg-table-sub">Compatibility shim for Blesta-style ticketing.</div></td>
+                            <td>Integration</td>
+                            <td>0.4.1</td>
+                            <td><span class="lg-badge lg-badge-success"><span class="lg-dot lg-dot-success"></span> Enabled</span></td>
+                            <td class="lg-table-actions"><label class="lg-toggle" style="vertical-align:middle"><input type="checkbox" checked><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label></td>
+                        </tr>
+                        <tr>
+                            <td><div class="lg-table-name">status-widget</div><div class="lg-table-sub">Live system-status card in the client dashboard.</div></td>
+                            <td>Widget</td>
+                            <td>1.0.2</td>
+                            <td><span class="lg-badge lg-badge-success"><span class="lg-dot lg-dot-success"></span> Enabled</span></td>
+                            <td class="lg-table-actions"><label class="lg-toggle" style="vertical-align:middle"><input type="checkbox" checked><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label></td>
+                        </tr>
+                        <tr>
+                            <td><div class="lg-table-name">announcements-banner</div><div class="lg-table-sub">Site-wide announcement bar above the navigation.</div></td>
+                            <td>Banner</td>
+                            <td>0.9.0</td>
+                            <td><span class="lg-badge lg-badge-neutral">Disabled</span></td>
+                            <td class="lg-table-actions"><label class="lg-toggle" style="vertical-align:middle"><input type="checkbox"><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="lg-card lg-ext-empty" hidden>
+            <div class="lg-empty">
+                <svg class="lg-empty-icon" viewBox="0 0 32 32" fill="none">
+                    <rect x="4" y="4" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="18" y="4" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="4" y="18" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                <h3 class="lg-empty-title">No extensions installed</h3>
+                <p>Extensions appear here once added under <code>core/extensions/&lt;name&gt;/</code>.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====================== TOOLS ====================== -->
+    <section class="lg-pane" data-pane-content="tools">
+        <div class="lg-head">
+            <div>
+                <h1 class="lg-head-title">Tools</h1>
+                <p class="lg-head-sub">Operational utilities for cache, license, filesystem, and migrations.</p>
+            </div>
+        </div>
+
+        <div class="lg-alert lg-alert-success lg-flash-only" hidden>
+            <span class="lg-alert-icon"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><polyline points="5 8 7 10 11 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div><strong>Template cache cleared.</strong> All Smarty templates will recompile on the next request.</div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Cache</h2></div></div>
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Clear template cache <span class="lg-info" title="Recompile all Smarty templates on the next request.">i</span></div>
+                    <div class="lg-row-help">Recompile all Smarty templates on the next request.</div>
+                </div>
+                <button class="lg-btn lg-btn-outline">Clear</button>
+            </div>
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Refresh menu cache</div>
+                    <div class="lg-row-help">Force the menu builder to re-read configuration.</div>
+                </div>
+                <button class="lg-btn lg-btn-outline">Refresh</button>
+            </div>
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Rebuild pages discovery</div>
+                    <div class="lg-row-help">Re-scan <code>core/pages/</code> for new directories.</div>
+                </div>
+                <button class="lg-btn lg-btn-outline">Rebuild</button>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">License</h2></div></div>
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Refresh license</div>
+                    <div class="lg-row-help">Force a callback to the license server now.</div>
+                </div>
+                <button class="lg-btn lg-btn-outline">Refresh</button>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Migrations</h2></div></div>
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Convert custom links to WHMCS pages</div>
+                    <div class="lg-row-help">Walk every menu; re-type matching <code>custom_link</code> items &rarr; <code>whmcs_page</code>. Safe to re-run.</div>
+                </div>
+                <button class="lg-btn lg-btn-outline">Convert</button>
+            </div>
+        </div>
+
+        <div class="lg-card">
+            <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Server</h2></div></div>
+            <div class="lg-row">
+                <div class="lg-row-text">
+                    <div class="lg-row-label">Generate Nginx / .htaccess rules</div>
+                    <div class="lg-row-help">Build SEO redirect rules for your hosting platform.</div>
+                </div>
+                <button class="lg-btn lg-btn-outline">Generate</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====================== LICENSE ====================== -->
+    <section class="lg-pane" data-pane-content="license">
+        <div class="lg-head">
+            <div>
+                <h1 class="lg-head-title">License</h1>
+                <p class="lg-head-sub">License status for <strong>hadrian</strong>.</p>
+            </div>
+        </div>
+
+        <div class="lg-alert lg-alert-success lg-license-active">
+            <span class="lg-alert-icon"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><polyline points="5 8 7 10 11 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div><strong>License is active.</strong> Theme is rendering normally.</div>
+        </div>
+
+        <div class="lg-alert lg-alert-warning lg-dev-only" hidden>
+            <span class="lg-alert-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1L1 14h14L8 1zM8 6v3.5M8 11v.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div><strong>Development mode is active.</strong> License checks are bypassed; the theme renders as if licensed.</div>
+        </div>
+
+        <div class="lg-alert lg-alert-danger lg-license-error" hidden>
+            <span class="lg-alert-icon"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3.5M8 11v.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+            <div><strong>License is not active.</strong> Enter your license key below or contact support.</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
+            <div class="lg-card">
+                <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">License key</h2></div></div>
+                <div class="lg-card-body">
+                    <div class="lg-field">
+                        <label class="lg-label">Key</label>
+                        <input class="lg-input" type="text" value="MT-XXXX-XXXX-AB12-CD34">
+                        <div class="lg-help">Find your key in your customer portal.</div>
+                    </div>
+                    <div style="display:flex;gap:8px">
+                        <button class="lg-btn lg-btn-primary">Save and check</button>
+                        <button class="lg-btn lg-btn-outline">Refresh now</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg-card">
+                <div class="lg-card-h"><div class="lg-card-h-text"><h2 class="lg-card-h-title">Subscription</h2></div></div>
+                <div class="lg-card-body">
+                    <div class="lg-kv-grid">
+                        <div><div class="lg-kv-k">Status</div><div class="lg-kv-v"><span class="lg-badge lg-badge-success"><span class="lg-dot lg-dot-success"></span> Active</span></div></div>
+                        <div><div class="lg-kv-k">Renews</div><div class="lg-kv-v">2026-08-12</div></div>
+                        <div><div class="lg-kv-k">Plan</div><div class="lg-kv-v">Annual &middot; $49</div></div>
+                        <div><div class="lg-kv-k">Payment</div><div class="lg-kv-v">Visa &middot;&middot;&middot;&middot; 4242</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<div class="mock-state">
+    <label>State:</label>
+    <select id="lgState">
+        <option value="normal">Normal</option>
+        <option value="dev">Dev mode</option>
+        <option value="empty">Empty</option>
+        <option value="errors">With flash</option>
+    </select>
+</div>
+
+<script>
+function lgSwitch(name) {
+    document.querySelectorAll('.lg-nav-item').forEach(function (el) {
+        var match = el.getAttribute('data-pane') === name || (name === 'menu-edit' && el.getAttribute('data-pane') === 'menu');
+        el.classList.toggle('is-active', match);
+    });
+    document.querySelectorAll('.lg-pane').forEach(function (el) {
+        el.classList.toggle('is-active', el.getAttribute('data-pane-content') === name);
+    });
+    try { history.replaceState(null, '', '#' + name); } catch (e) {}
+    window.scrollTo({ top: 0 });
+}
+
+document.querySelectorAll('.lg-nav-item[data-pane]').forEach(function (el) {
+    el.addEventListener('click', function (e) { e.preventDefault(); lgSwitch(el.getAttribute('data-pane')); });
+});
+
+(function () {
+    var hash = (location.hash || '').replace('#', '');
+    if (hash && document.querySelector('[data-pane-content="' + hash + '"]')) lgSwitch(hash);
+})();
+
+document.getElementById('lgState').addEventListener('change', function (e) {
+    var s = e.target.value;
+    var dev    = s === 'dev';
+    var empty  = s === 'empty';
+    var errors = s === 'errors';
+
+    document.querySelectorAll('.lg-dev-only').forEach(function (el) { el.hidden = !dev; });
+    document.querySelectorAll('.lg-flash-only').forEach(function (el) { el.hidden = !errors; });
+    var licOk = document.querySelector('.lg-license-active'); if (licOk) licOk.hidden = dev || errors;
+    var licEr = document.querySelector('.lg-license-error');  if (licEr) licEr.hidden = !errors;
+    var mt = document.querySelector('.lg-menu-table'); if (mt) mt.hidden = empty;
+    var me = document.querySelector('.lg-menu-empty'); if (me) me.hidden = !empty;
+    var el = document.querySelector('.lg-ext-list'); if (el) el.hidden = empty;
+    var ee = document.querySelector('.lg-ext-empty'); if (ee) ee.hidden = !empty;
+});
+
+// ============================================================================
+// Menu editor — Lagom-style. Event-delegated off #lgMiList so handlers survive
+// future ajax re-renders without needing per-item re-binding.
+//
+// Each lg-mi-item recognises these data-act values:
+//   edit         — expand/collapse its sectioned property panel (auto-closes siblings)
+//   add-child    — spawn a child under this item (mockup: drop a stub)
+//   delete       — confirm + remove
+//   up / down    — swap with adjacent sibling at the same depth
+//   sub-toggle   — expand/collapse a sub-section (Menu Item Label / Sub-Menu / Display)
+//   add-sibling  — for the "+ Add New Item" footer inside a children container
+// ============================================================================
+(function () {
+    var list = document.getElementById('lgMiList');
+    if (!list) return;
+
+    function refreshUpDownDisabled() {
+        // Disable Up on first item, Down on last item, at every depth.
+        // The top-level container is #lgMiList itself, plus every
+        // .lg-mi-children nested inside it.
+        var containers = [list].concat(Array.prototype.slice.call(list.querySelectorAll('.lg-mi-children')));
+        containers.forEach(function (container) {
+            var kids = Array.prototype.filter.call(container.children, function (c) {
+                return c.classList && c.classList.contains('lg-mi-item');
+            });
+            kids.forEach(function (k, i) {
+                var up   = k.querySelector(':scope > .lg-mi-row [data-act="up"]');
+                var down = k.querySelector(':scope > .lg-mi-row [data-act="down"]');
+                if (up)   up.disabled   = (i === 0);
+                if (down) down.disabled = (i === kids.length - 1);
+            });
+        });
+    }
+    refreshUpDownDisabled();
+
+    list.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-act]');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var act = btn.getAttribute('data-act');
+
+        // Sub-section collapse/expand (Menu Item Label, Sub-Menu Settings, ...).
+        if (act === 'sub-toggle') {
+            var sub = btn.closest('.lg-mi-sub');
+            if (!sub) return;
+            var body = sub.querySelector(':scope > .lg-mi-sub-body');
+            if (!body) return;
+            body.hidden = !body.hidden;
+            sub.classList.toggle('is-open', !body.hidden);
+            btn.querySelector('.lg-mi-sub-expand').firstChild.nodeValue =
+                body.hidden ? 'Expand ' : 'Collapse ';
+            return;
+        }
+
+        var item = btn.closest('.lg-mi-item');
+        if (!item) return;
+
+        if (act === 'edit') {
+            var props = item.querySelector(':scope > .lg-mi-props');
+            // Items without explicit props can still flip open/closed (the
+            // chev rotates; future code could lazy-render an empty form).
+            // Either way, the sibling auto-collapse always runs so two items
+            // never look "open" at once.
+            var willOpen = props ? props.hidden : !item.classList.contains('is-open');
+
+            // Auto-collapse every sibling at the same nesting level — keeps
+            // the editor focused on one item at a time.
+            var siblings = item.parentNode.children;
+            for (var i = 0; i < siblings.length; i++) {
+                var sib = siblings[i];
+                if (sib === item || !sib.classList || !sib.classList.contains('lg-mi-item')) continue;
+                var sibProps = sib.querySelector(':scope > .lg-mi-props');
+                if (sibProps) sibProps.hidden = true;
+                sib.classList.remove('is-open');
+            }
+
+            if (props) props.hidden = !willOpen;
+            item.classList.toggle('is-open', willOpen);
+        }
+
+        if (act === 'up') {
+            var prev = item.previousElementSibling;
+            while (prev && !prev.classList.contains('lg-mi-item')) prev = prev.previousElementSibling;
+            if (prev) item.parentNode.insertBefore(item, prev);
+            refreshUpDownDisabled();
+        }
+
+        if (act === 'down') {
+            var next = item.nextElementSibling;
+            while (next && !next.classList.contains('lg-mi-item')) next = next.nextElementSibling;
+            if (next) item.parentNode.insertBefore(next, item);
+            refreshUpDownDisabled();
+        }
+
+        if (act === 'delete') {
+            if (confirm('Delete this item?')) {
+                item.remove();
+                refreshUpDownDisabled();
+            }
+        }
+
+        if (act === 'add-child' || act === 'add-sibling') {
+            // Mockup: drop a stub child. add-child appends to (or creates) the
+            // children container of THIS item; add-sibling inserts before the
+            // "+ Add New Item" button it lives inside.
+            var stub = buildStubItem('New Item');
+            if (act === 'add-child') {
+                var children = item.querySelector(':scope > .lg-mi-children');
+                if (!children) {
+                    children = document.createElement('div');
+                    children.className = 'lg-mi-children';
+                    var addRow = document.createElement('button');
+                    addRow.className = 'lg-mi-add-row';
+                    addRow.setAttribute('data-act', 'add-sibling');
+                    addRow.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> Add New Item';
+                    children.appendChild(addRow);
+                    item.appendChild(children);
+                    item.classList.add('is-open');
+                }
+                children.insertBefore(stub, children.querySelector('.lg-mi-add-row'));
+            } else {
+                // add-sibling: btn is the add row itself
+                btn.parentNode.insertBefore(stub, btn);
+            }
+            refreshUpDownDisabled();
+        }
+    });
+
+    // Visibility toggle — flip .is-hidden on the item.
+    list.addEventListener('change', function (e) {
+        var t = e.target.closest('[data-vis]');
+        if (!t) return;
+        var item = t.closest('.lg-mi-item');
+        if (item) item.classList.toggle('is-hidden', !t.checked);
+    });
+
+    function buildStubItem(label) {
+        var el = document.createElement('div');
+        el.className = 'lg-mi-item';
+        el.setAttribute('draggable', 'true');
+        el.innerHTML =
+            '<div class="lg-mi-row">' +
+                '<span class="lg-mi-grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="4" cy="13" r="1" fill="currentColor"/><circle cx="8" cy="13" r="1" fill="currentColor"/></svg></span><button class="lg-mi-chev" data-act="edit"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+                '<span class="lg-mi-name">' + label + '</span>' +
+                '<div class="lg-mi-ctrls">' +
+                    '<button class="lg-mi-btn lg-mi-btn-del" data-act="delete"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>' +
+                    '<label class="lg-toggle lg-toggle-sm"><input type="checkbox" checked data-vis><span class="lg-toggle-track"><span class="lg-toggle-thumb"></span></span></label>' +
+                    '<button class="lg-mi-btn" data-act="up"><svg viewBox="0 0 14 14" fill="none"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+                    '<button class="lg-mi-btn" data-act="down"><svg viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+                '</div>' +
+            '</div>';
+        return el;
+    }
+
+    // ------------------------------------------------------------------------
+    // Drag-and-drop reorder. The whole .lg-mi-item is draggable, but the grip
+    // is the visual affordance — clicks on interactive descendants (button,
+    // input, select, label, etc.) cancel the dragstart so they keep working.
+    //
+    // Drop semantics: insertion as a sibling above (top half) or below
+    // (bottom half) the target item, in the target's parent. Cross-level
+    // drops work the same way. Dropping onto your own descendant is rejected.
+    // ------------------------------------------------------------------------
+    var dragged = null;
+
+    function clearDropIndicators() {
+        list.querySelectorAll('.is-drop-before, .is-drop-after').forEach(function (el) {
+            el.classList.remove('is-drop-before', 'is-drop-after');
+        });
+    }
+    function isAncestor(maybeAncestor, node) {
+        while (node) {
+            if (node === maybeAncestor) return true;
+            node = node.parentNode;
+        }
+        return false;
+    }
+
+    list.addEventListener('dragstart', function (e) {
+        if (e.target.closest('button, input, select, textarea, label, a')) {
+            e.preventDefault();
+            return;
+        }
+        var item = e.target.closest('.lg-mi-item');
+        if (!item) return;
+        dragged = item;
+        item.classList.add('is-dragging');
+        try {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', 'mi');
+        } catch (err) {}
+    });
+
+    list.addEventListener('dragover', function (e) {
+        if (!dragged) return;
+        var target = e.target.closest('.lg-mi-item');
+        if (!target || target === dragged) return;
+        if (isAncestor(dragged, target)) return;
+        e.preventDefault();
+        if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+
+        clearDropIndicators();
+        var rect = target.getBoundingClientRect();
+        var before = (e.clientY - rect.top) < rect.height / 2;
+        target.classList.add(before ? 'is-drop-before' : 'is-drop-after');
+    });
+
+    list.addEventListener('dragleave', function (e) {
+        if (!list.contains(e.relatedTarget)) clearDropIndicators();
+    });
+
+    list.addEventListener('drop', function (e) {
+        if (!dragged) return;
+        var target = e.target.closest('.lg-mi-item');
+        if (!target || target === dragged || isAncestor(dragged, target)) {
+            clearDropIndicators();
+            return;
+        }
+        e.preventDefault();
+        var rect = target.getBoundingClientRect();
+        var before = (e.clientY - rect.top) < rect.height / 2;
+        if (before) target.parentNode.insertBefore(dragged, target);
+        else        target.parentNode.insertBefore(dragged, target.nextSibling);
+        clearDropIndicators();
+        refreshUpDownDisabled();
+    });
+
+    list.addEventListener('dragend', function () {
+        if (dragged) dragged.classList.remove('is-dragging');
+        dragged = null;
+        clearDropIndicators();
+    });
+})();
+</script>
+</body>
+</html>

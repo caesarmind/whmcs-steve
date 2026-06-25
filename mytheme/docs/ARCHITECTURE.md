@@ -7,14 +7,14 @@ For the addon-managed, WHMCS-native target structure, see [HYBRID-STRUCTURE.md](
 ## Two-piece product
 
 ```
-modules/addons/MyTheme/   ← engine (encoded for production)
-templates/mytheme/        ← visual layer (mostly plain)
+modules/addons/Hadrian/   ← engine (encoded for production)
+templates/hadrian/        ← visual layer (mostly plain)
 ```
 
 - The **addon** holds business logic: license check, hooks dispatch, admin UI, DB models.
 - The **template** holds presentation: Smarty tpls, SCSS sources, assets, per-variant manifests, and a template-level license guard.
 
-Either piece is useless without the other. WHMCS picks the template by name from `tblconfiguration.Template`. The addon validates the license, populates the `$myTheme` Smarty super-array, exposes `$myTheme.license.canRender`, and force-resets the template to `six` if licensing fails. If the addon is missing entirely, the template-level guard renders only the license-required screen.
+Either piece is useless without the other. WHMCS picks the template by name from `tblconfiguration.Template`. The addon validates the license, populates the `$hadrian` Smarty super-array, exposes `$hadrian.license.canRender`, and force-resets the template to `six` if licensing fails. If the addon is missing entirely, the template-level guard renders only the license-required screen.
 
 ## Discovery model
 
@@ -40,9 +40,9 @@ Lagom's pattern: `{if file_exists(...)}{include}{else}<300 lines of inline defau
 This pattern: 5-line dispatcher, default lives at `core/pages/<page>/default/default.tpl`.
 
 ```smarty
-{* templates/mytheme/clientareahome.tpl *}
-{if isset($myTheme.pages.clientareahome.fullPath) && file_exists("templates/`$myTheme.pages.clientareahome.fullPath`")}
-    {include file="`$myTheme.pages.clientareahome.fullPath`"}
+{* templates/hadrian/clientareahome.tpl *}
+{if isset($hadrian.pages.clientareahome.fullPath) && file_exists("templates/`$hadrian.pages.clientareahome.fullPath`")}
+    {include file="`$hadrian.pages.clientareahome.fullPath`"}
 {else}
     {include file="`$template`/core/pages/clientareahome/default/default.tpl"}
 {/if}
@@ -55,8 +55,8 @@ The "default" variant is a real file with a real implementation. The dispatcher 
 The production layout model follows Lagom's useful pattern: the addon resolves the active layout path, then Smarty includes only that file.
 
 ```text
-$myTheme.layouts.main-menu.mediumPath → selected main-menu layout tpl
-$myTheme.layouts.footer.mediumPath    → selected footer layout tpl
+$hadrian.layouts.main-menu.mediumPath → selected main-menu layout tpl
+$hadrian.layouts.footer.mediumPath    → selected footer layout tpl
 ```
 
 Do not render top-nav, sidebar, and rail layout HTML together and hide inactive versions with CSS in production. That is only acceptable for design-preview mode.
@@ -83,7 +83,7 @@ Compare to Lagom: 6 separate `ClientAreaPage` hook registrations with mixed prio
 | Store | Used for |
 |---|---|
 | `tblconfiguration` | License state (key, blob, warning, hour, domain), WHMCS-native template selection (`Template`, `OrderFormTemplate`), `ActiveAddonModules` flag |
-| `mytheme_settings` | Everything else — typed key/value (string/int/bool/json) for theme-specific addon settings |
+| `hadrian_settings` | Everything else — typed key/value (string/int/bool/json) for theme-specific addon settings |
 
 Lagom uses four (`tbladdonmodules` + `tblconfiguration` + `rsthemes_settings` + JSON-in-text in `rstheme_themes`). Don't.
 
@@ -108,8 +108,8 @@ Every protected file calls `IntegrityHashes::verifyOrDie(__FILE__)` in its const
 ```php
 // src/Helpers/IntegrityHashes.php (GENERATED)
 private const HASHES = [
-    'modules/addons/MyTheme/src/Template/License.php'  => 'a3f2...',
-    'modules/addons/MyTheme/src/Template/Template.php' => 'b9e1...',
+    'modules/addons/Hadrian/src/Template/License.php'  => 'a3f2...',
+    'modules/addons/Hadrian/src/Template/Template.php' => 'b9e1...',
     // ...
 ];
 ```

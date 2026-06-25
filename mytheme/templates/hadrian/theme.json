@@ -1,0 +1,61 @@
+{
+  "$schema": "https://your-domain.com/schemas/hadrian-theme.json",
+  "name": "hadrian",
+  "version": "1.6.4",
+  "displayName": "Hadrian",
+  "description": "A modern WHMCS client area theme.",
+  "author": "Your Studio",
+
+  "requires": {
+    "whmcs": ">=9.0",
+    "php": ">=8.1",
+    "smarty": ">=4.0",
+    "ioncube": true
+  },
+
+  "provides": {
+    "styles": ["default", "dark"],
+    "layouts": {
+      "main-menu": ["top", "sidebar", "rail"],
+      "footer": ["default", "extended", "extended-info"]
+    },
+    "pages": [
+      "announcements",
+      "clientareadetails",
+      "clientareadomains",
+      "clientareahome",
+      "clientareainvoices",
+      "clientareaproducts",
+      "custom-page",
+      "homepage",
+      "login",
+      "supporttickets",
+      "supportticketslist",
+      "viewinvoice",
+      "viewticket"
+    ],
+    "extensions": [],
+    "widgets": []
+  },
+
+  "commercial": {
+    "licenseRequired": true,
+    "addonRequired": "Hadrian",
+    "renderGuard": "$hadrian.license.canRender",
+    "encodedFiles": ["core/hadrian.php"]
+  },
+
+  "admin": {
+    "managedAreas": ["branding", "styles", "layouts", "pages", "menu", "sidebar", "dashboard", "extensions"],
+    "nativeFirst": true
+  },
+
+  "deps": {
+    "bootstrap": "5.3.0",
+    "fontawesome": "6.5.1"
+  },
+
+  "rtlLanguages": ["arabic", "hebrew", "farsi"],
+
+  "comment": "This file replaces filesystem-scan-with-Symfony-Finder discovery. The engine reads it once at startup and caches the result. Adding a new style or layout is: (1) add the directory under core/, (2) add its name to the appropriate list here, (3) bump version. The buyer's Configuration cache is invalidated on version bump."
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout — saved card + CVC mockup</title>
+<style>
+  :root{
+    --color-accent:#0071e3; --color-accent-light:rgba(0,113,227,.08);
+    --color-border:#e8e8ed; --color-surface:#fff;
+    --color-surface-secondary:#f5f5f7; --color-surface-tertiary:#fafafa;
+    --color-text-primary:#1d1d1f; --color-text-secondary:#424245;
+    --color-text-tertiary:#86868b; --color-text-quaternary:#c7c7cc;
+    --color-red-bg:rgba(255,59,48,.08); --color-red-text:#d70015;
+    --color-green-text:#34c759;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+    background:#eef0f3; color:var(--color-text-primary); margin:0; padding:40px 20px; letter-spacing:-.01em;}
+  .wrap{max-width:560px; margin:0 auto}
+  h1{font-size:15px;font-weight:600;letter-spacing:-.01em;margin:0 0 4px}
+  .lede{font-size:12.5px;color:var(--color-text-tertiary);margin:0 0 22px}
+  .panel-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--color-text-tertiary);margin:26px 0 10px}
+
+  /* ── The card-entry panel (matches checkout's .co-card-input-panel) ── */
+  .co-card-input-panel{padding:16px;border:.5px dashed var(--color-border);border-radius:12px;
+    background:var(--color-surface-tertiary)}
+
+  /* ── Saved-card row (replaces the stacked CARD / MasterCard-5933 / 12/2028 text) ── */
+  .pm-list{display:flex;flex-direction:column;gap:8px;margin:0 0 14px}
+  .pm-row{display:flex;align-items:center;gap:13px;padding:13px 15px;border:.5px solid var(--color-border);
+    border-radius:12px;background:var(--color-surface);cursor:pointer;transition:border-color .15s,background .15s}
+  .pm-row:hover{border-color:var(--color-accent)}
+  .pm-row.is-selected{border-color:var(--color-accent);background:var(--color-accent-light)}
+  .pm-radio{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--color-border);
+    background:var(--color-surface);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;transition:.15s}
+  .pm-row.is-selected .pm-radio{border-color:var(--color-accent);background:var(--color-accent)}
+  .pm-radio::after{content:"";width:6px;height:6px;border-radius:50%;background:#fff;transform:scale(0);transition:transform .15s}
+  .pm-row.is-selected .pm-radio::after{transform:scale(1)}
+  /* mini card-brand chip */
+  .pm-brand{width:42px;height:27px;border-radius:5px;flex-shrink:0;display:inline-flex;align-items:center;
+    justify-content:center;color:#fff;font-size:9px;font-weight:700;letter-spacing:.04em;
+    box-shadow:inset 0 0 0 .5px rgba(255,255,255,.25)}
+  .pm-brand.mc{background:linear-gradient(135deg,#eb001b 0%,#f79e1b 100%)}
+  .pm-brand.visa{background:linear-gradient(135deg,#1a1f71 0%,#2557d6 100%)}
+  .pm-brand.amex{background:linear-gradient(135deg,#2e77bb 0%,#1a4d8f 100%)}
+  .pm-brand.cc{background:#3a3a3c}
+  .pm-brand.bank{background:var(--color-surface-secondary);color:var(--color-text-primary)}
+  .pm-meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .pm-name{font-size:13.5px;font-weight:600;color:var(--color-text-primary);font-variant-numeric:tabular-nums}
+  .pm-sub{font-size:11.5px;color:var(--color-text-tertiary)}
+  .pm-default{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--color-accent);background:var(--color-accent-light);border-radius:999px;padding:3px 8px;flex-shrink:0}
+  .pm-row.is-expired{opacity:.55}
+  .pm-row.is-expired .pm-expired{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--color-red-text);background:var(--color-red-bg);border-radius:999px;padding:3px 8px}
+
+  /* ── CVC field for the selected saved card (the "show normally" fix) ── */
+  .pm-cvc{margin:4px 0 2px;display:flex;flex-direction:column;gap:6px}
+  .pm-cvc-label{font-size:12px;color:var(--color-text-secondary);font-weight:500}
+  .pm-cvc-row{display:flex;align-items:center;gap:8px}
+  .pm-cvc-input{width:120px;height:40px;padding:0 14px;border:.5px solid var(--color-border);border-radius:10px;
+    background:var(--color-surface);font-size:14px;font-family:inherit;color:var(--color-text-primary);
+    letter-spacing:.04em;font-variant-numeric:tabular-nums;transition:border-color .15s,box-shadow .15s}
+  .pm-cvc-input::placeholder{color:var(--color-text-quaternary);letter-spacing:-.01em}
+  .pm-cvc-input:focus{outline:none;border-color:var(--color-accent);box-shadow:0 0 0 3px var(--color-accent-light)}
+  .pm-cvc-help{width:24px;height:24px;border-radius:50%;border:.5px solid var(--color-border);background:var(--color-surface);
+    color:var(--color-text-tertiary);font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;
+    align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
+  .pm-cvc-help:hover{border-color:var(--color-accent);color:var(--color-accent)}
+  .pm-cvc-hint{font-size:11px;color:var(--color-text-tertiary)}
+  /* error hidden by default; only shown when the field is flagged invalid */
+  .pm-cvc-error{font-size:11.5px;color:var(--color-red-text);display:none}
+  .pm-cvc.has-error .pm-cvc-input{border-color:var(--color-red-text);box-shadow:0 0 0 3px var(--color-red-bg)}
+  .pm-cvc.has-error .pm-cvc-error{display:block}
+  .pm-cvc.has-error .pm-cvc-hint{display:none}
+
+  /* ── "Use a new card" toggle (replaces the bare pill) ── */
+  .pm-newcard{margin-top:14px;display:flex;align-items:center;gap:10px;padding:12px 15px;border:.5px solid var(--color-border);
+    border-radius:12px;background:var(--color-surface);cursor:pointer;font-size:13px;font-weight:500;
+    color:var(--color-text-primary);transition:border-color .15s}
+  .pm-newcard:hover{border-color:var(--color-accent);color:var(--color-accent)}
+  .pm-newcard .plus{width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;display:inline-flex;
+    align-items:center;justify-content:center;font-size:14px;line-height:1;flex-shrink:0}
+
+  .controls{margin-top:24px;display:flex;gap:8px;flex-wrap:wrap}
+  .controls button{height:34px;padding:0 14px;border-radius:999px;border:.5px solid var(--color-border);
+    background:var(--color-surface);font-size:12.5px;font-weight:500;cursor:pointer;color:var(--color-text-primary)}
+  .controls button:hover{border-color:var(--color-accent);color:var(--color-accent)}
+  .note{font-size:11.5px;color:var(--color-text-tertiary);margin-top:18px;line-height:1.6}
+  .note code{background:var(--color-surface-secondary);padding:1px 5px;border-radius:4px;font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Payment — saved card &amp; CVC</h1>
+  <p class="lede">Proposed Apple treatment for the existing-card picker and the security-code field. Click a card to select; use the buttons to preview the CVC error state.</p>
+
+  <div class="panel-label">Card</div>
+  <div class="co-card-input-panel">
+
+    <div class="pm-list">
+      <!-- Saved card row (was: "CARD / MasterCard-5933 / 12/2028" stacked text) -->
+      <div class="pm-row is-selected" id="row1" onclick="selectRow('row1')">
+        <span class="pm-radio" aria-hidden="true"></span>
+        <span class="pm-brand mc">MC</span>
+        <span class="pm-meta">
+          <span class="pm-name">MasterCard &bull;&bull;&bull;&bull; 5933</span>
+          <span class="pm-sub">Expires 12/2028</span>
+        </span>
+        <span class="pm-default">Default</span>
+      </div>
+
+      <!-- second card example (shows multi-card + brand gradients) -->
+      <div class="pm-row" id="row2" onclick="selectRow('row2')">
+        <span class="pm-radio" aria-hidden="true"></span>
+        <span class="pm-brand visa">VISA</span>
+        <span class="pm-meta">
+          <span class="pm-name">Visa &bull;&bull;&bull;&bull; 4242</span>
+          <span class="pm-sub">Expires 04/2027</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- CVC for the selected saved card -->
+    <div class="pm-cvc" id="cvc">
+      <label class="pm-cvc-label" for="cvcInput">Security code</label>
+      <div class="pm-cvc-row">
+        <input class="pm-cvc-input" id="cvcInput" type="tel" inputmode="numeric" placeholder="CVC" autocomplete="cc-csc" maxlength="4">
+        <button type="button" class="pm-cvc-help" title="3-digit code on the back of your card (4 digits on the front for Amex)">?</button>
+      </div>
+      <span class="pm-cvc-hint">3 digits on the back of your card.</span>
+      <span class="pm-cvc-error">The CVC you entered doesn&rsquo;t look valid. Please re-check the 3-digit code.</span>
+    </div>
+
+    <!-- Use a new card -->
+    <div class="pm-newcard" onclick="alert('Would reveal the Stripe new-card fields')">
+      <span class="plus">+</span>
+      Enter a new card
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button onclick="document.getElementById('cvc').classList.add('has-error')">Preview CVC error</button>
+    <button onclick="document.getElementById('cvc').classList.remove('has-error')">Reset CVC (normal)</button>
+  </div>
+
+  <p class="note">
+    Maps to the real markup with IDs preserved:<br>
+    &bull; saved card = the 5-cell <code>.paymethod-info</code> grid in <code>existing-paymethods.tpl</code> (radio / brand / name / desc / expiry) restyled as one row;<br>
+    &bull; CVC = <code>#existingCardInfo</code> / <code>#inputCardCVV2</code> in <code>payment.tpl</code>, with <code>.field-error-msg</code> hidden until validation flags it;<br>
+    &bull; also fixes the backwards <code>strpos</code> brand sniff so MasterCard/Visa/Amex show the right chip + gradient (today everything falls back to a grey "CARD").
+  </p>
+</div>
+
+<script>
+  function selectRow(id){
+    document.querySelectorAll('.pm-row').forEach(function(r){ r.classList.toggle('is-selected', r.id===id); });
+  }
+</script>
+</body>
+</html>

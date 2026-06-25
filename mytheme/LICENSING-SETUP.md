@@ -2,7 +2,7 @@
 
 The theme calls back to a license server you operate. This document explains what to set up.
 
-For commercial distribution, licensing is load-bearing: the template must not render normal pages unless the addon is active and the license layer exposes `$myTheme.license.canRender`.
+For commercial distribution, licensing is load-bearing: the template must not render normal pages unless the addon is active and the license layer exposes `$hadrian.license.canRender`.
 
 ## Architecture
 
@@ -11,7 +11,7 @@ buyer's WHMCS install
         │
         │ 1. License key entered in admin
         ▼
-modules/addons/MyTheme/src/Template/License.php
+modules/addons/Hadrian/src/Template/License.php
         │
         │ 2. POST https://licensing.<your-domain>/check
         │    Body: {licensekey, domain, ip, dir, version, template, clientdate, nonce}
@@ -33,7 +33,7 @@ returns: {status, expires, allowed_domains, features, nonce_echo, signed_at, sig
 theme renders normally OR falls back to "six" template
 ```
 
-There is also a template-level guard in `templates/mytheme/header.tpl`. If the addon is missing or `$myTheme.license.canRender` is not present, the theme renders only a license-required screen. This prevents the plain template folder from being useful without the encoded addon.
+There is also a template-level guard in `templates/hadrian/header.tpl`. If the addon is missing or `$hadrian.license.canRender` is not present, the theme renders only a license-required screen. This prevents the plain template folder from being useful without the encoded addon.
 
 ## What you need to set up
 
@@ -45,11 +45,11 @@ openssl rsa -in license-server-private.pem -pubout -out license-server-public.pe
 ```
 
 - **Private key**: stays on your license server, never leaves
-- **Public key**: embedded in `modules/addons/MyTheme/src/Template/License.php` — replace the `LICENSE_SERVER_PUBLIC_KEY` constant placeholder
+- **Public key**: embedded in `modules/addons/Hadrian/src/Template/License.php` — replace the `LICENSE_SERVER_PUBLIC_KEY` constant placeholder
 
 ### 2. Set the license server URL
 
-Edit `modules/addons/MyTheme/src/Template/License.php`:
+Edit `modules/addons/Hadrian/src/Template/License.php`:
 
 ```php
 public static $licenseServerUrl = 'https://licensing.your-domain.com/';
@@ -66,13 +66,13 @@ Each template under `templates/<slug>/` has a `core/<slug>.php` file with a `sec
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Put the result in `templates/mytheme/core/mytheme.php`:
+Put the result in `templates/hadrian/core/hadrian.php`:
 
 ```php
 <?php
 return [
     'secret_key'   => '<paste-hex-here>',
-    'display_name' => 'MyTheme',
+    'display_name' => 'Hadrian',
     'version'      => '1.0.0',
     'preview'      => 'core/thumb.svg',
     'functions'    => [...],
@@ -108,7 +108,7 @@ The **canonical JSON** for signing must be deterministic — sort keys alphabeti
 
 ### 5. Recommended license server stacks
 
-- **WHMCS itself + a custom server module** under `modules/servers/MyThemeLicensing/verify.php`. This is what RS Studio does for Lagom — keeps all licensing inside WHMCS.
+- **WHMCS itself + a custom server module** under `modules/servers/HadrianLicensing/verify.php`. This is what RS Studio does for Lagom — keeps all licensing inside WHMCS.
 - **Standalone Node/Go/Python service** if you want decoupling. ~200 lines of code total.
 
 A reference Node implementation is sketched in `docs/license-server-reference.md` (TODO — write this when you're ready).
@@ -130,11 +130,11 @@ For a stricter subscription product, change `LicenseState::shouldRender()` so on
 
 ## Production hardening checklist
 
-- Set `templates/mytheme/core/mytheme.php` `dev_mode` to `false`.
+- Set `templates/hadrian/core/hadrian.php` `dev_mode` to `false`.
 - Replace the placeholder RSA public key in `License.php`.
 - Replace `License::$licenseServerUrl` with the real licensing endpoint.
 - Generate a unique per-template `secret_key`.
-- Encode `modules/addons/MyTheme/src`, protected helpers, and `templates/mytheme/core/mytheme.php`.
+- Encode `modules/addons/Hadrian/src`, protected helpers, and `templates/hadrian/core/hadrian.php`.
 - Regenerate integrity hashes after all production edits.
 - Verify the template does not render in these cases:
         - addon disabled;
@@ -145,12 +145,12 @@ For a stricter subscription product, change `LicenseState::shouldRender()` so on
 
 ## Local cache
 
-The client caches the server response in `tblconfiguration` row `MyTheme-<slug>-license-data`:
+The client caches the server response in `tblconfiguration` row `Hadrian-<slug>-license-data`:
 
 - Payload is `json_encode([fields])` (NOT `serialize` — eliminates `unserialize()` RCE class)
 - MAC is `hash_hmac('sha256', $payload, $secretKey)`
 - Verified with `hash_equals` (constant time)
-- TTL: 24h, randomized check hour (per `tblconfiguration` row `MyTheme-<slug>-license-hour`)
+- TTL: 24h, randomized check hour (per `tblconfiguration` row `Hadrian-<slug>-license-hour`)
 
 ## Anti-tamper
 
@@ -182,13 +182,13 @@ You'll get a support ticket. Diagnostics:
 
 ```sql
 SELECT setting, value FROM tblconfiguration
-  WHERE setting LIKE 'MyTheme-%';
+  WHERE setting LIKE 'Hadrian-%';
 ```
 
 Check:
-- `MyTheme-<slug>-license` — the key
-- `MyTheme-<slug>-license-data` — the encoded blob
-- `MyTheme-<slug>-license-warning` — the warning message
-- `MyTheme-license-domain` — captured `$_SERVER['SERVER_NAME']`
+- `Hadrian-<slug>-license` — the key
+- `Hadrian-<slug>-license-data` — the encoded blob
+- `Hadrian-<slug>-license-warning` — the warning message
+- `Hadrian-license-domain` — captured `$_SERVER['SERVER_NAME']`
 
 If the domain captured doesn't match what they purchased, that's the issue.

@@ -1,0 +1,3789 @@
+/*
+ * hadrian_cart -- main Apple-language stylesheet
+ * --------------------------------------------------------------
+ * Owns the visual look for every cart-flow page (products,
+ * viewcart, configureproduct, domainregister, domaintransfer,
+ * checkout, signup). The `.min` suffix is a name convention --
+ * the file is left readable here and minified in CI.
+ *
+ * Companion file: css/custom.css owns the `--vl-*` Shadow-DOM
+ * tokens (the safety net for any Vue SPA bits that still load).
+ *
+ * Section index:
+ *   1. Tokens
+ *   2. Shared section scaffolding (.ds-section, .ds-container)
+ *   3. Hero block
+ *   4. Pricing grid (plan cards)
+ *   5. Showcase (split image + content)
+ *   6. Comparison table
+ *   7. Video block + modal
+ *   8. Free-form 3-up
+ *   9. FAQ accordion
+ *  10. Empty state
+ *  11. Order form sidebar (categories, mini-cart)
+ *  12. Buttons / form primitives shared across cart pages
+ */
+
+/* ---------------------------------------------------------------
+   1. TOKENS -- Apple light mode + system dark mode mirror.
+   These are the same values apple-client-area/css/apple-theme.css
+   exposes; redeclared here so the cart pages don't have to
+   depend on the client-area theme bundle being loaded first.
+   --------------------------------------------------------------- */
+:root {
+    --color-bg:                #fbfbfd;
+    --color-surface:           #ffffff;
+    --color-surface-secondary: #f5f5f7;
+    --color-surface-tertiary:  #fafafa;
+    --color-border:            #e8e8ed;
+    --color-border-light:      #f0f0f5;
+    --color-text-primary:      #1d1d1f;
+    --color-text-secondary:    #6e6e73;
+    --color-text-tertiary:     #86868b;
+    --color-text-quaternary:   #aeaeb2;
+    --color-accent:            #0071e3;
+    --color-accent-hover:      #0077ED;
+    --color-accent-light:      rgba(0, 113, 227, 0.08);
+    --color-green-bg:          rgba(48, 209, 88, 0.10);
+    --color-green-text:        #248a3d;
+    --color-orange-bg:         rgba(255, 159, 10, 0.10);
+    --color-orange-text:       #c27400;
+    --color-red-bg:            rgba(255, 59, 48, 0.10);
+    --color-red-text:          #d70015;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 14px;
+    --radius-pill: 980px;
+    --transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    --shadow-card-hover: 0 0 0 0.5px rgba(0,0,0,0.04), 0 2px 12px rgba(0,0,0,0.06);
+    --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Dark mode is opt-in via [data-theme="dark"] on <html> or <body>.
+   We do NOT gate on @media (prefers-color-scheme: dark) -- the parent
+   hadrian uses explicit data-theme so the deployed site can default
+   to light even when the visitor's OS is in dark mode. The OS
+   preference is honored only as a fallback when no data-theme is
+   set anywhere in the document (see :where(html:not(...)) below). */
+html[data-theme="dark"],
+body[data-theme="dark"],
+[data-theme="dark"] {
+    --color-bg:                #1c1c1e;
+    --color-surface:           #2c2c2e;
+    --color-surface-secondary: #3a3a3c;
+    --color-surface-tertiary:  #252527;
+    --color-border:            #3a3a3c;
+    --color-border-light:      #2c2c2e;
+    --color-text-primary:      #f5f5f7;
+    --color-text-secondary:    #a1a1a6;
+    --color-text-tertiary:     #8e8e93;
+    --color-text-quaternary:   #636366;
+    --color-accent:            #2997ff;
+    --color-accent-hover:      #40a3ff;
+    --color-accent-light:      rgba(41, 151, 255, 0.12);
+    --color-green-bg:          rgba(48, 209, 88, 0.16);
+    --color-green-text:        #30d158;
+    --color-orange-bg:         rgba(255, 159, 10, 0.16);
+    --color-orange-text:       #ff9f0a;
+    --color-red-bg:            rgba(255, 59, 48, 0.16);
+    --color-red-text:          #ff453a;
+}
+
+/* OS-preference fallback -- only applies when the page does NOT set
+   data-theme explicitly. The :where() keeps specificity at zero so
+   any [data-theme] attribute on <html>/<body> wins. */
+@media (prefers-color-scheme: dark) {
+    :where(html:not([data-theme]):not([data-theme="light"])) {
+        --color-bg:                #1c1c1e;
+        --color-surface:           #2c2c2e;
+        --color-surface-secondary: #3a3a3c;
+        --color-surface-tertiary:  #252527;
+        --color-border:            #3a3a3c;
+        --color-border-light:      #2c2c2e;
+        --color-text-primary:      #f5f5f7;
+        --color-text-secondary:    #a1a1a6;
+        --color-text-tertiary:     #8e8e93;
+        --color-text-quaternary:   #636366;
+        --color-accent:            #2997ff;
+        --color-accent-hover:      #40a3ff;
+        --color-accent-light:      rgba(41, 151, 255, 0.12);
+        --color-green-bg:          rgba(48, 209, 88, 0.16);
+        --color-green-text:        #30d158;
+        --color-orange-bg:         rgba(255, 159, 10, 0.16);
+        --color-orange-text:       #ff9f0a;
+        --color-red-bg:            rgba(255, 59, 48, 0.16);
+        --color-red-text:          #ff453a;
+    }
+}
+
+body {
+    font-family: var(--font-family);
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------------------------------------------------------------
+   2. SHARED SECTION SCAFFOLDING
+   --------------------------------------------------------------- */
+.ds-section { padding: 80px 24px; position: relative; overflow: hidden; }
+@media (max-width: 720px) { .ds-section { padding: 56px 20px; } }
+.ds-section.bg-main   { background: var(--color-bg); }
+.ds-section.bg-lifted { background: var(--color-surface); }
+.ds-container { max-width: 1100px; margin: 0 auto; }
+
+.ds-eyebrow {
+    font-size: 11.5px; font-weight: 600;
+    color: var(--color-accent);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin: 0 0 14px;
+}
+.ds-section-title {
+    font-size: 36px; font-weight: 600;
+    letter-spacing: -0.026em; line-height: 1.1;
+    color: var(--color-text-primary);
+    margin: 0 0 14px;
+    text-wrap: balance;
+}
+@media (max-width: 720px) { .ds-section-title { font-size: 28px; } }
+.ds-section-subtitle {
+    font-size: 17px; line-height: 1.5;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.012em;
+    margin: 0 0 36px; max-width: 640px;
+    text-wrap: pretty;
+}
+@media (max-width: 720px) { .ds-section-subtitle { font-size: 15px; margin-bottom: 28px; } }
+.ds-section-subtitle.center { margin-left: auto; margin-right: auto; }
+
+/* ---------------------------------------------------------------
+   3. HERO (group landing)
+   --------------------------------------------------------------- */
+.ds-hero { padding: 120px 24px 96px; }
+@media (max-width: 720px) { .ds-hero { padding: 72px 20px 56px; } }
+.ds-hero-inner { max-width: 980px; margin: 0 auto; text-align: center; }
+.ds-hero-logo {
+    width: 88px; height: 88px; margin: 0 auto 28px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, var(--color-accent) 0%, #5856d6 100%);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 14px 40px rgba(0, 113, 227, 0.30);
+}
+.ds-hero-logo svg { width: 44px; height: 44px; }
+.ds-hero-logo img { width: 56px; height: 56px; object-fit: contain; }
+.ds-hero-title {
+    font-size: 56px; font-weight: 600;
+    letter-spacing: -0.038em; line-height: 1.04;
+    color: var(--color-text-primary);
+    margin: 0 0 18px;
+    text-wrap: balance;
+}
+@media (max-width: 960px) { .ds-hero-title { font-size: 44px; } }
+@media (max-width: 560px) { .ds-hero-title { font-size: 34px; letter-spacing: -0.028em; } }
+.ds-hero-subtitle {
+    font-size: 22px; font-weight: 400;
+    line-height: 1.34; color: var(--color-text-secondary);
+    letter-spacing: -0.018em;
+    margin: 0 auto 16px; max-width: 720px;
+    text-wrap: balance;
+}
+@media (max-width: 720px) { .ds-hero-subtitle { font-size: 17px; } }
+.ds-hero-description {
+    font-size: 15px; line-height: 1.55;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.008em;
+    margin: 0 auto 32px; max-width: 600px;
+    text-wrap: pretty;
+}
+.ds-hero-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 46px; padding: 0 24px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff;
+    font-size: 14.5px; font-weight: 500;
+    letter-spacing: -0.008em;
+    text-decoration: none;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.ds-hero-cta:hover {
+    background: var(--color-accent-hover);
+    color: #fff;
+    transform: translateY(-1px);
+}
+.ds-hero-cta svg { width: 14px; height: 14px; }
+.ds-hero-accent {
+    position: absolute; left: 50%; bottom: -120px; transform: translateX(-50%);
+    width: 620px; height: 240px;
+    background: radial-gradient(ellipse at center, var(--color-accent-light), transparent 70%);
+    pointer-events: none; opacity: 0.7;
+}
+
+/* ---------------------------------------------------------------
+   4. PRICING GRID (plan cards)
+   --------------------------------------------------------------- */
+.ds-pricing-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+}
+@media (max-width: 1000px) { .ds-pricing-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px)  { .ds-pricing-grid { grid-template-columns: 1fr; } }
+
+.ds-plan {
+    position: relative;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: 18px;
+    padding: 28px 24px 24px;
+    display: flex; flex-direction: column;
+    transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.ds-plan:hover {
+    border-color: var(--color-text-quaternary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+}
+.ds-plan.featured {
+    border-color: var(--color-accent);
+    border-width: 1px;
+    box-shadow: 0 0 0 1px var(--color-accent), 0 8px 24px var(--color-accent-light);
+}
+.ds-plan-badge {
+    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    padding: 4px 12px; border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff;
+    font-size: 10.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+.ds-plan-name {
+    font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--color-text-tertiary);
+    margin: 0 0 8px;
+}
+.ds-plan-price {
+    display: flex; align-items: baseline; gap: 4px;
+    margin: 0 0 6px;
+    font-variant-numeric: tabular-nums;
+}
+.ds-plan-price .currency { font-size: 18px; color: var(--color-text-secondary); font-weight: 500; }
+.ds-plan-price .amount   { font-size: 40px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.028em; line-height: 1; }
+.ds-plan-price .period   { font-size: 14px; color: var(--color-text-tertiary); margin-left: 2px; font-weight: 500; }
+.ds-plan-price.free .amount {
+    font-size: 28px; color: var(--color-green-text);
+    letter-spacing: -0.018em;
+    text-transform: uppercase; font-weight: 700;
+}
+.ds-plan-desc {
+    font-size: 13px; color: var(--color-text-tertiary);
+    letter-spacing: -0.004em; line-height: 1.5;
+    margin: 0 0 20px;
+    min-height: 39px;
+}
+.ds-plan-features {
+    list-style: none; padding: 0; margin: 0 0 22px;
+    display: flex; flex-direction: column; gap: 9px;
+    flex: 1;
+}
+.ds-plan-features li {
+    display: flex; align-items: flex-start; gap: 9px;
+    font-size: 13px; color: var(--color-text-secondary);
+    letter-spacing: -0.004em; line-height: 1.45;
+}
+.ds-plan-features li svg {
+    width: 13px; height: 13px;
+    color: var(--color-green-text);
+    flex-shrink: 0; margin-top: 3px;
+}
+.ds-plan-features li.muted { color: var(--color-text-quaternary); text-decoration: line-through; }
+.ds-plan-features li.muted svg { color: var(--color-text-quaternary); }
+.ds-plan-features li b {
+    color: var(--color-text-primary); font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+.ds-plan-cta {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 40px; padding: 0 18px;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 13px; font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer; font-family: inherit;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+.ds-plan-cta:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.ds-plan.featured .ds-plan-cta {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+}
+.ds-plan.featured .ds-plan-cta:hover {
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    color: #fff;
+}
+
+/* ---------------------------------------------------------------
+   5. SHOWCASE (product_preview split)
+   --------------------------------------------------------------- */
+.ds-showcase {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 48px; align-items: center;
+}
+@media (max-width: 880px) { .ds-showcase { grid-template-columns: 1fr; gap: 28px; } }
+.ds-showcase.reverse { direction: rtl; }
+.ds-showcase.reverse > * { direction: ltr; }
+.ds-showcase-content { max-width: 480px; }
+.ds-showcase-title {
+    font-size: 32px; font-weight: 600;
+    letter-spacing: -0.022em; line-height: 1.1;
+    color: var(--color-text-primary);
+    margin: 0 0 14px;
+    text-wrap: balance;
+}
+@media (max-width: 720px) { .ds-showcase-title { font-size: 26px; } }
+.ds-showcase-subtitle {
+    font-size: 17px; line-height: 1.45;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.012em;
+    margin: 0 0 18px;
+}
+.ds-showcase-description {
+    font-size: 14.5px; line-height: 1.6;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.008em;
+}
+.ds-showcase-description p { margin: 0 0 12px; }
+.ds-showcase-description p:last-child { margin: 0; }
+.ds-showcase-description ul {
+    padding-left: 0; list-style: none;
+    margin: 14px 0 0;
+    display: flex; flex-direction: column; gap: 8px;
+}
+.ds-showcase-description ul li {
+    display: flex; align-items: flex-start; gap: 8px;
+    color: var(--color-text-secondary);
+}
+.ds-showcase-description ul li::before {
+    content: ""; width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    margin-top: 9px; flex-shrink: 0;
+}
+.ds-showcase-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: 24px;
+    background: linear-gradient(135deg, var(--color-accent-light) 0%, rgba(88, 86, 214, 0.10) 100%);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+}
+.ds-showcase-media::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(0, 113, 227, 0.20), transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(88, 86, 214, 0.16), transparent 50%);
+}
+.ds-showcase-media img {
+    position: relative; z-index: 1;
+    max-width: 80%; max-height: 80%; object-fit: contain;
+}
+.ds-showcase-media-fallback {
+    position: relative; z-index: 1;
+    color: var(--color-accent);
+    opacity: 0.85;
+}
+.ds-showcase-media-fallback svg { width: 96px; height: 96px; }
+
+/* ---------------------------------------------------------------
+   6. COMPARISON TABLE
+   --------------------------------------------------------------- */
+.ds-table-wrap {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: 18px;
+    overflow: hidden;
+}
+.ds-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13.5px; letter-spacing: -0.004em;
+}
+.ds-table thead { background: var(--color-surface-tertiary); }
+.ds-table th,
+.ds-table td {
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 0.5px solid var(--color-border);
+}
+.ds-table tr:last-child td { border-bottom: 0; }
+.ds-table thead th {
+    font-size: 14.5px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    padding-top: 20px; padding-bottom: 20px;
+    white-space: nowrap;
+}
+.ds-table thead th:not(:first-child) { text-align: center; }
+.ds-table tbody td:not(:first-child) {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+.ds-table tbody td:first-child {
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+.ds-table tbody tr:hover { background: rgba(0, 0, 0, 0.02); }
+.ds-table-check { color: var(--color-green-text); display: inline-flex; }
+.ds-table-check svg { width: 16px; height: 16px; }
+.ds-table-cross { color: var(--color-text-quaternary); display: inline-flex; }
+.ds-table-cross svg { width: 16px; height: 16px; }
+.ds-table-value {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+.ds-table-mobile-hint {
+    display: none;
+    padding: 10px 16px;
+    font-size: 11px; color: var(--color-text-tertiary);
+    background: var(--color-surface-tertiary);
+    border-top: 0.5px solid var(--color-border);
+}
+@media (max-width: 720px) {
+    .ds-table-wrap { overflow-x: auto; }
+    .ds-table { min-width: 600px; }
+    .ds-table-mobile-hint { display: block; }
+}
+
+/* ---------------------------------------------------------------
+   7. VIDEO BLOCK + MODAL
+   --------------------------------------------------------------- */
+.ds-video {
+    position: relative; max-width: 880px; margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    border-radius: 22px; overflow: hidden;
+    background: linear-gradient(135deg, #1d1d1f 0%, #3a3a3c 100%);
+    cursor: pointer;
+}
+.ds-video::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(0, 113, 227, 0.16), transparent 60%);
+}
+.ds-video-poster {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255, 255, 255, 0.40);
+}
+.ds-video-poster svg { width: 120px; height: 120px; }
+.ds-video-play {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 84px; height: 84px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--color-accent);
+    transition: transform var(--transition-fast), background var(--transition-fast);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.30);
+}
+.ds-video:hover .ds-video-play { transform: translate(-50%, -50%) scale(1.06); }
+.ds-video-play svg { width: 32px; height: 32px; margin-left: 4px; }
+
+.ds-video-modal {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(20px);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 1000;
+    padding: 32px;
+}
+.ds-video-modal.is-open { display: flex; }
+.ds-video-modal-content {
+    position: relative;
+    max-width: 1000px; width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000; border-radius: 14px; overflow: hidden;
+}
+.ds-video-modal-close {
+    position: absolute; top: -42px; right: 0;
+    width: 32px; height: 32px;
+    border-radius: 50%; border: 0;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff; font-size: 20px;
+    cursor: pointer; font-family: inherit;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background var(--transition-fast);
+}
+.ds-video-modal-close:hover { background: rgba(255, 255, 255, 0.25); }
+
+/* ---------------------------------------------------------------
+   8. FREE-FORM 3-UP
+   --------------------------------------------------------------- */
+.ds-freeform {
+    font-size: 15.5px; line-height: 1.65;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.008em;
+}
+.ds-freeform-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
+    margin-top: 40px;
+}
+@media (max-width: 880px) { .ds-freeform-grid { grid-template-columns: 1fr; gap: 24px; } }
+.ds-freeform-card {
+    padding: 28px 24px;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: 18px;
+}
+.ds-freeform-card-ico {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+}
+.ds-freeform-card-ico svg { width: 22px; height: 22px; }
+.ds-freeform-card-title {
+    font-size: 16px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    margin: 0 0 8px;
+}
+.ds-freeform-card-desc {
+    font-size: 13.5px; color: var(--color-text-tertiary);
+    line-height: 1.55; letter-spacing: -0.004em;
+    margin: 0;
+}
+
+/* ---------------------------------------------------------------
+   9. FAQ ACCORDION
+   --------------------------------------------------------------- */
+.ds-faq {
+    max-width: 760px; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 10px;
+}
+.ds-faq-item {
+    border: 0.5px solid var(--color-border);
+    border-radius: 14px;
+    background: var(--color-surface);
+    overflow: hidden;
+    transition: border-color var(--transition-fast);
+}
+.ds-faq-item:has(.ds-faq-toggle:checked) { border-color: var(--color-accent); }
+.ds-faq-toggle { position: absolute; opacity: 0; pointer-events: none; }
+.ds-faq-question {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    cursor: pointer;
+    font-size: 15px; font-weight: 500;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    user-select: none;
+    transition: color var(--transition-fast);
+}
+.ds-faq-question:hover { color: var(--color-accent); }
+.ds-faq-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--color-surface-tertiary);
+    color: var(--color-text-secondary);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: transform var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+}
+.ds-faq-icon svg { width: 12px; height: 12px; transition: transform var(--transition-fast); }
+.ds-faq-item:has(.ds-faq-toggle:checked) .ds-faq-icon {
+    background: var(--color-accent);
+    color: #fff;
+    transform: rotate(45deg);
+}
+.ds-faq-answer {
+    max-height: 0; overflow: hidden;
+    transition: max-height 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.ds-faq-item:has(.ds-faq-toggle:checked) .ds-faq-answer { max-height: 600px; }
+.ds-faq-answer-inner {
+    padding: 0 22px 22px;
+    font-size: 14px; line-height: 1.6;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.008em;
+}
+
+/* ---------------------------------------------------------------
+  10. EMPTY STATE (no products / blocks / blank flow)
+   --------------------------------------------------------------- */
+.ds-empty { padding: 120px 24px; text-align: center; }
+.ds-empty-ico {
+    width: 80px; height: 80px;
+    margin: 0 auto 22px;
+    border-radius: 22px;
+    background: var(--color-surface-secondary);
+    color: var(--color-text-tertiary);
+    display: flex; align-items: center; justify-content: center;
+}
+.ds-empty-ico svg { width: 36px; height: 36px; }
+.ds-empty-title {
+    font-size: 26px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.022em;
+    margin: 0 0 10px;
+}
+.ds-empty-desc {
+    font-size: 15px; color: var(--color-text-tertiary);
+    line-height: 1.55; letter-spacing: -0.008em;
+    margin: 0 auto 26px; max-width: 460px;
+}
+.ds-empty-actions { display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.ds-empty-actions a {
+    height: 42px; padding: 0 22px; font-size: 14px;
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    font-weight: 500; letter-spacing: -0.008em;
+    transition: all var(--transition-fast);
+}
+.ds-empty-actions .btn-primary {
+    background: var(--color-accent); color: #fff;
+    border: 1px solid var(--color-accent);
+}
+.ds-empty-actions .btn-primary:hover { background: var(--color-accent-hover); border-color: var(--color-accent-hover); color: #fff; }
+.ds-empty-actions .btn-secondary {
+    background: transparent; color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+}
+.ds-empty-actions .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.ds-empty-actions svg { width: 14px; height: 14px; }
+
+/* ---------------------------------------------------------------
+  11. ORDER FORM SIDEBAR (categories + mini-cart)
+   --------------------------------------------------------------- */
+.ds-cart-layout {
+    display: grid; grid-template-columns: 240px 1fr;
+    gap: 32px;
+    max-width: 1280px; margin: 0 auto;
+    padding: 24px;
+}
+@media (max-width: 960px) { .ds-cart-layout { grid-template-columns: 1fr; } }
+.ds-sidebar {
+    position: sticky; top: 88px;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: 14px;
+    padding: 18px 16px;
+}
+.ds-sidebar h3 {
+    font-size: 11.5px; font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.07em;
+    margin: 0 0 12px;
+}
+.ds-sidebar-list { list-style: none; padding: 0; margin: 0; }
+.ds-sidebar-list a {
+    display: block;
+    padding: 8px 10px;
+    font-size: 13.5px; color: var(--color-text-primary);
+    text-decoration: none;
+    border-radius: 8px;
+    letter-spacing: -0.008em;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+.ds-sidebar-list a:hover {
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+}
+.ds-sidebar-list a.is-active {
+    background: var(--color-accent);
+    color: #fff;
+}
+
+/* ===============================================================
+   STORE (.st-*) -- the actual products-page layout.
+   Source: apple-client-area/store.html
+   Used by: products.tpl, sidebar-categories.tpl
+   =============================================================== */
+
+/* -- Page header (sits above the split) ---------------------- */
+.st-page-header { margin-bottom: 24px; }
+.st-page-header h1 {
+    font-size: 32px; font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    margin: 0 0 6px;
+}
+.st-page-header .page-subtitle {
+    font-size: 14px; color: var(--color-text-secondary);
+    letter-spacing: -0.008em; line-height: 1.5;
+    margin: 0; max-width: 620px;
+}
+
+/* -- 2-column split: sidebar + main ------------------------ */
+.st-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+@media (max-width: 880px) { .st-split { grid-template-columns: 1fr; } }
+/* Sub-nav preview toggle (state-chip "Sub-nav: Hide") -- the per-page
+   CSS for .ct-split, .pm-split, .um-split already wires this for client-
+   area pages; replicate for the store .st-split sidebar (Categories +
+   Actions card) so the same chip control hides it on /store/* too. */
+body[data-subnav="off"] .st-split { grid-template-columns: 1fr; }
+body[data-subnav="off"] .st-split > aside { display: none; }
+body[data-subnav-side="left"] .st-split { grid-template-columns: 240px 1fr; }
+body[data-subnav-side="left"] .st-split > aside { grid-column: 1; grid-row: 1; }
+
+/* Admin "Order Category Sidebar" toggle (Addons -> Hadrian -> Settings).
+   Independent of the dev chip's data-subnav; drives the same hide + reflow
+   as data-subnav="off", but scoped to order/cart pages only. */
+body[data-subnav-order="off"] .st-split,
+body[data-subnav-order="off"] .dp-split { grid-template-columns: 1fr; }
+body[data-subnav-order="off"] .st-split > aside,
+body[data-subnav-order="off"] .dp-split > aside { display: none; }
+body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
+
+/* -- Sidebar cards (Categories + Actions) ------------------ */
+.subnav-card { padding: 8px; }
+.subnav-heading {
+    font-size: 11px; font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 10px 12px 8px;
+}
+.subnav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    font-size: 13px; letter-spacing: -0.008em;
+    text-decoration: none; font-family: inherit;
+    background: transparent; border: 0;
+    width: 100%; text-align: left; cursor: pointer;
+    transition: background var(--transition-fast);
+}
+.subnav-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+.subnav-item.active {
+    background: rgba(0, 0, 0, 0.06);
+    font-weight: 500;
+}
+.subnav-item.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+/* Non-link sidebar items (rendered when WHMCS menu node has no URI) */
+.subnav-item--static { cursor: default; }
+.subnav-item--static:hover { background: transparent; }
+/* The label fills available width so the badge can sit at the far right */
+.subnav-item-label {
+    flex: 1; min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.subnav-item svg {
+    width: 14px; height: 14px;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+}
+.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item .subnav-badge,
+.subnav-badge {
+    margin-left: auto;
+    font-size: 11px; font-weight: 500;
+    padding: 1px 7px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    flex-shrink: 0;
+}
+.subnav-divider {
+    height: 0.5px;
+    background: var(--color-border);
+    margin: 8px 12px;
+}
+/* Vertical gap between stacked sidebar panels (Categories -> Actions) */
+.subnav-card--gap { margin-top: 12px; }
+
+/* -- Category header (with billing cycle pill switch) ------ */
+.st-cat-head { padding: 24px 28px 22px; }
+.st-cat-head-row {
+    display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
+}
+.st-cat-head-ico {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.st-cat-head-ico svg { width: 22px; height: 22px; }
+.st-cat-head-ico img { width: 28px; height: 28px; object-fit: contain; }
+.st-cat-head-meta { flex: 1; min-width: 0; }
+.st-cat-head-title {
+    font-size: 22px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: 0 0 4px;
+}
+.st-cat-head-desc {
+    font-size: 14px; color: var(--color-text-secondary);
+    letter-spacing: -0.008em;
+    line-height: 1.5;
+    max-width: 540px;
+    margin: 0;
+}
+
+/* Billing cycle pill switcher */
+.st-cycle {
+    display: inline-flex;
+    background: var(--color-surface-secondary);
+    border-radius: var(--radius-pill);
+    padding: 3px;
+    flex-shrink: 0;
+}
+.st-cycle button {
+    border: 0; background: transparent;
+    padding: 6px 14px;
+    font-size: 12.5px; font-weight: 500;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-pill);
+    cursor: pointer; font-family: inherit;
+    letter-spacing: -0.008em;
+    transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.st-cycle button.active {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.st-cycle-saving {
+    display: inline-flex; align-items: center;
+    padding: 1px 6px; border-radius: var(--radius-pill);
+    background: var(--color-green-bg); color: var(--color-green-text);
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* -- Plan grid (Variant A -- 3 cards w/ feature list) -------
+   Fixed 3-column layout for groups with 3+ products. The :has() rules
+   below collapse to fewer columns when a group has only 1 or 2 packages
+   (lagom2's approach: row-eq-height with auto-distributed flex cols),
+   so a single-product group doesn't render as one narrow card with two
+   empty columns next to it. Mobile (<900px) stacks to one column. */
+.st-pricing {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    padding: 0 20px 24px;
+    justify-content: center;
+}
+.st-pricing:has(.st-plan:nth-child(2):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 380px));
+}
+.st-pricing:has(.st-plan:only-child) {
+    grid-template-columns: minmax(0, 420px);
+}
+@media (max-width: 900px) {
+    .st-pricing,
+    .st-pricing:has(.st-plan:nth-child(2):last-child),
+    .st-pricing:has(.st-plan:only-child) {
+        grid-template-columns: minmax(0, 420px);
+    }
+}
+
+.st-plan {
+    padding: 24px 22px 22px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    background: var(--color-surface);
+    transition: all var(--transition-fast);
+    position: relative;
+    display: flex; flex-direction: column;
+}
+.st-plan:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    transform: translateY(-2px);
+}
+.st-plan.featured {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-accent);
+}
+.st-plan-badge {
+    position: absolute; top: 0; right: 22px;
+    transform: translateY(-50%);
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase;
+}
+.st-plan-name {
+    font-size: 15px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    margin: 0 0 6px;
+}
+.st-plan-tag {
+    font-size: 12.5px;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.004em;
+    line-height: 1.45;
+    margin: 0 0 18px;
+    min-height: 36px;
+}
+.st-plan-price {
+    display: flex; align-items: baseline; gap: 4px;
+    margin-bottom: 14px;
+    font-variant-numeric: tabular-nums;
+}
+.st-plan-price .currency {
+    font-size: 18px; font-weight: 500;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.014em;
+    align-self: flex-start; margin-top: 4px;
+}
+.st-plan-price .amount {
+    font-size: 44px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+.st-plan-price .period {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.008em;
+    margin-left: 4px;
+}
+.st-plan-price-sub {
+    font-size: 11.5px;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.004em;
+    margin: -8px 0 18px;
+}
+/* Description body for Variant A.
+   Wrapper is a <div> populated from $product.description (admin-authored HTML,
+   typically <ul><li>...</li></ul>). Same class also styles a legacy ul-as-wrapper
+   used by the mockup (apple-client-area/store.html) for backward compatibility.
+   Variants B + G use the same pattern at smaller scale so a single bit of HTML
+   in the description renders consistently regardless of which variant is active. */
+.st-plan-features {
+    flex: 1;
+    margin: 0 0 22px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    letter-spacing: -0.008em;
+    line-height: 1.45;
+}
+.st-plan-features,
+.st-plan-features ul,
+.st-plan-features ol {
+    list-style: none; padding: 0;
+}
+.st-plan-features ul,
+.st-plan-features ol {
+    margin: 0;
+    display: flex; flex-direction: column; gap: 9px;
+}
+.st-plan-features li {
+    display: flex; align-items: flex-start; gap: 9px;
+    margin: 0;
+}
+.st-plan-features li > svg {
+    width: 14px; height: 14px;
+    color: var(--color-green-text);
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+/* Green checkmark bullet for plain-text <li> (no inline svg). Mask-image lets
+   the bullet color follow --color-green-text in light + dark mode. */
+.st-plan-features li:not(:has(> svg))::before {
+    content: '';
+    display: block;
+    width: 14px; height: 14px;
+    flex-shrink: 0; margin-top: 1px;
+    background-color: var(--color-green-text);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.st-plan-features li strong,
+.st-plan-features li b {
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+.st-plan-features li.muted {
+    color: var(--color-text-tertiary);
+}
+.st-plan-features li.muted > svg { color: var(--color-text-quaternary); }
+.st-plan-features li.muted:not(:has(> svg))::before { background-color: var(--color-text-quaternary); }
+/* Graceful fallback if admin pastes paragraphs / headings into the description. */
+.st-plan-features p { margin: 0 0 8px; }
+.st-plan-features p:last-child { margin-bottom: 0; }
+.st-plan-features h1, .st-plan-features h2, .st-plan-features h3,
+.st-plan-features h4, .st-plan-features h5, .st-plan-features h6 {
+    font-size: 13px; font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 6px;
+}
+
+.st-plan-cta {
+    height: 40px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: #fff;
+    border: 0;
+    font-size: 13.5px; font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer; font-family: inherit;
+    transition: all var(--transition-fast);
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    text-decoration: none;
+    width: 100%;
+}
+.st-plan-cta:hover { background: var(--color-accent-hover); color: #fff; }
+.st-plan-cta.secondary {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 0.5px solid var(--color-border);
+}
+.st-plan-cta.secondary:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: var(--color-accent-light);
+}
+
+/* -- Compare bar (fine print under the grid) -------------- */
+.st-compare {
+    margin-top: 16px;
+    padding: 14px 20px;
+    border-top: 0.5px solid var(--color-border);
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: var(--color-surface-tertiary);
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.004em;
+}
+.st-compare .spacer { flex: 1; }
+.st-compare a {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* -- Guarantees strip (3 trust cards below the grid) ------ */
+.st-guarantees {
+    margin-top: 20px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+@media (max-width: 720px) { .st-guarantees { grid-template-columns: 1fr; } }
+.st-guarantee {
+    padding: 14px 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+}
+.st-guarantee-ico {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.st-guarantee-ico svg { width: 15px; height: 15px; }
+.st-guarantee-title {
+    font-size: 13px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+}
+.st-guarantee-sub {
+    font-size: 11.5px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+    line-height: 1.4;
+}
+
+/* -- Empty state -- used inside the main card when the
+   selected category has no purchasable packages --------- */
+.st-empty {
+    padding: 72px 24px 64px;
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+.st-empty-ico {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: var(--color-surface-secondary);
+    color: var(--color-text-tertiary);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+}
+.st-empty-ico svg { width: 26px; height: 26px; }
+.st-empty-title {
+    font-size: 17px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.014em;
+    margin: 0 0 8px;
+}
+.st-empty-desc {
+    font-size: 13.5px; color: var(--color-text-secondary);
+    line-height: 1.55;
+    letter-spacing: -0.008em;
+    max-width: 380px;
+    margin: 0 auto 22px;
+}
+.st-empty-actions {
+    display: inline-flex; gap: 8px; flex-wrap: wrap;
+    justify-content: center;
+}
+.st-empty-actions a {
+    height: 34px; padding: 0 16px; font-size: 13px;
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    font-weight: 500; letter-spacing: -0.008em;
+    transition: all var(--transition-fast);
+}
+.st-empty-actions .btn-primary {
+    background: var(--color-accent); color: #fff;
+    border: 1px solid var(--color-accent);
+}
+.st-empty-actions .btn-primary:hover {
+    background: var(--color-accent-hover); border-color: var(--color-accent-hover); color: #fff;
+}
+.st-empty-actions .btn-secondary {
+    background: transparent; color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+}
+.st-empty-actions .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.st-empty-actions svg { width: 13px; height: 13px; }
+
+/* -- Plan variant switching (All / A / B / C / D / E / F / G / H) --
+   When a specific plan is chosen via the state-chip (`data-plan` set
+   on <body>), every other .plan-variant AND every .st-variant-label is
+   hidden, leaving only the selected block visible. When no data-plan
+   is set (i.e., the state-chip "All" mode used for dev preview only),
+   the cart wrapper falls back to Variant A -- stacking all 8 variants
+   for one product is overwhelming for end users and was leaving the
+   visible viewport empty after the category header.
+
+   The per-wrapper fallback uses #order-standard_cart so it only
+   applies inside the cart-flow page, not in apple-client-area mockups
+   where stacking all variants is the intended dev behavior. */
+.plan-variant { display: block; }
+body[data-plan="a"] .plan-variant:not(.v-a),
+body[data-plan="b"] .plan-variant:not(.v-b),
+body[data-plan="c"] .plan-variant:not(.v-c),
+body[data-plan="d"] .plan-variant:not(.v-d),
+body[data-plan="e"] .plan-variant:not(.v-e),
+body[data-plan="f"] .plan-variant:not(.v-f),
+body[data-plan="g"] .plan-variant:not(.v-g),
+body[data-plan="h"] .plan-variant:not(.v-h) { display: none; }
+
+/* Default-to-Variant-A when state-chip is in "All" mode (no data-plan
+   attribute on body). The mutually-exclusive [data-plan] selectors
+   above take precedence when the chip picks a specific variant. */
+body:not([data-plan]) #order-standard_cart .plan-variant:not(.v-a) { display: none; }
+body:not([data-plan]) #order-standard_cart .st-variant-label { display: none; }
+
+.st-variant-label {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 24px;
+    font-size: 11px; font-weight: 600;
+    color: var(--color-accent);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--color-accent-light);
+    border-top: 0.5px solid var(--color-border);
+}
+.st-variant-label svg { width: 12px; height: 12px; }
+/* Hide every variant-label when a specific variant is picked */
+body[data-plan] .st-variant-label { display: none; }
+
+/* -- Variant B -- 4 minimal packages -------------------------
+   4-column default with :has() collapses to 3 / 2 / 1 columns when
+   fewer packages exist (same pattern as .st-pricing for Variant A).
+   Without this a single-product category renders as a narrow 1/4-width
+   card with three empty grid tracks beside it. */
+.st-pricing-b {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    padding: 0 20px 24px;
+    justify-content: center;
+}
+.st-pricing-b:has(.st-plan-b:nth-child(3):last-child) {
+    grid-template-columns: repeat(3, minmax(0, 280px));
+}
+.st-pricing-b:has(.st-plan-b:nth-child(2):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 320px));
+}
+.st-pricing-b:has(.st-plan-b:only-child) {
+    grid-template-columns: minmax(0, 360px);
+}
+@media (max-width: 1040px) {
+    .st-pricing-b,
+    .st-pricing-b:has(.st-plan-b:nth-child(3):last-child) {
+        grid-template-columns: repeat(2, minmax(0, 320px));
+    }
+}
+@media (max-width: 540px) {
+    .st-pricing-b,
+    .st-pricing-b:has(.st-plan-b:only-child),
+    .st-pricing-b:has(.st-plan-b:nth-child(2):last-child),
+    .st-pricing-b:has(.st-plan-b:nth-child(3):last-child) {
+        grid-template-columns: minmax(0, 360px);
+    }
+}
+.st-plan-b {
+    padding: 20px 18px 18px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    display: flex; flex-direction: column;
+    transition: all var(--transition-fast);
+    position: relative;
+}
+.st-plan-b:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-light);
+}
+.st-plan-b.featured { border-color: var(--color-accent); background: var(--color-accent-light); }
+.st-plan-b-name { font-size: 13px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; margin-bottom: 4px; }
+.st-plan-b-tag  { font-size: 11.5px; color: var(--color-text-tertiary); letter-spacing: -0.004em; margin-bottom: 12px; min-height: 16px; }
+.st-plan-b-price {
+    display: flex; align-items: baseline; gap: 2px;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 12px;
+}
+.st-plan-b-price .currency { font-size: 14px; color: var(--color-text-secondary); margin-top: 2px; }
+.st-plan-b-price .amount   { font-size: 28px; font-weight: 600; letter-spacing: -0.025em; color: var(--color-text-primary); line-height: 1; }
+.st-plan-b-price .period   { font-size: 11.5px; color: var(--color-text-tertiary); margin-left: 2px; }
+/* Description body for Variant B — same admin-authored HTML as Variant A,
+   smaller scale to suit the denser 4-up card chrome. See .st-plan-features
+   for the full pattern. */
+.st-plan-b-specs {
+    flex: 1;
+    margin: 0 0 14px;
+    font-size: 12px; color: var(--color-text-secondary);
+    letter-spacing: -0.004em;
+    line-height: 1.45;
+}
+.st-plan-b-specs,
+.st-plan-b-specs ul,
+.st-plan-b-specs ol { list-style: none; padding: 0; }
+.st-plan-b-specs ul,
+.st-plan-b-specs ol {
+    margin: 0;
+    display: flex; flex-direction: column; gap: 6px;
+}
+.st-plan-b-specs li { display: flex; align-items: flex-start; gap: 7px; margin: 0; }
+.st-plan-b-specs li > svg {
+    width: 12px; height: 12px;
+    color: var(--color-green-text);
+    flex-shrink: 0; margin-top: 2px;
+}
+.st-plan-b-specs li:not(:has(> svg))::before {
+    content: '';
+    display: block;
+    width: 12px; height: 12px;
+    flex-shrink: 0; margin-top: 2px;
+    background-color: var(--color-green-text);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.st-plan-b-specs li strong,
+.st-plan-b-specs li b { color: var(--color-text-primary); font-weight: 500; }
+.st-plan-b-specs p { margin: 0 0 6px; }
+.st-plan-b-specs p:last-child { margin-bottom: 0; }
+.st-plan-b-specs h1, .st-plan-b-specs h2, .st-plan-b-specs h3,
+.st-plan-b-specs h4, .st-plan-b-specs h5, .st-plan-b-specs h6 {
+    font-size: 12px; font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 4px;
+}
+.st-plan-b-cta {
+    height: 32px; padding: 0 14px;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    border: 0.5px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 12.5px; font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer; font-family: inherit;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.st-plan-b-cta:hover { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+.st-plan-b.featured .st-plan-b-cta { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+.st-plan-b.featured .st-plan-b-cta:hover { background: var(--color-accent-hover); }
+
+/* -- Variant C -- 5 horizontal rows ------------------------- */
+.st-rows { padding: 0; }
+.st-row {
+    display: grid;
+    grid-template-columns: 180px 1fr auto auto;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 24px;
+    border-bottom: 0.5px solid var(--color-border);
+    transition: background var(--transition-fast);
+}
+.st-row:last-child { border-bottom: 0; }
+.st-row:hover { background: rgba(0, 0, 0, 0.02); }
+@media (max-width: 720px) {
+    .st-row { grid-template-columns: 1fr; gap: 10px; }
+}
+.st-row.featured {
+    background: var(--color-accent-light);
+    position: relative;
+}
+.st-row.featured::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--color-accent);
+}
+.st-row-name { display: flex; flex-direction: column; gap: 2px; }
+.st-row-name strong { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.012em; }
+.st-row-name span { font-size: 11.5px; color: var(--color-text-tertiary); letter-spacing: -0.004em; }
+.st-row-specs {
+    display: flex; flex-wrap: wrap; gap: 4px 14px;
+    font-size: 12px; color: var(--color-text-secondary);
+    letter-spacing: -0.004em;
+}
+.st-row-spec { display: inline-flex; align-items: center; gap: 5px; }
+.st-row-spec svg { width: 12px; height: 12px; color: var(--color-green-text); flex-shrink: 0; }
+.st-row-spec strong { color: var(--color-text-primary); font-weight: 500; }
+.st-row-price {
+    display: flex; align-items: baseline; gap: 3px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.st-row-price .currency { font-size: 13px; color: var(--color-text-secondary); }
+.st-row-price .amount   { font-size: 22px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.02em; }
+.st-row-price .period   { font-size: 11.5px; color: var(--color-text-tertiary); margin-left: 2px; }
+.st-row-cta {
+    height: 32px; padding: 0 16px;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 12.5px; font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer; font-family: inherit;
+    text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all var(--transition-fast);
+}
+.st-row-cta:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+.st-row.featured .st-row-cta { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+
+/* -- Variant D -- comparison table --------------------------- */
+.st-compare-tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.st-compare-tbl th, .st-compare-tbl td {
+    padding: 14px 18px;
+    border-bottom: 0.5px solid var(--color-border);
+    text-align: center;
+    letter-spacing: -0.008em;
+}
+.st-compare-tbl th:first-child, .st-compare-tbl td:first-child {
+    text-align: left;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    width: 30%;
+}
+.st-compare-tbl thead th {
+    padding: 20px 18px 16px;
+    font-weight: 600;
+    border-bottom: 0.5px solid var(--color-border);
+    background: var(--color-surface-tertiary);
+    vertical-align: top;
+}
+.st-compare-tbl thead th.featured {
+    background: var(--color-accent-light);
+    position: relative;
+}
+.st-compare-tbl thead th.featured::before {
+    content: "Most popular";
+    position: absolute; top: 6px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+}
+.st-compare-plan-name {
+    font-size: 14px; font-weight: 600; color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    margin-top: 8px;
+}
+.st-compare-plan-price {
+    display: flex; align-items: baseline; justify-content: center; gap: 2px;
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+}
+.st-compare-plan-price .currency { font-size: 12px; color: var(--color-text-secondary); }
+.st-compare-plan-price .amount { font-size: 24px; font-weight: 600; letter-spacing: -0.022em; color: var(--color-text-primary); }
+.st-compare-plan-price .period { font-size: 11px; color: var(--color-text-tertiary); margin-left: 2px; }
+.st-compare-tbl tbody tr:last-child td { border-bottom: 0; }
+.st-compare-tbl td.featured { background: var(--color-accent-light); }
+.st-compare-val { font-weight: 500; color: var(--color-text-primary); }
+.st-compare-val.muted { color: var(--color-text-quaternary); font-weight: 400; }
+.st-compare-check { color: var(--color-green-text); }
+.st-compare-x { color: var(--color-text-quaternary); }
+.st-compare-check svg, .st-compare-x svg { width: 14px; height: 14px; }
+.st-compare-footer {
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 30% 1fr 1fr 1fr;
+    gap: 0;
+}
+.st-compare-footer > * { padding: 0 18px; }
+.st-compare-footer-cta { display: flex; justify-content: center; }
+
+/* -- Variant E -- Bento asymmetric --------------------------- */
+.st-bento {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 14px;
+    padding: 0 20px 24px;
+}
+@media (max-width: 720px) { .st-bento { grid-template-columns: 1fr; } }
+.st-bento-hero {
+    grid-column: 1 / -1;
+    padding: 28px 28px 24px;
+    border: 0.5px solid var(--color-accent);
+    border-radius: var(--radius-lg, 14px);
+    background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-surface) 70%);
+    display: grid; grid-template-columns: 1fr auto; gap: 20px;
+    align-items: center;
+    position: relative;
+}
+@media (max-width: 600px) { .st-bento-hero { grid-template-columns: 1fr; } }
+.st-bento-hero .st-plan-badge {
+    position: absolute; top: -10px; left: 28px;
+}
+.st-bento-hero-name { font-size: 22px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.02em; margin: 0 0 4px; }
+.st-bento-hero-tag  { font-size: 13.5px; color: var(--color-text-secondary); letter-spacing: -0.008em; margin: 0 0 14px; }
+.st-bento-hero-specs {
+    display: flex; flex-wrap: wrap; gap: 6px 14px;
+    font-size: 12.5px; color: var(--color-text-secondary);
+    letter-spacing: -0.004em;
+}
+.st-bento-hero-specs span { display: inline-flex; align-items: center; gap: 5px; }
+.st-bento-hero-specs span::before { content: "\2713"; color: var(--color-accent); font-weight: 700; }
+.st-bento-hero-specs strong { color: var(--color-text-primary); font-weight: 500; }
+.st-bento-hero-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+@media (max-width: 600px) { .st-bento-hero-right { text-align: left; align-items: flex-start; } }
+.st-bento-hero-price {
+    display: flex; align-items: baseline; gap: 3px;
+    font-variant-numeric: tabular-nums;
+}
+.st-bento-hero-price .currency { font-size: 20px; color: var(--color-text-secondary); }
+.st-bento-hero-price .amount { font-size: 52px; font-weight: 600; line-height: 1; letter-spacing: -0.035em; color: var(--color-text-primary); }
+.st-bento-hero-price .period { font-size: 14px; color: var(--color-text-tertiary); margin-left: 4px; }
+.st-bento-hero-cta {
+    height: 40px; padding: 0 22px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff; border: 0;
+    font-size: 13.5px; font-weight: 500; letter-spacing: -0.008em;
+    cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+}
+.st-bento-hero-cta:hover { background: var(--color-accent-hover); color: #fff; }
+.st-bento-mini {
+    padding: 20px 20px 18px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    display: flex; flex-direction: column;
+}
+.st-bento-mini-name { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.012em; }
+.st-bento-mini-tag  { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
+.st-bento-mini-price { margin-top: 14px; display: flex; align-items: baseline; gap: 2px; font-variant-numeric: tabular-nums; }
+.st-bento-mini-price .currency { font-size: 14px; color: var(--color-text-secondary); }
+.st-bento-mini-price .amount   { font-size: 30px; font-weight: 600; line-height: 1; letter-spacing: -0.028em; color: var(--color-text-primary); }
+.st-bento-mini-price .period   { font-size: 12px; color: var(--color-text-tertiary); margin-left: 2px; }
+.st-bento-mini-specs {
+    margin: 14px 0 16px 0;
+    padding: 0; list-style: none;
+    display: flex; flex-direction: column; gap: 4px;
+    font-size: 12px; color: var(--color-text-secondary);
+    flex: 1;
+}
+.st-bento-mini-specs strong { color: var(--color-text-primary); font-weight: 500; }
+.st-bento-mini-cta {
+    height: 32px; padding: 0 14px;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    border: 0.5px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 12.5px; font-weight: 500;
+    cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all var(--transition-fast);
+}
+.st-bento-mini-cta:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+
+/* -- Variant F -- Segmented bar ------------------------------ */
+.st-seg {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 0 20px 24px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    overflow: hidden;
+    background: var(--color-surface);
+}
+@media (max-width: 720px) { .st-seg { grid-template-columns: 1fr; } }
+.st-seg-col {
+    padding: 24px 22px 22px;
+    display: flex; flex-direction: column;
+    border-right: 0.5px solid var(--color-border);
+    position: relative;
+}
+.st-seg-col:last-child { border-right: 0; }
+@media (max-width: 720px) {
+    .st-seg-col { border-right: 0; border-bottom: 0.5px solid var(--color-border); }
+    .st-seg-col:last-child { border-bottom: 0; }
+}
+.st-seg-col.featured { background: var(--color-accent-light); }
+.st-seg-col.featured::before {
+    content: "Most popular";
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+}
+.st-seg-col.featured .st-seg-name { margin-top: 14px; }
+.st-seg-name { font-size: 15px; font-weight: 600; letter-spacing: -0.012em; color: var(--color-text-primary); }
+.st-seg-tag  { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; min-height: 32px; }
+.st-seg-price { display: flex; align-items: baseline; gap: 3px; margin: 14px 0 14px; font-variant-numeric: tabular-nums; }
+.st-seg-price .currency { font-size: 16px; color: var(--color-text-secondary); }
+.st-seg-price .amount   { font-size: 36px; font-weight: 600; line-height: 1; letter-spacing: -0.03em; color: var(--color-text-primary); }
+.st-seg-price .period   { font-size: 12px; color: var(--color-text-tertiary); margin-left: 3px; }
+.st-seg-specs {
+    list-style: none; padding: 0; margin: 0 0 18px;
+    display: flex; flex-direction: column; gap: 6px;
+    font-size: 12.5px; color: var(--color-text-secondary);
+    flex: 1;
+}
+.st-seg-specs strong { color: var(--color-text-primary); font-weight: 500; }
+.st-seg-cta {
+    height: 34px; padding: 0 16px;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    border: 0.5px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 12.5px; font-weight: 500;
+    text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all var(--transition-fast);
+}
+.st-seg-cta:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+.st-seg-col.featured .st-seg-cta { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+.st-seg-col.featured .st-seg-cta:hover { background: var(--color-accent-hover); }
+
+/* -- Variant G -- Spec matrix (label/value rows) -------------
+   3-column default with :has() collapses for groups with fewer
+   packages -- same pattern as Variants A and B. */
+.st-matrix {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    padding: 0 20px 24px;
+    justify-content: center;
+}
+.st-matrix:has(.st-matrix-card:nth-child(2):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 380px));
+}
+.st-matrix:has(.st-matrix-card:only-child) {
+    grid-template-columns: minmax(0, 420px);
+}
+@media (max-width: 900px) {
+    .st-matrix,
+    .st-matrix:has(.st-matrix-card:only-child),
+    .st-matrix:has(.st-matrix-card:nth-child(2):last-child) {
+        grid-template-columns: minmax(0, 420px);
+    }
+}
+.st-matrix-card {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    background: var(--color-surface);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+}
+.st-matrix-card.featured {
+    border-color: var(--color-accent);
+    background: linear-gradient(180deg, var(--color-accent-light) 0%, var(--color-surface) 80px);
+    box-shadow: 0 4px 20px rgba(0,113,227,0.08);
+}
+.st-matrix-head { padding: 22px 22px 18px; border-bottom: 0.5px solid var(--color-border); text-align: center; }
+.st-matrix-card.featured .st-matrix-head { border-bottom-color: rgba(0,113,227,0.2); }
+.st-matrix-eyebrow { font-size: 10.5px; font-weight: 600; color: var(--color-accent); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+.st-matrix-name { font-size: 17px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.014em; margin: 0; }
+/* Description body for Variant G — same admin-authored HTML as Variants A
+   and B. Was previously a label/value matrix sourced from $product.features;
+   now mirrors A/B so admins write one set of <ul><li>...</li></ul> and it
+   renders consistently across all three variants. */
+.st-matrix-specs {
+    padding: 14px 22px; flex: 1;
+    font-size: 12.5px; color: var(--color-text-secondary);
+    letter-spacing: -0.004em;
+    line-height: 1.45;
+}
+.st-matrix-specs,
+.st-matrix-specs ul,
+.st-matrix-specs ol { list-style: none; }
+.st-matrix-specs ul,
+.st-matrix-specs ol {
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 8px;
+}
+.st-matrix-specs li { display: flex; align-items: flex-start; gap: 8px; margin: 0; }
+.st-matrix-specs li > svg {
+    width: 13px; height: 13px;
+    color: var(--color-green-text);
+    flex-shrink: 0; margin-top: 1px;
+}
+.st-matrix-specs li:not(:has(> svg))::before {
+    content: '';
+    display: block;
+    width: 13px; height: 13px;
+    flex-shrink: 0; margin-top: 1px;
+    background-color: var(--color-green-text);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.st-matrix-specs li strong,
+.st-matrix-specs li b { color: var(--color-text-primary); font-weight: 500; }
+.st-matrix-specs p { margin: 0 0 6px; }
+.st-matrix-specs p:last-child { margin-bottom: 0; }
+.st-matrix-specs h1, .st-matrix-specs h2, .st-matrix-specs h3,
+.st-matrix-specs h4, .st-matrix-specs h5, .st-matrix-specs h6 {
+    font-size: 12.5px; font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 6px;
+}
+.st-matrix-foot { padding: 18px 22px 22px; border-top: 0.5px solid var(--color-border); display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.st-matrix-card.featured .st-matrix-foot { border-top-color: rgba(0,113,227,0.2); }
+.st-matrix-price { display: flex; align-items: baseline; gap: 2px; font-variant-numeric: tabular-nums; }
+.st-matrix-price .currency { font-size: 15px; color: var(--color-text-secondary); }
+.st-matrix-price .amount   { font-size: 36px; font-weight: 600; line-height: 1; letter-spacing: -0.028em; color: var(--color-text-primary); }
+.st-matrix-price .period   { font-size: 12px; color: var(--color-text-tertiary); margin-left: 3px; }
+.st-matrix-cta {
+    height: 36px; padding: 0 22px; width: 100%;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    border: 0.5px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 13px; font-weight: 500;
+    text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all var(--transition-fast);
+}
+.st-matrix-cta:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+.st-matrix-card.featured .st-matrix-cta { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+.st-matrix-card.featured .st-matrix-cta:hover { background: var(--color-accent-hover); }
+
+/* -- Variant H -- Addon card with radio tiers ---------------- */
+.st-addon-wrap { padding: 0 20px 24px; }
+.st-addon-wrap + .st-addon-wrap { padding-top: 0; }
+.st-addon {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    background: var(--color-surface);
+    overflow: hidden;
+}
+.st-addon-head {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 22px;
+    align-items: center;
+    padding: 24px 28px;
+    border-bottom: 0.5px solid var(--color-border);
+}
+@media (max-width: 640px) { .st-addon-head { grid-template-columns: 1fr; } }
+.st-addon-title {
+    font-size: 17px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.014em;
+    margin: 0 0 6px;
+}
+.st-addon-desc {
+    font-size: 13px; color: var(--color-text-secondary);
+    letter-spacing: -0.008em;
+    line-height: 1.55;
+    margin: 0;
+}
+.st-addon-desc a { color: var(--color-accent); text-decoration: none; }
+.st-addon-desc a:hover { text-decoration: underline; }
+.st-addon-illus {
+    display: flex; align-items: center; justify-content: center;
+    height: 100px;
+    background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-surface-secondary) 100%);
+    border-radius: var(--radius-md);
+    color: var(--color-accent);
+}
+.st-addon-illus svg { width: 48px; height: 48px; }
+.st-addon-tier {
+    display: grid;
+    grid-template-columns: 22px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 16px 28px;
+    border-bottom: 0.5px solid var(--color-border);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+.st-addon-tier:last-child { border-bottom: 0; }
+.st-addon-tier:hover { background: rgba(0, 0, 0, 0.02); }
+.st-addon-tier input { position: absolute; opacity: 0; pointer-events: none; }
+.st-addon-radio {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-surface);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+}
+.st-addon-radio::after {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: #fff;
+    transform: scale(0);
+    transition: transform var(--transition-fast);
+}
+.st-addon-tier:has(input:checked) .st-addon-radio {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+}
+.st-addon-tier:has(input:checked) .st-addon-radio::after { transform: scale(1); }
+.st-addon-tier:has(input:checked) { background: var(--color-accent-light); }
+.st-addon-tier-label {
+    font-size: 14px; font-weight: 500;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+}
+.st-addon-tier-sub {
+    font-size: 12px; color: var(--color-text-tertiary);
+    margin-top: 1px; letter-spacing: -0.004em;
+}
+.st-addon-tier-price {
+    font-size: 13.5px; font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.008em;
+    text-align: right;
+    white-space: nowrap;
+}
+.st-addon-tier-price.muted { color: var(--color-text-tertiary); font-weight: 400; }
+.st-addon-tier-price.free  { color: var(--color-green-text); font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; font-size: 11px; }
+.st-addon-tier-price .period {
+    font-size: 11px; color: var(--color-text-tertiary); font-weight: 400;
+    letter-spacing: -0.004em;
+}
+
+/* -- "Pick a category" landing -- shown in the right column when
+   no productgroup is selected. Replaces the awkward
+   category-card + empty-state combo that was rendering whenever a
+   visitor hit /cart.php without a ?gid. ------------------------- */
+.st-pick {
+    padding: 56px 32px 60px;
+    text-align: center;
+}
+.st-pick-ico {
+    width: 60px; height: 60px; border-radius: 16px;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+}
+.st-pick-ico svg { width: 28px; height: 28px; }
+.st-pick-title {
+    font-size: 22px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em; line-height: 1.2;
+    margin: 0 0 8px;
+}
+.st-pick-desc {
+    font-size: 14px; color: var(--color-text-secondary);
+    letter-spacing: -0.008em; line-height: 1.5;
+    max-width: 460px;
+    margin: 0 auto 28px;
+}
+.st-pick-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    text-align: left;
+}
+.st-pick-tile {
+    display: flex; flex-direction: column;
+    padding: 18px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    min-height: 124px;
+}
+.st-pick-tile:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-light);
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+.st-pick-tile-ico {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+    transition: all var(--transition-fast);
+}
+.st-pick-tile:hover .st-pick-tile-ico {
+    background: var(--color-accent);
+    color: #fff;
+}
+.st-pick-tile-ico svg { width: 16px; height: 16px; }
+.st-pick-tile-name {
+    font-size: 14px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    margin-bottom: 4px;
+}
+.st-pick-tile-tag {
+    font-size: 12.5px;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.004em;
+    line-height: 1.45;
+    flex: 1;
+    margin-bottom: 12px;
+}
+.st-pick-tile-cta {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12.5px; font-weight: 500;
+    color: var(--color-accent);
+    letter-spacing: -0.008em;
+    margin-top: auto;
+}
+.st-pick-tile-cta svg { width: 12px; height: 12px; }
+
+/* -- Bootstrap modal + helper-hidden safety net ------------------
+   The standard_cart recommendations-modal.tpl uses Bootstrap 4 modal
+   markup (.modal.fade + .modal-dialog) which relies on Bootstrap's CSS
+   to keep it invisible until JS adds .show. If Bootstrap CSS isn't
+   loaded on the cart page (or loads late), the modal contents leak
+   into the page as raw stacked HTML. .modal:not(.show):not(.in) keeps
+   the scaffolding hidden until Bootstrap drops in.
+
+   `.w-hidden` is a WHMCS utility class that scripts.min.js and the
+   gateway scripts (Stripe etc.) toggle via jQuery slideDown / slideUp
+   / show / hide. Those use INLINE styles to override the class --
+   which only works when our class rule is NOT !important. The earlier
+   `.w-hidden { display: none !important }` rule silently broke the
+   entire error-feedback path: .gateway-errors never became visible on
+   a Stripe failure, so the user saw "click button -> nothing happens"
+   instead of "Remote Transaction Failure. Please Contact Support."
+   Keep this rule plain `display: none` (matches standard_cart's
+   own .w-hidden in standard_cart/css/all.css:1864). */
+.modal:not(.show):not(.in) { display: none !important; }
+.hidden { display: none !important; }
+.w-hidden { display: none; }
+/* `.w-hidden.w-hidden` doubles the specificity to (0,2,0) without changing
+   the matched set. Needed so `.btn { display: inline-flex }` (defined
+   later in this file at (0,1,0)) doesn't outrank `.w-hidden`'s display:
+   none and leave the inactive Already-Registered / Create-Account button
+   visible. We don't use !important here because scripts.min.js + gateway
+   scripts toggle visibility via inline styles (see note above). */
+.w-hidden.w-hidden { display: none; }
+
+/* -- Bootstrap modal base positioning ------------------------------
+   hadrian_cart's common.tpl deliberately doesn't pull in standard_cart's
+   bulky all.min.css, so Bootstrap 4's own .modal / .modal-dialog /
+   .modal-content base rules never reach the cart pages. Without them
+   Bootstrap's .modal('show') just removes our .w-hidden / display:none
+   safety net and the modal HTML cascades inline at the end of the page
+   ("Generate Password" form rendering below the cart instead of
+   floating over it). Restate the minimum Bootstrap modal scaffolding
+   here so .modal.show / .modal.in render as a real centred overlay
+   with a backdrop -- works for every modal the cart loads
+   (#modalRemoveItem, #modalEmptyCart, #recommendationsModal,
+   #modalGeneratePassword). Individual modals can still override the
+   chrome via their own selector (e.g. .modal-generate-password). */
+.modal.show,
+.modal.in {
+    display: block !important;
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+    z-index: 1050;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+    background: rgba(0, 0, 0, 0.45);
+    -webkit-overflow-scrolling: touch;
+}
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 1.75rem auto;
+    max-width: 500px;
+    pointer-events: none;
+}
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 0.3rem;
+    outline: 0;
+}
+.modal-header,
+.modal-body,
+.modal-footer {
+    padding: 1rem;
+}
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid #dee2e6;
+}
+.modal-body { position: relative; flex: 1 1 auto; }
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    border-top: 1px solid #dee2e6;
+}
+.modal-footer > :not(:last-child) { margin-right: 0.25rem; }
+.modal-footer > :not(:first-child) { margin-left: 0.25rem; }
+.modal-title { margin: 0; line-height: 1.5; }
+.modal-backdrop {
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+    z-index: 1040;
+    background-color: #000;
+}
+.modal-backdrop.fade { opacity: 0; }
+.modal-backdrop.show,
+.modal-backdrop.in { opacity: 0.5; }
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
+    transform: translate(0, -50px);
+}
+.modal.show .modal-dialog,
+.modal.in .modal-dialog { transform: none; }
+body.modal-open { overflow: hidden; }
+
+/* ===============================================================
+   DOMAIN PICKER (.dp-*) -- configureproductdomain.tpl layout.
+   Source: apple-client-area/configureproductdomain.html inline <style>
+   Used by: configureproductdomain.tpl
+
+   The .dp-* classes were live in the TPL but only had inline styles
+   in the mockup; nothing in hadrian_cart/style.min.css owned them, so
+   the live render came up unstyled (radio cards, search input, step
+   strip, footer all bare). Ported verbatim here with one substitution:
+   the mockup's --sidebar-item-hover / --sidebar-item-active tokens are
+   replaced with literal rgba() values since style.min.css doesn't
+   redeclare those (same pattern as .subnav-item above).
+   =============================================================== */
+
+/* -- 2-column split (matches .st-split) -------------------- */
+.dp-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+@media (max-width: 880px) { .dp-split { grid-template-columns: 1fr; } }
+/* Sub-nav state-chip wiring -- same pattern as .st-split above. The
+   domain-search page (configureproductdomain.tpl, served at
+   /store/<group>/<product>) uses .dp-split with the same Categories
+   sidebar include as products.tpl, so the chip needs the same hooks. */
+body[data-subnav="off"] .dp-split { grid-template-columns: 1fr; }
+body[data-subnav="off"] .dp-split > aside { display: none; }
+body[data-subnav-side="left"] .dp-split { grid-template-columns: 240px 1fr; }
+body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
+
+/* -- Checkout progress strip (above the card) ------------- */
+.dp-steps {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 18px;
+    font-size: 12.5px; color: var(--color-text-tertiary);
+    letter-spacing: -0.008em;
+}
+.dp-step { display: inline-flex; align-items: center; gap: 8px; }
+.dp-step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--color-surface-secondary);
+    color: var(--color-text-tertiary);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    flex-shrink: 0;
+}
+.dp-step.done .dp-step-num { background: var(--color-green-bg); color: var(--color-green-text); }
+.dp-step.active .dp-step-num { background: var(--color-accent); color: #fff; }
+.dp-step.active { color: var(--color-text-primary); font-weight: 500; }
+.dp-step-sep { color: var(--color-text-quaternary); }
+
+/* -- Option tabs (3-up radio cards) ------------------------ */
+.dp-options {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    padding: 22px 22px 0;
+}
+@media (max-width: 720px) { .dp-options { grid-template-columns: 1fr; } }
+.dp-option {
+    position: relative;
+    padding: 18px 18px 16px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex; flex-direction: column; gap: 4px;
+}
+.dp-option input { position: absolute; opacity: 0; pointer-events: none; }
+.dp-option:hover { border-color: var(--color-accent); }
+.dp-option:has(input:checked) {
+    border-color: var(--color-accent);
+    background: var(--color-accent-light);
+}
+.dp-option-ico {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: var(--color-surface-secondary);
+    color: var(--color-text-secondary);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+}
+.dp-option:has(input:checked) .dp-option-ico {
+    background: var(--color-accent); color: #fff;
+}
+.dp-option-ico svg { width: 16px; height: 16px; }
+.dp-option-title {
+    font-size: 13px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+}
+.dp-option-desc {
+    font-size: 11.5px; color: var(--color-text-tertiary);
+    line-height: 1.45;
+    letter-spacing: -0.004em;
+}
+.dp-option-check {
+    position: absolute; top: 14px; right: 14px;
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-surface);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+}
+.dp-option:has(input:checked) .dp-option-check {
+    background: var(--color-accent); border-color: var(--color-accent);
+}
+.dp-option-check svg { width: 10px; height: 10px; opacity: 0; }
+.dp-option:has(input:checked) .dp-option-check svg { opacity: 1; }
+
+/* -- Panel body (contents for selected option) ------------- */
+.dp-panel {
+    padding: 22px 22px 24px;
+    border-top: 0.5px solid var(--color-border);
+    margin-top: 22px;
+}
+.dp-panel-hint {
+    font-size: 12.5px; color: var(--color-text-tertiary);
+    letter-spacing: -0.004em;
+    line-height: 1.55;
+    margin: 0 0 14px;
+    max-width: 640px;
+}
+.dp-panel-hint strong { color: var(--color-text-primary); font-weight: 500; }
+
+/* Search / input row */
+.dp-search-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+.dp-input-wrap {
+    position: relative;
+    flex: 1; min-width: 260px;
+}
+.dp-input-wrap > svg {
+    position: absolute; left: 14px; top: 50%;
+    transform: translateY(-50%);
+    width: 15px; height: 15px;
+    color: var(--color-text-tertiary);
+    pointer-events: none;
+}
+.dp-input {
+    width: 100%; height: 46px;
+    padding: 0 16px 0 40px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    font-size: 15px; letter-spacing: -0.012em;
+    color: var(--color-text-primary);
+    font-family: inherit;
+    transition: all var(--transition-fast);
+}
+.dp-input::placeholder { color: var(--color-text-quaternary); }
+.dp-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+.dp-input.no-ico { padding-left: 18px; }
+.dp-search-cta {
+    height: 46px; padding: 0 24px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff;
+    border: 0;
+    font-size: 14px; font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background var(--transition-fast);
+    display: inline-flex; align-items: center; gap: 6px;
+    flex-shrink: 0;
+}
+.dp-search-cta:hover { background: var(--color-accent-hover); color: #fff; }
+.dp-search-cta svg { width: 14px; height: 14px; }
+
+/* Example hint */
+.dp-example {
+    font-size: 12.5px; color: var(--color-text-tertiary);
+    line-height: 1.5;
+    letter-spacing: -0.004em;
+    margin-bottom: 18px;
+    max-width: 640px;
+}
+.dp-example code {
+    background: var(--color-surface-secondary);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+    font-size: 11.5px;
+    color: var(--color-text-secondary);
+}
+
+/* Safe-search toggle -- Apple switch style */
+.dp-toggle-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0;
+    margin-top: 4px;
+    border-top: 0.5px solid var(--color-border-light, var(--color-border));
+}
+.dp-toggle-row-meta { flex: 1; min-width: 0; }
+.dp-toggle-row-title {
+    font-size: 13px; font-weight: 500;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.dp-toggle-row-title svg { width: 12px; height: 12px; color: var(--color-text-tertiary); cursor: help; }
+.dp-toggle-row-sub {
+    font-size: 11.5px; color: var(--color-text-tertiary);
+    margin-top: 2px;
+    letter-spacing: -0.004em;
+}
+.dp-switch {
+    position: relative;
+    width: 40px; height: 24px;
+    border-radius: 999px;
+    background: var(--color-accent);
+    cursor: pointer;
+    border: 0; padding: 0;
+    flex-shrink: 0;
+    transition: background var(--transition-fast);
+}
+.dp-switch::after {
+    content: ""; position: absolute;
+    top: 2px; right: 2px;
+    width: 20px; height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: transform var(--transition-fast);
+}
+.dp-switch.off { background: var(--color-border); }
+.dp-switch.off::after { transform: translateX(-16px); }
+
+/* -- Error / validation states ----------------------------- */
+.dp-error {
+    display: none;
+    align-items: flex-start; gap: 12px;
+    margin-top: 16px; padding: 14px 16px;
+    background: var(--color-red-bg);
+    border-radius: var(--radius-md);
+    color: var(--color-red-text);
+    letter-spacing: -0.008em;
+}
+.dp-panel[data-state="error"] .dp-error { display: flex; }
+.dp-error svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+.dp-error-body { flex: 1; min-width: 0; }
+.dp-error-title { font-size: 13.5px; font-weight: 600; letter-spacing: -0.012em; margin-bottom: 4px; }
+.dp-error-text {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--color-red-text);
+    opacity: 0.85;
+    margin: 0;
+}
+.dp-error-text a {
+    color: var(--color-red-text);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.dp-error.compact { align-items: center; padding: 10px 14px; }
+.dp-error.compact .dp-error-title { margin: 0; font-weight: 500; font-size: 13px; }
+.dp-error.compact svg { margin: 0; width: 15px; height: 15px; }
+
+.dp-panel[data-state="error"] .dp-input {
+    border-color: var(--color-red-text);
+    box-shadow: 0 0 0 3px var(--color-red-bg);
+}
+
+/* Nameserver fields (option C) */
+.dp-ns-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-top: 14px;
+}
+@media (max-width: 560px) { .dp-ns-grid { grid-template-columns: 1fr; } }
+.dp-ns-row { display: flex; flex-direction: column; gap: 5px; }
+.dp-ns-label { font-size: 11.5px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: -0.004em; }
+.dp-ns-input {
+    height: 38px;
+    padding: 0 14px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    font-size: 13px; letter-spacing: -0.008em;
+    color: var(--color-text-primary);
+    font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+    transition: all var(--transition-fast);
+}
+.dp-ns-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+
+/* Panel show/hide */
+.dp-panel { display: none; }
+.dp-panel.is-active { display: block; }
+
+/* Continue footer */
+.dp-footer {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 22px;
+    border-top: 0.5px solid var(--color-border);
+    background: var(--color-surface-tertiary);
+    flex-wrap: wrap;
+}
+.dp-footer .spacer { flex: 1; }
+.dp-footer .dp-footer-note {
+    font-size: 11.5px; color: var(--color-text-tertiary);
+    display: inline-flex; align-items: center; gap: 6px;
+    letter-spacing: -0.004em;
+}
+.dp-footer .dp-footer-note svg { width: 12px; height: 12px; color: var(--color-green-text); }
+.dp-back {
+    height: 34px; padding: 0 16px;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    border: 0.5px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 13px; font-weight: 500;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px;
+    cursor: pointer; font-family: inherit;
+    transition: all var(--transition-fast);
+}
+.dp-back:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.dp-continue {
+    height: 34px; padding: 0 20px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff;
+    border: 0;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 4px;
+    transition: background var(--transition-fast);
+    text-decoration: none;
+}
+.dp-continue:hover { background: var(--color-accent-hover); color: #fff; }
+
+/* ===============================================================
+   CONFIGURE PRODUCT (.cp-*) -- configureproduct.tpl layout.
+   Source: apple-client-area/configureproduct.html inline <style>
+   Used by: configureproduct.tpl
+   The .st-addon-* classes referenced from this page are already
+   defined above (ported earlier for products.tpl Variant H).
+   =============================================================== */
+
+/* -- Step strip (mirrors .dp-steps) ---------------------- */
+.cp-steps {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 18px;
+    font-size: 12.5px; color: var(--color-text-tertiary);
+    letter-spacing: -0.008em;
+}
+.cp-step { display: inline-flex; align-items: center; gap: 8px; }
+.cp-step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--color-surface-secondary);
+    color: var(--color-text-tertiary);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; flex-shrink: 0;
+}
+.cp-step.done .cp-step-num { background: var(--color-green-bg); color: var(--color-green-text); }
+.cp-step.active .cp-step-num { background: var(--color-accent); color: #fff; }
+.cp-step.active { color: var(--color-text-primary); font-weight: 500; }
+.cp-step-sep { color: var(--color-text-quaternary); }
+
+/* -- 2-column split (form + sticky summary) ------------- */
+.cp-split { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+@media (max-width: 960px) { .cp-split { grid-template-columns: 1fr; } }
+
+/* -- Section card --------------------------------------- */
+.cp-section { padding: 0; }
+.cp-section-head { padding: 18px 22px 14px; border-bottom: 0.5px solid var(--color-border); }
+.cp-section-title { font-size: 15px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.012em; margin: 0; line-height: 1.3; }
+.cp-section-sub { font-size: 12.5px; color: var(--color-text-tertiary); margin-top: 2px; letter-spacing: -0.008em; }
+.cp-section-body { padding: 18px 22px 20px; }
+
+/* -- Selected-plan hero -------------------------------- */
+.cp-plan-hero { display: flex; align-items: center; gap: 18px; padding: 22px 24px; flex-wrap: wrap; }
+.cp-plan-hero-ico {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.cp-plan-hero-ico svg { width: 22px; height: 22px; }
+.cp-plan-hero-meta { flex: 1; min-width: 200px; }
+.cp-plan-hero-eyebrow {
+    font-size: 10.5px; font-weight: 600;
+    color: var(--color-accent);
+    text-transform: uppercase; letter-spacing: 0.06em;
+}
+.cp-plan-hero-name {
+    font-size: 20px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.018em;
+    margin: 2px 0;
+}
+.cp-plan-hero-desc { font-size: 13px; color: var(--color-text-tertiary); letter-spacing: -0.008em; }
+.cp-plan-hero-change {
+    height: 32px; padding: 0 16px;
+    background: transparent;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    color: var(--color-text-secondary);
+    font-size: 12.5px; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    align-self: center; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.cp-plan-hero-change:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+/* -- Selected-plan card domain row ----------------------
+   Sub-row inside the plan-hero card showing the chosen domain.
+   Lives below the plan info, divided by a hairline border. Globe
+   icon on the left, "Domain" label + monospace domain name + optional
+   "Included" badge in the middle, "Change" pill button on the right. */
+.cp-plan-hero-card { padding: 0; }
+.cp-plan-hero-domain {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 24px;
+    border-top: 0.5px solid var(--color-border);
+    flex-wrap: wrap;
+}
+.cp-plan-hero-domain-ico {
+    width: 16px; height: 16px;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+}
+.cp-plan-hero-domain-meta { flex: 1; min-width: 0; }
+.cp-plan-hero-domain-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    letter-spacing: -0.004em;
+}
+.cp-plan-hero-domain-value {
+    font-size: 13.5px; font-weight: 500;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+    margin-top: 1px;
+    display: inline-flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+}
+.cp-plan-hero-domain-name {
+    font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+}
+.cp-plan-hero-domain-badge {
+    padding: 1px 7px;
+    border-radius: var(--radius-pill);
+    background: var(--color-green-bg);
+    color: var(--color-green-text);
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.4;
+}
+
+/* -- Billing cycle picker ------------------------------ */
+.cp-cycle { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 720px) { .cp-cycle { grid-template-columns: 1fr; } }
+.cp-cycle-opt {
+    position: relative;
+    padding: 16px 16px 14px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.cp-cycle-opt input { position: absolute; opacity: 0; pointer-events: none; }
+.cp-cycle-opt:hover { border-color: var(--color-accent); }
+.cp-cycle-opt:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-light); }
+.cp-cycle-save {
+    position: absolute; top: 12px; right: 12px;
+    padding: 3px 9px; border-radius: var(--radius-pill);
+    background: var(--color-green-bg); color: var(--color-green-text);
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    line-height: 1.1;
+}
+.cp-cycle-title { font-size: 13.5px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
+.cp-cycle-sub { font-size: 11.5px; color: var(--color-text-tertiary); margin-top: 2px; letter-spacing: -0.004em; }
+.cp-cycle-price {
+    display: flex; align-items: baseline; gap: 2px;
+    font-variant-numeric: tabular-nums; margin-top: 10px;
+}
+.cp-cycle-price .currency { font-size: 13px; color: var(--color-text-secondary); }
+.cp-cycle-price .amount   { font-size: 22px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.02em; line-height: 1; }
+.cp-cycle-price .period   { font-size: 12px; color: var(--color-text-tertiary); margin-left: 2px; }
+
+/* Fallback while the JS at the bottom of configureproduct.tpl hasn't
+   run yet -- keeps the raw WHMCS price string readable. Once the JS
+   wraps the text into .currency / .amount / .period spans, the
+   structured rules above (.cp-cycle-price .currency / .amount / .period)
+   take over and produce the mockup small-big-small typography. */
+.cp-cycle-price:not(:has(.amount)) {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+}
+
+/* -- Form fields --------------------------------------- */
+.cp-form { display: flex; flex-direction: column; gap: 16px; }
+.cp-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 640px) { .cp-form-grid { grid-template-columns: 1fr; } }
+.cp-row { display: flex; flex-direction: column; gap: 6px; }
+.cp-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: -0.004em; }
+.cp-input, .cp-select {
+    height: 38px;
+    padding: 0 14px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    font-size: 14px; letter-spacing: -0.008em;
+    color: var(--color-text-primary);
+    font-family: inherit;
+    width: 100%;
+    transition: all var(--transition-fast);
+}
+.cp-input:focus, .cp-select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+.cp-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    cursor: pointer;
+}
+.cp-hint { font-size: 11.5px; color: var(--color-text-tertiary); letter-spacing: -0.004em; margin-top: 2px; }
+.cp-field { display: flex; flex-direction: column; gap: 6px; }
+.cp-field-help { font-size: 11.5px; color: var(--color-text-tertiary); letter-spacing: -0.004em; margin-top: 2px; }
+
+/* -- Region picker ------------------------------------- */
+.cp-regions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 720px) { .cp-regions { grid-template-columns: 1fr; } }
+.cp-region {
+    position: relative;
+    padding: 14px 14px 12px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex; align-items: center; gap: 12px;
+}
+.cp-region input { position: absolute; opacity: 0; pointer-events: none; }
+.cp-region:hover { border-color: var(--color-accent); }
+.cp-region:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-light); }
+.cp-region-flag {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--color-surface-secondary);
+    color: var(--color-text-secondary);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+}
+.cp-region:has(input:checked) .cp-region-flag { background: var(--color-accent); color: #fff; }
+.cp-region-meta { flex: 1; min-width: 0; }
+.cp-region-name { font-size: 13px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; }
+.cp-region-lat {
+    font-size: 11px; color: var(--color-text-tertiary);
+    margin-top: 2px; letter-spacing: -0.004em;
+    display: inline-flex; align-items: center; gap: 4px;
+}
+.cp-region-lat::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--color-green-text);
+}
+
+/* -- Configurable options list ------------------------- */
+.cp-opt-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 0.5px solid var(--color-border); }
+.cp-opt-row:last-child { border-bottom: 0; }
+.cp-opt-meta { flex: 1; min-width: 0; }
+.cp-opt-name { font-size: 13.5px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -0.008em; }
+.cp-opt-desc { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; letter-spacing: -0.004em; line-height: 1.45; }
+.cp-opt-picker {
+    height: 34px; padding: 0 32px 0 12px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    font-size: 13px; font-variant-numeric: tabular-nums;
+    color: var(--color-text-primary); font-family: inherit;
+    appearance: none;
+    min-width: 180px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.cp-opt-picker:focus { outline: none; border-color: var(--color-accent); }
+.cp-opt-radios { display: flex; gap: 8px; flex-wrap: wrap; }
+.cp-opt-radio {
+    position: relative;
+    padding: 8px 14px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    font-size: 12.5px; font-weight: 500;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.cp-opt-radio input { position: absolute; opacity: 0; pointer-events: none; }
+.cp-opt-radio:hover { border-color: var(--color-accent); }
+.cp-opt-radio:has(input:checked) { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+.cp-opt-control { flex-shrink: 0; }
+.cp-opt-qty {
+    display: inline-flex; align-items: center;
+    border: 0.5px solid var(--color-border); border-radius: var(--radius-pill);
+    overflow: hidden; background: var(--color-surface);
+}
+.cp-opt-qty button {
+    width: 32px; height: 32px;
+    background: transparent; border: 0;
+    color: var(--color-text-secondary);
+    cursor: pointer; font-family: inherit; font-size: 14px;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: color var(--transition-fast);
+}
+.cp-opt-qty button:hover { color: var(--color-accent); }
+.cp-opt-qty input {
+    width: 42px; text-align: center;
+    border: 0; background: transparent;
+    font: inherit; font-variant-numeric: tabular-nums;
+    font-size: 13px; font-weight: 500;
+    color: var(--color-text-primary); font-family: inherit;
+    padding: 0;
+}
+.cp-opt-qty input:focus { outline: none; }
+.cp-opt-qty-unit { font-size: 11.5px; color: var(--color-text-tertiary); margin-left: 8px; letter-spacing: -0.004em; }
+.cp-metric-list { display: flex; flex-direction: column; gap: 4px; }
+
+/* -- Add-ons list -------------------------------------- */
+.cp-addons { display: flex; flex-direction: column; gap: 10px; }
+.cp-addon {
+    position: relative;
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.cp-addon input { position: absolute; opacity: 0; pointer-events: none; }
+.cp-addon:hover { border-color: var(--color-accent); }
+.cp-addon:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-light); }
+.cp-addon-check {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-surface);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; flex-shrink: 0;
+    transition: all var(--transition-fast);
+}
+.cp-addon:has(input:checked) .cp-addon-check { background: var(--color-accent); border-color: var(--color-accent); }
+.cp-addon-check svg { width: 12px; height: 12px; opacity: 0; }
+.cp-addon:has(input:checked) .cp-addon-check svg { opacity: 1; }
+.cp-addon-ico {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: var(--color-surface-secondary);
+    color: var(--color-text-secondary);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.cp-addon-ico svg { width: 16px; height: 16px; }
+.cp-addon-meta { flex: 1; min-width: 0; }
+.cp-addon-name { font-size: 13.5px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; }
+.cp-addon-desc { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; letter-spacing: -0.004em; }
+.cp-addon-price {
+    font-size: 13px; font-weight: 500;
+    color: var(--color-text-primary); flex-shrink: 0;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.008em;
+    white-space: nowrap;
+}
+.cp-addon-price .period { font-size: 11px; color: var(--color-text-tertiary); font-weight: 400; }
+
+/* -- Promo code row ------------------------------------ */
+.cp-promo-row { display: flex; gap: 8px; align-items: center; padding: 12px 22px 16px; flex-wrap: wrap; }
+.cp-promo-input {
+    flex: 1; min-width: 200px; height: 34px;
+    padding: 0 14px;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    font-size: 13px; letter-spacing: -0.008em;
+    color: var(--color-text-primary); font-family: inherit;
+}
+.cp-promo-input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
+.cp-promo-apply {
+    height: 34px; padding: 0 16px;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    border: 0.5px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 12.5px; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    transition: all var(--transition-fast);
+}
+.cp-promo-apply:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+
+/* -- Sticky order summary (right column) --------------- */
+.cp-summary-card { position: sticky; top: 72px; padding: 0; }
+.cp-summary-head { padding: 18px 20px 14px; border-bottom: 0.5px solid var(--color-border); }
+.cp-summary-head h2 { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; margin: 0; }
+.cp-summary-line-list { padding: 8px 20px; }
+
+/* ===============================================================
+   WHMCS recalctotals() output styling.
+   The AJAX-fetched HTML that WHMCS injects into #producttotal uses
+   Bootstrap-era markup: .product-name + .product-group eyebrow, then
+   .clearfix rows containing .pull-left.float-left (label) +
+   .pull-right.float-right (price), grouped under .summary-totals
+   for setup/recurring, plus .total-due-today as the closing strip.
+   We restyle each of those classes in place so the WHMCS-driven
+   summary reads as the Apple-style line list + Due Today block.
+   =============================================================== */
+
+/* Product name + group eyebrow at the very top of the summary body.
+   Each row owns its own horizontal padding (20px) since #producttotal
+   is now a direct child of the padding:0 .cp-summary-card. */
+#producttotal { padding: 0; }
+#producttotal .product-name {
+    display: block;
+    padding: 14px 20px 2px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    line-height: 1.3;
+    margin: 0;
+}
+#producttotal .product-group {
+    display: block;
+    padding: 0 20px 12px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0;
+    border-bottom: 0.5px solid var(--color-border);
+}
+
+/* Line item rows -- standalone .clearfix (base + addons). Self-padded
+   on the sides; gap to the next row controlled via top margin on the
+   first one. */
+#producttotal > .clearfix {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0 20px;
+    padding: 7px 0;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.004em;
+}
+#producttotal > .clearfix:first-of-type { margin-top: 8px; }
+#producttotal > .clearfix:last-of-type { margin-bottom: 4px; }
+#producttotal .pull-left,
+#producttotal .float-left {
+    color: var(--color-text-secondary);
+    flex: 1;
+    min-width: 0;
+    float: none !important;
+    font-weight: 400;
+}
+#producttotal .pull-right,
+#producttotal .float-right {
+    color: var(--color-text-primary);
+    font-weight: 500;
+    white-space: nowrap;
+    float: none !important;
+}
+
+/* Setup Fees + Monthly sub-totals -- bordered top, slightly muted to
+   read as secondary information vs the line items. */
+#producttotal .summary-totals {
+    margin: 8px 20px 0;
+    padding: 10px 0 8px;
+    border-top: 0.5px solid var(--color-border);
+}
+#producttotal .summary-totals > .clearfix {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0;
+    padding: 5px 0;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.004em;
+}
+#producttotal .summary-totals .pull-left {
+    color: var(--color-text-secondary);
+    font-weight: 400;
+}
+#producttotal .summary-totals .pull-right {
+    color: var(--color-text-tertiary);
+    font-weight: 400;
+}
+
+/* Total Due Today strip -- full-width tertiary tint, big amount. DOM
+   order is .amt first then a label span; row-reverse flips them so the
+   label sits on the left and the number on the right. */
+#producttotal .total-due-today {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 0.5px solid var(--color-border);
+    background: var(--color-surface-tertiary);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.004em;
+}
+#producttotal .total-due-today .amt {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.022em;
+    white-space: nowrap;
+    line-height: 1;
+}
+#producttotal .total-due-today > span:not(.amt) {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+    flex: 1;
+}
+
+/* recalctotals spinner aligned right inside the head row */
+#orderSummary .cp-summary-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#orderSummaryLoader { font-size: 12px; color: var(--color-text-tertiary); }
+
+
+.cp-summary-line {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.004em;
+}
+.cp-summary-line .label { color: var(--color-text-secondary); min-width: 0; flex: 1; }
+.cp-summary-line .value { color: var(--color-text-primary); font-weight: 500; white-space: nowrap; }
+.cp-summary-line .value.muted { color: var(--color-text-tertiary); font-weight: 400; }
+.cp-summary-line .value.good  { color: var(--color-green-text); font-weight: 500; }
+.cp-summary-line.divider { border-top: 0.5px solid var(--color-border); padding-top: 12px; margin-top: 4px; }
+.cp-summary-total {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 0.5px solid var(--color-border);
+    background: var(--color-surface-tertiary);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.004em;
+}
+.cp-summary-total .label { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
+.cp-summary-total .value { font-size: 22px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.022em; white-space: nowrap; }
+.cp-summary-cycle {
+    font-size: 11px; color: var(--color-text-tertiary);
+    padding: 10px 20px 14px;
+    letter-spacing: -0.004em;
+    margin: 0;
+}
+.cp-summary-footer {
+    padding: 16px 20px 18px;
+    border-top: 0.5px solid var(--color-border);
+    display: flex; flex-direction: column; gap: 10px;
+}
+.cp-checkout-btn {
+    height: 44px; padding: 0 20px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff;
+    border: 0;
+    font-size: 14px; font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer; font-family: inherit;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    text-decoration: none;
+    transition: background var(--transition-fast);
+}
+.cp-checkout-btn:hover { background: var(--color-accent-hover); color: #fff; }
+.cp-checkout-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+.cp-back-link {
+    font-size: 12.5px; color: var(--color-text-tertiary);
+    text-align: center; text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    letter-spacing: -0.004em;
+}
+.cp-back-link:hover { color: var(--color-accent); }
+.cp-back-link svg { width: 11px; height: 11px; }
+.cp-guarantees {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--color-text-tertiary);
+    padding: 10px 20px 0;
+    letter-spacing: -0.004em;
+}
+.cp-guarantees svg { width: 12px; height: 12px; color: var(--color-green-text); flex-shrink: 0; }
+
+/* Shared card frame used by sidebar + main content */
+.card {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+}
+
+/* ===============================================================
+   PROMO ADDONS (.addon-promo-container) -- WHMCS-rendered markup.
+   On configureproduct.tpl the {foreach $addonsPromoOutput} loop
+   echoes pre-built HTML from MarketConnect (Symantec SSL, Weebly,
+   SpamExperts, CodeGuard, SiteLock, MarketGoo, OX, etc.). The
+   markup uses .addon-promo-container > .description + label.radio-inline
+   and is NOT under our TPL control, so we style by class instead of
+   rewriting. Target: visual parity with the mockup's .st-addon /
+   .st-addon-tier design.
+   =============================================================== */
+
+#productAddonsContainer .cp-section-body { padding: 0; }
+
+.addon-promo-container {
+    background: var(--color-surface) !important;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    overflow: hidden;
+    margin: 0;
+}
+.addon-promo-container + .addon-promo-container {
+    margin-top: 12px;
+}
+
+/* Header band: title + paragraph on LEFT, logo on RIGHT -- matches the
+   mockup's .st-addon-head pattern (text takes 1fr, logo is a 200px
+   wide rounded illustration box on the right). The mockup-faithful
+   layout has logo on the right; the prior version had it on the left
+   which made the addon read like a profile card instead of a service
+   panel. */
+.addon-promo-container .description {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 22px;
+    align-items: center;
+    padding: 22px 24px;
+    border-bottom: 0.5px solid var(--color-border);
+}
+@media (max-width: 640px) {
+    .addon-promo-container .description { grid-template-columns: 1fr; }
+}
+/* Logo sits in the right column inside a tinted illustration frame */
+.addon-promo-container .description .logo {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+    height: 90px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-surface-secondary) 100%);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+}
+.addon-promo-container .description .logo img {
+    max-width: 80px;
+    max-height: 56px;
+    width: auto !important;
+    height: auto;
+    object-fit: contain;
+}
+.addon-promo-container .description h3,
+.addon-promo-container .description p {
+    grid-column: 1;
+}
+.addon-promo-container h3 {
+    font-size: 16px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.012em;
+    margin: 0 0 6px;
+    line-height: 1.3;
+}
+.addon-promo-container .description p {
+    font-size: 12.5px; color: var(--color-text-secondary);
+    line-height: 1.55;
+    letter-spacing: -0.004em;
+    margin: 0;
+}
+.addon-promo-container .description p a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+.addon-promo-container .description p a:hover { text-decoration: underline; }
+
+/* Hide the inline clearfix and BR separators between tier rows;
+   the labels are flex-block rows in the new design. */
+.addon-promo-container > .clearfix,
+.addon-promo-container > br { display: none; }
+
+/* Tier rows (each pricing tier rendered as label.radio-inline).
+   WHMCS emits each label as:
+     <label class="radio-inline">
+       <input class="addon-selector" type="radio">
+       Option name text node
+       <span class="pull-right float-right">$X.XX USD/yr</span>
+     </label>
+   So the radio + name sit on the left of the flex row, and we push the
+   .pull-right price span to the right edge via margin-left: auto. */
+.addon-promo-container .radio-inline {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 24px;
+    margin: 0;
+    border-bottom: 0.5px solid var(--color-border);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+    font-weight: 500;
+    font-family: var(--font-family);
+    transition: background var(--transition-fast);
+    position: relative;
+}
+.addon-promo-container .radio-inline .pull-right,
+.addon-promo-container .radio-inline .float-right {
+    margin-left: auto;
+    float: none !important;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.addon-promo-container .radio-inline:last-of-type { border-bottom: 0; }
+.addon-promo-container .radio-inline:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+.addon-promo-container .radio-inline:has(input:checked) {
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    font-weight: 600;
+}
+.addon-promo-container .radio-inline:has(input:checked)::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--color-accent);
+}
+/* Custom radio circle -- hide the native input visually and draw our own. */
+.addon-promo-container .radio-inline input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-surface);
+    margin: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    position: relative;
+}
+.addon-promo-container .radio-inline input[type="radio"]:checked {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+}
+.addon-promo-container .radio-inline input[type="radio"]:checked::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+/* Per-provider logo tint (Apple addon mockup vibe) */
+.addon-promo-container-symantec   .logo { background: rgba(255, 159, 10, 0.08); }
+.addon-promo-container-weebly     .logo { background: rgba(0, 113, 227, 0.06); }
+.addon-promo-container-spamexperts .logo { background: rgba(0, 113, 227, 0.06); }
+.addon-promo-container-codeguard  .logo { background: rgba(48, 209, 88, 0.08); }
+.addon-promo-container-sitelock   .logo { background: rgba(255, 159, 10, 0.08); }
+.addon-promo-container-marketgoo  .logo { background: rgba(175, 82, 222, 0.08); }
+.addon-promo-container-ox         .logo { background: rgba(90, 200, 250, 0.08); }
+.addon-promo-container-xovi       .logo { background: rgba(0, 113, 227, 0.06); }
+
+/* ---------------------------------------------------------------
+  12. SHARED FORM PRIMITIVES (buttons, inputs)
+   --------------------------------------------------------------- */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 40px; padding: 0 20px;
+    border-radius: var(--radius-pill);
+    font-size: 13.5px; font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer; font-family: inherit;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+}
+.btn-primary {
+    background: var(--color-accent); color: #fff;
+    border-color: var(--color-accent);
+}
+.btn-primary:hover { background: var(--color-accent-hover); border-color: var(--color-accent-hover); color: #fff; }
+.btn-secondary {
+    background: transparent; color: var(--color-text-primary);
+    border-color: var(--color-border);
+}
+.btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+
+/* ===============================================================
+   13. DOMAIN REGISTER (.dr-*)
+   Source: apple-client-area/cart-domain-register.html
+   Used by: domainregister.tpl
+   Search card + AI/Classic mode tabs + result card + popular TLD
+   grid + suggestions list + pricing table + transfer CTA.
+   =============================================================== */
+
+.dr-main { min-width: 0; }
+
+/* Page-eyebrow above the H1 (matches the mockup's "ORDER" tag) */
+.st-page-header .page-eyebrow {
+    font-size: 11px; font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin: 0 0 6px;
+}
+
+/* -- Search card -------------------------------------------- */
+.dr-search {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    padding: 22px;
+    margin-bottom: 24px;
+}
+
+/* Mode tabs (AI Generator / Classic Search pill switcher) */
+.dr-mode-tabs {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px;
+    background: var(--color-surface-secondary);
+    border-radius: var(--radius-pill);
+    margin-bottom: 14px;
+}
+.dr-mode-tab {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 30px; padding: 0 14px;
+    border-radius: var(--radius-pill);
+    background: transparent; border: 0;
+    color: var(--color-text-tertiary);
+    font-size: 12px; font-weight: 500;
+    font-family: inherit; cursor: pointer;
+    letter-spacing: -0.004em;
+    transition: all var(--transition-fast);
+}
+.dr-mode-tab:hover { color: var(--color-text-primary); }
+.dr-mode-tab.active {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.dr-mode-tab svg { width: 12px; height: 12px; }
+
+/* Form visibility driven by the parent .dr-search[data-search-mode] */
+.dr-search[data-search-mode="ai"]      .dr-search-form[data-mode-form="classic"] { display: none; }
+.dr-search[data-search-mode="classic"] .dr-search-form[data-mode-form="ai"]      { display: none; }
+
+.dr-search-form { display: flex; flex-direction: column; gap: 12px; margin: 0; }
+/* Re-cancel Bootstrap input-group's negative-margin / table-cell tricks
+   so the rounded pill renders without seams. WHMCS standard_cart adds
+   .input-group.input-group-lg.input-group-box on the search box for
+   the legacy plugin; we keep those for backwards-compat but blank out
+   their visual side-effects. */
+.dr-search-form .input-group { display: flex !important; flex-wrap: nowrap; }
+.dr-search-form .input-group > * { float: none; }
+
+/* Pill-shaped search box (icon + input + submit) */
+.dr-search-box {
+    display: flex; align-items: center; gap: 0;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    padding: 0 4px 0 16px;
+    height: 52px;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.dr-search-box:focus-within {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+.dr-search-icon {
+    width: 16px; height: 16px;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+}
+.dr-search-input {
+    flex: 1; min-width: 0;
+    border: 0 !important; background: transparent !important;
+    padding: 0 12px !important;
+    height: 100% !important;
+    font-size: 15px; letter-spacing: -0.012em;
+    color: var(--color-text-primary);
+    font-family: inherit;
+    box-shadow: none !important; outline: none;
+    resize: none;
+    /* textarea support -- single visual line for the AI form */
+    line-height: 50px;
+}
+.dr-search-input:focus { outline: none; box-shadow: none; }
+.dr-search-input::placeholder { color: var(--color-text-quaternary); }
+textarea.dr-search-input {
+    line-height: 1.4;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+    /* Guard: clip any multi-line placeholder so it can't bleed past the
+       single-line pill (covers the pre-JS frame + future long placeholders). */
+    overflow: hidden !important;
+}
+
+.dr-generate-btn {
+    height: 44px; padding: 0 22px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff; border: 0;
+    font-size: 13.5px; font-weight: 500;
+    font-family: inherit; cursor: pointer;
+    letter-spacing: -0.008em;
+    flex-shrink: 0;
+    transition: background var(--transition-fast);
+}
+.dr-generate-btn:hover { background: var(--color-accent-hover); color: #fff; }
+
+/* AI-mode filters -- right-aligned "Filters" dropdown (Apple).
+   Replaces the old bootstrap-multiselect widgets. The hidden native
+   <select>s (.dr-tld-source / .dr-length-source) are the source of
+   truth WHMCS serializes; this panel just mirrors them via filter JS. */
+.dr-tld-source, .dr-length-source { display: none !important; }
+
+/* Filters live INSIDE the search bar, between the input and the Search
+   button, separated by a left hairline divider. The bar is the
+   positioning context so the panel drops straight down below it. */
+.dr-search-box { position: relative; }
+/* The in-bar Filters panel is absolutely positioned against .dr-search-box.
+   The shared apple-layout pill rule (#order-standard_cart .domain-checker-bg
+   .input-group-box) sets overflow:hidden -- which clips the dropdown to the
+   52px bar. Un-clip this box so the panel can drop below it; the pill still
+   renders cleanly since its children fit within the radius. Specificity
+   (1,3,0) beats the apple-layout rule (1,2,0); !important is needed to also
+   beat bootstrap-multiselect.min.css's input-group overflow rule (it is
+   CORS-loaded so it out-specifies a plain selector; confirmed live). */
+#order-standard_cart .domain-checker-bg .input-group-box.dr-search-box { overflow: visible !important; }
+.dr-filters { position: static; display: inline-flex; align-items: center; flex-shrink: 0; }
+.dr-filters-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 30px; padding: 0 14px;
+    background: transparent; color: var(--color-text-tertiary);
+    border: 0; border-left: 1px solid var(--color-border); border-radius: 0;
+    font-size: 12.5px; font-weight: 500; font-family: inherit;
+    letter-spacing: -0.008em; cursor: pointer; white-space: nowrap;
+    transition: color var(--transition-fast);
+}
+.dr-filters-toggle:hover { color: var(--color-text-primary); }
+/* On narrow screens drop the "Filters" word, keep the icon + count badge */
+@media (max-width: 560px) {
+    .dr-filters-toggle { padding: 0 10px; gap: 5px; }
+    .dr-filters-toggle > span:not(.dr-filters-count) { display: none; }
+}
+.dr-filters-toggle svg { width: 14px; height: 14px; flex-shrink: 0; }
+.dr-filters-toggle .dr-filters-caret { width: 12px; height: 12px; transition: transform var(--transition-fast); }
+.dr-filters-toggle[aria-expanded="true"] .dr-filters-caret { transform: rotate(180deg); }
+.dr-filters-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 18px; height: 18px; padding: 0 5px;
+    background: var(--color-accent-light); color: var(--color-accent);
+    border-radius: var(--radius-pill);
+    font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums;
+}
+
+.dr-filters-panel {
+    position: absolute; top: calc(100% + 8px); right: 0; z-index: 40;
+    width: 300px; max-width: calc(100vw - 48px);
+    padding: 14px;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+}
+.dr-filters-panel[hidden] { display: none; }
+.dr-filters-group { margin-bottom: 14px; }
+.dr-filters-label {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--color-text-tertiary); margin-bottom: 8px;
+}
+
+.dr-tld-search { position: relative; margin-bottom: 8px; }
+.dr-tld-search svg {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    width: 14px; height: 14px; color: var(--color-text-quaternary); pointer-events: none;
+}
+.dr-tld-search-input {
+    width: 100%; height: 34px; padding: 0 12px 0 32px;
+    background: var(--color-surface-secondary); color: var(--color-text-primary);
+    border: 0.5px solid var(--color-border); border-radius: var(--radius-md);
+    font-size: 13px; font-family: inherit; letter-spacing: -0.008em;
+}
+.dr-tld-search-input:focus { outline: none; border-color: var(--color-accent); }
+.dr-tld-search-input::placeholder { color: var(--color-text-quaternary); }
+
+.dr-tld-list { max-height: 196px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.dr-tld-option {
+    display: flex; align-items: center; gap: 9px;
+    width: 100%; padding: 7px 8px; margin: 0;
+    border: 0; background: transparent; border-radius: var(--radius-sm);
+    cursor: pointer; text-align: left;
+    font-size: 13px; font-family: inherit; color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+    transition: background var(--transition-fast);
+}
+.dr-tld-option:hover { background: var(--color-surface-secondary); }
+/* override the big spotlight-card .dr-tld-name treatment inside the list */
+.dr-tld-option .dr-tld-name { font-size: 13px; font-weight: 400; color: inherit; letter-spacing: inherit; margin: 0; line-height: normal; }
+.dr-check {
+    flex: none; width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid var(--color-border); background: var(--color-surface);
+    position: relative; transition: all var(--transition-fast);
+}
+.dr-tld-option.active .dr-check { background: var(--color-accent); border-color: var(--color-accent); }
+.dr-tld-option.active .dr-check::after {
+    content: ""; position: absolute; left: 5px; top: 2px;
+    width: 4px; height: 8px;
+    border: solid #fff; border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.dr-tld-empty { padding: 12px 8px; font-size: 13px; color: var(--color-text-tertiary); text-align: center; }
+
+.dr-length-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.dr-length-pill {
+    min-width: 42px; height: 30px; padding: 0 12px;
+    background: var(--color-surface-secondary); color: var(--color-text-secondary);
+    border: 0.5px solid var(--color-border); border-radius: var(--radius-pill);
+    font-size: 13px; font-weight: 500; font-family: inherit;
+    font-variant-numeric: tabular-nums; cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.dr-length-pill:hover { color: var(--color-text-primary); }
+.dr-length-pill.active { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+
+.dr-safesearch { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0; cursor: pointer; }
+.dr-safesearch-text { font-size: 13px; color: var(--color-text-primary); letter-spacing: -0.008em; }
+.dr-switch { position: relative; flex: none; width: 40px; height: 24px; }
+.dr-switch input { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
+.dr-switch-track {
+    display: block; width: 40px; height: 24px; border-radius: var(--radius-pill);
+    background: var(--color-border); transition: background var(--transition-fast);
+}
+.dr-switch-thumb {
+    position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+    background: #fff; border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform var(--transition-fast);
+}
+.dr-switch input:checked + .dr-switch-track { background: var(--color-accent); }
+.dr-switch input:checked + .dr-switch-track .dr-switch-thumb { transform: translateX(16px); }
+
+/* Shared captcha -- visible on both tabs, sits below the search box */
+.dr-captcha-shared { margin-top: 16px; text-align: center; }
+.dr-captcha-shared .default-captcha p { margin: 0 0 8px; font-size: 13px; color: var(--color-text-secondary); letter-spacing: -0.008em; }
+.dr-captcha-shared #inputCaptchaImage { vertical-align: middle; border-radius: var(--radius-sm); }
+.dr-captcha-shared #inputCaptcha {
+    display: inline-block; width: auto; max-width: 150px;
+    height: 34px; margin-left: 8px; vertical-align: middle;
+    border: 0.5px solid var(--color-border); border-radius: var(--radius-md);
+    padding: 0 12px; font-family: inherit;
+}
+.dr-captcha-shared #inputCaptcha:focus { outline: none; border-color: var(--color-accent); }
+
+/* Classic tab = focused exact match: hide the AI suggestion list so the
+   Classic search shows only the exact-match result (+ spotlight TLDs). */
+.dr-main[data-search-mode="classic"] .suggested-domains { display: none !important; }
+
+/* -- Section heads above sub-blocks ------------------------- */
+.dr-section { margin-bottom: 28px; }
+.dr-section-head { margin-bottom: 12px; }
+.dr-section-head h2 {
+    font-size: 18px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.018em;
+    margin: 0 0 4px;
+}
+.dr-section-head p {
+    font-size: 13px; color: var(--color-text-tertiary);
+    margin: 0; letter-spacing: -0.008em;
+}
+
+/* WHMCS-emitted "Top Suggestion" / "Exact Match" headlines */
+.dr-results-heading {
+    font-size: 13px; font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    margin: 18px 0 10px;
+}
+.dr-results-heading i { color: var(--color-accent); margin-right: 6px; }
+
+/* -- Primary result card ------------------------------------ */
+.dr-result-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    padding: 20px 22px;
+    margin-bottom: 24px;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+/* Available state -- WHMCS shows .domain-available text. We tint the
+   whole card via :has() so it reads like the mockup's green pill. */
+.dr-result-card:has(.domain-available:not([style*="display: none"]):not([style*="display:none"])) {
+    border-color: var(--color-green-text);
+    background: var(--color-green-bg);
+}
+.dr-result-card:has(.domain-unavailable:not([style*="display: none"]):not([style*="display:none"])),
+.dr-result-card:has(.domain-invalid:not([style*="display: none"]):not([style*="display:none"])),
+.dr-result-card:has(.domain-tld-unavailable:not([style*="display: none"]):not([style*="display:none"])) {
+    border-color: var(--color-red-text);
+    background: var(--color-red-bg);
+}
+
+.dr-result-card .domain-lookup-primary-loader {
+    margin: 0; padding: 0;
+    font-size: 14px; color: var(--color-text-secondary);
+    display: flex; align-items: center; gap: 10px;
+}
+.dr-result-card .domain-lookup-primary-loader i { color: var(--color-accent); }
+
+.dr-result-card .domain-checker-result-headline,
+.dr-result-card .domain-lookup-result { display: block; }
+
+.dr-result-card p { margin: 0 0 6px; font-size: 14px; }
+.dr-result-card .domain-available {
+    color: var(--color-green-text);
+    font-size: 16px; font-weight: 500;
+    letter-spacing: -0.012em;
+    margin-bottom: 8px;
+}
+.dr-result-card .domain-unavailable,
+.dr-result-card .domain-invalid,
+.dr-result-card .domain-tld-unavailable,
+.dr-result-card .domain-error {
+    color: var(--color-red-text);
+    font-size: 14px; font-weight: 500;
+    letter-spacing: -0.008em;
+}
+.dr-result-card .domain-price {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+    margin: 10px 0 0;
+}
+.dr-result-card .domain-price .price {
+    font-size: 18px; font-weight: 600;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.012em;
+}
+.dr-result-card .btn-add-to-cart {
+    height: 38px; padding: 0 22px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff;
+    border: 0;
+    font-size: 13px; font-weight: 500;
+    letter-spacing: -0.008em;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.dr-result-card .btn-add-to-cart:hover { background: var(--color-accent-hover); color: #fff; }
+.dr-result-card .domain-contact-support { margin-top: 10px; }
+.dr-result-card .idn-language-selector { margin-top: 12px; }
+.dr-result-card .idn-language-selector select { max-width: 320px; }
+
+/* -- Popular TLD grid (spotlightTlds + featuredTlds) -------- */
+.dr-popular-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    float: none !important;
+}
+.dr-tld-card {
+    position: relative;
+    padding: 18px 16px 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    text-align: center;
+    float: none !important;
+    width: auto !important;
+    transition: border-color var(--transition-fast);
+}
+.dr-tld-card:hover { border-color: var(--color-text-quaternary); }
+
+.dr-tld-card .spotlight-tld { padding: 0; }
+.dr-tld-card .img-container {
+    height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 6px;
+}
+.dr-tld-card .img-container img { max-height: 32px; max-width: 80px; object-fit: contain; }
+
+.dr-tld-tag {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 2px 8px; border-radius: var(--radius-pill);
+}
+.dr-tld-tag-new,    .spotlight-tld-new    { background: var(--color-accent-light); color: var(--color-accent); }
+.dr-tld-tag-sale,   .spotlight-tld-sale   { background: var(--color-red-bg); color: var(--color-red-text); }
+.dr-tld-tag-hot,    .spotlight-tld-hot    { background: var(--color-orange-bg); color: var(--color-orange-text); }
+
+.dr-tld-name {
+    font-size: 22px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.022em;
+    margin-bottom: 8px;
+    line-height: 1.1;
+}
+.dr-tld-status {
+    display: block;
+    font-size: 12px; font-weight: 500;
+    color: var(--color-text-tertiary);
+    margin-bottom: 10px; letter-spacing: -0.004em;
+}
+.dr-tld-status.unavailable { color: var(--color-red-text); }
+.dr-tld-price {
+    display: block;
+    font-size: 13.5px; font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 10px; font-variant-numeric: tabular-nums;
+}
+.dr-tld-price span { font-weight: 400; color: var(--color-text-tertiary); }
+.dr-tld-btn {
+    display: inline-block; width: 100%;
+    height: 32px; padding: 0 14px;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    border: 0.5px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 12.5px; font-weight: 500;
+    text-decoration: none;
+    line-height: 31px; cursor: pointer;
+    font-family: inherit;
+    letter-spacing: -0.008em;
+    transition: all var(--transition-fast);
+    text-align: center;
+}
+.dr-tld-btn:hover { background: var(--color-accent); color: #fff; border-color: var(--color-accent); text-decoration: none; }
+.dr-tld-btn.disabled,
+.dr-tld-btn[disabled] {
+    color: var(--color-text-quaternary);
+    cursor: not-allowed; opacity: 0.6;
+}
+.dr-tld-btn.disabled:hover,
+.dr-tld-btn[disabled]:hover { background: transparent; color: var(--color-text-quaternary); border-color: var(--color-border); }
+
+/* -- Suggested-for-you list --------------------------------- */
+.suggested-domains.dr-section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    overflow: hidden;
+    padding: 0;
+}
+.suggested-domains .dr-section-head {
+    padding: 16px 18px 12px;
+    margin: 0;
+    border: 0; background: transparent;
+}
+.dr-suggested-list { border-radius: 0 !important; border: 0 !important; background: transparent !important; padding: 0 !important; margin: 0 !important; }
+.dr-sug-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+    padding: 14px 18px;
+    border: 0;
+    border-top: 0.5px solid var(--color-border);
+    background: transparent;
+    transition: background var(--transition-fast);
+}
+.dr-sug-row:hover { background: var(--color-surface-secondary); }
+.dr-sug-name {
+    font-size: 14px; font-weight: 500;
+    color: var(--color-text-primary);
+    letter-spacing: -0.008em;
+    display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.dr-sug-name .extension,
+.dr-sug-name .tld { color: var(--color-text-tertiary); font-weight: 500; }
+.dr-sug-chip {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 2px 7px; border-radius: var(--radius-pill);
+}
+.dr-sug-chip.sale,  .tld-sale-group-sale  { background: var(--color-red-bg); color: var(--color-red-text); }
+.dr-sug-chip.new,   .tld-sale-group-new   { background: var(--color-accent-light); color: var(--color-accent); }
+.dr-sug-chip.hot,   .tld-sale-group-hot   { background: var(--color-orange-bg); color: var(--color-orange-text); }
+.dr-sug-actions {
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.dr-sug-actions .price,
+.dr-sug-price {
+    font-size: 13px; font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Generic add-to-cart pill used in result card + suggestions list */
+.dr-add-btn {
+    height: 38px; padding: 0 22px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent); color: #fff;
+    font-size: 13px; font-weight: 500;
+    text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    letter-spacing: -0.008em;
+    flex-shrink: 0;
+    border: 0;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+}
+.dr-add-btn:hover { background: var(--color-accent-hover); color: #fff; text-decoration: none; }
+.dr-add-btn.outline {
+    background: transparent; color: var(--color-accent);
+    border: 0.5px solid var(--color-border);
+}
+.dr-add-btn.outline:hover { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+
+/* "Give me more suggestions" link footer */
+.dr-more-wrap {
+    text-align: center;
+    padding: 14px;
+    border-top: 0.5px solid var(--color-border);
+    background: transparent;
+}
+.dr-more-link {
+    color: var(--color-accent); text-decoration: none;
+    font-size: 13px; letter-spacing: -0.008em; font-weight: 500;
+}
+.dr-more-link:hover { color: var(--color-accent-hover); text-decoration: underline; }
+
+/* Suppress the WHMCS "ssl warning" paragraph if needed */
+.suggested-domains .domain-suggestions-warning {
+    padding: 10px 18px 14px;
+    font-size: 11.5px; color: var(--color-text-tertiary);
+}
+
+/* -- TLD category filter chips ------------------------------ */
+.dr-tld-filters {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 14px;
+}
+.dr-tld-filter {
+    display: inline-flex; align-items: center;
+    height: 28px; padding: 0 12px;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-secondary);
+    border: 0;
+    color: var(--color-text-secondary);
+    font-size: 12px; font-weight: 500;
+    letter-spacing: -0.004em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.dr-tld-filter:hover,
+.dr-tld-filter:focus,
+.dr-tld-filter.active {
+    background: var(--color-accent); color: #fff;
+    text-decoration: none;
+}
+
+/* -- TLD pricing table -------------------------------------- */
+.dr-pricing-table {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    overflow: hidden;
+}
+.dr-pricing-head {
+    padding: 12px 16px;
+    background: var(--color-surface-secondary);
+    border-bottom: 0.5px solid var(--color-border);
+    font-size: 11px; font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dr-pricing-row {
+    padding: 14px 16px;
+    border-top: 0.5px solid var(--color-border);
+    font-size: 13.5px;
+    color: var(--color-text-primary);
+}
+.dr-pricing-row:first-of-type { border-top: 0; }
+.dr-pricing-row strong { font-weight: 600; letter-spacing: -0.012em; }
+.dr-pricing-row .two-row-center { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dr-pricing-row small { color: var(--color-text-tertiary); font-size: 11px; }
+.dr-pricing-row.no-tlds {
+    color: var(--color-text-tertiary);
+    font-size: 13px; text-align: center;
+    padding: 24px 16px;
+}
+
+/* -- Transfer CTA strip ------------------------------------- */
+.dr-transfer-cta {
+    margin-top: 16px;
+    padding: 22px 24px;
+    background: var(--color-surface-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 18px; flex-wrap: wrap;
+}
+.dr-transfer-eyebrow {
+    font-size: 11px; font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 4px;
+}
+.dr-transfer-cta h2 {
+    font-size: 18px; font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.018em; margin: 0 0 4px;
+}
+.dr-transfer-cta p {
+    font-size: 13px; color: var(--color-text-secondary);
+    margin: 0; letter-spacing: -0.008em;
+}
+
+/* Strip Bootstrap .domain-promo-box legacy borders / padding so the
+   above tokens are the only thing styling the CTA. */
+.dr-transfer-cta.domain-promo-box {
+    text-align: left;
+    box-shadow: none;
+}
+.dr-transfer-cta .fa,
+.dr-transfer-cta .fas,
+.dr-transfer-cta .far { display: none; }
+
+/* -- Empty state placeholder -------------------------------- */
+.dr-results-empty {
+    display: none;
+    text-align: center;
+    padding: 60px 24px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 14px);
+}
+.dr-empty-ico {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--color-bg);
+    color: var(--color-text-tertiary);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+}
+.dr-empty-ico svg { width: 22px; height: 22px; }
+.dr-empty-title {
+    font-size: 17px; font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 6px;
+    letter-spacing: -0.014em;
+}
+.dr-empty-desc {
+    font-size: 14px; color: var(--color-text-secondary);
+    margin: 0 auto 0;
+    max-width: 380px;
+    line-height: 1.5;
+    letter-spacing: -0.008em;
+}
+
+/* -- Full / Empty state toggle, scoped to this page --------- */
+body[data-data="empty"] #order-standard_cart .dr-results-full  { display: none; }
+body[data-data="empty"] #order-standard_cart .dr-results-empty { display: block; }
+
+/* -- Responsive ---------------------------------------------- */
+@media (max-width: 640px) {
+    .dr-search { padding: 16px; }
+    .dr-search-box { height: 46px; }
+    .dr-generate-btn { height: 38px; padding: 0 16px; }
+    .dr-transfer-cta { flex-direction: column; align-items: flex-start; }
+    .dr-result-card { padding: 16px; }
+    .dr-result-card .domain-price { flex-direction: column; align-items: flex-start; }
+}

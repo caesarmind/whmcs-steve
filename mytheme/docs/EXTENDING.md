@@ -8,10 +8,10 @@ How to add the things buyers will ask for.
 
 ```bash
 # 1. Create the directory
-mkdir -p templates/mytheme/core/styles/sunset/assets
+mkdir -p templates/hadrian/core/styles/sunset/assets
 
 # 2. Add the manifest
-cat > templates/mytheme/core/styles/sunset/style.php <<'EOF'
+cat > templates/hadrian/core/styles/sunset/style.php <<'EOF'
 <?php
 return [
     'name'        => 'Sunset',
@@ -29,13 +29,13 @@ return [
 EOF
 
 # 3. Add SCSS overrides for this style
-cat > templates/mytheme/core/styles/sunset/_overrides.scss <<'EOF'
+cat > templates/hadrian/core/styles/sunset/_overrides.scss <<'EOF'
 .theme-sunset {
     --color-primary: #f97316;
     --color-secondary: #fbbf24;
 }
 EOF
-# (remember to @use this in templates/mytheme/assets/scss/theme.scss)
+# (remember to @use this in templates/hadrian/assets/scss/theme.scss)
 
 # 4. Register in theme.json
 # Add "sunset" to provides.styles array
@@ -52,10 +52,10 @@ npm run build
 
 ```bash
 # 1. Create directory
-mkdir -p templates/mytheme/core/layouts/main-menu/condensed
+mkdir -p templates/hadrian/core/layouts/main-menu/condensed
 
 # 2. Manifest
-cat > templates/mytheme/core/layouts/main-menu/condensed/layout.php <<'EOF'
+cat > templates/hadrian/core/layouts/main-menu/condensed/layout.php <<'EOF'
 <?php
 return [
     'displayName' => 'Condensed',
@@ -70,7 +70,7 @@ return [
 EOF
 
 # 3. The actual layout tpl
-cat > templates/mytheme/core/layouts/main-menu/condensed/default.tpl <<'EOF'
+cat > templates/hadrian/core/layouts/main-menu/condensed/default.tpl <<'EOF'
 <header class="app-nav app-nav--condensed">
     {* your markup *}
 </header>
@@ -83,10 +83,10 @@ EOF
 
 ```bash
 # Each WHMCS page can have multiple variants
-mkdir -p templates/mytheme/core/pages/clientareahome/compact
+mkdir -p templates/hadrian/core/pages/clientareahome/compact
 
 # Variant settings (admin-editable checkboxes etc.)
-cat > templates/mytheme/core/pages/clientareahome/compact/pageoption.php <<'EOF'
+cat > templates/hadrian/core/pages/clientareahome/compact/pageoption.php <<'EOF'
 <?php
 return [
     'display_name' => 'Compact',
@@ -104,7 +104,7 @@ return [
 EOF
 
 # Variant implementation
-cat > templates/mytheme/core/pages/clientareahome/compact/compact.tpl <<'EOF'
+cat > templates/hadrian/core/pages/clientareahome/compact/compact.tpl <<'EOF'
 <div class="dashboard-compact">
     {* your markup *}
 </div>
@@ -117,7 +117,7 @@ The variant becomes selectable in the admin UI under Pages → Dashboard.
 
 ```bash
 # Copy the English file as a starting point
-cp templates/mytheme/core/lang/english.php templates/mytheme/core/lang/spanish.php
+cp templates/hadrian/core/lang/english.php templates/hadrian/core/lang/spanish.php
 
 # Edit each value. Don't change keys.
 ```
@@ -126,7 +126,7 @@ cp templates/mytheme/core/lang/english.php templates/mytheme/core/lang/spanish.p
 
 ## Add a hook
 
-The addon-side: edit `modules/addons/MyTheme/src/Service/Hooks.php` and add a new private method matching the hook name (lowercase first letter):
+The addon-side: edit `modules/addons/Hadrian/src/Service/Hooks.php` and add a new private method matching the hook name (lowercase first letter):
 
 ```php
 // inside Hooks class
@@ -138,7 +138,7 @@ private function clientAreaPageInvoices(array $vars, Template $template): array
 }
 ```
 
-Then register it in `modules/addons/MyTheme/hooks.php`:
+Then register it in `modules/addons/Hadrian/hooks.php`:
 
 ```php
 add_hook('ClientAreaPageInvoices', 1, fn($vars) =>
@@ -149,11 +149,11 @@ add_hook('ClientAreaPageInvoices', 1, fn($vars) =>
 
 ```php
 // Anywhere
-\MyTheme\Models\Settings::setValue('show_search_box', true, 'bool');
-$shown = \MyTheme\Models\Settings::getValue('show_search_box', false);
+\Hadrian\Models\Settings::setValue('show_search_box', true, 'bool');
+$shown = \Hadrian\Models\Settings::getValue('show_search_box', false);
 ```
 
-In Smarty: `{$myTheme.addonSettings.show_search_box}`.
+In Smarty: `{$hadrian.addonSettings.show_search_box}`.
 
 ## Add a build target for integrity check
 
@@ -180,9 +180,9 @@ Trigger from JS: `fetch('/clientarea.php', { method: 'POST', body: 'mtAction=get
 Buyers do this. Document it in your customer-facing readme:
 
 ```
-templates/mytheme/overwrites/header.tpl       # overrides header.tpl
-templates/mytheme/includes/common/overwrites/logo.tpl   # overrides includes/common/logo.tpl
-templates/mytheme/core/pages/clientareahome/overwrites/  # not yet supported by dispatcher; document if you add it
+templates/hadrian/overwrites/header.tpl       # overrides header.tpl
+templates/hadrian/includes/common/overwrites/logo.tpl   # overrides includes/common/logo.tpl
+templates/hadrian/core/pages/clientareahome/overwrites/  # not yet supported by dispatcher; document if you add it
 ```
 
 The overrides escape hatch is per-file: each tpl that includes another via `{include}` checks for an `overwrites/` sibling first.

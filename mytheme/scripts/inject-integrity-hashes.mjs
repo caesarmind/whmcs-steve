@@ -2,7 +2,7 @@
 // scripts/inject-integrity-hashes.mjs
 //
 // Computes sha256 of every protected PHP file and writes the resulting map
-// into modules/addons/MyTheme/src/Helpers/IntegrityHashes.php.
+// into modules/addons/Hadrian/src/Helpers/IntegrityHashes.php.
 //
 // Run AFTER any PHP edit, BEFORE encoding.
 //
@@ -17,7 +17,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
 
 // Targets — paths relative to ROOTDIR (the WHMCS install root, where this addon
-// gets dropped into modules/addons/MyTheme/).
+// gets dropped into modules/addons/Hadrian/).
 const TARGETS_FILE = resolve(__dirname, 'integrity-targets.json');
 const targets = JSON.parse(readFileSync(TARGETS_FILE, 'utf8'));
 
@@ -44,7 +44,7 @@ const phpEntries = Object.entries(hashes)
 const phpContent = `<?php
 declare(strict_types=1);
 
-namespace MyTheme\\Helpers;
+namespace Hadrian\\Helpers;
 
 /**
  * Anti-tamper file-integrity verifier — GENERATED.
@@ -97,7 +97,7 @@ ${phpEntries}
 <style>body{font-family:system-ui,sans-serif;max-width:640px;margin:80px auto;padding:24px;color:#333}
 h1{color:#c00}code{background:#fceeef;padding:8px 12px;border-radius:4px;display:block;margin-top:16px}</style>
 </head><body><h1>Access has been blocked</h1>
-<p>File integrity check failed (reason: {$reason}). Reinstall MyTheme or contact support.</p>
+<p>File integrity check failed (reason: {$reason}). Reinstall Hadrian or contact support.</p>
 <code>{$safe}</code></body></html>
 HTML;
         exit(503);
@@ -105,6 +105,6 @@ HTML;
 }
 `;
 
-const outFile = resolve(root, 'modules/addons/MyTheme/src/Helpers/IntegrityHashes.php');
+const outFile = resolve(root, 'modules/addons/Hadrian/src/Helpers/IntegrityHashes.php');
 writeFileSync(outFile, phpContent);
 console.log(`\n✓ Wrote ${relative(root, outFile)} (${Object.keys(hashes).length} hashes)`);

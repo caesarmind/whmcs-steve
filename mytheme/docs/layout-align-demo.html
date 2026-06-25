@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layouts as cards + content alignment — concept demo</title>
+<style>
+  :root{
+    --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#86868b;
+    --line:#e5e5ea; --line2:#d2d2d7; --blue:#0071e3; --blue-soft:rgba(0,113,227,.10);
+    --green:#1d8a4e; --green-bg:#e7f6ed; --radius:16px;
+    --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 28px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    line-height:1.5;padding:40px 24px 80px}
+  .wrap{max-width:1040px;margin:0 auto}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+  h1{font-size:30px;letter-spacing:-.02em;margin:.2em 0 .15em}
+  .lede{color:var(--ink2);font-size:16px;margin:0 0 28px;max-width:66ch}
+  h2{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);margin:34px 0 12px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+
+  .tabs{display:inline-flex;background:#ececed;border-radius:10px;padding:3px;gap:2px;margin-bottom:18px}
+  .tabs a{font-size:13px;font-weight:500;color:var(--ink2);padding:6px 16px;border-radius:8px;text-decoration:none}
+  .tabs a.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .sec-head h3{font-size:18px;margin:0}
+  .sec-head .count{color:var(--ink3);font-size:14px}
+
+  /* ---- layout cards ---- */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{border:1.5px solid var(--line2);border-radius:14px;background:#fff;display:flex;flex-direction:column;
+    overflow:hidden;transition:border-color .15s,box-shadow .15s}
+  .card.is-active{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+  .card-thumb{height:78px;background:#f2f2f4;border-bottom:1px solid var(--line);display:flex;cursor:pointer;overflow:hidden}
+  .card-thumb:hover{background:#eef0f4}
+  .t-rail{width:16px;background:#d8dae1;flex:none}
+  .t-side{width:40px;background:#d8dae1;flex:none}
+  .t-body{flex:1;padding:9px;display:flex;flex-direction:column;gap:5px}
+  .t-top{height:14px;background:#d8dae1;border-radius:0;width:100%}
+  .t-line{height:6px;border-radius:3px;background:#e3e4e9}
+  .card-body{padding:13px 15px 15px;display:flex;flex-direction:column;gap:11px;flex:1}
+  .card-titlerow{display:flex;align-items:center;gap:8px}
+  .card-title{font-weight:600;font-size:14.5px;background:0;border:0;padding:0;cursor:pointer;color:inherit}
+  .card-title:hover{color:var(--blue)}
+  .pin{margin-left:auto;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--blue);background:var(--blue-soft);padding:2px 7px;border-radius:5px}
+  .card-desc{font-size:12.5px;color:var(--ink3);margin-top:-4px;min-height:34px}
+
+  .acts{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:11px}
+  .act{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--ink2)}
+  .act b{font-weight:500;color:var(--ink2)}
+  .badge{font-size:11.5px;font-weight:600;color:var(--green);background:var(--green-bg);padding:2px 10px;border-radius:20px}
+  .link{background:0;border:0;font:inherit;font-size:12.5px;color:var(--blue);cursor:pointer;padding:0}
+
+  .card-opt{border-top:1px solid var(--line);padding-top:11px}
+  .opt-lbl{font-size:11.5px;font-weight:600;color:var(--ink2);display:block;margin-bottom:6px}
+  .seg{display:inline-flex;background:#f2f2f4;border-radius:9px;padding:3px;gap:2px;width:100%}
+  .seg button{flex:1;border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;color:var(--ink2);
+    padding:6px 0;border-radius:7px;cursor:pointer}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .opt-none{border-top:1px dashed var(--line);padding-top:11px;font-size:11.5px;color:var(--ink3);font-style:italic}
+
+  .note{font-size:13px;color:var(--ink2);background:#fff;border:1px solid var(--line);
+    border-left:3px solid var(--blue);border-radius:10px;padding:12px 15px;margin-top:16px}
+  .note b{color:var(--ink)} code.k{background:#f2f2f4;border-radius:5px;padding:1px 6px;font-size:12.5px;color:#3a3a3c}
+
+  /* ---- live preview ---- */
+  .pvp{padding:0 !important}
+  .pv-bar{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink2);padding:10px 14px;border-bottom:1px solid var(--line)}
+  .pv-bar .dot{width:11px;height:11px;border-radius:50%;background:#e3e3e6}
+  .pv-bar code{background:#f2f2f4;border-radius:6px;padding:2px 7px;font-size:11.5px;color:#3a3a3c}
+  .pv{height:420px;display:flex;background:#fbfbfd;border-radius:0 0 var(--radius) var(--radius);overflow:hidden}
+  .pv-rail,.pv-side{flex:none;background:#fff;border-right:1px solid var(--line);padding:16px 12px}
+  .pv-rail{width:62px;align-items:center;display:flex;flex-direction:column;gap:14px}
+  .pv-side{width:188px;display:flex;flex-direction:column;gap:7px}
+  .pv-ico{width:30px;height:30px;border-radius:9px;background:#eef0f4}
+  .pv-navitem{height:30px;border-radius:8px;background:#f2f3f6;display:flex;align-items:center;padding:0 10px}
+  .pv-navitem.act{background:var(--blue-soft)} .pv-navitem span{height:7px;width:62%;border-radius:4px;background:#d7d9e0}
+  .pv-navitem.act span{background:#9cc2f5}
+  .pv-main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .pv-top{height:46px;border-bottom:1px solid var(--line);background:#fff;display:none;align-items:center;gap:14px;padding:0 18px}
+  .pv-top .pv-navitem{height:24px;width:74px}
+  .pv-content-area{flex:1;padding:24px;overflow:auto}
+  .pv-col{max-width:520px;margin:0 auto;transition:margin .25s ease}
+  .pv-h{height:26px;width:56%;border-radius:7px;background:#e1e2e7;margin-bottom:6px}
+  .pv-sub{height:11px;width:80%;border-radius:5px;background:#ececef;margin-bottom:18px}
+  .pv-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pv-tile{height:92px;border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .pv[data-layout="side"] .pv-rail{display:none}
+  .pv[data-layout="rail"] .pv-side{display:none}
+  .pv[data-layout="top"] .pv-rail,.pv[data-layout="top"] .pv-side{display:none}
+  .pv[data-layout="top"] .pv-top{display:flex}
+  .pv[data-align="left"]:not([data-layout="top"]) .pv-col{margin-left:0;margin-right:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Hadrian · concept</div>
+  <h1>Layouts as cards, with content alignment built in</h1>
+  <p class="lede">Cards replace the table — each shows a thumbnail, the two activations (Guest / Existing),
+  and, on the layouts that support it, a <b>Content alignment</b> control. <b>Top Navigation</b> shows none
+  (always centered). Click a thumbnail or title to preview a layout; click Center/Left to see the shift.</p>
+
+  <h2>Admin · Layouts (Main menu) — card view</h2>
+  <div class="panel">
+    <div class="tabs"><a class="on">Main menu</a><a>Footer</a></div>
+    <div class="sec-head"><h3>Main menu layouts</h3><span class="count">3 layouts</span></div>
+
+    <div class="cards">
+
+      <!-- TOP: no align option -->
+      <div class="card" data-layout="top">
+        <div class="card-thumb" data-pv="top"><div class="t-body"><div class="t-top"></div><div class="t-line" style="width:60%"></div><div class="t-line" style="width:78%"></div></div></div>
+        <div class="card-body">
+          <div class="card-titlerow"><button class="card-title" data-pv="top">Top Navigation</button></div>
+          <div class="card-desc">Horizontal navbar at the top, full-width content below.</div>
+          <div class="acts">
+            <div class="act"><b>Guest client</b><button class="link">Activate</button></div>
+            <div class="act"><b>Existing client</b><button class="link">Activate</button></div>
+          </div>
+          <div class="opt-none">No alignment option — content is always centered.</div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR: active + align option -->
+      <div class="card is-active" data-layout="side">
+        <div class="card-thumb" data-pv="side"><div class="t-side"></div><div class="t-body"><div class="t-line" style="width:70%"></div><div class="t-line"></div><div class="t-line" style="width:52%"></div></div></div>
+        <div class="card-body">
+          <div class="card-titlerow"><button class="card-title" data-pv="side">Sidebar</button><span class="pin">Active</span></div>
+          <div class="card-desc">Fixed 260px sidebar on the left, content shifts right.</div>
+          <div class="acts">
+            <div class="act"><b>Guest client</b><span class="badge">Active</span></div>
+            <div class="act"><b>Existing client</b><span class="badge">Active</span></div>
+          </div>
+          <div class="card-opt">
+            <span class="opt-lbl">Content alignment</span>
+            <div class="seg" data-align-group data-layout="side"><button data-align="center" class="on">Center</button><button data-align="left">Left</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RAIL: align option -->
+      <div class="card" data-layout="rail">
+        <div class="card-thumb" data-pv="rail"><div class="t-rail"></div><div class="t-body"><div class="t-line" style="width:66%"></div><div class="t-line"></div><div class="t-line" style="width:48%"></div></div></div>
+        <div class="card-body">
+          <div class="card-titlerow"><button class="card-title" data-pv="rail">Icon Rail</button></div>
+          <div class="card-desc">Compact 80px icon rail with flyout panels on hover.</div>
+          <div class="acts">
+            <div class="act"><b>Guest client</b><button class="link">Activate</button></div>
+            <div class="act"><b>Existing client</b><button class="link">Activate</button></div>
+          </div>
+          <div class="card-opt">
+            <span class="opt-lbl">Content alignment</span>
+            <div class="seg" data-align-group data-layout="rail"><button data-align="center" class="on">Center</button><button data-align="left">Left</button></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="note">Wiring is identical regardless of table vs cards: each layout's <code class="k">layout.php</code>
+  declares its <code class="k">supportedOptions</code> (Sidebar/Rail → <code class="k">align</code>, Top → none);
+  <code class="k">LayoutsController</code> renders + saves them per card; <code class="k">Hooks</code> exposes the
+  active layout's options on <code class="k">$hadrian.layouts['main-menu'].options</code>;
+  <code class="k">header.tpl</code> emits <code class="k">body[data-align]</code> and the existing
+  <code class="k">:not([data-layout="top"])</code> CSS does the shift.</div>
+
+  <h2>Live preview</h2>
+  <div class="panel pvp">
+    <div class="pv-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span>Client area — layout <code id="pvLayoutLbl">side</code> · align <code id="pvAlignLbl">center</code></span></div>
+    <div class="pv" id="pv" data-layout="side" data-align="center">
+      <aside class="pv-rail"><div class="pv-ico"></div><div class="pv-ico"></div><div class="pv-ico"></div><div class="pv-ico"></div></aside>
+      <aside class="pv-side"><div class="pv-navitem act"><span></span></div><div class="pv-navitem"><span></span></div><div class="pv-navitem"><span></span></div><div class="pv-navitem"><span></span></div></aside>
+      <div class="pv-main">
+        <div class="pv-top"><div class="pv-navitem act"></div><div class="pv-navitem"></div><div class="pv-navitem"></div></div>
+        <div class="pv-content-area"><div class="pv-col"><div class="pv-h"></div><div class="pv-sub"></div><div class="pv-cards"><div class="pv-tile"></div><div class="pv-tile"></div><div class="pv-tile"></div><div class="pv-tile"></div></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var pv = document.getElementById('pv'), lLbl = document.getElementById('pvLayoutLbl'), aLbl = document.getElementById('pvAlignLbl');
+  function setLayout(layout){
+    pv.setAttribute('data-layout', layout); lLbl.textContent = layout;
+    if(layout === 'top'){ pv.setAttribute('data-align','center'); aLbl.textContent = 'center (n/a)'; }
+    else { aLbl.textContent = pv.getAttribute('data-align') === 'left' ? 'left' : 'center'; }
+  }
+  function setAlign(group, align){
+    group.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-align') === align); });
+    setLayout(group.getAttribute('data-layout')); pv.setAttribute('data-align', align); aLbl.textContent = align;
+  }
+  document.querySelectorAll('[data-pv]').forEach(function(el){ el.addEventListener('click', function(){ setLayout(el.getAttribute('data-pv')); }); });
+  document.querySelectorAll('[data-align-group] button').forEach(function(btn){ btn.addEventListener('click', function(){ setAlign(btn.closest('[data-align-group]'), btn.getAttribute('data-align')); }); });
+})();
+</script>
+</body>
+</html>

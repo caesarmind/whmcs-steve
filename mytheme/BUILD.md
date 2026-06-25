@@ -23,12 +23,12 @@ npm run package                # zip everything for distribution
 
 | Source | Output |
 |---|---|
-| `templates/mytheme/assets/scss/theme.scss` | `templates/mytheme/assets/css/theme.css` (minified) |
-| `templates/mytheme/assets/scss/site.scss` | `templates/mytheme/assets/css/site.css` (minified) |
-| `templates/mytheme/assets/scss/theme-rtl.scss` | `templates/mytheme/assets/css/theme-rtl.css` |
-| `templates/mytheme/assets/scss/site-rtl.scss` | `templates/mytheme/assets/css/site-rtl.css` |
-| Per-style SCSS in `templates/mytheme/core/styles/<name>/assets/_*.scss` | Concatenated into per-style `style.css` |
-| `templates/mytheme/assets/js/src/*.js` | `templates/mytheme/assets/js/dist/{theme.js,theme.min.js}` |
+| `templates/hadrian/assets/scss/theme.scss` | `templates/hadrian/assets/css/theme.css` (minified) |
+| `templates/hadrian/assets/scss/site.scss` | `templates/hadrian/assets/css/site.css` (minified) |
+| `templates/hadrian/assets/scss/theme-rtl.scss` | `templates/hadrian/assets/css/theme-rtl.css` |
+| `templates/hadrian/assets/scss/site-rtl.scss` | `templates/hadrian/assets/css/site-rtl.css` |
+| Per-style SCSS in `templates/hadrian/core/styles/<name>/assets/_*.scss` | Concatenated into per-style `style.css` |
+| `templates/hadrian/assets/js/src/*.js` | `templates/hadrian/assets/js/dist/{theme.js,theme.min.js}` |
 
 Source maps are generated for development builds (`NODE_ENV=development`); stripped for production.
 
@@ -37,7 +37,7 @@ Source maps are generated for development builds (`NODE_ENV=development`); strip
 The starter includes `scripts/inject-integrity-hashes.mjs`. It:
 
 1. Computes `sha256_file()` of the load-bearing files: `License.php`, `LicenseHelper.php`, `Template.php`, plus any others you add to `scripts/integrity-targets.json`.
-2. Writes the hashes into a generated PHP file at `modules/addons/MyTheme/src/Helpers/IntegrityHashes.php`.
+2. Writes the hashes into a generated PHP file at `modules/addons/Hadrian/src/Helpers/IntegrityHashes.php`.
 3. Stub files (auto-injected at the top of every encoded PHP file) call `IntegrityHashes::verifyOrDie($targetFile)` — which checks the runtime sha256 against the build-time hash and renders an error page on mismatch.
 
 **Run integrity hash injection AFTER any PHP edit and BEFORE encoding.**
@@ -68,27 +68,27 @@ ioncube_encoder \
   --encode src/Service/Hooks.php \
   --encode src/Models/Configuration.php \
   --encode src/Models/Settings.php \
-  --encode MyTheme.php \
+  --encode Hadrian.php \
   --encode hooks.php \
   --encode adminHooks.php \
   --encode autoload.php \
   --target-version 8.1 \
   --target-php81 \
-  modules/addons/MyTheme/
+  modules/addons/Hadrian/
 ```
 
 (adjust paths and target-version per supported PHP minor; PHP 8.1 is the minimum because the code uses backed enums and readonly properties)
 
 **What to encode:**
-- All PHP under `modules/addons/MyTheme/src/`
-- `MyTheme.php`, `hooks.php`, `adminHooks.php`, `autoload.php`
-- `templates/mytheme/core/mytheme.php` (the per-template `secret_key` file)
+- All PHP under `modules/addons/Hadrian/src/`
+- `Hadrian.php`, `hooks.php`, `adminHooks.php`, `autoload.php`
+- `templates/hadrian/core/hadrian.php` (the per-template `secret_key` file)
 
 **What NOT to encode** (leave plain so customers can customize):
 - All `.tpl` files
-- All static assets (`templates/mytheme/assets/**`)
-- All admin views (`modules/addons/MyTheme/views/**/*.tpl`)
-- `templates/mytheme/theme.json` (manifest)
+- All static assets (`templates/hadrian/assets/**`)
+- All admin views (`modules/addons/Hadrian/views/**/*.tpl`)
+- `templates/hadrian/theme.json` (manifest)
 
 ## Multi-PHP-version builds
 
@@ -96,10 +96,10 @@ WHMCS 9 supports PHP 8.1+. The code in this scaffold avoids PHP 8.2/8.3-only fea
 
 ```
 dist/
-├── php81/modules/addons/MyTheme/...    # encoded for PHP 8.1 (WHMCS 9 minimum)
-├── php82/modules/addons/MyTheme/...    # encoded for PHP 8.2
-├── php83/modules/addons/MyTheme/...    # encoded for PHP 8.3
-└── php84/modules/addons/MyTheme/...    # encoded for PHP 8.4 (once ionCube supports it)
+├── php81/modules/addons/Hadrian/...    # encoded for PHP 8.1 (WHMCS 9 minimum)
+├── php82/modules/addons/Hadrian/...    # encoded for PHP 8.2
+├── php83/modules/addons/Hadrian/...    # encoded for PHP 8.3
+└── php84/modules/addons/Hadrian/...    # encoded for PHP 8.4 (once ionCube supports it)
 ```
 
 ionCube encoding is PHP-version-locked: an 8.1-encoded file won't run on 8.3 (different bytecode). Generate one folder per supported runtime. The non-encoded files (`.tpl`, assets, json, SCSS sources, build scripts) are identical across all versions.
@@ -120,7 +120,7 @@ Rebuilds CSS on `.scss` change, JS on `.js` change. Skips integrity-hash regener
 ## Packaging for distribution
 
 ```bash
-npm run package        # produces dist/MyTheme-<version>.zip
+npm run package        # produces dist/Hadrian-<version>.zip
 ```
 
 The packaged zip:
@@ -128,7 +128,7 @@ The packaged zip:
 - Encodes the protected files
 - Strips source maps and `.scss` files (for the buyer-facing zip; ship `BUILD.md` separately or in `dist/source/`)
 - Generates a manifest with file hashes for the installer to verify
-- Bundles into `dist/MyTheme-<version>.zip`
+- Bundles into `dist/Hadrian-<version>.zip`
 
 ## Recommended workflow
 
@@ -144,5 +144,5 @@ release:  npm run build && npm run build:integrity && encode → npm run package
 |---|---|---|
 | `Sass compilation failed` | SCSS syntax error | check `assets/scss/_*.scss` for the file noted |
 | `IntegrityHashes mismatch on <file>` at runtime | Forgot to run `build:integrity` after editing PHP | `npm run build:integrity` then re-encode |
-| `License check fails on every page` | TLS issue or license key not set | check `tblconfiguration['MyTheme-<template>-license']`; check the license server URL in `src/Template/License.php` |
+| `License check fails on every page` | TLS issue or license key not set | check `tblconfiguration['Hadrian-<template>-license']`; check the license server URL in `src/Template/License.php` |
 | ionCube error 199 ("Loader not installed") | Trying to run encoded files without ionCube | use plain (development) build, or install ionCube on the test server |

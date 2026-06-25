@@ -1,7 +1,7 @@
 # Page creation & verification checklist
 
 Working reference for converting every WHMCS client-area page from the
-`apple-client-area/` mockups into the live theme at `templates/mytheme/`.
+`apple-client-area/` mockups into the live theme at `templates/hadrian/`.
 Built from the bugs found shipping `clientareahome`, `clientareaproducts`,
 `clientareadomains`, `clientareainvoices`, `supporttickets`, `viewinvoice`.
 
@@ -12,7 +12,7 @@ Built from the bugs found shipping `clientareahome`, `clientareaproducts`,
 Every page needs exactly these five things on disk:
 
 ```
-templates/mytheme/
+templates/hadrian/
 ├── <page>.tpl                                  ← top-level dispatcher (1)
 ├── core/pages/<page>/
 │   ├── page.php                                ← page metadata        (2)
@@ -25,8 +25,8 @@ templates/mytheme/
 Plus optionally:
 
 ```
-modules/addons/MyTheme/src/Service/Hooks.php    ← localAPI fallback hook (6)
-modules/addons/MyTheme/hooks.php                ← register the hook    (7)
+modules/addons/Hadrian/src/Service/Hooks.php    ← localAPI fallback hook (6)
+modules/addons/Hadrian/hooks.php                ← register the hook    (7)
 ```
 
 `<page>` matches WHMCS's `$templatefile` value (e.g. `clientareaproducts`,
@@ -36,18 +36,18 @@ modules/addons/MyTheme/hooks.php                ← register the hook    (7)
 
 ## 2. What each file must contain
 
-### (1) `templates/mytheme/<page>.tpl` — dispatcher
+### (1) `templates/hadrian/<page>.tpl` — dispatcher
 
 ```smarty
-{if isset($myTheme.pages.<page>.fullPath) && $myTheme.pages.<page>.fullPath && file_exists("templates/`$myTheme.pages.<page>.fullPath`")}
-    {include file="`$myTheme.pages.<page>.fullPath`"}
+{if isset($hadrian.pages.<page>.fullPath) && $hadrian.pages.<page>.fullPath && file_exists("templates/`$hadrian.pages.<page>.fullPath`")}
+    {include file="`$hadrian.pages.<page>.fullPath`"}
 {else}
     {include file="`$template`/core/pages/<page>/default/default.tpl"}
 {/if}
 ```
 
 The `isset && truthy && file_exists` triple is **required** — the first two
-fail-safe `$myTheme.pages` not being populated; `file_exists` covers a
+fail-safe `$hadrian.pages` not being populated; `file_exists` covers a
 mis-named variant.
 
 ### (2) `core/pages/<page>/page.php` — page metadata
@@ -84,7 +84,7 @@ Top-of-file structure (the contract every variant tpl must follow):
 {if $count_all > 0}{assign var=dashIsEmpty value='full'}{else}{assign var=dashIsEmpty value='empty'}{/if}
 
 {* (C) Load page-specific CSS *)
-<link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/<page>.css?v={$myTheme.version|default:'1.0'}">
+<link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/<page>.css?v={$hadrian.version|default:'1.0'}">
 
 {* (D) Hand layout signals to body so CSS toggles fire *)
 <script>
@@ -182,9 +182,9 @@ add_hook('ClientAreaPage<X>', 1, function ($vars) {
 | `{assign var=foo value='bar'}` | `{$foo = 'bar'}` (inline assignment, can silently fail on WHMCS Smarty) |
 | `$list\|@count` | `$list\|count` for Collection objects |
 | `{if isset($x) && $x\|@count > 0}` | `{if $x}` (errors when $x is undefined) |
-| `$myTheme.layouts['main-menu']` | `$myTheme.layouts.main-menu` (hyphen parsed as subtraction) |
+| `$hadrian.layouts['main-menu']` | `$hadrian.layouts.main-menu` (hyphen parsed as subtraction) |
 | Strip-tags before using a value as a CSS class | Pipe a value through `\|lower\|escape` straight into an HTML attribute when WHMCS may wrap it in `<span>` |
-| Wrap nested `$myTheme.x.y` access in `isset()` chain | Rely on `\|default:''` to catch failures — it doesn't fire if the chain blows up first |
+| Wrap nested `$hadrian.x.y` access in `isset()` chain | Rely on `\|default:''` to catch failures — it doesn't fire if the chain blows up first |
 | `{foreach $list as $row}{if $row@iteration <= 5}` | `{foreach $list as $row@idx}{if $idx < 5}` — Smarty doesn't accept custom iterator names; this is a silent compile failure that empties the content-area. Use `@iteration` (1-based) or `@index` (0-based) on the loop var itself |
 | Wrap inline `<script>` and `<style>` bodies in `{literal}…{/literal}` | Leave `{` from JS object literals or CSS selectors exposed — Smarty parses them as directives and bails mid-template |
 
@@ -210,7 +210,7 @@ Universal globals always available:
 - `$clientsstats.{productsnumactive, numactivedomains, numunpaidinvoices, numactivetickets, unpaidinvoicesamount, numexpiringdomains, numoverdueinvoices}`
 - `$pagetitle`, `$templatefile`
 - `$activeLocale.languageCode`, `$language`
-- `$myTheme.{version, manifest, layouts, pages, styles}` (populated by `Hooks::clientAreaPage`)
+- `$hadrian.{version, manifest, layouts, pages, styles}` (populated by `Hooks::clientAreaPage`)
 
 ---
 
@@ -648,7 +648,7 @@ curl -s -b cookies.txt "https://bill.hostnodes.com/clientarea.php?action=invoice
 **Curl-based remote check** (no browser needed):
 
 ```bash
-curl -s https://bill.hostnodes.com/templates/mytheme/assets/css/apple-layout.css \
+curl -s https://bill.hostnodes.com/templates/hadrian/assets/css/apple-layout.css \
   | grep -A 8 '^\.ph-main-wrap {' \
   | grep -E 'flex: 1|min-width: 0'
 # Both lines must appear. If either is missing, the bug is back.
@@ -669,7 +669,7 @@ Before pushing, run through:
 - [ ] Smarty assignments use `{assign}`, not `{$x = y}`
 - [ ] `{foreach}` loops use the iterator's built-in `@iteration` / `@index` properties — no `{foreach $x as $y@custom}` (invalid syntax, silent compile failure that empties the content-area)
 - [ ] Inline `<script>` (and `<style>` if it contains `{...}`) bodies are wrapped in `{literal}…{/literal}` so Smarty doesn't parse JS curly braces
-- [ ] No bare `$myTheme.layouts['…']` chain — always `isset()`-guarded
+- [ ] No bare `$hadrian.layouts['…']` chain — always `isset()`-guarded
 - [ ] No `$x|lower|escape` straight into a class attr when `$x` may contain HTML (e.g. WHMCS invoice statuses)
 - [ ] If both `when-empty` and `when-full` markup coexist, the universal CSS toggle in `apple-layout.css` is **uncommented**
 - [ ] `data-data` set by the inline `<script>` in the page tpl
@@ -682,7 +682,7 @@ After GitHub Action finishes (~60s) + manual `templates_c/` wipe + browser hard-
 
 ```bash
 # Asset reachability — every CSS file must return 200, not 404
-curl -sI "https://bill.hostnodes.com/templates/mytheme/assets/css/pages/<page>.css" -w "%{http_code}\n" -o /dev/null
+curl -sI "https://bill.hostnodes.com/templates/hadrian/assets/css/pages/<page>.css" -w "%{http_code}\n" -o /dev/null
 
 # Page renders with the right structural hooks (login + check class hits)
 curl -s -b cookies.txt "https://bill.hostnodes.com/<page-url>" \
@@ -742,7 +742,7 @@ These pages render a real H1 + page-prefixed div + working CSS link so they exis
 
 | Page | Reason |
 |---|---|
-| `cart.php` (order form) | Different theme system — order-form templates live in a separate directory hierarchy outside `templates/mytheme/`. |
+| `cart.php` (order form) | Different theme system — order-form templates live in a separate directory hierarchy outside `templates/hadrian/`. |
 
 ### Workflow for filling in a scaffolded page
 
@@ -763,13 +763,13 @@ These pages render a real H1 + page-prefixed div + working CSS link so they exis
 - **WHMCS sends invoice (and sometimes product / ticket) status as `<span class="textred">Unpaid</span>` or `<span style="color:#779500">Open</span>`** → always `strip_tags()` (PHP-side) or `|strip_tags` (Smarty-side) before piping into a class attr AND before showing as visible text. If you don't, the raw HTML lands inside `class="status-pill ..."` and the browser parses the embedded `"` as terminating the attribute, smearing the rest of the HTML into the surrounding tag. Hit on `clientareaproducts/default/default.tpl` line 150 (status badge), `viewticket/default/default.tpl` line 27/201 (commit `adab4f7` — assigned `$tktStatusText = $status|strip_tags` once at the top, used it everywhere). Pattern: do the strip ONCE, assign to a `*Text` variable, then derive `*Lower` from that and use both.
 - **`|date_format:"%B %e, %Y"` produces garbage on PHP 8.1+** → output looks like `AprApr/SatSat/2026202620262026` because strftime is deprecated and Smarty 4's `date_format` modifier misinterprets `%`-style codes against Carbon objects. Works fine for `$smarty.now|date_format:"%Y"` (a plain DateTime) but breaks for any WHMCS `$timestamp` variable that's a Carbon under the hood. The WHMCS-canonical fix that both Nexus and Lagom use is the `$carbon` helper with PHP `date()` format codes (no `%`): `{$carbon->createFromTimestamp($timestamp)->format('F j, Y')}`. Commit `adab4f7` fixed viewannouncement this way; any other page that formats a WHMCS-supplied timestamp should follow the same pattern.
 - **`{$var = value}` inline assignment fails silently in WHMCS Smarty 4** → use `{assign var=var value=value}`.
-- **Chained property access on potentially-missing `$myTheme.x.y.z`** → wrap in `isset()` chain before access, or short-circuit assigns won't fire.
-- **Hyphenated keys in Smarty dot-notation get parsed as subtraction** → `$myTheme.pages.account-user-management.fullPath` becomes `account MINUS user MINUS management`, the whole template fails to compile, and `.content-area` ends up empty in view-source even though `data-tpl` looks right. Fix in every hyphenated dispatcher under `templates/mytheme/<page>.tpl`: switch to bracket form `$myTheme.pages['account-user-management'].fullPath` (works inside backticks too: `\`$myTheme.pages['account-user-management'].fullPath\``). Hit on 27 dispatchers (all `account-*`, `user-*`, `configuressl-*`, `two-factor-*`, `supportticketsubmit-{customfields,kbsuggestions,confirm}`, `upgrade-configure`, `subscription-manage`, `invoice-payment`, `domain-pricing`, `access-denied`, `markdown-guide`). `scripts/check-pages.sh lint` greps for the broken form now.
+- **Chained property access on potentially-missing `$hadrian.x.y.z`** → wrap in `isset()` chain before access, or short-circuit assigns won't fire.
+- **Hyphenated keys in Smarty dot-notation get parsed as subtraction** → `$hadrian.pages.account-user-management.fullPath` becomes `account MINUS user MINUS management`, the whole template fails to compile, and `.content-area` ends up empty in view-source even though `data-tpl` looks right. Fix in every hyphenated dispatcher under `templates/hadrian/<page>.tpl`: switch to bracket form `$hadrian.pages['account-user-management'].fullPath` (works inside backticks too: `\`$hadrian.pages['account-user-management'].fullPath\``). Hit on 27 dispatchers (all `account-*`, `user-*`, `configuressl-*`, `two-factor-*`, `supportticketsubmit-{customfields,kbsuggestions,confirm}`, `upgrade-configure`, `subscription-manage`, `invoice-payment`, `domain-pricing`, `access-denied`, `markdown-guide`). `scripts/check-pages.sh lint` greps for the broken form now.
 - **WHMCS v8 vs v9 data shapes diverge for account-* pages** → reference Nexus for v9 (production), NOT Lagom. Lagom 2.3 targets WHMCS 8. The trap that bit us: in v8, `$user->isOwner` returned a bool; in v9, `isOwner($client)` is a relationship method that requires a `WHMCS\Client` argument. Reading `$user->isOwner` as a property (or `$user.isOwner` in Smarty) triggers `Eloquent::getAttribute → getRelationshipFromMethod → call_user_func() with 0 args → ArgumentCountError`, which kills page rendering with the WHMCS "Oops!" screen. The v9 canonical "is this user the account owner" check is `$user->pivot->owner` (boolean on the client_user pivot table). Same applies to other v8/v9 forks: `$invites` is a separate Collection in v9 (use `$invites->count()` and iterate it for pending invites — they're NOT in `$users`), and `$user->hasTwoFactorAuthEnabled()`, `$user->pivot->hasLastLogin()`, `$user->pivot->getLastLogin()->diffForHumans()` are the v9 methods for the metadata column. **Rule of thumb**: when porting a Lagom snippet, sanity-check the same shape against Nexus first; if Nexus uses `$user->pivot->X` and Lagom uses `$user->X`, trust Nexus.
 - **`{include file="…/includes/flashmessage.tpl"}` silently fails if that file isn't in our theme** → Nexus delegates flash-message rendering to `includes/flashmessage.tpl`, but we never copied it. A Smarty `{include}` targeting a non-existent file produces no output (it doesn't throw on the visible page; the rest of the template may also short-circuit), so the whole page goes blank below the include line. Fix: use the inline pattern Nexus's flashmessage.tpl uses internally — `{if $message = get_flash_message()}<div ...>{$message.text}</div>{/if}`. `get_flash_message()` is a Smarty function WHMCS registers globally for client-area templates.
 - **PHP functions in Smarty `{if}` expressions: only `is_array`, `count`, `time` and a few others are whitelisted** → `{if method_exists($user, 'hasTwoFactorAuthEnabled') && ...}` will compile but fail at render with the rest of the template silently dropped. Symptoms: page renders chrome but `.content-area` is empty in view-source. Fix: don't guard with `method_exists` — call the method directly like Nexus does (`{if $user->hasTwoFactorAuthEnabled()}…`). Same goes for `property_exists`, `function_exists`, `class_exists`. If you genuinely need defense, structure with `{if isset($x)}` + direct method call.
 - **v9 friendly URLs vs `clientarea.php?action=…` legacy URLs** → on a v9 install with friendly URLs enabled, the canonical user-level + account-level URLs are `/user/profile`, `/user/security`, `/user/password`, `/user/accounts`, `/account/users`, `/account/paymentmethods`, `/account/contacts`. The legacy `clientarea.php?action=switchaccount`, `?action=changepw` etc. may not even resolve. Never hardcode either — use `{routePath('user-profile')}`, `{routePath('user-accounts')}`, `{routePath('user-password')}`, `{routePath('account-users')}` etc. Both Nexus AND Lagom do this; the routePath function picks the right URL for whatever WHMCS version + URL-mode is configured.
-- **`viewinvoice.php` and `viewquote.php` do NOT auto-wrap in our client-area chrome** → WHMCS renders these tpls standalone, which means `header.tpl` (and therefore `apple-theme.css`, `apple-layout.css`, and every CSS variable) never loads. The page comes out completely unstyled — raw HTML with the page-CSS color/spacing tokens all `undefined`. Both Lagom AND Nexus handle this: Lagom puts `{include file="\`$template\`/header.tpl"}` at the top of `viewinvoice.tpl` and `{include file="\`$template\`/footer.tpl"}` at the bottom; Nexus inlines an entire `<!DOCTYPE html><html><head>…</head><body>…</body></html>`. We use Lagom's approach in our dispatcher. **Rule:** any new dispatcher tpl at `templates/mytheme/<pagename>.tpl` that targets a WHMCS route that bypasses the chrome — currently just `viewinvoice` and `viewquote`, but watch for new ones — must explicitly `{include}` header.tpl + footer.tpl.
+- **`viewinvoice.php` and `viewquote.php` do NOT auto-wrap in our client-area chrome** → WHMCS renders these tpls standalone, which means `header.tpl` (and therefore `apple-theme.css`, `apple-layout.css`, and every CSS variable) never loads. The page comes out completely unstyled — raw HTML with the page-CSS color/spacing tokens all `undefined`. Both Lagom AND Nexus handle this: Lagom puts `{include file="\`$template\`/header.tpl"}` at the top of `viewinvoice.tpl` and `{include file="\`$template\`/footer.tpl"}` at the bottom; Nexus inlines an entire `<!DOCTYPE html><html><head>…</head><body>…</body></html>`. We use Lagom's approach in our dispatcher. **Rule:** any new dispatcher tpl at `templates/hadrian/<pagename>.tpl` that targets a WHMCS route that bypasses the chrome — currently just `viewinvoice` and `viewquote`, but watch for new ones — must explicitly `{include}` header.tpl + footer.tpl.
 - **Both `when-empty` and `when-full` markup coexisting** → relies on `apple-layout.css` toggle rules; keep them active, never comment out.
 - **`body { display: block; }` leak in page CSS** → kills the body's `display: flex` chain that holds sidebar + main-wrap, most visibly breaking **top-nav layout** since the sticky `.homepage-nav` needs intact flex. Strip this from every page CSS (was in 5 files: clientareahome, clientareaproducts, clientareadomains, clientareainvoices, supporttickets).
 - **`[data-subnav-side="outside"]` content-area transforms unscoped** → in top layout there's no sidebar to offset against, so `translateX(-132px)` shoves content off-center. Always include `:not([data-layout="top"])` in the selector.
@@ -790,7 +790,7 @@ These pages render a real H1 + page-prefixed div + working CSS link so they exis
   1. Smarty parse error in the page's `default.tpl` (invalid syntax, unbalanced tags, modifier-on-wrong-type). Smarty 4 in production mode swallows the error and emits nothing for that include.
   2. WHMCS's templatefile doesn't resolve to any tpl on disk (either the dispatcher file is missing, or it's untracked in git so never deployed via the SFTP action).
 
-  Debug flow: (a) `view-source:`, locate `.content-area`, confirm it's empty. (b) Search for the template's class hooks in the source — if they're entirely absent, the include never ran. (c) `git ls-files | grep <page>` on local repo to confirm everything is tracked. (d) `curl -sI https://bill.hostnodes.com/templates/mytheme/<page>.tpl` to confirm the file is on the live server. (e) If on-disk but still empty, suspect Smarty syntax — `php -l` won't catch this; eyeball the tpl for `$x@custom` iterators, unbalanced `{if}`/`{/if}`, or modifier chains where one step doesn't accept the previous step's output type.
+  Debug flow: (a) `view-source:`, locate `.content-area`, confirm it's empty. (b) Search for the template's class hooks in the source — if they're entirely absent, the include never ran. (c) `git ls-files | grep <page>` on local repo to confirm everything is tracked. (d) `curl -sI https://bill.hostnodes.com/templates/hadrian/<page>.tpl` to confirm the file is on the live server. (e) If on-disk but still empty, suspect Smarty syntax — `php -l` won't catch this; eyeball the tpl for `$x@custom` iterators, unbalanced `{if}`/`{/if}`, or modifier chains where one step doesn't accept the previous step's output type.
 
 ---
 

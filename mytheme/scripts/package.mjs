@@ -17,7 +17,7 @@ const version = pkg.version;
 const distDir = resolve(root, 'dist');
 if (!existsSync(distDir)) mkdirSync(distDir, { recursive: true });
 
-const zipName = `MyTheme-${version}.zip`;
+const zipName = `Hadrian-${version}.zip`;
 const zipPath = resolve(distDir, zipName);
 
 console.log(`Packaging ${zipName}...`);

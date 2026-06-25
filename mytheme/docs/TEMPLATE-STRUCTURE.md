@@ -1,10 +1,10 @@
-# Template Layer: `templates/mytheme`
+# Template Layer: `templates/hadrian`
 
-This document describes the sellable visual theme package. The directory is intentionally **not standalone**: it requires `modules/addons/MyTheme` to render normal pages.
+This document describes the sellable visual theme package. The directory is intentionally **not standalone**: it requires `modules/addons/Hadrian` to render normal pages.
 
 ## Role
 
-`templates/mytheme` is the plain visual layer:
+`templates/hadrian` is the plain visual layer:
 
 - WHMCS-named entry templates.
 - Smarty page variants.
@@ -15,7 +15,7 @@ This document describes the sellable visual theme package. The directory is inte
 The addon is the protected engine:
 
 - License validation.
-- `$myTheme` runtime variables.
+- `$hadrian` runtime variables.
 - Active style/layout/page variant selection.
 - Admin UI and settings storage.
 
@@ -25,21 +25,21 @@ The template must not be useful without the addon.
 
 Current safeguards:
 
-1. `header.tpl` checks `$myTheme.license.canRender`.
+1. `header.tpl` checks `$hadrian.license.canRender`.
 2. If the addon is missing or unlicensed, normal output is wrapped in a hidden container.
 3. `footer.tpl` closes only the license-required screen in the blocked state.
 4. `error/license-required.tpl` displays the commercial license message.
-5. `core/mytheme.php` contains the per-template secret and must be encoded for production.
+5. `core/hadrian.php` contains the per-template secret and must be encoded for production.
 6. `theme.json` declares `commercial.licenseRequired` and the `renderGuard` contract.
 
-Production requirement: set `core/mytheme.php` `dev_mode` to `false` before encoding.
+Production requirement: set `core/hadrian.php` `dev_mode` to `false` before encoding.
 
 ## Current structure
 
 ```text
-templates/mytheme/
+templates/hadrian/
 ├── theme.json                         # manifest consumed by addon
-├── core/mytheme.php                   # per-template config + license secret, encoded in production
+├── core/hadrian.php                   # per-template config + license secret, encoded in production
 ├── header.tpl                         # layout shell + license guard
 ├── footer.tpl                         # layout shell close + license guard close
 ├── *.tpl                              # WHMCS entry dispatchers
@@ -67,8 +67,8 @@ Every WHMCS-named root template should stay tiny. It checks whether the addon se
 Example:
 
 ```smarty
-{if isset($myTheme.pages.clientareahome.fullPath) && $myTheme.pages.clientareahome.fullPath && file_exists("templates/`$myTheme.pages.clientareahome.fullPath`")}
-    {include file="`$myTheme.pages.clientareahome.fullPath`"}
+{if isset($hadrian.pages.clientareahome.fullPath) && $hadrian.pages.clientareahome.fullPath && file_exists("templates/`$hadrian.pages.clientareahome.fullPath`")}
+    {include file="`$hadrian.pages.clientareahome.fullPath`"}
 {else}
     {include file="`$template`/core/pages/clientareahome/default/default.tpl"}
 {/if}
@@ -94,7 +94,7 @@ This is the key bridge between the admin addon and the visual theme.
 
 When adding a new WHMCS page:
 
-1. Add root dispatcher: `templates/mytheme/<templatefile>.tpl`.
+1. Add root dispatcher: `templates/hadrian/<templatefile>.tpl`.
 2. Add default implementation: `core/pages/<templatefile>/default/default.tpl`.
 3. Add metadata: `core/pages/<templatefile>/page.php`.
 4. Add variant options if needed: `core/pages/<templatefile>/default/pageoption.php`.
@@ -151,8 +151,8 @@ Keep `overwrites/` available, but document exactly which override files are supp
 Ship two folders together:
 
 ```text
-modules/addons/MyTheme/
-templates/mytheme/
+modules/addons/Hadrian/
+templates/hadrian/
 ```
 
 The sales package should fail gracefully if either piece is missing, but normal rendering should require both.

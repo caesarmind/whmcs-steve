@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Typography &mdash; System Font Face + Apple-first mix (proposal mock)</title>
+
+<!-- Inter loaded so the "Default" preview genuinely shows Inter on any OS,
+     exactly like the deployed theme does (bundled InterVariable.woff2). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap">
+
+<style>
+:root{
+  --bg:#f5f5f7; --surface:#ffffff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#86868b;
+  --border:#e8e8ed; --border2:#d2d2d7; --accent:#0071e3; --accent-soft:rgba(0,113,227,.08);
+  --green:#248a3d; --green-bg:rgba(48,209,88,.12);
+  --radius:14px; --admin-font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--ink);font-family:var(--admin-font);
+  line-height:1.5;padding:40px 20px 100px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1060px;margin:0 auto;}
+
+/* ---- breadcrumb / heading ---- */
+.crumb{font-size:13px;color:var(--ink3);margin-bottom:6px;}
+.crumb b{color:var(--ink2);font-weight:600;}
+h1{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-bottom:4px;}
+.sub{color:var(--ink2);font-size:15px;margin-bottom:22px;max-width:760px;}
+.sub b{color:var(--ink);font-weight:600;} .sub em{font-style:italic;color:var(--ink2);}
+
+.note{display:flex;gap:10px;align-items:flex-start;background:#fff8e6;border:1px solid #f5e2a8;
+  color:#7a5b00;border-radius:12px;padding:12px 14px;font-size:13.5px;margin-bottom:26px;}
+.note b{color:#5c4400;}
+
+/* ---- two column ---- */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start;}
+@media(max-width:880px){.cols{grid-template-columns:1fr;}}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:0 0 0 .5px rgba(0,0,0,.02),0 1px 2px rgba(0,0,0,.03);overflow:hidden;}
+.card-h{padding:16px 20px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;
+  letter-spacing:.02em;text-transform:uppercase;color:var(--ink2);}
+.card-b{padding:18px 20px;}
+
+/* ---- option rows: clickable card + checkbox-style selector (single active) ---- */
+.opt{display:block;border:1px solid var(--border);border-radius:12px;padding:13px 15px;
+  margin-bottom:10px;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s;position:relative;}
+.opt:hover{border-color:var(--border2);}
+.opt.is-active{border-color:var(--accent);background:var(--accent-soft);
+  box-shadow:0 0 0 3px rgba(0,113,227,.12);}
+.opt-row{display:flex;align-items:center;gap:11px;}
+/* the radio is visually a rounded check box; selected state filled via .is-active */
+.opt input[type=radio]{appearance:none;-webkit-appearance:none;width:19px;height:19px;flex:none;
+  border:2px solid var(--border2);border-radius:6px;cursor:pointer;position:relative;transition:all .15s;margin:0;}
+.opt.is-active input[type=radio]{border-color:var(--accent);background:var(--accent);}
+.opt.is-active input[type=radio]::after{content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
+.opt-title{font-size:14.5px;font-weight:600;}
+.opt-title em{font-style:normal;font-weight:400;color:var(--ink3);font-size:13px;}
+.opt-help{margin:7px 0 0 30px;font-size:12.5px;color:var(--ink2);line-height:1.45;}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:980px;
+  background:var(--green-bg);color:var(--green);margin-left:8px;vertical-align:middle;}
+.badge.blue{background:var(--accent-soft);color:var(--accent);}
+
+/* dependent control under an option */
+.dep{margin:10px 0 2px 30px;}
+.dep select,.dep input[type=text]{width:100%;font:inherit;font-size:13.5px;color:var(--ink);
+  background:#fff;border:1px solid var(--border2);border-radius:9px;padding:8px 10px;}
+.dep[hidden]{display:none;}
+.dep.is-disabled{opacity:.4;pointer-events:none;}
+.dep-sub{margin:8px 0 4px 25px;}
+.dep-sub[hidden]{display:none;}
+
+/* checkbox rows (Apple-first; custom load sources) */
+.mix-check{display:flex;align-items:flex-start;gap:8px;margin-top:10px;font-size:12.5px;
+  color:var(--ink2);cursor:pointer;line-height:1.4;}
+.mix-check input{width:16px;height:16px;margin-top:1px;accent-color:var(--accent);flex:none;}
+.mix-check b{color:var(--ink);font-weight:600;} .mix-check em{font-style:normal;color:var(--ink3);}
+.cust-lead{font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.03em;margin-top:14px;margin-bottom:6px;}
+.cust-note{font-size:11.5px;color:var(--ink3);margin-top:10px;line-height:1.4;}
+
+.newpill{position:absolute;top:-9px;right:12px;background:var(--accent);color:#fff;font-size:10.5px;
+  font-weight:700;letter-spacing:.04em;padding:2px 9px;border-radius:980px;text-transform:uppercase;}
+
+/* ---- preview pane ---- */
+.pv-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.chip{font-size:12px;font-weight:600;padding:5px 11px;border-radius:980px;border:1px solid var(--border);
+  background:#fafafa;color:var(--ink2);display:inline-flex;align-items:center;gap:6px;}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:#c7c7cc;}
+.chip.ok .dot{background:#30d158;} .chip.warn .dot{background:#ff9f0a;}
+.chip.net-none{color:var(--green);} .chip.net-dl{color:#c27400;}
+
+.preview{font-family:var(--demo-font);}
+.pv-eyebrow{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+.pv-h{font-size:26px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px;}
+.pv-p{font-size:14.5px;color:var(--ink2);margin-bottom:16px;}
+.pv-mini{display:flex;gap:18px;font-size:13px;color:var(--ink2);margin-bottom:18px;flex-wrap:wrap;}
+.pv-mini b{color:var(--ink);font-weight:600;}
+.pv-btn{display:inline-flex;align-items:center;height:38px;padding:0 20px;background:var(--accent);
+  color:#fff;border:0;border-radius:980px;font:inherit;font-size:14px;font-weight:500;cursor:pointer;}
+.pv-stack{margin-top:16px;font-size:11.5px;color:var(--ink3);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:#fafafa;border:1px solid var(--border);border-radius:8px;padding:9px 11px;word-break:break-word;line-height:1.5;}
+
+/* ---- resolves-to per-OS breakdown (admin font, sits outside .preview) ---- */
+.resolves{margin-top:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.resolves .rh{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);
+  padding:8px 12px;background:#fafafa;border-bottom:1px solid var(--border);}
+.resolves .row{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);}
+.resolves .row:last-child{border-bottom:0;}
+.resolves .row.you{background:var(--accent-soft);}
+.resolves .plat{display:flex;align-items:center;gap:8px;color:var(--ink2);font-weight:500;}
+.resolves .you-tag{font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+  color:var(--accent);background:#fff;border:1px solid var(--accent);border-radius:980px;padding:1px 6px;}
+.resolves .val{font-weight:600;color:var(--ink);text-align:right;}
+
+/* verdict: is the current config equivalent to Default? */
+.verdict{margin-top:14px;border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.45;
+  border:1px solid var(--border);background:#fafafa;color:var(--ink2);}
+.verdict.match{border-color:#bfe6c8;background:var(--green-bg);color:var(--green);}
+.verdict b{color:inherit;font-weight:700;}
+
+/* ---- rebuild Default recipe ---- */
+.rebuild-link{color:var(--accent);font-weight:600;text-decoration:none;}
+.rebuild-link:hover{text-decoration:underline;}
+.rebuild{margin-top:24px;scroll-margin-top:20px;}
+.rebuild h2{font-size:17px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px;}
+.rebuild .lead{font-size:13.5px;color:var(--ink2);margin-bottom:18px;max-width:700px;}
+.rebuild .lead b{color:var(--ink);font-weight:600;}
+.recipe{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.step{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--border);
+  border-radius:11px;background:#fafafa;transition:border-color .15s,background .15s;}
+.step.done{border-color:#bfe6c8;background:var(--green-bg);}
+.step .tick{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--ink3);
+  background:#fff;transition:all .15s;}
+.step.done .tick{border-color:var(--green);background:var(--green);color:#fff;}
+.step .stxt{font-size:13.5px;color:var(--ink);line-height:1.4;}
+.step .stxt b{font-weight:600;}
+.step .stxt em{font-style:normal;color:var(--ink3);font-size:12.5px;display:block;margin-top:2px;}
+.recipe-eq{font-size:13px;color:var(--ink2);padding-left:4px;}
+.recipe-eq b{color:var(--ink);font-weight:600;}
+.rebuild-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px;}
+.rebuild-btn{display:inline-flex;align-items:center;height:38px;padding:0 20px;background:var(--accent);
+  color:#fff;border:0;border-radius:980px;font:inherit;font-size:14px;font-weight:500;cursor:pointer;}
+.rebuild-status{font-size:13px;font-weight:600;color:var(--ink3);}
+.rebuild-status.ok{color:var(--green);}
+
+/* ---- side-by-side comparison ---- */
+.compare{margin-top:24px;}
+.compare h2{font-size:17px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px;}
+.compare .sub2{font-size:13.5px;color:var(--ink2);margin-bottom:16px;}
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:880px){.cmp-grid{grid-template-columns:1fr;}}
+.cmp{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:#fff;}
+.cmp .lbl{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;margin-bottom:2px;}
+.cmp .who{font-size:12px;color:var(--ink3);margin-bottom:12px;}
+.cmp.inter .lbl{color:var(--accent);} .cmp.system .lbl{color:var(--green);}
+.cmp .big{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.15;margin-bottom:8px;}
+.cmp .glyphs{font-size:22px;letter-spacing:.02em;margin-bottom:8px;}
+.cmp .pg{font-size:14px;color:var(--ink2);}
+.font-inter{font-family:"Inter",sans-serif;}
+.font-system{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,Helvetica,Arial,sans-serif;}
+
+.foot{margin-top:30px;font-size:13px;color:var(--ink3);text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="crumb"><b>Hadrian</b> &rsaquo; Styles &rsaquo; <b>Typography</b></div>
+  <h1>Font Family</h1>
+  <p class="sub"><b>Default stays</b> as a one&#8209;click preset. The point of the new options is that you can <b>rebuild exactly what Default does</b> yourself &mdash; it's just <b>Self&#8209;hosted &rarr; Inter</b> + the <b>Apple&#8209;first</b> checkbox. Scroll to <a href="#rebuild" class="rebuild-link">Rebuild "Default"</a> for the step&#8209;by&#8209;step path; the ticks light up as your selection matches.</p>
+
+  <div class="note">
+    <span>&#9888;</span>
+    <div><b>Static mock</b>, not wired to the admin. The Apple&#8209;first checkbox only changes what <em>Apple</em> visitors see &mdash; so on your machine the rendered preview won't move. Use the <b>Resolves to</b> panel below the preview: it shows what every OS gets. <span id="osline">detecting your OS&hellip;</span></div>
+  </div>
+
+  <div class="cols">
+
+    <!-- LEFT: the control -->
+    <div class="card">
+      <div class="card-h">Font Family &mdash; source</div>
+      <div class="card-b">
+
+        <label class="opt" data-mode="default">
+          <div class="opt-row">
+            <input type="radio" name="ffmode" value="default" checked>
+            <span class="opt-title">Default <em>&mdash; San Francisco on Apple, bundled Inter elsewhere</em></span>
+          </div>
+          <div class="opt-help">A built&#8209;in mix: native on Apple, bundled <code>Inter</code> on every other platform. <b>It's just a preset</b> &mdash; the identical result is buildable from the options below. <a href="#rebuild" class="rebuild-link">See how &darr;</a></div>
+        </label>
+
+        <label class="opt" data-mode="system">
+          <span class="newpill">New</span>
+          <div class="opt-row">
+            <input type="radio" name="ffmode" value="system">
+            <span class="opt-title">System fonts <span class="badge">No external download</span></span>
+          </div>
+          <div class="opt-help">Each visitor's own OS font &mdash; <b>Segoe UI</b> on Windows, <b>San Francisco</b> on Mac, system default on Linux. Nothing to fetch. Edit the stack below to fine&#8209;tune it.</div>
+          <div class="dep is-disabled" data-dep="system" hidden>
+            <input type="text" id="systemInp" placeholder="system font stack" value="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+          </div>
+        </label>
+
+        <label class="opt" data-mode="google">
+          <div class="opt-row">
+            <input type="radio" name="ffmode" value="google">
+            <span class="opt-title">Google Font <span class="badge blue">external request</span></span>
+          </div>
+          <div class="dep is-disabled" data-dep="google" hidden>
+            <select id="googleSel">
+              <option value="Roboto">Roboto</option>
+              <option value="Open Sans">Open Sans</option>
+              <option value="Poppins">Poppins</option>
+              <option value="Montserrat">Montserrat</option>
+              <option value="Lato">Lato</option>
+              <option value="Manrope">Manrope</option>
+            </select>
+            <div class="cust-lead">How it's written into the system</div>
+            <input type="text" id="googleStack" value="'Roboto', system-ui, sans-serif">
+            <div class="cust-note">Auto&#8209;filled from the font above &mdash; edit to change the fallback, or put the system font first for an Apple&#8209;first mix.</div>
+          </div>
+        </label>
+
+        <label class="opt" data-mode="folder">
+          <div class="opt-row">
+            <input type="radio" name="ffmode" value="folder">
+            <span class="opt-title">Self&#8209;hosted font <em>&mdash; a font file in /assets/fonts</em></span>
+          </div>
+          <div class="dep is-disabled" data-dep="folder" hidden>
+            <input type="text" id="folderName" placeholder="Font face name, e.g. Inter or BrandSans" value="Inter">
+            <label class="mix-check">
+              <input type="checkbox" id="folderApple">
+              <span><b>Keep the device's system font on Apple</b> <em id="folderHint">&mdash; your font only on Windows/Linux</em></span>
+            </label>
+            <div class="cust-lead">How it's written into the system</div>
+            <input type="text" id="folderStack" value="'Inter', system-ui, sans-serif">
+            <div class="cust-note">Auto&#8209;filled from the name (+ Apple&#8209;first) above &mdash; edit to change the fallback.</div>
+          </div>
+        </label>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: live preview -->
+    <div class="card">
+      <div class="card-h">Live preview</div>
+      <div class="card-b">
+        <div class="pv-meta">
+          <span class="chip" id="chipOs"><span class="dot"></span> <span>OS</span></span>
+          <span class="chip" id="chipFace"><span class="dot"></span> <span>face</span></span>
+          <span class="chip" id="chipNet"><span class="dot"></span> <span>network</span></span>
+        </div>
+
+        <div class="preview" id="preview">
+          <div class="pv-eyebrow">Service overview</div>
+          <div class="pv-h">Cloud VPS &mdash; Frankfurt</div>
+          <p class="pv-p">Your plan renews on 12 July 2026. Manage resources, upgrade, or open a ticket below.</p>
+          <div class="pv-mini">
+            <div>Status <b>Active</b></div>
+            <div>vCPU <b>4</b></div>
+            <div>RAM <b>8 GB</b></div>
+            <div>Price <b>$19.00/mo</b></div>
+          </div>
+          <button class="pv-btn">Manage service</button>
+          <div class="pv-stack" id="stackText">--font-family: &hellip;</div>
+        </div>
+
+        <div class="resolves" id="resolves">
+          <div class="rh">Resolves to, by visitor OS</div>
+          <div class="row" data-plat="apple"><span class="plat">Apple (Mac / iOS)</span><span class="val"></span></div>
+          <div class="row" data-plat="windows"><span class="plat">Windows</span><span class="val"></span></div>
+          <div class="row" data-plat="linux"><span class="plat">Linux</span><span class="val"></span></div>
+        </div>
+
+        <div class="verdict" id="verdict"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- REBUILD DEFAULT -->
+  <div class="card rebuild" id="rebuild">
+    <div class="card-b">
+      <h2>Rebuild &ldquo;Default&rdquo; from the configurator</h2>
+      <p class="lead"><b>Default stays</b> as a one&#8209;click preset &mdash; but it isn't magic. It's exactly the two settings below. Set them yourself, or hit <b>Apply</b>, and the live preview + verdict become byte&#8209;for&#8209;byte Default. The ticks below light up as each step matches your current selection in the panel above.</p>
+      <div class="recipe">
+        <div class="step" id="step1">
+          <span class="tick">1</span>
+          <span class="stxt"><b>Source:</b> pick <b>Self&#8209;hosted font</b> and type <b>Inter</b><em>The theme's own Inter file, self&#8209;hosted &mdash; nothing is fetched from a third party.</em></span>
+        </div>
+        <div class="step" id="step2">
+          <span class="tick">2</span>
+          <span class="stxt"><b>Apple&#8209;first:</b> tick <b>Keep the device's system font on Apple</b><em>San Francisco wins on Apple; Inter loads only on Windows / Linux.</em></span>
+        </div>
+      </div>
+      <div class="recipe-eq">= <b>San Francisco</b> on Apple &middot; <b>bundled Inter</b> on Windows/Linux &middot; <b>0 external requests</b> &mdash; the Default mix, exactly.</div>
+      <div class="rebuild-actions">
+        <button class="rebuild-btn" id="rebuildBtn">Apply these settings</button>
+        <span class="rebuild-status" id="rebuildStatus">0 of 2 steps match.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDE BY SIDE -->
+  <div class="card compare">
+    <div class="card-b">
+      <h2>Letterforms: Inter vs the system font (rendered live)</h2>
+      <p class="sub2">Same words, same size. Left = what a bundled font (Inter) looks like; right = your OS font. Look at <b>a g R 1 l I</b> and the overall rhythm &mdash; this is the visual cost/benefit of bundling vs. going native.</p>
+      <div class="cmp-grid">
+        <div class="cmp inter">
+          <div class="lbl">Bundled (Inter)</div>
+          <div class="who">downloaded &middot; identical on every OS</div>
+          <div class="big font-inter">Hostnodes Cloud</div>
+          <div class="glyphs font-inter">a g R 1 l I 0 Q &amp; @ ?</div>
+          <div class="pg font-inter">The quick brown fox jumps over 12 lazy dogs.</div>
+        </div>
+        <div class="cmp system">
+          <div class="lbl">System font</div>
+          <div class="who" id="cmpWho">your OS font &middot; zero download</div>
+          <div class="big font-system">Hostnodes Cloud</div>
+          <div class="glyphs font-system">a g R 1 l I 0 Q &amp; @ ?</div>
+          <div class="pg font-system">The quick brown fox jumps over 12 lazy dogs.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">Mock for review &middot; hadrian/docs/typography-system-font-demo.html</p>
+</div>
+
+<script>
+(function(){
+  var APPLE   = "-apple-system, BlinkMacSystemFont";
+  var SYS_TAIL= "Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif";
+  var GOOGLE_FALLBACK = "system-ui, sans-serif";
+  var STACKS = {
+    "default": APPLE + ", 'SF Pro Display','SF Pro Text', 'Inter', 'Segoe UI', " + SYS_TAIL,
+    "system":  "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+  };
+
+  // ---- detect OS so copy + the "you" row are accurate ----
+  var plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+  var youKey = /win/i.test(plat) ? "windows" : (/mac/i.test(plat) ? "apple" : (/linux/i.test(plat) ? "linux" : "windows"));
+  var osName = {windows:"Windows", apple:"macOS", linux:"Linux"}[youKey];
+  var sysFace = {apple:"San Francisco", windows:"Segoe UI", linux:"system default"};
+
+  document.getElementById("osline").textContent = "You're on " + osName + ", so the highlighted row below is what you see.";
+  document.getElementById("cmpWho").textContent = osName + " -> " + sysFace[youKey] + " . zero download";
+
+  var el = {
+    preview:    document.getElementById("preview"),
+    stack:      document.getElementById("stackText"),
+    chipOs:     document.getElementById("chipOs"),
+    chipFace:   document.getElementById("chipFace"),
+    chipNet:    document.getElementById("chipNet"),
+    systemInp:  document.getElementById("systemInp"),
+    google:     document.getElementById("googleSel"),
+    googleStack:document.getElementById("googleStack"),
+    folder:     document.getElementById("folderName"),
+    folderApple:document.getElementById("folderApple"),
+    folderHint: document.getElementById("folderHint"),
+    folderStack:document.getElementById("folderStack"),
+    resolves:   document.getElementById("resolves"),
+    verdict:    document.getElementById("verdict"),
+    step1:      document.getElementById("step1"),
+    step2:      document.getElementById("step2"),
+    rebuildStatus: document.getElementById("rebuildStatus")
+  };
+  var injected = {};
+  el.chipOs.querySelector("span:last-child").textContent = osName;
+
+  function injectGoogle(name){
+    if(!name || injected[name]) return; injected[name] = true;
+    var l = document.createElement("link"); l.rel = "stylesheet";
+    l.href = "https://fonts.googleapis.com/css2?family=" + encodeURIComponent(name) + ":wght@300;400;500;600;700&display=swap";
+    document.head.appendChild(l);
+  }
+
+  function compute(mode){
+    if(mode === "system"){
+      return { stack: el.systemInp.value.trim() || STACKS.system,
+        res:{apple:"San Francisco", windows:"Segoe UI", linux:"system default"},
+        net:"0 external font requests", netClass:"net-none ok" };
+    }
+    if(mode === "google"){
+      var g = el.google.value; injectGoogle(g);
+      var gstack = el.googleStack.value.trim() || googleStackFor(g);
+      var appleFirst = /^\s*(-apple-system|BlinkMacSystemFont)/.test(gstack);
+      return { stack: gstack,
+        res:{ apple: appleFirst ? "San Francisco" : g, windows:g, linux:g },
+        net: appleFirst ? "downloads " + g + " on non-Apple only" : "downloads " + g + " on every OS",
+        netClass:"net-dl warn" };
+    }
+    if(mode === "folder"){
+      var f = el.folder.value.trim() || "your font";
+      var fstack = el.folderStack.value.trim() || ("'" + f + "', system-ui, sans-serif");
+      var appleFirst = /^\s*(-apple-system|BlinkMacSystemFont)/.test(fstack);
+      var bundled = (f.toLowerCase() === "inter");
+      return { stack: fstack,
+        res:{ apple: appleFirst ? "San Francisco" : f, windows:f, linux:f },
+        net: bundled ? "0 external requests (bundled)" : "self-hosted on your server",
+        netClass: bundled ? "net-none ok" : "" };
+    }
+    // default
+    return { stack:STACKS["default"],
+      res:{apple:"San Francisco", windows:"Inter", linux:"Inter"},
+      net:"downloads InterVariable.woff2 on non-Apple", netClass:"net-dl warn" };
+  }
+
+  function renderResolves(res){
+    el.resolves.querySelectorAll(".row").forEach(function(row){
+      var p = row.getAttribute("data-plat");
+      row.querySelector(".val").textContent = res[p];
+      var you = (p === youKey);
+      row.classList.toggle("you", you);
+      var platEl = row.querySelector(".plat");
+      var tag = platEl.querySelector(".you-tag");
+      if(you && !tag){ var s = document.createElement("span"); s.className = "you-tag"; s.textContent = "you"; platEl.appendChild(s); }
+      if(!you && tag){ tag.remove(); }
+    });
+  }
+
+  function apply(mode){
+    var r = compute(mode);
+    el.preview.style.setProperty("--demo-font", r.stack);
+    el.stack.textContent = "--font-family: " + r.stack;
+    el.chipFace.querySelector("span:last-child").textContent = r.faceLabel || r.res[youKey];
+    el.chipNet.className = "chip " + r.netClass;
+    el.chipNet.querySelector("span:last-child").textContent = r.net;
+    renderResolves(r.res);
+    el.folderHint.textContent = "— " + (el.folder.value.trim() || "your font") + " only on Windows/Linux";
+
+    // verdict: have we reconstructed Default from configurator primitives?
+    var folderIsInter = el.folder.value.trim().toLowerCase() === "inter";
+    var matchesDefault = (mode === "default") ||
+      (mode === "folder" && folderIsInter && el.folderApple.checked);
+    if(matchesDefault){
+      el.verdict.className = "verdict match";
+      el.verdict.innerHTML = "&#10003; <b>Identical to Default</b> &mdash; San Francisco on Apple, bundled Inter on every other platform, zero external requests. You've rebuilt the Default preset from the configurator's own parts.";
+    } else {
+      el.verdict.className = "verdict";
+      el.verdict.innerHTML = "To rebuild <b>Default</b>: pick <b>Self&#8209;hosted font</b>, type <b>Inter</b>, and tick <b>Keep the device's system font on Apple</b> &mdash; or use the recipe below.";
+    }
+
+    updateRebuild(mode);
+  }
+
+  function updateRebuild(mode){
+    var inFolder = (mode === "folder");
+    var isInter  = el.folder.value.trim().toLowerCase() === "inter";
+    var s1 = inFolder && isInter;
+    var s2 = inFolder && el.folderApple.checked;
+    el.step1.classList.toggle("done", s1);
+    el.step2.classList.toggle("done", s2);
+    el.step1.querySelector(".tick").innerHTML = s1 ? "&#10003;" : "1";
+    el.step2.querySelector(".tick").innerHTML = s2 ? "&#10003;" : "2";
+    if(s1 && s2){
+      el.rebuildStatus.className = "rebuild-status ok";
+      el.rebuildStatus.innerHTML = "&#10003; Rebuilt &mdash; byte-for-byte Default.";
+    } else if(mode === "default"){
+      el.rebuildStatus.className = "rebuild-status";
+      el.rebuildStatus.textContent = "You're on the Default preset — hit Apply to build the identical result from the parts.";
+    } else {
+      el.rebuildStatus.className = "rebuild-status";
+      el.rebuildStatus.textContent = ((s1 ? 1 : 0) + (s2 ? 1 : 0)) + " of 2 steps match.";
+    }
+  }
+
+  var opts = document.querySelectorAll(".opt");
+  function refresh(){
+    var mode = document.querySelector("input[name=ffmode]:checked").value;
+    opts.forEach(function(o){
+      var active = o.getAttribute("data-mode") === mode;
+      o.classList.toggle("is-active", active);
+      var dep = o.querySelector(".dep");
+      if(dep){ dep.hidden = !active; dep.classList.toggle("is-disabled", !active); }
+    });
+    apply(mode);
+  }
+
+  document.querySelectorAll("input[name=ffmode]").forEach(function(x){ x.addEventListener("change", refresh); });
+  el.systemInp.addEventListener("input", function(){ apply("system"); });
+  el.google.addEventListener("change", function(){ setLeadFont(el.google.value, el.googleStack); apply("google"); });
+  el.googleStack.addEventListener("input", function(){ apply("google"); });
+  el.folder.addEventListener("input", function(){ buildFolderStack(); apply("folder"); });
+  el.folderApple.addEventListener("change", function(){ buildFolderStack(); apply("folder"); });
+  el.folderStack.addEventListener("input", function(){ apply("folder"); });
+  // Keep the stack's FIRST font in sync with the font being loaded (Google),
+  // preserving the user's fallback tail (everything from the first comma on).
+  function setLeadFont(name, inputEl){
+    name = (name || "").trim();
+    if(!name) return;
+    var cur = inputEl.value;
+    var idx = cur.indexOf(",");
+    var tail = idx >= 0 ? cur.slice(idx) : ", sans-serif";
+    inputEl.value = "'" + name + "'" + tail;
+  }
+  function googleStackFor(g){ return "'" + g + "', " + GOOGLE_FALLBACK; }
+  function buildFolderStack(){
+    var name = el.folder.value.trim() || "your font";
+    el.folderStack.value = (el.folderApple.checked ? APPLE + ", " : "") + "'" + name + "', system-ui, sans-serif";
+  }
+
+  document.getElementById("rebuildBtn").addEventListener("click", function(){
+    document.querySelector("input[name=ffmode][value=folder]").checked = true;
+    el.folder.value = "Inter";
+    el.folderApple.checked = true;
+    buildFolderStack();
+    refresh();
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

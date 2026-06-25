@@ -1,0 +1,89 @@
+<?php
+declare(strict_types=1);
+
+namespace Hadrian\Controller\Admin;
+
+use Hadrian\Controller\AbstractController;
+
+/**
+ * Admin entry point. Delegates by ?action= to a sub-controller.
+ *
+ * Routes:
+ *   ?action=index            → Info (default landing)
+ *   ?action=info             → Info (alias)
+ *   ?action=settings         → addon-wide settings
+ *   ?action=styles           → style picker
+ *   ?action=editStyle        → style editor (color groups, typography, etc.)
+ *   ?action=layouts          → layout picker
+ *   ?action=pages            → pages list (default sub=index, ?sub=edit, ?sub=save)
+ *   ?action=sitemap          → sitemap.xml + robots.txt (sub=save|generate|preview)
+ *   ?action=menu             → menu list
+ *   ?action=editMenu         → menu editor (drag-drop tree)
+ *   ?action=branding         → logo / favicon uploads
+ *   ?action=extensions       → theme extensions
+ *   ?action=tools            → cache, license refresh, htaccess gen
+ *   ?action=templates        → list installed templates (rare)
+ *   ?action=template         → single template config (sub-view)
+ *   ?action=license          → license key entry
+ */
+final class MainController extends AbstractController
+{
+    /** Default landing — Info page (mirrors Lagom). */
+    public function indexAction(): string      { return (new InfoController())->indexAction(); }
+    public function infoAction(): string       { return (new InfoController())->indexAction(); }
+    public function settingsAction(): string   { return (new SettingsController())->indexAction(); }
+    public function stylesAction(): string     { return (new StylesController())->indexAction(); }
+    public function editStyleAction(): string  { return (new StylesController())->editAction(); }
+    public function layoutsAction(): string    { return (new LayoutsController())->indexAction(); }
+    public function pagesAction(): string
+    {
+        $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');
+        $ctl = new PagesController();
+        return match ($sub) {
+            'edit' => $ctl->editAction(),
+            'save' => $ctl->saveAction(),
+            default => $ctl->indexAction(),
+        };
+    }
+    public function sitemapAction(): string
+    {
+        $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');
+        $ctl = new SitemapController();
+        return match ($sub) {
+            'save'     => $ctl->saveAction(),
+            'generate' => $ctl->generateAction(),
+            'preview'  => $ctl->previewAction(),
+            default    => $ctl->indexAction(),
+        };
+    }
+    public function menuAction(): string
+    {
+        $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');
+        $ctl = new MenuController();
+        return match ($sub) {
+            'edit'           => $ctl->editAction(),
+            'save'           => $ctl->saveAction(),
+            'delete'         => $ctl->deleteAction(),
+            'seed'           => $ctl->seedAction(),
+            'reset-defaults' => $ctl->resetDefaultsAction(),
+            'diagnose'       => $ctl->diagnoseAction(),
+            'create'         => $ctl->createAction(),
+            default          => $ctl->indexAction(),
+        };
+    }
+    public function editMenuAction(): string   { return (new MenuController())->editAction(); }
+    public function brandingAction(): string
+    {
+        $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');
+        $ctl = new BrandingController();
+        return match ($sub) {
+            'remove' => $ctl->removeAction(),
+            default  => $ctl->indexAction(),
+        };
+    }
+    public function extensionsAction(): string { return (new ExtensionsController())->indexAction(); }
+    public function toolsAction(): string      { return (new ToolsController())->indexAction(); }
+    public function templatesAction(): string  { return (new TemplatesController())->indexAction(); }
+    public function templateAction(): string   { return (new TemplatesController())->showAction(); }
+    public function licenseAction(): string    { return (new LicenseController())->indexAction(); }
+}
