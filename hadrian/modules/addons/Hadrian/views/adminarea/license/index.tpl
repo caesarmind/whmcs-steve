@@ -21,36 +21,7 @@
     <div class="mt-alert mt-alert-danger"><strong>Not active.</strong> This license key is not valid for this domain.</div>
 {/if}
 
-{* Enforcement — what the front-end hook last decided to do *}
 <div class="mt-panel" style="max-width:560px;">
-<section class="mt-section">
-    <header class="mt-section-header">
-        <h2 class="mt-section-title">Enforcement</h2>
-    </header>
-    <dl class="mt-deflist">
-        <dt>Mode</dt>
-        <dd>
-            {if $enforce === true}<span class="mt-badge mt-badge-success">Enforcing</span>
-            {elseif $enforce === false}<span class="mt-badge mt-badge-warning">Dry-run (not enforcing)</span>
-            {else}<span class="mt-badge mt-badge-neutral">Hook not detected yet</span>{/if}
-        </dd>
-
-        <dt>Current decision</dt>
-        <dd>
-            {if $decLevel == 'success'}<span class="mt-badge mt-badge-success">OK</span>
-            {elseif $decLevel == 'danger'}<span class="mt-badge mt-badge-danger">Reverted</span>
-            {elseif $decLevel == 'warning'}<span class="mt-badge mt-badge-warning">Attention</span>
-            {else}<span class="mt-badge mt-badge-neutral">&mdash;</span>{/if}
-            <div class="mt-field-help">{$decText|escape}</div>
-        </dd>
-
-        {if $reverted}
-        <dt>Active template</dt>
-        <dd><span class="mt-badge mt-badge-danger">Default (six)</span> <span class="mt-text-3">the theme is currently reverted</span></dd>
-        {/if}
-    </dl>
-</section>
-
 {* Key entry *}
 <section class="mt-section">
     <header class="mt-section-header">
