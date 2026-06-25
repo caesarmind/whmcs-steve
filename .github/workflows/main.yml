@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'mytheme/modules/addons/Hadrian/**'
-      - 'mytheme/templates/hadrian/**'
+      - 'hadrian/modules/addons/Hadrian/**'
+      - 'hadrian/templates/hadrian/**'
       - 'hadrian_cart/**'
       - '.github/workflows/main.yml'
   workflow_dispatch:
@@ -45,47 +45,49 @@ jobs:
 
           SSH="ssh -i $HOME/.ssh/id_ed25519 -p $REMOTE_PORT -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST"
 
-          # ─────────────────────────────────────────────────────────────
-          # PASS 1: mytheme/  →  $REMOTE_BASE/  (strip "mytheme/" prefix)
-          #   mytheme/templates/mytheme/header.tpl → templates/mytheme/header.tpl
-          #   mytheme/modules/addons/MyTheme/x.php → modules/addons/MyTheme/x.php
-          # ─────────────────────────────────────────────────────────────
-          CHANGED_MAIN=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'mytheme/**' | grep -v '/\.' || true)
-          DELETED_MAIN=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'mytheme/**' | grep -v '/\.' || true)
+          # --------------------------------------------------------------
+          # PASS 1: hadrian/  ->  $REMOTE_BASE/  (strip "hadrian/" prefix)
+          #   hadrian/templates/hadrian/header.tpl  -> templates/hadrian/header.tpl
+          #   hadrian/modules/addons/Hadrian/x.php  -> modules/addons/Hadrian/x.php
+          # "hadrian/" is the repo container folder; it is stripped on deploy,
+          # so the server tree is modules/addons/Hadrian + templates/hadrian.
+          # --------------------------------------------------------------
+          CHANGED_MAIN=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'hadrian/**' | grep -v '/\.' || true)
+          DELETED_MAIN=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'hadrian/**' | grep -v '/\.' || true)
 
           if [ -n "$CHANGED_MAIN" ]; then
-            echo "=== Uploading mytheme/ changes ==="
+            echo "=== Uploading hadrian/ changes ==="
             echo "$CHANGED_MAIN"
-            echo "$CHANGED_MAIN" | tar czf - --files-from=- --transform='s|^mytheme/||' \
-              | $SSH "tar xzpf - -C $REMOTE_BASE && echo '✅ mytheme upload complete'"
+            echo "$CHANGED_MAIN" | tar czf - --files-from=- --transform='s|^hadrian/||' \
+              | $SSH "tar xzpf - -C $REMOTE_BASE && echo '✅ hadrian upload complete'"
           fi
 
           if [ -n "$DELETED_MAIN" ]; then
             echo "=== Filtering deletes through safety allowlist ==="
             # SAFETY GUARD: only allow deletes inside the two intended subtrees.
-            # Anything outside (e.g. mytheme/modules/autoload.php, mytheme/init.php)
+            # Anything outside (e.g. hadrian/composer.json, hadrian/custom-page.php)
             # is logged and SKIPPED so it can never reach `rm -f` on the server.
-            SAFE_MAIN=$(echo "$DELETED_MAIN" | grep -E '^mytheme/(modules/addons/(MyTheme|Hadrian)|templates/(mytheme|hadrian))/' || true)
-            BLOCKED=$(echo "$DELETED_MAIN" | grep -vE '^mytheme/(modules/addons/(MyTheme|Hadrian)|templates/(mytheme|hadrian))/' || true)
+            SAFE_MAIN=$(echo "$DELETED_MAIN" | grep -E '^hadrian/(modules/addons/Hadrian|templates/hadrian)/' || true)
+            BLOCKED=$(echo "$DELETED_MAIN" | grep -vE '^hadrian/(modules/addons/Hadrian|templates/hadrian)/' || true)
             if [ -n "$BLOCKED" ]; then
               echo "⚠️  BLOCKED from delete (outside allowed subtrees):"
               echo "$BLOCKED"
             fi
             if [ -n "$SAFE_MAIN" ]; then
-              echo "=== Deleting safe mytheme/ files ==="
+              echo "=== Deleting safe hadrian/ files ==="
               echo "$SAFE_MAIN"
-              DEL=$(echo "$SAFE_MAIN" | sed "s|^mytheme/|rm -f '$REMOTE_BASE/|; s|$|'|")
+              DEL=$(echo "$SAFE_MAIN" | sed "s|^hadrian/|rm -f '$REMOTE_BASE/|; s|$|'|")
               echo "$DEL" | $SSH "bash -s"
             fi
           fi
 
-          # ─────────────────────────────────────────────────────────────
-          # PASS 2: mytheme_cart/  →  $REMOTE_BASE/templates/orderforms/mytheme_cart/
-          #   mytheme_cart/css/x.css → templates/orderforms/mytheme_cart/css/x.css
-          #   mytheme_cart/theme.yaml → templates/orderforms/mytheme_cart/theme.yaml
+          # --------------------------------------------------------------
+          # PASS 2: hadrian_cart/  ->  $REMOTE_BASE/templates/orderforms/hadrian_cart/
+          #   hadrian_cart/css/x.css  -> templates/orderforms/hadrian_cart/css/x.css
+          #   hadrian_cart/theme.yaml -> templates/orderforms/hadrian_cart/theme.yaml
           # PASS 2 is inherently safe — the sed hardcodes the destination
-          # subtree, so deletes can ONLY happen inside templates/orderforms/mytheme_cart/.
-          # ─────────────────────────────────────────────────────────────
+          # subtree, so deletes can ONLY happen inside templates/orderforms/hadrian_cart/.
+          # --------------------------------------------------------------
           CHANGED_CART=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'hadrian_cart/**' | grep -v '/\.' || true)
           DELETED_CART=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'hadrian_cart/**' | grep -v '/\.' || true)
 
@@ -93,7 +95,7 @@ jobs:
             echo "=== Uploading hadrian_cart/ changes ==="
             echo "$CHANGED_CART"
             echo "$CHANGED_CART" | tar czf - --files-from=- --transform='s|^hadrian_cart/|templates/orderforms/hadrian_cart/|' \
-              | $SSH "tar xzpf - -C $REMOTE_BASE && echo '✅ mytheme_cart upload complete'"
+              | $SSH "tar xzpf - -C $REMOTE_BASE && echo '✅ hadrian_cart upload complete'"
           fi
 
           if [ -n "$DELETED_CART" ]; then
