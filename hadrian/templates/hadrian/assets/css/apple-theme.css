@@ -1810,7 +1810,8 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 
 /* --- Features Variant F — Spotlight (single hero feature) --- */
 .hp-feature-spotlight { max-width: 1024px; margin: 0 auto; padding: 80px 22px; }
-.hp-feature-spotlight .spotlight-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; background: linear-gradient(135deg, var(--color-surface-tertiary) 0%, var(--color-border-light) 100%); border-radius: 24px; padding: 56px; }
+/* 1fr 1.2fr / 60px mirror the inline style this rule replaced, so desktop is unchanged. */
+.hp-feature-spotlight .spotlight-inner { display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: center; background: linear-gradient(135deg, var(--color-surface-tertiary) 0%, var(--color-border-light) 100%); border-radius: 24px; padding: 56px; }
 .hp-feature-spotlight .spotlight-text .hp-eyebrow { font-size: var(--text-base); font-weight: var(--fw-semibold); text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-accent); margin-bottom: 12px; }
 .hp-feature-spotlight .spotlight-text h3 { font-size: var(--text-h2); font-weight: var(--fw-semibold); letter-spacing: -0.025em; line-height: 1.1; margin: 0 0 14px; color: var(--color-text-primary); }
 .hp-feature-spotlight .spotlight-text p { font-size: var(--text-xl); color: var(--color-text-secondary); line-height: 1.55; margin: 0 0 24px; }

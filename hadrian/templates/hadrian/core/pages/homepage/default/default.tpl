@@ -133,7 +133,10 @@
 {* 5. OpenPanel spotlight *}
 <div style="background: var(--color-surface-secondary);">
 <section class="hp-feature-spotlight" style="padding: 72px 22px;">
-    <div class="spotlight-inner" style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: center;">
+    {* Grid lives in apple-theme.css (.hp-feature-spotlight .spotlight-inner) — an
+       inline grid-template-columns here outranks the max-width:820px stack rule,
+       which kept this section 2-up on phones and overflowed the page by 329px. *}
+    <div class="spotlight-inner">
         <div>
             <div class="hp-eyebrow" style="color: var(--color-accent);">{$hadrianLang.home.spotEyebrow}</div>
             <h2 style="font-size: 44px; font-weight: 600; letter-spacing: -0.02em; margin: 12px 0;">{$hadrianLang.home.spotTitle}</h2>
