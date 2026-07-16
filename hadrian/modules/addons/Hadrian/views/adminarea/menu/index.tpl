@@ -21,36 +21,6 @@
     <div class="mt-alert mt-alert-info">Reset {$flashMsg|replace:'reset-defaults-':''|escape} WHMCS Defaults preset(s) to factory items.</div>
 {/if}
 
-{* Runtime diagnostic — what the frontend will actually render for each
-   audience right now. If "Items: 0" or "Picked: (none)" shows below,
-   that's why the sidebar looks empty on the public site. *}
-<div class="mt-panel pad" style="margin-bottom:18px">
-<section class="mt-section">
-    <header class="mt-section-header">
-        <h2 class="mt-section-title">Live state</h2>
-        <span class="mt-table-muted" style="font-size:12px">What the frontend renders right now for each audience.</span>
-    </header>
-    <div class="mt-diag-grid">
-        {foreach ['client', 'guest'] as $aud}
-        <div class="mt-diag-card{if !$diag[$aud].picked_id} is-warn{/if}">
-            <div class="mt-diag-eyebrow">{$aud|capitalize} audience</div>
-            <div class="mt-diag-title">
-                {if $diag[$aud].picked_name}{$diag[$aud].picked_name|escape}{else}<em>(no active menu)</em>{/if}
-            </div>
-            <div class="mt-diag-meta">
-                {if $diag[$aud].picked_id}
-                    {$diag[$aud].picked_items} item{if $diag[$aud].picked_items != 1}s{/if}
-                    {if $diag[$aud].picked_items == 0} — that's why the sidebar looks empty{/if}
-                {else}
-                    Activate a menu for this audience, or click <a href="?module=Hadrian&action=menu&sub=seed">Re-seed presets</a>.
-                {/if}
-            </div>
-        </div>
-        {/foreach}
-    </div>
-</section>
-</div>
-
 <div class="mt-panel pad">
 <section class="mt-section">
     <header class="mt-section-header">
