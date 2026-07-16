@@ -173,7 +173,7 @@ final class TreeRenderer
         } elseif ($node->item_type === ItemTypes::CUSTOM_LINK) {
             $uri = (string)($config['url'] ?? '#');
         } elseif ($node->item_type === ItemTypes::LOGIN_BUTTON) {
-            $uri = function_exists('routePath') ? (string)routePath('login') : 'login.php';
+            $uri = self::loginUrl();
         }
 
         // Auto-cycle palette colour by item id (override-able via config.color)
@@ -370,7 +370,7 @@ final class TreeRenderer
 
     private static function renderLoginButton(Item $parent, MenuItem $node): void
     {
-        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), routePath('login'));
+        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), self::loginUrl());
         if ($child !== null) {
             $config = $node->config();
             $style  = (string)($config['style'] ?? 'primary');
@@ -530,6 +530,21 @@ final class TreeRenderer
     private static function keyFor(MenuItem $node): string
     {
         return 'mt-' . $node->id;
+    }
+
+    /**
+     * URL for a login_button item.
+     *
+     * NOT routePath('login') — 'login' is not a registered WHMCS route name, so
+     * routePath() hands back the literal "/index.php/route-not-defined" sentinel,
+     * which ships straight into the href and 404s. resolvePageUrl() goes through
+     * the WhmcsDefaults table, which maps 'login' → login.php. The fallback keeps
+     * the button present (pointing somewhere real) even if that entry ever goes.
+     */
+    private static function loginUrl(): string
+    {
+        $url = self::resolvePageUrl('login');
+        return $url !== '' ? $url : 'login.php';
     }
 
     private static function resolvePageUrl(string $page): string
