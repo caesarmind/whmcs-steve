@@ -3543,7 +3543,12 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 /* ── intl-tel-input (phone country-code picker) — Apple-styled, applied wherever
    the widget is used (register, contacts). body-prefixed so these win over the
    CDN intlTelInput.css regardless of stylesheet load order. ── */
-body .iti { display: block; width: 100%; }
+/* :not(.iti--container) is load-bearing. With dropdownContainer:document.body the
+   widget appends a SECOND .iti element (.iti.iti--container) straight to <body>,
+   absolutely positioned at the input's x-offset. width:100% there resolves against
+   body, not the input, so it spills past the right edge and gives the page a
+   horizontal scrollbar on open. Only the inline wrapper should stretch. */
+body .iti:not(.iti--container) { display: block; width: 100%; }
 body .iti__tel-input,
 body input.iti__tel-input { width: 100%; box-sizing: border-box; }
 body .iti--separate-dial-code .iti__selected-flag {
