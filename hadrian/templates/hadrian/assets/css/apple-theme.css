@@ -2255,8 +2255,12 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 /* "Starting at" label + spelled-out billing cycle around the price, mirroring
    Lagom's product-group block. .desc now sits above these, so the price group
    is pushed to the bottom of the column and the CTAs line up across cards. */
-.hp-seg-col .seg-from { font-size: var(--text-sm); color: var(--color-text-tertiary); margin-top: auto; }
+.hp-seg-col .seg-from { font-size: var(--text-sm); color: var(--color-text-tertiary); }
 .hp-seg-col .seg-cycle { font-size: var(--text-sm); color: var(--color-text-secondary); margin-bottom: 18px; }
+/* Anchor the CTA, not the price block. A group with no priced product renders
+   no seg-from/price/seg-cycle at all, so hanging the auto margin off seg-from
+   left that column short and its button ~98px higher than its neighbours. */
+.hp-seg-col .buy { margin-top: auto; }
 .hp-seg-col .seg-features { list-style: none; padding: 16px 0; margin: 0 0 18px; border-top: 1px solid var(--color-border); text-align: left; flex: 1; }
 .hp-seg-col .seg-features li { padding: 6px 0; font-size: var(--text-base); color: var(--color-text-primary); display: flex; gap: 8px; align-items: center; }
 .hp-seg-col .seg-features li::before { content: '\2713'; color: var(--color-green); font-weight: var(--fw-bold); flex-shrink: 0; }
