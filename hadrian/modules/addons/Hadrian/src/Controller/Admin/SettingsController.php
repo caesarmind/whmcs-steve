@@ -20,16 +20,11 @@ final class SettingsController extends AbstractController
      * handled in indexAction/save below.
      */
     public const FLAGS = [
-        'custom_logo_url'        => ['Custom Logo URL',          'Send the visitor to this URL when clicking the logo.',                   false, 'bool'],
-        'sticky_sidebars'        => ['Sticky Sidebars',          'Keep sidebars visible while scrolling.',                                  true,  'bool'],
-        'gravatar'               => ['Gravatar',                 'Show Gravatar avatars next to user details.',                            true,  'bool'],
         'affixed_navigation'     => ['Affixed Navigation',       'Pin the navbar on scroll.',                                              false, 'bool'],
         'hide_breadcrumb'        => ['Hide Breadcrumb',          'Hide the breadcrumb above the page title on every layout (the "Portal Home" back-link on top nav, and the "Home / Page" trail on the sidebar and icon-rail layouts).', false, 'bool'],
         'cookie_box'             => ['Cookie Box',               'Show a cookie consent banner on first visit.',                          false, 'bool'],
         'free_label'             => ['"0.00" → "Free"',          'Display free items as "Free" instead of "$0.00".',                       true,  'bool'],
-        'show_status_icon'       => ['Show Status Icon',         'Use status icons in product/service lists.',                            false, 'bool'],
         'table_cache_duration'   => ['Table Cache Duration',     'Cache rendered tables to reduce DB load.',                              true,  'bool'],
-        'show_client_id'         => ['Show Client ID',           "Display the client's numeric ID in their account dropdown.",            false, 'bool'],
         'enable_alternate_links' => ['Enable Alternate Links',   'Add SEO multi-language alternate links.',                               true,  'bool'],
         'capitalize_titles'      => ['Section Titles Capitalization', 'Apply uppercase to section titles.',                                 true,  'bool'],
         'disable_cms_cache'      => ['Disable CMS Menu Cache',   'Bypass the menu cache during development.',                             false, 'bool'],
