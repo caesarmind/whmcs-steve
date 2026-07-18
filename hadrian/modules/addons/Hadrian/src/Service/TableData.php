@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Hadrian\Service;
 
+use Hadrian\Helpers\PriceHelper;
 use WHMCS\Database\Capsule;
 
 /**
@@ -357,10 +358,22 @@ final class TableData
         return $ts ? date('M j, Y', $ts) : '';
     }
 
-    /** Currency-format using the client's currency; degrade gracefully. */
+    /**
+     * Currency-format using the client's currency; degrade gracefully.
+     *
+     * When the admin's "0.00" -> "Free" flag is on, a zero amount renders as
+     * the localized Free label instead. The test is numeric (on $val, before
+     * formatting), so it is unaffected by currency symbols, separators or
+     * decimal precision — see PriceHelper.
+     */
     private static function fmtMoney(mixed $amount, int $uid): string
     {
         $val = (float)$amount;
+
+        if (PriceHelper::enabled() && PriceHelper::isFree($val)) {
+            return PriceHelper::label();
+        }
+
         try {
             if (class_exists('\\WHMCS\\View\\Formatter\\Price') && function_exists('getCurrency')) {
                 return (string)(new \WHMCS\View\Formatter\Price($val, getCurrency($uid)))->toFull();

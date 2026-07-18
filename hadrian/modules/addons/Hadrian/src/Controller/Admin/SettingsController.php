@@ -23,7 +23,11 @@ final class SettingsController extends AbstractController
         'affixed_navigation'     => ['Affixed Navigation',       'Pin the navbar on scroll.',                                              false, 'bool'],
         'hide_breadcrumb'        => ['Hide Breadcrumb',          'Hide the breadcrumb above the page title on every layout (the "Portal Home" back-link on top nav, and the "Home / Page" trail on the sidebar and icon-rail layouts).', false, 'bool'],
         'cookie_box'             => ['Cookie Box',               'Show a cookie consent banner on first visit.',                          false, 'bool'],
-        'free_label'             => ['"0.00" → "Free"',          'Display free items as "Free" instead of "$0.00".',                       true,  'bool'],
+        // Default OFF deliberately: the runtime (PriceHelper / price.tpl) treats
+        // unset as off, so a `true` here would render the box pre-checked while
+        // nothing actually changed until the admin pressed Save. Opt-in also
+        // means deploying this never silently relabels prices on a live install.
+        'free_label'             => ['"0.00" → "Free"',          'Display free items as "Free" instead of "$0.00".',                       false, 'bool'],
         'table_cache_duration'   => ['Table Cache Duration',     'Cache rendered tables to reduce DB load.',                              true,  'bool'],
         'enable_alternate_links' => ['Enable Alternate Links',   'Add SEO multi-language alternate links.',                               true,  'bool'],
         'capitalize_titles'      => ['Section Titles Capitalization', 'Apply uppercase to section titles.',                                 true,  'bool'],

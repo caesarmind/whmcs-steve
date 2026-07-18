@@ -769,6 +769,71 @@
         });
     }
 
+    // ── Affixed navigation (admin "Affixed Navigation" toggle) ─
+    // Scroll-direction reveal: the top bar hides while scrolling DOWN and
+    // returns on the first scroll UP. Gated on <body data-affixed-nav="1">;
+    // all the showing/hiding is CSS (apple-layout.css) keyed off the three
+    // body classes set here, so this function only classifies scroll state.
+    //
+    // Deliberately different from Lagom's implementation in three ways:
+    //   1. rAF-throttled on a passive scroll listener, instead of a 50ms
+    //      setInterval that keeps polling for the life of the page even when
+    //      nobody is scrolling.
+    //   2. No element measuring, no body padding-top juggling and no resize
+    //      recalculation — our bars stay position:sticky and are merely
+    //      translated, so the document flow never changes.
+    //   3. Bails out entirely when the page cannot scroll, so short pages
+    //      never register a listener at all.
+    function initAffixedNav() {
+        if (document.body.dataset.affixedNav !== '1') return;
+
+        var bar = document.querySelector('.topbar, .ph-side-topbar');
+        if (!bar) return;
+
+        // Ignore deltas smaller than the bar's own height: without this a
+        // trackpad's sub-pixel jitter flips the state constantly.
+        var threshold = Math.max(bar.offsetHeight, 44);
+        var last = window.pageYOffset || 0;
+        var ticking = false;
+
+        function classify() {
+            ticking = false;
+            var y = window.pageYOffset || 0;
+            var cl = document.body.classList;
+
+            // At (or rubber-banded above) the top: always show.
+            if (y <= 0) {
+                cl.add('scrolled-top');
+                cl.remove('scroll-down', 'scroll-up');
+                last = 0;
+                return;
+            }
+            if (Math.abs(y - last) < threshold) return;
+
+            cl.remove('scrolled-top');
+            // Never hide past the very end of the document — with the bar
+            // gone there is nothing left to scroll back up to reveal it.
+            var atEnd = (y + window.innerHeight) >= (document.documentElement.scrollHeight - 2);
+            if (y > last && !atEnd) {
+                cl.add('scroll-down');
+                cl.remove('scroll-up');
+            } else {
+                cl.add('scroll-up');
+                cl.remove('scroll-down');
+            }
+            last = y;
+        }
+
+        function onScroll() {
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(classify);
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        classify();
+    }
+
     // ── Bootstrap ──────────────────────────────────────────
     function boot() {
         var params = new URLSearchParams(window.location.search);
@@ -789,6 +854,7 @@
             initLocaleModal();
             applyActiveNav();
             applyPageTitle();
+            initAffixedNav();
             document.dispatchEvent(new CustomEvent('apple-layout:ready'));
         });
     }

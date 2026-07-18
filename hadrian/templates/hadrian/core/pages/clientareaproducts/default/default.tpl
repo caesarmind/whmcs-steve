@@ -167,7 +167,11 @@
                                 </td>
                                 <td data-order="{if $product.recurringamount}{$product.recurringamount|regex_replace:'/[^0-9.\-]/':''}{elseif $product.firstpaymentamount}{$product.firstpaymentamount|regex_replace:'/[^0-9.\-]/':''}{else}0{/if}">
                                     <div class="svc-cell-price-main">
-                                        {if $product.recurringamount}{$product.recurringamount}{elseif $product.firstpaymentamount}{$product.firstpaymentamount}{else}—{/if}
+                                        {* Price via the shared partial so the admin's "0.00" -> "Free"
+                                           flag applies. The data-order sort key above deliberately keeps
+                                           the raw numeric — relabelling it would strip to "" and sort
+                                           free services wrong. *}
+                                        {if $product.recurringamount}{include file="`$template`/includes/common/price.tpl" hPrice=$product.recurringamount}{elseif $product.firstpaymentamount}{include file="`$template`/includes/common/price.tpl" hPrice=$product.firstpaymentamount}{else}—{/if}
                                         {if $product.billingcycle}<span class="cycle">/{$product.billingcycle|escape}</span>{/if}
                                     </div>
                                 </td>

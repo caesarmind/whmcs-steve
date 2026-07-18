@@ -556,6 +556,60 @@ body[data-hide-breadcrumb="1"] .ph-side-crumbs { display: none; }
    gone, keep the actions group pinned right instead of sliding to the left. */
 body[data-hide-breadcrumb="1"] .ph-side-topbar-actions { margin-left: auto; }
 
+/* -- Affixed Navigation (admin "Affixed Navigation" toggle) -- */
+/* Scroll-direction reveal, the same semantics as Lagom's affixed nav: the bar
+   hides while scrolling DOWN and comes back on the first scroll UP, so long
+   pages reclaim the vertical space without losing quick access to the nav.
+   body[data-affixed-nav] gates it; apple-layout.js sets scroll-down /
+   scroll-up / scrolled-top on <body>.
+
+   Both bars are ALREADY position:sticky, so hiding them is a pure transform
+   and the document flow never changes. That is why there is no body
+   padding-top compensation here -- Lagom needs that machinery only because it
+   swaps the bar to position:fixed and has to re-measure on every resize.
+
+   WHICH LAYOUTS (matches the call Lagom makes, for the same reason):
+     top          .topbar        desktop + mobile -- it IS the navigation.
+     side / rail  .ph-side-topbar  MOBILE ONLY (<=900px). Above that the
+                  sidebar is the navigation and is vertical + full height, so
+                  there is nothing to affix; .ph-side-topbar is a thin
+                  breadcrumb/actions strip and hiding it on scroll would be
+                  jitter for ~44px. Below 900px both sidebars go off-canvas
+                  and that strip becomes the only nav, so it earns the
+                  behaviour. Lagom likewise bails out of affixed nav for its
+                  left-nav layout on desktop but keeps it on mobile. */
+body[data-affixed-nav="1"] .topbar {
+    transition: transform 0.28s ease;
+    will-change: transform;
+}
+body[data-affixed-nav="1"].scroll-down .topbar { transform: translateY(-100%); }
+body[data-affixed-nav="1"].scroll-up   .topbar,
+body[data-affixed-nav="1"].scrolled-top .topbar { transform: translateY(0); }
+
+@media (max-width: 900px) {
+    body[data-affixed-nav="1"] .ph-side-topbar {
+        transition: transform 0.28s ease;
+        will-change: transform;
+    }
+    body[data-affixed-nav="1"].scroll-down .ph-side-topbar { transform: translateY(-100%); }
+    body[data-affixed-nav="1"].scroll-up   .ph-side-topbar,
+    body[data-affixed-nav="1"].scrolled-top .ph-side-topbar { transform: translateY(0); }
+}
+
+/* Never hide the bar while the mobile drawer is open -- the toggle lives in it.
+   MUST come after the @media block above: a media query adds no specificity, so
+   this rule and the in-media .scroll-down rule both compute to (0,3,1) and the
+   winner is decided purely by source order. Declared before the block, the
+   drawer stayed open with the bar slid off screen. */
+body[data-affixed-nav="1"].nav-open .topbar,
+body[data-affixed-nav="1"].nav-open .ph-side-topbar { transform: translateY(0); }
+
+/* Respect a reduced-motion preference: still hide/show, just without sliding. */
+@media (prefers-reduced-motion: reduce) {
+    body[data-affixed-nav="1"] .topbar,
+    body[data-affixed-nav="1"] .ph-side-topbar { transition: none; }
+}
+
 /* =============================================================
    RAIL LAYOUT -- icon rail (80px) + flyout panel (240px)
    ============================================================= */
