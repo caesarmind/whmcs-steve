@@ -234,21 +234,29 @@
     <p class="sub">{$hadrianLang.home.pricingSub}</p>
 
     <div class="when-full">
-        {* count-N, not an inline grid-template-columns: an inline value outranks
-           the max-width:820px collapse in apple-theme.css, which kept this bar
-           multi-column on phones. *}
-        <div class="hp-segmented-bar count-{if $groupCount > 0 && $groupCount <= 4}{$groupCount}{else}4{/if}">
+        {* .hp-pricing-grid + .hp-price-card is the theme's standard Apple card
+           grid — already used by 7 store pages — rather than the joined
+           .hp-segmented-bar, which reads as a dense comparison table and left a
+           gaping void in any card that has no price.
+
+           cols-N, never an inline grid-template-columns: an inline value
+           outranks the responsive collapse in apple-theme.css.
+
+           No "POPULAR" flag. It used to be pinned to $grp@iteration == 2, so
+           whichever group happened to be second got badged as popular — a claim
+           the data doesn't support. *}
+        <div class="hp-pricing-grid{if $groupCount > 0 && $groupCount < 3} cols-{$groupCount}{/if}">
             {foreach $hpGroups as $grp}
-            {* Order mirrors Lagom's "Products For All Businesses" block:
-               group name, tagline, then "Starting at" above the price with the
-               billing cycle spelled out underneath. *}
-            <div class="hp-seg-col{if $grp@iteration == 2} highlight{/if}">
-                <div class="tier">{$grp.name|escape}</div>
-                {if $grp.tagline}<div class="desc">{$grp.tagline|escape}</div>{/if}
+            {* Order mirrors Lagom's "Products For All Businesses" block: name,
+               tagline, then "Starting at" above the price with the billing cycle
+               spelled out underneath. *}
+            <div class="hp-price-card pc-group">
+                <h3>{$grp.name|escape}</h3>
+                {if $grp.tagline}<p class="pc-tagline">{$grp.tagline|escape}</p>{/if}
                 {if $grp.fromPrice}
-                <div class="seg-from">{$hadrianLang.home.startingAt}</div>
-                <div class="price">{$grp.fromPrice}</div>
-                <div class="seg-cycle">{$hadrianLang.home.cycleName[$grp.cycle]|default:''}</div>
+                <div class="pc-from">{$hadrianLang.home.startingAt}</div>
+                <div class="price-row"><span class="price">{$grp.fromPrice}</span></div>
+                <div class="pc-cycle">{$hadrianLang.home.cycleName[$grp.cycle]|default:''}</div>
                 {/if}
                 <a href="{$WEB_ROOT}/{$grp.url}" class="buy">{$hadrianLang.home.buyGroup}</a>
             </div>

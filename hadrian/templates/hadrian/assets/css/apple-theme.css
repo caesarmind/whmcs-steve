@@ -1425,6 +1425,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
     .hp-tile h2 { font-size: var(--text-h3); }
     .hp-strip-card { flex: 0 0 280px; }
     .hp-pricing-grid,
+    .hp-pricing-grid.cols-1,
     .hp-pricing-grid.cols-2,
     .hp-pricing-grid.cols-4 { grid-template-columns: 1fr; }
     .hp-footer-cols { grid-template-columns: repeat(2, 1fr); }
@@ -2255,12 +2256,24 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 /* "Starting at" label + spelled-out billing cycle around the price, mirroring
    Lagom's product-group block. .desc now sits above these, so the price group
    is pushed to the bottom of the column and the CTAs line up across cards. */
-.hp-seg-col .seg-from { font-size: var(--text-sm); color: var(--color-text-tertiary); }
-.hp-seg-col .seg-cycle { font-size: var(--text-sm); color: var(--color-text-secondary); margin-bottom: 18px; }
-/* Anchor the CTA, not the price block. A group with no priced product renders
-   no seg-from/price/seg-cycle at all, so hanging the auto margin off seg-from
-   left that column short and its button ~98px higher than its neighbours. */
-.hp-seg-col .buy { margin-top: auto; }
+/* --- Homepage product categories (.pc-*) ---------------------------------
+   Rides .hp-price-card, the card the store pages already use. Centred rather
+   than the card's default left-align, because each card carries only a name,
+   a tagline and one price — left-aligning that little content in a wide card
+   looks unbalanced. Generous leading, one accent (the price), everything else
+   quiet: the Apple pricing-card shape.                                      */
+.hp-price-card.pc-group { text-align: center; align-items: stretch; padding: 40px 28px 32px; }
+.hp-price-card.pc-group h3 { font-size: var(--text-h4); letter-spacing: -0.02em; margin: 0 0 8px; }
+.hp-price-card.pc-group .pc-tagline { font-size: var(--text-md); color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 28px; }
+.hp-price-card.pc-group .pc-from { font-size: var(--text-sm); color: var(--color-text-tertiary); margin-bottom: 2px; }
+.hp-price-card.pc-group .price { font-size: var(--text-display-sm); letter-spacing: -0.03em; line-height: 1.05; }
+.hp-price-card.pc-group .pc-cycle { font-size: var(--text-sm); color: var(--color-text-secondary); margin-top: 4px; }
+/* Anchor the CTA, not the price block: a group with no priced product renders
+   no pc-from/price/pc-cycle at all, so hanging the auto margin off those left
+   that card short and its button ~98px higher than its neighbour. */
+.hp-price-card.pc-group .buy { margin-top: auto; padding: 12px 16px; }
+/* Single visible group shouldn't stretch to a full-width slab. */
+.hp-pricing-grid.cols-1 { grid-template-columns: minmax(0, 420px); justify-content: center; }
 .hp-seg-col .seg-features { list-style: none; padding: 16px 0; margin: 0 0 18px; border-top: 1px solid var(--color-border); text-align: left; flex: 1; }
 .hp-seg-col .seg-features li { padding: 6px 0; font-size: var(--text-base); color: var(--color-text-primary); display: flex; gap: 8px; align-items: center; }
 .hp-seg-col .seg-features li::before { content: '\2713'; color: var(--color-green); font-weight: var(--fw-bold); flex-shrink: 0; }
