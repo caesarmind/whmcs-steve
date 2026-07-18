@@ -1,10 +1,22 @@
-/* Error / notice (Apple-style) — shared by access-denied + banned. Prefix: .err-* */
+/* Error / notice (Apple-style) — IP-block page. Prefix: .err-*
+   access-denied.css carries its own copy of the shared .err-* rules; this page
+   diverged because it renders full-bleed (see core/pages/banned/default/default.php).
 
-.page-header { margin: 8px 0 24px; }
-.page-header .page-eyebrow { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px; }
-.page-header h1 { font-size: var(--text-h2); font-weight: var(--fw-semibold); letter-spacing: -0.028em; color: var(--color-text-primary); margin: 0 0 8px; line-height: 1.1; }
-@media (max-width: 880px) { .page-header h1 { font-size: var(--text-h3); } }
-@media (max-width: 480px) { .page-header h1 { font-size: var(--text-h4); } }
+   No .page-header here on purpose. Every other focused single-action page in the
+   theme (pwreset, two-factor-challenge, user-verify-email, invoice-payment,
+   login) renders the card alone with no heading above it. This page used to be
+   the exception, and its h1 restated the card's own h2 — "Account suspended"
+   directly above "Your account access is suspended" — at twice the width,
+   which is what made the centred card look orphaned. */
+
+/* Full-bleed: no shell, so centre the card in the viewport itself.
+   Loaded after apple-theme.css, so this wins over the global display:block. */
+body.mt-login-fullpage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
 
 .err-card { max-width: 520px; margin: 0 auto; text-align: center; padding: 56px 32px; }
 .err-ico { width: 68px; height: 68px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; background: rgba(255,59,48,0.08); color: var(--color-red); }

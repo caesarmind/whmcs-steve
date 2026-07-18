@@ -44,9 +44,19 @@ return [
         ],
         'backHome' => 'Back to home',
         // Banned / access-denied pages (no native WHMCS key for these).
-        'bannedTitle'     => 'Account suspended',
-        'bannedHeading'   => 'Your account access is suspended',
-        'bannedSub'       => 'Access to this account has been temporarily restricted. Please contact support to resolve the issue.',
+        // banned.php is WHMCS's IP-ban screen, NOT an account suspension — the
+        // visitor's account is usually fine, their address is blocked. The old
+        // copy said "Account suspended", which sends people to support about a
+        // problem they don't have. WHMCS's own <title> and breadcrumb both say
+        // "IP Banned"; these strings now agree with them.
+        'bannedTitle'     => 'Access temporarily blocked',
+        'bannedHeading'   => 'Your IP address has been temporarily blocked',
+        'bannedSub'       => 'Access from your current network has been temporarily blocked. This is usually automatic and clears on its own. Your account itself is unaffected.',
+        // Set this to an off-domain support address. contact.php is behind the
+        // same IP ban, so it is unreachable for anyone who lands on this page;
+        // when this is non-empty the CTA becomes a mailto: instead. Left blank
+        // so the existing on-site link stays until a real address is supplied.
+        'bannedContactEmail' => '',
         'accessDeniedSub' => 'Your account may not have permission to view this, or you may need to sign in again. Contact support if you believe this is an error.',
     ],
 

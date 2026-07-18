@@ -274,6 +274,14 @@ body {
     min-height: 100vh;
 }
 
+/* Full-bleed pages. A variant declaring `fullPage => true` makes header.tpl
+   swap .client-area-layout for .mt-login-fullpage and suppress the nav,
+   sidebar/rail, breadcrumb and footer — so the body must drop the app-shell
+   flex row above, or the page content becomes a flex child of a missing shell.
+   Global on purpose: this lived only in pages/login-split.css, so login/split
+   was the only full-bleed page that actually worked. Any page can set the flag. */
+body.mt-login-fullpage { display: block; min-height: 100vh; margin: 0; }
+
 a { color: var(--color-link); text-decoration: none; transition: color var(--transition-fast); }
 a:hover { color: var(--color-link-hover); text-decoration: underline; }
 
