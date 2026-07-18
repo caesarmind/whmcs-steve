@@ -119,7 +119,7 @@
 
     {* 3. Big stat callout (hp-stat-callout - inline styled in the mockup) *}
     <section class="hp-stat-callout" style="padding: 72px 22px; max-width: 1024px; margin: 0 auto;">
-        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center;">
+        <div class="hp-split-2">
             <div>
                 <div class="hp-eyebrow">{$hadrianLang.store.cgWhyEyebrow}</div>
                 <h2 style="font-size: 56px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin: 0 0 20px;"><span style="color: #ff453a;">{$hadrianLang.store.cgWhyHighlight}</span>{$hadrianLang.store.cgWhyTitle}</h2>
