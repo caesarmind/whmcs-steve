@@ -232,6 +232,21 @@ if (AddonHelper::isActive()) {
         return HookService::instance()->dispatch('ClientAreaPageLogin', $vars);
     });
 
+    // Public homepage — expose the real product catalogue as $homeProductGroups
+    // so the "product categories" section renders live groups and prices rather
+    // than hardcoded tiers. WHMCS has no ClientAreaPageHomepage hook, so this
+    // rides the generic ClientAreaPage and guards on templatefile — the same
+    // approach Lagom uses for its homepage vars.
+    //
+    // $announcements is NOT fetched here: WHMCS already passes it to
+    // homepage.tpl natively (see stock six/homepage.tpl).
+    add_hook('ClientAreaPage', 2, function ($vars) {
+        if (($vars['templatefile'] ?? '') !== 'homepage') {
+            return null;
+        }
+        return HookService::instance()->dispatch('ClientAreaPageHomepage', $vars);
+    });
+
     add_hook('ClientAreaHomepagePanels', 9, function (WHMCS\View\Menu\Item $panels) {
         return HookService::instance()->dispatch('ClientAreaHomepagePanels', $panels);
     });

@@ -132,6 +132,151 @@ final class Hooks
     }
 
     /**
+     * Public homepage (templatefile 'homepage'). Surfaces the real product
+     * catalogue as $homeProductGroups so the "product categories" section can
+     * show live groups and prices instead of hardcoded tiers.
+     *
+     * WHMCS already passes $announcements to homepage.tpl natively (see stock
+     * six/homepage.tpl), so the announcements block needs nothing from here.
+     *
+     * @return array{homeProductGroups: list<array<string,mixed>>}
+     */
+    private function clientAreaPageHomepage(array $vars, Template $template): array
+    {
+        return ['homeProductGroups' => $this->fetchProductGroups(4)];
+    }
+
+    /**
+     * Visible product groups with a "starting at" price, mirroring what Lagom's
+     * homepage shows per group (name, tagline, cheapest cycle price).
+     *
+     * The price is the lowest positive recurring price across every active
+     * product in the group, in the visitor's currency. WHMCS stores "not
+     * available for this cycle" as -1 (and free as 0), so anything <= 0 is
+     * skipped rather than rendered as a real "$0 / -1" price. A group with no
+     * priced product still returns, with fromPrice = null — the template shows
+     * the group without a price rather than dropping it.
+     *
+     * Defensive throughout: any DB failure returns an empty list, exactly like
+     * fetchRecentAnnouncements(), so a broken catalogue can never take down the
+     * public homepage.
+     *
+     * @return list<array{gid:int,name:string,tagline:string,url:string,fromPrice:?string,cycle:string}>
+     */
+    private function fetchProductGroups(int $limit): array
+    {
+        $cycles = ['monthly', 'quarterly', 'semiannually', 'annually', 'biennially', 'triennially'];
+
+        try {
+            $groups = \WHMCS\Database\Capsule::table('tblproductgroups')
+                ->where('hidden', '!=', 1)
+                ->orderBy('order')
+                ->orderBy('name')
+                ->limit($limit)
+                ->get(['id', 'name', 'tagline', 'slug']);
+
+            if ($groups->isEmpty()) {
+                return [];
+            }
+
+            $gids = [];
+            foreach ($groups as $g) {
+                $gids[] = (int)$g->id;
+            }
+
+            // Active products per group, then their pricing rows in one pass —
+            // avoids a query per group on a page that must stay fast.
+            $products = \WHMCS\Database\Capsule::table('tblproducts')
+                ->whereIn('gid', $gids)
+                ->where('hidden', '!=', 1)
+                ->get(['id', 'gid']);
+
+            $gidByPid = [];
+            foreach ($products as $p) {
+                $gidByPid[(int)$p->id] = (int)$p->gid;
+            }
+
+            $lowest = [];
+            if ($gidByPid !== []) {
+                $currency = $this->currentCurrencyId();
+                $pricingQuery = \WHMCS\Database\Capsule::table('tblpricing')
+                    ->where('type', 'product')
+                    ->whereIn('relid', array_keys($gidByPid));
+                if ($currency !== null) {
+                    $pricingQuery->where('currency', $currency);
+                }
+
+                foreach ($pricingQuery->get() as $row) {
+                    $gid = $gidByPid[(int)$row->relid] ?? null;
+                    if ($gid === null) {
+                        continue;
+                    }
+                    foreach ($cycles as $cycle) {
+                        $price = isset($row->{$cycle}) ? (float)$row->{$cycle} : -1.0;
+                        if ($price <= 0) {
+                            continue; // -1 = cycle unavailable
+                        }
+                        if (!isset($lowest[$gid]) || $price < $lowest[$gid]['amount']) {
+                            $lowest[$gid] = ['amount' => $price, 'cycle' => $cycle];
+                        }
+                    }
+                }
+            }
+
+            $out = [];
+            foreach ($groups as $g) {
+                $gid  = (int)$g->id;
+                $slug = trim((string)($g->slug ?? ''));
+                $best = $lowest[$gid] ?? null;
+
+                $out[] = [
+                    'gid'       => $gid,
+                    'name'      => (string)($g->name ?? ''),
+                    'tagline'   => (string)($g->tagline ?? ''),
+                    'url'       => $slug !== '' ? 'cart.php?gid=' . rawurlencode($slug) : 'cart.php?gid=' . $gid,
+                    'fromPrice' => $best ? $this->formatPrice($best['amount']) : null,
+                    'cycle'     => $best['cycle'] ?? '',
+                ];
+            }
+            return $out;
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /** Active currency id, or null to fall back to whatever pricing rows exist. */
+    private function currentCurrencyId(): ?int
+    {
+        try {
+            if (function_exists('getCurrency')) {
+                $c = getCurrency();
+                if (is_array($c) && !empty($c['id'])) {
+                    return (int)$c['id'];
+                }
+            }
+        } catch (\Throwable $e) {
+            // fall through
+        }
+        return null;
+    }
+
+    /**
+     * Currency-format a price. Same approach as TableData::fmtMoney() — WHMCS's
+     * own formatter when available, plain number otherwise.
+     */
+    private function formatPrice(float $amount): string
+    {
+        try {
+            if (class_exists('\\WHMCS\\View\\Formatter\\Price') && function_exists('getCurrency')) {
+                return (string)(new \WHMCS\View\Formatter\Price($amount, getCurrency()))->toPrefixed();
+            }
+        } catch (\Throwable $e) {
+            // fall through
+        }
+        return number_format($amount, 2);
+    }
+
+    /**
      * Latest published, past-dated announcements. Defensive: any DB failure
      * returns an empty list so the login page can never break.
      *

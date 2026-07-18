@@ -16,7 +16,34 @@
 {assign var=_hTitle value=$hadrian.pages.homepage.config.heroTitle|default:''}
 {assign var=_hSub value=$hadrian.pages.homepage.config.heroSubtitle|default:''}
 
+{* ── Real-data state ────────────────────────────────────────────────────────
+   $homeProductGroups  ← Hooks::clientAreaPageHomepage (live product catalogue)
+   $announcements      ← WHMCS native on homepage.tpl (see stock six/homepage.tpl)
+   $hadrianLang.home.testimonials ← lang file; ships empty so no invented quotes
+                                    ever render. Fill it to enable the section.
+
+   The page-level full/empty flag follows the product catalogue, since that is
+   the primary dynamic content here. Announcements and testimonials gate
+   themselves on their own presence as well. *}
+{assign var=hpGroups value=$homeProductGroups|default:[]}
+{assign var=groupCount value=$hpGroups|@count}
+{assign var=annCount value=$announcements|default:[]|@count}
+{assign var=hpTestimonials value=$hadrianLang.home.testimonials|default:[]}
+{if $groupCount > 0}
+    {assign var=dashIsEmpty value='full'}
+{else}
+    {assign var=dashIsEmpty value='empty'}
+{/if}
+
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/homepage.css?v={$hadrian.version|default:'1.0'}">
+
+<script>
+(function () {
+    var b = document.body;
+    if (!b) return;
+    b.setAttribute('data-data', '{$dashIsEmpty}');
+})();
+</script>
 
 {* 1. Hero - "Hosting, redesigned" + working domain search *}
 <section class="hp-hero" style="padding: 96px 22px 40px; background: transparent;">
@@ -102,7 +129,9 @@
 </section>
 
 {* 4. Isolation - 4-up icon grid *}
-<section class="hp-icon-grid" style="padding: 72px 22px 48px;">
+{* cols-4: this section has 4 items and the base grid is 3-wide, which left the
+   fourth card stranded alone on a second row. *}
+<section class="hp-icon-grid cols-4" style="padding: 72px 22px 48px;">
     <div style="grid-column: 1 / -1; text-align: center; max-width: 800px; margin: 0 auto 40px;">
         <div class="hp-eyebrow" style="color: var(--color-accent);">{$hadrianLang.home.isoEyebrow}</div>
         <h2 style="font-size: 40px; font-weight: 600; letter-spacing: -0.02em; margin: 12px 0;">{$hadrianLang.home.isoTitle}</h2>
@@ -269,41 +298,38 @@
     </div>
 </section>
 
-{* 9. Pricing - segmented bar (representative tiers; CTAs to the order form) *}
+{* 9. Product categories — REAL WHMCS product groups.
+     $homeProductGroups comes from Hooks::clientAreaPageHomepage(); each entry is
+     {gid, name, tagline, url, fromPrice, cycle}. fromPrice is null when the group
+     has no positively-priced product, in which case we show the group without a
+     price rather than inventing one. Previously these were four hardcoded tiers
+     ($0/$9/$29/$79) with untranslated English bullets and CTAs to a bare cart.php. *}
 <section class="hp-pricing-segmented" id="pricing">
     <h2 style="font-size: 44px;">{$hadrianLang.home.pricingTitle}</h2>
     <p class="sub">{$hadrianLang.home.pricingSub}</p>
-    <div class="hp-segmented-bar" style="grid-template-columns: repeat(4, 1fr);">
-        <div class="hp-seg-col">
-            <div class="tier">{$hadrianLang.home.tierFree}</div>
-            <div class="price">$0<span class="per">{$hadrianLang.home.perForever}</span></div>
-            <div class="desc">{$hadrianLang.home.tierFreeDesc}</div>
-            <ul class="seg-features"><li>1 website</li><li>2 GB SSD</li><li>Free SSL</li><li>1 location</li></ul>
-            <a href="{$WEB_ROOT}/cart.php" class="buy">{$hadrianLang.home.buyFree}</a>
-        </div>
-        <div class="hp-seg-col">
-            <div class="tier">{$hadrianLang.home.tierStarter}</div>
-            <div class="price">$9<span class="per">{$hadrianLang.home.perMo}</span></div>
-            <div class="desc">{$hadrianLang.home.tierStarterDesc}</div>
-            <ul class="seg-features"><li>5 websites</li><li>10 GB SSD</li><li>Free SSL</li><li>Daily backups</li></ul>
-            <a href="{$WEB_ROOT}/cart.php" class="buy">{$hadrianLang.home.buyStarter}</a>
-        </div>
-        <div class="hp-seg-col highlight">
-            <div class="tier">{$hadrianLang.home.tierPro}</div>
-            <div class="price">$29<span class="per">{$hadrianLang.home.perMo}</span></div>
-            <div class="desc">{$hadrianLang.home.tierProDesc}</div>
-            <ul class="seg-features"><li>Unlimited sites</li><li>50 GB SSD</li><li>White-label</li><li>Priority support</li><li>Staging environments</li></ul>
-            <a href="{$WEB_ROOT}/cart.php" class="buy">{$hadrianLang.home.buyPro}</a>
-        </div>
-        <div class="hp-seg-col">
-            <div class="tier">{$hadrianLang.home.tierAgency}</div>
-            <div class="price">$79<span class="per">{$hadrianLang.home.perMo}</span></div>
-            <div class="desc">{$hadrianLang.home.tierAgencyDesc}</div>
-            <ul class="seg-features"><li>Unlimited clients</li><li>200 GB SSD</li><li>Custom domain panel</li><li>Account manager</li></ul>
-            <a href="{$WEB_ROOT}/cart.php" class="buy">{$hadrianLang.home.buyAgency}</a>
+
+    <div class="when-full">
+        <div class="hp-segmented-bar" style="grid-template-columns: repeat({if $groupCount > 0}{$groupCount}{else}4{/if}, 1fr);">
+            {foreach $hpGroups as $grp}
+            <div class="hp-seg-col{if $grp@iteration == 2} highlight{/if}">
+                <div class="tier">{$grp.name|escape}</div>
+                {if $grp.fromPrice}
+                <div class="price">{$grp.fromPrice}<span class="per">{$hadrianLang.home.perCycle[$grp.cycle]|default:''}</span></div>
+                {/if}
+                {if $grp.tagline}<div class="desc">{$grp.tagline|escape}</div>{/if}
+                <a href="{$WEB_ROOT}/{$grp.url}" class="buy">{$hadrianLang.home.buyGroup}</a>
+            </div>
+            {/foreach}
         </div>
     </div>
-    <p style="text-align: center; font-size: 14px; color: #6e6e73; margin-top: 32px;">{$hadrianLang.home.pricingNote} <a href="{$WEB_ROOT}/cart.php" style="color: var(--color-accent);">{$hadrianLang.home.pricingNoteLink} &rsaquo;</a></p>
+
+    {* No visible product groups configured, or the catalogue query failed. *}
+    <div class="when-empty" style="text-align: center; padding: 32px 22px;">
+        <p style="font-size: 17px; color: var(--color-text-secondary); margin: 0 0 20px;">{$hadrianLang.home.noProductsText}</p>
+        <a href="{$WEB_ROOT}/cart.php" class="btn-primary">{$hadrianLang.home.noProductsCta}</a>
+    </div>
+
+    <p style="text-align: center; font-size: 14px; color: var(--color-text-secondary); margin-top: 32px;">{$hadrianLang.home.pricingNote} <a href="{$WEB_ROOT}/cart.php" style="color: var(--color-accent);">{$hadrianLang.home.pricingNoteLink} &rsaquo;</a></p>
 </section>
 
 {* 10. Reviews *}
@@ -318,6 +344,61 @@
         <div class="rev-src"><div class="stars">&starf;&starf;&starf;&starf;&starf;</div><div class="src-name">Indie Hackers</div><div class="src-count">310 reviews</div></div>
     </div>
 </section>
+
+{* 10b. Testimonials — "What our customers say".
+     Driven by $hadrianLang.home.testimonials, which SHIPS EMPTY on purpose: the
+     section renders nothing until real quotes are added, so no invented customer
+     praise ever goes live. Lagom hardcodes its testimonials in the template; this
+     keeps them in the lang system so they stay translatable.
+     Reuses .hp-testimonials-grid, already in apple-theme.css. *}
+{if $hpTestimonials}
+<section class="hp-testimonials-grid">
+    <h2 style="text-align: center;">{$hadrianLang.home.testiTitle}</h2>
+    <p class="sub" style="text-align: center;">{$hadrianLang.home.testiSub}</p>
+    <div class="testi-grid">
+        {foreach $hpTestimonials as $t}
+        <figure class="testi-card">
+            <blockquote>{$t.quote|escape}</blockquote>
+            <figcaption>
+                <span class="testi-author">{$t.author|escape}</span>
+                {if $t.role || $t.company}
+                <span class="testi-role">{$t.role|escape}{if $t.role && $t.company}, {/if}{$t.company|escape}</span>
+                {/if}
+            </figcaption>
+        </figure>
+        {/foreach}
+    </div>
+</section>
+{/if}
+
+{* 10c. Latest announcements — REAL data.
+     $announcements is passed to homepage.tpl natively by WHMCS (stock
+     six/homepage.tpl iterates the same var). WHMCS announcements carry only a
+     title, date and body — there are no categories, so no tag chips here. *}
+{if $annCount > 0}
+<section class="hp-announcements when-full" style="max-width: 1024px; margin: 0 auto; padding: 72px 22px;">
+    <h2 style="font-size: 44px; text-align: center; margin: 0 0 8px;">{$hadrianLang.home.newsTitle}</h2>
+    <p class="sub" style="text-align: center; color: var(--color-text-secondary); margin: 0 0 40px;">{$hadrianLang.home.newsSub}</p>
+    <div class="hp-announce-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+        {foreach $announcements as $ann}
+        {if $ann@iteration <= 3}
+        <a href="{routePath('announcement-view', $ann.id, $ann.urlfriendlytitle)}" class="card hp-announce-card" style="display: block; padding: 24px; text-decoration: none;">
+            {* $carbon is provided by WHMCS on this page (stock six/homepage.tpl
+               uses it the same way), but guard anyway: a fatal in a template
+               drops the whole site back to the six theme, and the compiled-cache
+               poisoning that causes is not recoverable by reverting. *}
+            <div style="font-size: 13px; color: var(--color-text-tertiary); margin-bottom: 8px;">{if $carbon}{$carbon->translatePassedToFormat($ann.rawDate, 'M jS, Y')}{else}{$ann.date}{/if}</div>
+            <h3 style="font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 10px; line-height: 1.35;">{$ann.title}</h3>
+            <span style="font-size: 14px; color: var(--color-accent);">{$hadrianLang.home.newsReadMore} &rsaquo;</span>
+        </a>
+        {/if}
+        {/foreach}
+    </div>
+    <p style="text-align: center; margin-top: 32px;">
+        <a href="{$WEB_ROOT}/announcements.php" style="color: var(--color-accent); font-size: 14px;">{$hadrianLang.home.newsAll} &rsaquo;</a>
+    </p>
+</section>
+{/if}
 
 {* 11. Final CTA *}
 <section class="hp-cta-immersive">

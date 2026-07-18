@@ -2111,6 +2111,39 @@ return [
         'buyAgency'          => 'Choose Agency',
         'pricingNote'        => 'Annual plans save 20%.',
         'pricingNoteLink'    => 'See full pricing &amp; add-ons',
+
+        // --- Product categories (real WHMCS groups) -------------------------
+        // The tier* / buy* / per* keys above belong to the retired hardcoded
+        // $0/$9/$29/$79 tiers. Kept because the 'portal' homepage variant may
+        // still reference them; the default variant no longer does.
+        'buyGroup'           => 'View plans',
+        // Keyed by WHMCS billing cycle, so the suffix matches the cheapest
+        // cycle actually found for each group.
+        'perCycle'           => [
+            'monthly'      => '/mo',
+            'quarterly'    => '/qtr',
+            'semiannually' => '/6 mo',
+            'annually'     => '/yr',
+            'biennially'   => '/2 yr',
+            'triennially'  => '/3 yr',
+        ],
+        'noProductsText'     => 'Our product catalogue is being updated. Browse the store for everything that&rsquo;s available right now.',
+        'noProductsCta'      => 'Browse the store',
+
+        // --- Testimonials ---------------------------------------------------
+        'testiTitle'         => 'What our customers say',
+        'testiSub'           => 'Real words from teams running on Hostnodes.',
+        // SHIPS EMPTY BY DESIGN. The section renders only when this is
+        // non-empty, so no invented customer quotes can reach production. Add
+        // real ones as:
+        //   ['quote' => '...', 'author' => 'Jane Doe', 'role' => 'CTO', 'company' => 'Acme'],
+        'testimonials'       => [],
+
+        // --- Latest announcements (real WHMCS data) -------------------------
+        'newsTitle'          => 'Latest announcements',
+        'newsSub'            => 'Product updates, maintenance windows and network news.',
+        'newsReadMore'       => 'Read more',
+        'newsAll'            => 'View all announcements',
         'ratingOf'           => 'out of 5 from 2,400+ verified Trustpilot reviews',
         'ctaTitle'           => 'Launch on hosting that feels modern.',
         'ctaText'            => 'Start free today &mdash; no card needed. Upgrade when you&rsquo;re ready.',

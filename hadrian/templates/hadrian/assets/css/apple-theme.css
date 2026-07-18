@@ -1482,6 +1482,11 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 /* --- Icon Grid (3-col) --- */
 .hp-icon-grid { max-width: 1024px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; padding: 80px 22px; }
 .hp-icon-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+/* 4-up variant. The base grid is 3-wide, so a section with 4 items strands the
+   fourth alone on row two — which is what the homepage did. Collapses with the
+   others at 820px (see the override in that media block; without it this
+   higher-specificity rule would beat the collapse and overflow on phones). */
+.hp-icon-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
 .hp-icon-item { text-align: center; padding: 32px 20px; }
 .hp-icon-item .icon-circle { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: var(--text-h4); }
 .hp-icon-item .icon-circle svg { width: 30px; height: 30px; }
@@ -1623,6 +1628,9 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
     .hp-alt-row.reverse { direction: ltr; }
     .hp-alt-text h3 { font-size: var(--text-h3); }
     .hp-icon-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; padding: 48px 22px; }
+    /* Must repeat the modifier here: .hp-icon-grid.cols-4 outranks the bare
+       .hp-icon-grid above, so without this the 4-up stays 4 wide on phones. */
+    .hp-icon-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
     .hp-stats-strip .stats-inner { flex-wrap: wrap; }
     .hp-stat { flex: 0 0 50%; border-right: none; padding: 16px; }
     .hp-stat .stat-num { font-size: var(--text-h3); }
