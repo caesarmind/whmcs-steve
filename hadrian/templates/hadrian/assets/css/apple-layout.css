@@ -134,8 +134,7 @@ body[data-tpl="homepage"] .ph-main-wrap .content-area {
     padding-right: 0;
 }
 body[data-tpl="homepage"] .content-area > .mt-verify-banner,
-body[data-tpl="homepage"] .content-area > .hp-hero,
-body[data-tpl="homepage"] .content-area > .hp-locations-section {
+body[data-tpl="homepage"] .content-area > .hp-hero {
     max-width: 1024px;
     margin-left: auto;
     margin-right: auto;
@@ -148,9 +147,7 @@ body[data-tpl="homepage"] .content-area > .hp-locations-section {
    figures stay in the centred measure — same shape as .hp-cta-immersive and
    the footer. .hp-hero stays capped because its text sits in direct children
    with no inner wrapper, so full-bleed would stretch the copy across the whole
-   viewport. .hp-locations-section stays capped too: its background is
-   --color-bg, identical to the page, so bleeding it would change nothing
-   visible while un-capping its heading. */
+   viewport. */
 
 /* Content alignment "Left" -- on full-bleed store pages, anchor the content as a
    capped column on the left (under the sidebar) instead of running it full-bleed

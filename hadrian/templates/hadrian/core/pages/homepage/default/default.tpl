@@ -162,34 +162,6 @@
     </div>
 </section>
 
-{* 6. Data centers - locations *}
-<section class="hp-locations-section" style="padding: 72px 22px;">
-    <h2 style="font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 12px;">{$hadrianLang.home.locTitle}</h2>
-    <p class="loc-sub">{$hadrianLang.home.locSub}</p>
-    <div class="hp-loc-grid" style="grid-template-columns: 1fr 1fr; max-width: 1000px; margin: 40px auto 0;">
-        <div class="hp-loc-card" style="padding: 32px;">
-            <div class="loc-flag" style="font-size: 42px; margin-bottom: 16px;">&#127465;&#127466;</div>
-            <h4 style="font-size: 22px;">{$hadrianLang.home.loc1Title}</h4>
-            <p style="margin-bottom: 16px;">{$hadrianLang.home.loc1Coverage}</p>
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px;">
-                <div style="display: flex; align-items: center; gap: 8px;"><span style="color: #86868b;">{$hadrianLang.home.locInfraLabel} &middot;</span><span style="color: var(--color-text-primary); font-weight: 500;">Google Cloud &middot; europe-west3</span></div>
-                <div style="display: flex; align-items: center; gap: 8px;"><span style="color: #86868b;">{$hadrianLang.home.locComplianceLabel} &middot;</span><span style="color: var(--color-text-primary); font-weight: 500;">{$hadrianLang.home.loc1Compliance}</span></div>
-                <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;"><span style="width: 8px; height: 8px; background: #30d158; border-radius: 50%;"></span><span style="color: #30d158; font-weight: 600; font-size: 12px;">{$hadrianLang.home.locOnline}</span></div>
-            </div>
-        </div>
-        <div class="hp-loc-card" style="padding: 32px;">
-            <div class="loc-flag" style="font-size: 42px; margin-bottom: 16px;">&#127482;&#127480;</div>
-            <h4 style="font-size: 22px;">{$hadrianLang.home.loc2Title}</h4>
-            <p style="margin-bottom: 16px;">{$hadrianLang.home.loc2Coverage}</p>
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px;">
-                <div style="display: flex; align-items: center; gap: 8px;"><span style="color: #86868b;">{$hadrianLang.home.locInfraLabel} &middot;</span><span style="color: var(--color-text-primary); font-weight: 500;">Google Cloud &middot; us-east1</span></div>
-                <div style="display: flex; align-items: center; gap: 8px;"><span style="color: #86868b;">{$hadrianLang.home.locComplianceLabel} &middot;</span><span style="color: var(--color-text-primary); font-weight: 500;">{$hadrianLang.home.loc2Compliance}</span></div>
-                <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;"><span style="width: 8px; height: 8px; background: #30d158; border-radius: 50%;"></span><span style="color: #30d158; font-weight: 600; font-size: 12px;">{$hadrianLang.home.locOnline}</span></div>
-            </div>
-        </div>
-    </div>
-</section>
-
 {* 7. White-label + dev tools - intel duo *}
 <section class="hp-intel-duo">
     <div class="hp-intel-big">

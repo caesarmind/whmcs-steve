@@ -2057,17 +2057,6 @@ return [
         // spotEyebrow / spotTitle / spotText / spotStat1-3 removed with the
         // OpenPanel spotlight section. Its "12 active sites / 99.9% / 14 GB"
         // figures were decorative mock-panel numbers, not real metrics.
-        'locTitle'           => 'Your data, closer to home.',
-        'locSub'             => 'Both regions run on Google Cloud &mdash; premium fibre backbone, low-latency routing, 99.9% uptime SLA.',
-        'locInfraLabel'      => 'Infrastructure',
-        'locComplianceLabel' => 'Compliance',
-        'locOnline'          => 'Online',
-        'loc1Title'          => 'Frankfurt, Europe',
-        'loc1Coverage'       => 'Coverage: Europe, Middle East, Africa',
-        'loc1Compliance'     => 'GDPR ready',
-        'loc2Title'          => 'New York, Americas',
-        'loc2Coverage'       => 'Coverage: North &amp; South America',
-        'loc2Compliance'     => 'SOC 2 ready',
         'wlEyebrow'          => 'White-label',
         'wlTitle'            => 'Hosting that looks like your brand.',
         'wlStrong'           => 'Your clients see your brand, not ours.',
@@ -2145,6 +2134,8 @@ return [
         // from 2,400+ verified Trustpilot reviews" alongside hardcoded G2 /
         // Product Hunt / Indie Hackers counts — none of it sourced. Deleted
         // rather than left dormant so it can't be reintroduced by accident.
+        // loc* keys removed with the data-centres section: they named
+        // specific Google Cloud regions and SOC 2 / GDPR readiness.
         'ctaTitle'           => 'Launch on hosting that feels modern.',
         'ctaText'            => 'Start free today &mdash; no card needed. Upgrade when you&rsquo;re ready.',
         'ctaBtn'             => 'Start for free',
