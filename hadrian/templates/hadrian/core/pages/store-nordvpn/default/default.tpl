@@ -88,7 +88,7 @@
     <section class="hp-features-section" style="padding: 48px 22px;">
         <h2>{$hadrianLang.store.nvDevicesTitle}</h2>
         <p class="feat-sub">{$hadrianLang.store.nvDevicesSub}</p>
-        <div class="hp-feature-cards" style="margin-top: 40px; grid-template-columns: repeat(5, 1fr);">
+        <div class="hp-feature-cards cols-5"  style="margin-top: 40px">
             <div class="hp-feature-card" style="align-items: center; text-align: center;"><div class="feat-icon blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.48L10.93 4.4v7.74H3V5.48zM3 18.52l7.93 1.08v-7.68H3v6.6zM11.86 4.27L22.4 2.85v9.29H11.86V4.27zM11.86 19.73L22.4 21.15v-9.01H11.86v7.59z"/></svg></div><h4>Windows</h4><p style="font-size: 12px;">Windows 10, 11</p></div>
             <div class="hp-feature-card" style="align-items: center; text-align: center;"><div class="feat-icon" style="background: var(--color-surface-secondary); color: var(--color-text-primary);"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21z"/></svg></div><h4>macOS</h4><p style="font-size: 12px;">macOS 11+</p></div>
             <div class="hp-feature-card" style="align-items: center; text-align: center;"><div class="feat-icon green"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52z"/></svg></div><h4>Android</h4><p style="font-size: 12px;">Play Store</p></div>
@@ -134,7 +134,7 @@
     {* 5. VPN benefits 3-col *}
     <div style="background: var(--color-surface-secondary);">
     <section class="hp-features-section" style="padding: 48px 22px;">
-        <div class="hp-feature-cards" style="max-width: 1024px; margin: 0 auto; grid-template-columns: repeat(3, 1fr);">
+        <div class="hp-feature-cards"  style="max-width: 1024px; margin: 0 auto">
             <div class="hp-feature-card">
                 <div class="feat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
                 <h4>{$hadrianLang.store.nvBenefit1Title}</h4>
@@ -191,7 +191,7 @@
     <section class="hp-features-section" style="padding: 48px 22px;">
         <h2>{$hadrianLang.store.nvUseTitle}</h2>
         <p class="feat-sub">{$hadrianLang.store.nvUseSub}</p>
-        <div class="hp-feature-cards" style="margin-top: 40px; grid-template-columns: repeat(3, 1fr); max-width: 1024px; margin-left: auto; margin-right: auto;">
+        <div class="hp-feature-cards"  style="margin-top: 40px; max-width: 1024px; margin-left: auto; margin-right: auto">
             <div class="hp-feature-card">
                 <div class="feat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div>
                 <h4>{$hadrianLang.store.nvUse1Title}</h4>

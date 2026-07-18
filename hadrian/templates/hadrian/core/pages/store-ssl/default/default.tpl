@@ -186,7 +186,7 @@
     <div style="background: var(--color-surface-secondary);">
     <section class="hp-features-section" style="padding: 72px 22px;">
         <h2>{$hadrianLang.store.sslFeaturesTitle}</h2>
-        <div class="hp-feature-cards" style="margin-top: 40px; max-width: 1024px; margin-left: auto; margin-right: auto; grid-template-columns: repeat(5, 1fr);">
+        <div class="hp-feature-cards cols-5"  style="margin-top: 40px; max-width: 1024px; margin-left: auto; margin-right: auto">
             <div class="hp-feature-card">
                 <div class="feat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
                 <h4>{$hadrianLang.store.sslFeat1Title}</h4>

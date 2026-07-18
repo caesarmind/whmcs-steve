@@ -185,7 +185,7 @@
     <section class="hp-features-section" style="padding: 72px 22px;">
         <div style="text-align: center; color: var(--color-accent); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">{$hadrianLang.store.mgCustomersEyebrow}</div>
         <h2>{$hadrianLang.store.mgCustomersTitle}</h2>
-        <div class="hp-feature-cards" style="margin-top: 40px; grid-template-columns: repeat(3, 1fr);">
+        <div class="hp-feature-cards"  style="margin-top: 40px">
             <div class="hp-feature-card">
                 <div class="stars" style="color: #ffd60a; font-size: 18px; margin-bottom: 10px;">&starf;&starf;&starf;&starf;&starf;</div>
                 <p style="font-size: 14px; color: var(--color-text-primary);">marketgoo made me stand out in just 2 months. Traffic tripled. I worked through the plan tasks, followed every recommendation, and the rank-tracking dashboard is the cherry on top.</p>
@@ -209,7 +209,7 @@
     <section class="hp-pricing-section" id="pricing" style="padding: 72px 22px;">
         <div style="text-align: center; color: var(--color-accent); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">{$hadrianLang.store.mgPricingEyebrow}</div>
         <h2 style="text-align: center;">{$hadrianLang.store.mgPricingTitle}</h2>
-        <div class="hp-pricing-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 760px; margin: 40px auto 0;">
+        <div class="hp-pricing-grid cols-2"  style="max-width: 760px; margin: 40px auto 0">
             <div class="hp-price-card dim">
                 <div class="label">{if isset($_mgLite)}{$_mgLite->name|escape}{else}Lite{/if}</div>
                 <h3>{$hadrianLang.store.mgLiteTagline}</h3>

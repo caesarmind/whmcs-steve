@@ -192,7 +192,7 @@
                 <button data-feat="fsc" role="tab" aria-selected="false">{$hadrianLang.store.monFullSiteCheck}</button>
             </div>
             <div class="mon-pane active" data-featpane="site">
-                <div class="hp-feature-cards" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="hp-feature-cards" >
                     <div class="hp-feature-card"><div class="feat-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h4>{$hadrianLang.store.monSF1Title}</h4><p>{$hadrianLang.store.monSF1Text}</p></div>
                     <div class="hp-feature-card"><div class="feat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h4>{$hadrianLang.store.monSF2Title}</h4><p>{$hadrianLang.store.monSF2Text}</p></div>
                     <div class="hp-feature-card"><div class="feat-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><h4>{$hadrianLang.store.monSF3Title}</h4><p>{$hadrianLang.store.monSF3Text}</p></div>
@@ -202,7 +202,7 @@
                 </div>
             </div>
             <div class="mon-pane" data-featpane="fsc">
-                <div class="hp-feature-cards" style="grid-template-columns: repeat(2, 1fr); max-width: 720px; margin: 0 auto;">
+                <div class="hp-feature-cards cols-2"  style="max-width: 720px; margin: 0 auto">
                     <div class="hp-feature-card"><div class="feat-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div><h4>{$hadrianLang.store.monFF1Title}</h4><p>{$hadrianLang.store.monFF1Text}</p></div>
                     <div class="hp-feature-card"><div class="feat-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><h4>{$hadrianLang.store.monFF2Title}</h4><p>{$hadrianLang.store.monFF2Text}</p></div>
                     <div class="hp-feature-card"><div class="feat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><h4>{$hadrianLang.store.monFF3Title}</h4><p>{$hadrianLang.store.monFF3Text}</p></div>
@@ -323,7 +323,7 @@
             <button data-cycle="server">{$hadrianLang.store.monModeServer}</button>
         </div>
         <div class="mon-pane active" data-pricepane="site">
-            <div class="hp-pricing-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="hp-pricing-grid cols-4" >
                 <div class="hp-price-card dim">
                     <div class="label">{if isset($_ws0)}{$_ws0->name|escape}{else}Lite{/if}</div>
                     <h3>{$hadrianLang.store.monSitePlan1Tagline}</h3>
@@ -355,7 +355,7 @@
             </div>
         </div>
         <div class="mon-pane" data-pricepane="server">
-            <div class="hp-pricing-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="hp-pricing-grid" >
                 <div class="hp-price-card dim">
                     <div class="label">{if isset($_sv0)}{$_sv0->name|escape}{else}Pro{/if}</div>
                     <h3>{$hadrianLang.store.monSrvPlan1Tagline}</h3>

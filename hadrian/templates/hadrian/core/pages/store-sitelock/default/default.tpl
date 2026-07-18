@@ -195,7 +195,7 @@
     <section class="hp-features-section" style="padding: 72px 22px;">
         <div style="text-align: center; color: var(--color-accent); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">{$hadrianLang.store.slScanEyebrow}</div>
         <h2>{$hadrianLang.store.slScanTitle}</h2>
-        <div class="hp-feature-cards" style="margin-top: 40px; grid-template-columns: repeat(3, 1fr);">
+        <div class="hp-feature-cards"  style="margin-top: 40px">
             <div class="hp-feature-card">
                 <div class="feat-icon red"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
                 <h4>{$hadrianLang.store.slScan1Title}</h4>
@@ -283,7 +283,7 @@
         <div style="text-align: center; color: var(--color-accent); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">{$hadrianLang.store.slEmergencyEyebrow}</div>
         <h2 style="text-align: center; font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 12px;">{$hadrianLang.store.slEmergencyTitle}</h2>
         <p style="text-align: center; color: var(--color-text-secondary); font-size: 16px; max-width: 720px; margin: 0 auto 48px;">{$hadrianLang.store.slEmergencySub}</p>
-        <div class="step-flow-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
+        <div class="step-flow-row"  style="display: grid; gap: 20px; margin-bottom: 20px">
             <div style="background: var(--color-surface); border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
                 <div style="width: 44px; height: 44px; margin: 0 auto 16px; background: linear-gradient(135deg, #0071e3, #5ac8fa); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">1</div>
                 <h4 style="font-size: 15px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.slStep1Title}</h4>
@@ -300,7 +300,7 @@
                 <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.slStep3Text}</p>
             </div>
         </div>
-        <div class="step-flow-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+        <div class="step-flow-row"  style="display: grid; gap: 20px">
             <div style="background: var(--color-surface); border-radius: 16px; padding: 28px 20px; text-align: center; position: relative;">
                 <div style="width: 44px; height: 44px; margin: 0 auto 16px; background: linear-gradient(135deg, #0071e3, #5ac8fa); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">4</div>
                 <h4 style="font-size: 15px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.slStep4Title}</h4>

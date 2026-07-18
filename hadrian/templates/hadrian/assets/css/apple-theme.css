@@ -1242,6 +1242,9 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .hp-pricing-section h2 { font-size: var(--text-display-sm); line-height: 1.05; font-weight: var(--fw-semibold); letter-spacing: -0.025em; margin: 0 0 14px; color: var(--color-text-primary); }
 .hp-pricing-section .sub { font-size: var(--text-2xl); color: var(--color-text-secondary); max-width: 600px; margin: 0 auto 48px; }
 .hp-pricing-grid { max-width: 1024px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+/* Same story as .hp-feature-cards — modifiers, never an inline override. */
+.hp-pricing-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.hp-pricing-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
 .hp-price-card { background: var(--color-surface); border-radius: 18px; padding: 36px 28px; text-align: left; border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; }
 .hp-price-card.highlight { border: 2px solid var(--color-accent); }
 .hp-price-card .label { font-size: var(--text-base); color: var(--color-text-secondary); font-weight: var(--fw-semibold); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 10px; }
@@ -1421,7 +1424,9 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
     .hp-tile { min-height: 500px; }
     .hp-tile h2 { font-size: var(--text-h3); }
     .hp-strip-card { flex: 0 0 280px; }
-    .hp-pricing-grid { grid-template-columns: 1fr; }
+    .hp-pricing-grid,
+    .hp-pricing-grid.cols-2,
+    .hp-pricing-grid.cols-4 { grid-template-columns: 1fr; }
     .hp-footer-cols { grid-template-columns: repeat(2, 1fr); }
     .hp-final-cta h2 { font-size: var(--text-h1); }
     .hp-dash-tiles { grid-template-columns: repeat(2, 1fr); }
@@ -1692,6 +1697,17 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-features-section h2 { font-size: var(--text-h1); font-weight: var(--fw-semibold); letter-spacing: -0.02em; text-align: center; margin: 0 0 10px; color: var(--color-text-primary); }
 .hp-features-section .feat-sub { font-size: var(--text-xl); color: var(--color-text-secondary); text-align: center; margin-bottom: 48px; }
 .hp-feature-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+/* Column-count modifiers. The store pages used to set grid-template-columns
+   INLINE on this component, which outranks the max-width:820px collapse below —
+   so a 5-up feature row stayed 5-up on a phone and pushed the page hundreds of
+   px wide. Use these instead; they collapse with everything else. */
+.hp-feature-cards.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.hp-feature-cards.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.hp-feature-cards.cols-5 { grid-template-columns: repeat(5, 1fr); }
+/* .step-flow-row shipped with no CSS at all — sitelock drew it entirely from an
+   inline grid, so it could never collapse. Give it a real responsive rule. */
+.step-flow-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+@media (max-width: 820px) { .step-flow-row { grid-template-columns: 1fr; } }
 .hp-feature-card { background: var(--color-surface-secondary); border-radius: 18px; padding: 32px 24px; text-align: center; }
 .hp-feature-card .feat-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: var(--text-3xl); }
 .hp-feature-card .feat-icon svg { width: 26px; height: 26px; }
@@ -2107,7 +2123,14 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 @media (max-width: 820px) {
     .hp-faq-grid .faq-grid-inner { grid-template-columns: 1fr; }
     .hp-loc-grid { grid-template-columns: repeat(2, 1fr); }
-    .hp-feature-cards { grid-template-columns: 1fr; }
+    /* Modifiers repeated: .cols-N is more specific than the bare selector. */
+    .hp-feature-cards,
+    .hp-feature-cards.cols-2,
+    .hp-feature-cards.cols-4,
+    .hp-feature-cards.cols-5 { grid-template-columns: 1fr; }
+    /* .hp-pricing-grid's own collapse is at 600; step the wide variants down
+       here so they aren't still 4-up on a tablet. */
+    .hp-pricing-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
     .hp-numbered-item { grid-template-columns: 40px 1fr; gap: 16px; }
     .hp-numbered-item .num { font-size: var(--text-3xl); }
     .hp-bento-grid { grid-template-columns: 1fr; }
