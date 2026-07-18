@@ -63,7 +63,7 @@
                 <span style="width: 9px; height: 9px; background: #ff9f0a; border-radius: 50%;"></span>
                 <span style="width: 9px; height: 9px; background: #30d158; border-radius: 50%;"></span>
             </div>
-            <div style="display: grid; grid-template-columns: 180px 1fr 260px; gap: 12px; min-height: 380px;">
+            <div class="hp-mock-panes" style="min-height: 380px;">
                 <div style="background: var(--color-surface-secondary); border-radius: 14px; padding: 16px;">
                     <div style="display: flex; flex-direction: column; gap: 6px;">
                         <div style="padding: 10px; background: var(--color-surface); border-radius: 10px; display: flex; align-items: center; gap: 8px; color: var(--color-accent); font-weight: 600; font-size: 12px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>

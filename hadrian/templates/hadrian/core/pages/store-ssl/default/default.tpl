@@ -294,7 +294,7 @@
             {if $_sslCount > 0}
                 {foreach $certificates as $_type => $_certProducts}
                     {foreach $_certProducts as $_cert}
-                    <div style="display: grid; grid-template-columns: 80px 1fr 120px 120px; align-items: center; gap: 16px; padding: 20px; background: var(--color-surface-secondary); border-radius: 14px;">
+                    <div class="hp-compare-row" style="padding: 20px; background: var(--color-surface-secondary); border-radius: 14px;">
                         <div style="width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; background: {if $_type == 'dv'}linear-gradient(135deg, #0071e3, #5ac8fa){elseif $_type == 'ov'}linear-gradient(135deg, #30d158, #5cdb79){elseif $_type == 'ev'}linear-gradient(135deg, #bf5af2, #c678ff){else}linear-gradient(135deg, #ff9f0a, #ffb843){/if};">{$_type|escape}</div>
                         <div>
                             <div style="font-weight: 600; color: var(--color-text-primary); font-size: 15px;">{$_cert->name|escape}</div>

@@ -77,7 +77,7 @@
     <section class="hp-onboarding-steps" style="padding: 72px 22px; max-width: 1024px; margin: 0 auto;">
         <div style="text-align: center; color: var(--color-accent); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">{$hadrianLang.store.mgStepsEyebrow}</div>
         <h2 style="text-align: center; font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 48px;">{$hadrianLang.store.mgStepsTitle}</h2>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; position: relative;">
+        <div class="hp-onboarding-steps-row" style="gap: 20px; position: relative;">
             <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
                 <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">1</div>
                 <div style="width: 72px; height: 72px; margin: 8px auto 16px; background: linear-gradient(135deg, #eaf4ff, #dbeafe); border-radius: 18px; display: flex; align-items: center; justify-content: center;">
