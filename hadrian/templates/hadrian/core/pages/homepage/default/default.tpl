@@ -82,7 +82,10 @@
 </section>
 
 {* 2. Trust stats strip *}
-<section class="hp-stats-strip" style="padding: 48px 22px;">
+{* Full-bleed band — see the body[data-tpl="homepage"] block in apple-layout.css.
+   Padding comes from .hp-stats-strip in apple-theme.css (56px 22px); the inline
+   48px override that used to sit here is gone so the band has one source. *}
+<section class="hp-stats-strip">
     <div class="stats-inner">
         <div class="hp-stat"><div class="stat-num">10K+</div><div class="stat-label">{$hadrianLang.home.stat1}</div></div>
         <div class="hp-stat"><div class="stat-num">99.9%</div><div class="stat-label">{$hadrianLang.home.stat2}</div></div>
