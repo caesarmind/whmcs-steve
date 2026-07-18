@@ -578,6 +578,47 @@ body[data-hide-breadcrumb="1"] .ph-side-topbar-actions { margin-left: auto; }
                   and that strip becomes the only nav, so it earns the
                   behaviour. Lagom likewise bails out of affixed nav for its
                   left-nav layout on desktop but keeps it on mobile. */
+/* -- Section Titles Capitalization (admin toggle) ------------ */
+/* INVERTED on purpose, exactly like Lagom's `inherit-section-titles` body
+   class: the attribute is emitted only when the admin explicitly switches the
+   setting OFF. The flag defaults to true and uppercase is the theme's baseline,
+   so an install that has never saved the Settings screen keeps the look it has
+   today rather than silently losing its capitals on deploy.
+
+   SCOPE: marketing / store pages only -- the eyebrows, tags, tier names and
+   price labels inside hp-* / fp-* sections, plus the two standalone marketing
+   labels. Client-area chrome (table headers, .sidebar-section-label,
+   .settings-group-title, .invoice-address-label, nav dropdown headers) keeps
+   its uppercase: those are table and UI-chrome decisions, not "section
+   titles", and Lagom likewise scopes its rule to `.site .site-section
+   .section-title` rather than the whole theme.
+
+   Matched via ancestor prefix rather than by listing all 24 affected
+   selectors, so marketing sections added later are covered automatically.
+   [class^="hp-"] plus [class*=" hp-"] rather than a bare [class*="hp-"] so it
+   cannot match an unrelated class that merely contains those two letters.
+   !important because the per-element rules it overrides run as high as (0,4,0)
+   -- Lagom uses !important on its sibling hide-discounts rule for the same
+   reason. Safe here: no capitalize/lowercase transforms exist to clobber. */
+body[data-capitalize-titles="0"] [class^="hp-"],
+body[data-capitalize-titles="0"] [class*=" hp-"],
+body[data-capitalize-titles="0"] [class^="hp-"] *,
+body[data-capitalize-titles="0"] [class*=" hp-"] *,
+body[data-capitalize-titles="0"] [class^="fp-"],
+body[data-capitalize-titles="0"] [class*=" fp-"],
+body[data-capitalize-titles="0"] [class^="fp-"] *,
+body[data-capitalize-titles="0"] [class*=" fp-"] *,
+body[data-capitalize-titles="0"] .store-plan-name,
+body[data-capitalize-titles="0"] .page-eyebrow { text-transform: none !important; }
+
+/* -- Hide Billing Cycle Discounts (admin toggle) ------------- */
+/* The "Save X%" pill is built by JS in hadrian_cart/configureproduct.tpl,
+   which now bails out early on this same attribute, so normally nothing is
+   rendered to hide. This is the safety net for a cached page whose JS guard
+   predates the setting, and it costs one rule. Mirrors Lagom's .hide-discounts
+   rule (which is CSS-only and likewise !important). */
+body[data-hide-discounts="1"] .cp-cycle-save { display: none !important; }
+
 /* OFF (the default) = the bar is NOT pinned: it scrolls away with the page,
    which is what "Pin the navbar on scroll" promises when unchecked. The bars
    are position:sticky unconditionally in apple-theme.css / above, so without

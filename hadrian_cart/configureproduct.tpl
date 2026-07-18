@@ -821,6 +821,12 @@ var _localLang = {
    Skips when there's no monthly baseline, when savings <= 0, or when a
    pill is already present (defensive against re-runs). */
 (function () {
+    /* Admin "Hide Billing Cycle Discounts" — bail before building anything,
+       so the pills are never created rather than created and then hidden.
+       apple-layout.css carries a display:none safety net for cached pages
+       whose JS predates this guard. */
+    if (document.body.getAttribute('data-hide-discounts') === '1') return;
+
     var CYCLE_MONTHS = {
         monthly: 1, quarterly: 3,
         semiannually: 6, annually: 12,
