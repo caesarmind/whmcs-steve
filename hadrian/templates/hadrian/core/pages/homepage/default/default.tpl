@@ -259,7 +259,10 @@
     <p class="sub">{$hadrianLang.home.pricingSub}</p>
 
     <div class="when-full">
-        <div class="hp-segmented-bar" style="grid-template-columns: repeat({if $groupCount > 0}{$groupCount}{else}4{/if}, 1fr);">
+        {* count-N, not an inline grid-template-columns: an inline value outranks
+           the max-width:820px collapse in apple-theme.css, which kept this bar
+           multi-column on phones. *}
+        <div class="hp-segmented-bar count-{if $groupCount > 0 && $groupCount <= 4}{$groupCount}{else}4{/if}">
             {foreach $hpGroups as $grp}
             <div class="hp-seg-col{if $grp@iteration == 2} highlight{/if}">
                 <div class="tier">{$grp.name|escape}</div>
@@ -274,8 +277,8 @@
     </div>
 
     {* No visible product groups configured, or the catalogue query failed. *}
-    <div class="when-empty" style="text-align: center; padding: 32px 22px;">
-        <p style="font-size: 17px; color: var(--color-text-secondary); margin: 0 0 20px;">{$hadrianLang.home.noProductsText}</p>
+    <div class="when-empty hp-pricing-empty">
+        <p>{$hadrianLang.home.noProductsText}</p>
         <a href="{$WEB_ROOT}/cart.php" class="btn-primary">{$hadrianLang.home.noProductsCta}</a>
     </div>
 
@@ -290,19 +293,22 @@
      Reuses .hp-testimonials-grid, already in apple-theme.css. *}
 {if $hpTestimonials}
 <section class="hp-testimonials-grid">
-    <h2 style="text-align: center;">{$hadrianLang.home.testiTitle}</h2>
-    <p class="sub" style="text-align: center;">{$hadrianLang.home.testiSub}</p>
-    <div class="testi-grid">
+    {* .hp-testimonials-grid h2 already centres itself in apple-theme.css. *}
+    <h2>{$hadrianLang.home.testiTitle}</h2>
+    <div class="hp-testimonial-cards">
         {foreach $hpTestimonials as $t}
-        <figure class="testi-card">
-            <blockquote>{$t.quote|escape}</blockquote>
-            <figcaption>
-                <span class="testi-author">{$t.author|escape}</span>
-                {if $t.role || $t.company}
-                <span class="testi-role">{$t.role|escape}{if $t.role && $t.company}, {/if}{$t.company|escape}</span>
-                {/if}
-            </figcaption>
-        </figure>
+        <div class="hp-testimonial-card">
+            <div class="quote">{$t.quote|escape}</div>
+            <div class="author">
+                <div class="author-avatar">{$t.author|truncate:1:''|upper}</div>
+                <div>
+                    <div class="author-name">{$t.author|escape}</div>
+                    {if $t.role || $t.company}
+                    <div class="author-role">{$t.role|escape}{if $t.role && $t.company}, {/if}{$t.company|escape}</div>
+                    {/if}
+                </div>
+            </div>
+        </div>
         {/foreach}
     </div>
 </section>
@@ -313,27 +319,41 @@
      six/homepage.tpl iterates the same var). WHMCS announcements carry only a
      title, date and body — there are no categories, so no tag chips here. *}
 {if $annCount > 0}
-<section class="hp-announcements when-full" style="max-width: 1024px; margin: 0 auto; padding: 72px 22px;">
-    <h2 style="font-size: 44px; text-align: center; margin: 0 0 8px;">{$hadrianLang.home.newsTitle}</h2>
-    <p class="sub" style="text-align: center; color: var(--color-text-secondary); margin: 0 0 40px;">{$hadrianLang.home.newsSub}</p>
-    <div class="hp-announce-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+{* Uses the .hp-announce-grid component already in apple-theme.css (header +
+   .hp-announce-cards + .hp-announce-item-card, with dark-mode and mobile rules
+   already written) rather than inline styles — inline styles can't be
+   overridden by media queries, which is the exact cause of the marketing-page
+   mobile overflows.
+
+   Column count follows the announcement count, the way Lagom does it
+   (1 → full row, 2 → halves, 3+ → thirds), so a single announcement fills the
+   row instead of sitting narrow and centred with dead space beside it. *}
+<section class="hp-announce-grid when-full">
+    <div class="hp-announce-grid-header">
+        <div>
+            <h2>{$hadrianLang.home.newsTitle}</h2>
+            <p>{$hadrianLang.home.newsSub}</p>
+        </div>
+        <a href="{$WEB_ROOT}/announcements.php" class="announce-view-all">{$hadrianLang.home.newsAll} &rsaquo;</a>
+    </div>
+    <div class="hp-announce-cards count-{if $annCount >= 3}3{else}{$annCount}{/if}">
         {foreach $announcements as $ann}
         {if $ann@iteration <= 3}
-        <a href="{routePath('announcement-view', $ann.id, $ann.urlfriendlytitle)}" class="card hp-announce-card" style="display: block; padding: 24px; text-decoration: none;">
-            {* $carbon is provided by WHMCS on this page (stock six/homepage.tpl
-               uses it the same way), but guard anyway: a fatal in a template
-               drops the whole site back to the six theme, and the compiled-cache
-               poisoning that causes is not recoverable by reverting. *}
-            <div style="font-size: 13px; color: var(--color-text-tertiary); margin-bottom: 8px;">{if $carbon}{$carbon->translatePassedToFormat($ann.rawDate, 'M jS, Y')}{else}{$ann.date}{/if}</div>
-            <h3 style="font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 10px; line-height: 1.35;">{$ann.title}</h3>
-            <span style="font-size: 14px; color: var(--color-accent);">{$hadrianLang.home.newsReadMore} &rsaquo;</span>
+        <a href="{routePath('announcement-view', $ann.id, $ann.urlfriendlytitle)}" class="hp-announce-item-card">
+            <h3>{$ann.title}</h3>
+            {if $ann.summary}<p>{$ann.summary|strip_tags}</p>{/if}
+            <div class="announce-foot">
+                {* $carbon is provided by WHMCS here (stock six/homepage.tpl uses
+                   it the same way), but guard anyway: a template fatal drops the
+                   site to the six theme and poisons the compiled cache, which a
+                   revert does not undo. *}
+                <time>{if $carbon}{$carbon->translatePassedToFormat($ann.rawDate, 'M jS, Y')}{else}{$ann.rawDate}{/if}</time>
+                <span class="announce-read">{$hadrianLang.home.newsReadMore} &rsaquo;</span>
+            </div>
         </a>
         {/if}
         {/foreach}
     </div>
-    <p style="text-align: center; margin-top: 32px;">
-        <a href="{$WEB_ROOT}/announcements.php" style="color: var(--color-accent); font-size: 14px;">{$hadrianLang.home.newsAll} &rsaquo;</a>
-    </p>
 </section>
 {/if}
 
