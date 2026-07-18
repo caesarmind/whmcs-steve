@@ -2079,8 +2079,12 @@ return [
         'col3Title'          => 'Reliable, quietly.',
         'col3Text'           => 'Rock-solid uptime, one-click backups, and a clean panel your team can actually use. No sysadmin required.',
         'col3Link'           => 'For business',
-        'pricingTitle'       => 'Start free. Scale when ready.',
-        'pricingSub'         => 'Premium hosting with a genuinely free plan &mdash; no credit card, no time limit.',
+        // Section now lists the real WHMCS product groups, so the old
+        // "Start free / genuinely free plan - no credit card" copy no longer
+        // holds unless a genuinely free group exists. Neutral framing instead,
+        // matching Lagom's "Products For All Businesses" block.
+        'pricingTitle'       => 'Products for all businesses',
+        'pricingSub'         => 'Pick the category that fits, and see what&rsquo;s included.',
         'perForever'         => 'forever',
         'perMo'              => '/mo',
         'tierFree'           => 'Free',
@@ -2103,8 +2107,11 @@ return [
         // $0/$9/$29/$79 tiers. Kept because the 'portal' homepage variant may
         // still reference them; the default variant no longer does.
         'buyGroup'           => 'View plans',
+        'startingAt'         => 'Starting at',
         // Keyed by WHMCS billing cycle, so the suffix matches the cheapest
-        // cycle actually found for each group.
+        // cycle actually found for each group. perCycle is the compact suffix
+        // (kept for any inline use); cycleName is the spelled-out label shown
+        // under the price, the way Lagom's product block does it.
         'perCycle'           => [
             'monthly'      => '/mo',
             'quarterly'    => '/qtr',
@@ -2112,6 +2119,14 @@ return [
             'annually'     => '/yr',
             'biennially'   => '/2 yr',
             'triennially'  => '/3 yr',
+        ],
+        'cycleName'          => [
+            'monthly'      => 'Monthly',
+            'quarterly'    => 'Quarterly',
+            'semiannually' => 'Semi-Annually',
+            'annually'     => 'Annually',
+            'biennially'   => 'Biennially',
+            'triennially'  => 'Triennially',
         ],
         'noProductsText'     => 'Our product catalogue is being updated. Browse the store for everything that&rsquo;s available right now.',
         'noProductsCta'      => 'Browse the store',

@@ -239,12 +239,17 @@
            multi-column on phones. *}
         <div class="hp-segmented-bar count-{if $groupCount > 0 && $groupCount <= 4}{$groupCount}{else}4{/if}">
             {foreach $hpGroups as $grp}
+            {* Order mirrors Lagom's "Products For All Businesses" block:
+               group name, tagline, then "Starting at" above the price with the
+               billing cycle spelled out underneath. *}
             <div class="hp-seg-col{if $grp@iteration == 2} highlight{/if}">
                 <div class="tier">{$grp.name|escape}</div>
-                {if $grp.fromPrice}
-                <div class="price">{$grp.fromPrice}<span class="per">{$hadrianLang.home.perCycle[$grp.cycle]|default:''}</span></div>
-                {/if}
                 {if $grp.tagline}<div class="desc">{$grp.tagline|escape}</div>{/if}
+                {if $grp.fromPrice}
+                <div class="seg-from">{$hadrianLang.home.startingAt}</div>
+                <div class="price">{$grp.fromPrice}</div>
+                <div class="seg-cycle">{$hadrianLang.home.cycleName[$grp.cycle]|default:''}</div>
+                {/if}
                 <a href="{$WEB_ROOT}/{$grp.url}" class="buy">{$hadrianLang.home.buyGroup}</a>
             </div>
             {/foreach}
