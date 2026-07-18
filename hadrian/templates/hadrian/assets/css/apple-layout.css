@@ -119,6 +119,30 @@ body[data-bleed="1"] .content-area > .when-empty {
     padding-right: 22px;
     box-sizing: border-box;
 }
+/* Homepage: let the immersive CTA band run edge-to-edge.
+   Same idea as data-bleed above, but scoped to the homepage so store pages are
+   untouched. .content-area caps at 1120px and centres, so .hp-cta-immersive
+   rendered as a 1024px box with gutters either side while the footer band
+   directly below it spanned the full width of .ph-main-wrap -- the two bands
+   visibly disagreed. Drop the cap + side gutter here and re-cap the sections
+   that don't already carry their own max-width, so only the CTA stretches.
+   Safe to drop the gutter: every homepage section has its own 22px inner
+   padding (the verify banner has 16px), so nothing runs to the edge. */
+body[data-tpl="homepage"] .ph-main-wrap .content-area {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+body[data-tpl="homepage"] .content-area > .mt-verify-banner,
+body[data-tpl="homepage"] .content-area > .hp-hero,
+body[data-tpl="homepage"] .content-area > .hp-stats-strip,
+body[data-tpl="homepage"] .content-area > .hp-locations-section {
+    max-width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
 /* Content alignment "Left" -- on full-bleed store pages, anchor the content as a
    capped column on the left (under the sidebar) instead of running it full-bleed
    + centred. Only meaningful in sidebar/rail layouts; the top nav has no sidebar

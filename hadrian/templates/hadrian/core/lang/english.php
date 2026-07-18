@@ -2054,12 +2054,9 @@ return [
         'iso3Text'           => 'Private cache instance. No resource sharing, no cold keys when the neighbor ships a big update.',
         'iso4Title'          => 'Resources',
         'iso4Text'           => 'CPU and RAM capped per container. No noisy neighbors. Your performance is your performance.',
-        'spotEyebrow'        => 'OpenPanel',
-        'spotTitle'          => 'A panel that feels like software from 2026.',
-        'spotText'           => 'No more clutter. Focused workflows. Real-time metrics. Everything where you&rsquo;d expect it, responsive on any screen.',
-        'spotStat1'          => 'Active sites',
-        'spotStat2'          => 'Uptime',
-        'spotStat3'          => 'Storage used',
+        // spotEyebrow / spotTitle / spotText / spotStat1-3 removed with the
+        // OpenPanel spotlight section. Its "12 active sites / 99.9% / 14 GB"
+        // figures were decorative mock-panel numbers, not real metrics.
         'locTitle'           => 'Your data, closer to home.',
         'locSub'             => 'Both regions run on Google Cloud &mdash; premium fibre backbone, low-latency routing, 99.9% uptime SLA.',
         'locInfraLabel'      => 'Infrastructure',
@@ -2144,7 +2141,10 @@ return [
         'newsSub'            => 'Product updates, maintenance windows and network news.',
         'newsReadMore'       => 'Read more',
         'newsAll'            => 'View all announcements',
-        'ratingOf'           => 'out of 5 from 2,400+ verified Trustpilot reviews',
+        // ratingOf removed with the review-badge strip. It asserted "4.9 out of 5
+        // from 2,400+ verified Trustpilot reviews" alongside hardcoded G2 /
+        // Product Hunt / Indie Hackers counts — none of it sourced. Deleted
+        // rather than left dormant so it can't be reintroduced by accident.
         'ctaTitle'           => 'Launch on hosting that feels modern.',
         'ctaText'            => 'Start free today &mdash; no card needed. Upgrade when you&rsquo;re ready.',
         'ctaBtn'             => 'Start for free',

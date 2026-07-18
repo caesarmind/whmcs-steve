@@ -159,56 +159,6 @@
     </div>
 </section>
 
-{* 5. OpenPanel spotlight *}
-<div style="background: var(--color-surface-secondary);">
-<section class="hp-feature-spotlight" style="padding: 72px 22px;">
-    {* Grid lives in apple-theme.css (.hp-feature-spotlight .spotlight-inner) — an
-       inline grid-template-columns here outranks the max-width:820px stack rule,
-       which kept this section 2-up on phones and overflowed the page by 329px. *}
-    <div class="spotlight-inner">
-        <div>
-            <div class="hp-eyebrow" style="color: var(--color-accent);">{$hadrianLang.home.spotEyebrow}</div>
-            <h2 style="font-size: 44px; font-weight: 600; letter-spacing: -0.02em; margin: 12px 0;">{$hadrianLang.home.spotTitle}</h2>
-            <p style="font-size: 17px; color: #6e6e73; line-height: 1.5;">{$hadrianLang.home.spotText}</p>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px;">
-                <div><div style="font-size: 28px; font-weight: 700; color: #1d1d1f;">12</div><div style="font-size: 12px; color: #86868b;">{$hadrianLang.home.spotStat1}</div></div>
-                <div><div style="font-size: 28px; font-weight: 700; color: #30d158;">99.9%</div><div style="font-size: 12px; color: #86868b;">{$hadrianLang.home.spotStat2}</div></div>
-                <div><div style="font-size: 28px; font-weight: 700; color: var(--color-accent);">14 GB</div><div style="font-size: 12px; color: #86868b;">{$hadrianLang.home.spotStat3}</div></div>
-            </div>
-        </div>
-        <div>
-            <div style="background: #fff; border-radius: 18px; padding: 12px; box-shadow: 0 24px 60px rgba(0,0,0,0.10); overflow: hidden;">
-                <div style="display: flex; gap: 5px; margin-bottom: 10px; padding: 4px 8px;"><span style="width: 8px; height: 8px; background: #ff453a; border-radius: 50%;"></span><span style="width: 8px; height: 8px; background: #ff9f0a; border-radius: 50%;"></span><span style="width: 8px; height: 8px; background: #30d158; border-radius: 50%;"></span></div>
-                <div style="display: grid; grid-template-columns: 140px 1fr; gap: 12px; min-height: 320px;">
-                    <div style="background: #f5f5f7; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
-                        <div style="padding: 8px; background: #fff; border-radius: 8px; font-size: 11px; font-weight: 600; color: var(--color-accent); display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
-                        <div style="padding: 8px; font-size: 11px; color: #1d1d1f; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>Sites</div>
-                        <div style="padding: 8px; font-size: 11px; color: #1d1d1f; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/></svg>Databases</div>
-                        <div style="padding: 8px; font-size: 11px; color: #1d1d1f; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Email</div>
-                        <div style="padding: 8px; font-size: 11px; color: #1d1d1f; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Backups</div>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                            <div style="background: #f5f5f7; border-radius: 10px; padding: 12px;"><div style="font-size: 10px; color: #86868b;">{$hadrianLang.home.spotStat1}</div><div style="font-size: 22px; font-weight: 700; color: #1d1d1f; margin-top: 2px;">12</div></div>
-                            <div style="background: #e8f8ed; border-radius: 10px; padding: 12px;"><div style="font-size: 10px; color: #1a7f37;">{$hadrianLang.home.spotStat2}</div><div style="font-size: 22px; font-weight: 700; color: #1a7f37; margin-top: 2px;">99.9%</div></div>
-                            <div style="background: #eaf4ff; border-radius: 10px; padding: 12px;"><div style="font-size: 10px; color: var(--color-accent);">Storage</div><div style="font-size: 22px; font-weight: 700; color: var(--color-accent); margin-top: 2px;">14 GB</div></div>
-                        </div>
-                        <div style="background: #f5f5f7; border-radius: 12px; padding: 12px;">
-                            <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 10px;">Your sites</div>
-                            <div style="display: flex; flex-direction: column; gap: 6px;">
-                                <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #fff; border-radius: 8px;"><span style="width: 6px; height: 6px; background: #30d158; border-radius: 50%;"></span><span style="font-size: 11px; color: #1d1d1f; flex: 1;">morganstudio.com</span><span style="font-size: 10px; color: #30d158; font-weight: 600;">Running</span></div>
-                                <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #fff; border-radius: 8px;"><span style="width: 6px; height: 6px; background: #30d158; border-radius: 50%;"></span><span style="font-size: 11px; color: #1d1d1f; flex: 1;">alexmorgan.io</span><span style="font-size: 10px; color: #30d158; font-weight: 600;">Running</span></div>
-                                <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #fff; border-radius: 8px;"><span style="width: 6px; height: 6px; background: #30d158; border-radius: 50%;"></span><span style="font-size: 11px; color: #1d1d1f; flex: 1;">ourstudio.design</span><span style="font-size: 10px; color: #30d158; font-weight: 600;">Running</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-</div>
-
 {* 6. Data centers - locations *}
 <section class="hp-locations-section" style="padding: 72px 22px;">
     <h2 style="font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 12px;">{$hadrianLang.home.locTitle}</h2>
@@ -330,19 +280,6 @@
     </div>
 
     <p style="text-align: center; font-size: 14px; color: var(--color-text-secondary); margin-top: 32px;">{$hadrianLang.home.pricingNote} <a href="{$WEB_ROOT}/cart.php" style="color: var(--color-accent);">{$hadrianLang.home.pricingNoteLink} &rsaquo;</a></p>
-</section>
-
-{* 10. Reviews *}
-<section class="hp-testi-reviews">
-    <div class="big-stars">&starf;&starf;&starf;&starf;&starf;</div>
-    <div class="rating-num">4.9</div>
-    <div class="rating-of">{$hadrianLang.home.ratingOf}</div>
-    <div class="review-sources">
-        <div class="rev-src"><div class="stars">&starf;&starf;&starf;&starf;&starf;</div><div class="src-name">Trustpilot</div><div class="src-count">2,400+ reviews</div></div>
-        <div class="rev-src"><div class="stars">&starf;&starf;&starf;&starf;&starf;</div><div class="src-name">G2</div><div class="src-count">890 reviews</div></div>
-        <div class="rev-src"><div class="stars">&starf;&starf;&starf;&starf;&starf;</div><div class="src-name">Product Hunt</div><div class="src-count">520 reviews</div></div>
-        <div class="rev-src"><div class="stars">&starf;&starf;&starf;&starf;&starf;</div><div class="src-name">Indie Hackers</div><div class="src-count">310 reviews</div></div>
-    </div>
 </section>
 
 {* 10b. Testimonials — "What our customers say".
