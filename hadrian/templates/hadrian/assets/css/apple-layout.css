@@ -578,6 +578,23 @@ body[data-hide-breadcrumb="1"] .ph-side-topbar-actions { margin-left: auto; }
                   and that strip becomes the only nav, so it earns the
                   behaviour. Lagom likewise bails out of affixed nav for its
                   left-nav layout on desktop but keeps it on mobile. */
+/* OFF (the default) = the bar is NOT pinned: it scrolls away with the page,
+   which is what "Pin the navbar on scroll" promises when unchecked. The bars
+   are position:sticky unconditionally in apple-theme.css / above, so without
+   this the toggle could only ever ADD the hide-on-scroll behaviour and an
+   admin who switched it off still saw a pinned bar. Lagom behaves the same
+   way -- it only adds .sticky-navigation when the setting is enabled.
+
+   position:relative rather than static: with no offsets it occupies the exact
+   same place in flow, but stays a positioned element so z-index still applies
+   and the nav dropdowns keep stacking above page content. */
+body:not([data-affixed-nav="1"]) .topbar,
+body:not([data-affixed-nav="1"]) .ph-side-topbar,
+body:not([data-affixed-nav="1"]) .homepage-nav { position: relative; }
+/* The product sub-nav clears the 44px bar above it; unpinned there is nothing
+   to clear, so it would otherwise stick 44px down from the viewport top. */
+body:not([data-affixed-nav="1"]) .homepage-subnav { top: 0; }
+
 body[data-affixed-nav="1"] .topbar {
     transition: transform 0.28s ease;
     will-change: transform;

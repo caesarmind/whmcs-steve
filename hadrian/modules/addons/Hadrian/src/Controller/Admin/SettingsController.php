@@ -20,7 +20,10 @@ final class SettingsController extends AbstractController
      * handled in indexAction/save below.
      */
     public const FLAGS = [
-        'affixed_navigation'     => ['Affixed Navigation',       'Pin the navbar on scroll.',                                              false, 'bool'],
+        // Help text spells out the scroll-up reveal: "Pin the navbar on scroll"
+        // described neither half accurately, and a toggle whose label does not
+        // match its behaviour is the exact problem this audit set out to fix.
+        'affixed_navigation'     => ['Affixed Navigation',       'Keep the navbar pinned while scrolling. It slides out of the way as you scroll down and returns the moment you scroll up. Off lets the navbar scroll away with the page.', false, 'bool'],
         'hide_breadcrumb'        => ['Hide Breadcrumb',          'Hide the breadcrumb above the page title on every layout (the "Portal Home" back-link on top nav, and the "Home / Page" trail on the sidebar and icon-rail layouts).', false, 'bool'],
         'cookie_box'             => ['Cookie Box',               'Show a cookie consent banner on first visit.',                          false, 'bool'],
         // Default OFF deliberately: the runtime (PriceHelper / price.tpl) treats
