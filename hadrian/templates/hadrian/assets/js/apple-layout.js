@@ -698,7 +698,14 @@
         var closeBtn = document.getElementById('localeModalClose');
         var applyBtn = document.getElementById('localeApply');
 
-        function open() { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+        // preventDefault matters: the footer trigger is a <button>, but the
+        // menu switchers and the cart's currency link are <a href="#">, which
+        // would open the modal AND jump the page to the top.
+        function open(e) {
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
         function close() { modal.classList.remove('open'); document.body.style.overflow = ''; }
 
         openBtns.forEach(function (btn) { btn.addEventListener('click', open); });

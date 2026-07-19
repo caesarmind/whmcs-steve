@@ -693,11 +693,23 @@
                     </div>{* /.plan-variant.v-h *}
 
                     {* ── Compare bar (fine print) ────────────────── *}
+                    {* "Compare all features" removed: it was <a href="#"
+                       id="cart-compare-link"> with no handler anywhere, so it
+                       clicked and did nothing. Note the .st-compare-tbl styles
+                       in css/style.min.css are NOT orphaned by this — variant
+                       v-d renders that table for real (line ~408); it is simply
+                       a different product-list variant, never something this
+                       link revealed.
+
+                       "Change currency" now carries data-locale-open — the
+                       attribute the locale modal actually listens for. It had
+                       data-currency-toggle, which nothing reads, so the link
+                       only jumped to the top of the page. The modal handles
+                       currency and ships on cart pages via footer.tpl. *}
                     <div class="st-compare">
                         <span>{$hadrianLang.cart.comparePlans}</span>
-                        <a href="#" id="cart-compare-link">{$hadrianLang.cart.compareAll}</a>
                         <span class="spacer"></span>
-                        <span>{$hadrianLang.cart.pricesIn} {$currency.code|default:'USD'} · <a href="#" data-currency-toggle>{$LANG.changecurrency|default:'Change currency'}</a></span>
+                        <span>{$hadrianLang.cart.pricesIn} {$currency.code|default:'USD'} · <a href="#" data-locale-open>{$LANG.changecurrency|default:'Change currency'}</a></span>
                     </div>
 
                 </div>{* /.cart-plans-grid *}
