@@ -30,9 +30,14 @@
 
     .mt-lay-b{padding:13px 14px;display:flex;flex-direction:column;gap:10px;flex:1}
     .mt-lay-title{font-weight:600;font-size:14.5px;color:var(--mt-text)}
-    /* Reserve two lines so a one-line and a two-line description still put the
-       activation rows at the same height across cards. */
-    .mt-lay-desc{font-size:12.5px;color:var(--mt-text-3);margin-top:-5px;min-height:2.9em;line-height:1.45}
+    /* Fixed two-line box. A min-height alone is not enough: layout descriptions
+       run anywhere from one to four lines (the extended-info footer is ~150
+       chars), and any reserve picked for one card width breaks at another as
+       wrapping changes. Clamping makes the box the same height everywhere, which
+       is what actually keeps the activation rows on one line across cards. The
+       full text stays available via the title attribute. */
+    .mt-lay-desc{font-size:12.5px;color:var(--mt-text-3);margin-top:-5px;line-height:1.45;
+        display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:2.9em}
 
     /* Guest / client activation. Two independent rows, not a radio group -- a
        layout can be live for one audience and not the other. Stacked full-width
@@ -172,7 +177,8 @@
 
                     <div class="mt-lay-b">
                         <div class="mt-lay-title">{$layout.displayName|escape}</div>
-                        {if $layout.description}<div class="mt-lay-desc">{$layout.description|escape}</div>{/if}
+                        {* title carries the untruncated text, since the box clamps to two lines. *}
+                        {if $layout.description}<div class="mt-lay-desc" title="{$layout.description|escape}">{$layout.description|escape}</div>{/if}
 
                         <div class="mt-lay-auds">
                             {if $layout.isActiveGuest}
@@ -322,12 +328,33 @@
     {/if}
 {/foreach}
 
+{* Footer options: wired flags first, then whatever is still a placeholder. *}
 {foreach $planned['footer'] as $sectionName => $rows}
     <section class="mt-section" data-kind-panel="footer"{if $activeKind != 'footer'} hidden{/if}>
         <header class="mt-section-header">
             <h2 class="mt-section-title">{$sectionName|escape}</h2>
-            <span class="mt-section-count">Not wired yet</span>
+            <span class="mt-section-count">{if $footerFlags}{$footerFlags|count} wired{else}Not wired yet{/if}</span>
         </header>
+
+        {foreach $footerFlags as $flagKey => $flag}
+            <div class="mt-row">
+                <div>
+                    <div class="mt-row-label">{$flag.label|escape}</div>
+                    <div class="mt-row-help">{$flag.help|escape}</div>
+                </div>
+                <form method="post" action="" class="mt-flag-form">
+                    <input type="hidden" name="layout_flag" value="{$flagKey|escape}">
+                    <input type="hidden" name="value" value="{if $flag.value}0{else}1{/if}">
+                    <label class="mt-toggle">
+                        <input type="checkbox" data-flag-toggle{if $flag.value} checked{/if}
+                               aria-label="{$flag.label|escape}">
+                        <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
+                    </label>
+                    <noscript><button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button></noscript>
+                </form>
+            </div>
+        {/foreach}
+
         {foreach $rows as $p}
             {include file="layouts/planned-row.tpl" row=$p}
         {/foreach}

@@ -83,8 +83,6 @@ final class LayoutsController extends AbstractController
         'footer' => [
             'Footer options' => [
                 ['Back-to-top button', 'Show a floating button to scroll back to the top.', 'bool',   []],
-                ['Newsletter signup',  'Include an email-capture field in the footer.',     'bool',   []],
-                ['Social links',       'Render social icons from your Branding settings.',  'bool',   []],
             ],
         ],
     ];
@@ -169,15 +167,23 @@ final class LayoutsController extends AbstractController
 
         // Header-section flags, read straight from the SettingsController
         // registry so label/help/default stay defined in exactly one place.
+        // Split by which tab they render under; unlisted flags default to the
+        // Main menu tab's Header section.
         $layoutFlags = [];
+        $footerFlags = [];
         foreach (SettingsController::LAYOUT_FLAGS as $flagKey) {
             if (!isset(SettingsController::FLAGS[$flagKey])) { continue; }
             [$label, $help, $default] = SettingsController::FLAGS[$flagKey];
-            $layoutFlags[$flagKey] = [
+            $row = [
                 'label' => $label,
                 'help'  => $help,
                 'value' => (bool)Settings::getValue($flagKey, $default),
             ];
+            if ((SettingsController::LAYOUT_FLAG_SECTION[$flagKey] ?? 'main-menu') === 'footer') {
+                $footerFlags[$flagKey] = $row;
+            } else {
+                $layoutFlags[$flagKey] = $row;
+            }
         }
 
         return $this->view('layouts/index', [
@@ -185,6 +191,7 @@ final class LayoutsController extends AbstractController
             'activeKind'  => $activeKind,
             'template'    => $template->getName(),
             'layoutFlags' => $layoutFlags,
+            'footerFlags' => $footerFlags,
             'flagSaved'   => isset($_GET['flag']),
             'planned'     => self::PLANNED_CONTROLS,
             'contentWidths'  => self::CONTENT_WIDTHS,
@@ -192,7 +199,11 @@ final class LayoutsController extends AbstractController
         ]);
     }
 
-    /** Persist one Header-section flag, then PRG back to the Main menu tab. */
+    /**
+     * Persist one relocated flag, then PRG back to the tab it lives on — a
+     * footer toggle bouncing the admin to the Main menu tab reads as the click
+     * having gone somewhere unexpected.
+     */
     private function saveFlagAction(string $key, string $value): string
     {
         if (in_array($key, SettingsController::LAYOUT_FLAGS, true)
@@ -202,7 +213,8 @@ final class LayoutsController extends AbstractController
             Settings::setValue($key, $value === '1' ? '1' : '0', $type);
         }
 
-        $this->redirect('?module=Hadrian&action=layouts&kind=main-menu&flag=1');
+        $kind = SettingsController::LAYOUT_FLAG_SECTION[$key] ?? 'main-menu';
+        $this->redirect('?module=Hadrian&action=layouts&kind=' . urlencode($kind) . '&flag=1');
     }
 
     /**

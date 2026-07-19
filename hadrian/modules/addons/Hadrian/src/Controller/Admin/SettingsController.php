@@ -56,6 +56,10 @@ final class SettingsController extends AbstractController
         // having more than one active currency.
         'hide_language_switcher'   => ['Hide Language Switcher',  'Remove the language chooser from the header. The locale button disappears entirely when the currency selector is hidden too.', false, 'bool'],
         'hide_currency_selector'   => ['Hide Currency Selector',  'Remove the currency chooser from the header. Has no visible effect on single-currency installs, which never show it.', false, 'bool'],
+        // Only the extended-info footer renders socials (from $mtBrand.socials),
+        // and it already self-gates on those being set in Branding. This is a
+        // master override on top of that.
+        'hide_footer_socials'      => ['Hide Footer Social Links', 'Hide the social icons in the footer. Only the "Extended Footer + Info" layout renders them, and only when social URLs are set under Branding.', false, 'bool'],
     ];
 
     /**
@@ -73,6 +77,15 @@ final class SettingsController extends AbstractController
         'hide_breadcrumb',
         'hide_language_switcher',
         'hide_currency_selector',
+        'hide_footer_socials',
+    ];
+
+    /**
+     * Which Layouts tab+section a relocated flag renders under. Anything not
+     * listed falls back to the Main menu tab's Header section.
+     */
+    public const LAYOUT_FLAG_SECTION = [
+        'hide_footer_socials' => 'footer',
     ];
 
     /** Which Settings tab each flag renders on. Unlisted flags default to 'general'. */

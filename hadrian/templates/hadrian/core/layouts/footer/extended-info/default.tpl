@@ -28,7 +28,9 @@
                 {/if}
             </div>
             <p class="hp-footer-tagline">{if !empty($mtBrand.description)}{$mtBrand.description|escape}{else}{$hadrianLang.footer.tagline}{/if}</p>
-            {if !empty($mtBrand.socials)}
+            {* Admin gating (Layouts -> Footer options) on top of the existing
+               "only if any social URL is set in Branding" check. *}
+            {if !$hadrian.addonSettings.hide_footer_socials && !empty($mtBrand.socials)}
                 <div class="hp-footer-socials">
                     {if !empty($mtBrand.socials.x)}<a class="hp-footer-social" href="{$mtBrand.socials.x|escape}" target="_blank" rel="noopener" aria-label="X (Twitter)" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>{/if}
                     {if !empty($mtBrand.socials.linkedin)}<a class="hp-footer-social" href="{$mtBrand.socials.linkedin|escape}" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>{/if}
