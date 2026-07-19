@@ -1250,18 +1250,29 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
    account controls live, and it is the one that becomes the profile menu once
    you are signed in. So the menu's login button is the one that gives way.
 
-   Keyed on :has(.nav-signin) rather than hiding .nav-cta outright, so this
-   stays a de-duplication rule and not a blanket kill: .nav-signin renders only
-   in the logged-out branch of topnav.tpl, so if that branch ever stops
-   emitting it the menu button reappears rather than leaving no way to sign in.
+   Keyed on :has(.nav-signin) rather than hiding them outright, so this stays a
+   de-duplication rule and not a blanket kill: .nav-signin renders only in the
+   logged-out branch of topnav.tpl, so if that branch ever stops emitting it
+   the menu group reappears rather than leaving no way to sign in.
 
-   min-width pairs with the 900px collapse above — below it .nav-cta is already
-   hidden into the hamburger drawer, so there is nothing to de-duplicate.
+   min-width pairs with the 900px collapse above — below it these are already
+   folded into the hamburger drawer, so there is nothing to de-duplicate and
+   the drawer remains the only place Register and Language live on a phone.
 
-   NOTE this makes an admin-configured menu item invisible on desktop. The
-   cleaner fix is deleting the login_button item in admin -> Menu, after which
-   this rule can go. */
+   Scope is the whole right-aligned menu group (.nav-item-right), not just the
+   login button: Login, Register and Language all carry it, and the point is to
+   run ONE set of account controls on desktop rather than two competing ones.
+   .nav-cta is listed separately so a login button placed on the LEFT is still
+   caught — it duplicates .nav-signin wherever it sits.
+
+   NOTE this hides admin-configured menu items on desktop, and Register and
+   Language have no counterpart in the utility group — on the top layout the
+   .nav-switcher here is the only trigger for the locale modal, and register.php
+   is otherwise only linked from sidebar.tpl, which this layout never renders.
+   Deleting those items in admin -> Menu is the cleaner fix, after which this
+   rule can go. */
 @media (min-width: 901px) {
+    .homepage-nav .homepage-nav-inner:has(.nav-signin) .nav-item-right,
     .homepage-nav .homepage-nav-inner:has(.nav-signin) .nav-cta { display: none; }
 }
 

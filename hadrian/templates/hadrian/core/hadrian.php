@@ -31,7 +31,7 @@ declare(strict_types=1);
 return [
     'secret_key'   => 'REPLACE_WITH_64_HEX_CHARS_BEFORE_ENCODING_FOR_PRODUCTION',
     'display_name' => 'Hadrian',
-    'version'      => '1.1.144',
+    'version'      => '1.1.145',
     'description'  => 'A modern WHMCS client area theme',
     'preview'      => 'core/thumb.svg',
     'dev_mode'     => true,                  // ← FLIP TO false BEFORE PRODUCTION
