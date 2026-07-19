@@ -97,18 +97,27 @@
                             </div>
                         </div>
 
-                        {if isset($layout.options.align)}
+                        {* Loop every declared option, don't hardcode 'align'.
+                           The controller and Hooks::buildLayoutMeta are already
+                           generic over supportedOptions, so a layout declaring a
+                           second option rendered NOTHING here while remaining
+                           settable by POST — the same shape as the page-editor
+                           bug where 55 of 60 options fell through to a text box.
+                           Only 'align' exists today, so this changes no output. *}
+                        {if $layout.options}
+                            {foreach $layout.options as $optKey => $opt}
                             <div class="mt-lay-opt">
-                                <span class="mt-lay-opt-lbl">{$layout.options.align.label|escape}</span>
+                                <span class="mt-lay-opt-lbl">{$opt.label|escape}</span>
                                 <form method="post" action="" class="mt-seg">
                                     <input type="hidden" name="kind"   value="{$k|escape}">
                                     <input type="hidden" name="layout" value="{$layout.name|escape}">
-                                    <input type="hidden" name="option" value="align">
-                                    {foreach $layout.options.align.choices as $cval => $clabel}
-                                        <button type="submit" name="value" value="{$cval|escape}"{if $cval == $layout.options.align.value} class="on"{/if}>{$clabel|escape}</button>
+                                    <input type="hidden" name="option" value="{$optKey|escape}">
+                                    {foreach $opt.choices as $cval => $clabel}
+                                        <button type="submit" name="value" value="{$cval|escape}"{if $cval == $opt.value} class="on"{/if}>{$clabel|escape}</button>
                                     {/foreach}
                                 </form>
                             </div>
+                            {/foreach}
                         {elseif $k == 'main-menu'}
                             <div class="mt-lay-optnone">No alignment option &mdash; content is always centered.</div>
                         {/if}

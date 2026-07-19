@@ -14,45 +14,66 @@ final class ToolsController extends AbstractController
     public function indexAction(): string
     {
         $message = '';
+        $ok      = true;
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $message = $this->runTool((string)($_POST['tool'] ?? ''));
+            [$ok, $message] = $this->runTool((string)($_POST['tool'] ?? ''));
         }
 
-        return $this->view('tools/index', ['message' => $message]);
+        return $this->view('tools/index', ['message' => $message, 'messageOk' => $ok]);
     }
 
-    private function runTool(string $tool): string
+    /**
+     * Run a tool and report whether it succeeded.
+     *
+     * Returns [ok, message] rather than a bare string: the view used to render
+     * every outcome in a green success alert, so "No active template — cannot
+     * rebuild discovery." and "Unknown tool" both read as wins.
+     *
+     * @return array{0:bool,1:string}
+     */
+    private function runTool(string $tool): array
     {
         return match ($tool) {
             'clear_template_cache'  => $this->clearTemplateCache(),
-            'refresh_menu_cache'    => $this->refreshMenuCache(),
             'rebuild_pages_cache'   => $this->rebuildPagesCache(),
             'migrate_menu_pages'    => $this->migrateMenuPages(),
             'refresh_license'       => $this->refreshLicense(),
-            'generate_htaccess'     => $this->generateHtaccess(),
-            default                 => 'Unknown tool',
+            default                 => [false, 'Unknown tool.'],
         };
     }
 
-    private function rebuildPagesCache(): string
+    /** @return array{0:bool,1:string} */
+    private function rebuildPagesCache(): array
     {
         $template = AddonHelper::getTemplate();
         if ($template === null) {
-            return 'No active template — cannot rebuild discovery.';
+            return [false, 'No active template — cannot rebuild discovery.'];
         }
         $pages = PagesCache::rebuild($template);
-        return 'Pages discovery rebuilt — ' . count($pages) . ' pages found.';
+        return [true, 'Pages discovery rebuilt — ' . count($pages) . ' pages found.'];
     }
 
-    private function migrateMenuPages(): string
+    /** @return array{0:bool,1:string} */
+    private function migrateMenuPages(): array
     {
         $count = (new MenuSeeder())->migrateCustomLinksToWhmcsPages();
-        return $count === 0
+        return [true, $count === 0
             ? 'No custom_link items matched a known WHMCS page — nothing to do.'
-            : "Converted {$count} custom_link items to whmcs_page.";
+            : "Converted {$count} custom_link items to whmcs_page."];
     }
 
-    private function clearTemplateCache(): string
+    /**
+     * Clear the ADDON's compiled templates.
+     *
+     * Scope is deliberately named in the message: this is the admin addon's own
+     * Smarty compile dir (AbstractController / ViewHelper both point there).
+     * Client-facing theme templates are compiled by WHMCS's Smarty into its own
+     * templates_c/, which this cannot reach — the button used to promise
+     * "recompile all Smarty templates", which it never did for the front end.
+     *
+     * @return array{0:bool,1:string}
+     */
+    private function clearTemplateCache(): array
     {
         $dir = sys_get_temp_dir() . '/hadrian-smarty';
         $count = 0;
@@ -63,32 +84,20 @@ final class ToolsController extends AbstractController
                 }
             }
         }
-        return "Cleared {$count} compiled templates.";
+        return [true, "Cleared {$count} compiled admin templates."];
     }
 
-    private function refreshMenuCache(): string
-    {
-        // Bump cache key — invalidates Settings::$cache and any reads keyed off it
-        Settings::setValue('cache_key', (string)time());
-        return 'Menu cache invalidated.';
-    }
-
-    private function refreshLicense(): string
+    /** @return array{0:bool,1:string} */
+    private function refreshLicense(): array
     {
         $template = AddonHelper::getTemplate();
         if ($template === null) {
-            return 'No active template — cannot refresh license.';
+            return [false, 'No active template — cannot refresh license.'];
         }
         if ($template->license()->isDevMode()) {
-            return 'Development mode active — license refresh is a no-op.';
+            return [true, 'Development mode active — license refresh is a no-op.'];
         }
         $template->license()->refreshNow();
-        return 'License refreshed from server.';
-    }
-
-    private function generateHtaccess(): string
-    {
-        // TODO: write SEO-friendly redirect rules to <ROOTDIR>/.htaccess
-        return 'htaccess generation: not yet implemented.';
+        return [true, 'License refreshed from server.'];
     }
 }

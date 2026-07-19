@@ -177,7 +177,13 @@ final class SitemapGenerator
         }
 
         $block  = '# ' . self::MARK_START . "\n";
-        $block .= 'Sitemap: ' . $base . "/sitemap.xml\n";
+        // Only advertise the sitemap when it is actually being generated —
+        // with the feature off, buildSitemap() strips the block from
+        // sitemap.xml, so pointing crawlers at it sends them to a file we no
+        // longer maintain. The Disallow rules below still apply either way.
+        if (!empty(self::config()['enabled'])) {
+            $block .= 'Sitemap: ' . $base . "/sitemap.xml\n";
+        }
         $block .= "User-agent: *\n";
         foreach (Page::all($template) as $row) {
             if (($row['indexing'] ?? '') === 'disallow' && (string)($row['url'] ?? '') !== '') {

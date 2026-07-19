@@ -1615,12 +1615,14 @@ final class Hooks
             $options[$okey] = (string)($storedOpts[$okey] ?? ($ospec['default'] ?? ''));
         }
 
+        // No 'mediumPath': it was built for every layout and read by nothing.
+        // footer.tpl composes the include path itself from .name, and main-menu
+        // layouts render through includes/partials rather than core/layouts.
         return [
-            'name'       => $name,
-            'meta'       => $meta,
-            'vars'       => $meta['variables'] ?? [],
-            'options'    => $options,
-            'mediumPath' => "{$template->getName()}/core/layouts/{$kind}/{$name}/default.tpl",
+            'name'    => $name,
+            'meta'    => $meta,
+            'vars'    => $meta['variables'] ?? [],
+            'options' => $options,
         ];
     }
 
