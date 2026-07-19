@@ -198,6 +198,24 @@
             </div>
         {/if}
 
+        {* Locale control, in the utility group with the cart and theme toggle.
+           The right-aligned menu group (Login / Register / Language) is hidden
+           from 901px up so the bar runs one set of account controls — but that
+           group's "Language" item was a [data-switcher] link, an attribute
+           nothing in apple-layout.js listens for, so it never opened anything.
+           This is the working component the footers already use: it posts to
+           the real locale modal via [data-locale-open].
+
+           Sits OUTSIDE the logged-in/out branch below on purpose — choosing a
+           language is not an account action.
+
+           Desktop only: under 901px the drawer already carries the menu's own
+           locale entry, and the bar has no room for a text pill next to the
+           hamburger. *}
+        <span class="nav-locale">
+            {include file="`$template`/includes/partials/locale-btn.tpl"}
+        </span>
+
         <a href="{$WEB_ROOT}/cart.php?a=view" class="topbar-btn topbar-cart-btn" title="{$LANG.carttitle}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
             {* Cart-count badge.

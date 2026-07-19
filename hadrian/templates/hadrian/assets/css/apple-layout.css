@@ -1276,6 +1276,19 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
     .homepage-nav .homepage-nav-inner:has(.nav-signin) .nav-cta { display: none; }
 }
 
+/* Locale control in the utility group, replacing the Language entry the rule
+   above hides. Scoped to .nav-locale rather than a generic .only-desktop
+   utility — a broad visibility class in this file is how the [class$="-split"]
+   collisions started.
+
+   Hidden below 901px to mirror that rule: on a phone the hamburger drawer
+   already carries the menu's locale entry, and the bar has no room for a text
+   pill beside the hamburger and cart. */
+.homepage-nav .nav-locale { display: inline-flex; align-items: center; }
+@media (max-width: 900px) {
+    .homepage-nav .nav-locale { display: none; }
+}
+
 [data-theme="dark"] .ph-nav-backdrop { background: rgba(0, 0, 0, 0.55); }
 
 @media (max-width: 768px) {
