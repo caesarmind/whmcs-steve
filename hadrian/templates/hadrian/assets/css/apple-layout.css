@@ -132,6 +132,12 @@ body[data-tpl="homepage"] .ph-main-wrap .content-area {
     max-width: none;
     padding-left: 0;
     padding-right: 0;
+    /* .content-area's 40px bottom padding left a white band between the final
+       full-bleed CTA and the footer. Every homepage section carries its own
+       vertical padding and the page always ends on .hp-cta-immersive, so the
+       wrapper has nothing left to space — the gradient should meet the footer
+       edge to edge, the same way .hp-stats-strip meets its neighbours. */
+    padding-bottom: 0;
 }
 body[data-tpl="homepage"] .content-area > .mt-verify-banner,
 body[data-tpl="homepage"] .content-area > .hp-hero {
