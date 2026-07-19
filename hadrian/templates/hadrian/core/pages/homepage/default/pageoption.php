@@ -28,5 +28,16 @@ return [
             'default' => '',
             'tooltip' => 'Override the tagline under the hero heading. Leave blank to use the default.',
         ],
+        // A bool rather than a cards|rows select on purpose: the admin page-option
+        // renderer (views/adminarea/pages/edit.tpl) only draws a real control for
+        // 'bool' — every other type falls through to a plain text input, so a
+        // select would show up as a free-text box the admin could mistype.
+        'categoryRows' => [
+            'type'    => 'bool',
+            'name'    => 'categoryRows',
+            'label'   => 'Categories as rows',
+            'default' => false,
+            'tooltip' => 'Show the product categories as a compact list instead of cards. Rows stay tidy with any number of categories, and a category with no price costs one blank cell rather than half a card. Off keeps the card grid, which shows three per row.',
+        ],
     ],
 ];

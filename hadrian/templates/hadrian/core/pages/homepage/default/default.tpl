@@ -225,6 +225,41 @@
            No "POPULAR" flag. It used to be pinned to $grp@iteration == 2, so
            whichever group happened to be second got badged as popular — a claim
            the data doesn't support. *}
+        {if $hadrian.pages.homepage.config.categoryRows|default:false}
+        {* Row list (admin Pages -> Homepage -> "Categories as rows").
+           Every string is live WHMCS data — name, tagline, price and cycle all
+           come from Hooks::fetchProductGroups(), same source as the cards.
+
+           A category with no priced product renders "See plans" in the price
+           cell instead of leaving it blank, so the column still reads as a
+           column. That is the case the card grid handles worst, and the reason
+           this layout exists.
+
+           The leading mark is the group's initial, not an icon: WHMCS product
+           groups have no icon field, and the theme already uses initials-on-a-
+           tint for user avatars, so this stays consistent without inventing an
+           admin field. *}
+        <div class="hp-cat-rows">
+            {foreach $hpGroups as $grp}
+            <a class="hp-cat-row" href="{$WEB_ROOT}/{$grp.url}">
+                <span class="cat-mark" aria-hidden="true">{$grp.name|truncate:1:''|upper}</span>
+                <span class="cat-text">
+                    <strong>{$grp.name|escape}</strong>
+                    {if $grp.tagline}<span class="cat-tagline">{$grp.tagline|escape}</span>{/if}
+                </span>
+                <span class="cat-price">
+                    {if $grp.fromPrice}
+                        <b>{$grp.fromPrice}</b>
+                        <em>{$hadrianLang.home.cycleName[$grp.cycle]|default:''}</em>
+                    {else}
+                        <em>{$hadrianLang.home.buyGroup}</em>
+                    {/if}
+                </span>
+                <span class="cat-chev" aria-hidden="true">&rsaquo;</span>
+            </a>
+            {/foreach}
+        </div>
+        {else}
         <div class="hp-pricing-grid{if $groupCount > 0 && $groupCount < 3} cols-{$groupCount}{/if}">
             {foreach $hpGroups as $grp}
             {* Order mirrors Lagom's "Products For All Businesses" block: name,
@@ -242,6 +277,7 @@
             </div>
             {/foreach}
         </div>
+        {/if}
     </div>
 
     {* No visible product groups configured, or the catalogue query failed. *}

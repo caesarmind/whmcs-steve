@@ -72,6 +72,100 @@
 .ph-domain-footer a { color: var(--color-accent); text-decoration: none; }
 .ph-domain-footer a:hover { text-decoration: underline; }
 
+/* ── Product categories as rows ─────────────────────────────────────────
+   Alternative to the .hp-pricing-grid card layout, chosen per-page in admin
+   Pages -> Homepage -> "Categories as rows".
+
+   Why rows exist: in the card grid a category with no priced product leaves
+   half a card empty, and the 2-up/3-up grid gets awkward past four groups.
+   A row absorbs a missing price in one cell and stays tidy at any count.
+
+   1024px to match the marketing column used across the homepage and store
+   pages — see the other hp-* sections in apple-theme.css. */
+.hp-cat-rows {
+    max-width: 1024px;
+    margin: 0 auto;
+    display: grid;
+    gap: 10px;
+}
+.hp-cat-row {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: 44px 1fr auto auto;
+    gap: 18px;
+    align-items: center;
+    text-decoration: none;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.hp-cat-row:hover {
+    border-color: var(--color-accent);
+    text-decoration: none;
+}
+.hp-cat-row:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* Initial-on-a-tint, mirroring the theme's avatar treatment. WHMCS product
+   groups carry no icon, so the group's own name is the only honest source. */
+.hp-cat-row .cat-mark {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--color-surface-secondary);
+    color: var(--color-accent);
+    font-size: var(--text-lg);
+    font-weight: var(--fw-semibold);
+    line-height: 1;
+}
+
+.hp-cat-row .cat-text { text-align: left; min-width: 0; }
+.hp-cat-row .cat-text strong {
+    display: block;
+    font-size: var(--text-xl);
+    font-weight: var(--fw-semibold);
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+}
+.hp-cat-row .cat-tagline {
+    display: block;
+    font-size: var(--text-md);
+    color: var(--color-text-secondary);
+    line-height: 1.45;
+}
+
+.hp-cat-row .cat-price { text-align: right; white-space: nowrap; }
+.hp-cat-row .cat-price b {
+    font-size: var(--text-h5);
+    font-weight: var(--fw-semibold);
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+.hp-cat-row .cat-price em {
+    display: block;
+    font-style: normal;
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+}
+.hp-cat-row .cat-chev {
+    color: var(--color-text-tertiary);
+    font-size: var(--text-h5);
+    line-height: 1;
+}
+
+@media (max-width: 560px) {
+    /* Drop the chevron and tuck the price under the name — four columns will
+       not fit a phone without truncating the tagline to uselessness. */
+    .hp-cat-row { grid-template-columns: 40px 1fr; gap: 14px; padding: 16px 18px; }
+    .hp-cat-row .cat-mark { width: 40px; height: 40px; }
+    .hp-cat-row .cat-price { grid-column: 2; text-align: left; }
+    .hp-cat-row .cat-chev { display: none; }
+}
+
 /* TLD price strip — live register prices under the hero domain search.
    Compact inline row rather than cards: it sits inside the hero, so it has to
    read as a quiet supporting rail and not compete with the search box.

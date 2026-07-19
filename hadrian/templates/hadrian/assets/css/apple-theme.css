@@ -2267,7 +2267,11 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-price-card.pc-group .pc-tagline { font-size: var(--text-md); color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 28px; }
 .hp-price-card.pc-group .pc-from { font-size: var(--text-sm); color: var(--color-text-tertiary); margin-bottom: 2px; }
 .hp-price-card.pc-group .price { font-size: var(--text-display-sm); letter-spacing: -0.03em; line-height: 1.05; }
-.hp-price-card.pc-group .pc-cycle { font-size: var(--text-sm); color: var(--color-text-secondary); margin-top: 4px; }
+/* margin-bottom guarantees a gap between the price block and the CTA. The
+   button's margin-top:auto only pushes it down in a card that is taller than
+   its content, so in the tallest card — the one setting the row height — the
+   button ended up sitting directly under "Monthly" with nothing between them. */
+.hp-price-card.pc-group .pc-cycle { font-size: var(--text-sm); color: var(--color-text-secondary); margin-top: 4px; margin-bottom: 28px; }
 /* Anchor the CTA, not the price block: a group with no priced product renders
    no pc-from/price/pc-cycle at all, so hanging the auto margin off those left
    that card short and its button ~98px higher than its neighbour. */
