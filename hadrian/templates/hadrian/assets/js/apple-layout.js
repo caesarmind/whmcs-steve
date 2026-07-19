@@ -879,6 +879,51 @@
         apply();
     }
 
+    // ── Dismissible notices ────────────────────────────────
+    // [data-dismiss] with no value. Bootstrap ships on these pages but binds
+    // [data-dismiss="alert"], so a valueless attribute matched nothing — the
+    // X on the dashboard's overdue-invoice and expiring-domain notices was
+    // styled as an interactive control (cursor:pointer plus a hover state) and
+    // did nothing when clicked.
+    function initDismissibles() {
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest ? e.target.closest('[data-dismiss]') : null;
+            if (!btn) return;
+            // Leave Bootstrap's own components alone.
+            if (btn.getAttribute('data-dismiss')) return;
+            e.preventDefault();
+            var notice = btn.closest('.notice, .alert, .mt-notice') || btn.parentElement;
+            if (notice) notice.remove();
+        });
+    }
+
+    // ── Dark-mode logo swap ────────────────────────────────
+    // Branding lets an admin upload a separate dark-surface logo; the templates
+    // render it as data-logo-dark and nothing ever swapped it in, so the light
+    // logo showed on dark backgrounds. Runs on load and again whenever the
+    // theme changes, since the toggle flips <html data-theme> at runtime.
+    function initLogoSwap() {
+        var imgs = document.querySelectorAll('img[data-logo-dark]');
+        if (!imgs.length) return;
+
+        function apply() {
+            var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+            for (var i = 0; i < imgs.length; i++) {
+                var img = imgs[i];
+                // Remember the light source the first time, so toggling back
+                // does not need the template to re-render.
+                if (!img.dataset.logoLight) img.dataset.logoLight = img.getAttribute('src') || '';
+                var next = dark ? img.getAttribute('data-logo-dark') : img.dataset.logoLight;
+                if (next && img.getAttribute('src') !== next) img.setAttribute('src', next);
+            }
+        }
+
+        apply();
+        new MutationObserver(apply).observe(document.documentElement, {
+            attributes: true, attributeFilter: ['data-theme']
+        });
+    }
+
     // ── Bootstrap ──────────────────────────────────────────
     function boot() {
         var params = new URLSearchParams(window.location.search);
@@ -901,6 +946,8 @@
             applyPageTitle();
             initAffixedNav();
             initFreePriceLabels();
+            initDismissibles();
+            initLogoSwap();
             document.dispatchEvent(new CustomEvent('apple-layout:ready'));
         });
     }
