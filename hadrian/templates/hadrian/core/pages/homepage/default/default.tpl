@@ -71,7 +71,7 @@
         {if $homeTldPricing}
         <div class="hp-tld-strip">
             {foreach $homeTldPricing as $mtTld}
-                <a class="hp-tld" href="{$WEB_ROOT}/index.php?rp=/domain/pricing">
+                <a class="hp-tld" href="{$WEB_ROOT}/cart.php?a=add&domain=register">
                     <span class="hp-tld-ext">{$mtTld.tld|escape}</span>
                     <span class="hp-tld-price">{$mtTld.price|escape}</span>
                 </a>
@@ -80,10 +80,10 @@
         {/if}
         <div class="ph-domain-footer">
             <span>{$hadrianLang.dashboard.heroDomainSubtitle}</span>
-            {* Domain Pricing page, NOT the cart. cart.php?gid=domain 302s (WHMCS
-               has no group with that id) and dumps the visitor on the hosting
-               list — the opposite of what this link promises. *}
-            <a href="{$WEB_ROOT}/index.php?rp=/domain/pricing">{$LANG.viewallpricing|default:'View all pricing'} &rarr;</a>
+            {* Cart domain-registration step, which lists TLD pricing AND lets the
+               visitor buy in one place. NOT cart.php?gid=domain — WHMCS has no
+               group with that id, so it 302s onto the hosting list. *}
+            <a href="{$WEB_ROOT}/cart.php?a=add&domain=register">{$LANG.viewallpricing|default:'View all pricing'} &rarr;</a>
         </div>
     </form>
 

@@ -38,10 +38,10 @@
 
             <div class="ph-domain-footer">
                 <span>{$hadrianLang.dashboard.heroDomainSubtitle}</span>
-                {* Domain Pricing page, NOT the cart — see the same fix in
+                {* Cart domain-registration step — see the same fix in
                    homepage/default/default.tpl. cart.php?gid=domain 302s to
                    the hosting list. *}
-                <a href="{$WEB_ROOT}/index.php?rp=/domain/pricing">{$LANG.viewallpricing|default:'View all pricing'} &rarr;</a>
+                <a href="{$WEB_ROOT}/cart.php?a=add&domain=register">{$LANG.viewallpricing|default:'View all pricing'} &rarr;</a>
             </div>
         </form>
     </div>
