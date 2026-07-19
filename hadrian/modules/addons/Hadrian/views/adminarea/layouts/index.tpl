@@ -30,12 +30,20 @@
 
     .mt-lay-b{padding:13px 14px;display:flex;flex-direction:column;gap:10px;flex:1}
     .mt-lay-title{font-weight:600;font-size:14.5px;color:var(--mt-text)}
-    .mt-lay-desc{font-size:12.5px;color:var(--mt-text-3);margin-top:-5px;min-height:32px;line-height:1.45}
+    /* Reserve two lines so a one-line and a two-line description still put the
+       activation rows at the same height across cards. */
+    .mt-lay-desc{font-size:12.5px;color:var(--mt-text-3);margin-top:-5px;min-height:2.9em;line-height:1.45}
 
     /* Guest / client activation. Two independent rows, not a radio group -- a
        layout can be live for one audience and not the other. Stacked full-width
        with the state on the right, matching the picker in the design file. */
-    .mt-lay-auds{display:flex;flex-direction:column;gap:6px;margin-top:auto;padding-top:2px}
+    /* NO margin-top:auto here. Pushing this to the card bottom made the rows sit
+       at a different height per card, because what follows them varies -- the
+       alignment segment on an active layout, the "no alignment option" note on
+       top nav, nothing at all on an inactive one. Anchoring to the (fixed-height)
+       thumb + title + description above instead keeps Guest/Existing client on
+       one line across every card; the slack falls at the card bottom. */
+    .mt-lay-auds{display:flex;flex-direction:column;gap:6px;padding-top:2px}
     .mt-lay-auds form{display:block;margin:0}
     .mt-lay-aud{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:7px 10px;border-radius:8px;border:none;background:var(--mt-surface-2);font:inherit;cursor:pointer;text-align:left;transition:background .15s ease}
     .mt-lay-aud:hover{background:var(--mt-border)}
@@ -43,7 +51,10 @@
     .mt-lay-aud.is-on{background:var(--mt-primary-tint);cursor:default}
     .mt-lay-aud-label{font-size:12.5px;font-weight:600;color:var(--mt-text-2)}
     .mt-lay-aud.is-on .mt-lay-aud-label{color:var(--mt-primary)}
-    .mt-lay-aud-cta{font-size:12px;font-weight:600;color:var(--mt-text-3);flex-shrink:0}
+    /* Same box metrics as .mt-badge (3px padding + 1.5 line-height on 12px), so
+       an "Activate" row is exactly as tall as an "Active" one. Without this the
+       second row sits ~5px lower on whichever card is already active. */
+    .mt-lay-aud-cta{font-size:12px;font-weight:600;color:var(--mt-text-3);flex-shrink:0;padding:3px 0;line-height:1.5}
 
     .mt-lay-opt{border-top:1px solid var(--mt-border);padding-top:11px}
     .mt-lay-opt-lbl{font-size:11.5px;font-weight:600;color:var(--mt-text-2);display:block;margin-bottom:6px}
