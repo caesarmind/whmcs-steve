@@ -337,7 +337,11 @@
 
     {$headoutput}
 </head>
-<body class="{if $mt_fullPage}mt-login-fullpage{else}client-area-layout{/if}"
+{* $hadrian.styles.vars.bodyClass comes from the active preset's style.php
+   (core/styles/<preset>/style.php) via Hooks::resolveActiveStyle. Emitting it
+   here gives each preset a CSS hook to scope its own overrides — it was
+   declared but never rendered, so presets had no way to reach the page. *}
+<body class="{if $mt_fullPage}mt-login-fullpage{else}client-area-layout{/if}{if $hadrian.styles.vars.bodyClass} {$hadrian.styles.vars.bodyClass|escape}{/if}"
       data-auth="{$mt_auth}"
       data-layout="{$mt_layout}"
       data-active-nav="{$mt_activeNav|escape}"
