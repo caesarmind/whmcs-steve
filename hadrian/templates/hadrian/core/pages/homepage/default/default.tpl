@@ -91,10 +91,6 @@
         <a href="{$WEB_ROOT}/cart.php" class="hp-buy-btn">{$hadrianLang.home.heroCta}</a>
         <a href="#how">{$hadrianLang.home.heroSecondary} &rsaquo;</a>
     </div>
-    <div style="display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; padding: 10px 18px; background: var(--color-surface-secondary); border-radius: 999px;">
-        <span style="color: #30d158; font-size: 15px; letter-spacing: 1px;">&starf;&starf;&starf;&starf;&starf;</span>
-        <span style="font-size: 13px; font-weight: 500; color: var(--color-text-primary);"><strong>{$hadrianLang.home.trustStrong}</strong> &middot; {$hadrianLang.home.trustText}</span>
-    </div>
 </section>
 
 {* 2. Trust stats strip *}
@@ -110,47 +106,15 @@
     </div>
 </section>
 
-{* 3. cPanel comparison - duo *}
-<section id="how" style="padding: 72px 22px 24px; text-align: center; max-width: 900px; margin: 0 auto;">
-    <div class="hp-eyebrow" style="color: var(--color-accent);">{$hadrianLang.home.duoEyebrow}</div>
-    <h2 style="font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin: 12px 0;">{$hadrianLang.home.duoTitle}</h2>
-    <p style="font-size: 17px; color: #6e6e73; max-width: 600px; margin: 0 auto;">{$hadrianLang.home.duoSub}</p>
-</section>
-<section class="hp-duo-feature">
-    <div class="hp-duo-card">
-        <p class="duo-text"><strong>{$hadrianLang.home.duoOldStrong}</strong> {$hadrianLang.home.duoOldText}</p>
-        <div class="duo-visual duo-visual--left">
-            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #1c1c1e, #2c2c2e); border-radius: 14px; display: flex; align-items: center; justify-content: center; padding: 30px;">
-                <div style="background: #0f0f12; border-radius: 10px; padding: 14px; width: 100%; max-width: 320px; border: 1px solid #2a2a2c;">
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
-                        <div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div><div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div><div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div><div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div><div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div><div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div><div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div><div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div><div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div><div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div><div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div><div style="height: 24px; background: rgba(255,255,255,0.08); border-radius: 3px;"></div>
-                    </div>
-                    <div style="margin-top: 10px; font-size: 10px; color: rgba(255,255,255,0.3); text-align: center;">47 menu items &middot; 12 toolbars</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="hp-duo-card">
-        <p class="duo-text"><strong>{$hadrianLang.home.duoNewStrong}</strong> {$hadrianLang.home.duoNewText}</p>
-        <div class="duo-visual duo-visual--right">
-            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #0a84ff, #64d2ff); border-radius: 14px; display: flex; align-items: center; justify-content: center; padding: 30px;">
-                <div style="background: #fff; border-radius: 10px; padding: 16px; width: 100%; max-width: 260px; box-shadow: 0 12px 32px rgba(0,0,0,0.2);">
-                    <div style="display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #f5f5f7;"><div style="width: 8px; height: 8px; background: #30d158; border-radius: 50%;"></div><span style="font-size: 11px; font-weight: 600; color: #1d1d1f;">OpenPanel</span></div>
-                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><div style="width: 14px; height: 14px; background: rgba(0,113,227,0.1); border-radius: 4px;"></div><span style="font-size: 11px; color: #1d1d1f;">Sites</span></div>
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><div style="width: 14px; height: 14px; background: rgba(48,209,88,0.1); border-radius: 4px;"></div><span style="font-size: 11px; color: #1d1d1f;">Resources</span></div>
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><div style="width: 14px; height: 14px; background: rgba(191,90,242,0.1); border-radius: 4px;"></div><span style="font-size: 11px; color: #1d1d1f;">Backups</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-{* 4. Isolation - 4-up icon grid *}
+{* Isolation - 4-up icon grid *}
 {* cols-4: this section has 4 items and the base grid is 3-wide, which left the
-   fourth card stranded alone on a second row. *}
-<section class="hp-icon-grid cols-4" style="padding: 72px 22px 48px;">
+   fourth card stranded alone on a second row.
+
+   Carries id="how" — the hero's "See how it works" link targets it. The anchor
+   used to live on the cPanel-comparison section; when that was removed this
+   became the first explanatory block, so the link keeps working instead of
+   scrolling nowhere. *}
+<section id="how" class="hp-icon-grid cols-4" style="padding: 72px 22px 48px;">
     <div style="grid-column: 1 / -1; text-align: center; max-width: 800px; margin: 0 auto 40px;">
         <div class="hp-eyebrow" style="color: var(--color-accent);">{$hadrianLang.home.isoEyebrow}</div>
         <h2 style="font-size: 40px; font-weight: 600; letter-spacing: -0.02em; margin: 12px 0;">{$hadrianLang.home.isoTitle}</h2>
