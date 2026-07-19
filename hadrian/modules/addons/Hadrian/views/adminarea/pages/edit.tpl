@@ -58,7 +58,11 @@
         <section class="mt-section">
             <header class="mt-section-header"><h2 class="mt-section-title">Page options</h2></header>
             {foreach $optionRows as $opt}
-                {if $opt.type == 'bool'}
+                {* 'checkbox' is the type every pageoption.php in the theme
+                   actually declares; only 'bool' was handled here, so 48
+                   toggles across the page editor rendered as text inputs an
+                   admin could not meaningfully switch off. *}
+                {if $opt.type == 'bool' || $opt.type == 'checkbox'}
                     <div class="mt-row">
                         <div>
                             <div class="mt-row-label">{$opt.label|escape}</div>
@@ -69,6 +73,16 @@
                             <input type="checkbox" name="option[{$opt.key|escape}]" value="1" {if $opt.value}checked{/if}>
                             <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
                         </label>
+                    </div>
+                {elseif $opt.type == 'select' && $opt.options}
+                    <div class="mt-field">
+                        <label class="mt-field-label" for="opt-{$opt.key|escape}">{$opt.label|escape}</label>
+                        {if $opt.help}<div class="mt-row-help">{$opt.help|escape}</div>{/if}
+                        <select id="opt-{$opt.key|escape}" class="mt-select" name="option[{$opt.key|escape}]">
+                            {foreach $opt.options as $mtChoice}
+                                <option value="{$mtChoice|escape}"{if (string)$opt.value == (string)$mtChoice} selected{/if}>{$mtChoice|escape}</option>
+                            {/foreach}
+                        </select>
                     </div>
                 {else}
                     <div class="mt-field">

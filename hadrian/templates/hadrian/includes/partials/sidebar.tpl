@@ -77,7 +77,9 @@
             {$item.label|escape}
         </a>
     {elseif $mtType == 'language' || $mtType == 'currency'}
-        <a href="#" class="sidebar-item sidebar-item-switcher" data-switcher="{$mtType|escape}">
+        {* data-locale-open, NOT data-switcher — see the same fix in topnav.tpl.
+           Nothing listens for [data-switcher], so this was a dead link. *}
+        <a href="#" class="sidebar-item sidebar-item-switcher" data-locale-open data-switcher="{$mtType|escape}">
             <div class="sidebar-item-icon gray">{mtSidebarIcon iconName=($mtIconName|default:'globe')}</div>
             {$item.label|escape}
         </a>

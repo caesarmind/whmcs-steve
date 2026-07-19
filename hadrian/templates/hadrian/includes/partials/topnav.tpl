@@ -112,7 +112,11 @@
         </a>
         {/if}
     {elseif $mtType == 'language' || $mtType == 'currency'}
-        <a href="#" class="nav-switcher{$sideRight}" data-switcher="{$mtType|escape}">{$item.label|escape}</a>
+        {* data-locale-open, NOT data-switcher: nothing in apple-layout.js has
+           ever listened for [data-switcher], so language/currency menu items
+           were links that did nothing. The locale modal (which covers both) is
+           opened by [data-locale-open]. *}
+        <a href="#" class="nav-switcher{$sideRight}" data-locale-open data-switcher="{$mtType|escape}">{$item.label|escape}</a>
     {else}
         <a href="{$item.uri|escape}" class="nav-item{$sideRight}"{if $item.target} target="{$item.target|escape}"{/if}>
             {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}

@@ -2,21 +2,25 @@
 /**
  * check-free-price.mjs
  *
- * The "0.00" -> "Free" feature has TWO implementations that must agree:
+ * The "0.00" -> "Free" feature has THREE implementations that must agree:
  *
  *   1. includes/common/price.tpl        (Smarty, for server-rendered prices)
  *   2. src/Helpers/PriceHelper.php      (PHP, for the AJAX data tables)
+ *   3. initFreePriceLabels() in
+ *      assets/js/apple-layout.js        (JS, for the order form's client-side
+ *                                        price rewrites)
  *
  * Lagom's equivalent is duplicated inline across ~10 templates plus a JS
- * copy, which is exactly how such checks drift apart. This asserts the two
+ * copy, which is exactly how such checks drift apart. This asserts all three
  * still classify every case identically.
  *
- * The Smarty path is not simulated from a hardcoded copy of the regexes --
- * they are EXTRACTED from price.tpl, so editing the template without
- * updating the expectations here fails the check.
+ * None of the three is simulated from a hardcoded copy: the regexes are
+ * EXTRACTED from price.tpl and the isZero() body is EXTRACTED from
+ * apple-layout.js, so editing either without updating the expectations here
+ * fails the check.
  *
  * The PHP path runs only when a `php` binary is reachable; otherwise it is
- * skipped with a notice (the Smarty assertions still run).
+ * skipped with a notice (the Smarty and JS assertions still run).
  *
  * Usage:  node scripts/check-free-price.mjs      (from hadrian/)
  * Exit:   0 all agree, 1 on any mismatch.
@@ -30,6 +34,7 @@ import { tmpdir } from 'node:os';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const TPL = resolve(root, 'templates/hadrian/includes/common/price.tpl');
 const PHP = resolve(root, 'modules/addons/Hadrian/src/Helpers/PriceHelper.php');
+const JS  = resolve(root, 'templates/hadrian/assets/js/apple-layout.js');
 
 // [input, expectedFree, description]
 const CASES = [
@@ -80,6 +85,25 @@ if (patterns.length !== 2) {
   }
 }
 
+// -------------------------------------------------------------------- JS side
+// initFreePriceLabels() in apple-layout.js carries a third copy of the test,
+// for the order form's client-side price rewrites. Extract its isZero() body
+// verbatim rather than restating the logic here.
+const js = readFileSync(JS, 'utf8');
+const isZeroSrc = js.match(/function isZero\(text\) \{([\s\S]*?)\n {8}\}/);
+if (!isZeroSrc) {
+  fail('could not find isZero() in apple-layout.js — did initFreePriceLabels change shape?');
+} else {
+  const jsIsFree = new Function('text', isZeroSrc[1]);
+  for (const [input, want, desc] of CASES) {
+    let got;
+    try { got = jsIsFree(input); } catch (e) { fail(`js threw on '${input}': ${e.message}`); continue; }
+    if (Boolean(got) !== want) {
+      fail(`js: '${input}' -> ${got ? 'FREE' : 'price'}, expected ${want ? 'FREE' : 'price'}  (${desc})`);
+    }
+  }
+}
+
 // ------------------------------------------------------------------- PHP side
 let phpBin = null;
 for (const cand of ['php', 'php.exe']) {
@@ -124,7 +148,7 @@ echo json_encode($out);
 
 if (failures === 0) {
   console.log(`Checked ${CASES.length} price cases` +
-              `${phpBin ? ' against both the Smarty and PHP paths' : ' (Smarty path only)'}.`);
+              `${phpBin ? ' against the Smarty, JS and PHP paths' : ' (Smarty + JS paths)'}.`);
   console.log('"0.00" -> "Free" implementations agree.');
 } else {
   console.error(`\n${failures} mismatch(es).`);

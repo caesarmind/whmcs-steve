@@ -845,7 +845,12 @@
             if (!amountEl) return;
             var price = host.getAttribute('data-price-' + cycle);
             if (price) {
-                amountEl.textContent = price;
+                /* Route through the shared "0.00" -> "Free" test when the admin
+                   flag is on. Without this the label reappears as $0.00 the
+                   moment a visitor picks a different billing cycle. */
+                amountEl.textContent = (window.hnFreePrice && window.hnFreePrice.isZero(price))
+                    ? window.hnFreePrice.label
+                    : price;
                 if (periodEl) periodEl.textContent = CYCLE_LABEL[cycle] || '';
             } else {
                 // Fall back to minprice when this product doesn't offer the picked cycle.

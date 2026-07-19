@@ -155,7 +155,13 @@ final class PagesController extends AbstractController
                 'key'     => (string)$key,
                 'type'    => (string)($spec['type'] ?? 'string'),
                 'label'   => (string)($spec['label'] ?? ucwords(str_replace(['_', '-'], ' ', (string)$key))),
-                'help'    => (string)($spec['help'] ?? ''),
+                // Every pageoption.php in the theme declares 'tooltip', not
+                // 'help' — reading only 'help' meant all 60 help lines rendered
+                // blank. 'help' stays first so an option can still use it.
+                'help'    => (string)($spec['help'] ?? $spec['tooltip'] ?? ''),
+                // Needed by the select branch in the view; without it a
+                // declared select had no choices to draw.
+                'options' => is_array($spec['options'] ?? null) ? array_values($spec['options']) : [],
                 'default' => $spec['default'] ?? null,
                 'value'   => $options['options'][$key] ?? $spec['default'] ?? null,
             ];
@@ -248,8 +254,16 @@ final class PagesController extends AbstractController
             $type = (string)($spec['type'] ?? 'string');
             $raw  = $submitted[$key] ?? null;
             $options[(string)$key] = match ($type) {
-                'bool'  => $raw !== null && $raw !== '' && $raw !== '0' && $raw !== 0 && $raw !== false,
+                // 'checkbox' is what every pageoption.php actually declares;
+                // without it here a toggle round-tripped as the string "1"/""
+                // rather than a real bool.
+                'bool', 'checkbox' => $raw !== null && $raw !== '' && $raw !== '0' && $raw !== 0 && $raw !== false,
                 'int'   => (int)$raw,
+                // Reject anything not on the declared list so a hand-edited
+                // form can't store a value the page never offered.
+                'select' => in_array((string)$raw, array_map('strval', (array)($spec['options'] ?? [])), true)
+                    ? (string)$raw
+                    : (string)($spec['default'] ?? ''),
                 default => substr((string)$raw, 0, 500),
             };
         }

@@ -834,6 +834,44 @@
         classify();
     }
 
+    // ── "0.00" -> "Free" for JS-driven prices ──────────────
+    // The server-rendered side is handled by includes/common/price.tpl and
+    // PriceHelper. The order form is not reachable that way: its card prices
+    // are rewritten client-side from data-price-<cycle> every time a visitor
+    // clicks a billing-cycle pill, so a server-rendered label would be undone
+    // on the first interaction. This covers those surfaces.
+    //
+    // Same digits-only test as the PHP and Smarty twins: strip every non-digit,
+    // and treat it as free only when what remains is all zeros. Naturally
+    // idempotent — the label itself contains no digits, so re-running can never
+    // convert an already-converted element.
+    function initFreePriceLabels() {
+        if (document.body.dataset.freeLabel !== '1') return;
+
+        var LABEL = document.body.dataset.freeLabelText || 'Free';
+        var SELECTOR = '[data-price-display], .cp-cycle-price .amount';
+
+        function isZero(text) {
+            var digits = String(text).replace(/\D/g, '');
+            return digits !== '' && !/[1-9]/.test(digits);
+        }
+
+        function apply(root) {
+            var scope = root || document;
+            var nodes = scope.querySelectorAll(SELECTOR);
+            for (var i = 0; i < nodes.length; i++) {
+                var el = nodes[i];
+                var text = (el.textContent || '').trim();
+                if (isZero(text)) el.textContent = LABEL;
+            }
+        }
+
+        // Exposed so the cart's cycle-switcher can route its own writes through
+        // the same test rather than duplicating it.
+        window.hnFreePrice = { apply: apply, isZero: isZero, label: LABEL };
+        apply();
+    }
+
     // ── Bootstrap ──────────────────────────────────────────
     function boot() {
         var params = new URLSearchParams(window.location.search);
@@ -855,6 +893,7 @@
             applyActiveNav();
             applyPageTitle();
             initAffixedNav();
+            initFreePriceLabels();
             document.dispatchEvent(new CustomEvent('apple-layout:ready'));
         });
     }
