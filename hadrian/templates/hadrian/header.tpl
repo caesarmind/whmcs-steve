@@ -77,6 +77,18 @@
 {/if}
 {if $mt_align == 'center'}{assign var=mt_align value=''}{/if}
 
+{* sidebar side - which edge the fixed nav column sits on. Read from the ACTIVE
+   main-menu layout's saved option; only `sidebar` and `rail` declare it, and
+   `top` declares no supportedOptions at all, so a top-layout install never
+   emits it and the drawer it borrows from .sidebar stays on the left.
+   'left' emits nothing, so an untouched install renders exactly as before. *}
+{assign var=mt_sidebarSide value=$hadrian.layouts['main-menu'].options.side|default:'left'}
+{if $mt_preview && isset($smarty.get.sidebarside)}
+    {assign var=_q value=$smarty.get.sidebarside}
+    {if $_q == 'left' || $_q == 'right'}{assign var=mt_sidebarSide value=$_q}{/if}
+{/if}
+{if $mt_sidebarSide != 'right'}{assign var=mt_sidebarSide value=''}{/if}
+
 {* subnav (on/off) *}
 {assign var=mt_subnav value=''}
 {if isset($smarty.get.subnav)}
@@ -346,7 +358,7 @@
       data-layout="{$mt_layout}"
       data-active-nav="{$mt_activeNav|escape}"
       data-page-title="{$pagetitle|escape|default:'Page'}"
-      data-tpl="{$templatefile|default:''|escape}"{if ($templatefile|default:''|strstr:'store') && !($templatefile|default:''|strstr:'order') && !($templatefile|default:''|strstr:'not-found')} data-bleed="1"{/if}{if $mt_align} data-align="{$mt_align|escape}"{/if}{if $mt_subnav} data-subnav="{$mt_subnav|escape}"{/if}{if $mt_subnavOrder} data-subnav-order="{$mt_subnavOrder|escape}"{/if}{if $mt_subnavWebsite} data-subnav-website="{$mt_subnavWebsite|escape}"{/if}{if $mt_subnavSide} data-subnav-side="{$mt_subnavSide|escape}"{/if}{if $mt_svcLayout} data-svc-layout="{$mt_svcLayout|escape}"{/if}{if $mt_data} data-data="{$mt_data|escape}"{/if}{if $mt_tiles} data-tiles="{$mt_tiles|escape}"{/if}{if $mt_form} data-form="{$mt_form|escape}"{/if}{if $mt_plan} data-plan="{$mt_plan|escape}"{/if}{if $mt_product} data-product="{$mt_product|escape}"{/if}{if $hadrian.addonSettings.hide_breadcrumb} data-hide-breadcrumb="1"{/if}{if $hadrian.addonSettings.content_width && $hadrian.addonSettings.content_width != 'boxed'} data-content-width="{$hadrian.addonSettings.content_width|escape}"{/if}{if $hadrian.addonSettings.affixed_navigation} data-affixed-nav="1"{/if}{if !($hadrian.addonSettings.capitalize_titles|default:true)} data-capitalize-titles="0"{/if}{if $hadrian.addonSettings.hide_cycle_discounts} data-hide-discounts="1"{/if}{if $hadrian.addonSettings.free_label} data-free-label="1" data-free-label-text="{$LANG.orderfree|default:'Free'|escape}"{/if}>
+      data-tpl="{$templatefile|default:''|escape}"{if ($templatefile|default:''|strstr:'store') && !($templatefile|default:''|strstr:'order') && !($templatefile|default:''|strstr:'not-found')} data-bleed="1"{/if}{if $mt_align} data-align="{$mt_align|escape}"{/if}{if $mt_sidebarSide} data-sidebar-side="{$mt_sidebarSide|escape}"{/if}{if $mt_subnav} data-subnav="{$mt_subnav|escape}"{/if}{if $mt_subnavOrder} data-subnav-order="{$mt_subnavOrder|escape}"{/if}{if $mt_subnavWebsite} data-subnav-website="{$mt_subnavWebsite|escape}"{/if}{if $mt_subnavSide} data-subnav-side="{$mt_subnavSide|escape}"{/if}{if $mt_svcLayout} data-svc-layout="{$mt_svcLayout|escape}"{/if}{if $mt_data} data-data="{$mt_data|escape}"{/if}{if $mt_tiles} data-tiles="{$mt_tiles|escape}"{/if}{if $mt_form} data-form="{$mt_form|escape}"{/if}{if $mt_plan} data-plan="{$mt_plan|escape}"{/if}{if $mt_product} data-product="{$mt_product|escape}"{/if}{if $hadrian.addonSettings.hide_breadcrumb} data-hide-breadcrumb="1"{/if}{if $hadrian.addonSettings.content_width && $hadrian.addonSettings.content_width != 'boxed'} data-content-width="{$hadrian.addonSettings.content_width|escape}"{/if}{if $hadrian.addonSettings.affixed_navigation} data-affixed-nav="1"{/if}{if $hadrian.addonSettings.unpin_sidebar} data-unpin-sidebar="1"{/if}{if !($hadrian.addonSettings.capitalize_titles|default:true)} data-capitalize-titles="0"{/if}{if $hadrian.addonSettings.hide_cycle_discounts} data-hide-discounts="1"{/if}{if $hadrian.addonSettings.free_label} data-free-label="1" data-free-label-text="{$LANG.orderfree|default:'Free'|escape}"{/if}>
 
 {$headeroutput}
 

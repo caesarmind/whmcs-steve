@@ -27,5 +27,13 @@ return [
             'default' => 'center',
             'choices' => ['center' => 'Center', 'left' => 'Left'],
         ],
+        // Flipping the rail's edge is safe (unlike unpinning it, which would
+        // strand the only nav on this layout). Stored per-layout, so the rail's
+        // side is independent of the sidebar's.
+        'side' => [
+            'label'   => 'Rail position',
+            'default' => 'left',
+            'choices' => ['left' => 'Left', 'right' => 'Right'],
+        ],
     ],
 ];

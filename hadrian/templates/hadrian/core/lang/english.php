@@ -93,6 +93,7 @@ return [
         'darkMode'    => 'Dark Mode',
         'toggleTheme' => 'Toggle theme',
         'page'        => 'Page',
+        'backToTop'   => 'Back to top',
 
         // Locale picker (B08b) - combined "language & currency" phrase has no single WHMCS key.
         'localeChoose'  => 'Choose language & currency',

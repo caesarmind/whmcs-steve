@@ -1142,6 +1142,40 @@ body[data-svc-layout="outside"] .content-area .settings-group > .settings-item:l
    Controls inside/outside toggle floats its caption and the wrapped body becomes
    the white box. No opt-out needed. */
 
+/* -- Unpin Sidebar (admin flag: unpin_sidebar) ----------------
+   Default (attribute absent) = unchanged: .sidebar stays position:fixed
+   (apple-theme.css:291).
+
+   ON swaps fixed -> absolute. <body> declares no position, transform, filter or
+   contain, so the containing block is the initial containing block: top:0
+   anchors to the document top while top:0 + bottom:0 still compute to one
+   viewport height. The panel keeps its size and internal flex column and simply
+   travels with the page. Do NOT add body{position:relative} to stretch it --
+   that would retarget every position:absolute descendant on a live site.
+
+   Absolute is still out of flow, so body[data-layout="side"] .ph-main-wrap
+   { margin-left:260px } (line 27) needs no change.
+
+   SIDE LAYOUT ONLY. The icon rail is the only navigation on its layout, its
+   flyout panel is never rendered (no .ph-rail-panel markup exists, so
+   apple-layout.js aborts initRail() and the data-rail buttons are inert), and
+   .ph-mobile-toggle is display:none above 900px -- unpinning the rail would
+   leave zero reachable nav below the fold.
+
+   The topbar unpins with it. With affixed_navigation OFF, the rule near :638
+   already makes .ph-side-topbar relative, so this is a no-op; with it ON, a bar
+   left pinned over the 260px gutter the sidebar just vacated reads as a
+   rendering fault. 'relative' not 'static', matching that idiom, so z-index
+   still applies to the topbar dropdowns.
+
+   min-width:901px is LOAD-BEARING. The drawer block below declares no
+   `position` at all -- it inherits `fixed` from apple-theme.css:291 -- so this
+   media guard is the only thing keeping the mobile drawer pinned. */
+@media (min-width: 901px) {
+    body[data-unpin-sidebar="1"][data-layout="side"] .sidebar { position: absolute; }
+    body[data-unpin-sidebar="1"][data-layout="side"] .ph-side-topbar { position: relative; }
+}
+
 /* -- Responsive sidebar drawer (<=900px, side layout) -------- */
 /* On narrow viewports the fixed 260px sidebar would crowd content,
    so we convert it to a slide-in drawer. The hamburger toggle lives
@@ -3153,3 +3187,76 @@ body[data-tpl="fraudcheck"] {
     body[data-tpl="complete"],
     body[data-tpl="fraudcheck"]
 ) h3 { font-size: var(--text-h6); font-weight: var(--fw-semibold); letter-spacing: -0.014em; }
+
+/* ============================================================
+   SIDEBAR SIDE -- body[data-sidebar-side="right"]
+   ------------------------------------------------------------
+   Mirrors the fixed nav column to the right edge. Emitted by
+   header.tpl from the ACTIVE main-menu layout's `side` option.
+   .sidebar and .ph-rail are position:fixed, so DOM order is
+   irrelevant -- a pure CSS flip, no markup moves.
+   ============================================================ */
+
+/* Fixed column. The :not([data-layout="top"]) guard is required: under
+   ?preview=1 header.tpl renders .sidebar regardless of layout and
+   apple-layout.js can set data-layout=top independently, which would pin the
+   top-layout drawer to right:0 while it kept translateX(-100%) from the drawer
+   block -- leaving a slice of drawer permanently on screen. */
+body[data-sidebar-side="right"]:not([data-layout="top"]) .sidebar,
+body[data-sidebar-side="right"]:not([data-layout="top"]) .ph-rail {
+    left: auto;
+    right: 0;
+    border-right: 0;
+    border-left: 0.5px solid var(--color-border);
+}
+
+/* Content gutter. Zeroing margin-left is mandatory, not tidiness -- the base
+   rules at the top of this file are still in effect. */
+body[data-sidebar-side="right"][data-layout="side"] .ph-main-wrap {
+    margin-left: 0;
+    margin-right: 260px;
+}
+body[data-sidebar-side="right"][data-layout="rail"] .ph-main-wrap {
+    margin-left: 0;
+    margin-right: 80px;
+}
+
+@media (max-width: 900px) {
+    /* The drawer OVERLAYS, never pushes, so BOTH gutters must be zeroed --
+       omitting margin-right leaves a 260px/80px dead strip down the right of
+       every phone screen. */
+    body[data-sidebar-side="right"][data-layout="side"] .ph-main-wrap,
+    body[data-sidebar-side="right"][data-layout="rail"] .ph-main-wrap {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    /* Off-canvas direction. `top` is included so the preview-mode combination
+       above stays coherent. */
+    body[data-sidebar-side="right"][data-layout="side"] .sidebar,
+    body[data-sidebar-side="right"][data-layout="top"]  .sidebar,
+    body[data-sidebar-side="right"][data-layout="rail"] .ph-rail {
+        transform: translateX(100%);
+        box-shadow: -4px 0 24px rgba(0, 0, 0, 0.18);
+    }
+    /* Open state MUST be its own rule: the base open rules in the drawer block
+       are (0,3,1), identical to the closed rules above, so the drawer would
+       never open. Scoping makes these (0,4,1) and order-independent. */
+    body[data-sidebar-side="right"][data-layout="side"].nav-open .sidebar,
+    body[data-sidebar-side="right"][data-layout="top"].nav-open  .sidebar,
+    body[data-sidebar-side="right"][data-layout="rail"].nav-open .ph-rail {
+        transform: translateX(0);
+    }
+
+    /* Mirror the topbar so the hamburger sits on the drawer's entry edge.
+       .ph-side-topbar-inner is a space-between flex row with FOUR children:
+       .ph-mobile-toggle, .ph-side-logo, .ph-side-crumbs, .ph-side-topbar-actions.
+       Only the crumbs are hidden at <=900px -- .ph-side-topbar-actions is NOT,
+       and carries no `order` anywhere. Ranking only two children would strand
+       the actions at the initial order:0 and hoist the bell/cart/avatar cluster
+       to the far LEFT. Every child is ranked; rank any child added later too. */
+    body[data-sidebar-side="right"]:not([data-layout="top"]) .ph-side-logo           { order: 1; }
+    body[data-sidebar-side="right"]:not([data-layout="top"]) .ph-side-crumbs         { order: 2; }
+    body[data-sidebar-side="right"]:not([data-layout="top"]) .ph-side-topbar-actions { order: 3; }
+    body[data-sidebar-side="right"]:not([data-layout="top"]) .ph-mobile-toggle       { order: 4; }
+}

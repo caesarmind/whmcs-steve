@@ -26,6 +26,15 @@ final class SettingsController extends AbstractController
         'affixed_navigation'     => ['Affixed Navigation',       'Keep the navbar pinned while scrolling. It slides out of the way as you scroll down and returns the moment you scroll up. Off lets the navbar scroll away with the page.', false, 'bool'],
         'hide_breadcrumb'        => ['Hide Breadcrumb',          'Hide the breadcrumb above the page title on every layout (the "Portal Home" back-link on top nav, and the "Home / Page" trail on the sidebar and icon-rail layouts).', false, 'bool'],
         'cookie_box'             => ['Cookie Box',               'Show a cookie consent banner on first visit.',                          false, 'bool'],
+        // Negative key on purpose: the sidebar IS pinned today (apple-theme.css:291
+        // position:fixed), so a "Sticky sidebar" label would imply the toggle adds
+        // stickiness that already exists. Default false == today's rendering.
+        // SIDE LAYOUT ONLY -- the icon rail is the sole navigation on its layout and
+        // its flyout panel is never rendered (no .ph-rail-panel markup exists, so
+        // apple-layout.js aborts initRail()), while .ph-mobile-toggle is display:none
+        // above 900px. Unpinning the rail would leave no reachable nav below the fold.
+        'unpin_sidebar'          => ['Unpin Sidebar',            'Let the sidebar scroll away with the page instead of staying pinned to the viewport. Applies to the Sidebar layout above 900px only; the icon rail and the mobile slide-in drawer stay pinned. While this is on, the main menu is only reachable at the top of the page.', false, 'bool'],
+        'back_to_top'            => ['Back to Top Button',       'Show a floating button in the bottom-right corner once the visitor scrolls down, returning them to the top of the page when clicked.', false, 'bool'],
         // Default OFF deliberately: the runtime (PriceHelper / price.tpl) treats
         // unset as off, so a `true` here would render the box pre-checked while
         // nothing actually changed until the admin pressed Save. Opt-in also
@@ -74,10 +83,12 @@ final class SettingsController extends AbstractController
      */
     public const LAYOUT_FLAGS = [
         'affixed_navigation',
+        'unpin_sidebar',
         'hide_breadcrumb',
         'hide_language_switcher',
         'hide_currency_selector',
         'hide_footer_socials',
+        'back_to_top',
     ];
 
     /**
@@ -86,6 +97,7 @@ final class SettingsController extends AbstractController
      */
     public const LAYOUT_FLAG_SECTION = [
         'hide_footer_socials' => 'footer',
+        'back_to_top'         => 'footer',
     ];
 
     /** Which Settings tab each flag renders on. Unlisted flags default to 'general'. */

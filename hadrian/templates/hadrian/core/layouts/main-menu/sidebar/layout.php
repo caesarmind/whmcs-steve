@@ -27,5 +27,13 @@ return [
             'default' => 'center',
             'choices' => ['center' => 'Center', 'left' => 'Left'],
         ],
+        // Which edge the fixed 260px column sits on. 'left' is the default and
+        // header.tpl emits NO attribute for it, so an install that never touches
+        // this renders byte-identically to today.
+        'side' => [
+            'label'   => 'Sidebar position',
+            'default' => 'left',
+            'choices' => ['left' => 'Left', 'right' => 'Right'],
+        ],
     ],
 ];

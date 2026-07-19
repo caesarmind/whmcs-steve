@@ -74,16 +74,19 @@ final class LayoutsController extends AbstractController
      * Shape: section => [ [label, help, type, choices?], ... ]
      */
     private const PLANNED_CONTROLS = [
-        'main-menu' => [
-            'Sidebar' => [
-                ['Position',       'Which side a sidebar-based menu sits on.',              'select', ['Left', 'Right']],
-                ['Sticky sidebar', 'Pin the sidebar in view while the page scrolls.',       'bool',   []],
-            ],
-        ],
+        // Emptied: every control that lived here is now wired.
+        //   Position       -> per-layout 'side' option on the sidebar/rail cards
+        //   Sticky sidebar -> unpin_sidebar flag (inverted; the sidebar is pinned
+        //                     by default, so the flag turns pinning OFF)
+        //   Back-to-top    -> back_to_top flag, Footer options
+        //   Newsletter     -> dropped
+        'main-menu' => [],
+        // The 'footer' => 'Footer options' key MUST stay even while empty:
+        // layouts/index.tpl draws the Footer options <section> from INSIDE
+        // {foreach $planned['footer']}, so removing it would take the wired
+        // $footerFlags rows down with it.
         'footer' => [
-            'Footer options' => [
-                ['Back-to-top button', 'Show a floating button to scroll back to the top.', 'bool',   []],
-            ],
+            'Footer options' => [],
         ],
     ];
 

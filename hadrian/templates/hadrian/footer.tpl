@@ -55,6 +55,12 @@
    admin enabled the Cookie Box setting. *}
 {include file="`$template`/includes/partials/cookie-box.tpl"}
 
+{* Back-to-top button — fixed overlay, rendered on every page (incl. cart +
+   full-bleed) since it sits outside the portal-chrome gate, and after the
+   cookie bar so the two never fight for the same corner. No-op unless the
+   admin enabled the Back to Top Button setting. *}
+{include file="`$template`/includes/partials/back-to-top.tpl"}
+
 {$footeroutput}
 
 <script src="{$WEB_ROOT}/templates/{$template}/assets/js/apple-theme.js?v={$hadrian.version|default:'1.1'}"></script>
