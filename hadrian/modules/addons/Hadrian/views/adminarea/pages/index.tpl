@@ -10,6 +10,18 @@
     <div class="mt-alert mt-alert-success">Page settings saved.</div>
 {/if}
 
+<div class="mt-search mt-pages-search">
+    <span class="mt-search-icon" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none">
+            <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+    </span>
+    <input type="search" id="mt-pages-search" class="mt-input" placeholder="Search pages&hellip;"
+           autocomplete="off" spellcheck="false" aria-label="Search pages">
+    <button type="button" class="mt-search-clear" id="mt-pages-search-clear" aria-label="Clear search" hidden>&#10005;</button>
+</div>
+
 <div class="mt-tabs" id="mt-pages-tabs" role="tablist">
     <a class="mt-tab is-active" href="#tab=all" data-tab="all" role="tab">
         All <span class="mt-tab-pill" data-tab-pill>{$totalCount}</span>
@@ -21,12 +33,52 @@
     {/foreach}
 </div>
 
+{literal}
 <style>
 .mt-tab-pill { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:999px; background:var(--mt-border); color:var(--mt-text-3); font-size:11px; font-weight:500; line-height:1.6; min-width:18px; text-align:center; }
 .mt-tab.is-active .mt-tab-pill { background:var(--mt-primary-tint); color:var(--mt-primary); }
-.mt-pages-section[hidden] { display:none !important; }
-.mt-pages-panel:has(> .mt-pages-section[hidden]) { display:none !important; }
+
+/* Search ------------------------------------------------------------- */
+.mt-pages-search { margin: 0 0 18px; }
+.mt-pages-search .mt-input { padding-right: 34px; }
+/* Suppress the native WebKit clear affordance -- we render our own so the
+   control looks identical across browsers. */
+.mt-pages-search input[type="search"]::-webkit-search-cancel-button,
+.mt-pages-search input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+.mt-search-clear { position:absolute; right:8px; top:50%; transform:translateY(-50%); display:flex; align-items:center; justify-content:center; width:22px; height:22px; padding:0; border:none; border-radius:50%; background:transparent; color:var(--mt-text-3); font-size:12px; line-height:1; cursor:pointer; transition:background 0.15s ease, color 0.15s ease; }
+.mt-search-clear:hover { background:var(--mt-neutral-tint); color:var(--mt-text); }
+.mt-search-clear:focus-visible { outline:2px solid var(--mt-primary); outline-offset:1px; }
+.mt-search-clear[hidden] { display:none; }
+
+/* Page rows ----------------------------------------------------------- */
+.mt-pagerow-scroll { overflow-x:auto; }
+.mt-pagerow-grid { min-width:640px; }
+.mt-pagerow-head,
+.mt-pagerow { display:grid; grid-template-columns:minmax(200px,1fr) 112px 64px 104px 112px 20px; gap:14px; align-items:center; }
+.mt-pagerow-head { padding:0 14px 8px; }
+.mt-pagerow-head span { font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--mt-text-3); }
+.mt-pagerow-list { display:flex; flex-direction:column; gap:6px; }
+.mt-pagerow { padding:12px 14px; border:1px solid var(--mt-border); border-radius:var(--mt-radius); background:var(--mt-surface); text-decoration:none; color:inherit; transition:background 0.15s ease, border-color 0.15s ease; }
+.mt-pagerow:hover { background:var(--mt-surface-2); border-color:var(--mt-text-4); text-decoration:none; }
+.mt-pagerow:focus-visible { outline:2px solid var(--mt-primary); outline-offset:2px; }
+.mt-pagerow[hidden] { display:none; }
+.mt-pagerow-main { min-width:0; }
+.mt-pagerow-name { display:block; font-size:14px; font-weight:600; color:var(--mt-text); }
+.mt-pagerow-desc { display:block; font-size:12px; color:var(--mt-text-3); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mt-pagerow-variant { font-size:12.5px; color:var(--mt-text-2); }
+.mt-pagerow-dash { color:var(--mt-text-4); }
+.mt-pagerow-chev { color:var(--mt-text-3); font-size:13px; text-align:right; }
+
+.mt-pages-panel[hidden], .mt-pages-noresults[hidden] { display:none; }
 </style>
+{/literal}
+
+<div class="mt-panel pad mt-pages-noresults" id="mt-pages-noresults" hidden>
+    <div class="mt-empty">
+        <h3 class="mt-empty-title">No pages match &ldquo;<span id="mt-pages-noresults-q"></span>&rdquo;</h3>
+        <p>Try a different search term, or switch to another group.</p>
+    </div>
+</div>
 
 {foreach $groups as $g}
     {assign var=groupRows value=$pagesByGroup[$g]}
@@ -34,40 +86,41 @@
     <section class="mt-section mt-pages-section" data-group-section="{$g|escape}">
         <header class="mt-section-header">
             <h2 class="mt-section-title">{$g|escape} pages</h2>
-            <span class="mt-section-count">{$groupRows|count}</span>
+            <span class="mt-section-count" data-group-count data-total="{$groupRows|count}">{$groupRows|count}</span>
         </header>
 
         {if $groupRows|count}
-            <div class="mt-table-wrap">
-                <table class="mt-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Variant</th>
-                            <th>SEO</th>
-                            <th>Indexing</th>
-                            <th>Visibility</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <div class="mt-pagerow-scroll">
+                <div class="mt-pagerow-grid">
+                    <div class="mt-pagerow-head" aria-hidden="true">
+                        <span>Name</span>
+                        <span>Variant</span>
+                        <span>SEO</span>
+                        <span>Indexing</span>
+                        <span>Visibility</span>
+                        <span></span>
+                    </div>
+                    <div class="mt-pagerow-list">
                         {foreach $groupRows as $page}
-                            <tr>
-                                <td class="mt-table-name">
-                                    <div>{$page.label|escape}</div>
+                            <a class="mt-pagerow"
+                               href="?module=Hadrian&amp;action=pages&amp;sub=edit&amp;page={$page.name|escape:'url'}"
+                               data-page-row
+                               data-search="{$page.label|lower|escape} {$page.description|lower|escape} {$page.name|lower|escape} {$page.variantLabel|lower|escape}">
+                                <span class="mt-pagerow-main">
+                                    <span class="mt-pagerow-name">{$page.label|escape}</span>
                                     {if $page.description}
-                                        <div style="font-size:12px;color:var(--mt-text-3);margin-top:2px;">{$page.description|escape}</div>
+                                        <span class="mt-pagerow-desc">{$page.description|escape}</span>
                                     {/if}
-                                </td>
-                                <td>{$page.variantLabel|escape}</td>
-                                <td>
+                                </span>
+                                <span class="mt-pagerow-variant">{$page.variantLabel|escape}</span>
+                                <span>
                                     {if $page.hasSeo}
                                         <span class="mt-badge mt-badge-success">SEO</span>
                                     {else}
-                                        <span class="mt-badge mt-badge-neutral">—</span>
+                                        <span class="mt-pagerow-dash">&mdash;</span>
                                     {/if}
-                                </td>
-                                <td>
+                                </span>
+                                <span>
                                     {if $page.indexing == 'allow'}
                                         <span class="mt-badge mt-badge-success">Allow</span>
                                     {elseif $page.indexing == 'disallow'}
@@ -75,8 +128,8 @@
                                     {else}
                                         <span class="mt-badge mt-badge-neutral">Inherit</span>
                                     {/if}
-                                </td>
-                                <td>
+                                </span>
+                                <span>
                                     {if $page.visibility == 'disabled'}
                                         <span class="mt-badge mt-badge-warning">Disabled</span>
                                     {elseif $page.visibility == 'auth'}
@@ -84,14 +137,12 @@
                                     {else}
                                         <span class="mt-badge mt-badge-neutral">Public</span>
                                     {/if}
-                                </td>
-                                <td class="mt-table-actions">
-                                    <a href="?module=Hadrian&action=pages&sub=edit&page={$page.name|escape:'url'}" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a>
-                                </td>
-                            </tr>
+                                </span>
+                                <span class="mt-pagerow-chev" aria-hidden="true">&rsaquo;</span>
+                            </a>
                         {/foreach}
-                    </tbody>
-                </table>
+                    </div>
+                </div>
             </div>
         {else}
             <div class="mt-empty">
@@ -103,26 +154,83 @@
     </div>
 {/foreach}
 
+{literal}
 <script>
 (function() {
-    var tabs = document.querySelectorAll('#mt-pages-tabs .mt-tab');
-    var sections = document.querySelectorAll('.mt-pages-section');
-    if (!tabs.length || !sections.length) return;
+    var tabs     = document.querySelectorAll('#mt-pages-tabs .mt-tab');
+    var panels   = document.querySelectorAll('.mt-pages-panel');
+    var input    = document.getElementById('mt-pages-search');
+    var clearBtn = document.getElementById('mt-pages-search-clear');
+    var noRes    = document.getElementById('mt-pages-noresults');
+    var noResQ   = document.getElementById('mt-pages-noresults-q');
+    if (!tabs.length || !panels.length) return;
 
     var validTabs = {};
     Array.prototype.forEach.call(tabs, function(t) { validTabs[t.getAttribute('data-tab')] = true; });
 
-    function activate(name) {
+    var activeTab = 'all';
+    var query     = '';
+
+    // Single source of truth: a row is visible when it belongs to the active
+    // tab AND matches the query. Group panels hide when they have no visible
+    // rows, so searching collapses irrelevant groups the way the tabs do.
+    function apply() {
+        var q = query.trim().toLowerCase();
+        var totalVisible = 0;
+
+        Array.prototype.forEach.call(panels, function(panel) {
+            var group   = panel.getAttribute('data-group-panel');
+            var inTab   = (activeTab === 'all') || (group === activeTab);
+            var rows    = panel.querySelectorAll('[data-page-row]');
+            var shown   = 0;
+
+            Array.prototype.forEach.call(rows, function(row) {
+                var hit = inTab && (!q || row.getAttribute('data-search').indexOf(q) !== -1);
+                if (hit) { row.removeAttribute('hidden'); shown++; }
+                else     { row.setAttribute('hidden', ''); }
+            });
+
+            var countEl = panel.querySelector('[data-group-count]');
+            if (countEl) {
+                var total = countEl.getAttribute('data-total');
+                countEl.textContent = q ? (shown + ' of ' + total) : total;
+            }
+
+            // A group with zero rows on the server still shows its own empty
+            // state, but only while it is in the active tab and unfiltered.
+            var serverEmpty = rows.length === 0;
+            var visible = inTab && (serverEmpty ? !q : shown > 0);
+            if (visible) { panel.removeAttribute('hidden'); }
+            else         { panel.setAttribute('hidden', ''); }
+
+            totalVisible += shown;
+        });
+
+        var noneAtAll = q && totalVisible === 0;
+        if (noneAtAll) {
+            noResQ.textContent = query.trim();
+            noRes.removeAttribute('hidden');
+        } else {
+            noRes.setAttribute('hidden', '');
+        }
+
+        if (clearBtn) {
+            if (query) { clearBtn.removeAttribute('hidden'); }
+            else       { clearBtn.setAttribute('hidden', ''); }
+        }
+    }
+
+    function activate(name, push) {
         if (!validTabs[name]) name = 'all';
+        activeTab = name;
         Array.prototype.forEach.call(tabs, function(t) {
             t.classList.toggle('is-active', t.getAttribute('data-tab') === name);
         });
-        Array.prototype.forEach.call(sections, function(s) {
-            var visible = (name === 'all') || (s.getAttribute('data-group-section') === name);
-            if (visible) { s.removeAttribute('hidden'); } else { s.setAttribute('hidden', ''); }
-        });
-        try { history.replaceState(null, '', '#tab=' + encodeURIComponent(name)); } catch (e) {}
-        try { localStorage.setItem('mt-pages-tab', name); } catch (e) {}
+        apply();
+        if (push !== false) {
+            try { history.replaceState(null, '', '#tab=' + encodeURIComponent(name)); } catch (e) {}
+            try { localStorage.setItem('mt-pages-tab', name); } catch (e) {}
+        }
     }
 
     Array.prototype.forEach.call(tabs, function(t) {
@@ -131,6 +239,22 @@
             activate(t.getAttribute('data-tab'));
         });
     });
+
+    if (input) {
+        input.addEventListener('input', function() { query = input.value; apply(); });
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && input.value) {
+                e.preventDefault();
+                input.value = ''; query = ''; apply();
+            }
+        });
+    }
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            input.value = ''; query = ''; apply();
+            input.focus();
+        });
+    }
 
     // Resolve initial tab: URL hash > localStorage > default 'all'.
     var initial = null;
@@ -143,9 +267,10 @@
     // React to back/forward navigation that changes the hash.
     window.addEventListener('hashchange', function() {
         var mm = window.location.hash.match(/tab=([^&]+)/);
-        if (mm) { try { activate(decodeURIComponent(mm[1])); } catch (e) {} }
+        if (mm) { try { activate(decodeURIComponent(mm[1]), false); } catch (e) {} }
     });
 })();
 </script>
+{/literal}
 
 {include file="includes/footer.tpl"}
