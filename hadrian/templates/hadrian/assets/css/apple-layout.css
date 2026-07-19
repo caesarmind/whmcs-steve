@@ -1240,6 +1240,24 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
     body[data-layout="top"] .homepage-nav .nav-divider { display: none !important; }
 }
 
+/* Two "Login" links in the top bar.
+   The theme hardcodes a utility sign-in (.nav-signin, next to cart + theme
+   toggle) AND the menu can carry a login_button item (.nav-cta). Logged out,
+   both rendered — the nav-cta is only suppressed under 900px by the collapse
+   rule above, so from 900px up the bar showed Login twice.
+
+   Hide the utility one when the menu actually supplies a login button, rather
+   than deleting either outright: :has() means an admin who removes the
+   login_button item from the menu still gets a working sign-in link instead of
+   a bar with no way in.
+
+   min-width pairs with the 900px collapse above. Without it this would also
+   match on mobile — where .nav-cta is display:none but still in the DOM, so
+   :has() matches and would leave no login link at all. */
+@media (min-width: 901px) {
+    .homepage-nav .homepage-nav-inner:has(.nav-cta) .nav-signin { display: none; }
+}
+
 [data-theme="dark"] .ph-nav-backdrop { background: rgba(0, 0, 0, 0.55); }
 
 @media (max-width: 768px) {
