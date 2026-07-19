@@ -52,8 +52,17 @@ jobs:
           # "hadrian/" is the repo container folder; it is stripped on deploy,
           # so the server tree is modules/addons/Hadrian + templates/hadrian.
           # --------------------------------------------------------------
-          CHANGED_MAIN=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'hadrian/**' | grep -v '/\.' || true)
-          DELETED_MAIN=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'hadrian/**' | grep -v '/\.' || true)
+          # Restricted to the two subtrees that belong on the server — the same
+          # pair the `paths:` trigger names and the delete allowlist below
+          # enforces. It used to glob all of 'hadrian/**', which quietly shipped
+          # hadrian/scripts/ (build + lint tooling) into the web root: 16 files
+          # fetchable at https://<site>/scripts/, including a curl cookie jar
+          # holding a live session cookie. Anything outside these two paths is
+          # repo-side tooling and has no business on a billing site.
+          UPLOAD_PATHS='hadrian/modules/addons/Hadrian/**'
+          UPLOAD_PATHS2='hadrian/templates/hadrian/**'
+          CHANGED_MAIN=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- "$UPLOAD_PATHS" "$UPLOAD_PATHS2" | grep -v '/\.' || true)
+          DELETED_MAIN=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- "$UPLOAD_PATHS" "$UPLOAD_PATHS2" | grep -v '/\.' || true)
 
           if [ -n "$CHANGED_MAIN" ]; then
             echo "=== Uploading hadrian/ changes ==="
