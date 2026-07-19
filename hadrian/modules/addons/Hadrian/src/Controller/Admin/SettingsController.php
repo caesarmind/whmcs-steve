@@ -31,13 +31,11 @@ final class SettingsController extends AbstractController
         // nothing actually changed until the admin pressed Save. Opt-in also
         // means deploying this never silently relabels prices on a live install.
         'free_label'             => ['"0.00" → "Free"',          'Display free items as "Free" instead of "$0.00".',                       false, 'bool'],
-        'table_cache_duration'   => ['Table Cache Duration',     'Cache rendered tables to reduce DB load.',                              true,  'bool'],
         'enable_alternate_links' => ['Enable Alternate Links',   'Add SEO multi-language alternate links.',                               true,  'bool'],
         // Scope spelled out: this covers marketing/store section labels only,
         // NOT client-area table headers or sidebar labels (see apple-layout.css).
         // Lagom scopes its equivalent the same way.
         'capitalize_titles'      => ['Section Titles Capitalization', 'Uppercase the eyebrows, tags and tier labels on homepage and store pages. Client-area table headings and sidebar labels are unaffected.', true,  'bool'],
-        'disable_cms_cache'      => ['Disable CMS Menu Cache',   'Bypass the menu cache during development.',                             false, 'bool'],
         'hide_cycle_discounts'   => ['Hide Billing Cycle Discounts', 'Hide the "Save X%" pills shown next to the billing cycle choices when configuring a product.', false, 'bool'],
         'enable_dynamic_ajax'    => ['Enable Dynamic AJAX Loading',  'Load data tables (services, domains, invoices, tickets, quotes, emails) in pages of 10 via AJAX — fast first paint on large accounts.', false, 'bool'],
         'custom_language_list'   => ['Custom Language List',     'Override the language list shown to clients in the locale chooser.',    false, 'bool'],
