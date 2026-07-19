@@ -102,10 +102,15 @@
             {/if}
         </div>
     {elseif $mtType == 'login_button'}
+        {* Logged-out only. The menu carries no client-status gate of its own, so
+           without this a signed-in visitor still got a "Login" button sitting
+           next to their own profile menu. *}
+        {if !$loggedin}
         <a href="{$item.uri|escape}" class="nav-cta{$sideRight}">
             {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
             {$item.label|escape}
         </a>
+        {/if}
     {elseif $mtType == 'language' || $mtType == 'currency'}
         <a href="#" class="nav-switcher{$sideRight}" data-switcher="{$mtType|escape}">{$item.label|escape}</a>
     {else}

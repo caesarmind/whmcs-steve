@@ -1246,16 +1246,23 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
    both rendered — the nav-cta is only suppressed under 900px by the collapse
    rule above, so from 900px up the bar showed Login twice.
 
-   Hide the utility one when the menu actually supplies a login button, rather
-   than deleting either outright: :has() means an admin who removes the
-   login_button item from the menu still gets a working sign-in link instead of
-   a bar with no way in.
+   The utility sign-in wins: it sits with the cart and theme toggle where the
+   account controls live, and it is the one that becomes the profile menu once
+   you are signed in. So the menu's login button is the one that gives way.
 
-   min-width pairs with the 900px collapse above. Without it this would also
-   match on mobile — where .nav-cta is display:none but still in the DOM, so
-   :has() matches and would leave no login link at all. */
+   Keyed on :has(.nav-signin) rather than hiding .nav-cta outright, so this
+   stays a de-duplication rule and not a blanket kill: .nav-signin renders only
+   in the logged-out branch of topnav.tpl, so if that branch ever stops
+   emitting it the menu button reappears rather than leaving no way to sign in.
+
+   min-width pairs with the 900px collapse above — below it .nav-cta is already
+   hidden into the hamburger drawer, so there is nothing to de-duplicate.
+
+   NOTE this makes an admin-configured menu item invisible on desktop. The
+   cleaner fix is deleting the login_button item in admin -> Menu, after which
+   this rule can go. */
 @media (min-width: 901px) {
-    .homepage-nav .homepage-nav-inner:has(.nav-cta) .nav-signin { display: none; }
+    .homepage-nav .homepage-nav-inner:has(.nav-signin) .nav-cta { display: none; }
 }
 
 [data-theme="dark"] .ph-nav-backdrop { background: rgba(0, 0, 0, 0.55); }
