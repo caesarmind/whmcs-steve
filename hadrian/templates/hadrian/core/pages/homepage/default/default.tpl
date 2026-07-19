@@ -65,9 +65,25 @@
         {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
         <div class="ph-captcha">{include file="`$template`/includes/captcha.tpl"}</div>
         {/if}
+        {* Live TLD register prices (Hooks::fetchDomainTldPricing -> localAPI
+           GetTLDPricing, visitor's currency). Renders nothing when WHMCS has no
+           priced TLDs, so the hero never shows an empty rail. *}
+        {if $homeTldPricing}
+        <div class="hp-tld-strip">
+            {foreach $homeTldPricing as $mtTld}
+                <a class="hp-tld" href="{$WEB_ROOT}/index.php?rp=/domain/pricing">
+                    <span class="hp-tld-ext">{$mtTld.tld|escape}</span>
+                    <span class="hp-tld-price">{$mtTld.price|escape}</span>
+                </a>
+            {/foreach}
+        </div>
+        {/if}
         <div class="ph-domain-footer">
             <span>{$hadrianLang.dashboard.heroDomainSubtitle}</span>
-            <a href="{$WEB_ROOT}/cart.php?gid=domain">{$LANG.viewallpricing|default:'View all pricing'} &rarr;</a>
+            {* Domain Pricing page, NOT the cart. cart.php?gid=domain 302s (WHMCS
+               has no group with that id) and dumps the visitor on the hosting
+               list — the opposite of what this link promises. *}
+            <a href="{$WEB_ROOT}/index.php?rp=/domain/pricing">{$LANG.viewallpricing|default:'View all pricing'} &rarr;</a>
         </div>
     </form>
 

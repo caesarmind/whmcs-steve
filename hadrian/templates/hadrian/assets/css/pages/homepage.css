@@ -72,6 +72,33 @@
 .ph-domain-footer a { color: var(--color-accent); text-decoration: none; }
 .ph-domain-footer a:hover { text-decoration: underline; }
 
+/* TLD price strip — live register prices under the hero domain search.
+   Compact inline row rather than cards: it sits inside the hero, so it has to
+   read as a quiet supporting rail and not compete with the search box.
+   Wraps on narrow viewports instead of scrolling, so no price is ever cut off. */
+.hp-tld-strip {
+    margin-top: 14px;
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 8px;
+}
+.hp-tld {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--color-surface-secondary);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    transition: background var(--transition-fast);
+}
+.hp-tld:hover { background: var(--color-border-light); text-decoration: none; }
+.hp-tld-ext   { font-weight: var(--fw-semibold); color: var(--color-text-primary); }
+.hp-tld-price { color: var(--color-text-tertiary); }
+
+@media (max-width: 560px) {
+    /* Keep it to two tidy rows on a phone rather than a ragged six. */
+    .hp-tld { padding: 4px 10px; font-size: var(--text-xs); }
+}
+
 /* Captcha — shown on the domain search when enabled for the domain checker */
 .ph-captcha {
     max-width: 480px; margin: 16px auto 0;

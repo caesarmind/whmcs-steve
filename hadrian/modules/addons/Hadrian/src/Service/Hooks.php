@@ -143,7 +143,78 @@ final class Hooks
      */
     private function clientAreaPageHomepage(array $vars, Template $template): array
     {
-        return ['homeProductGroups' => $this->fetchProductGroups(4)];
+        return [
+            'homeProductGroups' => $this->fetchProductGroups(4),
+            'homeTldPricing'    => $this->fetchDomainTldPricing(6),
+        ];
+    }
+
+    /**
+     * Cheapest 1-year REGISTER price per TLD, for the price strip under the
+     * homepage domain search.
+     *
+     * Uses localAPI('GetTLDPricing') rather than querying tbldomainpricing /
+     * tblpricing directly: WHMCS stores domain year-prices in reused product
+     * columns (1yr in msetupfee, 2yr in qsetupfee, ...), which is exactly the
+     * kind of schema quirk fetchClientProducts() already avoids by going
+     * through the API. The API also resolves the visitor's currency for us.
+     *
+     * TLDs with no positive register price are skipped rather than rendered as
+     * "0.00" — matching fetchProductGroups(), which treats <= 0 as "no price
+     * to show" rather than free.
+     *
+     * Defensive throughout: any failure returns an empty list and the template
+     * simply omits the strip, exactly like fetchProductGroups().
+     *
+     * @return list<array{tld:string, price:string}>
+     */
+    private function fetchDomainTldPricing(int $limit): array
+    {
+        if ($limit < 1) {
+            return [];
+        }
+
+        try {
+            if (!function_exists('localAPI')) {
+                return [];
+            }
+            $res = localAPI('GetTLDPricing', []);
+            if (($res['result'] ?? '') !== 'success' || empty($res['pricing']) || !is_array($res['pricing'])) {
+                return [];
+            }
+
+            $out = [];
+            foreach ($res['pricing'] as $tld => $data) {
+                if (!is_array($data)) {
+                    continue;
+                }
+                // register is keyed by registration period in years.
+                $raw = $data['register']['1'] ?? null;
+                if ($raw === null || $raw === '') {
+                    continue;
+                }
+                $amount = (float)$raw;
+                if ($amount <= 0) {
+                    continue;
+                }
+
+                $ext = (string)$tld;
+                if ($ext === '') {
+                    continue;
+                }
+                if ($ext[0] !== '.') {
+                    $ext = '.' . $ext;
+                }
+
+                $out[] = ['tld' => $ext, 'price' => $this->formatPrice($amount)];
+                if (count($out) >= $limit) {
+                    break;
+                }
+            }
+            return $out;
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     /**
