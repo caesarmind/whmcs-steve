@@ -1,6 +1,7 @@
 {include file="includes/header.tpl"}
 
 <header class="mt-page-header">
+    <div class="mt-page-eyebrow">Theme</div>
     <h1 class="mt-page-title">Layouts</h1>
     <p class="mt-page-subtitle">
         Pick the navigation and footer arrangement for <strong>{$template|escape}</strong>.
@@ -10,22 +11,41 @@
 
 <style>
 {literal}
-    .mt-lay-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-    .mt-lay-card{border:1.5px solid var(--mt-input-border,#d2d2d7);border-radius:14px;background:var(--mt-surface,#fff);display:flex;flex-direction:column;overflow:hidden}
-    .mt-lay-card.is-on{border-color:var(--mt-primary,#0071e3);box-shadow:0 0 0 3px rgba(0,113,227,.10)}
-    .mt-lay-thumb{height:96px;background:var(--mt-surface-2,#f5f5f7);border-bottom:1px solid var(--mt-border,#e5e5ea);display:flex;align-items:center;justify-content:center}
-    .mt-lay-thumb svg{width:122px;height:78px;display:block}
-    .mt-lay-b{padding:14px 15px;display:flex;flex-direction:column;gap:11px;flex:1}
-    .mt-lay-title{font-weight:600;font-size:14.5px}
-    .mt-lay-desc{font-size:12.5px;color:var(--mt-text-3,#86868b);margin-top:-6px;min-height:34px}
-    .mt-lay-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;border-top:1px solid var(--mt-border,#e5e5ea);padding-top:11px}
-    .mt-lay-act{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--mt-text-2,#6e6e73)}
-    .mt-lay-opt{border-top:1px solid var(--mt-border,#e5e5ea);padding-top:11px}
-    .mt-lay-opt-lbl{font-size:11.5px;font-weight:600;color:var(--mt-text-2,#6e6e73);display:block;margin-bottom:6px}
-    .mt-seg{display:inline-flex;background:var(--mt-surface-2,#f2f2f4);border-radius:9px;padding:3px;gap:2px;width:100%;border:0;margin:0}
-    .mt-seg button{flex:1;border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;color:var(--mt-text-2,#6e6e73);padding:6px 0;border-radius:7px;cursor:pointer}
-    .mt-seg button.on{background:var(--mt-surface,#fff);color:var(--mt-text,#1d1d1f);box-shadow:0 1px 2px rgba(0,0,0,.12)}
-    .mt-lay-optnone{border-top:1px dashed var(--mt-border,#e5e5ea);padding-top:11px;font-size:11.5px;color:var(--mt-text-3,#86868b);font-style:italic}
+    .mt-lay-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+    .mt-lay-card{border:1px solid var(--mt-border);border-radius:14px;background:var(--mt-surface);display:flex;flex-direction:column;overflow:hidden;transition:border-color .15s ease,box-shadow .15s ease}
+    .mt-lay-card.is-on{border-color:var(--mt-primary);box-shadow:0 0 0 3px var(--mt-primary-ring)}
+
+    /* The wireframe inherits `color`, so one rule recolors the whole drawing on
+       activation and both themes work without a second set of hex values. The
+       marks sitting ON the accent bar stay white in both themes by design. */
+    .mt-lay-thumb{background:var(--mt-surface-2);border-bottom:1px solid var(--mt-border);color:var(--mt-text-4);transition:background .15s ease,color .15s ease}
+    .mt-lay-card.is-on .mt-lay-thumb{background:var(--mt-primary-tint);color:var(--mt-primary)}
+    .mt-lay-thumb svg{width:100%;height:auto;display:block}
+
+    .mt-lay-b{padding:13px 14px;display:flex;flex-direction:column;gap:10px;flex:1}
+    .mt-lay-title{font-weight:600;font-size:14.5px;color:var(--mt-text)}
+    .mt-lay-desc{font-size:12.5px;color:var(--mt-text-3);margin-top:-5px;min-height:32px;line-height:1.45}
+
+    /* Guest / client activation. Two independent switches, not a radio group --
+       a layout can be live for one audience and not the other. */
+    .mt-lay-auds{display:flex;gap:7px;border-top:1px solid var(--mt-border);padding-top:11px;margin-top:auto}
+    .mt-lay-auds form{flex:1;display:flex;margin:0}
+    .mt-lay-aud{flex:1;display:inline-flex;align-items:center;gap:7px;padding:7px 9px;border-radius:9px;border:1px solid var(--mt-border);background:var(--mt-surface);font:inherit;font-size:12.5px;color:var(--mt-text-2);cursor:pointer;text-align:left;transition:background .15s ease,border-color .15s ease,color .15s ease}
+    .mt-lay-aud:hover{background:var(--mt-surface-2);color:var(--mt-text)}
+    .mt-lay-aud:focus-visible{outline:2px solid var(--mt-primary);outline-offset:1px}
+    .mt-lay-aud.is-on{border-color:var(--mt-primary);background:var(--mt-primary-tint);color:var(--mt-primary);font-weight:600;cursor:default}
+    .mt-lay-radio{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--mt-text-4);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s ease,border-color .15s ease}
+    .mt-lay-aud.is-on .mt-lay-radio{border-color:var(--mt-primary);background:var(--mt-primary)}
+    .mt-lay-radio svg{width:9px;height:9px;display:none}
+    .mt-lay-aud.is-on .mt-lay-radio svg{display:block;color:#fff}
+
+    .mt-lay-opt{border-top:1px solid var(--mt-border);padding-top:11px}
+    .mt-lay-opt-lbl{font-size:11.5px;font-weight:600;color:var(--mt-text-2);display:block;margin-bottom:6px}
+    .mt-seg{display:inline-flex;background:var(--mt-surface-2);border-radius:9px;padding:3px;gap:2px;width:100%;border:0;margin:0}
+    .mt-seg button{flex:1;border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;color:var(--mt-text-2);padding:6px 0;border-radius:7px;cursor:pointer}
+    .mt-seg button:hover{color:var(--mt-text)}
+    .mt-seg button.on{background:var(--mt-surface);color:var(--mt-text);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+    .mt-lay-optnone{border-top:1px dashed var(--mt-border);padding-top:11px;font-size:11.5px;color:var(--mt-text-3);font-style:italic}
 {/literal}
 </style>
 
@@ -49,18 +69,79 @@
                 <div class="mt-lay-card{if $layout.isActiveGuest || $layout.isActiveClient} is-on{/if}">
                     <div class="mt-lay-thumb">
                         {if $layout.name == 'top'}
-                            <svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="9" width="104" height="14" rx="3" fill="#9cc2f5"/><rect x="9" y="31" width="58" height="6" rx="3" fill="#dfe1e6"/><rect x="9" y="43" width="104" height="26" rx="4" fill="#f0f1f4"/></svg>
+                            <svg viewBox="0 0 150 86" role="img" aria-label="Top navigation wireframe">
+                                <rect x="0" y="0" width="150" height="16" fill="currentColor"/>
+                                <rect x="8" y="6" width="20" height="4" rx="2" fill="#fff" opacity=".9"/>
+                                <rect x="66" y="6" width="12" height="4" rx="2" fill="#fff" opacity=".55"/>
+                                <rect x="82" y="6" width="12" height="4" rx="2" fill="#fff" opacity=".55"/>
+                                <rect x="14" y="28" width="64" height="6" rx="3" fill="currentColor" opacity=".45"/>
+                                <rect x="14" y="42" width="122" height="32" rx="5" fill="currentColor" opacity=".13"/>
+                            </svg>
                         {elseif $layout.name == 'sidebar'}
-                            <svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="9" width="32" height="60" rx="4" fill="#9cc2f5"/><rect x="49" y="13" width="48" height="6" rx="3" fill="#dfe1e6"/><rect x="49" y="27" width="64" height="42" rx="4" fill="#f0f1f4"/></svg>
+                            <svg viewBox="0 0 150 86" role="img" aria-label="Sidebar wireframe">
+                                <rect x="0" y="0" width="40" height="86" fill="currentColor"/>
+                                <rect x="8" y="10" width="24" height="5" rx="2" fill="#fff" opacity=".9"/>
+                                <rect x="8" y="26" width="24" height="4" rx="2" fill="#fff" opacity=".5"/>
+                                <rect x="8" y="36" width="24" height="4" rx="2" fill="#fff" opacity=".5"/>
+                                <rect x="8" y="46" width="24" height="4" rx="2" fill="#fff" opacity=".5"/>
+                                <rect x="52" y="16" width="56" height="6" rx="3" fill="currentColor" opacity=".45"/>
+                                <rect x="52" y="30" width="86" height="44" rx="5" fill="currentColor" opacity=".13"/>
+                            </svg>
                         {elseif $layout.name == 'rail'}
-                            <svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="9" width="14" height="60" rx="4" fill="#9cc2f5"/><rect x="31" y="13" width="48" height="6" rx="3" fill="#dfe1e6"/><rect x="31" y="27" width="82" height="42" rx="4" fill="#f0f1f4"/></svg>
+                            <svg viewBox="0 0 150 86" role="img" aria-label="Icon rail wireframe">
+                                <rect x="0" y="0" width="19" height="86" fill="currentColor"/>
+                                <circle cx="9.5" cy="14" r="4" fill="#fff" opacity=".9"/>
+                                <circle cx="9.5" cy="31" r="3" fill="#fff" opacity=".5"/>
+                                <circle cx="9.5" cy="44" r="3" fill="#fff" opacity=".5"/>
+                                <circle cx="9.5" cy="57" r="3" fill="#fff" opacity=".5"/>
+                                <rect x="31" y="16" width="56" height="6" rx="3" fill="currentColor" opacity=".45"/>
+                                <rect x="31" y="30" width="106" height="44" rx="5" fill="currentColor" opacity=".13"/>
+                            </svg>
                         {elseif $layout.name == 'extended'}
-                            <svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="9" width="104" height="30" rx="4" fill="#f0f1f4"/><rect x="9" y="45" width="22" height="24" rx="3" fill="#9cc2f5"/><rect x="36" y="45" width="22" height="24" rx="3" fill="#9cc2f5"/><rect x="63" y="45" width="22" height="24" rx="3" fill="#9cc2f5"/><rect x="90" y="45" width="22" height="24" rx="3" fill="#9cc2f5"/></svg>
+                            <svg viewBox="0 0 150 86" role="img" aria-label="Extended footer wireframe">
+                                <rect x="16" y="10" width="118" height="22" rx="5" fill="currentColor" opacity=".11"/>
+                                <rect x="0" y="40" width="150" height="46" fill="currentColor"/>
+                                <g fill="#fff">
+                                    <rect x="12" y="49" width="18" height="3" rx="1.5" opacity=".8"/>
+                                    <rect x="12" y="57" width="16" height="2.5" rx="1" opacity=".4"/>
+                                    <rect x="12" y="63" width="16" height="2.5" rx="1" opacity=".4"/>
+                                    <rect x="46" y="49" width="18" height="3" rx="1.5" opacity=".8"/>
+                                    <rect x="46" y="57" width="16" height="2.5" rx="1" opacity=".4"/>
+                                    <rect x="46" y="63" width="16" height="2.5" rx="1" opacity=".4"/>
+                                    <rect x="80" y="49" width="18" height="3" rx="1.5" opacity=".8"/>
+                                    <rect x="80" y="57" width="16" height="2.5" rx="1" opacity=".4"/>
+                                    <rect x="80" y="63" width="16" height="2.5" rx="1" opacity=".4"/>
+                                    <rect x="114" y="49" width="18" height="3" rx="1.5" opacity=".8"/>
+                                    <rect x="114" y="57" width="16" height="2.5" rx="1" opacity=".4"/>
+                                    <rect x="114" y="63" width="16" height="2.5" rx="1" opacity=".4"/>
+                                </g>
+                            </svg>
                         {elseif $layout.name == 'extended-info'}
-                            <svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="9" width="104" height="26" rx="4" fill="#f0f1f4"/><rect x="9" y="41" width="42" height="28" rx="3" fill="#bcd5f8"/><rect x="56" y="41" width="26" height="28" rx="3" fill="#9cc2f5"/><rect x="87" y="41" width="26" height="28" rx="3" fill="#9cc2f5"/></svg>
+                            <svg viewBox="0 0 150 86" role="img" aria-label="Extended footer with info band wireframe">
+                                <rect x="16" y="8" width="118" height="18" rx="5" fill="currentColor" opacity=".11"/>
+                                <rect x="0" y="34" width="150" height="34" fill="currentColor"/>
+                                <g fill="#fff">
+                                    <rect x="12" y="42" width="18" height="3" rx="1.5" opacity=".8"/>
+                                    <rect x="12" y="50" width="16" height="2.5" rx="1" opacity=".4"/>
+                                    <rect x="12" y="56" width="16" height="2.5" rx="1" opacity=".4"/>
+                                    <rect x="52" y="42" width="18" height="3" rx="1.5" opacity=".8"/>
+                                    <rect x="52" y="50" width="16" height="2.5" rx="1" opacity=".4"/>
+                                    <rect x="92" y="42" width="18" height="3" rx="1.5" opacity=".8"/>
+                                    <rect x="92" y="50" width="16" height="2.5" rx="1" opacity=".4"/>
+                                </g>
+                                <rect x="0" y="70" width="150" height="16" fill="currentColor" opacity=".5"/>
+                                <rect x="12" y="76" width="30" height="4" rx="2" fill="#fff" opacity=".65"/>
+                                <rect x="108" y="76" width="30" height="4" rx="2" fill="#fff" opacity=".45"/>
+                            </svg>
                         {else}
-                            {* default footer / fallback *}
-                            <svg viewBox="0 0 122 78"><rect x=".5" y=".5" width="121" height="77" rx="7" fill="#fff" stroke="#e5e5ea"/><rect x="9" y="11" width="104" height="40" rx="4" fill="#f0f1f4"/><rect x="9" y="58" width="104" height="11" rx="3" fill="#9cc2f5"/></svg>
+                            {* Default / single-row footer, and the fallback for any
+                               layout that ships without its own wireframe. *}
+                            <svg viewBox="0 0 150 86" role="img" aria-label="Default footer wireframe">
+                                <rect x="16" y="12" width="118" height="46" rx="5" fill="currentColor" opacity=".11"/>
+                                <rect x="0" y="66" width="150" height="20" fill="currentColor"/>
+                                <rect x="12" y="73" width="26" height="5" rx="2.5" fill="#fff" opacity=".85"/>
+                                <rect x="104" y="73" width="34" height="5" rx="2.5" fill="#fff" opacity=".45"/>
+                            </svg>
                         {/if}
                     </div>
 
@@ -68,33 +149,38 @@
                         <div class="mt-lay-title">{$layout.displayName|escape}</div>
                         {if $layout.description}<div class="mt-lay-desc">{$layout.description|escape}</div>{/if}
 
-                        <div class="mt-lay-acts">
-                            <div class="mt-lay-act">
-                                <span>Guest client</span>
-                                {if $layout.isActiveGuest}
-                                    <span class="mt-badge mt-badge-success">Active</span>
-                                {else}
-                                    <form method="post" action="" style="display:inline">
-                                        <input type="hidden" name="kind"     value="{$k|escape}">
-                                        <input type="hidden" name="layout"   value="{$layout.name|escape}">
-                                        <input type="hidden" name="audience" value="guest">
-                                        <button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Activate</button>
-                                    </form>
-                                {/if}
-                            </div>
-                            <div class="mt-lay-act">
-                                <span>Existing client</span>
-                                {if $layout.isActiveClient}
-                                    <span class="mt-badge mt-badge-success">Active</span>
-                                {else}
-                                    <form method="post" action="" style="display:inline">
-                                        <input type="hidden" name="kind"     value="{$k|escape}">
-                                        <input type="hidden" name="layout"   value="{$layout.name|escape}">
-                                        <input type="hidden" name="audience" value="client">
-                                        <button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Activate</button>
-                                    </form>
-                                {/if}
-                            </div>
+                        <div class="mt-lay-auds">
+                            {if $layout.isActiveGuest}
+                                <span class="mt-lay-aud is-on">
+                                    <span class="mt-lay-radio"><svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1.5 5.2l2.2 2.2L8.5 2.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                                    Guest
+                                </span>
+                            {else}
+                                <form method="post" action="">
+                                    <input type="hidden" name="kind"     value="{$k|escape}">
+                                    <input type="hidden" name="layout"   value="{$layout.name|escape}">
+                                    <input type="hidden" name="audience" value="guest">
+                                    <button type="submit" class="mt-lay-aud" title="Activate {$layout.displayName|escape} for guests">
+                                        <span class="mt-lay-radio"></span> Guest
+                                    </button>
+                                </form>
+                            {/if}
+
+                            {if $layout.isActiveClient}
+                                <span class="mt-lay-aud is-on">
+                                    <span class="mt-lay-radio"><svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1.5 5.2l2.2 2.2L8.5 2.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                                    Client
+                                </span>
+                            {else}
+                                <form method="post" action="">
+                                    <input type="hidden" name="kind"     value="{$k|escape}">
+                                    <input type="hidden" name="layout"   value="{$layout.name|escape}">
+                                    <input type="hidden" name="audience" value="client">
+                                    <button type="submit" class="mt-lay-aud" title="Activate {$layout.displayName|escape} for logged-in clients">
+                                        <span class="mt-lay-radio"></span> Client
+                                    </button>
+                                </form>
+                            {/if}
                         </div>
 
                         {* Loop every declared option, don't hardcode 'align'.
