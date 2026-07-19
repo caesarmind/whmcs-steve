@@ -37,6 +37,58 @@ final class LayoutsController extends AbstractController
     /** Per-kind default layout — kept in sync with Hooks::resolveActiveLayout. */
     private const DEFAULT_BY_KIND = ['main-menu' => 'sidebar', 'footer' => 'extended'];
 
+    /**
+     * Content width. Not a FLAGS entry because those are booleans — this is an
+     * enum, stored under 'content_width' and read by header.tpl, which emits
+     * body[data-content-width]. 'boxed' is the default and emits nothing, so an
+     * install that never touches this keeps exactly today's rendering.
+     *
+     * The width itself is the --content-max-width custom property
+     * (apple-theme.css), so the CSS override is two rules rather than a hunt
+     * through every layout.
+     */
+    public const CONTENT_WIDTHS = [
+        'boxed' => 'Boxed — centered, max 1120px',
+        'full'  => 'Full width — use the whole viewport',
+        'fluid' => 'Fluid — padded but unbounded',
+    ];
+
+    /**
+     * Controls drawn in the design file that have no backing yet. They render
+     * DISABLED and badged so the shape of the finished page is visible without
+     * anyone believing a dead switch did something — a toggle that silently
+     * does nothing is the exact failure the flag audit cleaned up.
+     *
+     * To wire one: add a real entry to SettingsController::FLAGS, name it in
+     * LAYOUT_FLAGS, gate the feature in the theme, then delete it from here.
+     *
+     * Two notes for whoever picks this up:
+     *  - 'Language switcher' and 'Currency selector' are ONE control in the
+     *    theme (includes/partials/locale-btn.tpl opens a combined modal, and the
+     *    currency segment already self-gates on multi-currency). They are drawn
+     *    separately here only because the design file draws them that way.
+     *  - 'Social links' already renders in the extended footer layouts from
+     *    $mtBrand.socials and self-gates on those being set, so its flag would be
+     *    a master override rather than new behaviour.
+     *
+     * Shape: section => [ [label, help, type, choices?], ... ]
+     */
+    private const PLANNED_CONTROLS = [
+        'main-menu' => [
+            'Sidebar' => [
+                ['Position',       'Which side a sidebar-based menu sits on.',              'select', ['Left', 'Right']],
+                ['Sticky sidebar', 'Pin the sidebar in view while the page scrolls.',       'bool',   []],
+            ],
+        ],
+        'footer' => [
+            'Footer options' => [
+                ['Back-to-top button', 'Show a floating button to scroll back to the top.', 'bool',   []],
+                ['Newsletter signup',  'Include an email-capture field in the footer.',     'bool',   []],
+                ['Social links',       'Render social icons from your Branding settings.',  'bool',   []],
+            ],
+        ],
+    ];
+
     public function indexAction(): string
     {
         $template = AddonHelper::getTemplate();
@@ -53,6 +105,22 @@ final class LayoutsController extends AbstractController
                 $postKind = 'main-menu';
             }
             return $this->saveAction($template, $postKind);
+        }
+
+        // A Header-section flag toggle. These are declared in
+        // SettingsController::FLAGS but render here instead of on Settings, so
+        // the storage key and everything reading it on the front end are
+        // unchanged — only the admin surface moved.
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['layout_flag'])) {
+            return $this->saveFlagAction((string)$_POST['layout_flag'], (string)($_POST['value'] ?? '0'));
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content_width'])) {
+            $width = (string)$_POST['content_width'];
+            if (isset(self::CONTENT_WIDTHS[$width])) {
+                Settings::setValue('content_width', $width, 'string');
+            }
+            $this->redirect('?module=Hadrian&action=layouts&kind=main-menu&flag=1');
         }
 
         // Which tab opens first — preserved across save-redirects via ?kind.
@@ -99,11 +167,42 @@ final class LayoutsController extends AbstractController
             $groups[$kind] = $list;
         }
 
+        // Header-section flags, read straight from the SettingsController
+        // registry so label/help/default stay defined in exactly one place.
+        $layoutFlags = [];
+        foreach (SettingsController::LAYOUT_FLAGS as $flagKey) {
+            if (!isset(SettingsController::FLAGS[$flagKey])) { continue; }
+            [$label, $help, $default] = SettingsController::FLAGS[$flagKey];
+            $layoutFlags[$flagKey] = [
+                'label' => $label,
+                'help'  => $help,
+                'value' => (bool)Settings::getValue($flagKey, $default),
+            ];
+        }
+
         return $this->view('layouts/index', [
-            'groups'     => $groups,
-            'activeKind' => $activeKind,
-            'template'   => $template->getName(),
+            'groups'      => $groups,
+            'activeKind'  => $activeKind,
+            'template'    => $template->getName(),
+            'layoutFlags' => $layoutFlags,
+            'flagSaved'   => isset($_GET['flag']),
+            'planned'     => self::PLANNED_CONTROLS,
+            'contentWidths'  => self::CONTENT_WIDTHS,
+            'contentWidth'   => (string)Settings::getValue('content_width', 'boxed'),
         ]);
+    }
+
+    /** Persist one Header-section flag, then PRG back to the Main menu tab. */
+    private function saveFlagAction(string $key, string $value): string
+    {
+        if (in_array($key, SettingsController::LAYOUT_FLAGS, true)
+            && isset(SettingsController::FLAGS[$key])
+        ) {
+            $type = SettingsController::FLAGS[$key][3];
+            Settings::setValue($key, $value === '1' ? '1' : '0', $type);
+        }
+
+        $this->redirect('?module=Hadrian&action=layouts&kind=main-menu&flag=1');
     }
 
     /**

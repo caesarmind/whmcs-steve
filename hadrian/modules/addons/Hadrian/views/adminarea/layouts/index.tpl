@@ -9,9 +9,15 @@
     </p>
 </header>
 
+{if $flagSaved}
+    <div class="mt-alert mt-alert-success">Header setting saved.</div>
+{/if}
+
 <style>
 {literal}
-    .mt-lay-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+    /* auto-fit (not auto-fill) so three layouts fill the row as three equal
+       columns instead of leaving an empty fourth track. */
+    .mt-lay-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
     .mt-lay-card{border:1px solid var(--mt-border);border-radius:14px;background:var(--mt-surface);display:flex;flex-direction:column;overflow:hidden;transition:border-color .15s ease,box-shadow .15s ease}
     .mt-lay-card.is-on{border-color:var(--mt-primary);box-shadow:0 0 0 3px var(--mt-primary-ring)}
 
@@ -26,18 +32,18 @@
     .mt-lay-title{font-weight:600;font-size:14.5px;color:var(--mt-text)}
     .mt-lay-desc{font-size:12.5px;color:var(--mt-text-3);margin-top:-5px;min-height:32px;line-height:1.45}
 
-    /* Guest / client activation. Two independent switches, not a radio group --
-       a layout can be live for one audience and not the other. */
-    .mt-lay-auds{display:flex;gap:7px;border-top:1px solid var(--mt-border);padding-top:11px;margin-top:auto}
-    .mt-lay-auds form{flex:1;display:flex;margin:0}
-    .mt-lay-aud{flex:1;display:inline-flex;align-items:center;gap:7px;padding:7px 9px;border-radius:9px;border:1px solid var(--mt-border);background:var(--mt-surface);font:inherit;font-size:12.5px;color:var(--mt-text-2);cursor:pointer;text-align:left;transition:background .15s ease,border-color .15s ease,color .15s ease}
-    .mt-lay-aud:hover{background:var(--mt-surface-2);color:var(--mt-text)}
+    /* Guest / client activation. Two independent rows, not a radio group -- a
+       layout can be live for one audience and not the other. Stacked full-width
+       with the state on the right, matching the picker in the design file. */
+    .mt-lay-auds{display:flex;flex-direction:column;gap:6px;margin-top:auto;padding-top:2px}
+    .mt-lay-auds form{display:block;margin:0}
+    .mt-lay-aud{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:7px 10px;border-radius:8px;border:none;background:var(--mt-surface-2);font:inherit;cursor:pointer;text-align:left;transition:background .15s ease}
+    .mt-lay-aud:hover{background:var(--mt-border)}
     .mt-lay-aud:focus-visible{outline:2px solid var(--mt-primary);outline-offset:1px}
-    .mt-lay-aud.is-on{border-color:var(--mt-primary);background:var(--mt-primary-tint);color:var(--mt-primary);font-weight:600;cursor:default}
-    .mt-lay-radio{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--mt-text-4);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s ease,border-color .15s ease}
-    .mt-lay-aud.is-on .mt-lay-radio{border-color:var(--mt-primary);background:var(--mt-primary)}
-    .mt-lay-radio svg{width:9px;height:9px;display:none}
-    .mt-lay-aud.is-on .mt-lay-radio svg{display:block;color:#fff}
+    .mt-lay-aud.is-on{background:var(--mt-primary-tint);cursor:default}
+    .mt-lay-aud-label{font-size:12.5px;font-weight:600;color:var(--mt-text-2)}
+    .mt-lay-aud.is-on .mt-lay-aud-label{color:var(--mt-primary)}
+    .mt-lay-aud-cta{font-size:12px;font-weight:600;color:var(--mt-text-3);flex-shrink:0}
 
     .mt-lay-opt{border-top:1px solid var(--mt-border);padding-top:11px}
     .mt-lay-opt-lbl{font-size:11.5px;font-weight:600;color:var(--mt-text-2);display:block;margin-bottom:6px}
@@ -46,6 +52,14 @@
     .mt-seg button:hover{color:var(--mt-text)}
     .mt-seg button.on{background:var(--mt-surface);color:var(--mt-text);box-shadow:0 1px 2px rgba(0,0,0,.12)}
     .mt-lay-optnone{border-top:1px dashed var(--mt-border);padding-top:11px;font-size:11.5px;color:var(--mt-text-3);font-style:italic}
+    .mt-flag-form{display:flex;align-items:center;gap:8px;margin:0;flex-shrink:0}
+
+    /* Not-yet-wired placeholders. Dimmed and non-interactive so they read as
+       "coming", never as a control that failed to work. */
+    .mt-row-planned{opacity:.55}
+    .mt-row-planned .mt-toggle,.mt-row-planned .mt-select{pointer-events:none}
+    .mt-planned-tag{margin-left:8px;vertical-align:middle;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+    .mt-planned-select{max-width:280px}
 {/literal}
 </style>
 
@@ -152,8 +166,8 @@
                         <div class="mt-lay-auds">
                             {if $layout.isActiveGuest}
                                 <span class="mt-lay-aud is-on">
-                                    <span class="mt-lay-radio"><svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1.5 5.2l2.2 2.2L8.5 2.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                                    Guest
+                                    <span class="mt-lay-aud-label">Guest client</span>
+                                    <span class="mt-badge mt-badge-success">Active</span>
                                 </span>
                             {else}
                                 <form method="post" action="">
@@ -161,15 +175,16 @@
                                     <input type="hidden" name="layout"   value="{$layout.name|escape}">
                                     <input type="hidden" name="audience" value="guest">
                                     <button type="submit" class="mt-lay-aud" title="Activate {$layout.displayName|escape} for guests">
-                                        <span class="mt-lay-radio"></span> Guest
+                                        <span class="mt-lay-aud-label">Guest client</span>
+                                        <span class="mt-lay-aud-cta">Activate</span>
                                     </button>
                                 </form>
                             {/if}
 
                             {if $layout.isActiveClient}
                                 <span class="mt-lay-aud is-on">
-                                    <span class="mt-lay-radio"><svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1.5 5.2l2.2 2.2L8.5 2.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                                    Client
+                                    <span class="mt-lay-aud-label">Existing client</span>
+                                    <span class="mt-badge mt-badge-success">Active</span>
                                 </span>
                             {else}
                                 <form method="post" action="">
@@ -177,7 +192,8 @@
                                     <input type="hidden" name="layout"   value="{$layout.name|escape}">
                                     <input type="hidden" name="audience" value="client">
                                     <button type="submit" class="mt-lay-aud" title="Activate {$layout.displayName|escape} for logged-in clients">
-                                        <span class="mt-lay-radio"></span> Client
+                                        <span class="mt-lay-aud-label">Existing client</span>
+                                        <span class="mt-lay-aud-cta">Activate</span>
                                     </button>
                                 </form>
                             {/if}
@@ -190,27 +206,120 @@
                            settable by POST — the same shape as the page-editor
                            bug where 55 of 60 options fell through to a text box.
                            Only 'align' exists today, so this changes no output. *}
-                        {if $layout.options}
-                            {foreach $layout.options as $optKey => $opt}
-                            <div class="mt-lay-opt">
-                                <span class="mt-lay-opt-lbl">{$opt.label|escape}</span>
-                                <form method="post" action="" class="mt-seg">
-                                    <input type="hidden" name="kind"   value="{$k|escape}">
-                                    <input type="hidden" name="layout" value="{$layout.name|escape}">
-                                    <input type="hidden" name="option" value="{$optKey|escape}">
-                                    {foreach $opt.choices as $cval => $clabel}
-                                        <button type="submit" name="value" value="{$cval|escape}"{if $cval == $opt.value} class="on"{/if}>{$clabel|escape}</button>
-                                    {/foreach}
-                                </form>
-                            </div>
-                            {/foreach}
-                        {elseif $k == 'main-menu'}
-                            <div class="mt-lay-optnone">No alignment option &mdash; content is always centered.</div>
+                        {* Options only surface on a card that is actually live for
+                           someone — configuring alignment on a layout nobody is
+                           served is noise. Matches the design file, where the
+                           alignment segment appears only on an activated card. *}
+                        {if $layout.isActiveGuest || $layout.isActiveClient}
+                            {if $layout.options}
+                                {foreach $layout.options as $optKey => $opt}
+                                <div class="mt-lay-opt">
+                                    <span class="mt-lay-opt-lbl">{$opt.label|escape}</span>
+                                    <form method="post" action="" class="mt-seg">
+                                        <input type="hidden" name="kind"   value="{$k|escape}">
+                                        <input type="hidden" name="layout" value="{$layout.name|escape}">
+                                        <input type="hidden" name="option" value="{$optKey|escape}">
+                                        {foreach $opt.choices as $cval => $clabel}
+                                            <button type="submit" name="value" value="{$cval|escape}"{if $cval == $opt.value} class="on"{/if}>{$clabel|escape}</button>
+                                        {/foreach}
+                                    </form>
+                                </div>
+                                {/foreach}
+                            {elseif $k == 'main-menu'}
+                                <div class="mt-lay-optnone">No alignment option &mdash; content is always centered.</div>
+                            {/if}
                         {/if}
                     </div>
                 </div>
             {/foreach}
         </div>
+    </section>
+{/foreach}
+
+{* Header options. These are SettingsController::FLAGS entries that render here
+   rather than on Settings — same storage key, same runtime, different surface.
+   Each toggle is its own instant-apply form, matching the Activate buttons
+   above; this page deliberately has no global Save. *}
+{if $layoutFlags}
+    <section class="mt-section" data-kind-panel="main-menu"{if $activeKind != 'main-menu'} hidden{/if}>
+        <header class="mt-section-header">
+            <h2 class="mt-section-title">Header</h2>
+            {* Counts the WIRED rows only. This section also carries placeholders,
+               so a bare row count would overstate what actually works. *}
+            <span class="mt-section-count">{$layoutFlags|count} wired</span>
+        </header>
+
+        {foreach $layoutFlags as $flagKey => $flag}
+            <div class="mt-row">
+                <div>
+                    <div class="mt-row-label">{$flag.label|escape}</div>
+                    <div class="mt-row-help">{$flag.help|escape}</div>
+                </div>
+                <form method="post" action="" class="mt-flag-form">
+                    <input type="hidden" name="layout_flag" value="{$flagKey|escape}">
+                    {* Pre-computed as the opposite of the current state, so the
+                       submitted value is explicit and needs no JS to derive. *}
+                    <input type="hidden" name="value" value="{if $flag.value}0{else}1{/if}">
+                    <label class="mt-toggle">
+                        <input type="checkbox" data-flag-toggle{if $flag.value} checked{/if}
+                               aria-label="{$flag.label|escape}">
+                        <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
+                    </label>
+                    <noscript><button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button></noscript>
+                </form>
+            </div>
+        {/foreach}
+
+    </section>
+{/if}
+
+{* Containers — content width. An enum, not a flag, so it posts its own field. *}
+<section class="mt-section" data-kind-panel="main-menu"{if $activeKind != 'main-menu'} hidden{/if}>
+    <header class="mt-section-header">
+        <h2 class="mt-section-title">Containers</h2>
+        <span class="mt-section-count">1 wired</span>
+    </header>
+    <div class="mt-row">
+        <div>
+            <div class="mt-row-label">Content width</div>
+            <div class="mt-row-help">Boxed keeps long-form pages readable; full width suits data-dense dashboards. Applies to the client area content column.</div>
+        </div>
+        <form method="post" action="" class="mt-flag-form">
+            <select name="content_width" class="mt-select mt-width-select" data-autosubmit aria-label="Content width">
+                {foreach $contentWidths as $cwKey => $cwLabel}
+                    <option value="{$cwKey|escape}"{if $cwKey == $contentWidth} selected{/if}>{$cwLabel|escape}</option>
+                {/foreach}
+            </select>
+            <noscript><button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button></noscript>
+        </form>
+    </div>
+</section>
+
+{* Remaining planned sections. Rendered disabled so the finished shape of the
+   page is visible without any control implying it does something. *}
+{foreach $planned['main-menu'] as $sectionName => $rows}
+    {if $sectionName != 'Header'}
+        <section class="mt-section" data-kind-panel="main-menu"{if $activeKind != 'main-menu'} hidden{/if}>
+            <header class="mt-section-header">
+                <h2 class="mt-section-title">{$sectionName|escape}</h2>
+                <span class="mt-section-count">Not wired yet</span>
+            </header>
+            {foreach $rows as $p}
+                {include file="layouts/planned-row.tpl" row=$p}
+            {/foreach}
+        </section>
+    {/if}
+{/foreach}
+
+{foreach $planned['footer'] as $sectionName => $rows}
+    <section class="mt-section" data-kind-panel="footer"{if $activeKind != 'footer'} hidden{/if}>
+        <header class="mt-section-header">
+            <h2 class="mt-section-title">{$sectionName|escape}</h2>
+            <span class="mt-section-count">Not wired yet</span>
+        </header>
+        {foreach $rows as $p}
+            {include file="layouts/planned-row.tpl" row=$p}
+        {/foreach}
     </section>
 {/foreach}
 </div>
@@ -228,6 +337,23 @@
     }
     tabs.forEach(function (t) {
         t.addEventListener('click', function (e) { e.preventDefault(); show(t.getAttribute('data-kind-tab')); });
+    });
+
+    // Header flags apply on flip. The value posted is already baked into the
+    // hidden field, so this only has to submit the form.
+    document.querySelectorAll('[data-flag-toggle]').forEach(function (cb) {
+        cb.addEventListener('change', function () {
+            var f = cb.closest('form');
+            if (f) { f.submit(); }
+        });
+    });
+
+    // Enum controls (content width) apply on change, same instant-apply idiom.
+    document.querySelectorAll('[data-autosubmit]').forEach(function (sel) {
+        sel.addEventListener('change', function () {
+            var f = sel.closest('form');
+            if (f) { f.submit(); }
+        });
     });
 })();
 {/literal}

@@ -22,6 +22,8 @@
             {else}
                 {assign var=mtLangList value=[]}
             {/if}
+            {* Admin gating (Layouts -> Header), mirroring locale-btn.tpl. *}
+            {if !$hadrian.addonSettings.hide_language_switcher}
             <div class="locale-modal-section-label">{$LANG.chooselanguage}</div>
             <div class="locale-grid" role="radiogroup" aria-label="{$LANG.chooselanguage}">
                 {if $mtLangList|@count > 0}
@@ -57,10 +59,12 @@
                     <button type="button" data-lang="ukrainian">&#1059;&#1082;&#1088;&#1072;&#1111;&#1085;&#1089;&#1100;&#1082;&#1072;</button>
                 {/if}
             </div>
+            {/if}
             {* Currency section hides entirely when the WHMCS install has a single
                currency configured. We keep it visible when $currencies isn't
-               populated on a page so the modal still feels complete. *}
-            {if !isset($currencies) || $currencies|@count > 1}
+               populated on a page so the modal still feels complete. The admin
+               toggle is an additional gate on top of that. *}
+            {if !$hadrian.addonSettings.hide_currency_selector && (!isset($currencies) || $currencies|@count > 1)}
             <div class="locale-modal-section-label">{$LANG.choosecurrency}</div>
             <div class="locale-grid" role="radiogroup" aria-label="{$LANG.choosecurrency}">
                 {if isset($currencies) && $currencies|@count > 0}

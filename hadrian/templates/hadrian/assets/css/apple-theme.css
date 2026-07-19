@@ -558,6 +558,15 @@ html { scroll-behavior: smooth; }
    CONTENT AREA
    ============================================ */
 .content, .content-area { flex: 1; padding: 40px var(--content-pad-x) 60px; max-width: var(--content-max-width); }
+/* Content width (admin: Layouts -> Containers). Overriding the custom property
+   rather than max-width itself means every rule already reading
+   --content-max-width follows along, and "boxed" needs no rule at all because
+   it is the declared default -- an install that never touches the setting
+   renders byte-identically to before.
+     full:  edge to edge, gutter reduced to a comfortable minimum
+     fluid: unbounded but keeps the full 48px gutter */
+body[data-content-width="full"]  { --content-max-width: none; --content-pad-x: 24px; }
+body[data-content-width="fluid"] { --content-max-width: none; }
 .page-actions { margin-top: 24px; }
 .service-item-info { flex: 1; min-width: 0; }
 .service-item-name { font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-text-primary); }

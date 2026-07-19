@@ -43,13 +43,48 @@ final class SettingsController extends AbstractController
         'topnav_show_icons'      => ['Top-Nav Icons',            'Show icons next to menu items in the top navigation. Off by default.',  false, 'bool'],
         'cart_subnav'            => ['Order Category Sidebar',   'Show the Categories / Actions sidebar on order (cart) pages.',          true,  'bool'],
         'website_subnav'         => ['Website Section Sidebar',  'Show the per-page section sub-nav (Account, Domain Tools, etc.) on client-area pages.', true, 'bool'],
-        'service_controls_outside' => ['Service List Controls', 'Float search & pagination outside the white card on list pages (services, invoices, domains, etc.). Off keeps them inside the card.', false, 'bool'],
+        // Label widened to match what this actually does now. The CSS rule it
+        // drives (apple-layout.css, body[data-svc-layout="outside"]) stopped
+        // being list-page-specific: it floats the .card-header — the TITLE — of
+        // every standard card page onto the page background above a flat
+        // .card-body. Calling it "Service List Controls" undersold it and left
+        // admins looking for a titles-inside/outside option that was already here.
+        'service_controls_outside' => ['Card Titles Outside the Box', 'Float card titles (and the search/pagination controls beside them) on the page background above a flat card, instead of keeping them inside one unified white card. Applies to every standard card page.', false, 'bool'],
+        // Locale controls. locale-btn.tpl renders ONE button covering both, so
+        // hiding both suppresses the button entirely; the modal sections are
+        // gated independently. Currency additionally self-gates on the install
+        // having more than one active currency.
+        'hide_language_switcher'   => ['Hide Language Switcher',  'Remove the language chooser from the header. The locale button disappears entirely when the currency selector is hidden too.', false, 'bool'],
+        'hide_currency_selector'   => ['Hide Currency Selector',  'Remove the currency chooser from the header. Has no visible effect on single-currency installs, which never show it.', false, 'bool'],
+    ];
+
+    /**
+     * Flags that render on the Layouts page instead of here. They stay declared
+     * in FLAGS above so there is still one registry for label/help/default/type
+     * — LayoutsController reads their metadata straight from it.
+     *
+     * These are excluded from BOTH the render and save() below. The exclusion in
+     * save() is the load-bearing half: that loop writes every FLAGS key from
+     * `isset($_POST[$key])`, so a flag that no longer renders here would be
+     * posted-as-absent and silently switched off every time Settings is saved.
+     */
+    public const LAYOUT_FLAGS = [
+        'affixed_navigation',
+        'hide_breadcrumb',
+        'hide_language_switcher',
+        'hide_currency_selector',
     ];
 
     /** Which Settings tab each flag renders on. Unlisted flags default to 'general'. */
     public const FLAG_TABS = [
         'cart_subnav' => 'order',
     ];
+
+    /** FLAGS minus the ones that have moved to the Layouts page. */
+    public static function settingsPageFlags(): array
+    {
+        return array_diff_key(self::FLAGS, array_flip(self::LAYOUT_FLAGS));
+    }
 
     public function indexAction(): string
     {
@@ -135,7 +170,7 @@ final class SettingsController extends AbstractController
         }
 
         return $this->view('settings/index', [
-            'flags'              => self::FLAGS,
+            'flags'              => self::settingsPageFlags(),
             'flagTabs'           => self::FLAG_TABS,
             'values'             => $values,
             'darkModeDisplay'    => (string)Settings::getValue('dark_mode_display', 'switcher'),
@@ -172,8 +207,10 @@ final class SettingsController extends AbstractController
 
     private function save(): void
     {
-        foreach (self::FLAGS as $key => [, , , $type]) {
-            // Posted as 'on' when checked, missing when unchecked
+        foreach (self::settingsPageFlags() as $key => [, , , $type]) {
+            // Posted as 'on' when checked, missing when unchecked. Flags that
+            // render on Layouts are skipped — this form never carries them, so
+            // including them here would write '0' over the admin's choice.
             $val = isset($_POST[$key]) ? true : false;
             Settings::setValue($key, $val ? '1' : '0', $type);
         }
