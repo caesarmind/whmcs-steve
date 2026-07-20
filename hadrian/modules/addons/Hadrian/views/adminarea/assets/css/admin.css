@@ -348,8 +348,15 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-icon-btn { width: 26px; height: 26px; padding: 0; border: 0; background: transparent; color: var(--mt-text-3); border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
 .mt-icon-btn:hover { background: var(--mt-surface-2); color: var(--mt-text); }
 .mt-icon-btn svg { width: 14px; height: 14px; display: block; }
-.mt-menu-add-row { display: flex; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--mt-border); }
-.mt-menu-add-row .mt-input { flex: 1; }
+.mt-menu-add-row { display: flex; gap: 8px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--mt-border); }
+/* Compact picker, not a full-width field. `flex: 1` used to stretch a five-option
+   type selector across the whole panel, which is what made this row read as
+   unstyled. Sizing comes from .mt-input-compact on the element (same pairing as
+   every other select in this admin); only the width is constrained here. */
+.mt-menu-add-row .mt-select { flex: 0 1 220px; min-width: 150px; }
+/* align-self:stretch rather than a hand-picked padding: it keeps the button flush
+   with the select whatever .mt-input-compact's metrics become later. */
+.mt-menu-add-row .mt-menu-add { flex-shrink: 0; align-self: stretch; display: inline-flex; align-items: center; }
 .mt-menu-add { border: 1px dashed var(--mt-input-border); background: transparent; color: var(--mt-text-2); padding: 9px 12px; border-radius: var(--mt-radius-sm); font-size: 12px; font-weight: 600; cursor: pointer; }
 .mt-menu-add:hover { border-color: var(--mt-primary); color: var(--mt-primary); background: var(--mt-primary-tint); }
 .mt-menu-split { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; align-items: start; }

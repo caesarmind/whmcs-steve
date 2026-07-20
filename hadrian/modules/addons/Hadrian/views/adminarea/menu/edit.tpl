@@ -223,13 +223,21 @@
                     {/foreach}
                 </ul>
 
+                {* .mt-select (not .mt-input) carries the custom chevron; with
+                   .mt-input this fell back to the native OS dropdown arrow.
+                   .mt-input-sm was never defined in admin.css, so the intended
+                   compact sizing silently did nothing -- .mt-input-compact is the
+                   real one, and pairing it with .mt-select is what every other
+                   select in this admin already does. The add button uses
+                   .mt-menu-add, the dashed affordance already in admin.css and
+                   the treatment the design file draws. *}
                 <div class="mt-menu-add-row">
-                    <select class="mt-input mt-input-sm" id="mtAddType">
+                    <select class="mt-select mt-input-compact" id="mtAddType" aria-label="Item type to add">
                         {foreach $itemTypes as $key => $meta}
                             <option value="{$key|escape}">{$meta.label|escape}</option>
                         {/foreach}
                     </select>
-                    <button type="button" class="mt-btn mt-btn-ghost mt-btn-sm" id="mtAddBtn">+ Add item</button>
+                    <button type="button" class="mt-menu-add" id="mtAddBtn">+ Add item</button>
                 </div>
             </div>
             </div>
