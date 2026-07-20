@@ -354,11 +354,19 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
    unstyled. Sizing comes from .mt-input-compact on the element (same pairing as
    every other select in this admin); only the width is constrained here. */
 .mt-menu-add-row .mt-select { flex: 0 1 220px; min-width: 150px; }
-/* align-self:stretch rather than a hand-picked padding: it keeps the button flush
-   with the select whatever .mt-input-compact's metrics become later. */
-.mt-menu-add-row .mt-menu-add { flex-shrink: 0; align-self: stretch; display: inline-flex; align-items: center; }
-.mt-menu-add { border: 1px dashed var(--mt-input-border); background: transparent; color: var(--mt-text-2); padding: 9px 12px; border-radius: var(--mt-radius-sm); font-size: 12px; font-weight: 600; cursor: pointer; }
-.mt-menu-add:hover { border-color: var(--mt-primary); color: var(--mt-primary); background: var(--mt-primary-tint); }
+/* The button takes the remaining width so the dashed band still spans the list
+   the way the design file draws it, with the type picker sitting to its left.
+   align-self:stretch keeps it flush with the select whatever
+   .mt-input-compact's metrics become later. */
+.mt-menu-add-row .mt-menu-add { flex: 1; align-self: stretch; }
+/* Matches the design file's add affordance, measured from it: a dashed band in
+   accent blue, left-aligned, 13px/600, 10px radius, 9px 12px padding, 7px gap,
+   with the "+" as a larger separate glyph. It is deliberately NOT a compact
+   hug -- in the design it spans the item list, which is what makes it read as
+   "add another row here" rather than as a stray button. */
+.mt-menu-add { display: inline-flex; align-items: center; justify-content: flex-start; gap: 7px; border: 1px dashed var(--mt-border); background: transparent; color: var(--mt-primary); padding: 9px 12px; border-radius: 10px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease; }
+.mt-menu-add:hover { border-color: var(--mt-primary); background: var(--mt-primary-tint); }
+.mt-menu-add-plus { font-size: 15px; line-height: 1; }
 .mt-menu-split { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; align-items: start; }
 .mt-split { display: grid; grid-template-columns: 180px 1fr; gap: 20px; align-items: start; }
 @media (max-width: 1100px) { .mt-menu-split, .mt-split { grid-template-columns: 1fr; } }

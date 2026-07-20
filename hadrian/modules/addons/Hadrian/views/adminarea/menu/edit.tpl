@@ -219,6 +219,19 @@
                                     </li>
                                 {/foreach}
                             </ul>
+                            {* Per-level add band, matching the design file. Sits
+                               OUTSIDE the children <ul> on purpose: the tree
+                               walkers iterate ul.children, so anything placed
+                               inside would be read as a menu item. From here,
+                               closest('li.mt-menu-item') resolves to THIS parent,
+                               which is exactly what data-action="add-child" wants. *}
+                            {if $itemTypes[$itm->item_type]['accepts_children']}
+                                <div class="mt-menu-add-nested">
+                                    <button type="button" class="mt-menu-add" data-action="add-child">
+                                        <span class="mt-menu-add-plus" aria-hidden="true">+</span> Add item
+                                    </button>
+                                </div>
+                            {/if}
                         </li>
                     {/foreach}
                 </ul>
@@ -237,7 +250,7 @@
                             <option value="{$key|escape}">{$meta.label|escape}</option>
                         {/foreach}
                     </select>
-                    <button type="button" class="mt-menu-add" id="mtAddBtn">+ Add item</button>
+                    <button type="button" class="mt-menu-add" id="mtAddBtn"><span class="mt-menu-add-plus" aria-hidden="true">+</span> Add item</button>
                 </div>
             </div>
             </div>
@@ -523,6 +536,16 @@
 }
 .mt-menu-tree-col ul.mt-menu-children { list-style: none; margin: 0 0 0 22px; padding: 8px 0 8px 12px; border-left: 1.5px solid var(--mt-border); display: flex; flex-direction: column; gap: 0; background: transparent; }
 .mt-menu-tree-col ul.mt-menu-children:empty { display: none; }
+
+/* Per-level add band. Indented to the children rail (22px margin + 12px pad on
+   ul.mt-menu-children) so it lines up with the rows it appends to, exactly as
+   the design file indents its nested add button. Full width like the root band.
+   Not inside the <ul> -- the tree walkers would read it as an item. */
+.mt-menu-tree-col .mt-menu-add-nested { display: flex; margin: 2px 0 10px 34px; }
+.mt-menu-tree-col .mt-menu-add-nested .mt-menu-add { flex: 1; }
+/* An empty dropdown collapses its children <ul>, so pull the band up to sit
+   directly under the parent row rather than leaving a gap. */
+.mt-menu-tree-col ul.mt-menu-children:empty + .mt-menu-add-nested { margin-top: 8px; }
 
 /* Default rows are borderless — just a hairline between adjacent items
    for separation. The full bordered "card" look is reserved for the
@@ -931,6 +954,24 @@
         } else if (existing) {
             existing.remove();
         }
+
+        // Keep the per-level add band in step with the icon button, so changing
+        // an item's type to/from Dropdown adds or removes both. Inserted after
+        // the children <ul>, never inside it -- see the walker guard above.
+        var band = li.querySelector(':scope > .mt-menu-add-nested');
+        if (type === 'dropdown_parent') {
+            if (!band) {
+                var childUl = li.querySelector(':scope > ul.mt-menu-children');
+                if (childUl) {
+                    band = document.createElement('div');
+                    band.className = 'mt-menu-add-nested';
+                    band.innerHTML = '<button type="button" class="mt-menu-add" data-action="add-child"><span class="mt-menu-add-plus" aria-hidden="true">+</span> Add item</button>';
+                    childUl.parentNode.insertBefore(band, childUl.nextSibling);
+                }
+            }
+        } else if (band) {
+            band.remove();
+        }
     }
 
     // Side effect for item_type changes — confirm before orphaning children,
@@ -972,7 +1013,12 @@
         if (!root) return;
         function walk(ul, parentId){
             Array.from(ul.children).forEach(function(li, pos){
-                if (li.tagName !== 'LI') return;
+                // Filter on the CLASS, not just the tag. A tag-only check would
+                // ingest any non-item <li> in a children list as a real menu
+                // entry with null id/type, corrupting the tree on save. The
+                // per-level add band deliberately sits OUTSIDE these <ul>s, but
+                // this guard means a future stray <li> cannot do that damage.
+                if (li.tagName !== 'LI' || !li.classList.contains('mt-menu-item')) return;
                 var dbId = li.getAttribute('data-id');
                 var type = li.getAttribute('data-type');
                 var tempId = uid();
@@ -1096,7 +1142,12 @@
     function syncStateFromDom(){
         function walk(ul, parentTempId){
             Array.from(ul.children).forEach(function(li, pos){
-                if (li.tagName !== 'LI') return;
+                // Filter on the CLASS, not just the tag. A tag-only check would
+                // ingest any non-item <li> in a children list as a real menu
+                // entry with null id/type, corrupting the tree on save. The
+                // per-level add band deliberately sits OUTSIDE these <ul>s, but
+                // this guard means a future stray <li> cannot do that damage.
+                if (li.tagName !== 'LI' || !li.classList.contains('mt-menu-item')) return;
                 var tempId = li.getAttribute('data-temp');
                 var entry = state.items.find(function(it){ return it.tempId === tempId; });
                 if (entry){
@@ -1354,7 +1405,10 @@
                 '</div>' +
             '</div>' +
             '<div class="mt-menu-props-slot" hidden></div>' +
-            '<ul class="mt-menu-children" data-children></ul>';
+            '<ul class="mt-menu-children" data-children></ul>' +
+            // Outside the <ul>, same as the server-rendered rows.
+            (acceptsKids ?
+            '<div class="mt-menu-add-nested"><button type="button" class="mt-menu-add" data-action="add-child"><span class="mt-menu-add-plus" aria-hidden="true">+</span> Add item</button></div>' : '');
         return li;
     }
 
