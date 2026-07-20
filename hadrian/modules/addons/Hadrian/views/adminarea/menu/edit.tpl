@@ -1322,9 +1322,35 @@
             updateCount();
             refreshUpDownDisabled();
             markDirty();
+            // A new row is unconfigured -- an unnamed "New whmcs_page" is not a
+            // useful end state -- so drop straight into its editor. Safe after
+            // syncStateFromDom(): that reads data-temp, it does not reassign it,
+            // so entry.tempId still resolves.
+            revealNewItem(entry.tempId);
             return;
         }
     });
+
+    /**
+     * Open the freshly-added row's inline editor and bring it into view.
+     * openInlinePanel() toggles when the row is already open, but a brand-new
+     * row never is, so this only ever opens.
+     */
+    function revealNewItem(tempId){
+        openInlinePanel(tempId);
+        var li = document.querySelector('li.mt-menu-item[data-temp="' + tempId + '"]');
+        if (!li) return;
+        try {
+            li.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } catch (e) {
+            li.scrollIntoView();
+        }
+        // Focus the first editable field so the label can be typed immediately.
+        var first = li.querySelector('.mt-menu-props-slot [data-drawer-field]');
+        if (first && typeof first.focus === 'function') {
+            try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
+        }
+    }
 
     // Visibility toggle (change event on row checkbox)
     document.addEventListener('change', function(e){
@@ -1361,6 +1387,7 @@
         updateCount();
         refreshUpDownDisabled();
         markDirty();
+        revealNewItem(entry.tempId);
     });
 
     function createNewItemEntry(type, parentTempId){
