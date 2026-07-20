@@ -858,10 +858,13 @@
 .mt-menu-sub-body .mt-field-label { color: var(--mt-text-2); }
 
 /* ----- Label source: Custom String | Language Variable -----
-   Every "{" below is followed by a space. This style block is NOT wrapped in a
-   Smarty literal tag and parses only because auto-literal ignores "{"+whitespace.
-   Do not write that tag's name in braces here -- Smarty would read it as a real
-   tag and swallow everything down to the script block's closing one. */
+   Every opening brace below is followed by a space. This style block is NOT
+   wrapped in a Smarty literal tag; it parses only because auto-literal skips a
+   brace followed by whitespace.
+   Two things must never appear in this comment: the literal tag name in braces
+   (Smarty reads it as a real tag), and a brace immediately followed by a quote
+   (that is valid Smarty string syntax, so the lint allows it and Smarty then
+   fails to parse it). Both have already broken this page once. */
 .mt-label-block { display: flex; flex-direction: column; gap: 10px; }
 .mt-label-modes { display: flex; gap: 8px; flex-wrap: wrap; }
 .mt-label-mode { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border: 1px solid var(--mt-border); border-radius: 999px; font-size: 12.5px; color: var(--mt-text-2); cursor: pointer; background: var(--mt-surface); }
