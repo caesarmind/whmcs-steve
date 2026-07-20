@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Hadrian\Menu;
 
+use Hadrian\Helpers\LocaleHelper;
 use Hadrian\Models\Menu;
 use Hadrian\Models\MenuItem;
 use WHMCS\View\Menu\Item;
@@ -34,6 +35,9 @@ final class TreeRenderer
      */
     private static int $orderCounter = 0;
 
+    /** Request locale, resolved once per render so labels translate. */
+    private static string $locale = 'english';
+
     /**
      * Flat ordered list of top-level items collected during populate(). The
      * sidebar/topnav templates iterate THIS instead of
@@ -50,6 +54,7 @@ final class TreeRenderer
 
     public static function populate(Item $parent, Menu $menu): void
     {
+        self::$locale = LocaleHelper::current();
         $audience = $menu->audience === Audience::ALL ? Audience::current() : $menu->audience;
         $layout   = self::currentLayout();
 
@@ -123,6 +128,7 @@ final class TreeRenderer
      */
     public static function buildFlatList(Menu $menu): array
     {
+        self::$locale = LocaleHelper::current();
         $audience = $menu->audience === Audience::ALL ? Audience::current() : $menu->audience;
         $layout   = self::currentLayout();
         $out = [];
@@ -204,7 +210,7 @@ final class TreeRenderer
         return [
             'type'           => $node->item_type,
             'name'           => 'mt-' . $node->id,
-            'label'          => $node->resolvedLabel(),
+            'label'          => $node->resolvedLabel(self::$locale),
             'uri'            => $uri,
             'icon'           => (string)($config['icon'] ?? ''),
             'color'          => $color,
@@ -294,7 +300,7 @@ final class TreeRenderer
         if ($url === '') {
             return;
         }
-        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), $url);
+        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(self::$locale), $url);
         if ($child === null) {
             return;
         }
@@ -306,7 +312,7 @@ final class TreeRenderer
     {
         $config = $node->config();
         $url    = (string)($config['url'] ?? '#');
-        $child  = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), $url);
+        $child  = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(self::$locale), $url);
         if ($child === null) {
             return;
         }
@@ -321,7 +327,7 @@ final class TreeRenderer
 
     private static function renderDropdown(Item $parent, MenuItem $node, string $audience, string $layout): void
     {
-        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), '#');
+        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(self::$locale), '#');
         if ($child === null) {
             return;
         }
@@ -338,7 +344,7 @@ final class TreeRenderer
         // addChildSafe assigns order via the addChild array AND setOrder()
         // (Lagom-style). Don't call setOrder again here — that would
         // double-bump the counter and shift subsequent siblings.
-        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), '#');
+        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(self::$locale), '#');
         if ($child !== null) {
             // Set data-mt-type FIRST so the sidebar template's getAttribute()
             // lookup never returns null no matter what side-effects later
@@ -360,7 +366,7 @@ final class TreeRenderer
     private static function renderSwitcher(Item $parent, MenuItem $node, string $flavor): void
     {
         // addChildSafe handles order assignment.
-        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), '#');
+        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(self::$locale), '#');
         if ($child !== null) {
             $child->setAttribute('data-mt-type', $node->item_type);
             $child->addClass('mt-menu-switcher mt-menu-switcher-' . $flavor);
@@ -370,7 +376,7 @@ final class TreeRenderer
 
     private static function renderLoginButton(Item $parent, MenuItem $node): void
     {
-        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), self::loginUrl());
+        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(self::$locale), self::loginUrl());
         if ($child !== null) {
             $config = $node->config();
             $style  = (string)($config['style'] ?? 'primary');
@@ -388,7 +394,7 @@ final class TreeRenderer
         // Renders as a dropdown that contains the account-related links; the
         // children come from the saved tree, so admins can decide which links
         // appear here from the builder.
-        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(), '#');
+        $child = self::addChildSafe($parent, self::keyFor($node), $node->resolvedLabel(self::$locale), '#');
         if ($child === null) {
             return;
         }

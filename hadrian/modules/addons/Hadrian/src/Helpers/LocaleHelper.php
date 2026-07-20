@@ -40,7 +40,13 @@ final class LocaleHelper
         $codes = [];
         foreach ($files as $file) {
             $name = pathinfo($file, PATHINFO_FILENAME);
-            if ($name === '' || $name[0] === '.') {
+            // Strict shape, not just a dotfile check. PATHINFO_FILENAME turns
+            // "english.old.php" into "english.old", and these codes become
+            // menu-label field paths (label.custom.<code>) -- a dot there would
+            // make the editor's writePath() replace the STRING at custom.english
+            // with an object, destroying the English label and rendering a
+            // literal "Array" in the client nav.
+            if (!preg_match('/^[A-Za-z][A-Za-z0-9_-]*$/', $name)) {
                 continue;
             }
             $codes[] = strtolower($name);
@@ -113,5 +119,44 @@ final class LocaleHelper
             'albanian' => 'sq', 'armenian' => 'hy', 'belarusian' => 'be', 'icelandic' => 'is',
         ];
         return $map[strtolower(trim($name))] ?? null;
+    }
+
+    /** WHMCS system default language, lowercased. Memoised per request. */
+    public static function systemDefault(): string
+    {
+        static $memo = null;
+        if ($memo !== null) {
+            return $memo;
+        }
+        $lang = '';
+        try {
+            $lang = strtolower(trim((string)\WHMCS\Config\Setting::getValue('Language')));
+        } catch (\Throwable $e) {
+            $lang = '';
+        }
+        return $memo = ($lang !== '' ? $lang : 'english');
+    }
+
+    /** Locale recorded by the ClientAreaPage hooks for this request. */
+    private static ?string $requestLocale = null;
+
+    public static function rememberRequestLocale(string $locale): void
+    {
+        $locale = strtolower(trim($locale));
+        if ($locale !== '' && preg_match('/^[a-z][a-z0-9_-]*$/', $locale)) {
+            self::$requestLocale = $locale;
+        }
+    }
+
+    /**
+     * Locale to resolve menu labels in. In order:
+     *   1. $vars['language'] recorded by the ClientAreaPage hooks (authoritative)
+     *   2. the WHMCS system default Language setting
+     *   3. 'english'
+     * Never returns ''.
+     */
+    public static function current(): string
+    {
+        return self::$requestLocale ?? self::systemDefault();
     }
 }

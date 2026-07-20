@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Hadrian\Models;
 
+use Hadrian\Helpers\LocaleHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
@@ -90,23 +91,94 @@ class MenuItem extends Model
      *   3. custom.english fallback
      *   4. The raw whmcs key as a last resort (so we never render blank)
      */
-    public function resolvedLabel(string $locale = 'english'): string
+    public const LABEL_MODE_CUSTOM = 'custom';
+    public const LABEL_MODE_WHMCS  = 'whmcs';
+
+    /**
+     * Which label source the admin picked, stored as label_json.mode.
+     * Rows saved before that key existed are DERIVED, and the derivation
+     * reproduces the previous resolution order exactly, so no live label moves.
+     */
+    public function labelMode(): string
     {
         $label = $this->label();
-        $custom = $label['custom'] ?? [];
-        if (!empty($custom[$locale])) {
-            return (string)$custom[$locale];
+        $mode  = (string)($label['mode'] ?? '');
+        if ($mode === self::LABEL_MODE_CUSTOM || $mode === self::LABEL_MODE_WHMCS) {
+            return $mode;
         }
-        $whmcsKey = (string)($label['whmcs'] ?? '');
-        if ($whmcsKey !== '') {
-            $lang = $GLOBALS['_LANG'] ?? [];
-            if (!empty($lang[$whmcsKey])) {
-                return (string)$lang[$whmcsKey];
+        $custom = is_array($label['custom'] ?? null) ? $label['custom'] : [];
+        foreach ($custom as $val) {
+            if (is_string($val) && $val !== '') {
+                return self::LABEL_MODE_CUSTOM;
             }
         }
-        if (!empty($custom['english'])) {
+        return trim((string)($label['whmcs'] ?? '')) !== ''
+            ? self::LABEL_MODE_WHMCS
+            : self::LABEL_MODE_CUSTOM;
+    }
+
+    /**
+     * Human label for a CLIENT-FACING render.
+     *
+     *   mode = whmcs  : $_LANG[key], else the raw key. Terminal on purpose --
+     *                   never falls back to custom, so a mistyped key is
+     *                   visibly wrong rather than silently masked.
+     *   mode = custom : custom[$locale] -> $_LANG[key] -> custom['english'] -> key
+     *
+     * $_LANG stays as rung 2 of the custom chain deliberately: seeded rows carry
+     * BOTH a key and custom.english, so dropping it would pin a French visitor
+     * to English forever.
+     *
+     * $locale is NULLABLE, not required. TreeRenderer wraps its calls in
+     * catch (\Throwable), so a required argument would turn an ArgumentCountError
+     * into a silently DROPPED nav item rather than a visible error.
+     */
+    public function resolvedLabel(?string $locale = null): string
+    {
+        $locale = strtolower(trim((string)($locale ?? LocaleHelper::current())));
+        if ($locale === '') {
+            $locale = 'english';
+        }
+
+        $label    = $this->label();
+        $custom   = is_array($label['custom'] ?? null) ? $label['custom'] : [];
+        $whmcsKey = trim((string)($label['whmcs'] ?? ''));
+        $lang     = is_array($GLOBALS['_LANG'] ?? null) ? $GLOBALS['_LANG'] : [];
+
+        if ($this->labelMode() === self::LABEL_MODE_WHMCS && $whmcsKey !== '') {
+            if (!empty($lang[$whmcsKey]) && is_string($lang[$whmcsKey])) {
+                return (string)$lang[$whmcsKey];
+            }
+            return $whmcsKey;
+        }
+
+        if (!empty($custom[$locale]) && is_string($custom[$locale])) {
+            return (string)$custom[$locale];
+        }
+        if ($whmcsKey !== '' && !empty($lang[$whmcsKey]) && is_string($lang[$whmcsKey])) {
+            return (string)$lang[$whmcsKey];
+        }
+        if (!empty($custom['english']) && is_string($custom['english'])) {
             return (string)$custom['english'];
         }
         return $whmcsKey;
+    }
+
+    /**
+     * Label for the ADMIN menu tree. Never reads $GLOBALS['_LANG'] -- in the
+     * admin area that global holds the ADMIN language file, not the client one,
+     * so resolvedLabel() here would print the wrong string. Mirrors the editor's
+     * JS rowLabelFor(), so a row label does not jump between page load and the
+     * first keystroke.
+     */
+    public function editorLabel(): string
+    {
+        $label  = $this->label();
+        $custom = is_array($label['custom'] ?? null) ? $label['custom'] : [];
+        if (!empty($custom['english']) && is_string($custom['english'])) {
+            return (string)$custom['english'];
+        }
+        $whmcsKey = trim((string)($label['whmcs'] ?? ''));
+        return $whmcsKey !== '' ? $whmcsKey : '(no label)';
     }
 }

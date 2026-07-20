@@ -6,6 +6,7 @@ namespace Hadrian\Controller\Admin;
 use Hadrian\Controller\AbstractController;
 use Hadrian\Database\Migrator;
 use Hadrian\Helpers\AddonHelper;
+use Hadrian\Helpers\LocaleHelper;
 use Hadrian\Menu\ItemTypes;
 use Hadrian\Menu\Seeder;
 use Hadrian\Menu\WhmcsDefaults;
@@ -166,10 +167,32 @@ final class MenuController extends AbstractController
             });
         }
 
+        // Languages offered in the Translate disclosure. effectiveList() is the
+        // client-facing set; union it with locales this menu ALREADY stores, so
+        // a de-curated language's saved translation stays editable instead of
+        // becoming invisible while still rendering on the front end.
+        $localeSet = [];
+        foreach (LocaleHelper::effectiveList() as $code) {
+            $localeSet[strtolower((string)$code)] = true;
+        }
+        foreach ($allItems as $itm) {
+            $custom = $itm->label()['custom'] ?? [];
+            if (!is_array($custom)) { continue; }
+            foreach (array_keys($custom) as $code) {
+                if (is_string($code) && preg_match('/^[a-z][a-z0-9_-]*$/', $code)) {
+                    $localeSet[$code] = true;
+                }
+            }
+        }
+        unset($localeSet['english']);
+        $extraLocales = array_keys($localeSet);
+        sort($extraLocales);
+
         return $this->view('menu/edit', [
             'menu'             => $menu,
             'tree'             => $tree,
             'itemTypes'        => ItemTypes::all(),
+            'extraLocales'     => $extraLocales,
             'icons'            => \Hadrian\Menu\Icons::pickerList(),
             'iconsJson'        => json_encode(\Hadrian\Menu\Icons::all()),
             'pagesByGroup'     => $pagesByGroup,
@@ -513,12 +536,33 @@ final class MenuController extends AbstractController
             $position = (int)($row['position'] ?? $i);
             $active   = array_key_exists('active', $row) ? !empty($row['active']) : true;
 
+            // Clamp mode ONLY when the key is present. Never invent one: a
+            // pristine save resubmits the server-rendered label_json verbatim,
+            // and stamping 'custom' on every row would permanently kill
+            // MenuItem::labelMode()'s derivation for legacy rows.
+            if (array_key_exists('mode', $label)
+                && $label['mode'] !== MenuItem::LABEL_MODE_WHMCS) {
+                $label['mode'] = MenuItem::LABEL_MODE_CUSTOM;
+            }
+            if (!is_array($label['custom'] ?? null)) {
+                $label['custom'] = [];
+            }
+            // Drop malformed or blank locales so an empty Translate input never
+            // persists as a key that shadows the English fallback.
+            foreach ($label['custom'] as $code => $val) {
+                if (!is_string($code) || !preg_match('/^[a-z][a-z0-9_-]*$/', $code)
+                    || !is_string($val) || trim($val) === '') {
+                    unset($label['custom'][$code]);
+                }
+            }
+
             // Defensive default: a brand-new item with no meaningful
             // label gets a "New <type>" placeholder so admins see
             // something editable rather than an invisible row.
             if (!is_numeric($row['id'] ?? null) && !$this->isMeaningfulLabel($label)) {
                 $typeLabel = ItemTypes::meta($type)['label'] ?? $type;
-                $label = ['whmcs' => '', 'custom' => ['english' => 'New ' . strtolower($typeLabel)]];
+                $label['whmcs']  = (string)($label['whmcs'] ?? '');
+                $label['custom'] = ['english' => 'New ' . strtolower($typeLabel)];
             }
 
             try {

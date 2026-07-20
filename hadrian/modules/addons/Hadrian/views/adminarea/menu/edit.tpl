@@ -157,7 +157,7 @@
                                     <svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </button>
                                 <span class="mt-menu-type-tag mt-menu-type-tag-{$itm->item_type|escape}" data-role="type-tag">{$mtTagFor[$itm->item_type]|default:$itm->item_type|escape}</span>
-                                <span class="mt-menu-name" data-role="label">{$itm->resolvedLabel()|escape}</span>
+                                <span class="mt-menu-name" data-role="label">{$itm->editorLabel()|escape}</span>
                                 <div class="mt-menu-ctrls">
                                     {if $itemTypes[$itm->item_type]['accepts_children']}
                                         <button type="button" class="mt-menu-btn mt-menu-btn-add" data-action="add-child" title="Add child item">
@@ -197,7 +197,7 @@
                                                 <svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                             </button>
                                             <span class="mt-menu-type-tag mt-menu-type-tag-{$childItm->item_type|escape}" data-role="type-tag">{$mtTagFor[$childItm->item_type]|default:$childItm->item_type|escape}</span>
-                                            <span class="mt-menu-name" data-role="label">{$childItm->resolvedLabel()|escape}</span>
+                                            <span class="mt-menu-name" data-role="label">{$childItm->editorLabel()|escape}</span>
                                             <div class="mt-menu-ctrls">
                                                 <button type="button" class="mt-menu-btn mt-menu-btn-del" data-action="delete-item" title="Delete">
                                                     <svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 7v4M8.5 7v4M3 4l.8 8h6.4l.8-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
@@ -312,10 +312,51 @@
             </div>
         </div>
 
+        {* Label source, Lagom-style: Custom String (translatable) OR Language
+           Variable. The radios carry NO name= on purpose -- the panel moves
+           inside #menuForm, so a name would post and count against
+           max_input_vars. Grouping is done in JS. *}
         <div class="mt-menu-sect" data-section="name">
-            <div class="mt-menu-sect-label">Name</div>
-            <input id="drawerLabelEn" class="mt-input" type="text" data-drawer-field="label.custom.english" placeholder="English label">
-            <div class="mt-menu-sect-help">Shown to clients. The WHMCS lang key (in <em>Advanced label</em>) takes precedence if set.</div>
+            <div class="mt-menu-sect-label">Label</div>
+            <div class="mt-label-block">
+                <div class="mt-label-modes" role="radiogroup" aria-label="Label source">
+                    <label class="mt-label-mode">
+                        <input type="radio" data-drawer-field="label.mode" data-drawer-radio-value="custom" value="custom">
+                        <span>Custom String</span>
+                    </label>
+                    <label class="mt-label-mode">
+                        <input type="radio" data-drawer-field="label.mode" data-drawer-radio-value="whmcs" value="whmcs">
+                        <span>Language Variable</span>
+                    </label>
+                </div>
+
+                <div class="mt-label-pane" data-label-pane="custom">
+                    <div class="mt-label-row">
+                        <input id="drawerLabelEn" class="mt-input" type="text" data-drawer-field="label.custom.english" placeholder="English label">
+                        {if $extraLocales}
+                            <button type="button" class="mt-translate-btn" data-translate-toggle aria-expanded="false">Translate<span class="mt-translate-count" data-translate-count hidden></span></button>
+                        {/if}
+                    </div>
+                    {if $extraLocales}
+                        <div class="mt-menu-sect-help">Use the custom string, which can then be translated into different languages using the Translate button on the right.</div>
+                        <div class="mt-translate-body" data-translate-body hidden>
+                            {foreach $extraLocales as $code}
+                                <div class="mt-translate-row">
+                                    <label class="mt-translate-lang" for="drawerLabel_{$code|escape}">{$code|ucfirst|escape}</label>
+                                    <input id="drawerLabel_{$code|escape}" class="mt-input" type="text" data-drawer-field="label.custom.{$code|escape}" data-translate-input placeholder="Leave empty to use the English label">
+                                </div>
+                            {/foreach}
+                        </div>
+                    {else}
+                        <div class="mt-menu-sect-help">Shown to clients in the client-area navigation.</div>
+                    {/if}
+                </div>
+
+                <div class="mt-label-pane" data-label-pane="whmcs" hidden>
+                    <input id="drawerLabelWhmcs" class="mt-input" type="text" placeholder="e.g. navhome" data-drawer-field="label.whmcs">
+                    <div class="mt-menu-sect-help">Assign an existing WHMCS language string by placing its language key here. If WHMCS does not know the key, the key itself is shown.</div>
+                </div>
+            </div>
         </div>
 
         <div class="mt-menu-sect" data-drawer-show-when="whmcs_page">
@@ -403,20 +444,11 @@
             </div>
         </div>
 
-        {* COLLAPSIBLE — Advanced label *}
-        <div class="mt-menu-sub" data-sub="label" data-section="langKey">
-            <button type="button" class="mt-menu-sub-h">
-                <span>Advanced label</span>
-                <span class="mt-menu-sub-chev"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </button>
-            <div class="mt-menu-sub-body" hidden>
-                <div class="mt-field">
-                    <label class="mt-field-label" for="drawerLabelWhmcs">WHMCS lang key</label>
-                    <input id="drawerLabelWhmcs" class="mt-input" type="text" placeholder="e.g. navhome" data-drawer-field="label.whmcs">
-                    <div class="mt-field-help">If set, this lang-key wins over the English label.</div>
-                </div>
-            </div>
-        </div>
+        {* The "Advanced label" collapsible is gone: its WHMCS lang key input now
+           lives in the Label section above as the Language Variable pane. Both
+           its old help text and the old Name help asserted the OPPOSITE of what
+           resolvedLabel() actually did -- an explicit label.mode replaces the
+           guesswork. *}
 
         {* COLLAPSIBLE — Display & Advanced settings *}
         <div class="mt-menu-sub" data-sub="display" data-section="display">
@@ -825,6 +857,31 @@
 .mt-menu-sub-body .mt-field:last-child { margin-bottom: 0; }
 .mt-menu-sub-body .mt-field-label { color: var(--mt-text-2); }
 
+/* ----- Label source: Custom String | Language Variable -----
+   Every "{" below is followed by a space. This style block is NOT wrapped in a
+   Smarty literal tag and parses only because auto-literal ignores "{"+whitespace.
+   Do not write that tag's name in braces here -- Smarty would read it as a real
+   tag and swallow everything down to the script block's closing one. */
+.mt-label-block { display: flex; flex-direction: column; gap: 10px; }
+.mt-label-modes { display: flex; gap: 8px; flex-wrap: wrap; }
+.mt-label-mode { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border: 1px solid var(--mt-border); border-radius: 999px; font-size: 12.5px; color: var(--mt-text-2); cursor: pointer; background: var(--mt-surface); }
+/* Re-assert visibility: radios inside admin cards are hidden elsewhere. */
+.mt-label-mode input[type="radio"] { appearance: auto; -webkit-appearance: radio; display: inline-block; width: auto; height: auto; margin: 0; opacity: 1; position: static; }
+.mt-label-mode:hover { border-color: var(--mt-text-4); color: var(--mt-text); }
+.mt-label-mode:has(input:checked) { border-color: var(--mt-primary); background: var(--mt-primary-tint); color: var(--mt-primary); font-weight: 600; }
+.mt-label-pane[hidden] { display: none; }
+.mt-label-row { display: flex; align-items: center; gap: 8px; }
+.mt-label-row .mt-input { flex: 1; min-width: 0; }
+.mt-translate-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--mt-primary); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 6px 4px; }
+.mt-translate-btn:hover { text-decoration: underline; }
+.mt-translate-count { display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px; background: var(--mt-primary-tint); color: var(--mt-primary); font-size: 11px; font-weight: 600; }
+.mt-translate-count[hidden] { display: none; }
+.mt-translate-body { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; padding: 10px 12px; border: 1px dashed var(--mt-border); border-radius: 10px; }
+.mt-translate-body[hidden] { display: none; }
+.mt-translate-row { display: flex; align-items: center; gap: 10px; }
+.mt-translate-lang { flex: 0 0 104px; font-size: 12px; font-weight: 600; color: var(--mt-text-2); }
+.mt-translate-row .mt-input { flex: 1; min-width: 0; }
+
 @media (max-width: 640px) {
     .mt-menu-grip { display: none; } /* hide on touch — use up/down buttons */
     .mt-menu-sect { grid-template-columns: 1fr; padding-left: 16px; gap: 6px; }
@@ -901,18 +958,18 @@
     // exclusives. Unknown types default to "show everything" so a future
     // PHP type addition doesn't blank the panel.
     var TYPE_FIELDS = {
-        whmcs_page:       { name: true,  icon: true,  langKey: true,  display: true  },
-        custom_link:      { name: true,  icon: true,  langKey: true,  display: true  },
-        dropdown_parent:  { name: true,  icon: true,  langKey: true,  display: true  },
-        header:           { name: true,  icon: false, langKey: true,  display: true  },
-        divider:          { name: false, icon: false, langKey: false, display: true  },
-        language:         { name: false, icon: false, langKey: false, display: true  },
-        currency:         { name: false, icon: false, langKey: false, display: true  },
-        login_button:     { name: true,  icon: true,  langKey: true,  display: true  },
-        account_dropdown: { name: true,  icon: true,  langKey: true,  display: true  },
-        whmcs_default:    { name: false, icon: false, langKey: false, display: true  }
+        whmcs_page:       { name: true,  icon: true,  display: true  },
+        custom_link:      { name: true,  icon: true,  display: true  },
+        dropdown_parent:  { name: true,  icon: true,  display: true  },
+        header:           { name: true,  icon: false,  display: true  },
+        divider:          { name: false, icon: false, display: true  },
+        language:         { name: false, icon: false, display: true  },
+        currency:         { name: false, icon: false, display: true  },
+        login_button:     { name: true,  icon: true,  display: true  },
+        account_dropdown: { name: true,  icon: true,  display: true  },
+        whmcs_default:    { name: false, icon: false, display: true  }
     };
-    var TYPE_FIELDS_DEFAULT = { name: true, icon: true, langKey: true, display: true };
+    var TYPE_FIELDS_DEFAULT = { name: true, icon: true, display: true };
 
     function applyTypeVisibility(type) {
         var fields = TYPE_FIELDS[type] || TYPE_FIELDS_DEFAULT;
@@ -932,6 +989,51 @@
         }
         var l = entry.label || {};
         return (l.custom && l.custom.english) || l.whmcs || '(no label)';
+    }
+
+    // Mirrors MenuItem::labelMode(). Display-only for legacy rows: never
+    // written back, so an untouched row still saves with `mode` absent and the
+    // PHP-side derivation stays live.
+    function labelModeFor(entry) {
+        var l = (entry && entry.label) || {};
+        if (l.mode === 'custom' || l.mode === 'whmcs') return l.mode;
+        var c = (l.custom && typeof l.custom === 'object' && !Array.isArray(l.custom)) ? l.custom : {};
+        for (var k in c) {
+            if (Object.prototype.hasOwnProperty.call(c, k) && typeof c[k] === 'string' && c[k] !== '') {
+                return 'custom';
+            }
+        }
+        return (typeof l.whmcs === 'string' && l.whmcs.trim() !== '') ? 'whmcs' : 'custom';
+    }
+
+    function applyLabelMode(mode) {
+        panel.querySelectorAll('[data-label-pane]').forEach(function (el) {
+            el.hidden = (el.getAttribute('data-label-pane') !== mode);
+        });
+        panel.querySelectorAll('[data-drawer-radio-value]').forEach(function (el) {
+            el.checked = (el.getAttribute('data-drawer-radio-value') === mode);
+        });
+    }
+
+    // Per-row UI state on a SHARED panel subtree -- the panel physically moves
+    // between rows, so both must be reset on every populate.
+    function syncTranslateUi() {
+        var inputs = panel.querySelectorAll('[data-translate-input]');
+        var n = 0;
+        for (var i = 0; i < inputs.length; i++) {
+            if ((inputs[i].value || '').trim() !== '') n++;
+        }
+        var badge = panel.querySelector('[data-translate-count]');
+        if (badge) { badge.textContent = String(n); badge.hidden = (n === 0); }
+        return n;
+    }
+
+    function resetTranslateDisclosure() {
+        var body = panel.querySelector('[data-translate-body]');
+        var btn  = panel.querySelector('[data-translate-toggle]');
+        if (!body) return;
+        body.hidden = (syncTranslateUi() === 0);
+        if (btn) btn.setAttribute('aria-expanded', String(!body.hidden));
     }
 
     // Show or hide the per-row "+ Add child" button based on whether the
@@ -1032,7 +1134,9 @@
                 if (Array.isArray(label) || typeof label !== 'object' || label === null) {
                     label = {whmcs:'', custom:{}};
                 }
-                if (Array.isArray(label.custom)) label.custom = {};
+                if (!label.custom || typeof label.custom !== 'object' || Array.isArray(label.custom)) {
+                    label.custom = {};
+                }
                 if (Array.isArray(config) || typeof config !== 'object' || config === null) {
                     config = {};
                 }
@@ -1216,6 +1320,8 @@
                 el.checked = Array.isArray(v) && v.indexOf(multi) >= 0;
             } else if (checkboxVal){
                 el.checked = v === checkboxVal;
+            } else if (el.type === 'radio'){
+                el.checked = (el.getAttribute('data-drawer-radio-value') === labelModeFor(entry));
             } else if (el.type === 'checkbox'){
                 el.checked = !!v;
             } else {
@@ -1224,13 +1330,26 @@
         });
         syncIconPickerFromEntry(entry);
         syncPagePickerFromEntry(entry);
+        applyLabelMode(labelModeFor(entry));
+        resetTranslateDisclosure();
     }
 
     // ──────────────────────────────────────────────────────────────────────
     // Click delegation — single listener handles all row actions.
     // ──────────────────────────────────────────────────────────────────────
     document.addEventListener('click', function(e){
-        // Sub-section collapse/expand (Advanced label, Display & advanced)
+        // Translate disclosure inside the Label section.
+        var trBtn = e.target.closest('[data-translate-toggle]');
+        if (trBtn) {
+            e.preventDefault();
+            var trBody = panel.querySelector('[data-translate-body]');
+            if (trBody) {
+                trBody.hidden = !trBody.hidden;
+                trBtn.setAttribute('aria-expanded', String(!trBody.hidden));
+            }
+            return;
+        }
+        // Sub-section collapse/expand (Display & advanced)
         var subBtn = e.target.closest('.mt-menu-sub-h');
         if (subBtn) {
             e.preventDefault();
@@ -1592,10 +1711,12 @@
         if (li) {
             var labelEl = li.querySelector('[data-role=label]');
             if (labelEl) {
-                labelEl.textContent = entry.label.custom.english || entry.label.whmcs || '(no label)';
+                labelEl.textContent = rowLabelFor(entry);
             }
         }
         syncPagePickerFromEntry(entry);
+        applyLabelMode(labelModeFor(entry));
+        syncTranslateUi();
         markDirty();
         var panel = document.getElementById('drawerPagePickerPanel');
         if (panel) panel.hidden = true;
@@ -1623,6 +1744,10 @@
             writePath(entry, path, arr);
         } else if (checkboxVal){
             writePath(entry, path, el.checked ? checkboxVal : '');
+        } else if (el.type === 'radio'){
+            if (!el.checked) return;
+            writePath(entry, path, el.getAttribute('data-drawer-radio-value'));
+            applyLabelMode(el.getAttribute('data-drawer-radio-value'));
         } else if (el.type === 'checkbox'){
             writePath(entry, path, el.checked);
             // If toggling the "active" field in the panel, mirror to the row toggle.
@@ -1642,6 +1767,7 @@
             onTypeChanged(entry, oldType);
         }
         markDirty();
+        if (path.indexOf('label.custom.') === 0) { syncTranslateUi(); }
         // Reflect label changes in the tree row (type-aware fallback).
         var li = document.querySelector('li[data-temp="' + selectedTempId + '"]');
         if (li){
@@ -1655,7 +1781,7 @@
     document.addEventListener('change', function(e){
         var el = e.target.closest('[data-drawer-field]');
         if (!el) return;
-        if (el.tagName !== 'SELECT' && el.type !== 'checkbox') return;
+        if (el.tagName !== 'SELECT' && el.type !== 'checkbox' && el.type !== 'radio') return;
         // Reuse the input handler logic.
         var evt = new Event('input', { bubbles: true });
         el.dispatchEvent(evt);

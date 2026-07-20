@@ -138,6 +138,16 @@ if (AddonHelper::isActive()) {
         return HookService::instance()->dispatch('ClientAreaPage', $vars);
     });
 
+    // Record the request language for the ClientAreaPrimaryNavbar /
+    // ClientAreaSecondaryNavbar populate() paths, which receive no $vars.
+    // Priority -1000 so it precedes every other ClientAreaPage hook. The three
+    // buildFlatList hooks record it themselves, so the sidebar/footer path does
+    // NOT depend on this ordering.
+    add_hook('ClientAreaPage', -1000, function ($vars) {
+        Hadrian\Helpers\LocaleHelper::rememberRequestLocale((string)($vars['language'] ?? ''));
+        return null;
+    });
+
     // Expose the menu icon registry to Smarty as $mtIcons (map of name → SVG
     // path data). sidebar.tpl / topnav.tpl look up {$mtIcons[$name]} when
     // rendering a menu item whose config.icon is a known registry name.
@@ -298,6 +308,7 @@ if (AddonHelper::isActive()) {
     // ready when the template renders — no race condition.
     add_hook('ClientAreaPage', 3, function ($vars) {
         try {
+            Hadrian\Helpers\LocaleHelper::rememberRequestLocale((string)($vars['language'] ?? ''));
             if (!\WHMCS\Database\Capsule::schema()->hasTable('hadrian_menus')) {
                 return null;
             }
@@ -318,6 +329,7 @@ if (AddonHelper::isActive()) {
     // audience-specific footer is configured.
     add_hook('ClientAreaPage', 3, function ($vars) {
         try {
+            Hadrian\Helpers\LocaleHelper::rememberRequestLocale((string)($vars['language'] ?? ''));
             if (!\WHMCS\Database\Capsule::schema()->hasTable('hadrian_menus')) {
                 return null;
             }
@@ -347,6 +359,7 @@ if (AddonHelper::isActive()) {
     // links only — dropdowns are not surfaced for this location.
     add_hook('ClientAreaPage', 3, function ($vars) {
         try {
+            Hadrian\Helpers\LocaleHelper::rememberRequestLocale((string)($vars['language'] ?? ''));
             if (!\WHMCS\Database\Capsule::schema()->hasTable('hadrian_menus')) {
                 return null;
             }
