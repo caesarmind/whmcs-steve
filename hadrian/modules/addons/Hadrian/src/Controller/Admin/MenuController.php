@@ -8,6 +8,7 @@ use Hadrian\Database\Migrator;
 use Hadrian\Helpers\AddonHelper;
 use Hadrian\Helpers\LocaleHelper;
 use Hadrian\Menu\ItemTypes;
+use Hadrian\Menu\MenuPages;
 use Hadrian\Menu\Seeder;
 use Hadrian\Menu\WhmcsDefaults;
 use Hadrian\Models\Menu;
@@ -149,7 +150,10 @@ final class MenuController extends AbstractController
         $template = AddonHelper::getTemplate();
         if ($template !== null) {
             PagesCache::ensure($template); // self-heal on first use after activation
-            foreach ($template->getAllPageMeta() as $meta) {
+            // Curated, Lagom-style: the picker offers menu-worthy destinations
+            // only, not every registered page. MenuPages::all() still exposes the
+            // complete set for anything that needs it.
+            foreach (MenuPages::forPicker($template) as $meta) {
                 $defaults = WhmcsDefaults::lookup($meta['name']);
                 $meta['whmcs_lang_key']      = $defaults['lang_key']      ?? '';
                 $meta['whmcs_default_label'] = $defaults['default_label'] ?? '';
