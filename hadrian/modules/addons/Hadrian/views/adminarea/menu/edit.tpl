@@ -1699,9 +1699,29 @@
         if (!entry.label || typeof entry.label !== 'object') entry.label = {whmcs:'', custom:{}};
         if (!entry.label.custom || typeof entry.label.custom !== 'object') entry.label.custom = {};
         if (langKey) {
+            // Picking a WHMCS page LINKS the label to that page's language
+            // variable, so the item translates itself in every language WHMCS
+            // ships -- no per-language typing. Setting mode explicitly matters:
+            // without it labelModeFor() derives 'custom' from the english
+            // fallback below and the item would render a fixed English string.
             entry.label.whmcs = langKey;
+            entry.label.mode  = 'whmcs';
+            // Kept as the fallback if the admin switches to Custom String, and
+            // as the admin-tree row label (editorLabel prefers it).
             var currentEn = entry.label.custom.english || '';
             if (!currentEn || /^New\s/i.test(currentEn)) {
+                entry.label.custom.english = defaultLabel;
+            }
+        } else {
+            // This page has no language variable mapped, so a custom string is
+            // the only option. Clear BOTH the mode and the key inherited from a
+            // previously picked page: in custom mode $_LANG[key] is still rung 2
+            // of the resolution chain, so a stale key would make a non-English
+            // visitor see the OLD page's label on this item.
+            entry.label.mode  = 'custom';
+            entry.label.whmcs = '';
+            var curEn2 = entry.label.custom.english || '';
+            if ((!curEn2 || /^New\s/i.test(curEn2)) && defaultLabel) {
                 entry.label.custom.english = defaultLabel;
             }
         }
