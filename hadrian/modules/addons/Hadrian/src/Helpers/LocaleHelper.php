@@ -49,6 +49,12 @@ final class LocaleHelper
             if (!preg_match('/^[A-Za-z][A-Za-z0-9_-]*$/', $name)) {
                 continue;
             }
+            // WHMCS ships lang/index.php as a directory-listing stub, not a
+            // language. Without this it surfaced as a language called "Index"
+            // in the menu-label Translate list.
+            if (in_array(strtolower($name), ['index', 'overrides'], true)) {
+                continue;
+            }
             $codes[] = strtolower($name);
         }
         $codes = array_values(array_unique($codes));
