@@ -106,15 +106,57 @@ class MenuItem extends Model
         if ($mode === self::LABEL_MODE_CUSTOM || $mode === self::LABEL_MODE_WHMCS) {
             return $mode;
         }
-        $custom = is_array($label['custom'] ?? null) ? $label['custom'] : [];
+        $custom   = is_array($label['custom'] ?? null) ? $label['custom'] : [];
+        $whmcsKey = trim((string)($label['whmcs'] ?? ''));
+
+        // A page-linked item that the admin has NOT customised reads as a
+        // Language Variable, which is what it actually is. Without this rung,
+        // every seeded row derives 'custom' purely because Presets stores a
+        // default English string alongside the key -- so the editor showed
+        // "Custom String" for items that were plainly linked to a WHMCS page.
+        //
+        // Gated on the custom map holding nothing the admin typed: empty, or
+        // only an 'english' still equal to that page's shipped default. Any
+        // edited English, and any translation, keeps it 'custom' so admin text
+        // is never overridden by the WHMCS string.
+        if ($whmcsKey !== '' && $this->isPristinePageLink($whmcsKey, $custom)) {
+            return self::LABEL_MODE_WHMCS;
+        }
+
         foreach ($custom as $val) {
             if (is_string($val) && $val !== '') {
                 return self::LABEL_MODE_CUSTOM;
             }
         }
-        return trim((string)($label['whmcs'] ?? '')) !== ''
-            ? self::LABEL_MODE_WHMCS
-            : self::LABEL_MODE_CUSTOM;
+        return $whmcsKey !== '' ? self::LABEL_MODE_WHMCS : self::LABEL_MODE_CUSTOM;
+    }
+
+    /**
+     * True when this item points at a known WHMCS page whose language variable
+     * matches the stored key, and the custom map still holds only that page's
+     * shipped default English (or nothing at all).
+     */
+    private function isPristinePageLink(string $whmcsKey, array $custom): bool
+    {
+        $page = (string)($this->config()['page'] ?? '');
+        if ($page === '') {
+            return false;
+        }
+        $defaults = \Hadrian\Menu\WhmcsDefaults::lookup($page);
+        if (!is_array($defaults) || trim((string)($defaults['lang_key'] ?? '')) !== $whmcsKey) {
+            return false;
+        }
+
+        $keys = array_keys($custom);
+        if ($keys === []) {
+            return true;
+        }
+        if ($keys !== ['english']) {
+            return false; // a translation exists -> the admin has invested in custom text
+        }
+        $stored  = trim((string)($custom['english'] ?? ''));
+        $default = trim((string)($defaults['default_label'] ?? ''));
+        return $stored === '' || $stored === $default;
     }
 
     /**
@@ -148,6 +190,13 @@ class MenuItem extends Model
         if ($this->labelMode() === self::LABEL_MODE_WHMCS && $whmcsKey !== '') {
             if (!empty($lang[$whmcsKey]) && is_string($lang[$whmcsKey])) {
                 return (string)$lang[$whmcsKey];
+            }
+            // Graceful fallback before showing the raw key. A key WHMCS does not
+            // know in this language would otherwise render "navhome" to a client.
+            // The raw key still surfaces when there is no English at all, which
+            // is the case that actually signals a typo.
+            if (!empty($custom['english']) && is_string($custom['english'])) {
+                return (string)$custom['english'];
             }
             return $whmcsKey;
         }

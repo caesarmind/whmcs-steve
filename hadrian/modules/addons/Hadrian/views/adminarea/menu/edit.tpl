@@ -997,16 +997,39 @@
     // Mirrors MenuItem::labelMode(). Display-only for legacy rows: never
     // written back, so an untouched row still saves with `mode` absent and the
     // PHP-side derivation stays live.
+    // Mirrors MenuItem::isPristinePageLink(). Page defaults come from the
+    // picker tiles, which already carry lang key + default label per page.
+    function pristinePageLink(entry, whmcsKey) {
+        var page = (entry && entry.config && entry.config.page) || '';
+        if (!page) return false;
+        var tile = document.querySelector('.mt-page-picker-tile[data-page-name="' + page + '"]');
+        if (!tile) return false;
+        if ((tile.getAttribute('data-page-lang-key') || '').trim() !== whmcsKey) return false;
+
+        var l = (entry && entry.label) || {};
+        var c = (l.custom && typeof l.custom === 'object' && !Array.isArray(l.custom)) ? l.custom : {};
+        var keys = Object.keys(c);
+        if (keys.length === 0) return true;
+        if (keys.length !== 1 || keys[0] !== 'english') return false;
+        var stored = (c.english || '').trim();
+        return stored === '' || stored === (tile.getAttribute('data-page-default-label') || '').trim();
+    }
+
     function labelModeFor(entry) {
         var l = (entry && entry.label) || {};
         if (l.mode === 'custom' || l.mode === 'whmcs') return l.mode;
+        var key = (typeof l.whmcs === 'string') ? l.whmcs.trim() : '';
+        // A page-linked item the admin has not customised IS a language
+        // variable; without this it read as "Custom String" purely because
+        // Presets stores a default English string next to the key.
+        if (key && pristinePageLink(entry, key)) return 'whmcs';
         var c = (l.custom && typeof l.custom === 'object' && !Array.isArray(l.custom)) ? l.custom : {};
         for (var k in c) {
             if (Object.prototype.hasOwnProperty.call(c, k) && typeof c[k] === 'string' && c[k] !== '') {
                 return 'custom';
             }
         }
-        return (typeof l.whmcs === 'string' && l.whmcs.trim() !== '') ? 'whmcs' : 'custom';
+        return key ? 'whmcs' : 'custom';
     }
 
     function applyLabelMode(mode) {
