@@ -1218,15 +1218,44 @@
 
     // ──────────────────────────────────────────────────────────────────────
     // Drag-drop (vanilla HTML5 — no jQuery UI, no Sortable.js)
-    // The grip has cursor:grab as the affordance; the whole <li> is draggable
-    // and dragstart is cancelled if the user grabbed from a control.
+    //
+    // HANDLE PATTERN. An item is draggable ONLY while the pointer went down on
+    // its own .mt-menu-item-row. Previously every <li> carried draggable=true
+    // permanently, so once a row was expanded the open editor panel dragged the
+    // whole item too -- and worse, text inside the panel could not be selected,
+    // because the browser started a drag instead of a selection.
+    //
+    // Arming on mousedown (rather than cancelling in dragstart) is what fixes
+    // the selection half: a cancelled dragstart still costs the gesture.
     // ──────────────────────────────────────────────────────────────────────
     var draggingEl = null;
+    var armedEl = null;
+    function disarmDrag(){
+        if (armedEl){ armedEl.removeAttribute('draggable'); armedEl = null; }
+    }
+    function armDrag(li){
+        disarmDrag();
+        li.setAttribute('draggable', 'true');
+        armedEl = li;
+    }
     function makeDraggable(){
-        document.querySelectorAll('li.mt-menu-item').forEach(function(li){
-            li.setAttribute('draggable', 'true');
+        // Defensive: strip any stale attribute. Nothing is draggable at rest.
+        document.querySelectorAll('li.mt-menu-item[draggable]').forEach(function(li){
+            li.removeAttribute('draggable');
         });
     }
+    document.addEventListener('mousedown', function(e){
+        disarmDrag();
+        if (e.button !== 0) return;
+        // closest() finds the INNERMOST row, so a nested child arms itself and
+        // not its parent.
+        var row = e.target.closest('.mt-menu-item-row');
+        if (!row) return;                       // open panel, add band, anything else
+        if (e.target.closest('button, input, select, textarea, label, a')) return;
+        var li = row.closest('li.mt-menu-item');
+        if (li) armDrag(li);
+    }, true);
+    document.addEventListener('mouseup', disarmDrag, true);
     document.addEventListener('dragstart', function(e){
         // Cancel if the user grabbed from a control. The grip itself is a
         // <span> so it doesn't match — only the grip area starts a drag.
@@ -1236,6 +1265,10 @@
         }
         var li = e.target.closest('li.mt-menu-item');
         if (!li) return;
+        // Safety net for the handle pattern: only the row-armed item may drag.
+        // Without this, a drag begun inside the open panel would still move the
+        // item on any engine that dispatches dragstart without our mousedown.
+        if (armedEl !== li) { e.preventDefault(); return; }
         draggingEl = li;
         li.classList.add('is-dragging');
         try {
@@ -1263,6 +1296,7 @@
         }
     });
     document.addEventListener('dragend', function(){
+        disarmDrag();
         if (draggingEl){ draggingEl.classList.remove('is-dragging'); draggingEl = null; }
         syncStateFromDom();
         refreshUpDownDisabled();
@@ -1553,7 +1587,7 @@
         li.className = 'mt-menu-item';
         li.setAttribute('data-temp', entry.tempId);
         li.setAttribute('data-type', entry.item_type);
-        li.setAttribute('draggable', 'true');
+        // draggable is NOT set here: it is armed on mousedown over the row.
         // Use the same SVG grip / chev / buttons as the server-rendered rows.
         // accepts-children: only show + add-child for dropdown_parent type.
         var acceptsKids = (entry.item_type === 'dropdown_parent');
