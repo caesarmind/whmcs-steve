@@ -17,7 +17,9 @@
     </div>
 
     {if $row[2] == 'select'}
-        <select class="mt-select mt-planned-select" disabled aria-label="{$row[0]|escape} (not wired yet)">
+        {* data-mt-native: opt out of the styled listbox. `disabled` already
+           excludes it, but this makes the intent explicit for a placeholder. *}
+        <select class="mt-select mt-planned-select" disabled data-mt-native aria-label="{$row[0]|escape} (not wired yet)">
             {foreach $row[3] as $choice}
                 <option>{$choice|escape}</option>
             {/foreach}

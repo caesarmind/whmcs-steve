@@ -402,6 +402,44 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-icon-tile svg { width: 18px; height: 18px; }
 .mt-icon-tile-clear { color: var(--mt-text-3); font-size: 14px; }
 
+/* -- Select popup (native listbox replacement) ---------------------------- */
+/* ONE body-level panel shared by every .mt-select. The native select is never
+   hidden, wrapped or duplicated -- it keeps name/id/value and stays focused, so
+   every existing change listener, data-default reset and form post is
+   untouched. .mt-wrap is carried on the panel so the --mt-* tokens resolve
+   outside #mt-admin-root; data-theme is copied on open so dark mode follows.
+   Parented to document.body: no transform or overflow ancestor to clip it. */
+.mt-selpop { position: fixed; z-index: 9999; display: none;
+    background: var(--mt-surface); color: var(--mt-text);
+    min-height: 0; padding: 0;
+    border: 1px solid var(--mt-border); border-radius: var(--mt-radius-sm);
+    box-shadow: var(--mt-shadow-dropdown);
+    max-width: min(440px, calc(100vw - 16px)); overflow: hidden; }
+.mt-selpop-list { max-height: 320px; overflow-y: auto; overscroll-behavior: contain; padding: 5px; }
+.mt-selpop-group { font-size: 11px; font-weight: 700; color: var(--mt-text-2);
+    text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 9px 3px; }
+.mt-selpop-opt { display: flex; align-items: center; gap: 9px; padding: 7px 10px;
+    border-radius: 7px; font-size: 13px; line-height: 1.3; color: var(--mt-text);
+    cursor: pointer; user-select: none; }
+.mt-selpop-opt.is-active { background: var(--mt-surface-2); }
+.mt-selpop-opt.is-selected { color: var(--mt-primary); font-weight: 600; }
+.mt-selpop-opt.is-selected.is-active { background: var(--mt-primary-tint); }
+.mt-selpop-opt.is-disabled { color: var(--mt-text-3); cursor: not-allowed; }
+.mt-selpop-dot { width: 16px; height: 16px; border-radius: 5px; flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.12); background-clip: padding-box; }
+.mt-selpop-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Keep the closed control lit while its panel is open. (0,3,0) so it beats the
+   page-local .mt-select:focus rule in settings/index.tpl, which is (0,2,0). */
+.mt-wrap .mt-select.is-selpop-open { border-color: var(--mt-primary); box-shadow: 0 0 0 4px var(--mt-primary-ring); }
+/* Windows high contrast flattens author colours, so state must come from system
+   colours and the swatch needs a real frame. */
+@media (forced-colors: active) {
+    .mt-selpop { border: 1px solid CanvasText; }
+    .mt-selpop-opt.is-active { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+    .mt-selpop-opt.is-disabled { color: GrayText; }
+    .mt-selpop-dot { forced-color-adjust: none; outline: 1px solid CanvasText; }
+}
+
 /* -- Empty state ---------------------------------------------------------- */
 .mt-empty { text-align: center; padding: 48px 20px; color: var(--mt-text-2); }
 .mt-empty-icon { width: 44px; height: 44px; margin: 0 auto 14px; color: var(--mt-text-3); }

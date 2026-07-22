@@ -237,4 +237,224 @@
     });
 })();
 </script>
+
+<script>
+/* Native <select> popup replacement. ONE body-level listbox shared by every
+   .mt-select on the page. The native select is never hidden, wrapped or
+   duplicated -- it keeps name/id/value and stays focused, so every existing
+   change listener, [data-default] reset and form post is untouched. Coarse
+   pointers keep the OS wheel. Deliberately its own script element: a parse
+   error here cannot take down the shared admin script above. */
+(function(){
+    var root = document.getElementById('mt-admin-root');
+    if (!root) return;
+    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
+
+    var pop = null, list = null, sel = null, startIndex = -1, rows = [];
+    var typed = '', typedAt = 0, progScroll = false;
+
+    function eligible(el){
+        return !!el && el.tagName === 'SELECT' && el.classList.contains('mt-select')
+            && !el.disabled && !el.multiple && el.size <= 1
+            && !el.hasAttribute('data-mt-native') && el.options.length > 0;
+    }
+    /* Label activation forwards a click to the labelled control, so a click on
+       a caption or swatch inside an implicit <label>, or on any label[for=],
+       must resolve to the select or the OS picker still opens. */
+    function selectFrom(target){
+        if (!target || !target.closest) return null;
+        var el = target.closest('select.mt-select');
+        if (!el){
+            var lab = target.closest('label');
+            if (lab) el = lab.control || (lab.htmlFor && document.getElementById(lab.htmlFor)) || lab.querySelector('select.mt-select');
+        }
+        return eligible(el) ? el : null;
+    }
+    function build(){
+        pop = document.createElement('div');
+        pop.className = 'mt-wrap mt-selpop';
+        pop.setAttribute('aria-hidden', 'true');   /* decorative: focus never leaves the select */
+        list = document.createElement('div');
+        list.className = 'mt-selpop-list';
+        pop.appendChild(list);
+        document.body.appendChild(pop);
+        list.addEventListener('mousedown', function(e){ e.preventDefault(); });  /* keep focus on the select */
+        list.addEventListener('mousemove', function(e){
+            var r = e.target.closest('.mt-selpop-opt');
+            if (r && !r.classList.contains('is-disabled')) markActive(parseInt(r.getAttribute('data-i'), 10));
+        });
+        list.addEventListener('click', function(e){
+            var r = e.target.closest('.mt-selpop-opt');
+            if (!r || r.classList.contains('is-disabled')) return;
+            highlight(parseInt(r.getAttribute('data-i'), 10), false);
+            close(true);
+        });
+    }
+    function render(){
+        list.textContent = ''; rows = [];
+        var i = 0;
+        function addOpt(o){
+            var r = document.createElement('div');
+            r.className = 'mt-selpop-opt' + (o.disabled ? ' is-disabled' : '');
+            r.setAttribute('data-i', i);
+            var sw = o.getAttribute('data-swatch');
+            if (sw){ var d = document.createElement('span'); d.className = 'mt-selpop-dot'; d.style.background = sw; r.appendChild(d); }
+            var t = document.createElement('span'); t.className = 'mt-selpop-txt'; t.textContent = o.text;
+            r.appendChild(t); list.appendChild(r); rows[i] = r; i++;
+        }
+        [].forEach.call(sel.children, function(n){
+            if (n.tagName === 'OPTGROUP'){
+                var g = document.createElement('div'); g.className = 'mt-selpop-group'; g.textContent = n.label;
+                list.appendChild(g);
+                [].forEach.call(n.children, addOpt);
+            } else if (n.tagName === 'OPTION'){ addOpt(n); }
+        });
+    }
+    function markActive(i){ rows.forEach(function(r, n){ r.classList.toggle('is-active', n === i); }); }
+    /* Scroll the panel's own list directly. scrollIntoView() walks every
+       scrollable ancestor and can move the document scroller too. */
+    function reveal(i){
+        var r = rows[i]; if (!r) return;
+        progScroll = true;
+        var top = r.offsetTop - list.offsetTop, bot = top + r.offsetHeight;
+        if (top < list.scrollTop) list.scrollTop = top;
+        else if (bot > list.scrollTop + list.clientHeight) list.scrollTop = bot - list.clientHeight;
+        setTimeout(function(){ progScroll = false; }, 0);
+    }
+    function highlight(i, scroll){
+        if (i < 0 || i >= sel.options.length) return;
+        if (sel.options[i].disabled) return;          /* one disabled rule for every entry point */
+        sel.selectedIndex = i;                        /* real value moves; no event until commit */
+        rows.forEach(function(r, n){
+            r.classList.toggle('is-selected', n === i);
+            r.classList.toggle('is-active', n === i);
+        });
+        if (scroll) reveal(i);
+    }
+    function step(dir){
+        for (var n = sel.selectedIndex + dir; n >= 0 && n < sel.options.length; n += dir){
+            if (!sel.options[n].disabled){ highlight(n, true); return; }
+        }
+    }
+    function stepClosed(el, dir){
+        for (var n = el.selectedIndex + dir; n >= 0 && n < el.options.length; n += dir){
+            if (el.options[n].disabled) continue;
+            el.selectedIndex = n;
+            el.dispatchEvent(new Event('input',  { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+            return;
+        }
+    }
+    function place(){
+        if (!sel) return;
+        var r = sel.getBoundingClientRect();
+        pop.style.visibility = 'hidden'; pop.style.display = 'block';
+        pop.style.left = '0px'; pop.style.top = '0px'; pop.style.minWidth = r.width + 'px';
+        var ph = pop.offsetHeight, pw = pop.offsetWidth;
+        var below = window.innerHeight - r.bottom - 8, above = r.top - 8;
+        var top = (ph <= below || below >= above) ? r.bottom + 4 : r.top - ph - 4;
+        pop.style.top  = Math.max(8, Math.min(top, window.innerHeight - ph - 8)) + 'px';
+        pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pw - 8)) + 'px';
+        pop.style.visibility = '';
+    }
+    function open(el){
+        if (sel === el){ close(true); return; }
+        if (sel) close(true);
+        if (!pop) build();
+        sel = el; startIndex = el.selectedIndex;   /* index, not value: duplicate values stay unambiguous */
+        pop.setAttribute('data-theme', root.getAttribute('data-theme') || 'light');
+        render();
+        rows.forEach(function(r, n){
+            r.classList.toggle('is-selected', n === el.selectedIndex);
+            r.classList.toggle('is-active', n === el.selectedIndex);
+        });
+        pop.style.display = 'block';
+        place();
+        reveal(el.selectedIndex);
+        el.classList.add('is-selpop-open');
+        try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+    }
+    function close(commit){
+        if (!sel) return;
+        var el = sel;
+        if (!commit && el.selectedIndex !== startIndex) el.selectedIndex = startIndex;
+        pop.style.display = 'none';
+        el.classList.remove('is-selpop-open');
+        sel = null; rows = []; typed = '';
+        if (commit && el.selectedIndex !== startIndex){
+            el.dispatchEvent(new Event('input',  { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
+
+    document.addEventListener('mousedown', function(e){
+        var el = (e.button === 0) ? selectFrom(e.target) : null;
+        if (el){ e.preventDefault(); open(el); return; }
+        if (sel && !(pop && pop.contains(e.target))) close(true);
+    }, true);
+    /* Belt and braces: label activation, and engines that open on click. */
+    document.addEventListener('click', function(e){
+        var el = selectFrom(e.target);
+        if (!el) return;
+        e.preventDefault();
+        if (sel !== el) open(el);
+    }, true);
+    /* Focus can leave without a mousedown (the menu editor moves focus when a
+       row is added, window blur, extensions). Bind the panel to the control. */
+    document.addEventListener('focusout', function(e){ if (sel && e.target === sel) close(true); }, true);
+    window.addEventListener('blur', function(){ if (sel) close(true); });
+
+    document.addEventListener('keydown', function(e){
+        var el = e.target;
+        if (!eligible(el)) return;
+        var k = e.key;
+        if (sel !== el){
+            /* Enter is deliberately NOT intercepted: it performs implicit form
+               submission from a focused select and admins rely on that. */
+            var buffering = (Date.now() - typedAt) < 900;
+            if ((k === ' ' || k === 'Spacebar') && !buffering){ e.preventDefault(); open(el); return; }
+            if ((k === 'ArrowDown' || k === 'ArrowUp') && e.altKey){ e.preventDefault(); open(el); return; }
+            if (k === 'ArrowDown'){ e.preventDefault(); stepClosed(el,  1); return; }
+            if (k === 'ArrowUp'){   e.preventDefault(); stepClosed(el, -1); return; }
+            if (k.length === 1) typedAt = Date.now();   /* let native typeahead run, track the buffer */
+            return;
+        }
+        if (k === 'Escape'){ e.preventDefault(); close(false); return; }
+        if (k === 'Enter'){  e.preventDefault(); close(true);  return; }
+        if (k === 'Tab'){    close(true); return; }
+        if (k === 'ArrowDown'){ e.preventDefault(); step(1);  return; }
+        if (k === 'ArrowUp'){   e.preventDefault(); step(-1); return; }
+        if (k === 'Home'){ e.preventDefault(); highlight(0, true); return; }
+        if (k === 'End'){  e.preventDefault(); highlight(sel.options.length - 1, true); return; }
+        if (k.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey){
+            e.preventDefault();
+            var now = Date.now(), n, q;
+            typed = (now - typedAt < 900) ? typed + k : k;
+            typedAt = now;
+            /* Same-key repeat cycles, like a native select: several option sets
+               here share a long prefix ("Primary hover", "Primary text"...). */
+            var repeat = typed.length > 1 && /^(.)\1+$/.test(typed);
+            q = (repeat ? typed.charAt(0) : typed).toLowerCase();
+            var from = repeat ? sel.selectedIndex + 1 : 0;
+            for (var c = 0; c < sel.options.length; c++){
+                n = (from + c) % sel.options.length;
+                if (sel.options[n].disabled) continue;
+                if (sel.options[n].text.toLowerCase().indexOf(q) === 0){ highlight(n, true); break; }
+            }
+        }
+    }, true);
+
+    /* A fixed panel must re-anchor, not vanish, and must ignore scrolls coming
+       from its own overflowing list. Close only when the control itself leaves
+       the viewport. */
+    window.addEventListener('scroll', function(e){
+        if (!sel || progScroll) return;
+        if (pop && e.target && e.target.nodeType === 1 && (e.target === pop || pop.contains(e.target))) return;
+        var r = sel.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > window.innerHeight) { close(true); return; }
+        place();
+    }, true);
+    window.addEventListener('resize', function(){ if (sel) place(); });
+})();
+</script>
 {/literal}
