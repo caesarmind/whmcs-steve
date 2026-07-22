@@ -40,7 +40,9 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
     --mt-primary:      #0071e3;
     --mt-primary-h:    #0077ed;
     --mt-primary-tint: rgba(0,113,227,0.08);
-    --mt-primary-ring: rgba(0,113,227,0.15);
+    /* Matches the Apple client theme's --color-accent-light exactly
+       (apple-theme.css). Was 0.15, which read as a glow rather than a halo. */
+    --mt-primary-ring: rgba(0,113,227,0.08);
     --mt-link:         #0066cc;
 
     /* Semantic */
@@ -89,7 +91,8 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
     --mt-primary:      #2997ff;
     --mt-primary-h:    #2997ff;
     --mt-primary-tint: rgba(41,151,255,0.14);
-    --mt-primary-ring: rgba(41,151,255,0.25);
+    /* Matches the Apple client theme's dark --color-accent-light. Was 0.25. */
+    --mt-primary-ring: rgba(41,151,255,0.12);
     --mt-link:         #2997ff;
 
     --mt-success-text: #34c759;
@@ -211,7 +214,9 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 
 /* -- Inputs / selects / textareas ----------------------------------------- */
 .mt-input, .mt-select, .mt-textarea { width: 100%; padding: 11px 14px; border: 1px solid var(--mt-input-border); border-radius: var(--mt-radius); background: var(--mt-surface); color: var(--mt-text); font-family: inherit; font-size: 15px; line-height: 1.4; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
-.mt-input:focus, .mt-select:focus, .mt-textarea:focus { outline: none; border-color: var(--mt-primary); box-shadow: 0 0 0 4px var(--mt-primary-ring); }
+/* 3px, matching every form-control focus ring in the Apple client theme
+   (.form-input / .form-select / .form-textarea). Was 4px. */
+.mt-input:focus, .mt-select:focus, .mt-textarea:focus { outline: none; border-color: var(--mt-primary); box-shadow: 0 0 0 3px var(--mt-primary-ring); }
 .mt-input::placeholder, .mt-textarea::placeholder { color: var(--mt-text-4); }
 .mt-textarea { resize: vertical; line-height: 1.5; }
 .mt-select {
@@ -430,7 +435,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-selpop-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Keep the closed control lit while its panel is open. (0,3,0) so it beats the
    page-local .mt-select:focus rule in settings/index.tpl, which is (0,2,0). */
-.mt-wrap .mt-select.is-selpop-open { border-color: var(--mt-primary); box-shadow: 0 0 0 4px var(--mt-primary-ring); }
+.mt-wrap .mt-select.is-selpop-open { border-color: var(--mt-primary); box-shadow: 0 0 0 3px var(--mt-primary-ring); }
 /* Windows high contrast flattens author colours, so state must come from system
    colours and the swatch needs a real frame. */
 @media (forced-colors: active) {
