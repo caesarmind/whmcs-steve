@@ -334,25 +334,15 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-wrap .mt-back:hover { color: var(--mt-primary); text-decoration: none; }
 .mt-back svg { width: 14px; height: 14px; }
 
-/* -- Menu tree ------------------------------------------------------------ */
-.mt-menu-tree { display: flex; flex-direction: column; gap: 6px; }
-.mt-menu-tree ul.mt-menu-list, .mt-menu-tree ul.mt-menu-children { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-.mt-menu-tree ul.mt-menu-children { margin: 4px 0 4px 22px; padding-left: 12px; border-left: 2px solid var(--mt-border); }
-.mt-menu-tree ul.mt-menu-children:empty { display: none; }
-.mt-menu-tree ul.is-drag-over { background: var(--mt-primary-tint); border-radius: var(--mt-radius-sm); outline: 1px dashed var(--mt-primary); }
-.mt-menu-item { list-style: none; }
-.mt-menu-item.is-dragging > .mt-menu-item-row { opacity: 0.4; }
-.mt-menu-item-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-sm); cursor: grab; transition: border-color .12s; }
-.mt-menu-item-row:hover { border-color: var(--mt-primary); }
-.mt-menu-handle { color: var(--mt-text-3); flex-shrink: 0; }
-.mt-menu-handle svg { width: 14px; height: 14px; display: block; }
-.mt-menu-type-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 999px; background: var(--mt-primary-tint); color: var(--mt-primary); flex-shrink: 0; }
-.mt-menu-name { flex: 1; font-size: 13px; font-weight: 500; color: var(--mt-text); }
-.mt-menu-actions { display: flex; gap: 4px; flex-shrink: 0; opacity: 0; transition: opacity .15s; }
-.mt-menu-item-row:hover .mt-menu-actions, .mt-menu-item-row:focus-within .mt-menu-actions { opacity: 1; }
-.mt-icon-btn { width: 26px; height: 26px; padding: 0; border: 0; background: transparent; color: var(--mt-text-3); border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-.mt-icon-btn:hover { background: var(--mt-surface-2); color: var(--mt-text); }
-.mt-icon-btn svg { width: 14px; height: 14px; display: block; }
+/* -- Menu tree ------------------------------------------------------------
+   The tree rows / children / drag styling live page-local in
+   views/adminarea/menu/edit.tpl (scoped to .mt-menu-tree-col) — the sole
+   source of truth. The old UNSCOPED rules that used to sit here
+   (.mt-menu-item-row{border/radius}, :hover{border-color:primary},
+   .mt-menu-name, .mt-menu-item, plus the never-used .mt-menu-handle /
+   .mt-menu-type-badge / .mt-menu-actions / .mt-icon-btn / .is-drag-over) were
+   dead or leaked into the current tree, so they were removed. Only the shared
+   add-row affordance below remains. */
 .mt-menu-add-row { display: flex; gap: 8px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--mt-border); }
 /* Compact picker, not a full-width field. `flex: 1` used to stretch a five-option
    type selector across the whole panel, which is what made this row read as
