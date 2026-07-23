@@ -860,12 +860,14 @@
     font-weight: 500;
     color: var(--mt-text);
 }
-.mt-menu-sub-h:hover { background: var(--mt-surface-2); }
+/* The "Display & advanced" title stays a calm dark label; hover and expanded
+   state are signalled ONLY by the chevron (the section's indicator) turning
+   accent -- no whole-area grey box on hover, no loud all-blue title. */
+.mt-menu-sub-h:hover .mt-menu-sub-chev { color: var(--mt-primary); }
 .mt-menu-sub-chev { color: var(--mt-text-4); display: inline-flex; align-items: center; }
 .mt-menu-sub-chev svg { width: 12px; height: 12px; transition: transform .15s; }
 .mt-menu-sub.is-open .mt-menu-sub-chev svg { transform: rotate(90deg); color: var(--mt-primary); }
 .mt-menu-sub.is-open .mt-menu-sub-chev { color: var(--mt-primary); }
-.mt-menu-sub.is-open > .mt-menu-sub-h { color: var(--mt-primary); }
 
 /* Sub-body — a neutral rounded card (matching the design mock's display-
    settings panel), not the old blue tint + left accent bar. The section
