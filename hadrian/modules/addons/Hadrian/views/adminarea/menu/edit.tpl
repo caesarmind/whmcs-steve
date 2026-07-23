@@ -245,12 +245,15 @@
                    .mt-menu-add, the dashed affordance already in admin.css and
                    the treatment the design file draws. *}
                 <div class="mt-menu-add-row">
-                    <select class="mt-select mt-input-compact" id="mtAddType" aria-label="Item type to add">
-                        {foreach $itemTypes as $key => $meta}
-                            <option value="{$key|escape}">{$meta.label|escape}</option>
-                        {/foreach}
-                    </select>
                     <button type="button" class="mt-menu-add" id="mtAddBtn"><span class="mt-menu-add-plus" aria-hidden="true">+</span> Add item</button>
+                    <div class="mt-menu-add-as">
+                        <label for="mtAddType">Add as</label>
+                        <select class="mt-select mt-input-compact" id="mtAddType" aria-label="Item type to add">
+                            {foreach $itemTypes as $key => $meta}
+                                <option value="{$key|escape}">{$meta.label|escape}</option>
+                            {/foreach}
+                        </select>
+                    </div>
                 </div>
             </div>
             </div>
@@ -560,11 +563,21 @@
    top-border + padding-top — those produce a visible second horizontal
    line below the last item ("double line"). Inside the new flat tree
    we just want breathing space, no extra rule. */
+/* Root add band: stack so "+ Add item" is a full-width, dead-centre primary,
+   with the type picker as a small centred line beneath it (the design mock
+   shows a lone centred button; the picker is our addition). */
 .mt-menu-tree-col .mt-menu-add-row {
     border-top: 0;
     padding-top: 0;
     margin-top: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
 }
+.mt-menu-tree-col .mt-menu-add-row .mt-menu-add { flex: 0 0 auto; width: 100%; }
+.mt-menu-add-as { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.mt-menu-add-as label { font-size: 12px; color: var(--mt-text-3); }
+.mt-menu-tree-col .mt-menu-add-as .mt-select { flex: 0 0 auto; width: auto; min-width: 150px; }
 .mt-menu-tree-col ul.mt-menu-children { list-style: none; margin: 0 0 0 22px; padding: 8px 0 8px 12px; border-left: 1.5px solid var(--mt-border); display: flex; flex-direction: column; gap: 0; background: transparent; }
 .mt-menu-tree-col ul.mt-menu-children:empty { display: none; }
 
