@@ -298,18 +298,9 @@
 <div id="mtPanelHome" hidden>
     <div id="mtItemDrawer" class="mt-menu-props">
 
-        {* Identifies whether the open editor is a top-level item or a nested
-           one. Text is set by openInlinePanel from the row's depth, matching the
-           design mock's "Menu item" / "Sub-menu item" heading. *}
-        <div class="mt-menu-kind">
-            <span class="mt-menu-kind-dot" aria-hidden="true"></span>
-            <span data-drawer-kind>Menu item</span>
-        </div>
-
-        {* Grey card wrapping the primary fields, per the design mock. The
-           heading above and the Display-and-advanced collapsible below stay
-           outside it. Styled by .mt-menu-fields; carries no id/data-attr, so
-           every JS sect selector treats it as transparent. *}
+        {* Grey card wrapping the primary fields. The Display & advanced
+           collapsible below stays outside it. .mt-menu-fields carries no
+           id/data-attr, so every JS sect selector treats it as transparent. *}
         <div class="mt-menu-fields">
         <div class="mt-menu-sect">
             <div class="mt-menu-sect-label mt-tip-line">Type {include file="includes/tip.tpl" text="What this item is. The fields below change to match the type you pick."}</div>
@@ -461,7 +452,7 @@
         {* COLLAPSIBLE — Display & Advanced settings *}
         <div class="mt-menu-sub" data-sub="display" data-section="display">
             <button type="button" class="mt-menu-sub-h">
-                <span class="mt-menu-sub-title"><span class="mt-menu-sub-dot" aria-hidden="true"></span><span data-drawer-kind-suffix>Menu item</span> display settings</span>
+                <span>Display &amp; advanced</span>
                 <span class="mt-menu-sub-chev"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </button>
             <div class="mt-menu-sub-body" hidden>
@@ -664,7 +655,10 @@
     opacity: 0.4;
     transition: opacity .15s, color .15s;
 }
-.mt-menu-item-row:hover .mt-menu-grip { opacity: 1; }
+/* Hover feedback is localised to the grip (the leftmost "bullet"): it brightens
+   and takes the accent colour, so hovering a row is visible without tinting the
+   whole row. */
+.mt-menu-item-row:hover .mt-menu-grip { opacity: 1; color: var(--mt-primary); }
 .mt-menu-grip:active { cursor: grabbing; }
 .mt-menu-grip:hover { color: var(--mt-text-2); }
 .mt-menu-grip svg { width: 12px; height: 16px; display: block; }
@@ -803,26 +797,7 @@
 .mt-menu-props {
     background: var(--mt-surface);
     border-top: 1px solid var(--mt-border-2);
-    padding: 4px 16px 16px;
-}
-/* Editor heading: accent dot + "Menu item" / "Sub-menu item". Identifies the
-   open row's depth, matching the design mock. */
-.mt-menu-kind {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    font-size: 13.5px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    color: var(--mt-text);
-    padding: 12px 0 8px;
-}
-.mt-menu-kind-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--mt-primary);
-    flex-shrink: 0;
+    padding: 12px 16px 16px;
 }
 
 /* Grey rounded card wrapping the primary fields (Type / Label / Page / URL /
@@ -891,9 +866,6 @@
 .mt-menu-sub.is-open .mt-menu-sub-chev svg { transform: rotate(90deg); color: var(--mt-primary); }
 .mt-menu-sub.is-open .mt-menu-sub-chev { color: var(--mt-primary); }
 .mt-menu-sub.is-open > .mt-menu-sub-h { color: var(--mt-primary); }
-.mt-menu-sub-title { display: inline-flex; align-items: center; gap: 9px; }
-.mt-menu-sub-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mt-text-4); flex-shrink: 0; }
-.mt-menu-sub.is-open .mt-menu-sub-dot { background: var(--mt-primary); }
 
 /* Sub-body — a neutral rounded card (matching the design mock's display-
    settings panel), not the old blue tint + left accent bar. The section
@@ -1425,13 +1397,6 @@
         slot.hidden = false;
         li.classList.add('is-open');
         selectedTempId = tempId;
-        // Label the editor by depth: anything inside a children list is a
-        // sub-menu item. closest() walks up, so grandchildren read the same.
-        var kindText = li.closest('ul.mt-menu-children') ? 'Sub-menu item' : 'Menu item';
-        var kindEl = panel.querySelector('[data-drawer-kind]');
-        if (kindEl) kindEl.textContent = kindText;
-        var kindSuffix = panel.querySelector('[data-drawer-kind-suffix]');
-        if (kindSuffix) kindSuffix.textContent = kindText;
         populatePanelFromEntry(tempId);
     }
 
