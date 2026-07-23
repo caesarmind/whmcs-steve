@@ -557,7 +557,7 @@
 
 /* ----- Items list (flat hairline-divided rows, left accent bar on open) ----- */
 .mt-menu-tree-col .mt-menu-tree { display: flex; flex-direction: column; gap: 0; }
-.mt-menu-tree-col ul.mt-menu-list { display: flex; flex-direction: column; gap: 0; list-style: none; margin: 0; padding: 0; }
+.mt-menu-tree-col ul.mt-menu-list { display: flex; flex-direction: column; gap: 6px; list-style: none; margin: 0; padding: 0; }
 
 /* Override footer.tpl's global .mt-menu-add-row that draws a dashed
    top-border + padding-top — those produce a visible second horizontal
@@ -578,14 +578,14 @@
 .mt-menu-add-as { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .mt-menu-add-as label { font-size: 12px; color: var(--mt-text-3); }
 .mt-menu-tree-col .mt-menu-add-as .mt-select { flex: 0 0 auto; width: auto; min-width: 150px; }
-.mt-menu-tree-col ul.mt-menu-children { list-style: none; margin: 0 0 0 22px; padding: 8px 0 8px 12px; border-left: 1.5px solid var(--mt-border); display: flex; flex-direction: column; gap: 0; background: transparent; }
+.mt-menu-tree-col ul.mt-menu-children { list-style: none; margin: 6px 0 6px 24px; padding: 0; display: flex; flex-direction: column; gap: 6px; background: transparent; }
 .mt-menu-tree-col ul.mt-menu-children:empty { display: none; }
 
 /* Per-level add band. Indented to the children rail (22px margin + 12px pad on
    ul.mt-menu-children) so it lines up with the rows it appends to, exactly as
    the design file indents its nested add button. Full width like the root band.
    Not inside the <ul> -- the tree walkers would read it as an item. */
-.mt-menu-tree-col .mt-menu-add-nested { display: flex; margin: 2px 0 10px 34px; }
+.mt-menu-tree-col .mt-menu-add-nested { display: flex; margin: 0 0 8px 24px; }
 .mt-menu-tree-col .mt-menu-add-nested .mt-menu-add { flex: 1; }
 /* Centre the "+ Add item" label in its band, per the design mock (admin.css
    draws it left-aligned). */
@@ -604,21 +604,19 @@
     position: relative;
     list-style: none;
 }
-.mt-menu-tree-col ul.mt-menu-list > li.mt-menu-item + li.mt-menu-item,
-.mt-menu-tree-col ul.mt-menu-children > li.mt-menu-item + li.mt-menu-item {
-    border-top: 1px solid var(--mt-border-2);
-}
 
-.mt-menu-tree-col li.mt-menu-item.is-open {
-    background: var(--mt-surface);
-    border-radius: 8px;
-    /* 1px gray ring around the open item — no blue accent bar. */
-    box-shadow: 0 0 0 1px var(--mt-border);
-    z-index: 1;
+/* When open, the row (rounded top) + drawer (rounded bottom) form ONE card, so
+   a dropdown parent's child cards sit BELOW it rather than inside its outline. */
+.mt-menu-tree-col li.mt-menu-item.is-open { z-index: 1; }
+.mt-menu-tree-col li.mt-menu-item.is-open > .mt-menu-item-row {
+    border-radius: 10px 10px 0 0;
+    border-bottom: 0;
 }
-/* Suppress the hairline above the sibling immediately after an open item —
-   the open item's box-shadow ring already draws its own border there. */
-.mt-menu-tree-col li.mt-menu-item.is-open + li.mt-menu-item { border-top: 0; }
+.mt-menu-tree-col li.mt-menu-item.is-open > .mt-menu-props-slot > .mt-menu-props {
+    border: 1px solid var(--mt-border);
+    border-top: 1px solid var(--mt-border-2);
+    border-radius: 0 0 10px 10px;
+}
 .mt-menu-tree-col li.mt-menu-item.is-dragging { opacity: 0.4; }
 
 /* Drag-over insertion line (drop indicator) */
@@ -639,25 +637,21 @@
 .mt-menu-tree-col li.mt-menu-item.is-row-hidden > .mt-menu-item-row > .mt-menu-name { color: var(--mt-text-4); }
 .mt-menu-tree-col li.mt-menu-item.is-row-hidden > .mt-menu-item-row { background: var(--mt-surface-2); }
 
-/* ----- The row itself ----- */
+/* ----- The row itself — a self-contained card, per the design mock ----- */
 .mt-menu-tree-col .mt-menu-item-row {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 8px 12px 8px 6px;
-    min-height: 42px;
+    gap: 6px;
+    padding: 9px 12px;
+    min-height: 40px;
     cursor: default;
-    background: transparent;
-    /* Neutralise the legacy admin.css .mt-menu-item-row rule (a dead
-       .mt-menu-tree block) which boxes every row in a 1px border + radius and
-       turns it primary on :hover -- that stale border fought the open item's
-       own accent bar/ring (the "broken blue line") and gave sub-rows a
-       whole-row hover outline. Borderless rows are the intended design; the
-       zero-width border also makes the leaked :hover border-color invisible,
-       so hover now only brightens the grip. */
-    border: 0;
-    border-radius: 0;
+    background: var(--mt-surface);
+    border: 1px solid var(--mt-border);
+    border-radius: 10px;
 }
+/* Keep the card border neutral on hover (admin.css turns it primary) — hover
+   feedback stays on the grip alone. */
+.mt-menu-tree-col .mt-menu-item-row:hover { border-color: var(--mt-border); }
 
 .mt-menu-grip {
     display: inline-flex;
