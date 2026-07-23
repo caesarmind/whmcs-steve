@@ -306,6 +306,11 @@
             <span data-drawer-kind>Menu item</span>
         </div>
 
+        {* Grey card wrapping the primary fields, per the design mock. The
+           heading above and the Display-and-advanced collapsible below stay
+           outside it. Styled by .mt-menu-fields; carries no id/data-attr, so
+           every JS sect selector treats it as transparent. *}
+        <div class="mt-menu-fields">
         <div class="mt-menu-sect">
             <div class="mt-menu-sect-label">Type</div>
             <div>
@@ -451,6 +456,7 @@
                 Top-nav icons render only when the global <a href="?module=Hadrian&amp;action=settings" target="_blank">Top-Nav Icons</a> setting is on. Sidebar and rail layouts always show icons.
             </div>
         </div>
+        </div>{* /.mt-menu-fields *}
 
         {* The "Advanced label" collapsible is gone: its WHMCS lang key input now
            lives in the Label section above as the Language Variable pane. Both
@@ -794,7 +800,7 @@
 .mt-menu-props {
     background: var(--mt-surface);
     border-top: 1px solid var(--mt-border-2);
-    padding: 0;
+    padding: 4px 16px 16px;
 }
 /* Editor heading: accent dot + "Menu item" / "Sub-menu item". Identifies the
    open row's depth, matching the design mock. */
@@ -806,7 +812,7 @@
     font-weight: 600;
     letter-spacing: -0.01em;
     color: var(--mt-text);
-    padding: 14px 0 4px;
+    padding: 12px 0 8px;
 }
 .mt-menu-kind-dot {
     width: 6px;
@@ -816,13 +822,29 @@
     flex-shrink: 0;
 }
 
-.mt-menu-sect {
-    display: grid;
-    grid-template-columns: 140px 1fr;
-    align-items: start;
+/* Grey rounded card wrapping the primary fields (Type / Label / Page / URL /
+   Dropdown / Icon), per the design mock. The heading sits above it and the
+   Display-and-advanced collapsible below it, both OUTSIDE the card. No overflow
+   is set, so the absolutely-positioned page / icon picker panels are not clipped. */
+.mt-menu-fields {
+    background: var(--mt-surface-2);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
     gap: 14px;
-    padding: 14px 16px 14px 32px;
-    border-top: 1px solid var(--mt-border-2);
+}
+
+/* Each field now stacks (label above control) inside the card. align-items:
+   stretch is load-bearing: .mt-icon-picker-wrap has no intrinsic width, so a
+   non-stretch column collapses the page / icon pickers to content width. */
+.mt-menu-sect {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 0;
+    border-top: 0;
 }
 .mt-menu-sect:first-child { border-top: 0; }
 .mt-menu-sect-label {
@@ -831,12 +853,12 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    padding-top: 9px;
+    padding-top: 0;
     display: flex;
     align-items: center;
     gap: 5px;
 }
-.mt-menu-sect > :not(.mt-menu-sect-label) { grid-column: 2; min-width: 0; }
+.mt-menu-sect > :not(.mt-menu-sect-label) { min-width: 0; }
 .mt-menu-sect-help { font-size: 12px; color: var(--mt-text-3); line-height: 1.5; }
 .mt-menu-sect-help em { font-style: normal; color: var(--mt-text); }
 .mt-menu-sect[data-drawer-show-when][style*="none"] { display: none; }
@@ -846,12 +868,12 @@
 .mt-menu-sect > .mt-checkbox { font-size: 13px; }
 
 /* ----- Collapsible sub-sections (Advanced label / Display & advanced) ----- */
-.mt-menu-sub { border-top: 1px solid var(--mt-border-2); background: var(--mt-surface); }
+.mt-menu-sub { border-top: 0; margin-top: 4px; background: var(--mt-surface); }
 .mt-menu-sub-h {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px 12px 32px;
+    padding: 12px 0;
     cursor: pointer;
     background: transparent;
     border: 0;
@@ -869,15 +891,15 @@
 .mt-menu-sub.is-open .mt-menu-sub-chev { color: var(--mt-primary); }
 .mt-menu-sub.is-open > .mt-menu-sub-h { color: var(--mt-primary); }
 
-/* Sub-body — left accent bar + soft primary tint show that these fields
-   belong to the section header above. Without these, the body just flows
-   inline and reads as part of the next section. */
+/* Sub-body — a neutral rounded card (matching the design mock's display-
+   settings panel), not the old blue tint + left accent bar. The section
+   header above already groups these fields; a grey card reads as "advanced,
+   set apart" without shouting in primary blue. */
 .mt-menu-sub-body {
-    padding: 14px 16px 16px 16px;
-    margin: 4px 16px 12px 32px;
-    background: var(--mt-primary-tint);
-    border-left: 3px solid var(--mt-primary);
-    border-radius: 0 6px 6px 0;
+    padding: 16px;
+    margin: 4px 0;
+    background: var(--mt-surface-2);
+    border-radius: 12px;
 }
 .mt-menu-sub-body[hidden] { display: none; }
 .mt-menu-sub-body .mt-field { margin-bottom: 12px; }
@@ -914,8 +936,7 @@
 
 @media (max-width: 640px) {
     .mt-menu-grip { display: none; } /* hide on touch — use up/down buttons */
-    .mt-menu-sect { grid-template-columns: 1fr; padding-left: 16px; gap: 6px; }
-    .mt-menu-sub-h, .mt-menu-sub-body { padding-left: 16px; }
+    .mt-menu-props { padding-left: 12px; padding-right: 12px; }
     .mt-menu-tree-col ul.mt-menu-children { margin-left: 12px; padding-left: 8px; }
 }
 </style>
