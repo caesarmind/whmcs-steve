@@ -578,7 +578,7 @@
 .mt-menu-add-as { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .mt-menu-add-as label { font-size: 12px; color: var(--mt-text-3); }
 .mt-menu-tree-col .mt-menu-add-as .mt-select { flex: 0 0 auto; width: auto; min-width: 150px; }
-.mt-menu-tree-col ul.mt-menu-children { list-style: none; margin: 6px 0 6px 24px; padding: 0; display: flex; flex-direction: column; gap: 6px; background: transparent; }
+.mt-menu-tree-col ul.mt-menu-children { list-style: none; margin: 6px 0 6px 24px; padding: 0; border-left: 0; display: flex; flex-direction: column; gap: 6px; background: transparent; }
 .mt-menu-tree-col ul.mt-menu-children:empty { display: none; }
 
 /* Per-level add band. Indented to the children rail (22px margin + 12px pad on
