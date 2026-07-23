@@ -457,4 +457,102 @@
     window.addEventListener('resize', function(){ if (sel) place(); });
 })();
 </script>
+
+<script>
+/* Info tooltips. ONE body-level panel shared by every .mt-tip button (authored
+   in markup via includes/tip.tpl). Shows on hover AND focus, so it is keyboard
+   reachable; dismissed on Escape, blur, scroll-away or resize. Copy comes from
+   data-tip. Its own script element so a parse error cannot take down the shared
+   admin script or the select popup above. */
+(function(){
+    var root = document.getElementById('mt-admin-root');
+    if (!root) return;
+
+    var pop = null, arrow = null, cur = null, hideT = null;
+
+    function build(){
+        pop = document.createElement('div');
+        pop.className = 'mt-wrap mt-tip-pop';
+        pop.setAttribute('role', 'tooltip');
+        arrow = document.createElement('div');
+        arrow.className = 'mt-tip-arrow';
+        pop.appendChild(arrow);
+        var txt = document.createElement('span');
+        txt.className = 'mt-tip-txt';
+        pop.appendChild(txt);
+        pop._txt = txt;
+        document.body.appendChild(pop);
+        // A hover onto the panel itself keeps it open (so it can be read/copied).
+        pop.addEventListener('mouseenter', function(){ clearTimeout(hideT); });
+        pop.addEventListener('mouseleave', hideSoon);
+    }
+    function place(btn){
+        var r = btn.getBoundingClientRect();
+        pop.style.visibility = 'hidden'; pop.style.display = 'block';
+        pop.style.left = '0px'; pop.style.top = '0px';
+        var ph = pop.offsetHeight, pw = pop.offsetWidth;
+        var below = window.innerHeight - r.bottom - 10, above = r.top - 10;
+        var side = (ph <= below || below >= above) ? 'bottom' : 'top';
+        pop.setAttribute('data-side', side);
+        var top = side === 'bottom' ? r.bottom + 8 : r.top - ph - 8;
+        var mid = r.left + r.width / 2;
+        var left = Math.max(8, Math.min(mid - pw / 2, window.innerWidth - pw - 8));
+        pop.style.top = Math.max(8, Math.min(top, window.innerHeight - ph - 8)) + 'px';
+        pop.style.left = left + 'px';
+        // Arrow tracks the trigger centre within the panel.
+        var ax = Math.max(8, Math.min(mid - left - 4, pw - 16));
+        arrow.style.left = ax + 'px'; arrow.style.right = 'auto';
+        pop.style.visibility = '';
+    }
+    function show(btn){
+        clearTimeout(hideT);
+        if (cur === btn) return;
+        if (!pop) build();
+        cur = btn;
+        pop._txt.textContent = btn.getAttribute('data-tip') || '';
+        pop.setAttribute('data-theme', root.getAttribute('data-theme') || 'light');
+        btn.setAttribute('data-open', '');
+        pop.style.display = 'block';
+        place(btn);
+    }
+    function hide(){
+        clearTimeout(hideT);
+        if (!cur) return;
+        cur.removeAttribute('data-open');
+        if (pop) pop.style.display = 'none';
+        cur = null;
+    }
+    function hideSoon(){ clearTimeout(hideT); hideT = setTimeout(hide, 120); }
+
+    document.addEventListener('mouseover', function(e){
+        var btn = e.target.closest && e.target.closest('.mt-tip');
+        if (btn) show(btn);
+    }, true);
+    document.addEventListener('mouseout', function(e){
+        var btn = e.target.closest && e.target.closest('.mt-tip');
+        if (btn && !(pop && pop.contains(e.relatedTarget))) hideSoon();
+    }, true);
+    document.addEventListener('focusin', function(e){
+        var btn = e.target.closest && e.target.closest('.mt-tip');
+        if (btn) show(btn); else if (cur) hide();
+    }, true);
+    document.addEventListener('focusout', function(e){
+        var btn = e.target.closest && e.target.closest('.mt-tip');
+        if (btn) hideSoon();
+    }, true);
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && cur){ hide(); }
+    }, true);
+    /* A fixed panel must re-anchor, not drift, and must ignore scrolls from
+       inside itself. Hide when the trigger scrolls out of view. */
+    window.addEventListener('scroll', function(e){
+        if (!cur) return;
+        if (pop && e.target && e.target.nodeType === 1 && pop.contains(e.target)) return;
+        var r = cur.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > window.innerHeight){ hide(); return; }
+        place(cur);
+    }, true);
+    window.addEventListener('resize', function(){ if (cur) place(cur); });
+})();
+</script>
 {/literal}

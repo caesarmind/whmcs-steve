@@ -360,7 +360,7 @@
         </div>
 
         <div class="mt-menu-sect" data-drawer-show-when="whmcs_page">
-            <div class="mt-menu-sect-label">WHMCS Page</div>
+            <div class="mt-menu-sect-label mt-tip-line">WHMCS Page {include file="includes/tip.tpl" text="The built-in WHMCS page this item opens. Its link is filled in for you."}</div>
             <div class="mt-icon-picker-wrap">
                 <button type="button" class="mt-icon-picker-trigger" id="drawerPagePickerBtn">
                     <span class="mt-page-picker-current" id="drawerPagePickerLabel">— Choose a page —</span>
@@ -398,7 +398,7 @@
         </div>
 
         <div class="mt-menu-sect" data-drawer-show-when="custom_link">
-            <div class="mt-menu-sect-label">URL</div>
+            <div class="mt-menu-sect-label mt-tip-line">URL {include file="includes/tip.tpl" text="Any internal path or a full external link, for example https://example.com."}</div>
             <input id="drawerUrl" class="mt-input" type="text" placeholder="https://…" data-drawer-field="config.url">
             <label class="mt-checkbox" style="margin-top:8px">
                 <input type="checkbox" data-drawer-field="config.target" data-drawer-checkbox-value="_blank"> Open in new tab
@@ -458,7 +458,7 @@
             </button>
             <div class="mt-menu-sub-body" hidden>
                 <div class="mt-field">
-                    <label class="mt-field-label" for="drawerPosition">Position</label>
+                    <span class="mt-tip-line"><label class="mt-field-label" for="drawerPosition">Position</label>{include file="includes/tip.tpl" text="Move this item to the right of the top navigation. Only the top-nav layout uses this; other layouts ignore it."}</span>
                     <select id="drawerPosition" class="mt-select" data-drawer-field="config.position_side">
                         <option value="">Auto</option>
                         <option value="left">Left</option>
@@ -467,7 +467,7 @@
                 </div>
 
                 <div class="mt-field">
-                    <label class="mt-field-label" for="drawerAudience">Visible to (per-item)</label>
+                    <span class="mt-tip-line"><label class="mt-field-label" for="drawerAudience">Visible to (per-item)</label>{include file="includes/tip.tpl" text="Show this item to everyone, only to signed-in clients, or only to guests."}</span>
                     <select id="drawerAudience" class="mt-select" data-drawer-field="config.audience">
                         <option value="all">All</option>
                         <option value="client">Clients only</option>

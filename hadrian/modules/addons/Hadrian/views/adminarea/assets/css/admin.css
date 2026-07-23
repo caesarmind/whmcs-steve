@@ -445,6 +445,40 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
     .mt-selpop-dot { forced-color-adjust: none; outline: 1px solid CanvasText; }
 }
 
+/* -- Info tooltip --------------------------------------------------------- */
+/* Trigger is a real <button> authored in markup via includes/tip.tpl. The popup
+   is ONE body-level panel, same shape as .mt-selpop above: .mt-wrap carries the
+   tokens, data-theme is copied on open, min-height/padding re-asserted because
+   .mt-wrap sets 70vh + padding. z-index 10000 clears the select popup's 9999. */
+.mt-tip-line { display: inline-flex; align-items: center; gap: 4px; }
+.mt-tip { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; margin: -4px -4px -4px 0;   /* 20px target, no layout shift */
+    padding: 0; border: 0; background: none; border-radius: 50%;
+    color: var(--mt-text-3); cursor: help; -webkit-appearance: none; appearance: none;
+    vertical-align: middle; }
+.mt-tip svg { width: 12px; height: 12px; display: block; }
+.mt-tip:hover, .mt-tip[data-open] { color: var(--mt-text-2); }
+.mt-tip:focus-visible { outline: 2px solid var(--mt-primary); outline-offset: -2px; border-radius: 50%; }
+/* On the uppercase 11px section eyebrows a 12px glyph overshoots the cap. */
+.mt-menu-sect-label .mt-tip svg { width: 10px; height: 10px; }
+
+.mt-tip-pop { position: fixed; z-index: 10000; display: none;
+    min-height: 0; padding: 9px 12px;
+    max-width: min(280px, calc(100vw - 16px));
+    background: var(--mt-surface); color: var(--mt-text-2);
+    border: 1px solid var(--mt-border); border-radius: var(--mt-radius-sm);
+    box-shadow: var(--mt-shadow-dropdown);
+    font-size: 12.5px; font-weight: 400; line-height: 1.45;
+    letter-spacing: 0; text-transform: none; text-align: left; }
+.mt-tip-arrow { position: absolute; width: 8px; height: 8px; background: var(--mt-surface);
+    border-left: 1px solid var(--mt-border); border-top: 1px solid var(--mt-border); }
+.mt-tip-pop[data-side="bottom"] .mt-tip-arrow { top: -5px; transform: rotate(45deg); }
+.mt-tip-pop[data-side="top"]    .mt-tip-arrow { bottom: -5px; transform: rotate(225deg); }
+@media (forced-colors: active) {
+    .mt-tip-pop { border: 1px solid CanvasText; }
+    .mt-tip[data-open] { forced-color-adjust: none; outline: 1px solid Highlight; }
+}
+
 /* -- Empty state ---------------------------------------------------------- */
 .mt-empty { text-align: center; padding: 48px 20px; color: var(--mt-text-2); }
 .mt-empty-icon { width: 44px; height: 44px; margin: 0 auto 14px; color: var(--mt-text-3); }
