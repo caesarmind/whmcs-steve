@@ -298,6 +298,14 @@
 <div id="mtPanelHome" hidden>
     <div id="mtItemDrawer" class="mt-menu-props">
 
+        {* Identifies whether the open editor is a top-level item or a nested
+           one. Text is set by openInlinePanel from the row's depth, matching the
+           design mock's "Menu item" / "Sub-menu item" heading. *}
+        <div class="mt-menu-kind">
+            <span class="mt-menu-kind-dot" aria-hidden="true"></span>
+            <span data-drawer-kind>Menu item</span>
+        </div>
+
         <div class="mt-menu-sect">
             <div class="mt-menu-sect-label">Type</div>
             <div>
@@ -787,6 +795,25 @@
     background: var(--mt-surface);
     border-top: 1px solid var(--mt-border-2);
     padding: 0;
+}
+/* Editor heading: accent dot + "Menu item" / "Sub-menu item". Identifies the
+   open row's depth, matching the design mock. */
+.mt-menu-kind {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--mt-text);
+    padding: 14px 0 4px;
+}
+.mt-menu-kind-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--mt-primary);
+    flex-shrink: 0;
 }
 
 .mt-menu-sect {
@@ -1358,6 +1385,12 @@
         slot.hidden = false;
         li.classList.add('is-open');
         selectedTempId = tempId;
+        // Label the editor by depth: anything inside a children list is a
+        // sub-menu item. closest() walks up, so grandchildren read the same.
+        var kindEl = panel.querySelector('[data-drawer-kind]');
+        if (kindEl) {
+            kindEl.textContent = li.closest('ul.mt-menu-children') ? 'Sub-menu item' : 'Menu item';
+        }
         populatePanelFromEntry(tempId);
     }
 
