@@ -247,7 +247,7 @@
                 <div class="mt-menu-add-row">
                     <button type="button" class="mt-menu-add" id="mtAddBtn"><span class="mt-menu-add-plus" aria-hidden="true">+</span> Add item</button>
                     <div class="mt-menu-add-as">
-                        <label for="mtAddType">Add as</label>
+                        <label for="mtAddType">Add As</label>
                         <select class="mt-select mt-input-compact" id="mtAddType" aria-label="Item type to add">
                             {foreach $itemTypes as $key => $meta}
                                 <option value="{$key|escape}">{$meta.label|escape}</option>
@@ -306,7 +306,7 @@
            design mock's heading. *}
         <div class="mt-menu-kind">
             <span class="mt-menu-kind-dot" aria-hidden="true"></span>
-            <span data-drawer-kind>Menu item</span>
+            <span data-drawer-kind>Menu Item</span>
         </div>
 
         {* Grey card wrapping the primary fields. The Display & advanced
@@ -374,7 +374,7 @@
         </div>
 
         <div class="mt-menu-sect" data-drawer-show-when="dropdown_parent">
-            <div class="mt-menu-sect-label mt-tip-line">Dropdown style {include file="includes/tip.tpl" text="Classic is a simple floating list; Mega menu is a wide, multi-column panel."}</div>
+            <div class="mt-menu-sect-label mt-tip-line">Dropdown Style {include file="includes/tip.tpl" text="Classic is a simple floating list; Mega menu is a wide, multi-column panel."}</div>
             <select id="drawerDropdown" class="mt-select" data-drawer-field="config.dropdown_style">
                 <option value="default">Default (classic)</option>
                 <option value="mega">Mega menu</option>
@@ -477,13 +477,13 @@
            via data-drawer-field; the frontend does not consume them yet. *}
         <div class="mt-menu-sub" data-sub="label" data-section="name">
             <button type="button" class="mt-menu-sub-h">
-                <span class="mt-menu-sub-title"><span class="mt-menu-sub-dot" aria-hidden="true"></span><span data-drawer-kind-suffix>Menu item</span> label</span>
+                <span class="mt-menu-sub-title"><span class="mt-menu-sub-dot" aria-hidden="true"></span><span data-drawer-kind-suffix>Menu Item</span> Label</span>
                 <span class="mt-menu-sub-chev"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </button>
             <div class="mt-menu-sub-body" hidden>
                 <div class="mt-menu-sub-row">
                     <div class="mt-field">
-                        <span class="mt-tip-line"><label class="mt-field-label" for="drawerTextTransform">Text transform</label>{include file="includes/tip.tpl" text="Force the label case: leave as-is, all caps, or capitalize each word."}</span>
+                        <span class="mt-tip-line"><label class="mt-field-label" for="drawerTextTransform">Text Transform</label>{include file="includes/tip.tpl" text="Force the label case: leave as-is, all caps, or capitalize each word."}</span>
                         <select id="drawerTextTransform" class="mt-select" data-drawer-field="config.text_transform">
                             <option value="">None</option>
                             <option value="uppercase">Uppercase</option>
@@ -497,7 +497,7 @@
                 </div>
                 <div class="mt-row">
                     <div>
-                        <div class="mt-row-label">Hide label text</div>
+                        <div class="mt-row-label">Hide Label Text</div>
                         <div class="mt-row-help">Show only the icon (icon layouts).</div>
                     </div>
                     <label class="mt-toggle"><input type="checkbox" data-drawer-field="config.hide_label"><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></label>
@@ -508,7 +508,7 @@
         {* COLLAPSIBLE — {depth} display settings *}
         <div class="mt-menu-sub" data-sub="display" data-section="display">
             <button type="button" class="mt-menu-sub-h">
-                <span class="mt-menu-sub-title"><span class="mt-menu-sub-dot" aria-hidden="true"></span><span data-drawer-kind-suffix>Menu item</span> display settings</span>
+                <span class="mt-menu-sub-title"><span class="mt-menu-sub-dot" aria-hidden="true"></span><span data-drawer-kind-suffix>Menu Item</span> Display Settings</span>
                 <span class="mt-menu-sub-chev"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </button>
             <div class="mt-menu-sub-body" hidden>
@@ -522,7 +522,7 @@
                 </div>
 
                 <div class="mt-field">
-                    <span class="mt-tip-line"><label class="mt-field-label" for="drawerAudience">Visible to (per-item)</label>{include file="includes/tip.tpl" text="Show this item to everyone, only to signed-in clients, or only to guests."}</span>
+                    <span class="mt-tip-line"><label class="mt-field-label" for="drawerAudience">Visible To (Per-Item)</label>{include file="includes/tip.tpl" text="Show this item to everyone, only to signed-in clients, or only to guests."}</span>
                     <select id="drawerAudience" class="mt-select" data-drawer-field="config.audience">
                         <option value="all">All</option>
                         <option value="client">Clients only</option>
@@ -539,7 +539,7 @@
                 </div>
 
                 <div class="mt-field">
-                    <label class="mt-field-label" for="drawerCss">Custom CSS class</label>
+                    <label class="mt-field-label" for="drawerCss">Custom CSS Class</label>
                     <input id="drawerCss" class="mt-input" type="text" data-drawer-field="config.css_class" placeholder="e.g. highlight-item">
                 </div>
 
@@ -549,7 +549,7 @@
                    this toggle exactly as it did to the old checkbox. *}
                 <div class="mt-row">
                     <div>
-                        <div class="mt-row-label">Show in menu</div>
+                        <div class="mt-row-label">Show In Menu</div>
                         <div class="mt-row-help">Uncheck to keep the item saved but hidden from the rendered menu.</div>
                     </div>
                     <label class="mt-toggle"><input type="checkbox" data-drawer-field="active"><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></label>
@@ -1514,7 +1514,7 @@
         // Label the editor by depth: anything inside a children list is a
         // sub-menu item. closest() walks up, so grandchildren read the same.
         // One selector covers the top heading AND both collapsible-title suffixes.
-        var kindText = li.closest('ul.mt-menu-children') ? 'Sub-menu item' : 'Menu item';
+        var kindText = li.closest('ul.mt-menu-children') ? 'Sub-Menu Item' : 'Menu Item';
         panel.querySelectorAll('[data-drawer-kind], [data-drawer-kind-suffix]').forEach(function(el){ el.textContent = kindText; });
         populatePanelFromEntry(tempId);
     }
