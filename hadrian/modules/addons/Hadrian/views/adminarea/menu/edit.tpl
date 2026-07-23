@@ -612,8 +612,8 @@
 .mt-menu-tree-col li.mt-menu-item.is-open {
     background: var(--mt-surface);
     border-radius: 8px;
-    /* Inset 3px left bar (accent) + 1px gray ring around the open item. */
-    box-shadow: inset 3px 0 0 var(--mt-primary), 0 0 0 1px var(--mt-border);
+    /* 1px gray ring around the open item — no blue accent bar. */
+    box-shadow: 0 0 0 1px var(--mt-border);
     z-index: 1;
 }
 /* Suppress the hairline above the sibling immediately after an open item —
