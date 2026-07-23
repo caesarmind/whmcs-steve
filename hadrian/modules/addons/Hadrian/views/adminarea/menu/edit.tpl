@@ -301,6 +301,14 @@
 <div id="mtPanelHome" hidden>
     <div id="mtItemDrawer" class="mt-menu-props">
 
+        {* Depth heading: accent dot + "Menu item" / "Sub-menu item". Its text
+           is set by openInlinePanel from the open row's depth, matching the
+           design mock's heading. *}
+        <div class="mt-menu-kind">
+            <span class="mt-menu-kind-dot" aria-hidden="true"></span>
+            <span data-drawer-kind>Menu item</span>
+        </div>
+
         {* Grey card wrapping the primary fields. The Display & advanced
            collapsible below stays outside it. .mt-menu-fields carries no
            id/data-attr, so every JS sect selector treats it as transparent. *}
@@ -315,47 +323,6 @@
                 </select>
                 <div class="mt-menu-sect-help" style="margin-top:6px">
                     Changing the type hides fields that don't apply. Existing label / icon / URL values are kept in case you switch back.
-                </div>
-            </div>
-        </div>
-
-        {* Label source, Lagom-style: Custom String (translatable) OR Language
-           Variable. The radios carry NO name= on purpose -- the panel moves
-           inside #menuForm, so a name would post and count against
-           max_input_vars. Grouping is done in JS. *}
-        <div class="mt-menu-sect" data-section="name">
-            <div class="mt-menu-sect-label mt-label-head">
-                <span class="mt-label-head-title">Name {include file="includes/tip.tpl" text="Use a custom string, or a WHMCS language variable key so the label follows the client's language."}</span>
-                {if $extraLocales}
-                    <button type="button" class="mt-translate-btn" data-translate-toggle aria-expanded="false">Translate<span class="mt-translate-count" data-translate-count hidden></span></button>
-                {/if}
-            </div>
-            <div class="mt-label-block" role="radiogroup" aria-label="Label source">
-                <label class="mt-label-mode">
-                    <input type="radio" data-drawer-field="label.mode" data-drawer-radio-value="custom" value="custom">
-                    <span>Custom String</span>
-                </label>
-                <div class="mt-label-pane" data-label-pane="custom">
-                    <input id="drawerLabelEn" class="mt-input" type="text" data-drawer-field="label.custom.english" placeholder="English label">
-                    {if $extraLocales}
-                        <div class="mt-translate-body" data-translate-body hidden>
-                            {foreach $extraLocales as $code}
-                                <div class="mt-translate-row">
-                                    <label class="mt-translate-lang" for="drawerLabel_{$code|escape}">{$code|ucfirst|escape}</label>
-                                    <input id="drawerLabel_{$code|escape}" class="mt-input" type="text" data-drawer-field="label.custom.{$code|escape}" data-translate-input placeholder="Leave empty to use the English label">
-                                </div>
-                            {/foreach}
-                        </div>
-                    {/if}
-                </div>
-
-                <label class="mt-label-mode">
-                    <input type="radio" data-drawer-field="label.mode" data-drawer-radio-value="whmcs" value="whmcs">
-                    <span>Language Variable</span>
-                </label>
-                <div class="mt-label-pane" data-label-pane="whmcs" hidden>
-                    <input id="drawerLabelWhmcs" class="mt-input" type="text" placeholder="e.g. navhome" data-drawer-field="label.whmcs">
-                    <div class="mt-menu-sect-help">Use a language variable so the label translates across your installed languages. If WHMCS does not know the key, the key itself is shown.</div>
                 </div>
             </div>
         </div>
@@ -418,6 +385,61 @@
             </div>
         </div>
 
+        {* Label source, Lagom-style: Custom String (translatable) OR Language
+           Variable. The radios carry NO name= on purpose -- the panel moves
+           inside #menuForm, so a name would post and count against
+           max_input_vars. Grouping is done in JS. This sits AFTER the type-
+           conditional Page / URL / Dropdown fields, per the design mock's
+           Type -> Page -> Name -> Description -> Icon order. *}
+        <div class="mt-menu-sect" data-section="name">
+            <div class="mt-menu-sect-label mt-label-head">
+                <span class="mt-label-head-title">Name {include file="includes/tip.tpl" text="Use a custom string, or a WHMCS language variable key so the label follows the client's language."}</span>
+                {if $extraLocales}
+                    <button type="button" class="mt-translate-btn" data-translate-toggle aria-expanded="false">Translate<span class="mt-translate-count" data-translate-count hidden></span></button>
+                {/if}
+            </div>
+            <div class="mt-label-block" role="radiogroup" aria-label="Label source">
+                <label class="mt-label-mode">
+                    <input type="radio" data-drawer-field="label.mode" data-drawer-radio-value="custom" value="custom">
+                    <span>Custom String</span>
+                </label>
+                <div class="mt-label-pane" data-label-pane="custom">
+                    <input id="drawerLabelEn" class="mt-input" type="text" data-drawer-field="label.custom.english" placeholder="English label">
+                    {if $extraLocales}
+                        <div class="mt-translate-body" data-translate-body hidden>
+                            {foreach $extraLocales as $code}
+                                <div class="mt-translate-row">
+                                    <label class="mt-translate-lang" for="drawerLabel_{$code|escape}">{$code|ucfirst|escape}</label>
+                                    <input id="drawerLabel_{$code|escape}" class="mt-input" type="text" data-drawer-field="label.custom.{$code|escape}" data-translate-input placeholder="Leave empty to use the English label">
+                                </div>
+                            {/foreach}
+                        </div>
+                    {/if}
+                </div>
+
+                <label class="mt-label-mode">
+                    <input type="radio" data-drawer-field="label.mode" data-drawer-radio-value="whmcs" value="whmcs">
+                    <span>Language Variable</span>
+                </label>
+                <div class="mt-label-pane" data-label-pane="whmcs" hidden>
+                    <input id="drawerLabelWhmcs" class="mt-input" type="text" placeholder="e.g. navhome" data-drawer-field="label.whmcs">
+                    <div class="mt-menu-sect-help">Use a language variable so the label translates across your installed languages. If WHMCS does not know the key, the key itself is shown.</div>
+                </div>
+            </div>
+        </div>
+
+        {* Description -- persists to config.description via data-drawer-field
+           (saved automatically by the panel's change handler). Not yet rendered
+           on the frontend; that is an accepted follow-up. The Translate control
+           is intentionally inert (disabled), mirroring the design mock. *}
+        <div class="mt-menu-sect" data-section="name">
+            <div class="mt-menu-sect-label mt-label-head">
+                <span class="mt-label-head-title">Description</span>
+                <button type="button" class="mt-translate-btn" disabled aria-disabled="true" title="Description translation is not available yet">Translate</button>
+            </div>
+            <textarea id="drawerDescription" class="mt-textarea" rows="2" data-drawer-field="config.description" placeholder="Optional — shown in mega-menu and rail tooltips."></textarea>
+        </div>
+
         <div class="mt-menu-sect" data-section="icon">
             <div class="mt-menu-sect-label mt-tip-line">Icon {include file="includes/tip.tpl" text="Shown on sidebar and rail layouts always; on the top nav only when Top-Nav Icons is enabled."}</div>
             <div class="mt-icon-picker-wrap">
@@ -446,16 +468,47 @@
         </div>
         </div>{* /.mt-menu-fields *}
 
-        {* The "Advanced label" collapsible is gone: its WHMCS lang key input now
-           lives in the Label section above as the Language Variable pane. Both
-           its old help text and the old Name help asserted the OPPOSITE of what
-           resolvedLabel() actually did -- an explicit label.mode replaces the
-           guesswork. *}
+        {* COLLAPSIBLE -- {depth} label. The old "Advanced label" collapsible
+           that held the WHMCS lang key is gone (that key now lives in the Name
+           section's Language Variable pane). This is the design mock's per-label
+           styling: text transform, badge, and hide-label. data-section="name"
+           hides it for name-less types (divider, language, ...), exactly like
+           the Name field. text_transform / badge / hide_label persist to config
+           via data-drawer-field; the frontend does not consume them yet. *}
+        <div class="mt-menu-sub" data-sub="label" data-section="name">
+            <button type="button" class="mt-menu-sub-h">
+                <span class="mt-menu-sub-title"><span class="mt-menu-sub-dot" aria-hidden="true"></span><span data-drawer-kind-suffix>Menu item</span> label</span>
+                <span class="mt-menu-sub-chev"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </button>
+            <div class="mt-menu-sub-body" hidden>
+                <div class="mt-menu-sub-row">
+                    <div class="mt-field">
+                        <span class="mt-tip-line"><label class="mt-field-label" for="drawerTextTransform">Text transform</label>{include file="includes/tip.tpl" text="Force the label case: leave as-is, all caps, or capitalize each word."}</span>
+                        <select id="drawerTextTransform" class="mt-select" data-drawer-field="config.text_transform">
+                            <option value="">None</option>
+                            <option value="uppercase">Uppercase</option>
+                            <option value="capitalize">Capitalize</option>
+                        </select>
+                    </div>
+                    <div class="mt-field">
+                        <span class="mt-tip-line"><label class="mt-field-label" for="drawerBadge">Badge</label>{include file="includes/tip.tpl" text="A small pill shown next to the label, for example New or a count."}</span>
+                        <input id="drawerBadge" class="mt-input" type="text" data-drawer-field="config.badge" placeholder="e.g. New">
+                    </div>
+                </div>
+                <div class="mt-row">
+                    <div>
+                        <div class="mt-row-label">Hide label text</div>
+                        <div class="mt-row-help">Show only the icon (icon layouts).</div>
+                    </div>
+                    <label class="mt-toggle"><input type="checkbox" data-drawer-field="config.hide_label"><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></label>
+                </div>
+            </div>
+        </div>
 
-        {* COLLAPSIBLE — Display & Advanced settings *}
+        {* COLLAPSIBLE — {depth} display settings *}
         <div class="mt-menu-sub" data-sub="display" data-section="display">
             <button type="button" class="mt-menu-sub-h">
-                <span>Display &amp; advanced</span>
+                <span class="mt-menu-sub-title"><span class="mt-menu-sub-dot" aria-hidden="true"></span><span data-drawer-kind-suffix>Menu item</span> display settings</span>
                 <span class="mt-menu-sub-chev"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </button>
             <div class="mt-menu-sub-body" hidden>
@@ -487,14 +540,19 @@
 
                 <div class="mt-field">
                     <label class="mt-field-label" for="drawerCss">Custom CSS class</label>
-                    <input id="drawerCss" class="mt-input" type="text" data-drawer-field="config.css_class">
+                    <input id="drawerCss" class="mt-input" type="text" data-drawer-field="config.css_class" placeholder="e.g. highlight-item">
                 </div>
 
-                {* The "Visible" checkbox mirrors the row-level toggle.
-                   We keep it in the panel for keyboard/discoverability —
-                   the row toggle handles the common case. *}
-                <div class="mt-field">
-                    <label class="mt-checkbox"><input type="checkbox" data-drawer-field="active"> Show in menu</label>
+                {* Mirrors the row-level visibility toggle; kept here for
+                   keyboard / discoverability. data-drawer-field="active" is
+                   unchanged, so the panel <-> row mirror logic still applies to
+                   this toggle exactly as it did to the old checkbox. *}
+                <div class="mt-row">
+                    <div>
+                        <div class="mt-row-label">Show in menu</div>
+                        <div class="mt-row-help">Uncheck to keep the item saved but hidden from the rendered menu.</div>
+                    </div>
+                    <label class="mt-toggle"><input type="checkbox" data-drawer-field="active"><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></label>
                 </div>
             </div>
         </div>
@@ -807,7 +865,26 @@
 .mt-menu-props {
     background: var(--mt-surface);
     border-top: 1px solid var(--mt-border-2);
-    padding: 12px 16px 16px;
+    padding: 4px 16px 16px;
+}
+/* Depth heading: accent dot + "Menu item" / "Sub-menu item". Its text is set by
+   openInlinePanel from the open row's depth, matching the design mock. */
+.mt-menu-kind {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--mt-text);
+    padding: 12px 0 8px;
+}
+.mt-menu-kind-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--mt-primary);
+    flex-shrink: 0;
 }
 
 /* Grey rounded card wrapping the primary fields (Type / Label / Page / URL /
@@ -850,6 +927,7 @@
 .mt-menu-sect[data-drawer-show-when][style*="none"] { display: none; }
 
 .mt-menu-sect .mt-input,
+.mt-menu-sect .mt-textarea,
 .mt-menu-sect .mt-select { width: 100%; }
 .mt-menu-sect > .mt-checkbox { font-size: 13px; }
 /* Compact field metrics to match the design mock's editor card (13px / 9px 11px
@@ -884,6 +962,12 @@
 .mt-menu-sub-chev svg { width: 12px; height: 12px; transition: transform .15s; }
 .mt-menu-sub.is-open .mt-menu-sub-chev svg { transform: rotate(90deg); color: var(--mt-primary); }
 .mt-menu-sub.is-open .mt-menu-sub-chev { color: var(--mt-primary); }
+/* Collapsible title: a leading depth dot (text-4 at rest, accent when open)
+   next to the depth-prefixed label / display-settings title. The title text
+   itself stays a calm dark label -- only the dot + chevron signal open state. */
+.mt-menu-sub-title { display: inline-flex; align-items: center; gap: 9px; }
+.mt-menu-sub-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mt-text-4); flex-shrink: 0; }
+.mt-menu-sub.is-open .mt-menu-sub-dot { background: var(--mt-primary); }
 
 /* Sub-body — a neutral rounded card (matching the design mock's display-
    settings panel), not the old blue tint + left accent bar. The section
@@ -900,6 +984,16 @@
 .mt-menu-sub-body .mt-field:last-child { margin-bottom: 0; }
 .mt-menu-sub-body .mt-field-label { color: var(--mt-text-2); font-size: 11.5px; }
 .mt-menu-sub-body .mt-field-help { font-size: 11px; }
+/* Two-up field row (Text transform + Badge), per the mock's label card. Wraps
+   to one column on narrow widths. */
+.mt-menu-sub-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.mt-menu-sub-row > .mt-field { flex: 1 1 150px; margin-bottom: 0; }
+/* SetRow (title + help left, toggle right) inside a sub-body card. Strip the
+   global .mt-row hairline + tall padding so it fits the compact drawer scale,
+   and pull its type down to the drawer's 12.5 / 11px metrics. */
+.mt-menu-sub-body .mt-row { border-bottom: 0; padding: 0; gap: 16px; }
+.mt-menu-sub-body .mt-row-label { font-size: 12.5px; font-weight: 600; }
+.mt-menu-sub-body .mt-row-help { font-size: 11px; margin-top: 2px; max-width: none; }
 
 /* ----- Label source: Custom String | Language Variable -----
    Every opening brace below is followed by a space. This style block is NOT
@@ -931,6 +1025,7 @@
 #drawerIconBtn .mt-icon-assign-plus { font-size: 15px; line-height: 1; }
 .mt-translate-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--mt-primary); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 6px 4px; }
 .mt-translate-btn:hover { text-decoration: underline; }
+.mt-translate-btn:disabled { opacity: 0.4; cursor: default; text-decoration: none; }
 .mt-translate-count { display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px; background: var(--mt-primary-tint); color: var(--mt-primary); font-size: 11px; font-weight: 600; }
 .mt-translate-count[hidden] { display: none; }
 .mt-translate-body { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; padding: 10px 12px; border: 1px dashed var(--mt-border); border-radius: 10px; }
@@ -1416,6 +1511,11 @@
         slot.hidden = false;
         li.classList.add('is-open');
         selectedTempId = tempId;
+        // Label the editor by depth: anything inside a children list is a
+        // sub-menu item. closest() walks up, so grandchildren read the same.
+        // One selector covers the top heading AND both collapsible-title suffixes.
+        var kindText = li.closest('ul.mt-menu-children') ? 'Sub-menu item' : 'Menu item';
+        panel.querySelectorAll('[data-drawer-kind], [data-drawer-kind-suffix]').forEach(function(el){ el.textContent = kindText; });
         populatePanelFromEntry(tempId);
     }
 
