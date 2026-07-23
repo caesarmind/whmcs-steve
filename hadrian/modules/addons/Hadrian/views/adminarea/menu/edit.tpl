@@ -312,7 +312,7 @@
            every JS sect selector treats it as transparent. *}
         <div class="mt-menu-fields">
         <div class="mt-menu-sect">
-            <div class="mt-menu-sect-label">Type</div>
+            <div class="mt-menu-sect-label mt-tip-line">Type {include file="includes/tip.tpl" text="What this item is. The fields below change to match the type you pick."}</div>
             <div>
                 <select id="drawerType" class="mt-select" data-drawer-field="item_type">
                     {foreach $itemTypes as $key => $meta}
@@ -330,28 +330,20 @@
            inside #menuForm, so a name would post and count against
            max_input_vars. Grouping is done in JS. *}
         <div class="mt-menu-sect" data-section="name">
-            <div class="mt-menu-sect-label">Label</div>
-            <div class="mt-label-block">
-                <div class="mt-label-modes" role="radiogroup" aria-label="Label source">
-                    <label class="mt-label-mode">
-                        <input type="radio" data-drawer-field="label.mode" data-drawer-radio-value="custom" value="custom">
-                        <span>Custom String</span>
-                    </label>
-                    <label class="mt-label-mode">
-                        <input type="radio" data-drawer-field="label.mode" data-drawer-radio-value="whmcs" value="whmcs">
-                        <span>Language Variable</span>
-                    </label>
-                </div>
-
+            <div class="mt-menu-sect-label mt-label-head">
+                <span class="mt-label-head-title">Name {include file="includes/tip.tpl" text="Use a custom string, or a WHMCS language variable key so the label follows the client's language."}</span>
+                {if $extraLocales}
+                    <button type="button" class="mt-translate-btn" data-translate-toggle aria-expanded="false">Translate<span class="mt-translate-count" data-translate-count hidden></span></button>
+                {/if}
+            </div>
+            <div class="mt-label-block" role="radiogroup" aria-label="Label source">
+                <label class="mt-label-mode">
+                    <input type="radio" data-drawer-field="label.mode" data-drawer-radio-value="custom" value="custom">
+                    <span>Custom String</span>
+                </label>
                 <div class="mt-label-pane" data-label-pane="custom">
-                    <div class="mt-label-row">
-                        <input id="drawerLabelEn" class="mt-input" type="text" data-drawer-field="label.custom.english" placeholder="English label">
-                        {if $extraLocales}
-                            <button type="button" class="mt-translate-btn" data-translate-toggle aria-expanded="false">Translate<span class="mt-translate-count" data-translate-count hidden></span></button>
-                        {/if}
-                    </div>
+                    <input id="drawerLabelEn" class="mt-input" type="text" data-drawer-field="label.custom.english" placeholder="English label">
                     {if $extraLocales}
-                        <div class="mt-menu-sect-help">Use the custom string, which can then be translated into different languages using the Translate button on the right.</div>
                         <div class="mt-translate-body" data-translate-body hidden>
                             {foreach $extraLocales as $code}
                                 <div class="mt-translate-row">
@@ -360,14 +352,16 @@
                                 </div>
                             {/foreach}
                         </div>
-                    {else}
-                        <div class="mt-menu-sect-help">Shown to clients in the client-area navigation.</div>
                     {/if}
                 </div>
 
+                <label class="mt-label-mode">
+                    <input type="radio" data-drawer-field="label.mode" data-drawer-radio-value="whmcs" value="whmcs">
+                    <span>Language Variable</span>
+                </label>
                 <div class="mt-label-pane" data-label-pane="whmcs" hidden>
                     <input id="drawerLabelWhmcs" class="mt-input" type="text" placeholder="e.g. navhome" data-drawer-field="label.whmcs">
-                    <div class="mt-menu-sect-help">Assign an existing WHMCS language string by placing its language key here. If WHMCS does not know the key, the key itself is shown.</div>
+                    <div class="mt-menu-sect-help">Use a language variable so the label translates across your installed languages. If WHMCS does not know the key, the key itself is shown.</div>
                 </div>
             </div>
         </div>
@@ -419,7 +413,7 @@
         </div>
 
         <div class="mt-menu-sect" data-drawer-show-when="dropdown_parent">
-            <div class="mt-menu-sect-label">Dropdown style</div>
+            <div class="mt-menu-sect-label mt-tip-line">Dropdown style {include file="includes/tip.tpl" text="Classic is a simple floating list; Mega menu is a wide, multi-column panel."}</div>
             <select id="drawerDropdown" class="mt-select" data-drawer-field="config.dropdown_style">
                 <option value="default">Default (classic)</option>
                 <option value="mega">Mega menu</option>
@@ -431,12 +425,12 @@
         </div>
 
         <div class="mt-menu-sect" data-section="icon">
-            <div class="mt-menu-sect-label">Icon</div>
+            <div class="mt-menu-sect-label mt-tip-line">Icon {include file="includes/tip.tpl" text="Shown on sidebar and rail layouts always; on the top nav only when Top-Nav Icons is enabled."}</div>
             <div class="mt-icon-picker-wrap">
-                <button type="button" class="mt-icon-picker-trigger" id="drawerIconBtn">
+                <button type="button" class="mt-icon-picker-trigger mt-icon-assign" id="drawerIconBtn">
                     <span class="mt-icon-picker-preview" id="drawerIconPreview"></span>
-                    <span class="mt-icon-picker-name" id="drawerIconName">(none)</span>
-                    <span class="mt-icon-picker-caret">▾</span>
+                    <span class="mt-icon-picker-name" id="drawerIconName">No icon assigned</span>
+                    <span class="mt-icon-assign-cta"><span class="mt-icon-assign-plus">&#8853;</span> Assign icon</span>
                 </button>
                 <input type="hidden" id="drawerIcon" data-drawer-field="config.icon" value="">
                 <div class="mt-icon-picker-panel" id="drawerIconPanel" hidden>
@@ -467,7 +461,7 @@
         {* COLLAPSIBLE — Display & Advanced settings *}
         <div class="mt-menu-sub" data-sub="display" data-section="display">
             <button type="button" class="mt-menu-sub-h">
-                <span>Display &amp; advanced</span>
+                <span class="mt-menu-sub-title"><span class="mt-menu-sub-dot" aria-hidden="true"></span><span data-drawer-kind-suffix>Menu item</span> display settings</span>
                 <span class="mt-menu-sub-chev"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </button>
             <div class="mt-menu-sub-body" hidden>
@@ -848,15 +842,13 @@
 }
 .mt-menu-sect:first-child { border-top: 0; }
 .mt-menu-sect-label {
-    font-size: 11px;
-    color: var(--mt-text-3);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    font-size: 12px;
+    color: var(--mt-text-2);
+    font-weight: 500;
     padding-top: 0;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
 }
 .mt-menu-sect > :not(.mt-menu-sect-label) { min-width: 0; }
 .mt-menu-sect-help { font-size: 12px; color: var(--mt-text-3); line-height: 1.5; }
@@ -890,6 +882,9 @@
 .mt-menu-sub.is-open .mt-menu-sub-chev svg { transform: rotate(90deg); color: var(--mt-primary); }
 .mt-menu-sub.is-open .mt-menu-sub-chev { color: var(--mt-primary); }
 .mt-menu-sub.is-open > .mt-menu-sub-h { color: var(--mt-primary); }
+.mt-menu-sub-title { display: inline-flex; align-items: center; gap: 9px; }
+.mt-menu-sub-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mt-text-4); flex-shrink: 0; }
+.mt-menu-sub.is-open .mt-menu-sub-dot { background: var(--mt-primary); }
 
 /* Sub-body — a neutral rounded card (matching the design mock's display-
    settings panel), not the old blue tint + left accent bar. The section
@@ -914,16 +909,26 @@
    (Smarty reads it as a real tag), and a brace immediately followed by a quote
    (that is valid Smarty string syntax, so the lint allows it and Smarty then
    fails to parse it). Both have already broken this page once. */
+/* Name section, per the design mock: the "Name" label + a right-aligned
+   Translate link share a header row; the two source radios stack vertically,
+   each with its input indented under it behind a hairline accent bar. */
+.mt-label-head { justify-content: space-between; }
+.mt-label-head-title { display: inline-flex; align-items: center; gap: 6px; }
 .mt-label-block { display: flex; flex-direction: column; gap: 10px; }
-.mt-label-modes { display: flex; gap: 8px; flex-wrap: wrap; }
-.mt-label-mode { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border: 1px solid var(--mt-border); border-radius: 999px; font-size: 12.5px; color: var(--mt-text-2); cursor: pointer; background: var(--mt-surface); }
+.mt-label-mode { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mt-text); cursor: pointer; }
 /* Re-assert visibility: radios inside admin cards are hidden elsewhere. */
-.mt-label-mode input[type="radio"] { appearance: auto; -webkit-appearance: radio; display: inline-block; width: auto; height: auto; margin: 0; opacity: 1; position: static; }
-.mt-label-mode:hover { border-color: var(--mt-text-4); color: var(--mt-text); }
-.mt-label-mode:has(input:checked) { border-color: var(--mt-primary); background: var(--mt-primary-tint); color: var(--mt-primary); font-weight: 600; }
+.mt-label-mode input[type="radio"] { appearance: auto; -webkit-appearance: radio; accent-color: var(--mt-primary); width: 15px; height: 15px; display: inline-block; margin: 0; opacity: 1; position: static; }
+.mt-label-pane { border-left: 2px solid var(--mt-border); margin-left: 7px; padding-left: 16px; display: flex; flex-direction: column; gap: 8px; }
 .mt-label-pane[hidden] { display: none; }
-.mt-label-row { display: flex; align-items: center; gap: 8px; }
-.mt-label-row .mt-input { flex: 1; min-width: 0; }
+
+/* Icon field as the design mock's "Assign icon" dashed drop-zone. Scoped to
+   #drawerIconBtn so the WHMCS-page picker (which shares .mt-icon-picker-*)
+   keeps its plain trigger look. */
+#drawerIconBtn.mt-icon-assign { justify-content: center; gap: 8px; padding: 14px 16px; background: var(--mt-surface); border: 1px dashed var(--mt-border); border-radius: 10px; }
+#drawerIconBtn.mt-icon-assign:hover { border-color: var(--mt-primary); }
+#drawerIconBtn .mt-icon-picker-name { flex: 0 0 auto; text-align: center; color: var(--mt-text-3); font-family: inherit; font-size: 13.5px; }
+#drawerIconBtn .mt-icon-assign-cta { display: inline-flex; align-items: center; gap: 6px; color: var(--mt-primary); font-weight: 600; font-size: 13px; }
+#drawerIconBtn .mt-icon-assign-plus { font-size: 15px; line-height: 1; }
 .mt-translate-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--mt-primary); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 6px 4px; }
 .mt-translate-btn:hover { text-decoration: underline; }
 .mt-translate-count { display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px; background: var(--mt-primary-tint); color: var(--mt-primary); font-size: 11px; font-weight: 600; }
@@ -1087,6 +1092,11 @@
         panel.querySelectorAll('[data-drawer-radio-value]').forEach(function (el) {
             el.checked = (el.getAttribute('data-drawer-radio-value') === mode);
         });
+        // Translate reveals per-language inputs for the custom string, so it
+        // only makes sense in custom mode. The button now lives in the Name
+        // header (outside the panes), so hide it explicitly for whmcs mode.
+        var trBtn = panel.querySelector('[data-translate-toggle]');
+        if (trBtn) trBtn.style.display = (mode === 'custom') ? '' : 'none';
     }
 
     // Per-row UI state on a SHARED panel subtree -- the panel physically moves
@@ -1408,10 +1418,11 @@
         selectedTempId = tempId;
         // Label the editor by depth: anything inside a children list is a
         // sub-menu item. closest() walks up, so grandchildren read the same.
+        var kindText = li.closest('ul.mt-menu-children') ? 'Sub-menu item' : 'Menu item';
         var kindEl = panel.querySelector('[data-drawer-kind]');
-        if (kindEl) {
-            kindEl.textContent = li.closest('ul.mt-menu-children') ? 'Sub-menu item' : 'Menu item';
-        }
+        if (kindEl) kindEl.textContent = kindText;
+        var kindSuffix = panel.querySelector('[data-drawer-kind-suffix]');
+        if (kindSuffix) kindSuffix.textContent = kindText;
         populatePanelFromEntry(tempId);
     }
 
@@ -1699,8 +1710,12 @@
         var iconPreview = document.getElementById('drawerIconPreview');
         var iconName    = document.getElementById('drawerIconName');
         if (iconInput)   iconInput.value = name;
-        if (iconPreview) iconPreview.innerHTML = iconSvgFor(name) || '<span class="mt-icon-tile-clear">∅</span>';
-        if (iconName)    iconName.textContent = name || '(none)';
+        if (iconPreview) iconPreview.innerHTML = name ? (iconSvgFor(name) || '') : '';
+        if (iconName)    iconName.textContent = name || 'No icon assigned';
+        // The "Assign icon" call-to-action shows only in the empty state, like
+        // the design mock; once an icon is set the box shows icon + name.
+        var iconCta = document.querySelector('#drawerIconBtn .mt-icon-assign-cta');
+        if (iconCta) iconCta.style.display = name ? 'none' : '';
         document.querySelectorAll('#drawerIconPanel .mt-icon-tile').forEach(function(t){
             t.classList.toggle('is-active', t.getAttribute('data-icon-name') === name);
         });
