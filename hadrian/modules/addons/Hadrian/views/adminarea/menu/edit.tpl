@@ -641,6 +641,15 @@
     min-height: 42px;
     cursor: default;
     background: transparent;
+    /* Neutralise the legacy admin.css .mt-menu-item-row rule (a dead
+       .mt-menu-tree block) which boxes every row in a 1px border + radius and
+       turns it primary on :hover -- that stale border fought the open item's
+       own accent bar/ring (the "broken blue line") and gave sub-rows a
+       whole-row hover outline. Borderless rows are the intended design; the
+       zero-width border also makes the leaked :hover border-color invisible,
+       so hover now only brightens the grip. */
+    border: 0;
+    border-radius: 0;
 }
 
 .mt-menu-grip {
