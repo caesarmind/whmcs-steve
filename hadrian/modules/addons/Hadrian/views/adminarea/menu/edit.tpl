@@ -574,6 +574,9 @@
    Not inside the <ul> -- the tree walkers would read it as an item. */
 .mt-menu-tree-col .mt-menu-add-nested { display: flex; margin: 2px 0 10px 34px; }
 .mt-menu-tree-col .mt-menu-add-nested .mt-menu-add { flex: 1; }
+/* Centre the "+ Add item" label in its band, per the design mock (admin.css
+   draws it left-aligned). */
+.mt-menu-tree-col .mt-menu-add { justify-content: center; }
 /* An empty dropdown collapses its children <ul>, so pull the band up to sit
    directly under the parent row rather than leaving a gap. */
 .mt-menu-tree-col ul.mt-menu-children:empty + .mt-menu-add-nested { margin-top: 8px; }
@@ -826,7 +829,7 @@
 }
 .mt-menu-sect:first-child { border-top: 0; }
 .mt-menu-sect-label {
-    font-size: 12px;
+    font-size: 11.5px;
     color: var(--mt-text-2);
     font-weight: 500;
     padding-top: 0;
@@ -835,13 +838,19 @@
     gap: 6px;
 }
 .mt-menu-sect > :not(.mt-menu-sect-label) { min-width: 0; }
-.mt-menu-sect-help { font-size: 12px; color: var(--mt-text-3); line-height: 1.5; }
+.mt-menu-sect-help { font-size: 11px; color: var(--mt-text-3); line-height: 1.5; }
 .mt-menu-sect-help em { font-style: normal; color: var(--mt-text); }
 .mt-menu-sect[data-drawer-show-when][style*="none"] { display: none; }
 
 .mt-menu-sect .mt-input,
 .mt-menu-sect .mt-select { width: 100%; }
 .mt-menu-sect > .mt-checkbox { font-size: 13px; }
+/* Compact field metrics to match the design mock's editor card (13px / 9px 11px
+   vs the admin-wide 15px). Scoped to the drawer so the rest of the admin keeps
+   its larger controls. */
+.mt-menu-props .mt-input,
+.mt-menu-props .mt-textarea { font-size: 13px; padding: 9px 11px; }
+.mt-menu-props .mt-select { font-size: 13px; padding: 9px 32px 9px 11px; }
 
 /* ----- Collapsible sub-sections (Advanced label / Display & advanced) ----- */
 .mt-menu-sub { border-top: 0; margin-top: 4px; background: var(--mt-surface); }
@@ -882,7 +891,8 @@
 .mt-menu-sub-body[hidden] { display: none; }
 .mt-menu-sub-body .mt-field { margin-bottom: 12px; }
 .mt-menu-sub-body .mt-field:last-child { margin-bottom: 0; }
-.mt-menu-sub-body .mt-field-label { color: var(--mt-text-2); }
+.mt-menu-sub-body .mt-field-label { color: var(--mt-text-2); font-size: 11.5px; }
+.mt-menu-sub-body .mt-field-help { font-size: 11px; }
 
 /* ----- Label source: Custom String | Language Variable -----
    Every opening brace below is followed by a space. This style block is NOT
