@@ -42,10 +42,11 @@
     </div>
 
     <div class="ph-rail-panel-group" data-panel="domains-out">
-        <div class="ph-rail-panel-header"><h3>{$LANG.navdomains}</h3></div>
+        <div class="ph-rail-panel-header"><h3>{$LANG.navdomains|default:'Domains'}</h3></div>
         <div class="ph-rail-panel-items">
             <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>{$hadrianLang.rail.registerDomain}</a>
-            <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=transfer"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4-4 4-4"/><path d="M3 13h14"/><path d="M17 7l4 4-4 4"/></svg>{$hadrianLang.rail.transferDomain}</a>        </div>
+            <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=transfer"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4-4 4-4"/><path d="M3 13h14"/><path d="M17 7l4 4-4 4"/></svg>{$hadrianLang.rail.transferDomain}</a>
+        </div>
     </div>
 
     <div class="ph-rail-panel-group" data-panel="info-out">
@@ -60,7 +61,7 @@
 
     {* ---- Logged-in ---- *}
     <div class="ph-rail-panel-group" data-panel="services">
-        <div class="ph-rail-panel-header"><h3>{$LANG.navservices}</h3></div>
+        <div class="ph-rail-panel-header"><h3>{$LANG.navservices|default:'Services'}</h3></div>
         <div class="ph-rail-panel-items">
             <a href="{$WEB_ROOT}/clientarea.php?action=services"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>{$hadrianLang.rail.myServices}</a>
             <a href="{$WEB_ROOT}/cart.php"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>{$hadrianLang.rail.orderServices}</a>
@@ -68,11 +69,12 @@
     </div>
 
     <div class="ph-rail-panel-group" data-panel="domains-in">
-        <div class="ph-rail-panel-header"><h3>{$LANG.navdomains}</h3></div>
+        <div class="ph-rail-panel-header"><h3>{$LANG.navdomains|default:'Domains'}</h3></div>
         <div class="ph-rail-panel-items">
             <a href="{$WEB_ROOT}/clientarea.php?action=domains"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>{$hadrianLang.rail.myDomains}</a>
             <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>{$hadrianLang.rail.registerDomain}</a>
-            <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=transfer"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4-4 4-4"/><path d="M3 13h14"/><path d="M17 7l4 4-4 4"/></svg>{$hadrianLang.rail.transferDomain}</a>        </div>
+            <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=transfer"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4-4 4-4"/><path d="M3 13h14"/><path d="M17 7l4 4-4 4"/></svg>{$hadrianLang.rail.transferDomain}</a>
+        </div>
     </div>
 
     <div class="ph-rail-panel-group" data-panel="billing">
@@ -80,7 +82,7 @@
         <div class="ph-rail-panel-items">
             <a href="{$WEB_ROOT}/clientarea.php?action=invoices"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>{$hadrianLang.rail.myInvoices}</a>
             <a href="{$WEB_ROOT}/clientarea.php?action=quotes"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H5a2 2 0 00-2 2v7h18v-7a2 2 0 00-2-2h-4"/><path d="M9 11V4a2 2 0 012-2h2a2 2 0 012 2v7"/></svg>{$hadrianLang.rail.myQuotes}</a>
-            <a href="{routePath('account-paymentmethods')}"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>{$LANG.paymentMethods.title}</a>
+            <a href="{routePath('account-paymentmethods')}"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>{$LANG.paymentMethods.title|default:'Payment Methods'}</a>
             <a href="{$WEB_ROOT}/clientarea.php?action=addfunds"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>{$hadrianLang.rail.addFunds}</a>
         </div>
     </div>
@@ -100,12 +102,12 @@
     <div class="ph-rail-panel-group" data-panel="account">
         <div class="ph-rail-panel-header"><h3>{$LANG.accounttab|default:'Account'}</h3></div>
         <div class="ph-rail-panel-items">
-            <a href="{$WEB_ROOT}/clientarea.php?action=details"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>{$LANG.accountdetails}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=contacts"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>{$LANG.contacts}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=security"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>{$LANG.securitysettings}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=changepw"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>{$LANG.clientareanavchangepassword}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=emails"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>{$LANG.emailstitle}</a>
-            <a href="{$WEB_ROOT}/logout.php"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>{$LANG.logout}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=details"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>{$LANG.accountdetails|default:'Account Details'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=contacts"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>{$LANG.contacts|default:'Contacts'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=security"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>{$LANG.securitysettings|default:'Security settings'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=changepw"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>{$LANG.clientareanavchangepassword|default:'Change Password'}</a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=emails"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>{$LANG.emailstitle|default:'Email History'}</a>
+            <a href="{$WEB_ROOT}/logout.php"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>{$LANG.logout|default:'Sign Out'}</a>
         </div>
     </div>
 </aside>
