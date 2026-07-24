@@ -372,6 +372,11 @@
    are siblings before .ph-main-wrap; the top navbar renders inside it. *}
 {if $mt_preview || $mt_layout == 'rail'}
     {include file="`$template`/includes/partials/rail.tpl"}
+    {* Flyout panels are a SIBLING of the rail, not a child: initRail() binds
+       mouseleave/mouseenter to .ph-rail and .ph-rail-panel independently and
+       aborts entirely if .ph-rail-panel is absent (apple-layout.js:629), which
+       is why the rail's hover menus never opened before this include existed. *}
+    {include file="`$template`/includes/partials/rail-panels.tpl"}
 {/if}
 {* Sidebar also renders on the TOP layout, where it stays off-canvas and acts
    as the mobile slide-in drawer (opened by the top-nav hamburger). CSS scoped

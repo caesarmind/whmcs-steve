@@ -30,9 +30,10 @@ final class SettingsController extends AbstractController
         // position:fixed), so a "Sticky sidebar" label would imply the toggle adds
         // stickiness that already exists. Default false == today's rendering.
         // SIDE LAYOUT ONLY -- the icon rail is the sole navigation on its layout and
-        // its flyout panel is never rendered (no .ph-rail-panel markup exists, so
-        // apple-layout.js aborts initRail()), while .ph-mobile-toggle is display:none
-        // above 900px. Unpinning the rail would leave no reachable nav below the fold.
+        // its flyout panel is pinned to the rail (position:fixed, left:80px), while
+        // .ph-mobile-toggle is display:none above 900px. Unpinning the rail would
+        // scroll the only nav away and strand the panel, leaving no reachable nav
+        // below the fold.
         'unpin_sidebar'          => ['Unpin Sidebar',            'Let the sidebar scroll away with the page instead of staying pinned to the viewport. Applies to the Sidebar layout above 900px only; the icon rail and the mobile slide-in drawer stay pinned. While this is on, the main menu is only reachable at the top of the page.', false, 'bool'],
         'back_to_top'            => ['Back to Top Button',       'Show a floating button in the bottom-right corner once the visitor scrolls down, returning them to the top of the page when clicked.', false, 'bool'],
         // Default OFF deliberately: the runtime (PriceHelper / price.tpl) treats

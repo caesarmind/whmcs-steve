@@ -138,6 +138,39 @@ return [
     ],
 
     // ---------------------------------------------------------------------
+    // RAIL - icon-rail flyout panels (includes/partials/rail-panels.tpl).
+    //
+    // Secondary-nav labels for the 80px rail layout. These are link captions
+    // WHMCS builds through the Menu API rather than exposing as $_LANG keys
+    // (stock six/ renders them from Menu Items, so there is no real key to
+    // reuse) -- hence local copy instead of a fake {$LANG.x|default:'...'},
+    // which would silently mask a genuine string if one ever appears.
+    // Group is self-contained on purpose: loadLanguage() exposes groups by
+    // name, so a key borrowed from 'domains'/'billing' would resolve in the
+    // i18n validator but come back NULL at render time.
+    // ---------------------------------------------------------------------
+    'rail' => [
+        'panelLabel'      => 'Secondary navigation',
+        'browseAll'       => 'Browse All',
+        'registerDomain'  => 'Register a New Domain',
+        'transferDomain'  => 'Transfer a Domain',
+        'domainSearch'    => 'Domain Search',
+        'myServices'      => 'My Services',
+        'orderServices'   => 'Order New Services',
+        'myDomains'       => 'My Domains',
+        'myInvoices'      => 'My Invoices',
+        'myQuotes'        => 'My Quotes',
+        'addFunds'        => 'Add Funds',
+        'myTickets'       => 'My Tickets',
+        'openTicket'      => 'Open Ticket',
+        'knowledgebase'   => 'Knowledgebase',
+        'downloads'       => 'Downloads',
+        'announcements'   => 'Announcements',
+        'networkStatus'   => 'Network Status',
+        'contactUs'       => 'Contact Us',
+    ],
+
+    // ---------------------------------------------------------------------
     // AUTH - login / register / password reset / 2FA (B06, B07).
     // ---------------------------------------------------------------------
     'auth' => [

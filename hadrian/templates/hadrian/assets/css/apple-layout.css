@@ -1181,10 +1181,10 @@ body[data-svc-layout="outside"] .content-area .settings-group > .settings-item:l
    { margin-left:260px } (line 27) needs no change.
 
    SIDE LAYOUT ONLY. The icon rail is the only navigation on its layout, its
-   flyout panel is never rendered (no .ph-rail-panel markup exists, so
-   apple-layout.js aborts initRail() and the data-rail buttons are inert), and
+   flyout panel is anchored to the rail itself (position:fixed, left:80px), and
    .ph-mobile-toggle is display:none above 900px -- unpinning the rail would
-   leave zero reachable nav below the fold.
+   scroll the only nav away while the panel stayed pinned to a rail that is no
+   longer beside it, leaving nothing reachable below the fold.
 
    The topbar unpins with it. With affixed_navigation OFF, the rule near :638
    already makes .ph-side-topbar relative, so this is a no-op; with it ON, a bar
@@ -3243,6 +3243,24 @@ body[data-sidebar-side="right"][data-layout="side"] .ph-main-wrap {
 body[data-sidebar-side="right"][data-layout="rail"] .ph-main-wrap {
     margin-left: 0;
     margin-right: 80px;
+}
+
+/* The flyout must follow the rail across, or it opens 80px from the LEFT edge
+   while the rail sits on the right -- detached and overlaying the content.
+   That also breaks HOVER specifically: initRail()'s 180ms cancelClose bridge
+   only survives the pointer leaving .ph-rail because the two boxes are
+   edge-adjacent with a 0px gap. Split apart, the panel closes before the
+   pointer can ever reach it. The closed-state transform flips sign for the
+   same reason -- it must slide in FROM the rail, not away from it. */
+body[data-sidebar-side="right"][data-layout="rail"] .ph-rail-panel {
+    left: auto;
+    right: 80px;
+    border-right: 0;
+    border-left: 0.5px solid var(--color-border);
+    transform: translateX(10px);
+}
+body[data-sidebar-side="right"][data-layout="rail"].rail-panel-open .ph-rail-panel {
+    transform: translateX(0);
 }
 
 @media (max-width: 900px) {
