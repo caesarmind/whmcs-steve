@@ -289,10 +289,12 @@
 {if $layoutFlags}
     <section class="mt-section" data-kind-panel="main-menu"{if $activeKind != 'main-menu'} hidden{/if}>
         <header class="mt-section-header">
+            {* No count badge: see the note on Containers. "N wired" only ever
+               meant "not one of the placeholders", and PLANNED_CONTROLS is empty
+               now, so it counted everything and distinguished nothing. This
+               section renders under {if $layoutFlags} anyway, so it can never be
+               the empty case the label was guarding. *}
             <h2 class="mt-section-title">Header</h2>
-            {* Counts the WIRED rows only. This section also carries placeholders,
-               so a bare row count would overstate what actually works. *}
-            <span class="mt-section-count">{$layoutFlags|count} wired</span>
         </header>
 
         {foreach $layoutFlags as $flagKey => $flag}
@@ -322,8 +324,13 @@
 {* Containers — content width. An enum, not a flag, so it posts its own field. *}
 <section class="mt-section" data-kind-panel="main-menu"{if $activeKind != 'main-menu'} hidden{/if}>
     <header class="mt-section-header">
+        {* No count badge here. "N wired" was build scaffolding -- the counterpart
+           to the "Not wired yet" marker on placeholder sections -- and
+           PLANNED_CONTROLS is now empty, so nothing is unwired to contrast
+           against and the label told an admin nothing. This one was also
+           hardcoded rather than computed, so it would have gone stale the moment
+           a third control landed in this section. *}
         <h2 class="mt-section-title">Containers</h2>
-        <span class="mt-section-count">2 wired</span>
     </header>
     <div class="mt-row">
         <div>
@@ -385,7 +392,11 @@
     <section class="mt-section" data-kind-panel="footer"{if $activeKind != 'footer'} hidden{/if}>
         <header class="mt-section-header">
             <h2 class="mt-section-title">{$sectionName|escape}</h2>
-            <span class="mt-section-count">{if $footerFlags}{$footerFlags|count} wired{else}Not wired yet{/if}</span>
+            {* The "N wired" half is gone (see Containers), but the EMPTY case is
+               kept: if every footer flag were ever removed this section would
+               otherwise render as a bare heading over nothing, which reads as a
+               rendering fault rather than an empty state. *}
+            {if !$footerFlags}<span class="mt-section-count">Not wired yet</span>{/if}
         </header>
 
         {foreach $footerFlags as $flagKey => $flag}
