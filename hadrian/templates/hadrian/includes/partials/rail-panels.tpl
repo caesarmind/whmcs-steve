@@ -19,7 +19,16 @@
 
    Groups render unconditionally, not behind {if $loggedin}: .only-out/.only-in
    on the rail BUTTONS do the gating in CSS, which is also what lets the
-   ?preview=1 state-chip flip auth live without a page load. *}
+   ?preview=1 state-chip flip auth live without a page load.
+
+   Do NOT add a "Domain Search" link to domainchecker.php here. That endpoint is
+   POST-only in practice -- every other reference in this theme is a <form
+   method="post"> action, never an <a href>. A bare GET 302s harmlessly while
+   logged out, but while logged IN it tries to redirect to
+   clientarea.php?action=domains and WHMCS rejects the absolute URL with
+   "Invalid filename for redirect", dropping the client on an error page.
+   cart.php?a=add&domain=register IS the domain search, and it is already
+   linked here as "Register a New Domain". *}
 <aside class="ph-rail-panel only-rail" aria-label="{$hadrianLang.rail.panelLabel}">
 
     {* ---- Logged-out ---- *}
@@ -36,9 +45,7 @@
         <div class="ph-rail-panel-header"><h3>{$LANG.navdomains}</h3></div>
         <div class="ph-rail-panel-items">
             <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>{$hadrianLang.rail.registerDomain}</a>
-            <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=transfer"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4-4 4-4"/><path d="M3 13h14"/><path d="M17 7l4 4-4 4"/></svg>{$hadrianLang.rail.transferDomain}</a>
-            <a href="{$WEB_ROOT}/domainchecker.php"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>{$hadrianLang.rail.domainSearch}</a>
-        </div>
+            <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=transfer"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4-4 4-4"/><path d="M3 13h14"/><path d="M17 7l4 4-4 4"/></svg>{$hadrianLang.rail.transferDomain}</a>        </div>
     </div>
 
     <div class="ph-rail-panel-group" data-panel="info-out">
@@ -65,9 +72,7 @@
         <div class="ph-rail-panel-items">
             <a href="{$WEB_ROOT}/clientarea.php?action=domains"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>{$hadrianLang.rail.myDomains}</a>
             <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>{$hadrianLang.rail.registerDomain}</a>
-            <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=transfer"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4-4 4-4"/><path d="M3 13h14"/><path d="M17 7l4 4-4 4"/></svg>{$hadrianLang.rail.transferDomain}</a>
-            <a href="{$WEB_ROOT}/domainchecker.php"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>{$hadrianLang.rail.domainSearch}</a>
-        </div>
+            <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=transfer"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4-4 4-4"/><path d="M3 13h14"/><path d="M17 7l4 4-4 4"/></svg>{$hadrianLang.rail.transferDomain}</a>        </div>
     </div>
 
     <div class="ph-rail-panel-group" data-panel="billing">

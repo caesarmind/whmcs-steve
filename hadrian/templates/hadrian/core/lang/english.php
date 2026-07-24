@@ -154,7 +154,6 @@ return [
         'browseAll'       => 'Browse All',
         'registerDomain'  => 'Register a New Domain',
         'transferDomain'  => 'Transfer a Domain',
-        'domainSearch'    => 'Domain Search',
         'myServices'      => 'My Services',
         'orderServices'   => 'Order New Services',
         'myDomains'       => 'My Domains',
