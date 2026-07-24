@@ -168,6 +168,13 @@ final class LayoutsController extends AbstractController
                     'isActiveGuest'  => $name === $currentGuest,
                     'isActiveClient' => $name === $currentClient,
                     'options'        => $options,
+                    // Feeds the "Live preview" link. header.tpl honours
+                    // ?preview=1&layout=<side|top|rail> and that value is this
+                    // manifest's dataLayout, NOT the folder name -- the sidebar
+                    // layout emits data-layout="side". Footer layouts declare no
+                    // dataLayout, so the view drops the link for them rather
+                    // than building a URL that previews nothing.
+                    'dataLayout'     => (string)($meta['dataLayout'] ?? ''),
                 ];
             }
             $groups[$kind] = $list;
@@ -206,6 +213,11 @@ final class LayoutsController extends AbstractController
             'contentWidth'   => (string)Settings::getValue('content_width', 'boxed'),
             'contentMaxWidth'        => $this->contentMaxWidth(),
             'contentMaxWidthDefault' => $this->contentMaxWidthDefault(),
+            // Client-area root for the "Live preview" links. WEB_ROOT is the
+            // same source ViewHelper::assetUrl() uses, so it is present in the
+            // admin area and already respects a subdirectory install; the empty
+            // fallback yields a root-relative URL rather than a broken absolute.
+            'previewBase'    => defined('WEB_ROOT') ? rtrim((string)WEB_ROOT, '/') : '',
         ]);
     }
 

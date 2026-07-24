@@ -49,6 +49,10 @@
        thumb + title + description above instead keeps Guest/Existing client on
        one line across every card; the slack falls at the card bottom. */
     .mt-lay-auds{display:flex;flex-direction:column;gap:6px;padding-top:2px}
+    /* margin-top:auto pins the preview link to the bottom of .mt-lay-b (a flex
+       column), so cards with a one-line description and cards with a clamped
+       two-line one still line their buttons up across the grid. */
+    .mt-lay-preview{margin-top:auto}
     .mt-lay-auds form{display:block;margin:0}
     .mt-lay-aud{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:7px 10px;border-radius:8px;border:none;background:var(--mt-surface-2);font:inherit;cursor:pointer;text-align:left;transition:background .15s ease}
     .mt-lay-aud:hover{background:var(--mt-border)}
@@ -215,6 +219,31 @@
                                 </form>
                             {/if}
                         </div>
+
+                        {* Live preview. The mechanism already existed and was
+                           simply never linked: header.tpl:59-67 honours
+                           ?preview=1&layout=<side|top|rail>, and under preview
+                           it renders EVERY layout's chrome so the state-chip can
+                           switch between them client-side. Nothing is persisted,
+                           so this is a look at a layout without activating it
+                           for real visitors.
+
+                           The value is the manifest's dataLayout, NOT the folder
+                           name -- the "sidebar" layout previews as layout=side.
+                           Footer layouts declare no dataLayout and get no link,
+                           rather than one that would preview nothing.
+
+                           New tab on purpose: the card may hold unsaved option
+                           state, and navigating away from the manager to look at
+                           a layout loses it. *}
+                        {if $layout.dataLayout}
+                            <div class="mt-lay-preview">
+                                <a class="mt-btn mt-btn-ghost mt-btn-sm"
+                                   href="{$previewBase}/?preview=1&amp;layout={$layout.dataLayout|escape:'url'}"
+                                   target="_blank" rel="noopener"
+                                   title="Open the client area with {$layout.displayName|escape} applied. Preview only - does not activate it.">Live preview</a>
+                            </div>
+                        {/if}
 
                         {* Loop every declared option, don't hardcode 'align'.
                            The controller and Hooks::buildLayoutMeta are already
