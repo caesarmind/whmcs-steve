@@ -612,8 +612,18 @@ body {
    inner containers follow the viewport puts an 880px card column at 2560px on a
    wide monitor, which is the unreadable case the boxed/full choice exists to
    avoid. 1500 lands the widest tier (--w-wide) at ~1607px -- full-bleed chrome,
-   readable content. */
-body[data-content-width="full"]  { --content-max-width: none; --content-pad-x: 24px; --w-base: 1500px; }
+   readable content.
+
+   "fluid" is a LEGACY ALIAS for "full" and must keep matching. The two modes
+   only ever differed by gutter (full hardcoded 24px, fluid inherited 48px);
+   that is now the admin's own Padding X field, so they collapsed into one
+   option. Any install still holding content_width=fluid keeps rendering as
+   full instead of silently falling back to boxed.
+
+   The old --content-pad-x:24px override is deliberately gone: hardcoding the
+   gutter here would make the Padding X control dead in exactly the mode where
+   a gutter matters most. */
+body[data-content-width="full"],
 body[data-content-width="fluid"] { --content-max-width: none; --w-base: 1500px; }
 .page-actions { margin-top: 24px; }
 .service-item-info { flex: 1; min-width: 0; }

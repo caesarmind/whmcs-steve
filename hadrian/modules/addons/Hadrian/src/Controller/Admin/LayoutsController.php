@@ -46,11 +46,17 @@ final class LayoutsController extends AbstractController
      * The width itself is the --content-max-width custom property
      * (apple-theme.css), so the CSS override is two rules rather than a hunt
      * through every layout.
+     *
+     * 'fluid' was RETIRED (2026-07-24). It differed from 'full' by gutter alone
+     * -- full hardcoded --content-pad-x:24px, fluid inherited 48px -- so two
+     * options existed whose entire visible difference was 24px of padding. The
+     * gutter is now its own "Side padding" field, which is both clearer and more
+     * capable than a mode. Stored 'fluid' values normalise to 'full' on read
+     * (contentWidthMode) and the CSS keeps matching both, so nothing breaks.
      */
     public const CONTENT_WIDTHS = [
-        'boxed' => 'Boxed — centered, max 1120px',
+        'boxed' => 'Boxed — centered, fixed maximum width',
         'full'  => 'Full width — use the whole viewport',
-        'fluid' => 'Fluid — padded but unbounded',
     ];
 
     /**
@@ -125,7 +131,12 @@ final class LayoutsController extends AbstractController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content_max_width'])) {
-            $this->saveContentMaxWidth((string)$_POST['content_max_width']);
+            $this->saveLayoutVar('--content-max-width', (string)$_POST['content_max_width']);
+            $this->redirect('?module=Hadrian&action=layouts&kind=main-menu&flag=1');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content_pad_x'])) {
+            $this->saveLayoutVar('--content-pad-x', (string)$_POST['content_pad_x']);
             $this->redirect('?module=Hadrian&action=layouts&kind=main-menu&flag=1');
         }
 
@@ -217,9 +228,11 @@ final class LayoutsController extends AbstractController
             'flagSaved'   => isset($_GET['flag']),
             'planned'     => self::PLANNED_CONTROLS,
             'contentWidths'  => self::CONTENT_WIDTHS,
-            'contentWidth'   => (string)Settings::getValue('content_width', 'boxed'),
-            'contentMaxWidth'        => $this->contentMaxWidth(),
-            'contentMaxWidthDefault' => $this->contentMaxWidthDefault(),
+            'contentWidth'   => $this->contentWidthMode(),
+            'contentMaxWidth'        => $this->layoutVar('--content-max-width'),
+            'contentMaxWidthDefault' => $this->layoutVarDefault('--content-max-width'),
+            'contentPadX'            => $this->layoutVar('--content-pad-x'),
+            'contentPadXDefault'     => $this->layoutVarDefault('--content-pad-x'),
             // Client-area root for the "Live preview" links. WEB_ROOT is the
             // same source ViewHelper::assetUrl() uses, so it is present in the
             // admin area and already respects a subdirectory install; the empty
@@ -229,50 +242,51 @@ final class LayoutsController extends AbstractController
     }
 
     /**
-     * The content column's max width, in px.
+     * Read/write one px entry of the layout-vars blob.
      *
-     * Deliberately NOT a new setting. This reads and writes the exact
-     * '--content-max-width' entry of the '<template>_layout_vars' blob that
-     * Styles > Layout > Content already edits, so the two panels are two doors
-     * onto one value instead of competing sources of truth. Hooks::
-     * buildLayoutHead() emits it as :root{--content-max-width:Npx}.
+     * Deliberately NOT new settings. These read and write the exact
+     * '--content-max-width' / '--content-pad-x' entries of the
+     * '<template>_layout_vars' blob that Styles > Layout > Content already
+     * edits, so the two panels are two doors onto one value instead of
+     * competing sources of truth. Hooks::buildLayoutHead() emits them as
+     * :root{--content-max-width:Npx;--content-pad-x:Npx}.
      *
-     * Only bites in 'boxed' mode: body[data-content-width="full"|"fluid"] sets
-     * the same property on <body>, which is nearer than :root and therefore
-     * wins. The view says so rather than leaving the field looking broken.
+     * Generic over the var name so Padding X reuses the merge + clamp logic
+     * rather than duplicating it -- the duplicated version is exactly where a
+     * second field would forget to merge and start dropping the first.
      */
-    private function contentMaxWidthDefault(): int
+    private function layoutVarDefault(string $var): int
     {
         $template = AddonHelper::getTemplate();
         $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');
         foreach (($cfg['sizeGroups'] ?? []) as $fields) {
             foreach ($fields as $f) {
-                if ((string)($f['var'] ?? '') === '--content-max-width') {
-                    return (int)($f['default'] ?? 1120);
+                if ((string)($f['var'] ?? '') === $var) {
+                    return (int)($f['default'] ?? 0);
                 }
             }
         }
-        return 1120;
+        return 0;
     }
 
-    private function contentMaxWidth(): int
+    private function layoutVar(string $var): int
     {
         $template = AddonHelper::getTemplate();
         $stored   = Settings::getValue($template->getName() . '_layout_vars', []);
-        return (is_array($stored) && isset($stored['--content-max-width']))
-            ? (int)$stored['--content-max-width']
-            : $this->contentMaxWidthDefault();
+        return (is_array($stored) && isset($stored[$var]))
+            ? (int)$stored[$var]
+            : $this->layoutVarDefault($var);
     }
 
     /**
      * MERGES into the layout-vars blob rather than replacing it. That blob also
-     * carries --content-pad-x, --sidebar-width and --topbar-height, and
+     * carries --sidebar-width and --topbar-height, and
      * StylesController::saveLayoutAction rebuilds it wholesale from its own
-     * form; a blind setValue() from this panel would silently drop the other
-     * three. Storing nothing when the value equals the default matches that
-     * panel's convention, so an untouched install still emits no <style> block.
+     * form; a blind setValue() from this panel would silently drop the others.
+     * Storing nothing when the value equals the default matches that panel's
+     * convention, so an untouched install still emits no <style> block.
      */
-    private function saveContentMaxWidth(string $raw): void
+    private function saveLayoutVar(string $var, string $raw): void
     {
         $template = AddonHelper::getTemplate();
         $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');
@@ -285,13 +299,31 @@ final class LayoutsController extends AbstractController
         }
 
         $val = (int)$raw;
-        if ($val < $min || $val > $max || $val === $this->contentMaxWidthDefault()) {
-            unset($stored['--content-max-width']);
+        if ($val < $min || $val > $max || $val === $this->layoutVarDefault($var)) {
+            unset($stored[$var]);
         } else {
-            $stored['--content-max-width'] = $val;
+            $stored[$var] = $val;
         }
 
         Settings::setValue($template->getName() . '_layout_vars', $stored, 'json');
+    }
+
+    /**
+     * Stored content_width, with the retired 'fluid' folded onto 'full'.
+     *
+     * 'fluid' differed from 'full' by gutter alone (24px vs 48px), which is now
+     * the Padding X field, so the option was removed. Normalising on READ means
+     * an install still holding 'fluid' shows "Full width" selected instead of
+     * an empty select, and is migrated the next time the admin saves -- no
+     * migration script, and the CSS keeps matching 'fluid' meanwhile.
+     */
+    private function contentWidthMode(): string
+    {
+        $stored = (string)Settings::getValue('content_width', 'boxed');
+        if ($stored === 'fluid') {
+            return 'full';
+        }
+        return isset(self::CONTENT_WIDTHS[$stored]) ? $stored : 'boxed';
     }
 
     /**

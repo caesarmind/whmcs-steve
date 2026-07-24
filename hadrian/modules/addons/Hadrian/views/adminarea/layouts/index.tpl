@@ -369,6 +369,28 @@
             <button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button>
         </form>
     </div>
+    {* Was the entire difference between the old "Full width" and "Fluid"
+       options (24px vs 48px). Promoted to its own field so it applies in BOTH
+       modes instead of being the hidden payload of a mode choice. Same stored
+       value as Styles > Layout > Content > Padding X. *}
+    <div class="mt-row">
+        <div>
+            <div class="mt-row-label">Side padding</div>
+            <div class="mt-row-help">
+                Gutter between the content and the edge of its column, in both modes.
+                Applies per side. Default {$contentPadXDefault}px.
+            </div>
+        </div>
+        <form method="post" action="" class="mt-flag-form">
+            <span class="mt-affix">
+                <input type="number" name="content_pad_x" class="mt-input mt-input-compact"
+                       value="{$contentPadX}" data-default="{$contentPadXDefault}"
+                       min="0" max="160" step="4" inputmode="numeric" aria-label="Side padding in pixels">
+                <span class="mt-affix-unit">px</span>
+            </span>
+            <button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button>
+        </form>
+    </div>
 </section>
 
 {* Remaining planned sections. Rendered disabled so the finished shape of the
