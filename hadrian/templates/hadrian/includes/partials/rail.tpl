@@ -2,7 +2,20 @@
    Paired with rail-panels for hover flyouts. *}
 <aside class="ph-rail only-rail">
     <a href="{$WEB_ROOT}/" class="ph-rail-logo" aria-label="{$hadrianLang.nav.portalHome}">
-        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="4"/></svg>
+        {* The rail is a 44px column, so the square mark is the only logo that
+           fits -- same slot the sidebar header uses. The full logo is
+           deliberately NOT a fallback here: a wide wordmark squeezed into a
+           28px square is unreadable, so we drop straight to the built-in
+           placeholder glyph. data-logo-dark is exchanged by initLogoSwap()
+           in apple-layout.js when <html data-theme> flips; emitted only when
+           the two uploads actually differ (the resolver mirrors a single
+           upload into both variants). *}
+        {if !empty($hadrian.branding.square.light)}
+            <img src="{$hadrian.branding.square.light|escape}" alt="{$companyname|escape}"
+                 {if !empty($hadrian.branding.square.dark) && $hadrian.branding.square.dark != $hadrian.branding.square.light}data-logo-dark="{$hadrian.branding.square.dark|escape}"{/if}>
+        {else}
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="4"/></svg>
+        {/if}
     </a>
     <div class="ph-rail-items">
         {* Logged-out *}

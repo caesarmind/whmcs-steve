@@ -34,6 +34,11 @@ final class BrandingController extends AbstractController
      * attribute, size cap). Adding a new branding slot only requires
      * touching this table.
      *
+     * `help` is the small grey line printed inside the empty upload tile.
+     * Per-slot explanation stops there — the two logo sections carry an
+     * info-tooltip on their heading (see renderIndex) and that is the only
+     * place tooltip copy lives on this page.
+     *
      * @var array<string, array{
      *   label: string,
      *   help: string,
@@ -346,10 +351,27 @@ final class BrandingController extends AbstractController
         // Build view rows: regroup FIELDS into the three sections the
         // template needs (full / square / favicon) with current value +
         // resolved preview URL + per-field error attached.
+        //
+        // `tip` is the heading's info-tooltip copy. Only the two logo
+        // sections get one -- what "Favicon" means needs no explaining, and
+        // the per-slot tiles say enough with their label + help line. The
+        // view renders a plain <h2> when tip is ''.
         $sections = [
-            'full'    => ['title' => 'Full Logo',   'rows' => []],
-            'square'  => ['title' => 'Square Logo', 'rows' => []],
-            'favicon' => ['title' => 'Favicon',     'rows' => []],
+            'full' => [
+                'title' => 'Full Logo',
+                'tip'   => 'The wide, horizontal version of your logo -- the one most of the client area uses. Shown in the top navigation, the page topbar, the login screen and the footer. Upload both variants so it stays legible in light and dark mode.',
+                'rows'  => [],
+            ],
+            'square' => [
+                'title' => 'Square Logo',
+                'tip'   => 'A compact, square version of your mark, for the places a wide logo would be cut off: the icon rail, the top of the sidebar, and the home-screen icon when someone saves the site to a phone. The sidebar falls back to the full logo when this is empty; the rail shows a placeholder.',
+                'rows'  => [],
+            ],
+            'favicon' => [
+                'title' => 'Favicon',
+                'tip'   => '',
+                'rows'  => [],
+            ],
         ];
         foreach (self::FIELDS as $field => $cfg) {
             $stored = $this->uploader->normalizeStored((string)Settings::getValue($field, ''));

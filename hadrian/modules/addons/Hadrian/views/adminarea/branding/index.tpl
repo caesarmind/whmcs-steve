@@ -31,7 +31,16 @@
 <div class="mt-panel">
 {foreach $sections as $sectionKey => $section}
     <section class="mt-section">
-        <header class="mt-section-header"><h2 class="mt-section-title">{$section.title|escape}</h2></header>
+        {* Only the two logo sections carry a tip -- Favicon is self-evident.
+           .mt-section-header is a flex container, so the inline-flex of
+           .mt-tip-line blockifies to flex on the h2 -- gap + centring hold. *}
+        <header class="mt-section-header">
+            {if $section.tip}
+                <h2 class="mt-section-title mt-tip-line">{$section.title|escape} {include file="includes/tip.tpl" text=$section.tip}</h2>
+            {else}
+                <h2 class="mt-section-title">{$section.title|escape}</h2>
+            {/if}
+        </header>
         {if $sectionKey == 'favicon'}
             {* Favicon is a single-tile section. *}
             {foreach $section.rows as $row}
