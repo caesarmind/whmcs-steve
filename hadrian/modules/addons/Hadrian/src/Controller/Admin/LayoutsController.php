@@ -174,7 +174,14 @@ final class LayoutsController extends AbstractController
                     // layout emits data-layout="side". Footer layouts declare no
                     // dataLayout, so the view drops the link for them rather
                     // than building a URL that previews nothing.
-                    'dataLayout'     => (string)($meta['dataLayout'] ?? ''),
+                    //
+                    // Nested under 'variables', NOT top level. Reading
+                    // $meta['dataLayout'] returns null for every layout, so the
+                    // view's {if $layout.dataLayout} was false everywhere and no
+                    // button rendered at all. header.tpl reaches the same value
+                    // as .vars.dataLayout because Hooks renames the key on the
+                    // way out; the manifest itself says 'variables'.
+                    'dataLayout'     => (string)($meta['variables']['dataLayout'] ?? ''),
                 ];
             }
             $groups[$kind] = $list;
