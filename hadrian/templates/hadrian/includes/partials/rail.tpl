@@ -60,7 +60,19 @@
     </div>
     <div class="ph-rail-spacer"></div>
     {if $loggedin}
-        <a href="{$WEB_ROOT}/clientarea.php?action=details" class="ph-rail-user only-in">{($clientsdetails.firstname|default:'')|truncate:1:''|upper}</a>
+        {* Avatar opens the account menu, matching every other layout. It used
+           to be a bare <a> straight to clientarea.php?action=details, so a
+           click skipped the menu entirely and dropped you on Account Details
+           -- the rail was the one layout without a profile dropdown, because
+           the panel markup was copy-pasted per layout instead of shared.
+           role=button + tabindex keeps it keyboard reachable now that it no
+           longer has an href. *}
+        <div class="profile-dropdown-wrapper only-in">
+            <div class="ph-rail-user" role="button" tabindex="0"
+                 title="{$LANG.accounttab|default:'Account'}"
+                 onclick="togglePortalProfile && togglePortalProfile(event, 'rail')">{($clientsdetails.firstname|default:'')|truncate:1:''|upper}</div>
+            {include file="`$template`/includes/partials/profile-dropdown.tpl" ddId="profileDropdownRail" ddUp=true}
+        </div>
     {else}
         <a href="{$WEB_ROOT}/login.php" class="ph-rail-item only-out" style="margin-top:auto">
             <span class="rail-ico" style="background:var(--color-accent);color:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></span>

@@ -476,10 +476,12 @@
         });
     }
 
-    // ── Notifications + profile dropdowns (nav + side) ─────
+    // ── Notifications + profile dropdowns (nav + side + rail) ─────
     function initDropdowns() {
+        // Every panel id must be listed here or outside-click never closes it.
         var ALL = ['notificationDropdownNav', 'notificationDropdownSide',
-                   'profileDropdown', 'profileDropdownSide', 'profileDropdownSidebar'];
+                   'profileDropdown', 'profileDropdownSide', 'profileDropdownSidebar',
+                   'profileDropdownRail'];
         function closeAll(except) {
             ALL.forEach(function (id) {
                 if (id === except) return;
@@ -500,6 +502,7 @@
             if (e) e.stopPropagation();
             var id = which === 'sidebar' ? 'profileDropdownSidebar'
                    : which === 'side'    ? 'profileDropdownSide'
+                   : which === 'rail'    ? 'profileDropdownRail'
                                          : 'profileDropdown';
             var dd = document.getElementById(id);
             if (!dd) return;
@@ -514,6 +517,24 @@
                 var wrap = dd.parentElement;
                 if (wrap && !wrap.contains(e.target)) dd.classList.remove('open');
             });
+        });
+        // The rail and sidebar triggers are <div role="button">, not <button>,
+        // so the browser does not synthesise a click from Enter/Space the way
+        // it does for real buttons -- keyboard users could focus the avatar and
+        // get nothing. Delegated so it covers both, and any future one.
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+            var t = e.target;
+            if (!t || !t.closest) return;
+            var trigger = t.closest('.profile-dropdown-wrapper [role="button"]');
+            if (!trigger) return;
+            e.preventDefault();          // stop Space scrolling the page
+            trigger.click();
+        });
+        // Escape closes whatever is open, and returns focus nowhere special --
+        // the trigger keeps focus because we never moved it.
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeAll(null);
         });
     }
 
