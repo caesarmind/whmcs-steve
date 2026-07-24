@@ -83,7 +83,7 @@
    1024px to match the marketing column used across the homepage and store
    pages — see the other hp-* sections in apple-theme.css. */
 .hp-cat-rows {
-    max-width: 1024px;
+    max-width: var(--w-prose);
     margin: 0 auto;
     display: grid;
     gap: 10px;

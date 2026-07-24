@@ -294,7 +294,7 @@
 <section class="mt-section" data-kind-panel="main-menu"{if $activeKind != 'main-menu'} hidden{/if}>
     <header class="mt-section-header">
         <h2 class="mt-section-title">Containers</h2>
-        <span class="mt-section-count">1 wired</span>
+        <span class="mt-section-count">2 wired</span>
     </header>
     <div class="mt-row">
         <div>
@@ -308,6 +308,29 @@
                 {/foreach}
             </select>
             <noscript><button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button></noscript>
+        </form>
+    </div>
+    {* Same stored value as Styles > Layout > Content > Max width (the
+       --content-max-width layout var) -- two doors onto one setting, not a
+       second one. No data-autosubmit: a number field would post on every
+       keystroke and store half-typed values. *}
+    <div class="mt-row">
+        <div>
+            <div class="mt-row-label">Maximum width</div>
+            <div class="mt-row-help">
+                Exact width of the content column when Boxed is selected above.
+                {if $contentWidth != 'boxed'}<strong>Currently overridden</strong> &mdash; &ldquo;{$contentWidths[$contentWidth]|escape}&rdquo; ignores this value.{/if}
+                Also editable at Styles &rsaquo; Layout &rsaquo; Content; both edit the same setting. Default {$contentMaxWidthDefault}px.
+            </div>
+        </div>
+        <form method="post" action="" class="mt-flag-form">
+            <span class="mt-affix">
+                <input type="number" name="content_max_width" class="mt-input mt-input-compact"
+                       value="{$contentMaxWidth}" data-default="{$contentMaxWidthDefault}"
+                       min="640" max="2400" step="10" inputmode="numeric" aria-label="Maximum content width in pixels">
+                <span class="mt-affix-unit">px</span>
+            </span>
+            <button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button>
         </form>
     </div>
 </section>

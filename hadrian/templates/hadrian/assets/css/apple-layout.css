@@ -112,7 +112,7 @@ body[data-bleed="1"] .ph-main-wrap .content-area {
 }
 body[data-bleed="1"] .content-area > .page-header,
 body[data-bleed="1"] .content-area > .when-empty {
-    max-width: 1024px;
+    max-width: var(--w-prose);
     margin-left: auto;
     margin-right: auto;
     padding-left: 22px;
@@ -141,7 +141,7 @@ body[data-tpl="homepage"] .ph-main-wrap .content-area {
 }
 body[data-tpl="homepage"] .content-area > .mt-verify-banner,
 body[data-tpl="homepage"] .content-area > .hp-hero {
-    max-width: 1024px;
+    max-width: var(--w-prose);
     margin-left: auto;
     margin-right: auto;
     box-sizing: border-box;
@@ -160,7 +160,7 @@ body[data-tpl="homepage"] .content-area > .hp-hero {
    + centred. Only meaningful in sidebar/rail layouts; the top nav has no sidebar
    to anchor against, so those stay full-bleed + centred. */
 body[data-bleed="1"][data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area {
-    max-width: 1024px;
+    max-width: var(--w-prose);
     margin-left: 0;
     margin-right: auto;
 }
@@ -304,7 +304,7 @@ html[data-palette="slate"]   .sidebar-avatar { background: linear-gradient(135de
     padding: 4px 22px; font-size: var(--text-xs);
 }
 .ph-auth-strip-inner {
-    max-width: 1024px; margin: 0 auto;
+    max-width: var(--w-prose); margin: 0 auto;
     display: flex; align-items: center; justify-content: space-between;
     gap: 10px; min-height: 22px;
 }
@@ -519,7 +519,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
     padding: 10px 22px;
 }
 .ph-breadcrumb-inner {
-    max-width: 1024px; margin: 0 auto;
+    max-width: var(--w-prose); margin: 0 auto;
     display: flex; align-items: center; gap: 7px;
     font-size: var(--text-sm); color: var(--color-text-tertiary);
 }
@@ -803,7 +803,7 @@ body[data-layout="rail"].rail-panel-open .ph-rail-panel {
 body[data-layout="rail"] .ph-hero,
 body[data-layout="rail"] .ph-section,
 body[data-layout="rail"] .ph-side-footer-inner {
-    max-width: 1120px; margin-left: auto; margin-right: auto;
+    max-width: var(--w-base); margin-left: auto; margin-right: auto;
     padding-left: 48px; padding-right: 48px;
 }
 body[data-layout="rail"] .ph-hero { padding-top: 40px; padding-bottom: 40px; }
@@ -930,7 +930,7 @@ body[data-layout="rail"] .ph-hero-inner { max-width: none; }
 body[data-layout="side"] .ph-hero,
 body[data-layout="side"] .ph-section,
 body[data-layout="side"] .ph-side-footer-inner {
-    max-width: 1120px; margin-left: auto; margin-right: auto;
+    max-width: var(--w-base); margin-left: auto; margin-right: auto;
     padding-left: 48px; padding-right: 48px;
 }
 body[data-layout="side"] .ph-hero { padding-top: 40px; padding-bottom: 40px; }
@@ -1517,7 +1517,7 @@ body[data-tpl="fraudcheck"] {
         .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-6, .col-sm-8, .col-sm-9, .col-sm-12 { flex: 0 0 100%; max-width: 100%; }
     }
 
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 16px; box-sizing: border-box; }
+    .container { max-width: var(--w-wide); margin: 0 auto; padding: 0 16px; box-sizing: border-box; }
     .container-fluid { width: 100%; padding: 0 16px; box-sizing: border-box; }
 
     /* -- Panels / cards (Bootstrap 3 + 4 + 5 aliases) ---- */

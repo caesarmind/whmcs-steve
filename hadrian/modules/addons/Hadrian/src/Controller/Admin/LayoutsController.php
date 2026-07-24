@@ -124,6 +124,11 @@ final class LayoutsController extends AbstractController
             $this->redirect('?module=Hadrian&action=layouts&kind=main-menu&flag=1');
         }
 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content_max_width'])) {
+            $this->saveContentMaxWidth((string)$_POST['content_max_width']);
+            $this->redirect('?module=Hadrian&action=layouts&kind=main-menu&flag=1');
+        }
+
         // Which tab opens first — preserved across save-redirects via ?kind.
         $activeKind = (string)($_GET['kind'] ?? 'main-menu');
         if (!in_array($activeKind, ['main-menu', 'footer'], true)) {
@@ -199,7 +204,75 @@ final class LayoutsController extends AbstractController
             'planned'     => self::PLANNED_CONTROLS,
             'contentWidths'  => self::CONTENT_WIDTHS,
             'contentWidth'   => (string)Settings::getValue('content_width', 'boxed'),
+            'contentMaxWidth'        => $this->contentMaxWidth(),
+            'contentMaxWidthDefault' => $this->contentMaxWidthDefault(),
         ]);
+    }
+
+    /**
+     * The content column's max width, in px.
+     *
+     * Deliberately NOT a new setting. This reads and writes the exact
+     * '--content-max-width' entry of the '<template>_layout_vars' blob that
+     * Styles > Layout > Content already edits, so the two panels are two doors
+     * onto one value instead of competing sources of truth. Hooks::
+     * buildLayoutHead() emits it as :root{--content-max-width:Npx}.
+     *
+     * Only bites in 'boxed' mode: body[data-content-width="full"|"fluid"] sets
+     * the same property on <body>, which is nearer than :root and therefore
+     * wins. The view says so rather than leaving the field looking broken.
+     */
+    private function contentMaxWidthDefault(): int
+    {
+        $template = AddonHelper::getTemplate();
+        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');
+        foreach (($cfg['sizeGroups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                if ((string)($f['var'] ?? '') === '--content-max-width') {
+                    return (int)($f['default'] ?? 1120);
+                }
+            }
+        }
+        return 1120;
+    }
+
+    private function contentMaxWidth(): int
+    {
+        $template = AddonHelper::getTemplate();
+        $stored   = Settings::getValue($template->getName() . '_layout_vars', []);
+        return (is_array($stored) && isset($stored['--content-max-width']))
+            ? (int)$stored['--content-max-width']
+            : $this->contentMaxWidthDefault();
+    }
+
+    /**
+     * MERGES into the layout-vars blob rather than replacing it. That blob also
+     * carries --content-pad-x, --sidebar-width and --topbar-height, and
+     * StylesController::saveLayoutAction rebuilds it wholesale from its own
+     * form; a blind setValue() from this panel would silently drop the other
+     * three. Storing nothing when the value equals the default matches that
+     * panel's convention, so an untouched install still emits no <style> block.
+     */
+    private function saveContentMaxWidth(string $raw): void
+    {
+        $template = AddonHelper::getTemplate();
+        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');
+        $min = (int)($cfg['sizeMin'] ?? 0);
+        $max = (int)($cfg['sizeMax'] ?? 4000);
+
+        $stored = Settings::getValue($template->getName() . '_layout_vars', []);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+
+        $val = (int)$raw;
+        if ($val < $min || $val > $max || $val === $this->contentMaxWidthDefault()) {
+            unset($stored['--content-max-width']);
+        } else {
+            $stored['--content-max-width'] = $val;
+        }
+
+        Settings::setValue($template->getName() . '_layout_vars', $stored, 'json');
     }
 
     /**
