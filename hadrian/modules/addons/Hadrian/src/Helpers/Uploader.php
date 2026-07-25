@@ -62,9 +62,24 @@ final class Uploader
     /** Common bundles used by the Branding controller. */
     public const IMAGE_BITMAP_AND_SVG = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
     public const IMAGE_FAVICON        = ['image/png', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/svg+xml'];
+    /**
+     * Media library: raster only. SVG is deliberately EXCLUDED even though
+     * scanSvg() exists — that scanner is a regex, not a parser, and the
+     * library both lists and serves its files same-origin, which turns any
+     * bypass into stored XSS. og:image consumers reject SVG anyway. ICO is
+     * excluded for the same reason it makes no sense socially.
+     * image/gif was already in MIME_EXT_MAP but reachable from no bundle.
+     */
+    public const IMAGE_MEDIA = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
 
     /** Max upload size cap regardless of caller config — server-side limit floor. */
     private const HARD_CEILING_BYTES = 5 * 1024 * 1024;
+
+    /** Decoded-pixel ceiling (w*h). 50 MP never fires for a logo or a 1200x630 card. */
+    private const DEFAULT_MAX_PIXELS = 50000000;
+
+    /** Extensions the media library will list, serve and delete. Lowercase, no dot. */
+    private const LIBRARY_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
 
     private string $diskDir;
     private string $webPath;
@@ -106,6 +121,14 @@ final class Uploader
         }
         if ($err !== UPLOAD_ERR_OK) {
             return ['ok' => false, 'error' => $this->describePhpUploadError($err)];
+        }
+
+        // A multi-file $_FILES entry has ARRAYS in every slot. Without this
+        // the (string) cast below yields the literal "Array" plus a PHP 8
+        // warning, and the caller gets "not received through PHP" — which
+        // sends whoever debugs it looking at the wrong thing entirely.
+        if (is_array($file['tmp_name'] ?? null)) {
+            return ['ok' => false, 'error' => 'Multi-file uploads are not supported on this endpoint; send one file per request.'];
         }
 
         $tmp = (string)($file['tmp_name'] ?? '');
@@ -151,6 +174,16 @@ final class Uploader
             if ($probe === false) {
                 return ['ok' => false, 'error' => 'File does not appear to be a real image.'];
             }
+            // Decompression-bomb guard. A 30000x30000 PNG compresses to well
+            // under the 5 MB ceiling but needs ~3.6 GB once decoded, so any
+            // later thumbnail/optimise pass OOMs the worker. The probe was
+            // already computed here and thrown away; this just reads it.
+            $width  = (int)($probe[0] ?? 0);
+            $height = (int)($probe[1] ?? 0);
+            $maxPx  = (int)($config['maxPixels'] ?? self::DEFAULT_MAX_PIXELS);
+            if ($maxPx > 0 && $width > 0 && $height > 0 && ($width * $height) > $maxPx) {
+                return ['ok' => false, 'error' => 'Image dimensions are too large (' . $width . 'x' . $height . ').'];
+            }
         }
 
         if (!$this->ensureDir()) {
@@ -175,8 +208,14 @@ final class Uploader
         }
         $destDir = dirname($dest);
         $realDestDir = realpath($destDir);
-        if ($realDestDir === false || strpos($realDestDir, $realDir) !== 0) {
-            return ['ok' => false, 'error' => 'Refusing to write outside the branding directory.'];
+        // IDENTITY, not a prefix test. $dest is always diskDir/<file>, so
+        // dirname($dest) resolves to the upload dir ITSELF — a
+        // "starts-with $realDir . SEPARATOR" test can never be true here and
+        // would reject every upload. (A bare prefix test would pass, but it
+        // also passes for a sibling like /img/media-old, so identity is both
+        // correct and stricter.)
+        if ($realDestDir === false || $realDestDir !== $realDir) {
+            return ['ok' => false, 'error' => 'Refusing to write outside the upload directory.'];
         }
 
         if (!@move_uploaded_file($tmp, $dest)) {
@@ -216,7 +255,12 @@ final class Uploader
         $candidate = $this->diskDir . DIRECTORY_SEPARATOR . $stored;
         $realDir   = realpath($this->diskDir);
         $realFile  = realpath($candidate);
-        if ($realDir === false || $realFile === false || strpos($realFile, $realDir) !== 0) {
+        // Separator IS required here: $realFile is a file INSIDE the dir, so a
+        // bare prefix test would also accept a sibling directory that merely
+        // starts with the same string (".../img/media-old/x.png" vs
+        // ".../img/media").
+        if ($realDir === false || $realFile === false
+            || strpos($realFile, $realDir . DIRECTORY_SEPARATOR) !== 0) {
             return '';
         }
         return $realFile;
@@ -254,6 +298,84 @@ final class Uploader
             return '';
         }
         return $stored;
+    }
+
+    /**
+     * Is $name safe to LIST or DELETE as a library image?
+     *
+     * normalizeStored() validates SHAPE only, and that is not enough here:
+     * ".htaccess" contains no slash and matches ^[A-Za-z0-9._-]+$, so it
+     * survives normalisation verbatim and diskPathFor() resolves it happily
+     * inside the dir. A delete endpoint built on normalizeStored() alone
+     * would let one request unlink the security sidecar that stops PHP
+     * executing in the upload dir (it is only rewritten on the next
+     * successful upload). Same for any stray .php dropped in by FTP.
+     *
+     * So: canonical already, not a dotfile, and an image extension we serve.
+     */
+    public function isLibraryName(string $name): bool
+    {
+        $n = $this->normalizeStored($name);
+        if ($n === '' || $n !== trim($name)) {
+            return false;                       // not already canonical
+        }
+        if ($n[0] === '.' || $n === '..') {
+            return false;                       // .htaccess, .hadrian-media.json, dot-anything
+        }
+        $ext = strtolower((string)pathinfo($n, PATHINFO_EXTENSION));
+        return in_array($ext, self::LIBRARY_EXT, true);
+    }
+
+    /**
+     * List library images, newest first.
+     *
+     * scandir (not glob): glob's brace/character-class patterns get hairy
+     * across case variants, and we have to re-validate every entry anyway.
+     * Deliberately does NOT call getimagesize() per file — that is one file
+     * open per image on every modal open, which is a self-inflicted DoS on a
+     * large library. The client reads naturalWidth/naturalHeight off the
+     * <img> it already loaded; callers that want dimensions cache them.
+     *
+     * @return list<array{name:string,bytes:int,mtime:int}>
+     */
+    public function listStored(int $limit = 500): array
+    {
+        $realDir = realpath($this->diskDir);
+        if ($realDir === false) {
+            return [];                          // never created yet — not an error
+        }
+        $entries = @scandir($realDir);
+        if ($entries === false) {
+            return [];
+        }
+        $out = [];
+        foreach ($entries as $entry) {
+            $entry = (string)$entry;
+            if (!$this->isLibraryName($entry)) {
+                continue;                       // skips . .. .htaccess, manifest, non-images
+            }
+            $path = $realDir . DIRECTORY_SEPARATOR . $entry;
+            // A symlink would otherwise be both listed and served, letting a
+            // filesystem-level plant expose a file from outside the dir.
+            if (is_link($path) || !is_file($path)) {
+                continue;
+            }
+            $real = realpath($path);
+            if ($real === false || strpos($real, $realDir . DIRECTORY_SEPARATOR) !== 0) {
+                continue;
+            }
+            $out[] = [
+                'name'  => $entry,
+                'bytes' => (int)@filesize($path),
+                'mtime' => (int)@filemtime($path),
+            ];
+        }
+        // Newest first, name as a stable tiebreak so the order never jitters
+        // between requests for files written in the same second.
+        usort($out, static function (array $a, array $b): int {
+            return $b['mtime'] <=> $a['mtime'] ?: strcmp($a['name'], $b['name']);
+        });
+        return $limit > 0 ? array_slice($out, 0, $limit) : $out;
     }
 
     public function getDiskDir(): string { return $this->diskDir; }

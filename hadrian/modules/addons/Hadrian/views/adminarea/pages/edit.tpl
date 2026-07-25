@@ -108,29 +108,6 @@
 .mt-seo-lang[hidden] { display: none !important; }
 @media (max-width: 760px) { .mt-seo-langs.is-table .mt-seo-lang { grid-template-columns: 1fr; } .mt-seo-langs.is-table .mt-seo-lang-head { padding-top: 0; } }
 
-/* -- Modal ---------------------------------------------------------------- */
-/* z-index band, measured against the live admin rather than guessed:
-     1050  WHMCS's own Bootstrap modals (.whmcs-modal, .modal-my-notes)
-     2000  this modal -- must clear them
-     9999  .mt-selpop, 10000 .mt-tip-pop (admin.css)
-   Deliberately BELOW our own popups: a <select> opened inside this modal has
-   to paint on top of it. The reference's 200 would have put us under WHMCS. */
-.mt-modal { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; padding: 28px; }
-.mt-modal[hidden] { display: none; }
-.mt-modal-card { width: min(1040px, 96vw); max-height: 90vh; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,0.4); display: flex; flex-direction: column; overflow: hidden; }
-.mt-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--mt-border); }
-.mt-modal-title { font-size: 16px; font-weight: 600; color: var(--mt-text); }
-.mt-modal-sub { font-size: 12.5px; color: var(--mt-text-3); margin-top: 2px; }
-.mt-modal-x { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--mt-border); background: var(--mt-surface); color: var(--mt-text-2); font-size: 18px; line-height: 1; cursor: pointer; flex-shrink: 0; }
-.mt-modal-x:hover { background: var(--mt-surface-2); }
-.mt-modal-tools { display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-bottom: 1px solid var(--mt-border); background: var(--mt-surface-2); flex-wrap: wrap; }
-.mt-modal-tools .mt-input { width: 200px; }
-.mt-modal-tools-gap { flex: 1; }
-.mt-modal-check { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--mt-text-2); cursor: pointer; }
-.mt-modal-check input { accent-color: var(--mt-primary); width: 15px; height: 15px; }
-.mt-modal-body { overflow: auto; padding: 4px 20px 12px; }
-.mt-modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--mt-border); }
-.mt-modal-empty { font-size: 13px; color: var(--mt-text-3); padding: 18px 0; }
 </style>
 {/literal}
 
@@ -353,9 +330,21 @@
                 {/foreach}
             </div>
 
+            {* data-mt-media upgrades this into a picker (library + upload) via
+               includes/media-picker.tpl. The input itself is untouched: same
+               name, same maxlength, still typeable, so the save path is
+               unchanged and it degrades to a plain URL field without JS.
+               value="url" because header.tpl emits this straight into
+               og:image / twitter:image with no resolver, and Open Graph
+               requires an absolute URL. *}
             <div class="mt-field">
                 <label class="mt-field-label" for="seo-social">Social image URL</label>
-                <input id="seo-social" class="mt-input" type="text" name="seo_social_image" maxlength="500" value="{$seo.social_image|escape}" placeholder="https://… (1200×630)">
+                <input id="seo-social" class="mt-input" type="text" name="seo_social_image" maxlength="500" value="{$seo.social_image|escape}" placeholder="https://… (1200×630)"
+                       data-mt-media
+                       data-mt-media-value="url"
+                       data-mt-media-collection="library"
+                       data-mt-media-title="Social image"
+                       data-mt-media-hint="1200 x 630 recommended">
             </div>
         </div>
 

@@ -92,6 +92,52 @@ if (
 }
 
 // ============================================================================
+// Media library AJAX (the image picker behind any [data-mt-media] field).
+//
+// A SEPARATE gate block on purpose. The branding block above dispatches with
+// an else-less fall-through:
+//     if ($sub === 'upload-ajax') { uploadAjaxAction(); }
+//     removeAjaxAction();
+// so any sub added to ITS in_array() that is not 'upload-ajax' silently lands
+// in removeAjaxAction(). Here every arm of the match returns `never`, so
+// there is nothing to fall through to.
+//
+// Same auth posture and the same reason as the branding block above: by the
+// time this runs, WHMCS has already verified the admin (ADMINAREA is only
+// defined inside the admin bootstrap). POST-only, which is why `list` is a
+// POST despite being a read — a GET would fall through to addonmodules.php
+// and return admin HTML that the caller cannot JSON.parse.
+if (
+    defined('ADMINAREA')
+    && $_SERVER['REQUEST_METHOD'] === 'POST'
+    && ($_GET['module'] ?? '') === 'Hadrian'
+    && ($_GET['action'] ?? '') === 'media'
+    && in_array($_GET['sub'] ?? '', ['list', 'upload', 'delete'], true)
+) {
+    try {
+        $_mtMediaCtl = new \Hadrian\Controller\Admin\MediaController();
+        match ($_GET['sub']) {
+            'list'   => $_mtMediaCtl->listAction(),    // never returns
+            'upload' => $_mtMediaCtl->uploadAction(),  // never returns
+            'delete' => $_mtMediaCtl->deleteAction(),  // never returns
+        };
+    } catch (\Throwable $_mtMediaEx) {
+        error_log('Hadrian media AJAX: ' . $_mtMediaEx->getMessage()
+            . ' at ' . $_mtMediaEx->getFile() . ':' . $_mtMediaEx->getLine());
+        while (ob_get_level() > 0) { @ob_end_clean(); }
+        if (!headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        echo json_encode([
+            'ok'    => false,
+            'error' => 'Server error: ' . $_mtMediaEx->getMessage(),
+        ]);
+        exit;
+    }
+}
+
+// ============================================================================
 // Admin addon page: full-width canvas (no sidebar flash).
 //
 // Inject the sidebar/title-hiding CSS into the admin <head> so it applies

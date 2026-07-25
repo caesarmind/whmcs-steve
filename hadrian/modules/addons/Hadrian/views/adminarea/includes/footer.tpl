@@ -1,3 +1,9 @@
+        {* Media picker: rendered on every admin page so any [data-mt-media]
+           field gets it for free. Included INSIDE .mt-wrap so it inherits the
+           --mt-* tokens; its script then relocates the modal to document.body.
+           Costs nothing on pages with no media field (the script returns
+           after finding no inputs to upgrade). *}
+        {include file="includes/media-picker.tpl"}
         </div>{* /.mt-body *}
 </div>{* /.mt-wrap *}
 
