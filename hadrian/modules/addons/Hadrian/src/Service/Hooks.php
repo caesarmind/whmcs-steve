@@ -19,6 +19,16 @@ use Hadrian\Template\Template;
  */
 final class Hooks
 {
+    /**
+     * Templatefiles that are genuinely a single piece of authored, dated
+     * content and so warrant og:type=article. Everything else — including the
+     * announcement and knowledge-base LIST pages, which merely index these —
+     * gets Open Graph's own default of "website".
+     *
+     * @var list<string>
+     */
+    private const OG_ARTICLE_PAGES = ['viewannouncement', 'knowledgebasearticle'];
+
     private static ?self $instance = null;
 
     public static function instance(): self
@@ -1814,8 +1824,16 @@ final class Hooks
         unset($params['currency'], $params['language']);
         $clean = $path . ($params !== [] ? '?' . http_build_query($params) : '');
 
+        // og:type. "article" is for time-stamped, authored content — it was
+        // previously the default for everything except the homepage, which
+        // labelled shop and client-area pages (store/sitelock, My Services)
+        // as articles. Open Graph's own default is "website", so that is the
+        // fallback and "article" is now the exception: a SINGLE announcement
+        // or knowledge-base entry. The list pages that index them
+        // (announcements, knowledgebase, knowledgebasecat) stay "website" —
+        // a listing is not an article.
         $page   = (string)($vars['templatefile'] ?? '');
-        $ogType = in_array($page, ['', 'index', 'homepage', 'clientareahome'], true) ? 'website' : 'article';
+        $ogType = in_array($page, self::OG_ARTICLE_PAGES, true) ? 'article' : 'website';
 
         $hreflang = [];
         if ($base !== '' && $this->settingFlag('enable_alternate_links')) {
