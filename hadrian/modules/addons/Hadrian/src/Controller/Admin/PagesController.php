@@ -101,6 +101,8 @@ final class PagesController extends AbstractController
                 'visibility'   => $options['visibility'],
                 'publicUrl'    => $public['url'],
                 'publicReason' => $public['reason'],
+                // Filtered behind a toggle in the list, never dropped.
+                'isSystem'     => in_array($page, self::SYSTEM_PAGES, true),
             ];
         }
 
@@ -129,6 +131,7 @@ final class PagesController extends AbstractController
             'groups'       => $groups,
             'pagesByGroup' => $pagesByGroup,
             'totalCount'   => count($rows),
+            'systemCount'  => count(array_filter($rows, static fn (array $r): bool => !empty($r['isSystem']))),
             'flashMsg'     => (string)($_GET['flash'] ?? ''),
         ]);
     }
@@ -354,6 +357,58 @@ final class PagesController extends AbstractController
      *   layout_overrides: array{main-menu: ?string, footer: ?string},
      * }
      */
+    /**
+     * Pages that exist so WHMCS has something to render mid-flow, but that an
+     * admin never navigates to and rarely configures: wizard sub-steps,
+     * partials included by another page, and error states WHMCS substitutes
+     * for whatever page you asked for.
+     *
+     * These are FILTERED, not removed. The Pages list hides them behind a
+     * "Show system pages" toggle rather than dropping them, because
+     * page.php's own `listDisplay => false` makes a page reachable only by
+     * typing its ?sub=edit&page= URL — fine for the four password-reset
+     * dispatchers that genuinely have nothing to set, but wrong for a page
+     * like two-factor-challenge that a visitor really sees and an admin may
+     * legitimately want to give a layout override or a noindex.
+     *
+     * Classification comes from tracing each one to how WHMCS actually
+     * reaches it; see the notes per entry.
+     *
+     * @var list<string>
+     */
+    private const SYSTEM_PAGES = [
+        // Error states — WHMCS renders these INSTEAD of the page you asked for.
+        'access-denied',
+        'banned',
+        'downloaddenied',
+        // Not a routed page at all: a per-metric modal fragment that
+        // clientareaproductdetails includes.
+        'usagebillingpricing',
+        // Gateway interstitial, auto-submitted mid-payment.
+        '3dsecure',
+        // Ticket submission wizard: steps and two partials included by step 2.
+        'supportticketsubmit-stepone',
+        'supportticketsubmit-steptwo',
+        'supportticketsubmit-confirm',
+        'supportticketsubmit-customfields',
+        'supportticketsubmit-kbsuggestions',
+        // SSL configuration wizard, entered with ?cert=<hash>.
+        'configuressl-stepone',
+        'configuressl-steptwo',
+        'configuressl-complete',
+        // Upgrade wizard steps 2 and 3; step 1 is `upgrade`, which stays.
+        'upgrade-configure',
+        'upgradesummary',
+        // Shown mid-login / once after generating a code.
+        'two-factor-challenge',
+        'two-factor-new-backup-code',
+        // Per-domain buy/disable confirmation; needs domainid + action + addon.
+        'clientareadomainaddons',
+        // NB deliberately NOT here: custom-page (the designed extension point),
+        // and the four password-reset-* dirs, which already carry
+        // listDisplay => false in their own page.php.
+    ];
+
     private function readPageOptions(Template $template, string $page, array $meta): array
     {
         $row         = Page::get($template->getName(), $page) ?? [];

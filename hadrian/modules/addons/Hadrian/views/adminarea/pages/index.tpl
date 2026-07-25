@@ -18,6 +18,20 @@
     <button type="button" class="mt-search-clear" id="mt-pages-search-clear" aria-label="Clear search" hidden>&#10005;</button>
 </div>
 
+{* System pages -- wizard sub-steps, included partials and error states -- are
+   hidden by default because an admin never navigates to them. They are
+   FILTERED, not dropped: page.php's own listDisplay => false would make them
+   reachable only by typing a ?sub=edit&page= URL, and some of them (the 2FA
+   challenge, the upgrade summary) are pages a visitor really sees and an admin
+   may legitimately want to set a layout override or a noindex on. *}
+{if $systemCount > 0}
+    <label class="mt-sys-toggle">
+        <input type="checkbox" id="mt-pages-showsys">
+        <span>Show {$systemCount} system pages</span>
+        {include file="includes/tip.tpl" text="Wizard steps, partials included by another page, and error states WHMCS renders in place of whatever you asked for. They are hidden because you never navigate to them - not because they cannot be configured."}
+    </label>
+{/if}
+
 <div class="mt-tabs" id="mt-pages-tabs" role="tablist">
     <a class="mt-tab is-active" href="#tab=all" data-tab="all" role="tab">
         All <span class="mt-tab-pill" data-tab-pill>{$totalCount}</span>
@@ -45,7 +59,19 @@
 .mt-tab-pill { margin-left:6px; font-size:11px; opacity:0.6; }
 
 /* Search ------------------------------------------------------------- */
-.mt-pages-search { margin: 0 0 18px; }
+.mt-pages-search { margin: 0 0 10px; }
+
+/* System-pages toggle. Sits under the search, above the tabs. */
+.mt-sys-toggle { display:inline-flex; align-items:center; gap:8px; margin:0 0 14px;
+    font-size:12.5px; color:var(--mt-text-2); cursor:pointer; user-select:none; }
+.mt-sys-toggle input { accent-color:var(--mt-primary); width:14px; height:14px; margin:0; cursor:pointer; }
+/* While a search is running the toggle does nothing (search reveals system
+   pages regardless), so it reads as unavailable rather than broken. */
+.mt-sys-toggle.is-muted { opacity:0.45; cursor:default; }
+.mt-sys-toggle.is-muted input { cursor:default; }
+/* A revealed system row is dimmed so it stays visually secondary to the real
+   pages it sits among. */
+.mt-pagerow.is-system .mt-pagerow-name { color:var(--mt-text-2); }
 /* Radius scoped to this page so the global .mt-input (var(--mt-radius), 12px)
    is left alone on every other admin screen. */
 .mt-pages-search .mt-input { padding-right: 34px; border-radius: 10px; }
@@ -173,8 +199,8 @@
                                shattering the grid. Instead the NAME cell is
                                the anchor and a stretched ::after restores the
                                whole-row click target. *}
-                            <div class="mt-pagerow"
-                                 data-page-row
+                            <div class="mt-pagerow{if $page.isSystem} is-system{/if}"
+                                 data-page-row{if $page.isSystem} data-system{/if}
                                  data-search="{$page.label|lower|escape} {$page.description|lower|escape} {$page.name|lower|escape} {$page.variantLabel|lower|escape}">
                                 <a class="mt-pagerow-main mt-pagerow-edit"
                                    href="?module=Hadrian&amp;action=pages&amp;sub=edit&amp;page={$page.name|escape:'url'}">
@@ -258,6 +284,10 @@
 
     var activeTab = 'all';
     var query     = '';
+    // Not persisted on purpose: a returning admin must never land on a
+    // filtered list they did not choose. Off is the honest default.
+    var sysToggle  = document.getElementById('mt-pages-showsys');
+    var showSystem = false;
 
     // Single source of truth: a row is visible when it belongs to the active
     // tab AND matches the query. Group panels hide when they have no visible
@@ -265,6 +295,7 @@
     function apply() {
         var q = query.trim().toLowerCase();
         var totalVisible = 0;
+        var panelCounts = {};
 
         Array.prototype.forEach.call(panels, function(panel) {
             var group   = panel.getAttribute('data-group-panel');
@@ -273,15 +304,31 @@
             var shown   = 0;
 
             Array.prototype.forEach.call(rows, function(row) {
-                var hit = inTab && (!q || row.getAttribute('data-search').indexOf(q) !== -1);
+                // A system page is suppressed unless the toggle is on -- EXCEPT
+                // when it matches an explicit search, because someone typing
+                // "two-factor" is looking for exactly that row and silently
+                // withholding it would read as the page not existing.
+                var isSys   = row.hasAttribute('data-system');
+                var sysOk   = !isSys || showSystem || !!q;
+                var hit = inTab && sysOk && (!q || row.getAttribute('data-search').indexOf(q) !== -1);
                 if (hit) { row.removeAttribute('hidden'); shown++; }
                 else     { row.setAttribute('hidden', ''); }
             });
 
+            // Counts must describe what is ON SCREEN. The server-rendered
+            // total includes system pages, so with them suppressed an
+            // unadjusted "22 pages" over a list of 19 would simply be wrong.
+            var countable = 0;
+            Array.prototype.forEach.call(rows, function(r) {
+                if (!r.hasAttribute('data-system') || showSystem) { countable++; }
+            });
+            panelCounts[group] = countable;
+
             var countEl = panel.querySelector('[data-group-count]');
             if (countEl) {
-                var total = countEl.getAttribute('data-total');
-                countEl.textContent = q ? (shown + ' of ' + total + ' pages') : (total + ' pages');
+                countEl.textContent = q
+                    ? (shown + ' of ' + countable + ' pages')
+                    : (countable + (countable === 1 ? ' page' : ' pages'));
             }
 
             // A group with zero rows on the server still shows its own empty
@@ -305,6 +352,28 @@
         if (clearBtn) {
             if (query) { clearBtn.removeAttribute('hidden'); }
             else       { clearBtn.setAttribute('hidden', ''); }
+        }
+
+        // Tab pills follow the same rule as the group counts: they name what
+        // the tab would show, not what the server rendered.
+        var grand = 0;
+        Array.prototype.forEach.call(tabs, function(t) {
+            var name = t.getAttribute('data-tab');
+            var pill = t.querySelector('[data-tab-pill]');
+            if (!pill || name === 'all') { return; }
+            var n = panelCounts[name] || 0;
+            grand += n;
+            pill.textContent = n;
+        });
+        var allPill = document.querySelector('[data-tab="all"] [data-tab-pill]');
+        if (allPill) { allPill.textContent = grand; }
+
+        // The toggle is a no-op while a query is running (search already
+        // reveals system pages), so say so instead of leaving it looking broken.
+        if (sysToggle) {
+            sysToggle.disabled = !!q;
+            var lbl = sysToggle.closest('.mt-sys-toggle');
+            if (lbl) { lbl.classList.toggle('is-muted', !!q); }
         }
     }
 
@@ -341,6 +410,12 @@
         clearBtn.addEventListener('click', function() {
             input.value = ''; query = ''; apply();
             input.focus();
+        });
+    }
+    if (sysToggle) {
+        sysToggle.addEventListener('change', function() {
+            showSystem = sysToggle.checked;
+            apply();
         });
     }
 
