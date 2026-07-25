@@ -464,7 +464,11 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-tip:hover, .mt-tip[data-open] { color: var(--mt-text-2); }
 .mt-tip:focus-visible { outline: 2px solid var(--mt-primary); outline-offset: -2px; border-radius: 50%; }
 /* On the uppercase 11px section eyebrows a 12px glyph overshoots the cap. */
-.mt-menu-sect-label .mt-tip svg { width: 10px; height: 10px; }
+.mt-menu-sect-label .mt-tip svg,
+.mt-subhead .mt-tip svg { width: 10px; height: 10px; }
+/* .mt-tip-line is inline-flex, which would shrink-wrap the heading and drop it
+   onto a text baseline; a card heading wants to stay its own block row. */
+.mt-subhead.mt-tip-line { display: flex; }
 
 .mt-tip-pop { position: fixed; z-index: 10000; display: none;
     min-height: 0; padding: 9px 12px;

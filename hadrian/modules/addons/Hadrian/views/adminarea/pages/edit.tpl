@@ -123,7 +123,7 @@
            options ARE the settings for the chosen template, so splitting them
            into two cards made them read as unrelated. *}
         <div class="mt-panel pad">
-            <div class="mt-subhead">Page template</div>
+            <div class="mt-subhead mt-tip-line">Page template {include file="includes/tip.tpl" text="Which template file renders this page. Most pages ship a single option; only a few, like the homepage and login, offer alternatives."}</div>
             {if $variants|count}
                 <div class="mt-variant-grid mt-pd-variants" data-saved-variant="{$activeVariant|escape}">
                     {foreach $variants as $v}
@@ -148,7 +148,7 @@
             {/if}
 
             <div class="mt-pd-div"></div>
-            <div class="mt-subhead">Template settings</div>
+            <div class="mt-subhead mt-tip-line">Template settings {include file="includes/tip.tpl" text="Options declared by the template selected above. Choosing a different template changes what appears here."}</div>
             {if $hasOptions}
                 <div class="mt-pd-rows">
                 {foreach $optionRows as $opt}
@@ -200,7 +200,7 @@
         {* Everything that governs the page itself rather than its template:
            who reaches it, and what chrome it renders. *}
         <div class="mt-panel pad">
-            <div class="mt-subhead">Page settings</div>
+            <div class="mt-subhead mt-tip-line">Page settings {include file="includes/tip.tpl" text="Who can reach this page, and which pieces of chrome it renders. These apply whichever template is selected."}</div>
             <div class="mt-pd-rows">
                 <div class="mt-row">
                     <div>
@@ -247,7 +247,7 @@
     <div class="mt-pd-side">
 
         <div class="mt-panel pad">
-            <div class="mt-subhead">SEO</div>
+            <div class="mt-subhead mt-tip-line">SEO {include file="includes/tip.tpl" text="How this page appears in search results and when its link is shared. Languages you leave blank fall back to the site default."}</div>
 
             <div class="mt-field">
                 <label class="mt-field-label" for="seo-indexing">Indexing</label>
@@ -349,7 +349,7 @@
         </div>
 
         <div class="mt-panel pad">
-            <div class="mt-subhead">Custom layout</div>
+            <div class="mt-subhead mt-tip-line">Custom layout {include file="includes/tip.tpl" text="Override the site-wide Layouts settings for this page only. Leave both on the global option to follow whatever Layouts is set to."}</div>
             <div class="mt-field">
                 <label class="mt-field-label" for="lay-main">Main menu</label>
                 <select id="lay-main" class="mt-select" name="layout_main_menu">

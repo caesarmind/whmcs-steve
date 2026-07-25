@@ -27,7 +27,15 @@
     <div class="mt-modal-card" role="dialog" aria-modal="true" aria-labelledby="mt-media-title">
         <div class="mt-modal-head">
             <div>
-                <div class="mt-modal-title" id="mt-media-title">Media</div>
+                {* The heading text lives in its own span because the script
+                   rewrites it per field; setting textContent on the row itself
+                   would delete the tip button along with the old text. The tip
+                   popup is body-appended at z-index 10000 and this modal is
+                   2000, so it correctly paints above the dialog. *}
+                <div class="mt-modal-title mt-tip-line">
+                    <span id="mt-media-title">Media</span>
+                    {include file="includes/tip.tpl" text="One shared library for the whole admin. Uploads stay here until you delete them, and the same image can be used on any number of pages."}
+                </div>
                 <div class="mt-modal-sub" id="mt-media-sub">Choose an image or upload a new one.</div>
             </div>
             <button type="button" class="mt-modal-x" id="mt-media-x" aria-label="Close">&times;</button>
@@ -556,14 +564,21 @@
         if (e.dataTransfer && e.dataTransfer.files) enqueue(e.dataTransfer.files);
     });
 
+    // CAPTURE phase on purpose. The shared tooltip controller in footer.tpl
+    // also handles Escape in capture, and it hides the popup before a bubble
+    // listener would ever see the event -- so a keyboard user who tabs to an
+    // info tip and presses Escape to dismiss it would lose the whole dialog
+    // too. Running first lets us see that a tip is open and defer to it.
+    // Escape peels one layer at a time: tooltip, then delete-confirm, then
+    // the modal.
     document.addEventListener('keydown', function (e) {
-        if (modal.hidden) return;
-        if (e.key === 'Escape') {
-            var openConfirm = modal.querySelector('.mt-media-confirm');
-            if (openConfirm) { openConfirm.remove(); return; }
-            close();
-        }
-    });
+        if (modal.hidden || e.key !== 'Escape') return;
+        var tip = document.querySelector('.mt-tip-pop');
+        if (tip && getComputedStyle(tip).display !== 'none') return;   // tip owns this press
+        var openConfirm = modal.querySelector('.mt-media-confirm');
+        if (openConfirm) { openConfirm.remove(); return; }
+        close();
+    }, true);
 
     // Delegated opener: any [data-mt-media] input, including ones added later.
     document.addEventListener('click', function (e) {
