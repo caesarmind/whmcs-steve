@@ -3,12 +3,8 @@
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
     <h1 class="mt-page-title">Pages</h1>
-    <p class="mt-page-subtitle">Configure template variant, SEO, options and layout overrides for each WHMCS page.</p>
+    <p class="mt-page-subtitle">Set the template variant, SEO, indexing, visibility and layout overrides for each WHMCS page.</p>
 </header>
-
-{if $flashMsg == 'saved'}
-    <div class="mt-alert mt-alert-success">Page settings saved.</div>
-{/if}
 
 <div class="mt-search mt-pages-search">
     <span class="mt-search-icon" aria-hidden="true">
@@ -33,14 +29,27 @@
     {/foreach}
 </div>
 
+{* Between the tab strip and the group cards, so the confirmation sits with the
+   content it describes rather than above the search box. *}
+{if $flashMsg == 'saved'}
+    <div class="mt-alert mt-alert-success mt-alert-lead">
+        <span class="mt-alert-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>
+        <span>Page settings saved.</span>
+    </div>
+{/if}
+
 {literal}
 <style>
-.mt-tab-pill { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:999px; background:var(--mt-border); color:var(--mt-text-3); font-size:11px; font-weight:500; line-height:1.6; min-width:18px; text-align:center; }
-.mt-tab.is-active .mt-tab-pill { background:var(--mt-primary-tint); color:var(--mt-primary); }
+/* A bare count that inherits the tab's own colour (so it goes accent at 60% on
+   the active tab), not a filled pill with a background of its own. */
+.mt-tab-pill { margin-left:6px; font-size:11px; opacity:0.6; }
 
 /* Search ------------------------------------------------------------- */
 .mt-pages-search { margin: 0 0 18px; }
-.mt-pages-search .mt-input { padding-right: 34px; }
+/* Radius scoped to this page so the global .mt-input (var(--mt-radius), 12px)
+   is left alone on every other admin screen. */
+.mt-pages-search .mt-input { padding-right: 34px; border-radius: 10px; }
+.mt-pages-search .mt-search-icon svg { width: 16px; height: 16px; }
 /* Suppress the native WebKit clear affordance -- we render our own so the
    control looks identical across browsers. */
 .mt-pages-search input[type="search"]::-webkit-search-cancel-button,
@@ -50,16 +59,27 @@
 .mt-search-clear:focus-visible { outline:2px solid var(--mt-primary); outline-offset:1px; }
 .mt-search-clear[hidden] { display:none; }
 
+/* Section heading: 22px title with the count as a sub-line beneath it. */
+.mt-pages-section .mt-section-title { font-size:22px; letter-spacing:-0.02em; }
+
 /* Page rows ----------------------------------------------------------- */
 .mt-pagerow-scroll { overflow-x:auto; }
+/* The wrapper is ours, not the reference's: a bare 1fr first track collapses
+   the name cell inside the WHMCS admin content column. At normal widths it
+   changes nothing. */
 .mt-pagerow-grid { min-width:640px; }
 .mt-pagerow-head,
-.mt-pagerow { display:grid; grid-template-columns:minmax(200px,1fr) 112px 64px 104px 112px 20px; gap:14px; align-items:center; }
+.mt-pagerow { display:grid; grid-template-columns:minmax(200px,1fr) 92px 56px 92px 104px 18px; gap:14px; align-items:center; }
 .mt-pagerow-head { padding:0 14px 8px; }
-.mt-pagerow-head span { font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--mt-text-3); }
+.mt-pagerow-head span { font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--mt-text-4); }
 .mt-pagerow-list { display:flex; flex-direction:column; gap:6px; }
-.mt-pagerow { padding:12px 14px; border:1px solid var(--mt-border); border-radius:var(--mt-radius); background:var(--mt-surface); text-decoration:none; color:inherit; transition:background 0.15s ease, border-color 0.15s ease; }
-.mt-pagerow:hover { background:var(--mt-surface-2); border-color:var(--mt-text-4); text-decoration:none; }
+.mt-pagerow { padding:12px 14px; border:1px solid var(--mt-border); border-radius:10px; background:var(--mt-surface); text-decoration:none; color:inherit; transition:background 0.15s ease; }
+.mt-pagerow:hover { background:var(--mt-surface-2); text-decoration:none; }
+/* Row-scoped badge metrics. Deliberately NOT applied to the global .mt-badge:
+   .mt-lay-aud-cta on the Layouts cards is hand-tuned to .mt-badge's exact box
+   (3px padding + 1.5 line-height on 12px) so an "Activate" row is the same
+   height as an "Active" one -- changing the global would break that. */
+.mt-pagerow .mt-badge { padding:3px 9px; font-size:11px; letter-spacing:0.02em; }
 .mt-pagerow:focus-visible { outline:2px solid var(--mt-primary); outline-offset:2px; }
 .mt-pagerow[hidden] { display:none; }
 .mt-pagerow-main { min-width:0; }
@@ -69,12 +89,16 @@
 .mt-pagerow-dash { color:var(--mt-text-4); }
 .mt-pagerow-chev { color:var(--mt-text-3); font-size:13px; text-align:right; }
 
+.mt-pages-noresults .mt-empty-title { font-size:17px; }
 .mt-pages-panel[hidden], .mt-pages-noresults[hidden] { display:none; }
 </style>
 {/literal}
 
 <div class="mt-panel pad mt-pages-noresults" id="mt-pages-noresults" hidden>
     <div class="mt-empty">
+        <div class="mt-empty-icon mt-empty-icon-circle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        </div>
         <h3 class="mt-empty-title">No pages match &ldquo;<span id="mt-pages-noresults-q"></span>&rdquo;</h3>
         <p>Try a different search term, or switch to another group.</p>
     </div>
@@ -85,15 +109,21 @@
     <div class="mt-panel pad mt-pages-panel" data-group-panel="{$g|escape}">
     <section class="mt-section mt-pages-section" data-group-section="{$g|escape}">
         <header class="mt-section-header">
-            <h2 class="mt-section-title">{$g|escape} pages</h2>
-            <span class="mt-section-count" data-group-count data-total="{$groupRows|count}">{$groupRows|count}</span>
+            {* One wrapper div, so .mt-section-header's space-between has a
+               single left child and the count reads as a sub-line of the title.
+               [data-group-count] and data-total move WITH it -- the search JS
+               selects by attribute and reads data-total off this element. *}
+            <div>
+                <h2 class="mt-section-title">{$g|escape} pages</h2>
+                <div class="mt-section-sub" data-group-count data-total="{$groupRows|count}">{$groupRows|count} pages</div>
+            </div>
         </header>
 
         {if $groupRows|count}
             <div class="mt-pagerow-scroll">
                 <div class="mt-pagerow-grid">
                     <div class="mt-pagerow-head" aria-hidden="true">
-                        <span>Name</span>
+                        <span>Page</span>
                         <span>Variant</span>
                         <span>SEO</span>
                         <span>Indexing</span>
@@ -115,7 +145,7 @@
                                 <span class="mt-pagerow-variant">{$page.variantLabel|escape}</span>
                                 <span>
                                     {if $page.hasSeo}
-                                        <span class="mt-badge mt-badge-success">SEO</span>
+                                        <span class="mt-badge mt-badge-primary">SEO</span>
                                     {else}
                                         <span class="mt-pagerow-dash">&mdash;</span>
                                     {/if}
@@ -135,7 +165,7 @@
                                     {elseif $page.visibility == 'auth'}
                                         <span class="mt-badge mt-badge-primary">Auth only</span>
                                     {else}
-                                        <span class="mt-badge mt-badge-neutral">Public</span>
+                                        <span class="mt-badge mt-badge-success">Public</span>
                                     {/if}
                                 </span>
                                 <span class="mt-pagerow-chev" aria-hidden="true">&rsaquo;</span>
@@ -193,7 +223,7 @@
             var countEl = panel.querySelector('[data-group-count]');
             if (countEl) {
                 var total = countEl.getAttribute('data-total');
-                countEl.textContent = q ? (shown + ' of ' + total) : total;
+                countEl.textContent = q ? (shown + ' of ' + total + ' pages') : (total + ' pages');
             }
 
             // A group with zero rows on the server still shows its own empty

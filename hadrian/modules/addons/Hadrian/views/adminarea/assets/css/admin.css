@@ -157,10 +157,10 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-body { max-width: 1180px; margin: 0 auto; padding: 8px 28px 72px; }
 
 /* -- Page header (sits on the background, above the cards) ----------------- */
-.mt-page-header { padding: 30px 0 22px; }
+.mt-page-header { padding: 32px 0 24px; }
 .mt-page-eyebrow { font-size: 12px; font-weight: 600; color: var(--mt-primary); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 10px; }
 .mt-page-title { font-size: 40px; font-weight: 600; letter-spacing: -0.028em; margin: 0; line-height: 1.05; color: var(--mt-text); }
-.mt-page-subtitle { font-size: 17px; color: var(--mt-text-2); margin: 10px 0 0; max-width: 720px; line-height: 1.5; }
+.mt-page-subtitle { font-size: 17px; color: var(--mt-text-2); margin: 10px 0 0; max-width: 680px; line-height: 1.5; }
 .mt-page-meta { color: var(--mt-text-3); font-weight: 400; }
 
 /* -- Panel card (the white content card) ---------------------------------- */
@@ -176,7 +176,16 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-section-header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
 .mt-section-title { font-size: 20px; font-weight: 600; margin: 0; letter-spacing: -0.018em; color: var(--mt-text); }
 .mt-section-count { font-size: 13px; color: var(--mt-text-3); font-weight: 400; }
+/* A sub-line bound to the section title, as opposed to .mt-section-note, which
+   is a standalone paragraph rendered after the whole header. Wrap the h2 and
+   this in one <div> so .mt-section-header's space-between still has a single
+   left child; a tools cluster added later must be the SECOND child. */
+.mt-section-sub { font-size: 13px; color: var(--mt-text-3); margin-top: 4px; }
 .mt-section-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+/* Eyebrow-weight heading INSIDE a card, for screens that stack several small
+   grouped cards rather than a few big sections. Distinct from .mt-section-title
+   (20px), which stays the heading for full-width single-purpose sections. */
+.mt-subhead { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mt-text-3); margin: 4px 0 12px; }
 
 /* -- Tabs (underline) ----------------------------------------------------- */
 .mt-tabs { display: flex; gap: 4px; margin: 0 0 20px; border-bottom: 1px solid var(--mt-border); flex-wrap: wrap; }
@@ -472,6 +481,10 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 /* -- Empty state ---------------------------------------------------------- */
 .mt-empty { text-align: center; padding: 48px 20px; color: var(--mt-text-2); }
 .mt-empty-icon { width: 44px; height: 44px; margin: 0 auto 14px; color: var(--mt-text-3); }
+/* Circular icon well. Composes with .mt-empty-icon, which supplies the colour;
+   this overrides the box so the glyph sits inside a 52px tinted disc. */
+.mt-empty-icon-circle { width: 52px; height: 52px; margin: 0 auto 16px; border-radius: 50%; background: var(--mt-surface-2); display: flex; align-items: center; justify-content: center; }
+.mt-empty-icon-circle svg { width: 22px; height: 22px; display: block; }
 .mt-empty-title { font-size: 16px; font-weight: 600; color: var(--mt-text); margin: 0 0 6px; }
 
 /* -- Alerts --------------------------------------------------------------- */
@@ -482,6 +495,11 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-alert-warning { background: var(--mt-warning-tint); border-color: rgba(255,159,10,0.25); color: var(--mt-warning-text); }
 .mt-alert-danger  { background: var(--mt-danger-tint);  border-color: rgba(255,59,48,0.25); color: var(--mt-danger-text); }
 .mt-alert ol, .mt-alert ul { margin: 6px 0 0 18px; padding: 0; }
+/* Leading icon chip. A MODIFIER, not a change to .mt-alert -- every other alert
+   call site in the addon stays a plain padded block with no flex context. */
+.mt-alert-lead { display: flex; gap: 12px; align-items: flex-start; }
+.mt-alert-icon { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--mt-success); color: #fff; display: flex; align-items: center; justify-content: center; }
+.mt-alert-icon svg { width: 12px; height: 12px; display: block; }
 
 /* -- Detail grid (templates/show) ----------------------------------------- */
 .mt-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

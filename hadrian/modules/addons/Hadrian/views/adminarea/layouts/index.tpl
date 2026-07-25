@@ -51,8 +51,22 @@
     .mt-lay-auds{display:flex;flex-direction:column;gap:6px;padding-top:2px}
     /* margin-top:auto pins the preview link to the bottom of .mt-lay-b (a flex
        column), so cards with a one-line description and cards with a clamped
-       two-line one still line their buttons up across the grid. */
+       two-line one still line their buttons up across the grid. Keep it: the
+       block now renders LAST in the card, so this is what makes the buttons
+       line up across cards whose descriptions clamp to different heights. */
     .mt-lay-preview{margin-top:auto}
+    /* Full-width bordered strip, not a small ghost pill. Purpose-built rather
+       than .mt-btn+.mt-btn-secondary+.mt-btn-block+.mt-btn-sm, which would need
+       five overrides (pill radius 980px vs 8px, 7px 16px vs 7px 0, 13px vs
+       12.5px, 1.5px vs 1px border, --mt-text vs accent text).
+       display:flex (not block) so the external-link mark can sit beside the
+       centered label without breaking the full-width strip. */
+    .mt-lay-preview-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:7px 0;border:1px solid var(--mt-border);border-radius:8px;background:var(--mt-surface);color:var(--mt-primary);font:inherit;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer;transition:background .15s ease,border-color .15s ease}
+    /* The explicit color + text-decoration are required: .mt-wrap a carries its
+       own link colour and the admin underlines anchors on hover. */
+    .mt-lay-preview-btn:hover{background:var(--mt-primary-tint);border-color:var(--mt-primary);color:var(--mt-primary);text-decoration:none}
+    .mt-lay-preview-btn:focus-visible{outline:2px solid var(--mt-primary);outline-offset:2px}
+    .mt-lay-preview-btn svg{width:13px;height:13px;display:block;flex-shrink:0}
     .mt-lay-auds form{display:block;margin:0}
     .mt-lay-aud{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:7px 10px;border-radius:8px;border:none;background:var(--mt-surface-2);font:inherit;cursor:pointer;text-align:left;transition:background .15s ease}
     .mt-lay-aud:hover{background:var(--mt-border)}
@@ -220,31 +234,6 @@
                             {/if}
                         </div>
 
-                        {* Live preview. The mechanism already existed and was
-                           simply never linked: header.tpl:59-67 honours
-                           ?preview=1&layout=<side|top|rail>, and under preview
-                           it renders EVERY layout's chrome so the state-chip can
-                           switch between them client-side. Nothing is persisted,
-                           so this is a look at a layout without activating it
-                           for real visitors.
-
-                           The value is the manifest's dataLayout, NOT the folder
-                           name -- the "sidebar" layout previews as layout=side.
-                           Footer layouts declare no dataLayout and get no link,
-                           rather than one that would preview nothing.
-
-                           New tab on purpose: the card may hold unsaved option
-                           state, and navigating away from the manager to look at
-                           a layout loses it. *}
-                        {if $layout.dataLayout}
-                            <div class="mt-lay-preview">
-                                <a class="mt-btn mt-btn-ghost mt-btn-sm"
-                                   href="{$previewBase}/?preview=1&amp;layout={$layout.dataLayout|escape:'url'}"
-                                   target="_blank" rel="noopener"
-                                   title="Open the client area with {$layout.displayName|escape} applied. Preview only - does not activate it.">Live preview</a>
-                            </div>
-                        {/if}
-
                         {* Loop every declared option, don't hardcode 'align'.
                            The controller and Hooks::buildLayoutMeta are already
                            generic over supportedOptions, so a layout declaring a
@@ -274,6 +263,37 @@
                             {elseif $k == 'main-menu'}
                                 <div class="mt-lay-optnone">No alignment option &mdash; content is always centered.</div>
                             {/if}
+                        {/if}
+
+                        {* Live preview. The mechanism already existed and was
+                           simply never linked: header.tpl:59-67 honours
+                           ?preview=1&layout=<side|top|rail>, and under preview
+                           it renders EVERY layout's chrome so the state-chip can
+                           switch between them client-side. Nothing is persisted,
+                           so this is a look at a layout without activating it
+                           for real visitors.
+
+                           The value is the manifest's dataLayout, NOT the folder
+                           name -- the "sidebar" layout previews as layout=side.
+                           Footer layouts declare no dataLayout and get no link,
+                           rather than one that would preview nothing.
+
+                           New tab on purpose: the card may hold unsaved option
+                           state, and navigating away from the manager to look at
+                           a layout loses it.
+
+                           Rendered LAST in the card body, after the alignment
+                           segment, so the slack in the flex column falls between
+                           the options and the button (.mt-lay-b already supplies
+                           the 10px gap). This is a real client-area link, not a
+                           wireframe -- href/target/rel are unchanged. *}
+                        {if $layout.dataLayout}
+                            <div class="mt-lay-preview">
+                                <a class="mt-lay-preview-btn"
+                                   href="{$previewBase}/?preview=1&amp;layout={$layout.dataLayout|escape:'url'}"
+                                   target="_blank" rel="noopener"
+                                   title="Open the client area with {$layout.displayName|escape} applied. Preview only - does not activate it."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-8 8"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg>Live preview</a>
+                            </div>
                         {/if}
                     </div>
                 </div>
