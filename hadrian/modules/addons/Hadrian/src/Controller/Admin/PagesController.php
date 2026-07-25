@@ -7,6 +7,7 @@ use Hadrian\Controller\AbstractController;
 use Hadrian\Database\Migrator;
 use Hadrian\Helpers\AddonHelper;
 use Hadrian\Helpers\LocaleHelper;
+use Hadrian\Helpers\PageUrlResolver;
 use Hadrian\Models\Page;
 use Hadrian\Service\PageRegistry;
 use Hadrian\Template\PagesCache;
@@ -80,6 +81,14 @@ final class PagesController extends AbstractController
             $options = $this->readPageOptions($template, $page, $meta);
             $variant = $options['variant'];
 
+            // Public URL for the "Open" link. Resolved from data we already
+            // have in $options, so no extra query per row.
+            $public = PageUrlResolver::resolve(
+                $page,
+                (string)($options['url'] ?? ''),
+                (string)($options['visibility'] ?? 'public')
+            );
+
             $rows[] = [
                 'name'         => $page,
                 'label'        => (string)($meta['display_name'] ?? ucwords(str_replace(['-', '_'], ' ', $page))),
@@ -90,6 +99,8 @@ final class PagesController extends AbstractController
                 'hasSeo'       => $options['hasSeo'],
                 'indexing'     => $options['indexing'],
                 'visibility'   => $options['visibility'],
+                'publicUrl'    => $public['url'],
+                'publicReason' => $public['reason'],
             ];
         }
 
@@ -152,6 +163,14 @@ final class PagesController extends AbstractController
         // an alphabetical list, so a fresh install opened every page on Arabic.
         $seoDefaultLanguage = LocaleHelper::systemDefault();
 
+        // Resolve the page's own public URL once, here, so the view never has
+        // to build one (and can never build a different one from the list).
+        $publicLink = PageUrlResolver::resolve(
+            $page,
+            (string)($options['url'] ?? ''),
+            (string)($options['visibility'] ?? 'public')
+        );
+
         // Project each declared option onto a uniform row the view can iterate.
         $optionRows = [];
         foreach ($supportedOptions as $key => $spec) {
@@ -189,6 +208,10 @@ final class PagesController extends AbstractController
             'seoUrl'           => $options['url'],
             'seoLanguages'     => $seoLanguages,
             'seoDefaultLanguage' => $seoDefaultLanguage,
+            // Public URL for the "View page" link in the toolbar. Same
+            // resolver as the list, so the two can never disagree.
+            'publicUrl'        => $publicLink['url'],
+            'publicUrlReason'  => $publicLink['reason'],
             'layoutChoices'    => [
                 'main-menu' => $this->layoutChoices($template, 'main-menu'),
                 'footer'    => $this->layoutChoices($template, 'footer'),

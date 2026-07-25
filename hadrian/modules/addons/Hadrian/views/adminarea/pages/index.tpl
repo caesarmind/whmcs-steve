@@ -67,9 +67,11 @@
 /* The wrapper is ours, not the reference's: a bare 1fr first track collapses
    the name cell inside the WHMCS admin content column. At normal widths it
    changes nothing. */
-.mt-pagerow-grid { min-width:640px; }
+/* 750, not 640: the Open column adds 84 + one 14px gap. Miss this and the
+   badges compress before .mt-pagerow-scroll engages. */
+.mt-pagerow-grid { min-width:750px; }
 .mt-pagerow-head,
-.mt-pagerow { display:grid; grid-template-columns:minmax(200px,1fr) 92px 56px 92px 104px 18px; gap:14px; align-items:center; }
+.mt-pagerow { display:grid; grid-template-columns:minmax(200px,1fr) 92px 56px 92px 104px 84px 18px; gap:14px; align-items:center; }
 .mt-pagerow-head { padding:0 14px 8px; }
 .mt-pagerow-head span { font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--mt-text-4); }
 .mt-pagerow-list { display:flex; flex-direction:column; gap:6px; }
@@ -80,8 +82,38 @@
    (3px padding + 1.5 line-height on 12px) so an "Activate" row is the same
    height as an "Active" one -- changing the global would break that. */
 .mt-pagerow .mt-badge { padding:3px 9px; font-size:11px; letter-spacing:0.02em; }
-.mt-pagerow:focus-visible { outline:2px solid var(--mt-primary); outline-offset:2px; }
+/* position:relative anchors the stretched overlay below. */
+.mt-pagerow { position:relative; }
+/* The name cell is the editor link; its ::after covers the whole row so
+   clicking anywhere still opens the editor, exactly as when the row itself
+   was an anchor.
+   position:static is LOAD-BEARING and looks like a no-op: without it the
+   inset:0 overlay would size to this cell instead of the row, and the
+   whole-row click target silently disappears. */
+.mt-pagerow-edit { position:static; text-decoration:none; color:inherit; }
+.mt-pagerow-edit:hover { text-decoration:none; color:inherit; }
+.mt-pagerow-edit::after { content:""; position:absolute; inset:0; border-radius:10px; }
+/* The row is a div now and cannot take focus, so the ring moves to the link
+   that can. Inset offset because .mt-pagerow-scroll is overflow-x:auto, which
+   clips in BOTH axes and would shave a positive-offset ring off the edge
+   rows. */
+.mt-pagerow-edit:focus-visible { outline:none; }
+.mt-pagerow-edit:focus-visible::after { outline:2px solid var(--mt-primary); outline-offset:-1px; }
+/* 0,2,0 so it beats the 0,1,0 display:grid above -- the search JS toggles this. */
 .mt-pagerow[hidden] { display:none; }
+
+/* Open cell: sits above the overlay so it wins the click. */
+.mt-pagerow-open { position:relative; z-index:1; justify-self:start; }
+.mt-pagerow-openlink { display:inline-flex; align-items:center; gap:5px; padding:3px 9px;
+    border:1px solid var(--mt-border); border-radius:999px; background:var(--mt-surface);
+    color:var(--mt-primary); font-size:11px; font-weight:600; letter-spacing:0.02em;
+    text-decoration:none; white-space:nowrap; transition:background .12s ease, border-color .12s ease; }
+.mt-pagerow-openlink:hover { background:var(--mt-primary-tint); border-color:var(--mt-primary);
+    color:var(--mt-primary); text-decoration:none; }
+.mt-pagerow-openlink:focus-visible { outline:2px solid var(--mt-primary); outline-offset:1px; }
+.mt-pagerow-openlink svg { width:11px; height:11px; display:block; flex-shrink:0; }
+/* cursor:help -- the dash's title carries the reason there is no link. */
+.mt-pagerow-open .mt-pagerow-dash { cursor:help; }
 .mt-pagerow-main { min-width:0; }
 .mt-pagerow-name { display:block; font-size:14px; font-weight:600; color:var(--mt-text); }
 .mt-pagerow-desc { display:block; font-size:12px; color:var(--mt-text-3); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -128,20 +160,29 @@
                         <span>SEO</span>
                         <span>Indexing</span>
                         <span>Visibility</span>
+                        <span>Open</span>
                         <span></span>
                     </div>
                     <div class="mt-pagerow-list">
                         {foreach $groupRows as $page}
-                            <a class="mt-pagerow"
-                               href="?module=Hadrian&amp;action=pages&amp;sub=edit&amp;page={$page.name|escape:'url'}"
-                               data-page-row
-                               data-search="{$page.label|lower|escape} {$page.description|lower|escape} {$page.name|lower|escape} {$page.variantLabel|lower|escape}">
-                                <span class="mt-pagerow-main">
+                            {* The row is a DIV, not an anchor. It used to be an
+                               <a> wrapping every cell, but the Open link below
+                               is a second anchor and anchors cannot nest --
+                               the parser would close the outer one early and
+                               re-parent the remaining cells as siblings,
+                               shattering the grid. Instead the NAME cell is
+                               the anchor and a stretched ::after restores the
+                               whole-row click target. *}
+                            <div class="mt-pagerow"
+                                 data-page-row
+                                 data-search="{$page.label|lower|escape} {$page.description|lower|escape} {$page.name|lower|escape} {$page.variantLabel|lower|escape}">
+                                <a class="mt-pagerow-main mt-pagerow-edit"
+                                   href="?module=Hadrian&amp;action=pages&amp;sub=edit&amp;page={$page.name|escape:'url'}">
                                     <span class="mt-pagerow-name">{$page.label|escape}</span>
                                     {if $page.description}
                                         <span class="mt-pagerow-desc">{$page.description|escape}</span>
                                     {/if}
-                                </span>
+                                </a>
                                 <span class="mt-pagerow-variant">{$page.variantLabel|escape}</span>
                                 <span>
                                     {if $page.hasSeo}
@@ -168,8 +209,25 @@
                                         <span class="mt-badge mt-badge-success">Public</span>
                                     {/if}
                                 </span>
+                                {* Sits ABOVE the stretched overlay (z-index), so
+                                   clicking Open opens the client-area page while
+                                   clicking anywhere else in the row still opens
+                                   the editor. plain |escape, never |escape:'url'
+                                   -- the value carries its own ?a=b query. *}
+                                <span class="mt-pagerow-open">
+                                    {if $page.publicUrl}
+                                        <a class="mt-pagerow-openlink" href="{$page.publicUrl|escape}"
+                                           target="_blank" rel="noopener"
+                                           title="Opens {$page.publicUrl|escape} in a new tab.">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-8 8"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg>
+                                            Open
+                                        </a>
+                                    {else}
+                                        <span class="mt-pagerow-dash" title="{$page.publicReason|escape}">&mdash;</span>
+                                    {/if}
+                                </span>
                                 <span class="mt-pagerow-chev" aria-hidden="true">&rsaquo;</span>
-                            </a>
+                            </div>
                         {/foreach}
                     </div>
                 </div>

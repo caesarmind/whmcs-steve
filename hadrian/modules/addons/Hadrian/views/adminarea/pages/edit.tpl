@@ -5,7 +5,29 @@
         <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Back to Pages
     </a>
-    <button form="page-edit-form" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
+    <div class="mt-toolbar-right">
+        {* Opens the real client-area page. Rendered only when the URL is
+           certain -- see Helpers\PageUrlResolver; pages that need a record id,
+           or that are one step inside a flow, get the muted note instead of a
+           link that would 404.
+
+           NB plain |escape, NOT |escape:'url'. The value is a whole path plus
+           query ("clientarea.php?action=services"); url-escaping would
+           percent-encode the ? and = and produce a dead link. This is the
+           opposite of the {$layout.dataLayout|escape:'url'} idiom on the
+           Layouts page, where only a bare value is spliced into a query
+           string someone else wrote. *}
+        {if $publicUrl}
+            <a class="mt-viewpage" href="{$publicUrl|escape}" target="_blank" rel="noopener"
+               title="Opens {$publicUrl|escape} in a new tab.">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-8 8"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg>
+                View page
+            </a>
+        {elseif $publicUrlReason}
+            <span class="mt-viewpage-none" title="{$publicUrlReason|escape}">No public URL</span>
+        {/if}
+        <button form="page-edit-form" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
+    </div>
 </div>
 
 <header class="mt-page-header">
@@ -53,6 +75,19 @@
    instead of sitting in the left half beside a hole. */
 .mt-pd-variants .mt-variant:only-child { grid-column: 1 / -1; }
 @media (max-width: 620px) { .mt-pd-variants { grid-template-columns: 1fr; } }
+
+/* Toolbar right cluster: View page + Save, so Save keeps its far-right slot. */
+.mt-toolbar-right { display: flex; align-items: center; gap: 10px; }
+.mt-viewpage { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
+    border: 1px solid var(--mt-border); border-radius: 8px; background: var(--mt-surface);
+    color: var(--mt-primary); font-size: 13px; font-weight: 600; text-decoration: none;
+    transition: background .15s ease, border-color .15s ease; }
+.mt-viewpage:hover { background: var(--mt-primary-tint); border-color: var(--mt-primary);
+    color: var(--mt-primary); text-decoration: none; }
+.mt-viewpage:focus-visible { outline: 2px solid var(--mt-primary); outline-offset: 2px; }
+.mt-viewpage svg { width: 13px; height: 13px; display: block; flex-shrink: 0; }
+/* cursor:help so the title is discoverable -- the reason IS the content here. */
+.mt-viewpage-none { font-size: 12.5px; color: var(--mt-text-3); cursor: help; }
 
 /* Rule between the variant picker and its settings, inside the same card. */
 .mt-pd-div { border-top: 1px solid var(--mt-border); margin: 20px 0 16px; }
