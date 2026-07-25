@@ -11,6 +11,20 @@
     <a class="mt-tab {if $tab == 'order'}is-active{/if}" href="?module=Hadrian&action=settings&tab=order">Order Process</a>
 </div>
 
+{* Search sits OUTSIDE the form on purpose: Enter inside a form submits it, and
+   an accidental settings save is not something an admin can undo. It filters
+   across BOTH tabs, because "which tab is it under" is exactly the thing an
+   admin does not know when they are hunting for a setting. *}
+<div class="mt-search mt-set-search">
+    <span class="mt-search-icon" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </span>
+    <input type="search" id="mt-set-search" class="mt-input" placeholder="Search settings&hellip;"
+           autocomplete="off" spellcheck="false" aria-label="Search settings">
+    <button type="button" class="mt-search-clear" id="mt-set-search-clear" aria-label="Clear search" hidden>&#10005;</button>
+</div>
+<div class="mt-set-searchinfo" id="mt-set-searchinfo" role="status" aria-live="polite"></div>
+
 <style>
     .mt-tab-off { display: none !important; }
     .mt-row-with-sub { border-bottom: 0; }
@@ -170,6 +184,41 @@
     .mt-multi-chip-icon svg { width: 12px; height: 12px; display: block; }
 </style>
 
+{* A SEPARATE, {literal}-wrapped block. The <style> above is NOT wrapped and
+   survives only because every "{" in it happens to be followed by a space --
+   compact CSS added there would be parsed as a Smarty tag and break the page.
+   New rules go here where that cannot happen. *}
+{literal}
+<style>
+/* Group heading + its one-line description. .mt-subhead is the house eyebrow
+   (11px uppercase); the sub-line explains the group in the admin's words. */
+.mt-set-group + .mt-set-group { margin-top: 26px; }
+.mt-set-group-head { margin-bottom: 2px; }
+.mt-set-group-sub { font-size: 12.5px; color: var(--mt-text-3); margin: 0 0 10px; }
+
+/* Search box. .mt-search/.mt-search-icon/.mt-search-clear already exist in
+   admin.css (the Pages list uses them); only the page-level spacing is new. */
+.mt-set-search { margin: 0 0 6px; }
+.mt-set-search .mt-input { padding-right: 34px; border-radius: 10px; }
+.mt-set-search input[type="search"]::-webkit-search-cancel-button,
+.mt-set-search input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+.mt-set-searchinfo { font-size: 12.5px; color: var(--mt-text-3); margin: 0 0 16px; min-height: 1px; }
+.mt-set-searchinfo:empty { margin-bottom: 18px; }
+
+/* .mt-row is display:flex and admin.css has no [hidden] rule, so the author
+   declaration beats the UA sheet and row.hidden would do nothing without this.
+   Same for the sub-panels and the group wrappers. */
+.mt-row[hidden],
+.mt-row-sub[hidden],
+.mt-set-group[hidden] { display: none !important; }
+
+/* While a search is active the tab strip is misleading -- results cross both
+   tabs -- so it is dimmed and the group headings carry the context instead. */
+.mt-set-searching .mt-tabs { opacity: 0.45; }
+.mt-set-noresults { font-size: 13px; color: var(--mt-text-3); padding: 20px 0 4px; }
+</style>
+{/literal}
+
 <form method="post" action="" novalidate>
     <div class="mt-panel">
     <section class="mt-section">
@@ -180,11 +229,28 @@
             </div>
         </header>
 
-        {foreach $flags as $key => $meta}
+        {* Rows are grouped into named sections so the eye can land somewhere.
+           The grouping is presentational ONLY: every group still renders, for
+           BOTH tabs, and the inactive tab is hidden with .mt-tab-off exactly as
+           before. That matters because save() writes each flag from
+           isset($_POST[$key]) -- a row that stopped rendering would be
+           posted-as-absent and silently switched off. display:none does not
+           exclude a control from submission, so hidden rows still post. *}
+        {foreach $flagGroups as $mtGroup}
+        <div class="mt-set-group{if $mtGroup.tab != $tab} mt-tab-off{/if}" data-set-group="{$mtGroup.slug|escape}">
+            <div class="mt-subhead mt-set-group-head">{$mtGroup.label|escape}</div>
+            <div class="mt-set-group-sub">{$mtGroup.sub|escape}</div>
+        {foreach $mtGroup.flags as $key => $meta}
             {assign var=mtIsLangToggle value=($key == 'custom_language_list')}
             {assign var=mtFlagTab value=$flagTabs[$key]|default:'general'}
             {assign var=mtHasSub value=($mtIsLangToggle || $key == 'cart_subnav' || $key == 'website_subnav' || $key == 'service_controls_outside' || $key == 'enable_dark_mode' || $key == 'cookie_box')}
-            <div class="mt-row{if $mtHasSub} mt-row-with-sub{/if}{if $mtFlagTab != $tab} mt-tab-off{/if}">
+            {* data-search carries label + help + the synonym list from
+               SettingsController::FLAG_SEARCH_TERMS, so "gdpr" finds Cookie Box
+               and "hreflang" finds Enable Alternate Links. Filtering only ever
+               toggles [hidden]; the input stays in the DOM and still posts. *}
+            <div class="mt-row{if $mtHasSub} mt-row-with-sub{/if}{if $mtFlagTab != $tab} mt-tab-off{/if}"
+                 data-set-row
+                 data-search="{$meta[0]|lower|escape} {$meta[1]|lower|escape} {$searchTerms[$key]|default:''|escape}">
                 <div>
                     <div class="mt-row-label">{$meta[0]|escape}</div>
                     <div class="mt-row-help">{$meta[1]|escape}</div>
@@ -436,6 +502,8 @@
                     </div>
                 </div>
             {/if}
+        {/foreach}
+        </div>
         {/foreach}
 
         {* ════════════════════════════════════════════════════════════════
@@ -987,6 +1055,102 @@
         }
         select.addEventListener('change', function () { show(select.value); });
         show(select.value);
+    });
+})();
+</script>
+{/literal}
+
+
+{literal}
+<script>
+/* Settings search + the Enter guard.
+
+   Its own IIFE, appended last, so it cannot be affected by the early returns
+   in the pickers' script above. Filtering only toggles [hidden]: a hidden
+   control is still submitted, so a filtered view saves exactly like an
+   unfiltered one. Nothing is ever removed from the DOM -- save() writes each
+   flag from isset($_POST[key]), so a row that stopped rendering would be
+   posted-as-absent and silently switched off. */
+(function () {
+    'use strict';
+
+    // Enter inside ANY search box on this page would submit the settings form
+    // and save. That includes the pre-existing chip pickers (language, page
+    // and product-group choosers), which have always had this hazard.
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        var t = e.target;
+        if (!t || t.tagName !== 'INPUT') return;
+        if (t.type !== 'search' && t.type !== 'text') return;
+        if (!t.closest('.mt-search, .mt-multi-search-wrap')) return;
+        e.preventDefault();
+    });
+
+    var box = document.getElementById('mt-set-search');
+    if (!box) return;
+    var clear  = document.getElementById('mt-set-search-clear');
+    var info   = document.getElementById('mt-set-searchinfo');
+    var groups = [].slice.call(document.querySelectorAll('[data-set-group]'));
+    var rows   = [].slice.call(document.querySelectorAll('[data-set-row]'));
+    if (!rows.length) return;
+
+    // A row's sub-panel is a SIBLING, not a child, so hiding the row alone
+    // would leave an orphaned picker floating under the wrong heading.
+    function subsOf(row) {
+        var out = [], n = row.nextElementSibling;
+        while (n && !n.hasAttribute('data-set-row')) {
+            if (n.classList.contains('mt-row-sub')) out.push(n);
+            n = n.nextElementSibling;
+        }
+        return out;
+    }
+    var subs = rows.map(subsOf);
+
+    // Remembered so clearing the search restores exactly what the sub-panel's
+    // own toggle had decided, rather than forcing everything open.
+    var subWasHidden = subs.map(function (list) {
+        return list.map(function (el) { return el.hidden; });
+    });
+
+    function apply() {
+        var q = (box.value || '').trim().toLowerCase();
+        clear.hidden = q === '';
+        document.body.classList.toggle('mt-set-searching', q !== '');
+
+        var shown = 0;
+        rows.forEach(function (row, i) {
+            var hit = !q || (row.getAttribute('data-search') || '').indexOf(q) !== -1;
+            row.hidden = !hit;
+            subs[i].forEach(function (el, j) {
+                // While searching, a matched row keeps its panel in whatever
+                // state its toggle left it; a non-matched row hides both.
+                el.hidden = !hit || (q ? subWasHidden[i][j] : subWasHidden[i][j]);
+            });
+            if (hit) shown++;
+        });
+
+        // A group with nothing visible would leave a bare heading behind.
+        groups.forEach(function (g) {
+            var any = [].slice.call(g.querySelectorAll('[data-set-row]'))
+                        .some(function (r) { return !r.hidden; });
+            g.hidden = q !== '' && !any;
+        });
+
+        if (!q) {
+            info.textContent = '';
+        } else if (shown === 0) {
+            info.textContent = 'No settings match "' + q + '".';
+        } else {
+            info.textContent = shown === 1
+                ? '1 setting matches "' + q + '" (across both tabs).'
+                : shown + ' settings match "' + q + '" (across both tabs).';
+        }
+    }
+
+    box.addEventListener('input', apply);
+    clear.addEventListener('click', function () { box.value = ''; apply(); box.focus(); });
+    box.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && box.value) { e.preventDefault(); box.value = ''; apply(); }
     });
 })();
 </script>

@@ -106,10 +106,110 @@ final class SettingsController extends AbstractController
         'cart_subnav' => 'order',
     ];
 
+    /**
+     * Which sub-group each flag renders under, and the order the groups appear.
+     *
+     * Purely presentational: it decides where a row is DRAWN, never whether it
+     * is drawn. Every settingsPageFlags() key still reaches the form (see
+     * grouped() below), because save() writes each key from
+     * isset($_POST[$key]) — a row that stopped rendering would be
+     * posted-as-absent and silently switched off.
+     *
+     * Declaration order here is the render order. The FLAGS array itself must
+     * NOT be reordered: LayoutsController reads its slots positionally.
+     */
+    private const FLAG_GROUPS = [
+        // slug        => [label, one-line description, which tab it belongs to]
+        'appearance'   => ['Appearance',            'Colour mode, label casing and card treatment.', 'general'],
+        'navigation'   => ['Navigation',            'Menu icons and the client-area section sidebar.', 'general'],
+        'pricing'      => ['Pricing Display',       'How prices are presented. Nothing here changes a price.', 'general'],
+        'locale'       => ['Language & SEO',        'The locale chooser and multi-language link tags.', 'general'],
+        'privacy'      => ['Privacy & Performance', 'Consent banner and data-table loading.', 'general'],
+        // Catch-all. Empty today; it exists so a future FLAGS key with no
+        // FLAG_GROUP entry lands somewhere VISIBLE rather than vanishing.
+        'general'      => ['Other',                 'Options not yet assigned to a category.', 'general'],
+        'cart'         => ['Cart Layout',           'The order form’s own sidebar.', 'order'],
+    ];
+
+    /** flag key => FLAG_GROUPS slug. Anything unlisted falls into 'general'. */
+    private const FLAG_GROUP = [
+        'enable_dark_mode'         => 'appearance',
+        'capitalize_titles'        => 'appearance',
+        'service_controls_outside' => 'appearance',
+        'topnav_show_icons'        => 'navigation',
+        'website_subnav'           => 'navigation',
+        'free_label'               => 'pricing',
+        'hide_cycle_discounts'     => 'pricing',
+        'custom_language_list'     => 'locale',
+        'enable_alternate_links'   => 'locale',
+        'cookie_box'               => 'privacy',
+        'enable_dynamic_ajax'      => 'privacy',
+        'cart_subnav'              => 'cart',
+    ];
+
+    /**
+     * Extra words folded into a row's search haystack, so a setting is
+     * findable by the outcome an admin has in mind rather than only by the
+     * exact words in its label ("gdpr" -> Cookie Box, "hreflang" -> Enable
+     * Alternate Links).
+     */
+    private const FLAG_SEARCH_TERMS = [
+        'cookie_box'               => 'gdpr consent banner privacy notice',
+        'enable_alternate_links'   => 'hreflang seo multilingual alternate head tags',
+        'custom_language_list'     => 'locale chooser restrict limit languages translations',
+        'enable_dynamic_ajax'      => 'paginate pagination tables performance services domains invoices tickets',
+        'free_label'               => 'price pricing zero 0.00 currency',
+        'hide_cycle_discounts'     => 'save percent pill billing cycle discount',
+        'capitalize_titles'        => 'uppercase caps casing marketing store homepage eyebrow',
+        'service_controls_outside' => 'card title header inside outside layout flat',
+        'topnav_show_icons'        => 'menu icons navbar header navigation',
+        'website_subnav'           => 'sidebar section client area subnav account domain tools',
+        'cart_subnav'              => 'sidebar categories cart order store subnav',
+        'enable_dark_mode'         => 'dark light theme colour color switcher forced',
+    ];
+
     /** FLAGS minus the ones that have moved to the Layouts page. */
     public static function settingsPageFlags(): array
     {
         return array_diff_key(self::FLAGS, array_flip(self::LAYOUT_FLAGS));
+    }
+
+    /**
+     * settingsPageFlags() partitioned into render groups.
+     *
+     * Built by iterating settingsPageFlags() itself — the same array save()
+     * iterates — so the set of keys the form renders is provably identical to
+     * the set save() writes. A key with no FLAG_GROUP entry falls into
+     * 'general' rather than disappearing. Empty groups are dropped so no bare
+     * heading is drawn.
+     *
+     * @return list<array{slug:string,label:string,sub:string,tab:string,flags:array<string,array>}>
+     */
+    public static function groupedFlags(): array
+    {
+        $buckets = array_fill_keys(array_keys(self::FLAG_GROUPS), []);
+        foreach (self::settingsPageFlags() as $key => $meta) {
+            $slug = self::FLAG_GROUP[$key] ?? 'general';
+            if (!array_key_exists($slug, $buckets)) {
+                $slug = 'general';           // unknown slug still renders
+            }
+            $buckets[$slug][$key] = $meta;
+        }
+
+        $out = [];
+        foreach (self::FLAG_GROUPS as $slug => [$label, $sub, $tab]) {
+            if ($buckets[$slug] === []) {
+                continue;
+            }
+            $out[] = ['slug' => $slug, 'label' => $label, 'sub' => $sub, 'tab' => $tab, 'flags' => $buckets[$slug]];
+        }
+        return $out;
+    }
+
+    /** @return array<string,string> flag key => extra search words */
+    public static function searchTerms(): array
+    {
+        return self::FLAG_SEARCH_TERMS;
     }
 
     public function indexAction(): string
@@ -198,6 +298,8 @@ final class SettingsController extends AbstractController
         return $this->view('settings/index', [
             'flags'              => self::settingsPageFlags(),
             'flagTabs'           => self::FLAG_TABS,
+            'flagGroups'         => self::groupedFlags(),
+            'searchTerms'        => self::searchTerms(),
             'values'             => $values,
             'darkModeDisplay'    => (string)Settings::getValue('dark_mode_display', 'switcher'),
             'darkModeDefault'    => (string)Settings::getValue('dark_mode_default', 'light'),
