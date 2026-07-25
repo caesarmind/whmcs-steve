@@ -147,6 +147,10 @@ final class PagesController extends AbstractController
             fn (string $l) => ['name' => $l, 'label' => ucwords(str_replace(['-', '_'], ' ', $l))],
             LocaleHelper::effectiveList()
         );
+        // Which language the editor's picker should open on when nothing is
+        // translated yet. Without this the view fell back to the first entry of
+        // an alphabetical list, so a fresh install opened every page on Arabic.
+        $seoDefaultLanguage = LocaleHelper::systemDefault();
 
         // Project each declared option onto a uniform row the view can iterate.
         $optionRows = [];
@@ -184,6 +188,7 @@ final class PagesController extends AbstractController
             'seo'              => $options['seo'],
             'seoUrl'           => $options['url'],
             'seoLanguages'     => $seoLanguages,
+            'seoDefaultLanguage' => $seoDefaultLanguage,
             'layoutChoices'    => [
                 'main-menu' => $this->layoutChoices($template, 'main-menu'),
                 'footer'    => $this->layoutChoices($template, 'footer'),

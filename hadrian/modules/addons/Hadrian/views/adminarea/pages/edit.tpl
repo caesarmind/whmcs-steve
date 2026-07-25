@@ -319,7 +319,7 @@
                 </button>
             {/if}
 
-            <div id="seo-langs" class="mt-seo-langs{if $seoLanguages|count > 1} is-single{/if}">
+            <div id="seo-langs" class="mt-seo-langs{if $seoLanguages|count > 1} is-single{/if}" data-default-lang="{$seoDefaultLanguage|escape}">
                 {foreach $seoLanguages as $lng}
                     {assign var=lcode value=$lng.name}
                     <div class="mt-seo-lang" data-lang="{$lcode|escape}" data-label="{$lng.label|escape}">
@@ -503,8 +503,12 @@
     });
 
     pick.addEventListener('change', function () { showLang(pick.value); });
-    // Prefer the language that already has content, else the first option.
-    var initial = (langs.filter(isFilled)[0] || langs[0]).getAttribute('data-lang');
+    // Open on a language that already has content; otherwise the WHMCS system
+    // default. Falling back to langs[0] alone meant a fresh install (nothing
+    // translated anywhere) opened every page on Arabic -- first alphabetically.
+    var def = box.getAttribute('data-default-lang') || '';
+    var defBlock = langs.filter(function (l) { return l.getAttribute('data-lang') === def; })[0];
+    var initial = (langs.filter(isFilled)[0] || defBlock || langs[0]).getAttribute('data-lang');
     pick.value = initial;
     showLang(initial);
     refreshCounts();
