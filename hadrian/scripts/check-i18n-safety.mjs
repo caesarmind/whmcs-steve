@@ -33,6 +33,16 @@ for (const f of files) {
   for (const [name, o, cl] of checks) {
     if (o !== cl) { console.log(`IMBALANCE  ${f}: ${name} -> ${o} open vs ${cl} close`); fail = 1; }
   }
+  // NESTED {* *}: Smarty comments do not nest, so an inner close ends the
+  // outer block early and everything after it renders as literal text on the
+  // page. The count check above cannot see this -- a nested pair balances.
+  for (const m of raw.matchAll(/\{\*([\s\S]*?)\*\}/g)) {
+    if (m[1].includes('{*')) {
+      const line = raw.slice(0, m.index).split('\n').length;
+      console.log(`NESTEDCOMM ${f}:${line}: a {* *} comment contains another {* -- comments do not nest, so the rest of the block leaks onto the page as text`);
+      fail = 1;
+    }
+  }
   for (const m of raw.matchAll(/hadrianLang\.([a-zA-Z]+)\.([a-zA-Z0-9]+)/g)) {
     if (!haveKey(m[2])) { console.log(`BADREF     ${f}: $hadrianLang.${m[1]}.${m[2]} (key '${m[2]}' not in lang file)`); fail = 1; }
   }

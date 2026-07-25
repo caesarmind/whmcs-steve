@@ -106,6 +106,11 @@
 .mt-seo-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mt-text-4); flex-shrink: 0; }
 .mt-seo-lang.is-filled .mt-seo-dot { background: var(--mt-success); }
 .mt-seo-lang[hidden] { display: none !important; }
+/* The title/description tips live inside the per-language block, so the rail
+   (one language at a time) shows one of each -- but the bulk table renders all
+   26 rows at once and 52 info icons is noise. The column context there makes
+   them redundant anyway. */
+.mt-seo-langs.is-table .mt-tip { display: none; }
 @media (max-width: 760px) { .mt-seo-langs.is-table .mt-seo-lang { grid-template-columns: 1fr; } .mt-seo-langs.is-table .mt-seo-lang-head { padding-top: 0; } }
 
 </style>
@@ -309,7 +314,7 @@
                         </div>
                         <div class="mt-field mt-seo-title">
                             <div class="mt-field-row">
-                                <label class="mt-field-label" for="seo-title-{$lcode|escape}">SEO title</label>
+                                <span class="mt-tip-line"><label class="mt-field-label" for="seo-title-{$lcode|escape}">SEO title</label>{include file="includes/tip.tpl" text="The page title tag, and the headline shown in search results. Aim for 50-60 characters; longer titles get truncated."}</span>
                                 <div class="mt-field-tools">
                                     <span class="mt-charcount">{$titleMap[$lcode]|default:''|strlen}/64</span>
                                 </div>
@@ -319,7 +324,7 @@
 
                         <div class="mt-field mt-seo-desc">
                             <div class="mt-field-row">
-                                <label class="mt-field-label" for="seo-desc-{$lcode|escape}">SEO description</label>
+                                <span class="mt-tip-line"><label class="mt-field-label" for="seo-desc-{$lcode|escape}">SEO description</label>{include file="includes/tip.tpl" text="The snippet under the title in search results. Keep it under 160 characters. It does not affect ranking, but it drives click-through."}</span>
                                 <div class="mt-field-tools">
                                     <span class="mt-charcount">{$descMap[$lcode]|default:''|strlen}/160</span>
                                 </div>

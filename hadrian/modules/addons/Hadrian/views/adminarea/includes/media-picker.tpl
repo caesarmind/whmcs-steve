@@ -1,11 +1,13 @@
 {*
     Media picker — ONE modal shared by every image field in the admin.
 
-    Opt in from any text input by adding data-mt-media:
+    Opt in from any text input by adding data-mt-media. NB: no nested Smarty
+    comment markers below -- comments do NOT nest, so an inner close would end
+    this block early and dump the rest of it onto the page as text.
 
       <input type="text" name="seo_social_image" class="mt-input"
              data-mt-media
-             data-mt-media-value="url"          {* url | filename *}
+             data-mt-media-value="url"           (url | filename)
              data-mt-media-collection="library"
              data-mt-media-title="Social image"
              data-mt-media-hint="1200 x 630 recommended">
