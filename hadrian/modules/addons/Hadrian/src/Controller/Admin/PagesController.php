@@ -386,14 +386,19 @@ final class PagesController extends AbstractController
         'usagebillingpricing',
         // Gateway interstitial, auto-submitted mid-payment.
         '3dsecure',
-        // Ticket submission wizard: steps and two partials included by step 2.
-        'supportticketsubmit-stepone',
-        'supportticketsubmit-steptwo',
+        // Ticket submission: only the POST-entered confirmation and the two
+        // partials step 2 includes. NOT -stepone or -steptwo, which are both
+        // plain GET destinations -- verified live, /submitticket.php returns
+        // data-tpl="supportticketsubmit-stepone" and
+        // ?step=2&deptid=1 returns data-tpl="supportticketsubmit-steptwo"
+        // (?step=3 redirects to login, so confirm really is unreachable).
         'supportticketsubmit-confirm',
         'supportticketsubmit-customfields',
         'supportticketsubmit-kbsuggestions',
-        // SSL configuration wizard, entered with ?cert=<hash>.
-        'configuressl-stepone',
+        // SSL wizard steps 2 and 3 only: step 1 is GET-entered from the SSL
+        // module's link (configuressl.php?cert=<hash>) and its own stock
+        // template branches on {if !$status} to an "Invalid link" message,
+        // which can only render on a bare GET. Steps 2-3 are POSTed to.
         'configuressl-steptwo',
         'configuressl-complete',
         // Upgrade wizard steps 2 and 3; step 1 is `upgrade`, which stays.
@@ -404,9 +409,38 @@ final class PagesController extends AbstractController
         'two-factor-new-backup-code',
         // Per-domain buy/disable confirmation; needs domainid + action + addon.
         'clientareadomainaddons',
+
+        // ── Legacy template names WHMCS 9 never renders ──────────────────
+        // Each pairs with a modern templatefile that IS emitted, so the list
+        // was showing two rows for one screen. Confirmed by their absence from
+        // BOTH stock themes in this repo: `six` is what WHMCS falls back to
+        // when the active theme lacks a template, so a name missing from six
+        // AND nexus cannot be one WHMCS 9 emits. The legacy URLs still resolve
+        // (clientarea.php?action=changepw|contacts|users all return 200) --
+        // it is the URL that stayed compatible, not the templatefile.
+        //
+        // These rows are inert: Hooks::resolveCurrentPage keys off
+        // $vars['templatefile'], so settings saved against them never reach a
+        // request. Hiding the row loses nothing.
+        //
+        // DO NOT DELETE THE DIRECTORIES. Several are still load-bearing:
+        // supporttickets/ holds the real 14 KB implementation that the
+        // 74-byte supportticketslist/ forwards to, supportticketsubmit/ holds
+        // the 21 KB implementation that -stepone and -steptwo include, and
+        // most are menu URL targets (Menu\WhmcsDefaults) or picker entries
+        // (Menu\MenuPages) with page names already persisted in seeded menus.
+        'changepassword',       // -> user-password
+        'changepw',             // -> user-password
+        'clientareacontacts',   // -> account-contacts-manage
+        'clientareausers',      // -> account-user-management
+        'supporttickets',       // -> supportticketslist
+        'submitticket',         // -> supportticketsubmit-stepone
+        'supportticketsubmit',  // -> supportticketsubmit-stepone / -steptwo
+
         // NB deliberately NOT here: custom-page (the designed extension point),
-        // and the four password-reset-* dirs, which already carry
-        // listDisplay => false in their own page.php.
+        // the 13 bespoke store-* Shop pages, `upgrade` (GET-linked from
+        // productdetails), and the four password-reset-* dirs, which already
+        // carry listDisplay => false in their own page.php.
     ];
 
     private function readPageOptions(Template $template, string $page, array $meta): array
