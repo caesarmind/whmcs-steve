@@ -49,6 +49,11 @@
 {/if}
 {if $secW >= 4}{assign var=secRoomy value=true}{else}{assign var=secRoomy value=false}{/if}
 
+{* Panels, not lists. They have no rows, so they must not run the list
+   scaffolding below -- and above all not the hide-when-empty guard, which reads
+   $secCount and would delete an always-available block outright. *}
+{if $sec == 'domainreg' || $sec == 'profile'}{assign var=secPanel value=true}{else}{assign var=secPanel value=false}{/if}
+
 {* Which sections can grow a filter box: Services and Domains only. They are the
    two an established client keeps scanning for a specific row -- "which of my
    hosting accounts is web-03" -- whereas invoices, tickets and announcements
@@ -67,12 +72,85 @@
    no heading and no grid item behind. Guarding the whole file rather than just
    the empty-state branch is what makes the surrounding grid close up. *}
 {assign var=secHide value=$secHideEmpty|default:false}
-{if $secCount > 0 || !$secHide}
+{if $secPanel || $secCount > 0 || !$secHide}
 {* data-blk-paint / data-blk-fill drive the block paint rules in
    pages/clientareahome.css. Both are whitelisted in SectionLayout::parse, so an
    unknown value never reaches the attribute. Emitted only when set, so an
    unpainted block carries no attribute and matches no rule. *}
 <div class="min-section" data-sec="{$sec}" data-w="{$secW}"{if $secPaint|default:''} data-blk-paint="{$secPaint|escape}" data-blk-fill="{$secFill|default:'solid'|escape}"{/if}>
+{if $secPanel}
+    {* ---------- Panels ----------
+       Kept inside .min-section so they take part in the grid, the width spans
+       and the :has(> .min-section) visibility guard, but they carry no section
+       head and no .min-list: one .blk that reflows via its container query. *}
+    <div class="blk">
+        {if $sec == 'domainreg'}
+        <div class="blk-body">
+            <div>
+                <div class="blk-title">{$LANG.registerdomain|default:'Register a domain'}</div>
+                <div class="blk-sub">{$hadrianLang.dashboard.domainBlockSub}</div>
+            </div>
+            {* Posts to the same endpoint and field name the stock themes use
+               (six/header.tpl: action=domainchecker.php, name="domain"). The
+               second control is a plain LINK into the cart rather than a second
+               submit: WHMCS's own transfer button depends on scripts.min.js,
+               which this theme does not load, and a link always works.
+
+               $captcha is not assigned on clientareahome, so it is included
+               only when present -- on an install with captcha required for the
+               domain checker the inline search would abort, which is exactly
+               why the cart link beside it is a real navigation. *}
+            <form class="blk-form" action="{$WEB_ROOT}/domainchecker.php" method="post">
+                <input class="blk-input" type="text" name="domain" autocapitalize="none" autocomplete="off"
+                       placeholder="{$LANG.exampledomain|default:'yourdomain.com'|escape}"
+                       aria-label="{$LANG.registerdomain|default:'Register a domain'|escape}">
+                <div class="blk-btns">
+                    <button type="submit" class="blk-btn">{$LANG.search|default:'Search'}</button>
+                    <a class="blk-btn ghost" href="{$WEB_ROOT}/cart.php?a=add&amp;domain=transfer">{$LANG.transferdomain|default:'Transfer'}</a>
+                </div>
+            </form>
+            {if isset($captcha) && $captcha && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm|default:'')}
+                {include file="`$template`/includes/captcha.tpl"}
+            {/if}
+            {* Live register prices, newest currency. Renders nothing when WHMCS
+               has no priced TLDs, so the block never shows an empty rail. *}
+            {if $dashboard.tldPricing|default:[] && $dashboard.tldPricing|@count > 0}
+            <div class="blk-chips">
+                {foreach $dashboard.tldPricing as $tld}
+                <span class="blk-chip">{$tld.tld|escape} <b>{$tld.price|escape}</b></span>
+                {/foreach}
+            </div>
+            {/if}
+        </div>
+        {else}
+        {* Profile. $clientsdetails is global on every client-area page, so this
+           needs no hook data. Initials are recomputed here rather than reusing
+           $user_initials: that is assigned inside whichever chrome partial the
+           active layout happens to include, so it is not reliably in scope. *}
+        {assign var=blkFirst value=$clientsdetails.firstname|default:''}
+        {assign var=blkLast value=$clientsdetails.lastname|default:''}
+        {assign var=blkI1 value=$blkFirst|truncate:1:''|upper}
+        {assign var=blkI2 value=$blkLast|truncate:1:''|upper}
+        {assign var=blkInitials value=$blkI1|cat:$blkI2}
+        <div class="blk-body">
+            <div class="blk-person">
+                <span class="blk-avatar">{$blkInitials|escape}</span>
+                <span class="blk-who">
+                    <span class="blk-name">{"`$blkFirst` `$blkLast`"|trim|escape}</span>
+                    <span class="blk-meta">
+                        {$clientsdetails.email|default:''|escape}
+                        {if $clientsdetails.city}<br>{$clientsdetails.city|escape}{if $clientsdetails.state}, {$clientsdetails.state|escape}{/if}{/if}
+                    </span>
+                </span>
+                <span class="blk-acts">
+                    <a class="blk-btn quiet" href="{$WEB_ROOT}/clientarea.php?action=details">{$LANG.navchangedetails|default:'My Details'}</a>
+                    <a class="blk-btn quiet" href="{routePath('user-security')}">{$LANG.navsecuritysettings|default:'Security'}</a>
+                </span>
+            </div>
+        </div>
+        {/if}
+    </div>
+{else}
     <div class="min-section-head">
         <span class="min-section-label">{if $sec == 'services'}{$LANG.navservices|default:'Services'}{elseif $sec == 'domains'}{$LANG.navdomains|default:'Domains'}{elseif $sec == 'invoices'}{$hadrianLang.dashboard.recentInvoices}{elseif $sec == 'tickets'}{$LANG.navtickets|default:'Support'}{else}{$LANG.announcements|default:'Announcements'}{/if}</span>
         {if $secCount > 0}
@@ -176,5 +254,6 @@
             {/if}
         {/if}
     </div>
+{/if}{* /panel vs list *}
 </div>
 {/if}{* /hide-when-empty guard *}

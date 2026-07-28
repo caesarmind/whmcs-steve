@@ -85,6 +85,34 @@ return [
                 'invoices'      => ['label' => 'Recent invoices', 'w' => '1/2'],
                 'tickets'       => ['label' => 'Support',         'w' => '1/2'],
                 'announcements' => ['label' => 'Announcements',   'w' => '1/2'],
+                // optIn: appended SWITCHED OFF to layouts saved before these
+                // existed, so an arranged dashboard never gains blocks on its
+                // own. They show in the builder ready to be turned on.
+                // paintable: offers the colour control in the settings drawer.
+                // The list sections do not -- their rows carry status pills and
+                // token-coloured text that a saturated fill would wreck.
+                'domainreg'     => ['label' => 'Register a domain', 'w' => '1/2', 'optIn' => true, 'paintable' => true],
+                'profile'       => ['label' => 'Profile',           'w' => '1/2', 'optIn' => true, 'paintable' => true],
+            ],
+
+            // Colours a block may be painted with: the palette keys the theme
+            // already ships, plus the three free slots a buyer sets on
+            // Styles > Colors. Keys are matched against this list in
+            // SectionLayout::parse -- an unlisted one is dropped rather than
+            // reaching the CSS. APPEND ONLY: removing a key silently strips
+            // that colour from any layout using it on the next save.
+            'paints' => [
+                'accent' => 'Accent',
+                'indigo' => 'Indigo',
+                'purple' => 'Purple',
+                'green'  => 'Green',
+                'teal'   => 'Teal',
+                'orange' => 'Orange',
+                'red'    => 'Red',
+                'gray'   => 'Gray',
+                'block1' => 'Block accent 1',
+                'block2' => 'Block accent 2',
+                'block3' => 'Block accent 3',
             ],
             'widths' => [
                 '1/1' => 'Full width',

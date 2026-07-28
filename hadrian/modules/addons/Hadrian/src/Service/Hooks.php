@@ -976,8 +976,46 @@ final class Hooks
                 // and a badge and nothing else. Reuse the login page's fetcher so
                 // the dashboard gets real ids, titles and dates.
                 'announcements'  => $this->fetchRecentAnnouncements(self::DASHBOARD_ROWS),
+                // TLD prices for the Register-a-domain block. GATED: this is an
+                // uncached localAPI('GetTLDPricing') on the busiest page in the
+                // client area, so it only runs when a layout actually mentions
+                // that block. A substring test rather than a full parse -- the
+                // false positive (block present but switched off) costs one
+                // wasted call on a page nobody has arranged that way, whereas a
+                // second Page::get + parse would cost every visitor.
+                'tldPricing'     => $this->dashboardMentions($template, 'domainreg')
+                    ? $this->fetchDomainTldPricing(6)
+                    : [],
             ],
         ];
+    }
+
+    /**
+     * Cheap "is this block in the saved dashboard layout at all" probe, used to
+     * gate work that only one block needs. Reads the same registry row the
+     * renderer will read moments later; returns false when nothing is saved,
+     * which is the common case (a blank layout means the classic shell, which
+     * has no such blocks).
+     */
+    private function dashboardMentions(Template $template, string $sectionKey): bool
+    {
+        try {
+            $row = \Hadrian\Models\Page::get($template->getName(), 'clientareahome');
+            if ($row === null) {
+                return false;
+            }
+            $settings = is_array($row['settings'] ?? null) ? $row['settings'] : [];
+            $options  = is_array($settings['options'] ?? null) ? $settings['options'] : [];
+            foreach ($options as $key => $value) {
+                if (is_string($value) && str_starts_with((string)$key, 'min_sections')
+                    && str_contains($value, $sectionKey)) {
+                    return true;
+                }
+            }
+        } catch (\Throwable) {
+            // Registry unavailable -- skip the extra work rather than fail the page.
+        }
+        return false;
     }
 
     /**

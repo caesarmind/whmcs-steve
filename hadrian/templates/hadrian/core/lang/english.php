@@ -265,6 +265,7 @@ return [
         // Prefix for a domain's next renewal date. Deliberately NOT
         // $LANG.domainrenewals, which is the "Domain Renewals" page title.
         'renews'            => 'Renews',
+        'domainBlockSub'    => 'Find your perfect domain name',
         'noMatches'         => 'Nothing matches your search.',
         'noDomainsTitle'    => 'No domains yet',
         'noDomainsSub'      => 'Register or transfer a domain to see it here.',
