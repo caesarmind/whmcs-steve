@@ -1253,6 +1253,15 @@ final class Hooks
             $response = localAPI('GetTickets', [
                 'clientid' => $clientId,
                 'limitnum' => 100,
+                // localAPI runs as an admin, and GetTickets adheres to that
+                // admin's department memberships unless told otherwise -- a
+                // restricted API user gets result=success with an empty list,
+                // which reads exactly like "this client has no tickets". Same
+                // root cause that emptied the dashboard tile; see
+                // fetchOpenTickets. This path is only the fallback behind
+                // WHMCS-native $tickets on supporttickets, so it keeps the API
+                // (and its deptname/unread fields) and just asks correctly.
+                'ignore_dept_assignments' => true,
             ]);
             if (($response['result'] ?? '') !== 'success') return [];
             $out = [];
@@ -1541,20 +1550,108 @@ final class Hooks
         }
     }
 
+    /**
+     * The client's open tickets for the dashboard.
+     *
+     * READS tbltickets DIRECTLY, and that is the whole point of this method.
+     *
+     * It used to call localAPI('GetTickets'). localAPI runs as an ADMIN, and
+     * GetTickets adheres to the departments that admin is a member of unless
+     * `ignore_dept_assignments` is passed — the official parameter table words
+     * it as "Pass as true to not adhere to the departments the API user is a
+     * member of". A department-restricted API user therefore gets back
+     * result=success with an EMPTY ticket list, which is indistinguishable
+     * from "this client has no tickets".
+     *
+     * That produced a dashboard reading "6 Tickets" over "No open tickets.":
+     * the heading comes from $clientsstats.numactivetickets, which WHMCS
+     * computes straight from the client's rows with no department filter, and
+     * the body came from this fetch, which the department filter had emptied.
+     *
+     * Passing ignore_dept_assignments would fix that one cause. Querying the
+     * table removes the whole class of them — no admin identity, no department
+     * adherence, no API-user configuration to get wrong on a buyer's install.
+     * It is also what this codebase already does everywhere else tickets
+     * actually work: TableData::tickets() (the Support page's AJAX table) runs
+     * exactly this query with the same $_SESSION['uid'], which is the evidence
+     * that the client id was never the problem.
+     *
+     * Side benefit: the old call passed 'orderby'/'order', which GetTickets
+     * does not accept — the intended "newest reply first" never happened and
+     * the rows came back in whatever order the API chose. It is a real
+     * ORDER BY now.
+     */
     private function fetchOpenTickets(int $clientId): array
+    {
+        if ($clientId === 0) {
+            return [];
+        }
+        try {
+            // select('*') rather than naming columns: this runs against every
+            // buyer's schema and an unknown column name is a fatal, whereas a
+            // missing key below just reads as ''.
+            $rows = \WHMCS\Database\Capsule::table('tbltickets')
+                ->where('userid', $clientId)
+                // Same exclusion the API path applied, kept verbatim so this
+                // change cannot alter which tickets appear — only whether any
+                // appear at all. A custom status configured as closed-like in
+                // tblticketstatuses is still treated as open here, exactly as
+                // it was before.
+                ->where('status', '!=', 'Closed')
+                ->orderBy('lastreply', 'desc')
+                ->orderBy('id', 'desc')
+                ->limit(self::DASHBOARD_ROWS)
+                ->get();
+        } catch (\Throwable) {
+            // Schema not as expected — fall back to the API, this time asking
+            // it not to adhere to department assignments.
+            return $this->fetchOpenTicketsViaApi($clientId);
+        }
+
+        $tickets = [];
+        foreach ($rows as $row) {
+            // tbltickets calls the subject 'title'; the API called it
+            // 'subject'. The templates read 'subject', so map it here rather
+            // than touching three variant templates.
+            $dateRaw      = (string)($row->date ?? '');
+            $lastReplyRaw = (string)($row->lastreply ?? '');
+            $dateTs       = $dateRaw !== '' ? strtotime($dateRaw) : false;
+            $lastReplyTs  = ($lastReplyRaw !== '' && $lastReplyRaw !== '0000-00-00 00:00:00')
+                ? strtotime($lastReplyRaw) : false;
+
+            $tickets[] = [
+                'tid'       => (string)($row->tid ?? ''),
+                'c'         => (string)($row->c ?? ''),
+                'subject'   => (string)($row->title ?? ''),
+                'status'    => trim(strip_tags((string)($row->status ?? ''))),
+                'priority'  => (string)($row->urgency ?? 'Medium'),
+                'date'      => $dateTs ? date('M j, Y', $dateTs) : '',
+                'lastreply' => $lastReplyTs ? date('M j, Y', $lastReplyTs) : '',
+            ];
+        }
+        return $tickets;
+    }
+
+    /**
+     * Fallback for fetchOpenTickets when the direct query is unavailable.
+     * Identical output shape. `ignore_dept_assignments` is the load-bearing
+     * parameter — without it a department-restricted API user silently returns
+     * success with zero tickets. 'orderby'/'order' are deliberately absent:
+     * GetTickets does not accept them.
+     */
+    private function fetchOpenTicketsViaApi(int $clientId): array
     {
         try {
             $response = localAPI('GetTickets', [
-                'clientid'  => $clientId,
-                'limitnum'  => 25,
-                'orderby'   => 'lastreply',
-                'order'     => 'desc',
+                'clientid'                => $clientId,
+                'limitnum'                => 25,
+                'ignore_dept_assignments' => true,
             ]);
             if (($response['result'] ?? '') !== 'success') return [];
 
             $tickets = [];
             foreach (($response['tickets']['ticket'] ?? []) as $tkt) {
-                $status = (string)($tkt['status'] ?? '');
+                $status = trim(strip_tags((string)($tkt['status'] ?? '')));
                 if (strcasecmp($status, 'Closed') === 0) continue;
 
                 $dateRaw = (string)($tkt['date'] ?? '');
