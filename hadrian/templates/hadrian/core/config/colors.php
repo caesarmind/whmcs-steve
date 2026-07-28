@@ -88,5 +88,21 @@ return [
             ['var' => '--color-icon-indigo', 'label' => 'Indigo', 'light' => '#5856d6', 'dark' => '#5856d6'],
             ['var' => '--color-icon-pink',   'label' => 'Pink',   'light' => '#ff2d55', 'dark' => '#ff2d55'],
         ],
+
+        // Three free slots a buyer can set to anything, offered alongside the
+        // palette when painting a dashboard block. This is what "add a custom
+        // colour" means here: the Colors panel cannot invent a token, its group
+        // list IS the universe, so a custom colour has to be a slot that exists
+        // up front. Each carries its own dark value, which a hex typed into a
+        // page option never could.
+        //
+        // Defaults are distinct hues rather than copies of the accent: a slot
+        // that merely duplicates --color-accent only pretends to inherit it and
+        // goes stale the moment the accent changes.
+        'Block accents' => [
+            ['var' => '--color-block-1', 'label' => 'Block accent 1', 'light' => '#5856d6', 'dark' => '#7d7bff'],
+            ['var' => '--color-block-2', 'label' => 'Block accent 2', 'light' => '#0f9d58', 'dark' => '#34c759'],
+            ['var' => '--color-block-3', 'label' => 'Block accent 3', 'light' => '#d9480f', 'dark' => '#ff9500'],
+        ],
     ],
 ];

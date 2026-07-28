@@ -1924,7 +1924,11 @@ final class Hooks
             }
             $entry['sections'][$optKey] = \Hadrian\Helpers\SectionLayout::parse(
                 (string)($entry['options'][$optKey] ?? ''),
-                is_array($optSpec['sections'] ?? null) ? $optSpec['sections'] : []
+                is_array($optSpec['sections'] ?? null) ? $optSpec['sections'] : [],
+                // Paint vocabulary, declared once beside the catalogue. Anything
+                // outside it is dropped rather than rendered, so a retired or
+                // mistyped palette key can never reach the CSS.
+                array_keys(is_array($optSpec['paints'] ?? null) ? $optSpec['paints'] : [])
             );
         }
 

@@ -68,7 +68,11 @@
    the empty-state branch is what makes the surrounding grid close up. *}
 {assign var=secHide value=$secHideEmpty|default:false}
 {if $secCount > 0 || !$secHide}
-<div class="min-section" data-sec="{$sec}" data-w="{$secW}">
+{* data-blk-paint / data-blk-fill drive the block paint rules in
+   pages/clientareahome.css. Both are whitelisted in SectionLayout::parse, so an
+   unknown value never reaches the attribute. Emitted only when set, so an
+   unpainted block carries no attribute and matches no rule. *}
+<div class="min-section" data-sec="{$sec}" data-w="{$secW}"{if $secPaint|default:''} data-blk-paint="{$secPaint|escape}" data-blk-fill="{$secFill|default:'solid'|escape}"{/if}>
     <div class="min-section-head">
         <span class="min-section-label">{if $sec == 'services'}{$LANG.navservices|default:'Services'}{elseif $sec == 'domains'}{$LANG.navdomains|default:'Domains'}{elseif $sec == 'invoices'}{$hadrianLang.dashboard.recentInvoices}{elseif $sec == 'tickets'}{$LANG.navtickets|default:'Support'}{else}{$LANG.announcements|default:'Announcements'}{/if}</span>
         {if $secCount > 0}

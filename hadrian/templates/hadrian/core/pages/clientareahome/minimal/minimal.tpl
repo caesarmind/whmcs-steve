@@ -168,7 +168,7 @@
                {include} drops the whole client area to the Six theme, and the
                poisoned compiled-template cache survives a git revert. *}
             {if $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements'}
-                {include file="`$template`/core/pages/clientareahome/minimal/rows.tpl" sec=$s.key secSpan=$s.span secHideEmpty=$s.hideEmpty}
+                {include file="`$template`/core/pages/clientareahome/minimal/rows.tpl" sec=$s.key secSpan=$s.span secHideEmpty=$s.hideEmpty secPaint=$s.paint secFill=$s.fill}
             {/if}
         {/if}
     {/foreach}

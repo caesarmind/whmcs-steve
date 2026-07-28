@@ -564,3 +564,92 @@ body[data-min-title="inside"] .min-list {
     .min-grid-custom { grid-template-columns: minmax(0, 1fr); }
     .min-grid-custom > .min-section[data-w] { grid-column: 1 / -1; }
 }
+
+/* --- Block paints -------------------------------------------------------
+   A dashboard block can be filled with a palette colour. Two orthogonal
+   choices: WHICH colour (data-blk-paint) and HOW it is applied
+   (data-blk-fill = solid | tint | grad).
+
+   Only the Domain and Profile blocks offer this. The list sections are left
+   alone deliberately: their rows carry status pills and token-coloured text
+   that would need a whole parallel set of on-colour overrides to survive a
+   saturated fill, and the design never asked for it.
+
+   EVERY var() below carries a literal fallback, and that is load-bearing
+   rather than defensive habit. `background: var(--blk-base)` with --blk-base
+   unset is invalid-at-computed-value-time and behaves as if unset, while
+   `color: var(--blk-ink)` would still resolve -- white text on the page
+   background, i.e. a block that vanishes. The PHP paint whitelist is the real
+   guard; these fallbacks are the second one.
+
+   --blk-ink is authored per paint, not computed. There is no contrast
+   function in CSS, and these fills are saturated enough that guessing wrong
+   is unreadable rather than merely ugly.
+   ASCII only, per this install's Chrome section-skipping hazard. */
+
+.min-section[data-blk-paint] { --blk-base: var(--color-accent, #0071e3); --blk-ink: #fff; }
+.min-section[data-blk-paint="accent"]  { --blk-base: var(--color-accent, #0071e3);   --blk-ink: #fff; }
+.min-section[data-blk-paint="indigo"]  { --blk-base: var(--color-icon-indigo, #5856d6); --blk-ink: #fff; }
+.min-section[data-blk-paint="purple"]  { --blk-base: var(--color-icon-purple, #af52de); --blk-ink: #fff; }
+.min-section[data-blk-paint="green"]   { --blk-base: var(--color-icon-green, #34c759);  --blk-ink: #06280f; }
+.min-section[data-blk-paint="teal"]    { --blk-base: var(--color-icon-teal, #5ac8fa);   --blk-ink: #06283a; }
+.min-section[data-blk-paint="orange"]  { --blk-base: var(--color-icon-orange, #ff9500); --blk-ink: #2b1600; }
+.min-section[data-blk-paint="red"]     { --blk-base: var(--color-icon-red, #ff3b30);    --blk-ink: #fff; }
+.min-section[data-blk-paint="gray"]    { --blk-base: var(--color-icon-gray, #8e8e93);   --blk-ink: #fff; }
+.min-section[data-blk-paint="block1"]  { --blk-base: var(--color-block-1, #5856d6); --blk-ink: #fff; }
+.min-section[data-blk-paint="block2"]  { --blk-base: var(--color-block-2, #0f9d58); --blk-ink: #fff; }
+.min-section[data-blk-paint="block3"]  { --blk-base: var(--color-block-3, #d9480f); --blk-ink: #fff; }
+
+/* SOLID: the block becomes the colour. Inner controls flip onto the fill. */
+.min-section[data-blk-fill="solid"] > .blk {
+    background: var(--blk-base);
+    border-color: var(--blk-base);
+    color: var(--blk-ink);
+}
+/* GRADIENT: the same fill, darkened 22% towards black on the far corner --
+   the figure --brand-primary-darker already uses, rather than the mockup's
+   hardcoded second stop, so it tracks whatever colour is chosen. */
+.min-section[data-blk-fill="grad"] > .blk {
+    background: linear-gradient(135deg, var(--blk-base), color-mix(in srgb, var(--blk-base), #000 22%));
+    border-color: transparent;
+    color: var(--blk-ink);
+}
+/* TINT: a wash of the colour, text stays on the normal token. Safe with any
+   paint, which is why it is the picker's default. Mixed against the surface
+   rather than a fixed rgba so it is correct in both modes. */
+.min-section[data-blk-fill="tint"] > .blk {
+    background: color-mix(in srgb, var(--blk-base) 10%, var(--color-surface));
+    border-color: color-mix(in srgb, var(--blk-base) 28%, var(--color-surface));
+}
+
+/* On-colour treatment for the two blocks that can be painted. Scoped to the
+   filled states so an unpainted block is untouched. */
+[data-blk-fill="solid"] .blk-title,
+[data-blk-fill="grad"] .blk-title { color: var(--blk-ink); }
+[data-blk-fill="solid"] .blk-sub,
+[data-blk-fill="grad"] .blk-sub { color: var(--blk-ink); opacity: 0.82; }
+[data-blk-fill="solid"] .blk-input,
+[data-blk-fill="grad"] .blk-input {
+    background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.28); color: var(--blk-ink);
+}
+[data-blk-fill="solid"] .blk-input::placeholder,
+[data-blk-fill="grad"] .blk-input::placeholder { color: var(--blk-ink); opacity: 0.7; }
+[data-blk-fill="solid"] .blk-input:focus,
+[data-blk-fill="grad"] .blk-input:focus { background: rgba(255,255,255,0.24); border-color: var(--blk-ink); }
+[data-blk-fill="solid"] .blk-btn,
+[data-blk-fill="grad"] .blk-btn { background: var(--blk-ink); color: var(--blk-base); border-color: var(--blk-ink); }
+[data-blk-fill="solid"] .blk-btn.ghost,
+[data-blk-fill="grad"] .blk-btn.ghost {
+    background: rgba(255,255,255,0.14); color: var(--blk-ink); border-color: rgba(255,255,255,0.45);
+}
+[data-blk-fill="solid"] .blk-chip,
+[data-blk-fill="grad"] .blk-chip { background: rgba(255,255,255,0.16); color: var(--blk-ink); }
+[data-blk-fill="solid"] .blk-avatar,
+[data-blk-fill="grad"] .blk-avatar { background: var(--blk-ink); color: var(--blk-base); }
+[data-blk-fill="solid"] .blk-btn.quiet,
+[data-blk-fill="grad"] .blk-btn.quiet {
+    background: rgba(255,255,255,0.14); color: var(--blk-ink); border-color: rgba(255,255,255,0.35);
+}
+/* Tint keeps dark text, so it needs only the one fix: a white field so the
+   input does not disappear into the wash. */
+[data-blk-fill="tint"] .blk-input { background: var(--color-surface); }

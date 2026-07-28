@@ -55,13 +55,23 @@ final class SectionLayout
      */
     private const FLAG_LETTERS = 'e';
 
+    /** How a paint is applied. Bare paint (no suffix) means solid. */
+    private const FILLS = ['solid', 'tint', 'grad'];
+
     /**
      * @param string $raw       the stored option value
      * @param array<string, array{label?:string, w?:string}> $catalogue
      *        the sections this page offers, in factory order, with factory widths
-     * @return list<array{key:string, width:string, span:int, visible:bool, hideEmpty:bool}>
+     * @param list<string> $paints
+     *        palette keys a block may be painted with. Passed in rather than
+     *        hardcoded so the vocabulary has ONE home (the variant's own
+     *        <variant>.php) instead of being retyped here and in the admin JS.
+     *        A paint not on this list is dropped -- see the note below on why
+     *        that matters more than it looks.
+     * @return list<array{key:string, width:string, span:int, visible:bool,
+     *                    hideEmpty:bool, paint:string, fill:string}>
      */
-    public static function parse(string $raw, array $catalogue): array
+    public static function parse(string $raw, array $catalogue, array $paints = []): array
     {
         $raw = trim($raw);
 
@@ -81,10 +91,11 @@ final class SectionLayout
             if ($entry === '' || !str_contains($entry, ':')) {
                 continue;
             }
-            $parts = explode(':', $entry);
-            $key   = strtolower(trim($parts[0]));
-            $width = strtolower(trim($parts[1] ?? ''));
-            $flags = strtolower(trim($parts[2] ?? ''));
+            $parts  = explode(':', $entry);
+            $key    = strtolower(trim($parts[0]));
+            $width  = strtolower(trim($parts[1] ?? ''));
+            $flags  = strtolower(trim($parts[2] ?? ''));
+            $colour = strtolower(trim($parts[3] ?? ''));
 
             if (!isset($catalogue[$key]) || isset($seen[$key])) {
                 continue; // unknown section, or a duplicate -- first wins
@@ -99,6 +110,27 @@ final class SectionLayout
                 $flags = '';
             }
 
+            // Colour: "<paint>" or "<paint>_<fill>". The paint is a palette KEY,
+            // never a value -- a hex could not survive the option pipeline and
+            // could not carry a separate dark-mode variant.
+            //
+            // An unrecognised paint is dropped to ''. That is not tidiness: the
+            // CSS sets `background: var(--blk-base)` and `color: var(--blk-ink)`,
+            // and if no rule matched, --blk-base would be unset while --blk-ink
+            // still resolved -- white text on the page background, i.e. an
+            // invisible block. This whitelist is the actual guard.
+            $paint = '';
+            $fill  = '';
+            if ($colour !== '') {
+                $bits = explode('_', $colour, 2);
+                $p    = $bits[0];
+                $f    = $bits[1] ?? 'solid';
+                if (in_array($p, $paints, true) && in_array($f, self::FILLS, true)) {
+                    $paint = $p;
+                    $fill  = $f;
+                }
+            }
+
             $seen[$key] = true;
             $out[] = [
                 'key'       => $key,
@@ -106,6 +138,8 @@ final class SectionLayout
                 'span'      => self::SPANS[$width] ?? 6,
                 'visible'   => $width !== 'off',
                 'hideEmpty' => str_contains($flags, 'e'),
+                'paint'     => $paint,
+                'fill'      => $fill,
             ];
         }
 
@@ -119,6 +153,13 @@ final class SectionLayout
         // factory width. This is what makes a section added in a later release
         // show up in layouts admins saved before it existed, instead of
         // silently vanishing from their dashboard.
+        //
+        // A section marked `optIn` is appended SWITCHED OFF instead. Sections
+        // added after this feature shipped are new capabilities, not corrections
+        // to the original set: appending them visible would silently add blocks
+        // to a dashboard an admin had already arranged and saved. They still
+        // appear in the builder, so turning one on is one click -- it is just
+        // never done on the admin's behalf.
         foreach ($catalogue as $key => $spec) {
             if (isset($seen[$key])) {
                 continue;
@@ -127,12 +168,15 @@ final class SectionLayout
             if (!isset(self::SPANS[$width])) {
                 $width = '1/1';
             }
+            $optIn = !empty($spec['optIn']);
             $out[] = [
                 'key'       => (string)$key,
-                'width'     => $width,
+                'width'     => $optIn ? 'off' : $width,
                 'span'      => self::SPANS[$width],
-                'visible'   => true,
+                'visible'   => !$optIn,
                 'hideEmpty' => false,
+                'paint'     => '',
+                'fill'      => '',
             ];
         }
 

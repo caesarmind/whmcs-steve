@@ -59,6 +59,12 @@
     --color-icon-gray: #8e8e93;
     --color-icon-indigo: #5856d6;
     --color-icon-pink: #ff2d55;
+    /* Free slots the buyer sets on Styles > Colors, offered when painting a
+       dashboard block. MUST mirror core/config/colors.php 'Block accents' or
+       the admin panel's "is this an override?" comparison desyncs. */
+    --color-block-1: #5856d6;
+    --color-block-2: #0f9d58;
+    --color-block-3: #d9480f;
     --sidebar-width: 260px;
     /* The admin's "Maximum width" writes THIS token (Hooks::buildLayoutHead
        emits :root{--content-max-width:Npx}). The container scale below derives
@@ -265,6 +271,12 @@
     --shadow-card: none;
     --shadow-card-hover: 0 2px 12px rgba(0,0,0,0.20);
     --shadow-dropdown: 0 4px 32px rgba(0,0,0,0.30), 0 0 1px rgba(255,255,255,0.08);
+    /* Lifted for dark surfaces. Mirrors core/config/colors.php 'Block accents'
+       dark values -- a block accent that did not brighten here would sit as a
+       muddy patch on #1c1c1e. */
+    --color-block-1: #7d7bff;
+    --color-block-2: #34c759;
+    --color-block-3: #ff9500;
 }
 
 html { font-size: var(--text-xl); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
