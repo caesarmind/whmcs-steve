@@ -9,7 +9,6 @@
      $clientsdetails.firstname
      $clientsstats.productsnumactive / .numactivedomains
                    .numunpaidinvoices / .numactivetickets
-                   .dueinvoicesbalance (pre-formatted currency, may be absent)
 
    From the Hadrian ClientAreaPageHome hook ($dashboard):
      greeting        'morning'|'afternoon'|'evening'
@@ -74,14 +73,11 @@
     {assign var=dashIsEmpty value='empty'}
 {/if}
 
-{* Unpaid tile. The headline number is the COUNT, like its three siblings and
-   like the label above it -- putting a currency string there made one tile read
-   in a different unit from the rest, and "$0.00 USD" is wide enough at
-   --text-h2 to wrap onto two lines inside the tile. The balance rides beneath
-   as a small line, and only when something is actually owed. *}
+{* Unpaid tile. A COUNT, like its three siblings and like the label above it.
+   The amount owed is deliberately not shown here: the tile is a pointer to the
+   invoices page, not a bill, and a currency figure made one tile read in a
+   different unit from the rest of the row. *}
 {assign var=minUnpaid value=$clientsstats.numunpaidinvoices|default:0}
-{assign var=minDueBalance value=$clientsstats.dueinvoicesbalance|default:''}
-{if !$minDueBalance}{assign var=minDueBalance value=$clientsstats.unpaidinvoicesamount|default:''}{/if}
 
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareahome.css?v={$hadrian.version|default:'1.0'}">
 
@@ -116,7 +112,6 @@
     <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="min-tile{if $minUnpaid > 0} due{/if}">
         <div class="n">{$minUnpaid}</div>
         <div class="l">{$LANG.clientHomePanels.unpaidInvoices|default:'Unpaid Invoices'}</div>
-        {if $minUnpaid > 0 && $minDueBalance}<div class="min-tile-sub">{$minDueBalance|escape} {$hadrianLang.dashboard.due}</div>{/if}
     </a>
     <a href="{$WEB_ROOT}/supporttickets.php" class="min-tile">
         <div class="n">{$clientsstats.numactivetickets|default:0}</div>
