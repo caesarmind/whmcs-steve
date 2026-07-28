@@ -9,7 +9,13 @@
 .ph-hero-inner { max-width: 760px; margin: 0 auto; }
 .ph-hero h1 { font-size: var(--text-h1); font-weight: var(--fw-semibold); letter-spacing: -0.025em; margin: 0 0 12px; color: var(--color-text-primary); line-height: 1.08; }
 .ph-hero p { font-size: var(--text-xl); color: var(--color-text-secondary); margin: 0 0 28px; }
-.ph-hero .ph-domain-tabs {
+/* Both hero shells, on purpose. The portal variant uses .ph-hero; the default
+   and simple variants use .hp-hero. Scoped to .ph-hero alone this rule matched
+   only portal, so the segmented Search/Transfer tabs on the other two homepages
+   silently fell back to the barer .ph-domain-tabs base in apple-layout.css --
+   no gap, 3px padding instead of 4, and no margin under the pill row. */
+.ph-hero .ph-domain-tabs,
+.hp-hero .ph-domain-tabs {
     display: inline-flex; gap: 4px; padding: 4px;
     background: var(--color-surface-secondary);
     border-radius: 980px; margin-bottom: 16px;
