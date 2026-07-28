@@ -7,6 +7,9 @@
                       admin-supplied value interpolated into a file path.
      secSpan  int     6|4|3|2 = 1/1|2/3|1/2|1/3. Drives data-w (the grid span)
                       and picks the roomy vs compact empty state.
+     secHideEmpty bool when true, a section with no items renders NOTHING at
+                      all -- no card, no heading, no grid item -- instead of an
+                      empty state. Per-section, set in the admin builder.
 
    Everything else ($minServices, $nServices, $minRows, $minSearchAt, $LANG,
    $hadrianLang, $WEB_ROOT, $clientsstats) arrives by Smarty's normal
@@ -45,6 +48,11 @@
 {/if}
 {if $secW >= 4}{assign var=secRoomy value=true}{else}{assign var=secRoomy value=false}{/if}
 
+{* "Hide when empty": emit nothing whatsoever, so the section leaves no card,
+   no heading and no grid item behind. Guarding the whole file rather than just
+   the empty-state branch is what makes the surrounding grid close up. *}
+{assign var=secHide value=$secHideEmpty|default:false}
+{if $secCount > 0 || !$secHide}
 <div class="min-section" data-sec="{$sec}" data-w="{$secW}">
     <div class="min-section-head">
         <span class="min-section-label">{if $sec == 'services'}{$LANG.navservices|default:'Services'}{elseif $sec == 'domains'}{$LANG.navdomains|default:'Domains'}{elseif $sec == 'invoices'}{$hadrianLang.dashboard.recentInvoices}{elseif $sec == 'tickets'}{$LANG.navtickets|default:'Support'}{else}{$LANG.announcements|default:'Announcements'}{/if}</span>
@@ -150,3 +158,4 @@
         {/if}
     </div>
 </div>
+{/if}{* /hide-when-empty guard *}

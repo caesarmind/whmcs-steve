@@ -14,13 +14,20 @@ namespace Hadrian\Helpers;
  *
  * GRAMMAR
  *   layout := '' | entry (',' entry)*
- *   entry  := key ':' width
+ *   entry  := key ':' width [':' flags]
  *   width  := '1/1' | '2/3' | '1/2' | '1/3' | 'off'
+ *   flags  := one or more single letters; unknown letters are ignored
+ *             'e' = hide this section entirely when it has no items, instead
+ *                   of rendering its empty state
  *
- * e.g. "services:1/1,domains:1/2,invoices:1/2,tickets:1/3,announcements:off"
+ * e.g. "services:1/1,domains:1/2:e,invoices:1/2,tickets:1/3,announcements:off"
  *
  * List order IS render order. 'off' hides a section but REMEMBERS its position,
  * so switching it back on restores it where it was rather than at the end.
+ *
+ * Flags are a THIRD field rather than a second option key so that one string
+ * still describes the whole arrangement: one thing to store, to validate, and
+ * to reason about when it round-trips through the editor.
  *
  * The charset is [a-z0-9_:,/] -- none of the five characters htmlspecialchars
  * touches -- so the value survives WHMCS's POST-time encoding and the admin
@@ -37,10 +44,22 @@ final class SectionLayout
     private const SPANS = ['1/1' => 6, '2/3' => 4, '1/2' => 3, '1/3' => 2];
 
     /**
+     * Every letter the flags field may contain. The field is WHITELISTED
+     * against this rather than substring-searched, because a single mistyped
+     * comma puts a section key in the flags slot -- and four of the five
+     * dashboard keys (services, invoices, tickets, announcements) contain an
+     * 'e'. "domains:1/2:invoices:1/2" would otherwise silently grant Domains a
+     * setting nobody asked for. Unrecognised content yields NO flags, which
+     * matches the rest of this parser: malformed input loses information, it
+     * never invents behaviour.
+     */
+    private const FLAG_LETTERS = 'e';
+
+    /**
      * @param string $raw       the stored option value
      * @param array<string, array{label?:string, w?:string}> $catalogue
      *        the sections this page offers, in factory order, with factory widths
-     * @return list<array{key:string, width:string, span:int, visible:bool}>
+     * @return list<array{key:string, width:string, span:int, visible:bool, hideEmpty:bool}>
      */
     public static function parse(string $raw, array $catalogue): array
     {
@@ -62,9 +81,10 @@ final class SectionLayout
             if ($entry === '' || !str_contains($entry, ':')) {
                 continue;
             }
-            [$key, $width] = explode(':', $entry, 2);
-            $key   = strtolower(trim($key));
-            $width = strtolower(trim($width));
+            $parts = explode(':', $entry);
+            $key   = strtolower(trim($parts[0]));
+            $width = strtolower(trim($parts[1] ?? ''));
+            $flags = strtolower(trim($parts[2] ?? ''));
 
             if (!isset($catalogue[$key]) || isset($seen[$key])) {
                 continue; // unknown section, or a duplicate -- first wins
@@ -73,12 +93,19 @@ final class SectionLayout
                 continue; // unknown width token
             }
 
+            // Anything outside the whitelist means this is not a flags field at
+            // all (most likely a comma typed as a colon) -- drop it wholesale.
+            if ($flags !== '' && strspn($flags, self::FLAG_LETTERS) !== strlen($flags)) {
+                $flags = '';
+            }
+
             $seen[$key] = true;
             $out[] = [
-                'key'     => $key,
-                'width'   => $width,
-                'span'    => self::SPANS[$width] ?? 6,
-                'visible' => $width !== 'off',
+                'key'       => $key,
+                'width'     => $width,
+                'span'      => self::SPANS[$width] ?? 6,
+                'visible'   => $width !== 'off',
+                'hideEmpty' => str_contains($flags, 'e'),
             ];
         }
 
@@ -101,10 +128,11 @@ final class SectionLayout
                 $width = '1/1';
             }
             $out[] = [
-                'key'     => (string)$key,
-                'width'   => $width,
-                'span'    => self::SPANS[$width],
-                'visible' => true,
+                'key'       => (string)$key,
+                'width'     => $width,
+                'span'      => self::SPANS[$width],
+                'visible'   => true,
+                'hideEmpty' => false,
             ];
         }
 

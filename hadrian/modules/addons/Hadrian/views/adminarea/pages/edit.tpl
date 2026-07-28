@@ -727,6 +727,25 @@
 .mt-seclay-move button:disabled { opacity: 0.3; cursor: default; }
 .mt-seclay-move button:not(:disabled):hover { color: var(--mt-text); }
 
+/* Per-section settings drawer. Row and drawer join into one card while open,
+   the way the reference's block composer does it. */
+.mt-seclay-item.is-open { border-color: var(--mt-primary); background: var(--mt-primary-tint); border-radius: 10px 10px 0 0; border-bottom: none; }
+.mt-seclay-disc { flex: 1; min-width: 0; display: flex; align-items: center; gap: 7px; background: transparent; border: none; padding: 0; text-align: left; cursor: pointer; font: inherit; }
+.mt-seclay-disc:disabled { cursor: default; }
+/* display is belt-and-braces only: as a flex child this span is blockified
+   anyway, so the rotation below works without it. Kept so the rule does not
+   depend on the parent staying a flex container. */
+.mt-seclay-chev { display: inline-block; width: 11px; flex-shrink: 0; font-size: 11px; color: var(--mt-text-4); transition: transform .15s ease; }
+.mt-seclay-item.is-open .mt-seclay-chev { transform: rotate(90deg); color: var(--mt-primary); }
+.mt-seclay-count { font-size: 10px; color: var(--mt-text-4); }
+.mt-seclay-drawer { margin-top: -6px; margin-bottom: 4px; padding: 16px 20px 20px; background: var(--mt-surface); border: 1px solid var(--mt-primary); border-top: 1px solid var(--mt-border); border-radius: 0 0 12px 12px; }
+.mt-seclay-drawer-h { display: flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 600; color: var(--mt-text); margin-bottom: 12px; }
+.mt-seclay-drawer-h span.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mt-primary); flex-shrink: 0; }
+.mt-seclay-opts { background: var(--mt-surface-2); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+.mt-seclay-opt { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.mt-seclay-opt-l { font-size: 12.5px; font-weight: 500; color: var(--mt-text-2); }
+.mt-seclay-opt-h { font-size: 11.5px; color: var(--mt-text-3); margin-top: 2px; line-height: 1.45; max-width: 460px; }
+
 .mt-seclay-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .mt-seclay-presets button { border: 1px solid var(--mt-border); background: var(--mt-surface); color: var(--mt-text); border-radius: 6px; padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer; }
 .mt-seclay-presets button:hover { border-color: var(--mt-primary); color: var(--mt-primary); }
@@ -798,23 +817,32 @@
                     var bits = part.split(':');
                     var k = (bits[0] || '').trim().toLowerCase();
                     var w = (bits[1] || '').trim().toLowerCase();
+                    var f = (bits[2] || '').trim().toLowerCase();
+                    // Whitelist the flags field, mirroring SectionLayout::parse.
+                    // A mistyped comma puts a section KEY here, and most keys
+                    // contain an 'e' -- a bare indexOf would invent settings.
+                    if (f && !/^e*$/.test(f)) { f = ''; }
                     if (!cat[k] || seen[k]) return;
                     if (w !== 'off' && SPAN[w] === undefined) return;
                     seen[k] = 1;
-                    out.push({ key: k, on: w !== 'off', w: w === 'off' ? (cat[k].w || '1/1') : w });
+                    out.push({ key: k, on: w !== 'off', w: w === 'off' ? (cat[k].w || '1/1') : w,
+                               hideEmpty: f.indexOf('e') !== -1 });
                 });
             }
             keys.forEach(function (k) {
-                if (!seen[k]) out.push({ key: k, on: true, w: cat[k].w || '1/1' });
+                if (!seen[k]) out.push({ key: k, on: true, w: cat[k].w || '1/1', hideEmpty: false });
             });
             return out;
         }
 
         var state = readState();
         var dirty = (input.value || '').trim() !== '';
+        var openKey = null;   // which section's settings drawer is open
 
         function serialise() {
-            return state.map(function (s) { return s.key + ':' + (s.on ? s.w : 'off'); }).join(',');
+            return state.map(function (s) {
+                return s.key + ':' + (s.on ? s.w : 'off') + (s.hideEmpty ? ':e' : '');
+            }).join(',');
         }
         function commit() { dirty = true; input.value = serialise(); paint(); }
         // The hidden field is the source of truth at submit; bfcache restores
@@ -888,10 +916,28 @@
                 grip.addEventListener('mouseup', function () { li.draggable = false; });
                 li.appendChild(grip);
 
+                // Name doubles as the disclosure for this section's own
+                // settings, matching the reference's block rows.
+                var disc = document.createElement('button');
+                disc.type = 'button';
+                disc.className = 'mt-seclay-disc';
+                var chev = document.createElement('span');
+                chev.className = 'mt-seclay-chev';
+                chev.textContent = '›';
                 var name = document.createElement('span');
                 name.className = 'mt-seclay-name';
                 name.textContent = label(s.key);
-                li.appendChild(name);
+                var cnt = document.createElement('span');
+                cnt.className = 'mt-seclay-count';
+                // State-derived, so a flag set behind a collapsed drawer is
+                // still visible on the row.
+                cnt.textContent = s.hideEmpty ? 'Hides when empty' : '1 setting';
+                disc.appendChild(chev); disc.appendChild(name); disc.appendChild(cnt);
+                disc.addEventListener('click', function () {
+                    openKey = (openKey === s.key) ? null : s.key;
+                    paint();
+                });
+                li.appendChild(disc);
 
                 var seg = document.createElement('span');
                 seg.className = 'mt-seclay-w';
@@ -937,8 +983,44 @@
                 track.appendChild(thumb);
                 tog.appendChild(cb); tog.appendChild(track);
                 li.appendChild(tog);
-
+                if (openKey === s.key) { li.classList.add('is-open'); }
                 list.appendChild(li);
+
+                if (openKey === s.key) {
+                    var dr = document.createElement('li');
+                    dr.className = 'mt-seclay-drawer';
+                    var h = document.createElement('div');
+                    h.className = 'mt-seclay-drawer-h';
+                    var dot = document.createElement('span'); dot.className = 'dot';
+                    var ht = document.createElement('span'); ht.textContent = label(s.key) + ' settings';
+                    h.appendChild(dot); h.appendChild(ht);
+                    var opts = document.createElement('div');
+                    opts.className = 'mt-seclay-opts';
+
+                    var opt = document.createElement('div');
+                    opt.className = 'mt-seclay-opt';
+                    var lw = document.createElement('div');
+                    var ll = document.createElement('div');
+                    ll.className = 'mt-seclay-opt-l';
+                    ll.textContent = 'Hide when empty';
+                    var lh = document.createElement('div');
+                    lh.className = 'mt-seclay-opt-h';
+                    lh.textContent = 'Leave this section out altogether when the client has nothing in it, instead of showing an empty card. The rest of the layout closes up around it.';
+                    lw.appendChild(ll); lw.appendChild(lh);
+                    var ht2 = document.createElement('label');
+                    ht2.className = 'mt-toggle';
+                    var hcb = document.createElement('input');
+                    hcb.type = 'checkbox'; hcb.checked = !!s.hideEmpty;
+                    hcb.addEventListener('change', function () { s.hideEmpty = hcb.checked; commit(); });
+                    var htr = document.createElement('span'); htr.className = 'mt-toggle-track';
+                    var hth = document.createElement('span'); hth.className = 'mt-toggle-thumb';
+                    htr.appendChild(hth); ht2.appendChild(hcb); ht2.appendChild(htr);
+                    opt.appendChild(lw); opt.appendChild(ht2);
+                    opts.appendChild(opt);
+
+                    dr.appendChild(h); dr.appendChild(opts);
+                    list.appendChild(dr);
+                }
             });
 
             paintPreview();
@@ -949,6 +1031,18 @@
         }
 
         // Drag to reorder.
+        // An open drawer is a sibling <li> in the same list, so a plain
+        // closest('.mt-seclay-item') returns null anywhere over that ~150px
+        // band: dragover would bail before preventDefault, the browser would
+        // refuse the drop, and a stale insertion line stayed lit. Resolve the
+        // drawer to the row that owns it -- always its previous sibling.
+        function rowFor(target) {
+            var li = target.closest ? target.closest('.mt-seclay-item') : null;
+            if (li) return li;
+            var dr = target.closest ? target.closest('.mt-seclay-drawer') : null;
+            var own = dr && dr.previousElementSibling;
+            return (own && own.classList.contains('mt-seclay-item')) ? own : null;
+        }
         var dragKey = null;
         list.addEventListener('dragstart', function (e) {
             var li = e.target.closest('.mt-seclay-item'); if (!li) return;
@@ -957,18 +1051,21 @@
             e.dataTransfer.effectAllowed = 'move';
         });
         list.addEventListener('dragover', function (e) {
-            var li = e.target.closest('.mt-seclay-item'); if (!li || !dragKey) return;
+            var li = rowFor(e.target); if (!li || !dragKey) return;
             e.preventDefault();
             var r = li.getBoundingClientRect();
-            var after = (e.clientY - r.top) > r.height / 2;
+            // Over the drawer always means "after the section that owns it".
+            var after = e.target.closest('.mt-seclay-drawer')
+                ? true : (e.clientY - r.top) > r.height / 2;
             [].forEach.call(list.children, function (n) { n.classList.remove('is-drop-before', 'is-drop-after'); });
             li.classList.add(after ? 'is-drop-after' : 'is-drop-before');
         });
         list.addEventListener('drop', function (e) {
-            var li = e.target.closest('.mt-seclay-item'); if (!li || !dragKey) return;
+            var li = rowFor(e.target); if (!li || !dragKey) return;
             e.preventDefault();
             var r = li.getBoundingClientRect();
-            var after = (e.clientY - r.top) > r.height / 2;
+            var after = e.target.closest('.mt-seclay-drawer')
+                ? true : (e.clientY - r.top) > r.height / 2;
             var from = state.findIndex(function (s) { return s.key === dragKey; });
             if (from < 0 || li.dataset.key === dragKey) { dragKey = null; paint(); return; }
             var moved = state.splice(from, 1)[0];
@@ -987,20 +1084,36 @@
 
         var presets = document.createElement('div');
         presets.className = 'mt-seclay-presets';
+        // Presets carry a WIDTH RESOLVER, not a finished string, so they can
+        // rewrite order and width while preserving each section's own settings.
+        // Rebuilding the string from the catalogue would silently clear every
+        // "Hide when empty" flag -- and those live behind a collapsed drawer,
+        // so the admin would not see them go. 'Restore default' is the one that
+        // legitimately clears everything, which is its whole job.
         [
-            ['Restore default', ''],
-            ['Two columns', keys.map(function (k, n) { return k + ':' + (n < 2 ? '1/1' : '1/2'); }).join(',')],
-            ['Single column', keys.map(function (k) { return k + ':1/1'; }).join(',')],
-            ['Thirds', keys.map(function (k, n) { return k + ':' + (n < 2 ? '1/1' : '1/3'); }).join(',')],
+            ['Restore default', null],
+            ['Two columns', function (k, n) { return n < 2 ? '1/1' : '1/2'; }],
+            ['Single column', function () { return '1/1'; }],
+            ['Thirds', function (k, n) { return n < 2 ? '1/1' : '1/3'; }],
         ].forEach(function (p) {
             var b = document.createElement('button');
             b.type = 'button';
             b.textContent = p[0];
             b.addEventListener('click', function () {
-                input.value = p[1];
-                state = readState();
-                dirty = p[1] !== '';
-                paint();
+                if (!p[1]) {                       // Restore default
+                    input.value = '';
+                    state = readState();
+                    dirty = false;
+                    paint();
+                    return;
+                }
+                var prev = {};
+                state.forEach(function (s) { prev[s.key] = s; });
+                state = keys.map(function (k, n) {
+                    return { key: k, on: true, w: p[1](k, n),
+                             hideEmpty: !!(prev[k] && prev[k].hideEmpty) };
+                });
+                commit();
             });
             presets.appendChild(b);
         });

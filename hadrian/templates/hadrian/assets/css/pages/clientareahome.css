@@ -537,6 +537,13 @@ body[data-min-title="inside"] .min-list {
    default min-width is auto, so one long unbroken domain name would push its
    track past its share and overflow the row. */
 .min-grid-custom { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+/* Every section can be set to hide when it has no items, so on a brand-new
+   account the grid can legitimately end up with no sections. Drop the box
+   rather than leave its 34px top margin as dead space.
+   :not(:has(...)) and NOT :empty -- the Smarty loop leaves whitespace text
+   nodes inside the wrapper, so :empty never matches. :has() is already relied
+   on elsewhere in this theme. */
+.min-grid-custom:not(:has(> .min-section)) { display: none; }
 /* Grid item margins do not collapse, so the section's own top margin would
    add to the row gap. */
 .min-grid-custom > .min-section { margin-top: 0; }
