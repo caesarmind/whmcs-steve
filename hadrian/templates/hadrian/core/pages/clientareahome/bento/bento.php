@@ -42,9 +42,9 @@ return [
         ],
         'bnt_visible_rows' => [
             'type'    => 'int',
-            'label'   => 'Rows before "Show more"',
+            'label'   => 'Items shown per tile',
             'default' => 4,
-            'tooltip' => 'How many rows each tile shows before the rest collapse behind a Show more control. Bento tiles sit two-up, so they are shorter than the minimal variant\'s full-width lists. The tiles hold at most 8 rows; the full set lives on each collection\'s own page.',
+            'tooltip' => 'The default number of items a tile lists. Bento has no Show more control -- a tile shows this many and its View all link goes to the full page -- so this is a real cap, not a fold. Each tile can override it in its own settings under Dashboard tiles. Tiles hold at most 8 items.',
         ],
         'bnt_search_at' => [
             'type'    => 'int',
@@ -107,6 +107,23 @@ return [
                 'block2' => 'Block accent 2',
                 'block3' => 'Block accent 3',
             ],
+            // Turns on the per-section "Items shown" control in the builder's
+            // settings drawer, stored as the 5th field of each layout entry.
+            // Declared here rather than assumed by the builder because it only
+            // makes sense for a variant with no Show more: minimal reveals the
+            // rest in place, where a per-section cap would mean something else.
+            // Blank leaves a tile on bnt_visible_rows.
+            //
+            // max is 8 on purpose -- the hook caps every collection at
+            // DASHBOARD_ROWS (8), so a larger number could never render.
+            'rowsControl' => [
+                'label' => 'Items shown',
+                'hint'  => 'How many rows this tile lists before its View all link takes over. Leave blank to use the page default. A narrow tile beside a tall one can be given fewer, so a row of tiles stays even.',
+                'min'   => 1,
+                'max'   => 8,
+                'def'   => 4,
+            ],
+
             'widths' => [
                 '1/1' => 'Full width',
                 '2/3' => 'Two thirds',

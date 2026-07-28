@@ -30,8 +30,10 @@
      - the :not(:has(> .min-section)) empty-grid guard
      - the 13 dashboard-only .min-row .status-pill.<x> colours (an Expired
        domain under any other row class renders an invisible badge)
-     - the .min-more / .min-hidden / .searching disclosure and filter states
-     - the delegated Show-more and filter listeners in bento.tpl
+     - the .min-hidden / .searching filter states
+     - the delegated filter listener in bento.tpl
+   (NOT the .min-more disclosure -- bento has no Show more. Each tile prints a
+   fixed number of items and hands the rest to its View all link.)
    Bento ADDS classes to those elements (.bn-card, .bn-row); it never
    substitutes them.
 *}
@@ -58,6 +60,25 @@
 {/if}
 {if $secW >= 4}{assign var=secRoomy value=true}{else}{assign var=secRoomy value=false}{/if}
 
+{* ---------- how many items this tile lists ----------
+   Bento has NO Show more. Each tile prints its first N rows and its View all
+   link carries the rest, so N is a real cap rather than a fold -- which is why
+   it is worth setting per tile: a 1/3 tile beside a 2/3 one can be given fewer
+   so the row stays even.
+
+   secRowsIn is the 5th field of this section's layout entry (0 when the admin
+   left it blank), and it falls back to the page-level bnt_visible_rows. Clamped
+   to DASHBOARD_ROWS because the hook never hands over more than 8 -- a larger
+   number is not wrong, it is just unreachable. *}
+{assign var=secRows value=$secRowsIn|default:0}
+{if $secRows < 1}{assign var=secRows value=$bnRows}{/if}
+{if $secRows < 1}{assign var=secRows value=4}{/if}
+{if $secRows > 8}{assign var=secRows value=8}{/if}
+{* What the tile will actually print. The filter box and the empty state both
+   key off this rather than off the fetched count: a search box over rows the
+   tile is not showing filters nothing a reader can see. *}
+{if $secCount < $secRows}{assign var=secShown value=$secCount}{else}{assign var=secShown value=$secRows}{/if}
+
 {* Which tiles can grow a filter box: Services and Domains only. They are the
    two an established client keeps scanning for a specific row -- "which of my
    hosting accounts is web-03" -- whereas invoices, tickets and announcements
@@ -66,7 +87,7 @@
    NOTE every dashboard list, these two included, is capped at DASHBOARD_ROWS
    (8) by the hook, so $secCount tops out at 8 and a threshold above 8 can never
    fire. The useful range is 1-8; 0 switches the filter off everywhere. *}
-{if ($sec == 'services' || $sec == 'domains') && $bnSearchAt > 0 && $secCount >= $bnSearchAt}
+{if ($sec == 'services' || $sec == 'domains') && $bnSearchAt > 0 && $secShown >= $bnSearchAt}
     {assign var=secSearch value=true}
 {else}
     {assign var=secSearch value=false}
@@ -203,7 +224,8 @@
 
             {if $sec == 'services'}
                 {foreach $bnServices as $svc}
-                <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&amp;id={$svc.id|escape:'url'}" class="min-row bn-row{if $svc@iteration > $bnRows} min-more{/if}">
+                {if $svc@iteration <= $secRows}
+                <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&amp;id={$svc.id|escape:'url'}" class="min-row bn-row">
                     {* The domain is the identifier a client recognises; the
                        product name drops to the sub-line beside the renewal.
                        With no domain on the service the name takes the top
@@ -214,10 +236,12 @@
                     </span>
                     <span class="status-pill {$svc.status|default:'Active'|lower|replace:' ':'-'|escape}">{$svc.status|default:'Active'|escape}</span>
                 </a>
+                {/if}
                 {/foreach}
             {elseif $sec == 'domains'}
                 {foreach $bnDomains as $dom}
-                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&amp;id={$dom.id|escape:'url'}" class="min-row bn-row{if $dom@iteration > $bnRows} min-more{/if}">
+                {if $dom@iteration <= $secRows}
+                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&amp;id={$dom.id|escape:'url'}" class="min-row bn-row">
                     <span class="min-name">
                         <span class="bn-rn">{$dom.domain|escape}</span>
                         {* Custom key, not $LANG.domainrenewals -- that one is
@@ -228,10 +252,12 @@
                     </span>
                     <span class="status-pill {$dom.statusLower|default:'active'|replace:' ':'-'|escape}">{$dom.status|default:'Active'|escape}</span>
                 </a>
+                {/if}
                 {/foreach}
             {elseif $sec == 'invoices'}
                 {foreach $bnInvoices as $inv}
-                <a href="{$WEB_ROOT}/viewinvoice.php?id={$inv.id|escape:'url'}" class="min-row bn-row{if $inv@iteration > $bnRows} min-more{/if}">
+                {if $inv@iteration <= $secRows}
+                <a href="{$WEB_ROOT}/viewinvoice.php?id={$inv.id|escape:'url'}" class="min-row bn-row">
                     {* invoicestitle ("Invoice"), NOT invoicenumber ("Invoice #") --
                        the latter carries its own hash and would render "Invoice # #12". *}
                     <span class="min-name">
@@ -243,20 +269,24 @@
                         {if $inv.status}<span class="status-pill {$inv.statusLower|default:''|escape}">{$inv.status|escape}</span>{/if}
                     </span>
                 </a>
+                {/if}
                 {/foreach}
             {elseif $sec == 'tickets'}
                 {foreach $bnTickets as $tkt}
-                <a href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape:'url'}{if $tkt.c}&amp;c={$tkt.c|escape:'url'}{/if}" class="min-row bn-row{if $tkt@iteration > $bnRows} min-more{/if}">
+                {if $tkt@iteration <= $secRows}
+                <a href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape:'url'}{if $tkt.c}&amp;c={$tkt.c|escape:'url'}{/if}" class="min-row bn-row">
                     <span class="min-name">
                         <span class="bn-rn">{$tkt.subject|escape}</span>
                         <span class="bn-rs">#{$tkt.tid|escape}{if $tkt.lastreply} &middot; {$hadrianLang.dashboard.updated} {$tkt.lastreply|escape}{/if}</span>
                     </span>
                     <span class="status-pill {$tkt.status|default:'Open'|lower|replace:' ':'-'|escape}">{$tkt.status|default:'Open'|escape}</span>
                 </a>
+                {/if}
                 {/foreach}
             {else}
                 {foreach $bnNews as $ann}
-                <a href="{$WEB_ROOT}/announcements.php?id={$ann.id|escape:'url'}" class="min-row bn-row bn-ann{if $ann@iteration > $bnRows} min-more{/if}">
+                {if $ann@iteration <= $secRows}
+                <a href="{$WEB_ROOT}/announcements.php?id={$ann.id|escape:'url'}" class="min-row bn-row bn-ann">
                     {* dateMonth / dateDay are split in the hook, not here:
                        $ann.date is one pre-formatted "M j, Y" string with no
                        timestamp left in it to take apart. Both are empty when
@@ -270,12 +300,10 @@
                         {if $ann.excerpt|default:''}<span class="bn-rs">{$ann.excerpt|escape}</span>{elseif $ann.date}<span class="bn-rs">{$ann.date|escape}</span>{/if}
                     </span>
                 </a>
+                {/if}
                 {/foreach}
             {/if}
 
-            {if $secCount > $bnRows}
-            <button type="button" class="min-showmore" data-more="{$hadrianLang.dashboard.showMore|escape}" data-less="{$hadrianLang.dashboard.showLess|escape}"><span class="min-showmore-label">{$hadrianLang.dashboard.showMore}</span><span class="chev">&#9662;</span></button>
-            {/if}
             {* Only meaningful when a search box exists to produce no matches.
                Emitting it unconditionally leaves a permanently hidden last
                child, which keeps the final visible row on its non-:last-child

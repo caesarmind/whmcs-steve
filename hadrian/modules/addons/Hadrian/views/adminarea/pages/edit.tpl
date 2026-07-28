@@ -763,6 +763,14 @@
 .mt-seclay-opt { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .mt-seclay-opt-l { font-size: 12.5px; font-weight: 500; color: var(--mt-text-2); }
 .mt-seclay-opt-h { font-size: 11.5px; color: var(--mt-text-3); margin-top: 2px; line-height: 1.45; max-width: 460px; }
+/* Number input in a settings drawer. Sized to its content rather than the
+   full row -- a stretched text box beside a toggle reads as a different kind
+   of control than it is. Same complaint the owner raised about the page-level
+   int rows. */
+.mt-seclay-num { width: 74px; flex-shrink: 0; height: 32px; padding: 0 6px 0 10px; text-align: left;
+    border: 1px solid var(--mt-border); border-radius: 8px; background: var(--mt-surface);
+    color: var(--mt-text); font: inherit; font-size: 13px; }
+.mt-seclay-num:focus { outline: none; border-color: var(--mt-primary); }
 
 .mt-seclay-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .mt-seclay-presets button { border: 1px solid var(--mt-border); background: var(--mt-surface); color: var(--mt-text); border-radius: 6px; padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer; }
@@ -817,6 +825,10 @@
         var widths = Object.keys(spec.widths || {});
         var keys = Object.keys(cat);
         if (!keys.length || !widths.length) return;
+        // Per-section "items shown" control, declared by the variant. Null for
+        // variants that do not want it, which is how the same builder serves
+        // both bento and minimal.
+        var RC = spec.rowsControl || null;
 
         // The builder renders into its own card between Template settings and
         // Page settings. The input stays exactly where it is, inside the form,
@@ -836,19 +848,28 @@
                     var k = (bits[0] || '').trim().toLowerCase();
                     var w = (bits[1] || '').trim().toLowerCase();
                     var f = (bits[2] || '').trim().toLowerCase();
+                    var c = (bits[3] || '').trim().toLowerCase();
+                    var n = (bits[4] || '').trim();
                     // Whitelist the flags field, mirroring SectionLayout::parse.
                     // A mistyped comma puts a section KEY here, and most keys
                     // contain an 'e' -- a bare indexOf would invent settings.
                     if (f && !/^e*$/.test(f)) { f = ''; }
+                    // Colour is READ AND KEPT, not discarded. It used to be
+                    // dropped here while serialise() never wrote it either, so
+                    // merely opening the builder and touching anything erased a
+                    // stored colour. It is also field 4, so field 5 could not
+                    // be reached at all without carrying it.
+                    if (c && !/^[a-z0-9_]+$/.test(c)) { c = ''; }
+                    if (!/^[0-9]{1,2}$/.test(n)) { n = ''; }
                     if (!cat[k] || seen[k]) return;
                     if (w !== 'off' && SPAN[w] === undefined) return;
                     seen[k] = 1;
                     out.push({ key: k, on: w !== 'off', w: w === 'off' ? (cat[k].w || '1/1') : w,
-                               hideEmpty: f.indexOf('e') !== -1 });
+                               hideEmpty: f.indexOf('e') !== -1, colour: c, rows: n });
                 });
             }
             keys.forEach(function (k) {
-                if (!seen[k]) out.push({ key: k, on: true, w: cat[k].w || '1/1', hideEmpty: false });
+                if (!seen[k]) out.push({ key: k, on: true, w: cat[k].w || '1/1', hideEmpty: false, colour: '', rows: '' });
             });
             return out;
         }
@@ -857,9 +878,15 @@
         var dirty = (input.value || '').trim() !== '';
         var openKey = null;   // which section's settings drawer is open
 
+        // key:width[:flags[:colour[:rows]]] -- POSITIONAL, so a later field
+        // needs the earlier ones present as empty placeholders. Trailing empties
+        // are trimmed so a section with no settings still serialises to the
+        // short "key:width" it always did.
         function serialise() {
             return state.map(function (s) {
-                return s.key + ':' + (s.on ? s.w : 'off') + (s.hideEmpty ? ':e' : '');
+                var f = [s.key, (s.on ? s.w : 'off'), (s.hideEmpty ? 'e' : ''), (s.colour || ''), (s.rows || '')];
+                while (f.length > 2 && f[f.length - 1] === '') f.pop();
+                return f.join(':');
             }).join(',');
         }
         function commit() { dirty = true; input.value = serialise(); paint(); }
@@ -949,7 +976,12 @@
                 cnt.className = 'mt-seclay-count';
                 // State-derived, so a flag set behind a collapsed drawer is
                 // still visible on the row.
-                cnt.textContent = s.hideEmpty ? 'Hides when empty' : '1 setting';
+                // State-derived so a setting made behind a collapsed drawer is
+                // still visible on the row.
+                var bits = [];
+                if (s.hideEmpty) bits.push('Hides when empty');
+                if (RC && s.rows) bits.push(s.rows + ' items');
+                cnt.textContent = bits.length ? bits.join(' · ') : (RC ? '2 settings' : '1 setting');
                 disc.appendChild(chev); disc.appendChild(name); disc.appendChild(cnt);
                 disc.addEventListener('click', function () {
                     openKey = (openKey === s.key) ? null : s.key;
@@ -1035,6 +1067,48 @@
                     htr.appendChild(hth); ht2.appendChild(hcb); ht2.appendChild(htr);
                     opt.appendChild(lw); opt.appendChild(ht2);
                     opts.appendChild(opt);
+
+                    // Items shown -- only for variants that declare the control
+                    // (bento). Minimal reveals the rest behind Show more, so a
+                    // per-section cap there would mean something different and
+                    // is deliberately not offered.
+                    if (RC) {
+                        var ro = document.createElement('div');
+                        ro.className = 'mt-seclay-opt';
+                        var rw = document.createElement('div');
+                        var rl = document.createElement('div');
+                        rl.className = 'mt-seclay-opt-l';
+                        rl.textContent = RC.label || 'Items shown';
+                        var rh = document.createElement('div');
+                        rh.className = 'mt-seclay-opt-h';
+                        rh.textContent = RC.hint || '';
+                        rw.appendChild(rl); rw.appendChild(rh);
+                        var ri = document.createElement('input');
+                        ri.type = 'number';
+                        ri.className = 'mt-seclay-num';
+                        ri.min = RC.min || 1;
+                        ri.max = RC.max || 8;
+                        ri.step = 1;
+                        ri.value = s.rows || '';
+                        ri.placeholder = RC.def || '';
+                        // Blank is meaningful: it means "use the page default".
+                        // Clamp anything else so a typed 99 cannot serialise a
+                        // value the template would have to defend against.
+                        ri.addEventListener('change', function () {
+                            var v = ri.value.trim();
+                            if (v === '') { s.rows = ''; }
+                            else {
+                                var n = parseInt(v, 10);
+                                if (isNaN(n)) { n = ''; }
+                                else { n = Math.max(RC.min || 1, Math.min(RC.max || 8, n)); }
+                                s.rows = n === '' ? '' : String(n);
+                            }
+                            ri.value = s.rows;
+                            commit();
+                        });
+                        ro.appendChild(rw); ro.appendChild(ri);
+                        opts.appendChild(ro);
+                    }
 
                     dr.appendChild(h); dr.appendChild(opts);
                     list.appendChild(dr);

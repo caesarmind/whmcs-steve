@@ -14,13 +14,18 @@ namespace Hadrian\Helpers;
  *
  * GRAMMAR
  *   layout := '' | entry (',' entry)*
- *   entry  := key ':' width [':' flags]
+ *   entry  := key ':' width [':' flags [':' colour [':' rows]]]
  *   width  := '1/1' | '2/3' | '1/2' | '1/3' | 'off'
  *   flags  := one or more single letters; unknown letters are ignored
  *             'e' = hide this section entirely when it has no items, instead
  *                   of rendering its empty state
+ *   colour := paint | paint '_' fill      (fill: solid | tint | grad)
+ *   rows   := 1-99, how many items this section shows; 0/absent = page default
  *
- * e.g. "services:1/1,domains:1/2:e,invoices:1/2,tickets:1/3,announcements:off"
+ * The fields are POSITIONAL, so a later one needs the earlier ones present as
+ * empty placeholders: "profile:1/3:::6" is rows=6 with no flags and no colour.
+ *
+ * e.g. "services:1/1,domains:1/2:e,invoices:1/2::accent_tint,tickets:1/3:::3"
  *
  * List order IS render order. 'off' hides a section but REMEMBERS its position,
  * so switching it back on restores it where it was rather than at the end.
@@ -69,7 +74,7 @@ final class SectionLayout
      *        A paint not on this list is dropped -- see the note below on why
      *        that matters more than it looks.
      * @return list<array{key:string, width:string, span:int, visible:bool,
-     *                    hideEmpty:bool, paint:string, fill:string}>
+     *                    hideEmpty:bool, paint:string, fill:string, rows:int}>
      */
     public static function parse(string $raw, array $catalogue, array $paints = []): array
     {
@@ -96,6 +101,7 @@ final class SectionLayout
             $width  = strtolower(trim($parts[1] ?? ''));
             $flags  = strtolower(trim($parts[2] ?? ''));
             $colour = strtolower(trim($parts[3] ?? ''));
+            $rowsIn = trim($parts[4] ?? '');
 
             if (!isset($catalogue[$key]) || isset($seen[$key])) {
                 continue; // unknown section, or a duplicate -- first wins
@@ -131,6 +137,16 @@ final class SectionLayout
                 }
             }
 
+            // How many items this section shows. 0 means "not set" -- the
+            // template falls back to the page-level default, which is also what
+            // a malformed value yields. ctype_digit rather than (int) because
+            // (int)'abc' is 0 and (int)'3x' is 3: both would be accepted
+            // silently, one of them wrongly.
+            $rows = ($rowsIn !== '' && ctype_digit($rowsIn)) ? (int)$rowsIn : 0;
+            if ($rows < 1 || $rows > 99) {
+                $rows = 0;
+            }
+
             $seen[$key] = true;
             $out[] = [
                 'key'       => $key,
@@ -140,6 +156,7 @@ final class SectionLayout
                 'hideEmpty' => str_contains($flags, 'e'),
                 'paint'     => $paint,
                 'fill'      => $fill,
+                'rows'      => $rows,
             ];
         }
 
@@ -177,6 +194,7 @@ final class SectionLayout
                 'hideEmpty' => false,
                 'paint'     => '',
                 'fill'      => '',
+                'rows'      => 0,
             ];
         }
 

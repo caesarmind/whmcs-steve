@@ -33,7 +33,7 @@
    $hadrian.pages.clientareahome.options.* - NOT .config.*, which does not exist:
      bnt_attention     bool - the attention strip
      bnt_account       bool - the identity card beside the greeting
-     bnt_visible_rows  int  - rows before "Show more"
+     bnt_visible_rows  int  - default items per tile (each tile may override)
      bnt_search_at     int  - row count at which Services/Domains grow a filter
      bnt_sections      the tile arrangement (see bento.php)
 *}
@@ -206,7 +206,7 @@
                {include} drops the whole client area to the Six theme, and the
                poisoned compiled-template cache survives a git revert. *}
             {if $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'domainreg' || $s.key == 'profile'}
-                {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec=$s.key secSpan=$s.span secHideEmpty=$s.hideEmpty secPaint=$s.paint secFill=$s.fill}
+                {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec=$s.key secSpan=$s.span secHideEmpty=$s.hideEmpty secPaint=$s.paint secFill=$s.fill secRowsIn=$s.rows}
             {/if}
         {/if}
     {/foreach}
@@ -221,36 +221,28 @@
 {/if}
 </div>
 
-{* Progressive disclosure + the strip's dismiss. All markup above is
+{* The strip's dismiss and the in-tile filter. All markup above is
    server-rendered - this only binds behaviour, so the page is complete and
-   readable with JS off (every row is in the DOM; .min-more rows are simply
-   collapsed).
+   readable with JS off.
 
-   The two list behaviours are byte-identical to minimal.tpl's. Copied rather
-   than extracted into a shared partial deliberately: minimal is live on
-   installs today and adding bento must not require editing a file it renders.
-   Worth folding into one includes/ partial the next time either changes.
+   The filter is byte-identical to minimal.tpl's. Copied rather than extracted
+   into a shared partial deliberately: minimal is live on installs today and
+   adding bento must not require editing a file it renders. Worth folding into
+   one includes/ partial the next time either changes.
 
    {literal} because Smarty would otherwise parse the JS braces as tags. *}
 {literal}
 <script>
 (function () {
-    // Show more / Show less. One delegated listener rather than an inline
-    // handler per button; labels come from data-* so they stay translatable.
+    // Attention strip. Dismissal is per browser session, not persisted to the
+    // account: the underlying invoice or expiry has not gone anywhere, and
+    // burying it for good would hide a bill.
+    //
+    // There is deliberately no Show more handler here. Every tile server-renders
+    // exactly the rows it shows, so there is nothing to reveal -- the rest of
+    // the collection lives behind the tile's View all link.
     document.addEventListener('click', function (e) {
         if (!e.target.closest) return;
-        var btn = e.target.closest('.min-showmore');
-        if (btn) {
-            var list = btn.closest('.min-list');
-            if (!list) return;
-            var open = list.classList.toggle('expanded');
-            var label = btn.querySelector('.min-showmore-label');
-            if (label) label.textContent = open ? btn.dataset.less : btn.dataset.more;
-            return;
-        }
-        // Attention strip. Dismissal is per browser session, not persisted to
-        // the account: the underlying invoice or expiry has not gone anywhere,
-        // and burying it for good would hide a bill.
         var x = e.target.closest('[data-bn-dismiss]');
         if (x) {
             var strip = x.closest('[data-bn-attn]');
@@ -265,16 +257,15 @@
         }
     } catch (err) {}
 
-    // In-list filter. Rendered server-side only on lists long enough to need
-    // it; while a query is active every row becomes a candidate (including the
-    // collapsed .min-more ones) and Show more steps aside.
+    // In-tile filter. Rendered server-side only on tiles showing enough rows
+    // to need it. Every row in the tile is a candidate -- there are no hidden
+    // ones, because the tile server-renders exactly what it shows.
     document.querySelectorAll('.min-list').forEach(function (list) {
         var search = list.querySelector('.min-search');
         if (!search) return;
         var input = search.querySelector('input');
         var clear = search.querySelector('.min-search-clear');
         var rows  = Array.prototype.slice.call(list.querySelectorAll('.min-row'));
-        var more  = list.querySelector('.min-showmore');
         if (!input) return;
 
         function apply() {
@@ -289,7 +280,6 @@
                 if (hit) matches++;
             });
             list.classList.toggle('no-results', !!q && matches === 0);
-            if (more) more.style.display = q ? 'none' : '';
         }
 
         input.addEventListener('input', apply);
