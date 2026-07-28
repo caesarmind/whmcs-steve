@@ -986,8 +986,38 @@ final class Hooks
                 'tldPricing'     => $this->dashboardMentions($template, 'domainreg')
                     ? $this->fetchDomainTldPricing(6)
                     : [],
+                // $clientsdetails carries the ISO country CODE and no name, and
+                // the code=>name map ($countries) is page-scoped to the details
+                // page. Resolve the display name here, gated the same way as the
+                // TLD prices so it costs nothing unless the block is in use.
+                'countryName'    => $this->dashboardMentions($template, 'profile')
+                    ? $this->fetchClientCountryName($clientId)
+                    : '',
             ],
         ];
+    }
+
+    /**
+     * The client's country as a display NAME ("United States"), not the ISO
+     * code $clientsdetails carries. Empty when it cannot be resolved, so the
+     * template simply omits the line rather than printing "US".
+     */
+    private function fetchClientCountryName(int $clientId): string
+    {
+        if ($clientId === 0) {
+            return '';
+        }
+        try {
+            $res = localAPI('GetClientsDetails', ['clientid' => $clientId, 'stats' => false]);
+            if (($res['result'] ?? '') !== 'success') {
+                return '';
+            }
+            // Shape differs across WHMCS versions: some return the fields at the
+            // top level, some nest them under 'client'.
+            return (string)($res['countryname'] ?? $res['client']['countryname'] ?? '');
+        } catch (\Throwable) {
+            return '';
+        }
     }
 
     /**

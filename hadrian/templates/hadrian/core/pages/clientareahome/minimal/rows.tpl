@@ -138,18 +138,28 @@
         {assign var=blkI1 value=$blkFirst|truncate:1:''|upper}
         {assign var=blkI2 value=$blkLast|truncate:1:''|upper}
         {assign var=blkInitials value=$blkI1|cat:$blkI2}
+        {assign var=blkName value="`$blkFirst` `$blkLast`"|trim}
+        {assign var=blkCompany value=$clientsdetails.companyname|default:''}
+        {* The company is the heading when there is one, with the person beneath
+           it -- that is who the account belongs to. With no company the person
+           IS the account, so they take the heading and the second line is
+           dropped rather than repeated. *}
         <div class="blk-body">
             <div class="blk-person">
                 <span class="blk-avatar">{$blkInitials|escape}</span>
                 <span class="blk-who">
-                    <span class="blk-name">{"`$blkFirst` `$blkLast`"|trim|escape}</span>
-                    <span class="blk-meta">
-                        {$clientsdetails.email|default:''|escape}
-                        {if $clientsdetails.city}<br>{$clientsdetails.city|escape}{if $clientsdetails.state}, {$clientsdetails.state|escape}{/if}{/if}
-                    </span>
+                    <span class="blk-name">{if $blkCompany}{$blkCompany|escape}{else}{$blkName|escape}{/if}</span>
+                    {if $blkCompany}<span class="blk-person-name">{$blkName|escape}</span>{/if}
+                    {if $clientsdetails.address1}<span class="blk-addr">{$clientsdetails.address1|escape}</span>{/if}
+                    {if $clientsdetails.city || $clientsdetails.state || $clientsdetails.postcode}
+                    <span class="blk-addr">{$clientsdetails.city|default:''|escape}{if $clientsdetails.city && $clientsdetails.state}, {/if}{$clientsdetails.state|default:''|escape}{if ($clientsdetails.city || $clientsdetails.state) && $clientsdetails.postcode}, {/if}{$clientsdetails.postcode|default:''|escape}</span>
+                    {/if}
+                    {* Name, not the ISO code -- resolved in the hook. Omitted
+                       entirely when it could not be resolved. *}
+                    {if $dashboard.countryName|default:''}<span class="blk-addr">{$dashboard.countryName|escape}</span>{/if}
                 </span>
                 <span class="blk-acts">
-                    <a class="blk-btn quiet" href="{$WEB_ROOT}/clientarea.php?action=details">{$LANG.navchangedetails|default:'My Details'}</a>
+                    <a class="blk-btn" href="{$WEB_ROOT}/clientarea.php?action=details">{$LANG.navchangedetails|default:'My Details'}</a>
                     <a class="blk-btn quiet" href="{routePath('user-security')}">{$LANG.navsecuritysettings|default:'Security'}</a>
                 </span>
             </div>

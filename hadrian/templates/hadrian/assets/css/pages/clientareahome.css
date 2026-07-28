@@ -735,9 +735,14 @@ body[data-min-title="inside"] .min-list {
     display: flex; align-items: center; justify-content: center;
     font-size: var(--text-2xl); font-weight: var(--fw-semibold);
 }
+/* These are spans (a span cannot legally wrap the block content around them
+   here), so each identity line needs display:block or the company, person and
+   address all run together on one line. */
 .blk-who { min-width: 0; }
-.blk-name { font-size: var(--text-xl); font-weight: var(--fw-semibold); color: var(--color-text-primary); }
-.blk-meta { font-size: var(--text-base); color: var(--color-text-secondary); line-height: 1.5; margin-top: 4px; }
+.blk-name { display: block; font-size: var(--text-xl); font-weight: var(--fw-semibold); color: var(--color-text-primary); line-height: 1.3; }
+.blk-person-name { display: block; font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-text-primary); margin-top: 2px; }
+.blk-addr { display: block; font-size: var(--text-base); color: var(--color-text-secondary); line-height: 1.5; }
+.blk-addr:first-of-type { margin-top: 6px; }
 .blk-acts { display: flex; flex-direction: column; gap: 8px; width: 100%; }
 .blk-acts .blk-btn { width: 100%; }
 
