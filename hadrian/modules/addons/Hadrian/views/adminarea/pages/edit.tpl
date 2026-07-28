@@ -631,87 +631,105 @@
 </script>
 {/literal}
 
-{* ── Dashboard section layout builder ─────────────────────────────────────
+{* ── Section layout builder ───────────────────────────────────────────────
    Progressive enhancement over the plain text input that an option of type
    'sections' renders (the {else} catch-all above). The input is KEPT -- same
    element, same name="option[...]", same position inside #page-edit-form --
-   and only switched to type=hidden. That is deliberate and load-bearing:
-   PagesController::saveAction rewrites EVERY declared option key from the POST
-   on every save of this page for any reason, so a control that stops posting
-   would silently reset an admin's layout the next time they edited an
-   unrelated SEO field.
+   and only switched to type=hidden. That is load-bearing: saveAction rewrites
+   EVERY declared option key from the POST on every save of this page for any
+   reason, so a control that stopped posting would silently reset an admin's
+   layout the next time they edited an unrelated SEO field.
+
+   Design follows the Caesarthemes admin reference (the "Homepage blocks"
+   composer in hadrian-admin-panel/apple-admin.jsx): an uppercase eyebrow, a
+   six-column visual preview of the resulting layout, then one row per section
+   with a drag grip, a segmented width control, move arrows and an on/off
+   toggle. Its per-block settings expander is intentionally not carried over --
+   our sections have no per-section options to put in it.
 
    With JS off, or if this script throws, the admin still sees and edits the
-   raw string. Nothing is hidden until the builder has actually rendered. *}
+   raw string; nothing is hidden until the builder has actually rendered. *}
 <script id="mtSectionSpecs" type="application/json">{$sectionSpecsJson|default:'{}' nofilter}</script>
 
 {literal}
 <style>
-.mt-seclay { display: none; }
+.mt-seclay { display: none; margin-top: 10px; }
 .mt-seclay[data-ready] { display: block; }
-.mt-seclay-list { list-style: none; margin: 8px 0 0; padding: 0; border: 1px solid var(--mt-border); border-radius: 8px; overflow: hidden; }
-.mt-seclay-item { position: relative; display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--mt-surface); border-bottom: 1px solid var(--mt-border); }
-.mt-seclay-item:last-child { border-bottom: 0; }
-.mt-seclay-item.is-off .mt-seclay-name { opacity: 0.45; text-decoration: line-through; }
-.mt-seclay-item.is-dragging { opacity: 0.4; }
+
+/* Visual preview -- the same six-column grid the client area renders, so an
+   admin can see a half-filled row before saving rather than after. */
+.mt-seclay-prev { background: var(--mt-surface-2); border: 1px solid var(--mt-border); border-radius: var(--mt-radius); padding: 12px; margin-bottom: 16px; }
+.mt-seclay-prev-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.mt-seclay-cell { min-height: 46px; background: var(--mt-surface); border: 1px solid var(--mt-primary); border-radius: var(--mt-radius-sm); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px; text-align: center; }
+.mt-seclay-cell b { font-size: 11px; font-weight: 600; color: var(--mt-text); line-height: 1.2; }
+.mt-seclay-cell i { font-size: 10px; font-style: normal; font-weight: 600; color: var(--mt-primary); }
+.mt-seclay-prev-empty { grid-column: span 6; padding: 18px 0; text-align: center; font-size: 12.5px; color: var(--mt-text-3); }
+
+/* Rows */
+.mt-seclay-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.mt-seclay-item { position: relative; display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: 10px; }
+.mt-seclay-item.is-off { opacity: 0.5; }
+.mt-seclay-item.is-dragging { opacity: 0.35; }
 .mt-seclay-item.is-drop-before::before,
 .mt-seclay-item.is-drop-after::after { content: ''; position: absolute; left: 0; right: 0; height: 2px; background: var(--mt-primary); z-index: 5; pointer-events: none; }
-.mt-seclay-item.is-drop-before::before { top: -1px; }
-.mt-seclay-item.is-drop-after::after { bottom: -1px; }
-.mt-seclay-grip { cursor: grab; user-select: none; color: var(--mt-text-dim); line-height: 1; padding: 2px 4px; }
+.mt-seclay-item.is-drop-before::before { top: -4px; }
+.mt-seclay-item.is-drop-after::after { bottom: -4px; }
+.mt-seclay-grip { cursor: grab; color: var(--mt-text-4); font-size: 13px; user-select: none; line-height: 1; }
 .mt-seclay-grip:active { cursor: grabbing; }
-.mt-seclay-name { flex: 1; min-width: 0; font-size: 13px; }
-.mt-seclay-move { display: flex; gap: 2px; }
-.mt-seclay-move button { border: 1px solid var(--mt-border); background: var(--mt-surface); color: var(--mt-text-dim); border-radius: 5px; width: 22px; height: 22px; line-height: 1; cursor: pointer; font-size: 11px; padding: 0; }
+.mt-seclay-name { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 500; color: var(--mt-text); }
+
+/* Segmented width control -- same shape as the admin top-nav pill. */
+.mt-seclay-w { display: inline-flex; background: var(--mt-surface-2); padding: 2px; border-radius: 7px; gap: 2px; }
+.mt-seclay-w button { padding: 3px 8px; font: inherit; font-size: 11px; font-weight: 600; border: none; border-radius: 5px; cursor: pointer; background: transparent; color: var(--mt-text-3); }
+.mt-seclay-w button:hover { color: var(--mt-text); }
+.mt-seclay-w button.is-active { background: var(--mt-surface); color: var(--mt-primary); box-shadow: var(--mt-shadow-seg); }
+
+.mt-seclay-move button { background: transparent; border: none; cursor: pointer; color: var(--mt-text-3); font-size: 12px; padding: 3px 5px; line-height: 1; }
 .mt-seclay-move button:disabled { opacity: 0.3; cursor: default; }
-.mt-seclay-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.mt-seclay-presets button { border: 1px solid var(--mt-border); background: var(--mt-surface); color: var(--mt-text); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+.mt-seclay-move button:not(:disabled):hover { color: var(--mt-text); }
+
+.mt-seclay-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.mt-seclay-presets button { border: 1px solid var(--mt-border); background: var(--mt-surface); color: var(--mt-text); border-radius: 6px; padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer; }
 .mt-seclay-presets button:hover { border-color: var(--mt-primary); color: var(--mt-primary); }
-.mt-seclay-sum { font-size: 12px; color: var(--mt-text-dim); margin-top: 8px; }
-.mt-seclay-sum b { color: var(--mt-text); font-weight: 600; }
+.mt-seclay-note { font-size: 12.5px; color: var(--mt-text-3); margin-top: 10px; line-height: 1.5; }
+.mt-seclay-note b { color: var(--mt-text-2); font-weight: 600; }
 </style>
 <script>
 (function () {
+    var SPAN = { '1/1': 6, '2/3': 4, '1/2': 3, '1/3': 2 };
     var specsEl = document.getElementById('mtSectionSpecs');
     if (!specsEl) return;
     var specs; try { specs = JSON.parse(specsEl.textContent || '{}'); } catch (e) { return; }
 
     Object.keys(specs).forEach(function (key) {
         var input = document.getElementById('opt-' + key);
-        if (!input || !input.form) return;               // no field -> leave the page alone
+        if (!input || !input.form) return;              // no field -> leave the page alone
         var spec = specs[key] || {};
         var cat = spec.sections || {};
-        var widths = spec.widths || {};
+        var widths = Object.keys(spec.widths || {});
         var keys = Object.keys(cat);
-        if (!keys.length) return;
+        if (!keys.length || !widths.length) return;
 
         var wrap = input.closest('.mt-field') || input.parentNode;
-        var box = document.createElement('div');
-        box.className = 'mt-seclay';
-        var list = document.createElement('ul');
-        list.className = 'mt-seclay-list';
-        box.appendChild(list);
 
-        // Parse the stored string. An empty value means "built-in arrangement":
-        // render the catalogue in factory order but DO NOT write anything back,
-        // so saving an unrelated field on this page leaves it empty and the
-        // dashboard keeps its default layout.
+        // Parse the stored string. Empty means "built-in arrangement": show the
+        // catalogue in factory order but DO NOT write anything back, so saving
+        // an unrelated field leaves it empty and the page keeps its default.
         function readState() {
-            var raw = (input.value || '').trim();
-            var seen = {}, out = [];
+            var raw = (input.value || '').trim(), seen = {}, out = [];
             if (raw) {
                 raw.split(',').forEach(function (part) {
                     var bits = part.split(':');
                     var k = (bits[0] || '').trim().toLowerCase();
                     var w = (bits[1] || '').trim().toLowerCase();
                     if (!cat[k] || seen[k]) return;
-                    if (w !== 'off' && !widths[w]) return;
+                    if (w !== 'off' && SPAN[w] === undefined) return;
                     seen[k] = 1;
-                    out.push({ key: k, w: w });
+                    out.push({ key: k, on: w !== 'off', w: w === 'off' ? (cat[k].w || '1/1') : w });
                 });
             }
             keys.forEach(function (k) {
-                if (!seen[k]) out.push({ key: k, w: cat[k].w || '1/1' });
+                if (!seen[k]) out.push({ key: k, on: true, w: cat[k].w || '1/1' });
             });
             return out;
         }
@@ -720,31 +738,60 @@
         var dirty = (input.value || '').trim() !== '';
 
         function serialise() {
-            return state.map(function (s) { return s.key + ':' + s.w; }).join(',');
+            return state.map(function (s) { return s.key + ':' + (s.on ? s.w : 'off'); }).join(',');
         }
-        function commit() {
-            dirty = true;
-            input.value = serialise();
-            paint();
-        }
-        // The hidden field is the single source of truth at submit time, and
-        // bfcache restores control state but not programmatic value changes.
+        function commit() { dirty = true; input.value = serialise(); paint(); }
+        // The hidden field is the source of truth at submit; bfcache restores
+        // control state but not programmatic value changes.
         input.form.addEventListener('submit', function () { if (dirty) input.value = serialise(); });
         window.addEventListener('pageshow', function () { if (dirty) input.value = serialise(); });
 
-        var summary = document.createElement('div');
-        summary.className = 'mt-seclay-sum';
+        var box = document.createElement('div');
+        box.className = 'mt-seclay';
+        var prev = document.createElement('div');
+        prev.className = 'mt-seclay-prev';
+        var prevGrid = document.createElement('div');
+        prevGrid.className = 'mt-seclay-prev-grid';
+        prev.appendChild(prevGrid);
+        var list = document.createElement('ul');
+        list.className = 'mt-seclay-list';
+        var note = document.createElement('div');
+        note.className = 'mt-seclay-note';
+        box.appendChild(prev); box.appendChild(list); box.appendChild(note);
+
+        function label(k) { return (cat[k] && cat[k].label) || k; }
+
+        function paintPreview() {
+            prevGrid.innerHTML = '';
+            var shown = state.filter(function (s) { return s.on; });
+            if (!shown.length) {
+                var e = document.createElement('div');
+                e.className = 'mt-seclay-prev-empty';
+                e.textContent = 'No sections shown.';
+                prevGrid.appendChild(e);
+                return;
+            }
+            shown.forEach(function (s) {
+                var c = document.createElement('div');
+                c.className = 'mt-seclay-cell';
+                c.style.gridColumn = 'span ' + (SPAN[s.w] || 6);
+                var b = document.createElement('b'); b.textContent = label(s.key);
+                var i = document.createElement('i'); i.textContent = s.w;
+                c.appendChild(b); c.appendChild(i);
+                prevGrid.appendChild(c);
+            });
+        }
 
         function paint() {
             list.innerHTML = '';
             state.forEach(function (s, idx) {
                 var li = document.createElement('li');
-                li.className = 'mt-seclay-item' + (s.w === 'off' ? ' is-off' : '');
+                li.className = 'mt-seclay-item' + (s.on ? '' : ' is-off');
                 li.dataset.key = s.key;
 
                 var grip = document.createElement('span');
                 grip.className = 'mt-seclay-grip';
-                grip.textContent = '≡';
+                grip.textContent = '⠿';
                 grip.title = 'Drag to reorder';
                 // Arm draggable only while the grip is held, so text stays
                 // selectable and the row is not draggable from anywhere.
@@ -754,17 +801,31 @@
 
                 var name = document.createElement('span');
                 name.className = 'mt-seclay-name';
-                name.textContent = (cat[s.key] && cat[s.key].label) || s.key;
+                name.textContent = label(s.key);
                 li.appendChild(name);
 
+                var seg = document.createElement('span');
+                seg.className = 'mt-seclay-w';
+                widths.forEach(function (w) {
+                    var b = document.createElement('button');
+                    b.type = 'button';
+                    b.textContent = w;
+                    b.title = spec.widths[w];
+                    if (s.w === w) b.className = 'is-active';
+                    b.addEventListener('click', function () { s.w = w; s.on = true; commit(); });
+                    seg.appendChild(b);
+                });
+                li.appendChild(seg);
+
                 // Up / down are NOT polish: HTML5 drag-and-drop is mouse-only,
-                // so these are the entire touch and keyboard story.
+                // so these are the entire touch and keyboard path.
                 var mv = document.createElement('span');
                 mv.className = 'mt-seclay-move';
                 [['↑', -1], ['↓', 1]].forEach(function (pair) {
                     var b = document.createElement('button');
                     b.type = 'button';
                     b.textContent = pair[0];
+                    b.title = pair[1] < 0 ? 'Move up' : 'Move down';
                     b.disabled = (pair[1] < 0 && idx === 0) || (pair[1] > 0 && idx === state.length - 1);
                     b.addEventListener('click', function () {
                         var j = idx + pair[1];
@@ -776,32 +837,25 @@
                 });
                 li.appendChild(mv);
 
-                var sel = document.createElement('select');
-                sel.className = 'mt-select mt-input-compact';
-                // Opt out of the admin's custom select upgrade: it re-parents the
-                // panel to <body> with fixed positioning, which detaches mid-drag.
-                sel.setAttribute('data-mt-native', '1');
-                Object.keys(widths).forEach(function (w) {
-                    var o = document.createElement('option');
-                    o.value = w; o.textContent = widths[w];
-                    if (s.w === w) o.selected = true;
-                    sel.appendChild(o);
-                });
-                var off = document.createElement('option');
-                off.value = 'off'; off.textContent = 'Hidden';
-                if (s.w === 'off') off.selected = true;
-                sel.appendChild(off);
-                sel.addEventListener('change', function () { s.w = sel.value; commit(); });
-                li.appendChild(sel);
+                var tog = document.createElement('label');
+                tog.className = 'mt-toggle';
+                tog.title = 'Show this section';
+                var cb = document.createElement('input');
+                cb.type = 'checkbox'; cb.checked = s.on;
+                cb.addEventListener('change', function () { s.on = cb.checked; commit(); });
+                var track = document.createElement('span'); track.className = 'mt-toggle-track';
+                var thumb = document.createElement('span'); thumb.className = 'mt-toggle-thumb';
+                track.appendChild(thumb);
+                tog.appendChild(cb); tog.appendChild(track);
+                li.appendChild(tog);
 
                 list.appendChild(li);
             });
 
-            var span = { '1/1': 6, '2/3': 4, '1/2': 3, '1/3': 2 };
-            var shown = state.filter(function (s) { return s.w !== 'off'; });
-            var total = shown.reduce(function (n, s) { return n + (span[s.w] || 6); }, 0);
-            summary.innerHTML = '<b>' + shown.length + '</b> of ' + state.length +
-                ' sections shown. Widths run on a six-column grid; a row fills up when its widths add to a whole, so leftover space is left blank.' +
+            paintPreview();
+            var shown = state.filter(function (s) { return s.on; }).length;
+            note.innerHTML = '<b>' + shown + '</b> of ' + state.length +
+                ' sections shown. Widths run on a six-column grid, so a row fills up when its widths add to a whole; anything left over stays blank.' +
                 (dirty ? '' : ' <b>Currently using the built-in arrangement.</b>');
         }
 
@@ -827,8 +881,7 @@
             var r = li.getBoundingClientRect();
             var after = (e.clientY - r.top) > r.height / 2;
             var from = state.findIndex(function (s) { return s.key === dragKey; });
-            var onto = state.findIndex(function (s) { return s.key === li.dataset.key; });
-            if (from < 0 || onto < 0 || from === onto) { dragKey = null; paint(); return; }
+            if (from < 0 || li.dataset.key === dragKey) { dragKey = null; paint(); return; }
             var moved = state.splice(from, 1)[0];
             var at = state.findIndex(function (s) { return s.key === li.dataset.key; }) + (after ? 1 : 0);
             state.splice(at, 0, moved);
@@ -862,10 +915,9 @@
             });
             presets.appendChild(b);
         });
-
-        box.appendChild(summary);
         box.appendChild(presets);
-        input.type = 'hidden';                 // keep the SAME element, same name
+
+        input.type = 'hidden';                 // keep the SAME element and name
         wrap.appendChild(box);
         paint();
         box.setAttribute('data-ready', '1');   // only now is the builder usable
