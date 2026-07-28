@@ -205,6 +205,9 @@ final class PagesController extends AbstractController
                 continue;
             }
             $sectionSpecs[(string)$key] = [
+                // Heading for the builder's own card. Falls back to the option
+                // label, which reads fine but carries the variant suffix.
+                'title'    => (string)($spec['title'] ?? $spec['label'] ?? 'Sections'),
                 'sections' => is_array($spec['sections'] ?? null) ? $spec['sections'] : [],
                 'widths'   => is_array($spec['widths'] ?? null) ? $spec['widths'] : [],
             ];

@@ -237,6 +237,20 @@
             {/if}
         </div>
 
+        {* Mount point for the section-layout builder (the script at the foot of
+           this file fills it). It is its OWN card here, a sibling between
+           Template settings and Page settings, matching the admin reference
+           where the block composer is a standalone card rather than a settings
+           row -- composing a page's blocks is a different job from toggling an
+           option, and it needs the full width.
+
+           Stays empty and invisible when the page declares no option of type
+           'sections', or when JS is off. The field it drives lives in the rows
+           above and keeps posting either way. *}
+        {assign var=mtSecVariant value=$activeVariant}
+        {foreach $variants as $mtV}{if $mtV.name == $activeVariant}{assign var=mtSecVariant value=$mtV.label}{/if}{/foreach}
+        <div id="mt-seclay-mount" data-variant="{$mtSecVariant|escape}"></div>
+
         {* Everything that governs the page itself rather than its template:
            who reaches it, and what chrome it renders. *}
         <div class="mt-panel pad">
@@ -653,8 +667,15 @@
 
 {literal}
 <style>
-.mt-seclay { display: none; margin-top: 10px; }
-.mt-seclay[data-ready] { display: block; }
+/* The builder is its own card in the main column. Hidden until the script has
+   populated it, so a JS failure leaves no empty shell behind. */
+#mt-seclay-mount:not([data-ready]) { display: none; }
+.mt-seclay-head { font-size: 12.5px; color: var(--mt-text-3); line-height: 1.5; margin: -4px 0 14px; max-width: 620px; }
+.mt-seclay-head b { color: var(--mt-text-2); font-weight: 600; }
+/* The option's own text field is redundant once the builder renders -- the card
+   carries the heading and help. The input STAYS in the DOM and in the form so
+   it keeps posting; only its wrapper is hidden. */
+.mt-field.mt-seclay-raw { display: none; }
 
 /* Visual preview -- the same six-column grid the client area renders, so an
    admin can see a half-filled row before saving rather than after. */
@@ -710,7 +731,12 @@
         var keys = Object.keys(cat);
         if (!keys.length || !widths.length) return;
 
-        var wrap = input.closest('.mt-field') || input.parentNode;
+        // The builder renders into its own card between Template settings and
+        // Page settings. The input stays exactly where it is, inside the form,
+        // just hidden along with its now-redundant label and help text.
+        var mount = document.getElementById('mt-seclay-mount');
+        if (!mount) return;
+        var field = input.closest('.mt-field');
 
         // Parse the stored string. Empty means "built-in arrangement": show the
         // catalogue in factory order but DO NOT write anything back, so saving
@@ -747,7 +773,17 @@
         window.addEventListener('pageshow', function () { if (dirty) input.value = serialise(); });
 
         var box = document.createElement('div');
-        box.className = 'mt-seclay';
+        box.className = 'mt-panel pad mt-seclay';
+        var head = document.createElement('div');
+        head.className = 'mt-subhead';
+        head.textContent = spec.title || 'Sections';
+        var blurb = document.createElement('div');
+        blurb.className = 'mt-seclay-head';
+        var vName = mount.getAttribute('data-variant') || '';
+        blurb.innerHTML = (vName ? 'Sections available to the <b>' + vName.replace(/[<&>]/g, '') + '</b> template. ' : '') +
+            'Choose which appear, drag to reorder, and set each one’s width.';
+        box.appendChild(head);
+        box.appendChild(blurb);
         var prev = document.createElement('div');
         prev.className = 'mt-seclay-prev';
         var prevGrid = document.createElement('div');
@@ -918,9 +954,10 @@
         box.appendChild(presets);
 
         input.type = 'hidden';                 // keep the SAME element and name
-        wrap.appendChild(box);
+        if (field) { field.classList.add('mt-seclay-raw'); }
+        mount.appendChild(box);
         paint();
-        box.setAttribute('data-ready', '1');   // only now is the builder usable
+        mount.setAttribute('data-ready', '1'); // only now is the builder usable
     });
 })();
 </script>

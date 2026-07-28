@@ -65,6 +65,9 @@ return [
         // the whitelist in minimal.tpl, or it renders as an empty card.
         'min_sections' => [
             'type'    => 'sections',
+            // 'title' heads the builder's own card; 'label' is the (hidden)
+            // form field's label, kept variant-suffixed like its siblings.
+            'title'   => 'Dashboard sections',
             'label'   => 'Dashboard sections (Minimal)',
             'default' => '',
             'tooltip' => 'Drag to reorder, switch a section off to hide it, and set each one to full, two thirds, one half or one third width. Widths run on a six-column grid, so a row fills up when its widths add to a whole. Leave blank for the built-in arrangement.',
