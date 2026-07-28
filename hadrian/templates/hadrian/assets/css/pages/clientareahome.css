@@ -357,4 +357,166 @@
         .news-row:hover .news-title { color: var(--color-accent); }
         .news-title { font-size: var(--text-md); color: var(--color-text-primary); letter-spacing: -0.008em; }
         .news-date { font-size: var(--text-sm); color: var(--color-text-tertiary); white-space: nowrap; }
-    </style>
+
+/* ==========================================================================
+   MINIMAL DASHBOARD VARIANT  (core/pages/clientareahome/minimal/minimal.tpl)
+   --------------------------------------------------------------------------
+   Shared stylesheet: both dashboard variants link pages/clientareahome.css,
+   matching the homepage precedent where default/marketing/portal share
+   pages/homepage.css. Everything below is namespaced .min-* -- verified
+   collision-free against apple-theme.css, apple-layout.css and pages/*.css.
+
+   Deliberately avoids two shapes the global sheet reserves:
+     - no class ending in -split or -aside (apple-layout.css forces those to a
+       single column and hides their children with !important when the website
+       sub-nav is off)
+     - no .card / .card-body, so the data-svc-layout inside/outside rule
+       (scoped to ".content-area .card:has(> .card-body)") can never reach us.
+
+   ASCII only, per this install's documented Chrome section-skipping hazard
+   with dense box-drawing glyphs in CSS comments.
+   ========================================================================== */
+
+/* --- Greeting ----------------------------------------------------------- */
+.min-head { margin: 0 0 28px; }
+.min-greeting { font-size: var(--text-h3); font-weight: var(--fw-semibold); letter-spacing: -0.03em; margin: 0 0 6px; line-height: 1.1; color: var(--color-text-primary); }
+.min-sub { font-size: var(--text-lg); color: var(--color-text-secondary); margin: 0; letter-spacing: -0.01em; }
+
+/* --- Summary tiles ------------------------------------------------------
+   The Due tile carries the only accent on the page, so the one number worth
+   acting on is the one that draws the eye. */
+/* minmax(0, 1fr), not 1fr: a grid track's default min-width is auto, so one
+   long unbroken string (a 60-character domain, an untranslated label) can push
+   a track past its share and overflow the row. */
+.min-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 880px) { .min-tiles { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .min-tiles { grid-template-columns: 1fr; } }
+.min-tile { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--card-radius); padding: 26px 28px; text-decoration: none; color: inherit; box-shadow: var(--shadow-card); transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
+.min-tile:hover { border-color: var(--color-text-quaternary); box-shadow: var(--shadow-card-hover); text-decoration: none; color: inherit; }
+.min-tile .n { font-size: var(--text-h2); font-weight: var(--fw-semibold); letter-spacing: -0.03em; color: var(--color-text-primary); font-variant-numeric: tabular-nums; line-height: 1; }
+.min-tile.due .n { color: var(--color-accent); }
+.min-tile .l { font-size: var(--text-sm); font-weight: var(--fw-semibold); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); margin-top: 12px; }
+
+/* --- Quick actions ------------------------------------------------------
+   The primary things a client comes here to DO, directly under the summary
+   so they are visible without hunting. Always rendered -- a brand-new account
+   needs these most -- so NOT inside a when-full block. */
+.min-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.min-act { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-primary); font-size: var(--text-md); font-weight: var(--fw-medium); letter-spacing: -0.01em; text-decoration: none; transition: background var(--transition-fast), border-color var(--transition-fast), filter var(--transition-fast); }
+.min-act svg { width: 17px; height: 17px; flex-shrink: 0; }
+.min-act:hover { background: var(--color-surface-secondary); border-color: var(--color-text-quaternary); text-decoration: none; color: var(--color-text-primary); }
+.min-act.primary { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+.min-act.primary:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; filter: brightness(0.93); }
+
+/* --- Section = uppercase label (+ View all) above a boxed list ----------
+   Named groups without adding a new surface: the label and link sit on the
+   page background, the list keeps the card. */
+.min-section { margin-top: 34px; }
+.min-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding: 0 2px; }
+.min-section-label { font-size: var(--text-sm); font-weight: var(--fw-semibold); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); }
+.min-section-link { font-size: var(--text-base); color: var(--color-accent); text-decoration: none; white-space: nowrap; }
+.min-section-link:hover { text-decoration: none; opacity: 0.75; }
+
+/* Titles INSIDE the card (page option "Section titles" = inside). The section
+   head becomes a card header and the list drops its own top edge, so head and
+   rows read as one card. Default keeps titles outside, on the page background. */
+body[data-min-title="inside"] .min-section-head {
+    margin: 0; padding: 15px 20px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-bottom: 0.5px solid var(--color-border);
+    border-radius: var(--card-radius) var(--card-radius) 0 0;
+}
+body[data-min-title="inside"] .min-list {
+    margin-top: 0; border-top: none;
+    border-top-left-radius: 0; border-top-right-radius: 0;
+    box-shadow: none;
+}
+
+/* --- The list card ------------------------------------------------------ */
+.min-list { margin-top: 20px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--card-radius); box-shadow: var(--shadow-card); overflow: hidden; }
+.min-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 24px; border-bottom: 0.5px solid var(--color-border); text-decoration: none; color: inherit; transition: background var(--transition-fast); }
+.min-row:last-child { border-bottom: none; }
+.min-row:hover { background: var(--color-surface-secondary); text-decoration: none; color: inherit; }
+.min-name { font-size: var(--text-lg); font-weight: var(--fw-medium); letter-spacing: -0.01em; color: var(--color-text-primary); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Right-hand cluster for rows carrying more than a status: an amount then a
+   pill (invoices), or a quiet date (domains, announcements). */
+.min-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.min-amt { font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
+.min-when { font-size: var(--text-base); color: var(--color-text-secondary); white-space: nowrap; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
+/* Reuse the theme's .status-pill (25 dark-mode-correct status modifiers)
+   rather than a local three-colour pill that would paint Suspended or
+   Cancelled a healthy green. Only the proportions are nudged to this page. */
+.min-row .status-pill { padding: 4px 12px; font-size: var(--text-sm); font-weight: var(--fw-semibold); flex-shrink: 0; }
+
+/* --- Empty states ------------------------------------------------------
+   Inside the list card, so the page keeps its one-surface rhythm even for a
+   brand-new account. Secondary blocks use .compact -- one muted line, no CTA
+   -- so five empty sections do not become five big cards. */
+.min-empty { padding: 48px 24px; text-align: center; }
+.min-empty p { font-size: var(--text-lg); color: var(--color-text-secondary); margin: 0 0 18px; letter-spacing: -0.01em; }
+.min-empty .acts { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.min-empty.compact { padding: 20px 24px; text-align: left; }
+.min-empty.compact p { margin: 0; }
+
+/* --- Bottom grid -------------------------------------------------------
+   Primary blocks (services, domains) stay full width and calm; secondary
+   blocks drop into an asymmetric two-column grid so the lower page reads as
+   composed rather than a stack of identical bars. align-items:start lets the
+   tall left column sit beside two shorter stacked blocks without stretching. */
+.min-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 34px 24px; align-items: start; margin-top: 34px; }
+@media (max-width: 720px) { .min-grid { grid-template-columns: 1fr; gap: 30px; } }
+.min-gcol { display: flex; flex-direction: column; gap: 30px; }
+.min-grid .min-section { margin-top: 0; }
+
+/* --- Overflow ----------------------------------------------------------
+   A dashboard list shows the first few and reveals the rest in place --
+   progressive disclosure, not page numbers, which belong on the dedicated
+   page the "View all" link points to. */
+.min-more { display: none; }
+.min-list.expanded .min-more { display: flex; }
+.min-showmore { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 14px; border: none; border-top: 0.5px solid var(--color-border); background: transparent; color: var(--color-accent); font: inherit; font-size: var(--text-base); font-weight: var(--fw-medium); cursor: pointer; transition: background var(--transition-fast); }
+.min-showmore:hover { background: var(--color-surface-secondary); }
+.min-showmore .chev { transition: transform var(--transition-fast); font-size: var(--text-xs); }
+.min-list.expanded .min-showmore .chev { transform: rotate(180deg); }
+
+/* --- In-list search ----------------------------------------------------
+   Rendered only on lists long enough to need it. While a query is active,
+   .searching reveals the capped .min-more rows so every row is a search
+   candidate, .min-hidden removes non-matches, and Show more steps aside. */
+.min-search { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-bottom: 0.5px solid var(--color-border); color: var(--color-text-tertiary); }
+.min-search svg { width: 16px; height: 16px; flex-shrink: 0; }
+.min-search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font: inherit; font-size: var(--text-md); color: var(--color-text-primary); }
+.min-search input::placeholder { color: var(--color-text-tertiary); }
+.min-search .min-search-clear { border: none; background: transparent; cursor: pointer; color: var(--color-text-tertiary); font-size: var(--text-xl); line-height: 1; padding: 0 2px; display: none; }
+.min-search.has-q .min-search-clear { display: block; }
+.min-hidden { display: none !important; }
+.min-list.searching .min-more { display: flex; }
+.min-noresults { display: none; padding: 30px 24px; text-align: center; font-size: var(--text-md); color: var(--color-text-secondary); }
+.min-list.no-results .min-noresults { display: block; }
+
+/* Status pills this dashboard can emit that apple-theme.css does not define.
+   The dashboard lists services, domains, invoices AND tickets on one page, so
+   it can produce statuses whose only rules today live inside another page's
+   stylesheet -- .expired/.expiring in clientareadomains.css, .terminated in
+   clientareaproducts.css (and that one is scoped to .svc-table). Verified in a
+   real-cascade harness: without these, an Expired domain or a Refunded invoice
+   renders a transparent pill with body-coloured text, i.e. an invisible badge.
+
+   Colours mirror the existing definitions so a status looks the same wherever
+   it appears. Tokens (not literals) so dark mode flips correctly. */
+.min-row .status-pill.expired,
+.min-row .status-pill.fraud            { background: var(--color-red-bg);     color: var(--color-red-text); }
+.min-row .status-pill.redemption       { background: var(--color-red-bg);     color: var(--color-red-text); }
+.min-row .status-pill.expiring,
+.min-row .status-pill.grace,
+.min-row .status-pill.pending-transfer,
+.min-row .status-pill.pending-registration,
+.min-row .status-pill.payment-pending,
+.min-row .status-pill.collections      { background: var(--color-orange-bg);  color: var(--color-orange-text); }
+.min-row .status-pill.terminated,
+.min-row .status-pill.transferred-away,
+.min-row .status-pill.refunded,
+.min-row .status-pill.draft            { background: var(--color-gray-bg);    color: var(--color-gray-text); }

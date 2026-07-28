@@ -250,6 +250,28 @@ return [
         'updated'           => 'Updated',
         'opened'            => 'Opened',
 
+        // Minimal dashboard variant (core/pages/clientareahome/minimal).
+        // Time-of-day greeting. The bucket is picked from the WHMCS server
+        // clock, the same clock every other date on the dashboard is rendered
+        // against -- not the visitor's, which the server cannot know.
+        'goodMorning'       => 'Good morning',
+        'goodAfternoon'     => 'Good afternoon',
+        'goodEvening'       => 'Good evening',
+        'accountOverview'   => 'Account overview',
+        'recentInvoices'    => 'Recent invoices',
+        'showMore'          => 'Show more',
+        'showLess'          => 'Show less',
+        'searchPlaceholder' => 'Search',
+        // Prefix for a domain's next renewal date. Deliberately NOT
+        // $LANG.domainrenewals, which is the "Domain Renewals" page title.
+        'renews'            => 'Renews',
+        'noMatches'         => 'Nothing matches your search.',
+        'noDomainsTitle'    => 'No domains yet',
+        'noDomainsSub'      => 'Register or transfer a domain to see it here.',
+        'noInvoices'        => 'No invoices yet.',
+        'noOpenTickets'     => 'No open tickets.',
+        'noAnnouncementsShort' => 'No announcements.',
+
         // Public homepage marketing copy.
         'heroTitle'           => 'Secure your domain name.',
         'heroSubtitle'        => 'Search, register, and transfer -- all in one place.',
@@ -2055,7 +2077,7 @@ return [
         'xoEmptyHome'         => 'Home',
     ],
 
-    /* Public marketing homepage (core/pages/homepage/default - the "Hosting,
+    /* Public marketing homepage (core/pages/homepage/marketing - the "Hosting,
        redesigned" landing ported from apple-client-area/homepage.html). */
     'home' => [
         'heroEyebrow'        => 'Premium managed hosting',
@@ -2187,6 +2209,12 @@ return [
         'ctaTitle'           => 'Launch on hosting that feels modern.',
         'ctaText'            => 'Start free today &mdash; no card needed. Upgrade when you&rsquo;re ready.',
         'ctaBtn'             => 'Start for free',
+        // Closing-CTA paragraph for the 'simple' homepage variant. Deliberately
+        // separate from ctaText/ctaBtn above: those assert a free plan the real
+        // WHMCS catalogue may not contain, which is the same reason the
+        // free-plan framing was already retired from the pricing section (see
+        // the note above pricingTitle). Says nothing the catalogue can't back.
+        'simpleCtaText'      => 'Browse the catalogue, pick what fits, and get set up in minutes.',
     ],
 
 ];

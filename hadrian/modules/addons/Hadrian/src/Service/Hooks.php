@@ -29,6 +29,16 @@ final class Hooks
      */
     private const OG_ARTICLE_PAGES = ['viewannouncement', 'knowledgebasearticle'];
 
+    /**
+     * How many rows each $dashboard list carries (clientareahome only).
+     *
+     * Was a hardcoded 5 in three separate fetchers. The minimal dashboard
+     * variant caps its visible rows lower still and reveals the remainder in
+     * place, so anything at or below its own visible cap made that control dead
+     * on arrival. Kept small: these run on every dashboard load.
+     */
+    private const DASHBOARD_ROWS = 8;
+
     private static ?self $instance = null;
 
     public static function instance(): self
@@ -924,23 +934,111 @@ final class Hooks
     }
 
     /**
-     * Populate $dashboard.{activeServices, recentInvoices, openTickets} for clientareahome.
-     * Uses WHMCS localAPI so we don't have to hardcode the schema.
+     * Populate $dashboard.{activeServices, domains, recentInvoices, openTickets,
+     * announcements} for clientareahome. Uses WHMCS localAPI so we don't have to
+     * hardcode the schema.
+     *
+     * The row cap is DASHBOARD_ROWS rather than the old hardcoded 5: the
+     * "minimal" dashboard variant shows the first few rows and reveals the rest
+     * in place, so a cap of 5 left its Show-more control permanently dead. The
+     * "default" variant renders the same arrays and simply lists a few more rows.
+     *
+     * $dashboard is read by clientareahome only (both variants) — nothing else
+     * in the theme consumes it.
      */
     private function clientAreaPageHome(array $vars, Template $template): array
     {
         $clientId = (int)($_SESSION['uid'] ?? 0);
         if ($clientId === 0) {
-            return ['dashboard' => ['activeServices' => [], 'recentInvoices' => [], 'openTickets' => []]];
+            return ['dashboard' => [
+                'activeServices' => [], 'domains' => [], 'recentInvoices' => [],
+                'openTickets' => [], 'announcements' => [],
+                'greeting' => $this->greetingBucket(),
+            ]];
         }
 
         return [
             'dashboard' => [
+                // Time-of-day bucket for the minimal variant's greeting.
+                // Computed here rather than in Smarty because |date_format's
+                // %-style codes are broken on PHP 8.1+ (strftime deprecation;
+                // see the trap documented in viewannouncement/default.tpl).
+                'greeting'       => $this->greetingBucket(),
                 'activeServices' => $this->fetchActiveServices($clientId),
+                // Domains were previously fetched only on the domains page. The
+                // minimal dashboard lists them as a primary section, so surface a
+                // capped, active-first slice here too.
+                'domains'        => $this->fetchDashboardDomains($clientId),
                 'recentInvoices' => $this->fetchRecentInvoices($clientId),
                 'openTickets'    => $this->fetchOpenTickets($clientId),
+                // WHMCS does NOT pass $publishedAnnouncements to clientareahome —
+                // only the "Recent News" $panels tree, whose children carry a label
+                // and a badge and nothing else. Reuse the login page's fetcher so
+                // the dashboard gets real ids, titles and dates.
+                'announcements'  => $this->fetchRecentAnnouncements(self::DASHBOARD_ROWS),
             ],
         ];
+    }
+
+    /**
+     * 'morning' | 'afternoon' | 'evening', from the WHMCS server clock — the
+     * same clock every other date on the dashboard is rendered against. The
+     * visitor's local time is not knowable server-side, and guessing it from
+     * the browser would make the heading flicker on load.
+     */
+    private function greetingBucket(): string
+    {
+        $hour = (int)date('G');
+        if ($hour < 12) return 'morning';
+        if ($hour < 18) return 'afternoon';
+        return 'evening';
+    }
+
+    /**
+     * Active-first domain slice for the dashboard. Deliberately NOT fetchAllDomains():
+     * that pulls up to 100 rows of every status for the paginated domains page,
+     * where the dashboard wants a handful of live ones.
+     *
+     * @return list<array{id:int,domain:string,status:string,statusLower:string,expirydate:string,nextduedate:string}>
+     */
+    private function fetchDashboardDomains(int $clientId): array
+    {
+        try {
+            $response = localAPI('GetClientsDomains', [
+                'clientid' => $clientId,
+                'limitnum' => 50,
+            ]);
+            if (($response['result'] ?? '') !== 'success') return [];
+
+            $live = [];
+            $rest = [];
+            foreach (($response['domains']['domain'] ?? []) as $d) {
+                $status = (string)($d['status'] ?? 'Active');
+                $row = [
+                    'id'          => (int)($d['id'] ?? 0),
+                    'domain'      => (string)($d['domainname'] ?? ''),
+                    'status'      => $status,
+                    'statusLower' => strtolower($status),
+                    'expirydate'  => !empty($d['expirydate']) && $d['expirydate'] !== '0000-00-00'
+                        ? date('M j, Y', strtotime((string)$d['expirydate']))
+                        : '',
+                    'nextduedate' => !empty($d['nextduedate']) && $d['nextduedate'] !== '0000-00-00'
+                        ? date('M j, Y', strtotime((string)$d['nextduedate']))
+                        : '',
+                ];
+                if ($row['domain'] === '') continue;
+                // Active and Pending Transfer first; expired/cancelled last, so a
+                // short dashboard list never fills up with dead names.
+                if (in_array($status, ['Active', 'Pending Transfer', 'Pending Registration'], true)) {
+                    $live[] = $row;
+                } else {
+                    $rest[] = $row;
+                }
+            }
+            return array_slice(array_merge($live, $rest), 0, self::DASHBOARD_ROWS);
+        } catch (\Throwable) {
+            return [];
+        }
     }
 
     private function fetchActiveServices(int $clientId): array
@@ -963,7 +1061,7 @@ final class Hooks
                     'nextDueDate'  => !empty($p['nextduedate']) ? date('M j, Y', strtotime((string)$p['nextduedate'])) : '',
                     'manageUrl'    => '/clientarea.php?action=productdetails&id=' . (int)($p['id'] ?? 0),
                 ];
-                if (count($services) >= 5) break;
+                if (count($services) >= self::DASHBOARD_ROWS) break;
             }
             return $services;
         } catch (\Throwable) {
@@ -1305,7 +1403,7 @@ final class Hooks
         try {
             $response = localAPI('GetInvoices', [
                 'userid'    => $clientId,
-                'limitnum'  => 5,
+                'limitnum'  => self::DASHBOARD_ROWS,
                 'orderby'   => 'date',
                 'order'     => 'desc',
             ]);
@@ -1313,11 +1411,17 @@ final class Hooks
 
             $invoices = [];
             foreach (($response['invoices']['invoice'] ?? []) as $inv) {
+                // WHMCS wraps invoice status in markup ('<span class="textred">
+                // Overdue</span>'), so strip it here the way fetchAllInvoices
+                // already does — otherwise a status-pill class built from this
+                // value is markup, not a word.
+                $status = trim(strip_tags((string)($inv['status'] ?? '')));
                 $invoices[] = [
-                    'id'     => (int)($inv['id'] ?? 0),
-                    'date'   => !empty($inv['date']) ? date('M j, Y', strtotime((string)$inv['date'])) : '',
-                    'total'  => (string)($inv['total'] ?? ''),
-                    'status' => (string)($inv['status'] ?? ''),
+                    'id'          => (int)($inv['id'] ?? 0),
+                    'date'        => !empty($inv['date']) ? date('M j, Y', strtotime((string)$inv['date'])) : '',
+                    'total'       => (string)($inv['total'] ?? ''),
+                    'status'      => $status,
+                    'statusLower' => strtolower(str_replace(' ', '-', $status)),
                 ];
             }
             return $invoices;
@@ -1356,7 +1460,7 @@ final class Hooks
                     'date'     => $dateTimestamp ? date('M j, Y', $dateTimestamp) : $dateRaw,
                     'lastreply' => $lastReplyTimestamp ? date('M j, Y', $lastReplyTimestamp) : $lastReplyRaw,
                 ];
-                if (count($tickets) >= 5) break;
+                if (count($tickets) >= self::DASHBOARD_ROWS) break;
             }
             return $tickets;
         } catch (\Throwable) {
