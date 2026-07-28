@@ -1896,7 +1896,10 @@ final class Hooks
         $variantMetaOpts = is_array($variantMeta['supportedOptions'] ?? null)
             ? $variantMeta['supportedOptions'] : [];
         foreach ($variantMetaOpts as $optKey => $optSpec) {
-            $nsKey = $optKey . '@' . $variant;
+            // Separator must match PagesController::VARIANT_SEP. Kept to
+            // [a-z0-9_]: WHMCS's POST handling drops option keys containing an
+            // '@', so anything fancier never reaches the database at all.
+            $nsKey = $optKey . '__' . $variant;
             if (array_key_exists($nsKey, $stored['options'] ?? [])) {
                 $entry['options'][$optKey] = $stored['options'][$nsKey];
             } elseif (!array_key_exists($optKey, $entry['options'])) {

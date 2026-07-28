@@ -396,11 +396,18 @@ final class PagesController extends AbstractController
     }
 
     /**
-     * Separator between an option key and the variant that owns it.
-     * `min_sections@minimal`. Survives PHP's POST-key mangling (which only
-     * rewrites dots and spaces) and is legal in an HTML name and id.
+     * Separator between an option key and the variant that owns it:
+     * `min_sections__minimal`.
+     *
+     * MUST stay within [a-z0-9_]. This was '@' first, on the reasoning that PHP
+     * only mangles dots and spaces in POST keys — but WHMCS's own input
+     * handling drops the key entirely, so every variant-scoped option silently
+     * failed to save while bare keys on the same form saved fine. Verified on
+     * the live admin: option[heroTitle] persists, option[min_sections@minimal]
+     * does not. Underscores are the character class every working option key
+     * already uses.
      */
-    private const VARIANT_SEP = '@';
+    private const VARIANT_SEP = '__';
 
     /**
      * The options currently stored for a page, raw. Used on save to carry
