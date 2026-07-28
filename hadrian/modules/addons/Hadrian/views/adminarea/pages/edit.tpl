@@ -103,6 +103,9 @@
    line, but wide enough for the longest option label ("Inherit (global
    default)"). */
 .mt-pd-rows .mt-select { max-width: 220px; }
+/* Numeric option. .mt-row is a flex row, so the input would otherwise stretch;
+   size it to the value it holds rather than to the panel. */
+.mt-pd-rows .mt-input-num { width: 90px; flex: none; text-align: center; }
 
 /* Rail: stacked full-width fields, not label-left/control-right -- 300px is too
    narrow to split. */
@@ -224,6 +227,21 @@
                                     <option value="{$mtChoice|escape}"{if (string)$opt.value == (string)$mtChoice} selected{/if}>{$mtChoice|escape}</option>
                                 {/foreach}
                             </select>
+                        </div>
+                    {elseif $opt.type == 'int'}
+                        {* A number is a two-character value; without this branch
+                           it fell into the free-text catch-all below and drew a
+                           full-width input the length of the panel, sitting oddly
+                           beside the compact toggle and select rows. Same
+                           label-left / control-right row as its neighbours. *}
+                        <div class="mt-row" data-opt-variant="{$opt.variant|escape}">
+                            <div>
+                                <div class="mt-row-label">{$opt.label|escape}</div>
+                                {if $opt.help}<div class="mt-row-help">{$opt.help|escape}</div>{/if}
+                            </div>
+                            <input id="opt-{$opt.key|escape}" class="mt-input mt-input-num" type="number"
+                                   min="0" step="1" inputmode="numeric"
+                                   name="option[{$opt.key|escape}]" value="{$opt.value|escape}">
                         </div>
                     {else}
                         {* Free text needs the full width, so it stays a stacked
