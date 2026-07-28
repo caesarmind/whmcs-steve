@@ -109,8 +109,14 @@
                     <a class="blk-btn ghost" href="{$WEB_ROOT}/cart.php?a=add&amp;domain=transfer">{$LANG.transferdomain|default:'Transfer'}</a>
                 </div>
             </form>
+            {* includes/captcha.tpl styles nothing itself -- by its own contract
+               it renders INSIDE a page's own .X-captcha container, which sizes
+               the image and the code box. Included bare, the verify image comes
+               out at its natural size and swamps the block. *}
             {if isset($captcha) && $captcha && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm|default:'')}
+            <div class="blk-captcha">
                 {include file="`$template`/includes/captcha.tpl"}
+            </div>
             {/if}
             {* Live register prices, newest currency. Renders nothing when WHMCS
                has no priced TLDs, so the block never shows an empty rail. *}

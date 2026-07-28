@@ -92,10 +92,40 @@
 })();
 </script>
 
+{* ---------- heading, optionally with the profile strip beside it ----------
+   The .min-head-row WRAPPER is conditional, not just the strip. It sets
+   `.min-head { margin: 0 }`, so emitting it unconditionally would change the
+   heading's spacing on every install whether or not the strip is on.
+
+   The strip lives here rather than in the section grid so it works identically
+   under both the classic and the arranged shell. *}
+{assign var=minProfileInline value=$hadrian.pages.clientareahome.options.min_profile_inline|default:false}
+
+{if $minProfileInline}<div class="min-head-row">{/if}
 <div class="min-head">
     <h1 class="min-greeting">{if $dashboard.greeting == 'morning'}{$hadrianLang.dashboard.goodMorning}{elseif $dashboard.greeting == 'evening'}{$hadrianLang.dashboard.goodEvening}{else}{$hadrianLang.dashboard.goodAfternoon}{/if}{if $clientsdetails.firstname}, {$clientsdetails.firstname|escape}{/if}.</h1>
     <p class="min-sub">{$hadrianLang.dashboard.accountOverview}</p>
 </div>
+{if $minProfileInline}
+    {assign var=minPf value=$clientsdetails.firstname|default:''}
+    {assign var=minPl value=$clientsdetails.lastname|default:''}
+    {assign var=minPi1 value=$minPf|truncate:1:''|upper}
+    {assign var=minPi2 value=$minPl|truncate:1:''|upper}
+    <div class="pblk-inline">
+        <a class="pblk-inline-link" href="{$WEB_ROOT}/clientarea.php?action=details" title="{$LANG.navchangedetails|default:'My Details'|escape}">
+            <span class="pblk-av">{$minPi1|cat:$minPi2|escape}</span>
+            <span class="pblk-txt">
+                <span class="pblk-nm">{"`$minPf` `$minPl`"|trim|escape}</span>
+                {if $clientsdetails.city}<span class="pblk-mt">{$clientsdetails.city|escape}{if $clientsdetails.state}, {$clientsdetails.state|escape}{/if}</span>{/if}
+            </span>
+        </a>
+        <span class="pblk-inline-acts">
+            <a href="{$WEB_ROOT}/clientarea.php?action=details" class="pblk-ibtn" title="{$LANG.navchangedetails|default:'My Details'|escape}" aria-label="{$LANG.navchangedetails|default:'My Details'|escape}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></a>
+            <a href="{routePath('user-security')}" class="pblk-ibtn" title="{$LANG.navsecuritysettings|default:'Security'|escape}" aria-label="{$LANG.navsecuritysettings|default:'Security'|escape}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></a>
+        </span>
+    </div>
+</div>
+{/if}
 
 {* ---------- summary tiles ---------- *}
 <div class="min-tiles">

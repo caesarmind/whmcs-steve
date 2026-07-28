@@ -757,3 +757,73 @@ body[data-min-title="inside"] .min-list {
     .blk-acts { flex-direction: row; }
     .blk-avatar { width: 64px; height: 64px; }
 }
+
+/* Captcha inside the domain block. includes/captcha.tpl deliberately ships no
+   styling of its own -- each page wraps it in its own container and sizes the
+   image and code box there (same contract as .ph-captcha and .cr-captcha).
+   The verify image is emitted at its natural pixel size, so without a max-width
+   it fills the whole block. */
+.blk-captcha { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.blk-captcha .mt-captcha-verify { max-width: 380px; }
+.blk-captcha img {
+    max-width: 220px; height: auto;
+    border-radius: var(--radius-sm); border: 0.5px solid var(--color-border);
+}
+.blk-captcha input[type="text"] {
+    height: 40px; padding: 0 14px; max-width: 200px; box-sizing: border-box;
+    border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+    background: var(--color-surface); color: var(--color-text-primary);
+    font: inherit; font-size: var(--text-md);
+    text-align: center; letter-spacing: 2px; text-transform: uppercase;
+}
+.blk-captcha input[type="text"]:focus {
+    outline: none; border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+.blk-captcha .g-recaptcha, .blk-captcha .h-captcha { display: inline-block; }
+/* On a painted block the label has to read on the fill, and the image keeps a
+   light plate of its own since WHMCS renders it on white. */
+[data-blk-fill="solid"] .blk-captcha .mt-captcha-verify,
+[data-blk-fill="grad"] .blk-captcha .mt-captcha-verify { color: var(--blk-ink); opacity: 0.85; }
+[data-blk-fill="solid"] .blk-captcha img,
+[data-blk-fill="grad"] .blk-captcha img { border-color: rgba(255,255,255,0.45); }
+
+/* --- Profile beside the page title --------------------------------------
+   A compact strip in the page header rather than a block in the grid. Sits in
+   .min-head-row, which only exists when the strip is switched on -- it sets
+   `.min-head { margin: 0 }`, so wrapping unconditionally would change the
+   heading's spacing on every install. */
+.min-head-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin: 0 0 28px; flex-wrap: wrap; }
+.min-head-row .min-head { margin: 0; }
+.pblk-inline {
+    display: flex; align-items: center; gap: 6px; padding: 7px 9px;
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill); box-shadow: var(--shadow-card);
+}
+.pblk-inline-link { display: flex; align-items: center; gap: 11px; padding: 2px 4px 2px 2px; text-decoration: none; color: inherit; }
+.pblk-inline-link:hover { text-decoration: none; color: inherit; }
+.pblk-inline-link:hover .pblk-nm { color: var(--color-accent); }
+.pblk-av {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: var(--color-accent); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: var(--text-lg); font-weight: var(--fw-semibold);
+}
+.pblk-txt { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
+.pblk-nm { font-size: var(--text-md); font-weight: var(--fw-semibold); color: var(--color-text-primary); }
+.pblk-mt { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.pblk-inline-acts { display: flex; align-items: center; gap: 4px; padding-left: 6px; border-left: 1px solid var(--color-border); }
+.pblk-ibtn {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--color-border); background: var(--color-surface);
+    color: var(--color-text-secondary); text-decoration: none;
+    transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+.pblk-ibtn:hover { background: var(--color-accent-light); border-color: var(--color-accent); color: var(--color-accent); text-decoration: none; }
+.pblk-ibtn svg { width: 15px; height: 15px; }
+/* Narrow: the strip goes full width under the heading rather than squeezing it. */
+@media (max-width: 620px) {
+    .min-head-row { flex-direction: column; align-items: stretch; gap: 14px; }
+    .pblk-inline { justify-content: space-between; }
+}

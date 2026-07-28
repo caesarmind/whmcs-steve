@@ -50,6 +50,12 @@ return [
             'default' => 8,
             'tooltip' => 'Services and Domains grow their own filter box once they reach this many rows. Only those two: the other lists are read newest-first, where a filter is noise. Every dashboard list holds at most 8 rows, so useful values are 1 to 8 and anything higher never triggers. Set to 0 to switch the filter off.',
         ],
+        'min_profile_inline' => [
+            'type'    => 'bool',
+            'label'   => 'Profile beside the title',
+            'default' => false,
+            'tooltip' => 'Shows a compact profile strip in line with the page heading: avatar, name, location, and shortcuts to account details and security. Independent of the Profile block, which is a full panel in the grid below.',
+        ],
         'min_show_actions' => [
             'type'    => 'bool',
             'label'   => 'Show quick actions',
