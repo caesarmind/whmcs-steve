@@ -937,38 +937,6 @@ body[data-min-title="inside"] .min-list {
 .bn-cta { display: inline-flex; align-items: center; justify-content: center; align-self: flex-start; margin-top: 14px; padding: 9px 16px; border-radius: var(--radius-sm); background: var(--color-accent); color: #fff; border: 1px solid var(--color-accent); font-size: var(--text-md); font-weight: var(--fw-medium); text-decoration: none; }
 .bn-cta:hover { color: #fff; text-decoration: none; filter: brightness(0.93); }
 
-/* --- Proportion bar + legend --------------------------------------------
-   Segment and legend-dot colours are keyed off the SAME normalised status
-   string the pill on each row carries, so a segment can never disagree with
-   the rows it summarises. Anything outside the vocabulary falls through to the
-   neutral default, which is why the base rule sets a colour before the
-   modifiers do. */
-.bn-bar { display: flex; height: 7px; border-radius: var(--radius-pill); overflow: hidden; background: var(--color-surface-secondary); margin-top: 13px; }
-.bn-bar i { display: block; height: 100%; background: var(--color-text-quaternary); }
-.bn-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 9px; }
-.bn-leg { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--color-text-secondary); }
-.bn-leg i { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--color-text-quaternary); }
-.bn-leg b { font-weight: var(--fw-semibold); color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
-
-/* The grouping below is COPIED FROM THE PILLS, not chosen: apple-theme.css:709
-   onwards plus the 13 dashboard-only extras above. A segment that disagreed
-   with the pills in the rows beneath it would be worse than no bar at all --
-   note Answered is GREEN here because that is what the pill is, and Closed is
-   neutral for the same reason. Anything outside the vocabulary falls through to
-   the neutral default set on the base rule. */
-.bn-bar i.active, .bn-bar i.paid, .bn-bar i.answered,
-.bn-leg i.active, .bn-leg i.paid, .bn-leg i.answered { background: var(--color-green); }
-.bn-bar i.overdue, .bn-bar i.suspended, .bn-bar i.expired, .bn-bar i.fraud, .bn-bar i.redemption,
-.bn-leg i.overdue, .bn-leg i.suspended, .bn-leg i.expired, .bn-leg i.fraud, .bn-leg i.redemption { background: var(--color-red); }
-.bn-bar i.pending, .bn-bar i.unpaid, .bn-bar i.customer-reply, .bn-bar i.in-progress,
-.bn-bar i.on-hold, .bn-bar i.expiring, .bn-bar i.grace, .bn-bar i.pending-transfer,
-.bn-bar i.pending-registration, .bn-bar i.payment-pending, .bn-bar i.collections,
-.bn-leg i.pending, .bn-leg i.unpaid, .bn-leg i.customer-reply, .bn-leg i.in-progress,
-.bn-leg i.on-hold, .bn-leg i.expiring, .bn-leg i.grace, .bn-leg i.pending-transfer,
-.bn-leg i.pending-registration, .bn-leg i.payment-pending, .bn-leg i.collections { background: var(--color-orange); }
-.bn-bar i.open,
-.bn-leg i.open { background: var(--color-accent); }
-
 /* --- Rows ---------------------------------------------------------------
    .min-list is a card in its own right on the minimal dashboard. Inside a tile
    it is just the row container, so its surface, border, radius and shadow all

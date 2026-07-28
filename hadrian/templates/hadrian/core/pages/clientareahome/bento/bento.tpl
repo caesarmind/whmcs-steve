@@ -1,8 +1,8 @@
 {* Hostnodes - Client Home dashboard, "bento" variant.
 
    Where minimal lays every collection out as plain rows on one surface, bento
-   gives each one its own tile: an eyebrow, a count, a proportion bar and its
-   rows, arranged two-up on the same six-column grid the admin builder drives.
+   gives each one its own tile: an eyebrow, a count and its rows, arranged
+   two-up on the same six-column grid the admin builder drives.
    Above the grid sit a greeting with the account's real scale and an attention
    strip that pulls the few things needing action out of the many rows.
 
@@ -33,7 +33,6 @@
    $hadrian.pages.clientareahome.options.* - NOT .config.*, which does not exist:
      bnt_attention     bool - the attention strip
      bnt_account       bool - the identity card beside the greeting
-     bnt_bars          bool - proportion bar + labelled counts on each tile
      bnt_visible_rows  int  - rows before "Show more"
      bnt_search_at     int  - row count at which Services/Domains grow a filter
      bnt_sections      the tile arrangement (see bento.php)
@@ -42,7 +41,6 @@
 {* ---------- options ---------- *}
 {assign var=bnActs value=$hadrian.pages.clientareahome.options.bnt_attention|default:true}
 {assign var=bnAcct value=$hadrian.pages.clientareahome.options.bnt_account|default:true}
-{assign var=bnBars value=$hadrian.pages.clientareahome.options.bnt_bars|default:true}
 
 {* Deliberately NOT |default: on the two integers. Zero is a meaningful stored
    value ("off" for the filter), and whether |default: treats 0 as missing

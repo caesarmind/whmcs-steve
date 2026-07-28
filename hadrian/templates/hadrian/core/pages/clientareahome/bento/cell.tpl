@@ -77,65 +77,6 @@
 {assign var=secHide value=$secHideEmpty|default:false}
 {if $secPanel || $secCount > 0 || !$secHide}
 
-{* ---------- status split ----------
-   The proportion bar and its legend describe THE ROWS IN THIS TILE, so they may
-   only be drawn when the tile provably holds the whole collection. The hook
-   caps every list at 8 rows, so fewer than 8 rows means nothing was cut; at the
-   cap the bar is dropped rather than reporting a slice as if it were the total.
-
-   Buckets are the distinct status strings themselves, in first-seen order, up
-   to five. The colour comes from the same normalisation the pills below use
-   ({$status|lower|replace:' ':'-'}), so a segment and its rows always agree.
-   A sixth distinct status suppresses the whole thing rather than filing rows
-   under a label that is not theirs.
-
-   Five, not four, because of tickets specifically: Open, Answered,
-   Customer-Reply, In Progress and On Hold are all reachable at once (Closed is
-   filtered out upstream), so a four-slot bucket set suppressed the ticket bar
-   on any account with a busy queue -- which is the one account it is for. *}
-{assign var=secBar value=false}
-{if $bnBars && $secCount > 0 && $secCount < 8 && ($sec == 'services' || $sec == 'domains' || $sec == 'tickets')}
-    {assign var=secBar value=true}
-    {assign var=b1k value=''}{assign var=b1n value=0}
-    {assign var=b2k value=''}{assign var=b2n value=0}
-    {assign var=b3k value=''}{assign var=b3n value=0}
-    {assign var=b4k value=''}{assign var=b4n value=0}
-    {assign var=b5k value=''}{assign var=b5n value=0}
-    {assign var=bOver value=false}
-
-    {if $sec == 'services'}{assign var=barRows value=$bnServices}
-    {elseif $sec == 'domains'}{assign var=barRows value=$bnDomains}
-    {else}{assign var=barRows value=$bnTickets}{/if}
-
-    {foreach $barRows as $br}
-        {assign var=bst value=$br.status|default:''}
-        {if $bst == ''}{assign var=bst value='Active'}{/if}
-        {if $b1k == '' || $b1k == $bst}
-            {assign var=b1k value=$bst}{assign var=b1n value=($b1n+1)}
-        {elseif $b2k == '' || $b2k == $bst}
-            {assign var=b2k value=$bst}{assign var=b2n value=($b2n+1)}
-        {elseif $b3k == '' || $b3k == $bst}
-            {assign var=b3k value=$bst}{assign var=b3n value=($b3n+1)}
-        {elseif $b4k == '' || $b4k == $bst}
-            {assign var=b4k value=$bst}{assign var=b4n value=($b4n+1)}
-        {elseif $b5k == '' || $b5k == $bst}
-            {assign var=b5k value=$bst}{assign var=b5n value=($b5n+1)}
-        {else}
-            {assign var=bOver value=true}
-        {/if}
-    {/foreach}
-    {if $bOver}{assign var=secBar value=false}{/if}
-{/if}
-
-{* A list tile only ever takes the WASH, whatever the admin picked.
-   Measured: a .status-pill is a 10%-alpha background over the tile, so on a
-   solid accent fill an Active pill composites to rgb(20,123,210) behind
-   rgb(36,138,61) text -- 1.05:1, an invisible badge. Every list tile carries
-   pills, so the two saturated fills are coerced here rather than offered and
-   then broken. The panels (Register, Profile) have no pills and keep all three
-   fills, straight from the shared .blk rules. *}
-{assign var=secFillOut value=$secFill|default:'solid'}
-{if !$secPanel && $secFillOut != 'tint'}{assign var=secFillOut value='tint'}{/if}
 <div class="min-section bn-cell" data-sec="{$sec}" data-w="{$secW}"{if $secPaint|default:''} data-blk-paint="{$secPaint|escape}" data-blk-fill="{$secFillOut|escape}"{/if}>
 {if $secPanel}
     {* ---------- Panels ----------
@@ -248,32 +189,6 @@
             <div class="bn-titlerow">
                 <div class="bn-title">{if $sec == 'services'}{$clientsstats.productsnumactive|default:0} {$LANG.navservices|default:'Services'}{elseif $sec == 'domains'}{$clientsstats.numactivedomains|default:0} {$LANG.navdomains|default:'Domains'}{elseif $sec == 'tickets'}{$clientsstats.numactivetickets|default:0} {$LANG.navtickets|default:'Support'}{else}{$LANG.announcements|default:'Announcements'}{/if}</div>
             </div>
-        {/if}
-
-        {if $secBar}
-        {* Percentages to four places so eight equal rows still sum to 100.
-           Computed into variables first: a string_format's own quoted "%.4f"
-           sitting inside a quoted HTML attribute parses fine in Smarty but
-           reads as unbalanced to every HTML checker that looks at the source. *}
-        {assign var=p1 value=($b1n*100/$secCount)|string_format:'%.4f'}
-        {assign var=p2 value=($b2n*100/$secCount)|string_format:'%.4f'}
-        {assign var=p3 value=($b3n*100/$secCount)|string_format:'%.4f'}
-        {assign var=p4 value=($b4n*100/$secCount)|string_format:'%.4f'}
-        {assign var=p5 value=($b5n*100/$secCount)|string_format:'%.4f'}
-        <div class="bn-bar">
-            {if $b1n > 0}<i class="{$b1k|lower|replace:' ':'-'|escape}" style="width:{$p1}%"></i>{/if}
-            {if $b2n > 0}<i class="{$b2k|lower|replace:' ':'-'|escape}" style="width:{$p2}%"></i>{/if}
-            {if $b3n > 0}<i class="{$b3k|lower|replace:' ':'-'|escape}" style="width:{$p3}%"></i>{/if}
-            {if $b4n > 0}<i class="{$b4k|lower|replace:' ':'-'|escape}" style="width:{$p4}%"></i>{/if}
-            {if $b5n > 0}<i class="{$b5k|lower|replace:' ':'-'|escape}" style="width:{$p5}%"></i>{/if}
-        </div>
-        <div class="bn-legend">
-            {if $b1n > 0}<span class="bn-leg"><i class="{$b1k|lower|replace:' ':'-'|escape}"></i>{$b1k|escape} <b>{$b1n}</b></span>{/if}
-            {if $b2n > 0}<span class="bn-leg"><i class="{$b2k|lower|replace:' ':'-'|escape}"></i>{$b2k|escape} <b>{$b2n}</b></span>{/if}
-            {if $b3n > 0}<span class="bn-leg"><i class="{$b3k|lower|replace:' ':'-'|escape}"></i>{$b3k|escape} <b>{$b3n}</b></span>{/if}
-            {if $b4n > 0}<span class="bn-leg"><i class="{$b4k|lower|replace:' ':'-'|escape}"></i>{$b4k|escape} <b>{$b4n}</b></span>{/if}
-            {if $b5n > 0}<span class="bn-leg"><i class="{$b5k|lower|replace:' ':'-'|escape}"></i>{$b5k|escape} <b>{$b5n}</b></span>{/if}
-        </div>
         {/if}
 
         <div class="min-list bn-rows">

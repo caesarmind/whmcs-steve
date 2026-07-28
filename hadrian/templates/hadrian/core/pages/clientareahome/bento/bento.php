@@ -19,7 +19,7 @@
  */
 return [
     'name'        => 'Bento',
-    'description' => 'A bento grid of self-contained cards. Each collection gets its own tile with a count, a status bar and its rows, arranged two-up on a six-column grid. Adds an attention strip that pulls the few things needing action out of the many rows, and an identity card beside the greeting.',
+    'description' => 'A bento grid of self-contained cards. Each collection gets its own tile with a count and its rows, arranged two-up on a six-column grid. Adds an attention strip that pulls the few things needing action out of the many rows, and an identity card beside the greeting.',
     'fullPage'    => false,
 
     // Read in bento.tpl as $hadrian.pages.clientareahome.options.<key>.
@@ -39,12 +39,6 @@ return [
             'label'   => 'Identity card beside the greeting',
             'default' => true,
             'tooltip' => 'Surfaces the account name and shortcuts to details, security and payment methods as a small card in line with the page heading. Independent of the Profile block, which is a full tile in the grid below.',
-        ],
-        'bnt_bars' => [
-            'type'    => 'bool',
-            'label'   => 'Status bars on each card',
-            'default' => true,
-            'tooltip' => 'Draws a proportion bar and a labelled count under each collection\'s title, so a tile answers "how are my services doing" before you read a single row. Switch off for a plainer card that goes straight from the title to the rows.',
         ],
         'bnt_visible_rows' => [
             'type'    => 'int',
