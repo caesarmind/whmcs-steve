@@ -498,7 +498,16 @@
     cards.forEach(function (card) {
         card.addEventListener('click', function () {
             var radio = card.querySelector('input[name="variant"]');
-            if (radio) radio.checked = true;
+            if (radio && !radio.checked) {
+                radio.checked = true;
+                // Setting .checked in script does NOT fire 'change', and the
+                // radios are hidden so the label's native activation cannot be
+                // relied on either. Announce the selection explicitly, or
+                // anything listening for it never hears -- which is exactly how
+                // the per-template settings filter below ended up only updating
+                // after a save round-trip.
+                radio.dispatchEvent(new Event('change', { bubbles: true }));
+            }
             render();
         });
     });
@@ -753,6 +762,15 @@
     document.querySelectorAll('input[name="variant"]').forEach(function (r) {
         r.addEventListener('change', applyVariantFilter);
     });
+    // Belt and braces: the variant cards are label-wrapped hidden radios driven
+    // by their own click handler. That handler now dispatches 'change', but a
+    // click listener on the grid means the filter still tracks the selection if
+    // the picker is ever reworked to set .checked silently again. Deferred a
+    // tick so it reads the radio AFTER that handler has set it. Idempotent.
+    var vGrid = document.querySelector('.mt-variant-grid');
+    if (vGrid) {
+        vGrid.addEventListener('click', function () { setTimeout(applyVariantFilter, 0); });
+    }
 
     Object.keys(specs).forEach(function (key) {
         var input = document.getElementById('opt-' + key);
