@@ -159,7 +159,7 @@
                     {if $dashboard.countryName|default:''}<span class="blk-addr">{$dashboard.countryName|escape}</span>{/if}
                 </span>
                 <span class="blk-acts">
-                    <a class="blk-btn" href="{$WEB_ROOT}/clientarea.php?action=details">{$LANG.navchangedetails|default:'My Details'}</a>
+                    <a class="blk-btn" href="{$WEB_ROOT}/clientarea.php?action=details">{$hadrianLang.dashboard.editProfile}</a>
                     <a class="blk-btn quiet" href="{routePath('user-security')}">{$LANG.navsecuritysettings|default:'Security'}</a>
                 </span>
             </div>

@@ -266,6 +266,9 @@ return [
         // $LANG.domainrenewals, which is the "Domain Renewals" page title.
         'renews'            => 'Renews',
         'domainBlockSub'    => 'Find your perfect domain name',
+        // Block copy, not a WHMCS nav label: the card's action reads "Edit
+        // profile" rather than the sidebar's "My Details".
+        'editProfile'       => 'Edit profile',
         'noMatches'         => 'Nothing matches your search.',
         'noDomainsTitle'    => 'No domains yet',
         'noDomainsSub'      => 'Register or transfer a domain to see it here.',

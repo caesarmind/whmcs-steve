@@ -676,6 +676,21 @@ body[data-min-title="inside"] .min-list {
    (dblk-/pblk- in the mockup) so the paint rules above style both blocks once.
    ASCII only. */
 
+/* A grid row is as tall as its tallest item, and .min-grid* is align-items:start
+   so a short block leaves bare page beneath it -- a 330px profile beside a 491px
+   list left a 161px hole. Panels therefore STRETCH to their row and take the
+   slack inside, which reads as a deliberate equal-height card instead of a gap.
+   Scoped with :has(> .blk) so only these panels stretch: a list card grown to
+   match its neighbour would just be a taller box of nothing. */
+.min-grid > .min-section:has(> .blk),
+.min-grid-custom > .min-section:has(> .blk) { align-self: stretch; display: flex; flex-direction: column; }
+.min-section > .blk { flex: 1; }
+.min-section > .blk > .blk-body { height: 100%; }
+/* With the slack now inside the card, the actions anchor its bottom edge rather
+   than floating mid-air under the address. */
+.blk-person { flex: 1; }
+.blk-person > .blk-acts { margin-top: auto; }
+
 .min-section > .blk {
     container-type: inline-size;
     container-name: blk;
@@ -755,6 +770,9 @@ body[data-min-title="inside"] .min-list {
     .blk-who { flex: 1; }
     .blk-acts { width: auto; flex-shrink: 0; }
     .blk-acts .blk-btn { width: auto; }
+    /* Horizontal now, so bottom-anchoring the actions would drop them off the
+       vertical centre. Only the stacked form wants them pinned. */
+    .blk-person > .blk-acts { margin-top: 0; }
 }
 /* Two thirds and up: more room, larger type, actions side by side. */
 @container blk (min-width: 600px) {
