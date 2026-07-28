@@ -153,7 +153,6 @@ final class PagesController extends AbstractController
 
         $options          = $this->readPageOptions($template, $page, $meta);
         $activeVariant    = $options['variant'];
-        $supportedOptions = is_array($meta['supportedOptions'] ?? null) ? $meta['supportedOptions'] : [];
 
         // Languages for the multi-language SEO fields (one field per language;
         // a single-language install renders exactly one, as before).
@@ -173,6 +172,11 @@ final class PagesController extends AbstractController
             (string)($options['url'] ?? ''),
             (string)($options['visibility'] ?? 'public')
         );
+
+        // Page-scoped options plus the ACTIVE variant's own. Only the active
+        // variant's are rendered; the others still exist in the declared set
+        // (see declaredOptions) so saving does not destroy them.
+        $supportedOptions = self::visibleOptions($template, $page, $meta, $activeVariant);
 
         // Project each declared option onto a uniform row the view can iterate.
         $optionRows = [];
@@ -298,13 +302,30 @@ final class PagesController extends AbstractController
         $urlRaw = trim((string)($_POST['url'] ?? ''));
         $url    = $urlRaw === '' ? null : ltrim(substr($urlRaw, 0, 255), '/');
 
-        // Supported options — type-coerce per page.php spec.
-        $supportedOptions = is_array($meta['supportedOptions'] ?? null) ? $meta['supportedOptions'] : [];
+        // Supported options — type-coerce per spec. The declared set spans the
+        // page AND every variant, so saving while template A is selected does
+        // not drop template B's stored options.
+        $supportedOptions = self::declaredOptions($template, $page, $meta);
         $submitted        = is_array($_POST['option'] ?? null) ? $_POST['option'] : [];
+        $existing         = self::storedOptions($template->getName(), $page);
         $options          = [];
         foreach ($supportedOptions as $key => $spec) {
             $type = (string)($spec['type'] ?? 'string');
-            $raw  = $submitted[$key] ?? null;
+
+            // Not on this form at all — an option belonging to a variant that
+            // is not currently selected. Carry the stored value through
+            // untouched. Without this the coercion below would write it as
+            // false/0/'' and wipe that template's configuration. (Rendered
+            // controls always post: checkboxes ship a paired hidden 0, and
+            // selects and text inputs always submit.)
+            if (!array_key_exists($key, $submitted)) {
+                if (array_key_exists($key, $existing)) {
+                    $options[(string)$key] = $existing[$key];
+                }
+                continue;
+            }
+
+            $raw = $submitted[$key] ?? null;
             $options[(string)$key] = match ($type) {
                 // 'checkbox' is what every pageoption.php actually declares;
                 // without it here a toggle round-tripped as the string "1"/""
@@ -354,6 +375,77 @@ final class PagesController extends AbstractController
         ]);
 
         $this->redirect('?module=Hadrian&action=pages&sub=edit&page=' . urlencode($page) . '&flash=saved');
+    }
+
+    /**
+     * Separator between an option key and the variant that owns it.
+     * `min_sections@minimal`. Survives PHP's POST-key mangling (which only
+     * rewrites dots and spaces) and is legal in an HTML name and id.
+     */
+    private const VARIANT_SEP = '@';
+
+    /**
+     * The options currently stored for a page, raw. Used on save to carry
+     * through anything the submitted form did not render.
+     *
+     * @return array<string,mixed>
+     */
+    private static function storedOptions(string $tpl, string $page): array
+    {
+        $row = \Hadrian\Models\Page::get($tpl, $page);
+        if ($row === null) {
+            return [];
+        }
+        $settings = is_array($row['settings'] ?? null) ? $row['settings'] : [];
+        return is_array($settings['options'] ?? null) ? $settings['options'] : [];
+    }
+
+    /**
+     * EVERY option this page can store: page.php's own (which apply whichever
+     * template is selected) plus each variant's, namespaced `<key>@<variant>`.
+     *
+     * The full set matters on SAVE. saveAction rebuilds settings['options']
+     * from scratch, so a key missing from the declared set is dropped — which
+     * would mean selecting template A and saving silently destroyed template
+     * B's block layout. Declaring all of them keeps every variant's config
+     * alive regardless of which one is active.
+     *
+     * @param array<string,mixed> $meta page.php metadata
+     * @return array<string, array<string,mixed>>
+     */
+    private static function declaredOptions(Template $template, string $page, array $meta): array
+    {
+        $out = is_array($meta['supportedOptions'] ?? null) ? $meta['supportedOptions'] : [];
+        foreach ($template->getPageVariants($page) as $v) {
+            $vName = (string)($v['name'] ?? '');
+            $vMeta = $template->getVariantMeta($page, $vName);
+            $vOpts = is_array($vMeta['supportedOptions'] ?? null) ? $vMeta['supportedOptions'] : [];
+            foreach ($vOpts as $k => $spec) {
+                if (!is_array($spec)) { continue; }
+                $spec['_variant'] = $vName;
+                $out[$k . self::VARIANT_SEP . $vName] = $spec;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * The subset the editor renders: page-scoped options plus the options
+     * belonging to the variant currently selected. Another variant's options
+     * would be meaningless controls on this screen.
+     *
+     * @return array<string, array<string,mixed>>
+     */
+    private static function visibleOptions(Template $template, string $page, array $meta, string $activeVariant): array
+    {
+        $out = [];
+        foreach (self::declaredOptions($template, $page, $meta) as $key => $spec) {
+            $owner = (string)($spec['_variant'] ?? '');
+            if ($owner === '' || $owner === $activeVariant) {
+                $out[$key] = $spec;
+            }
+        }
+        return $out;
     }
 
     /**

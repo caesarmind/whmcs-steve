@@ -223,6 +223,31 @@ final class Template
     }
 
     /**
+     * Load core/pages/<page>/<variant>/<variant>.php.
+     *
+     * Beyond the `name`/`description`/`fullPage` keys getPageVariants reads, a
+     * variant may declare its own `supportedOptions` in exactly the shape
+     * page.php uses. Those belong to that ONE template: a dashboard block list
+     * only means something to the template that renders those blocks, so a
+     * sibling variant must not inherit it or show it in the editor.
+     *
+     * Returns [] when the file is missing.
+     *
+     * @return array<string, mixed>
+     */
+    public function getVariantMeta(string $page, string $variant): array
+    {
+        if ($page === '' || $variant === '') {
+            return [];
+        }
+        return \Hadrian\Helpers\ThemeManifest::loadVariantMeta(
+            $this->fullPath . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'pages'
+            . DIRECTORY_SEPARATOR . $page . DIRECTORY_SEPARATOR . $variant
+            . DIRECTORY_SEPARATOR . $variant . '.php'
+        );
+    }
+
+    /**
      * Discover variants for a page from the filesystem.
      *
      * A "variant" is any subdirectory of core/pages/<page>/ that contains a

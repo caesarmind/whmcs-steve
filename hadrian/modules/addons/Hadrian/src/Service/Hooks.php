@@ -1884,21 +1884,43 @@ final class Hooks
             ],
         ];
 
-        // Section layouts. Any option declared with type 'sections' in page.php
-        // is parsed from its stored string into an ordered list of
-        // ['key','width','span','visible'] and exposed as
-        // $hadrian.pages.<page>.sections.<optionKey>. Driven off the option spec
-        // rather than the page name, so a second page can adopt the mechanism by
-        // declaring the option alone.
+        // Variant-scoped options. A variant may declare its own
+        // `supportedOptions` in <variant>.php; those are stored namespaced as
+        // `<key>@<variant>` so sibling templates keep independent settings.
+        // Flatten the ACTIVE variant's into $entry['options'] under their bare
+        // keys, so a template just reads
+        // $hadrian.pages.<page>.options.<key> and never has to know.
         //
-        // $entry['options'] is deliberately left raw and untouched beside it --
-        // existing templates read the raw string from there.
-        foreach (($pageMeta['supportedOptions'] ?? []) as $optKey => $optSpec) {
+        // Page-scoped options already sit there and are not disturbed; a
+        // variant key of the same name wins, since it is the more specific.
+        $variantMetaOpts = is_array($variantMeta['supportedOptions'] ?? null)
+            ? $variantMeta['supportedOptions'] : [];
+        foreach ($variantMetaOpts as $optKey => $optSpec) {
+            $nsKey = $optKey . '@' . $variant;
+            if (array_key_exists($nsKey, $stored['options'] ?? [])) {
+                $entry['options'][$optKey] = $stored['options'][$nsKey];
+            } elseif (!array_key_exists($optKey, $entry['options'])) {
+                // Legacy: this option used to be page-scoped, so an install
+                // that saved it before the move still has the bare key.
+                $entry['options'][$optKey] = $stored['options'][$optKey] ?? null;
+            }
+        }
+
+        // Section layouts. Any option of type 'sections' — declared on the page
+        // or on the active variant — is parsed from its stored string into an
+        // ordered list of ['key','width','span','visible'] and exposed as
+        // $hadrian.pages.<page>.sections.<optionKey>. Driven off the spec, not
+        // the page name, so any page can adopt it by declaring the option.
+        $sectionSpecs = array_merge(
+            is_array($pageMeta['supportedOptions'] ?? null) ? $pageMeta['supportedOptions'] : [],
+            $variantMetaOpts
+        );
+        foreach ($sectionSpecs as $optKey => $optSpec) {
             if (!is_array($optSpec) || ($optSpec['type'] ?? '') !== 'sections') {
                 continue;
             }
             $entry['sections'][$optKey] = \Hadrian\Helpers\SectionLayout::parse(
-                (string)($stored['options'][$optKey] ?? ''),
+                (string)($entry['options'][$optKey] ?? ''),
                 is_array($optSpec['sections'] ?? null) ? $optSpec['sections'] : []
             );
         }
