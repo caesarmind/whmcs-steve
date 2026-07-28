@@ -173,10 +173,21 @@ final class PagesController extends AbstractController
             (string)($options['visibility'] ?? 'public')
         );
 
-        // Page-scoped options plus the ACTIVE variant's own. Only the active
-        // variant's are rendered; the others still exist in the declared set
-        // (see declaredOptions) so saving does not destroy them.
-        $supportedOptions = self::visibleOptions($template, $page, $meta, $activeVariant);
+        // EVERY variant's options are rendered, each tagged with the variant
+        // that owns it; the view shows only the selected one's and swaps them
+        // as soon as a different template card is clicked. Rendering just the
+        // active variant's meant its settings did not appear until the page had
+        // been saved, which contradicts the panel's own copy ("Choosing a
+        // different template changes what appears here").
+        //
+        // Rendering them all is also what preserves them: every field posts, so
+        // an unselected template's values round-trip through the save untouched
+        // rather than relying on the absent-key fallback.
+        $supportedOptions = self::declaredOptions($template, $page, $meta);
+        $variantLabels    = [];
+        foreach ($variants as $v) {
+            $variantLabels[(string)($v['name'] ?? '')] = (string)($v['label'] ?? $v['name'] ?? '');
+        }
 
         // Project each declared option onto a uniform row the view can iterate.
         $optionRows = [];
@@ -194,6 +205,10 @@ final class PagesController extends AbstractController
                 'options' => is_array($spec['options'] ?? null) ? array_values($spec['options']) : [],
                 'default' => $spec['default'] ?? null,
                 'value'   => $options['options'][$key] ?? $spec['default'] ?? null,
+                // Which template owns this option; '' = applies to all of them.
+                // The view tags each control with it so the client can swap the
+                // visible set the instant a different template is picked.
+                'variant' => (string)($spec['_variant'] ?? ''),
             ];
         }
 
@@ -208,12 +223,15 @@ final class PagesController extends AbstractController
             if (!is_array($spec) || ($spec['type'] ?? '') !== 'sections') {
                 continue;
             }
+            $owner = (string)($spec['_variant'] ?? '');
             $sectionSpecs[(string)$key] = [
                 // Heading for the builder's own card. Falls back to the option
                 // label, which reads fine but carries the variant suffix.
-                'title'    => (string)($spec['title'] ?? $spec['label'] ?? 'Sections'),
-                'sections' => is_array($spec['sections'] ?? null) ? $spec['sections'] : [],
-                'widths'   => is_array($spec['widths'] ?? null) ? $spec['widths'] : [],
+                'title'        => (string)($spec['title'] ?? $spec['label'] ?? 'Sections'),
+                'variant'      => $owner,
+                'variantLabel' => $variantLabels[$owner] ?? $owner,
+                'sections'     => is_array($spec['sections'] ?? null) ? $spec['sections'] : [],
+                'widths'       => is_array($spec['widths'] ?? null) ? $spec['widths'] : [],
             ];
         }
 
@@ -424,25 +442,6 @@ final class PagesController extends AbstractController
                 if (!is_array($spec)) { continue; }
                 $spec['_variant'] = $vName;
                 $out[$k . self::VARIANT_SEP . $vName] = $spec;
-            }
-        }
-        return $out;
-    }
-
-    /**
-     * The subset the editor renders: page-scoped options plus the options
-     * belonging to the variant currently selected. Another variant's options
-     * would be meaningless controls on this screen.
-     *
-     * @return array<string, array<string,mixed>>
-     */
-    private static function visibleOptions(Template $template, string $page, array $meta, string $activeVariant): array
-    {
-        $out = [];
-        foreach (self::declaredOptions($template, $page, $meta) as $key => $spec) {
-            $owner = (string)($spec['_variant'] ?? '');
-            if ($owner === '' || $owner === $activeVariant) {
-                $out[$key] = $spec;
             }
         }
         return $out;

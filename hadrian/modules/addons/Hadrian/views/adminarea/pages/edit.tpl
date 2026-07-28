@@ -190,6 +190,11 @@
             <div class="mt-pd-div"></div>
             <div class="mt-subhead mt-tip-line">Template settings {include file="includes/tip.tpl" text="Options declared by the template selected above. Choosing a different template changes what appears here."}</div>
             {if $hasOptions}
+                {* Shown by the variant filter when the selected template
+                   declares no settings of its own. Every template's controls
+                   are rendered (so they all keep posting) and hidden client
+                   side, so this cannot be a server-side {if}. *}
+                <div class="mt-pd-none mt-pd-none-options mt-opt-hidden">There are no settings for the selected template.</div>
                 <div class="mt-pd-rows">
                 {foreach $optionRows as $opt}
                     {* 'checkbox' is the type every pageoption.php in the theme
@@ -197,7 +202,7 @@
                        toggles across the page editor rendered as text inputs an
                        admin could not meaningfully switch off. *}
                     {if $opt.type == 'bool' || $opt.type == 'checkbox'}
-                        <div class="mt-row">
+                        <div class="mt-row" data-opt-variant="{$opt.variant|escape}">
                             <div>
                                 <div class="mt-row-label">{$opt.label|escape}</div>
                                 {if $opt.help}<div class="mt-row-help">{$opt.help|escape}</div>{/if}
@@ -209,7 +214,7 @@
                             </label>
                         </div>
                     {elseif $opt.type == 'select' && $opt.options}
-                        <div class="mt-row">
+                        <div class="mt-row" data-opt-variant="{$opt.variant|escape}">
                             <div>
                                 <div class="mt-row-label">{$opt.label|escape}</div>
                                 {if $opt.help}<div class="mt-row-help">{$opt.help|escape}</div>{/if}
@@ -223,7 +228,7 @@
                     {else}
                         {* Free text needs the full width, so it stays a stacked
                            field rather than a label-left row. *}
-                        <div class="mt-field">
+                        <div class="mt-field" data-opt-variant="{$opt.variant|escape}">
                             <label class="mt-field-label" for="opt-{$opt.key|escape}">{$opt.label|escape}</label>
                             {if $opt.help}<div class="mt-row-help">{$opt.help|escape}</div>{/if}
                             <input id="opt-{$opt.key|escape}" class="mt-input" type="text"
@@ -670,6 +675,10 @@
 /* The builder is its own card in the main column. Hidden until the script has
    populated it, so a JS failure leaves no empty shell behind. */
 #mt-seclay-mount:not([data-ready]) { display: none; }
+/* A control belonging to a template that is not the one selected. It stays in
+   the DOM and keeps posting -- hiding it is purely so the admin sees the
+   settings for the template they are actually looking at. */
+.mt-opt-hidden { display: none !important; }
 .mt-seclay-head { font-size: 12.5px; color: var(--mt-text-3); line-height: 1.5; margin: -4px 0 14px; max-width: 620px; }
 .mt-seclay-head b { color: var(--mt-text-2); font-weight: 600; }
 /* The option's own text field is redundant once the builder renders -- the card
@@ -721,6 +730,29 @@
     var specsEl = document.getElementById('mtSectionSpecs');
     if (!specsEl) return;
     var specs; try { specs = JSON.parse(specsEl.textContent || '{}'); } catch (e) { return; }
+
+    // Show the settings belonging to the template currently selected, and swap
+    // them the moment a different card is picked -- no save round-trip. Every
+    // control stays in the DOM and keeps posting whichever template is chosen,
+    // so an unselected one's values survive the save untouched.
+    function applyVariantFilter() {
+        var picked = document.querySelector('input[name="variant"]:checked');
+        var name = picked ? picked.value : '';
+        var any = false;
+        document.querySelectorAll('[data-opt-variant]').forEach(function (el) {
+            var owner = el.getAttribute('data-opt-variant');
+            var show = !owner || owner === name;
+            el.classList.toggle('mt-opt-hidden', !show);
+            if (show) any = true;
+        });
+        // "There are no settings for the current option." should track the
+        // selection too, not the last saved template.
+        var none = document.querySelector('.mt-pd-none-options');
+        if (none) { none.classList.toggle('mt-opt-hidden', any); }
+    }
+    document.querySelectorAll('input[name="variant"]').forEach(function (r) {
+        r.addEventListener('change', applyVariantFilter);
+    });
 
     Object.keys(specs).forEach(function (key) {
         var input = document.getElementById('opt-' + key);
@@ -774,13 +806,16 @@
 
         var box = document.createElement('div');
         box.className = 'mt-panel pad mt-seclay';
+        // Tagged like every other control, so the same filter shows this card
+        // only while its own template is the one selected.
+        box.setAttribute('data-opt-variant', spec.variant || '');
         var head = document.createElement('div');
         head.className = 'mt-subhead';
         head.textContent = spec.title || 'Sections';
         var blurb = document.createElement('div');
         blurb.className = 'mt-seclay-head';
-        var vName = mount.getAttribute('data-variant') || '';
-        blurb.innerHTML = (vName ? 'Sections available to the <b>' + vName.replace(/[<&>]/g, '') + '</b> template. ' : '') +
+        var vName = (spec.variantLabel || '').replace(/[<&>]/g, '');
+        blurb.innerHTML = (vName ? 'Sections available to the <b>' + vName + '</b> template. ' : '') +
             'Choose which appear, drag to reorder, and set each one’s width.';
         box.appendChild(head);
         box.appendChild(blurb);
@@ -959,6 +994,9 @@
         paint();
         mount.setAttribute('data-ready', '1'); // only now is the builder usable
     });
+
+    // Run last, so the freshly built cards are filtered along with everything else.
+    applyVariantFilter();
 })();
 </script>
 {/literal}
