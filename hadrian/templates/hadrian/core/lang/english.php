@@ -276,6 +276,19 @@ return [
         'noOpenTickets'     => 'No open tickets.',
         'noAnnouncementsShort' => 'No announcements.',
 
+        // Bento dashboard variant (core/pages/clientareahome/bento).
+        // Attention strip. Every chip is an account total from $clientsstats,
+        // so these read as exact counts, not "at least N".
+        'needsAttention'    => 'Needs your attention',
+        'unpaidInvoiceOne'  => 'unpaid invoice',
+        'unpaidInvoiceMany' => 'unpaid invoices',
+        'expiringSoon'      => 'expiring soon',
+        // Billing tile with nothing outstanding. Not $LANG.invoicesnonefound,
+        // which reports an empty invoice HISTORY -- this reports a zero balance
+        // on an account that may well have years of paid invoices behind it.
+        'allPaidUp'         => 'All paid up',
+        'nothingDue'        => 'Nothing is due right now.',
+
         // Public homepage marketing copy.
         'heroTitle'           => 'Secure your domain name.',
         'heroSubtitle'        => 'Search, register, and transfer -- all in one place.',

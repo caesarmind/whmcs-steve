@@ -1,0 +1,124 @@
+<?php
+/**
+ * Variant meta for clientareahome/bento.
+ *
+ * Read by:
+ *   - Template::getPageVariants  -> label + description in the admin Pages picker
+ *   - Template::getVariantMeta   -> this variant's own 'supportedOptions'
+ *   - Hooks::resolveCurrentPage  -> `fullPage` (false: keeps nav, sidebar, footer)
+ *
+ * The filename MUST match the directory name (bento/bento.php beside
+ * bento/bento.tpl) or the variant is silently skipped -- no admin card, no
+ * error anywhere. There is deliberately no pageoption.php: nothing reads it.
+ *
+ * OPTIONS ARE VARIANT-SCOPED, stored as `<key>__bento`, so arranging the bento
+ * grid never disturbs the minimal one and vice versa. The `bnt_` prefix is not
+ * decoration: Hooks falls back to the un-namespaced key for options that used
+ * to be page-scoped, so reusing `min_sections` here would let an install that
+ * saved the pre-namespacing bare key inherit minimal's arrangement into bento.
+ */
+return [
+    'name'        => 'Bento',
+    'description' => 'A bento grid of self-contained cards. Each collection gets its own tile with a count, a status bar and its rows, arranged two-up on a six-column grid. Adds an attention strip that pulls the few things needing action out of the many rows, and an identity card beside the greeting.',
+    'fullPage'    => false,
+
+    // Read in bento.tpl as $hadrian.pages.clientareahome.options.<key>.
+    // Hooks flattens the active variant's namespaced values onto the bare key,
+    // so the template never sees the namespace. The stored array is taken raw
+    // with no default merge, so every template read carries its own |default:
+    // matching the value declared here.
+    'supportedOptions' => [
+        'bnt_attention' => [
+            'type'    => 'bool',
+            'label'   => 'Attention strip',
+            'default' => true,
+            'tooltip' => 'A row of chips above the grid summarising what needs action: invoices outstanding, with the amount, and domains expiring in the next 45 days. Each chip is dropped when its count is zero, and the whole strip disappears when there is nothing to act on. The counts are account totals, not a count of the rows on this page, so they are exact.',
+        ],
+        'bnt_account' => [
+            'type'    => 'bool',
+            'label'   => 'Identity card beside the greeting',
+            'default' => true,
+            'tooltip' => 'Surfaces the account name and shortcuts to details, security and payment methods as a small card in line with the page heading. Independent of the Profile block, which is a full tile in the grid below.',
+        ],
+        'bnt_bars' => [
+            'type'    => 'bool',
+            'label'   => 'Status bars on each card',
+            'default' => true,
+            'tooltip' => 'Draws a proportion bar and a labelled count under each collection\'s title, so a tile answers "how are my services doing" before you read a single row. Switch off for a plainer card that goes straight from the title to the rows.',
+        ],
+        'bnt_visible_rows' => [
+            'type'    => 'int',
+            'label'   => 'Rows before "Show more"',
+            'default' => 4,
+            'tooltip' => 'How many rows each tile shows before the rest collapse behind a Show more control. Bento tiles sit two-up, so they are shorter than the minimal variant\'s full-width lists. The tiles hold at most 8 rows; the full set lives on each collection\'s own page.',
+        ],
+        'bnt_search_at' => [
+            'type'    => 'int',
+            'label'   => 'Search box after N rows',
+            'default' => 8,
+            'tooltip' => 'Services and Domains grow their own filter box once they reach this many rows. Only those two: the other collections are read newest-first, where a filter is noise. Every dashboard tile holds at most 8 rows, so useful values are 1 to 8 and anything higher never triggers. Set to 0 to switch the filter off.',
+        ],
+
+        // Which tiles appear, in what order, and how wide.
+        //
+        // BLANK MEANS "built-in arrangement" (see SectionLayout::parse), which
+        // for bento is the pairing below: a wide tile beside a narrow one, three
+        // rows deep, then the identity tile across the full width.
+        //
+        // No 'optIn' entries here. Unlike minimal -- where Register and Profile
+        // were added to a shipped design after the fact and so had to arrive
+        // switched off -- both are part of bento's arrangement from the start.
+        // Hooks::dashboardMentions has a matching arm: a bento install with no
+        // saved layout is treated as mentioning both, or the Register tile would
+        // render with no prices and the Profile tile with no country line.
+        'bnt_sections' => [
+            'type'    => 'sections',
+            'title'   => 'Dashboard tiles',
+            'label'   => 'Dashboard tiles',
+            'default' => '',
+            'tooltip' => 'Drag to reorder, switch a tile off to hide it, and set each one to full, two thirds, one half or one third width. Widths run on a six-column grid, so a row fills up when its widths add to a whole. Leave blank for the built-in arrangement. Note that tiles holding a list always show their colour as a soft wash, so the status badges on each row stay readable; Register a domain and Profile can take a solid or gradient fill.',
+            'sections' => [
+                'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true],
+                'domains'       => ['label' => 'Domains',           'w' => '1/3', 'paintable' => true],
+                'invoices'      => ['label' => 'Billing',           'w' => '1/3', 'paintable' => true],
+                'tickets'       => ['label' => 'Support',           'w' => '2/3', 'paintable' => true],
+                'announcements' => ['label' => 'Announcements',     'w' => '2/3', 'paintable' => true],
+                'domainreg'     => ['label' => 'Register a domain', 'w' => '1/3', 'paintable' => true],
+                'profile'       => ['label' => 'Profile',           'w' => '1/1', 'paintable' => true],
+            ],
+
+            // Colours a tile may be painted with: the palette keys the theme
+            // already ships, plus the three free slots a buyer sets on
+            // Styles > Colors. Matched against this list in SectionLayout::parse
+            // -- an unlisted one is dropped rather than reaching the CSS.
+            // APPEND ONLY: removing a key silently strips that colour from any
+            // layout using it on the next save.
+            //
+            // Every tile is paintable here, unlike minimal -- but a LIST tile
+            // only ever renders the colour as a wash, whatever fill is stored.
+            // Its rows carry status pills, and a pill is a 10%-alpha background
+            // over whatever is behind it, so a saturated fill turns an Active
+            // badge into 1.05:1 contrast. cell.tpl coerces it; see the note
+            // there. Register and Profile have no pills and take all three.
+            'paints' => [
+                'accent' => 'Accent',
+                'indigo' => 'Indigo',
+                'purple' => 'Purple',
+                'green'  => 'Green',
+                'teal'   => 'Teal',
+                'orange' => 'Orange',
+                'red'    => 'Red',
+                'gray'   => 'Gray',
+                'block1' => 'Block accent 1',
+                'block2' => 'Block accent 2',
+                'block3' => 'Block accent 3',
+            ],
+            'widths' => [
+                '1/1' => 'Full width',
+                '2/3' => 'Two thirds',
+                '1/2' => 'One half',
+                '1/3' => 'One third',
+            ],
+        ],
+    ],
+];

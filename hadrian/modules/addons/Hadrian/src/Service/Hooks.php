@@ -393,6 +393,14 @@ final class Hooks
                 'id'      => (int)($row->id ?? 0),
                 'title'   => (string)($row->title ?? ''),
                 'date'    => $ts ? date('M j, Y', $ts) : '',
+                // Split for the bento variant's calendar chip. Done here rather
+                // than in Smarty because 'date' above is already one formatted
+                // string with no timestamp left in it to take apart, and both
+                // are empty when the row's date would not parse, so the chip is
+                // dropped instead of rendering blank. Additive: every other
+                // consumer of this fetcher ignores keys it does not read.
+                'dateMonth' => $ts ? date('M', $ts) : '',
+                'dateDay'   => $ts ? date('j', $ts) : '',
                 'excerpt' => $this->announcementExcerpt((string)($row->announcement ?? '')),
             ];
         }
@@ -1024,8 +1032,15 @@ final class Hooks
      * Cheap "is this block in the saved dashboard layout at all" probe, used to
      * gate work that only one block needs. Reads the same registry row the
      * renderer will read moments later; returns false when nothing is saved,
-     * which is the common case (a blank layout means the classic shell, which
-     * has no such blocks).
+     * which is the common case for minimal (a blank layout there means the
+     * classic shell, which has no such blocks).
+     *
+     * BENTO IS THE EXCEPTION, and it is the reason for the second half of this
+     * method. A blank layout means "built-in arrangement" for every variant,
+     * but bento's built-in arrangement DOES carry both panels. Probing only for
+     * a mention would starve them on every install that has not rearranged the
+     * grid: the Register tile would come up with no price chips and the Profile
+     * tile with no country line, with nothing logged anywhere.
      */
     private function dashboardMentions(Template $template, string $sectionKey): bool
     {
@@ -1036,11 +1051,39 @@ final class Hooks
             }
             $settings = is_array($row['settings'] ?? null) ? $row['settings'] : [];
             $options  = is_array($settings['options'] ?? null) ? $settings['options'] : [];
+            $variant  = (string)($row['variant'] ?? '');
+
+            // This variant's own stored layout, if it has one. Namespaced as
+            // <key>__<variant>; the bare key is the pre-namespacing legacy form.
+            $ownLayout = '';
+
             foreach ($options as $key => $value) {
-                if (is_string($value) && str_starts_with((string)$key, 'min_sections')
-                    && str_contains($value, $sectionKey)) {
-                    return true;
+                if (!is_string($value)) {
+                    continue;
                 }
+                $k = (string)$key;
+                foreach (['min_sections', 'bnt_sections'] as $prefix) {
+                    if (!str_starts_with($k, $prefix)) {
+                        continue;
+                    }
+                    if ($k === $prefix || ($variant !== '' && str_ends_with($k, '__' . $variant))) {
+                        $ownLayout = $value;
+                    }
+                    // A substring test rather than a full parse: the false
+                    // positive (block present but switched off) costs one
+                    // wasted call on a page nobody has arranged that way,
+                    // whereas a second Page::get + parse would cost every
+                    // visitor. Deliberately looks at EVERY sections option, not
+                    // just the active variant's, so this keeps behaving exactly
+                    // as it did before bento existed.
+                    if (str_contains($value, $sectionKey)) {
+                        return true;
+                    }
+                }
+            }
+
+            if ($variant === 'bento' && trim($ownLayout) === '') {
+                return true;
             }
         } catch (\Throwable) {
             // Registry unavailable -- skip the extra work rather than fail the page.
