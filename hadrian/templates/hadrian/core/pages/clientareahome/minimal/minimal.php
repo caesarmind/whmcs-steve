@@ -44,6 +44,12 @@ return [
             'default' => 5,
             'tooltip' => 'How many rows each list shows before the rest collapse behind a Show more control. The lists hold at most 8 rows; the full set lives on each section\'s own page.',
         ],
+        'min_search_at' => [
+            'type'    => 'int',
+            'label'   => 'Search box after N rows',
+            'default' => 8,
+            'tooltip' => 'Services and Domains grow their own filter box once they reach this many rows. Only those two: the other lists are read newest-first, where a filter is noise. Every dashboard list holds at most 8 rows, so useful values are 1 to 8 and anything higher never triggers. Set to 0 to switch the filter off.',
+        ],
         'min_show_actions' => [
             'type'    => 'bool',
             'label'   => 'Show quick actions',

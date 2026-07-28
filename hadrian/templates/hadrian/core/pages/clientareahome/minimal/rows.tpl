@@ -27,8 +27,9 @@
      - the roomy empty state (icon + sentence + button) only renders when the
        section HAS a call to action and is at least 2/3 wide; a 48px centred
        CTA crammed into a 1/3 column looked broken.
-     - the in-list search box is emitted on the same >= $minSearchAt rule for
-       every section rather than only on the two that used to be full width.
+     - the in-list search box is limited to Services and Domains, the two lists
+       a client can grow without limit, and only once they reach $minSearchAt
+       rows (an admin setting; 0 switches it off).
 *}
 
 {assign var=secW value=$secSpan|default:6}
@@ -47,6 +48,20 @@
     {assign var=secCount value=0}
 {/if}
 {if $secW >= 4}{assign var=secRoomy value=true}{else}{assign var=secRoomy value=false}{/if}
+
+{* Which sections can grow a filter box: Services and Domains only. They are the
+   two an established client keeps scanning for a specific row -- "which of my
+   hosting accounts is web-03" -- whereas invoices, tickets and announcements
+   are read newest-first and a filter over them is noise.
+
+   NOTE every dashboard list, these two included, is capped at DASHBOARD_ROWS
+   (8) by the hook, so $secCount tops out at 8 and a threshold above 8 can never
+   fire. The useful range is 1-8; 0 switches the filter off everywhere. *}
+{if ($sec == 'services' || $sec == 'domains') && $minSearchAt > 0 && $secCount >= $minSearchAt}
+    {assign var=secSearch value=true}
+{else}
+    {assign var=secSearch value=false}
+{/if}
 
 {* "Hide when empty": emit nothing whatsoever, so the section leaves no card,
    no heading and no grid item behind. Guarding the whole file rather than just
@@ -67,7 +82,7 @@
     </div>
     <div class="min-list">
         {if $secCount > 0}
-            {if $secCount >= $minSearchAt}
+            {if $secSearch}
             <div class="min-search">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
                 <input type="text" placeholder="{$hadrianLang.dashboard.searchPlaceholder|escape}" aria-label="{$hadrianLang.dashboard.searchPlaceholder|escape}">
@@ -132,7 +147,7 @@
             {* Only meaningful when a search box exists to produce no matches. Emitting it
                unconditionally left a permanently hidden last child, which kept the final
                visible row on its non-:last-child branch and drew a stray hairline. *}
-            {if $secCount >= $minSearchAt}<div class="min-noresults">{$hadrianLang.dashboard.noMatches}</div>{/if}
+            {if $secSearch}<div class="min-noresults">{$hadrianLang.dashboard.noMatches}</div>{/if}
         {else}
             {if $sec == 'services' && $secRoomy}
             <div class="min-empty">

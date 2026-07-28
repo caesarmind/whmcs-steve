@@ -37,7 +37,21 @@
 {assign var=minRows   value=$hadrian.pages.clientareahome.options.min_visible_rows|default:5}
 {assign var=minActs   value=$hadrian.pages.clientareahome.options.min_show_actions|default:true}
 {if $minRows < 1}{assign var=minRows value=5}{/if}
+{* Row count at which a list grows its own filter box. 0 (or anything that is
+   not a positive number) switches the filter off everywhere. Applies to the
+   Services and Domains lists only -- see rows.tpl.
+
+   Deliberately NOT |default:8. Zero is a meaningful stored value here ("off"),
+   and whether |default: treats 0 as missing depends on which implementation of
+   the modifier is in play -- the compiled form tests null/'' and would keep the
+   0, an empty()-based one would replace it with 8 and make "off" unreachable.
+   Testing isset() explicitly is correct either way. *}
 {assign var=minSearchAt value=8}
+{if isset($hadrian.pages.clientareahome.options.min_search_at)
+    && $hadrian.pages.clientareahome.options.min_search_at !== ''}
+    {assign var=minSearchAt value=$hadrian.pages.clientareahome.options.min_search_at}
+{/if}
+{if !($minSearchAt > 0)}{assign var=minSearchAt value=0}{/if}
 
 {* ---------- data ---------- *}
 {assign var=minServices value=$dashboard.activeServices|default:[]}
