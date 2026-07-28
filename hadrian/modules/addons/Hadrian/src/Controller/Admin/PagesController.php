@@ -193,8 +193,26 @@ final class PagesController extends AbstractController
             ];
         }
 
+        // Catalogue for any option declared with type 'sections'. Passed beside
+        // $optionRows rather than folded into it: the projection above is a flat
+        // scalar shape that four other option types depend on, and a 'sections'
+        // option needs two nested maps (the section list and the width choices).
+        // The view emits this as JSON for the layout builder to enhance the
+        // option's plain text input into a sortable list.
+        $sectionSpecs = [];
+        foreach ($supportedOptions as $key => $spec) {
+            if (!is_array($spec) || ($spec['type'] ?? '') !== 'sections') {
+                continue;
+            }
+            $sectionSpecs[(string)$key] = [
+                'sections' => is_array($spec['sections'] ?? null) ? $spec['sections'] : [],
+                'widths'   => is_array($spec['widths'] ?? null) ? $spec['widths'] : [],
+            ];
+        }
+
         return $this->view('pages/edit', [
             'page'             => $page,
+            'sectionSpecsJson' => (string)json_encode($sectionSpecs, JSON_UNESCAPED_SLASHES),
             'pageLabel'        => (string)($meta['display_name'] ?? ucwords(str_replace(['-', '_'], ' ', $page))),
             'pageGroup'        => (string)($meta['group'] ?? 'Other'),
             'pageDescription'  => (string)($meta['description'] ?? ''),

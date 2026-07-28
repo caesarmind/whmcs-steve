@@ -1884,6 +1884,25 @@ final class Hooks
             ],
         ];
 
+        // Section layouts. Any option declared with type 'sections' in page.php
+        // is parsed from its stored string into an ordered list of
+        // ['key','width','span','visible'] and exposed as
+        // $hadrian.pages.<page>.sections.<optionKey>. Driven off the option spec
+        // rather than the page name, so a second page can adopt the mechanism by
+        // declaring the option alone.
+        //
+        // $entry['options'] is deliberately left raw and untouched beside it --
+        // existing templates read the raw string from there.
+        foreach (($pageMeta['supportedOptions'] ?? []) as $optKey => $optSpec) {
+            if (!is_array($optSpec) || ($optSpec['type'] ?? '') !== 'sections') {
+                continue;
+            }
+            $entry['sections'][$optKey] = \Hadrian\Helpers\SectionLayout::parse(
+                (string)($stored['options'][$optKey] ?? ''),
+                is_array($optSpec['sections'] ?? null) ? $optSpec['sections'] : []
+            );
+        }
+
         // Expose under the normalized key (admin Pages tab, dispatcher hardcoded keys)
         // AND under the original templatefile when WHMCS used a Nexus-style nested
         // path — so header.tpl's $hadrian.pages[$templatefile] SEO lookup still works.

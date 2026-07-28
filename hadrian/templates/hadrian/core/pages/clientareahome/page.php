@@ -46,5 +46,41 @@ return [
             'default' => true,
             'tooltip' => 'The Order a service / Register a domain / Open a ticket row under the summary tiles. Shown on empty accounts too, which need it most.',
         ],
+
+        // Which sections appear, in what order, and how wide.
+        //
+        // Type 'sections' is unknown to both the editor view and the save path,
+        // and that is deliberate: edit.tpl falls through to its catch-all text
+        // input, and PagesController stores it via the match()'s default arm
+        // (substr($raw, 0, 500)). So no admin-addon PHP had to change. The
+        // Pages editor then progressively enhances that one text input into a
+        // drag-to-reorder builder; with JS off the raw string is still editable.
+        //
+        // BLANK MEANS "built-in arrangement", not "no sections" -- see
+        // SectionLayout::parse. That is what keeps every existing install on
+        // the classic layout until someone deliberately changes it.
+        //
+        // 'sections' is the catalogue: admin label + factory width, in factory
+        // order. A key added here also needs an arm in minimal/rows.tpl and in
+        // the whitelist in minimal.tpl, or it renders as an empty card.
+        'min_sections' => [
+            'type'    => 'sections',
+            'label'   => 'Dashboard sections (Minimal)',
+            'default' => '',
+            'tooltip' => 'Drag to reorder, switch a section off to hide it, and set each one to full, two thirds, one half or one third width. Widths run on a six-column grid, so a row fills up when its widths add to a whole. Leave blank for the built-in arrangement.',
+            'sections' => [
+                'services'      => ['label' => 'Services',        'w' => '1/1'],
+                'domains'       => ['label' => 'Domains',         'w' => '1/1'],
+                'invoices'      => ['label' => 'Recent invoices', 'w' => '1/2'],
+                'tickets'       => ['label' => 'Support',         'w' => '1/2'],
+                'announcements' => ['label' => 'Announcements',   'w' => '1/2'],
+            ],
+            'widths' => [
+                '1/1' => 'Full width',
+                '2/3' => 'Two thirds',
+                '1/2' => 'One half',
+                '1/3' => 'One third',
+            ],
+        ],
     ],
 ];

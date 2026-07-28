@@ -60,11 +60,14 @@
     {assign var=dashIsEmpty value='empty'}
 {/if}
 
-{* Unpaid tile. Prefer the pre-formatted currency balance; fall back to the
-   count so the tile never renders blank on an install that does not expose it. *}
-{assign var=minDueValue value=$clientsstats.dueinvoicesbalance|default:''}
-{if !$minDueValue}{assign var=minDueValue value=$clientsstats.unpaidinvoicesamount|default:''}{/if}
-{if !$minDueValue}{assign var=minDueValue value=$clientsstats.numunpaidinvoices|default:0}{/if}
+{* Unpaid tile. The headline number is the COUNT, like its three siblings and
+   like the label above it -- putting a currency string there made one tile read
+   in a different unit from the rest, and "$0.00 USD" is wide enough at
+   --text-h2 to wrap onto two lines inside the tile. The balance rides beneath
+   as a small line, and only when something is actually owed. *}
+{assign var=minUnpaid value=$clientsstats.numunpaidinvoices|default:0}
+{assign var=minDueBalance value=$clientsstats.dueinvoicesbalance|default:''}
+{if !$minDueBalance}{assign var=minDueBalance value=$clientsstats.unpaidinvoicesamount|default:''}{/if}
 
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareahome.css?v={$hadrian.version|default:'1.0'}">
 
@@ -94,9 +97,12 @@
         <div class="n">{$clientsstats.numactivedomains|default:0}</div>
         <div class="l">{$LANG.navdomains|default:'Domains'}</div>
     </a>
-    <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="min-tile due">
-        <div class="n">{$minDueValue}</div>
+    {* .due (the page's only accent) only when there is something to act on --
+       a blue $0.00 draws the eye to nothing. *}
+    <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="min-tile{if $minUnpaid > 0} due{/if}">
+        <div class="n">{$minUnpaid}</div>
         <div class="l">{$LANG.clientHomePanels.unpaidInvoices|default:'Unpaid Invoices'}</div>
+        {if $minUnpaid > 0 && $minDueBalance}<div class="min-tile-sub">{$minDueBalance|escape} {$hadrianLang.dashboard.due}</div>{/if}
     </a>
     <a href="{$WEB_ROOT}/supporttickets.php" class="min-tile">
         <div class="n">{$clientsstats.numactivetickets|default:0}</div>
@@ -123,169 +129,54 @@
 </div>
 {/if}
 
-{* ---------- Services ---------- *}
-<div class="min-section">
-    <div class="min-section-head">
-        <span class="min-section-label">{$LANG.navservices|default:'Services'}</span>
-        {if $nServices > 0}<a href="{$WEB_ROOT}/clientarea.php?action=services" class="min-section-link">{$LANG.viewall|default:'View All'}{if $clientsstats.productsnumactive > 0} ({$clientsstats.productsnumactive}){/if} &rarr;</a>{/if}
-    </div>
-    <div class="min-list">
-        {if $nServices > 0}
-            {if $nServices >= $minSearchAt}
-            <div class="min-search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-                <input type="text" placeholder="{$hadrianLang.dashboard.searchPlaceholder|escape}" aria-label="{$hadrianLang.dashboard.searchPlaceholder|escape}">
-                <button type="button" class="min-search-clear" aria-label="{$LANG.clear|default:'Clear'|escape}">&times;</button>
-            </div>
-            {/if}
-            {foreach $minServices as $svc}
-            <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&amp;id={$svc.id|escape:'url'}" class="min-row{if $svc@iteration > $minRows} min-more{/if}">
-                <span class="min-name">{$svc.name|escape}{if $svc.domain} &mdash; {$svc.domain|escape}{/if}</span>
-                <span class="status-pill {$svc.status|default:'Active'|lower|replace:' ':'-'|escape}">{$svc.status|default:'Active'|escape}</span>
-            </a>
-            {/foreach}
-            {if $nServices > $minRows}
-            <button type="button" class="min-showmore" data-more="{$hadrianLang.dashboard.showMore|escape}" data-less="{$hadrianLang.dashboard.showLess|escape}"><span class="min-showmore-label">{$hadrianLang.dashboard.showMore}</span><span class="chev">&#9662;</span></button>
-            {/if}
-            {* Only meaningful when a search box exists to produce no matches. Emitting it
-               unconditionally left a permanently hidden last child, which kept the final
-               visible row on its non-:last-child branch and drew a stray hairline. *}
-            {if $nServices >= $minSearchAt}<div class="min-noresults">{$hadrianLang.dashboard.noMatches}</div>{/if}
-        {else}
-        <div class="min-empty">
-            <p>{$hadrianLang.dashboard.noServicesSub}</p>
-            <div class="acts"><a href="{$WEB_ROOT}/cart.php" class="btn-primary">{$LANG.orderproducts|default:'Order a service'}</a></div>
-        </div>
-        {/if}
-    </div>
-</div>
 
-{* ---------- Domains ---------- *}
-<div class="min-section">
-    <div class="min-section-head">
-        <span class="min-section-label">{$LANG.navdomains|default:'Domains'}</span>
-        {if $nDomains > 0}<a href="{$WEB_ROOT}/clientarea.php?action=domains" class="min-section-link">{$LANG.viewall|default:'View All'}{if $clientsstats.numactivedomains > 0} ({$clientsstats.numactivedomains}){/if} &rarr;</a>{/if}
-    </div>
-    <div class="min-list">
-        {if $nDomains > 0}
-            {if $nDomains >= $minSearchAt}
-            <div class="min-search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-                <input type="text" placeholder="{$hadrianLang.dashboard.searchPlaceholder|escape}" aria-label="{$hadrianLang.dashboard.searchPlaceholder|escape}">
-                <button type="button" class="min-search-clear" aria-label="{$LANG.clear|default:'Clear'|escape}">&times;</button>
-            </div>
-            {/if}
-            {foreach $minDomains as $dom}
-            <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&amp;id={$dom.id|escape:'url'}" class="min-row{if $dom@iteration > $minRows} min-more{/if}">
-                <span class="min-name">{$dom.domain|escape}</span>
-                {if $dom.status == 'Active' && $dom.expirydate}
-                    {* Custom key, not $LANG.domainrenewals -- that one is the
-                       "Domain Renewals" PAGE title, so it would read
-                       "Domain Renewals Aug 24, 2026" and the |default: would
-                       never fire to save it. *}
-                    <span class="min-when">{$hadrianLang.dashboard.renews} {$dom.expirydate|escape}</span>
-                {else}
-                    <span class="status-pill {$dom.statusLower|default:'active'|replace:' ':'-'|escape}">{$dom.status|default:'Active'|escape}</span>
-                {/if}
-            </a>
-            {/foreach}
-            {if $nDomains > $minRows}
-            <button type="button" class="min-showmore" data-more="{$hadrianLang.dashboard.showMore|escape}" data-less="{$hadrianLang.dashboard.showLess|escape}"><span class="min-showmore-label">{$hadrianLang.dashboard.showMore}</span><span class="chev">&#9662;</span></button>
-            {/if}
-            {* Only meaningful when a search box exists to produce no matches. Emitting it
-               unconditionally left a permanently hidden last child, which kept the final
-               visible row on its non-:last-child branch and drew a stray hairline. *}
-            {if $nDomains >= $minSearchAt}<div class="min-noresults">{$hadrianLang.dashboard.noMatches}</div>{/if}
-        {else}
-        <div class="min-empty">
-            <p>{$hadrianLang.dashboard.noDomainsSub}</p>
-            <div class="acts"><a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register" class="btn-primary">{$LANG.registerdomain|default:'Register a domain'}</a></div>
-        </div>
-        {/if}
-    </div>
-</div>
+{* ---------- Sections ----------
+   Two shells. The CLASSIC one is what every install gets until an admin opts
+   in: Services and Domains full width, then the asymmetric two-column grid.
+   It is hand-packed with .min-gcol, which is why Announcements always sits
+   directly under Support no matter how tall Invoices grows.
 
-{* ---------- Secondary: invoices | tickets + announcements ---------- *}
+   The CUSTOM shell renders whatever the admin arranged in
+   Hadrian > Pages > Dashboard: any order, any subset, each at 1/1, 2/3, 1/2 or
+   1/3 of a six-column grid. Being a real grid, items sit on shared rows, so a
+   short section beside a tall one leaves the row's full height -- unavoidable
+   once arbitrary ordering is the point, and the reason the classic path is
+   kept rather than reimplemented on top of the grid.
+
+   $minSecs is resolved in PHP (Hooks::resolveCurrentPage -> SectionLayout).
+   An empty list means "no admin layout saved" and selects the classic shell,
+   so this is fail-safe: if the theme deploys ahead of the addon the read is
+   null, |default:[] gives [], and the page renders exactly as before. *}
+{assign var=minSecs value=$hadrian.pages.clientareahome.sections.min_sections|default:[]}
+
+{if $minSecs|@count > 0}
+<div class="min-grid min-grid-custom">
+    {foreach $minSecs as $s}
+        {if $s.visible}
+            {* The include path is a constant; only `sec` varies, and it is
+               whitelisted here as well as in SectionLayout::parse. Never
+               interpolate a stored value into a file path -- an unresolvable
+               {include} drops the whole client area to the Six theme, and the
+               poisoned compiled-template cache survives a git revert. *}
+            {if $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements'}
+                {include file="`$template`/core/pages/clientareahome/minimal/rows.tpl" sec=$s.key secSpan=$s.span}
+            {/if}
+        {/if}
+    {/foreach}
+</div>
+{else}
+{include file="`$template`/core/pages/clientareahome/minimal/rows.tpl" sec='services' secSpan=6}
+{include file="`$template`/core/pages/clientareahome/minimal/rows.tpl" sec='domains' secSpan=6}
 <div class="min-grid">
     <div class="min-gcol">
-
-        <div class="min-section">
-            <div class="min-section-head">
-                <span class="min-section-label">{$hadrianLang.dashboard.recentInvoices}</span>
-                {if $nInvoices > 0}<a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="min-section-link">{$LANG.viewall|default:'View All'} &rarr;</a>{/if}
-            </div>
-            <div class="min-list">
-                {if $nInvoices > 0}
-                    {foreach $minInvoices as $inv}
-                    <a href="{$WEB_ROOT}/viewinvoice.php?id={$inv.id|escape:'url'}" class="min-row{if $inv@iteration > $minRows} min-more{/if}">
-                        {* invoicestitle ("Invoice"), NOT invoicenumber ("Invoice #") --
-                           the latter carries its own hash and would render "Invoice # #12".
-                           Matches viewinvoice/default.tpl:43 and invoice-payment/default.tpl:14. *}
-                        <span class="min-name">{$LANG.invoicestitle|default:'Invoice'} #{$inv.id|escape}</span>
-                        <span class="min-right">
-                            {if $inv.total}<span class="min-amt">{$inv.total|escape}</span>{/if}
-                            {if $inv.status}<span class="status-pill {$inv.statusLower|default:''|escape}">{$inv.status|escape}</span>{/if}
-                        </span>
-                    </a>
-                    {/foreach}
-                    {if $nInvoices > $minRows}
-                    <button type="button" class="min-showmore" data-more="{$hadrianLang.dashboard.showMore|escape}" data-less="{$hadrianLang.dashboard.showLess|escape}"><span class="min-showmore-label">{$hadrianLang.dashboard.showMore}</span><span class="chev">&#9662;</span></button>
-                    {/if}
-                {else}
-                <div class="min-empty compact"><p>{$hadrianLang.dashboard.noInvoices}</p></div>
-                {/if}
-            </div>
-        </div>
-
+        {include file="`$template`/core/pages/clientareahome/minimal/rows.tpl" sec='invoices' secSpan=3}
     </div>
     <div class="min-gcol">
-
-        <div class="min-section">
-            <div class="min-section-head">
-                <span class="min-section-label">{$LANG.navtickets|default:'Support'}</span>
-                {if $nTickets > 0}<a href="{$WEB_ROOT}/supporttickets.php" class="min-section-link">{$LANG.viewall|default:'View All'}{if $clientsstats.numactivetickets > 0} ({$clientsstats.numactivetickets}){/if} &rarr;</a>{/if}
-            </div>
-            <div class="min-list">
-                {if $nTickets > 0}
-                    {foreach $minTickets as $tkt}
-                    <a href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape:'url'}{if $tkt.c}&amp;c={$tkt.c|escape:'url'}{/if}" class="min-row{if $tkt@iteration > $minRows} min-more{/if}">
-                        <span class="min-name">{$tkt.subject|escape}</span>
-                        <span class="status-pill {$tkt.status|default:'Open'|lower|replace:' ':'-'|escape}">{$tkt.status|default:'Open'|escape}</span>
-                    </a>
-                    {/foreach}
-                    {if $nTickets > $minRows}
-                    <button type="button" class="min-showmore" data-more="{$hadrianLang.dashboard.showMore|escape}" data-less="{$hadrianLang.dashboard.showLess|escape}"><span class="min-showmore-label">{$hadrianLang.dashboard.showMore}</span><span class="chev">&#9662;</span></button>
-                    {/if}
-                {else}
-                <div class="min-empty compact"><p>{$hadrianLang.dashboard.noOpenTickets}</p></div>
-                {/if}
-            </div>
-        </div>
-
-        <div class="min-section">
-            <div class="min-section-head">
-                <span class="min-section-label">{$LANG.announcements|default:'Announcements'}</span>
-                {if $nNews > 0}<a href="{$WEB_ROOT}/announcements.php" class="min-section-link">{$LANG.viewall|default:'View All'} &rarr;</a>{/if}
-            </div>
-            <div class="min-list">
-                {if $nNews > 0}
-                    {foreach $minNews as $ann}
-                    <a href="{$WEB_ROOT}/announcements.php?id={$ann.id|escape:'url'}" class="min-row{if $ann@iteration > $minRows} min-more{/if}">
-                        <span class="min-name">{$ann.title|escape}</span>
-                        {if $ann.date}<span class="min-when">{$ann.date|escape}</span>{/if}
-                    </a>
-                    {/foreach}
-                    {if $nNews > $minRows}
-                    <button type="button" class="min-showmore" data-more="{$hadrianLang.dashboard.showMore|escape}" data-less="{$hadrianLang.dashboard.showLess|escape}"><span class="min-showmore-label">{$hadrianLang.dashboard.showMore}</span><span class="chev">&#9662;</span></button>
-                    {/if}
-                {else}
-                <div class="min-empty compact"><p>{$hadrianLang.dashboard.noAnnouncementsShort}</p></div>
-                {/if}
-            </div>
-        </div>
-
+        {include file="`$template`/core/pages/clientareahome/minimal/rows.tpl" sec='tickets' secSpan=3}
+        {include file="`$template`/core/pages/clientareahome/minimal/rows.tpl" sec='announcements' secSpan=3}
     </div>
 </div>
+{/if}
 
 {* Progressive disclosure. All markup above is server-rendered - this only binds
    behaviour, so the page is complete and readable with JS off (every row is in

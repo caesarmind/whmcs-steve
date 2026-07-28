@@ -396,6 +396,9 @@
 .min-tile .n { font-size: var(--text-h2); font-weight: var(--fw-semibold); letter-spacing: -0.03em; color: var(--color-text-primary); font-variant-numeric: tabular-nums; line-height: 1; }
 .min-tile.due .n { color: var(--color-accent); }
 .min-tile .l { font-size: var(--text-sm); font-weight: var(--fw-semibold); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); margin-top: 12px; }
+/* Amount owed, under the count. Small enough that a formatted balance
+   ("$1,240.00 USD") cannot wrap the way it did when it was the headline. */
+.min-tile-sub { font-size: var(--text-base); font-weight: var(--fw-medium); color: var(--color-accent); margin-top: 6px; font-variant-numeric: tabular-nums; }
 
 /* --- Quick actions ------------------------------------------------------
    The primary things a client comes here to DO, directly under the summary
@@ -520,3 +523,40 @@ body[data-min-title="inside"] .min-list {
 .min-row .status-pill.transferred-away,
 .min-row .status-pill.refunded,
 .min-row .status-pill.draft            { background: var(--color-gray-bg);    color: var(--color-gray-text); }
+
+/* --- Admin-arranged section grid ---------------------------------------
+   Only rendered when an admin has saved a layout in Hadrian > Pages >
+   Dashboard. Six columns, because 6 is the smallest number divisible by both
+   2 and 3, so 1/1, 2/3, 1/2 and 1/3 are all whole spans (6, 4, 3, 2).
+
+   Deliberately a SEPARATE class from .min-grid: the classic hand-packed
+   .min-gcol layout above must keep rendering byte-for-byte as it did, and it
+   is what every install gets until someone opts in.
+
+   minmax(0, 1fr), never 1fr -- same reason as .min-tiles above: a grid track's
+   default min-width is auto, so one long unbroken domain name would push its
+   track past its share and overflow the row. */
+.min-grid-custom { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+/* Grid item margins do not collapse, so the section's own top margin would
+   add to the row gap. */
+.min-grid-custom > .min-section { margin-top: 0; }
+.min-grid-custom > [data-w="6"] { grid-column: span 6; }
+.min-grid-custom > [data-w="4"] { grid-column: span 4; }
+.min-grid-custom > [data-w="3"] { grid-column: span 3; }
+.min-grid-custom > [data-w="2"] { grid-column: span 2; }
+
+/* A 1/3 is only ~357px inside the 1120px content column, and a row is 24px of
+   padding each side plus a 16px gap plus a status pill, which leaves too
+   little for the name. Below 880px promote the narrow spans one step. */
+@media (max-width: 880px) {
+    .min-grid-custom > [data-w="2"] { grid-column: span 3; }
+    .min-grid-custom > [data-w="4"] { grid-column: span 6; }
+}
+/* Single column. Resetting grid-template-columns alone is NOT enough: a
+   "grid-column: span 4" inside a one-track grid generates three IMPLICIT
+   columns and overflows the container instead of stacking, so the spans have
+   to be reset too. */
+@media (max-width: 720px) {
+    .min-grid-custom { grid-template-columns: minmax(0, 1fr); }
+    .min-grid-custom > .min-section[data-w] { grid-column: 1 / -1; }
+}

@@ -631,4 +631,247 @@
 </script>
 {/literal}
 
+{* ── Dashboard section layout builder ─────────────────────────────────────
+   Progressive enhancement over the plain text input that an option of type
+   'sections' renders (the {else} catch-all above). The input is KEPT -- same
+   element, same name="option[...]", same position inside #page-edit-form --
+   and only switched to type=hidden. That is deliberate and load-bearing:
+   PagesController::saveAction rewrites EVERY declared option key from the POST
+   on every save of this page for any reason, so a control that stops posting
+   would silently reset an admin's layout the next time they edited an
+   unrelated SEO field.
+
+   With JS off, or if this script throws, the admin still sees and edits the
+   raw string. Nothing is hidden until the builder has actually rendered. *}
+<script id="mtSectionSpecs" type="application/json">{$sectionSpecsJson|default:'{}' nofilter}</script>
+
+{literal}
+<style>
+.mt-seclay { display: none; }
+.mt-seclay[data-ready] { display: block; }
+.mt-seclay-list { list-style: none; margin: 8px 0 0; padding: 0; border: 1px solid var(--mt-border); border-radius: 8px; overflow: hidden; }
+.mt-seclay-item { position: relative; display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--mt-surface); border-bottom: 1px solid var(--mt-border); }
+.mt-seclay-item:last-child { border-bottom: 0; }
+.mt-seclay-item.is-off .mt-seclay-name { opacity: 0.45; text-decoration: line-through; }
+.mt-seclay-item.is-dragging { opacity: 0.4; }
+.mt-seclay-item.is-drop-before::before,
+.mt-seclay-item.is-drop-after::after { content: ''; position: absolute; left: 0; right: 0; height: 2px; background: var(--mt-primary); z-index: 5; pointer-events: none; }
+.mt-seclay-item.is-drop-before::before { top: -1px; }
+.mt-seclay-item.is-drop-after::after { bottom: -1px; }
+.mt-seclay-grip { cursor: grab; user-select: none; color: var(--mt-text-dim); line-height: 1; padding: 2px 4px; }
+.mt-seclay-grip:active { cursor: grabbing; }
+.mt-seclay-name { flex: 1; min-width: 0; font-size: 13px; }
+.mt-seclay-move { display: flex; gap: 2px; }
+.mt-seclay-move button { border: 1px solid var(--mt-border); background: var(--mt-surface); color: var(--mt-text-dim); border-radius: 5px; width: 22px; height: 22px; line-height: 1; cursor: pointer; font-size: 11px; padding: 0; }
+.mt-seclay-move button:disabled { opacity: 0.3; cursor: default; }
+.mt-seclay-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.mt-seclay-presets button { border: 1px solid var(--mt-border); background: var(--mt-surface); color: var(--mt-text); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+.mt-seclay-presets button:hover { border-color: var(--mt-primary); color: var(--mt-primary); }
+.mt-seclay-sum { font-size: 12px; color: var(--mt-text-dim); margin-top: 8px; }
+.mt-seclay-sum b { color: var(--mt-text); font-weight: 600; }
+</style>
+<script>
+(function () {
+    var specsEl = document.getElementById('mtSectionSpecs');
+    if (!specsEl) return;
+    var specs; try { specs = JSON.parse(specsEl.textContent || '{}'); } catch (e) { return; }
+
+    Object.keys(specs).forEach(function (key) {
+        var input = document.getElementById('opt-' + key);
+        if (!input || !input.form) return;               // no field -> leave the page alone
+        var spec = specs[key] || {};
+        var cat = spec.sections || {};
+        var widths = spec.widths || {};
+        var keys = Object.keys(cat);
+        if (!keys.length) return;
+
+        var wrap = input.closest('.mt-field') || input.parentNode;
+        var box = document.createElement('div');
+        box.className = 'mt-seclay';
+        var list = document.createElement('ul');
+        list.className = 'mt-seclay-list';
+        box.appendChild(list);
+
+        // Parse the stored string. An empty value means "built-in arrangement":
+        // render the catalogue in factory order but DO NOT write anything back,
+        // so saving an unrelated field on this page leaves it empty and the
+        // dashboard keeps its default layout.
+        function readState() {
+            var raw = (input.value || '').trim();
+            var seen = {}, out = [];
+            if (raw) {
+                raw.split(',').forEach(function (part) {
+                    var bits = part.split(':');
+                    var k = (bits[0] || '').trim().toLowerCase();
+                    var w = (bits[1] || '').trim().toLowerCase();
+                    if (!cat[k] || seen[k]) return;
+                    if (w !== 'off' && !widths[w]) return;
+                    seen[k] = 1;
+                    out.push({ key: k, w: w });
+                });
+            }
+            keys.forEach(function (k) {
+                if (!seen[k]) out.push({ key: k, w: cat[k].w || '1/1' });
+            });
+            return out;
+        }
+
+        var state = readState();
+        var dirty = (input.value || '').trim() !== '';
+
+        function serialise() {
+            return state.map(function (s) { return s.key + ':' + s.w; }).join(',');
+        }
+        function commit() {
+            dirty = true;
+            input.value = serialise();
+            paint();
+        }
+        // The hidden field is the single source of truth at submit time, and
+        // bfcache restores control state but not programmatic value changes.
+        input.form.addEventListener('submit', function () { if (dirty) input.value = serialise(); });
+        window.addEventListener('pageshow', function () { if (dirty) input.value = serialise(); });
+
+        var summary = document.createElement('div');
+        summary.className = 'mt-seclay-sum';
+
+        function paint() {
+            list.innerHTML = '';
+            state.forEach(function (s, idx) {
+                var li = document.createElement('li');
+                li.className = 'mt-seclay-item' + (s.w === 'off' ? ' is-off' : '');
+                li.dataset.key = s.key;
+
+                var grip = document.createElement('span');
+                grip.className = 'mt-seclay-grip';
+                grip.textContent = '≡';
+                grip.title = 'Drag to reorder';
+                // Arm draggable only while the grip is held, so text stays
+                // selectable and the row is not draggable from anywhere.
+                grip.addEventListener('mousedown', function () { li.draggable = true; });
+                grip.addEventListener('mouseup', function () { li.draggable = false; });
+                li.appendChild(grip);
+
+                var name = document.createElement('span');
+                name.className = 'mt-seclay-name';
+                name.textContent = (cat[s.key] && cat[s.key].label) || s.key;
+                li.appendChild(name);
+
+                // Up / down are NOT polish: HTML5 drag-and-drop is mouse-only,
+                // so these are the entire touch and keyboard story.
+                var mv = document.createElement('span');
+                mv.className = 'mt-seclay-move';
+                [['↑', -1], ['↓', 1]].forEach(function (pair) {
+                    var b = document.createElement('button');
+                    b.type = 'button';
+                    b.textContent = pair[0];
+                    b.disabled = (pair[1] < 0 && idx === 0) || (pair[1] > 0 && idx === state.length - 1);
+                    b.addEventListener('click', function () {
+                        var j = idx + pair[1];
+                        if (j < 0 || j >= state.length) return;
+                        var t = state[idx]; state[idx] = state[j]; state[j] = t;
+                        commit();
+                    });
+                    mv.appendChild(b);
+                });
+                li.appendChild(mv);
+
+                var sel = document.createElement('select');
+                sel.className = 'mt-select mt-input-compact';
+                // Opt out of the admin's custom select upgrade: it re-parents the
+                // panel to <body> with fixed positioning, which detaches mid-drag.
+                sel.setAttribute('data-mt-native', '1');
+                Object.keys(widths).forEach(function (w) {
+                    var o = document.createElement('option');
+                    o.value = w; o.textContent = widths[w];
+                    if (s.w === w) o.selected = true;
+                    sel.appendChild(o);
+                });
+                var off = document.createElement('option');
+                off.value = 'off'; off.textContent = 'Hidden';
+                if (s.w === 'off') off.selected = true;
+                sel.appendChild(off);
+                sel.addEventListener('change', function () { s.w = sel.value; commit(); });
+                li.appendChild(sel);
+
+                list.appendChild(li);
+            });
+
+            var span = { '1/1': 6, '2/3': 4, '1/2': 3, '1/3': 2 };
+            var shown = state.filter(function (s) { return s.w !== 'off'; });
+            var total = shown.reduce(function (n, s) { return n + (span[s.w] || 6); }, 0);
+            summary.innerHTML = '<b>' + shown.length + '</b> of ' + state.length +
+                ' sections shown. Widths run on a six-column grid; a row fills up when its widths add to a whole, so leftover space is left blank.' +
+                (dirty ? '' : ' <b>Currently using the built-in arrangement.</b>');
+        }
+
+        // Drag to reorder.
+        var dragKey = null;
+        list.addEventListener('dragstart', function (e) {
+            var li = e.target.closest('.mt-seclay-item'); if (!li) return;
+            dragKey = li.dataset.key; li.classList.add('is-dragging');
+            try { e.dataTransfer.setData('text/plain', dragKey); } catch (err) {}
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        list.addEventListener('dragover', function (e) {
+            var li = e.target.closest('.mt-seclay-item'); if (!li || !dragKey) return;
+            e.preventDefault();
+            var r = li.getBoundingClientRect();
+            var after = (e.clientY - r.top) > r.height / 2;
+            [].forEach.call(list.children, function (n) { n.classList.remove('is-drop-before', 'is-drop-after'); });
+            li.classList.add(after ? 'is-drop-after' : 'is-drop-before');
+        });
+        list.addEventListener('drop', function (e) {
+            var li = e.target.closest('.mt-seclay-item'); if (!li || !dragKey) return;
+            e.preventDefault();
+            var r = li.getBoundingClientRect();
+            var after = (e.clientY - r.top) > r.height / 2;
+            var from = state.findIndex(function (s) { return s.key === dragKey; });
+            var onto = state.findIndex(function (s) { return s.key === li.dataset.key; });
+            if (from < 0 || onto < 0 || from === onto) { dragKey = null; paint(); return; }
+            var moved = state.splice(from, 1)[0];
+            var at = state.findIndex(function (s) { return s.key === li.dataset.key; }) + (after ? 1 : 0);
+            state.splice(at, 0, moved);
+            dragKey = null;
+            commit();
+        });
+        list.addEventListener('dragend', function () {
+            dragKey = null;
+            [].forEach.call(list.children, function (n) {
+                n.classList.remove('is-dragging', 'is-drop-before', 'is-drop-after');
+                n.draggable = false;
+            });
+        });
+
+        var presets = document.createElement('div');
+        presets.className = 'mt-seclay-presets';
+        [
+            ['Restore default', ''],
+            ['Two columns', keys.map(function (k, n) { return k + ':' + (n < 2 ? '1/1' : '1/2'); }).join(',')],
+            ['Single column', keys.map(function (k) { return k + ':1/1'; }).join(',')],
+            ['Thirds', keys.map(function (k, n) { return k + ':' + (n < 2 ? '1/1' : '1/3'); }).join(',')],
+        ].forEach(function (p) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = p[0];
+            b.addEventListener('click', function () {
+                input.value = p[1];
+                state = readState();
+                dirty = p[1] !== '';
+                paint();
+            });
+            presets.appendChild(b);
+        });
+
+        box.appendChild(summary);
+        box.appendChild(presets);
+        input.type = 'hidden';                 // keep the SAME element, same name
+        wrap.appendChild(box);
+        paint();
+        box.setAttribute('data-ready', '1');   // only now is the builder usable
+    });
+})();
+</script>
+{/literal}
+
 {include file="includes/footer.tpl"}
