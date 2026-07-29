@@ -966,6 +966,15 @@
         // Cleared whenever a different drawer opens, so it can never describe
         // another section.
         var openMode = null;
+        // ...and the two values it is holding. These MUST survive the repaint
+        // too. commit() rebuilds the whole list, so anything re-derived from
+        // s.colour is re-derived from a value the flip may just have emptied:
+        // switching to Custom before a hex exists stores '' (there is nothing
+        // to store yet), and the theme colour it was supposed to remember is
+        // gone before the memo can capture it. Hoisting the pair makes the
+        // switch a view over unchanged state rather than a mutation of it.
+        var openLastKey = null;
+        var openLastHex = null;
 
         // key:width[:flags[:colour[:rows]]] -- POSITIONAL, so a later field
         // needs the earlier ones present as empty placeholders. Trailing empties
@@ -1082,7 +1091,7 @@
                 disc.appendChild(chev); disc.appendChild(name); disc.appendChild(cnt);
                 disc.addEventListener('click', function () {
                     openKey = (openKey === s.key) ? null : s.key;
-                    openMode = null;
+                    openMode = null; openLastKey = null; openLastHex = null;
                     paint();
                 });
                 li.appendChild(disc);
@@ -1230,22 +1239,34 @@
                         if (pf.indexOf(curFill) === -1) curFill = pf[0];
                         var curMemo  = cur[2] || '';
 
-                        var mode = openMode ||
-                            (curKind === 'hex' ? 'custom' : (curKind === 'key' ? 'theme' : 'none'));
-
-                        // Last value of each mode: the active paint, plus the
-                        // memo for the other. This pair IS the feature -- it is
-                        // what lets the switch flip back without re-picking.
-                        var lastKey = curKind === 'key' ? curPaint
-                                    : (paintKind(curMemo) === 'key' ? curMemo : '');
-                        var lastHex = curKind === 'hex' ? curPaint
-                                    : (paintKind(curMemo) === 'hex' ? curMemo : '');
+                        // Seed the drawer's working state from storage ONCE, when it
+                        // opens; after that the hoisted copies are the truth, so a
+                        // repaint cannot re-derive them from a value a mode flip
+                        // has legitimately emptied. `=== null` and not a truthy
+                        // test, because 'none' is a real mode.
+                        if (openMode === null) {
+                            openMode = curKind === 'hex' ? 'custom' : (curKind === 'key' ? 'theme' : 'none');
+                            // The active paint, plus the memo for the other mode.
+                            // This pair IS the feature -- it is what lets the
+                            // switch flip back without re-picking.
+                            openLastKey = curKind === 'key' ? curPaint
+                                        : (paintKind(curMemo) === 'key' ? curMemo : '');
+                            openLastHex = curKind === 'hex' ? curPaint
+                                        : (paintKind(curMemo) === 'hex' ? curMemo : '');
+                        }
+                        var mode    = openMode;
+                        var lastKey = openLastKey;
+                        var lastHex = openLastHex;
 
                         // The INACTIVE value rides along as the memo. 'none'
                         // stores nothing at all: a memo with no active paint
                         // would be a remembered setting for a block that has no
                         // colour, which is a thing to explain rather than want.
                         var setColour = function () {
+                            // Write the working state back before serialising, so
+                            // the repaint this triggers reads the values the user
+                            // just set rather than re-deriving them.
+                            openMode = mode; openLastKey = lastKey; openLastHex = lastHex;
                             if (mode === 'theme' && lastKey) {
                                 s.colour = lastKey + '_' + curFill + (lastHex ? '_' + lastHex : '');
                             } else if (mode === 'custom' && lastHex) {
