@@ -1217,19 +1217,30 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
    it. :has() scopes this to lists that actually hold an empty state, so the row
    layout is untouched. */
 .bn-card > .min-list:has(> .bn-empty) { display: flex; flex-direction: column; flex: 1; }
-.bn-empty { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; flex: 1; padding: 8px 0 4px; }
+/* CENTRED, matching the reference. Worth stating because the mockup's own
+   .lp-bempty rule reads `align-items: flex-start` and is overridden further
+   down -- reading the rule rather than the rendered page is how this shipped
+   left-aligned the first time. Measured on the reference: equal gutters each
+   side of the icon, the title and the buttons. */
+.bn-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; flex: 1; padding: 8px 0 4px; }
 .bn-empty-ico { width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--color-surface-secondary); display: flex; align-items: center; justify-content: center; margin-bottom: 13px; flex-shrink: 0; }
 .bn-empty-ico svg { width: 21px; height: 21px; color: var(--color-text-tertiary); }
 .bn-empty-t { font-size: var(--text-lg); font-weight: var(--fw-semibold); letter-spacing: -0.01em; color: var(--color-text-primary); margin-bottom: 5px; }
-.bn-empty p { font-size: var(--text-base); color: var(--color-text-secondary); margin: 0 0 16px; line-height: 1.45; max-width: 320px; }
-.bn-empty-acts { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-.bn-empty-acts .bn-cta { margin-top: 0; }
+.bn-empty p { font-size: var(--text-base); color: var(--color-text-secondary); margin: 0 auto 16px; line-height: 1.45; max-width: 320px; }
+.bn-empty-acts { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; justify-content: center; }
+/* .bn-cta carries align-self:flex-start for its normal home (a card column,
+   where it must not stretch). Inside this centred row that same declaration
+   overrides align-items and lifts the button above the link beside it. */
+.bn-empty-acts .bn-cta { margin-top: 0; align-self: auto; }
 /* 1/3 tiles keep every part -- they just get less air around it, and the
    actions stack rather than sitting side by side at ~280px of usable width. */
 .bn-empty.compact { padding: 4px 0; }
 .bn-empty.compact .bn-empty-ico { width: 38px; height: 38px; margin-bottom: 10px; }
 .bn-empty.compact p { margin-bottom: 13px; }
-.bn-empty.compact .bn-empty-acts { flex-direction: column; align-items: flex-start; gap: 10px; }
+/* No forced stacking: flex-wrap already drops the second action onto its own
+   line exactly when it stops fitting, and the reference keeps them inline at
+   1/3. A hard column broke them apart at widths where they fitted fine. */
+.bn-empty.compact .bn-empty-acts { gap: 10px; }
 /* On a saturated fill the empty state is ink-on-colour like everything else. */
 .bn-cell[data-blk-fill="solid"] > .bn-card .bn-empty-t,
 .bn-cell[data-blk-fill="grad"] > .bn-card .bn-empty-t,
