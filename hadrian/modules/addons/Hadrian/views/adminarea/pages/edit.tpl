@@ -786,6 +786,19 @@
 .mt-sw.is-none::after { content: ''; position: absolute; left: 50%; top: -4px; width: 1px; height: 34px;
     background: var(--mt-border); transform: rotate(45deg); }
 .mt-sw.is-bare { background: var(--mt-surface-2); }
+/* Custom colour. A native <input type="color"> cropped to a circle so it sits
+   in the same strip as the palette swatches -- the browser's own picker is the
+   right control here, and reimplementing one would be worse in every way. The
+   conic ring reads as "any colour" rather than as a 12th palette entry. */
+.mt-sw-custom { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; position: relative;
+    display: inline-block; flex-shrink: 0; cursor: pointer;
+    background: conic-gradient(#ff3b30, #ff9500, #ffcc00, #34c759, #5ac8fa, #007aff, #5856d6, #af52de, #ff3b30);
+    transition: transform 0.12s ease, box-shadow 0.12s ease; }
+.mt-sw-custom:hover { transform: scale(1.1); }
+.mt-sw-custom.is-active { box-shadow: 0 0 0 2px var(--mt-surface), 0 0 0 4px var(--mt-primary); }
+/* The input itself is the hit area; oversized so no native chrome shows. */
+.mt-sw-cin { position: absolute; inset: -6px; width: 38px; height: 38px; padding: 0; border: 0;
+    background: transparent; opacity: 0; cursor: pointer; }
 .mt-seclay-fill { margin-top: 11px; }
 .mt-seclay-fill button:disabled { opacity: 0.4; cursor: default; }
 .mt-seclay-num { width: 74px; flex-shrink: 0; height: 32px; padding: 0 6px 0 10px; text-align: left;
@@ -886,6 +899,8 @@
                     // merely opening the builder and touching anything erased a
                     // stored colour. It is also field 4, so field 5 could not
                     // be reached at all without carrying it.
+                    // Palette key, or 'hex' + rrggbb for a one-off colour,
+                    // each optionally suffixed _solid/_tint/_grad.
                     if (c && !/^[a-z0-9_]+$/.test(c)) { c = ''; }
                     if (!/^[0-9]{1,2}$/.test(n)) { n = ''; }
                     if (!cat[k] || seen[k]) return;
@@ -1010,7 +1025,8 @@
                 if (RC && s.rows) bits.push(s.rows + ' items');
                 if (s.colour) {
                     var pk = s.colour.split('_')[0];
-                    bits.push((PAINTS[pk] ? PAINTS[pk].label : pk));
+                    bits.push(PAINTS[pk] ? PAINTS[pk].label
+                            : (/^hex[0-9a-f]{6}$/.test(pk) ? 'Custom colour' : pk));
                 }
                 cnt.textContent = bits.length ? bits.join(' · ') : (RC ? '2 settings' : '1 setting');
                 disc.appendChild(chev); disc.appendChild(name); disc.appendChild(cnt);
@@ -1204,6 +1220,28 @@
                         };
                         sw.appendChild(mkSwatch(''));
                         PAINT_KEYS.forEach(function (k) { sw.appendChild(mkSwatch(k)); });
+
+                        // Custom colour. The palette swatches above store a KEY
+                        // and resolve through a var(), so they follow
+                        // Styles > Colors; this stores the literal value and
+                        // deliberately does not. Encoded 'hex' + rrggbb because
+                        // the layout string's charset excludes '#'.
+                        var isHex = /^hex[0-9a-f]{6}$/.test(curPaint);
+                        var cwrapc = document.createElement('span');
+                        cwrapc.className = 'mt-sw-custom' + (isHex ? ' is-active' : '');
+                        cwrapc.title = 'Custom colour (not linked to Styles > Colors)';
+                        var ci = document.createElement('input');
+                        ci.type = 'color';
+                        ci.className = 'mt-sw-cin';
+                        ci.value = isHex ? ('#' + curPaint.slice(3)) : '#5856d6';
+                        ci.addEventListener('input', function () {
+                            var v = (ci.value || '').toLowerCase();
+                            if (!/^#[0-9a-f]{6}$/.test(v)) return;
+                            curPaint = 'hex' + v.slice(1);
+                            setColour();
+                        });
+                        cwrapc.appendChild(ci);
+                        sw.appendChild(cwrapc);
                         co.appendChild(sw);
 
                         // Fill: only worth showing when there is a choice. A

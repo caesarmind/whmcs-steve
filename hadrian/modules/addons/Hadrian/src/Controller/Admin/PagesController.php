@@ -495,9 +495,22 @@ final class PagesController extends AbstractController
             // the whole Pages screen over a decoration.
         }
 
-        $stored = Settings::getValue($template->getName() . '_colors_default_light', []);
-        if (!is_array($stored)) {
-            $stored = [];
+        // The ACTIVE style, resolved exactly as Hooks::buildColorsHead resolves
+        // it for the front end -- including the legacy dark/empty pointer and
+        // the pre-refactor key. A swatch read from a style the site is not
+        // using would be a picker that disagrees with the page it configures.
+        $name   = $template->getName();
+        $active = (string)Settings::getValue($name . '_active_style', 'default');
+        if ($active === 'dark' || $active === '') {
+            $active = 'default';
+        }
+        $stored = [];
+        foreach (['_colors_' . $active . '_light', '_colors_' . $active] as $k) {
+            $v = Settings::getValue($name . $k, null);
+            if (is_array($v) && $v !== []) {
+                $stored = $v;
+                break;
+            }
         }
 
         $out = [];

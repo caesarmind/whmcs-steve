@@ -20,6 +20,8 @@ namespace Hadrian\Helpers;
  *             'e' = hide this section entirely when it has no items, instead
  *                   of rendering its empty state
  *   colour := paint | paint '_' fill      (fill: solid | tint | grad)
+ *   paint  := a palette KEY (tracks Styles > Colors), or 'hex' + rrggbb for a
+ *             one-off colour that deliberately does NOT track it
  *   rows   := 1-99, how many items this section shows; 0/absent = page default
  *
  * The fields are POSITIONAL, so a later one needs the earlier ones present as
@@ -74,7 +76,8 @@ final class SectionLayout
      *        A paint not on this list is dropped -- see the note below on why
      *        that matters more than it looks.
      * @return list<array{key:string, width:string, span:int, visible:bool,
-     *                    hideEmpty:bool, paint:string, fill:string, rows:int}>
+     *                    hideEmpty:bool, paint:string, fill:string, rows:int,
+     *                    custom:string, customInk:string}>
      */
     public static function parse(string $raw, array $catalogue, array $paints = []): array
     {
@@ -125,15 +128,38 @@ final class SectionLayout
             // and if no rule matched, --blk-base would be unset while --blk-ink
             // still resolved -- white text on the page background, i.e. an
             // invisible block. This whitelist is the actual guard.
-            $paint = '';
-            $fill  = '';
+            $paint     = '';
+            $fill      = '';
+            $custom    = '';
+            $customInk = '';
             if ($colour !== '') {
                 $bits = explode('_', $colour, 2);
                 $p    = $bits[0];
                 $f    = $bits[1] ?? 'solid';
-                if (in_array($p, $paints, true) && in_array($f, self::FILLS, true)) {
-                    $paint = $p;
-                    $fill  = $f;
+                if (in_array($f, self::FILLS, true)) {
+                    if (in_array($p, $paints, true)) {
+                        // A palette KEY. The CSS resolves it through a var(),
+                        // so this block follows Styles > Colors for free --
+                        // recolour the palette and the block recolours with it.
+                        $paint = $p;
+                        $fill  = $f;
+                    } elseif (preg_match('/^hex([0-9a-f]{6})$/', $p, $m) === 1) {
+                        // A one-off colour, deliberately NOT connected to the
+                        // palette: stored as the literal value and emitted as
+                        // an inline custom property, so changing Styles >
+                        // Colors leaves it exactly where the admin put it.
+                        //
+                        // Stored WITHOUT the '#'. The layout string's charset
+                        // is [a-z0-9_:,/] precisely so it survives WHMCS's
+                        // POST-time encoding and the admin field's |escape
+                        // byte-identically across repeated saves; '#' is
+                        // outside that set and is not worth the risk when a
+                        // three-letter prefix avoids it.
+                        $paint     = 'custom';
+                        $fill      = $f;
+                        $custom    = '#' . $m[1];
+                        $customInk = self::readableInk($m[1]);
+                    }
                 }
             }
 
@@ -156,6 +182,8 @@ final class SectionLayout
                 'hideEmpty' => str_contains($flags, 'e'),
                 'paint'     => $paint,
                 'fill'      => $fill,
+                'custom'    => $custom,
+                'customInk' => $customInk,
                 'rows'      => $rows,
             ];
         }
@@ -194,10 +222,41 @@ final class SectionLayout
                 'hideEmpty' => false,
                 'paint'     => '',
                 'fill'      => '',
+                'custom'    => '',
+                'customInk' => '',
                 'rows'      => 0,
             ];
         }
 
         return $out;
+    }
+
+    /**
+     * Ink for a custom fill: white or near-black, whichever contrasts better.
+     *
+     * The palette paints each declare their own --blk-ink because they are a
+     * known, small set someone could author by eye. A custom colour is any of
+     * 16.7 million, so it has to be computed -- and it has to be computed HERE
+     * rather than in CSS, which still has no contrast function. Getting it
+     * wrong is unreadable, not merely ugly.
+     *
+     * WCAG relative luminance: linearise each channel, weight, then compare the
+     * contrast the fill would give against white against the contrast it would
+     * give against the theme's own near-black. Pure #000 is deliberately not
+     * used -- nothing else in this theme prints pure black.
+     */
+    private static function readableInk(string $rrggbb): string
+    {
+        $lin = static function (int $v): float {
+            $c = $v / 255;
+            return $c <= 0.03928 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4;
+        };
+        $l = 0.2126 * $lin((int)hexdec(substr($rrggbb, 0, 2)))
+           + 0.7152 * $lin((int)hexdec(substr($rrggbb, 2, 2)))
+           + 0.0722 * $lin((int)hexdec(substr($rrggbb, 4, 2)));
+
+        $onWhite = 1.05 / ($l + 0.05);
+        $onDark  = ($l + 0.05) / (0.0176 + 0.05); // luminance of #1d1d1f
+        return $onWhite >= $onDark ? '#ffffff' : '#1d1d1f';
     }
 }

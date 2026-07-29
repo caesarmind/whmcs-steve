@@ -98,7 +98,31 @@
 {assign var=secHide value=$secHideEmpty|default:false}
 {if $secPanel || $secCount > 0 || !$secHide}
 
-<div class="min-section bn-cell" data-sec="{$sec}" data-w="{$secW}"{if $secPaint|default:''} data-blk-paint="{$secPaint|escape}" data-blk-fill="{$secFillOut|escape}"{/if}>
+{* A list tile only ever takes the WASH, whatever the admin picked.
+   Measured: a .status-pill is a 10%-alpha background over the tile, so on a
+   solid accent fill an Active pill composites to rgb(20,123,210) behind
+   rgb(36,138,61) text -- 1.05:1, an invisible badge. Every list tile carries
+   pills, so the two saturated fills are coerced here rather than offered and
+   then broken. The panels (Register, Profile) have no pills and keep all three
+   fills, straight from the shared .blk rules.
+
+   MUST NOT be allowed to resolve empty: the panel rules are keyed off the fill
+   VALUE (.min-section[data-blk-fill="tint"] > .blk), so an empty attribute
+   leaves --blk-base set with no rule to apply it and the panel renders
+   unpainted. The list-tile rule keys off attribute PRESENCE, so it would keep
+   working and hide the fault. *}
+{assign var=secFillOut value=$secFill|default:'solid'}
+{if $secFillOut == ''}{assign var=secFillOut value='solid'}{/if}
+{if !$secPanel && $secFillOut != 'tint'}{assign var=secFillOut value='tint'}{/if}
+
+{* A CUSTOM colour is emitted as inline custom properties rather than through a
+   [data-blk-paint="..."] rule, because there is no rule to write: the value is
+   whatever the admin picked. Inline beats every selector, so it overrides the
+   accent fallback the attribute alone would give -- and if it were ever
+   stripped, that fallback is a visible block rather than an invisible one.
+   --blk-ink is computed in PHP (SectionLayout::readableInk); CSS has no
+   contrast function, and on a saturated fill guessing wrong is unreadable. *}
+<div class="min-section bn-cell" data-sec="{$sec}" data-w="{$secW}"{if $secPaint|default:''} data-blk-paint="{$secPaint|escape}" data-blk-fill="{$secFillOut|escape}"{/if}{if $secCustom|default:''} style="--blk-base:{$secCustom|escape};--blk-ink:{$secCustomInk|default:'#ffffff'|escape}"{/if}>
 {if $secPanel}
     {* ---------- Panels ----------
        Shared byte-for-byte with the minimal variant's rows.tpl: the .blk
