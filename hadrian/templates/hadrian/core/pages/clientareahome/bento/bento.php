@@ -104,9 +104,21 @@ return [
                                     'listToggle' => [
                                         'label' => 'Show the invoice list',
                                         'hint'  => 'Off, the tile stays an aggregate: what you owe, how much of it is overdue and by how long, one Pay all button, and any credit that comes off first. The full history is a click away on the invoices page either way.',
+                                    ],
+                                    'rowsCompact' => [
+                                        'label' => 'Compact rows',
+                                        'hint'  => 'Name and status only, with no second line. A dense list you can scan in one pass, for an account with a lot of them or a tile that has to sit in a narrow column.',
                                     ]],
-                'tickets'       => ['label' => 'Support',           'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
-                'announcements' => ['label' => 'Announcements',     'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                'tickets'       => ['label' => 'Support',           'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                                    'rowsCompact' => [
+                                        'label' => 'Compact rows',
+                                        'hint'  => 'Name and status only, with no second line. A dense list you can scan in one pass, for an account with a lot of them or a tile that has to sit in a narrow column.',
+                                    ]],
+                'announcements' => ['label' => 'Announcements',     'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                                    'rowsCompact' => [
+                                        'label' => 'Compact rows',
+                                        'hint'  => 'Name and status only, with no second line. A dense list you can scan in one pass, for an account with a lot of them or a tile that has to sit in a narrow column.',
+                                    ]],
                 'domainreg'     => ['label' => 'Register a domain', 'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 'profile'       => ['label' => 'Profile',           'w' => '1/1', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
             ],

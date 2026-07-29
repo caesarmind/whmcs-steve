@@ -382,7 +382,7 @@
                        the latter carries its own hash and would render "Invoice # #12". *}
                     <span class="min-name">
                         <span class="bn-rn">{$LANG.invoicestitle|default:'Invoice'} #{$inv.id|escape}</span>
-                        {if $inv.date}<span class="bn-rs">{$inv.date|escape}</span>{/if}
+                        {if $inv.date && !$secCompact|default:false}<span class="bn-rs">{$inv.date|escape}</span>{/if}
                     </span>
                     <span class="min-right">
                         {if $inv.total}<span class="min-amt">{$inv.total|escape}</span>{/if}
@@ -397,7 +397,7 @@
                 <a href="{$WEB_ROOT}/viewticket.php?tid={$tkt.tid|escape:'url'}{if $tkt.c}&amp;c={$tkt.c|escape:'url'}{/if}" class="min-row bn-row">
                     <span class="min-name">
                         <span class="bn-rn">{$tkt.subject|escape}</span>
-                        <span class="bn-rs">#{$tkt.tid|escape}{if $tkt.lastreply} &middot; {$hadrianLang.dashboard.updated} {$tkt.lastreply|escape}{/if}</span>
+                        {if !$secCompact|default:false}<span class="bn-rs">#{$tkt.tid|escape}{if $tkt.lastreply} &middot; {$hadrianLang.dashboard.updated} {$tkt.lastreply|escape}{/if}</span>{/if}
                     </span>
                     <span class="status-pill {$tkt.status|default:'Open'|lower|replace:' ':'-'|escape}">{$tkt.status|default:'Open'|escape}</span>
                 </a>
@@ -412,13 +412,19 @@
                        timestamp left in it to take apart. Both are empty when
                        the row's date could not be parsed, and the calendar
                        chip is dropped rather than rendered blank. *}
-                    {if $ann.dateMonth|default:'' && $ann.dateDay|default:''}
+                    {* The calendar chip is ~46px tall, so in compact mode it -- not
+                       the text -- would set the row height and an announcements
+                       tile would sit at 68px while every other compact tile sat
+                       at 43. Compact swaps it for the date on the right, which
+                       is the shape the other tiles already use. *}
+                    {if $ann.dateMonth|default:'' && $ann.dateDay|default:'' && !$secCompact|default:false}
                     <span class="bn-cal"><span class="m">{$ann.dateMonth|escape}</span><span class="d">{$ann.dateDay|escape}</span></span>
                     {/if}
                     <span class="min-name">
                         <span class="bn-rn">{$ann.title|escape}</span>
-                        {if $ann.excerpt|default:''}<span class="bn-rs">{$ann.excerpt|escape}</span>{elseif $ann.date}<span class="bn-rs">{$ann.date|escape}</span>{/if}
+                        {if !$secCompact|default:false}{if $ann.excerpt|default:''}<span class="bn-rs">{$ann.excerpt|escape}</span>{elseif $ann.date}<span class="bn-rs">{$ann.date|escape}</span>{/if}{/if}
                     </span>
+                    {if $secCompact|default:false && $ann.date}<span class="min-when">{$ann.date|escape}</span>{/if}
                 </a>
                 {/if}
                 {/foreach}
