@@ -88,6 +88,13 @@ return [
             // APPEND ONLY: removing a key silently strips that colour from any
             // layout using it on the next save.
             //
+            // RESERVED: no key here may ever match /^hex[0-9a-f]{6}$/. That
+            // pattern is the OTHER colour vocabulary -- a one-off value that
+            // deliberately does not follow Styles > Colors -- and the admin's
+            // Theme/Custom switch derives which mode a block is in by testing
+            // the stored paint against exactly these two vocabularies. A key
+            // that matched both would make the mode ambiguous.
+            //
             // Every tile is paintable, and every tile takes all three fills.
             // The list tiles were wash-only until the pill treatment landed:
             // a .status-pill is a 10%-alpha background, so on a solid fill an

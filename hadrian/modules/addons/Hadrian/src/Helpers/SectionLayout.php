@@ -19,9 +19,13 @@ namespace Hadrian\Helpers;
  *   flags  := one or more single letters; unknown letters are ignored
  *             'e' = hide this section entirely when it has no items, instead
  *                   of rendering its empty state
- *   colour := paint | paint '_' fill      (fill: solid | tint | grad)
+ *   colour := paint | paint '_' fill | paint '_' fill '_' memo
  *   paint  := a palette KEY (tracks Styles > Colors), or 'hex' + rrggbb for a
  *             one-off colour that deliberately does NOT track it
+ *   fill   := solid | tint | grad
+ *   memo   := the paint of the mode that is NOT active, remembered so the
+ *             admin's Theme/Custom switch flips back without losing it.
+ *             Parsed past and DISCARDED here -- see the note in parse().
  *   rows   := 1-99, how many items this section shows; 0/absent = page default
  *
  * The fields are POSITIONAL, so a later one needs the earlier ones present as
@@ -119,9 +123,34 @@ final class SectionLayout
                 $flags = '';
             }
 
-            // Colour: "<paint>" or "<paint>_<fill>". The paint is a palette KEY,
-            // never a value -- a hex could not survive the option pipeline and
-            // could not carry a separate dark-mode variant.
+            // Colour: "<paint>", "<paint>_<fill>", or "<paint>_<fill>_<memo>".
+            //
+            // Segment 1 is the ACTIVE paint and alone decides the mode: a
+            // palette KEY follows Styles > Colors, 'hex' + rrggbb deliberately
+            // does not. The two vocabularies are disjoint, so the mode is
+            // DERIVED rather than stored -- a stored mode could contradict its
+            // own paint ("theme, hexaabbcc") with no non-arbitrary way to
+            // resolve it. A derived mode cannot disagree with itself. This is
+            // why no palette key may ever match /^hex[0-9a-f]{6}$/; the
+            // APPEND ONLY note on each variant's `paints` list says so too.
+            //
+            // Segment 2 is the fill, shared by both modes: it says how a paint
+            // is applied, which is orthogonal to which paint.
+            //
+            // Segment 3 is the MEMO -- the last value of the mode that is NOT
+            // active, kept so the admin's Theme/Custom switch can flip back
+            // without losing it. It is skipped past and DISCARDED: it records a
+            // choice the admin switched AWAY from, so rendering it would put a
+            // colour on the page that was explicitly deselected. It is also why
+            // this method's return shape did not change when the memo was added
+            // -- nothing downstream has any business knowing it exists.
+            //
+            // Third, not second, because segments 1 and 2 are spoken for by
+            // every layout ever saved. The field grows the way the paint
+            // vocabulary does: by appending. The limit of 3 (rather than none)
+            // documents that a fourth segment is not ours; without raising it
+            // from 2, "accent_tint_hexaabbcc" would put "tint_hexaabbcc" in the
+            // fill slot and drop the colour entirely.
             //
             // An unrecognised paint is dropped to ''. That is not tidiness: the
             // CSS sets `background: var(--blk-base)` and `color: var(--blk-ink)`,
@@ -133,7 +162,7 @@ final class SectionLayout
             $custom    = '';
             $customInk = '';
             if ($colour !== '') {
-                $bits = explode('_', $colour, 2);
+                $bits = explode('_', $colour, 3);
                 $p    = $bits[0];
                 $f    = $bits[1] ?? 'solid';
                 if (in_array($f, self::FILLS, true)) {

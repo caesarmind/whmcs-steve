@@ -107,6 +107,13 @@ return [
             // SectionLayout::parse -- an unlisted one is dropped rather than
             // reaching the CSS. APPEND ONLY: removing a key silently strips
             // that colour from any layout using it on the next save.
+            //
+            // RESERVED: no key here may ever match /^hex[0-9a-f]{6}$/. That
+            // pattern is the OTHER colour vocabulary -- a one-off value that
+            // deliberately does not follow Styles > Colors -- and the admin's
+            // Theme/Custom switch derives which mode a block is in by testing
+            // the stored paint against exactly these two vocabularies. A key
+            // that matched both would make the mode ambiguous.
             // 'track' says what a key FOLLOWS, which is the whole reason to
             // store a key rather than a value:
             //   preset - the Styles > Colors presets set this token, so picking
