@@ -72,13 +72,13 @@ return [
             'default' => '',
             'tooltip' => 'Drag to reorder, switch a tile off to hide it, and set each one to full, two thirds, one half or one third width. Widths run on a six-column grid, so a row fills up when its widths add to a whole. Leave blank for the built-in arrangement. Note that tiles holding a list always show their colour as a soft wash, so the status badges on each row stay readable; Register a domain and Profile can take a solid or gradient fill.',
             'sections' => [
-                'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true],
-                'domains'       => ['label' => 'Domains',           'w' => '1/3', 'paintable' => true],
-                'invoices'      => ['label' => 'Billing',           'w' => '1/3', 'paintable' => true],
-                'tickets'       => ['label' => 'Support',           'w' => '2/3', 'paintable' => true],
-                'announcements' => ['label' => 'Announcements',     'w' => '2/3', 'paintable' => true],
-                'domainreg'     => ['label' => 'Register a domain', 'w' => '1/3', 'paintable' => true],
-                'profile'       => ['label' => 'Profile',           'w' => '1/1', 'paintable' => true],
+                'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['tint']],
+                'domains'       => ['label' => 'Domains',           'w' => '1/3', 'paintable' => true, 'fills' => ['tint']],
+                'invoices'      => ['label' => 'Billing',           'w' => '1/3', 'paintable' => true, 'fills' => ['tint']],
+                'tickets'       => ['label' => 'Support',           'w' => '2/3', 'paintable' => true, 'fills' => ['tint']],
+                'announcements' => ['label' => 'Announcements',     'w' => '2/3', 'paintable' => true, 'fills' => ['tint']],
+                'domainreg'     => ['label' => 'Register a domain', 'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                'profile'       => ['label' => 'Profile',           'w' => '1/1', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
             ],
 
             // Colours a tile may be painted with: the palette keys the theme
@@ -94,18 +94,25 @@ return [
             // over whatever is behind it, so a saturated fill turns an Active
             // badge into 1.05:1 contrast. cell.tpl coerces it; see the note
             // there. Register and Profile have no pills and take all three.
+            // 'var' is the CSS token each key resolves to at render time --
+            // the same mapping the .min-section[data-blk-paint="..."] rules use.
+            // Declared here so the admin can draw a real swatch: PagesController
+            // resolves the token through core/config/colors.php plus whatever
+            // the buyer overrode on Styles > Colors, so the chip in the picker
+            // is the colour the block will actually be, not a hardcoded guess
+            // that drifts the moment someone changes the palette.
             'paints' => [
-                'accent' => 'Accent',
-                'indigo' => 'Indigo',
-                'purple' => 'Purple',
-                'green'  => 'Green',
-                'teal'   => 'Teal',
-                'orange' => 'Orange',
-                'red'    => 'Red',
-                'gray'   => 'Gray',
-                'block1' => 'Block accent 1',
-                'block2' => 'Block accent 2',
-                'block3' => 'Block accent 3',
+                'accent' => ['label' => 'Accent',          'var' => '--color-accent'],
+                'indigo' => ['label' => 'Indigo',          'var' => '--color-icon-indigo'],
+                'purple' => ['label' => 'Purple',          'var' => '--color-icon-purple'],
+                'green'  => ['label' => 'Green',           'var' => '--color-icon-green'],
+                'teal'   => ['label' => 'Teal',            'var' => '--color-icon-teal'],
+                'orange' => ['label' => 'Orange',          'var' => '--color-icon-orange'],
+                'red'    => ['label' => 'Red',             'var' => '--color-icon-red'],
+                'gray'   => ['label' => 'Gray',            'var' => '--color-icon-gray'],
+                'block1' => ['label' => 'Block accent 1',  'var' => '--color-block-1'],
+                'block2' => ['label' => 'Block accent 2',  'var' => '--color-block-2'],
+                'block3' => ['label' => 'Block accent 3',  'var' => '--color-block-3'],
             ],
             // Turns on the per-section "Items shown" control in the builder's
             // settings drawer, stored as the 5th field of each layout entry.

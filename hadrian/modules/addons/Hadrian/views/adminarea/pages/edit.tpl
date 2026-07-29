@@ -767,6 +767,27 @@
    full row -- a stretched text box beside a toggle reads as a different kind
    of control than it is. Same complaint the owner raised about the page-level
    int rows. */
+/* Colour picker. Stacked rather than the label-left/control-right of the other
+   drawer rows: a 12-swatch strip beside a wrapped help line reads as two
+   competing columns. */
+.mt-seclay-opt.is-stacked { display: block; }
+.mt-seclay-sw { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+.mt-sw { width: 26px; height: 26px; padding: 0; border-radius: 50%; cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.12); background: transparent; font: inherit; font-size: 9px;
+    font-weight: 600; color: var(--mt-text-3); text-transform: uppercase; line-height: 1;
+    transition: transform 0.12s ease, box-shadow 0.12s ease; }
+.mt-sw:hover { transform: scale(1.1); }
+/* The ring sits OUTSIDE the swatch, so a dark colour and a light one both read
+   as selected -- an inset border disappears into whichever it matches. */
+.mt-sw.is-active { box-shadow: 0 0 0 2px var(--mt-surface), 0 0 0 4px var(--mt-primary); }
+/* "No colour": a diagonal rule, the usual convention, so it is not mistaken
+   for a white swatch. */
+.mt-sw.is-none { background: var(--mt-surface); position: relative; overflow: hidden; }
+.mt-sw.is-none::after { content: ''; position: absolute; left: 50%; top: -4px; width: 1px; height: 34px;
+    background: var(--mt-border); transform: rotate(45deg); }
+.mt-sw.is-bare { background: var(--mt-surface-2); }
+.mt-seclay-fill { margin-top: 11px; }
+.mt-seclay-fill button:disabled { opacity: 0.4; cursor: default; }
 .mt-seclay-num { width: 74px; flex-shrink: 0; height: 32px; padding: 0 6px 0 10px; text-align: left;
     border: 1px solid var(--mt-border); border-radius: 8px; background: var(--mt-surface);
     color: var(--mt-text); font: inherit; font-size: 13px; }
@@ -829,6 +850,12 @@
         // variants that do not want it, which is how the same builder serves
         // both bento and minimal.
         var RC = spec.rowsControl || null;
+        // Palette for the per-section colour picker, already resolved to the
+        // colours these blocks will actually render as (PagesController walks
+        // core/config/colors.php + the buyer's Styles > Colors overrides).
+        var PAINTS = spec.paints || {};
+        var PAINT_KEYS = Object.keys(PAINTS);
+        var FILL_LABEL = { solid: 'Solid', tint: 'Wash', grad: 'Gradient' };
 
         // The builder renders into its own card between Template settings and
         // Page settings. The input stays exactly where it is, inside the form,
@@ -981,6 +1008,10 @@
                 var bits = [];
                 if (s.hideEmpty) bits.push('Hides when empty');
                 if (RC && s.rows) bits.push(s.rows + ' items');
+                if (s.colour) {
+                    var pk = s.colour.split('_')[0];
+                    bits.push((PAINTS[pk] ? PAINTS[pk].label : pk));
+                }
                 cnt.textContent = bits.length ? bits.join(' · ') : (RC ? '2 settings' : '1 setting');
                 disc.appendChild(chev); disc.appendChild(name); disc.appendChild(cnt);
                 disc.addEventListener('click', function () {
@@ -1108,6 +1139,91 @@
                         });
                         ro.appendChild(rw); ro.appendChild(ri);
                         opts.appendChild(ro);
+                    }
+
+                    // Colour. Only for sections the variant marked paintable
+                    // -- minimal's list sections are not, because their rows
+                    // carry status pills and token-coloured text that a fill
+                    // would wreck.
+                    //
+                    // The stored value is "<paint>" or "<paint>_<fill>", the
+                    // 4th field of this section's layout entry, whitelisted
+                    // again in SectionLayout::parse so nothing typed by hand
+                    // can reach the CSS.
+                    var pf = (cat[s.key] && cat[s.key].fills) || ['solid', 'tint', 'grad'];
+                    if (PAINT_KEYS.length && cat[s.key] && cat[s.key].paintable) {
+                        var cur = (s.colour || '').split('_');
+                        var curPaint = cur[0] || '';
+                        var curFill = cur[1] || (pf.indexOf('solid') !== -1 ? 'solid' : pf[0]);
+                        if (pf.indexOf(curFill) === -1) curFill = pf[0];
+
+                        var setColour = function () {
+                            // No paint means no colour at all -- do not store a
+                            // bare fill, which would be a setting with nothing
+                            // to apply it to.
+                            s.colour = curPaint ? (curPaint + '_' + curFill) : '';
+                            commit();
+                        };
+
+                        var co = document.createElement('div');
+                        co.className = 'mt-seclay-opt is-stacked';
+                        var cwrap = document.createElement('div');
+                        var cl = document.createElement('div');
+                        cl.className = 'mt-seclay-opt-l';
+                        cl.textContent = 'Colour';
+                        var ch = document.createElement('div');
+                        ch.className = 'mt-seclay-opt-h';
+                        ch.textContent = pf.length > 1
+                            ? 'Pick a palette colour for this block, then how it is applied. Colours follow Styles > Colors, so changing the palette carries them along.'
+                            : 'Tint this tile with a palette colour. Tiles holding a list only take the soft wash, so the status badges on each row stay readable. Colours follow Styles > Colors.';
+                        cwrap.appendChild(cl); cwrap.appendChild(ch);
+                        co.appendChild(cwrap);
+
+                        var sw = document.createElement('div');
+                        sw.className = 'mt-seclay-sw';
+
+                        var mkSwatch = function (key) {
+                            var b = document.createElement('button');
+                            b.type = 'button';
+                            b.className = 'mt-sw' + (curPaint === key ? ' is-active' : '') + (key ? '' : ' is-none');
+                            b.title = key ? PAINTS[key].label : 'No colour';
+                            if (key) {
+                                var v = PAINTS[key].swatch;
+                                // No resolved value (legacy paints declaration)
+                                // -- fall back to a labelled chip rather than a
+                                // blank button that looks broken.
+                                if (v) { b.style.background = v; }
+                                else { b.classList.add('is-bare'); b.textContent = PAINTS[key].label.slice(0, 2); }
+                            }
+                            b.setAttribute('aria-pressed', curPaint === key ? 'true' : 'false');
+                            b.addEventListener('click', function () {
+                                curPaint = (curPaint === key) ? '' : key;
+                                setColour();
+                            });
+                            return b;
+                        };
+                        sw.appendChild(mkSwatch(''));
+                        PAINT_KEYS.forEach(function (k) { sw.appendChild(mkSwatch(k)); });
+                        co.appendChild(sw);
+
+                        // Fill: only worth showing when there is a choice. A
+                        // list tile offers the wash alone, so a one-button
+                        // segmented control would be furniture.
+                        if (pf.length > 1) {
+                            var fseg = document.createElement('span');
+                            fseg.className = 'mt-seclay-w mt-seclay-fill';
+                            pf.forEach(function (f) {
+                                var b = document.createElement('button');
+                                b.type = 'button';
+                                b.textContent = FILL_LABEL[f] || f;
+                                if (curFill === f) b.className = 'is-active';
+                                b.disabled = !curPaint;
+                                b.addEventListener('click', function () { curFill = f; setColour(); });
+                                fseg.appendChild(b);
+                            });
+                            co.appendChild(fseg);
+                        }
+                        opts.appendChild(co);
                     }
 
                     dr.appendChild(h); dr.appendChild(opts);

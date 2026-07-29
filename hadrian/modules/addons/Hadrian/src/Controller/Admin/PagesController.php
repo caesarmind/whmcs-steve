@@ -8,6 +8,8 @@ use Hadrian\Database\Migrator;
 use Hadrian\Helpers\AddonHelper;
 use Hadrian\Helpers\LocaleHelper;
 use Hadrian\Helpers\PageUrlResolver;
+use Hadrian\Helpers\ThemeManifest;
+use Hadrian\Models\Settings;
 use Hadrian\Models\Page;
 use Hadrian\Service\PageRegistry;
 use Hadrian\Template\PagesCache;
@@ -446,6 +448,67 @@ final class PagesController extends AbstractController
      * @param array<string,mixed> $meta page.php metadata
      * @return array<string, array<string,mixed>>
      */
+    /**
+     * Turn a variant's `paints` vocabulary into swatches the builder can draw.
+     *
+     * Each paint names the CSS token it resolves to at render time (the same
+     * mapping the .min-section[data-blk-paint="..."] rules use), so the swatch
+     * is resolved the way the front end resolves it: the per-mode default from
+     * core/config/colors.php with the buyer's Styles > Colors override on top.
+     * Hardcoding hexes here would look right on a stock install and lie on
+     * every customised one -- and "Block accent 1/2/3" exist precisely to be
+     * customised, so they would lie immediately.
+     *
+     * LIGHT mode, default style: the picker is a small preview, not a theme
+     * switcher, and one honest value beats a dark-mode value on a light admin.
+     *
+     * Tolerates the legacy `key => 'Label'` shape, so a variant that has not
+     * been migrated still lists its paints (without swatches) rather than
+     * losing the control altogether.
+     *
+     * @param array<string, array{label?:string, var?:string}|string> $paints
+     * @return array<string, array{label:string, swatch:string}>
+     */
+    private function resolvePaintSwatches(Template $template, array $paints): array
+    {
+        if ($paints === []) {
+            return [];
+        }
+
+        $defaults = [];
+        try {
+            $cfg = ThemeManifest::loadVariantMeta(
+                $template->getFullPath() . '/core/config/colors.php'
+            );
+            foreach (($cfg['groups'] ?? []) as $tokens) {
+                foreach ($tokens as $t) {
+                    if (isset($t['var'])) {
+                        $defaults[(string)$t['var']] = (string)($t['light'] ?? '');
+                    }
+                }
+            }
+        } catch (\Throwable) {
+            // No schema -- fall through to label-only chips rather than fail
+            // the whole Pages screen over a decoration.
+        }
+
+        $stored = Settings::getValue($template->getName() . '_colors_default_light', []);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+
+        $out = [];
+        foreach ($paints as $key => $spec) {
+            $label = is_array($spec) ? (string)($spec['label'] ?? $key) : (string)$spec;
+            $var   = is_array($spec) ? (string)($spec['var'] ?? '') : '';
+            $out[(string)$key] = [
+                'label'  => $label,
+                'swatch' => $var !== '' ? (string)($stored[$var] ?? $defaults[$var] ?? '') : '',
+            ];
+        }
+        return $out;
+    }
+
     private static function declaredOptions(Template $template, string $page, array $meta): array
     {
         $out = is_array($meta['supportedOptions'] ?? null) ? $meta['supportedOptions'] : [];

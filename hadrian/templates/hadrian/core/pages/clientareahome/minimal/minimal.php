@@ -97,8 +97,8 @@ return [
                 // paintable: offers the colour control in the settings drawer.
                 // The list sections do not -- their rows carry status pills and
                 // token-coloured text that a saturated fill would wreck.
-                'domainreg'     => ['label' => 'Register a domain', 'w' => '1/2', 'optIn' => true, 'paintable' => true],
-                'profile'       => ['label' => 'Profile',           'w' => '1/2', 'optIn' => true, 'paintable' => true],
+                'domainreg'     => ['label' => 'Register a domain', 'w' => '1/2', 'optIn' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                'profile'       => ['label' => 'Profile',           'w' => '1/2', 'optIn' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
             ],
 
             // Colours a block may be painted with: the palette keys the theme
@@ -107,18 +107,25 @@ return [
             // SectionLayout::parse -- an unlisted one is dropped rather than
             // reaching the CSS. APPEND ONLY: removing a key silently strips
             // that colour from any layout using it on the next save.
+            // 'var' is the CSS token each key resolves to at render time --
+            // the same mapping the .min-section[data-blk-paint="..."] rules use.
+            // Declared here so the admin can draw a real swatch: PagesController
+            // resolves the token through core/config/colors.php plus whatever
+            // the buyer overrode on Styles > Colors, so the chip in the picker
+            // is the colour the block will actually be, not a hardcoded guess
+            // that drifts the moment someone changes the palette.
             'paints' => [
-                'accent' => 'Accent',
-                'indigo' => 'Indigo',
-                'purple' => 'Purple',
-                'green'  => 'Green',
-                'teal'   => 'Teal',
-                'orange' => 'Orange',
-                'red'    => 'Red',
-                'gray'   => 'Gray',
-                'block1' => 'Block accent 1',
-                'block2' => 'Block accent 2',
-                'block3' => 'Block accent 3',
+                'accent' => ['label' => 'Accent',          'var' => '--color-accent'],
+                'indigo' => ['label' => 'Indigo',          'var' => '--color-icon-indigo'],
+                'purple' => ['label' => 'Purple',          'var' => '--color-icon-purple'],
+                'green'  => ['label' => 'Green',           'var' => '--color-icon-green'],
+                'teal'   => ['label' => 'Teal',            'var' => '--color-icon-teal'],
+                'orange' => ['label' => 'Orange',          'var' => '--color-icon-orange'],
+                'red'    => ['label' => 'Red',             'var' => '--color-icon-red'],
+                'gray'   => ['label' => 'Gray',            'var' => '--color-icon-gray'],
+                'block1' => ['label' => 'Block accent 1',  'var' => '--color-block-1'],
+                'block2' => ['label' => 'Block accent 2',  'var' => '--color-block-2'],
+                'block3' => ['label' => 'Block accent 3',  'var' => '--color-block-3'],
             ],
             'widths' => [
                 '1/1' => 'Full width',
