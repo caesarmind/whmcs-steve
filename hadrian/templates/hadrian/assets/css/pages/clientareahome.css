@@ -958,8 +958,19 @@ body[data-min-title="inside"] .min-list {
 .bn-attn-lead .n { width: 20px; height: 20px; border-radius: 50%; background: var(--color-red); color: #fff; font-size: var(--text-xs); font-weight: var(--fw-semibold); display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
 .bn-chip { font-size: var(--text-sm); font-weight: var(--fw-medium); text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; }
 .bn-chip:hover { text-decoration: none; filter: brightness(0.97); }
-.bn-chip.red { background: var(--color-red-bg); color: var(--color-red-text); }
-.bn-chip.orange { background: var(--color-orange-bg); color: var(--color-orange-text); }
+/* Authored inks, not the --color-*-text tokens. Measured on the plain white
+   strip those tokens give red 4.71, blue 5.57 and ORANGE 3.37 -- under AA
+   before any paint is involved, because a -text token is tuned to sit on the
+   page surface, not on its own 10%-alpha wash of the same hue. These chips are
+   the most urgent text on the dashboard, so they get ink that clears it.
+
+   The same values are reused on a saturated fill further down, so a chip reads
+   identically whether the strip is painted or not. Not pushed into the
+   --color-*-text tokens themselves: those are buyer-editable on
+   Styles > Colors and shared with every status pill in the theme, which is a
+   change to make deliberately rather than as a side effect of this. */
+.bn-chip.red { background: var(--color-red-bg); color: #a1000e; }
+.bn-chip.orange { background: var(--color-orange-bg); color: #7a4900; }
 .bn-chip .bn-dot { color: inherit; opacity: 0.55; }
 .bn-attn-sp { flex: 1 1 8px; }
 .bn-attn-x { border: 0; background: none; font: inherit; font-size: var(--text-sm); color: var(--color-text-tertiary); cursor: pointer; padding: 4px 8px; border-radius: var(--radius-sm); }
@@ -1191,6 +1202,58 @@ body[data-min-title="inside"] .min-list {
 .bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.collections { color: #7a4900; }
 .bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.open,
 .bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.open { color: #0a4f9e; }
+
+/* In dark mode the chip wash sits on a dark surface, so dark ink would vanish.
+   These are the -text tokens' dark values, which are correct there. */
+/* The dark -text red (#ff453a) measures 3.5 on its own dark wash -- same
+   problem as the light one, opposite direction. Lifted until it clears. */
+[data-theme="dark"] .bn-chip.red { color: #ff9a90; }
+[data-theme="dark"] .bn-chip.orange { color: var(--color-orange-text, #ff9f0a); }
+[data-theme="dark"] .bn-chip.blue { color: var(--color-blue-text, #2997ff); }
+
+/* --- Painted attention strip ------------------------------------------
+   The strip carries its own surface rather than sitting in a .bn-card, so the
+   paint has to reach it separately. Same three fills, same derived ink -- the
+   @supports block above declares --blk-ink on .min-section, and an attention
+   cell is one, so nothing extra is needed to compute it.
+
+   Its chips are the same shape of problem as the status pills: a 10%-alpha
+   background over whatever is behind them, which composites to roughly the
+   fill and takes its mid-tone ink with it. Same fix, same authored inks --
+   near-opaque light chip, dark ink that does not flip in dark mode, because
+   the chip is light in both. */
+.bn-cell[data-blk-fill="tint"] > .bn-attn {
+    background: color-mix(in srgb, var(--blk-base, #0071e3) 10%, var(--color-surface));
+    border-color: color-mix(in srgb, var(--blk-base, #0071e3) 28%, var(--color-surface));
+}
+.bn-cell[data-blk-fill="solid"] > .bn-attn {
+    background: var(--blk-base, #0071e3); border-color: var(--blk-base, #0071e3);
+}
+.bn-cell[data-blk-fill="grad"] > .bn-attn {
+    background: linear-gradient(135deg, var(--blk-base, #0071e3), color-mix(in srgb, var(--blk-base, #0071e3), var(--blk-shade, #000) 22%));
+    border-color: transparent;
+}
+.bn-cell[data-blk-fill="solid"] > .bn-attn .bn-attn-lead,
+.bn-cell[data-blk-fill="grad"] > .bn-attn .bn-attn-lead,
+.bn-cell[data-blk-fill="solid"] > .bn-attn .bn-attn-x,
+.bn-cell[data-blk-fill="grad"] > .bn-attn .bn-attn-x { color: var(--blk-ink, #fff); }
+/* The badge is normally a red dot with white text. On a saturated fill -- red
+   most of all -- that disappears into the background, so it inverts: the ink
+   colour becomes the dot and the fill colour the number. */
+.bn-cell[data-blk-fill="solid"] > .bn-attn .bn-attn-lead .n,
+.bn-cell[data-blk-fill="grad"] > .bn-attn .bn-attn-lead .n {
+    background: var(--blk-ink, #fff); color: var(--blk-base, #0071e3);
+}
+.bn-cell[data-blk-fill="solid"] > .bn-attn .bn-attn-x:hover,
+.bn-cell[data-blk-fill="grad"] > .bn-attn .bn-attn-x:hover { background: rgba(255,255,255,0.14); }
+.bn-cell[data-blk-fill="solid"] > .bn-attn .bn-chip,
+.bn-cell[data-blk-fill="grad"] > .bn-attn .bn-chip { background: rgba(255,255,255,0.94); color: #45454a; }
+.bn-cell[data-blk-fill="solid"] > .bn-attn .bn-chip.red,
+.bn-cell[data-blk-fill="grad"] > .bn-attn .bn-chip.red { color: #a1000e; }
+.bn-cell[data-blk-fill="solid"] > .bn-attn .bn-chip.orange,
+.bn-cell[data-blk-fill="grad"] > .bn-attn .bn-chip.orange { color: #7a4900; }
+.bn-cell[data-blk-fill="solid"] > .bn-attn .bn-chip.blue,
+.bn-cell[data-blk-fill="grad"] > .bn-attn .bn-chip.blue { color: #0a4f9e; }
 
 /* --- Titles outside the tile ------------------------------------------
    The head is a SIBLING of the card (see cell.tpl), so this only has to space

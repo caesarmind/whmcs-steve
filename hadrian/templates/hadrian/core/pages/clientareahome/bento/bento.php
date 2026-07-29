@@ -82,7 +82,8 @@ return [
                 // here. It used to sit above the grid unconditionally, so
                 // appending it last would look like a regression rather than a
                 // new block.
-                'attention'     => ['label' => 'Needs your attention', 'w' => '1/1', 'prepend' => true],
+                'attention'     => ['label' => 'Needs your attention', 'w' => '1/1', 'prepend' => true,
+                                    'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',
@@ -124,7 +125,10 @@ return [
             // the stored paint against exactly these two vocabularies. A key
             // that matched both would make the mode ambiguous.
             //
-            // Every tile is paintable, and every tile takes all three fills.
+            // Every tile is paintable, and every tile takes all three fills --
+            // the attention strip included. Its chips are tinted the same way
+            // status pills are, so it needed the same treatment on a saturated
+            // fill; see the note beside those rules in the stylesheet.
             // The list tiles were wash-only until the pill treatment landed:
             // a .status-pill is a 10%-alpha background, so on a solid fill an
             // Active badge measured 1.05:1. pages/clientareahome.css now gives
