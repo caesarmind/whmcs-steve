@@ -952,8 +952,15 @@
                                colour: normColour(c, k), rows: n });
                 });
             }
+            // Catalogue keys the stored string never mentioned, so a section
+            // added in a later release shows up in layouts saved before it
+            // existed. MUST mirror SectionLayout::parse, including `prepend`:
+            // the renderer puts a prepend section at the front, and a builder
+            // that appended it would show an order the page does not render.
             keys.forEach(function (k) {
-                if (!seen[k]) out.push({ key: k, on: true, w: cat[k].w || '1/1', hideEmpty: false, hideList: false, colour: '', rows: '' });
+                if (seen[k]) return;
+                var row = { key: k, on: true, w: cat[k].w || '1/1', hideEmpty: false, hideList: false, colour: '', rows: '' };
+                if (cat[k].prepend) { out.unshift(row); } else { out.push(row); }
             });
             return out;
         }
