@@ -589,6 +589,31 @@ body[data-min-title="inside"] .min-list {
 
 .min-section[data-blk-paint] { --blk-base: var(--color-accent, #0071e3); --blk-ink: #fff; }
 .min-section[data-blk-paint="accent"]  { --blk-base: var(--color-accent, #0071e3);   --blk-ink: #fff; }
+/* ROLE paints. Both take their ink from --color-text-primary rather than a
+   literal, which is what makes them mode-correct for free: in dark mode the
+   surface they are mixed against goes dark and the text token goes light, so
+   the pair stays right without a [data-theme] rule. */
+.min-section[data-blk-paint="quiet"]   { --blk-base: color-mix(in srgb, var(--color-accent, #0071e3) 45%, var(--color-surface, #ffffff)); --blk-ink: var(--color-text-primary, #1d1d1f); }
+.min-section[data-blk-paint="neutral"] { --blk-base: var(--color-surface-secondary, #f5f5f7); --blk-ink: var(--color-text-primary, #1d1d1f); }
+
+/* FILL-STRENGTH VARIANTS ---------------------------------------------------
+   The palette hues are picked to work as ICONS on a light surface, where 3:1
+   is the bar. Carrying 13-14px text as a block fill they need 4.5:1, and
+   measured in a real cascade three of them did not clear it with white ink:
+   red 3.55, gray 3.26, purple 4.13. Each is deepened here, and ONLY for the
+   two saturated fills -- a 10% wash of a slightly deeper hue is
+   indistinguishable, so tint is left alone.
+
+   Deepening cannot be done generically. A single mix-toward-black factor big
+   enough to rescue teal (#5ac8fa, luminance 0.53) would turn accent into navy,
+   so the three that need it are named. The buyer-set Block accents cannot be
+   corrected this way at all -- see the note in the picker. */
+.min-section[data-blk-fill="solid"][data-blk-paint="red"],
+.min-section[data-blk-fill="grad"][data-blk-paint="red"]    { --blk-base: var(--color-red-text, #d70015); }
+.min-section[data-blk-fill="solid"][data-blk-paint="gray"],
+.min-section[data-blk-fill="grad"][data-blk-paint="gray"]   { --blk-base: var(--color-text-secondary, #6e6e73); }
+.min-section[data-blk-fill="solid"][data-blk-paint="purple"],
+.min-section[data-blk-fill="grad"][data-blk-paint="purple"] { --blk-base: color-mix(in srgb, var(--color-icon-purple, #af52de) 78%, #000); }
 .min-section[data-blk-paint="indigo"]  { --blk-base: var(--color-icon-indigo, #5856d6); --blk-ink: #fff; }
 .min-section[data-blk-paint="purple"]  { --blk-base: var(--color-icon-purple, #af52de); --blk-ink: #fff; }
 .min-section[data-blk-paint="green"]   { --blk-base: var(--color-icon-green, #34c759);  --blk-ink: #06280f; }
@@ -978,27 +1003,156 @@ body[data-min-title="inside"] .min-list {
 /* --- Painted tiles ------------------------------------------------------
    The paint vars (--blk-base / --blk-ink) are declared on .min-section by the
    block above, so a bento tile inherits the whole palette for free and only
-   the surface has to be pointed at .bn-card instead of .blk.
+   the surfaces have to be pointed at .bn-card instead of .blk.
 
-   ONE FILL, NOT THREE. Every list tile carries status pills, and a pill is a
-   10%-alpha background over whatever is behind it: on a solid accent fill an
-   Active pill composites to rgb(20,123,210) behind rgb(36,138,61) text, which
-   measures 1.05:1 -- an invisible badge, and the badge is the one thing on the
-   row that means something. cell.tpl therefore coerces solid and grad down to
-   the wash for list tiles, and a wash needs no on-colour ink corrections at
-   all: the text tokens keep working exactly as they do on plain surface.
-
-   The two panels are unaffected. They have no pills, they render as .blk, and
-   they take all three fills from the shared rules above.
+   ALL THREE FILLS, INCLUDING ON LIST TILES. That took fixing the reason they
+   were restricted rather than just lifting the restriction: a .status-pill is
+   a 10%-alpha background, so on a solid accent fill an Active pill composited
+   to rgb(20,123,210) behind rgb(36,138,61) text -- 1.05:1, an invisible badge,
+   and the badge is the one thing on the row that means something. The pill
+   treatment further down replaces that alpha background with a near-opaque
+   light chip and authored dark ink, which is legible on any --blk-base.
 
    The var() fallbacks are load-bearing rather than defensive habit: with
    --blk-base unset, color-mix() is invalid at computed-value time and the
    declaration behaves as if it were never written, leaving a tile that looks
    painted in admin and plain on the page. */
-.bn-cell[data-blk-fill] > .bn-card {
+.bn-cell[data-blk-fill="tint"] > .bn-card {
     background: color-mix(in srgb, var(--blk-base, #0071e3) 10%, var(--color-surface));
     border-color: color-mix(in srgb, var(--blk-base, #0071e3) 28%, var(--color-surface));
 }
+.bn-cell[data-blk-fill="solid"] > .bn-card {
+    background: var(--blk-base, #0071e3);
+    border-color: var(--blk-base, #0071e3);
+    color: var(--blk-ink, #fff);
+}
+/* Same fill, darkened 22% toward black on the far corner -- the figure
+   --brand-primary-darker already uses, so it tracks whatever colour is chosen
+   rather than pinning a second stop. */
+.bn-cell[data-blk-fill="grad"] > .bn-card {
+    background: linear-gradient(135deg, var(--blk-base, #0071e3), color-mix(in srgb, var(--blk-base, #0071e3), #000 22%));
+    border-color: transparent;
+    color: var(--blk-ink, #fff);
+}
+
+/* On-colour ink for the two saturated fills. Tint keeps the normal tokens and
+   needs none of this. Grouped by weight: full-strength ink for the things you
+   read, softened for the supporting lines. */
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-title,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-title,
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-big,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-big,
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-rn,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-rn,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-amt,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-amt,
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-viewall,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-viewall,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-showmore,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-showmore { color: var(--blk-ink, #fff); }
+/* Content keeps the ink at FULL strength. Softening it is how the theme
+   separates a row's name from its sub-line on a plain surface, but on a
+   saturated fill that costs more than it buys: at 0.9 the sub-line measured
+   4.1-4.5:1, under AA, while size (14 vs 12px) and weight already carry the
+   hierarchy on their own. Only the eyebrow -- a label, not something you read
+   -- keeps the softening. */
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-cardsub,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-cardsub,
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-rs,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-rs,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-empty p,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-empty p { color: var(--blk-ink, #fff); }
+/* The eyebrow keeps full ink too. At 0.78 it measured 3.45-4.44:1 and it is
+   11px, so AA wants 4.5 -- and it does not need the opacity: uppercase, 11px
+   and 0.06em tracking already say "label" without dimming it. */
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-eyebrow,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-eyebrow { color: var(--blk-ink, #fff); }
+/* Hairlines and hovers key off the ink rather than the border token, which is
+   a page-surface colour and vanishes on a saturated fill. */
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-showmore,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-showmore,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-search,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-search { border-color: rgba(255,255,255,0.22); }
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row:hover,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row:hover,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-showmore:hover,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-showmore:hover { background: rgba(255,255,255,0.12); }
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-cal,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-cal { background: rgba(255,255,255,0.18); }
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-cal .m,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-cal .m,
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-cal .d,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-cal .d { color: var(--blk-ink, #fff); }
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-cta,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-cta {
+    background: var(--blk-ink, #fff); color: var(--blk-base, #0071e3); border-color: var(--blk-ink, #fff);
+}
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-search input,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-search input { color: var(--blk-ink, #fff); }
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-search input::placeholder,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-search input::placeholder { color: var(--blk-ink, #fff); opacity: 0.6; }
+
+/* --- Status pills on a saturated fill ------------------------------------
+   THIS is what makes solid and gradient safe on a tile that carries rows.
+
+   A .status-pill is normally a 10%-alpha wash of its status colour with that
+   colour's -text token on top, which works because what is behind it is the
+   page surface. Over a saturated fill both halves fail at once: the wash
+   composites to roughly the fill, and the ink is a mid-tone chosen for white.
+
+   So the chip goes near-opaque light and the ink is authored dark. The inks
+   are LITERALS, not the -text tokens, and that is deliberate: those tokens
+   flip light in dark mode (--color-green-text is #248a3d light, #30d158 dark)
+   and #30d158 on a white chip measures under 2:1. The chip is light in both
+   modes, so its ink has to be too. Same status families as the pill
+   definitions above, so nothing changes meaning -- only legibility. */
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill {
+    background: rgba(255,255,255,0.94);
+    color: #45454a;
+}
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.active,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.active,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.paid,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.paid,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.answered,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.answered { color: #14682c; }
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.suspended,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.suspended,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.expired,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.expired,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.overdue,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.overdue,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.fraud,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.fraud,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.redemption,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.redemption { color: #a1000e; }
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.pending,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.pending,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.unpaid,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.unpaid,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.customer-reply,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.customer-reply,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.in-progress,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.in-progress,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.on-hold,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.on-hold,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.expiring,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.expiring,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.grace,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.grace,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.pending-transfer,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.pending-transfer,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.pending-registration,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.pending-registration,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.payment-pending,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.payment-pending,
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.collections,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.collections { color: #7a4900; }
+.bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.open,
+.bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.open { color: #0a4f9e; }
 
 /* --- Narrow tiles -------------------------------------------------------
    Below the grid's own 720px single-column reset the tiles are full width

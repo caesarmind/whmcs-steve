@@ -98,22 +98,18 @@
 {assign var=secHide value=$secHideEmpty|default:false}
 {if $secPanel || $secCount > 0 || !$secHide}
 
-{* A list tile only ever takes the WASH, whatever the admin picked.
-   Measured: a .status-pill is a 10%-alpha background over the tile, so on a
-   solid accent fill an Active pill composites to rgb(20,123,210) behind
-   rgb(36,138,61) text -- 1.05:1, an invisible badge. Every list tile carries
-   pills, so the two saturated fills are coerced here rather than offered and
-   then broken. The panels (Register, Profile) have no pills and keep all three
-   fills, straight from the shared .blk rules.
+{* The fill must never resolve EMPTY: the panel rules are keyed off the fill
+   VALUE (.min-section[data-blk-fill="tint"] > .blk) and so are the tile rules
+   now, so a blank attribute would leave --blk-base set with no rule to apply it
+   and the block would render unpainted while still looking painted in admin.
 
-   MUST NOT be allowed to resolve empty: the panel rules are keyed off the fill
-   VALUE (.min-section[data-blk-fill="tint"] > .blk), so an empty attribute
-   leaves --blk-base set with no rule to apply it and the panel renders
-   unpainted. The list-tile rule keys off attribute PRESENCE, so it would keep
-   working and hide the fault. *}
+   No coercion here any more. List tiles used to be forced to the wash because a
+   .status-pill is a 10%-alpha background and a saturated fill put an Active
+   badge at 1.05:1; pages/clientareahome.css now swaps those pills to a
+   near-opaque light chip with authored dark ink on solid and gradient tiles, so
+   all three fills are honoured as chosen. *}
 {assign var=secFillOut value=$secFill|default:'solid'}
 {if $secFillOut == ''}{assign var=secFillOut value='solid'}{/if}
-{if !$secPanel && $secFillOut != 'tint'}{assign var=secFillOut value='tint'}{/if}
 
 {* A CUSTOM colour is emitted as inline custom properties rather than through a
    [data-blk-paint="..."] rule, because there is no rule to write: the value is

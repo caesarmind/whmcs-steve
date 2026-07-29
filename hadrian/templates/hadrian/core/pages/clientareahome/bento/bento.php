@@ -70,13 +70,13 @@ return [
             'title'   => 'Dashboard tiles',
             'label'   => 'Dashboard tiles',
             'default' => '',
-            'tooltip' => 'Drag to reorder, switch a tile off to hide it, and set each one to full, two thirds, one half or one third width. Widths run on a six-column grid, so a row fills up when its widths add to a whole. Leave blank for the built-in arrangement. Note that tiles holding a list always show their colour as a soft wash, so the status badges on each row stay readable; Register a domain and Profile can take a solid or gradient fill.',
+            'tooltip' => 'Drag to reorder, switch a tile off to hide it, and set each one to full, two thirds, one half or one third width. Widths run on a six-column grid, so a row fills up when its widths add to a whole. Leave blank for the built-in arrangement. Every tile can be coloured and takes a solid, wash or gradient fill.',
             'sections' => [
-                'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['tint']],
-                'domains'       => ['label' => 'Domains',           'w' => '1/3', 'paintable' => true, 'fills' => ['tint']],
-                'invoices'      => ['label' => 'Billing',           'w' => '1/3', 'paintable' => true, 'fills' => ['tint']],
-                'tickets'       => ['label' => 'Support',           'w' => '2/3', 'paintable' => true, 'fills' => ['tint']],
-                'announcements' => ['label' => 'Announcements',     'w' => '2/3', 'paintable' => true, 'fills' => ['tint']],
+                'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                'domains'       => ['label' => 'Domains',           'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                'invoices'      => ['label' => 'Billing',           'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                'tickets'       => ['label' => 'Support',           'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                'announcements' => ['label' => 'Announcements',     'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 'domainreg'     => ['label' => 'Register a domain', 'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 'profile'       => ['label' => 'Profile',           'w' => '1/1', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
             ],
@@ -88,12 +88,13 @@ return [
             // APPEND ONLY: removing a key silently strips that colour from any
             // layout using it on the next save.
             //
-            // Every tile is paintable here, unlike minimal -- but a LIST tile
-            // only ever renders the colour as a wash, whatever fill is stored.
-            // Its rows carry status pills, and a pill is a 10%-alpha background
-            // over whatever is behind it, so a saturated fill turns an Active
-            // badge into 1.05:1 contrast. cell.tpl coerces it; see the note
-            // there. Register and Profile have no pills and take all three.
+            // Every tile is paintable, and every tile takes all three fills.
+            // The list tiles were wash-only until the pill treatment landed:
+            // a .status-pill is a 10%-alpha background, so on a solid fill an
+            // Active badge measured 1.05:1. pages/clientareahome.css now gives
+            // pills a near-opaque light chip with authored dark ink whenever
+            // the tile is solid or gradient, so the badge stays legible on any
+            // colour and the restriction is no longer needed.
             // 'track' says what a key FOLLOWS, which is the whole reason to
             // store a key rather than a value:
             //   preset - the Styles > Colors presets set this token, so picking
@@ -113,7 +114,22 @@ return [
             // is the colour the block will actually be, not a hardcoded guess
             // that drifts the moment someone changes the palette.
             'paints' => [
-                'accent' => ['label' => 'Accent',          'var' => '--color-accent', 'track' => 'preset'],
+                // ROLE colours, first because they are the ones that answer
+                // "make this block follow the style". A preset writes accent,
+                // accent hover, accent tint and link -- so these two are the
+                // pair that moves when a preset is switched: the ACTIVE one and
+                // its quiet counterpart. Neutral is the style's own muted
+                // surface, which also flips with dark mode.
+                'accent' => ['label' => 'Accent (active)',   'var' => '--color-accent',            'track' => 'preset'],
+                // Passive is DERIVED from the accent rather than pointing at
+                // --color-accent-light: that token is an 8%-alpha tint meant to
+                // sit behind text, so as a block fill it is barely a colour and,
+                // being translucent, would let the page show through a solid.
+                // 'mix' is the same figure the CSS uses, declared here so the
+                // admin swatch can compute the identical value.
+                'quiet'  => ['label' => 'Accent (passive)',  'var' => '--color-accent', 'track' => 'preset',
+                             'mix'   => 45, 'mixWith' => '--color-surface'],
+                'neutral'=> ['label' => 'Neutral',           'var' => '--color-surface-secondary', 'track' => 'token'],
                 'indigo' => ['label' => 'Indigo',          'var' => '--color-icon-indigo', 'track' => 'token'],
                 'purple' => ['label' => 'Purple',          'var' => '--color-icon-purple', 'track' => 'token'],
                 'green'  => ['label' => 'Green',           'var' => '--color-icon-green', 'track' => 'token'],

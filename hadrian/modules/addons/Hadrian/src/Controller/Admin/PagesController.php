@@ -472,6 +472,29 @@ final class PagesController extends AbstractController
      * @param array<string, array{label?:string, var?:string}|string> $paints
      * @return array<string, array{label:string, swatch:string}>
      */
+    /**
+     * Mix two #rrggbb colours, $pct% of the first. Mirrors the CSS
+     * color-mix(in srgb, A pct%, B) the derived paints use, so the admin swatch
+     * and the rendered block agree. Returns '' for anything that is not a plain
+     * hex pair -- rgba() tints and named colours are left to the caller's
+     * fallback rather than approximated.
+     */
+    private static function mixHex(string $a, string $b, int $pct): string
+    {
+        if (preg_match('/^#([0-9a-f]{6})$/i', trim($a), $ma) !== 1
+            || preg_match('/^#([0-9a-f]{6})$/i', trim($b), $mb) !== 1) {
+            return '';
+        }
+        $pct = max(0, min(100, $pct)) / 100;
+        $out = '#';
+        for ($i = 0; $i < 3; $i++) {
+            $ca = (int)hexdec(substr($ma[1], $i * 2, 2));
+            $cb = (int)hexdec(substr($mb[1], $i * 2, 2));
+            $out .= str_pad(dechex((int)round($ca * $pct + $cb * (1 - $pct))), 2, '0', STR_PAD_LEFT);
+        }
+        return $out;
+    }
+
     private function resolvePaintSwatches(Template $template, array $paints): array
     {
         if ($paints === []) {
@@ -517,9 +540,18 @@ final class PagesController extends AbstractController
         foreach ($paints as $key => $spec) {
             $label = is_array($spec) ? (string)($spec['label'] ?? $key) : (string)$spec;
             $var   = is_array($spec) ? (string)($spec['var'] ?? '') : '';
+            $value = $var !== '' ? (string)($stored[$var] ?? $defaults[$var] ?? '') : '';
+            // A derived paint (the passive accent) is a mix in the CSS, so mix
+            // it the same way here or the swatch shows the colour it was
+            // derived FROM rather than the one the block will be.
+            if ($value !== '' && is_array($spec) && isset($spec['mix'], $spec['mixWith'])) {
+                $with = (string)$spec['mixWith'];
+                $base = (string)($stored[$with] ?? $defaults[$with] ?? '#ffffff');
+                $value = self::mixHex($value, $base, (int)$spec['mix']) ?: $value;
+            }
             $out[(string)$key] = [
                 'label'  => $label,
-                'swatch' => $var !== '' ? (string)($stored[$var] ?? $defaults[$var] ?? '') : '',
+                'swatch' => $value,
                 // What this key follows -- see the note beside the vocabulary
                 // in <variant>.php. The picker groups on it, because a strip of
                 // identical swatches gives no way to tell that Accent moves
