@@ -19,6 +19,10 @@ namespace Hadrian\Helpers;
  *   flags  := one or more single letters; unknown letters are ignored
  *             'e' = hide this section entirely when it has no items, instead
  *                   of rendering its empty state
+ *             'l' = drop this section's row list, leaving whatever summary the
+ *                   section renders above it. Only sections that declare a
+ *                   `listToggle` offer it -- for most, a list with no rows is
+ *                   just an empty box.
  *   colour := paint | paint '_' fill | paint '_' fill '_' memo
  *   paint  := a palette KEY (tracks Styles > Colors), or 'hex' + rrggbb for a
  *             one-off colour that deliberately does NOT track it
@@ -63,8 +67,12 @@ final class SectionLayout
      * setting nobody asked for. Unrecognised content yields NO flags, which
      * matches the rest of this parser: malformed input loses information, it
      * never invents behaviour.
+     *
+     * strspn wants EVERY character in the set, which is what keeps this safe as
+     * letters are added: no catalogue key is spelled from 'e' and 'l' alone, so
+     * a key landing in this slot still fails whole.
      */
-    private const FLAG_LETTERS = 'e';
+    private const FLAG_LETTERS = 'el';
 
     /** How a paint is applied. Bare paint (no suffix) means solid. */
     private const FILLS = ['solid', 'tint', 'grad'];
@@ -80,8 +88,8 @@ final class SectionLayout
      *        A paint not on this list is dropped -- see the note below on why
      *        that matters more than it looks.
      * @return list<array{key:string, width:string, span:int, visible:bool,
-     *                    hideEmpty:bool, paint:string, fill:string, rows:int,
-     *                    custom:string}>
+     *                    hideEmpty:bool, hideList:bool, paint:string, fill:string,
+     *                    rows:int, custom:string}>
      */
     public static function parse(string $raw, array $catalogue, array $paints = []): array
     {
@@ -207,6 +215,7 @@ final class SectionLayout
                 'span'      => self::SPANS[$width] ?? 6,
                 'visible'   => $width !== 'off',
                 'hideEmpty' => str_contains($flags, 'e'),
+                'hideList'  => str_contains($flags, 'l'),
                 'paint'     => $paint,
                 'fill'      => $fill,
                 'custom'    => $custom,
@@ -246,6 +255,7 @@ final class SectionLayout
                 'span'      => self::SPANS[$width],
                 'visible'   => !$optIn,
                 'hideEmpty' => false,
+                'hideList'  => false,
                 'paint'     => '',
                 'fill'      => '',
                 'custom'    => '',

@@ -8,6 +8,8 @@
                       and picks the roomy vs compact empty state.
      secHideEmpty bool when true, a tile with no items renders NOTHING at all --
                       no card, no grid item -- instead of an empty state.
+     secHideList  bool when true, the tile keeps its summary and drops the row
+                      list. Only offered on sections declaring a `listToggle`.
      secPaint / secFill  the tile's colour, both whitelisted in
                       SectionLayout::parse, so an unknown value never reaches
                       the attribute.
@@ -241,17 +243,13 @@
             </div>
         {/if}
 
-        {* SUMMARY MODE. With the list off the tile is what it already leads
-           with -- what you owe, how late, one action -- and the rows go to the
-           invoices page. Only the Billing tile has this: it is the one
-           collection whose headline figure is an account total rather than a
-           count of the rows below it, so it still says something true with
-           nothing listed. *}
-        {if $sec == 'invoices' && !$bnBillList}
-            {assign var=secShowList value=false}
-        {else}
-            {assign var=secShowList value=true}
-        {/if}
+        {* SUMMARY MODE, the 'l' flag on this section's own entry. With the list
+           off the tile is what it already leads with -- what you owe, how late,
+           one action -- and the rows go to the invoices page. Only sections that
+           declare a `listToggle` offer the switch, so this can only ever be set
+           on one that still says something with nothing listed. *}
+        {assign var=secShowList value=true}
+        {if $secHideList|default:false}{assign var=secShowList value=false}{/if}
         {if $secShowList}
         <div class="min-list bn-rows">
         {if $secCount > 0}

@@ -40,12 +40,6 @@ return [
             'default' => true,
             'tooltip' => 'Surfaces the account name and shortcuts to details, security and payment methods as a small card in line with the page heading. Independent of the Profile block, which is a full tile in the grid below.',
         ],
-        'bnt_billing_list' => [
-            'type'    => 'bool',
-            'label'   => 'List invoices in the Billing tile',
-            'default' => true,
-            'tooltip' => 'On, the Billing tile lists recent invoices under the amount owed like every other tile. Off, it stays an aggregate: what you owe, how much of it is overdue and by how long, one Pay all button, and any credit that comes off first. Money is one number and one action more often than it is a list, and the full history is a click away on the invoices page either way.',
-        ],
         'bnt_visible_rows' => [
             'type'    => 'int',
             'label'   => 'Items shown per tile',
@@ -80,7 +74,17 @@ return [
             'sections' => [
                 'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 'domains'       => ['label' => 'Domains',           'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
-                'invoices'      => ['label' => 'Billing',           'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                // listToggle puts a per-block switch in this section's own
+                // settings drawer, stored as the 'l' flag. Only Billing
+                // declares it: it is the one collection whose headline is an
+                // ACCOUNT TOTAL rather than a count of the rows beneath it, so
+                // it still says something true with nothing listed. A Services
+                // tile with no rows would just be a number.
+                'invoices'      => ['label' => 'Billing',           'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                                    'listToggle' => [
+                                        'label' => 'Show the invoice list',
+                                        'hint'  => 'Off, the tile stays an aggregate: what you owe, how much of it is overdue and by how long, one Pay all button, and any credit that comes off first. The full history is a click away on the invoices page either way.',
+                                    ]],
                 'tickets'       => ['label' => 'Support',           'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 'announcements' => ['label' => 'Announcements',     'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 'domainreg'     => ['label' => 'Register a domain', 'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],

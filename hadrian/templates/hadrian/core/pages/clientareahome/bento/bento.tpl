@@ -33,7 +33,6 @@
    $hadrian.pages.clientareahome.options.* - NOT .config.*, which does not exist:
      bnt_attention     bool - the attention strip
      bnt_account       bool - the identity card beside the greeting
-     bnt_billing_list  bool - list invoices in the Billing tile, or keep it an aggregate
      bnt_visible_rows  int  - default items per tile (each tile may override)
      bnt_search_at     int  - row count at which Services/Domains grow a filter
      bnt_sections      the tile arrangement (see bento.php)
@@ -221,7 +220,7 @@
                {include} drops the whole client area to the Six theme, and the
                poisoned compiled-template cache survives a git revert. *}
             {if $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'domainreg' || $s.key == 'profile'}
-                {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec=$s.key secSpan=$s.span secHideEmpty=$s.hideEmpty secPaint=$s.paint secFill=$s.fill secRowsIn=$s.rows secCustom=$s.custom}
+                {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec=$s.key secSpan=$s.span secHideEmpty=$s.hideEmpty secHideList=$s.hideList secPaint=$s.paint secFill=$s.fill secRowsIn=$s.rows secCustom=$s.custom}
             {/if}
         {/if}
     {/foreach}
