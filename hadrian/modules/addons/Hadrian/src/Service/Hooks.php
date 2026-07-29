@@ -610,9 +610,19 @@ final class Hooks
         // [data-theme="dark"]. Read the per-scope keys, falling back to the
         // pre-refactor keys (_colors_<active> for light, _colors_dark for dark)
         // so saved colors keep applying before the admin-side migration runs.
+        //
+        // The dark selector is deliberately `html[data-theme="dark"]` and not
+        // the bare `[data-theme="dark"]`. Bare, it scores (0,1,0) -- exactly the
+        // same as `:root` -- so a token overridden in the LIGHT scope only would
+        // beat apple-theme.css's own dark value on source order and leak into
+        // dark mode. Measured before the fix: a preset with a warm sidebar in
+        // light kept that warm panel in dark mode while the text correctly
+        // flipped to near-white, giving 1.01:1. Adding the element bumps it to
+        // (0,1,1) so the dark scope always outranks the light one, which is what
+        // "light -> :root, dark -> dark block" was always meant to mean.
         $scopes = [
-            ':root'               => ['_colors_' . $active . '_light', '_colors_' . $active],
-            '[data-theme="dark"]' => ['_colors_' . $active . '_dark',  '_colors_dark'],
+            ':root'                    => ['_colors_' . $active . '_light', '_colors_' . $active],
+            'html[data-theme="dark"]'  => ['_colors_' . $active . '_dark',  '_colors_dark'],
         ];
 
         $blocks = '';

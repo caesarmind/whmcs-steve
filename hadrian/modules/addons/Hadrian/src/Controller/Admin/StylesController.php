@@ -100,6 +100,7 @@ final class StylesController extends AbstractController
             // Built only for the Variables tab (the only one that renders them),
             // so the other tabs skip the folder scan + view-model work.
             'colors'      => $tab === 'variables' ? $this->buildColorsViewModel($template, $style, $scope) : null,
+            'previewCss'  => $tab === 'variables' ? $this->buildPreviewStylesheets($template) : null,
             'typography'  => $tab === 'variables' ? $this->buildTypographyViewModel($template) : null,
             'buttons'     => $tab === 'variables' ? $this->buildButtonsViewModel($template) : null,
             'forms'       => $tab === 'variables' ? $this->buildFormsViewModel($template) : null,
@@ -120,6 +121,14 @@ final class StylesController extends AbstractController
     {
         $style = (string)$_POST['style'];
         if (in_array($style, $template->getStyles(), true)) {
+            // Fold legacy colour keys into the per-scope model FIRST. indexAction
+            // only reaches migrateColors on the GET path (the POST branch returns
+            // before it), and the seeder below must see a pre-refactor buyer's
+            // colours as "already stored" -- otherwise it writes manifest colours
+            // into _colors_default_light and migrateColors' own "already
+            // migrated" guard then refuses to restore the real data, forever.
+            $this->migrateColors($template);
+            $this->seedStyleColors($template, $style);
             Settings::setValue($template->getName() . '_active_style', $style);
         }
         // PRG — see LayoutsController::saveAction for why we don't
@@ -375,6 +384,101 @@ final class StylesController extends AbstractController
         if ((string)Settings::getValue($name . '_active_style', 'default') === 'dark') {
             Settings::setValue($name . '_active_style', 'default', 'string');
         }
+    }
+
+    /**
+     * Seed a style's stored colours from its manifest on FIRST activation.
+     *
+     * This is what lets a style preset ship a palette. It writes the very same
+     * rows the Colors panel reads and Hooks::buildColorsHead emits, so a preset
+     * needs no change to either — and, crucially, the buyer can then edit those
+     * colours like any other. A preset is a starting point, not a locked skin.
+     *
+     * The alternative was scoping a preset's colours in CSS off the manifest's
+     * bodyClass. That is wrong for colours: `body.theme-x { --color-accent }` is
+     * a declaration on <body>, while the admin's <style id="hadrian-colors">
+     * targets :root on <html>. The nearer element wins for an inherited custom
+     * property regardless of specificity, so a shipped preset would silently
+     * beat the buyer's own edits and the panel would display values the page
+     * never renders.
+     *
+     * The sentinel is ROW EXISTENCE, not emptiness: saveColorsAction
+     * legitimately stores [] when the buyer resets every token, and re-seeding
+     * over that would resurrect colours they deliberately cleared.
+     */
+    private function seedStyleColors($template, string $style): void
+    {
+        $meta = ThemeManifest::loadVariantMeta(
+            $template->getFullPath() . '/core/styles/' . $style . '/style.php'
+        );
+        $colors = $meta['colors'] ?? null;
+        if (!is_array($colors)) {
+            return; // preset ships no palette -- nothing to seed
+        }
+
+        $cfg  = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/colors.php');
+        $name = $template->getName();
+
+        foreach (['light', 'dark'] as $scope) {
+            $declared = $colors[$scope] ?? null;
+            if (!is_array($declared) || $declared === []) {
+                continue;
+            }
+            if ($this->hasStoredColors($template, $style, $scope)) {
+                continue; // buyer-owned, or already seeded -- never overwrite
+            }
+
+            // Walk the SCHEMA rather than the manifest, applying the same
+            // filters saveColorsAction does, so a seeded row is indistinguishable
+            // from a hand-saved one: unknown tokens dropped, invalid values
+            // dropped, and anything equal to the default left unstored.
+            $out = [];
+            foreach (($cfg['groups'] ?? []) as $tokens) {
+                foreach ($tokens as $t) {
+                    $var = (string)$t['var'];
+                    if (!isset($declared[$var])) {
+                        continue;
+                    }
+                    $val = trim((string)$declared[$var]);
+                    if ($val === '' || !$this->isColor($val)) {
+                        continue;
+                    }
+                    $default = (string)($t[$scope] ?? $t['light'] ?? '');
+                    if ($this->normColor($val) === $this->normColor($default)) {
+                        continue;
+                    }
+                    $out[$var] = $val;
+                }
+            }
+
+            // Written even when $out === [] -- the ROW is the sentinel, so a
+            // preset that happens to match every default still marks itself
+            // seeded and will not be re-seeded over the buyer's later edits.
+            Settings::setValue($name . '_colors_' . $style . '_' . $scope, $out, 'json');
+        }
+    }
+
+    /**
+     * True when this (style, scope) already has colours we must not touch.
+     *
+     * The legacy keys map to the DEFAULT style alone, so they must not veto a
+     * newly installed preset: _colors_dark survives migration untouched and
+     * would otherwise block every future preset's dark palette forever.
+     */
+    private function hasStoredColors($template, string $style, string $scope): bool
+    {
+        $name = $template->getName();
+        if (Settings::getValue($name . '_colors_' . $style . '_' . $scope, null) !== null) {
+            return true;
+        }
+        if ($style === 'default') {
+            $legacy = $scope === 'dark' ? '_colors_dark' : '_colors_default';
+            $v = Settings::getValue($name . $legacy, null);
+            if (is_array($v) && $v !== []) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

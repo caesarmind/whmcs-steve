@@ -316,8 +316,22 @@
     --fw-black:    900;
 }
 
-/* --- Dark Mode --- */
-[data-theme="dark"] {
+/* --- Dark Mode ---
+   Qualified with `html` on purpose. Bare [data-theme="dark"] scores (0,1,0) --
+   identical to :root -- and the admin Colors panel emits its overrides as
+   `:root{...}` in a <style> AFTER this file. So a token the buyer (or a style
+   preset) set in the LIGHT scope only would beat these dark values on source
+   order and leak into dark mode. Measured before this fix: a preset with a warm
+   sidebar in light kept that warm panel in dark mode while the text correctly
+   flipped to near-white -- 1.01:1, invisible.
+
+   `html[data-theme="dark"]` scores (0,1,1), so it outranks an emitted :root
+   while still losing to the panel's own emitted html[data-theme="dark"] block,
+   which ties and wins on source order. That is the intended precedence:
+   dark-scope override > stock dark > light-scope override. Relationship to
+   html[data-palette] in apple-layout.css is unchanged -- it already outranked
+   the bare form and, being a later file, still ties-and-wins. */
+html[data-theme="dark"] {
     --color-bg: #1c1c1e;
     --color-surface: #2c2c2e;
     --color-surface-secondary: #3a3a3c;

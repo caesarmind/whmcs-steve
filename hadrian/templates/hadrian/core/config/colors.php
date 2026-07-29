@@ -68,11 +68,30 @@ return [
             ['var' => '--color-gray-text', 'label' => 'Neutral',      'light' => '#6e6e73',                'dark' => '#a1a1a6'],
             ['var' => '--color-gray-bg',   'label' => 'Neutral fill', 'light' => 'rgba(142,142,147,0.12)', 'dark' => 'rgba(142,142,147,0.18)'],
         ],
+        // Every colour the sidebar / rail / mobile drawer paints. Overriding
+        // these recolours the NAV without touching the page, which is what a
+        // dark-sidebar style preset does.
+        //
+        // Two traps live here. First, the defaults must be the LITERAL each
+        // token's var() chain resolves to, not the var() itself -- isColorValue
+        // rejects var(), and the panel compares literals to decide "is this an
+        // override?". Second, 'Item hover'/'Item active' point at the PRIVATE
+        // --sidebar-item-*-bg aliases, not the shared --sidebar-item-hover /
+        // -active: those two are read by 127 declarations outside the sidebar
+        // (subnav, topbar, filter tabs, marketing buttons), so editing them
+        // here would tint half the product. See the note in apple-theme.css.
         'Sidebar' => [
-            ['var' => '--sidebar-bg',          'label' => 'Background',  'light' => 'rgba(246,246,248,0.80)', 'dark' => 'rgba(28,28,30,0.80)'],
-            ['var' => '--sidebar-item-hover',  'label' => 'Item hover',  'light' => 'rgba(0,0,0,0.04)',       'dark' => 'rgba(255,255,255,0.05)'],
-            ['var' => '--sidebar-item-active', 'label' => 'Item active', 'light' => 'rgba(0,0,0,0.06)',       'dark' => 'rgba(255,255,255,0.08)'],
-            ['var' => '--sidebar-icon-bg',     'label' => 'Icon tile',   'light' => '#e8e8ed',                'dark' => '#3a3a3c'],
+            ['var' => '--sidebar-bg',             'label' => 'Background',   'light' => 'rgba(246,246,248,0.80)', 'dark' => 'rgba(28,28,30,0.80)'],
+            ['var' => '--sidebar-panel-bg',       'label' => 'Flyout panel', 'light' => '#ffffff',                'dark' => '#2c2c2e'],
+            ['var' => '--sidebar-text',           'label' => 'Text',         'light' => '#1d1d1f',                'dark' => '#f5f5f7'],
+            ['var' => '--sidebar-text-secondary', 'label' => 'Text soft',    'light' => '#6e6e73',                'dark' => '#a1a1a6'],
+            ['var' => '--sidebar-text-muted',     'label' => 'Text muted',   'light' => '#86868b',                'dark' => '#8e8e93'],
+            ['var' => '--sidebar-text-faint',     'label' => 'Placeholder',  'light' => '#aeaeb2',                'dark' => '#636366'],
+            ['var' => '--sidebar-border',         'label' => 'Border',       'light' => '#e8e8ed',                'dark' => '#3a3a3c'],
+            ['var' => '--sidebar-field-bg',       'label' => 'Search field', 'light' => '#f5f5f7',                'dark' => '#3a3a3c'],
+            ['var' => '--sidebar-item-hover-bg',  'label' => 'Item hover',   'light' => 'rgba(0,0,0,0.04)',       'dark' => 'rgba(255,255,255,0.05)'],
+            ['var' => '--sidebar-item-active-bg', 'label' => 'Item active',  'light' => 'rgba(0,0,0,0.06)',       'dark' => 'rgba(255,255,255,0.08)'],
+            ['var' => '--sidebar-scroll-thumb',   'label' => 'Scrollbar',    'light' => 'rgba(0,0,0,0.15)',       'dark' => 'rgba(255,255,255,0.15)'],
         ],
         'Topbar' => [
             ['var' => '--topbar-bg', 'label' => 'Background', 'light' => 'rgba(251,251,253,0.72)', 'dark' => 'rgba(44,44,46,0.72)'],

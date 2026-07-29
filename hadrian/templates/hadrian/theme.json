@@ -14,7 +14,7 @@
   },
 
   "provides": {
-    "styles": ["default", "dark"],
+    "styles": ["default", "imperial", "aqueduct", "forum", "colosseum", "basalt", "porphyry", "laurel", "dark"],
     "layouts": {
       "main-menu": ["top", "sidebar", "rail"],
       "footer": ["default", "extended", "extended-info"]
