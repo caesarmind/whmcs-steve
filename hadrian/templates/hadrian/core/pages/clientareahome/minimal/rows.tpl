@@ -79,10 +79,11 @@
    unpainted block carries no attribute and matches no rule. *}
 {* A CUSTOM colour has no [data-blk-paint="..."] rule to carry it -- the value
    is whatever the admin picked -- so it rides inline custom properties, which
-   beat every selector. --blk-ink is computed in PHP (SectionLayout::readableInk)
-   because CSS has no contrast function and a wrong ink on a saturated fill is
-   unreadable rather than merely off. *}
-<div class="min-section" data-sec="{$sec}" data-w="{$secW}"{if $secPaint|default:''} data-blk-paint="{$secPaint|escape}" data-blk-fill="{$secFill|default:'solid'|escape}"{/if}{if $secCustom|default:''} style="--blk-base:{$secCustom|escape};--blk-ink:{$secCustomInk|default:'#ffffff'|escape}"{/if}>
+   beat every selector.
+   Only --blk-base: the ink is derived from it by the @supports block in
+   pages/clientareahome.css, so a custom colour and a palette colour go
+   through exactly the same contrast maths. *}
+<div class="min-section" data-sec="{$sec}" data-w="{$secW}"{if $secPaint|default:''} data-blk-paint="{$secPaint|escape}" data-blk-fill="{$secFill|default:'solid'|escape}"{/if}{if $secCustom|default:''} style="--blk-base:{$secCustom|escape}"{/if}>
 {if $secPanel}
     {* ---------- Panels ----------
        Kept inside .min-section so they take part in the grid, the width spans

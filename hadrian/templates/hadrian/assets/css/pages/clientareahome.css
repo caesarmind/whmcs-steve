@@ -582,13 +582,43 @@ body[data-min-title="inside"] .min-list {
    background, i.e. a block that vanishes. The PHP paint whitelist is the real
    guard; these fallbacks are the second one.
 
-   --blk-ink is authored per paint, not computed. There is no contrast
-   function in CSS, and these fills are saturated enough that guessing wrong
-   is unreadable rather than merely ugly.
+   --blk-ink is now DERIVED, not authored, from the ink primitive at :root in
+   apple-theme.css -- so it is correct for a colour the buyer picked, which no
+   authored table can be. See the gate immediately below.
    ASCII only, per this install's Chrome section-skipping hazard. */
 
-.min-section[data-blk-paint] { --blk-base: var(--color-accent, #0071e3); --blk-ink: #fff; }
-.min-section[data-blk-paint="accent"]  { --blk-base: var(--color-accent, #0071e3);   --blk-ink: #fff; }
+.min-section[data-blk-paint] { --blk-base: var(--color-accent, #0071e3); }
+
+/* INK. The floor is unconditional and the derivation is gated, and it has to
+   be in that order: a custom property is NOT parse-validated, so
+   `--blk-ink: #fff` followed by an unsupported `--blk-ink: color(from ...)`
+   does not fall back -- the second declaration parses fine everywhere, wins
+   the cascade, and fails later at the CONSUMER as invalid-at-computed-value-
+   time. On `color` that inherits (dark text on a saturated fill); on
+   `background` it computes to transparent, which paints .bn-cta and .blk-btn
+   in the fill colour on the fill, i.e. an invisible button. @supports is what
+   makes the floor reachable.
+
+   Scoped to the two SATURATED fills rather than to [data-blk-paint], so a wash
+   simply has no --blk-ink at all and a future unscoped `color: var(--blk-ink)`
+   cannot render black-or-white text on a 10% tint.
+
+   The derivation reads the COMPUTED --blk-base, so it automatically sees the
+   fill-strength variants further down, the inline value a custom colour sets,
+   and anything Styles > Colors injects. */
+.min-section[data-blk-fill="solid"],
+.min-section[data-blk-fill="grad"] { --blk-ink: #fff; --blk-shade: #000; }
+
+@supports (color: color(from red srgb-linear r g b)) {
+    .min-section[data-blk-fill="solid"],
+    .min-section[data-blk-fill="grad"] {
+        --_ink:  clamp(0, (var(--ink-crossover, 0.179129) - (0.2126*r + 0.7152*g + 0.0722*b)) * 100000, 1);
+        --_anti: clamp(0, ((0.2126*r + 0.7152*g + 0.0722*b) - var(--ink-crossover, 0.179129)) * 100000, 1);
+        --blk-ink:   color(from var(--blk-base) srgb-linear var(--_ink)  var(--_ink)  var(--_ink)  / 1);
+        --blk-shade: color(from var(--blk-base) srgb-linear var(--_anti) var(--_anti) var(--_anti) / 1);
+    }
+}
+.min-section[data-blk-paint="accent"]  { --blk-base: var(--color-accent, #0071e3); }
 /* ROLE paints. Both take their ink from --color-text-primary rather than a
    literal, which is what makes them mode-correct for free: in dark mode the
    surface they are mixed against goes dark and the text token goes light, so
@@ -614,16 +644,16 @@ body[data-min-title="inside"] .min-list {
 .min-section[data-blk-fill="grad"][data-blk-paint="gray"]   { --blk-base: var(--color-text-secondary, #6e6e73); }
 .min-section[data-blk-fill="solid"][data-blk-paint="purple"],
 .min-section[data-blk-fill="grad"][data-blk-paint="purple"] { --blk-base: color-mix(in srgb, var(--color-icon-purple, #af52de) 78%, #000); }
-.min-section[data-blk-paint="indigo"]  { --blk-base: var(--color-icon-indigo, #5856d6); --blk-ink: #fff; }
-.min-section[data-blk-paint="purple"]  { --blk-base: var(--color-icon-purple, #af52de); --blk-ink: #fff; }
-.min-section[data-blk-paint="green"]   { --blk-base: var(--color-icon-green, #34c759);  --blk-ink: #06280f; }
-.min-section[data-blk-paint="teal"]    { --blk-base: var(--color-icon-teal, #5ac8fa);   --blk-ink: #06283a; }
-.min-section[data-blk-paint="orange"]  { --blk-base: var(--color-icon-orange, #ff9500); --blk-ink: #2b1600; }
-.min-section[data-blk-paint="red"]     { --blk-base: var(--color-icon-red, #ff3b30);    --blk-ink: #fff; }
-.min-section[data-blk-paint="gray"]    { --blk-base: var(--color-icon-gray, #8e8e93);   --blk-ink: #fff; }
-.min-section[data-blk-paint="block1"]  { --blk-base: var(--color-block-1, #5856d6); --blk-ink: #fff; }
-.min-section[data-blk-paint="block2"]  { --blk-base: var(--color-block-2, #0f9d58); --blk-ink: #fff; }
-.min-section[data-blk-paint="block3"]  { --blk-base: var(--color-block-3, #d9480f); --blk-ink: #fff; }
+.min-section[data-blk-paint="indigo"]  { --blk-base: var(--color-icon-indigo, #5856d6); }
+.min-section[data-blk-paint="purple"]  { --blk-base: var(--color-icon-purple, #af52de); }
+.min-section[data-blk-paint="green"]   { --blk-base: var(--color-icon-green, #34c759); }
+.min-section[data-blk-paint="teal"]    { --blk-base: var(--color-icon-teal, #5ac8fa); }
+.min-section[data-blk-paint="orange"]  { --blk-base: var(--color-icon-orange, #ff9500); }
+.min-section[data-blk-paint="red"]     { --blk-base: var(--color-icon-red, #ff3b30); }
+.min-section[data-blk-paint="gray"]    { --blk-base: var(--color-icon-gray, #8e8e93); }
+.min-section[data-blk-paint="block1"]  { --blk-base: var(--color-block-1, #5856d6); }
+.min-section[data-blk-paint="block2"]  { --blk-base: var(--color-block-2, #0f9d58); }
+.min-section[data-blk-paint="block3"]  { --blk-base: var(--color-block-3, #d9480f); }
 
 /* SOLID: the block becomes the colour. Inner controls flip onto the fill. */
 .min-section[data-blk-fill="solid"] > .blk {
@@ -635,7 +665,7 @@ body[data-min-title="inside"] .min-list {
    the figure --brand-primary-darker already uses, rather than the mockup's
    hardcoded second stop, so it tracks whatever colour is chosen. */
 .min-section[data-blk-fill="grad"] > .blk {
-    background: linear-gradient(135deg, var(--blk-base), color-mix(in srgb, var(--blk-base), #000 22%));
+    background: linear-gradient(135deg, var(--blk-base), color-mix(in srgb, var(--blk-base), var(--blk-shade, #000) 22%));
     border-color: transparent;
     color: var(--blk-ink);
 }
@@ -1030,7 +1060,7 @@ body[data-min-title="inside"] .min-list {
    --brand-primary-darker already uses, so it tracks whatever colour is chosen
    rather than pinning a second stop. */
 .bn-cell[data-blk-fill="grad"] > .bn-card {
-    background: linear-gradient(135deg, var(--blk-base, #0071e3), color-mix(in srgb, var(--blk-base, #0071e3), #000 22%));
+    background: linear-gradient(135deg, var(--blk-base, #0071e3), color-mix(in srgb, var(--blk-base, #0071e3), var(--blk-shade, #000) 22%));
     border-color: transparent;
     color: var(--blk-ink, #fff);
 }

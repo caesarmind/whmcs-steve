@@ -116,9 +116,10 @@
    whatever the admin picked. Inline beats every selector, so it overrides the
    accent fallback the attribute alone would give -- and if it were ever
    stripped, that fallback is a visible block rather than an invisible one.
-   --blk-ink is computed in PHP (SectionLayout::readableInk); CSS has no
-   contrast function, and on a saturated fill guessing wrong is unreadable. *}
-<div class="min-section bn-cell" data-sec="{$sec}" data-w="{$secW}"{if $secPaint|default:''} data-blk-paint="{$secPaint|escape}" data-blk-fill="{$secFillOut|escape}"{/if}{if $secCustom|default:''} style="--blk-base:{$secCustom|escape};--blk-ink:{$secCustomInk|default:'#ffffff'|escape}"{/if}>
+   Only --blk-base: the ink is derived from it by the @supports block in
+   pages/clientareahome.css, so a custom colour and a palette colour go
+   through exactly the same contrast maths. *}
+<div class="min-section bn-cell" data-sec="{$sec}" data-w="{$secW}"{if $secPaint|default:''} data-blk-paint="{$secPaint|escape}" data-blk-fill="{$secFillOut|escape}"{/if}{if $secCustom|default:''} style="--blk-base:{$secCustom|escape}"{/if}>
 {if $secPanel}
     {* ---------- Panels ----------
        Shared byte-for-byte with the minimal variant's rows.tpl: the .blk

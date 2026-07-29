@@ -142,6 +142,61 @@
     --brand-danger-lighter-4: color-mix(in srgb, var(--brand-danger), #fff 92%);
     --brand-danger-darker:    color-mix(in srgb, var(--brand-danger), #000 22%);
 
+    /* ===== Readable-ink primitive ========================================
+       Given ANY fill colour, which of black or white is legible on it. The
+       ramp above answers "a lighter/darker shade of this"; this answers "text
+       on this", which is the other half of using a palette colour as a
+       background.
+
+       Why it lives here at :root, in CSS, and not in PHP: a custom property
+       resolves per element at computed-value time, so one declaration here
+       re-derives through ALL FOUR places a colour can be changed -- the
+       [data-theme="dark"] block below, html[data-palette] in apple-layout.css,
+       the buyer's Styles > Colors overrides injected as <style
+       id="hadrian-colors">, and any future scope nobody has thought of. PHP
+       can see only the second of those: buildColorsHead emits just the tokens
+       a buyer overrode, and it has no idea data-palette exists, so a
+       server-computed ink is stale the moment someone picks a palette.
+
+       HOW IT WORKS. color(from X srgb-linear r g b) converts the origin into
+       linear-light space first, so r/g/b are already gamma-decoded and WCAG
+       relative luminance is a plain dot product. Compare that against the
+       exact white/black crossover -- solve 1.05/(Y+0.05) = (Y+0.05)/0.05 for
+       Y* = sqrt(0.0525) - 0.05 = 0.179129 -- and clamp the difference to 0 or
+       1. Below the crossover white wins, above it black does.
+
+       This is exact rather than approximate, which matters more than it
+       sounds. A perceptual-lightness threshold (oklch L) cannot work at all:
+       WCAG contrast is linear-light and the two spaces diverge most at high
+       chroma, exactly where saturated fills live, so the white-needing and
+       black-needing sets OVERLAP in oklch L. No threshold in that space is
+       correct; the best possible one still mis-inks 2% of sRGB, and a naive
+       0.62 mis-inks 8.5% -- including this theme's own --color-block-2 and
+       --color-block-3 defaults.
+
+       Black, not the theme's usual #1d1d1f: white clears 4.5:1 up to
+       Y = 0.18333 and black down to Y = 0.175, and those ranges overlap, so
+       #fff/#000 provably covers every sRGB colour. #1d1d1f only works above
+       Y = 0.2307, which would leave 9.6% of the gamut with NO compliant ink.
+
+       The multiplier is 100000, not 1000: a shallower ramp leaves a narrow
+       band of colours resolving to mid-grey text, which fails against both.
+       The / 1 forces opacity, because color(from ...) otherwise inherits the
+       origin's alpha and isColorValue permits rgba() overrides.
+
+       --*-shade is the ink's OPPOSITE, for shading a gradient's far stop away
+       from the text rather than always toward black. Always-darkening leaves
+       21.6% of sRGB with no ink that clears 4.5:1 at BOTH stops.
+
+       Consumers must sit inside the same @supports gate, or provide their own
+       unconditional floor first. A custom property is not parse-validated --
+       it accepts almost any token stream -- so an unsupported value here does
+       NOT fall back to a previous declaration; it fails later, at the
+       consumer, as invalid-at-computed-value-time. For an inherited property
+       that means the parent's colour; for background it means transparent.
+       ASCII-only comments (see CSS-skip quirk). */
+    --ink-crossover: 0.179129;
+
     /* ===== Button tokens (consume the ramp; admin Buttons panel overrides
        these via select-colors dropdowns). Size tokens reference the type scale
        + radius so buttons track Typography until explicitly overridden.
