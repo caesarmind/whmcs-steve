@@ -83,8 +83,16 @@ return [
                 // appending it last would look like a regression rather than a
                 // new block.
                 'attention'     => ['label' => 'Needs your attention', 'w' => '1/1', 'prepend' => true],
-                'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
-                'domains'       => ['label' => 'Domains',           'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                                    'rowsCompact' => [
+                                        'label' => 'Compact rows',
+                                        'hint'  => 'Name and status only, with no second line. A dense list you can scan in one pass, for an account with a lot of them or a tile that has to sit in a narrow column.',
+                                    ]],
+                'domains'       => ['label' => 'Domains',           'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                                    'rowsCompact' => [
+                                        'label' => 'Compact rows',
+                                        'hint'  => 'Name and status only, with no second line. A dense list you can scan in one pass, for an account with a lot of them or a tile that has to sit in a narrow column.',
+                                    ]],
                 // listToggle puts a per-block switch in this section's own
                 // settings drawer, stored as the 'l' flag. Only Billing
                 // declares it: it is the one collection whose headline is an

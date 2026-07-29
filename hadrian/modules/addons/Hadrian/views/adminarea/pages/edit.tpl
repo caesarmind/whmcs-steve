@@ -934,7 +934,7 @@
                     // Whitelist the flags field, mirroring SectionLayout::parse.
                     // A mistyped comma puts a section KEY here, and most keys
                     // contain an 'e' -- a bare indexOf would invent settings.
-                    if (f && !/^[el]*$/.test(f)) { f = ''; }
+                    if (f && !/^[elc]*$/.test(f)) { f = ''; }
                     // Colour is READ AND KEPT, not discarded. It used to be
                     // dropped here while serialise() never wrote it either, so
                     // merely opening the builder and touching anything erased a
@@ -949,6 +949,7 @@
                     seen[k] = 1;
                     out.push({ key: k, on: w !== 'off', w: w === 'off' ? (cat[k].w || '1/1') : w,
                                hideEmpty: f.indexOf('e') !== -1, hideList: f.indexOf('l') !== -1,
+                               compact: f.indexOf('c') !== -1,
                                colour: normColour(c, k), rows: n });
                 });
             }
@@ -959,7 +960,7 @@
             // that appended it would show an order the page does not render.
             keys.forEach(function (k) {
                 if (seen[k]) return;
-                var row = { key: k, on: true, w: cat[k].w || '1/1', hideEmpty: false, hideList: false, colour: '', rows: '' };
+                var row = { key: k, on: true, w: cat[k].w || '1/1', hideEmpty: false, hideList: false, compact: false, colour: '', rows: '' };
                 if (cat[k].prepend) { out.unshift(row); } else { out.push(row); }
             });
             return out;
@@ -992,7 +993,7 @@
             return state.map(function (s) {
                 // Flags are emitted in a fixed order so the string is stable
                 // across saves; the parser does not care, a byte-diff does.
-                var fl = (s.hideEmpty ? 'e' : '') + (s.hideList ? 'l' : '');
+                var fl = (s.hideEmpty ? 'e' : '') + (s.hideList ? 'l' : '') + (s.compact ? 'c' : '');
                 var f = [s.key, (s.on ? s.w : 'off'), fl, (s.colour || ''), (s.rows || '')];
                 while (f.length > 2 && f[f.length - 1] === '') f.pop();
                 return f.join(':');
@@ -1090,6 +1091,7 @@
                 var bits = [];
                 if (s.hideEmpty) bits.push('Hides when empty');
                 if (s.hideList) bits.push('No list');
+                if (s.compact) bits.push('Compact');
                 if (RC && s.rows) bits.push(s.rows + ' items');
                 if (s.colour) {
                     // normColour has already dropped anything the page would
@@ -1191,77 +1193,44 @@
                     // Lives here rather than in the page's Template settings
                     // because it describes THIS block, the way its width and
                     // its colour do.
-                    var LT = (cat[s.key] && cat[s.key].listToggle) || null;
-                    if (LT) {
-                        var lo = document.createElement('div');
-                        lo.className = 'mt-seclay-opt';
-                        var lwrap = document.createElement('div');
-                        var lll = document.createElement('div');
-                        lll.className = 'mt-seclay-opt-l';
-                        lll.textContent = LT.label || 'Show the list';
-                        var llh = document.createElement('div');
-                        llh.className = 'mt-seclay-opt-h';
-                        llh.textContent = LT.hint || '';
-                        lwrap.appendChild(lll); lwrap.appendChild(llh);
-                        var lt = document.createElement('label');
-                        lt.className = 'mt-toggle';
-                        var lcb = document.createElement('input');
-                        lcb.type = 'checkbox';
-                        // The FLAG means "hide", the CONTROL reads "show" -- a
-                        // switch labelled for what it turns on is the one an
-                        // admin can predict, and the flag stays a positive
-                        // assertion in storage.
-                        lcb.checked = !s.hideList;
-                        lcb.addEventListener('change', function () { s.hideList = !lcb.checked; commit(); });
-                        var ltr = document.createElement('span'); ltr.className = 'mt-toggle-track';
-                        var lth = document.createElement('span'); lth.className = 'mt-toggle-thumb';
-                        ltr.appendChild(lth); lt.appendChild(lcb); lt.appendChild(ltr);
-                        lo.appendChild(lwrap); lo.appendChild(lt);
-                        opts.appendChild(lo);
-                    }
-
-                    // Items shown -- only for variants that declare the control
-                    // (bento). Minimal reveals the rest behind Show more, so a
-                    // per-section cap there would mean something different and
-                    // is deliberately not offered.
-                    if (RC) {
+                    // Per-section switches declared by the variant. Both follow
+                    // the same shape, so one builder serves any number of them.
+                    var ROWTOGGLES = [
+                        { spec: 'listToggle',  prop: 'hideList', invert: true  },
+                        { spec: 'rowsCompact', prop: 'compact',  invert: false }
+                    ];
+                    ROWTOGGLES.forEach(function (t) {
+                        var D = (cat[s.key] && cat[s.key][t.spec]) || null;
+                        if (!D) return;
                         var ro = document.createElement('div');
                         ro.className = 'mt-seclay-opt';
                         var rw = document.createElement('div');
                         var rl = document.createElement('div');
                         rl.className = 'mt-seclay-opt-l';
-                        rl.textContent = RC.label || 'Items shown';
+                        rl.textContent = D.label || t.spec;
                         var rh = document.createElement('div');
                         rh.className = 'mt-seclay-opt-h';
-                        rh.textContent = RC.hint || '';
+                        rh.textContent = D.hint || '';
                         rw.appendChild(rl); rw.appendChild(rh);
-                        var ri = document.createElement('input');
-                        ri.type = 'number';
-                        ri.className = 'mt-seclay-num';
-                        ri.min = RC.min || 1;
-                        ri.max = RC.max || 8;
-                        ri.step = 1;
-                        ri.value = s.rows || '';
-                        ri.placeholder = RC.def || '';
-                        // Blank is meaningful: it means "use the page default".
-                        // Clamp anything else so a typed 99 cannot serialise a
-                        // value the template would have to defend against.
-                        ri.addEventListener('change', function () {
-                            var v = ri.value.trim();
-                            if (v === '') { s.rows = ''; }
-                            else {
-                                var n = parseInt(v, 10);
-                                if (isNaN(n)) { n = ''; }
-                                else { n = Math.max(RC.min || 1, Math.min(RC.max || 8, n)); }
-                                s.rows = n === '' ? '' : String(n);
-                            }
-                            ri.value = s.rows;
+                        var rt = document.createElement('label');
+                        rt.className = 'mt-toggle';
+                        var rcb = document.createElement('input');
+                        rcb.type = 'checkbox';
+                        // `invert` is for a switch whose LABEL is positive while
+                        // the stored flag is negative -- "Show the list" over a
+                        // flag that means hide. A control labelled for what it
+                        // turns on is the one an admin can predict.
+                        rcb.checked = t.invert ? !s[t.prop] : !!s[t.prop];
+                        rcb.addEventListener('change', function () {
+                            s[t.prop] = t.invert ? !rcb.checked : rcb.checked;
                             commit();
                         });
-                        ro.appendChild(rw); ro.appendChild(ri);
+                        var rtr = document.createElement('span'); rtr.className = 'mt-toggle-track';
+                        var rth = document.createElement('span'); rth.className = 'mt-toggle-thumb';
+                        rtr.appendChild(rth); rt.appendChild(rcb); rt.appendChild(rtr);
+                        ro.appendChild(rw); ro.appendChild(rt);
                         opts.appendChild(ro);
-                    }
-
+                    });
                     // Colour. Only for sections the variant marked paintable
                     // -- minimal's list sections are not, because their rows
                     // carry status pills and token-coloured text that a fill

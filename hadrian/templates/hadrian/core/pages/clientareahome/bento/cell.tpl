@@ -10,6 +10,8 @@
                       no card, no grid item -- instead of an empty state.
      secHideList  bool when true, the tile keeps its summary and drops the row
                       list. Only offered on sections declaring a `listToggle`.
+     secCompact   bool when true, rows carry the name and the status only. Only
+                      offered on sections declaring a `rowsCompact`.
      secPaint / secFill  the tile's colour, both whitelisted in
                       SectionLayout::parse, so an unknown value never reaches
                       the attribute.
@@ -350,7 +352,7 @@
                        line and the sub-line carries the date alone. *}
                     <span class="min-name">
                         <span class="bn-rn">{if $svc.domain}{$svc.domain|escape}{else}{$svc.name|escape}{/if}</span>
-                        <span class="bn-rs">{if $svc.domain}{$svc.name|escape}{/if}{if $svc.domain && $svc.nextDueDate} &middot; {/if}{if $svc.nextDueDate}{$hadrianLang.dashboard.renews} {$svc.nextDueDate|escape}{/if}</span>
+                        {if !$secCompact|default:false}<span class="bn-rs">{if $svc.domain}{$svc.name|escape}{/if}{if $svc.domain && $svc.nextDueDate} &middot; {/if}{if $svc.nextDueDate}{$hadrianLang.dashboard.renews} {$svc.nextDueDate|escape}{/if}</span>{/if}
                     </span>
                     <span class="status-pill {$svc.status|default:'Active'|lower|replace:' ':'-'|escape}">{$svc.status|default:'Active'|escape}</span>
                 </a>
@@ -366,7 +368,7 @@
                            the "Domain Renewals" PAGE title, so it would read
                            "Domain Renewals Aug 24, 2026" and the |default:
                            would never fire to save it. *}
-                        {if $dom.expirydate}<span class="bn-rs">{$hadrianLang.dashboard.renews} {$dom.expirydate|escape}</span>{/if}
+                        {if $dom.expirydate && !$secCompact|default:false}<span class="bn-rs">{$hadrianLang.dashboard.renews} {$dom.expirydate|escape}</span>{/if}
                     </span>
                     <span class="status-pill {$dom.statusLower|default:'active'|replace:' ':'-'|escape}">{$dom.status|default:'Active'|escape}</span>
                 </a>
