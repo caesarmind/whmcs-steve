@@ -237,7 +237,10 @@ final class PagesController extends AbstractController
                 // Palette the per-section colour control offers. Was computed
                 // for the parser but never reached the view, so the builder
                 // could not draw the control at all.
-                'paints'       => is_array($spec['paints'] ?? null) ? $spec['paints'] : [],
+                'paints'       => $this->resolvePaintSwatches(
+                    $template,
+                    is_array($spec['paints'] ?? null) ? $spec['paints'] : []
+                ),
                 // Per-section "items shown" control. Declared by the variant
                 // that wants it (bento) so it never appears for one whose
                 // template would ignore it (minimal, which has Show more).
