@@ -798,6 +798,10 @@
     transition: transform 0.12s ease, box-shadow 0.12s ease; }
 .mt-sw-custom:hover { transform: scale(1.1); }
 .mt-sw-custom.is-active { box-shadow: 0 0 0 2px var(--mt-surface), 0 0 0 4px var(--mt-primary); }
+/* Which custom colour is set, beside the well -- "Custom" alone tells the
+   admin nothing about WHICH, and telling them is the reason the mode exists. */
+.mt-sw-hex { align-self: center; font-size: 12px; font-variant-numeric: tabular-nums;
+    color: var(--mt-text-2); letter-spacing: 0.02em; }
 /* The input itself is the hit area; oversized so no native chrome shows. */
 .mt-sw-cin { position: absolute; inset: -6px; width: 38px; height: 38px; padding: 0; border: 0;
     background: transparent; opacity: 0; cursor: pointer; }
@@ -872,6 +876,41 @@
         var PAINT_KEYS = Object.keys(PAINTS);
         var FILL_LABEL = { solid: 'Solid', tint: 'Wash', grad: 'Gradient' };
 
+        // The two colour MODES have disjoint vocabularies: a Theme colour is a
+        // palette key from PAINTS, a Custom colour is the reserved prefix 'hex'
+        // plus six hex digits. That disjointness is what lets the mode be
+        // DERIVED from the value rather than stored beside it -- a stored mode
+        // could contradict its own paint ("theme, hexaabbcc") with no
+        // non-arbitrary way to resolve it. RESERVED: no palette key may ever
+        // match HEX_RE; each variant's APPEND ONLY note carries that clause.
+        var HEX_RE = /^hex[0-9a-f]{6}$/;
+        function paintKind(tok) {
+            if (!tok) return '';
+            if (PAINTS[tok]) return 'key';
+            if (HEX_RE.test(tok)) return 'hex';
+            return '';
+        }
+        function fillsFor(k) { return (cat[k] && cat[k].fills) || ['solid', 'tint', 'grad']; }
+
+        // Normalise a stored colour field to "<paint>_<fill>[_<memo>]",
+        // mirroring SectionLayout::parse. Returns '' for anything the PAGE
+        // would refuse to render -- a palette key dropped in a later release,
+        // or a malformed hex -- so the builder can never show a colour the
+        // client area is not showing. The memo goes when it does not parse, or
+        // when it is the same kind as the active paint (not a memo at all).
+        function normColour(c, k) {
+            if (!c) return '';
+            var bits = String(c).split('_');
+            var kind = paintKind(bits[0]);
+            if (!kind) return '';
+            var fills = fillsFor(k);
+            var fill  = bits[1] || 'solid';
+            if (fills.indexOf(fill) === -1) fill = fills[0];
+            var memo  = bits[2] || '';
+            if (paintKind(memo) !== (kind === 'key' ? 'hex' : 'key')) memo = '';
+            return bits[0] + '_' + fill + (memo ? '_' + memo : '');
+        }
+
         // The builder renders into its own card between Template settings and
         // Page settings. The input stays exactly where it is, inside the form,
         // just hidden along with its now-redundant label and help text.
@@ -909,7 +948,7 @@
                     if (w !== 'off' && SPAN[w] === undefined) return;
                     seen[k] = 1;
                     out.push({ key: k, on: w !== 'off', w: w === 'off' ? (cat[k].w || '1/1') : w,
-                               hideEmpty: f.indexOf('e') !== -1, colour: c, rows: n });
+                               hideEmpty: f.indexOf('e') !== -1, colour: normColour(c, k), rows: n });
                 });
             }
             keys.forEach(function (k) {
@@ -921,6 +960,12 @@
         var state = readState();
         var dirty = (input.value || '').trim() !== '';
         var openKey = null;   // which section's settings drawer is open
+        // Which colour mode that drawer's switch is showing. UI state, not
+        // layout state: it survives the repaint so choosing Theme before
+        // picking a swatch does not snap the control back to what is stored.
+        // Cleared whenever a different drawer opens, so it can never describe
+        // another section.
+        var openMode = null;
 
         // key:width[:flags[:colour[:rows]]] -- POSITIONAL, so a later field
         // needs the earlier ones present as empty placeholders. Trailing empties
@@ -1026,14 +1071,18 @@
                 if (s.hideEmpty) bits.push('Hides when empty');
                 if (RC && s.rows) bits.push(s.rows + ' items');
                 if (s.colour) {
+                    // normColour has already dropped anything the page would
+                    // refuse to render, so this is a known key or a valid hex.
+                    // The old raw-key fallback could only ever print a colour
+                    // the client area was not showing.
                     var pk = s.colour.split('_')[0];
-                    bits.push(PAINTS[pk] ? PAINTS[pk].label
-                            : (/^hex[0-9a-f]{6}$/.test(pk) ? 'Custom colour' : pk));
+                    bits.push(PAINTS[pk] ? PAINTS[pk].label : 'Custom #' + pk.slice(3));
                 }
                 cnt.textContent = bits.length ? bits.join(' · ') : (RC ? '2 settings' : '1 setting');
                 disc.appendChild(chev); disc.appendChild(name); disc.appendChild(cnt);
                 disc.addEventListener('click', function () {
                     openKey = (openKey === s.key) ? null : s.key;
+                    openMode = null;
                     paint();
                 });
                 li.appendChild(disc);
@@ -1164,121 +1213,171 @@
                     // carry status pills and token-coloured text that a fill
                     // would wreck.
                     //
-                    // The stored value is "<paint>" or "<paint>_<fill>", the
-                    // 4th field of this section's layout entry, whitelisted
-                    // again in SectionLayout::parse so nothing typed by hand
-                    // can reach the CSS.
-                    var pf = (cat[s.key] && cat[s.key].fills) || ['solid', 'tint', 'grad'];
+                    // Stored as field 4 of this section's layout entry:
+                    // "<paint>_<fill>[_<memo>]". The MODE is derived from the
+                    // paint, never stored, because the two vocabularies are
+                    // disjoint and a derived mode cannot contradict its own
+                    // value. The MEMO is the other mode's last paint, so the
+                    // switch flips back without losing it; SectionLayout::parse
+                    // reads past it and drops it, so a colour the admin
+                    // switched away from can never reach the page.
+                    var pf = fillsFor(s.key);
                     if (PAINT_KEYS.length && cat[s.key] && cat[s.key].paintable) {
-                        var cur = (s.colour || '').split('_');
+                        var cur      = (s.colour || '').split('_');
                         var curPaint = cur[0] || '';
-                        var curFill = cur[1] || (pf.indexOf('solid') !== -1 ? 'solid' : pf[0]);
+                        var curKind  = paintKind(curPaint);
+                        var curFill  = cur[1] || (pf.indexOf('solid') !== -1 ? 'solid' : pf[0]);
                         if (pf.indexOf(curFill) === -1) curFill = pf[0];
+                        var curMemo  = cur[2] || '';
 
+                        var mode = openMode ||
+                            (curKind === 'hex' ? 'custom' : (curKind === 'key' ? 'theme' : 'none'));
+
+                        // Last value of each mode: the active paint, plus the
+                        // memo for the other. This pair IS the feature -- it is
+                        // what lets the switch flip back without re-picking.
+                        var lastKey = curKind === 'key' ? curPaint
+                                    : (paintKind(curMemo) === 'key' ? curMemo : '');
+                        var lastHex = curKind === 'hex' ? curPaint
+                                    : (paintKind(curMemo) === 'hex' ? curMemo : '');
+
+                        // The INACTIVE value rides along as the memo. 'none'
+                        // stores nothing at all: a memo with no active paint
+                        // would be a remembered setting for a block that has no
+                        // colour, which is a thing to explain rather than want.
                         var setColour = function () {
-                            // No paint means no colour at all -- do not store a
-                            // bare fill, which would be a setting with nothing
-                            // to apply it to.
-                            s.colour = curPaint ? (curPaint + '_' + curFill) : '';
+                            if (mode === 'theme' && lastKey) {
+                                s.colour = lastKey + '_' + curFill + (lastHex ? '_' + lastHex : '');
+                            } else if (mode === 'custom' && lastHex) {
+                                s.colour = lastHex + '_' + curFill + (lastKey ? '_' + lastKey : '');
+                            } else {
+                                s.colour = '';
+                            }
                             commit();
                         };
 
+                        // --- Row A: the mode switch -------------------------
                         var co = document.createElement('div');
-                        co.className = 'mt-seclay-opt is-stacked';
+                        co.className = 'mt-seclay-opt';
                         var cwrap = document.createElement('div');
                         var cl = document.createElement('div');
                         cl.className = 'mt-seclay-opt-l';
-                        cl.textContent = 'Colour';
+                        cl.textContent = 'Colour source';
                         var ch = document.createElement('div');
                         ch.className = 'mt-seclay-opt-h';
-                        ch.textContent = pf.length > 1
-                            ? 'Pick a colour for this block, then how it is applied.'
-                            : 'Tint this tile with a colour. Tiles holding a list only take the soft wash, so the status badges on each row stay readable.';
+                        ch.textContent = 'A theme colour is set on Styles > Colors, and every block using it '
+                                       + 'changes when you change it there. A custom colour is fixed: it stays '
+                                       + 'exactly as you set it, whatever the style does.';
                         cwrap.appendChild(cl); cwrap.appendChild(ch);
                         co.appendChild(cwrap);
 
-                        var mkSwatch = function (key) {
+                        var modeSeg = document.createElement('span');
+                        modeSeg.className = 'mt-seclay-w';
+                        [['none', 'None'], ['theme', 'Theme'], ['custom', 'Custom']].forEach(function (m) {
                             var b = document.createElement('button');
                             b.type = 'button';
-                            b.className = 'mt-sw' + (curPaint === key ? ' is-active' : '') + (key ? '' : ' is-none');
-                            b.title = key ? PAINTS[key].label : 'No colour';
-                            if (key) {
-                                var v = PAINTS[key].swatch;
-                                // No resolved value (legacy paints declaration)
-                                // -- fall back to a labelled chip rather than a
-                                // blank button that looks broken.
-                                if (v) { b.style.background = v; }
-                                else { b.classList.add('is-bare'); b.textContent = PAINTS[key].label.slice(0, 2); }
-                            }
-                            b.setAttribute('aria-pressed', curPaint === key ? 'true' : 'false');
+                            b.textContent = m[1];
+                            if (mode === m[0]) b.className = 'is-active';
+                            b.setAttribute('aria-pressed', mode === m[0] ? 'true' : 'false');
                             b.addEventListener('click', function () {
-                                curPaint = (curPaint === key) ? '' : key;
-                                setColour();
+                                openMode = m[0]; mode = m[0]; setColour();
                             });
-                            return b;
-                        };
-                        // Grouped by what each colour FOLLOWS. A single strip of
-                        // identical swatches gives no way to tell that Accent
-                        // moves when you switch preset on Styles > Colors and
-                        // Purple does not -- which is exactly the thing that is
-                        // surprising about them.
-                        var group = function (caption, keys, lead) {
-                            if (!keys.length) return null;
-                            var g = document.createElement('div');
-                            g.className = 'mt-sw-group';
-                            var cap = document.createElement('div');
-                            cap.className = 'mt-sw-cap';
-                            cap.textContent = caption;
-                            var strip = document.createElement('div');
-                            strip.className = 'mt-seclay-sw';
-                            if (lead) strip.appendChild(lead);
-                            keys.forEach(function (k) { strip.appendChild(mkSwatch(k)); });
-                            g.appendChild(cap); g.appendChild(strip);
-                            return g;
-                        };
-                        var preset = PAINT_KEYS.filter(function (k) { return PAINTS[k].track === 'preset'; });
-                        var token  = PAINT_KEYS.filter(function (k) { return PAINTS[k].track !== 'preset'; });
-
-                        var gp = group('Follows the Styles → Colors preset', preset, mkSwatch(''));
-                        if (gp) co.appendChild(gp);
-                        var gt = group('Follows its own colour on Styles → Colors', token, null);
-                        if (gt) co.appendChild(gt);
-
-                        // Custom colour. The palette swatches above store a KEY
-                        // and resolve through a var(), so they follow
-                        // Styles > Colors; this stores the literal value and
-                        // deliberately does not. Encoded 'hex' + rrggbb because
-                        // the layout string's charset excludes '#'.
-                        var isHex = /^hex[0-9a-f]{6}$/.test(curPaint);
-                        var cwrapc = document.createElement('span');
-                        cwrapc.className = 'mt-sw-custom' + (isHex ? ' is-active' : '');
-                        cwrapc.title = 'Custom colour (not linked to Styles > Colors)';
-                        var ci = document.createElement('input');
-                        ci.type = 'color';
-                        ci.className = 'mt-sw-cin';
-                        ci.value = isHex ? ('#' + curPaint.slice(3)) : '#5856d6';
-                        ci.addEventListener('input', function () {
-                            var v = (ci.value || '').toLowerCase();
-                            if (!/^#[0-9a-f]{6}$/.test(v)) return;
-                            curPaint = 'hex' + v.slice(1);
-                            setColour();
+                            modeSeg.appendChild(b);
                         });
-                        cwrapc.appendChild(ci);
-                        var gc = document.createElement('div');
-                        gc.className = 'mt-sw-group';
-                        var gcap = document.createElement('div');
-                        gcap.className = 'mt-sw-cap';
-                        gcap.textContent = 'Fixed — does not follow Styles → Colors';
-                        var gstrip = document.createElement('div');
-                        gstrip.className = 'mt-seclay-sw';
-                        gstrip.appendChild(cwrapc);
-                        gc.appendChild(gcap); gc.appendChild(gstrip);
-                        co.appendChild(gc);
+                        co.appendChild(modeSeg);
+                        opts.appendChild(co);
 
-                        // Fill: only worth showing when there is a choice. A
-                        // list tile offers the wash alone, so a one-button
-                        // segmented control would be furniture.
+                        // --- Row B: the value picker, swapped by mode -------
+                        if (mode !== 'none') {
+                            var vo = document.createElement('div');
+                            vo.className = 'mt-seclay-opt is-stacked';
+
+                            if (mode === 'theme') {
+                                // Keep the preset/token split: which colours move
+                                // when you switch preset and which do not is the
+                                // genuinely surprising part, and the mode switch
+                                // does not express it.
+                                var mkSwatch = function (key) {
+                                    var b = document.createElement('button');
+                                    b.type = 'button';
+                                    b.className = 'mt-sw' + (lastKey === key ? ' is-active' : '');
+                                    b.title = PAINTS[key].label;
+                                    var v = PAINTS[key].swatch;
+                                    if (v) { b.style.background = v; }
+                                    else { b.classList.add('is-bare'); b.textContent = PAINTS[key].label.slice(0, 2); }
+                                    b.setAttribute('aria-pressed', lastKey === key ? 'true' : 'false');
+                                    b.addEventListener('click', function () { lastKey = key; setColour(); });
+                                    return b;
+                                };
+                                var group = function (caption, keys) {
+                                    if (!keys.length) return;
+                                    var g = document.createElement('div');
+                                    g.className = 'mt-sw-group';
+                                    var cap = document.createElement('div');
+                                    cap.className = 'mt-sw-cap';
+                                    cap.textContent = caption;
+                                    var strip = document.createElement('div');
+                                    strip.className = 'mt-seclay-sw';
+                                    keys.forEach(function (k) { strip.appendChild(mkSwatch(k)); });
+                                    g.appendChild(cap); g.appendChild(strip);
+                                    vo.appendChild(g);
+                                };
+                                group('Moves with the preset',
+                                      PAINT_KEYS.filter(function (k) { return PAINTS[k].track === 'preset'; }));
+                                group('Its own row on Styles > Colors',
+                                      PAINT_KEYS.filter(function (k) { return PAINTS[k].track !== 'preset'; }));
+                            } else {
+                                var cg = document.createElement('div');
+                                cg.className = 'mt-sw-group';
+                                var ccap = document.createElement('div');
+                                ccap.className = 'mt-sw-cap';
+                                ccap.textContent = 'Fixed: does not follow Styles > Colors';
+                                var cstrip = document.createElement('div');
+                                cstrip.className = 'mt-seclay-sw';
+                                var cwrapc = document.createElement('span');
+                                cwrapc.className = 'mt-sw-custom is-active';
+                                cwrapc.title = 'Custom colour';
+                                var ci = document.createElement('input');
+                                ci.type = 'color';
+                                ci.className = 'mt-sw-cin';
+                                ci.value = lastHex ? ('#' + lastHex.slice(3)) : '#5856d6';
+                                // 'change', not 'input': input fires continuously
+                                // while dragging in the OS picker, and every fire
+                                // repaints the list, destroying the very input
+                                // being dragged.
+                                ci.addEventListener('change', function () {
+                                    var v = (ci.value || '').toLowerCase();
+                                    if (!/^#[0-9a-f]{6}$/.test(v)) return;
+                                    lastHex = 'hex' + v.slice(1); setColour();
+                                });
+                                cwrapc.appendChild(ci);
+                                cstrip.appendChild(cwrapc);
+                                var hexLabel = document.createElement('span');
+                                hexLabel.className = 'mt-sw-hex';
+                                hexLabel.textContent = lastHex ? '#' + lastHex.slice(3) : 'Pick a colour';
+                                cstrip.appendChild(hexLabel);
+                                cg.appendChild(ccap); cg.appendChild(cstrip);
+                                vo.appendChild(cg);
+                            }
+                            opts.appendChild(vo);
+                        }
+
+                        // --- Fill: shared by both modes ---------------------
+                        // It is segment 2 structurally, and "how a paint is
+                        // applied" is orthogonal to which paint -- so flipping
+                        // mode is a true A/B: same treatment, different source.
                         if (pf.length > 1) {
+                            var fo = document.createElement('div');
+                            fo.className = 'mt-seclay-opt';
+                            var fwrap = document.createElement('div');
+                            var fl = document.createElement('div');
+                            fl.className = 'mt-seclay-opt-l';
+                            fl.textContent = 'Fill';
+                            var fh = document.createElement('div');
+                            fh.className = 'mt-seclay-opt-h';
+                            fh.textContent = 'How the colour is applied. Text on a solid or gradient fill picks '
+                                           + 'black or white automatically, whichever is legible on it.';
+                            fwrap.appendChild(fl); fwrap.appendChild(fh);
                             var fseg = document.createElement('span');
                             fseg.className = 'mt-seclay-w mt-seclay-fill';
                             pf.forEach(function (f) {
@@ -1286,13 +1385,13 @@
                                 b.type = 'button';
                                 b.textContent = FILL_LABEL[f] || f;
                                 if (curFill === f) b.className = 'is-active';
-                                b.disabled = !curPaint;
+                                b.disabled = (mode === 'none');
                                 b.addEventListener('click', function () { curFill = f; setColour(); });
                                 fseg.appendChild(b);
                             });
-                            co.appendChild(fseg);
+                            fo.appendChild(fwrap); fo.appendChild(fseg);
+                            opts.appendChild(fo);
                         }
-                        opts.appendChild(co);
                     }
 
                     dr.appendChild(h); dr.appendChild(opts);
