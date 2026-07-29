@@ -38,7 +38,16 @@
         <div class="mt-color-rows">
             {foreach $tokens as $t}
             <div class="mt-color-row" data-var="{$t.var|escape}">
-                <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">{$t.label|escape}</label>
+                <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">
+                    {$t.label|escape}
+                    {* Optional per-token note from colors.php. Several labels
+                       are honestly ambiguous on their own -- "Surface 3" says
+                       nothing about the fact that its ordinal INVERTS between
+                       light and dark, and six tokens ship values byte-identical
+                       to a page token, so a buyer cannot tell them apart by
+                       swatch alone. *}
+                    {if $t.hint|default:''}<span class="mt-color-row-hint">{$t.hint|escape}</span>{/if}
+                </label>
                 <span class="mt-color-control">
                     <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
                     <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false">

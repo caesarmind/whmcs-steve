@@ -300,6 +300,11 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-card label { cursor: pointer; }
 .mt-card input[type="radio"] { display: none; }
 
+/* Per-token note under a Colors label. Muted and small, but --mt-text-2 not
+   --mt-text-3: these carry real information (which mode inverts, which token
+   is a private alias) and tertiary measures ~3.6:1 on a panel. */
+.mt-color-row-hint { display: block; margin-top: 2px; font-size: 11.5px; line-height: 1.4; font-weight: 400; color: var(--mt-text-2); max-width: 46ch; }
+
 /* -- Style preset cards --------------------------------------------------
    Private to the Styles picker. .mt-card above is shared with the Templates
    and Extensions grids, and a style card differs in three ways it cannot

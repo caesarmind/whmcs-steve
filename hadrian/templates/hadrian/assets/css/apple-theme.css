@@ -77,6 +77,22 @@
     --sidebar-item-hover: rgba(0, 0, 0, 0.04);
     --sidebar-item-active: rgba(0, 0, 0, 0.06);
     --sidebar-icon-bg: #e8e8ed;
+
+    /* Ink that sits ON a saturated accent fill -- button labels, badge text,
+       the avatar monogram. Deliberately its own token rather than reusing
+       --color-surface: they happen to share #ffffff in light mode, but they
+       are different ideas, and in DARK mode --color-surface is #2c2c2e while
+       this must stay white. 56 literal whites in the tree are candidates to
+       adopt it; see the note in core/config/colors.php. */
+    --color-on-accent: #ffffff;
+
+    /* The user monogram gradient. Was hardcoded in .sidebar-avatar and
+       .topbar-avatar, with six html[data-palette] variants that CANNOT fire in
+       production -- that attribute is set only from a ?palette= query param
+       (header.tpl:183-189), never by the admin -- so every buyer has always
+       seen exactly these two colours and had no way to change them. */
+    --color-avatar-from: #007aff;
+    --color-avatar-to: #5856d6;
     /* ===== Sidebar surface set ==========================================
        Every colour the sidebar / rail / mobile drawer paints, as its own
        token. Each DEFAULTS to the page token the rule used to name, so the
@@ -366,6 +382,13 @@ html[data-theme="dark"] {
        it is the only one that must be redeclared here -- every other one
        re-derives from the page tokens redeclared in this block. */
     --sidebar-scroll-thumb: rgba(255, 255, 255, 0.15);
+    /* Same values as light on purpose -- the accent stays saturated in dark
+       mode, so its ink stays white -- but they MUST be declared here anyway.
+       This block outranks an emitted :root override, so a token absent from it
+       would let a buyer's light-scope edit leak into dark. */
+    --color-on-accent: #ffffff;
+    --color-avatar-from: #0a84ff;
+    --color-avatar-to: #6e6cff;
     --topbar-bg: rgba(44, 44, 46, 0.72);
     /* Dark mode: bg color contrast already separates cards (~6% lightness step), so no resting shadow needed */
     --shadow-card: none;
@@ -466,7 +489,7 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
 .sidebar-footer { padding: 12px; border-top: 0.5px solid var(--sidebar-border); }
 .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: var(--radius-sm); cursor: pointer; transition: background var(--transition-fast); }
 .sidebar-user:hover { background: var(--sidebar-item-hover-bg); }
-.sidebar-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #007aff, #5856d6); color: white; font-size: var(--text-base); font-weight: var(--fw-semibold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sidebar-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--color-avatar-from), var(--color-avatar-to)); color: var(--color-on-accent); font-size: var(--text-base); font-weight: var(--fw-semibold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sidebar-user-info { flex: 1; min-width: 0; }
 .sidebar-user-name { font-size: var(--text-base); font-weight: var(--fw-medium); color: var(--sidebar-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sidebar-user-email { font-size: var(--text-xs); color: var(--sidebar-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -530,7 +553,7 @@ body[data-sidebar-side="right"] .main-content { margin-left: 0; margin-right: va
     font-variant-numeric: tabular-nums;
     pointer-events: none;
 }
-.topbar-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #007aff, #5856d6); color: white; font-size: var(--text-sm); font-weight: var(--fw-semibold); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity var(--transition-fast); }
+.topbar-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--color-avatar-from), var(--color-avatar-to)); color: var(--color-on-accent); font-size: var(--text-sm); font-weight: var(--fw-semibold); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity var(--transition-fast); }
 .topbar-avatar:hover { opacity: 0.85; }
 
 /* --- System Status Indicator --- */
