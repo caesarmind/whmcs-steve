@@ -42,6 +42,8 @@ final class StylesController extends AbstractController
                 'name'        => $name,
                 'displayName' => $meta['name'] ?? ucfirst($name),
                 'preview'     => $meta['preview'] ?? 'thumb.png',
+                'description' => (string)($meta['description'] ?? ''),
+                'swatch'      => $this->buildStyleSwatch($template, $meta),
                 'isActive'    => $name === $current,
             ];
         }
@@ -171,6 +173,70 @@ final class StylesController extends AbstractController
         // PRG — see LayoutsController::saveAction for why we don't
         // re-enter indexAction() directly.
         $this->redirect('?module=Hadrian&action=styles');
+    }
+
+    /**
+     * Two colours that stand for a style on its card in the picker.
+     *
+     * The card shows a wide band beside a narrow one — the treatment from the
+     * Caesarthemes admin demo, whose STYLES fixture carries a `primary` and an
+     * `accent` per style. No Hadrian manifest has a token called `primary`, so
+     * it is derived, and the derivation is chosen so the two bands are always
+     * DIFFERENT and always say something true about the preset:
+     *
+     *   - A preset that repaints a surface (a dark nav, or a warmed page) leads
+     *     with that surface, because it is the thing you cannot otherwise see
+     *     from the outside. Aqueduct reads slate + teal, Colosseum near-black +
+     *     gold: the dark sidebar is legible at a glance.
+     *   - A preset that only moves the accent has no distinct surface to show,
+     *     so it pairs its light accent with its dark-mode accent, which is a
+     *     lighter tone of the same hue by construction. Imperial reads cobalt +
+     *     periwinkle rather than cobalt twice.
+     *
+     * A style with no `colors` block at all — Default — falls through to the
+     * schema defaults and previews as the stock theme, which is exactly what it
+     * is. Nothing renders empty.
+     *
+     * @param  array $meta the style manifest, already loaded
+     * @return array{primary:string, accent:string}
+     */
+    private function buildStyleSwatch($template, array $meta): array
+    {
+        $cfg = ThemeManifest::loadVariantMeta(
+            $template->getFullPath() . '/core/config/colors.php'
+        );
+        $schema = [];
+        foreach (($cfg['groups'] ?? []) as $tokens) {
+            foreach ($tokens as $t) {
+                $schema[(string)$t['var']] = $t;
+            }
+        }
+        $fallback = static function (string $var, string $scope) use ($schema): string {
+            return (string)($schema[$var][$scope] ?? $schema[$var]['light'] ?? '');
+        };
+
+        $light = (array)($meta['colors']['light'] ?? []);
+        $dark  = (array)($meta['colors']['dark'] ?? []);
+
+        $accent  = (string)($light['--color-accent'] ?? $fallback('--color-accent', 'light'));
+        $surface = (string)($light['--sidebar-bg'] ?? $light['--color-bg'] ?? '');
+
+        if ($surface !== '') {
+            $primary = $surface;
+            $second  = $accent;
+        } else {
+            $primary = $accent;
+            $second  = (string)($dark['--color-accent'] ?? $fallback('--color-accent', 'dark'));
+        }
+
+        // These land in a style="" attribute. Everything here comes from files
+        // we ship, but validating rather than trusting keeps that true if a
+        // buyer hand-edits a manifest: anything that is not a colour is dropped
+        // to a neutral rather than injected.
+        return [
+            'primary' => $this->isColor($primary) ? $primary : 'transparent',
+            'accent'  => $this->isColor($second) ? $second : 'transparent',
+        ];
     }
 
     /**

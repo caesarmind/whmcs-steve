@@ -300,6 +300,85 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-card label { cursor: pointer; }
 .mt-card input[type="radio"] { display: none; }
 
+/* -- Style preset cards --------------------------------------------------
+   Private to the Styles picker. .mt-card above is shared with the Templates
+   and Extensions grids, and a style card differs in three ways it cannot
+   express: a colour band drawn from the preset's own palette instead of a
+   grey thumbnail, a real two-line description instead of a fixed label, and
+   the demo's tinted active state instead of a ring.
+
+   Card chrome follows the Caesarthemes admin demo (apple-admin.jsx, the
+   Styles screen): radius/padding, a 48px band above the name, name over a
+   muted description, then Active-or-Activate on the left and Customize on
+   the right. */
+.mt-sty-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.mt-sty-card {
+    background: var(--mt-surface); border: 1px solid var(--mt-border);
+    border-radius: var(--mt-radius); padding: 16px;
+    display: flex; flex-direction: column; gap: 12px; cursor: pointer;
+    /* Same three properties .mt-card transitions, and deliberately NOT
+       background: the card's background also carries the admin's light/dark
+       token, so animating it would fade every card on a theme toggle. */
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+.mt-sty-card:hover { transform: translateY(-1px); box-shadow: var(--mt-shadow-card-hover); }
+.mt-sty-card input[type="radio"] { display: none; }
+/* The demo fills the active card rather than ringing it, which reads as
+   "this one is on" at a glance across a grid of eight. The lift is dropped
+   because the active card is not going anywhere. */
+.mt-sty-card.is-active {
+    background: var(--mt-primary-tint); border-color: var(--mt-primary);
+}
+.mt-sty-card.is-active:hover { transform: none; }
+
+/* The band. Two children, 2:1, straight from the demo. The hairline matters:
+   a preset whose wide band is a warmed near-white page would otherwise have
+   no visible edge against the card. */
+.mt-sty-swatch {
+    display: flex; height: 48px; border-radius: var(--mt-radius-sm);
+    overflow: hidden; border: 1px solid var(--mt-border);
+}
+.mt-sty-swatch i { display: block; height: 100%; }
+.mt-sty-swatch i:first-child { flex: 2; }
+.mt-sty-swatch i:last-child  { flex: 1; }
+
+.mt-sty-body { display: flex; flex-direction: column; gap: 3px; }
+.mt-sty-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin: 0; color: var(--mt-text); }
+/* Clamped: the descriptions are a sentence, and an unclamped one would make
+   a single card taller than the rest of its row. */
+.mt-sty-desc {
+    /* --mt-text-2, not the --mt-text-3 the demo uses for its sub and that
+       .mt-card-meta uses. The demo's sub is a two-word tag; this is a real
+       sentence a buyer reads to choose a preset, and tertiary measures 3.62:1
+       on the card in light mode. Secondary is 5.07 / 6.61. */
+    font-size: 12px; line-height: 1.45; color: var(--mt-text-2); margin: 0;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    /* Reserve both lines whether or not the sentence needs them. Grid rows
+       size independently, so without this a row whose descriptions all wrap
+       to one line sits shorter than the row above it and the grid looks
+       ragged -- measured 167 / 172 / 184px across rows at a 2-up width. */
+    min-height: 2.9em;
+}
+/* min-height matches the .mt-badge box (18px line + 3px padding each side).
+   Only ONE card carries a badge; the rest carry a plain span, whose footer is
+   6px shorter. Grid rows stretch to their tallest card, so without this the
+   row holding the active card sits 6px taller than every other row -- measured
+   190 against 184. Reserving the badge's height makes every card identical
+   wherever the active one happens to be. */
+.mt-sty-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; min-height: 24px; }
+/* Not a badge. Only ONE card is active, so seven loud "Click to activate"
+   chips competed with the one state that mattered; the demo makes the
+   inactive affordance quiet text that comes forward on hover. */
+.mt-sty-activate { font-size: 12.5px; font-weight: 600; color: var(--mt-text-2); transition: color 0.15s ease; }
+.mt-sty-card:hover .mt-sty-activate { color: var(--mt-text); }
+.mt-sty-edit { font-size: 12.5px; font-weight: 600; color: var(--mt-primary); text-decoration: none; white-space: nowrap; position: relative; z-index: 1; }
+.mt-sty-edit:hover { text-decoration: underline; }
+/* The active card's background is an 8% wash of the accent, and an accent-
+   coloured link on it drops to 4.21:1 in light mode -- the one place this card
+   fails AA. --mt-link is the same role a shade deeper: 4.99 light, 4.64 dark.
+   Scoped to .is-active so the ordinary cards keep the house --mt-primary. */
+.mt-sty-card.is-active .mt-sty-edit { color: var(--mt-link); }
+
 /* -- Scheme chips (styles colors) ----------------------------------------- */
 .mt-schemes { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
 .mt-scheme { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 7px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-pill); cursor: pointer; font-size: 13px; font-weight: 500; text-decoration: none; color: var(--mt-text); }
