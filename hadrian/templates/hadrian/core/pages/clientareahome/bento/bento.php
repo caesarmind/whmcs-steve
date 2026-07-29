@@ -94,6 +94,17 @@ return [
             // over whatever is behind it, so a saturated fill turns an Active
             // badge into 1.05:1 contrast. cell.tpl coerces it; see the note
             // there. Register and Profile have no pills and take all three.
+            // 'track' says what a key FOLLOWS, which is the whole reason to
+            // store a key rather than a value:
+            //   preset - the Styles > Colors presets set this token, so picking
+            //            a preset recolours every block using it. Only the
+            //            accent qualifies: a preset writes accent, accent
+            //            hover, accent tint and link, and nothing else.
+            //   token  - follows its own token on Styles > Colors. Editing that
+            //            row recolours the block; switching preset does not
+            //            touch it.
+            // A custom colour follows neither, which is what it is for.
+            //
             // 'var' is the CSS token each key resolves to at render time --
             // the same mapping the .min-section[data-blk-paint="..."] rules use.
             // Declared here so the admin can draw a real swatch: PagesController
@@ -102,17 +113,17 @@ return [
             // is the colour the block will actually be, not a hardcoded guess
             // that drifts the moment someone changes the palette.
             'paints' => [
-                'accent' => ['label' => 'Accent',          'var' => '--color-accent'],
-                'indigo' => ['label' => 'Indigo',          'var' => '--color-icon-indigo'],
-                'purple' => ['label' => 'Purple',          'var' => '--color-icon-purple'],
-                'green'  => ['label' => 'Green',           'var' => '--color-icon-green'],
-                'teal'   => ['label' => 'Teal',            'var' => '--color-icon-teal'],
-                'orange' => ['label' => 'Orange',          'var' => '--color-icon-orange'],
-                'red'    => ['label' => 'Red',             'var' => '--color-icon-red'],
-                'gray'   => ['label' => 'Gray',            'var' => '--color-icon-gray'],
-                'block1' => ['label' => 'Block accent 1',  'var' => '--color-block-1'],
-                'block2' => ['label' => 'Block accent 2',  'var' => '--color-block-2'],
-                'block3' => ['label' => 'Block accent 3',  'var' => '--color-block-3'],
+                'accent' => ['label' => 'Accent',          'var' => '--color-accent', 'track' => 'preset'],
+                'indigo' => ['label' => 'Indigo',          'var' => '--color-icon-indigo', 'track' => 'token'],
+                'purple' => ['label' => 'Purple',          'var' => '--color-icon-purple', 'track' => 'token'],
+                'green'  => ['label' => 'Green',           'var' => '--color-icon-green', 'track' => 'token'],
+                'teal'   => ['label' => 'Teal',            'var' => '--color-icon-teal', 'track' => 'token'],
+                'orange' => ['label' => 'Orange',          'var' => '--color-icon-orange', 'track' => 'token'],
+                'red'    => ['label' => 'Red',             'var' => '--color-icon-red', 'track' => 'token'],
+                'gray'   => ['label' => 'Gray',            'var' => '--color-icon-gray', 'track' => 'token'],
+                'block1' => ['label' => 'Block accent 1',  'var' => '--color-block-1', 'track' => 'token'],
+                'block2' => ['label' => 'Block accent 2',  'var' => '--color-block-2', 'track' => 'token'],
+                'block3' => ['label' => 'Block accent 3',  'var' => '--color-block-3', 'track' => 'token'],
             ],
             // Turns on the per-section "Items shown" control in the builder's
             // settings drawer, stored as the 5th field of each layout entry.

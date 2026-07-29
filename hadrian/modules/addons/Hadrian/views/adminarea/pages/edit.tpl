@@ -771,7 +771,9 @@
    drawer rows: a 12-swatch strip beside a wrapped help line reads as two
    competing columns. */
 .mt-seclay-opt.is-stacked { display: block; }
-.mt-seclay-sw { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+.mt-seclay-sw { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 7px; }
+.mt-sw-group { margin-top: 12px; }
+.mt-sw-cap { font-size: 10.5px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; color: var(--mt-text-4); }
 .mt-sw { width: 26px; height: 26px; padding: 0; border-radius: 50%; cursor: pointer;
     border: 1px solid rgba(0,0,0,0.12); background: transparent; font: inherit; font-size: 9px;
     font-weight: 600; color: var(--mt-text-3); text-transform: uppercase; line-height: 1;
@@ -1190,13 +1192,10 @@
                         var ch = document.createElement('div');
                         ch.className = 'mt-seclay-opt-h';
                         ch.textContent = pf.length > 1
-                            ? 'Pick a palette colour for this block, then how it is applied. Colours follow Styles > Colors, so changing the palette carries them along.'
-                            : 'Tint this tile with a palette colour. Tiles holding a list only take the soft wash, so the status badges on each row stay readable. Colours follow Styles > Colors.';
+                            ? 'Pick a colour for this block, then how it is applied.'
+                            : 'Tint this tile with a colour. Tiles holding a list only take the soft wash, so the status badges on each row stay readable.';
                         cwrap.appendChild(cl); cwrap.appendChild(ch);
                         co.appendChild(cwrap);
-
-                        var sw = document.createElement('div');
-                        sw.className = 'mt-seclay-sw';
 
                         var mkSwatch = function (key) {
                             var b = document.createElement('button');
@@ -1218,8 +1217,32 @@
                             });
                             return b;
                         };
-                        sw.appendChild(mkSwatch(''));
-                        PAINT_KEYS.forEach(function (k) { sw.appendChild(mkSwatch(k)); });
+                        // Grouped by what each colour FOLLOWS. A single strip of
+                        // identical swatches gives no way to tell that Accent
+                        // moves when you switch preset on Styles > Colors and
+                        // Purple does not -- which is exactly the thing that is
+                        // surprising about them.
+                        var group = function (caption, keys, lead) {
+                            if (!keys.length) return null;
+                            var g = document.createElement('div');
+                            g.className = 'mt-sw-group';
+                            var cap = document.createElement('div');
+                            cap.className = 'mt-sw-cap';
+                            cap.textContent = caption;
+                            var strip = document.createElement('div');
+                            strip.className = 'mt-seclay-sw';
+                            if (lead) strip.appendChild(lead);
+                            keys.forEach(function (k) { strip.appendChild(mkSwatch(k)); });
+                            g.appendChild(cap); g.appendChild(strip);
+                            return g;
+                        };
+                        var preset = PAINT_KEYS.filter(function (k) { return PAINTS[k].track === 'preset'; });
+                        var token  = PAINT_KEYS.filter(function (k) { return PAINTS[k].track !== 'preset'; });
+
+                        var gp = group('Follows the Styles → Colors preset', preset, mkSwatch(''));
+                        if (gp) co.appendChild(gp);
+                        var gt = group('Follows its own colour on Styles → Colors', token, null);
+                        if (gt) co.appendChild(gt);
 
                         // Custom colour. The palette swatches above store a KEY
                         // and resolve through a var(), so they follow
@@ -1241,8 +1264,16 @@
                             setColour();
                         });
                         cwrapc.appendChild(ci);
-                        sw.appendChild(cwrapc);
-                        co.appendChild(sw);
+                        var gc = document.createElement('div');
+                        gc.className = 'mt-sw-group';
+                        var gcap = document.createElement('div');
+                        gcap.className = 'mt-sw-cap';
+                        gcap.textContent = 'Fixed — does not follow Styles → Colors';
+                        var gstrip = document.createElement('div');
+                        gstrip.className = 'mt-seclay-sw';
+                        gstrip.appendChild(cwrapc);
+                        gc.appendChild(gcap); gc.appendChild(gstrip);
+                        co.appendChild(gc);
 
                         // Fill: only worth showing when there is a choice. A
                         // list tile offers the wash alone, so a one-button

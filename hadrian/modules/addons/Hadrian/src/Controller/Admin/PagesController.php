@@ -520,6 +520,11 @@ final class PagesController extends AbstractController
             $out[(string)$key] = [
                 'label'  => $label,
                 'swatch' => $var !== '' ? (string)($stored[$var] ?? $defaults[$var] ?? '') : '',
+                // What this key follows -- see the note beside the vocabulary
+                // in <variant>.php. The picker groups on it, because a strip of
+                // identical swatches gives no way to tell that Accent moves
+                // with a preset and Purple does not.
+                'track'  => is_array($spec) ? (string)($spec['track'] ?? 'token') : 'token',
             ];
         }
         return $out;
