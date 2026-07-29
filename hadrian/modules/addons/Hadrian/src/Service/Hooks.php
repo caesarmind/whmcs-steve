@@ -1001,6 +1001,11 @@ final class Hooks
                 'countryName'    => $this->dashboardMentions($template, 'profile')
                     ? $this->fetchClientCountryName($clientId)
                     : '',
+                // Aggregate for the Billing tile's summary mode: what is
+                // overdue, how overdue the worst one is, and any credit that
+                // will come off first. $clientsstats carries the counts and the
+                // unpaid total but none of the detail.
+                'billing'        => $this->fetchBillingSummary($clientId),
             ],
         ];
     }
@@ -1581,6 +1586,98 @@ final class Hooks
      * the rows came back in whatever order the API chose. It is a real
      * ORDER BY now.
      */
+    /**
+     * Detail behind the Billing tile's summary: the overdue slice of what is
+     * owed, the single worst invoice, and any account credit.
+     *
+     * $clientsstats already carries numunpaidinvoices, numoverdueinvoices and
+     * unpaidinvoicesamount, and those stay the source for the headline figures
+     * -- they are account totals WHMCS computes itself. What it does NOT carry
+     * is how much of the balance is overdue, which invoice is worst, or how
+     * many days late it is, and the summary card is mostly about exactly that.
+     *
+     * Reads tblinvoices directly rather than through GetInvoices, for the same
+     * reason fetchOpenTickets does: localAPI runs as an admin and carries
+     * per-admin scoping this has no business inheriting. One query, ordered so
+     * the first row IS the worst one -- no second lookup.
+     *
+     * "Overdue" is derived, not stored: tblinvoices.status has no such value,
+     * so it is Unpaid with a due date in the past. That is the same definition
+     * WHMCS's own numoverdueinvoices uses, so the two agree.
+     *
+     * @return array{overdueCount:int, overdueAmount:string, worstNum:string,
+     *                worstAmount:string, worstDays:int, credit:string,
+     *                hasCredit:bool}
+     */
+    private function fetchBillingSummary(int $clientId): array
+    {
+        $out = [
+            'overdueCount' => 0, 'overdueAmount' => '',
+            'worstNum' => '', 'worstAmount' => '', 'worstDays' => 0,
+            'credit' => '', 'hasCredit' => false,
+        ];
+        if ($clientId === 0) {
+            return $out;
+        }
+
+        try {
+            $today = date('Y-m-d');
+            $rows  = \WHMCS\Database\Capsule::table('tblinvoices')
+                ->where('userid', $clientId)
+                ->where('status', 'Unpaid')
+                ->where('duedate', '<', $today)
+                ->orderBy('duedate', 'asc')
+                ->get(['id', 'invoicenum', 'duedate', 'total']);
+
+            // Walked rather than indexed: ->get() hands back a Collection on
+            // some WHMCS builds and a plain array on others, and foreach is the
+            // only access both agree on. The first row is the worst because the
+            // query is ordered by due date.
+            $sum   = 0.0;
+            $count = 0;
+            $worst = null;
+            foreach ($rows as $row) {
+                $count++;
+                $sum += (float)($row->total ?? 0);
+                if ($worst === null) {
+                    $worst = $row;
+                }
+            }
+
+            if ($count > 0 && $worst !== null) {
+                $due = strtotime((string)($worst->duedate ?? ''));
+                // invoicenum when the install uses custom numbering, else the id
+                // -- the same choice the invoice pages make.
+                $num = trim((string)($worst->invoicenum ?? ''));
+                $out['overdueCount']  = $count;
+                $out['overdueAmount'] = $this->formatPrice($sum);
+                $out['worstNum']      = $num !== '' ? $num : (string)($worst->id ?? '');
+                $out['worstAmount']   = $this->formatPrice((float)($worst->total ?? 0));
+                $out['worstDays']     = $due ? (int)floor((strtotime($today) - $due) / 86400) : 0;
+            }
+        } catch (\Throwable) {
+            // Leave the detail empty -- the tile falls back to the headline
+            // figures, which come from $clientsstats and are always there.
+        }
+
+        try {
+            // Raw decimal, so it can be TESTED as well as printed.
+            // $clientsstats.creditbalance arrives pre-formatted, which makes
+            // "is there any credit" a string comparison against "$0.00".
+            $credit = (float)\WHMCS\Database\Capsule::table('tblclients')
+                ->where('id', $clientId)
+                ->value('credit');
+            if ($credit > 0) {
+                $out['credit']    = $this->formatPrice($credit);
+                $out['hasCredit'] = true;
+            }
+        } catch (\Throwable) {
+            // no credit line rather than no page
+        }
+
+        return $out;
+    }
+
     private function fetchOpenTickets(int $clientId): array
     {
         if ($clientId === 0) {

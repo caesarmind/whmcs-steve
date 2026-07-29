@@ -40,6 +40,12 @@ return [
             'default' => true,
             'tooltip' => 'Surfaces the account name and shortcuts to details, security and payment methods as a small card in line with the page heading. Independent of the Profile block, which is a full tile in the grid below.',
         ],
+        'bnt_billing_list' => [
+            'type'    => 'bool',
+            'label'   => 'List invoices in the Billing tile',
+            'default' => true,
+            'tooltip' => 'On, the Billing tile lists recent invoices under the amount owed like every other tile. Off, it stays an aggregate: what you owe, how much of it is overdue and by how long, one Pay all button, and any credit that comes off first. Money is one number and one action more often than it is a list, and the full history is a click away on the invoices page either way.',
+        ],
         'bnt_visible_rows' => [
             'type'    => 'int',
             'label'   => 'Items shown per tile',

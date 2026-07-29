@@ -220,10 +220,18 @@
             </div>
             {if $bnDue > 0}
                 {if $clientsstats.unpaidinvoicesamount}<div class="bn-big">{$clientsstats.unpaidinvoicesamount}</div>{/if}
-                {if $clientsstats.numoverdueinvoices > 0}
+                {* How much of the balance is late, and how late the worst one
+                   is. $clientsstats has the COUNT of overdue invoices but not
+                   the amount, the invoice or the age, so this comes from
+                   $dashboard.billing -- and every part of it is omitted rather
+                   than guessed when the query could not answer. *}
+                {assign var=bnBill value=$dashboard.billing|default:[]}
+                {if $bnBill.overdueAmount|default:''}
+                <div class="bn-cardsub">{$bnBill.overdueAmount|escape} {$hadrianLang.dashboard.ofItIs} <strong>{$bnBill.worstDays} {if $bnBill.worstDays == 1}{$hadrianLang.dashboard.dayOverdue}{else}{$hadrianLang.dashboard.daysOverdue}{/if}</strong>{if $bnBill.worstNum} (#{$bnBill.worstNum|escape}){/if}</div>
+                {elseif $clientsstats.numoverdueinvoices > 0}
                 <div class="bn-cardsub">{$clientsstats.numoverdueinvoices} {if $clientsstats.numoverdueinvoices == 1}{$hadrianLang.dashboard.overdueInvoice}{else}{$hadrianLang.dashboard.overdueInvoices}{/if}</div>
                 {/if}
-                <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="bn-cta">{$LANG.invoicespaynow|default:'Pay Now'}</a>
+                <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="bn-cta">{$hadrianLang.dashboard.payAll}</a>
             {else}
                 <div class="bn-cardsub">{$hadrianLang.dashboard.nothingDue}</div>
             {/if}
@@ -233,6 +241,18 @@
             </div>
         {/if}
 
+        {* SUMMARY MODE. With the list off the tile is what it already leads
+           with -- what you owe, how late, one action -- and the rows go to the
+           invoices page. Only the Billing tile has this: it is the one
+           collection whose headline figure is an account total rather than a
+           count of the rows below it, so it still says something true with
+           nothing listed. *}
+        {if $sec == 'invoices' && !$bnBillList}
+            {assign var=secShowList value=false}
+        {else}
+            {assign var=secShowList value=true}
+        {/if}
+        {if $secShowList}
         <div class="min-list bn-rows">
         {if $secCount > 0}
             {if $secSearch}
@@ -354,6 +374,16 @@
             {/if}
         {/if}
         </div>
+        {/if}{* /show list *}
+
+        {* Credit comes off the next invoice before anything is charged, so it
+           belongs with the amount rather than on the invoices page. Gated on a
+           RAW value from the hook, not on $clientsstats.creditbalance -- that
+           one arrives pre-formatted, so testing it means comparing against the
+           string "$0.00". *}
+        {if $sec == 'invoices' && $dashboard.billing.hasCredit|default:false}
+        <div class="bn-credit">{$dashboard.billing.credit|escape} {$hadrianLang.dashboard.creditApplied}</div>
+        {/if}
 
         {* One footer slot, bottom-anchored, so every tile in a row lines its
            View all up on the same baseline however tall its neighbour grows. *}

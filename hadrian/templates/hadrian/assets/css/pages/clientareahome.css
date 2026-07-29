@@ -991,6 +991,14 @@ body[data-min-title="inside"] .min-list {
 .bn-big { font-size: var(--text-h4); font-weight: var(--fw-semibold); letter-spacing: -0.025em; font-variant-numeric: tabular-nums; color: var(--color-text-primary); margin: 8px 0 0; }
 .bn-cta { display: inline-flex; align-items: center; justify-content: center; align-self: flex-start; margin-top: 14px; padding: 9px 16px; border-radius: var(--radius-sm); background: var(--color-accent); color: #fff; border: 1px solid var(--color-accent); font-size: var(--text-md); font-weight: var(--fw-medium); text-decoration: none; }
 .bn-cta:hover { color: #fff; text-decoration: none; filter: brightness(0.93); }
+/* Credit note, above the footer. Hairline-topped so it reads as a footnote to
+   the amount rather than another row of content. */
+.bn-credit { margin-top: auto; padding-top: 13px; border-top: 0.5px solid var(--color-border); font-size: var(--text-sm); color: var(--color-text-secondary); }
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-credit,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-credit { color: var(--blk-ink, #fff); border-color: rgba(255,255,255,0.22); }
+/* With a credit line present the footer must not ALSO claim the auto margin,
+   or the two fight for the slack and the card grows a gap between them. */
+.bn-card > .bn-credit + .bn-foot { margin-top: 0; }
 
 /* --- Rows ---------------------------------------------------------------
    .min-list is a card in its own right on the minimal dashboard. Inside a tile

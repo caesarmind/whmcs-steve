@@ -289,6 +289,16 @@ return [
         'allPaidUp'         => 'All paid up',
         'nothingDue'        => 'Nothing is due right now.',
 
+        // Billing tile, summary mode. Fragments rather than one sentence with
+        // numbers substituted in: the theme has no placeholder mechanism, and
+        // the surrounding banner copy (youHave / withTotalOf / due) is already
+        // assembled this way.
+        'payAll'            => 'Pay all',
+        'ofItIs'            => 'of it is',
+        'dayOverdue'        => 'day overdue',
+        'daysOverdue'       => 'days overdue',
+        'creditApplied'     => 'account credit will be applied first',
+
         // Public homepage marketing copy.
         'heroTitle'           => 'Secure your domain name.',
         'heroSubtitle'        => 'Search, register, and transfer -- all in one place.',

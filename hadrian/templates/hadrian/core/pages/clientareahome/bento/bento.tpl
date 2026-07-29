@@ -33,6 +33,7 @@
    $hadrian.pages.clientareahome.options.* - NOT .config.*, which does not exist:
      bnt_attention     bool - the attention strip
      bnt_account       bool - the identity card beside the greeting
+     bnt_billing_list  bool - list invoices in the Billing tile, or keep it an aggregate
      bnt_visible_rows  int  - default items per tile (each tile may override)
      bnt_search_at     int  - row count at which Services/Domains grow a filter
      bnt_sections      the tile arrangement (see bento.php)
@@ -41,6 +42,7 @@
 {* ---------- options ---------- *}
 {assign var=bnActs value=$hadrian.pages.clientareahome.options.bnt_attention|default:true}
 {assign var=bnAcct value=$hadrian.pages.clientareahome.options.bnt_account|default:true}
+{assign var=bnBillList value=$hadrian.pages.clientareahome.options.bnt_billing_list|default:true}
 
 {* Deliberately NOT |default: on the two integers. Zero is a meaningful stored
    value ("off" for the filter), and whether |default: treats 0 as missing
