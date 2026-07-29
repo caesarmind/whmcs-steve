@@ -1231,6 +1231,48 @@
                         ro.appendChild(rw); ro.appendChild(rt);
                         opts.appendChild(ro);
                     });
+                    // Items shown -- only for variants that declare the control
+                    // (bento). Minimal reveals the rest behind Show more, so a
+                    // per-section cap there would mean something different and
+                    // is deliberately not offered.
+                    if (RC) {
+                        var ro2 = document.createElement('div');
+                        ro2.className = 'mt-seclay-opt';
+                        var rw2 = document.createElement('div');
+                        var rl2 = document.createElement('div');
+                        rl2.className = 'mt-seclay-opt-l';
+                        rl2.textContent = RC.label || 'Items shown';
+                        var rh2 = document.createElement('div');
+                        rh2.className = 'mt-seclay-opt-h';
+                        rh2.textContent = RC.hint || '';
+                        rw2.appendChild(rl2); rw2.appendChild(rh2);
+                        var ri = document.createElement('input');
+                        ri.type = 'number';
+                        ri.className = 'mt-seclay-num';
+                        ri.min = RC.min || 1;
+                        ri.max = RC.max || 8;
+                        ri.step = 1;
+                        ri.value = s.rows || '';
+                        ri.placeholder = RC.def || '';
+                        // Blank is meaningful: it means "use the page default".
+                        // Clamp anything else so a typed 99 cannot serialise a
+                        // value the template would have to defend against.
+                        ri.addEventListener('change', function () {
+                            var v = ri.value.trim();
+                            if (v === '') { s.rows = ''; }
+                            else {
+                                var n = parseInt(v, 10);
+                                if (isNaN(n)) { n = ''; }
+                                else { n = Math.max(RC.min || 1, Math.min(RC.max || 8, n)); }
+                                s.rows = n === '' ? '' : String(n);
+                            }
+                            ri.value = s.rows;
+                            commit();
+                        });
+                        ro2.appendChild(rw2); ro2.appendChild(ri);
+                        opts.appendChild(ro2);
+                    }
+
                     // Colour. Only for sections the variant marked paintable
                     // -- minimal's list sections are not, because their rows
                     // carry status pills and token-coloured text that a fill
