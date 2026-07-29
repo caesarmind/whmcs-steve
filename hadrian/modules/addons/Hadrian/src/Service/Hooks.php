@@ -472,10 +472,15 @@ final class Hooks
         $forms   = $this->buildFormsHead($template);
         $layout  = $this->buildLayoutHead($template);
         $elements = $this->buildElementsHead($template);
+        // General is the SCALE layer (radius/shadow/control/motion), so it is
+        // emitted BEFORE the panels that select between its steps -- Elements
+        // resolving "Large" to var(--radius-lg) must see the buyer's value for
+        // --radius-lg, and both land at :root where source order decides.
+        $general = $this->buildGeneralHead($template);
         $ext     = (string)$this->extensionOutput($template, $vars, slot: 'headOutput');
         $custom  = $this->buildCustomCss($template);
         // Custom CSS goes LAST so it can override the theme + token overrides.
-        $out     = $colors . $typo . $buttons . $forms . $layout . $elements . $ext . $custom;
+        $out     = $colors . $typo . $general . $buttons . $forms . $layout . $elements . $ext . $custom;
         return $out !== '' ? $out : null;
     }
 
@@ -842,6 +847,74 @@ final class Hooks
      * dimensions, px only, into :root. Var names re-validated against
      * core/config/layout.php; values are ints. Returns '' when nothing changed.
      */
+    /**
+     * Emit the Styles > General overrides — the scale layer (corner radius,
+     * shadow, control sizing, motion) that Elements/Buttons/Forms select
+     * between. Same contract as buildLayoutHead: defaults live in the cacheable
+     * apple-theme.css, only changed values are stored, and this block lands
+     * after the stylesheet links so it wins on source order.
+     *
+     * Values arrive already unit-suffixed from saveGeneralAction (`12px`,
+     * `150ms cubic-bezier(...)`, a shadow stack), so this is a passthrough --
+     * but it re-validates rather than trusting the row, because a stored value
+     * is buyer-writable state that lands inside a <style> block. The var name
+     * must be in the schema and the value must match one of the shapes the
+     * saver can produce; anything else is dropped.
+     */
+    private function buildGeneralHead(Template $template): string
+    {
+        $stored = Settings::getValue($template->getName() . '_general', null);
+        if (!is_array($stored) || $stored === []) {
+            return '';
+        }
+
+        $cfg   = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/general.php');
+        $valid = [];
+        foreach (($cfg['groups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $valid[(string)$f['var']] = (string)($f['type'] ?? 'px');
+            }
+        }
+        // A shadow may only ever be one of the stacks we author.
+        $shadows = [];
+        foreach ((array)($cfg['shadowOptions'] ?? []) as $o) {
+            $shadows[preg_replace('/\s+/', '', (string)$o['css'])] = true;
+        }
+
+        $decls = '';
+        foreach ($stored as $var => $val) {
+            $var = (string)$var;
+            $val = trim((string)$val);
+            if (!isset($valid[$var]) || $val === '') {
+                continue;
+            }
+            switch ($valid[$var]) {
+                case 'preset':
+                    if (!isset($shadows[preg_replace('/\s+/', '', $val)])) {
+                        continue 2;
+                    }
+                    break;
+                case 'em':
+                    if (!preg_match('/^\d{1,2}(\.\d{1,2})?em$/', $val)) {
+                        continue 2;
+                    }
+                    break;
+                case 'ms':
+                    if (!preg_match('/^\d{1,5}ms cubic-bezier\([\d.,\s]+\)$/', $val)) {
+                        continue 2;
+                    }
+                    break;
+                default:
+                    if (!preg_match('/^\d{1,4}px$/', $val)) {
+                        continue 2;
+                    }
+            }
+            $decls .= $var . ':' . $val . ';';
+        }
+
+        return $decls !== '' ? '<style id="hadrian-general">:root{' . $decls . '}</style>' : '';
+    }
+
     private function buildLayoutHead(Template $template): string
     {
         $stored = Settings::getValue($template->getName() . '_layout_vars', null);

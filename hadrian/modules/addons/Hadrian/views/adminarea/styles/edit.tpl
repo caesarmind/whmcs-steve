@@ -15,7 +15,6 @@
 
 <div class="mt-tabs">
     <a class="mt-tab {if $tab == 'variables'}is-active{/if}" href="?module=Hadrian&action=editStyle&style={$style|escape}&tab=variables">Style Variables</a>
-    <a class="mt-tab {if $tab == 'settings'}is-active{/if}" href="?module=Hadrian&action=editStyle&style={$style|escape}&tab=settings">Style Settings</a>
     <a class="mt-tab {if $tab == 'custom-css'}is-active{/if}" href="?module=Hadrian&action=editStyle&style={$style|escape}&tab=custom-css">Custom CSS</a>
 </div>
 
@@ -26,12 +25,10 @@
         <a class="mt-subcat {if $subcat == 'colors'}is-active{/if}"     data-subcat="colors"     href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=colors">Colors</a>
         <a class="mt-subcat {if $subcat == 'typography'}is-active{/if}" data-subcat="typography" href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=typography">Typography</a>
         <a class="mt-subcat {if $subcat == 'general'}is-active{/if}"    data-subcat="general"    href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=general">General</a>
-        <a class="mt-subcat {if $subcat == 'navigation'}is-active{/if}" data-subcat="navigation" href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=navigation">Navigation</a>
         <a class="mt-subcat {if $subcat == 'layout'}is-active{/if}"     data-subcat="layout"     href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=layout">Layout</a>
         <a class="mt-subcat {if $subcat == 'buttons'}is-active{/if}"    data-subcat="buttons"    href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=buttons">Buttons</a>
         <a class="mt-subcat {if $subcat == 'forms'}is-active{/if}"      data-subcat="forms"      href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=forms">Forms</a>
         <a class="mt-subcat {if $subcat == 'elements'}is-active{/if}"   data-subcat="elements"   href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=elements">Elements</a>
-        <a class="mt-subcat {if $subcat == 'site'}is-active{/if}"       data-subcat="site"       href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=site">Site</a>
     </nav>
   </div>
 
@@ -63,27 +60,13 @@
             {include file="styles/_elements.tpl"}
         </div>
 
-        {foreach ['general', 'navigation', 'site'] as $sc}
-        <div class="mt-subcat-panel" data-panel="{$sc}"{if $subcat != $sc} hidden{/if}>
-            <div class="mt-empty">
-                <div class="mt-empty-title">{$sc|capitalize}</div>
-                <p>This panel isn&rsquo;t available yet.</p>
-            </div>
+        <div class="mt-subcat-panel" data-panel="general"{if $subcat != 'general'} hidden{/if}>
+            {include file="styles/_general.tpl"}
         </div>
-        {/foreach}
     </div>
   </div>
 </div>
 {/if}{* /variables tab *}
-
-{if $tab == 'settings'}
-<div class="mt-panel pad">
-<div class="mt-empty">
-    <div class="mt-empty-title">Style Settings</div>
-    <p>This panel isn&rsquo;t available yet.</p>
-</div>
-</div>
-{/if}
 
 {if $tab == 'custom-css'}
     <form method="post" action="?module=Hadrian&action=editStyle&style={$style|escape}&tab=custom-css" class="mt-custom-css">

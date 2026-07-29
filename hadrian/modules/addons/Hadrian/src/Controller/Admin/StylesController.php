@@ -79,6 +79,9 @@ final class StylesController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_layout'])) {
             return $this->saveLayoutAction($template);
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_general'])) {
+            return $this->saveGeneralAction($template);
+        }
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_elements'])) {
             return $this->saveElementsAction($template);
         }
@@ -87,8 +90,18 @@ final class StylesController extends AbstractController
         $subcat = (string)($_GET['subcat'] ?? 'colors');
         $tab    = (string)($_GET['tab'] ?? 'variables');
         $scope  = (($_GET['scope'] ?? 'light') === 'dark') ? 'dark' : 'light';
-        if (!in_array($tab, ['variables', 'settings', 'custom-css'], true)) {
+        // 'settings' is gone: it rendered a permanent "not available yet" empty
+        // state. A stale bookmark to it now lands on Variables rather than a
+        // tab bar with nothing selected.
+        if (!in_array($tab, ['variables', 'custom-css'], true)) {
             $tab = 'variables';
+        }
+        // $subcat was never validated, so a stale link to a retired panel
+        // (?subcat=navigation, ?subcat=site) rendered the shell with every
+        // panel hidden -- a blank page with no indication why. Whitelist it and
+        // fall back to the first panel.
+        if (!in_array($subcat, ['colors', 'typography', 'general', 'layout', 'buttons', 'forms', 'elements'], true)) {
+            $subcat = 'colors';
         }
         $this->migrateColors($template);
 
@@ -106,6 +119,7 @@ final class StylesController extends AbstractController
             'typography'  => $tab === 'variables' ? $this->buildTypographyViewModel($template) : null,
             'buttons'     => $tab === 'variables' ? $this->buildButtonsViewModel($template) : null,
             'forms'       => $tab === 'variables' ? $this->buildFormsViewModel($template) : null,
+            'general'     => $tab === 'variables' ? $this->buildGeneralViewModel($template) : null,
             'layoutVars'  => $tab === 'variables' ? $this->buildLayoutViewModel($template) : null,
             'elements'    => $tab === 'variables' ? $this->buildElementsViewModel($template) : null,
             'saved'       => isset($_GET['saved']),
@@ -113,6 +127,7 @@ final class StylesController extends AbstractController
             'buttonsSaved'=> isset($_GET['buttons_saved']),
             'formsSaved'  => isset($_GET['forms_saved']),
             'layoutSaved' => isset($_GET['layout_saved']),
+            'generalSaved'=> isset($_GET['general_saved']),
             'elementsSaved'=> isset($_GET['elements_saved']),
             'customCss'   => (string)Settings::getValue($template->getName() . '_custom_css', ''),
             'cssSaved'    => isset($_GET['css_saved']),
@@ -976,6 +991,120 @@ final class StylesController extends AbstractController
      * GLOBAL stored overrides onto the core/config/layout.php defaults so each
      * field shows its effective value. Site-wide; no per-style key.
      */
+    /**
+     * View model for Styles > General — the scale layer the other panels
+     * select between (radius, shadow, control sizing, motion).
+     *
+     * Mirrors buildLayoutViewModel, with one difference that matters: fields
+     * are not all integers. A `preset` field resolves to an option KEY, not a
+     * number, because its stored value is a composite shadow string; matching
+     * is done on the normalised css so a stored value that no longer matches
+     * any authored option falls back to the default rather than rendering a
+     * dropdown with nothing selected.
+     */
+    private function buildGeneralViewModel($template): array
+    {
+        $cfg    = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/general.php');
+        $stored = Settings::getValue($template->getName() . '_general', []);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+
+        $shadowOptions = (array)($cfg['shadowOptions'] ?? []);
+        $byCss = [];
+        foreach ($shadowOptions as $o) {
+            $byCss[$this->normColor((string)$o['css'])] = (string)$o['key'];
+        }
+
+        $groups = [];
+        foreach (($cfg['groups'] ?? []) as $group => $fields) {
+            foreach ($fields as $f) {
+                $var  = (string)$f['var'];
+                $type = (string)($f['type'] ?? 'px');
+                $raw  = $stored[$var] ?? null;
+
+                if ($type === 'preset') {
+                    $f['value'] = $raw !== null
+                        ? ($byCss[$this->normColor((string)$raw)] ?? (string)$f['default'])
+                        : (string)$f['default'];
+                } elseif ($type === 'em') {
+                    $f['value'] = $raw !== null ? (float)$raw : (float)$f['default'];
+                } else {
+                    $f['value'] = $raw !== null ? (int)$raw : (int)$f['default'];
+                }
+                $groups[(string)$group][] = $f;
+            }
+        }
+
+        return [
+            'groups'        => $groups,
+            'shadowOptions' => $shadowOptions,
+        ];
+    }
+
+    /**
+     * Persist Styles > General. Only values that DIFFER from the schema default
+     * are stored, matching every other panel — so a buyer who never touches a
+     * field keeps inheriting whatever a theme update ships.
+     */
+    private function saveGeneralAction($template): string
+    {
+        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/general.php');
+        $min = (int)($cfg['sizeMin'] ?? 0);
+        $max = (int)($cfg['sizeMax'] ?? 4000);
+        $in  = is_array($_POST['gen'] ?? null) ? $_POST['gen'] : [];
+
+        $shadowByKey = [];
+        foreach ((array)($cfg['shadowOptions'] ?? []) as $o) {
+            $shadowByKey[(string)$o['key']] = (string)$o['css'];
+        }
+        $easing = (string)($cfg['easing'] ?? 'cubic-bezier(0.25, 0.1, 0.25, 1)');
+
+        $out = [];
+        foreach (($cfg['groups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $var  = (string)$f['var'];
+                $type = (string)($f['type'] ?? 'px');
+                if (!isset($in[$var]) || $in[$var] === '') {
+                    continue;
+                }
+
+                if ($type === 'preset') {
+                    // Whitelisted by construction: the posted value is only ever
+                    // an option key, and anything else is dropped rather than
+                    // written into a <style> block.
+                    $key = (string)$in[$var];
+                    if (!isset($shadowByKey[$key]) || $key === (string)$f['default']) {
+                        continue;
+                    }
+                    $out[$var] = $shadowByKey[$key];
+                    continue;
+                }
+
+                if ($type === 'em') {
+                    $val = round((float)$in[$var], 2);
+                    if ($val < 0 || $val > 20 || abs($val - (float)$f['default']) < 0.001) {
+                        continue;
+                    }
+                    $out[$var] = $val . 'em';
+                    continue;
+                }
+
+                $val = (int)$in[$var];
+                if ($val < $min || $val > $max || $val === (int)$f['default']) {
+                    continue;
+                }
+                // Motion is stored WITH the curve re-attached, so the emitter
+                // stays a dumb passthrough like every other head builder.
+                $out[$var] = $type === 'ms' ? ($val . 'ms ' . $easing) : ($val . 'px');
+            }
+        }
+
+        Settings::setValue($template->getName() . '_general', $out, 'json');
+        $style = (string)($_POST['style'] ?? 'default');
+        $this->redirect('?module=Hadrian&action=editStyle&style=' . urlencode($style) . '&subcat=general&general_saved=1');
+    }
+
     private function buildLayoutViewModel($template): array
     {
         $cfg    = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');

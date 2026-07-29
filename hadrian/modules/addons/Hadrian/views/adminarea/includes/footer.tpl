@@ -231,6 +231,21 @@
     });
 })();
 
+/* General panel: "Reset all" puts radius/control/motion inputs AND the shadow
+   selects back to default. Deliberately its own IIFE and its own form class --
+   every subcat panel is rendered into the same document and merely hidden, so a
+   shared selector would bind to whichever form happened to come first. */
+(function(){
+    var form = document.querySelector('.mt-general');
+    if (!form) return;
+    var greset = form.querySelector('#mt-general-reset');
+    if (greset) greset.addEventListener('click', function(){
+        [].slice.call(form.querySelectorAll('[data-default]')).forEach(function(el){
+            el.value = el.getAttribute('data-default');
+        });
+    });
+})();
+
 /* Elements panel: "Reset all" puts every px + scale field back to default. */
 (function(){
     var form = document.querySelector('.mt-elements');
