@@ -31,8 +31,8 @@
 
    Variant options (admin: Hadrian > Pages > Dashboard), read as
    $hadrian.pages.clientareahome.options.* - NOT .config.*, which does not exist:
-     bnt_attention     bool - the attention strip
      bnt_account       bool - the identity card beside the greeting
+     bnt_section_titles  inside|outside - where a tile's label sits
      bnt_visible_rows  int  - default items per tile (each tile may override)
      bnt_search_at     int  - row count at which Services/Domains grow a filter
      bnt_sections      the tile arrangement (see bento.php)
@@ -49,8 +49,7 @@
 
    Only default-TRUE booleans need this. A default-FALSE one is safe: its ON
    value is truthy, so no implementation can mistake it for missing. *}
-{assign var=bnActs value=true}
-{if isset($hadrian.pages.clientareahome.options.bnt_attention)}{assign var=bnActs value=$hadrian.pages.clientareahome.options.bnt_attention}{/if}
+{assign var=bnTitles value=$hadrian.pages.clientareahome.options.bnt_section_titles|default:'inside'}
 {assign var=bnAcct value=true}
 {if isset($hadrian.pages.clientareahome.options.bnt_account)}{assign var=bnAcct value=$hadrian.pages.clientareahome.options.bnt_account}{/if}
 {assign var=bnBillList value=true}
@@ -97,36 +96,19 @@
     {assign var=dashIsEmpty value='empty'}
 {/if}
 
-{* ---------- attention chips ----------
-   Every chip is an ACCOUNT TOTAL from $clientsstats, never a count taken over
-   one of the $dashboard arrays. Those are capped at 8 rows by the hook and
-   sliced in API order, so a suspended service can fall off the end entirely --
-   a chip derived from one would quietly undercount. The three below are the
-   same figures the default variant's notices already run on.
-
-   No "services need action" chip for exactly that reason: WHMCS publishes no
-   suspended-service total, and the only other source is the capped array. *}
-{assign var=bnOverdue value=$clientsstats.numoverdueinvoices|default:0}
-{assign var=bnUnpaid  value=$clientsstats.numunpaidinvoices|default:0}
-{assign var=bnExpiring value=$clientsstats.numexpiringdomains|default:0}
-{assign var=bnAttnCount value=0}
-{if $bnOverdue > 0}
-    {assign var=bnAttnCount value=($bnAttnCount+$bnOverdue)}
-{elseif $bnUnpaid > 0}
-    {assign var=bnAttnCount value=($bnAttnCount+$bnUnpaid)}
-{/if}
-{if $bnExpiring > 0}{assign var=bnAttnCount value=($bnAttnCount+$bnExpiring)}{/if}
-
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareahome.css?v={$hadrian.version|default:'1.0'}">
 
 {* Page-level signals. header.tpl owns data-layout / data-subnav / data-svc-layout,
-   so only the one this page actually decides is set here. Bento never emits
-   data-min-title: its titles are always inside the tile. *}
+   so only the two this page actually decides are set here. data-bn-title is
+   bento's own, deliberately NOT minimal's data-min-title: the two variants
+   place a title differently and sharing the attribute would have one variant's
+   CSS reach the other. *}
 <script>
 (function () {
     var b = document.body;
     if (!b) return;
     b.setAttribute('data-data', '{$dashIsEmpty}');
+    b.setAttribute('data-bn-title', '{$bnTitles|escape:'javascript'}');
 })();
 </script>
 
@@ -178,25 +160,6 @@
     {/if}
 </div>
 
-{* ---------- attention strip ----------
-   Dropped entirely when every chip would be zero, so a healthy account never
-   sees an empty alarm bar. *}
-{if $bnActs && $bnAttnCount > 0}
-<div class="bn-attn" data-bn-attn>
-    <span class="bn-attn-lead"><span class="n">{$bnAttnCount}</span>{$hadrianLang.dashboard.needsAttention}</span>
-    {if $bnOverdue > 0}
-    <a class="bn-chip red" href="{$WEB_ROOT}/clientarea.php?action=invoices">{$bnOverdue} {if $bnOverdue == 1}{$hadrianLang.dashboard.overdueInvoice}{else}{$hadrianLang.dashboard.overdueInvoices}{/if}{if $clientsstats.unpaidinvoicesamount} <span class="bn-dot">&middot;</span> {$clientsstats.unpaidinvoicesamount}{/if}</a>
-    {elseif $bnUnpaid > 0}
-    <a class="bn-chip orange" href="{$WEB_ROOT}/clientarea.php?action=invoices">{$bnUnpaid} {if $bnUnpaid == 1}{$hadrianLang.dashboard.unpaidInvoiceOne}{else}{$hadrianLang.dashboard.unpaidInvoiceMany}{/if}{if $clientsstats.unpaidinvoicesamount} <span class="bn-dot">&middot;</span> {$clientsstats.unpaidinvoicesamount}{/if}</a>
-    {/if}
-    {if $bnExpiring > 0}
-    <a class="bn-chip orange" href="{$WEB_ROOT}/clientarea.php?action=domains">{$bnExpiring} {if $bnExpiring == 1}{$hadrianLang.dashboard.domainSingular}{else}{$hadrianLang.dashboard.domainPlural}{/if} {$hadrianLang.dashboard.expiringSoon}</a>
-    {/if}
-    <span class="bn-attn-sp"></span>
-    <button type="button" class="bn-attn-x" data-bn-dismiss>{$hadrianLang.dashboard.dismiss}</button>
-</div>
-{/if}
-
 {* ---------- tiles ----------
    $bnSecs is resolved in PHP (Hooks::resolveCurrentPage -> SectionLayout). An
    empty list means "no admin layout saved" and selects the built-in
@@ -219,12 +182,13 @@
                interpolate a stored value into a file path -- an unresolvable
                {include} drops the whole client area to the Six theme, and the
                poisoned compiled-template cache survives a git revert. *}
-            {if $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'domainreg' || $s.key == 'profile'}
+            {if $s.key == 'attention' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'domainreg' || $s.key == 'profile'}
                 {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec=$s.key secSpan=$s.span secHideEmpty=$s.hideEmpty secHideList=$s.hideList secPaint=$s.paint secFill=$s.fill secRowsIn=$s.rows secCustom=$s.custom}
             {/if}
         {/if}
     {/foreach}
 {else}
+    {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec='attention' secSpan=6}
     {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec='services' secSpan=4}
     {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec='domains' secSpan=2}
     {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec='invoices' secSpan=2}

@@ -45,7 +45,7 @@
 {* Panels, not lists. They have no rows, so they must not run the list
    scaffolding below -- and above all not the hide-when-empty guard, which reads
    $secCount and would delete an always-available tile outright. *}
-{if $sec == 'domainreg' || $sec == 'profile'}{assign var=secPanel value=true}{else}{assign var=secPanel value=false}{/if}
+{if $sec == 'domainreg' || $sec == 'profile' || $sec == 'attention'}{assign var=secPanel value=true}{else}{assign var=secPanel value=false}{/if}
 
 {if $sec == 'services'}
     {assign var=secCount value=$nServices}
@@ -129,6 +129,61 @@
        rules are all keyed off `.min-section > .blk`, so these two tiles reflow
        to whichever of the four widths the admin dropped them into without a
        single bento-specific rule. *}
+    {if $sec == 'attention'}
+    {* ---------- Needs your attention ----------
+       Every chip is an exact figure. Three come from $clientsstats, which
+       WHMCS computes over the whole account; the other two are COUNT queries
+       in the hook. None is a tally of the rows on this page -- those are
+       capped at 8 and sliced in API order, so counting them would undercount
+       the moment a client had more than a screenful.
+
+       The whole tile renders NOTHING when there is nothing to act on. It is a
+       banner, not a collection: an empty attention strip is worse than no
+       strip, because it trains the reader to ignore it. *}
+    {assign var=bnOverdue   value=$clientsstats.numoverdueinvoices|default:0}
+    {assign var=bnUnpaid    value=$clientsstats.numunpaidinvoices|default:0}
+    {assign var=bnExpiring  value=$clientsstats.numexpiringdomains|default:0}
+    {assign var=bnSuspended value=$dashboard.attention.suspended|default:0}
+    {assign var=bnAwaiting  value=$dashboard.attention.awaitingReply|default:0}
+    {assign var=bnAttnCount value=0}
+    {* Overdue and merely-unpaid are the same invoices counted twice, so only
+       the more urgent framing contributes to the badge. *}
+    {if $bnOverdue > 0}{assign var=bnAttnCount value=($bnAttnCount+$bnOverdue)}
+    {elseif $bnUnpaid > 0}{assign var=bnAttnCount value=($bnAttnCount+$bnUnpaid)}{/if}
+    {if $bnExpiring > 0}{assign var=bnAttnCount value=($bnAttnCount+$bnExpiring)}{/if}
+    {if $bnSuspended > 0}{assign var=bnAttnCount value=($bnAttnCount+$bnSuspended)}{/if}
+    {if $bnAwaiting > 0}{assign var=bnAttnCount value=($bnAttnCount+$bnAwaiting)}{/if}
+    {if $bnAttnCount > 0}
+    <div class="bn-attn" data-bn-attn>
+        <span class="bn-attn-lead"><span class="n">{$bnAttnCount}</span>{$hadrianLang.dashboard.needsAttention}</span>
+        {if $bnOverdue > 0}
+        <a class="bn-chip red" href="{$WEB_ROOT}/clientarea.php?action=invoices">{$bnOverdue} {if $bnOverdue == 1}{$hadrianLang.dashboard.overdueInvoice}{else}{$hadrianLang.dashboard.overdueInvoices}{/if}{if $clientsstats.unpaidinvoicesamount} <span class="bn-dot">&middot;</span> {$clientsstats.unpaidinvoicesamount}{/if}</a>
+        {elseif $bnUnpaid > 0}
+        <a class="bn-chip orange" href="{$WEB_ROOT}/clientarea.php?action=invoices">{$bnUnpaid} {if $bnUnpaid == 1}{$hadrianLang.dashboard.unpaidInvoiceOne}{else}{$hadrianLang.dashboard.unpaidInvoiceMany}{/if}{if $clientsstats.unpaidinvoicesamount} <span class="bn-dot">&middot;</span> {$clientsstats.unpaidinvoicesamount}{/if}</a>
+        {/if}
+        {if $bnSuspended > 0}
+        <a class="bn-chip orange" href="{$WEB_ROOT}/clientarea.php?action=services">{$bnSuspended} {if $bnSuspended == 1}{$hadrianLang.dashboard.attnServiceOne}{else}{$hadrianLang.dashboard.attnServiceMany}{/if}</a>
+        {/if}
+        {if $bnAwaiting > 0}
+        <a class="bn-chip blue" href="{$WEB_ROOT}/supporttickets.php">{$bnAwaiting} {if $bnAwaiting == 1}{$hadrianLang.dashboard.attnTicketOne}{else}{$hadrianLang.dashboard.attnTicketMany}{/if}</a>
+        {/if}
+        {if $bnExpiring > 0}
+        <a class="bn-chip orange" href="{$WEB_ROOT}/clientarea.php?action=domains">{$bnExpiring} {if $bnExpiring == 1}{$hadrianLang.dashboard.domainSingular}{else}{$hadrianLang.dashboard.domainPlural}{/if} {$hadrianLang.dashboard.expiringSoon}</a>
+        {/if}
+        <span class="bn-attn-sp"></span>
+        <button type="button" class="bn-attn-x" data-bn-dismiss>{$hadrianLang.dashboard.dismiss}</button>
+    </div>
+    {/if}
+    {else}
+    {* With titles outside, a list tile's surface starts one head-height lower
+       than a panel's would, so a panel beside one sits proud of it. The spacer
+       is the SAME element with the same typography and margin, and carries BOTH
+       of the children a real head has -- the head's height comes from the View
+       all link (13px), not the eyebrow (11px), so an eyebrow-only spacer came
+       up 3px short. Measuring rather than hardcoding is what keeps this correct
+       when the type scale moves. Panels carry their own heading inside (.blk-title, sized
+       by the container query), so this stays empty rather than repeating it. *}
+    {if $bnTitles == 'outside'}<div class="bn-outhead" aria-hidden="true"><span class="bn-eyebrow">&nbsp;</span><span class="bn-viewall">&nbsp;</span></div>{/if}
     <div class="blk">
         {if $sec == 'domainreg'}
         <div class="blk-body">
@@ -207,10 +262,22 @@
         </div>
         {/if}
     </div>
+    {/if}{* /attention vs .blk panels *}
 {else}
     {* ---------- List tiles ---------- *}
+    {* TITLES OUTSIDE. The head is emitted as a SIBLING of the card rather than
+       restyled in place: it has to sit on the page background, and nothing can
+       lift a child out of a bordered, shadowed box. .bn-cell is already a
+       flex column, so a sibling above the card needs no extra scaffolding.
+       body[data-bn-title] then only has to say which of the two is in play. *}
+    {if $bnTitles == 'outside'}
+    <div class="bn-outhead">
+        <span class="bn-eyebrow{if $sec == 'invoices' && $clientsstats.numoverdueinvoices > 0} is-alert{/if}">{if $sec == 'services'}{$LANG.navservices|default:'Services'}{elseif $sec == 'domains'}{$LANG.navdomains|default:'Domains'}{elseif $sec == 'invoices'}{$LANG.invoicestitle|default:'Invoices'}{elseif $sec == 'tickets'}{$LANG.navtickets|default:'Support'}{else}{$LANG.announcements|default:'Announcements'}{/if}</span>
+        <a href="{if $sec == 'services'}{$WEB_ROOT}/clientarea.php?action=services{elseif $sec == 'domains'}{$WEB_ROOT}/clientarea.php?action=domains{elseif $sec == 'invoices'}{$WEB_ROOT}/clientarea.php?action=invoices{elseif $sec == 'tickets'}{$WEB_ROOT}/supporttickets.php{else}{$WEB_ROOT}/announcements.php{/if}" class="bn-viewall">{$LANG.viewall|default:'View All'} &rarr;</a>
+    </div>
+    {/if}
     <div class="bn-card">
-        <div class="bn-eyebrow{if $sec == 'invoices' && $clientsstats.numoverdueinvoices > 0} is-alert{/if}">{if $sec == 'services'}{$LANG.navservices|default:'Services'}{elseif $sec == 'domains'}{$LANG.navdomains|default:'Domains'}{elseif $sec == 'invoices'}{$LANG.invoicestitle|default:'Invoices'}{elseif $sec == 'tickets'}{$LANG.navtickets|default:'Support'}{else}{$LANG.announcements|default:'Announcements'}{/if}</div>
+        {if $bnTitles != 'outside'}<div class="bn-eyebrow{if $sec == 'invoices' && $clientsstats.numoverdueinvoices > 0} is-alert{/if}">{if $sec == 'services'}{$LANG.navservices|default:'Services'}{elseif $sec == 'domains'}{$LANG.navdomains|default:'Domains'}{elseif $sec == 'invoices'}{$LANG.invoicestitle|default:'Invoices'}{elseif $sec == 'tickets'}{$LANG.navtickets|default:'Support'}{else}{$LANG.announcements|default:'Announcements'}{/if}</div>{/if}
 
         {if $sec == 'invoices'}
             {* ---------- Billing: an aggregate, not a leaderboard ----------
@@ -239,7 +306,14 @@
             {/if}
         {else}
             <div class="bn-titlerow">
-                <div class="bn-title">{if $sec == 'services'}{$clientsstats.productsnumactive|default:0} {$LANG.navservices|default:'Services'}{elseif $sec == 'domains'}{$clientsstats.numactivedomains|default:0} {$LANG.navdomains|default:'Domains'}{elseif $sec == 'tickets'}{$clientsstats.numactivetickets|default:0} {$LANG.navtickets|default:'Support'}{else}{$LANG.announcements|default:'Announcements'}{/if}</div>
+                {* No title row for Announcements. The other three lead with an
+                   account total -- "8 Services" -- and there is no equivalent
+                   figure for announcements, so it printed the eyebrow's own
+                   word straight back underneath it. The eyebrow is the title
+                   here. *}
+                {if $sec != 'announcements'}
+                <div class="bn-title">{if $sec == 'services'}{$clientsstats.productsnumactive|default:0} {$LANG.navservices|default:'Services'}{elseif $sec == 'domains'}{$clientsstats.numactivedomains|default:0} {$LANG.navdomains|default:'Domains'}{else}{$clientsstats.numactivetickets|default:0} {$LANG.navtickets|default:'Support'}{/if}</div>
+                {/if}
             </div>
         {/if}
 
@@ -348,28 +422,44 @@
                child, which keeps the final visible row on its non-:last-child
                branch and draws a stray hairline. *}
             {if $secSearch}<div class="min-noresults">{$hadrianLang.dashboard.noMatches}</div>{/if}
+        {elseif $sec == 'invoices'}
+            {* Billing has no generic empty state: its aggregate branch above
+               already renders one ("All paid up" / "Nothing is due right now"),
+               and it is the more accurate of the two -- it keys off the unpaid
+               COUNT rather than off whether any invoice happens to be in the
+               8-row slice, so it still reads correctly for a client with a long
+               paid history and nothing owing. *}
         {else}
-            {if $sec == 'services' && $secRoomy}
-            <div class="min-empty">
-                <p>{$hadrianLang.dashboard.noServicesSub}</p>
-                <div class="acts"><a href="{$WEB_ROOT}/cart.php" class="btn-primary">{$LANG.orderproducts|default:'Order a service'}</a></div>
+            {* PER-TILE EMPTY STATE. Branches on THIS tile's own count, never on
+               the page-level .when-full/.when-empty classes -- those are driven
+               by one body[data-data] flag, so a client with services but no
+               domains would get an empty Services card too.
+
+               Icon, a title, one sentence and the action that fills the tile:
+               an empty block is the best possible moment to say what the block
+               is for. `.compact` drops the icon and the buttons for a tile too
+               narrow to seat them -- a 48px icon over a centred CTA in a 1/3
+               column reads as broken rather than inviting. *}
+            <div class="bn-empty{if !$secRoomy} compact{/if}">
+                <span class="bn-empty-ico">
+                {if $sec == 'services'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                {elseif $sec == 'domains'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 014 10 15 15 0 01-4 10 15 15 0 01-4-10 15 15 0 014-10z"/></svg>
+                {elseif $sec == 'invoices'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                {elseif $sec == 'tickets'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                {else}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 11-5.8-1.6"/></svg>
+                {/if}
+                </span>
+                <span class="bn-empty-t">{if $sec == 'services'}{$hadrianLang.dashboard.noServicesTitle}{elseif $sec == 'domains'}{$hadrianLang.dashboard.noDomainsTitle}{elseif $sec == 'invoices'}{$hadrianLang.dashboard.allPaidUp}{elseif $sec == 'tickets'}{$hadrianLang.dashboard.noTicketsTitle}{else}{$hadrianLang.dashboard.noAnnouncements}{/if}</span>
+                <p>{if $sec == 'services'}{$hadrianLang.dashboard.noServicesSub}{elseif $sec == 'domains'}{$hadrianLang.dashboard.noDomainsSub}{elseif $sec == 'invoices'}{$hadrianLang.dashboard.nothingDue}{elseif $sec == 'tickets'}{$hadrianLang.dashboard.noTicketsSub}{else}{$hadrianLang.dashboard.noAnnouncementsSub}{/if}</p>
+                <span class="bn-empty-acts">
+                {if $sec == 'services'}<a href="{$WEB_ROOT}/cart.php" class="bn-cta">{$LANG.orderproducts|default:'Order a service'}</a><a href="{$WEB_ROOT}/cart.php" class="bn-viewall">{$hadrianLang.dashboard.browseStore} &rsaquo;</a>
+                {elseif $sec == 'domains'}<a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register" class="bn-cta">{$LANG.registerdomain|default:'Register a domain'}</a><a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=transfer" class="bn-viewall">{$hadrianLang.dashboard.transferIn} &rsaquo;</a>
+                {elseif $sec == 'invoices'}<a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="bn-viewall">{$hadrianLang.dashboard.invoiceHistory} &rsaquo;</a>
+                {elseif $sec == 'tickets'}<a href="{$WEB_ROOT}/submitticket.php" class="bn-cta">{$LANG.navopenticket|default:'Open a ticket'}</a>
+                {else}<a href="{$WEB_ROOT}/announcements.php" class="bn-viewall">{$hadrianLang.dashboard.announcementArchive} &rsaquo;</a>
+                {/if}
+                </span>
             </div>
-            {elseif $sec == 'domains' && $secRoomy}
-            <div class="min-empty">
-                <p>{$hadrianLang.dashboard.noDomainsSub}</p>
-                <div class="acts"><a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register" class="btn-primary">{$LANG.registerdomain|default:'Register a domain'}</a></div>
-            </div>
-            {elseif $sec == 'services'}
-            <div class="min-empty compact"><p>{$hadrianLang.dashboard.noServicesSub}</p></div>
-            {elseif $sec == 'domains'}
-            <div class="min-empty compact"><p>{$hadrianLang.dashboard.noDomainsSub}</p></div>
-            {elseif $sec == 'invoices'}
-            <div class="min-empty compact"><p>{$hadrianLang.dashboard.noInvoices}</p></div>
-            {elseif $sec == 'tickets'}
-            <div class="min-empty compact"><p>{$hadrianLang.dashboard.noOpenTickets}</p></div>
-            {else}
-            <div class="min-empty compact"><p>{$hadrianLang.dashboard.noAnnouncementsShort}</p></div>
-            {/if}
         {/if}
         </div>
         {/if}{* /show list *}
@@ -385,6 +475,9 @@
 
         {* One footer slot, bottom-anchored, so every tile in a row lines its
            View all up on the same baseline however tall its neighbour grows. *}
+        {* The floated head already carries View all, so repeating it in the
+           footer would print the same link twice on one tile. *}
+        {if $bnTitles != 'outside'}
         <div class="bn-foot">
             {if $sec == 'services'}<a href="{$WEB_ROOT}/clientarea.php?action=services" class="bn-viewall">{$LANG.viewall|default:'View All'} &rarr;</a>
             {elseif $sec == 'domains'}<a href="{$WEB_ROOT}/clientarea.php?action=domains" class="bn-viewall">{$LANG.viewall|default:'View All'} &rarr;</a>
@@ -393,6 +486,7 @@
             {else}<a href="{$WEB_ROOT}/announcements.php" class="bn-viewall">{$LANG.viewall|default:'View All'} &rarr;</a>
             {/if}
         </div>
+        {/if}
     </div>
 {/if}{* /panel vs list *}
 </div>

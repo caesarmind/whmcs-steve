@@ -249,7 +249,12 @@ final class SectionLayout
                 $width = '1/1';
             }
             $optIn = !empty($spec['optIn']);
-            $out[] = [
+            // A section can ask to be appended at the FRONT. Only relevant to
+            // one that belongs above everything else -- the attention strip is
+            // a banner, and landing it at the bottom of a layout saved before
+            // it existed would read as a bug rather than as a new capability.
+            $prepend = !empty($spec['prepend']);
+            $entry = [
                 'key'       => (string)$key,
                 'width'     => $optIn ? 'off' : $width,
                 'span'      => self::SPANS[$width],
@@ -261,6 +266,11 @@ final class SectionLayout
                 'custom'    => '',
                 'rows'      => 0,
             ];
+            if ($prepend) {
+                array_unshift($out, $entry);
+            } else {
+                $out[] = $entry;
+            }
         }
 
         return $out;

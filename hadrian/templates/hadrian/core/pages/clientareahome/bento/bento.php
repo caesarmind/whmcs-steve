@@ -28,11 +28,12 @@ return [
     // with no default merge, so every template read carries its own |default:
     // matching the value declared here.
     'supportedOptions' => [
-        'bnt_attention' => [
-            'type'    => 'bool',
-            'label'   => 'Attention strip',
-            'default' => true,
-            'tooltip' => 'A row of chips above the grid summarising what needs action: invoices outstanding, with the amount, and domains expiring in the next 45 days. Each chip is dropped when its count is zero, and the whole strip disappears when there is nothing to act on. The counts are account totals, not a count of the rows on this page, so they are exact.',
+        'bnt_section_titles' => [
+            'type'    => 'select',
+            'label'   => 'Tile titles',
+            'default' => 'inside',
+            'options' => ['inside', 'outside'],
+            'tooltip' => 'Inside keeps each tile self-contained: its label and count sit on the card, which is how the bento grid was drawn. Outside floats them on the page background above the card, so a row of tiles reads as a set of labelled groups rather than a set of boxes.',
         ],
         'bnt_account' => [
             'type'    => 'bool',
@@ -72,6 +73,16 @@ return [
             'default' => '',
             'tooltip' => 'Drag to reorder, switch a tile off to hide it, and set each one to full, two thirds, one half or one third width. Widths run on a six-column grid, so a row fills up when its widths add to a whole. Leave blank for the built-in arrangement. Every tile can be coloured and takes a solid, wash or gradient fill.',
             'sections' => [
+                // A banner, not a collection: no rows, no empty state, and it
+                // renders nothing at all when there is nothing to act on. It is
+                // in the catalogue so it can be reordered, resized and switched
+                // off from the same place as everything else.
+                //
+                // prepend puts it at the TOP of a layout saved before it moved
+                // here. It used to sit above the grid unconditionally, so
+                // appending it last would look like a regression rather than a
+                // new block.
+                'attention'     => ['label' => 'Needs your attention', 'w' => '1/1', 'prepend' => true],
                 'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 'domains'       => ['label' => 'Domains',           'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 // listToggle puts a per-block switch in this section's own

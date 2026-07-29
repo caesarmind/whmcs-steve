@@ -1192,6 +1192,53 @@ body[data-min-title="inside"] .min-list {
 .bn-cell[data-blk-fill="solid"] > .bn-card .min-row .status-pill.open,
 .bn-cell[data-blk-fill="grad"] > .bn-card .min-row .status-pill.open { color: #0a4f9e; }
 
+/* --- Titles outside the tile ------------------------------------------
+   The head is a SIBLING of the card (see cell.tpl), so this only has to space
+   it. Deliberately mirrors the minimal variant's outside/inside idea without
+   sharing its attribute: data-bn-title vs data-min-title, because the two
+   variants place a title differently and one selector reaching the other
+   would be a silent cross-variant regression. */
+.bn-outhead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; padding: 0 2px; }
+.bn-outhead .bn-eyebrow { margin: 0; }
+/* The card keeps its own top padding, but with the label gone it no longer
+   needs to reserve room for one. */
+body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
+
+/* --- Per-tile empty states --------------------------------------------
+   An empty block is the best moment to say what the block is FOR, so it gets
+   an icon, a title, a sentence and the action -- not a muted line of text.
+
+   .compact is the narrow-tile form: no icon, no buttons. A 44px icon over a
+   centred CTA in a 1/3 column reads as broken rather than inviting, which is
+   the whole reason the old empty state had a compact mode at all. */
+.bn-empty { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; flex: 1; padding: 8px 0 4px; }
+.bn-empty-ico { width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--color-surface-secondary); display: flex; align-items: center; justify-content: center; margin-bottom: 13px; flex-shrink: 0; }
+.bn-empty-ico svg { width: 21px; height: 21px; color: var(--color-text-tertiary); }
+.bn-empty-t { font-size: var(--text-lg); font-weight: var(--fw-semibold); letter-spacing: -0.01em; color: var(--color-text-primary); margin-bottom: 5px; }
+.bn-empty p { font-size: var(--text-base); color: var(--color-text-secondary); margin: 0 0 16px; line-height: 1.45; max-width: 320px; }
+.bn-empty-acts { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.bn-empty-acts .bn-cta { margin-top: 0; }
+.bn-empty.compact .bn-empty-ico,
+.bn-empty.compact .bn-empty-acts { display: none; }
+.bn-empty.compact { padding: 4px 0; }
+.bn-empty.compact p { margin-bottom: 0; }
+/* On a saturated fill the empty state is ink-on-colour like everything else. */
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-empty-t,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-empty-t,
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-empty p,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-empty p { color: var(--blk-ink, #fff); }
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-empty-ico,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-empty-ico { background: rgba(255,255,255,0.18); }
+.bn-cell[data-blk-fill="solid"] > .bn-card .bn-empty-ico svg,
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-empty-ico svg { color: var(--blk-ink, #fff); }
+
+/* --- Attention strip as a tile ----------------------------------------
+   It sits in the grid now, so it is a .min-section like everything else and
+   must not inherit the card padding its siblings get. The strip keeps its own
+   surface; the cell around it just gets out of the way. */
+.bn-grid > .min-section[data-sec="attention"] { align-self: start; }
+.bn-grid > .min-section[data-sec="attention"] > .bn-attn { margin: 0; width: 100%; }
+
 /* --- Narrow tiles -------------------------------------------------------
    Below the grid's own 720px single-column reset the tiles are full width
    again, so only the in-tile padding needs easing. */

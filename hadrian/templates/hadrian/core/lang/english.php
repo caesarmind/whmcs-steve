@@ -299,6 +299,21 @@ return [
         'daysOverdue'       => 'days overdue',
         'creditApplied'     => 'account credit will be applied first',
 
+        // Attention chips backed by exact COUNT queries (see
+        // Hooks::fetchAttentionCounts). "Answered" is WHMCS's term for a ticket
+        // staff have replied to -- from the client's side that reads as
+        // awaiting THEIR reply.
+        'attnServiceOne'    => 'service needs action',
+        'attnServiceMany'   => 'services need action',
+        'attnTicketOne'     => 'ticket awaiting your reply',
+        'attnTicketMany'    => 'tickets awaiting your reply',
+
+        // Secondary links on the per-tile empty states.
+        'browseStore'       => 'Browse store',
+        'transferIn'        => 'Transfer one in',
+        'invoiceHistory'    => 'Invoice history',
+        'announcementArchive' => 'Announcement archive',
+
         // Public homepage marketing copy.
         'heroTitle'           => 'Secure your domain name.',
         'heroSubtitle'        => 'Search, register, and transfer -- all in one place.',

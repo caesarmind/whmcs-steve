@@ -1006,6 +1006,11 @@ final class Hooks
                 // will come off first. $clientsstats carries the counts and the
                 // unpaid total but none of the detail.
                 'billing'        => $this->fetchBillingSummary($clientId),
+                // Counts for the attention strip. COUNT queries over the whole
+                // set, not tallies of the 8-row dashboard slices -- that is the
+                // difference between "2 services need action" being true and
+                // being true only of what happens to be on screen.
+                'attention'      => $this->fetchAttentionCounts($clientId),
             ],
         ];
     }
@@ -1675,6 +1680,49 @@ final class Hooks
             // no credit line rather than no page
         }
 
+        return $out;
+    }
+
+    /**
+     * The two attention figures WHMCS does not publish.
+     *
+     * $clientsstats covers overdue invoices and expiring domains, so those come
+     * from there. It has nothing for "suspended services" or "tickets waiting
+     * on the client", and the obvious substitute -- counting the $dashboard
+     * arrays -- is wrong: the hook caps those at DASHBOARD_ROWS and slices them
+     * in API order, so a suspended service can fall off the end entirely and
+     * the chip would quietly undercount. That is why these chips were left out
+     * when the strip first shipped.
+     *
+     * A COUNT over the whole table has no such ceiling, so they are exact now.
+     *
+     * "Answered" is WHMCS's term for a ticket staff have replied to, i.e. the
+     * ball is with the client -- which is what "awaiting your reply" means from
+     * the client's side.
+     *
+     * @return array{suspended:int, awaitingReply:int}
+     */
+    private function fetchAttentionCounts(int $clientId): array
+    {
+        $out = ['suspended' => 0, 'awaitingReply' => 0];
+        if ($clientId === 0) {
+            return $out;
+        }
+        try {
+            $out['suspended'] = (int)\WHMCS\Database\Capsule::table('tblhosting')
+                ->where('userid', $clientId)
+                ->where('domainstatus', 'Suspended')
+                ->count();
+        } catch (\Throwable) {
+            // A missing figure drops its chip; it never shows a wrong one.
+        }
+        try {
+            $out['awaitingReply'] = (int)\WHMCS\Database\Capsule::table('tbltickets')
+                ->where('userid', $clientId)
+                ->where('status', 'Answered')
+                ->count();
+        } catch (\Throwable) {
+        }
         return $out;
     }
 
