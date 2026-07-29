@@ -311,7 +311,12 @@
                    figure for announcements, so it printed the eyebrow's own
                    word straight back underneath it. The eyebrow is the title
                    here. *}
-                {if $sec != 'announcements'}
+                {* The title row is a FULL-data line: it leads with an account
+                   total, and "0 Domains" sitting above "No domains yet" says
+                   the same thing twice in a row. The mockup keeps it inside its
+                   when-full block for the same reason. Billing is the exception
+                   -- its title IS its empty state ("All paid up"). *}
+                {if $sec != 'announcements' && ($secCount > 0 || $sec == 'invoices')}
                 <div class="bn-title">{if $sec == 'services'}{$clientsstats.productsnumactive|default:0} {$LANG.navservices|default:'Services'}{elseif $sec == 'domains'}{$clientsstats.numactivedomains|default:0} {$LANG.navdomains|default:'Domains'}{else}{$clientsstats.numactivetickets|default:0} {$LANG.navtickets|default:'Support'}{/if}</div>
                 {/if}
             </div>
@@ -437,10 +442,12 @@
 
                Icon, a title, one sentence and the action that fills the tile:
                an empty block is the best possible moment to say what the block
-               is for. `.compact` drops the icon and the buttons for a tile too
-               narrow to seat them -- a 48px icon over a centred CTA in a 1/3
-               column reads as broken rather than inviting. *}
-            <div class="bn-empty{if !$secRoomy} compact{/if}">
+               is for, and that is true at every width -- the mockup shows the
+               full treatment on a 1/3 tile. `.compact` therefore only tightens
+               spacing at 1/3; it no longer hides the icon or the buttons, which
+               was leaving the narrow tiles saying what was missing without
+               offering the way to fix it. *}
+            <div class="bn-empty{if $secW <= 2} compact{/if}">
                 <span class="bn-empty-ico">
                 {if $sec == 'services'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
                 {elseif $sec == 'domains'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 014 10 15 15 0 01-4 10 15 15 0 01-4-10 15 15 0 014-10z"/></svg>

@@ -1211,6 +1211,12 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
    .compact is the narrow-tile form: no icon, no buttons. A 44px icon over a
    centred CTA in a 1/3 column reads as broken rather than inviting, which is
    the whole reason the old empty state had a compact mode at all. */
+/* `flex: 1` on the empty state only means something if its PARENT is a flex
+   column -- .min-list is a plain block, so the state was pinned to the top and
+   a tile stretched to match a taller neighbour left a pile of dead space under
+   it. :has() scopes this to lists that actually hold an empty state, so the row
+   layout is untouched. */
+.bn-card > .min-list:has(> .bn-empty) { display: flex; flex-direction: column; flex: 1; }
 .bn-empty { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; flex: 1; padding: 8px 0 4px; }
 .bn-empty-ico { width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--color-surface-secondary); display: flex; align-items: center; justify-content: center; margin-bottom: 13px; flex-shrink: 0; }
 .bn-empty-ico svg { width: 21px; height: 21px; color: var(--color-text-tertiary); }
@@ -1218,10 +1224,12 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
 .bn-empty p { font-size: var(--text-base); color: var(--color-text-secondary); margin: 0 0 16px; line-height: 1.45; max-width: 320px; }
 .bn-empty-acts { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
 .bn-empty-acts .bn-cta { margin-top: 0; }
-.bn-empty.compact .bn-empty-ico,
-.bn-empty.compact .bn-empty-acts { display: none; }
+/* 1/3 tiles keep every part -- they just get less air around it, and the
+   actions stack rather than sitting side by side at ~280px of usable width. */
 .bn-empty.compact { padding: 4px 0; }
-.bn-empty.compact p { margin-bottom: 0; }
+.bn-empty.compact .bn-empty-ico { width: 38px; height: 38px; margin-bottom: 10px; }
+.bn-empty.compact p { margin-bottom: 13px; }
+.bn-empty.compact .bn-empty-acts { flex-direction: column; align-items: flex-start; gap: 10px; }
 /* On a saturated fill the empty state is ink-on-colour like everything else. */
 .bn-cell[data-blk-fill="solid"] > .bn-card .bn-empty-t,
 .bn-cell[data-blk-fill="grad"] > .bn-card .bn-empty-t,
