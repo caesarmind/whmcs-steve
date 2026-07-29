@@ -34,7 +34,18 @@
 {* ---------- options ---------- *}
 {assign var=minTitles value=$hadrian.pages.clientareahome.options.min_section_titles|default:'outside'}
 {assign var=minRows   value=$hadrian.pages.clientareahome.options.min_visible_rows|default:5}
-{assign var=minActs   value=$hadrian.pages.clientareahome.options.min_show_actions|default:true}
+{* A stored FALSE must not be re-defaulted to true. |default: fires on a value
+   the modifier considers "missing", and which values those are depends on the
+   Smarty build in play: the inlined compiler form tests null/'' and would keep
+   the false, but an empty()-based smarty_modifier_default treats false as
+   missing and hands back the default -- so a toggle switched OFF comes back ON
+   and the control looks broken. Same hazard the integer options below are
+   already written around; isset() is right under either implementation.
+
+   Only default-TRUE booleans need this. A default-FALSE one is safe: its ON
+   value is truthy, so no implementation can mistake it for missing. *}
+{assign var=minActs value=true}
+{if isset($hadrian.pages.clientareahome.options.min_show_actions)}{assign var=minActs value=$hadrian.pages.clientareahome.options.min_show_actions}{/if}
 {if $minRows < 1}{assign var=minRows value=5}{/if}
 {* Row count at which a list grows its own filter box. 0 (or anything that is
    not a positive number) switches the filter off everywhere. Applies to the

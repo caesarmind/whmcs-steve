@@ -42,11 +42,26 @@
    toggle off stores a real false. Declared in ../page.php 'supportedOptions'. *}
 {assign var=_hTitle       value=$hadrian.pages.homepage.options.heroTitle|default:''}
 {assign var=_hSub         value=$hadrian.pages.homepage.options.heroSubtitle|default:''}
-{assign var=_showDomain   value=$hadrian.pages.homepage.options.show_domain_search|default:true}
-{assign var=_showProducts value=$hadrian.pages.homepage.options.show_products|default:true}
-{assign var=_showFeatures value=$hadrian.pages.homepage.options.show_features|default:true}
-{assign var=_showNews     value=$hadrian.pages.homepage.options.show_news|default:true}
-{assign var=_showCta      value=$hadrian.pages.homepage.options.show_cta|default:true}
+{* A stored FALSE must not be re-defaulted to true. |default: fires on a value
+   the modifier considers "missing", and which values those are depends on the
+   Smarty build in play: the inlined compiler form tests null/'' and would keep
+   the false, but an empty()-based smarty_modifier_default treats false as
+   missing and hands back the default -- so a toggle switched OFF comes back ON
+   and the control looks broken. Same hazard the integer options below are
+   already written around; isset() is right under either implementation.
+
+   Only default-TRUE booleans need this. A default-FALSE one is safe: its ON
+   value is truthy, so no implementation can mistake it for missing. *}
+{assign var=_showDomain value=true}
+{if isset($hadrian.pages.homepage.options.show_domain_search)}{assign var=_showDomain value=$hadrian.pages.homepage.options.show_domain_search}{/if}
+{assign var=_showProducts value=true}
+{if isset($hadrian.pages.homepage.options.show_products)}{assign var=_showProducts value=$hadrian.pages.homepage.options.show_products}{/if}
+{assign var=_showFeatures value=true}
+{if isset($hadrian.pages.homepage.options.show_features)}{assign var=_showFeatures value=$hadrian.pages.homepage.options.show_features}{/if}
+{assign var=_showNews value=true}
+{if isset($hadrian.pages.homepage.options.show_news)}{assign var=_showNews value=$hadrian.pages.homepage.options.show_news}{/if}
+{assign var=_showCta value=true}
+{if isset($hadrian.pages.homepage.options.show_cta)}{assign var=_showCta value=$hadrian.pages.homepage.options.show_cta}{/if}
 
 {* Real-data state.
    $homeProductGroups is the primary dynamic content on this page, so it drives

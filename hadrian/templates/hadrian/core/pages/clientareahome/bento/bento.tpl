@@ -40,9 +40,22 @@
 *}
 
 {* ---------- options ---------- *}
-{assign var=bnActs value=$hadrian.pages.clientareahome.options.bnt_attention|default:true}
-{assign var=bnAcct value=$hadrian.pages.clientareahome.options.bnt_account|default:true}
-{assign var=bnBillList value=$hadrian.pages.clientareahome.options.bnt_billing_list|default:true}
+{* A stored FALSE must not be re-defaulted to true. |default: fires on a value
+   the modifier considers "missing", and which values those are depends on the
+   Smarty build in play: the inlined compiler form tests null/'' and would keep
+   the false, but an empty()-based smarty_modifier_default treats false as
+   missing and hands back the default -- so a toggle switched OFF comes back ON
+   and the control looks broken. Same hazard the integer options below are
+   already written around; isset() is right under either implementation.
+
+   Only default-TRUE booleans need this. A default-FALSE one is safe: its ON
+   value is truthy, so no implementation can mistake it for missing. *}
+{assign var=bnActs value=true}
+{if isset($hadrian.pages.clientareahome.options.bnt_attention)}{assign var=bnActs value=$hadrian.pages.clientareahome.options.bnt_attention}{/if}
+{assign var=bnAcct value=true}
+{if isset($hadrian.pages.clientareahome.options.bnt_account)}{assign var=bnAcct value=$hadrian.pages.clientareahome.options.bnt_account}{/if}
+{assign var=bnBillList value=true}
+{if isset($hadrian.pages.clientareahome.options.bnt_billing_list)}{assign var=bnBillList value=$hadrian.pages.clientareahome.options.bnt_billing_list}{/if}
 
 {* Deliberately NOT |default: on the two integers. Zero is a meaningful stored
    value ("off" for the filter), and whether |default: treats 0 as missing
