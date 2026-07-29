@@ -117,6 +117,43 @@ final class StylesController extends AbstractController
         ]);
     }
 
+    /**
+     * Stylesheet URLs for the Colors live-preview iframe. The preview links the
+     * REAL client-theme CSS -- the same files a client-area page loads -- so
+     * what the buyer sees is painted by production rules rather than by an
+     * admin-side imitation that would drift the moment the theme changes.
+     *
+     * LINKED, never inlined: apple-theme.css's @font-face points at
+     * ../fonts/InterVariable.woff2, and a CSS relative URL resolves against the
+     * STYLESHEET's own URL. Inline the text into a <style> and the font 404s.
+     *
+     * The two pages/ sheets are not optional. The dashboard tiles/bento blocks
+     * and the list-table + sub-nav components exist ONLY there, so without them
+     * a third of the gallery renders unstyled and the tokens they use would
+     * report "affects nothing".
+     *
+     * @return list<string>
+     */
+    private function buildPreviewStylesheets($template): array
+    {
+        $webRoot = defined('WEB_ROOT') ? rtrim((string)WEB_ROOT, '/') : '';
+        $base    = $webRoot . '/templates/' . $template->getName() . '/assets/css/';
+        // Same cache-bust the client area uses (core/<tpl>.php version), so the
+        // preview can never paint a stale sheet against a fresh token set.
+        $ver = '?v=' . rawurlencode($template->getVersion());
+
+        $out = [];
+        foreach ([
+            'apple-theme.css',
+            'apple-layout.css',
+            'pages/clientareahome.css',
+            'pages/clientareaproducts.css',
+        ] as $file) {
+            $out[] = $base . $file . $ver;
+        }
+        return $out;
+    }
+
     private function saveAction($template): string
     {
         $style = (string)$_POST['style'];
