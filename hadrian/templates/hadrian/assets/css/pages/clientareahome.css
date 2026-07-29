@@ -1286,7 +1286,20 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
    left-aligned the first time. Measured on the reference: equal gutters each
    side of the icon, the title and the buttons. */
 .bn-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; flex: 1; padding: 8px 0 4px; }
-.bn-empty-ico { width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--color-surface-secondary); display: flex; align-items: center; justify-content: center; margin-bottom: 13px; flex-shrink: 0; }
+/* The plate is a SEE-THROUGH wash, not an opaque grey. Opaque
+   --color-surface-secondary painted over whatever the card was, which is what
+   made it read as a dead grey square on a tinted tile -- the tile had a colour
+   and the plate ignored it.
+
+   The wash is 5% of the tile's own ink rather than 5% of literal black, and
+   that is the whole trick: --color-text-primary flips in dark mode, so the
+   plate becomes a light scrim on a dark card instead of a black square nobody
+   can see. Same reasoning the quiet/neutral paints use just above.
+
+   --blk-ink is deliberately undeclared on tint and unpainted tiles (see the
+   scoping note at the ink primitive), so the var() fallback chain picks the
+   right colour per context without a single extra selector. */
+.bn-empty-ico { width: 44px; height: 44px; border-radius: var(--radius-md); background: color-mix(in srgb, var(--blk-ink, var(--color-text-primary, #1d1d1f)) var(--bn-ico-wash, 5%), transparent); display: flex; align-items: center; justify-content: center; margin-bottom: 13px; flex-shrink: 0; }
 .bn-empty-ico svg { width: 21px; height: 21px; color: var(--color-text-tertiary); }
 .bn-empty-t { font-size: var(--text-lg); font-weight: var(--fw-semibold); letter-spacing: -0.01em; color: var(--color-text-primary); margin-bottom: 5px; }
 .bn-empty p { font-size: var(--text-base); color: var(--color-text-secondary); margin: 0 auto 16px; line-height: 1.45; max-width: 320px; }
@@ -1309,8 +1322,12 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
 .bn-cell[data-blk-fill="grad"] > .bn-card .bn-empty-t,
 .bn-cell[data-blk-fill="solid"] > .bn-card .bn-empty p,
 .bn-cell[data-blk-fill="grad"] > .bn-card .bn-empty p { color: var(--blk-ink, #fff); }
+/* On a saturated fill the wash only gets DEEPER. It names no colour, so it
+   still follows --blk-ink -- which comes out BLACK on a pale fill (teal,
+   orange, green, or a buyer's own light hue) instead of the white smudge the
+   old hard-coded rgba(255,255,255,0.18) left there. */
 .bn-cell[data-blk-fill="solid"] > .bn-card .bn-empty-ico,
-.bn-cell[data-blk-fill="grad"] > .bn-card .bn-empty-ico { background: rgba(255,255,255,0.18); }
+.bn-cell[data-blk-fill="grad"] > .bn-card .bn-empty-ico { --bn-ico-wash: 18%; }
 .bn-cell[data-blk-fill="solid"] > .bn-card .bn-empty-ico svg,
 .bn-cell[data-blk-fill="grad"] > .bn-card .bn-empty-ico svg { color: var(--blk-ink, #fff); }
 
