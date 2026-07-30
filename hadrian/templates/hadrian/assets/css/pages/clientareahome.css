@@ -1539,6 +1539,31 @@ html[data-theme="dark"] .at-hero-btn-primary { color: color-mix(in srgb, var(--c
     .at-stat-value { font-size: 26px; }
 }
 
+/* --- Block titles outside the card ------------------------------------
+   The head is not moved in the DOM -- it is lifted visually out of the card by
+   removing the card's own top framing and pulling the head above it. Nothing
+   can extract a child from a bordered, rounded, overflow-hidden box, so the
+   card loses its top edge instead and the head sits on the page background.
+
+   Deliberately data-at-title, NOT bento's data-bn-title: the two variants place
+   a title differently and sharing the attribute would have one variant's rules
+   reach the other. */
+body[data-at-title="outside"] .at-card { background: none; border: 0; box-shadow: none; border-radius: 0; overflow: visible; }
+body[data-at-title="outside"] .at-card-head { padding: 0 2px 10px; }
+body[data-at-title="outside"] .at-rows,
+body[data-at-title="outside"] .at-card-body,
+body[data-at-title="outside"] .at-empty {
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); overflow: hidden;
+}
+/* The first row's top border drew the line under the head; with the head
+   floated out, the panel's own border does that job. */
+body[data-at-title="outside"] .at-rows > .at-row:first-child { border-top: 0; }
+/* Panels keep their card -- their title is part of the surface, not a label
+   over a list, so floating it would leave a headless block of numbers. */
+body[data-at-title="outside"] .at-panel { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+body[data-at-title="outside"] .at-panel .at-card-head { padding: 0 0 12px; }
+
 /* --- Atrium body: two independent column stacks -----------------------
    minmax(0,...) on BOTH tracks is load-bearing: an ellipsised service name
    otherwise forces min-content and blows the grid past its container.

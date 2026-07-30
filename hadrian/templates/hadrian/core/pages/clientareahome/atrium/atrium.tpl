@@ -35,7 +35,7 @@
 
    Variant options (admin: Hadrian > Pages > Dashboard), read as
    $hadrian.pages.clientareahome.options.* - NOT .config.*, which does not exist:
-     atr_hero            bool - the welcome band
+     atr_section_titles  inside|outside - where a block's label sits
      atr_stat_services   bool - summary figure
      atr_stat_domains    bool - summary figure
      atr_stat_billing    bool - summary figure
@@ -49,8 +49,7 @@
    missing and hands back the default, so a toggle switched OFF comes back ON
    and the control looks broken. isset() is right under either implementation.
    Only default-TRUE booleans need this. *}
-{assign var=atHero value=true}
-{if isset($hadrian.pages.clientareahome.options.atr_hero)}{assign var=atHero value=$hadrian.pages.clientareahome.options.atr_hero}{/if}
+{assign var=atTitles value=$hadrian.pages.clientareahome.options.atr_section_titles|default:'inside'}
 {assign var=atHeroStyle value=$hadrian.pages.clientareahome.options.atr_hero_style|default:'gradient'}
 {assign var=atHeroWidth value=$hadrian.pages.clientareahome.options.atr_hero_width|default:'boxed'}
 {assign var=atHeroActs value=$hadrian.pages.clientareahome.options.atr_hero_actions|default:'right'}
@@ -88,94 +87,9 @@
     var b = document.body;
     if (!b) return;
     b.setAttribute('data-data', '{$dashIsEmpty}');
+    b.setAttribute('data-at-title', '{$atTitles|escape:'javascript'}');
 })();
 </script>
-
-{* ---------- welcome band ---------- *}
-{if $atHero}
-<section class="at-hero" data-at-style="{$atHeroStyle|escape}" data-at-width="{$atHeroWidth|escape}" data-at-acts="{$atHeroActs|escape}">
-    <div class="at-hero-main">
-        {* Supplied by the hook, not formatted in Smarty: |date_format's
-           %-style codes rely on strftime and are broken on PHP 8.1+. *}
-        {if $dashboard.today|default:''}<div class="at-hero-date">{$dashboard.today|escape}</div>{/if}
-        <h1 class="at-hero-title">
-{if $dashboard.greeting == 'morning'}{$hadrianLang.dashboard.goodMorning}{elseif $dashboard.greeting == 'afternoon'}{$hadrianLang.dashboard.goodAfternoon}{else}{$hadrianLang.dashboard.goodEvening}{/if}{if $clientsdetails.firstname}, {$clientsdetails.firstname|escape}{/if}
-        </h1>
-        <p class="at-hero-sub">
-            <span class="when-full">{$hadrianLang.dashboard.atriumSubFull}</span>
-            <span class="when-empty">{$hadrianLang.dashboard.atriumSubEmpty}</span>
-        </p>
-    </div>
-    {if $atHeroActs != 'off'}
-    <div class="at-hero-actions">
-        {* Gated with {if}, not CSS: a client with nothing due must never have
-           the string emitted at all, or it ships in the HTML for anyone
-           reading source. *}
-        {if $atInvN > 0 && $clientsstats.unpaidinvoicesamount}
-        <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="at-hero-btn at-hero-btn-primary">
-            {$hadrianLang.dashboard.payBalance} &mdash; {$clientsstats.unpaidinvoicesamount}
-        </a>
-        {/if}
-        <a href="{$WEB_ROOT}/cart.php" class="at-hero-btn">{$LANG.orderproducts|default:'Order a service'}</a>
-    </div>
-    {/if}
-</section>
-{/if}
-
-{* ---------- summary figures ----------
-   ONE section drawing its own four-up grid, not four sections: the layout DSL
-   has no 1/4 token and six columns cannot express quarters -- four 1/3 entries
-   would span 8 and wrap 3+1. Each tile is switched independently instead. *}
-{assign var=atStatN value=0}
-{if $atStatSvc}{assign var=atStatN value=($atStatN+1)}{/if}
-{if $atStatDom}{assign var=atStatN value=($atStatN+1)}{/if}
-{if $atStatBill}{assign var=atStatN value=($atStatN+1)}{/if}
-{if $atStatTkt}{assign var=atStatN value=($atStatN+1)}{/if}
-{if $atStatN > 0}
-{* --at-stat-n drives the column count: the tiles are independently switchable
-   and repeat(auto-fit, ...) would leave empty tracks when fewer than four are
-   on, half-filling the row. *}
-<section class="at-stats" style="--at-stat-n:{$atStatN}">
-    {if $atStatSvc}
-    <a class="at-stat" href="{$WEB_ROOT}/clientarea.php?action=services">
-        <span class="at-stat-label">{$hadrianLang.dashboard.activeServices}</span>
-        <span class="at-stat-value">{$atSvcN}</span>
-        {* No sub-line. The mockup's "3 renewing soon" has no source: nextDueDate
-           arrives pre-formatted with no timestamp left to window on. Every stat
-           tile in the default variant is count + label for the same reason. *}
-    </a>
-    {/if}
-    {if $atStatDom}
-    <a class="at-stat" href="{$WEB_ROOT}/clientarea.php?action=domains">
-        <span class="at-stat-label">{$LANG.navdomains|default:'Domains'}</span>
-        <span class="at-stat-value">{$atDomN}</span>
-        {if $atDomEx > 0}<span class="at-stat-sub">{$atDomEx} {if $atDomEx == 1}{$hadrianLang.dashboard.domainSingular}{else}{$hadrianLang.dashboard.domainPlural}{/if} {$hadrianLang.dashboard.expireWithin45}</span>{/if}
-    </a>
-    {/if}
-    {if $atStatBill}
-    <a class="at-stat{if $atInvN > 0} is-due{/if}" href="{$WEB_ROOT}/clientarea.php?action=invoices">
-        <span class="at-stat-label">{$hadrianLang.dashboard.balanceDue}</span>
-        <span class="at-stat-value">{if $clientsstats.unpaidinvoicesamount}{$clientsstats.unpaidinvoicesamount}{else}&mdash;{/if}</span>
-        {* Overdue AGE is knowable; a future due date is not. Shown only when
-           something actually is overdue. *}
-        {if $dashboard.billing.overdueAmount|default:'' && $dashboard.billing.worstDays|default:0 > 0}
-        <span class="at-stat-sub is-alert">{$dashboard.billing.worstDays} {$hadrianLang.dashboard.daysOverdue}</span>
-        {elseif $atInvN > 0}
-        <span class="at-stat-sub">{$atInvN} {if $atInvN == 1}{$hadrianLang.dashboard.unpaidInvoiceOne}{else}{$hadrianLang.dashboard.unpaidInvoiceMany}{/if}</span>
-        {/if}
-    </a>
-    {/if}
-    {if $atStatTkt}
-    <a class="at-stat" href="{$WEB_ROOT}/supporttickets.php">
-        <span class="at-stat-label">{$hadrianLang.dashboard.openTickets}</span>
-        <span class="at-stat-value">{$atTktN}</span>
-        {* "N awaiting your reply", never "N new": this is an exact COUNT of
-           tickets staff have answered, not an unread count. *}
-        {if $atTktWait > 0}<span class="at-stat-sub">{$atTktWait} {if $atTktWait == 1}{$hadrianLang.dashboard.attnTicketOne}{else}{$hadrianLang.dashboard.attnTicketMany}{/if}</span>{/if}
-    </a>
-    {/if}
-</section>
-{/if}
 
 {* ---------- body ----------
    Width reads as a COLUMN here, not a size. The parser already returns the
@@ -203,7 +117,7 @@
                    interpolate a stored value into a path -- an unresolvable
                    {include} drops the whole client area to the Six theme, and
                    the poisoned compiled-template cache survives a git revert. *}
-                {if $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
+                {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
                     {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secRows=$s.rows|default:$atDefRows}
                 {/if}
             {/if}
@@ -215,7 +129,7 @@
         <div class="at-main">
         {foreach $atSecs as $s}
             {if $s.visible && ($s.width == '2/3' || $s.width == '1/2')}
-                {if $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
+                {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
                     {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secRows=$s.rows|default:$atDefRows}
                 {/if}
             {/if}
@@ -224,7 +138,7 @@
         <div class="at-side">
         {foreach $atSecs as $s}
             {if $s.visible && $s.width == '1/3'}
-                {if $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
+                {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
                     {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secRows=$s.rows|default:$atDefRows}
                 {/if}
             {/if}
@@ -236,6 +150,10 @@
        the wide side, the things you act on down the narrow one. Hand-packed
        rather than derived, so a blank or corrupt layout string still renders a
        complete dashboard. *}
+    <div class="at-band">
+        {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec='hero'}
+        {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec='stats'}
+    </div>
     <div class="at-body">
         <div class="at-main">
             {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec='domains'  secRows=$atDefRows}

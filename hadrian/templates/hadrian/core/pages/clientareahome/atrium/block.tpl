@@ -35,12 +35,106 @@
      {if $secPaint|default:''}data-blk-paint="{$secPaint|escape}" data-blk-fill="{$atFill|escape}"{/if}
      {if $secCustom|default:''}style="--blk-base:{$secCustom|escape}"{/if}>
 
+{* ---------------- Welcome band ----------------
+   A block like any other now, so it reorders, hides and paints from the
+   builder alongside everything else. It carries no rows, so hide-when-empty
+   has nothing to act on. *}
+{if $sec == 'hero'}
+<section class="at-hero" data-at-style="{$atHeroStyle|escape}" data-at-width="{$atHeroWidth|escape}" data-at-acts="{$atHeroActs|escape}">
+    <div class="at-hero-main">
+        {* Supplied by the hook, not formatted in Smarty: |date_format's
+           %-style codes rely on strftime and are broken on PHP 8.1+. *}
+        {if $dashboard.today|default:''}<div class="at-hero-date">{$dashboard.today|escape}</div>{/if}
+        <h1 class="at-hero-title">
+{if $dashboard.greeting == 'morning'}{$hadrianLang.dashboard.goodMorning}{elseif $dashboard.greeting == 'afternoon'}{$hadrianLang.dashboard.goodAfternoon}{else}{$hadrianLang.dashboard.goodEvening}{/if}{if $clientsdetails.firstname}, {$clientsdetails.firstname|escape}{/if}
+        </h1>
+        <p class="at-hero-sub">
+            <span class="when-full">{$hadrianLang.dashboard.atriumSubFull}</span>
+            <span class="when-empty">{$hadrianLang.dashboard.atriumSubEmpty}</span>
+        </p>
+    </div>
+    {if $atHeroActs != 'off'}
+    <div class="at-hero-actions">
+        {* Gated with {if}, not CSS: a client with nothing due must never have
+           the string emitted at all, or it ships in the HTML for anyone
+           reading source. *}
+        {if $atInvN > 0 && $clientsstats.unpaidinvoicesamount}
+        <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="at-hero-btn at-hero-btn-primary">
+            {$hadrianLang.dashboard.payBalance} &mdash; {$clientsstats.unpaidinvoicesamount}
+        </a>
+        {/if}
+        <a href="{$WEB_ROOT}/cart.php" class="at-hero-btn">{$LANG.orderproducts|default:'Order a service'}</a>
+    </div>
+    {/if}
+</section>
+
+{* ---------------- Summary figures ----------------
+   ONE block drawing its own four-up grid, not four: the layout DSL has no 1/4
+   token and six columns cannot express quarters. WHICH figures appear is set
+   by the atr_stat_* options; hide-when-empty drops the whole strip when the
+   account has nothing in any of them, which is the one sense in which a strip
+   of counts can be empty. *}
+{elseif $sec == 'stats'}
+    {if !($secHideEmpty|default:false && $atSvcN == 0 && $atDomN == 0 && $atInvN == 0 && $atTktN == 0)}
+{assign var=atStatN value=0}
+{if $atStatSvc}{assign var=atStatN value=($atStatN+1)}{/if}
+{if $atStatDom}{assign var=atStatN value=($atStatN+1)}{/if}
+{if $atStatBill}{assign var=atStatN value=($atStatN+1)}{/if}
+{if $atStatTkt}{assign var=atStatN value=($atStatN+1)}{/if}
+{if $atStatN > 0}
+{* --at-stat-n drives the column count: the tiles are independently switchable
+   and repeat(auto-fit, ...) would leave empty tracks when fewer than four are
+   on, half-filling the row. *}
+<section class="at-stats" style="--at-stat-n:{$atStatN}">
+    {if $atStatSvc}
+    <a class="at-stat" href="{$WEB_ROOT}/clientarea.php?action=services">
+        <span class="at-stat-label">{$hadrianLang.dashboard.activeServices}</span>
+        <span class="at-stat-value">{$atSvcN}</span>
+        {* No sub-line. The mockup's "3 renewing soon" has no source: nextDueDate
+           arrives pre-formatted with no timestamp left to window on. Every stat
+           tile in the default variant is count + label for the same reason. *}
+    </a>
+    {/if}
+    {if $atStatDom}
+    <a class="at-stat" href="{$WEB_ROOT}/clientarea.php?action=domains">
+        <span class="at-stat-label">{$LANG.navdomains|default:'Domains'}</span>
+        <span class="at-stat-value">{$atDomN}</span>
+        {if $atDomEx > 0}<span class="at-stat-sub">{$atDomEx} {if $atDomEx == 1}{$hadrianLang.dashboard.domainSingular}{else}{$hadrianLang.dashboard.domainPlural}{/if} {$hadrianLang.dashboard.expireWithin45}</span>{/if}
+    </a>
+    {/if}
+    {if $atStatBill}
+    <a class="at-stat{if $atInvN > 0} is-due{/if}" href="{$WEB_ROOT}/clientarea.php?action=invoices">
+        <span class="at-stat-label">{$hadrianLang.dashboard.balanceDue}</span>
+        <span class="at-stat-value">{if $clientsstats.unpaidinvoicesamount}{$clientsstats.unpaidinvoicesamount}{else}&mdash;{/if}</span>
+        {* Overdue AGE is knowable; a future due date is not. Shown only when
+           something actually is overdue. *}
+        {if $dashboard.billing.overdueAmount|default:'' && $dashboard.billing.worstDays|default:0 > 0}
+        <span class="at-stat-sub is-alert">{$dashboard.billing.worstDays} {$hadrianLang.dashboard.daysOverdue}</span>
+        {elseif $atInvN > 0}
+        <span class="at-stat-sub">{$atInvN} {if $atInvN == 1}{$hadrianLang.dashboard.unpaidInvoiceOne}{else}{$hadrianLang.dashboard.unpaidInvoiceMany}{/if}</span>
+        {/if}
+    </a>
+    {/if}
+    {if $atStatTkt}
+    <a class="at-stat" href="{$WEB_ROOT}/supporttickets.php">
+        <span class="at-stat-label">{$hadrianLang.dashboard.openTickets}</span>
+        <span class="at-stat-value">{$atTktN}</span>
+        {* "N awaiting your reply", never "N new": this is an exact COUNT of
+           tickets staff have answered, not an unread count. *}
+        {if $atTktWait > 0}<span class="at-stat-sub">{$atTktWait} {if $atTktWait == 1}{$hadrianLang.dashboard.attnTicketOne}{else}{$hadrianLang.dashboard.attnTicketMany}{/if}</span>{/if}
+    </a>
+    {/if}
+</section>
+{/if}
+    {/if}
+
 {* ---------------- Amount due ----------------
    A panel, not a collection. Renders NOTHING when nothing is owed: an
    "amount due: nothing" card is worse than no card, because it trains the
    reader to skip the one block that matters when it does appear. Its
-   hide-when-empty switch is therefore inert, as documented in atrium.php. *}
-{if $sec == 'unpaid'}
+   hide-when-empty is therefore redundant here rather than inert -- the block
+   already behaves as though it were permanently switched on. *}
+{elseif $sec == 'unpaid'}
     {if $dashboard.billing.worstAmount|default:''}
     <div class="at-card at-panel">
         <div class="at-card-head">
@@ -63,6 +157,8 @@
 
 {* ---------------- Account credit ---------------- *}
 {elseif $sec == 'credit'}
+    {* Hide-when-empty here means "no credit on the account". *}
+    {if !($secHideEmpty|default:false && !$dashboard.billing.hasCredit|default:false)}
     <div class="at-card at-panel">
         <div class="at-card-head"><span class="at-card-title">{$hadrianLang.dashboard.accountCredit}</span></div>
         {* hasCredit is the raw float. Never test $clientsstats.creditbalance --
@@ -84,8 +180,12 @@
             <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="at-btn">{$hadrianLang.dashboard.invoiceHistory}</a>
         </div>
     </div>
+    {/if}
 
-{* ---------------- Quick actions ---------------- *}
+{* ---------------- Quick actions ----------------
+   Four fixed links, so there is nothing it can be empty OF. The builder offers
+   hide-when-empty on every block; on this one it is honestly a no-op rather
+   than something quietly broken. *}
 {elseif $sec == 'actions'}
     <div class="at-card at-panel">
         <div class="at-card-head"><span class="at-card-title">{$hadrianLang.dashboard.quickActions}</span></div>

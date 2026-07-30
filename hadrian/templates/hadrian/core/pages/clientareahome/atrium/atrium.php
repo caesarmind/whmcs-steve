@@ -36,13 +36,6 @@ return [
     // with no default merge, so every template read carries its own |default:
     // matching the value declared here.
     'supportedOptions' => [
-        'atr_hero' => [
-            'type'    => 'bool',
-            'label'   => 'Welcome band',
-            'default' => true,
-            'tooltip' => 'The greeting, the date and the actions across the top. Switching it off starts the page at the summary figures.',
-        ],
-
         // The four summary tiles, each independently switchable. They are ONE
         // section rather than four because the layout DSL has no 1/4 token and
         // six columns cannot express quarters -- four 1/3 entries would span 8
@@ -71,6 +64,14 @@ return [
             'label'   => 'Figure: open tickets',
             'default' => true,
             'tooltip' => 'Open tickets, with a sub-line for any where staff have replied and are waiting on the client.',
+        ],
+
+        'atr_section_titles' => [
+            'type'    => 'select',
+            'label'   => 'Block titles',
+            'default' => 'inside',
+            'options' => ['inside', 'outside'],
+            'tooltip' => 'Inside keeps each block self-contained: its label sits on the card, which is how the dashboard was drawn. Outside floats the label on the page background above the card, so a column reads as a set of labelled groups rather than a set of boxes.',
         ],
 
         // ---- Welcome band appearance ------------------------------------
@@ -123,6 +124,18 @@ return [
             'preview' => 'columns',
             'tooltip' => 'Drag to reorder, switch a block off to hide it, and choose which column it sits in. Full width spans the page above the split; Main column is the wide left stack and Side column the narrow right one. Reordering moves a block within its own column. Leave blank for the built-in arrangement. Every block can be coloured and takes a solid, wash or gradient fill.',
             'sections' => [
+                // The band and the figure strip are blocks like any other, so
+                // they reorder, hide, resize and paint from the same place.
+                // Both are 1/1: neither makes sense in a column, and the
+                // template only reads 1/1 as "the band above the split".
+                //
+                // prepend puts them at the TOP of a layout saved before they
+                // moved here -- they used to render unconditionally above the
+                // body, so appending them last would read as a regression
+                // rather than as new blocks. Same reason bento's attention
+                // strip carries it.
+                'hero'          => ['label' => 'Welcome band',    'w' => '1/1', 'prepend' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                'stats'         => ['label' => 'Summary figures', 'w' => '1/1', 'prepend' => true],
                 'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',
