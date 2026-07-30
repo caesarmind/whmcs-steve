@@ -1276,10 +1276,32 @@ final class Hooks
             $services = [];
             foreach (($response['products']['product'] ?? []) as $p) {
                 if (!in_array($p['status'] ?? '', ['Active', 'Suspended'], true)) continue;
+                $name   = (string)($p['name'] ?? $p['groupname'] ?? 'Service');
+                $domain = (string)($p['domain'] ?? '');
+
+                // WHMCS's `domain` column is free text for anything that is not
+                // hosting, and licensing modules put the LICENCE KEY in it --
+                // observed live as "22B91-DF67E-FD1FA-E84F3". So a dashboard
+                // that leads with the domain (which is the right identifier for
+                // a hosting account, where the product name repeats down the
+                // whole column) has to know when the value is not one.
+                //
+                // The test is deliberately narrow: at least one dot, no
+                // whitespace, and no character a hostname cannot contain. It
+                // decides a LABEL only -- nothing downstream is gated on it --
+                // so a false negative costs a nicer title, never a broken link.
+                $looksLikeHost = $domain !== ''
+                    && str_contains($domain, '.')
+                    && preg_match('/^[A-Za-z0-9.\-]+$/', $domain) === 1;
+
                 $services[] = [
                     'id'           => (int)($p['id'] ?? 0),
-                    'name'         => (string)($p['name'] ?? $p['groupname'] ?? 'Service'),
-                    'domain'       => (string)($p['domain'] ?? ''),
+                    'name'         => $name,
+                    'domain'       => $domain,
+                    // What to put on the row, and what to put under it. Resolved
+                    // here rather than in Smarty because the test is a regex.
+                    'label'        => $looksLikeHost ? $domain : $name,
+                    'sublabel'     => $looksLikeHost ? $name : '',
                     'status'       => (string)($p['status'] ?? 'Active'),
                     'nextDueDate'  => !empty($p['nextduedate']) ? date('M j, Y', strtotime((string)$p['nextduedate'])) : '',
                     'manageUrl'    => '/clientarea.php?action=productdetails&id=' . (int)($p['id'] ?? 0),

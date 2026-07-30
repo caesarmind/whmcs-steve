@@ -256,7 +256,12 @@
                            non-hosting products come back with domain '' -- so
                            the product name is the fallback rather than leaving
                            the row untitled. *}
-                        {if $sec == 'services'}{if $r.domain}{$r.domain|escape}{else}{$r.name|escape}{/if}
+                        {* label/sublabel are resolved in the hook: WHMCS's domain
+                           column holds a LICENCE KEY for licensing products, so
+                           "lead with the domain" needs a hostname test, and that
+                           is a regex rather than something Smarty should carry.
+                           Falls back to name on an older payload. *}
+                        {if $sec == 'services'}{$r.label|default:$r.name|escape}
                         {elseif $sec == 'domains'}{$r.domain|escape}
                         {elseif $sec == 'invoices'}#{$r.id|escape}
                         {elseif $sec == 'tickets'}{$r.subject|escape}
@@ -265,8 +270,8 @@
                     {if !$secCompact|default:false}
                         {* The sub-line carries whichever of the pair the title did
                            not use, so nothing is lost either way. *}
-                        {if $sec == 'services' && ($r.domain || $r.nextDueDate)}
-                        <span class="at-row-sub">{if $r.domain}{$r.name|escape}{/if}{if $r.domain && $r.nextDueDate} &middot; {/if}{if $r.nextDueDate}{$hadrianLang.dashboard.renews} {$r.nextDueDate|escape}{/if}</span>
+                        {if $sec == 'services' && ($r.sublabel|default:'' || $r.nextDueDate)}
+                        <span class="at-row-sub">{if $r.sublabel|default:''}{$r.sublabel|escape}{/if}{if $r.sublabel|default:'' && $r.nextDueDate} &middot; {/if}{if $r.nextDueDate}{$hadrianLang.dashboard.renews} {$r.nextDueDate|escape}{/if}</span>
                         {elseif $sec == 'domains' && $r.expirydate}
                         <span class="at-row-sub">{$hadrianLang.dashboard.renews} {$r.expirydate|escape}</span>
                         {elseif $sec == 'invoices' && $r.date}
