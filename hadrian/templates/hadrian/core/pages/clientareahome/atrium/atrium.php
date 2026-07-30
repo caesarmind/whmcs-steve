@@ -73,6 +73,32 @@ return [
             'tooltip' => 'Open tickets, with a sub-line for any where staff have replied and are waiting on the client.',
         ],
 
+        // ---- Welcome band appearance ------------------------------------
+        // The band is the one part of the page that is a designed surface
+        // rather than a container of data, so it gets its own controls rather
+        // than a section entry in the builder.
+        'atr_hero_style' => [
+            'type'    => 'select',
+            'label'   => 'Band style',
+            'default' => 'gradient',
+            'options' => ['gradient', 'solid', 'soft', 'plain'],
+            'tooltip' => 'Gradient is the shipped look: the accent deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint of the accent with dark text, for a lighter page. Plain drops the panel and sets the greeting directly on the page background.',
+        ],
+        'atr_hero_width' => [
+            'type'    => 'select',
+            'label'   => 'Band width',
+            'default' => 'boxed',
+            'options' => ['boxed', 'edge'],
+            'tooltip' => 'Boxed keeps the band inside the content column with the rest of the page. Edge runs it to the full width of the content area with the text still aligned to the column, which reads as a header rather than a card.',
+        ],
+        'atr_hero_actions' => [
+            'type'    => 'select',
+            'label'   => 'Band buttons',
+            'default' => 'right',
+            'options' => ['right', 'below', 'off'],
+            'tooltip' => 'Right places Pay balance and Order a service opposite the greeting. Below stacks them under it, which suits a narrow content column. Off hides them; the same actions are reachable from the blocks underneath.',
+        ],
+
         // Which blocks appear, in what order, and in which COLUMN.
         //
         // Width means something different here than in bento. Bento flows tiles
@@ -89,6 +115,12 @@ return [
             'title'   => 'Dashboard tiles',
             'label'   => 'Dashboard tiles',
             'default' => '',
+            // Tells the admin builder to draw its preview as a BAND over two
+            // COLUMNS rather than bento's six-column grid. Without it the
+            // preview shows Announcements beside Domains -- a row that can
+            // never happen here, because 2/3 and 1/3 land in different stacks
+            // rather than sharing a row. A preview that lies is worse than none.
+            'preview' => 'columns',
             'tooltip' => 'Drag to reorder, switch a block off to hide it, and choose which column it sits in. Full width spans the page above the split; Main column is the wide left stack and Side column the narrow right one. Reordering moves a block within its own column. Leave blank for the built-in arrangement. Every block can be coloured and takes a solid, wash or gradient fill.',
             'sections' => [
                 'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],

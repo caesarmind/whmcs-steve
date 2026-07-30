@@ -234,6 +234,11 @@ final class PagesController extends AbstractController
                 'variantLabel' => $variantLabels[$owner] ?? $owner,
                 'sections'     => is_array($spec['sections'] ?? null) ? $spec['sections'] : [],
                 'widths'       => is_array($spec['widths'] ?? null) ? $spec['widths'] : [],
+                // How the builder should DRAW its preview. 'grid' (default) is
+                // bento's six-column flow; 'columns' is atrium, where a width
+                // picks a stack rather than a size. Declared by the variant
+                // because only the variant knows what its widths mean.
+                'preview'      => (string)($spec['preview'] ?? 'grid'),
                 // Palette the per-section colour control offers. Was computed
                 // for the parser but never reached the view, so the builder
                 // could not draw the control at all.

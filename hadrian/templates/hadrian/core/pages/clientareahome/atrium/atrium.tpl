@@ -51,6 +51,9 @@
    Only default-TRUE booleans need this. *}
 {assign var=atHero value=true}
 {if isset($hadrian.pages.clientareahome.options.atr_hero)}{assign var=atHero value=$hadrian.pages.clientareahome.options.atr_hero}{/if}
+{assign var=atHeroStyle value=$hadrian.pages.clientareahome.options.atr_hero_style|default:'gradient'}
+{assign var=atHeroWidth value=$hadrian.pages.clientareahome.options.atr_hero_width|default:'boxed'}
+{assign var=atHeroActs value=$hadrian.pages.clientareahome.options.atr_hero_actions|default:'right'}
 {assign var=atStatSvc value=true}
 {if isset($hadrian.pages.clientareahome.options.atr_stat_services)}{assign var=atStatSvc value=$hadrian.pages.clientareahome.options.atr_stat_services}{/if}
 {assign var=atStatDom value=true}
@@ -90,7 +93,7 @@
 
 {* ---------- welcome band ---------- *}
 {if $atHero}
-<section class="at-hero">
+<section class="at-hero" data-at-style="{$atHeroStyle|escape}" data-at-width="{$atHeroWidth|escape}" data-at-acts="{$atHeroActs|escape}">
     <div class="at-hero-main">
         {* Supplied by the hook, not formatted in Smarty: |date_format's
            %-style codes rely on strftime and are broken on PHP 8.1+. *}
@@ -103,6 +106,7 @@
             <span class="when-empty">{$hadrianLang.dashboard.atriumSubEmpty}</span>
         </p>
     </div>
+    {if $atHeroActs != 'off'}
     <div class="at-hero-actions">
         {* Gated with {if}, not CSS: a client with nothing due must never have
            the string emitted at all, or it ships in the HTML for anyone
@@ -114,6 +118,7 @@
         {/if}
         <a href="{$WEB_ROOT}/cart.php" class="at-hero-btn">{$LANG.orderproducts|default:'Order a service'}</a>
     </div>
+    {/if}
 </section>
 {/if}
 

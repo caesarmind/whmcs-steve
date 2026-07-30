@@ -720,6 +720,11 @@
 .mt-seclay-cell { min-height: 46px; background: var(--mt-surface); border: 1px solid var(--mt-primary); border-radius: var(--mt-radius-sm); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px; text-align: center; }
 .mt-seclay-cell b { font-size: 11px; font-weight: 600; color: var(--mt-text); line-height: 1.2; }
 .mt-seclay-cell i { font-size: 10px; font-style: normal; font-weight: 600; color: var(--mt-primary); }
+.mt-seclay-prev-cols { display: flex; flex-direction: column; gap: 6px; }
+.mt-seclay-prev-band { display: flex; flex-direction: column; gap: 6px; }
+/* 1.85 / 1, the same ratio the page itself uses, so the preview is to scale. */
+.mt-seclay-prev-split { display: grid; grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr); gap: 6px; align-items: start; }
+.mt-seclay-prev-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .mt-seclay-prev-empty { grid-column: span 6; padding: 18px 0; text-align: center; font-size: 12.5px; color: var(--mt-text-3); }
 
 /* Rows */
@@ -1033,8 +1038,18 @@
 
         function label(k) { return (cat[k] && cat[k].label) || k; }
 
+        function cell(s) {
+            var c = document.createElement('div');
+            c.className = 'mt-seclay-cell';
+            var b = document.createElement('b'); b.textContent = label(s.key);
+            var i = document.createElement('i'); i.textContent = s.w;
+            c.appendChild(b); c.appendChild(i);
+            return c;
+        }
+
         function paintPreview() {
             prevGrid.innerHTML = '';
+            prevGrid.className = 'mt-seclay-prev-grid';
             var shown = state.filter(function (s) { return s.on; });
             if (!shown.length) {
                 var e = document.createElement('div');
@@ -1043,13 +1058,36 @@
                 prevGrid.appendChild(e);
                 return;
             }
+
+            // 'columns' variants (atrium) read a width as a COLUMN, not a size:
+            // 1/1 is a full-width band, 2/3 the main stack, 1/3 the side stack.
+            // Drawing those on the six-column grid put Announcements beside
+            // Domains -- a row that cannot occur, because the two live in
+            // different stacks. A preview that lies is worse than no preview.
+            if ((spec.preview || 'grid') === 'columns') {
+                prevGrid.className = 'mt-seclay-prev-cols';
+                var band = document.createElement('div');
+                band.className = 'mt-seclay-prev-band';
+                var split = document.createElement('div');
+                split.className = 'mt-seclay-prev-split';
+                var main = document.createElement('div');
+                main.className = 'mt-seclay-prev-col';
+                var side = document.createElement('div');
+                side.className = 'mt-seclay-prev-col is-side';
+                shown.forEach(function (s) {
+                    if (s.w === '1/1') band.appendChild(cell(s));
+                    else if (s.w === '1/3') side.appendChild(cell(s));
+                    else main.appendChild(cell(s));
+                });
+                if (band.children.length) prevGrid.appendChild(band);
+                split.appendChild(main); split.appendChild(side);
+                prevGrid.appendChild(split);
+                return;
+            }
+
             shown.forEach(function (s) {
-                var c = document.createElement('div');
-                c.className = 'mt-seclay-cell';
+                var c = cell(s);
                 c.style.gridColumn = 'span ' + (SPAN[s.w] || 6);
-                var b = document.createElement('b'); b.textContent = label(s.key);
-                var i = document.createElement('i'); i.textContent = s.w;
-                c.appendChild(b); c.appendChild(i);
                 prevGrid.appendChild(c);
             });
         }

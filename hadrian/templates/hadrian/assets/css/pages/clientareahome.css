@@ -1416,6 +1416,71 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
 .at-hero-btn-primary { background: #fff; border-color: #fff; color: var(--color-accent); }
 .at-hero-btn-primary:hover { background: rgba(255,255,255,0.9); color: var(--color-accent); text-decoration: none; }
 
+/* --- Band appearance options -------------------------------------------
+   Four styles. gradient is the shipped look and needs no rule (it is the base
+   .at-hero above). The other three each restate the background AND the ink,
+   because a pale panel needs dark text -- the two cannot be set independently
+   without producing an unreadable combination. */
+.at-hero[data-at-style="solid"] { background: var(--color-accent); }
+/* soft is a pale accent wash with page ink, for a lighter dashboard. Its
+   buttons invert too: a white pill on a near-white panel is invisible. */
+.at-hero[data-at-style="soft"] {
+    /* 8%, not 10%: the sub-line is --color-text-secondary, which measures 4.43
+       on a 10% wash and 4.56 on 8%. The difference is invisible as a colour
+       and is the difference between passing and failing AA. */
+    background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+    color: var(--color-text-primary);
+}
+.at-hero[data-at-style="soft"] .at-hero-title,
+.at-hero[data-at-style="soft"] .at-hero-date { color: var(--color-text-primary); }
+.at-hero[data-at-style="soft"] .at-hero-sub { opacity: 1; color: var(--color-text-secondary); }
+.at-hero[data-at-style="soft"] .at-hero-btn {
+    background: var(--color-surface); border-color: var(--color-border); color: var(--color-text-primary);
+}
+.at-hero[data-at-style="soft"] .at-hero-btn-primary {
+    background: var(--color-accent); border-color: var(--color-accent); color: var(--color-on-accent);
+}
+/* plain drops the panel entirely: greeting on the page background. */
+.at-hero[data-at-style="plain"] {
+    background: none; padding: 0; border-radius: 0; color: var(--color-text-primary);
+}
+.at-hero[data-at-style="plain"] .at-hero-title,
+.at-hero[data-at-style="plain"] .at-hero-date { color: var(--color-text-primary); }
+.at-hero[data-at-style="plain"] .at-hero-sub { opacity: 1; color: var(--color-text-secondary); }
+.at-hero[data-at-style="plain"] .at-hero-btn {
+    background: var(--color-surface); border-color: var(--color-border); color: var(--color-text-primary);
+}
+.at-hero[data-at-style="plain"] .at-hero-btn-primary {
+    background: var(--color-accent); border-color: var(--color-accent); color: var(--color-on-accent);
+}
+.at-hero[data-at-style="plain"] .at-hero-main { max-width: none; }
+
+/* The soft and plain bands use an ordinary accent pill, which measures 3.02:1
+   in dark mode because --color-accent brightens to #2997ff there. Deepened for
+   these two styles only -- 65% accent + black gives white 6.28:1 -- rather than
+   touching --btn-primary-color, which would repaint every button in the theme
+   and is a design call, not a fix. The gradient and solid bands already carry
+   their own pill treatment above. */
+html[data-theme="dark"] .at-hero[data-at-style="soft"] .at-hero-btn-primary,
+html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
+    background: color-mix(in srgb, var(--color-accent) 65%, #000);
+    border-color: color-mix(in srgb, var(--color-accent) 65%, #000);
+    color: #fff;
+}
+
+/* Edge: the panel spans the content area while the TEXT stays on the column,
+   so it reads as a page header rather than a card. Negative margins rather
+   than a container query -- container-type on the wrap would make it the
+   containing block for every fixed-position descendant, which is a theme-wide
+   side effect for one option. */
+.at-hero[data-at-width="edge"] { border-radius: 0; margin-left: calc(var(--content-pad-x, 48px) * -1); margin-right: calc(var(--content-pad-x, 48px) * -1); padding-left: var(--content-pad-x, 48px); padding-right: var(--content-pad-x, 48px); }
+.at-hero[data-at-style="plain"][data-at-width="edge"] { margin-left: 0; margin-right: 0; padding-left: 0; padding-right: 0; }
+
+/* Buttons below the greeting instead of opposite it. */
+.at-hero[data-at-acts="below"] { display: block; }
+.at-hero[data-at-acts="below"] .at-hero-main { max-width: none; }
+.at-hero[data-at-acts="below"] .at-hero-actions { margin-top: 16px; }
+
 /* Column count comes from the template: the four tiles are independently
    switchable, and repeat(auto-fit, ...) created as many tracks as fit the
    container, leaving empty ones and half-filling the row. */
@@ -1486,11 +1551,16 @@ html[data-theme="dark"] .at-hero-btn-primary { color: color-mix(in srgb, var(--c
 
 .at-card {
     background: var(--color-surface); border: 1px solid var(--color-border);
-    border-radius: var(--card-radius); overflow: hidden;
+    /* 16px and the soft shadow are the mockup's, not --card-radius (12px):
+       these cards read as a distinct set from the rest of the theme's. */
+    border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); overflow: hidden;
 }
 .at-card-head {
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 16px 20px; border-bottom: 1px solid var(--color-border);
+    /* Mockup: 17px 22px 13px -- asymmetric on purpose, the head sits closer to
+       the first row than to the card edge. No bottom border; the first row's
+       own top border draws that line. */
+    padding: 17px 22px 13px;
 }
 .at-card-title {
     font-size: 11.5px; font-weight: var(--fw-semibold); letter-spacing: 0.06em;
@@ -1502,10 +1572,9 @@ html[data-theme="dark"] .at-hero-btn-primary { color: color-mix(in srgb, var(--c
 
 .at-rows { display: flex; flex-direction: column; }
 .at-row {
-    display: flex; align-items: center; gap: 12px;
-    padding: 13px 20px; border-bottom: 1px solid var(--color-border-light);
+    display: flex; align-items: center; gap: 13px;
+    padding: 14px 22px; border-top: 1px solid var(--color-border);
 }
-.at-row:last-child { border-bottom: 0; }
 .at-row-main { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 .at-row-name {
     font-size: var(--text-md); font-weight: var(--fw-semibold); color: var(--color-text-primary);

@@ -67,7 +67,11 @@
             <div class="at-big">{$dashboard.billing.credit}</div>
             <div class="at-panel-meta">{$hadrianLang.dashboard.creditAppliedAuto}</div>
         {else}
-            <div class="at-big is-muted">{$dashboard.billing.credit|default:'&mdash;'}</div>
+            {* Show the FIGURE, not a sentence. credit is pre-formatted by the
+               hook and reads "$0.00" with nothing on the account, which says
+               the same thing in the shape the reader is scanning for -- and
+               keeps the block the same height either way. *}
+            <div class="at-big is-muted">{$dashboard.billing.credit|default:$clientsstats.creditbalance|default:'0.00'}</div>
             <div class="at-panel-meta">{$hadrianLang.dashboard.noCreditYet}</div>
         {/if}
         <div class="at-panel-btns">
