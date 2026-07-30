@@ -15,7 +15,12 @@
    .when-full/.when-empty classes -- those follow one body[data-data] flag, so a
    client with services but no domains would get an empty Services card too. *}
 
-{assign var=atRows value=$secRows|default:4}
+{* secRows is the 5th field of this block's layout entry, and the parser
+   returns 0 when the admin left it blank -- NOT "show no rows". |default:
+   does not fire on 0, so treating it as a cap emptied every list the moment a
+   layout was saved. Same guard bento uses. *}
+{assign var=atRows value=$secRows|default:0}
+{if $atRows < 1}{assign var=atRows value=4}{/if}
 
 {* Paint plumbing, identical to bento's: the palette key becomes an attribute
    the stylesheet matches, and a custom colour arrives as a --blk-base on the
@@ -28,7 +33,7 @@
 <div class="at-cell min-section"
      data-sec="{$sec|escape}"
      {if $secPaint|default:''}data-blk-paint="{$secPaint|escape}" data-blk-fill="{$atFill|escape}"{/if}
-     {if $secCustom|default:''}style="--blk-base:#{$secCustom|escape}"{/if}>
+     {if $secCustom|default:''}style="--blk-base:{$secCustom|escape}"{/if}>
 
 {* ---------------- Amount due ----------------
    A panel, not a collection. Renders NOTHING when nothing is owed: an

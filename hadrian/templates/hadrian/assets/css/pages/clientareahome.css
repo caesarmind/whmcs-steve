@@ -1556,6 +1556,12 @@ html[data-theme="dark"] .at-hero-btn-primary { color: color-mix(in srgb, var(--c
    The flex column owns spacing here; the margin is not wanted. */
 .at-cell { min-width: 0; }
 .at-cell.min-section { margin-top: 0; }
+/* A block that renders nothing -- hide-when-empty on an empty collection, or
+   Amount due with no balance -- still emits its wrapper, and a flex column puts
+   a 22px gap either side of it. So the option "worked" while leaving a hole
+   where the block had been. :not(:has(*)) rather than :empty, because the
+   wrapper contains whitespace text nodes and :empty would never match. */
+.at-cell:not(:has(*)) { display: none; }
 
 .at-card {
     background: var(--color-surface); border: 1px solid var(--color-border);
