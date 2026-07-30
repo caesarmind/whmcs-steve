@@ -73,7 +73,7 @@
        would invalidate the whole chain to `none`. */
     --content-max-width: 1120px;
     --content-pad-x: 48px;
-    --sidebar-bg: rgba(246, 246, 248, 0.80);
+    --sidebar-bg: var(--_sb-bg, rgba(246, 246, 248, 0.80));
     --sidebar-item-hover: rgba(0, 0, 0, 0.04);
     --sidebar-item-active: rgba(0, 0, 0, 0.06);
     --sidebar-icon-bg: #e8e8ed;
@@ -103,14 +103,14 @@
 
        Override any of them to recolour the nav WITHOUT touching the page.
        That is what a dark-sidebar style preset does. */
-    --sidebar-text: var(--color-text-primary);
-    --sidebar-text-secondary: var(--color-text-secondary);
-    --sidebar-text-muted: var(--color-text-tertiary);
-    --sidebar-text-faint: var(--color-text-quaternary);
-    --sidebar-border: var(--color-border);
-    --sidebar-panel-bg: var(--color-surface);
-    --sidebar-field-bg: var(--color-surface-secondary);
-    --sidebar-scroll-thumb: rgba(0, 0, 0, 0.15);
+    --sidebar-text: var(--_sb-ink, var(--color-text-primary));
+    --sidebar-text-secondary: var(--_sb-txt2, var(--color-text-secondary));
+    --sidebar-text-muted: var(--_sb-txt3, var(--color-text-tertiary));
+    --sidebar-text-faint: var(--_sb-txt4, var(--color-text-quaternary));
+    --sidebar-border: var(--_sb-border, var(--color-border));
+    --sidebar-panel-bg: var(--_sb-base, var(--color-surface));
+    --sidebar-field-bg: var(--_sb-field, var(--color-surface-secondary));
+    --sidebar-scroll-thumb: var(--_sb-thumb, rgba(0, 0, 0, 0.15));
     /* Private aliases for the two interactive fills. --sidebar-item-hover and
        --sidebar-item-active are MISNAMED: 137 declarations across 48 files
        read them from OUTSIDE the sidebar -- .subnav-item on 45 page
@@ -118,8 +118,13 @@
        the .homepage-nav border, and most hp-* marketing buttons. Darkening
        those two to suit a nav would tint the entire product. Only sidebar
        rules read the two below, so only these are safe to repaint. */
-    --sidebar-item-hover-bg: var(--sidebar-item-hover);
-    --sidebar-item-active-bg: var(--sidebar-item-active);
+    /* Public sidebar tokens. Each takes the DERIVED value from the tint
+       block below when the buyer has picked a --sidebar-color, and otherwise
+       falls back to the literal that has always shipped. See the tint block
+       for why the fallback is what makes this a no-op. */
+    --sidebar-item-hover-bg: var(--_sb-hover, var(--sidebar-item-hover));
+    --sidebar-item-active-bg: var(--_sb-active, var(--sidebar-item-active));
+    --sidebar-badge-bg: var(--_sb-badge, var(--color-gray-bg));
     --topbar-height: 44px;
     --topbar-bg: rgba(251, 251, 253, 0.72);
     /* Soft resting shadow stands in for the removed 1px outline — reads as a hairline edge against the page bg */
@@ -332,6 +337,58 @@
     --fw-black:    900;
 }
 
+/* ===== Sidebar tint ==================================================
+   ONE colour repaints the whole nav -- bar, rail, rail flyout, mobile
+   drawer -- with label ink chosen by exact WCAG luminance so it stays
+   legible whatever the buyer picks. Same primitive as the painted
+   dashboard tiles in pages/clientareahome.css; the question is identical
+   (given ANY fill, is black or white readable on it) so the maths is
+   shared rather than re-derived. --ink-crossover lives at :root above.
+
+   --sidebar-color IS DELIBERATELY NEVER DECLARED. Every token below
+   references it, so with no buyer pick each one is
+   invalid-at-computed-value-time, computes to guaranteed-invalid, and the
+   var() fallback on the PUBLIC token restores the literal that ships.
+   That absence is the entire "off" state: no PHP, no body attribute, no
+   stored mode, nothing to get wrong on upgrade. Measured with no pick:
+   bar 248,248,249 / text #1d1d1f / border #e8e8ed -- byte-identical to
+   before this block existed.
+
+   Private names are --_sb-* so a :root declaration can never be confused
+   with the --_ink / --_anti pair scoped to .min-section on the dashboard.
+
+   MEASURED CAVEAT: primary label ink is guaranteed by the crossover, but
+   the SOFTENED steps are best-effort. A mid-luminance pick sits close to
+   the crossover where neither black nor white has headroom -- #0071e3
+   yields only 2.3:1 muted at any mix. Dark or light picks are fine
+   (5.3-7.8 measured on slate, near-black and pale yellow). The admin
+   shows a live contrast readout for exactly this reason.
+
+   ASCII-only comment, per this install's CSS-skip quirk. */
+@supports (color: color(from red srgb-linear r g b)) {
+    :root {
+        --_sink:  clamp(0, (var(--ink-crossover, 0.179129) - (0.2126*r + 0.7152*g + 0.0722*b)) * 100000, 1);
+        /* Opaque form of the pick. The text ramp mixes INTO this, so it must
+           not carry alpha or the labels would come out translucent. */
+        --_sb-base: color(from var(--sidebar-color) srgb r g b / 1);
+        --_sb-ink:  color(from var(--sidebar-color) srgb-linear var(--_sink) var(--_sink) var(--_sink) / 1);
+        /* Text softens INTO the base; washes mix into TRANSPARENT so the
+           frost still shows through. color-mix premultiplies, so white 6%
+           gives rgba(255,255,255,0.06) and black 6% gives rgba(0,0,0,0.06):
+           the direction flips with the ink, for free. */
+        --_sb-bg:     color-mix(in srgb, var(--_sb-base) 94%, transparent);
+        --_sb-txt2:   color-mix(in srgb, var(--_sb-ink) 70%, var(--_sb-base));
+        --_sb-txt3:   color-mix(in srgb, var(--_sb-ink) 58%, var(--_sb-base));
+        --_sb-txt4:   color-mix(in srgb, var(--_sb-ink) 42%, var(--_sb-base));
+        --_sb-border: color-mix(in srgb, var(--_sb-ink) 10%, transparent);
+        --_sb-field:  color-mix(in srgb, var(--_sb-ink)  7%, transparent);
+        --_sb-hover:  color-mix(in srgb, var(--_sb-ink)  6%, transparent);
+        --_sb-active: color-mix(in srgb, var(--_sb-ink) 12%, transparent);
+        --_sb-thumb:  color-mix(in srgb, var(--_sb-ink) 18%, transparent);
+        --_sb-badge:  color-mix(in srgb, var(--_sb-ink) 12%, transparent);
+    }
+}
+
 /* --- Dark Mode ---
    Qualified with `html` on purpose. Bare [data-theme="dark"] scores (0,1,0) --
    identical to :root -- and the admin Colors panel emits its overrides as
@@ -374,14 +431,14 @@ html[data-theme="dark"] {
     --color-blue-text: #2997ff;
     --color-gray-bg: rgba(142, 142, 147, 0.18);
     --color-gray-text: #a1a1a6;
-    --sidebar-bg: rgba(28, 28, 30, 0.80);
+    --sidebar-bg: var(--_sb-bg, rgba(28, 28, 30, 0.80));
     --sidebar-item-hover: rgba(255, 255, 255, 0.05);
     --sidebar-item-active: rgba(255, 255, 255, 0.08);
     --sidebar-icon-bg: #3a3a3c;
     /* The only sidebar token that is a LITERAL rather than a var() chain, so
        it is the only one that must be redeclared here -- every other one
        re-derives from the page tokens redeclared in this block. */
-    --sidebar-scroll-thumb: rgba(255, 255, 255, 0.15);
+    --sidebar-scroll-thumb: var(--_sb-thumb, rgba(255, 255, 255, 0.15));
     /* Same values as light on purpose -- the accent stays saturated in dark
        mode, so its ink stays white -- but they MUST be declared here anyway.
        This block outranks an emitted :root override, so a token absent from it
@@ -436,6 +493,13 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-right: 0.5px solid var(--sidebar-border);
     display: flex; flex-direction: column; z-index: 100; overflow: hidden;
+    /* Inherit guard. Nothing set a colour here, so any descendant WITHOUT its
+       own rule fell back to the page text colour -- fine while the nav matched
+       the page, dark-on-dark the moment it is tinted. A no-op today
+       (--sidebar-text defaults to --color-text-primary, which is exactly what
+       they inherited), and it means a future nav element cannot be added
+       unreadable by omission. */
+    color: var(--sidebar-text);
 }
 .sidebar-header { padding: 20px 16px 8px; display: flex; align-items: center; gap: 10px; }
 .sidebar-home-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
@@ -485,7 +549,7 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
 .sidebar-item-icon.gray { background: var(--color-icon-gray); color: white; }
 .sidebar-item-icon.indigo { background: var(--color-icon-indigo); color: white; }
 .sidebar-item-icon.pink { background: var(--color-icon-pink); color: white; }
-.sidebar-item-badge { margin-left: auto; font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--sidebar-text-muted); background: var(--color-gray-bg); padding: 1px 7px; border-radius: var(--radius-pill); min-width: 20px; text-align: center; }
+.sidebar-item-badge { margin-left: auto; font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--sidebar-text-muted); background: var(--sidebar-badge-bg); padding: 1px 7px; border-radius: var(--radius-pill); min-width: 20px; text-align: center; }
 .sidebar-footer { padding: 12px; border-top: 0.5px solid var(--sidebar-border); }
 .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: var(--radius-sm); cursor: pointer; transition: background var(--transition-fast); }
 .sidebar-user:hover { background: var(--sidebar-item-hover-bg); }

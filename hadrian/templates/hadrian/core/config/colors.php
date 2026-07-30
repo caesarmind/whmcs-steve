@@ -110,6 +110,24 @@ return [
         // Navigation panel: those tokens were always here, the panel would only
         // have been a second place to edit the same rows.
         'Navigation & bars' => [
+            // THE SEED. Pick one colour and the eleven rows below all derive
+            // from it -- bar, panel, the four text steps, hairline, search
+            // field, hover, active, scrollbar and badge -- with black-or-white
+            // label ink chosen by exact WCAG luminance, so the menu is legible
+            // whatever colour lands here. See the "Sidebar tint" block in
+            // apple-theme.css.
+            //
+            // Its default is EMPTY on purpose, and that is load-bearing:
+            // --sidebar-color is never declared in the CSS, so with nothing
+            // stored every derived token is invalid-at-computed-value-time and
+            // the rows below fall back to the literals that ship. Empty means
+            // "off", clearing the field means "back to off", and an existing
+            // install renders byte-identically until someone types here.
+            //
+            // check-color-defaults.mjs skips any token with an empty default
+            // for this reason -- it is the one token that MUST NOT appear in
+            // apple-theme.css.
+            ['var' => '--sidebar-color',          'label' => 'Sidebar colour',     'light' => '',                       'dark' => '',                    'hint' => 'Optional. One colour for the whole nav -- text, borders and hovers derive from it automatically. Leave empty to set the rows below by hand.'],
             ['var' => '--sidebar-bg',             'label' => 'Sidebar background', 'light' => 'rgba(246,246,248,0.80)', 'dark' => 'rgba(28,28,30,0.80)', 'hint' => 'Translucent: it frosts whatever scrolls under it.'],
             ['var' => '--sidebar-panel-bg',       'label' => 'Flyout panel',       'light' => '#ffffff',                'dark' => '#2c2c2e', 'hint' => 'The rail layout only. Not the sidebar itself.'],
             ['var' => '--sidebar-text',           'label' => 'Text',               'light' => '#1d1d1f',                'dark' => '#f5f5f7', 'hint' => 'Set this whenever you darken the background, or the menu goes dark-on-dark.'],

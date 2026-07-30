@@ -46,7 +46,7 @@ function block(selector) {
 function tokens(text) {
   const out = new Map();
   const clean = text.replace(/\/\*[\s\S]*?\*\//g, '');
-  for (const m of clean.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/g)) {
+  for (const m of clean.matchAll(/(--[a-z0-9_-]+)\s*:\s*([^;]+);/g)) {
     out.set(m[1], m[2].trim());
   }
   return out;
@@ -58,7 +58,7 @@ const dark = tokens(block('html[data-theme="dark"] {'));
 // Parse the schema rows. Deliberately regex over the PHP rather than shelling
 // out to php -- this runs in CI where PHP may not exist.
 const rows = [...php.matchAll(
-  /\['var'\s*=>\s*'(--[a-z0-9-]+)'.*?'light'\s*=>\s*'([^']*)'\s*,\s*'dark'\s*=>\s*'([^']*)'/g,
+  /\['var'\s*=>\s*'(--[a-z0-9_-]+)'.*?'light'\s*=>\s*'([^']*)'\s*,\s*'dark'\s*=>\s*'([^']*)'/g,
 )];
 
 if (!rows.length) {
@@ -80,16 +80,30 @@ const norm = (s) => s.replace(/\s+/g, '').toLowerCase();
  */
 function resolve(value, scope, depth = 0) {
   if (depth > 10) return value; // cycle guard
-  const m = /^var\(\s*(--[a-z0-9-]+)\s*(?:,\s*([^)]+))?\)$/.exec(value.trim());
+  // The fallback may itself contain parens -- var(--x, rgba(0,0,0,.15)) -- so it
+  // is captured greedily against the trailing ')'. A non-greedy [^)]+ silently
+  // failed to match those and reported the raw var() text as a mismatch.
+  const m = /^var\(\s*(--[a-z0-9_-]+)\s*(?:,\s*(.+))?\)$/s.exec(value.trim());
   if (!m) return value;
+  // A token declared ONLY inside @supports (the --_sb-* tint set) is absent from
+  // the blocks we parsed, so we take the fallback -- which is exactly what a
+  // browser does while --sidebar-color is unset, since each derived token is
+  // then invalid-at-computed-value-time. Same answer, and the reason it is the
+  // same answer is the whole point of the tint design.
   const next = scope.get(m[1]) ?? light.get(m[1]) ?? m[2];
   return next === undefined ? value : resolve(next, scope, depth + 1);
 }
 
 let fail = 0;
 const missing = [];
+const skipped = [];
 
 for (const [, name, wantLight, wantDark] of rows) {
+  // A token with an EMPTY default is intentionally undeclared in the CSS. That
+  // is the --sidebar-color contract: every derived sidebar token references it,
+  // so its absence is what makes the tint feature off-by-default. Asserting it
+  // were declared would break the very mechanism.
+  if (wantLight === '' && wantDark === '') { skipped.push(name); continue; }
   const rawLight = light.get(name);
   if (rawLight === undefined) { missing.push(name); continue; }
   const gotLight = resolve(rawLight, light);
@@ -111,5 +125,6 @@ for (const name of missing) {
   fail++;
 }
 
-console.log(`${rows.length} tokens checked against both scopes; ${fail} mismatch(es).`);
+console.log(`${rows.length - skipped.length} tokens checked against both scopes; ${fail} mismatch(es).`
+  + (skipped.length ? ` ${skipped.length} intentionally undeclared: ${skipped.join(', ')}.` : ''));
 process.exit(fail ? 1 : 0);
