@@ -1303,7 +1303,13 @@
                     // (bento). Minimal reveals the rest behind Show more, so a
                     // per-section cap there would mean something different and
                     // is deliberately not offered.
-                    if (RC) {
+                    // ...and only on a section that LISTS something. The spec is
+                    // declared once per variant, so without this gate the
+                    // control appeared on panels -- a welcome band, a figure
+                    // strip, an amount-due card -- where there is nothing to
+                    // count and the number did nothing. Opt in per block with
+                    // 'rows' => true in the catalogue entry.
+                    if (RC && cat[s.key] && cat[s.key].rows) {
                         var ro2 = document.createElement('div');
                         ro2.className = 'mt-seclay-opt';
                         var rw2 = document.createElement('div');

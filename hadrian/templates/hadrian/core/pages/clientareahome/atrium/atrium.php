@@ -125,12 +125,12 @@ return [
                                         't' => ['label' => 'Figure: open tickets', 'invert' => true,
                                                 'hint'  => 'Open tickets, with a sub-line for any where staff have replied and are waiting on the client.'],
                                     ]],
-                'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                'services'      => ['label' => 'Services',          'w' => '2/3', 'rows' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',
                                         'hint'  => 'Name and status only, with no second line. A dense list you can scan in one pass.',
                                     ]],
-                'domains'       => ['label' => 'Domains',           'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                'domains'       => ['label' => 'Domains',           'w' => '2/3', 'rows' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',
                                         'hint'  => 'Name and status only, with no second line. A dense list you can scan in one pass.',
@@ -139,7 +139,7 @@ return [
                 // collection whose headline is an ACCOUNT TOTAL rather than a
                 // count of the rows beneath it, so it still says something true
                 // with nothing listed. A Services block with no rows is a number.
-                'invoices'      => ['label' => 'Recent invoices',   'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                'invoices'      => ['label' => 'Recent invoices',   'w' => '2/3', 'rows' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'listToggle' => [
                                         'label' => 'Show the invoice list',
                                         'hint'  => 'Off, the block stays an aggregate: what is owed and how overdue the worst of it is. The full history is a click away either way.',
@@ -148,7 +148,7 @@ return [
                                         'label' => 'Compact rows',
                                         'hint'  => 'Number, date and amount only, with no second line.',
                                     ]],
-                'announcements' => ['label' => 'Announcements',     'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                'announcements' => ['label' => 'Announcements',     'w' => '1/3', 'rows' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',
                                         'hint'  => 'Title only, with no date line.',
@@ -158,7 +158,7 @@ return [
                 // precedent as bento's attention strip.
                 'unpaid'        => ['label' => 'Amount due',        'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 'credit'        => ['label' => 'Account credit',    'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
-                'tickets'       => ['label' => 'Support',           'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                'tickets'       => ['label' => 'Support',           'w' => '1/3', 'rows' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',
                                         'hint'  => 'Subject and status only, with no ticket number line.',
