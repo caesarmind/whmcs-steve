@@ -1346,3 +1346,85 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
     .bn-card { padding: 18px; }
     .bn-grid { gap: 16px; }
 }
+
+/* =============================================================
+   ATRIUM VARIANT -- welcome band + summary figures
+   Prefix .at-* is private to this variant (verified unused elsewhere), and no
+   class here ends in -split or -aside, which apple-layout.css hijacks with
+   [class$=] selectors. All colour comes from tokens so dark mode and the Colors
+   panel both reach it with no extra rules.
+   ============================================================= */
+.at-hero {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap; margin-bottom: 22px;
+}
+.at-hero-main { min-width: 0; }
+.at-hero-title {
+    font-size: var(--text-h1); font-weight: var(--fw-semibold);
+    letter-spacing: -0.02em; color: var(--color-text-primary); margin: 0;
+}
+.at-hero-sub {
+    font-size: var(--text-md); color: var(--color-text-secondary);
+    margin: 6px 0 0; line-height: 1.45;
+}
+.at-hero-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.at-hero-btn {
+    display: inline-flex; align-items: center; height: 36px; padding: 0 18px;
+    border-radius: var(--radius-pill); border: 1px solid var(--color-border);
+    background: var(--color-surface); color: var(--color-text-primary);
+    font-size: var(--text-base); font-weight: var(--fw-medium);
+    text-decoration: none; white-space: nowrap;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.at-hero-btn:hover { background: var(--color-surface-secondary); text-decoration: none; color: var(--color-text-primary); }
+.at-hero-btn-primary {
+    background: var(--color-accent); border-color: var(--color-accent);
+    color: var(--color-on-accent);
+}
+.at-hero-btn-primary:hover { background: var(--color-accent-hover); border-color: var(--color-accent-hover); color: var(--color-on-accent); }
+
+/* Four-up summary strip. auto-fit rather than a fixed 4 because any of the
+   four tiles can be switched off independently -- with two on, two should fill
+   the row rather than leaving half the strip empty. */
+.at-stats {
+    /* Column count comes from the template, because the four tiles are
+       independently switchable: repeat(auto-fit, ...) creates as many tracks as
+       fit the container, so with two tiles enabled on a wide page it left three
+       empty tracks and the strip only half filled its row. */
+    display: grid; grid-template-columns: repeat(var(--at-stat-n, 4), minmax(0, 1fr));
+    gap: 14px; margin-bottom: 22px;
+}
+.at-stat {
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 18px 20px; border-radius: var(--card-radius);
+    background: var(--color-surface); border: 1px solid var(--color-border-card);
+    box-shadow: var(--card-shadow); text-decoration: none;
+    transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+.at-stat:hover { box-shadow: var(--shadow-card-hover); transform: translateY(-1px); text-decoration: none; }
+.at-stat-label {
+    font-size: var(--text-xs); font-weight: var(--fw-semibold);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    /* secondary, not tertiary: an 11px uppercase label at 3.62:1 on a card is
+       the weakest text on the page. Secondary measures 5.07 / 6.61. */
+    color: var(--color-text-secondary);
+}
+.at-stat-value {
+    font-size: var(--text-display); font-weight: var(--fw-semibold);
+    letter-spacing: -0.02em; color: var(--color-text-primary); line-height: 1.1;
+}
+/* --color-text-secondary, not tertiary: these sub-lines carry real figures
+   (overdue age, expiring count) and tertiary measures ~3.4:1 on a card. */
+.at-stat-sub { font-size: var(--text-base); color: var(--color-text-secondary); }
+.at-stat-sub.is-alert { color: var(--color-red-text); font-weight: var(--fw-medium); }
+
+@media (max-width: 900px) {
+    .at-hero { align-items: flex-start; }
+    .at-hero-actions { width: 100%; }
+    /* Two-up rather than the declared count: four figures side by side below
+       900px squeezes each value past legibility. */
+    .at-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+    .at-stats { grid-template-columns: minmax(0, 1fr); }
+}

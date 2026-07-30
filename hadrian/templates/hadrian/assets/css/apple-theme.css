@@ -79,11 +79,26 @@
     --sidebar-icon-bg: #e8e8ed;
 
     /* Ink that sits ON a saturated accent fill -- button labels, badge text,
-       the avatar monogram. Deliberately its own token rather than reusing
-       --color-surface: they happen to share #ffffff in light mode, but they
-       are different ideas, and in DARK mode --color-surface is #2c2c2e while
-       this must stay white. 56 literal whites in the tree are candidates to
-       adopt it; see the note in core/config/colors.php. */
+       the avatar monogram. Its own token rather than --color-surface: they
+       share #ffffff in light mode but are different ideas, and surface goes
+       #2c2c2e in dark.
+       MEASURED, AND CURRENTLY WRONG IN DARK MODE. The light accent #0071e3 has
+       luminance 0.1736, just below the 0.179129 ink crossover, so white is
+       correct there (4.70:1). The dark accent #2997ff is 0.2982, well above it,
+       where white collapses to 3.02:1 and black would give 6.96.
+
+       Deriving this from --color-accent with the crossover primitive fixes it
+       in one line and would hold for any accent a buyer picks -- but it is NOT
+       done here, for two reasons worth stating. First, --color-on-accent is
+       redeclared in the dark block below, which scores (0,1,1) and beats a
+       :root derivation, so the dark literal has to be deleted at the same time.
+       Second, and the real blocker: it would flip the avatar monogram to black
+       on the blue-purple gradient in dark mode, which is a visible design
+       change rather than a contrast fix.
+
+       Note this is NOT specific to this token: --btn-primary-color is #ffffff
+       in both modes too, so every primary button in the theme measures 3.02:1
+       in dark. Same root cause, same one-line fix, same design call. */
     --color-on-accent: #ffffff;
 
     /* The user monogram gradient. Was hardcoded in .sidebar-avatar and

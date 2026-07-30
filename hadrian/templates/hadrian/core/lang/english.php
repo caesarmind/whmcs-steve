@@ -231,7 +231,10 @@ return [
         'dismiss'        => 'Dismiss',
         'domainSingular' => 'domain',
         'domainPlural'   => 'domains',
-        'expireWithin45' => 'expires in the next 45 days',
+        // "expiring within", not "expires in": every call site prefixes a COUNT
+        // and a plural noun, so the verb has to agree with the plural. The old
+        // wording gave "2 domains expires in the next 45 days" in default.tpl.
+        'expireWithin45' => 'expiring within 45 days',
         'toKeepActive'   => 'to keep active',
 
         // Empty-state greeting fragments.
@@ -309,6 +312,16 @@ return [
         'attnTicketMany'    => 'tickets awaiting your reply',
 
         // Secondary links on the per-tile empty states.
+        // Atrium dashboard variant. Only the five keys it needs that no other
+        // variant already had -- greetings, the 45-day domain window, overdue
+        // age and the ticket-awaiting-reply plurals are shared.
+        'activeServices'    => 'Active services',
+        'balanceDue'        => 'Balance due',
+        'openTickets'       => 'Open tickets',
+        'payBalance'        => 'Pay balance',
+        'atriumSubFull'     => 'Everything is running normally.',
+        'atriumSubEmpty'    => 'Welcome. Your account is ready to set up.',
+
         'browseStore'       => 'Browse store',
         'transferIn'        => 'Transfer one in',
         'invoiceHistory'    => 'Invoice history',
