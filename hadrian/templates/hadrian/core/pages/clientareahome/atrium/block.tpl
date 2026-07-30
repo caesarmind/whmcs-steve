@@ -249,15 +249,24 @@
             <div class="at-row">
                 <span class="at-row-main">
                     <span class="at-row-name">
-                        {if $sec == 'services'}{$r.name|escape}
+                        {* Services lead with the DOMAIN: on a hosting account that
+                           is what identifies the service, and the product name
+                           repeats across every row ("License", "License"). Not
+                           every service has one though -- licences and other
+                           non-hosting products come back with domain '' -- so
+                           the product name is the fallback rather than leaving
+                           the row untitled. *}
+                        {if $sec == 'services'}{if $r.domain}{$r.domain|escape}{else}{$r.name|escape}{/if}
                         {elseif $sec == 'domains'}{$r.domain|escape}
                         {elseif $sec == 'invoices'}#{$r.id|escape}
                         {elseif $sec == 'tickets'}{$r.subject|escape}
                         {else}{$r.title|escape}{/if}
                     </span>
                     {if !$secCompact|default:false}
+                        {* The sub-line carries whichever of the pair the title did
+                           not use, so nothing is lost either way. *}
                         {if $sec == 'services' && ($r.domain || $r.nextDueDate)}
-                        <span class="at-row-sub">{if $r.domain}{$r.domain|escape}{/if}{if $r.domain && $r.nextDueDate} &middot; {/if}{if $r.nextDueDate}{$hadrianLang.dashboard.renews} {$r.nextDueDate|escape}{/if}</span>
+                        <span class="at-row-sub">{if $r.domain}{$r.name|escape}{/if}{if $r.domain && $r.nextDueDate} &middot; {/if}{if $r.nextDueDate}{$hadrianLang.dashboard.renews} {$r.nextDueDate|escape}{/if}</span>
                         {elseif $sec == 'domains' && $r.expirydate}
                         <span class="at-row-sub">{$hadrianLang.dashboard.renews} {$r.expirydate|escape}</span>
                         {elseif $sec == 'invoices' && $r.date}
