@@ -1211,8 +1211,15 @@
                     var opts = document.createElement('div');
                     opts.className = 'mt-seclay-opts';
 
+                    // Only on a block that LISTS something. A welcome band, a
+                    // figure strip, an account-credit panel or a row of fixed
+                    // links has no collection to be empty of, so the switch was
+                    // either inert or meant something the label did not say.
+                    // Same 'list' marker gates Items shown.
+                    var LISTS = !!(cat[s.key] && cat[s.key].list);
                     var opt = document.createElement('div');
                     opt.className = 'mt-seclay-opt';
+                    if (!LISTS) opt.style.display = 'none';
                     var lw = document.createElement('div');
                     var ll = document.createElement('div');
                     ll.className = 'mt-seclay-opt-l';
@@ -1309,7 +1316,7 @@
                     // strip, an amount-due card -- where there is nothing to
                     // count and the number did nothing. Opt in per block with
                     // 'rows' => true in the catalogue entry.
-                    if (RC && cat[s.key] && cat[s.key].rows) {
+                    if (RC && LISTS) {
                         var ro2 = document.createElement('div');
                         ro2.className = 'mt-seclay-opt';
                         var rw2 = document.createElement('div');
@@ -1345,6 +1352,51 @@
                         });
                         ro2.appendChild(rw2); ro2.appendChild(ri);
                         opts.appendChild(ro2);
+                    }
+
+                    // Per-block SELECTS. A switch can be a flag letter; a
+                    // three-way choice cannot, so these are stored as ordinary
+                    // options and merely PRESENTED in the block's drawer -- which
+                    // is where an admin looks for something that describes that
+                    // block. The hidden input the page form already renders is
+                    // the source of truth; this control writes to it.
+                    var SELECTS = (cat[s.key] && cat[s.key].selects) || null;
+                    if (SELECTS) {
+                        Object.keys(SELECTS).forEach(function (optKey) {
+                            var D = SELECTS[optKey];
+                            var field = document.querySelector('[name^="option[' + optKey + '"]');
+                            if (!field) return;
+                            var so = document.createElement('div');
+                            so.className = 'mt-seclay-opt';
+                            var sw = document.createElement('div');
+                            var sl = document.createElement('div');
+                            sl.className = 'mt-seclay-opt-l';
+                            sl.textContent = D.label || optKey;
+                            var sh = document.createElement('div');
+                            sh.className = 'mt-seclay-opt-h';
+                            sh.textContent = D.hint || '';
+                            sw.appendChild(sl); sw.appendChild(sh);
+                            var seg = document.createElement('span');
+                            seg.className = 'mt-seclay-w';
+                            (D.options || []).forEach(function (v) {
+                                var b = document.createElement('button');
+                                b.type = 'button';
+                                b.textContent = v;
+                                if ((field.value || D.default) === v) b.className = 'is-active';
+                                b.addEventListener('click', function () {
+                                    field.value = v;
+                                    [].slice.call(seg.children).forEach(function (x) { x.className = ''; });
+                                    b.className = 'is-active';
+                                });
+                                seg.appendChild(b);
+                            });
+                            so.appendChild(sw); so.appendChild(seg);
+                            opts.appendChild(so);
+                            // The page form still renders its own control for
+                            // this option; hide it so there is exactly one.
+                            var row = field.closest('.mt-field');
+                            if (row) row.style.display = 'none';
+                        });
                     }
 
                     // Colour. Only for sections the variant marked paintable

@@ -1539,6 +1539,77 @@ html[data-theme="dark"] .at-hero-btn-primary { color: color-mix(in srgb, var(--c
     .at-stat-value { font-size: 26px; }
 }
 
+/* --- Painted Atrium blocks --------------------------------------------
+   The paint TOKENS resolve on .at-cell already -- it carries .min-section, and
+   the ink primitive is declared there -- but nothing consumed them: the fill
+   rules select .min-section > .blk (minimal) and .bn-cell > .bn-card (bento),
+   and Atrium's card is .at-card. So a colour saved against an Atrium block set
+   the attributes and painted nothing. These are bento's three fills, retargeted.
+
+   Ink is DERIVED, so a pale paint gets black text and a dark one white without
+   either being authored here. See the @supports block at the ink primitive. */
+.at-cell[data-blk-fill="tint"] > .at-card {
+    background: color-mix(in srgb, var(--blk-base, #0071e3) 10%, var(--color-surface));
+    border-color: color-mix(in srgb, var(--blk-base, #0071e3) 28%, var(--color-surface));
+}
+.at-cell[data-blk-fill="solid"] > .at-card {
+    background: var(--blk-base, #0071e3);
+    border-color: var(--blk-base, #0071e3);
+    color: var(--blk-ink, #fff);
+}
+/* Darkened 22% toward the derived shade on the far corner -- the same figure
+   --brand-primary-darker uses, so it tracks whatever colour is chosen rather
+   than pinning a second stop. */
+.at-cell[data-blk-fill="grad"] > .at-card {
+    background: linear-gradient(135deg, var(--blk-base, #0071e3), color-mix(in srgb, var(--blk-base, #0071e3), var(--blk-shade, #000) 22%));
+    border-color: transparent;
+    color: var(--blk-ink, #fff);
+}
+
+/* On-colour ink for the two saturated fills. Tint keeps the page tokens and
+   needs none of this. Full strength for what you read, softened for the
+   supporting lines. */
+.at-cell[data-blk-fill="solid"] > .at-card .at-card-title,
+.at-cell[data-blk-fill="grad"] > .at-card .at-card-title,
+.at-cell[data-blk-fill="solid"] > .at-card .at-row-name,
+.at-cell[data-blk-fill="grad"] > .at-card .at-row-name,
+.at-cell[data-blk-fill="solid"] > .at-card .at-row-amt,
+.at-cell[data-blk-fill="grad"] > .at-card .at-row-amt,
+.at-cell[data-blk-fill="solid"] > .at-card .at-big,
+.at-cell[data-blk-fill="grad"] > .at-card .at-big,
+.at-cell[data-blk-fill="solid"] > .at-card .at-card-link,
+.at-cell[data-blk-fill="grad"] > .at-card .at-card-link,
+.at-cell[data-blk-fill="solid"] > .at-card .at-empty-title,
+.at-cell[data-blk-fill="grad"] > .at-card .at-empty-title { color: var(--blk-ink, #fff); }
+
+.at-cell[data-blk-fill="solid"] > .at-card .at-row-sub,
+.at-cell[data-blk-fill="grad"] > .at-card .at-row-sub,
+.at-cell[data-blk-fill="solid"] > .at-card .at-panel-meta,
+.at-cell[data-blk-fill="grad"] > .at-card .at-panel-meta,
+.at-cell[data-blk-fill="solid"] > .at-card .at-empty p,
+.at-cell[data-blk-fill="grad"] > .at-card .at-empty p { color: var(--blk-ink, #fff); opacity: 0.82; }
+
+/* Hairlines and insets follow the ink rather than the page border, or they
+   vanish on a saturated fill. */
+.at-cell[data-blk-fill="solid"] > .at-card .at-row,
+.at-cell[data-blk-fill="grad"] > .at-card .at-row { border-top-color: color-mix(in srgb, var(--blk-ink, #fff) 22%, transparent); }
+.at-cell[data-blk-fill="solid"] > .at-card .at-action,
+.at-cell[data-blk-fill="grad"] > .at-card .at-action {
+    background: color-mix(in srgb, var(--blk-ink, #fff) 14%, transparent); color: var(--blk-ink, #fff);
+}
+/* The primary button inverts: ink becomes the fill so it still reads as the
+   one thing to press. */
+.at-cell[data-blk-fill="solid"] > .at-card .at-btn-primary,
+.at-cell[data-blk-fill="grad"] > .at-card .at-btn-primary {
+    background: var(--blk-ink, #fff); border-color: var(--blk-ink, #fff); color: var(--blk-base, #0071e3);
+}
+.at-cell[data-blk-fill="solid"] > .at-card .at-btn,
+.at-cell[data-blk-fill="grad"] > .at-card .at-btn {
+    background: color-mix(in srgb, var(--blk-ink, #fff) 14%, transparent);
+    border-color: color-mix(in srgb, var(--blk-ink, #fff) 45%, transparent);
+    color: var(--blk-ink, #fff);
+}
+
 /* --- Block titles outside the card ------------------------------------
    The head is not moved in the DOM -- it is lifted visually out of the card by
    removing the card's own top framing and pulling the head above it. Nothing

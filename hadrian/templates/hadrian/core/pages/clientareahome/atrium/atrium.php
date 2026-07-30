@@ -44,32 +44,6 @@ return [
             'tooltip' => 'Inside keeps each block self-contained: its label sits on the card, which is how the dashboard was drawn. Outside floats the label on the page background above the card, so a column reads as a set of labelled groups rather than a set of boxes.',
         ],
 
-        // ---- Welcome band appearance ------------------------------------
-        // The band is the one part of the page that is a designed surface
-        // rather than a container of data, so it gets its own controls rather
-        // than a section entry in the builder.
-        'atr_hero_style' => [
-            'type'    => 'select',
-            'label'   => 'Band style',
-            'default' => 'gradient',
-            'options' => ['gradient', 'solid', 'soft', 'plain'],
-            'tooltip' => 'Gradient is the shipped look: the accent deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint of the accent with dark text, for a lighter page. Plain drops the panel and sets the greeting directly on the page background.',
-        ],
-        'atr_hero_width' => [
-            'type'    => 'select',
-            'label'   => 'Band width',
-            'default' => 'boxed',
-            'options' => ['boxed', 'edge'],
-            'tooltip' => 'Boxed keeps the band inside the content column with the rest of the page. Edge runs it to the full width of the content area with the text still aligned to the column, which reads as a header rather than a card.',
-        ],
-        'atr_hero_actions' => [
-            'type'    => 'select',
-            'label'   => 'Band buttons',
-            'default' => 'right',
-            'options' => ['right', 'below', 'off'],
-            'tooltip' => 'Right places Pay balance and Order a service opposite the greeting. Below stacks them under it, which suits a narrow content column. Off hides them; the same actions are reachable from the blocks underneath.',
-        ],
-
         // Which blocks appear, in what order, and in which COLUMN.
         //
         // Width means something different here than in bento. Bento flows tiles
@@ -104,7 +78,31 @@ return [
                 // body, so appending them last would read as a regression
                 // rather than as new blocks. Same reason bento's attention
                 // strip carries it.
-                'hero'          => ['label' => 'Welcome band',    'w' => '1/1', 'prepend' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                // The band's appearance belongs to the band, so its three
+                // controls live in its own drawer beside its width and colour.
+                // They are 'selects' rather than switches: a flag letter is a
+                // boolean, and these each pick one of three or four looks.
+                'hero'          => ['label' => 'Welcome band',    'w' => '1/1', 'prepend' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                                    'selects' => [
+                                        'atr_hero_style' => [
+                                            'label'   => 'Band style',
+                                            'default' => 'gradient',
+                                            'options' => ['gradient', 'solid', 'soft', 'plain'],
+                                            'hint'    => 'Gradient is the shipped look: the accent deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint with dark text, for a lighter page. Plain drops the panel and sets the greeting on the page background.',
+                                        ],
+                                        'atr_hero_width' => [
+                                            'label'   => 'Band width',
+                                            'default' => 'boxed',
+                                            'options' => ['boxed', 'edge'],
+                                            'hint'    => 'Boxed keeps the band inside the content column. Edge runs it to the full width of the content area with the text still aligned to the column, which reads as a header rather than a card.',
+                                        ],
+                                        'atr_hero_actions' => [
+                                            'label'   => 'Band buttons',
+                                            'default' => 'right',
+                                            'options' => ['right', 'below', 'off'],
+                                            'hint'    => 'Right places Pay balance and Order a service opposite the greeting. Below stacks them under it, for a narrow content column. Off hides them; the same actions are reachable from the blocks underneath.',
+                                        ],
+                                    ]],
                 // The four figures are switches on THIS block rather than page
                 // options: they describe the strip, the way its width and its
                 // order do, so they belong in its own drawer. Stored as flag
@@ -125,12 +123,12 @@ return [
                                         't' => ['label' => 'Figure: open tickets', 'invert' => true,
                                                 'hint'  => 'Open tickets, with a sub-line for any where staff have replied and are waiting on the client.'],
                                     ]],
-                'services'      => ['label' => 'Services',          'w' => '2/3', 'rows' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                'services'      => ['label' => 'Services',          'w' => '2/3', 'list' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',
                                         'hint'  => 'Name and status only, with no second line. A dense list you can scan in one pass.',
                                     ]],
-                'domains'       => ['label' => 'Domains',           'w' => '2/3', 'rows' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                'domains'       => ['label' => 'Domains',           'w' => '2/3', 'list' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',
                                         'hint'  => 'Name and status only, with no second line. A dense list you can scan in one pass.',
@@ -139,7 +137,7 @@ return [
                 // collection whose headline is an ACCOUNT TOTAL rather than a
                 // count of the rows beneath it, so it still says something true
                 // with nothing listed. A Services block with no rows is a number.
-                'invoices'      => ['label' => 'Recent invoices',   'w' => '2/3', 'rows' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                'invoices'      => ['label' => 'Recent invoices',   'w' => '2/3', 'list' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'listToggle' => [
                                         'label' => 'Show the invoice list',
                                         'hint'  => 'Off, the block stays an aggregate: what is owed and how overdue the worst of it is. The full history is a click away either way.',
@@ -148,7 +146,7 @@ return [
                                         'label' => 'Compact rows',
                                         'hint'  => 'Number, date and amount only, with no second line.',
                                     ]],
-                'announcements' => ['label' => 'Announcements',     'w' => '1/3', 'rows' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                'announcements' => ['label' => 'Announcements',     'w' => '1/3', 'list' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',
                                         'hint'  => 'Title only, with no date line.',
@@ -158,7 +156,7 @@ return [
                 // precedent as bento's attention strip.
                 'unpaid'        => ['label' => 'Amount due',        'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 'credit'        => ['label' => 'Account credit',    'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
-                'tickets'       => ['label' => 'Support',           'w' => '1/3', 'rows' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                'tickets'       => ['label' => 'Support',           'w' => '1/3', 'list' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',
                                         'hint'  => 'Subject and status only, with no ticket number line.',
