@@ -1020,6 +1020,20 @@
         // Tagged like every other control, so the same filter shows this card
         // only while its own template is the one selected.
         box.setAttribute('data-opt-variant', spec.variant || '');
+
+        // Options this variant presents inside a block's drawer still have a
+        // row in the page form -- that row is where the value is stored. Hide
+        // it ONCE, here. Doing it while rendering a drawer meant it only
+        // happened for blocks the admin had actually opened, so the controls
+        // showed in both places until then.
+        Object.keys(spec.inBlock || {}).forEach(function (blk) {
+            Object.keys(spec.inBlock[blk]).forEach(function (optKey) {
+                var f = document.querySelector('[name^="option[' + optKey + '"]');
+                if (!f) return;
+                var row = f.closest('.mt-row') || f.closest('.mt-field') || f.parentElement;
+                if (row) row.style.display = 'none';
+            });
+        });
         var head = document.createElement('div');
         head.className = 'mt-subhead';
         head.textContent = spec.title || 'Sections';
@@ -1392,13 +1406,6 @@
                             });
                             so.appendChild(sw); so.appendChild(seg);
                             opts.appendChild(so);
-                            // The page form still renders its own control for
-                            // this option; hide that row so there is exactly
-                            // one. The row class is .mt-row -- .mt-field is a
-                            // different wrapper, and closing on it matched
-                            // nothing, so both copies showed.
-                            var row = field.closest('.mt-row') || field.closest('.mt-field');
-                            if (row) row.style.display = 'none';
                         });
                     }
 
