@@ -1360,7 +1360,7 @@
                     // is where an admin looks for something that describes that
                     // block. The hidden input the page form already renders is
                     // the source of truth; this control writes to it.
-                    var SELECTS = (cat[s.key] && cat[s.key].selects) || null;
+                    var SELECTS = (spec.inBlock && spec.inBlock[s.key]) || null;
                     if (SELECTS) {
                         Object.keys(SELECTS).forEach(function (optKey) {
                             var D = SELECTS[optKey];

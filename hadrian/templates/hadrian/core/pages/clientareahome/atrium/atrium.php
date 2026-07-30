@@ -36,6 +36,36 @@ return [
     // with no default merge, so every template read carries its own |default:
     // matching the value declared here.
     'supportedOptions' => [
+        // The band's three appearance controls. DECLARED here so the page form
+        // stores them the ordinary way, and marked inBlock so that row is
+        // hidden and the control re-presented in the Welcome band's drawer --
+        // where an admin looks for something that describes the band. One
+        // control, one stored value, shown where it belongs.
+        'atr_hero_style' => [
+            'type'    => 'select',
+            'label'   => 'Band style',
+            'default' => 'gradient',
+            'options' => ['gradient', 'solid', 'soft', 'plain'],
+            'inBlock' => 'hero',
+            'tooltip' => 'Gradient is the shipped look: the accent deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint with dark text, for a lighter page. Plain drops the panel and sets the greeting on the page background.',
+        ],
+        'atr_hero_width' => [
+            'type'    => 'select',
+            'label'   => 'Band width',
+            'default' => 'boxed',
+            'options' => ['boxed', 'edge'],
+            'inBlock' => 'hero',
+            'tooltip' => 'Boxed keeps the band inside the content column. Edge runs it to the full width of the content area with the text still aligned to the column, which reads as a header rather than a card.',
+        ],
+        'atr_hero_actions' => [
+            'type'    => 'select',
+            'label'   => 'Band buttons',
+            'default' => 'right',
+            'options' => ['right', 'below', 'off'],
+            'inBlock' => 'hero',
+            'tooltip' => 'Right places Pay balance and Order a service opposite the greeting. Below stacks them under it, for a narrow content column. Off hides them; the same actions are reachable from the blocks underneath.',
+        ],
+
         'atr_section_titles' => [
             'type'    => 'select',
             'label'   => 'Block titles',
@@ -83,26 +113,7 @@ return [
                 // They are 'selects' rather than switches: a flag letter is a
                 // boolean, and these each pick one of three or four looks.
                 'hero'          => ['label' => 'Welcome band',    'w' => '1/1', 'prepend' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
-                                    'selects' => [
-                                        'atr_hero_style' => [
-                                            'label'   => 'Band style',
-                                            'default' => 'gradient',
-                                            'options' => ['gradient', 'solid', 'soft', 'plain'],
-                                            'hint'    => 'Gradient is the shipped look: the accent deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint with dark text, for a lighter page. Plain drops the panel and sets the greeting on the page background.',
-                                        ],
-                                        'atr_hero_width' => [
-                                            'label'   => 'Band width',
-                                            'default' => 'boxed',
-                                            'options' => ['boxed', 'edge'],
-                                            'hint'    => 'Boxed keeps the band inside the content column. Edge runs it to the full width of the content area with the text still aligned to the column, which reads as a header rather than a card.',
-                                        ],
-                                        'atr_hero_actions' => [
-                                            'label'   => 'Band buttons',
-                                            'default' => 'right',
-                                            'options' => ['right', 'below', 'off'],
-                                            'hint'    => 'Right places Pay balance and Order a service opposite the greeting. Below stacks them under it, for a narrow content column. Off hides them; the same actions are reachable from the blocks underneath.',
-                                        ],
-                                    ]],
+],
                 // The four figures are switches on THIS block rather than page
                 // options: they describe the strip, the way its width and its
                 // order do, so they belong in its own drawer. Stored as flag

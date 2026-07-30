@@ -225,6 +225,19 @@ final class PagesController extends AbstractController
             if (!is_array($spec) || ($spec['type'] ?? '') !== 'sections') {
                 continue;
             }
+            // Options tagged inBlock => '<sectionKey>' are shown in that
+            // block's drawer instead of the page form.
+            $inBlockOpts = [];
+            foreach ($supportedOptions as $oKey => $oSpec) {
+                $blk = is_array($oSpec) ? (string)($oSpec['inBlock'] ?? '') : '';
+                if ($blk === '') { continue; }
+                $inBlockOpts[$blk][$oKey] = [
+                    'label'   => (string)($oSpec['label'] ?? $oKey),
+                    'hint'    => (string)($oSpec['tooltip'] ?? ''),
+                    'options' => is_array($oSpec['options'] ?? null) ? $oSpec['options'] : [],
+                    'default' => (string)($oSpec['default'] ?? ''),
+                ];
+            }
             $owner = (string)($spec['_variant'] ?? '');
             $sectionSpecs[(string)$key] = [
                 // Heading for the builder's own card. Falls back to the option
@@ -239,6 +252,11 @@ final class PagesController extends AbstractController
                 // picks a stack rather than a size. Declared by the variant
                 // because only the variant knows what its widths mean.
                 'preview'      => (string)($spec['preview'] ?? 'grid'),
+                // Options this variant wants PRESENTED inside a block's drawer
+                // rather than in the page's Template settings. Keyed by block,
+                // so the builder can render them without a second declaration
+                // that could drift from the real one.
+                'inBlock'      => $inBlockOpts,
                 // Palette the per-section colour control offers. Was computed
                 // for the parser but never reached the view, so the builder
                 // could not draw the control at all.
