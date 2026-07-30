@@ -76,6 +76,14 @@
    of counts can be empty. *}
 {elseif $sec == 'stats'}
     {if !($secHideEmpty|default:false && $atSvcN == 0 && $atDomN == 0 && $atInvN == 0 && $atTktN == 0)}
+{* Each figure is a flag on THIS block. The flag is negative (its presence
+   HIDES the figure) because a flag is absent by default and the four figures
+   ship on; the admin control is labelled positively and inverted for storage,
+   the same way the invoice-list switch works. *}
+{assign var=atStatSvc value=true}{if $secFlags.s|default:false}{assign var=atStatSvc value=false}{/if}
+{assign var=atStatDom value=true}{if $secFlags.d|default:false}{assign var=atStatDom value=false}{/if}
+{assign var=atStatBill value=true}{if $secFlags.b|default:false}{assign var=atStatBill value=false}{/if}
+{assign var=atStatTkt value=true}{if $secFlags.t|default:false}{assign var=atStatTkt value=false}{/if}
 {assign var=atStatN value=0}
 {if $atStatSvc}{assign var=atStatN value=($atStatN+1)}{/if}
 {if $atStatDom}{assign var=atStatN value=($atStatN+1)}{/if}

@@ -36,10 +36,9 @@
    Variant options (admin: Hadrian > Pages > Dashboard), read as
    $hadrian.pages.clientareahome.options.* - NOT .config.*, which does not exist:
      atr_section_titles  inside|outside - where a block's label sits
-     atr_stat_services   bool - summary figure
-     atr_stat_domains    bool - summary figure
-     atr_stat_billing    bool - summary figure
-     atr_stat_tickets    bool - summary figure
+     atr_hero_style/_width/_actions - the welcome band's appearance
+   Which summary figures appear is a per-BLOCK switch on the stats section
+   (flag letters s/d/b/t), not a page option: it describes that block.
 *}
 
 {* ---------- options ----------
@@ -53,14 +52,6 @@
 {assign var=atHeroStyle value=$hadrian.pages.clientareahome.options.atr_hero_style|default:'gradient'}
 {assign var=atHeroWidth value=$hadrian.pages.clientareahome.options.atr_hero_width|default:'boxed'}
 {assign var=atHeroActs value=$hadrian.pages.clientareahome.options.atr_hero_actions|default:'right'}
-{assign var=atStatSvc value=true}
-{if isset($hadrian.pages.clientareahome.options.atr_stat_services)}{assign var=atStatSvc value=$hadrian.pages.clientareahome.options.atr_stat_services}{/if}
-{assign var=atStatDom value=true}
-{if isset($hadrian.pages.clientareahome.options.atr_stat_domains)}{assign var=atStatDom value=$hadrian.pages.clientareahome.options.atr_stat_domains}{/if}
-{assign var=atStatBill value=true}
-{if isset($hadrian.pages.clientareahome.options.atr_stat_billing)}{assign var=atStatBill value=$hadrian.pages.clientareahome.options.atr_stat_billing}{/if}
-{assign var=atStatTkt value=true}
-{if isset($hadrian.pages.clientareahome.options.atr_stat_tickets)}{assign var=atStatTkt value=$hadrian.pages.clientareahome.options.atr_stat_tickets}{/if}
 
 {* ---------- counts ----------
    Real figures, each from a named variable. numunpaidinvoices is NOT summed
@@ -118,7 +109,7 @@
                    {include} drops the whole client area to the Six theme, and
                    the poisoned compiled-template cache survives a git revert. *}
                 {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
-                    {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secRows=$s.rows|default:$atDefRows}
+                    {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secFlags=$s.flags secRows=$s.rows|default:$atDefRows}
                 {/if}
             {/if}
         {/foreach}
@@ -130,7 +121,7 @@
         {foreach $atSecs as $s}
             {if $s.visible && ($s.width == '2/3' || $s.width == '1/2')}
                 {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
-                    {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secRows=$s.rows|default:$atDefRows}
+                    {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secFlags=$s.flags secRows=$s.rows|default:$atDefRows}
                 {/if}
             {/if}
         {/foreach}
@@ -139,7 +130,7 @@
         {foreach $atSecs as $s}
             {if $s.visible && $s.width == '1/3'}
                 {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
-                    {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secRows=$s.rows|default:$atDefRows}
+                    {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secFlags=$s.flags secRows=$s.rows|default:$atDefRows}
                 {/if}
             {/if}
         {/foreach}

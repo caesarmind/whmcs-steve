@@ -36,36 +36,6 @@ return [
     // with no default merge, so every template read carries its own |default:
     // matching the value declared here.
     'supportedOptions' => [
-        // The four summary tiles, each independently switchable. They are ONE
-        // section rather than four because the layout DSL has no 1/4 token and
-        // six columns cannot express quarters -- four 1/3 entries would span 8
-        // and wrap 3+1. So the strip is a single full-width section that draws
-        // its own four-up grid, and these decide which tiles it draws.
-        'atr_stat_services' => [
-            'type'    => 'bool',
-            'label'   => 'Figure: active services',
-            'default' => true,
-            'tooltip' => 'Counts active services on the account, not the rows listed below.',
-        ],
-        'atr_stat_domains' => [
-            'type'    => 'bool',
-            'label'   => 'Figure: domains',
-            'default' => true,
-            'tooltip' => 'Counts active domains, with a sub-line for any expiring within 45 days.',
-        ],
-        'atr_stat_billing' => [
-            'type'    => 'bool',
-            'label'   => 'Figure: balance due',
-            'default' => true,
-            'tooltip' => 'The unpaid total and how many invoices make it up. Shows how overdue the worst one is only when something actually is.',
-        ],
-        'atr_stat_tickets' => [
-            'type'    => 'bool',
-            'label'   => 'Figure: open tickets',
-            'default' => true,
-            'tooltip' => 'Open tickets, with a sub-line for any where staff have replied and are waiting on the client.',
-        ],
-
         'atr_section_titles' => [
             'type'    => 'select',
             'label'   => 'Block titles',
@@ -135,7 +105,26 @@ return [
                 // rather than as new blocks. Same reason bento's attention
                 // strip carries it.
                 'hero'          => ['label' => 'Welcome band',    'w' => '1/1', 'prepend' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
-                'stats'         => ['label' => 'Summary figures', 'w' => '1/1', 'prepend' => true],
+                // The four figures are switches on THIS block rather than page
+                // options: they describe the strip, the way its width and its
+                // order do, so they belong in its own drawer. Stored as flag
+                // letters, which is why the labels are positive while the flag
+                // is negative -- a flag is absent by default, and a control
+                // labelled for what it turns ON is the one an admin can
+                // predict. The strip is one block rather than four because the
+                // layout DSL has no 1/4 token and six columns cannot express
+                // quarters: four 1/3 entries would span 8 and wrap 3+1.
+                'stats'         => ['label' => 'Summary figures', 'w' => '1/1', 'prepend' => true,
+                                    'switches' => [
+                                        's' => ['label' => 'Figure: active services', 'invert' => true,
+                                                'hint'  => 'Counts active services on the account, not the rows listed below.'],
+                                        'd' => ['label' => 'Figure: domains', 'invert' => true,
+                                                'hint'  => 'Counts active domains, with a sub-line for any expiring within 45 days.'],
+                                        'b' => ['label' => 'Figure: balance due', 'invert' => true,
+                                                'hint'  => 'The unpaid total and how many invoices make it up. Shows how overdue the worst one is only when something actually is.'],
+                                        't' => ['label' => 'Figure: open tickets', 'invert' => true,
+                                                'hint'  => 'Open tickets, with a sub-line for any where staff have replied and are waiting on the client.'],
+                                    ]],
                 'services'      => ['label' => 'Services',          'w' => '2/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',

@@ -75,9 +75,33 @@ final class SectionLayout
      * alone, so a key landing in this slot still fails whole. Check that again
      * before adding a fourth letter.
      */
-    private const FLAG_LETTERS = 'elc';
+    // 's','d','b','t' are the Atrium figure-strip switches. They are ordinary
+    // per-section flags rather than page options because they belong to ONE
+    // block, and the admin should find them in that block's own drawer.
+    //
+    // Before adding a letter, re-run the strspn safety argument below against
+    // every catalogue key in every variant: no key may be spellable from the
+    // flag letters alone, or a key landing in the flags slot would parse as
+    // flags instead of failing the entry whole. Checked for 'elcsdbt' --
+    // 'stats' needs 'a', 'credit' needs 'r', 'tickets' needs 'i' and 'k'.
+    private const FLAG_LETTERS = 'elcsdbt';
 
     /** How a paint is applied. Bare paint (no suffix) means solid. */
+    /**
+     * Flag letters as a lookup, every declared letter present so a template can
+     * test one without an isset() dance.
+     *
+     * @return array<string, bool>
+     */
+    private static function flagMap(string $flags): array
+    {
+        $out = [];
+        foreach (str_split(self::FLAG_LETTERS) as $letter) {
+            $out[$letter] = str_contains($flags, $letter);
+        }
+        return $out;
+    }
+
     private const FILLS = ['solid', 'tint', 'grad'];
 
     /**
@@ -220,6 +244,10 @@ final class SectionLayout
                 'hideEmpty' => str_contains($flags, 'e'),
                 'hideList'  => str_contains($flags, 'l'),
                 'compact'   => str_contains($flags, 'c'),
+                // Every flag letter as a map, so a variant can declare its own
+                // switches without this parser having to name them. The three
+                // above stay for the templates that already read them.
+                'flags'     => self::flagMap($flags),
                 'paint'     => $paint,
                 'fill'      => $fill,
                 'custom'    => $custom,
@@ -266,6 +294,7 @@ final class SectionLayout
                 'hideEmpty' => false,
                 'hideList'  => false,
                 'compact'   => false,
+                'flags'     => self::flagMap(''),
                 'paint'     => '',
                 'fill'      => '',
                 'custom'    => '',

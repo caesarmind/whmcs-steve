@@ -939,7 +939,7 @@
                     // Whitelist the flags field, mirroring SectionLayout::parse.
                     // A mistyped comma puts a section KEY here, and most keys
                     // contain an 'e' -- a bare indexOf would invent settings.
-                    if (f && !/^[elc]*$/.test(f)) { f = ''; }
+                    if (f && !/^[elcsdbt]*$/.test(f)) { f = ''; }
                     // Colour is READ AND KEPT, not discarded. It used to be
                     // dropped here while serialise() never wrote it either, so
                     // merely opening the builder and touching anything erased a
@@ -955,6 +955,11 @@
                     out.push({ key: k, on: w !== 'off', w: w === 'off' ? (cat[k].w || '1/1') : w,
                                hideEmpty: f.indexOf('e') !== -1, hideList: f.indexOf('l') !== -1,
                                compact: f.indexOf('c') !== -1,
+                               // Everything the three named props do not cover.
+                               // A variant declares its own switches in the
+                               // catalogue; the builder does not need to know
+                               // what they mean, only to round-trip them.
+                               extra: f.replace(/[elc]/g, ''),
                                colour: normColour(c, k), rows: n });
                 });
             }
@@ -965,7 +970,7 @@
             // that appended it would show an order the page does not render.
             keys.forEach(function (k) {
                 if (seen[k]) return;
-                var row = { key: k, on: true, w: cat[k].w || '1/1', hideEmpty: false, hideList: false, compact: false, colour: '', rows: '' };
+                var row = { key: k, on: true, w: cat[k].w || '1/1', hideEmpty: false, hideList: false, compact: false, extra: '', colour: '', rows: '' };
                 if (cat[k].prepend) { out.unshift(row); } else { out.push(row); }
             });
             return out;
@@ -998,7 +1003,7 @@
             return state.map(function (s) {
                 // Flags are emitted in a fixed order so the string is stable
                 // across saves; the parser does not care, a byte-diff does.
-                var fl = (s.hideEmpty ? 'e' : '') + (s.hideList ? 'l' : '') + (s.compact ? 'c' : '');
+                var fl = (s.hideEmpty ? 'e' : '') + (s.hideList ? 'l' : '') + (s.compact ? 'c' : '') + (s.extra || '');
                 var f = [s.key, (s.on ? s.w : 'off'), fl, (s.colour || ''), (s.rows || '')];
                 while (f.length > 2 && f[f.length - 1] === '') f.pop();
                 return f.join(':');
@@ -1237,9 +1242,28 @@
                         { spec: 'listToggle',  prop: 'hideList', invert: true  },
                         { spec: 'rowsCompact', prop: 'compact',  invert: false }
                     ];
+                    // Plus any switch the variant declares for THIS block under
+                    // 'switches': { letter: {label, hint, invert} }. Stored as a
+                    // flag letter like the two above, so a variant can add a
+                    // per-block control without the builder learning what it
+                    // means -- which is how the Atrium figure toggles moved out
+                    // of the page's Template settings and into the block they
+                    // actually belong to.
+                    var declared = (cat[s.key] && cat[s.key].switches) || null;
+                    if (declared) {
+                        Object.keys(declared).forEach(function (letter) {
+                            var d = declared[letter];
+                            ROWTOGGLES.push({ spec: '_sw_' + letter, letter: letter,
+                                              invert: !!d.invert, _def: d });
+                        });
+                    }
                     ROWTOGGLES.forEach(function (t) {
-                        var D = (cat[s.key] && cat[s.key][t.spec]) || null;
+                        var D = t._def || (cat[s.key] && cat[s.key][t.spec]) || null;
                         if (!D) return;
+                        // A letter-backed switch reads and writes s.extra.
+                        var has = t.letter
+                            ? (s.extra || '').indexOf(t.letter) !== -1
+                            : !!s[t.prop];
                         var ro = document.createElement('div');
                         ro.className = 'mt-seclay-opt';
                         var rw = document.createElement('div');
@@ -1258,9 +1282,15 @@
                         // the stored flag is negative -- "Show the list" over a
                         // flag that means hide. A control labelled for what it
                         // turns on is the one an admin can predict.
-                        rcb.checked = t.invert ? !s[t.prop] : !!s[t.prop];
+                        rcb.checked = t.invert ? !has : has;
                         rcb.addEventListener('change', function () {
-                            s[t.prop] = t.invert ? !rcb.checked : rcb.checked;
+                            var on = t.invert ? !rcb.checked : rcb.checked;
+                            if (t.letter) {
+                                var e = (s.extra || '').replace(new RegExp(t.letter, 'g'), '');
+                                s.extra = on ? e + t.letter : e;
+                            } else {
+                                s[t.prop] = on;
+                            }
                             commit();
                         });
                         var rtr = document.createElement('span'); rtr.className = 'mt-toggle-track';
