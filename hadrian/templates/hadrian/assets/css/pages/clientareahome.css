@@ -1349,82 +1349,120 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
 
 /* =============================================================
    ATRIUM VARIANT -- welcome band + summary figures
+
+   Sizes are taken from the v18 mockup rather than from the theme's type
+   scale, because the scale's steps do not land where the design does: the
+   stat value is 30px, and the nearest token (--text-display) is 72px, which
+   wrapped a currency string onto two lines and left the tiles half empty.
+   Where a token DOES match the design it is used; where it does not, the
+   literal is written with the mockup value it came from.
+
    Prefix .at-* is private to this variant (verified unused elsewhere), and no
    class here ends in -split or -aside, which apple-layout.css hijacks with
-   [class$=] selectors. All colour comes from tokens so dark mode and the Colors
-   panel both reach it with no extra rules.
+   [class$=] selectors.
    ============================================================= */
-.at-hero {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    gap: 24px; flex-wrap: wrap; margin-bottom: 22px;
-}
-.at-hero-main { min-width: 0; }
-.at-hero-title {
-    font-size: var(--text-h1); font-weight: var(--fw-semibold);
-    letter-spacing: -0.02em; color: var(--color-text-primary); margin: 0;
-}
-.at-hero-sub {
-    font-size: var(--text-md); color: var(--color-text-secondary);
-    margin: 6px 0 0; line-height: 1.45;
-}
-.at-hero-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.at-hero-btn {
-    display: inline-flex; align-items: center; height: 36px; padding: 0 18px;
-    border-radius: var(--radius-pill); border: 1px solid var(--color-border);
-    background: var(--color-surface); color: var(--color-text-primary);
-    font-size: var(--text-base); font-weight: var(--fw-medium);
-    text-decoration: none; white-space: nowrap;
-    transition: background var(--transition-fast), border-color var(--transition-fast);
-}
-.at-hero-btn:hover { background: var(--color-surface-secondary); text-decoration: none; color: var(--color-text-primary); }
-.at-hero-btn-primary {
-    background: var(--color-accent); border-color: var(--color-accent);
-    color: var(--color-on-accent);
-}
-.at-hero-btn-primary:hover { background: var(--color-accent-hover); border-color: var(--color-accent-hover); color: var(--color-on-accent); }
 
-/* Four-up summary strip. auto-fit rather than a fixed 4 because any of the
-   four tiles can be switched off independently -- with two on, two should fill
-   the row rather than leaving half the strip empty. */
+/* The band is a FILLED panel, not text on the page. Its gradient runs dark ->
+   accent -> light across the width, which is load-bearing for legibility: the
+   heading sits on the dark end and the white action pills on the light end.
+   Built from --color-accent with color-mix, so it follows a rebrand and the
+   style presets for free. */
+.at-hero {
+    position: relative; overflow: hidden;
+    border-radius: 22px; padding: 28px 40px; margin: 0 0 26px;
+    display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    color: #fff;
+    /* Accent stop at 78%, not the mockup's 55%. MEASURED: the heading runs to
+       ~63% of the width, and with the accent at 55% that lands in the pale
+       tail where white text falls to 4.17:1 -- fine for the 29px bold title
+       (large text, needs 3:1) but a fail for the 14.5px sub-line. Pushing the
+       stop right keeps the same dark -> accent -> light character while giving
+       the text block a dark runway; the pale end still sits under the action
+       pills, which is where it is wanted. */
+    background: linear-gradient(115deg,
+        color-mix(in srgb, var(--color-accent) 90%, #002050) 0%,
+        var(--color-accent) 78%,
+        color-mix(in srgb, var(--color-accent) 58%, #fff) 100%);
+}
+/* max-width caps how far the text can run into the gradient; without it a long
+   client name pushes the sub-line into the pale end regardless of the stop. */
+.at-hero-main { flex: 1; min-width: 0; max-width: 68%; position: relative; z-index: 2; }
+.at-hero-title {
+    font-size: 29px; font-weight: var(--fw-bold); letter-spacing: -0.025em;
+    line-height: 1.05; margin: 0 0 7px; color: #fff;
+}
+.at-hero-sub { font-size: 14.5px; font-weight: var(--fw-medium); opacity: 0.9; margin: 0; }
+.at-hero-actions {
+    display: flex; align-items: center; gap: 10px;
+    position: relative; z-index: 2; flex-shrink: 0; flex-wrap: wrap;
+}
+/* White pill on the gradient's light end, accent label. */
+.at-hero-btn {
+    background: rgba(255,255,255,0.16); color: #fff;
+    border: 1px solid rgba(255,255,255,0.35);
+    font-size: 13.5px; font-weight: var(--fw-semibold);
+    padding: 10px 19px; border-radius: var(--radius-pill);
+    text-decoration: none; white-space: nowrap;
+    transition: background var(--transition-fast);
+}
+.at-hero-btn:hover { background: rgba(255,255,255,0.26); color: #fff; text-decoration: none; }
+.at-hero-btn-primary { background: #fff; border-color: #fff; color: var(--color-accent); }
+.at-hero-btn-primary:hover { background: rgba(255,255,255,0.9); color: var(--color-accent); text-decoration: none; }
+
+/* Column count comes from the template: the four tiles are independently
+   switchable, and repeat(auto-fit, ...) created as many tracks as fit the
+   container, leaving empty ones and half-filling the row. */
 .at-stats {
-    /* Column count comes from the template, because the four tiles are
-       independently switchable: repeat(auto-fit, ...) creates as many tracks as
-       fit the container, so with two tiles enabled on a wide page it left three
-       empty tracks and the strip only half filled its row. */
     display: grid; grid-template-columns: repeat(var(--at-stat-n, 4), minmax(0, 1fr));
-    gap: 14px; margin-bottom: 22px;
+    gap: 18px; margin: 0 0 26px;
 }
 .at-stat {
-    display: flex; flex-direction: column; gap: 3px;
-    padding: 18px 20px; border-radius: var(--card-radius);
-    background: var(--color-surface); border: 1px solid var(--color-border-card);
-    box-shadow: var(--card-shadow); text-decoration: none;
+    display: block; padding: 22px 24px;
+    border-radius: 15px; background: var(--color-surface);
+    border: 1px solid var(--color-border); box-shadow: var(--shadow-card);
+    text-decoration: none;
     transition: box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 .at-stat:hover { box-shadow: var(--shadow-card-hover); transform: translateY(-1px); text-decoration: none; }
 .at-stat-label {
-    font-size: var(--text-xs); font-weight: var(--fw-semibold);
-    text-transform: uppercase; letter-spacing: 0.06em;
-    /* secondary, not tertiary: an 11px uppercase label at 3.62:1 on a card is
-       the weakest text on the page. Secondary measures 5.07 / 6.61. */
-    color: var(--color-text-secondary);
+    display: block; font-size: 11.5px; font-weight: var(--fw-semibold);
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--color-text-secondary); margin: 0 0 12px;
 }
+/* 30px, not --text-display's 72px. Baseline flex so a suffix sits beside the
+   figure, and nowrap so a currency string like "$40.00 USD" cannot break onto
+   a second line and blow the tile out. */
 .at-stat-value {
-    font-size: var(--text-display); font-weight: var(--fw-semibold);
-    letter-spacing: -0.02em; color: var(--color-text-primary); line-height: 1.1;
+    display: flex; align-items: baseline; gap: 9px;
+    font-size: 30px; font-weight: var(--fw-bold); letter-spacing: -0.025em;
+    line-height: 1.1; color: var(--color-text-primary); white-space: nowrap;
 }
-/* --color-text-secondary, not tertiary: these sub-lines carry real figures
-   (overdue age, expiring count) and tertiary measures ~3.4:1 on a card. */
-.at-stat-sub { font-size: var(--text-base); color: var(--color-text-secondary); }
+.at-stat-sub { display: block; font-size: 12.5px; color: var(--color-text-secondary); margin-top: 10px; }
 .at-stat-sub.is-alert { color: var(--color-red-text); font-weight: var(--fw-medium); }
 
+/* DARK MODE. --color-accent goes from #0071e3 to the much brighter #2997ff,
+   which lifts the whole panel and drops white text to 3.10:1 and the pill
+   label to 3.02 -- both fails. The panel is decorative and ours, so it is
+   deepened here rather than touching any shared token. Measured on the dark
+   accent: 65% accent + black gives white 6.28:1, and the same mix as a label
+   on the white pill gives 6.28:1. Hue is preserved, so it still follows a
+   rebrand and the style presets. */
+html[data-theme="dark"] .at-hero {
+    background: linear-gradient(115deg,
+        color-mix(in srgb, var(--color-accent) 42%, #000) 0%,
+        color-mix(in srgb, var(--color-accent) 65%, #000) 78%,
+        color-mix(in srgb, var(--color-accent) 88%, #000) 100%);
+}
+html[data-theme="dark"] .at-hero-btn-primary { color: color-mix(in srgb, var(--color-accent) 65%, #000); }
+
 @media (max-width: 900px) {
-    .at-hero { align-items: flex-start; }
-    .at-hero-actions { width: 100%; }
-    /* Two-up rather than the declared count: four figures side by side below
-       900px squeezes each value past legibility. */
+    .at-hero { padding: 24px 26px; align-items: flex-start; }
+    .at-hero-title { font-size: 23px; }
+    /* Two-up: four figures side by side below 900px squeezes each past
+       legibility. */
     .at-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 520px) {
     .at-stats { grid-template-columns: minmax(0, 1fr); }
+    .at-stat-value { font-size: 26px; }
 }

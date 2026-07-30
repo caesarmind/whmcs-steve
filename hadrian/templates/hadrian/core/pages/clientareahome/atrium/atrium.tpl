@@ -93,9 +93,7 @@
 <section class="at-hero">
     <div class="at-hero-main">
         <h1 class="at-hero-title">
-            {if $dashboard.greeting == 'morning'}{$hadrianLang.dashboard.goodMorning}
-            {elseif $dashboard.greeting == 'afternoon'}{$hadrianLang.dashboard.goodAfternoon}
-            {else}{$hadrianLang.dashboard.goodEvening}{/if}{if $clientsdetails.firstname}, {$clientsdetails.firstname|escape}{/if}
+{if $dashboard.greeting == 'morning'}{$hadrianLang.dashboard.goodMorning}{elseif $dashboard.greeting == 'afternoon'}{$hadrianLang.dashboard.goodAfternoon}{else}{$hadrianLang.dashboard.goodEvening}{/if}{if $clientsdetails.firstname}, {$clientsdetails.firstname|escape}{/if}
         </h1>
         <p class="at-hero-sub">
             <span class="when-full">{$hadrianLang.dashboard.atriumSubFull}</span>
