@@ -1045,6 +1045,7 @@ final class Hooks
                 'activeServices' => [], 'domains' => [], 'recentInvoices' => [],
                 'openTickets' => [], 'announcements' => [],
                 'greeting' => $this->greetingBucket(),
+                'today' => $this->todayLabel(),
             ]];
         }
 
@@ -1055,6 +1056,10 @@ final class Hooks
                 // %-style codes are broken on PHP 8.1+ (strftime deprecation;
                 // see the trap documented in viewannouncement/default.tpl).
                 'greeting'       => $this->greetingBucket(),
+                // Formatted here for the same reason as the greeting: Smarty's
+                // |date_format uses %-style codes, which rely on strftime and
+                // are broken on PHP 8.1+.
+                'today'          => $this->todayLabel(),
                 'activeServices' => $this->fetchActiveServices($clientId),
                 // Domains were previously fetched only on the domains page. The
                 // minimal dashboard lists them as a primary section, so surface a
@@ -1190,6 +1195,20 @@ final class Hooks
      * visitor's local time is not knowable server-side, and guessing it from
      * the browser would make the heading flicker on load.
      */
+    /**
+     * Today as "Tuesday - 2 June", for the Atrium hero eyebrow.
+     *
+     * date(), not Smarty's |date_format, whose %-style codes rely on strftime
+     * and are broken on PHP 8.1+ -- the same trap the greeting bucket is
+     * computed here to avoid. Deliberately not localised beyond PHP's own day
+     * and month names: WHMCS exposes no locale-aware date helper to hooks, and
+     * a half-translated date reads worse than an English one.
+     */
+    private function todayLabel(): string
+    {
+        return date('l') . " \u{00B7} " . date('j F');
+    }
+
     private function greetingBucket(): string
     {
         $hour = (int)date('G');

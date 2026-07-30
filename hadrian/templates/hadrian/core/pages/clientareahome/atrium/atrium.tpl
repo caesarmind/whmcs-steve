@@ -92,6 +92,9 @@
 {if $atHero}
 <section class="at-hero">
     <div class="at-hero-main">
+        {* Supplied by the hook, not formatted in Smarty: |date_format's
+           %-style codes rely on strftime and are broken on PHP 8.1+. *}
+        {if $dashboard.today|default:''}<div class="at-hero-date">{$dashboard.today|escape}</div>{/if}
         <h1 class="at-hero-title">
 {if $dashboard.greeting == 'morning'}{$hadrianLang.dashboard.goodMorning}{elseif $dashboard.greeting == 'afternoon'}{$hadrianLang.dashboard.goodAfternoon}{else}{$hadrianLang.dashboard.goodEvening}{/if}{if $clientsdetails.firstname}, {$clientsdetails.firstname|escape}{/if}
         </h1>
