@@ -312,6 +312,20 @@ return [
         'attnTicketMany'    => 'tickets awaiting your reply',
 
         // Secondary links on the per-tile empty states.
+        // Atrium body blocks.
+        'amountDue'         => 'Amount due',
+        'payNow'            => 'Pay now',
+        'accountCredit'     => 'Account credit',
+        'creditAppliedAuto' => 'Applied automatically to new invoices',
+        'noCreditYet'       => 'No credit on the account yet',
+        'addFunds'          => 'Add funds',
+        'quickActions'      => 'Quick actions',
+        'manage'            => 'Manage',
+        // "Issued", not "Due": recentInvoices carries the ISSUE date. There is
+        // no due date on this page, and labelling one as the other is the kind
+        // of plausible-but-wrong detail that costs a support ticket.
+        'issued'            => 'Issued',
+
         // Atrium dashboard variant. Only the five keys it needs that no other
         // variant already had -- greetings, the 45-day domain window, overdue
         // age and the ticket-awaiting-reply plurals are shared.
