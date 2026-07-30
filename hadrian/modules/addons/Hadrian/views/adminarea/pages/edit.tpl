@@ -1393,8 +1393,11 @@
                             so.appendChild(sw); so.appendChild(seg);
                             opts.appendChild(so);
                             // The page form still renders its own control for
-                            // this option; hide it so there is exactly one.
-                            var row = field.closest('.mt-field');
+                            // this option; hide that row so there is exactly
+                            // one. The row class is .mt-row -- .mt-field is a
+                            // different wrapper, and closing on it matched
+                            // nothing, so both copies showed.
+                            var row = field.closest('.mt-row') || field.closest('.mt-field');
                             if (row) row.style.display = 'none';
                         });
                     }
