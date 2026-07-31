@@ -325,6 +325,11 @@ return [
         // empty-state sentence all come from WHMCS's own $LANG.paymentMethods
         // group, so they stay translated with the install; only these three,
         // which WHMCS has no string for, live here.
+        // Summary-figure label. Title case, matching 'Active services' and
+        // 'Open tickets' beside it -- unpaidInvoiceMany is the lower-case form
+        // used mid-sentence and does not fit a tile.
+        'unpaidInvoices'    => 'Unpaid invoices',
+        'due'               => 'due',
         'noPayMethodsTitle' => 'No payment methods',
         'addPayMethod'      => 'Add payment method',
         'payMethodUnnamed'  => 'Saved method',

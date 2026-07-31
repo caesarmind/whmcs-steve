@@ -151,15 +151,24 @@
     {/if}
     {if $atStatBill}
     <a class="at-stat{if $atInvN > 0} is-due{/if}" href="{$WEB_ROOT}/clientarea.php?action=invoices">
-        <span class="at-stat-label">{$hadrianLang.dashboard.balanceDue}</span>
-        <span class="at-stat-value">{if $clientsstats.unpaidinvoicesamount}{$clientsstats.unpaidinvoicesamount}{else}&mdash;{/if}</span>
+        {* A COUNT, like the three figures beside it. This slot used to carry the
+           unpaid total, which made it the one tile in a strip of counts holding
+           a currency amount -- the reason it was also the only one that wrapped.
+           The amount is not lost: it moves to this tile's sub-line, and the
+           Amount due block and the band's Pay balance button both still carry
+           it. Same flag, same position, same link -- only what it shows. *}
+        <span class="at-stat-label">{$hadrianLang.dashboard.unpaidInvoices}</span>
+        <span class="at-stat-value">{$atInvN}</span>
         {* Overdue AGE is knowable; a future due date is not. Shown only when
            something actually is overdue. *}
         {if $atStatSub}
         {if $dashboard.billing.overdueAmount|default:'' && $dashboard.billing.worstDays|default:0 > 0}
         <span class="at-stat-sub is-alert">{$dashboard.billing.worstDays} {$hadrianLang.dashboard.daysOverdue}</span>
-        {elseif $atInvN > 0}
-        <span class="at-stat-sub">{$atInvN} {if $atInvN == 1}{$hadrianLang.dashboard.unpaidInvoiceOne}{else}{$hadrianLang.dashboard.unpaidInvoiceMany}{/if}</span>
+        {* The amount, now that the count is the headline. Saying "3 unpaid
+           invoices" under a figure already reading 3 would spend the line
+           repeating it. *}
+        {elseif $clientsstats.unpaidinvoicesamount}
+        <span class="at-stat-sub">{$clientsstats.unpaidinvoicesamount} {$hadrianLang.dashboard.due}</span>
         {/if}
         {/if}
     </a>

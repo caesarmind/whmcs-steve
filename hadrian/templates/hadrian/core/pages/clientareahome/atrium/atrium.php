@@ -152,8 +152,8 @@ return [
                                                 'hint'  => 'Counts active services on the account, not the rows listed below.'],
                                         'd' => ['label' => 'Figure: domains', 'invert' => true,
                                                 'hint'  => 'Counts active domains, with a sub-line for any expiring within 45 days.'],
-                                        'b' => ['label' => 'Figure: balance due', 'invert' => true,
-                                                'hint'  => 'The unpaid total and how many invoices make it up. Shows how overdue the worst one is only when something actually is.'],
+                                        'b' => ['label' => 'Figure: unpaid invoices', 'invert' => true,
+                                                'hint'  => 'How many invoices are unpaid, counted like the figures beside it. The total owed sits on its sub-line, and how overdue the worst one is replaces that whenever something actually is overdue.'],
                                         't' => ['label' => 'Figure: open tickets', 'invert' => true,
                                                 'hint'  => 'Open tickets, with a sub-line for any where staff have replied and are waiting on the client.'],
                                         // NOT inverted, unlike the four above. The strip ships
