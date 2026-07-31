@@ -66,6 +66,15 @@ return [
             'tooltip' => 'Right places Pay balance and Order a service opposite the greeting. Below stacks them under it, for a narrow content column. Off hides them; the same actions are reachable from the blocks underneath.',
         ],
 
+        'atr_hero_size' => [
+            'type'    => 'select',
+            'label'   => 'Band height',
+            'default' => 'full',
+            'options' => ['full', 'slim'],
+            'inBlock' => 'hero',
+            'tooltip' => 'Full is the shipped band: date, greeting and a line of copy. Slim drops the copy line and tightens the padding to a one-line bar -- the date and greeting on the left, buttons or the avatar on the right. Useful when the figures and blocks below are what the page is really for.',
+        ],
+
         'atr_hero_profile' => [
             'type'    => 'select',
             'label'   => 'Band profile',

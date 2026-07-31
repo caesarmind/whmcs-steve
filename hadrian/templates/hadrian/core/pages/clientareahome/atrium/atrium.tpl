@@ -53,6 +53,7 @@
 {assign var=atHeroWidth value=$hadrian.pages.clientareahome.options.atr_hero_width|default:'boxed'}
 {assign var=atHeroActs value=$hadrian.pages.clientareahome.options.atr_hero_actions|default:'right'}
 {assign var=atHeroProfile value=$hadrian.pages.clientareahome.options.atr_hero_profile|default:'off'}
+{assign var=atHeroSize value=$hadrian.pages.clientareahome.options.atr_hero_size|default:'full'}
 
 {* ---------- counts ----------
    Real figures, each from a named variable. numunpaidinvoices is NOT summed

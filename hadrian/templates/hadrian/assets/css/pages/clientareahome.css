@@ -1509,6 +1509,31 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
 .at-hero[data-at-acts="below"] .at-hero-main { max-width: none; }
 .at-hero[data-at-acts="below"] .at-hero-actions { margin-top: 16px; }
 
+/* Push the right-hand group to the far edge. .at-hero-main is flex:1 but
+   capped at 68%, so it stops growing and the leftover space trailed AFTER the
+   buttons and avatar -- which left the avatar floating mid-row instead of at
+   the end. margin-right:auto makes .at-hero-main absorb that space itself. */
+.at-hero-main { margin-right: auto; }
+
+/* --- Slim band ---------------------------------------------------------
+   The mockup's one-line bar: eyebrow and greeting on the left, buttons or the
+   avatar on the right, and the sub-line dropped -- it is the line that makes
+   the band two-storey. Values are the mockup's own
+   (body[data-hero-size="slim"]), read from its inline CSS. */
+.at-hero[data-at-size="slim"] { padding-top: 17px; padding-bottom: 17px; gap: 20px; }
+.at-hero[data-at-size="slim"] .at-hero-main { min-width: 200px; max-width: none; }
+.at-hero[data-at-size="slim"] .at-hero-date { margin: 0 0 4px; font-size: 10.5px; }
+.at-hero[data-at-size="slim"] .at-hero-title { font-size: 23px; margin: 0; }
+.at-hero[data-at-size="slim"] .at-hero-sub { display: none; }
+/* A smaller disc suits the shorter bar. The mockup uses 52 -> 42, but its band
+   is 141px tall and carries decorative rings around the avatar which are not
+   ported; 40 -> 34 keeps the same proportion against a 115px band. Copying 42
+   verbatim made the SLIM avatar bigger than the full one, which is backwards. */
+.at-hero[data-at-size="slim"] .at-hero-avatar { width: 34px; height: 34px; font-size: var(--text-base); }
+@media (max-width: 900px) {
+    .at-hero[data-at-size="slim"] .at-hero-title { font-size: 20px; }
+}
+
 /* --- Band profile ------------------------------------------------------
    The avatar sits after the buttons, matching the mockup's right-hand order.
    The band sets overflow:hidden, which would CLIP the dropdown, so a band

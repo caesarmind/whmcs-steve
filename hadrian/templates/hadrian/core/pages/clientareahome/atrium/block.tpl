@@ -40,7 +40,7 @@
    builder alongside everything else. It carries no rows, so hide-when-empty
    has nothing to act on. *}
 {if $sec == 'hero'}
-<section class="at-hero" data-at-style="{$atHeroStyle|escape}" data-at-width="{$atHeroWidth|escape}" data-at-acts="{$atHeroActs|escape}" data-at-profile="{$atHeroProfile|escape}">
+<section class="at-hero" data-at-style="{$atHeroStyle|escape}" data-at-width="{$atHeroWidth|escape}" data-at-acts="{$atHeroActs|escape}" data-at-profile="{$atHeroProfile|escape}" data-at-size="{$atHeroSize|escape}">
     <div class="at-hero-main">
         {* Supplied by the hook, not formatted in Smarty: |date_format's
            %-style codes rely on strftime and are broken on PHP 8.1+. *}
