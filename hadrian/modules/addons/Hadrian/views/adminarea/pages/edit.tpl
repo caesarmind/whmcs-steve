@@ -782,7 +782,11 @@
 /* Darker and heavier than the hint under it: the label is what an admin scans
    down the column, and at 12.5/500 in --mt-text-2 it sat at the same weight as
    its own description. */
-.mt-seclay-opt-l { font-size: 13px; font-weight: 600; color: var(--mt-text); }
+.mt-seclay-opt-l { font-size: 13px; font-weight: 600; color: var(--mt-text); display: flex; align-items: center; gap: 6px; }
+/* Carries the rest of the hint on hover. Sized off the label so it reads as
+   punctuation beside it rather than a button competing with the control. */
+.mt-seclay-opt-i { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--mt-border); font-size: 9px; font-style: italic; font-weight: 700; line-height: 1; color: var(--mt-text-3); cursor: help; flex-shrink: 0; }
+.mt-seclay-opt-i:hover { border-color: var(--mt-primary); color: var(--mt-primary); }
 .mt-seclay-opt-h { font-size: 11.5px; color: var(--mt-text-3); margin-top: 3px; line-height: 1.45; max-width: 460px; }
 /* Number input in a settings drawer. Sized to its content rather than the
    full row -- a stretched text box beside a toggle reads as a different kind
@@ -1649,6 +1653,41 @@
                             gColour.appendChild(fo);
                         }
                     }
+
+                    // Long hints become a short line plus an info dot. Every
+                    // hint here is written as "what the first choice does. what
+                    // the others do." -- accurate, but three wrapped lines per
+                    // row turns a nine-control drawer into a wall of prose that
+                    // is slower to scan than no help at all. The opening
+                    // sentence is the summary; the rest stays one hover away
+                    // rather than being deleted.
+                    //
+                    // Done as ONE pass over the assembled rows instead of at
+                    // each place a hint is written, so it covers every control
+                    // in every block -- including any added later -- without
+                    // those sites knowing about it.
+                    [gContent, gColour].forEach(function (g) {
+                        [].slice.call(g.querySelectorAll('.mt-seclay-opt')).forEach(function (row) {
+                            var hEl = row.querySelector('.mt-seclay-opt-h');
+                            var lEl = row.querySelector('.mt-seclay-opt-l');
+                            if (!hEl || !lEl) return;
+                            var full = (hEl.textContent || '').trim();
+                            if (!full) return;
+                            // First sentence, and only when there is genuinely
+                            // more after it -- a one-sentence hint gets no dot,
+                            // because a dot that reveals what is already on
+                            // screen is a control that lies.
+                            var m = full.match(/^([\s\S]*?[.!?])\s+\S/);
+                            if (!m || m[1].length >= full.length - 1) return;
+                            hEl.textContent = m[1];
+                            var dot = document.createElement('span');
+                            dot.className = 'mt-seclay-opt-i';
+                            dot.textContent = 'i';
+                            dot.setAttribute('title', full);
+                            dot.setAttribute('aria-label', full);
+                            lEl.appendChild(dot);
+                        });
+                    });
 
                     // A group appears only if it has a row the admin can
                     // actually see. Counting children is not enough: rows the
