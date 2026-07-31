@@ -474,6 +474,55 @@ html[data-theme="dark"] {
     --color-block-3: #ff9500;
 }
 
+/* ==========================================================================
+   ACCENT FAMILY, DERIVED
+   --------------------------------------------------------------------------
+   Change the Accent and its hover and link siblings follow. They were three
+   independent literals, so recolouring a theme to green left the hover state
+   and every link blue.
+
+   MEASURED, the shipped family is a pure LIGHTNESS RAMP on one hue -- every
+   value sits at H 210 (+/-1) and S 100, differing only in L -- so the
+   relationship it always had can be written down exactly:
+
+       light:  hover L+1.96   link L-4.51   link-hover L+0
+       dark:   hover L+4.51   link L+0      link-hover L+4.51
+
+   The offsets differ per scope, and that is not an inconsistency: on white a
+   link needs to sit DARKER than the accent to carry text contrast, while on a
+   dark surface the accent is already bright enough and hover lightens instead.
+
+   Reproduction against the shipped literals is exact for four of the six and
+   one channel-step (1/255) out on the other two, which is not a visible
+   difference. A stock install renders as it always has.
+
+   TWO THINGS THAT LOOK LIKE DETAILS AND ARE NOT:
+
+   `l` is a NUMBER here, not a percentage. calc(l + 2%) is invalid -- verified,
+   CSS.supports says false and the declaration falls back to inherited grey.
+
+   The literals above stay, and this block is GATED rather than being written
+   as a fallback pair. Custom properties are not parse-validated, so a second
+   declaration always wins whether or not the browser understood it; the only
+   fallback that works is a rule block a browser can decline whole.
+
+   An admin override still wins: buildColorsHead emits stored colours in a
+   <style> after this sheet, at the same specificity, so a typed value beats
+   the derivation and an empty field means "follow the Accent".
+   ========================================================================== */
+@supports (color: hsl(from red h s calc(l + 2))) {
+    :root {
+        --color-accent-hover: hsl(from var(--color-accent) h s calc(l + 1.96));
+        --color-link:         hsl(from var(--color-accent) h s calc(l - 4.51));
+        --color-link-hover:   var(--color-accent);
+    }
+    html[data-theme="dark"] {
+        --color-accent-hover: hsl(from var(--color-accent) h s calc(l + 4.51));
+        --color-link:         var(--color-accent);
+        --color-link-hover:   hsl(from var(--color-accent) h s calc(l + 4.51));
+    }
+}
+
 html { font-size: var(--text-xl); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
 body {

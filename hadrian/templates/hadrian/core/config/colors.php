@@ -42,11 +42,11 @@ return [
     'groups' => [
         'Brand' => [
             ['var' => '--color-accent',       'label' => 'Accent',       'light' => '#0071e3',              'dark' => '#2997ff',              'hint' => 'Primary buttons, active states, focus rings.'],
-            ['var' => '--color-accent-hover', 'label' => 'Accent hover', 'light' => '#0077ed',              'dark' => '#40a3ff'],
+            ['var' => '--color-accent-hover', 'label' => 'Accent hover', 'light' => '#0077ed',              'dark' => '#40a3ff',              'hint' => 'Follows the Accent automatically -- it is the same hue two points lighter. Set a colour here only to break that link; the swatch shows the shipped value, not the one being derived.'],
             ['var' => '--color-accent-light', 'label' => 'Accent tint',  'light' => 'rgba(0,113,227,0.08)', 'dark' => 'rgba(41,151,255,0.12)', 'hint' => 'The translucent wash behind selected rows and info badges.'],
             ['var' => '--color-on-accent',    'label' => 'On accent',    'light' => '#ffffff',              'dark' => '#ffffff',              'hint' => 'Text and icons sitting ON a filled accent surface. Stays light in both modes.'],
-            ['var' => '--color-link',         'label' => 'Link',         'light' => '#0066cc',              'dark' => '#2997ff'],
-            ['var' => '--color-link-hover',   'label' => 'Link hover',   'light' => '#0071e3',              'dark' => '#40a3ff'],
+            ['var' => '--color-link',         'label' => 'Link',         'light' => '#0066cc',              'dark' => '#2997ff',              'hint' => 'Follows the Accent automatically. Deliberately DARKER than it in light mode, where link text needs more contrast on white than a button fill does, and equal to it in dark mode where it is already bright enough.'],
+            ['var' => '--color-link-hover',   'label' => 'Link hover',   'light' => '#0071e3',              'dark' => '#40a3ff',              'hint' => 'Follows the Accent automatically.'],
         ],
 
         // Renamed from "Backgrounds" to match the word every other panel's
