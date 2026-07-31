@@ -1400,10 +1400,30 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
        change the composition you actually see to fix a gap you do not. */
     --at-ring-d: 130px; --at-ring-step: 42px; --at-ring-w: 1.5px;
     --at-ring-ink: rgba(255,255,255,0.22);
+    /* The colour every fill below is built from. --blk-base is what the block
+       paint system sets on the cell -- a palette token via [data-blk-paint], or
+       a hex inline for a custom colour -- and it is UNDEFINED when the block has
+       no paint, so the fallback is the shipped accent. That is the whole wiring:
+       with Colour source on None the band looks exactly as it always has, and
+       with a colour picked the same fills rebuild in it.
+
+       Before this the band read --color-accent directly, so the paint controls
+       were inert on this block: every paint rule selects '> .at-card' and the
+       band's element is .at-hero, so nothing matched and the drawer offered
+       three colour controls that could not change anything. */
+    --at-band: var(--blk-base, var(--color-accent));
     position: relative; overflow: hidden;
     border-radius: 22px; padding: var(--at-pad-y) var(--at-pad-x); margin: 0 0 26px;
     display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
-    color: #fff;
+    /* Ink is DERIVED once the band takes a colour of its own, so a buyer who
+       picks a pale one gets black text instead of white on white. --blk-ink is
+       the theme's existing primitive and it already resolves here, the cell
+       carrying .min-section where it is declared; it exists only for the solid
+       and gradient fills, which is exactly when this band is saturated.
+       Unpainted it is undefined and the band keeps its hardcoded white. The
+       eyebrow and sub-line inherit this and dim it with opacity, so they follow
+       without needing their own rule. */
+    color: var(--blk-ink, #fff);
     /* Accent stop at 78%, not the mockup's 55%. MEASURED: the heading runs to
        ~63% of the width, and with the accent at 55% that lands in the pale
        tail where white text falls to 4.17:1 -- fine for the 29px bold title
@@ -1412,9 +1432,9 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
        the text block a dark runway; the pale end still sits under the action
        pills, which is where it is wanted. */
     background: linear-gradient(115deg,
-        color-mix(in srgb, var(--color-accent) 90%, #002050) 0%,
-        var(--color-accent) 78%,
-        color-mix(in srgb, var(--color-accent) 58%, #fff) 100%);
+        color-mix(in srgb, var(--at-band) 90%, #002050) 0%,
+        var(--at-band) 78%,
+        color-mix(in srgb, var(--at-band) 58%, #fff) 100%);
 }
 /* max-width caps how far the text can run into the gradient; without it a long
    client name pushes the sub-line into the pale end regardless of the stop. */
@@ -1428,7 +1448,11 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
 }
 .at-hero-title {
     font-size: 29px; font-weight: var(--fw-bold); letter-spacing: -0.025em;
-    line-height: 1.05; margin: 0 0 7px; color: #fff;
+    /* inherit, not #fff: the band above resolves the derived ink, and a
+       hardcoded white here overrode it -- MEASURED, the band flipped to black
+       on a pale colour while the greeting stayed white on white. The soft and
+       plain styles still set their own colour at higher specificity. */
+    line-height: 1.05; margin: 0 0 7px; color: inherit;
 }
 .at-hero-sub { font-size: 14.5px; font-weight: var(--fw-medium); opacity: 0.9; margin: 0; }
 .at-hero-actions {
@@ -1445,22 +1469,24 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
     transition: background var(--transition-fast);
 }
 .at-hero-btn:hover { background: rgba(255,255,255,0.26); color: #fff; text-decoration: none; }
-.at-hero-btn-primary { background: #fff; border-color: #fff; color: var(--color-accent); }
-.at-hero-btn-primary:hover { background: rgba(255,255,255,0.9); color: var(--color-accent); text-decoration: none; }
+/* The white pill sits ON the band, so its label takes the band colour rather
+   than the theme accent -- otherwise a recoloured band keeps a blue label. */
+.at-hero-btn-primary { background: #fff; border-color: #fff; color: var(--at-band); }
+.at-hero-btn-primary:hover { background: rgba(255,255,255,0.9); color: var(--at-band); text-decoration: none; }
 
 /* --- Band appearance options -------------------------------------------
    Four styles. gradient is the shipped look and needs no rule (it is the base
    .at-hero above). The other three each restate the background AND the ink,
    because a pale panel needs dark text -- the two cannot be set independently
    without producing an unreadable combination. */
-.at-hero[data-at-style="solid"] { background: var(--color-accent); }
+.at-hero[data-at-style="solid"] { background: var(--at-band); }
 /* soft is a pale accent wash with page ink, for a lighter dashboard. Its
    buttons invert too: a white pill on a near-white panel is invisible. */
 .at-hero[data-at-style="soft"] {
     /* 8%, not 10%: the sub-line is --color-text-secondary, which measures 4.43
        on a 10% wash and 4.56 on 8%. The difference is invisible as a colour
        and is the difference between passing and failing AA. */
-    background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+    background: color-mix(in srgb, var(--at-band) 8%, var(--color-surface));
     color: var(--color-text-primary);
 }
 .at-hero[data-at-style="soft"] .at-hero-title,
@@ -1753,11 +1779,11 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] { --at-ring-ink: rgba(25
    rebrand and the style presets. */
 html[data-theme="dark"] .at-hero {
     background: linear-gradient(115deg,
-        color-mix(in srgb, var(--color-accent) 42%, #000) 0%,
-        color-mix(in srgb, var(--color-accent) 65%, #000) 78%,
-        color-mix(in srgb, var(--color-accent) 88%, #000) 100%);
+        color-mix(in srgb, var(--at-band) 42%, #000) 0%,
+        color-mix(in srgb, var(--at-band) 65%, #000) 78%,
+        color-mix(in srgb, var(--at-band) 88%, #000) 100%);
 }
-html[data-theme="dark"] .at-hero-btn-primary { color: color-mix(in srgb, var(--color-accent) 65%, #000); }
+html[data-theme="dark"] .at-hero-btn-primary { color: color-mix(in srgb, var(--at-band) 65%, #000); }
 
 @media (max-width: 900px) {
     .at-hero { padding: 24px 26px; align-items: flex-start; }

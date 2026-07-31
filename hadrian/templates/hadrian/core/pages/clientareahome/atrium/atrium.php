@@ -135,7 +135,14 @@ return [
                 // controls live in its own drawer beside its width and colour.
                 // They are 'selects' rather than switches: a flag letter is a
                 // boolean, and these each pick one of three or four looks.
-                'hero'          => ['label' => 'Welcome band',    'w' => '1/1', 'prepend' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                // ONE fill, which is what hides the generic Fill control on this
+                // block: the drawer only renders it when a block offers more
+                // than one. The band already has a fill control of its own --
+                // Band style, with four treatments instead of three -- so
+                // offering both asked the same question twice and the two could
+                // disagree. Colour source stays: it chooses WHICH colour, and
+                // Band style decides how it is applied.
+                'hero'          => ['label' => 'Welcome band',    'w' => '1/1', 'prepend' => true, 'paintable' => true, 'fills' => ['solid'],
 ],
                 // The four figures are switches on THIS block rather than page
                 // options: they describe the strip, the way its width and its
