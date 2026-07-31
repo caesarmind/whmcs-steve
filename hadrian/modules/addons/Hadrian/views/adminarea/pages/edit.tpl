@@ -764,10 +764,26 @@
 .mt-seclay-drawer { margin-top: -6px; margin-bottom: 4px; padding: 16px 20px 20px; background: var(--mt-surface); border: 1px solid var(--mt-primary); border-top: 1px solid var(--mt-border); border-radius: 0 0 12px 12px; }
 .mt-seclay-drawer-h { display: flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 600; color: var(--mt-text); margin-bottom: 12px; }
 .mt-seclay-drawer-h span.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mt-primary); flex-shrink: 0; }
-.mt-seclay-opts { background: var(--mt-surface-2); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+/* The drawer holds GROUPS now, so it stops being a card itself -- otherwise a
+   tinted box sits inside a tinted box. */
+.mt-seclay-opts { background: transparent; border-radius: 0; padding: 0; display: block; }
+/* A group is one bordered card: quiet small-caps header, then hairline-separated
+   rows. Nine controls in a flat list read as one long scan; split and ruled,
+   they read as two short ones, which is the whole point of the grouping. */
+.mt-seclay-grp { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: 10px; overflow: hidden; }
+.mt-seclay-grp + .mt-seclay-grp { margin-top: 12px; }
+.mt-seclay-grp-h { display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--mt-surface-2); border-bottom: 1px solid var(--mt-border); font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--mt-text-3); }
+.mt-seclay-grp-i { font-size: 11px; line-height: 1; color: var(--mt-primary); }
+.mt-seclay-grp .mt-seclay-opt { padding: 12px 14px; }
+/* Between ROWS, not below the header -- the header draws its own bottom rule,
+   and a row hidden for an unsupported block must not leave a doubled line. */
+.mt-seclay-grp .mt-seclay-opt + .mt-seclay-opt { border-top: 1px solid var(--mt-border); }
 .mt-seclay-opt { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-.mt-seclay-opt-l { font-size: 12.5px; font-weight: 500; color: var(--mt-text-2); }
-.mt-seclay-opt-h { font-size: 11.5px; color: var(--mt-text-3); margin-top: 2px; line-height: 1.45; max-width: 460px; }
+/* Darker and heavier than the hint under it: the label is what an admin scans
+   down the column, and at 12.5/500 in --mt-text-2 it sat at the same weight as
+   its own description. */
+.mt-seclay-opt-l { font-size: 13px; font-weight: 600; color: var(--mt-text); }
+.mt-seclay-opt-h { font-size: 11.5px; color: var(--mt-text-3); margin-top: 3px; line-height: 1.45; max-width: 460px; }
 /* Number input in a settings drawer. Sized to its content rather than the
    full row -- a stretched text box beside a toggle reads as a different kind
    of control than it is. Same complaint the owner raised about the page-level
@@ -1225,6 +1241,33 @@
                     var opts = document.createElement('div');
                     opts.className = 'mt-seclay-opts';
 
+                    // Two labelled groups instead of one flat list. A drawer can
+                    // carry nine controls and they answer two different
+                    // questions -- what the block DOES versus what it looks
+                    // like -- so reading it meant scanning every row.
+                    //
+                    // Rows are routed by where they are BUILT, not by their
+                    // label: the colour source, swatches and fill are colour by
+                    // construction, and a variant option says so with
+                    // group:'colour' in its own declaration. Nothing here has to
+                    // know a block's option names, so a new block groups itself.
+                    var mkGrp = function (icon, title) {
+                        var g = document.createElement('div');
+                        g.className = 'mt-seclay-grp';
+                        var h = document.createElement('div');
+                        h.className = 'mt-seclay-grp-h';
+                        var i = document.createElement('span');
+                        i.className = 'mt-seclay-grp-i';
+                        i.textContent = icon;
+                        var t = document.createElement('span');
+                        t.textContent = title;
+                        h.appendChild(i); h.appendChild(t);
+                        g.appendChild(h);
+                        return g;
+                    };
+                    var gContent = mkGrp('☲', 'Content & behaviour');
+                    var gColour  = mkGrp('◉', 'Colour & style');
+
                     // Only on a block that LISTS something. A welcome band, a
                     // figure strip, an account-credit panel or a row of fixed
                     // links has no collection to be empty of, so the switch was
@@ -1251,7 +1294,7 @@
                     var hth = document.createElement('span'); hth.className = 'mt-toggle-thumb';
                     htr.appendChild(hth); ht2.appendChild(hcb); ht2.appendChild(htr);
                     opt.appendChild(lw); opt.appendChild(ht2);
-                    opts.appendChild(opt);
+                    gContent.appendChild(opt);
 
                     // Per-section list switch, for sections that declare one.
                     // Lives here rather than in the page's Template settings
@@ -1318,7 +1361,7 @@
                         var rth = document.createElement('span'); rth.className = 'mt-toggle-thumb';
                         rtr.appendChild(rth); rt.appendChild(rcb); rt.appendChild(rtr);
                         ro.appendChild(rw); ro.appendChild(rt);
-                        opts.appendChild(ro);
+                        gContent.appendChild(ro);
                     });
                     // Items shown -- only for variants that declare the control
                     // (bento). Minimal reveals the rest behind Show more, so a
@@ -1365,7 +1408,7 @@
                             commit();
                         });
                         ro2.appendChild(rw2); ro2.appendChild(ri);
-                        opts.appendChild(ro2);
+                        gContent.appendChild(ro2);
                     }
 
                     // Per-block SELECTS. A switch can be a flag letter; a
@@ -1405,7 +1448,7 @@
                                 seg.appendChild(b);
                             });
                             so.appendChild(sw); so.appendChild(seg);
-                            opts.appendChild(so);
+                            (D && D.group === 'colour' ? gColour : gContent).appendChild(so);
                         });
                     }
 
@@ -1498,7 +1541,7 @@
                             modeSeg.appendChild(b);
                         });
                         co.appendChild(modeSeg);
-                        opts.appendChild(co);
+                        gColour.appendChild(co);
 
                         // --- Row B: the value picker, swapped by mode -------
                         if (mode !== 'none') {
@@ -1572,7 +1615,7 @@
                                 cg.appendChild(ccap); cg.appendChild(cstrip);
                                 vo.appendChild(cg);
                             }
-                            opts.appendChild(vo);
+                            gColour.appendChild(vo);
                         }
 
                         // --- Fill: shared by both modes ---------------------
@@ -1603,10 +1646,23 @@
                                 fseg.appendChild(b);
                             });
                             fo.appendChild(fwrap); fo.appendChild(fseg);
-                            opts.appendChild(fo);
+                            gColour.appendChild(fo);
                         }
                     }
 
+                    // A group appears only if it has a row the admin can
+                    // actually see. Counting children is not enough: rows the
+                    // block does not support are built and then display:none'd
+                    // (Hide-when-empty on a non-listing block), so a group of
+                    // those alone would render as a header with nothing under
+                    // it. Header + rows means a group's own header is never the
+                    // only thing in it.
+                    [gContent, gColour].forEach(function (g) {
+                        var shown = [].slice.call(g.children).filter(function (n) {
+                            return n.className !== 'mt-seclay-grp-h' && n.style.display !== 'none';
+                        });
+                        if (shown.length) opts.appendChild(g);
+                    });
                     dr.appendChild(h); dr.appendChild(opts);
                     list.appendChild(dr);
                 }

@@ -47,6 +47,11 @@ return [
             'default' => 'gradient',
             'options' => ['gradient', 'solid', 'soft', 'plain'],
             'inBlock' => 'hero',
+            // Files this control under Colour & style in the block drawer rather
+            // than Content & behaviour, which is where an inBlock option lands
+            // by default. It describes how the panel is FILLED, so it belongs
+            // beside the colour source and the fill.
+            'group'   => 'colour',
             'tooltip' => 'Gradient is the shipped look: the accent deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint with dark text, for a lighter page. Plain drops the panel and sets the greeting on the page background.',
         ],
         'atr_hero_width' => [
