@@ -117,6 +117,12 @@
 {assign var=atStatDom value=true}{if $secFlags.d|default:false}{assign var=atStatDom value=false}{/if}
 {assign var=atStatBill value=true}{if $secFlags.b|default:false}{assign var=atStatBill value=false}{/if}
 {assign var=atStatTkt value=true}{if $secFlags.t|default:false}{assign var=atStatTkt value=false}{/if}
+{* The sub-line flag runs the other way: the strip ships COMPACT, so 'f' turns
+   detail on rather than off. Compact is what the mockup's own Stats chip does
+   (body[data-stats="compact"] hides .dash-stat-sub) and it is the difference
+   between a 104px tile and a 136px one -- a single tile with a sub-line
+   stretches the whole grid row, so one overdue invoice grew all four. *}
+{assign var=atStatSub value=false}{if $secFlags.f|default:false}{assign var=atStatSub value=true}{/if}
 {assign var=atStatN value=0}
 {if $atStatSvc}{assign var=atStatN value=($atStatN+1)}{/if}
 {if $atStatDom}{assign var=atStatN value=($atStatN+1)}{/if}
@@ -140,7 +146,7 @@
     <a class="at-stat" href="{$WEB_ROOT}/clientarea.php?action=domains">
         <span class="at-stat-label">{$LANG.navdomains|default:'Domains'}</span>
         <span class="at-stat-value">{$atDomN}</span>
-        {if $atDomEx > 0}<span class="at-stat-sub">{$atDomEx} {if $atDomEx == 1}{$hadrianLang.dashboard.domainSingular}{else}{$hadrianLang.dashboard.domainPlural}{/if} {$hadrianLang.dashboard.expireWithin45}</span>{/if}
+        {if $atStatSub && $atDomEx > 0}<span class="at-stat-sub">{$atDomEx} {if $atDomEx == 1}{$hadrianLang.dashboard.domainSingular}{else}{$hadrianLang.dashboard.domainPlural}{/if} {$hadrianLang.dashboard.expireWithin45}</span>{/if}
     </a>
     {/if}
     {if $atStatBill}
@@ -149,10 +155,12 @@
         <span class="at-stat-value">{if $clientsstats.unpaidinvoicesamount}{$clientsstats.unpaidinvoicesamount}{else}&mdash;{/if}</span>
         {* Overdue AGE is knowable; a future due date is not. Shown only when
            something actually is overdue. *}
+        {if $atStatSub}
         {if $dashboard.billing.overdueAmount|default:'' && $dashboard.billing.worstDays|default:0 > 0}
         <span class="at-stat-sub is-alert">{$dashboard.billing.worstDays} {$hadrianLang.dashboard.daysOverdue}</span>
         {elseif $atInvN > 0}
         <span class="at-stat-sub">{$atInvN} {if $atInvN == 1}{$hadrianLang.dashboard.unpaidInvoiceOne}{else}{$hadrianLang.dashboard.unpaidInvoiceMany}{/if}</span>
+        {/if}
         {/if}
     </a>
     {/if}
@@ -162,7 +170,7 @@
         <span class="at-stat-value">{$atTktN}</span>
         {* "N awaiting your reply", never "N new": this is an exact COUNT of
            tickets staff have answered, not an unread count. *}
-        {if $atTktWait > 0}<span class="at-stat-sub">{$atTktWait} {if $atTktWait == 1}{$hadrianLang.dashboard.attnTicketOne}{else}{$hadrianLang.dashboard.attnTicketMany}{/if}</span>{/if}
+        {if $atStatSub && $atTktWait > 0}<span class="at-stat-sub">{$atTktWait} {if $atTktWait == 1}{$hadrianLang.dashboard.attnTicketOne}{else}{$hadrianLang.dashboard.attnTicketMany}{/if}</span>{/if}
     </a>
     {/if}
 </section>

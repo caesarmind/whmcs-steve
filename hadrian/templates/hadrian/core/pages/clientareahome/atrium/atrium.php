@@ -151,6 +151,12 @@ return [
                                                 'hint'  => 'The unpaid total and how many invoices make it up. Shows how overdue the worst one is only when something actually is.'],
                                         't' => ['label' => 'Figure: open tickets', 'invert' => true,
                                                 'hint'  => 'Open tickets, with a sub-line for any where staff have replied and are waiting on the client.'],
+                                        // NOT inverted, unlike the four above. The strip ships
+                                        // compact -- label and number only -- so this flag turns
+                                        // detail ON. Absent by default, which is what makes
+                                        // compact the default for layouts saved before it existed.
+                                        'f' => ['label' => 'Sub-lines under each figure',
+                                                'hint'  => 'Adds the second line under a figure when there is something to say: domains expiring within 45 days, how overdue the worst invoice is, tickets awaiting a reply. Off keeps every tile to a label and a number, which is the shorter strip the dashboard was drawn with.'],
                                     ]],
                 'services'      => ['label' => 'Services',          'w' => '2/3', 'list' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [

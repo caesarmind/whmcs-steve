@@ -84,7 +84,11 @@ final class SectionLayout
     // flag letters alone, or a key landing in the flags slot would parse as
     // flags instead of failing the entry whole. Checked for 'elcsdbt' --
     // 'stats' needs 'a', 'credit' needs 'r', 'tickets' needs 'i' and 'k'.
-    private const FLAG_LETTERS = 'elcsdbt';
+    // APPEND-ONLY. A letter's meaning is fixed once saved layouts contain it.
+    // 'f' = show the figure sub-lines (Atrium summary figures ship compact, so
+    // this flag turns detail ON rather than off). No catalogue key is spellable
+    // from these letters alone, which is what keeps a flags field unambiguous.
+    private const FLAG_LETTERS = 'elcsdbtf';
 
     /** How a paint is applied. Bare paint (no suffix) means solid. */
     /**
