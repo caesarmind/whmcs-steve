@@ -86,9 +86,16 @@ final class SectionLayout
     // 'stats' needs 'a', 'credit' needs 'r', 'tickets' needs 'i' and 'k'.
     // APPEND-ONLY. A letter's meaning is fixed once saved layouts contain it.
     // 'f' = show the figure sub-lines (Atrium summary figures ship compact, so
-    // this flag turns detail ON rather than off). No catalogue key is spellable
-    // from these letters alone, which is what keeps a flags field unambiguous.
-    private const FLAG_LETTERS = 'elcsdbtf';
+    // this flag turns detail ON rather than off).
+    // 'o','r','k','p' = hide the Order / Register domain / Open ticket /
+    // Account details link in the Quick actions block.
+    //
+    // No catalogue key is spellable from these letters alone, which is what
+    // keeps a flags field unambiguous -- CHECK THAT before adding one. 'a' in
+    // particular cannot be added: it would make "stats" spellable from
+    // {s,t,a}. A letter is scoped to the block that reads it, so the same
+    // letter may mean different things in two blocks.
+    private const FLAG_LETTERS = 'elcsdbtforkp';
 
     /** How a paint is applied. Bare paint (no suffix) means solid. */
     /**

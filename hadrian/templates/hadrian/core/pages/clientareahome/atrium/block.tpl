@@ -245,15 +245,27 @@
    hide-when-empty on every block; on this one it is honestly a no-op rather
    than something quietly broken. *}
 {elseif $sec == 'actions'}
+    {* Each link is a flag on THIS block, negative for the same reason the
+       figure switches are: a flag is absent by default and all four ship on,
+       so the control is labelled positively and inverted for storage. *}
+    {assign var=atActOrder value=true}{if $secFlags.o|default:false}{assign var=atActOrder value=false}{/if}
+    {assign var=atActDom   value=true}{if $secFlags.r|default:false}{assign var=atActDom   value=false}{/if}
+    {assign var=atActTkt   value=true}{if $secFlags.k|default:false}{assign var=atActTkt   value=false}{/if}
+    {assign var=atActAcct  value=true}{if $secFlags.p|default:false}{assign var=atActAcct  value=false}{/if}
+    {* With every link switched off the card would be a heading over nothing.
+       Drop the whole block instead -- the same thing hide-when-empty does for a
+       list that has no rows. *}
+    {if $atActOrder || $atActDom || $atActTkt || $atActAcct}
     <div class="at-card at-panel">
         <div class="at-card-head"><span class="at-card-title">{$hadrianLang.dashboard.quickActions}</span></div>
         <div class="at-actions">
-            <a href="{$WEB_ROOT}/cart.php" class="at-action">{$LANG.orderproducts|default:'Order a service'}</a>
-            <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register" class="at-action">{$LANG.registerdomain|default:'Register a domain'}</a>
-            <a href="{$WEB_ROOT}/submitticket.php" class="at-action">{$LANG.navopenticket|default:'Open a ticket'}</a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=details" class="at-action">{$LANG.clientareanavdetails|default:'Account details'}</a>
+            {if $atActOrder}<a href="{$WEB_ROOT}/cart.php" class="at-action">{$LANG.orderproducts|default:'Order a service'}</a>{/if}
+            {if $atActDom}<a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register" class="at-action">{$LANG.registerdomain|default:'Register a domain'}</a>{/if}
+            {if $atActTkt}<a href="{$WEB_ROOT}/submitticket.php" class="at-action">{$LANG.navopenticket|default:'Open a ticket'}</a>{/if}
+            {if $atActAcct}<a href="{$WEB_ROOT}/clientarea.php?action=details" class="at-action">{$LANG.clientareanavdetails|default:'Account details'}</a>{/if}
         </div>
     </div>
+    {/if}
 
 {* ---------------- Payment methods ----------------
    Its own arm rather than a sixth branch of the collections arm below: the row
@@ -280,10 +292,20 @@
             {foreach $atPm as $r}
             {if $r@iteration <= $atRows}
             <div class="at-row">
+                {* Text badge, not artwork: card-brand logos are licensed marks,
+                   and a row of them would be a network request each. *}
+                {if $r.brand|default:''}<span class="at-pm-brand">{$r.brand|escape}</span>{/if}
                 <span class="at-row-main">
-                    <span class="at-row-name">{if $r.label|default:''}{$r.label|escape}{else}{$hadrianLang.dashboard.payMethodUnnamed}{/if}</span>
-                    {if !$secCompact|default:false && $r.sub|default:''}
-                    <span class="at-row-sub">{$r.sub|escape}</span>
+                    <span class="at-row-name">
+                        {if $r.last4|default:''}&bull;&bull;&bull;&bull; {$r.last4|escape}
+                        {elseif $r.label|default:''}{$r.label|escape}
+                        {else}{$hadrianLang.dashboard.payMethodUnnamed}{/if}
+                    </span>
+                    {* Expiry leads: a lapsing card is the reason this block is
+                       on a dashboard at all. The client's own label for the
+                       method takes the line only when there is no expiry. *}
+                    {if !$secCompact|default:false && ($r.expires|default:'' || $r.sub|default:'')}
+                    <span class="at-row-sub">{if $r.expires|default:''}{$hadrianLang.dashboard.expires} {$r.expires|escape}{else}{$r.sub|escape}{/if}</span>
                     {/if}
                 </span>
                 {* Expired outranks default: a lapsed card that is ALSO the

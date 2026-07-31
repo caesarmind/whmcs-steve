@@ -1724,6 +1724,16 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] { --at-ring-ink: rgba(25
    accent rather than borrowing .active's green -- which on this row would read
    as "this card is working" next to an Expired one that is not. Both tokens
    already flip in dark mode. */
+/* Card-brand badge. A fixed width so the names beside it line up down the
+   column however long the code is -- VISA and PP in the same slot. Tabular
+   digits are irrelevant here; the monospace-ish tracking is what keeps a
+   four-letter code from looking wider than a two-letter one. */
+.at-pm-brand {
+    flex-shrink: 0; width: 42px; padding: 6px 0;
+    background: var(--color-surface-secondary); border-radius: 6px;
+    font-size: 9.5px; font-weight: var(--fw-bold); letter-spacing: 0.04em;
+    text-align: center; color: var(--color-text-secondary); text-transform: uppercase;
+}
 .status-pill.is-default {
     background: var(--color-blue-bg);
     /* --color-blue-text straight measures 4.21:1 on its own 8% wash, which is

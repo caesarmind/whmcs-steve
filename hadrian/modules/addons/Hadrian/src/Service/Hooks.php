@@ -1287,9 +1287,58 @@ final class Hooks
                     $description = '';
                 }
 
+                // Brand badge. Sniffed from the display name because that is
+                // the only place the brand appears -- the same approach lagom
+                // and the stock cart take. Falls back on the type, so a method
+                // from a gateway nobody anticipated still gets a badge rather
+                // than a gap. Kept to a short code: real brand artwork is
+                // licensed, and eight of these would be eight network requests.
+                $type = '';
+                if (method_exists($pm, 'getType')) {
+                    $type = (string)$pm->getType();
+                }
+                $hay   = strtolower($label . ' ' . $description . ' ' . $type);
+                $brand = '';
+                foreach ([
+                    'american express' => 'AMEX', 'amex'     => 'AMEX',
+                    'mastercard'       => 'MC',   'master'   => 'MC',
+                    'visa'             => 'VISA', 'discover' => 'DISC',
+                    'paypal'           => 'PP',   'diners'   => 'DINERS',
+                    'unionpay'         => 'UP',   'maestro'  => 'MAES',
+                    'jcb'              => 'JCB',
+                ] as $needle => $code) {
+                    if (str_contains($hay, $needle)) { $brand = $code; break; }
+                }
+                if ($brand === '') {
+                    $brand = str_contains($hay, 'bank') ? 'BANK' : 'CARD';
+                }
+
+                // Trailing four digits, so the row can read as a card does
+                // rather than repeating the gateway's own "MasterCard-5933".
+                // Only when they are actually there -- a PayPal method carries
+                // an email address and must keep it.
+                $last4 = '';
+                if (preg_match('/(\d{4})\D*$/', $label, $m) === 1) {
+                    $last4 = $m[1];
+                }
+
+                // Guarded in three steps because stock WHMCS guards it in three
+                // steps: the payment object can be absent, getExpiryDate can
+                // return null, and only a real date object has format().
+                $expires = '';
+                if ($payment !== null && method_exists($payment, 'getExpiryDate')) {
+                    $exp = $payment->getExpiryDate();
+                    if (is_object($exp) && method_exists($exp, 'format')) {
+                        $expires = (string)$exp->format('m/y');
+                    }
+                }
+
                 $out[] = [
                     'id'        => (int)($pm->id ?? 0),
                     'label'     => $label,
+                    'brand'     => $brand,
+                    'last4'     => $last4,
+                    'expires'   => $expires,
                     'sub'       => $description === $label ? '' : $description,
                     'isDefault' => method_exists($pm, 'isDefaultPayMethod') && (bool)$pm->isDefaultPayMethod(),
                     'isExpired' => method_exists($pm, 'isExpired') && (bool)$pm->isExpired(),

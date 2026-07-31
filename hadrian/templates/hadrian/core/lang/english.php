@@ -329,6 +329,7 @@ return [
         // 'Open tickets' beside it -- unpaidInvoiceMany is the lower-case form
         // used mid-sentence and does not fit a tile.
         'unpaidInvoices'    => 'Unpaid invoices',
+        'expires'           => 'Expires',
         'due'               => 'due',
         'noPayMethodsTitle' => 'No payment methods',
         'addPayMethod'      => 'Add payment method',

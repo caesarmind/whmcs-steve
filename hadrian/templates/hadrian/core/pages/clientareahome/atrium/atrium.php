@@ -210,7 +210,22 @@ return [
                                         'label' => 'Compact rows',
                                         'hint'  => 'Subject and status only, with no ticket number line.',
                                     ]],
-                'actions'       => ['label' => 'Quick actions',     'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                // The four links are switchable, same as the summary figures:
+                // labelled for what they turn ON and inverted for storage, so
+                // all four ship on and a layout saved before this existed keeps
+                // showing them. Turning every one off leaves the card with its
+                // heading and nothing under it, which the template guards.
+                'actions'       => ['label' => 'Quick actions',     'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                                    'switches' => [
+                                        'o' => ['label' => 'Link: order a service', 'invert' => true,
+                                                'hint'  => 'Opens the order form at the product catalogue.'],
+                                        'r' => ['label' => 'Link: register a domain', 'invert' => true,
+                                                'hint'  => 'Opens the order form at domain registration. Worth turning off on an install that does not sell domains.'],
+                                        'k' => ['label' => 'Link: open a ticket', 'invert' => true,
+                                                'hint'  => 'Goes to the support ticket form.'],
+                                        'p' => ['label' => 'Link: account details', 'invert' => true,
+                                                'hint'  => 'Goes to the profile page, where contact details and billing address are edited.'],
+                                    ]],
             ],
 
             'paints' => [
