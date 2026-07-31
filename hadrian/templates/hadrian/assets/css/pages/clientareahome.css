@@ -1509,6 +1509,38 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
 .at-hero[data-at-acts="below"] .at-hero-main { max-width: none; }
 .at-hero[data-at-acts="below"] .at-hero-actions { margin-top: 16px; }
 
+/* --- Band profile ------------------------------------------------------
+   The avatar sits after the buttons, matching the mockup's right-hand order.
+   The band sets overflow:hidden, which would CLIP the dropdown, so a band
+   carrying a profile opens it -- safe because the gradient clips to the
+   border-radius on its own, with or without overflow. */
+.at-hero[data-at-profile="avatar"] { overflow: visible; }
+.at-hero-profile { position: relative; flex-shrink: 0; z-index: 3; }
+.at-hero-avatar {
+    width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-family: inherit; font-size: var(--text-md); font-weight: var(--fw-semibold);
+    /* On the two saturated styles the avatar is a translucent white disc with
+       white ink -- the same treatment the band's secondary button uses, so the
+       pair reads as one control group. On the two light styles it takes the
+       page's own avatar gradient, which is what every other avatar in the
+       theme uses. */
+    background: rgba(255,255,255,0.18); color: #fff;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.35) inset;
+    transition: background var(--transition-fast);
+}
+.at-hero-avatar:hover { background: rgba(255,255,255,0.28); }
+.at-hero[data-at-style="soft"] .at-hero-avatar,
+.at-hero[data-at-style="plain"] .at-hero-avatar {
+    background: linear-gradient(135deg, var(--color-avatar-from), var(--color-avatar-to));
+    color: var(--color-on-accent); box-shadow: none;
+}
+.at-hero[data-at-style="soft"] .at-hero-avatar:hover,
+.at-hero[data-at-style="plain"] .at-hero-avatar:hover { opacity: 0.9; }
+/* The shared panel anchors to its wrapper; on a right-aligned trigger it must
+   open leftward or it runs off the content area. */
+.at-hero-profile .profile-dropdown { right: 0; left: auto; }
+
 /* Column count comes from the template: the four tiles are independently
    switchable, and repeat(auto-fit, ...) created as many tracks as fit the
    container, leaving empty ones and half-filling the row. */

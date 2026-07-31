@@ -481,7 +481,7 @@
         // Every panel id must be listed here or outside-click never closes it.
         var ALL = ['notificationDropdownNav', 'notificationDropdownSide',
                    'profileDropdown', 'profileDropdownSide', 'profileDropdownSidebar',
-                   'profileDropdownRail'];
+                   'profileDropdownRail', 'profileDropdownBand'];
         function closeAll(except) {
             ALL.forEach(function (id) {
                 if (id === except) return;
@@ -503,6 +503,7 @@
             var id = which === 'sidebar' ? 'profileDropdownSidebar'
                    : which === 'side'    ? 'profileDropdownSide'
                    : which === 'rail'    ? 'profileDropdownRail'
+                   : which === 'band'    ? 'profileDropdownBand'
                                          : 'profileDropdown';
             var dd = document.getElementById(id);
             if (!dd) return;

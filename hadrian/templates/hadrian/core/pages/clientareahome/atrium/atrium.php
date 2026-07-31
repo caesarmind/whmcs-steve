@@ -66,6 +66,15 @@ return [
             'tooltip' => 'Right places Pay balance and Order a service opposite the greeting. Below stacks them under it, for a narrow content column. Off hides them; the same actions are reachable from the blocks underneath.',
         ],
 
+        'atr_hero_profile' => [
+            'type'    => 'select',
+            'label'   => 'Band profile',
+            'default' => 'off',
+            'options' => ['off', 'avatar'],
+            'inBlock' => 'hero',
+            'tooltip' => 'Avatar puts the account monogram at the right of the band, opening the same account menu the topbar and sidebar use -- details, users, payment methods, contacts, security and log out. It sits after the buttons, so set Band buttons to off if you want the profile alone.',
+        ],
+
         'atr_section_titles' => [
             'type'    => 'select',
             'label'   => 'Block titles',

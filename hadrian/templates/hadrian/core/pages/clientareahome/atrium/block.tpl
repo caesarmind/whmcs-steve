@@ -40,7 +40,7 @@
    builder alongside everything else. It carries no rows, so hide-when-empty
    has nothing to act on. *}
 {if $sec == 'hero'}
-<section class="at-hero" data-at-style="{$atHeroStyle|escape}" data-at-width="{$atHeroWidth|escape}" data-at-acts="{$atHeroActs|escape}">
+<section class="at-hero" data-at-style="{$atHeroStyle|escape}" data-at-width="{$atHeroWidth|escape}" data-at-acts="{$atHeroActs|escape}" data-at-profile="{$atHeroProfile|escape}">
     <div class="at-hero-main">
         {* Supplied by the hook, not formatted in Smarty: |date_format's
            %-style codes rely on strftime and are broken on PHP 8.1+. *}
@@ -64,6 +64,30 @@
         </a>
         {/if}
         <a href="{$WEB_ROOT}/cart.php" class="at-hero-btn">{$LANG.orderproducts|default:'Order a service'}</a>
+    </div>
+    {/if}
+
+    {* Account menu. Reuses includes/partials/profile-dropdown.tpl -- the one
+       body four other call sites already share -- rather than porting the
+       mockup's own dropdown, so the band offers exactly the items the topbar
+       and sidebar do and gains no second list to keep in step.
+
+       The partial resolves $user_fullname and $_email from the INCLUDING
+       scope, and each call site sets them itself (see inner-topbar.tpl), so
+       they are assigned here too. ddId must match the arm added to
+       togglePortalProfile() and the ALL[] list in apple-layout.js, or the menu
+       opens and outside-click never closes it. *}
+    {if $atHeroProfile == 'avatar' && $loggedin}
+    {assign var=_first value=$clientsdetails.firstname|default:''}
+    {assign var=_last value=$clientsdetails.lastname|default:''}
+    {assign var=_email value=$clientsdetails.email|default:''}
+    {assign var=user_initials value=$_first|truncate:1:''|upper}
+    {assign var=user_fullname value=$_first|cat:' '|cat:$_last}
+    <div class="profile-dropdown-wrapper at-hero-profile" id="atBandUserWrap">
+        <button type="button" class="at-hero-avatar" onclick="togglePortalProfile && togglePortalProfile(event, 'band')"
+                aria-haspopup="menu" aria-expanded="false"
+                title="{$LANG.accounttab|default:'Account'}">{$user_initials|default:'U'}</button>
+        {include file="`$template`/includes/partials/profile-dropdown.tpl" ddId="profileDropdownBand"}
     </div>
     {/if}
 </section>
