@@ -1673,7 +1673,14 @@ final class Hooks
                 $invoices[] = [
                     'id'          => (int)($inv['id'] ?? 0),
                     'date'        => !empty($inv['date']) ? date('M j, Y', strtotime((string)$inv['date'])) : '',
-                    'total'       => (string)($inv['total'] ?? ''),
+                    // Currency-formatted, not the API's bare decimal. GetInvoices
+                    // returns total as "20.00" with no symbol, so the dashboard
+                    // was listing an amount with no unit -- and this row sits
+                    // beside a Balance due figure that IS formatted, which made
+                    // the two look like different kinds of number. Same helper
+                    // the billing summary already uses, so an install with a
+                    // non-dollar currency gets its own prefix and separators.
+                    'total'       => $this->formatPrice((float)($inv['total'] ?? 0)),
                     'status'      => $status,
                     'statusLower' => strtolower(str_replace(' ', '-', $status)),
                 ];
