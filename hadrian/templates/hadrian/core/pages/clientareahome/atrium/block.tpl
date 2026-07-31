@@ -41,6 +41,15 @@
    has nothing to act on. *}
 {if $sec == 'hero'}
 <section class="at-hero" data-at-style="{$atHeroStyle|escape}" data-at-width="{$atHeroWidth|escape}" data-at-acts="{$atHeroActs|escape}" data-at-profile="{$atHeroProfile|escape}" data-at-size="{$atHeroSize|escape}">
+    {* Decorative rings around the avatar. FIRST child so it paints under the
+       text and buttons, which carry z-index 2 and 3; it is inert (aria-hidden,
+       pointer-events:none) and takes no flex slot, being absolutely positioned.
+       Gated on the same condition as the avatar itself -- they are an ornament
+       ON the disc, so with no disc there is nothing to ring. It cannot sit
+       inside the avatar as the mockup has it; see .at-hero-rings in the CSS. *}
+    {if $atHeroProfile == 'avatar' && $loggedin}
+    <span class="at-hero-rings" aria-hidden="true"><span class="at-hero-ring"></span></span>
+    {/if}
     <div class="at-hero-main">
         {* Supplied by the hook, not formatted in Smarty: |date_format's
            %-style codes rely on strftime and are broken on PHP 8.1+. *}

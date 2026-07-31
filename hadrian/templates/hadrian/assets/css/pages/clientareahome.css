@@ -1368,8 +1368,21 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
    Built from --color-accent with color-mix, so it follows a rebrand and the
    style presets for free. */
 .at-hero {
+    /* The decorative rings are anchored to where the avatar IS rather than to
+       the avatar element (see .at-hero-rings for why they cannot live inside
+       it). These four are the inputs to that arithmetic, and the padding and
+       avatar rules below CONSUME them, so the decoration cannot drift from the
+       disc when a breakpoint or the edge option changes the padding. */
+    --at-pad-x: 40px; --at-pad-y: 28px; --at-avatar: 40px;
+    /* Ring geometry is its own constant, NOT derived from --at-avatar. The
+       circles are sized against the BAND -- both this one and the mockup's
+       render 140.68px tall, so 130px is what makes the outer arcs cut the top
+       and bottom edges at the mockup's angle. Scaling them to the disc would
+       change the composition you actually see to fix a gap you do not. */
+    --at-ring-d: 130px; --at-ring-step: 42px; --at-ring-w: 1.5px;
+    --at-ring-ink: rgba(255,255,255,0.22);
     position: relative; overflow: hidden;
-    border-radius: 22px; padding: 28px 40px; margin: 0 0 26px;
+    border-radius: 22px; padding: var(--at-pad-y) var(--at-pad-x); margin: 0 0 26px;
     display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
     color: #fff;
     /* Accent stop at 78%, not the mockup's 55%. MEASURED: the heading runs to
@@ -1442,6 +1455,11 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
 }
 /* plain drops the panel entirely: greeting on the page background. */
 .at-hero[data-at-style="plain"] {
+    /* The tokens are restated to match the padding they mirror. Nothing reads
+       them here today -- plain hides its rings -- but leaving them at the
+       inherited 40px would mean the ring anchor and the real padding disagree
+       by 40px the moment anyone un-hides them. */
+    --at-pad-x: 0px; --at-pad-y: 0px;
     background: none; padding: 0; border-radius: 0; color: var(--color-text-primary);
 }
 .at-hero[data-at-style="plain"] .at-hero-title,
@@ -1497,6 +1515,20 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
         padding-left: calc(50cqw - 50% + 40px);
         padding-right: calc(50cqw - 50% + 40px);
     }
+    /* Edge drops the rings, and this is the one drop that is a limitation
+       rather than a design choice. MEASURED at 768px out before this rule.
+
+       The padding above is the band's own: its 50% resolves against the band's
+       containing block, the content COLUMN. The ring is inside the band, so the
+       identical token resolves that 50% against the BAND -- which in edge mode
+       is 100cqw wide, collapsing the calc to a bare 40px. One token, two bases.
+       No expression available to a descendant can recover the column's width,
+       so --at-pad-x is deliberately NOT maintained here; nothing reads it.
+
+       Scoped exactly as the edge geometry is -- same @supports, same body flag
+       -- so a browser without container queries renders boxed AND keeps its
+       rings, rather than losing them to an edge mode it never applied. */
+    body[data-at-hero-width="edge"] .at-hero[data-at-width="edge"] .at-hero-rings { display: none; }
     /* Plain has no panel to stretch: only its text matters, and that should
        stay on the column. */
     body[data-at-hero-width="edge"] .at-hero[data-at-style="plain"][data-at-width="edge"] {
@@ -1520,16 +1552,16 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
    avatar on the right, and the sub-line dropped -- it is the line that makes
    the band two-storey. Values are the mockup's own
    (body[data-hero-size="slim"]), read from its inline CSS. */
-.at-hero[data-at-size="slim"] { padding-top: 17px; padding-bottom: 17px; gap: 20px; }
+.at-hero[data-at-size="slim"] { --at-pad-y: 17px; --at-avatar: 34px; gap: 20px; }
 .at-hero[data-at-size="slim"] .at-hero-main { min-width: 200px; max-width: none; }
 .at-hero[data-at-size="slim"] .at-hero-date { margin: 0 0 4px; font-size: 10.5px; }
 .at-hero[data-at-size="slim"] .at-hero-title { font-size: 23px; margin: 0; }
 .at-hero[data-at-size="slim"] .at-hero-sub { display: none; }
-/* A smaller disc suits the shorter bar. The mockup uses 52 -> 42, but its band
-   is 141px tall and carries decorative rings around the avatar which are not
-   ported; 40 -> 34 keeps the same proportion against a 115px band. Copying 42
-   verbatim made the SLIM avatar bigger than the full one, which is backwards. */
-.at-hero[data-at-size="slim"] .at-hero-avatar { width: 34px; height: 34px; font-size: var(--text-base); }
+/* A smaller disc suits the shorter bar -- the size itself is --at-avatar on the
+   band above, so the rings follow it. The mockup uses 52 -> 42; copying 42
+   verbatim made the SLIM avatar bigger than the full one, which is backwards.
+   The slim bar drops the rings entirely, as the mockup's does. */
+.at-hero[data-at-size="slim"] .at-hero-avatar { font-size: var(--text-base); }
 @media (max-width: 900px) {
     .at-hero[data-at-size="slim"] .at-hero-title { font-size: 20px; }
 }
@@ -1542,7 +1574,8 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
 .at-hero[data-at-profile="avatar"] { overflow: visible; }
 .at-hero-profile { position: relative; flex-shrink: 0; z-index: 3; }
 .at-hero-avatar {
-    width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
+    width: var(--at-avatar); height: var(--at-avatar);
+    border-radius: 50%; border: 0; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     font-family: inherit; font-size: var(--text-md); font-weight: var(--fw-semibold);
     /* On the two saturated styles the avatar is a translucent white disc with
@@ -1565,6 +1598,76 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
 /* The shared panel anchors to its wrapper; on a right-aligned trigger it must
    open leftward or it runs off the content area. */
 .at-hero-profile .profile-dropdown { right: 0; left: auto; }
+
+/* --- Band rings --------------------------------------------------------
+   Three concentric hairlines around the avatar, from the v18 mockup.
+
+   The mockup hangs them off the avatar itself -- its <span class="dash-hero-
+   rings"> is a CHILD of the avatar link -- and clips them with overflow:hidden
+   on the band. We cannot copy that. A band carrying a profile sets
+   overflow:visible (see [data-at-profile="avatar"] above) so the account menu
+   can escape it, and putting overflow:hidden back would clip the menu instead.
+
+   So the rings get their own clipping context: a layer pinned over the band at
+   inset:0 that inherits its radius. The band's overflow is left alone, the menu
+   still escapes, and the rings still stop at the rounded corner.
+
+   The cost of not living inside the avatar is that they no longer FOLLOW it --
+   they are anchored to where it sits, via --at-pad-x and --at-avatar, which the
+   padding and avatar rules also consume. MEASURED at 0,0 concentric wherever
+   they render -- but that anchor assumes the disc is on the band's centre-right,
+   and FIVE configurations break the assumption. Each is dropped rather than left
+   floating: acts="below", size="slim", style="plain", width="edge", and any
+   viewport under 900px. Each rule says why.
+
+   Geometry is the mockup's, unscaled: both bands render 140.68px tall, so the
+   arcs cut the top and bottom edges at the same angle, which is the part you
+   actually see. Our disc is 40px rather than the mockup's 52px, which only
+   widens the innermost gap from 39px to 45px. */
+.at-hero-rings {
+    position: absolute; inset: 0; z-index: 0;
+    overflow: hidden; border-radius: inherit; pointer-events: none;
+}
+.at-hero-ring,
+.at-hero-ring::before,
+.at-hero-ring::after {
+    position: absolute; border-radius: 50%;
+    border: var(--at-ring-w) solid var(--at-ring-ink);
+}
+/* translate(50%) because the offset is measured to the ring's CENTRE, and the
+   rings are inset from the RIGHT: half the disc plus the band's own padding is
+   where that centre sits. top is a flat 50% because the rings only ever render
+   where the band is align-items:center -- below 900px it turns flex-start, and
+   that is inside the breakpoint where they are hidden anyway. */
+.at-hero-ring {
+    top: 50%;
+    right: calc(var(--at-pad-x) + var(--at-avatar) / 2);
+    transform: translate(50%, -50%);
+    width: var(--at-ring-d); height: var(--at-ring-d);
+}
+/* The two pseudos are SIBLINGS, both inset from the base circle's PADDING box
+   -- box-sizing:border-box makes that 130 - 2*1.5 = 127 -- so the rendered
+   diameters are 127+84=211 and 127+168=295, not 214/298. Chrome reports
+   211.33/295.33 at DPR 1.5 (it snaps the 1.5px border to 1.33), which is
+   exactly what the mockup measures. Do not "correct" these to 214/298. */
+.at-hero-ring::before { content: ''; inset: calc(var(--at-ring-step) * -1); }
+.at-hero-ring::after  { content: ''; inset: calc(var(--at-ring-step) * -2); }
+
+/* Ink follows the panel, not the page: white on the two saturated styles, and
+   the mockup's own light-tone values on the pale one. Set for plain too, so
+   the pairing stays right if it ever renders. */
+.at-hero[data-at-style="soft"],
+.at-hero[data-at-style="plain"] { --at-ring-ink: rgba(0,0,0,0.08); }
+html[data-theme="dark"] .at-hero[data-at-style="soft"],
+html[data-theme="dark"] .at-hero[data-at-style="plain"] { --at-ring-ink: rgba(255,255,255,0.14); }
+
+/* Three configurations drop them. plain has no panel at all (background:none,
+   padding:0), so there is nothing for a ring to be an ornament ON; slim is
+   77.58px tall and a 130px circle would swamp it, which is why the mockup
+   hides them there too; below moves the avatar out from under them. */
+.at-hero[data-at-style="plain"] .at-hero-rings,
+.at-hero[data-at-size="slim"] .at-hero-rings,
+.at-hero[data-at-acts="below"] .at-hero-rings { display: none; }
 
 /* Column count comes from the template: the four tiles are independently
    switchable, and repeat(auto-fit, ...) created as many tracks as fit the
@@ -1614,6 +1717,17 @@ html[data-theme="dark"] .at-hero-btn-primary { color: color-mix(in srgb, var(--c
 
 @media (max-width: 900px) {
     .at-hero { padding: 24px 26px; align-items: flex-start; }
+    /* Rings stop at this breakpoint. .at-hero is flex-wrap:wrap, and once the
+       action buttons no longer fit beside the greeting the avatar drops to a
+       new flex line -- but the ring anchor is a fixed offset and stays on the
+       first one. MEASURED, holding at 0,0 down to a 500px band and breaking at
+       460px: dx +340, dy -134, three arcs stranded in the corner with the disc
+       far below them.
+       Hidden wholesale rather than only for the button configurations, because
+       the wrap threshold is set by button LABEL width -- a longer translation
+       moves it, so any rule tuned to today's English strings is one i18n pass
+       from being wrong. Above 900px the band never gets near 500px wide. */
+    .at-hero-rings { display: none; }
     .at-hero-title { font-size: 23px; }
     /* Two-up: four figures side by side below 900px squeezes each past
        legibility. */
