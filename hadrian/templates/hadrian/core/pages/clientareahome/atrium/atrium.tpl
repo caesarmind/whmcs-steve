@@ -79,6 +79,10 @@
     if (!b) return;
     b.setAttribute('data-data', '{$dashIsEmpty}');
     b.setAttribute('data-at-title', '{$atTitles|escape:'javascript'}');
+    // The edge band has to break out of .content-area's max-width, which means
+    // a rule on an ANCESTOR of the band -- so the flag goes on the body rather
+    // than only on the section.
+    b.setAttribute('data-at-hero-width', '{$atHeroWidth|escape:'javascript'}');
 })();
 </script>
 

@@ -1473,8 +1473,36 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
    than a container query -- container-type on the wrap would make it the
    containing block for every fixed-position descendant, which is a theme-wide
    side effect for one option. */
-.at-hero[data-at-width="edge"] { border-radius: 0; margin-left: calc(var(--content-pad-x, 48px) * -1); margin-right: calc(var(--content-pad-x, 48px) * -1); padding-left: var(--content-pad-x, 48px); padding-right: var(--content-pad-x, 48px); }
-.at-hero[data-at-style="plain"][data-at-width="edge"] { margin-left: 0; margin-right: 0; padding-left: 0; padding-right: 0; }
+/* Edge runs the band to the edges of the CONTENT AREA -- the region beside the
+   sidebar -- not merely to the content column's padding. Measured live: the
+   column is 1120px inside a 2465px wrap, so cancelling the 48px padding (the
+   first attempt) reached 1120 and stopped, which read as "not full width".
+
+   The band cannot know the wrap's width from inside a max-width column, so the
+   wrap becomes a query container and the band is sized in cqw. That is gated
+   two ways: on @supports, and on the body flag, so container-type is applied
+   ONLY on a page whose band is set to edge. It matters because container-type
+   makes the wrap the containing block for fixed-position descendants -- checked
+   on the live page and there are none, but scoping keeps that true for layouts
+   not checked.
+
+   Inner padding keeps the text where boxed mode puts it, so switching the
+   option moves the panel and not the words. */
+@supports (container-type: inline-size) {
+    body[data-at-hero-width="edge"] .ph-main-wrap { container-type: inline-size; }
+    body[data-at-hero-width="edge"] .at-hero[data-at-width="edge"] {
+        border-radius: 0;
+        width: 100cqw;
+        margin-left: calc(50% - 50cqw);
+        padding-left: calc(50cqw - 50% + 40px);
+        padding-right: calc(50cqw - 50% + 40px);
+    }
+    /* Plain has no panel to stretch: only its text matters, and that should
+       stay on the column. */
+    body[data-at-hero-width="edge"] .at-hero[data-at-style="plain"][data-at-width="edge"] {
+        width: auto; margin-left: 0; padding-left: 0; padding-right: 0;
+    }
+}
 
 /* Buttons below the greeting instead of opposite it. */
 .at-hero[data-at-acts="below"] { display: block; }
