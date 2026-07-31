@@ -49,7 +49,7 @@
    and the control looks broken. isset() is right under either implementation.
    Only default-TRUE booleans need this. *}
 {assign var=atTitles value=$hadrian.pages.clientareahome.options.atr_section_titles|default:'inside'}
-{assign var=atHeroStyle value=$hadrian.pages.clientareahome.options.atr_hero_style|default:'gradient'}
+{assign var=atHeroStyle value=$hadrian.pages.clientareahome.options.atr_hero_style|default:'light'}
 {assign var=atHeroWidth value=$hadrian.pages.clientareahome.options.atr_hero_width|default:'boxed'}
 {assign var=atHeroActs value=$hadrian.pages.clientareahome.options.atr_hero_actions|default:'right'}
 {assign var=atHeroProfile value=$hadrian.pages.clientareahome.options.atr_hero_profile|default:'off'}

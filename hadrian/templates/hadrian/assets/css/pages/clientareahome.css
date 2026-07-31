@@ -1482,6 +1482,19 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
 .at-hero[data-at-style="solid"] { background: var(--at-band); }
 /* soft is a pale accent wash with page ink, for a lighter dashboard. Its
    buttons invert too: a white pill on a near-white panel is invisible. */
+/* v18's Light tone: a panel with NO colour in it at all -- page surface and a
+   hairline border, the greeting in page ink. Distinct from soft, which is a
+   pale wash OF the accent; v18 carries both (Light and Tinted) and only this
+   one was missing. It is the shipped default: a dashboard that does not assume
+   the brand colour suits a full-bleed panel.
+
+   Deliberately ignores Colour source, being neutral by definition -- pick soft
+   or solid for a band built from a colour. */
+.at-hero[data-at-style="light"] {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+}
 .at-hero[data-at-style="soft"] {
     /* 8%, not 10%: the sub-line is --color-text-secondary, which measures 4.43
        on a 10% wash and 4.56 on 8%. The difference is invisible as a colour
@@ -1490,11 +1503,16 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
     color: var(--color-text-primary);
 }
 .at-hero[data-at-style="soft"] .at-hero-title,
-.at-hero[data-at-style="soft"] .at-hero-date { color: var(--color-text-primary); }
-.at-hero[data-at-style="soft"] .at-hero-sub { opacity: 1; color: var(--color-text-secondary); }
+.at-hero[data-at-style="soft"] .at-hero-date,
+.at-hero[data-at-style="light"] .at-hero-title,
+.at-hero[data-at-style="light"] .at-hero-date { color: var(--color-text-primary); }
+.at-hero[data-at-style="soft"] .at-hero-sub,
+.at-hero[data-at-style="light"] .at-hero-sub { opacity: 1; color: var(--color-text-secondary); }
+.at-hero[data-at-style="light"] .at-hero-btn,
 .at-hero[data-at-style="soft"] .at-hero-btn {
     background: var(--color-surface); border-color: var(--color-border); color: var(--color-text-primary);
 }
+.at-hero[data-at-style="light"] .at-hero-btn-primary,
 .at-hero[data-at-style="soft"] .at-hero-btn-primary {
     background: var(--color-accent); border-color: var(--color-accent); color: var(--color-on-accent);
 }
@@ -1525,6 +1543,7 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
    and is a design call, not a fix. The gradient and solid bands already carry
    their own pill treatment above. */
 html[data-theme="dark"] .at-hero[data-at-style="soft"] .at-hero-btn-primary,
+html[data-theme="dark"] .at-hero[data-at-style="light"] .at-hero-btn-primary,
 html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
     background: color-mix(in srgb, var(--color-accent) 65%, #000);
     border-color: color-mix(in srgb, var(--color-accent) 65%, #000);
@@ -1634,11 +1653,13 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
 }
 .at-hero-avatar:hover { background: rgba(255,255,255,0.28); }
 .at-hero[data-at-style="soft"] .at-hero-avatar,
+.at-hero[data-at-style="light"] .at-hero-avatar,
 .at-hero[data-at-style="plain"] .at-hero-avatar {
     background: linear-gradient(135deg, var(--color-avatar-from), var(--color-avatar-to));
     color: var(--color-on-accent); box-shadow: none;
 }
 .at-hero[data-at-style="soft"] .at-hero-avatar:hover,
+.at-hero[data-at-style="light"] .at-hero-avatar:hover,
 .at-hero[data-at-style="plain"] .at-hero-avatar:hover { opacity: 0.9; }
 /* The shared panel anchors to its wrapper; on a right-aligned trigger it must
    open leftward or it runs off the content area. */
@@ -1702,8 +1723,10 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
    the mockup's own light-tone values on the pale one. Set for plain too, so
    the pairing stays right if it ever renders. */
 .at-hero[data-at-style="soft"],
+.at-hero[data-at-style="light"],
 .at-hero[data-at-style="plain"] { --at-ring-ink: rgba(0,0,0,0.08); }
 html[data-theme="dark"] .at-hero[data-at-style="soft"],
+html[data-theme="dark"] .at-hero[data-at-style="light"],
 html[data-theme="dark"] .at-hero[data-at-style="plain"] { --at-ring-ink: rgba(255,255,255,0.14); }
 
 /* Three configurations drop them. plain has no panel at all (background:none,
@@ -1777,11 +1800,21 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] { --at-ring-ink: rgba(25
    accent: 65% accent + black gives white 6.28:1, and the same mix as a label
    on the white pill gives 6.28:1. Hue is preserved, so it still follows a
    rebrand and the style presets. */
-html[data-theme="dark"] .at-hero {
+/* Scoped to GRADIENT. Unscoped this repainted every style in dark mode --
+   pick light, soft or plain and you still got the blue gradient, because
+   html[data-theme="dark"] .at-hero scores (0,2,1) and beats the (0,2,0)
+   style rules. light, soft and plain need no dark rule at all: they are
+   built from --color-surface and --color-border, which flip on their own.
+   solid does, and gets its own below -- the dark accent is bright enough
+   that white on it measures 3.10:1. */
+html[data-theme="dark"] .at-hero[data-at-style="gradient"] {
     background: linear-gradient(115deg,
         color-mix(in srgb, var(--at-band) 42%, #000) 0%,
         color-mix(in srgb, var(--at-band) 65%, #000) 78%,
         color-mix(in srgb, var(--at-band) 88%, #000) 100%);
+}
+html[data-theme="dark"] .at-hero[data-at-style="solid"] {
+    background: color-mix(in srgb, var(--at-band) 65%, #000);
 }
 html[data-theme="dark"] .at-hero-btn-primary { color: color-mix(in srgb, var(--at-band) 65%, #000); }
 

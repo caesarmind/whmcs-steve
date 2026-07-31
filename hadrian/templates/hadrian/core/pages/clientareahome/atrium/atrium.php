@@ -44,15 +44,20 @@ return [
         'atr_hero_style' => [
             'type'    => 'select',
             'label'   => 'Band style',
-            'default' => 'gradient',
-            'options' => ['gradient', 'solid', 'soft', 'plain'],
+            // Light, not gradient. A full-bleed panel in the brand colour is a
+            // strong opening statement to make on every buyer's behalf; the
+            // neutral one asks nothing of their palette and the coloured
+            // looks are one click away. Listed first so the control reads
+            // default-first.
+            'default' => 'light',
+            'options' => ['light', 'gradient', 'solid', 'soft', 'plain'],
             'inBlock' => 'hero',
             // Files this control under Colour & style in the block drawer rather
             // than Content & behaviour, which is where an inBlock option lands
             // by default. It describes how the panel is FILLED, so it belongs
             // beside the colour source and the fill.
             'group'   => 'colour',
-            'tooltip' => 'Gradient is the shipped look: the accent deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint with dark text, for a lighter page. Plain drops the panel and sets the greeting on the page background.',
+            'tooltip' => 'Light is the shipped look: a plain panel in the page surface with a hairline border and no colour in it. Gradient fills it with the accent, deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint of the accent. Plain drops the panel altogether and sets the greeting on the page background. Colour source applies to gradient, solid and soft; light and plain are neutral by definition.',
         ],
         'atr_hero_width' => [
             'type'    => 'select',
