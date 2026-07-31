@@ -246,6 +246,59 @@
         </div>
     </div>
 
+{* ---------------- Payment methods ----------------
+   Its own arm rather than a sixth branch of the collections arm below: the row
+   is a different shape -- an identity and a standing, with no date and no
+   amount -- and the {else} would have rendered it as announcements.
+
+   Every value here is a plain string or bool flattened by the hook. Nothing in
+   this block touches a WHMCS pay-method object, which is deliberate: the
+   account page reaches those through $client, and $client does not exist on
+   the dashboard. See fetchPayMethods() for the rest of that reasoning. *}
+{elseif $sec == 'payments'}
+    {assign var=atPm value=$dashboard.payMethods|default:[]}
+    {assign var=atPmN value=$atPm|@count}
+    {if !($secHideEmpty|default:false && $atPmN == 0)}
+    <div class="at-card">
+        <div class="at-card-head">
+            <span class="at-card-title">{$LANG.paymentMethods.title|default:'Payment Methods'}</span>
+            {if $atPmN > 0}
+            <a class="at-card-link" href="{routePath('account-paymentmethods')}">{$hadrianLang.dashboard.manage} &rsaquo;</a>
+            {/if}
+        </div>
+        {if $atPmN > 0}
+        <div class="at-rows">
+            {foreach $atPm as $r}
+            {if $r@iteration <= $atRows}
+            <div class="at-row">
+                <span class="at-row-main">
+                    <span class="at-row-name">{if $r.label|default:''}{$r.label|escape}{else}{$hadrianLang.dashboard.payMethodUnnamed}{/if}</span>
+                    {if !$secCompact|default:false && $r.sub|default:''}
+                    <span class="at-row-sub">{$r.sub|escape}</span>
+                    {/if}
+                </span>
+                {* Expired outranks default: a lapsed card that is ALSO the
+                   default is the worst case on the account, and saying
+                   "Default" about it would bury that. *}
+                {if $r.isExpired|default:false}
+                <span class="status-pill expired">{$hadrianLang.billing.pmExpired}</span>
+                {elseif $r.isDefault|default:false}
+                <span class="status-pill is-default">{$LANG.paymentMethods.default|default:'Default'}</span>
+                {/if}
+            </div>
+            {/if}
+            {/foreach}
+        </div>
+        {else}
+        <div class="at-empty min-empty">
+            <div class="at-empty-title">{$hadrianLang.dashboard.noPayMethodsTitle}</div>
+            <p>{$LANG.paymentMethods.noPaymentMethodsCreated|default:'You have no payment methods saved.'}</p>
+            <a href="{routePath('account-paymentmethods-add')}" class="at-btn at-btn-primary">{$hadrianLang.dashboard.addPayMethod}</a>
+        </div>
+        {/if}
+    </div>
+    {/if}
+
 {* ---------------- Collections ---------------- *}
 {else}
     {* Resolve this block's rows and count ONCE, so the empty branch and the

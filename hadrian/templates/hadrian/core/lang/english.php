@@ -321,6 +321,13 @@ return [
         'addFunds'          => 'Add funds',
         'quickActions'      => 'Quick actions',
         'manage'            => 'Manage',
+        // Payment-methods block. The card title, the "Default" chip and the
+        // empty-state sentence all come from WHMCS's own $LANG.paymentMethods
+        // group, so they stay translated with the install; only these three,
+        // which WHMCS has no string for, live here.
+        'noPayMethodsTitle' => 'No payment methods',
+        'addPayMethod'      => 'Add payment method',
+        'payMethodUnnamed'  => 'Saved method',
         // "Issued", not "Due": recentInvoices carries the ISSUE date. There is
         // no due date on this page, and labelling one as the other is the kind
         // of plausible-but-wrong detail that costs a support ticket.

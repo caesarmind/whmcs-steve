@@ -1093,6 +1093,20 @@ final class Hooks
                 // overdue, how overdue the worst one is, and any credit that
                 // will come off first. $clientsstats carries the counts and the
                 // unpaid total but none of the detail.
+                // Saved cards and bank accounts. Deliberately NOT gated behind
+                // dashboardMentions() like the two above, and the reason is a
+                // trap rather than a preference: that gate is a substring test
+                // against the STORED layout string, but SectionLayout::parse
+                // appends every catalogue key the string is missing (verified --
+                // parsing "stats:1/1" returns all ten blocks). So a block added
+                // to the catalogue today renders immediately for everyone while
+                // no saved layout yet contains its name, and gating it would
+                // show a permanently empty card until each admin re-saved.
+                // The cost is two indexed queries; the gated pair guard an
+                // uncached GetTLDPricing, which is a different order of expense.
+                // $client is page-scoped to the routed account pages, so unlike
+                // account-paymentmethods this cannot read it from Smarty.
+                'payMethods'     => $this->fetchPayMethods($clientId),
                 'billing'        => $this->fetchBillingSummary($clientId),
                 // Counts for the attention strip. COUNT queries over the whole
                 // set, not tallies of the 8-row dashboard slices -- that is the
@@ -1207,6 +1221,85 @@ final class Hooks
     private function todayLabel(): string
     {
         return date('l') . " \u{00B7} " . date('j F');
+    }
+
+    /**
+     * Saved payment methods for the dashboard block.
+     *
+     * Every WHMCS object is flattened to a plain array HERE rather than handed
+     * to Smarty, which is the whole point of this method. The template can then
+     * do nothing worse than print an empty string, whereas a pay-method object
+     * in a template is a live fatal: Smarty's |default: does NOT guard a method
+     * call on null -- the call happens first -- so one client whose gateway was
+     * removed would take the client area down to Six for everybody.
+     *
+     * Three details are load-bearing, each verified against the stock Six theme
+     * and Hadrian's own account-paymentmethods page rather than assumed:
+     *
+     *   payMethods is a PROPERTY, not a method. $client->payMethods() hands back
+     *   the Eloquent relation, which has no validateGateways() -- a fatal.
+     *
+     *   validateGateways() is mandatory, not a nicety. It drops methods whose
+     *   gateway module is no longer enabled, and those are exactly the rows
+     *   whose ->payment is missing further down.
+     *
+     *   getDisplayName() lives on ->payment, NOT on the pay method. Unanimous
+     *   across six, nexus, lagom and standard_cart; it is the string carrying
+     *   the card brand and last four.
+     *
+     * The class name is checked rather than imported: nothing in this repo can
+     * prove the FQCN, and a `use` of a class that moved is an unconditional
+     * fatal at file load, where a false from class_exists() is just an empty
+     * block.
+     *
+     * @return list<array{id:int,label:string,sub:string,isDefault:bool,isExpired:bool}>
+     */
+    private function fetchPayMethods(int $clientId): array
+    {
+        try {
+            if (!class_exists('\WHMCS\User\Client')) {
+                return [];
+            }
+            $client = \WHMCS\User\Client::find($clientId);
+            if ($client === null) {
+                return [];
+            }
+            $methods = $client->payMethods;
+            if ($methods === null || !method_exists($methods, 'validateGateways')) {
+                return [];
+            }
+
+            $out = [];
+            foreach ($methods->validateGateways() as $pm) {
+                $payment = $pm->payment ?? null;
+
+                $label = '';
+                if ($payment !== null && method_exists($payment, 'getDisplayName')) {
+                    $label = trim((string)$payment->getDisplayName());
+                }
+                $description = trim((string)($pm->description ?? ''));
+
+                // The description is the client's own name for the method. It
+                // leads only when there is no card identity to lead with, and
+                // never repeats itself on the second line.
+                if ($label === '') {
+                    $label = $description;
+                    $description = '';
+                }
+
+                $out[] = [
+                    'id'        => (int)($pm->id ?? 0),
+                    'label'     => $label,
+                    'sub'       => $description === $label ? '' : $description,
+                    'isDefault' => method_exists($pm, 'isDefaultPayMethod') && (bool)$pm->isDefaultPayMethod(),
+                    'isExpired' => method_exists($pm, 'isExpired') && (bool)$pm->isExpired(),
+                ];
+            }
+
+            return $out;
+        } catch (\Throwable) {
+            return [];
+        }
     }
 
     private function greetingBucket(): string

@@ -114,7 +114,7 @@
                    interpolate a stored value into a path -- an unresolvable
                    {include} drops the whole client area to the Six theme, and
                    the poisoned compiled-template cache survives a git revert. *}
-                {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
+                {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions' || $s.key == 'payments'}
                     {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secFlags=$s.flags secRows=$s.rows|default:$atDefRows}
                 {/if}
             {/if}
@@ -126,7 +126,7 @@
         <div class="at-main">
         {foreach $atSecs as $s}
             {if $s.visible && ($s.width == '2/3' || $s.width == '1/2')}
-                {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
+                {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions' || $s.key == 'payments'}
                     {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secFlags=$s.flags secRows=$s.rows|default:$atDefRows}
                 {/if}
             {/if}
@@ -135,7 +135,7 @@
         <div class="at-side">
         {foreach $atSecs as $s}
             {if $s.visible && $s.width == '1/3'}
-                {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions'}
+                {if $s.key == 'hero' || $s.key == 'stats' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'unpaid' || $s.key == 'credit' || $s.key == 'actions' || $s.key == 'payments'}
                     {include file="`$template`/core/pages/clientareahome/atrium/block.tpl" sec=$s.key secPaint=$s.paint secFill=$s.fill secCustom=$s.custom secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secFlags=$s.flags secRows=$s.rows|default:$atDefRows}
                 {/if}
             {/if}

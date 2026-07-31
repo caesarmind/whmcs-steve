@@ -506,20 +506,39 @@ body[data-min-title="inside"] .min-list {
    renders a transparent pill with body-coloured text, i.e. an invisible badge.
 
    Colours mirror the existing definitions so a status looks the same wherever
-   it appears. Tokens (not literals) so dark mode flips correctly. */
+   it appears. Tokens (not literals) so dark mode flips correctly.
+
+   .at-row is listed alongside .min-row throughout. Atrium's rows never matched
+   this block, so every status in it -- an Expired domain, a Refunded invoice --
+   has been rendering as that same invisible badge on the Atrium dashboard.
+   MEASURED on a rendered Atrium page before this: background rgba(0,0,0,0),
+   text rgb(29,29,31), i.e. the pill shape gone and the word left in body ink. */
 .min-row .status-pill.expired,
-.min-row .status-pill.fraud            { background: var(--color-red-bg);     color: var(--color-red-text); }
-.min-row .status-pill.redemption       { background: var(--color-red-bg);     color: var(--color-red-text); }
+.at-row  .status-pill.expired,
+.min-row .status-pill.fraud,
+.at-row  .status-pill.fraud            { background: var(--color-red-bg);     color: var(--color-red-text); }
+.min-row .status-pill.redemption,
+.at-row  .status-pill.redemption       { background: var(--color-red-bg);     color: var(--color-red-text); }
 .min-row .status-pill.expiring,
+.at-row  .status-pill.expiring,
 .min-row .status-pill.grace,
+.at-row  .status-pill.grace,
 .min-row .status-pill.pending-transfer,
+.at-row  .status-pill.pending-transfer,
 .min-row .status-pill.pending-registration,
+.at-row  .status-pill.pending-registration,
 .min-row .status-pill.payment-pending,
-.min-row .status-pill.collections      { background: var(--color-orange-bg);  color: var(--color-orange-text); }
+.at-row  .status-pill.payment-pending,
+.min-row .status-pill.collections,
+.at-row  .status-pill.collections      { background: var(--color-orange-bg);  color: var(--color-orange-text); }
 .min-row .status-pill.terminated,
+.at-row  .status-pill.terminated,
 .min-row .status-pill.transferred-away,
+.at-row  .status-pill.transferred-away,
 .min-row .status-pill.refunded,
-.min-row .status-pill.draft            { background: var(--color-gray-bg);    color: var(--color-gray-text); }
+.at-row  .status-pill.refunded,
+.min-row .status-pill.draft,
+.at-row  .status-pill.draft            { background: var(--color-gray-bg);    color: var(--color-gray-text); }
 
 /* --- Admin-arranged section grid ---------------------------------------
    Only rendered when an admin has saved a layout in Hadrian > Pages >
@@ -1700,6 +1719,19 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] { --at-ring-ink: rgba(25
     line-height: 1; color: var(--color-text-primary); white-space: nowrap;
 }
 .at-stat-sub { display: block; font-size: 12.5px; color: var(--color-text-secondary); margin-top: 10px; }
+
+/* "Default" on a payment method is a DESIGNATION, not a status, so it takes the
+   accent rather than borrowing .active's green -- which on this row would read
+   as "this card is working" next to an Expired one that is not. Both tokens
+   already flip in dark mode. */
+.status-pill.is-default {
+    background: var(--color-blue-bg);
+    /* --color-blue-text straight measures 4.21:1 on its own 8% wash, which is
+       under AA. Deepened here only -- the same local idiom the band's dark-mode
+       button uses -- rather than moving the shared token, which would repaint
+       every link in the theme and is a design call, not a fix. */
+    color: color-mix(in srgb, var(--color-blue-text) 80%, #000);
+}
 .at-stat-sub.is-alert { color: var(--color-red-text); font-weight: var(--fw-medium); }
 
 /* DARK MODE. --color-accent goes from #0071e3 to the much brighter #2997ff,

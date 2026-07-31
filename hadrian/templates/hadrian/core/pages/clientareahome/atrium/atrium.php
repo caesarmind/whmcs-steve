@@ -191,6 +191,15 @@ return [
                 // precedent as bento's attention strip.
                 'unpaid'        => ['label' => 'Amount due',        'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
                 'credit'        => ['label' => 'Account credit',    'w' => '1/3', 'paintable' => true, 'fills' => ['solid', 'tint', 'grad']],
+                // A real WHMCS feature, not a dashboard invention: these are the
+                // saved methods from Billing -> Payment Methods, and the reason
+                // to surface them is the expiry -- a card that lapses is a failed
+                // renewal nobody sees coming.
+                'payments'      => ['label' => 'Payment methods',   'w' => '1/3', 'list' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
+                                    'rowsCompact' => [
+                                        'label' => 'Compact rows',
+                                        'hint'  => 'Drops the second line, leaving the card name and whether it is the default or has expired.',
+                                    ]],
                 'tickets'       => ['label' => 'Support',           'w' => '1/3', 'list' => true, 'paintable' => true, 'fills' => ['solid', 'tint', 'grad'],
                                     'rowsCompact' => [
                                         'label' => 'Compact rows',
