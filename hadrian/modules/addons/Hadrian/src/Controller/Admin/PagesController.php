@@ -236,6 +236,12 @@ final class PagesController extends AbstractController
                     'hint'    => (string)($oSpec['tooltip'] ?? ''),
                     'options' => is_array($oSpec['options'] ?? null) ? $oSpec['options'] : [],
                     'default' => (string)($oSpec['default'] ?? ''),
+                    // Which drawer group the control is filed under. This
+                    // projection is a whitelist, so an option's group has to be
+                    // carried across explicitly -- declaring it in the variant
+                    // alone leaves it behind here and the control silently
+                    // stays in the default group.
+                    'group'   => (string)($oSpec['group'] ?? ''),
                 ];
             }
             $owner = (string)($spec['_variant'] ?? '');
