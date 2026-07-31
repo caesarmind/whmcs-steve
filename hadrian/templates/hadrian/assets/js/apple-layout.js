@@ -482,11 +482,22 @@
         var ALL = ['notificationDropdownNav', 'notificationDropdownSide',
                    'profileDropdown', 'profileDropdownSide', 'profileDropdownSidebar',
                    'profileDropdownRail', 'profileDropdownBand'];
+        // Keep the trigger's aria-expanded honest. The panels are toggled by a
+        // class, and nothing was syncing the attribute -- so a trigger that
+        // declared aria-expanded="false" kept claiming it while its menu was
+        // open, which is worse for a screen reader than not declaring it at
+        // all. Finds the trigger as the aria-haspopup element beside the panel;
+        // call sites that do not declare one are unaffected.
+        function setExpanded(dd, open) {
+            var wrap = dd && dd.parentElement;
+            var trigger = wrap && wrap.querySelector('[aria-haspopup]');
+            if (trigger) trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
         function closeAll(except) {
             ALL.forEach(function (id) {
                 if (id === except) return;
                 var el = document.getElementById(id);
-                if (el) el.classList.remove('open');
+                if (el) { el.classList.remove('open'); setExpanded(el, false); }
             });
         }
         window.togglePortalNotifications = function (e, which) {
@@ -497,6 +508,7 @@
             var wasOpen = dd.classList.contains('open');
             closeAll(id);
             dd.classList.toggle('open', !wasOpen);
+            setExpanded(dd, !wasOpen);
         };
         window.togglePortalProfile = function (e, which) {
             if (e) e.stopPropagation();
@@ -510,13 +522,14 @@
             var wasOpen = dd.classList.contains('open');
             closeAll(id);
             dd.classList.toggle('open', !wasOpen);
+            setExpanded(dd, !wasOpen);
         };
         document.addEventListener('click', function (e) {
             ALL.forEach(function (id) {
                 var dd = document.getElementById(id);
                 if (!dd || !dd.classList.contains('open')) return;
                 var wrap = dd.parentElement;
-                if (wrap && !wrap.contains(e.target)) dd.classList.remove('open');
+                if (wrap && !wrap.contains(e.target)) { dd.classList.remove('open'); setExpanded(dd, false); }
             });
         });
         // The rail and sidebar triggers are <div role="button">, not <button>,
