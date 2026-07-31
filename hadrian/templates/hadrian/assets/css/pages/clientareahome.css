@@ -1746,6 +1746,18 @@ body[data-at-title="outside"] .at-panel .at-card-head { padding: 0 0 12px; }
     padding: 14px 22px; border-top: 1px solid var(--color-border);
 }
 .at-row-main { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+/* Invoices read across, not down: an invoice number and its date are one fact
+   ("#1048, issued 2 Aug"), where a service name and its domain are two. The
+   mockup lays them on a single baseline, and the number is short enough that
+   the pair never needs the second line the other collections do.
+   Scoped by the cell's own key rather than a modifier class, so the row markup
+   stays identical across every block. */
+.at-cell[data-sec="invoices"] .at-row-main {
+    flex-direction: row; align-items: baseline; gap: 8px;
+}
+/* The number keeps its width; the date is what gives way in a narrow column. */
+.at-cell[data-sec="invoices"] .at-row-name { flex: 0 0 auto; }
+.at-cell[data-sec="invoices"] .at-row-sub { flex: 1 1 auto; min-width: 0; }
 .at-row-name {
     font-size: var(--text-md); font-weight: var(--fw-semibold); color: var(--color-text-primary);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
