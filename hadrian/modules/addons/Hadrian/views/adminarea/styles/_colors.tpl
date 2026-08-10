@@ -113,7 +113,9 @@
 
     {foreach $colors.groups as $groupName => $tokens}
     <section class="mt-section mt-cs-group">
-        <div class="mt-cs-group-lbl">{$groupName|escape}</div>
+        <div class="mt-cs-group-head">
+            <span class="mt-cs-group-lbl">{$groupName|escape}</span>
+        </div>
 
         {* Sidebar style presets, at the head of the group that owns the sidebar
            rows -- the same relationship the accent chips at the top of the page
@@ -178,8 +180,13 @@
     </section>
     {/foreach}
 
-    <div class="mt-typo-actions">
-        <button type="button" class="mt-btn mt-btn-secondary" id="mt-colors-reset">Reset all to default</button>
-        <button type="submit" class="mt-btn mt-btn-primary">Save colors</button>
+    {* Floating save bar, ported from the demo. Restore sits far left because
+       margin-right:auto puts distance between the destructive action and the
+       confirming one; Cancel reloads, which is the honest way to discard when
+       every edit so far lives only in the form. *}
+    <div class="mt-savebar">
+        <button type="button" class="mt-savebar-quiet" id="mt-colors-reset">Restore defaults</button>
+        <a class="mt-btn mt-btn-secondary" href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=colors&scope={$colors.mode}">Cancel</a>
+        <button type="submit" class="mt-btn mt-btn-primary">Save changes</button>
     </div>
 </form>

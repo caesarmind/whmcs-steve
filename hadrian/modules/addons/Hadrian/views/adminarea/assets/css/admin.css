@@ -391,7 +391,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-scheme { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 7px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-pill); cursor: pointer; font-size: 13px; font-weight: 500; text-decoration: none; color: var(--mt-text); }
 /* Filled, not ringed: the design shows the matching preset as a tinted pill.
    A ring reads as focus; a fill reads as "this is the one you are on". */
-.mt-scheme.is-active { border-color: var(--mt-primary); background: var(--mt-primary-tint); color: var(--mt-primary); font-weight: 600; box-shadow: none; }
+.mt-scheme.is-active { border-color: transparent; background: var(--mt-primary-tint); color: var(--mt-primary); font-weight: 600; box-shadow: none; }
 .mt-scheme-dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.06); }
 
 /* -- Color tiles ---------------------------------------------------------- */
@@ -651,6 +651,26 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-color-swatch-input::-moz-color-swatch { border: 0; border-radius: 3px; }
 .mt-color-text { max-width: 132px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; text-transform: lowercase; }
 
+/* -- Floating save bar -----------------------------------------------------
+   Ported from the Caesarthemes demo (.adm-savebar). The padding expression is
+   the demo's verbatim and lands correctly here because our shell is the same
+   1180px: the bar spans the viewport while its buttons line up with the body
+   column, so it reads as part of the page rather than an overlay pinned to the
+   window edge.
+
+   .mt-body already reserves 72px of bottom padding, which is what keeps the
+   last row clear of the bar rather than hidden behind it. */
+.mt-savebar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 80; display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+    padding: 12px max(28px, calc((100% - 1180px) / 2));
+    background: color-mix(in srgb, var(--mt-surface) 88%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+    border-top: 1px solid var(--mt-border); box-shadow: 0 -6px 20px -12px rgba(0,0,0,0.18); }
+/* margin-right:auto is what pushes the destructive action away from the
+   confirming one, rather than a spacer element. */
+.mt-savebar-quiet { background: none; border: 0; cursor: pointer; font: 500 13px inherit; color: var(--mt-text-3); padding: 8px 2px; margin-right: auto; white-space: nowrap; }
+.mt-savebar-quiet:hover { color: var(--mt-text); }
+.mt-savebar-msg { font: 600 12.5px inherit; color: var(--mt-primary); padding-right: 4px; white-space: nowrap; }
+
 /* -- Colors panel: layout to match the design -----------------------------
    Groups read as a small uppercase label sitting ABOVE a white card, rather
    than a heading with a rule under it. The label is chrome; the card is the
@@ -662,27 +682,30 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
    the design draws a recessed track with the active half raised out of it,
    which reads as a two-state switch rather than as page navigation. The
    ::after is the tab underline, neutralised here rather than globally. */
-.mt-cs-editing .mt-tabs { display: inline-flex; gap: 2px; padding: 3px; border: 0; background: var(--mt-surface-2); border-radius: var(--mt-radius-pill); }
-.mt-cs-editing .mt-tab { border: 0; margin: 0; padding: 5px 15px; border-radius: var(--mt-radius-pill); background: none; font-size: 12.5px; font-weight: 500; color: var(--mt-text-2); cursor: pointer; }
+.mt-cs-editing .mt-tabs { display: inline-flex; gap: 2px; padding: 3px; border: 0; background: var(--mt-surface-2); border-radius: 8px; }
+.mt-cs-editing .mt-tab { border: 0; margin: 0; padding: 5px 14px; border-radius: 6px; background: none; font-size: 11px; font-weight: 600; text-transform: capitalize; color: var(--mt-text-2); cursor: pointer; }
 .mt-cs-editing .mt-tab::after { display: none; }
 .mt-cs-editing .mt-tab.is-active { background: var(--mt-surface); color: var(--mt-primary); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
-.mt-cs-group { padding: 0; margin-top: 18px; border-top: 0; }
+/* A group is a GREY box wrapping a white card -- the label sits on the grey,
+   the fields on the white. That nesting is the design's, and it is what gives
+   eight groups a rhythm a flat label-over-card cannot. */
+.mt-cs-group { padding: 10px; margin-top: 20px; border-top: 0; background: var(--mt-surface-2); border-radius: 12px; }
 .mt-cs-group + .mt-cs-group { border-top: 0; }
-.mt-cs-group-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); margin: 0 0 10px 4px; }
-.mt-cs-card { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: 14px; padding: 18px 20px; }
-/* Three columns, matching the design. minmax(0,1fr) rather than a min track:
-   an auto-fill min of 240px reflows to two columns at this panel width and the
-   grid stops lining up with the group above it. */
-.mt-cs-card.mt-color-rows { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; }
-@media (max-width: 1100px) { .mt-cs-card.mt-color-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 720px)  { .mt-cs-card.mt-color-rows { grid-template-columns: minmax(0, 1fr); } }
+.mt-cs-group-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 4px 8px 10px; }
+.mt-cs-group-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mt-text); margin: 0; }
+.mt-cs-group-note { font-size: 11px; color: var(--mt-text-3); }
+.mt-cs-card { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: 10px; padding: 16px 16px 18px; }
+/* auto-fill at 200px, as the design has it: the row count then follows the
+   panel width instead of being pinned to three, which is what let a fixed grid
+   overflow when the panel turned out narrower than the harness claimed. */
+.mt-cs-card.mt-color-rows { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px 20px; }
 /* Label above, control below -- the design stacks them, and it is what lets a
    long token name sit beside its info dot without squeezing the field. */
-.mt-cs-card .mt-color-row { display: block; }
-.mt-cs-card .mt-color-row-label { display: flex; align-items: center; gap: 5px; margin-bottom: 7px; font-size: 13px; font-weight: 600; color: var(--mt-text); }
-.mt-cs-card .mt-color-control { display: flex; gap: 8px; width: 100%; }
+.mt-cs-card .mt-color-row { display: block; min-width: 0; }
+.mt-cs-card .mt-color-row-label { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; font-size: 12.5px; font-weight: 600; color: var(--mt-text); }
+.mt-cs-card .mt-color-control { display: flex; align-items: center; gap: 8px; width: 100%; }
 .mt-cs-card .mt-color-text { max-width: none; flex: 1; min-width: 0; }
-.mt-cs-card .mt-color-swatch-input { width: 34px; height: 34px; }
+.mt-cs-card .mt-color-swatch-input { width: 30px; height: 30px; border-radius: 9px; }
 
 /* The note, now a tooltip. A BUTTON, not a styled span: it has to be
    focusable for the text to be reachable without a mouse, and title on a
@@ -724,29 +747,21 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-gen-ctl-act { grid-column: 1 / -1; justify-content: flex-end; padding-top: 2px; }
 .mt-gen .mt-gen-run { background: var(--mt-primary); border-color: var(--mt-primary); color: #fff; }
 .mt-gen .mt-gen-run:hover { filter: brightness(1.06); }
-/* The chips get a FULL-WIDTH row of their own rather than a third column.
-   Sizing a column to fit them is what failed twice: auto-fit gave 225px, then a
-   400px minimum measured in the harness met chips that actually render 406px on
-   the real panel -- six pixels short. The panel is ~880px wide here (the design
-   is drawn on a wider canvas, without the sub-nav column), so four chips and
-   two other controls cannot share one row at any honest track size. Spanning
-   the row makes the wrap impossible instead of unlikely. */
-.mt-gen-rail { display: grid; gap: 16px 26px; align-items: start;
-               grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr); }
-.mt-gen-ctl-seed { grid-column: 1; grid-row: 1; }
-.mt-gen-ctl-tint { grid-column: 2; grid-row: 1; }
-.mt-gen-ctl-what { grid-column: 1 / -1; grid-row: 2; }
-.mt-gen-ctl-act  { grid-column: 1 / -1; grid-row: 3; }
-@media (max-width: 620px) {
-    .mt-gen-rail { grid-template-columns: minmax(0, 1fr); }
-    .mt-gen-ctl-seed, .mt-gen-ctl-tint, .mt-gen-ctl-what, .mt-gen-ctl-act { grid-column: 1; grid-row: auto; }
-}
+/* Flex, as the demo has it, NOT a grid. Two attempts at sizing a grid track to
+   the four chips both failed -- auto-fit gave 225px, a measured 400px met 406px
+   of content -- because the panel is narrower than the canvas the design is
+   drawn on. Flex-wrap needs no track size to be right: the chips keep their
+   own width and the row breaks where it must. Actions go right on their own. */
+.mt-gen-rail { display: flex; align-items: flex-end; gap: 14px 22px; flex-wrap: wrap; }
+.mt-gen-ctl { flex: 0 0 auto; }
+.mt-gen-ctl-act { margin-left: auto; flex-direction: row; align-items: flex-end; padding-top: 0; }
+.mt-gen-tint { width: 170px; margin: 9px 0; }
 .mt-gen-ctl { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .mt-gen-lab { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); }
 .mt-gen-lab b { float: none; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mt-text-2); }
 .mt-gen-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.mt-gen-chip { padding: 6px 11px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-pill); cursor: pointer; font: 500 12.5px inherit; color: var(--mt-text-2); }
-.mt-gen-chip.is-on { border-color: var(--mt-primary); background: var(--mt-primary-tint); color: var(--mt-primary); font-weight: 600; }
+.mt-gen-chip { padding: 7px 13px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-pill); cursor: pointer; font: 600 12px inherit; color: var(--mt-text-2); }
+.mt-gen-chip.is-on { border-color: var(--mt-primary); background: var(--mt-primary-tint); color: var(--mt-primary); }
 .mt-gen-chip.is-on::before { content: '\2713\00a0'; }
 .mt-gen-tint { width: 100%; accent-color: var(--mt-primary); margin: 5px 0 0; }
 /* The action pair keeps the rail's label rhythm without a label of its own */
