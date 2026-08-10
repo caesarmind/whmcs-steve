@@ -119,42 +119,16 @@ final class SettingsController extends AbstractController
      * NOT be reordered: LayoutsController reads its slots positionally.
      */
     private const FLAG_GROUPS = [
-        // slug        => [label, one-line description, which tab it belongs to, icon]
-        //
-        // The icon is the INNER markup of a 24x24 stroke glyph -- no <svg>
-        // wrapper, because the template supplies that (viewBox, currentColor,
-        // stroke-width 1.8, round caps) so every chip is drawn identically and
-        // a group cannot bring its own geometry.
-        //
-        // Six of the seven are the Hadrian demo's own paths, lifted verbatim
-        // from its Settings page and its AP set, so the icon language is the
-        // design's rather than something invented next to it. Only Pricing has
-        // no counterpart there; it is drawn in the same grammar (24 grid,
-        // stroke-only, no fills).
-        'appearance'   => ['Appearance',            'Colour mode, label casing and card treatment.', 'general',
-            // demo: "Branding & identity" -- a palette
-            '<circle cx="13.5" cy="6.5" r="1.2"/><circle cx="17.5" cy="10.5" r="1.2"/><circle cx="8.5" cy="7.5" r="1.2"/><circle cx="6.5" cy="12.5" r="1.2"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.6-.7 1.6-1.7 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1a1.6 1.6 0 0 1 1.7-1.7h2c3 0 5.5-2.5 5.5-5.6C22 6 17.5 2 12 2z"/>'],
-        'navigation'   => ['Navigation',            'Menu icons and the client-area section sidebar.', 'general',
-            // demo: "Navigation" -- same group, same glyph
-            '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 20V9"/>'],
-        'pricing'      => ['Pricing Display',       'How prices are presented. Nothing here changes a price.', 'general',
-            // no demo counterpart: a price tag, drawn to the same rules
-            '<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.83 0l-7-7A2 2 0 0 1 3 12.2V5a2 2 0 0 1 2-2h7.2a2 2 0 0 1 1.41.59l7 7a2 2 0 0 1 0 2.81z"/><circle cx="7.5" cy="7.5" r="1.3"/>'],
-        'locale'       => ['Language & SEO',        'The locale chooser and multi-language link tags.', 'general',
-            // demo: AP.globe
-            '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>'],
-        'privacy'      => ['Privacy & Performance', 'Consent banner and data-table loading.', 'general',
-            // demo: "Performance & privacy" -- a bolt
-            '<path d="M13 2L4.5 13H11l-1 9 8.5-11H12z"/>'],
+        // slug        => [label, one-line description, which tab it belongs to]
+        'appearance'   => ['Appearance',            'Colour mode, label casing and card treatment.', 'general'],
+        'navigation'   => ['Navigation',            'Menu icons and the client-area section sidebar.', 'general'],
+        'pricing'      => ['Pricing Display',       'How prices are presented. Nothing here changes a price.', 'general'],
+        'locale'       => ['Language & SEO',        'The locale chooser and multi-language link tags.', 'general'],
+        'privacy'      => ['Privacy & Performance', 'Consent banner and data-table loading.', 'general'],
         // Catch-all. Empty today; it exists so a future FLAGS key with no
         // FLAG_GROUP entry lands somewhere VISIBLE rather than vanishing.
-        'general'      => ['Other',                 'Options not yet assigned to a category.', 'general',
-            // demo: the sliders glyph from its block-options section heads
-            '<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2.4"/><circle cx="15" cy="12" r="2.4"/><circle cx="7" cy="18" r="2.4"/>'],
-        'cart'         => ['Cart Layout',           'The order form’s own sidebar.', 'order',
-            // demo: "Sidebars & sub-navigation" -- a panel with a rail, which
-            // is literally what this group configures
-            '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><path d="M5.5 8h1.5M5.5 11h1.5"/>'],
+        'general'      => ['Other',                 'Options not yet assigned to a category.', 'general'],
+        'cart'         => ['Cart Layout',           'The order form’s own sidebar.', 'order'],
     ];
 
     /** flag key => FLAG_GROUPS slug. Anything unlisted falls into 'general'. */
@@ -209,7 +183,7 @@ final class SettingsController extends AbstractController
      * 'general' rather than disappearing. Empty groups are dropped so no bare
      * heading is drawn.
      *
-     * @return list<array{slug:string,label:string,sub:string,tab:string,icon:string,count:int,flags:array<string,array>}>
+     * @return list<array{slug:string,label:string,sub:string,tab:string,flags:array<string,array>}>
      */
     public static function groupedFlags(): array
     {
@@ -223,24 +197,11 @@ final class SettingsController extends AbstractController
         }
 
         $out = [];
-        foreach (self::FLAG_GROUPS as $slug => [$label, $sub, $tab, $icon]) {
+        foreach (self::FLAG_GROUPS as $slug => [$label, $sub, $tab]) {
             if ($buckets[$slug] === []) {
                 continue;
             }
-            // `count` is the group's total, which is what the head shows on
-            // load. While a search is running the JS overwrites it with the
-            // number still visible, exactly as the demo recomputes it from the
-            // filtered rows -- a head reading "4" above one row would be worse
-            // than no count at all.
-            $out[] = [
-                'slug'  => $slug,
-                'label' => $label,
-                'sub'   => $sub,
-                'tab'   => $tab,
-                'icon'  => $icon,
-                'count' => count($buckets[$slug]),
-                'flags' => $buckets[$slug],
-            ];
+            $out[] = ['slug' => $slug, 'label' => $label, 'sub' => $sub, 'tab' => $tab, 'flags' => $buckets[$slug]];
         }
         return $out;
     }
