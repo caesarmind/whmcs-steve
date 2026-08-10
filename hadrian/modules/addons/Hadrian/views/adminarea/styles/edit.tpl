@@ -5,7 +5,10 @@
         <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Back to Styles
     </a>
-    <button class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
+    {* No Save here. This button had no type, no form and sat outside every
+       <form>, so it submitted nothing -- an inert control that looked like
+       the real one. The floating save bar is the single save affordance on
+       this screen, which is how the demo draws it. *}
 </div>
 
 <header class="mt-page-header">

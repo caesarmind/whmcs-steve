@@ -132,9 +132,22 @@
 
     function syncSwatch(name, value){
         var sw = swatchFor(name); if (!sw) return;
-        var h = clean(value);
+        /* The visible face is the LABEL, painted with the raw value, so an
+           rgba row shows its actual translucency. The input inside it only
+           ever holds an opaque hex for the native picker to open on. */
+        var face = sw.parentNode && sw.parentNode.classList
+            && sw.parentNode.classList.contains('mt-color-swatch') ? sw.parentNode : null;
+        var raw = String(value == null ? '' : value).trim();
+        if (face) {
+            // Empty is a STATE, not a colour: show the slash, and hand the
+            // picker a mid grey so opening it does not start from black.
+            face.classList.toggle('is-empty', raw === '');
+            face.style.background = raw === '' ? '' : raw;
+        }
+        if (raw === '') { sw.value = '#888888'; return; }
+        var h = clean(raw);
         if (h) { sw.value = '#' + h; return; }
-        var rgb = toRgb(value);
+        var rgb = toRgb(raw);
         if (rgb) sw.value = toHex(rgb);
     }
     function setToken(name, value){
@@ -145,8 +158,17 @@
 
     [].slice.call(form.querySelectorAll('input.mt-color-swatch-input')).forEach(function(sw){
         sw.addEventListener('input', function(){
-            var t = textFor(sw.getAttribute('data-for'));
-            if (t) t.value = sw.value;
+            var name = sw.getAttribute('data-for'), t = textFor(name);
+            if (!t) return;
+            /* Keep the row's ALPHA. Writing the picker's bare hex straight in
+               turned rgba(246,246,248,0.80) into #f6f6f8 -- one click silently
+               destroying the frosted nav that those tokens' own hints warn
+               about ("keep some alpha or the frost effect is lost"), on five
+               rows of the nav group. Same "output format follows the ROW" rule
+               the generator already applies. */
+            var cur = parseCol(t.value);
+            t.value = (cur && cur.a !== null) ? rgba(toRgb(sw.value), cur.a) : sw.value;
+            syncSwatch(name, t.value);
         });
     });
     [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){

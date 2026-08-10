@@ -128,10 +128,12 @@
 
            Light carries no tokens of its own because it IS the defaults, so it
            resets those rows rather than writing to them. *}
+
+        <div class="mt-color-rows mt-cs-card">
         {if $groupName == $colors.navGroup && $colors.sbStyles}
         <div class="mt-schemes mt-sbt" data-sbt>
             <span class="mt-sbt-lab">Style</span>
-            <button type="button" class="mt-scheme mt-sbt-mode" data-sbt-mode="off">
+            <button type="button" class="mt-scheme mt-sbt-mode is-active" data-sbt-mode="off">
                 <span class="mt-scheme-dot mt-sbt-dot"></span>Light</button>
             {foreach $colors.sbStyles as $sbKey => $sb}
             {* data-sbt-tokens carries the style's whole token set as JSON, and
@@ -146,8 +148,6 @@
             {/foreach}
         </div>
         {/if}
-
-        <div class="mt-color-rows mt-cs-card">
             {foreach $tokens as $t}
             {* data-follows names a row this one already tracks IN CSS -- the
                seven sidebar rows are `var(--_sb-*, var(--color-*))`, so they
@@ -162,13 +162,27 @@
                    is still colors.php's `hint`, so nothing was rewritten to fit
                    a smaller space; it simply stopped occupying one. *}
                 <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">{$t.label|escape}{if $t.hint|default:''}<button type="button" class="mt-info" tabindex="0" aria-label="About {$t.label|escape}" title="{$t.hint|escape}">i</button>{/if}</label>
+                {* The swatch is a PAINTED LABEL with the native picker hidden
+                   inside it at opacity 0, as the demo draws it. A bare
+                   input[type=color] can only ever show an opaque hex, so the
+                   five rgba rows in the nav group rendered their translucency
+                   as solid colour -- "Item hover rgba(0,0,0,0.04)" painted pure
+                   black. Painting the label with the raw token value shows what
+                   the value actually is.
+
+                   An EMPTY value gets the demo's red diagonal slash rather than
+                   a black chip: --sidebar-color's whole contract is that empty
+                   means off, and toHexInput() turning '' into #000000 made the
+                   one row that means "nothing" read as "black is set". *}
                 <span class="mt-color-control">
-                    <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
+                    <label class="mt-color-swatch{if $t.value == ''} is-empty{/if}" title="Open colour picker"{if $t.value != ''} style="background:{$t.value|escape}"{/if}>
+                        <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
+                    </label>
                     {* No aria-describedby: the note it pointed at no longer
                        exists as an element. The tooltip button beside the label
                        carries the text now, and a describedby aimed at a
                        missing id announces nothing while looking correct. *}
-                    <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false">
+                    <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false"{if $t.value == ''} placeholder="inherit"{/if}>
                     {* The scope you are NOT editing. Carried, posted and saved
                        alongside; the switch just swaps the two values and their
                        defaults, so no reload and nothing unsaved is lost. *}

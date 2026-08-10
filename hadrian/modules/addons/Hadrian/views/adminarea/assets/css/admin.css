@@ -667,9 +667,9 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
     border-top: 1px solid var(--mt-border); box-shadow: 0 -6px 20px -12px rgba(0,0,0,0.18); }
 /* margin-right:auto is what pushes the destructive action away from the
    confirming one, rather than a spacer element. */
-.mt-savebar-quiet { background: none; border: 0; cursor: pointer; font: 500 13px inherit; color: var(--mt-text-3); padding: 8px 2px; margin-right: auto; white-space: nowrap; }
+.mt-savebar-quiet { background: none; border: 0; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--mt-text-3); padding: 8px 2px; margin-right: auto; white-space: nowrap; }
 .mt-savebar-quiet:hover { color: var(--mt-text); }
-.mt-savebar-msg { font: 600 12.5px inherit; color: var(--mt-primary); padding-right: 4px; white-space: nowrap; }
+.mt-savebar-msg { font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--mt-primary); padding-right: 4px; white-space: nowrap; }
 
 /* -- Colors panel: layout to match the design -----------------------------
    Groups read as a small uppercase label sitting ABOVE a white card, rather
@@ -704,13 +704,35 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-cs-card .mt-color-row { display: block; min-width: 0; }
 .mt-cs-card .mt-color-row-label { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; font-size: 12.5px; font-weight: 600; color: var(--mt-text); }
 .mt-cs-card .mt-color-control { display: flex; align-items: center; gap: 8px; width: 100%; }
-.mt-cs-card .mt-color-text { max-width: none; flex: 1; min-width: 0; }
-.mt-cs-card .mt-color-swatch-input { width: 30px; height: 30px; border-radius: 9px; }
+/* The field carries its own size rather than borrowing .mt-input-compact,
+   whose `font-size: 14px !important` outranked it on source order alone --
+   which truncated the five rgba values in the nav group inside a 200px cell. */
+.mt-cs-card .mt-color-text { max-width: none; flex: 1; min-width: 0; font-size: 11.5px; padding: 7px 10px; border-radius: 8px; }
+
+/* Swatch: a painted label with the native picker hidden inside it. The picker
+   itself can only render an opaque hex, so painting the LABEL with the raw
+   token value is what makes an rgba row show its real translucency over the
+   card instead of flattening to solid colour. overflow:hidden clips the fill
+   (and the empty-state gradient) to the radius. */
+.mt-color-swatch { display: block; position: relative; overflow: hidden; inline-size: 26px; block-size: 26px; border-radius: 8px; border: 1px solid var(--mt-border); flex-shrink: 0; cursor: pointer; }
+.mt-color-swatch .mt-color-swatch-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; padding: 0; border: 0; cursor: pointer; }
+/* Empty means OFF, and has to look unlike any colour. The demo's red 135deg
+   band, hardcoded there too -- it is a state mark, not a palette value. */
+.mt-color-swatch.is-empty { background: var(--mt-surface) linear-gradient(135deg, transparent 46%, #ff3b30 46%, #ff3b30 54%, transparent 54%); }
+
+/* The STYLE row lives INSIDE the card, above the token grid, so it reads as a
+   control belonging to the fields it writes into. The card is the grid, so it
+   has to span every column. */
+.mt-cs-card > .mt-sbt { grid-column: 1 / -1; margin: 0 0 16px; }
+/* ...and it marks its active chip differently from the accent presets: border
+   and text only, no fill, no check. The demo draws the two rows deliberately
+   unlike each other -- a preset is a jump, a style is a mode. */
+.mt-sbt .mt-scheme.is-active { background: var(--mt-surface); border-color: var(--mt-primary); color: var(--mt-primary); }
 
 /* The note, now a tooltip. A BUTTON, not a styled span: it has to be
    focusable for the text to be reachable without a mouse, and title on a
    non-interactive element is announced inconsistently at best. */
-.mt-info { display: inline-flex; align-items: center; justify-content: center; inline-size: 15px; block-size: 15px; padding: 0; border: 1px solid var(--mt-border-2); border-radius: 50%; background: var(--mt-surface-2); color: var(--mt-text-3); font: 600 10px/1 var(--mt-font, inherit); font-style: italic; cursor: help; flex-shrink: 0; }
+.mt-info { display: inline-flex; align-items: center; justify-content: center; inline-size: 15px; block-size: 15px; padding: 0; border: 1px solid var(--mt-border-2); border-radius: 50%; background: var(--mt-surface-2); color: var(--mt-text-3); font-family: inherit; font-size: 10px; font-weight: 600; line-height: 1; font-style: italic; cursor: help; flex-shrink: 0; }
 .mt-info:hover { border-color: var(--mt-primary); color: var(--mt-primary); }
 .mt-info:focus-visible { outline: 2px solid var(--mt-primary); outline-offset: 1px; }
 
@@ -760,7 +782,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-gen-lab { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); }
 .mt-gen-lab b { float: none; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mt-text-2); }
 .mt-gen-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.mt-gen-chip { padding: 7px 13px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-pill); cursor: pointer; font: 600 12px inherit; color: var(--mt-text-2); }
+.mt-gen-chip { padding: 7px 13px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-pill); cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--mt-text-2); }
 .mt-gen-chip.is-on { border-color: var(--mt-primary); background: var(--mt-primary-tint); color: var(--mt-primary); }
 .mt-gen-chip.is-on::before { content: '\2713\00a0'; }
 .mt-gen-tint { width: 100%; accent-color: var(--mt-primary); margin: 5px 0 0; }
@@ -773,7 +795,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-gen-sum .is-bad { color: var(--mt-danger-text); font-weight: 600; }
 .mt-gen-tbl { border-collapse: collapse; width: 100%; max-width: 520px; }
 .mt-gen-tbl th, .mt-gen-tbl td { padding: 6px 10px; border-bottom: 1px solid var(--mt-border-2); text-align: left; }
-.mt-gen-tbl th { font: 500 12.5px inherit; color: var(--mt-text-2); }
+.mt-gen-tbl th { font-family: inherit; font-size: 12.5px; font-weight: 500; color: var(--mt-text-2); }
 .mt-gen-tbl td { width: 96px; text-align: right; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .mt-gen-tbl td.is-ok  { color: var(--mt-success-text); }
 .mt-gen-tbl td.is-mid { color: var(--mt-warning-text); }

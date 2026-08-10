@@ -457,7 +457,11 @@ final class StylesController extends AbstractController
         return strtolower((string)preg_replace('/\s+/', '', $v));
     }
 
-    /** Best-effort hex for the native <input type="color"> swatch (drops any alpha). */
+    /** Best-effort hex for the native <input type="color"> swatch (drops any alpha).
+     *  An EMPTY value returns mid grey, never #000000: --sidebar-color ships
+     *  empty on purpose and black made the one row meaning "nothing" read as
+     *  "black is set". The swatch face shows the empty state; this value only
+     *  decides where the picker opens. */
     private function toHexInput(string $v): string
     {
         $v = trim($v);
@@ -471,7 +475,7 @@ final class StylesController extends AbstractController
         if (preg_match('/rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/i', $v, $m)) {
             return sprintf('#%02x%02x%02x', min(255, (int)$m[1]), min(255, (int)$m[2]), min(255, (int)$m[3]));
         }
-        return '#000000';
+        return $v === '' ? '#888888' : '#000000';
     }
 
     /**
