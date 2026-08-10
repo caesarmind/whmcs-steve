@@ -173,6 +173,63 @@
     });
 
     /* ------------------------------------------------------------------
+       Sidebar tint: Off / Follow brand / Custom.
+
+       The buttons hold no value of their own. They write '', 'brand' or a hex
+       into the same c[--sidebar-color] field every other row posts through, so
+       there is no new input, no new POST key and no new storage -- the mode is
+       READ BACK from the value, which means the two can never disagree.
+
+       Placed above the generator's early return on purpose: the tint switch is
+       not part of the generator and must still work if that section is absent.
+       ------------------------------------------------------------------ */
+    var sbt = form.querySelector('[data-sbt]');
+    if (sbt) {
+        var sbtField  = sbt.querySelector('input.mt-color-text'),
+            sbtSwatch = sbt.querySelector('input.mt-color-swatch-input'),
+            sbtCustom = sbt.querySelector('.mt-sbt-custom'),
+            // Remembered so flipping Off -> Custom -> Off -> Custom does not
+            // lose the colour that was picked.
+            sbtLast   = clean(sbtField.value) ? '#' + clean(sbtField.value) : '';
+
+        function sbtMode(){
+            var v = (sbtField.value || '').trim().toLowerCase();
+            return v === '' ? 'off' : (v === 'brand' ? 'brand' : 'custom');
+        }
+        function sbtSync(){
+            var m = sbtMode();
+            [].slice.call(sbt.querySelectorAll('.mt-sbt-mode')).forEach(function(b){
+                b.setAttribute('aria-pressed', String(b.getAttribute('data-sbt-mode') === m)); });
+            sbtCustom.hidden = m !== 'custom';
+            sbtField.hidden  = m !== 'custom';
+        }
+        sbt.addEventListener('click', function(e){
+            var b = e.target.closest('.mt-sbt-mode'); if (!b) return;
+            var m = b.getAttribute('data-sbt-mode');
+            if (m === 'custom') {
+                // Opening Custom with nothing remembered seeds from the Accent
+                // rather than #000000, which is what an empty colour input
+                // shows and is never what anyone wants.
+                var seed = sbtLast || (clean(fieldVal('--color-accent')) ? '#' + clean(fieldVal('--color-accent')) : '#1b2a4a');
+                sbtField.value = seed; sbtSwatch.value = seed;
+            } else {
+                if (sbtMode() === 'custom' && clean(sbtField.value)) sbtLast = '#' + clean(sbtField.value);
+                sbtField.value = m === 'brand' ? 'brand' : '';
+            }
+            sbtSync();
+        });
+        sbtField.addEventListener('input', function(){
+            if (clean(this.value)) sbtLast = '#' + clean(this.value);
+        });
+        // Reset-all writes every field back to its default (empty here), so the
+        // three buttons have to be told; otherwise the row reads Off while
+        // Custom still looks selected.
+        if (reset) reset.addEventListener('click', sbtSync);
+        sbtSync();
+    }
+    function fieldVal(name){ var t = textFor(name); return t ? t.value : ''; }
+
+    /* ------------------------------------------------------------------
        Seeded generation. Rebuilds the palette from one brand colour and
        writes the result into the fields above; Save colors persists it.
 
@@ -275,7 +332,6 @@
         ['--color-blue-text',      '--color-blue-bg',   'Info badge'],
         ['--sidebar-text',         '--sidebar-bg',      'Nav label on the sidebar']
     ];
-    function fieldVal(name){ var t = textFor(name); return t ? t.value : ''; }
     function defVal(name){ var t = textFor(name); return t ? t.getAttribute('data-default') : ''; }
     /* Measured on the FIELD VALUES, not on anything rendered: every token is a
        literal sitting in an input, so the ratios can be computed outright

@@ -642,13 +642,34 @@ final class Hooks
             }
             $decls = '';
             foreach ($stored as $var => $val) {
-                if (!preg_match('/^--[a-z0-9-]+$/', (string)$var)) {
+                $var = (string)$var;
+                if (!preg_match('/^--[a-z0-9-]+$/', $var)) {
+                    continue;
+                }
+                /* The sidebar tint's third state. --sidebar-color otherwise
+                   holds a LITERAL, which is why a nav set to today's accent
+                   does not move when the accent does. Stored as the word
+                   "brand", it is emitted as an indirection instead, and the
+                   whole existing derivation -- background, three ink steps,
+                   hover, active, hairline -- follows the accent for free.
+                   Emitted as CSS on purpose, NOT resolved to a hex here:
+                   html[data-palette] redefines --color-accent in static CSS
+                   the server cannot see, so a server-computed colour goes
+                   stale there while a var() chain resolves at computed-value
+                   time and stays correct through presets, palettes and dark
+                   mode. Verified: color(from var(--sidebar-color) ...) with
+                   --sidebar-color: var(--color-accent) resolves the full
+                   chain. The value stored is not a colour, so isColorValue
+                   rightly rejects it -- hence the branch rather than a
+                   loosened validator. */
+                if ($var === '--sidebar-color' && strtolower(trim((string)$val)) === 'brand') {
+                    $decls .= $var . ':var(--color-accent);';
                     continue;
                 }
                 if (!$this->isColorValue((string)$val)) {
                     continue;
                 }
-                $decls .= (string)$var . ':' . trim((string)$val) . ';';
+                $decls .= $var . ':' . trim((string)$val) . ';';
             }
             if ($decls !== '') {
                 $blocks .= $selector . '{' . $decls . '}';

@@ -112,10 +112,37 @@
                        swatch alone. *}
                     {if $t.hint|default:''}<span class="mt-color-row-hint">{$t.hint|escape}</span>{/if}
                 </label>
+                {* The sidebar tint is the one row that is not simply a colour.
+                   It has three states, and which one you are in is not
+                   inferable from a hex: Off (empty, neutral nav), Follow brand
+                   (the sentinel "brand", emitted as var(--color-accent) so the
+                   nav tracks a rebrand) and Custom (a literal, deliberately
+                   frozen). A light sidebar has no business following the brand,
+                   so Off stays the default; a coloured one usually should, and
+                   before this there was no way to say so.
+
+                   The mode buttons carry no value of their own -- the JS in
+                   footer.tpl writes '' / 'brand' / the hex into the SAME
+                   c[--sidebar-color] field every other row posts through, so
+                   the save path needs no new input and no new storage. *}
+                {if $t.var == '--sidebar-color'}
+                <span class="mt-color-control mt-sbt" data-sbt>
+                    <span class="mt-sbt-modes" role="group" aria-label="Sidebar tint mode">
+                        <button type="button" class="mt-sbt-mode" data-sbt-mode="off"    aria-pressed="{if $t.value == ''}true{else}false{/if}">Off</button>
+                        <button type="button" class="mt-sbt-mode" data-sbt-mode="brand"  aria-pressed="{if $t.value == 'brand'}true{else}false{/if}">Follow brand</button>
+                        <button type="button" class="mt-sbt-mode" data-sbt-mode="custom" aria-pressed="{if $t.value != '' && $t.value != 'brand'}true{else}false{/if}">Custom</button>
+                    </span>
+                    <span class="mt-sbt-custom"{if $t.value == '' || $t.value == 'brand'} hidden{/if}>
+                        <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
+                    </span>
+                    <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false"{if $t.value == '' || $t.value == 'brand'} hidden{/if}>
+                </span>
+                {else}
                 <span class="mt-color-control">
                     <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
                     <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false">
                 </span>
+                {/if}
             </div>
             {/foreach}
         </div>

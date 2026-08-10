@@ -558,6 +558,12 @@ final class StylesController extends AbstractController
                         continue;
                     }
                     $val = trim((string)$declared[$var]);
+                    // Same sentinel as saveColorsAction, so a style preset can
+                    // ship a nav that follows the accent rather than a frozen hex.
+                    if ($var === '--sidebar-color' && strtolower($val) === 'brand') {
+                        $out[$var] = 'brand';
+                        continue;
+                    }
                     if ($val === '' || !$this->isColor($val)) {
                         continue;
                     }
@@ -675,6 +681,16 @@ final class StylesController extends AbstractController
                     continue;
                 }
                 $val = trim((string)$in[$var]);
+                /* "brand" is the sidebar tint's follow-the-accent state, and it
+                   is deliberately NOT a colour: Hooks::buildColorsHead turns it
+                   into `var(--color-accent)` on the way out so the nav tracks a
+                   rebrand instead of freezing the hex that was current when it
+                   was picked. Accepted only for this one token -- anywhere else
+                   a non-colour is still a typo. */
+                if ($var === '--sidebar-color' && strtolower($val) === 'brand') {
+                    $out[$var] = 'brand';
+                    continue;
+                }
                 if ($val === '' || !$this->isColor($val)) {
                     continue;
                 }
