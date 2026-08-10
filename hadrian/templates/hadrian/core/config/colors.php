@@ -159,7 +159,7 @@ return [
             // check-color-defaults.mjs skips any token with an empty default
             // for this reason -- it is the one token that MUST NOT appear in
             // apple-theme.css.
-            ['var' => '--sidebar-color',          'label' => 'Sidebar colour',     'light' => '',                       'dark' => '',                    'hint' => 'Off keeps the nav neutral. Follow brand tracks the Accent; Custom stays fixed.'],
+            ['var' => '--sidebar-color',          'label' => 'Sidebar colour',     'light' => '',                       'dark' => '',                    'hint' => 'Light is neutral. Tinted and Brand follow the Accent; Dark and Graphite do not.'],
             ['var' => '--sidebar-bg',             'label' => 'Sidebar background', 'light' => 'rgba(246,246,248,0.80)', 'dark' => 'rgba(28,28,30,0.80)', 'hint' => 'Translucent: it frosts whatever scrolls under it.'],
             ['var' => '--sidebar-panel-bg',       'label' => 'Flyout panel',       'light' => '#ffffff',                'dark' => '#2c2c2e', 'hint' => 'The rail layout only. Not the sidebar itself.'],
             ['var' => '--sidebar-text',           'label' => 'Text',               'light' => '#1d1d1f',                'dark' => '#f5f5f7', 'hint' => 'Set this whenever you darken the background, or the menu goes dark-on-dark.'],
