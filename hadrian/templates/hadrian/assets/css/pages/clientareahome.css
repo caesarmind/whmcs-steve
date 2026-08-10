@@ -1444,7 +1444,11 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
    hero (141px) and ours without it (115px). */
 .at-hero-date {
     font-size: 11.5px; font-weight: var(--fw-bold); letter-spacing: 0.09em;
-    text-transform: uppercase; opacity: 0.82; margin: 0 0 9px; color: #fff;
+    /* inherit, like the title beside it. This hardcoded #fff and was missed
+       when the title was fixed, so a pale painted band flipped the greeting to
+       black and left the eyebrow white on white. The sub-line never set a
+       colour and was always fine -- one of the three, not all three. */
+    text-transform: uppercase; opacity: 0.82; margin: 0 0 9px; color: inherit;
 }
 .at-hero-title {
     font-size: 29px; font-weight: var(--fw-bold); letter-spacing: -0.025em;
