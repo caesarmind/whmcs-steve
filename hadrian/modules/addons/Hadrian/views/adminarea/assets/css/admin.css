@@ -389,7 +389,9 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 /* -- Scheme chips (styles colors) ----------------------------------------- */
 .mt-schemes { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
 .mt-scheme { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 7px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-pill); cursor: pointer; font-size: 13px; font-weight: 500; text-decoration: none; color: var(--mt-text); }
-.mt-scheme.is-active { border-color: var(--mt-primary); box-shadow: 0 0 0 2px var(--mt-primary-tint); color: var(--mt-primary); }
+/* Filled, not ringed: the design shows the matching preset as a tinted pill.
+   A ring reads as focus; a fill reads as "this is the one you are on". */
+.mt-scheme.is-active { border-color: var(--mt-primary); background: var(--mt-primary-tint); color: var(--mt-primary); font-weight: 600; box-shadow: none; }
 .mt-scheme-dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.06); }
 
 /* -- Color tiles ---------------------------------------------------------- */
@@ -656,6 +658,14 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-cs-head { align-items: center; }
 .mt-cs-editing { display: flex; align-items: center; gap: 10px; }
 .mt-cs-editing-lab { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); }
+/* A segmented pill, not the underlined text tabs .mt-tabs gives by default:
+   the design draws a recessed track with the active half raised out of it,
+   which reads as a two-state switch rather than as page navigation. The
+   ::after is the tab underline, neutralised here rather than globally. */
+.mt-cs-editing .mt-tabs { display: inline-flex; gap: 2px; padding: 3px; border: 0; background: var(--mt-surface-2); border-radius: var(--mt-radius-pill); }
+.mt-cs-editing .mt-tab { border: 0; margin: 0; padding: 5px 15px; border-radius: var(--mt-radius-pill); background: none; font-size: 12.5px; font-weight: 500; color: var(--mt-text-2); cursor: pointer; }
+.mt-cs-editing .mt-tab::after { display: none; }
+.mt-cs-editing .mt-tab.is-active { background: var(--mt-surface); color: var(--mt-primary); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
 .mt-cs-group { padding: 0; margin-top: 18px; border-top: 0; }
 .mt-cs-group + .mt-cs-group { border-top: 0; }
 .mt-cs-group-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); margin: 0 0 10px 4px; }
@@ -714,7 +724,13 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-gen-ctl-act { grid-column: 1 / -1; justify-content: flex-end; padding-top: 2px; }
 .mt-gen .mt-gen-run { background: var(--mt-primary); border-color: var(--mt-primary); color: #fff; }
 .mt-gen .mt-gen-run:hover { filter: brightness(1.06); }
-.mt-gen-rail { display: grid; gap: 16px 26px; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); align-items: start; }
+/* Explicit tracks, not auto-fit. auto-fit produced four equal 225px columns,
+   which left "What to rebuild" too narrow for its four chips -- they wrapped to
+   two rows where the design puts them on one. The middle track is sized to the
+   chips' measured content width (~375px plus gaps). */
+.mt-gen-rail { display: grid; gap: 16px 26px; align-items: start;
+               grid-template-columns: minmax(190px, 0.9fr) minmax(400px, 1.5fr) minmax(200px, 1fr); }
+@media (max-width: 900px) { .mt-gen-rail { grid-template-columns: minmax(0, 1fr); } }
 .mt-gen-ctl { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .mt-gen-lab { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); }
 .mt-gen-lab b { float: none; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mt-text-2); }

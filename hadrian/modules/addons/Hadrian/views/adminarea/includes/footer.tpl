@@ -195,11 +195,25 @@
         if (wasDark) swapScope('dark');
         sbtRefresh();
     }
+    /* Mark the preset the current Accent actually matches. Nothing stored which
+       preset was picked -- and nothing should, since every field is editable
+       afterwards -- so it is DERIVED from the accent each time. That also means
+       it lights up when the accent arrives by any route: a preset click, the
+       generator, or typing the hex by hand. */
+    function markActivePreset(){
+        var cur = clean(fieldVal('--color-accent'));
+        [].slice.call(form.querySelectorAll('.mt-scheme[data-accent]')).forEach(function(c){
+            c.classList.toggle('is-active', !!cur && clean(c.getAttribute('data-accent')) === cur);
+        });
+    }
     [].slice.call(form.querySelectorAll('.mt-scheme[data-accent]')).forEach(function(chip){
         chip.addEventListener('click', function(){
             applyAccentPreset(chip.getAttribute('data-accent'));
+            markActivePreset();
         });
     });
+    form.addEventListener('input', markActivePreset);
+    markActivePreset();
 
     /* ------------------------------------------------------------------
        Light <-> Dark without a reload.
