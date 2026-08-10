@@ -641,6 +641,33 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-color-swatch-input::-moz-color-swatch { border: 0; border-radius: 3px; }
 .mt-color-text { max-width: 132px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; text-transform: lowercase; }
 
+/* -- Colors panel: generate from one colour -------------------------------- */
+.mt-gen-lede { margin: 0 0 16px; max-width: 78ch; }
+.mt-gen-rail { display: grid; gap: 16px 26px; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); align-items: start; }
+.mt-gen-ctl { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.mt-gen-lab { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); }
+.mt-gen-lab b { float: right; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mt-text-2); }
+.mt-gen-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.mt-gen-chip { padding: 6px 11px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-pill); cursor: pointer; font: 500 12.5px inherit; color: var(--mt-text-2); }
+.mt-gen-chip.is-on { border-color: var(--mt-primary); background: var(--mt-primary-tint); color: var(--mt-primary); font-weight: 600; }
+.mt-gen-chip.is-on::before { content: '\2713\00a0'; }
+.mt-gen-tint { width: 100%; accent-color: var(--mt-primary); margin: 5px 0 0; }
+/* The action pair keeps the rail's label rhythm without a label of its own */
+.mt-gen-ctl-act { flex-direction: row; gap: 8px; align-items: flex-end; padding-top: 19px; }
+.mt-gen-report { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--mt-border); }
+.mt-gen-report[hidden] { display: none; }
+.mt-gen-sum { margin: 0 0 12px; font-size: 13px; line-height: 1.6; color: var(--mt-text-2); }
+.mt-gen-sum b { color: var(--mt-text); }
+.mt-gen-sum .is-bad { color: var(--mt-danger-text); font-weight: 600; }
+.mt-gen-tbl { border-collapse: collapse; width: 100%; max-width: 520px; }
+.mt-gen-tbl th, .mt-gen-tbl td { padding: 6px 10px; border-bottom: 1px solid var(--mt-border-2); text-align: left; }
+.mt-gen-tbl th { font: 500 12.5px inherit; color: var(--mt-text-2); }
+.mt-gen-tbl td { width: 96px; text-align: right; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.mt-gen-tbl td.is-ok  { color: var(--mt-success-text); }
+.mt-gen-tbl td.is-mid { color: var(--mt-warning-text); }
+.mt-gen-tbl td.is-bad { color: var(--mt-danger-text); }
+.mt-gen-was { display: block; font-weight: 500; font-size: 9.5px; color: var(--mt-text-3); }
+
 /* -- Buttons panel (sizes + per-variant matrix) --------------------------- */
 .mt-btn-variants { display: flex; flex-direction: column; gap: 14px; }
 .mt-btn-variant { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius); padding: 14px 16px; }

@@ -628,10 +628,26 @@ final class StylesController extends AbstractController
             }
         }
 
+        // The seeded generator needs BOTH accent defaults as reference points,
+        // not just this scope's: chroma travels between the modes by the ratio
+        // the shipped pair sits at, and the dark scope's lightness FLOOR is the
+        // dark accent itself. Only this scope's rows are on the page, so the
+        // other one has to be handed over explicitly.
+        $accents = ['light' => '', 'dark' => ''];
+        foreach (($cfg['groups'] ?? []) as $tokens) {
+            foreach ($tokens as $t) {
+                if ((string)($t['var'] ?? '') === '--color-accent') {
+                    $accents['light'] = (string)($t['light'] ?? '');
+                    $accents['dark']  = (string)($t['dark'] ?? '');
+                }
+            }
+        }
+
         return [
             'groups'  => $groups,
             'presets' => $cfg['presets'] ?? [],
             'mode'    => $mode,
+            'accents' => $accents,
         ];
     }
 

@@ -169,6 +169,290 @@
         [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
             setToken(t.getAttribute('data-var'), t.getAttribute('data-default'));
         });
+        genUndoState(null);
+    });
+
+    /* ------------------------------------------------------------------
+       Seeded generation. Rebuilds the palette from one brand colour and
+       writes the result into the fields above; Save colors persists it.
+
+       Deliberately produces LITERALS -- hex where the row ships hex, rgba
+       (shipped alpha carried through) where it ships rgba. isColor() rejects
+       color-mix() and relative colour syntax, so a generator emitting CSS
+       functions would build rows saveColorsAction silently drops.
+
+       Every row is rebuilt from its data-default, never from its current
+       value, so generating twice gives the same answer and generating after
+       a hand edit does not compound on it.
+       ------------------------------------------------------------------ */
+    var gen = form.querySelector('.mt-gen');
+    if (!gen) return;
+
+    function lin(v){ v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }
+    function gam(v){ v = v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055; return clamp(v * 255); }
+    function toLch(rgb){
+        var r = lin(rgb[0]), g = lin(rgb[1]), b = lin(rgb[2]);
+        var l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b),
+            m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b),
+            s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+        var L =  0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+            A =  1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+            B =  0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
+        var C = Math.sqrt(A * A + B * B);
+        return { L: L, C: C, H: C < 1e-6 ? 0 : (Math.atan2(B, A) * 180 / Math.PI + 360) % 360 };
+    }
+    function lchRaw(L, C, H){
+        var h = H * Math.PI / 180, A = C * Math.cos(h), B = C * Math.sin(h);
+        var l = L + 0.3963377774 * A + 0.2158037573 * B,
+            m = L - 0.1055613458 * A - 0.0638541728 * B,
+            s = L - 0.0894841775 * A - 1.2914855480 * B;
+        l = l * l * l; m = m * m * m; s = s * s * s;
+        return [  4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+                 -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+                 -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s ];
+    }
+    /* Gamut mapping drops CHROMA and never lightness. The recipes pin L
+       precisely because L is what contrast is made of, so clipping channels
+       would quietly undo the ratio the recipe just guaranteed. */
+    function lchToRgb(L, C, H){
+        L = Math.max(0, Math.min(1, L));
+        var ok = function(x){ return x[0] >= -0.0005 && x[0] <= 1.0005 && x[1] >= -0.0005
+                                  && x[1] <= 1.0005 && x[2] >= -0.0005 && x[2] <= 1.0005; };
+        var v = lchRaw(L, C, H);
+        if (!ok(v)) {
+            var lo = 0, hi = C, i, mid;
+            for (i = 0; i < 26; i++) { mid = (lo + hi) / 2; if (ok(lchRaw(L, mid, H))) lo = mid; else hi = mid; }
+            v = lchRaw(L, lo, H);
+        }
+        return [gam(v[0]), gam(v[1]), gam(v[2])];
+    }
+    function parseCol(s){
+        s = ('' + (s || '')).trim();
+        var h = clean(s);
+        if (h && s.charAt(0) === '#') return { rgb: toRgb('#' + h), a: null };
+        var m = /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)$/i.exec(s);
+        if (m) return { rgb: [+m[1], +m[2], +m[3]], a: m[4] === undefined ? null : m[4] };
+        return null;
+    }
+    // Output format follows the ROW, not the maths: a row that ships rgba is
+    // read back as rgba, and handing a hex to one the emitter expects to be
+    // translucent turns a wash into a solid block.
+    function fmtCol(rgb, a){ return a === null ? toHex(rgb) : rgba(rgb, a); }
+    function lum(c){ return 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]); }
+    function contrast(a, b){ var x = lum(a), y = lum(b), hi = Math.max(x, y), lo = Math.min(x, y);
+        return (hi + 0.05) / (lo + 0.05); }
+    function overlay(fg, a, bg){ return [0,1,2].map(function(i){ return fg[i] * a + bg[i] * (1 - a); }); }
+
+    var GEN_CLASS = {};
+    [['skip', ['--sidebar-color','--color-accent-hover','--color-link','--color-link-hover']],
+     ['brand', ['--color-accent','--color-accent-light','--color-on-accent','--color-avatar-from']],
+     ['neutral', ['--color-bg','--color-surface','--color-surface-secondary','--color-surface-tertiary',
+                  '--color-text-primary','--color-text-secondary','--color-text-tertiary',
+                  '--color-text-quaternary','--color-border','--color-border-light','--color-border-card',
+                  '--color-gray-text','--color-gray-bg','--sidebar-bg','--sidebar-panel-bg','--sidebar-text',
+                  '--sidebar-text-secondary','--sidebar-text-muted','--sidebar-text-faint','--sidebar-border',
+                  '--sidebar-field-bg','--sidebar-item-hover-bg','--sidebar-item-active-bg',
+                  '--sidebar-scroll-thumb','--topbar-bg']],
+     /* Info is NOT brand, though it ships equal to the accent. Its own row says
+        why: a separate token so an info badge need not follow a rebrand. Made to
+        follow, it measured 1.25:1 on a yellow brand -- yellow on a yellow wash. */
+     ['status', ['--color-green','--color-green-text','--color-green-bg','--color-orange',
+                 '--color-orange-text','--color-orange-bg','--color-red','--color-red-text',
+                 '--color-red-bg','--color-blue-text','--color-blue-bg']],
+     ['rotate', ['--color-icon-blue','--color-icon-purple','--color-icon-orange','--color-icon-green',
+                 '--color-icon-red','--color-icon-teal','--color-icon-gray','--color-icon-indigo',
+                 '--color-icon-pink','--color-avatar-to','--color-block-1','--color-block-2','--color-block-3']]
+    ].forEach(function(p){ p[1].forEach(function(v){ GEN_CLASS[v] = p[0]; }); });
+
+    var PAIRS = [
+        ['--color-text-primary',   '--color-surface',   'Body text on a card'],
+        ['--color-text-secondary', '--color-surface',   'Secondary text'],
+        ['--color-text-primary',   '--color-bg',        'Body text on the page'],
+        ['--color-on-accent',      '--color-accent',    'Button label on the accent'],
+        ['--color-green-text',     '--color-green-bg',  'Success badge'],
+        ['--color-orange-text',    '--color-orange-bg', 'Warning badge'],
+        ['--color-red-text',       '--color-red-bg',    'Danger badge'],
+        ['--color-blue-text',      '--color-blue-bg',   'Info badge'],
+        ['--sidebar-text',         '--sidebar-bg',      'Nav label on the sidebar']
+    ];
+    function fieldVal(name){ var t = textFor(name); return t ? t.value : ''; }
+    function defVal(name){ var t = textFor(name); return t ? t.getAttribute('data-default') : ''; }
+    /* Measured on the FIELD VALUES, not on anything rendered: every token is a
+       literal sitting in an input, so the ratios can be computed outright
+       instead of probing a preview that is not on this page. Translucent fills
+       are composited arithmetically over the card. */
+    function pairRatio(ink, bg){
+        var b = parseCol(fieldVal(bg)), f = parseCol(fieldVal(ink));
+        if (!b || !f) return null;
+        var surf = parseCol(fieldVal('--color-surface'));
+        var base = b.a !== null && +b.a < 0.999 && surf ? overlay(b.rgb, +b.a, surf.rgb) : b.rgb;
+        var fc   = f.a !== null && +f.a < 0.999 ? overlay(f.rgb, +f.a, base) : f.rgb;
+        return contrast(fc, base);
+    }
+
+    var genSeedSw  = gen.querySelector('.mt-gen-seed-sw'),
+        genSeedTx  = gen.querySelector('.mt-gen-seed'),
+        genTint    = gen.querySelector('.mt-gen-tint'),
+        genTintOut = gen.querySelector('.mt-gen-tint-out'),
+        genReport  = gen.querySelector('.mt-gen-report'),
+        genUndoBtn = gen.querySelector('.mt-gen-undo'),
+        GEN_PREV   = null;
+
+    function genUndoState(snapshot){
+        GEN_PREV = snapshot;
+        if (genUndoBtn) genUndoBtn.disabled = !snapshot;
+        if (!snapshot && genReport) genReport.hidden = true;
+    }
+    // Opens on whatever the Accent row currently holds, so the panel agrees
+    // with the form instead of proposing a colour nobody chose.
+    (function(){
+        var cur = clean(fieldVal('--color-accent'));
+        if (cur) { genSeedSw.value = '#' + cur; genSeedTx.value = '#' + cur; }
+    })();
+    genSeedSw.addEventListener('input', function(){ genSeedTx.value = this.value; });
+    genTint.addEventListener('input', function(){ genTintOut.textContent = this.value + '%'; });
+    [].slice.call(gen.querySelectorAll('.mt-gen-chip')).forEach(function(c){
+        c.addEventListener('click', function(){
+            var on = c.getAttribute('aria-pressed') !== 'true';
+            c.setAttribute('aria-pressed', String(on));
+            c.classList.toggle('is-on', on);
+        });
+    });
+
+    function generate(){
+        var seedHex = clean(genSeedTx.value);
+        if (!seedHex) { genSeedTx.value = genSeedSw.value; seedHex = clean(genSeedSw.value); }
+        if (!seedHex) return;
+        genSeedSw.value = '#' + seedHex; genSeedTx.value = '#' + seedHex;
+
+        var want = {};
+        [].slice.call(gen.querySelectorAll('.mt-gen-chip')).forEach(function(c){
+            want[c.getAttribute('data-what')] = c.getAttribute('aria-pressed') === 'true'; });
+
+        var dark  = gen.getAttribute('data-scope') === 'dark';
+        var tint  = (+genTint.value || 0) / 100;
+        var alRaw = parseCol(gen.getAttribute('data-accent-light'));
+        var adRaw = parseCol(gen.getAttribute('data-accent-dark'));
+        if (!alRaw || !adRaw) return;
+        var Al = toLch(alRaw.rgb), Ad = toLch(adRaw.rgb), S = toLch(toRgb('#' + seedHex));
+
+        /* Saturation is measured against the LIGHT accent in both scopes, so
+           the ratio is one number describing the brand -- "more muted than
+           stock", not "more muted than stock-in-this-mode". The floor is the
+           safety mechanism: a near-grey brand has a raw ratio near zero, and
+           unfloored it turns danger into brick. */
+        var sat = Al.C > 0.002 ? Math.max(0.70, Math.min(1.30, S.C / Al.C)) : 1;
+        var dH  = S.H - Al.H;
+        var A   = dark ? Ad : Al;
+        var lifted = false;
+
+        /* The dark seed is the brand colour RAISED TO the dark accent's
+           lightness -- a floor, not an offset. Offsetting fails upward: a
+           yellow brand is already lighter than the dark accent, and adding the
+           same delta again lands on a near-white "brand" colour. Chroma still
+           travels by the shipped ratio, so the stock accent is a fixed point. */
+        var seed = dark
+            ? { L: Math.max(S.L, Ad.L), C: S.C * (Al.C > 0.002 ? Ad.C / Al.C : 1), H: S.H }
+            : { L: S.L, C: S.C, H: S.H };
+
+        /* ...and then dark gets a measured lift on top, because the floor alone
+           is not enough. In dark mode the theme ships --color-link as
+           var(--color-accent) outright, so an accent that is merely lighter
+           than the brand and still dark reads as an unclickable link. */
+        if (dark) {
+            var surfDef = parseCol(defVal('--color-surface'));
+            var guard = 0;
+            while (surfDef && contrast(lchToRgb(seed.L, seed.C, seed.H), surfDef.rgb) < 4.5
+                   && seed.L < 0.92 && guard++ < 80) {
+                seed.L += 0.01; lifted = true;
+            }
+        }
+
+        var before = PAIRS.map(function(p){ return pairRatio(p[0], p[1]); });
+        var snapshot = {}, written = 0;
+        [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
+            snapshot[t.getAttribute('data-var')] = t.value; });
+
+        [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
+            var name = t.getAttribute('data-var'), cls = GEN_CLASS[name];
+            if (!cls || cls === 'skip' || !want[cls]) return;
+            var d = parseCol(t.getAttribute('data-default'));
+            if (!d) return;
+            var T = toLch(d.rgb), out;
+
+            if (name === '--color-accent') out = seed;
+            else if (name === '--color-on-accent') {
+                // black or white at the exact WCAG crossover, against the NEW accent
+                setToken(name, lum(lchToRgb(seed.L, seed.C, seed.H)) > 0.179129 ? '#000000' : '#ffffff');
+                written++; return;
+            }
+            else if (cls === 'brand')
+                out = { L: seed.L + (T.L - A.L), C: T.C * (A.C > 0.002 ? seed.C / A.C : 1), H: seed.H };
+            else if (cls === 'neutral')
+                // L untouched. Chroma tapers as the grey lightens, or a
+                // near-white surface picks up a cast long before a mid grey
+                // looks tinted at all.
+                out = { L: T.L, C: tint * 0.030 * (0.35 + 0.65 * (1 - T.L)), H: seed.H };
+            else if (cls === 'status')
+                out = { L: T.L, C: T.C * sat, H: T.H };
+            else
+                out = { L: T.L, C: T.C * sat, H: ((T.H + dH) % 360 + 360) % 360 };
+
+            setToken(name, fmtCol(lchToRgb(out.L, out.C, out.H), d.a));
+            written++;
+        });
+
+        /* The three rows apple-theme.css derives get RESET, not skipped. Left
+           alone they keep whatever was pinned there before, and a pinned hover
+           does not follow a rebrand -- generate a terracotta palette and the
+           hover stays blue. Reset to default they are dropped by
+           saveColorsAction and the @supports block derives them from the new
+           accent. Their swatches still read stock, exactly as the row hint
+           warns: writing the derived colour HERE would store it and freeze the
+           very link it exists to preserve. --sidebar-color is left alone
+           either way; a sidebar tint is a separate decision from a rebrand. */
+        var cleared = 0;
+        if (want.brand) {
+            ['--color-accent-hover', '--color-link', '--color-link-hover'].forEach(function(n){
+                var t = textFor(n); if (!t) return;
+                if (t.value !== t.getAttribute('data-default')) cleared++;
+                setToken(n, t.getAttribute('data-default'));
+            });
+        }
+
+        genUndoState(snapshot);
+        genRender(written, before, PAIRS.map(function(p){ return pairRatio(p[0], p[1]); }), lifted, cleared);
+    }
+
+    function genRender(written, before, after, lifted, cleared){
+        var fails = after.filter(function(r){ return r !== null && r < 4.5; }).length;
+        var checked = after.filter(function(r){ return r !== null; }).length;
+        var rows = PAIRS.map(function(p, i){
+            var a = after[i], b = before[i];
+            if (a === null) return '';
+            var cls = a >= 4.5 ? 'is-ok' : a >= 3 ? 'is-mid' : 'is-bad';
+            var moved = b !== null && Math.abs(a - b) >= 0.05;
+            return '<tr><th scope="row">' + p[2] + '</th><td class="' + cls + '">' + a.toFixed(2)
+                 + (moved ? '<span class="mt-gen-was">was ' + b.toFixed(2) + '</span>' : '') + '</td></tr>';
+        }).join('');
+        genReport.innerHTML =
+            '<p class="mt-gen-sum"><b>' + written + '</b> rows filled in below &middot; '
+            + (checked - fails) + ' of ' + checked + ' checked pairs clear AA'
+            + (fails ? ', <span class="is-bad">' + fails + ' below 4.5</span>' : '')
+            + (lifted ? ' &middot; the accent was <b>lifted</b> to stay legible on a dark card' : '')
+            + (cleared ? ' &middot; <b>' + cleared + '</b> pinned row(s) released back to following the accent' : '')
+            + '. Nothing is stored until you press <strong>Save colors</strong>.'
+            + ' Accent hover, link and link hover keep deriving in CSS, so their swatches stay stock.</p>'
+            + '<table class="mt-gen-tbl"><tbody>' + rows + '</tbody></table>';
+        genReport.hidden = false;
+    }
+
+    gen.querySelector('.mt-gen-run').addEventListener('click', generate);
+    genUndoBtn.addEventListener('click', function(){
+        if (!GEN_PREV) return;
+        var prev = GEN_PREV;
+        Object.keys(prev).forEach(function(k){ setToken(k, prev[k]); });
+        genUndoState(null);
     });
 })();
 
