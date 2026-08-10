@@ -12,10 +12,23 @@
     {if $colorsSaved}<div class="mt-alert mt-alert-success">Colors saved.</div>{/if}
 
     <section class="mt-section">
-        <header class="mt-section-header">
-            <h2 class="mt-section-title">Color Scheme</h2>
+        <header class="mt-section-header mt-cs-head">
+            <h2 class="mt-section-title">Color scheme</h2>
+            {* Editing scope, top-right of the header per the design. Both scopes
+               are IN THE PAGE -- the one you are not looking at rides along in a
+               hidden field per row -- so switching swaps values client-side with
+               no reload, and one Save writes both. It used to be a link that
+               reloaded and threw away unsaved edits in the scope you were
+               leaving. *}
+            <div class="mt-cs-editing">
+                <span class="mt-cs-editing-lab">Editing</span>
+                <div class="mt-tabs" data-scope-switch>
+                    <button type="button" class="mt-tab {if $colors.mode != 'dark'}is-active{/if}" data-scope-set="light">Light</button>
+                    <button type="button" class="mt-tab {if $colors.mode == 'dark'}is-active{/if}" data-scope-set="dark">Dark</button>
+                </div>
+            </div>
         </header>
-        <p class="mt-field-help">Every token below is editable independently. Quick presets just cascade the brand fields (accent, hover, tint, link) &mdash; tweak any value after. Editing the <strong>{$styleName|escape}</strong> style changes its <strong>{$colors.mode}</strong> colors; only changed tokens are saved, and they apply site-wide.</p>
+        <p class="mt-field-help">Every token below is editable independently. Quick presets just cascade the brand fields (accent, hover, tint, link) &mdash; tweak any value after. Only changed tokens are saved, and they apply site-wide.</p>
         <div class="mt-schemes">
             {foreach $colors.presets as $p}
                 <button type="button" class="mt-scheme" data-accent="{$p.accent|escape}">
@@ -85,7 +98,7 @@
                 </div>
             </div>
             <div class="mt-gen-ctl">
-                <span class="mt-gen-lab">Neutral tint <b class="mt-gen-tint-out">30%</b></span>
+                <span class="mt-gen-lab">Neutral tint &middot; <b class="mt-gen-tint-out">30%</b></span>
                 <input type="range" class="mt-gen-tint" min="0" max="100" step="5" value="30"
                        aria-label="How much of the brand hue the greys carry">
             </div>
@@ -98,25 +111,9 @@
         <div class="mt-gen-report" hidden></div>
     </section>
 
-    {* Light/Dark sits here rather than in the Color Scheme header: it governs
-       the rows BELOW it, not the presets and generator above, and reading it
-       immediately before the first group is what makes that obvious.
-
-       Both scopes are IN THE PAGE -- the one you are not looking at rides along
-       in a hidden field per row -- so switching swaps values client-side with
-       no reload, and one Save writes both. It used to be a link that reloaded
-       and threw away unsaved edits in the scope you were leaving. *}
-    <div class="mt-scope-bar">
-        <span class="mt-scope-lab">Editing</span>
-        <div class="mt-tabs" data-scope-switch>
-            <button type="button" class="mt-tab {if $colors.mode != 'dark'}is-active{/if}" data-scope-set="light">Light</button>
-            <button type="button" class="mt-tab {if $colors.mode == 'dark'}is-active{/if}" data-scope-set="dark">Dark</button>
-        </div>
-    </div>
-
     {foreach $colors.groups as $groupName => $tokens}
-    <section class="mt-section">
-        <header class="mt-section-header"><h2 class="mt-section-title">{$groupName|escape}</h2></header>
+    <section class="mt-section mt-cs-group">
+        <div class="mt-cs-group-lbl">{$groupName|escape}</div>
 
         {* Sidebar style presets, at the head of the group that owns the sidebar
            rows -- the same relationship the accent chips at the top of the page
@@ -148,7 +145,7 @@
         </div>
         {/if}
 
-        <div class="mt-color-rows">
+        <div class="mt-color-rows mt-cs-card">
             {foreach $tokens as $t}
             {* data-follows names a row this one already tracks IN CSS -- the
                seven sidebar rows are `var(--_sb-*, var(--color-*))`, so they
@@ -157,28 +154,24 @@
                swatch and, worse, freeze the link the moment the row was
                touched. Declaring it lets the panel mirror the source instead. *}
             <div class="mt-color-row" data-var="{$t.var|escape}"{if $t.shared|default:false} data-shared="1"{/if}{if $t.follows|default:''} data-follows="{$t.follows|escape}"{/if}>
-                <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">{$t.label|escape}</label>
+                {* The note is a TOOLTIP now, not a line of prose under the row.
+                   It lives on a focusable button so it is reachable by keyboard
+                   and announced -- a title on a bare span is neither. The text
+                   is still colors.php's `hint`, so nothing was rewritten to fit
+                   a smaller space; it simply stopped occupying one. *}
+                <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">{$t.label|escape}{if $t.hint|default:''}<button type="button" class="mt-info" tabindex="0" aria-label="About {$t.label|escape}" title="{$t.hint|escape}">i</button>{/if}</label>
                 <span class="mt-color-control">
                     <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
-                    <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false" {if $t.hint|default:''}aria-describedby="h{$t.var|replace:'--':'_'}"{/if}>
+                    {* No aria-describedby: the note it pointed at no longer
+                       exists as an element. The tooltip button beside the label
+                       carries the text now, and a describedby aimed at a
+                       missing id announces nothing while looking correct. *}
+                    <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false">
                     {* The scope you are NOT editing. Carried, posted and saved
                        alongside; the switch just swaps the two values and their
                        defaults, so no reload and nothing unsaved is lost. *}
                     <input type="hidden" name="o[{$t.var}]" class="mt-color-other" data-var="{$t.var|escape}" value="{$t.other|escape}" data-default="{$t.otherDef|escape}">
                 </span>
-                {* Optional per-token note from colors.php. Several labels are
-                   honestly ambiguous on their own -- "Surface 3" says nothing
-                   about the fact that its ordinal INVERTS between light and
-                   dark, and six tokens ship values byte-identical to a page
-                   token, so a buyer cannot tell them apart by swatch alone.
-
-                   A SIBLING of the label, and placed AFTER the control, for two
-                   reasons. It can then span the whole row instead of sharing a
-                   ~150px column with the control, which is what turned a
-                   twelve-word note into six lines. And a screen reader stops
-                   reading the paragraph as part of the field's NAME --
-                   aria-describedby announces it separately, after the label. *}
-                {if $t.hint|default:''}<span class="mt-color-row-hint" id="h{$t.var|replace:'--':'_'}">{$t.hint|escape}</span>{/if}
             </div>
             {/foreach}
         </div>

@@ -649,9 +649,37 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-color-swatch-input::-moz-color-swatch { border: 0; border-radius: 3px; }
 .mt-color-text { max-width: 132px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; text-transform: lowercase; }
 
-/* The scope switch, sitting directly above the rows it governs. */
-.mt-scope-bar { display: flex; align-items: center; gap: 10px; padding: 18px 0 0; border-top: 1px solid var(--mt-border); margin-top: 4px; }
-.mt-scope-lab { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); }
+/* -- Colors panel: layout to match the design -----------------------------
+   Groups read as a small uppercase label sitting ABOVE a white card, rather
+   than a heading with a rule under it. The label is chrome; the card is the
+   content, and the separation is what lets eight groups scan as a list. */
+.mt-cs-head { align-items: center; }
+.mt-cs-editing { display: flex; align-items: center; gap: 10px; }
+.mt-cs-editing-lab { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); }
+.mt-cs-group { padding: 0; margin-top: 18px; border-top: 0; }
+.mt-cs-group + .mt-cs-group { border-top: 0; }
+.mt-cs-group-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); margin: 0 0 10px 4px; }
+.mt-cs-card { background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: 14px; padding: 18px 20px; }
+/* Three columns, matching the design. minmax(0,1fr) rather than a min track:
+   an auto-fill min of 240px reflows to two columns at this panel width and the
+   grid stops lining up with the group above it. */
+.mt-cs-card.mt-color-rows { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; }
+@media (max-width: 1100px) { .mt-cs-card.mt-color-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 720px)  { .mt-cs-card.mt-color-rows { grid-template-columns: minmax(0, 1fr); } }
+/* Label above, control below -- the design stacks them, and it is what lets a
+   long token name sit beside its info dot without squeezing the field. */
+.mt-cs-card .mt-color-row { display: block; }
+.mt-cs-card .mt-color-row-label { display: flex; align-items: center; gap: 5px; margin-bottom: 7px; font-size: 13px; font-weight: 600; color: var(--mt-text); }
+.mt-cs-card .mt-color-control { display: flex; gap: 8px; width: 100%; }
+.mt-cs-card .mt-color-text { max-width: none; flex: 1; min-width: 0; }
+.mt-cs-card .mt-color-swatch-input { width: 34px; height: 34px; }
+
+/* The note, now a tooltip. A BUTTON, not a styled span: it has to be
+   focusable for the text to be reachable without a mouse, and title on a
+   non-interactive element is announced inconsistently at best. */
+.mt-info { display: inline-flex; align-items: center; justify-content: center; inline-size: 15px; block-size: 15px; padding: 0; border: 1px solid var(--mt-border-2); border-radius: 50%; background: var(--mt-surface-2); color: var(--mt-text-3); font: 600 10px/1 var(--mt-font, inherit); font-style: italic; cursor: help; flex-shrink: 0; }
+.mt-info:hover { border-color: var(--mt-primary); color: var(--mt-primary); }
+.mt-info:focus-visible { outline: 2px solid var(--mt-primary); outline-offset: 1px; }
 
 /* Rows the Dark scope has no opinion about, and the way back to them. */
 .mt-shared-note { margin: 14px 0 0; }
@@ -674,11 +702,22 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-sbt-dot { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08); }
 
 /* -- Colors panel: generate from one colour -------------------------------- */
+/* The generator reads as an inset panel, not another section: it ACTS on the
+   rows below rather than being one of them, and the recessed surface is what
+   says so before any of its copy is read. */
+.mt-gen { background: var(--mt-surface-2); border: 1px solid var(--mt-border); border-radius: 14px; padding: 18px 20px; margin-top: 16px; }
+.mt-gen .mt-section-header { border-bottom: 0; padding: 0; margin: 0 0 4px; }
 .mt-gen-lede { margin: 0 0 16px; max-width: 78ch; }
+/* Generate is the primary action of its panel; Undo sits beside it. Its own
+   full-width row, right-aligned, so the eye lands on the actions AFTER the
+   controls rather than finding them as a fourth column mid-rail. */
+.mt-gen-ctl-act { grid-column: 1 / -1; justify-content: flex-end; padding-top: 2px; }
+.mt-gen .mt-gen-run { background: var(--mt-primary); border-color: var(--mt-primary); color: #fff; }
+.mt-gen .mt-gen-run:hover { filter: brightness(1.06); }
 .mt-gen-rail { display: grid; gap: 16px 26px; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); align-items: start; }
 .mt-gen-ctl { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .mt-gen-lab { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); }
-.mt-gen-lab b { float: right; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mt-text-2); }
+.mt-gen-lab b { float: none; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mt-text-2); }
 .mt-gen-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .mt-gen-chip { padding: 6px 11px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: var(--mt-radius-pill); cursor: pointer; font: 500 12.5px inherit; color: var(--mt-text-2); }
 .mt-gen-chip.is-on { border-color: var(--mt-primary); background: var(--mt-primary-tint); color: var(--mt-primary); font-weight: 600; }
