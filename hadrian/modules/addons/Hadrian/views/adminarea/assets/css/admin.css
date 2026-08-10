@@ -724,13 +724,23 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-gen-ctl-act { grid-column: 1 / -1; justify-content: flex-end; padding-top: 2px; }
 .mt-gen .mt-gen-run { background: var(--mt-primary); border-color: var(--mt-primary); color: #fff; }
 .mt-gen .mt-gen-run:hover { filter: brightness(1.06); }
-/* Explicit tracks, not auto-fit. auto-fit produced four equal 225px columns,
-   which left "What to rebuild" too narrow for its four chips -- they wrapped to
-   two rows where the design puts them on one. The middle track is sized to the
-   chips' measured content width (~375px plus gaps). */
+/* The chips get a FULL-WIDTH row of their own rather than a third column.
+   Sizing a column to fit them is what failed twice: auto-fit gave 225px, then a
+   400px minimum measured in the harness met chips that actually render 406px on
+   the real panel -- six pixels short. The panel is ~880px wide here (the design
+   is drawn on a wider canvas, without the sub-nav column), so four chips and
+   two other controls cannot share one row at any honest track size. Spanning
+   the row makes the wrap impossible instead of unlikely. */
 .mt-gen-rail { display: grid; gap: 16px 26px; align-items: start;
-               grid-template-columns: minmax(190px, 0.9fr) minmax(400px, 1.5fr) minmax(200px, 1fr); }
-@media (max-width: 900px) { .mt-gen-rail { grid-template-columns: minmax(0, 1fr); } }
+               grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr); }
+.mt-gen-ctl-seed { grid-column: 1; grid-row: 1; }
+.mt-gen-ctl-tint { grid-column: 2; grid-row: 1; }
+.mt-gen-ctl-what { grid-column: 1 / -1; grid-row: 2; }
+.mt-gen-ctl-act  { grid-column: 1 / -1; grid-row: 3; }
+@media (max-width: 620px) {
+    .mt-gen-rail { grid-template-columns: minmax(0, 1fr); }
+    .mt-gen-ctl-seed, .mt-gen-ctl-tint, .mt-gen-ctl-what, .mt-gen-ctl-act { grid-column: 1; grid-row: auto; }
+}
 .mt-gen-ctl { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .mt-gen-lab { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); }
 .mt-gen-lab b { float: none; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mt-text-2); }

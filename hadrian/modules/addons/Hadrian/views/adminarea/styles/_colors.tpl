@@ -81,14 +81,14 @@
         </p>
 
         <div class="mt-gen-rail">
-            <div class="mt-gen-ctl">
+            <div class="mt-gen-ctl mt-gen-ctl-seed">
                 <span class="mt-gen-lab">Brand colour</span>
                 <span class="mt-color-control">
                     <input type="color" class="mt-color-swatch-input mt-gen-seed-sw" value="#0071e3" aria-label="Brand colour picker">
                     <input type="text" class="mt-input mt-input-compact mt-gen-seed" value="#0071e3" spellcheck="false" aria-label="Brand colour hex">
                 </span>
             </div>
-            <div class="mt-gen-ctl">
+            <div class="mt-gen-ctl mt-gen-ctl-what">
                 <span class="mt-gen-lab">What to rebuild</span>
                 <div class="mt-gen-chips">
                     <button type="button" class="mt-gen-chip is-on" data-what="brand"   aria-pressed="true">Brand</button>
@@ -97,7 +97,7 @@
                     <button type="button" class="mt-gen-chip is-on" data-what="rotate"  aria-pressed="true">Icons &amp; blocks</button>
                 </div>
             </div>
-            <div class="mt-gen-ctl">
+            <div class="mt-gen-ctl mt-gen-ctl-tint">
                 <span class="mt-gen-lab">Neutral tint &middot; <b class="mt-gen-tint-out">30%</b></span>
                 <input type="range" class="mt-gen-tint" min="0" max="100" step="5" value="30"
                        aria-label="How much of the brand hue the greys carry">
