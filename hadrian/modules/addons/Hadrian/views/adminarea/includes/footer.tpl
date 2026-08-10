@@ -676,7 +676,7 @@
         [].slice.call(gen.querySelectorAll('.mt-gen-chip')).forEach(function(c){
             want[c.getAttribute('data-what')] = c.getAttribute('aria-pressed') === 'true'; });
 
-        var dark  = gen.getAttribute('data-scope') === 'dark';
+        var activeDark = gen.getAttribute('data-scope') === 'dark';
         var tint  = (+genTint.value || 0) / 100;
         var alRaw = parseCol(gen.getAttribute('data-accent-light'));
         var adRaw = parseCol(gen.getAttribute('data-accent-dark'));
@@ -690,82 +690,106 @@
            unfloored it turns danger into brick. */
         var sat = Al.C > 0.002 ? Math.max(0.70, Math.min(1.30, S.C / Al.C)) : 1;
         var dH  = S.H - Al.H;
-        var A   = dark ? Ad : Al;
-        var lifted = false;
-
-        /* The dark seed is the brand colour RAISED TO the dark accent's
-           lightness -- a floor, not an offset. Offsetting fails upward: a
-           yellow brand is already lighter than the dark accent, and adding the
-           same delta again lands on a near-white "brand" colour. Chroma still
-           travels by the shipped ratio, so the stock accent is a fixed point. */
-        var seed = dark
-            ? { L: Math.max(S.L, Ad.L), C: S.C * (Al.C > 0.002 ? Ad.C / Al.C : 1), H: S.H }
-            : { L: S.L, C: S.C, H: S.H };
-
-        /* ...and then dark gets a measured lift on top, because the floor alone
-           is not enough. In dark mode the theme ships --color-link as
-           var(--color-accent) outright, so an accent that is merely lighter
-           than the brand and still dark reads as an unclickable link. */
-        if (dark) {
-            var surfDef = parseCol(defVal('--color-surface'));
-            var guard = 0;
-            while (surfDef && contrast(lchToRgb(seed.L, seed.C, seed.H), surfDef.rgb) < 4.5
-                   && seed.L < 0.92 && guard++ < 80) {
-                seed.L += 0.01; lifted = true;
-            }
-        }
+        var lifted = false, written = 0, cleared = 0;
 
         var before = PAIRS.map(function(p){ return pairRatio(p[0], p[1]); });
-        var snapshot = {}, written = 0;
+        // Snapshot BOTH scopes -- Undo has to put back what Generate touched,
+        // and Generate now touches both.
+        var snapshot = {};
         [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
-            snapshot[t.getAttribute('data-var')] = t.value; });
-
-        [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
-            var name = t.getAttribute('data-var'), cls = GEN_CLASS[name];
-            if (!cls || cls === 'skip' || !want[cls]) return;
-            var d = parseCol(t.getAttribute('data-default'));
-            if (!d) return;
-            var T = toLch(d.rgb), out;
-
-            if (name === '--color-accent') out = seed;
-            else if (name === '--color-on-accent') {
-                // black or white at the exact WCAG crossover, against the NEW accent
-                setToken(name, lum(lchToRgb(seed.L, seed.C, seed.H)) > 0.179129 ? '#000000' : '#ffffff');
-                written++; return;
-            }
-            else if (cls === 'brand')
-                out = { L: seed.L + (T.L - A.L), C: T.C * (A.C > 0.002 ? seed.C / A.C : 1), H: seed.H };
-            else if (cls === 'neutral')
-                // L untouched. Chroma tapers as the grey lightens, or a
-                // near-white surface picks up a cast long before a mid grey
-                // looks tinted at all.
-                out = { L: T.L, C: tint * 0.030 * (0.35 + 0.65 * (1 - T.L)), H: seed.H };
-            else if (cls === 'status')
-                out = { L: T.L, C: T.C * sat, H: T.H };
-            else
-                out = { L: T.L, C: T.C * sat, H: ((T.H + dH) % 360 + 360) % 360 };
-
-            setToken(name, fmtCol(lchToRgb(out.L, out.C, out.H), d.a));
-            written++;
+            var n = t.getAttribute('data-var'), o = otherFor(n);
+            snapshot[n] = { v: t.value, o: o ? o.value : null };
         });
 
-        /* The three rows apple-theme.css derives get RESET, not skipped. Left
-           alone they keep whatever was pinned there before, and a pinned hover
-           does not follow a rebrand -- generate a terracotta palette and the
-           hover stays blue. Reset to default they are dropped by
-           saveColorsAction and the @supports block derives them from the new
-           accent. Their swatches still read stock, exactly as the row hint
-           warns: writing the derived colour HERE would store it and freeze the
-           very link it exists to preserve. --sidebar-color is left alone
-           either way; a sidebar tint is a separate decision from a rebrand. */
-        var cleared = 0;
-        if (want.brand) {
-            ['--color-accent-hover', '--color-link', '--color-link-hover'].forEach(function(n){
-                var t = textFor(n); if (!t) return;
-                if (t.value !== t.getAttribute('data-default')) cleared++;
-                setToken(n, t.getAttribute('data-default'));
+        /* Run the whole recipe once PER SCOPE. It used to run only for the one
+           on screen, so generating in Light left Dark on the old palette -- and
+           the dark-follows-light link could not rescue it either, because
+           setToken assigns .value directly and fires no input event.
+
+           Each scope resolves against its OWN accent and its OWN row defaults,
+           which is the same reason the sidebar styles fill both: a palette is
+           not a light-mode palette. */
+        function runScope(isDark, other){
+            var el   = function(n){ return other ? otherFor(n) : textFor(n); };
+            var defOf = function(n){ var e = el(n); return e ? e.getAttribute('data-default') : null; };
+            var put  = function(n, val){
+                if (other) { var o = otherFor(n); if (o) o.value = val; }
+                else setToken(n, val);
+            };
+            var A = isDark ? Ad : Al;
+
+            /* The dark seed is the brand colour RAISED TO the dark accent's
+               lightness -- a floor, not an offset. Offsetting fails upward: a
+               yellow brand is already lighter than the dark accent, and adding
+               the same delta again lands on a near-white "brand" colour. Chroma
+               still travels by the shipped ratio, so the stock accent is a
+               fixed point. */
+            var seed = isDark
+                ? { L: Math.max(S.L, Ad.L), C: S.C * (Al.C > 0.002 ? Ad.C / Al.C : 1), H: S.H }
+                : { L: S.L, C: S.C, H: S.H };
+
+            /* ...and then dark gets a measured lift on top, because the floor
+               alone is not enough. In dark mode the theme ships --color-link as
+               var(--color-accent) outright, so an accent that is merely lighter
+               than the brand and still dark reads as an unclickable link. */
+            if (isDark) {
+                var surfDef = parseCol(defOf('--color-surface'));
+                var guard = 0;
+                while (surfDef && contrast(lchToRgb(seed.L, seed.C, seed.H), surfDef.rgb) < 4.5
+                       && seed.L < 0.92 && guard++ < 80) {
+                    seed.L += 0.01; lifted = true;
+                }
+            }
+
+            [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
+                var name = t.getAttribute('data-var'), cls = GEN_CLASS[name];
+                if (!cls || cls === 'skip' || !want[cls]) return;
+                var d = parseCol(defOf(name));
+                if (!d) return;
+                var T = toLch(d.rgb), out;
+
+                if (name === '--color-accent') out = seed;
+                else if (name === '--color-on-accent') {
+                    // black or white at the exact WCAG crossover, against the NEW accent
+                    put(name, lum(lchToRgb(seed.L, seed.C, seed.H)) > 0.179129 ? '#000000' : '#ffffff');
+                    written++; return;
+                }
+                else if (cls === 'brand')
+                    out = { L: seed.L + (T.L - A.L), C: T.C * (A.C > 0.002 ? seed.C / A.C : 1), H: seed.H };
+                else if (cls === 'neutral')
+                    // L untouched. Chroma tapers as the grey lightens, or a
+                    // near-white surface picks up a cast long before a mid grey
+                    // looks tinted at all.
+                    out = { L: T.L, C: tint * 0.030 * (0.35 + 0.65 * (1 - T.L)), H: seed.H };
+                else if (cls === 'status')
+                    out = { L: T.L, C: T.C * sat, H: T.H };
+                else
+                    out = { L: T.L, C: T.C * sat, H: ((T.H + dH) % 360 + 360) % 360 };
+
+                put(name, fmtCol(lchToRgb(out.L, out.C, out.H), d.a));
+                written++;
             });
+
+            /* The three rows apple-theme.css derives get RESET, not skipped.
+               Left alone they keep whatever was pinned there before, and a
+               pinned hover does not follow a rebrand -- generate a terracotta
+               palette and the hover stays blue. Reset to default they are
+               dropped by saveColorsAction and the @supports block derives them
+               from the new accent. Their swatches still read stock, exactly as
+               the row hint warns: writing the derived colour HERE would store
+               it and freeze the very link it exists to preserve.
+               --sidebar-color is left alone either way; a sidebar tint is a
+               separate decision from a rebrand. */
+            if (want.brand) {
+                ['--color-accent-hover', '--color-link', '--color-link-hover'].forEach(function(n){
+                    var e = el(n); if (!e) return;
+                    if (e.value !== e.getAttribute('data-default')) cleared++;
+                    put(n, e.getAttribute('data-default'));
+                });
+            }
         }
+        runScope(activeDark, false);
+        runScope(!activeDark, true);
 
         // The generator writes the Accent through setToken, which fires no
         // input event, so the sidebar preview has to be told a rebrand happened.
@@ -801,8 +825,13 @@
     genUndoBtn.addEventListener('click', function(){
         if (!GEN_PREV) return;
         var prev = GEN_PREV;
-        Object.keys(prev).forEach(function(k){ setToken(k, prev[k]); });
+        Object.keys(prev).forEach(function(k){
+            setToken(k, prev[k].v);
+            var o = otherFor(k);
+            if (o && prev[k].o !== null) o.value = prev[k].o;   // the other scope too
+        });
         genUndoState(null);
+        sbtRefresh();
     });
 })();
 
