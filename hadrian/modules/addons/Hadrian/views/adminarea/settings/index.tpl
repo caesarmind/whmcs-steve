@@ -27,23 +27,26 @@
 
 <style>
     .mt-tab-off { display: none !important; }
-    .mt-row-with-sub { border-bottom: 0; }
+    {* .mt-row-with-sub no longer strips the row's bottom border: the sub-panel
+       below is a CARD now, hung off a connector rail, so the row it belongs to
+       keeps its own rule exactly as the demo draws it. The relationship is
+       carried by the rail, not by a missing border. *}
     .mt-subnav-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 18px; margin-top: 6px; }
     .mt-subnav-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mt-text); padding: 3px 0; cursor: pointer; }
     .mt-subnav-check input { margin: 0; flex-shrink: 0; }
-    .mt-row-sub { padding: 4px 0 18px; border-bottom: 1px solid var(--mt-border); }
     .mt-row-sub[hidden] { display: none; }
-    .mt-row-sub-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
-    .mt-row-sub-title { font-size: 14px; font-weight: 500; margin: 0; }
-    .mt-row-sub-help { font-size: 12px; color: var(--mt-text-3); margin: 0 0 14px; }
-    .mt-row-sub-count { font-size: 13px; color: var(--mt-text-3); }
 
     /* Plain dropdown sub-field (dark-mode Display Type / Default Mode). */
     .mt-field { max-width: 520px; margin-bottom: 16px; }
     .mt-field:last-child { margin-bottom: 0; }
     .mt-field-label { display: block; font-size: 13px; font-weight: 500; color: var(--mt-text); margin-bottom: 6px; }
     .mt-field-help { font-size: 12px; color: var(--mt-text-3); margin: 6px 0 0; }
-    .mt-select { width: 100%; padding: 9px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 8px; background: var(--mt-surface); color: var(--mt-text); cursor: pointer; }
+    {* background-COLOR, not the shorthand. admin.css gives every .mt-select a
+       chevron via background-image; `background: var(--mt-surface)` here reset
+       it to none, and the 10px right padding left no room for it either -- so
+       every dropdown on this page rendered bare. This rule only wanted a
+       smaller select, and now that is all it takes. *}
+    .mt-select { width: 100%; padding: 9px 32px 9px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 8px; background-color: var(--mt-surface); background-position: right 10px center; color: var(--mt-text); cursor: pointer; }
     .mt-select:focus { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 3px rgba(0,113,227,0.15); }
 
     /* Chip multi-select — single field with removable chips + dropdown picker.
@@ -190,11 +193,65 @@
    New rules go here where that cannot happen. *}
 {literal}
 <style>
-/* Group heading + its one-line description. .mt-subhead is the house eyebrow
-   (11px uppercase); the sub-line explains the group in the admin's words. */
-.mt-set-group + .mt-set-group { margin-top: 26px; }
-.mt-set-group-head { margin-bottom: 2px; }
-.mt-set-group-sub { font-size: 12.5px; color: var(--mt-text-3); margin: 0 0 10px; }
+/* -- Group heading ---------------------------------------------------------
+   One line of chrome, measured off the Hadrian demo rather than eyeballed:
+   22px tinted icon chip, 10.5px/700/0.1em uppercase label, a 1px rule taking
+   the rest of the width, then the count. It replaced .mt-subhead plus a
+   sub-line of prose -- two lines of heading above every three-line group read
+   as more page than the settings did. The description survives as the label's
+   tooltip.
+
+   The rule is what makes this scan as chrome instead of as content: without
+   it the label and count are two floating scraps of text. */
+.mt-set-group + .mt-set-group { margin-top: 22px; }
+.mt-set-group-head { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; }
+.mt-set-group-ico { inline-size: 22px; block-size: 22px; border-radius: 6px; background: var(--mt-primary-tint); color: var(--mt-primary); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mt-set-group-ico svg { width: 13px; height: 13px; display: block; }
+.mt-set-group-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mt-text-3); white-space: nowrap; cursor: help; }
+.mt-set-group-rule { flex: 1; min-width: 12px; height: 1px; background: var(--mt-border); }
+.mt-set-group-count { font-size: 11px; color: var(--mt-text-4); white-space: nowrap; }
+
+/* Rows top-align their control. Centred, a toggle beside two lines of help
+   text drifts to the middle of the block and stops lining up with the title it
+   switches. Scoped to this page: .mt-row is shared with six other admin
+   screens whose rows carry taller controls. */
+.mt-set-group .mt-row { align-items: flex-start; }
+/* margin, not the demo's padding-top: .mt-toggle's track is inset:0 on a fixed
+   44x26 box, so padding would stretch the switch instead of nudging it. Same
+   2px optical offset, drawn where it does not distort the control. */
+.mt-set-group .mt-toggle { margin-top: 2px; }
+
+/* Search's empty state. .mt-empty/.mt-empty-icon-circle/.mt-empty-title are
+   already in admin.css; only the sub-line is new. */
+.mt-set-empty-text { font-size: 14px; color: var(--mt-text-3); margin: 0 auto; max-width: 420px; line-height: 1.5; }
+
+/* Search hides sub-panels with its OWN attribute, never with [hidden]. Search
+   and the reveal toggles were both writing .hidden, and search won: open a
+   panel, type one character, and it shut for good -- the restore read a
+   snapshot taken at page load, so clearing the box did not bring it back.
+   Two owners of one property is the bug; giving search a separate one is the
+   fix. */
+.mt-row-sub[data-search-off] { display: none !important; }
+
+/* -- Sub-setting panel -----------------------------------------------------
+   A card hung off a connector rail, which is how the demo shows that an option
+   belongs to the toggle above it. It used to be a flat strip separated by a
+   border -- indistinguishable from the gap between two ordinary rows, so a
+   nested setting read as a sibling of the thing that reveals it.
+
+   The rail is drawn with pseudo-elements rather than markup: 8px indent + 18px
+   rail + 14px gap puts the card 40px in, so the bars sit at -32px from its
+   edge. Same geometry as the demo, no extra <div> in ten places. */
+.mt-row-sub { position: relative; margin: 2px 0 6px 40px; padding: 16px; background: var(--mt-surface-2); border: 1px solid var(--mt-border); border-radius: 12px; }
+.mt-row-sub::before { content: ""; position: absolute; left: -32px; top: -10px; bottom: 12px; width: 2px; border-radius: 2px; background: var(--mt-border); }
+.mt-row-sub::after { content: ""; position: absolute; left: -32px; top: 22px; width: 14px; height: 2px; border-radius: 2px; background: var(--mt-border); }
+.mt-row-sub-head { display: flex; align-items: center; gap: 8px; margin-bottom: 0; }
+.mt-row-sub-tag { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--mt-primary); background: var(--mt-primary-tint); padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+.mt-row-sub-title { font-size: 14.5px; font-weight: 600; margin: 0; }
+/* margin-left:auto, not justify-content:space-between: the head has three
+   children now and space-between would strand the title in the middle. */
+.mt-row-sub-count { font-size: 12.5px; color: var(--mt-text-3); margin-left: auto; }
+.mt-row-sub-help { font-size: 13px; color: var(--mt-text-2); line-height: 1.55; margin: 7px 0 14px; max-width: 560px; }
 
 /* Search box. .mt-search/.mt-search-icon/.mt-search-clear already exist in
    admin.css (the Pages list uses them); only the page-level spacing is new. */
@@ -215,7 +272,8 @@
 /* While a search is active the tab strip is misleading -- results cross both
    tabs -- so it is dimmed and the group headings carry the context instead. */
 .mt-set-searching .mt-tabs { opacity: 0.45; }
-.mt-set-noresults { font-size: 13px; color: var(--mt-text-3); padding: 20px 0 4px; }
+/* .mt-set-noresults deleted: declared here, referenced by no markup and no
+   script. The zero-results case is #mt-set-empty now. */
 </style>
 {/literal}
 
@@ -224,9 +282,10 @@
     <section class="mt-section">
         <header class="mt-section-header">
             <h2 class="mt-section-title">{if $tab == 'order'}Order Process{else}General{/if} Settings</h2>
-            <div class="mt-section-tools">
-                <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
-            </div>
+            {* No Save here, and none at the foot either. This page had one at
+               each end of a form long enough to scroll, so which one you
+               reached depended on where you gave up. The demo has a single
+               floating bar; so does the Colors panel now. *}
         </header>
 
         {* Rows are grouped into named sections so the eye can land somewhere.
@@ -237,9 +296,28 @@
            posted-as-absent and silently switched off. display:none does not
            exclude a control from submission, so hidden rows still post. *}
         {foreach $flagGroups as $mtGroup}
+        {* One LINE of chrome, as the demo draws it: icon chip, label, a rule
+           that eats the remaining width, and the count. It replaced a two-line
+           label-over-description block -- the description is now the label's
+           tooltip, the same move the Colors page made with its row notes,
+           because a sentence under every heading competed with the settings
+           themselves for the eye.
+
+           The <svg> wrapper lives HERE, not in the icon strings: viewBox,
+           currentColor and the 1.8 stroke are the design's, and a group that
+           shipped its own geometry could quietly draw itself at a different
+           weight. FLAG_GROUPS supplies only the paths. *}
         <div class="mt-set-group{if $mtGroup.tab != $tab} mt-tab-off{/if}" data-set-group="{$mtGroup.slug|escape}">
-            <div class="mt-subhead mt-set-group-head">{$mtGroup.label|escape}</div>
-            <div class="mt-set-group-sub">{$mtGroup.sub|escape}</div>
+            <div class="mt-set-group-head">
+                <span class="mt-set-group-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{$mtGroup.icon}</svg>
+                </span>
+                <span class="mt-set-group-lbl" title="{$mtGroup.sub|escape}">{$mtGroup.label|escape}</span>
+                <span class="mt-set-group-rule" aria-hidden="true"></span>
+                {* data-total is the group's full size; the search JS swaps the
+                   text for the number still showing and restores it on clear. *}
+                <span class="mt-set-group-count" data-set-count data-total="{$mtGroup.count}">{$mtGroup.count} setting{if $mtGroup.count != 1}s{/if}</span>
+            </div>
         {foreach $mtGroup.flags as $key => $meta}
             {assign var=mtIsLangToggle value=($key == 'custom_language_list')}
             {assign var=mtFlagTab value=$flagTabs[$key]|default:'general'}
@@ -267,7 +345,7 @@
                the toggle is off — JS reveals it on toggle change. *}
             {if $mtIsLangToggle}
                 <div class="mt-row-sub{if $mtFlagTab != $tab} mt-tab-off{/if}" id="mt-language-picker"{if !$values[$key]} hidden{/if}>
-                    <header class="mt-row-sub-head">
+                    <header class="mt-row-sub-head"><span class="mt-row-sub-tag">Sub-setting</span>
                         <h3 class="mt-row-sub-title">Languages shown to clients</h3>
                         <span class="mt-row-sub-count" id="mt-lang-count"></span>
                     </header>
@@ -402,7 +480,7 @@
                "Order Category Sidebar" toggle (Order Process tab). *}
             {if $key == 'cart_subnav'}
                 <div class="mt-row-sub{if $mtFlagTab != $tab} mt-tab-off{/if}">
-                    <header class="mt-row-sub-head">
+                    <header class="mt-row-sub-head"><span class="mt-row-sub-tag">Sub-setting</span>
                         <h3 class="mt-row-sub-title">Per-page exceptions</h3>
                     </header>
                     <p class="mt-row-sub-help">Pages added here are <strong>exceptions</strong> — the order sub-nav is flipped on them (hidden when the toggle above is On, shown when Off). A page's own setting in the Pages editor still wins.</p>
@@ -437,7 +515,7 @@
                "Website Section Sidebar" toggle (General tab). *}
             {if $key == 'website_subnav'}
                 <div class="mt-row-sub{if $mtFlagTab != $tab} mt-tab-off{/if}">
-                    <header class="mt-row-sub-head">
+                    <header class="mt-row-sub-head"><span class="mt-row-sub-tag">Sub-setting</span>
                         <h3 class="mt-row-sub-title">Per-page exceptions</h3>
                     </header>
                     <p class="mt-row-sub-help">Pages added here are <strong>exceptions</strong> — the section sub-nav is flipped on them (hidden when the toggle above is On, shown when Off). A page's own setting in the Pages editor still wins.</p>
@@ -472,7 +550,7 @@
                "Service List Controls" toggle (General tab). *}
             {if $key == 'service_controls_outside'}
                 <div class="mt-row-sub{if $mtFlagTab != $tab} mt-tab-off{/if}">
-                    <header class="mt-row-sub-head">
+                    <header class="mt-row-sub-head"><span class="mt-row-sub-tag">Sub-setting</span>
                         <h3 class="mt-row-sub-title">Per-page exceptions</h3>
                     </header>
                     <p class="mt-row-sub-help">Pages added here are <strong>exceptions</strong> — the controls layout is flipped on them (inside when the toggle above is On, outside when Off). A page's own setting in the Pages editor still wins.</p>
@@ -514,7 +592,12 @@
            runtime (hadrian_cart/configureproduct.tpl).
            ════════════════════════════════════════════════════════════════ *}
         {literal}<style>
-        .mt-input { width: 100%; padding: 9px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 8px; background: var(--mt-surface); color: var(--mt-text); }
+        /* background-COLOR, for the same reason .mt-select needed it: a
+           `background` shorthand on a redeclared global class silently drops
+           whatever background-image the global set. .mt-input has none today,
+           so this was harmless -- but it is the identical construct that wiped
+           every dropdown chevron on this page, one class away. */
+        .mt-input { width: 100%; padding: 9px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 8px; background-color: var(--mt-surface); color: var(--mt-text); }
         .mt-input:focus { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 3px rgba(0,113,227,0.15); }
         .mt-input--sm { max-width: 140px; }
         /* .mt-field resolves to display:flex from the admin stylesheet, which
@@ -525,8 +608,31 @@
         @media (max-width: 640px) { .mt-hostname-grid { grid-template-columns: 1fr; } }
         </style>{/literal}
 
+        {* These three rows are hand-written rather than driven by FLAG_GROUPS
+           (they are tri-state settings, not booleans), and they used to sit
+           outside every group -- so the Order Process tab drew one iconed head
+           for Cart Layout and then three bare rows, as though the chrome had
+           run out half way down. They also carried no data-set-row, which meant
+           the search filter emptied every OTHER row on the page and left these
+           three standing.
+
+           Wrapping them in a real .mt-set-group fixes both: they get the head,
+           and they join the filter. The head is hand-written for the same
+           reason the rows are. *}
+        <div class="mt-set-group{if $tab != 'order'} mt-tab-off{/if}" data-set-group="orderprocess">
+            <div class="mt-set-group-head">
+                <span class="mt-set-group-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+                </span>
+                <span class="mt-set-group-lbl" title="Fields hidden or enforced during the product configuration step.">Configure Server</span>
+                <span class="mt-set-group-rule" aria-hidden="true"></span>
+                <span class="mt-set-group-count" data-set-count data-total="3">3 settings</span>
+            </div>
+
         {* ── 1. Hide Product Nameservers ─────────────────────────────── *}
-        <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}">
+        <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}"
+             data-set-row
+             data-search="hide product nameservers hide the ns1 prefix and ns2 prefix fields shown in the configure server section during the product configuration step. nameserver ns1 ns2 dns configure server">
             <div>
                 <div class="mt-row-label">Hide Product Nameservers</div>
                 <div class="mt-row-help">Hide the NS1 Prefix and NS2 Prefix fields shown in the Configure Server section during the product configuration step.</div>
@@ -574,7 +680,9 @@
         </div>
 
         {* ── 2. Hide Product Hostname (+ custom hostname + hide-on-checkout) ── *}
-        <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}">
+        <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}"
+             data-set-row
+             data-search="hide product hostname hostname fqdn root password configure server custom hostname">
             <div>
                 <div class="mt-row-label">Hide Product Hostname</div>
                 <div class="mt-row-help">Hide the Hostname and Root Password fields shown in the Configure Server section during the product configuration step.</div>
@@ -671,7 +779,9 @@
         </div>
 
         {* ── 3. Enable Password Strength for Root Password Field ──────── *}
-        <div class="mt-row{if $tab != 'order'} mt-tab-off{/if}">
+        <div class="mt-row{if $tab != 'order'} mt-tab-off{/if}"
+             data-set-row
+             data-search="enable password strength for root password field show a password-strength meter on the root password field during the product configuration step. password strength meter root secure">
             <div>
                 <div class="mt-row-label">Enable Password Strength For Root Password Field</div>
                 <div class="mt-row-help">Show a password-strength meter on the Root Password field during the product configuration step. Weak passwords are rejected server-side.</div>
@@ -681,10 +791,29 @@
                 <span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span>
             </label>
         </div>
+        </div>{* /.mt-set-group orderprocess *}
+
+        {* Empty state, shown when a search matches nothing. Without it the card
+           renders as a titled box with nothing in it, which reads as broken
+           rather than as filtered. .mt-empty and friends are already in
+           admin.css -- they are the demo's .adm-empty, ported. *}
+        <div class="mt-empty" id="mt-set-empty" hidden>
+            <div class="mt-empty-icon mt-empty-icon-circle" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <div class="mt-empty-title" id="mt-set-empty-title">No settings match</div>
+            <div class="mt-set-empty-text">Try a different term.</div>
+        </div>
     </section>
     </div>
 
-    <div style="margin-top:16px;display:flex;justify-content:flex-end">
+    {* Floating save bar, the same one the Colors panel uses -- .mt-savebar is
+       already in admin.css, and .mt-body reserves the 72px that keeps the last
+       row clear of it rather than behind it. Inside the <form> so the submit
+       button needs no form= association. Cancel reloads, which is the honest
+       way to discard when every edit so far lives only in the form. *}
+    <div class="mt-savebar">
+        <a class="mt-btn mt-btn-secondary" href="?module=Hadrian&action=settings&tab={$tab|escape}">Cancel</a>
         <button type="submit" class="mt-btn mt-btn-primary">Save changes</button>
     </div>
 </form>
@@ -1090,6 +1219,8 @@
     if (!box) return;
     var clear  = document.getElementById('mt-set-search-clear');
     var info   = document.getElementById('mt-set-searchinfo');
+    var empty      = document.getElementById('mt-set-empty');
+    var emptyTitle = document.getElementById('mt-set-empty-title');
     var groups = [].slice.call(document.querySelectorAll('[data-set-group]'));
     var rows   = [].slice.call(document.querySelectorAll('[data-set-row]'));
     if (!rows.length) return;
@@ -1106,12 +1237,6 @@
     }
     var subs = rows.map(subsOf);
 
-    // Remembered so clearing the search restores exactly what the sub-panel's
-    // own toggle had decided, rather than forcing everything open.
-    var subWasHidden = subs.map(function (list) {
-        return list.map(function (el) { return el.hidden; });
-    });
-
     function apply() {
         var q = (box.value || '').trim().toLowerCase();
         clear.hidden = q === '';
@@ -1121,20 +1246,46 @@
         rows.forEach(function (row, i) {
             var hit = !q || (row.getAttribute('data-search') || '').indexOf(q) !== -1;
             row.hidden = !hit;
-            subs[i].forEach(function (el, j) {
-                // While searching, a matched row keeps its panel in whatever
-                // state its toggle left it; a non-matched row hides both.
-                el.hidden = !hit || (q ? subWasHidden[i][j] : subWasHidden[i][j]);
+            subs[i].forEach(function (el) {
+                // data-search-off, NOT .hidden. Both this and the reveal
+                // toggles used to write .hidden, and this ran last: opening a
+                // panel and then typing shut it, and clearing the box restored
+                // a snapshot taken at PAGE LOAD, so it stayed shut. Search now
+                // owns its own attribute and [hidden] belongs solely to the
+                // toggle handler, so neither can undo the other.
+                el.toggleAttribute('data-search-off', !hit);
             });
             if (hit) shown++;
         });
 
-        // A group with nothing visible would leave a bare heading behind.
+        // A group with nothing visible would leave a bare heading behind, and
+        // a group heading claiming "4 settings" above one row would be worse
+        // than no count -- so the head counts what is SHOWING, the way the
+        // demo recomputes it from the filtered rows. data-total restores the
+        // real figure when the search clears.
         groups.forEach(function (g) {
-            var any = [].slice.call(g.querySelectorAll('[data-set-row]'))
-                        .some(function (r) { return !r.hidden; });
-            g.hidden = q !== '' && !any;
+            // .mt-tab-off is display:none !important but is NOT [hidden], so a
+            // row on the other tab would count as visible and hold open a head
+            // with nothing under it. No group mixes tabs today; the head is
+            // heavy enough chrome now that it would be obvious the day one did.
+            var visible = [].slice.call(g.querySelectorAll('[data-set-row]'))
+                            .filter(function (r) {
+                                return !r.hidden && !r.classList.contains('mt-tab-off');
+                            }).length;
+            g.hidden = q !== '' && !visible;
+
+            var badge = g.querySelector('[data-set-count]');
+            if (badge) {
+                var n = q ? visible : parseInt(badge.getAttribute('data-total'), 10);
+                badge.textContent = n + ' setting' + (n === 1 ? '' : 's');
+            }
         });
+
+        // The card would otherwise render as a titled box with nothing in it.
+        if (empty) {
+            empty.hidden = !(q && shown === 0);
+            if (emptyTitle && q) { emptyTitle.textContent = 'No settings match “' + q + '”'; }
+        }
 
         if (!q) {
             info.textContent = '';
