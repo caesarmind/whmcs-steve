@@ -212,6 +212,102 @@
         sharedShown = !sharedShown; applyShared();
     });
     applyShared();   // the page can load straight into the dark scope
+
+    /* ------------------------------------------------------------------
+       Linked rows. Two links, one idiom: a row keeps following until you
+       set it yourself, exactly as the Accent hover row has always described.
+
+       (1) FOLLOWS -- the seven sidebar rows already track the page ramp in
+           CSS. The panel now mirrors the source into them so the swatch is
+           not stale, instead of restating a literal that freezes on touch.
+
+       (2) DARK FOLLOWS LIGHT -- by each token's OWN shipped relationship,
+           not one global rule. There is no global rule: the lightness gap
+           between the shipped pairs runs from 0.03 on --color-text-tertiary
+           to 1.00 on the alpha-flip rows, with --color-surface at 0.71.
+           Taking the delta from each row's own two defaults reproduces the
+           shipped pair exactly when nothing has been touched, and carries
+           the same relationship onto whatever you pick.
+
+       A row that already carries a stored override starts UNLINKED, so
+       loading a saved palette never silently rewrites it.
+       ------------------------------------------------------------------ */
+    /* TWO links, tracked separately, because breaking one must not break the
+       other: setting a sidebar colour by hand should stop it following the
+       page ramp, but its own dark counterpart should still track it. */
+    var manualDark = {};    // this row's dark no longer follows its light
+    var manualFollow = {};  // this row no longer follows its source row
+    function normv(s){ return String(s == null ? '' : s).trim().toLowerCase().replace(/\s+/g, ''); }
+    var followers = {}, isFollower = {};
+    [].slice.call(form.querySelectorAll('.mt-color-row[data-follows]')).forEach(function(r){
+        var src = r.getAttribute('data-follows'), tgt = r.getAttribute('data-var');
+        (followers[src] = followers[src] || []).push(tgt);
+        isFollower[tgt] = true;
+    });
+    // A stored override means the buyer already decided; never rewrite it.
+    [].slice.call(form.querySelectorAll('input.mt-color-other')).forEach(function(o){
+        var n = o.getAttribute('data-var'), t = textFor(n);
+        if (normv(o.value) !== normv(o.getAttribute('data-default'))) manualDark[n] = true;
+        if (isFollower[n] && t && normv(t.value) !== normv(t.getAttribute('data-default'))) manualFollow[n] = true;
+    });
+
+    /* The dark counterpart of a light value, carrying this row's shipped
+       light->dark delta in OKLCH. Alpha is taken from the dark default
+       outright rather than shifted: the alpha bumps are fixed steps
+       (0.10 -> 0.16), not a function of the colour. */
+    function darkFrom(name, lightStr){
+        var t = textFor(name), o = otherFor(name);
+        if (!t || !o) return null;
+        var dl = parseCol(t.getAttribute('data-default')),
+            dd = parseCol(o.getAttribute('data-default')),
+            cur = parseCol(lightStr);
+        if (!dl || !dd || !cur) return null;
+        var a = toLch(dl.rgb), b = toLch(dd.rgb), c = toLch(cur.rgb);
+        return fmtCol(lchToRgb(
+            Math.max(0, Math.min(1, c.L + (b.L - a.L))),
+            Math.max(0, c.C + (b.C - a.C)),
+            ((c.H + (b.H - a.H)) % 360 + 360) % 360
+        ), dd.a);
+    }
+
+    function propagate(name){
+        var t = textFor(name); if (!t) return;
+        /* This row's own dark counterpart FIRST. Followers copy the source's
+           dark value, so recomputing it afterwards would hand them the stale
+           one -- the sidebar text kept the shipped dark while the page text
+           had already moved. */
+        var o = otherFor(name);
+        if (o && !manualDark[name]) {
+            var v = darkFrom(name, t.value);
+            if (v) o.value = v;
+        }
+        // ...then the rows that follow this one, in both scopes at once
+        (followers[name] || []).forEach(function(tgt){
+            if (manualFollow[tgt]) return;
+            if (textFor(tgt)) setToken(tgt, t.value);
+            var to = otherFor(tgt);
+            if (to && o && !manualDark[tgt]) to.value = o.value;
+        });
+    }
+
+    form.addEventListener('input', function(e){
+        var el = e.target;
+        if (!el || !el.getAttribute) return;
+        var name = el.classList && el.classList.contains('mt-color-text')
+            ? el.getAttribute('data-var')
+            : (el.classList && el.classList.contains('mt-color-swatch-input')
+                ? el.getAttribute('data-for') : null);
+        if (!name) return;
+        /* Editing while looking at Dark IS editing the dark value, so it
+           breaks that link rather than driving it. Editing in Light drives. */
+        if (curScope() === 'dark') { manualDark[name] = true; return; }
+        /* Setting a follower by hand stops it following its source -- but its
+           own dark counterpart still tracks it, which is why the two flags are
+           separate. Without this, editing the sidebar border then editing the
+           page border overwrote the sidebar again. */
+        if (isFollower[name]) manualFollow[name] = true;
+        propagate(name);
+    });
     function swapScope(want){
         if (want === curScope()) return;
         [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){

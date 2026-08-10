@@ -143,7 +143,13 @@
 
         <div class="mt-color-rows">
             {foreach $tokens as $t}
-            <div class="mt-color-row" data-var="{$t.var|escape}"{if $t.shared|default:false} data-shared="1"{/if}>
+            {* data-follows names a row this one already tracks IN CSS -- the
+               seven sidebar rows are `var(--_sb-*, var(--color-*))`, so they
+               fall back to the page ramp. The schema restated the resolved
+               literal as their default, which made the admin show a stale
+               swatch and, worse, freeze the link the moment the row was
+               touched. Declaring it lets the panel mirror the source instead. *}
+            <div class="mt-color-row" data-var="{$t.var|escape}"{if $t.shared|default:false} data-shared="1"{/if}{if $t.follows|default:''} data-follows="{$t.follows|escape}"{/if}>
                 <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">{$t.label|escape}</label>
                 <span class="mt-color-control">
                     <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
