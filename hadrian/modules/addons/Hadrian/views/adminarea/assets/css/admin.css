@@ -194,7 +194,16 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-tabs .mt-tab.is-active { color: var(--mt-primary); border-bottom-color: var(--mt-primary); font-weight: 600; }
 
 /* -- Sub-category rail (styles editor) ------------------------------------ */
-.mt-subcats { display: flex; flex-direction: column; gap: 2px; min-width: 180px; }
+/* NO min-width. The rail sits in a fixed 180px grid track (.mt-split), so a
+   180px floor plus the card's 28px padding made it 58px wider than the card it
+   lives in -- and a fixed track cannot grow, so the items simply painted
+   outside: the active row's tint crossed the card's right border and ran under
+   the panel beside it. The demo sizes the rail from its card (full-width
+   buttons in a 10px-padded card) rather than pinning it to the track width. */
+.mt-subcats { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+/* ...and the card is padded to match: 10px, as the demo has it. .mt-panel.pad's
+   28px is a section padding -- on a rail it is most of the column. */
+.mt-subcats-panel { padding: 10px; }
 .mt-subcats .mt-subcat { padding: 8px 12px; border-radius: var(--mt-radius-sm); color: var(--mt-text-2); font-size: 13.5px; font-weight: 500; cursor: pointer; text-decoration: none; }
 .mt-subcats .mt-subcat:hover { background: var(--mt-surface-2); color: var(--mt-text); text-decoration: none; }
 .mt-subcats .mt-subcat.is-active { background: var(--mt-primary-tint); color: var(--mt-primary); font-weight: 600; }
@@ -681,8 +690,12 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 /* A segmented pill, not the underlined text tabs .mt-tabs gives by default:
    the design draws a recessed track with the active half raised out of it,
    which reads as a two-state switch rather than as page navigation. The
-   ::after is the tab underline, neutralised here rather than globally. */
-.mt-cs-editing .mt-tabs { display: inline-flex; gap: 2px; padding: 3px; border: 0; background: var(--mt-surface-2); border-radius: 8px; }
+   ::after is the tab underline, neutralised here rather than globally.
+
+   margin:0 is not tidying: .mt-tabs ships `margin: 0 0 20px` for a page-level
+   tab strip, and align-items:center centres the MARGIN box -- so the pill
+   rendered exactly 10px above "Editing" and the "Color scheme" title. */
+.mt-cs-editing .mt-tabs { display: inline-flex; gap: 2px; margin: 0; padding: 3px; border: 0; background: var(--mt-surface-2); border-radius: 8px; }
 .mt-cs-editing .mt-tab { border: 0; margin: 0; padding: 5px 14px; border-radius: 6px; background: none; font-size: 11px; font-weight: 600; text-transform: capitalize; color: var(--mt-text-2); cursor: pointer; }
 .mt-cs-editing .mt-tab::after { display: none; }
 .mt-cs-editing .mt-tab.is-active { background: var(--mt-surface); color: var(--mt-primary); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }

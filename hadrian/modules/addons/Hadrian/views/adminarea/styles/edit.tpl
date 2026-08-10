@@ -23,7 +23,11 @@
 
 {if $tab == 'variables'}
 <div class="mt-split">
-  <div class="mt-panel pad">
+  {* Not .pad: a 28px section padding inside a 180px column leaves 122px for a
+     rail that wants the full width, which is what pushed the nav out from under
+     its own card. .mt-subcats-panel pads to 10px, as the demo's sub-nav card
+     does. *}
+  <div class="mt-panel mt-subcats-panel">
     <nav class="mt-subcats">
         <a class="mt-subcat {if $subcat == 'colors'}is-active{/if}"     data-subcat="colors"     href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=colors">Colors</a>
         <a class="mt-subcat {if $subcat == 'typography'}is-active{/if}" data-subcat="typography" href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=typography">Typography</a>
