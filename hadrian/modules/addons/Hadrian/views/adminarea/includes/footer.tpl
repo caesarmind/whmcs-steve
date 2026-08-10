@@ -177,6 +177,41 @@
     var scopeField  = form.querySelector('input[name="scope"]');
     var scopeSwitch = form.querySelector('[data-scope-switch]');
     function curScope(){ return scopeField && scopeField.value === 'dark' ? 'dark' : 'light'; }
+
+    /* Dark shows fewer rows than Light. 14 of the 57 ship the same value in
+       both modes -- the nine icon tiles, the three status bases,
+       --color-on-accent, --sidebar-color -- so in Dark they are not a decision,
+       they are the same question asked twice. Hidden there, with a count and a
+       way back: "the default matches" is not "you may never differ here".
+
+       Hidden, not removed. The inputs still post, so their values survive
+       untouched and saveColorsAction drops them for equalling the default. */
+    var sharedShown = false;
+    function applyShared(){
+        var dark = curScope() === 'dark', hide = dark && !sharedShown, n = 0;
+        [].slice.call(form.querySelectorAll('.mt-color-row[data-shared]')).forEach(function(r){
+            r.hidden = hide; n++;
+        });
+        // A group whose rows all vanished should not leave a heading behind
+        [].slice.call(form.querySelectorAll('.mt-color-rows')).forEach(function(g){
+            var vis = [].slice.call(g.querySelectorAll('.mt-color-row')).some(function(r){ return !r.hidden; });
+            var sec = g.closest('.mt-section');
+            if (sec) sec.hidden = !vis;
+        });
+        var note = form.querySelector('.mt-shared-note');
+        if (note) {
+            note.hidden = !dark;
+            var c = note.querySelector('.mt-shared-count');
+            if (c) c.textContent = n + (n === 1 ? ' colour is' : ' colours are');
+            var b = note.querySelector('.mt-shared-toggle');
+            if (b) b.textContent = sharedShown ? 'Hide them' : 'Show them';
+        }
+    }
+    var sharedBtn = form.querySelector('.mt-shared-toggle');
+    if (sharedBtn) sharedBtn.addEventListener('click', function(){
+        sharedShown = !sharedShown; applyShared();
+    });
+    applyShared();   // the page can load straight into the dark scope
     function swapScope(want){
         if (want === curScope()) return;
         [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
@@ -202,6 +237,7 @@
         if (scopeSwitch) [].slice.call(scopeSwitch.querySelectorAll('[data-scope-set]')).forEach(function(x){
             x.classList.toggle('is-active', x.getAttribute('data-scope-set') === want); });
         sbtRefresh();
+        applyShared();
     }
     if (scopeSwitch) scopeSwitch.addEventListener('click', function(e){
         var b = e.target.closest('[data-scope-set]');

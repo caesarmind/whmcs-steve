@@ -32,6 +32,15 @@
                 </button>
             {/foreach}
         </div>
+        {* Shown only in the Dark scope. Rows that ship the same value in both
+           modes are not dark-mode decisions -- asking for them twice is asking
+           the same question twice -- so Dark hides them and says how many.
+           The escape hatch matters though: "the default is the same" is not
+           "you may never differ here", so they can be brought back. *}
+        <p class="mt-field-help mt-shared-note" hidden>
+            <span class="mt-shared-count"></span> the same in both modes, so they are hidden here.
+            <button type="button" class="mt-shared-toggle">Show them</button>
+        </p>
     </section>
 
     {* Seeded generation — the other way to set a palette, sitting beside the
@@ -134,7 +143,7 @@
 
         <div class="mt-color-rows">
             {foreach $tokens as $t}
-            <div class="mt-color-row" data-var="{$t.var|escape}">
+            <div class="mt-color-row" data-var="{$t.var|escape}"{if $t.shared|default:false} data-shared="1"{/if}>
                 <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">{$t.label|escape}</label>
                 <span class="mt-color-control">
                     <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">

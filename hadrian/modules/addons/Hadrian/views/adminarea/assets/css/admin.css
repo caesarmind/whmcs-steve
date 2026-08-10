@@ -649,6 +649,13 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-color-swatch-input::-moz-color-swatch { border: 0; border-radius: 3px; }
 .mt-color-text { max-width: 132px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; text-transform: lowercase; }
 
+/* Rows the Dark scope has no opinion about, and the way back to them. */
+.mt-shared-note { margin: 14px 0 0; }
+.mt-shared-note[hidden] { display: none; }
+.mt-shared-count { font-weight: 600; color: var(--mt-text-2); }
+.mt-shared-toggle { border: 0; background: none; padding: 0 0 0 4px; cursor: pointer; font: inherit; color: var(--mt-link); text-decoration: underline; }
+.mt-color-row[hidden], .mt-section[hidden] { display: none; }
+
 /* -- Colors panel: sidebar style presets ----------------------------------- */
 /* Deliberately the SAME chip markup as the accent presets at the top of the
    page, because it is the same idea one group down: click a preset, the rows

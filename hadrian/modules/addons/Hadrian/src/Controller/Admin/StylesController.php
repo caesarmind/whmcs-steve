@@ -648,6 +648,20 @@ final class StylesController extends AbstractController
                 $t['otherDef'] = $defaultOther;
                 $t['other']    = isset($storedOther[$t['var']])
                     ? (string)$storedOther[$t['var']] : $defaultOther;
+
+                /* Rows that ship the SAME value in both modes are not dark-mode
+                   decisions, and 14 of 57 are: all nine icon tiles (they sit on
+                   a coloured chip, not the page), the three status bases,
+                   --color-on-accent and --sidebar-color. Their own hints say as
+                   much. Marking them lets the Dark scope hide what it has no
+                   opinion about instead of asking the same question twice.
+
+                   Compared on the DEFAULTS, not on the stored values: whether a
+                   token is mode-independent is a property of the design, and
+                   deriving it from what someone happened to save would make
+                   rows appear and disappear as they were edited. */
+                $t['shared'] = $this->normColor((string)($t['light'] ?? ''))
+                    === $this->normColor((string)($t['dark'] ?? ''));
                 $groups[$groupName][] = $t;
             }
         }
