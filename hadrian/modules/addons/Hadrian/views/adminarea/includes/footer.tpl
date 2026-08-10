@@ -753,26 +753,29 @@
             };
             var A = isDark ? Ad : Al;
 
-            /* The dark seed is the brand colour RAISED TO the dark accent's
-               lightness -- a floor, not an offset. Offsetting fails upward: a
-               yellow brand is already lighter than the dark accent, and adding
-               the same delta again lands on a near-white "brand" colour. Chroma
-               still travels by the shipped ratio, so the stock accent is a
-               fixed point. */
-            var seed = isDark
-                ? { L: Math.max(S.L, Ad.L), C: S.C * (Al.C > 0.002 ? Ad.C / Al.C : 1), H: S.H }
-                : { L: S.L, C: S.C, H: S.H };
+            /* THE BRAND ACCENT IS THE BRAND ACCENT, in both modes. An earlier
+               version raised it in dark for legibility; the owner's call is
+               that a brand colour does not change with the time of day, and
+               for the 105 places it is a BACKGROUND that costs nothing --
+               --color-on-accent picks its ink at the crossover either way. */
+            var seed = { L: S.L, C: S.C, H: S.H };
 
-            /* ...and then dark gets a measured lift on top, because the floor
-               alone is not enough. In dark mode the theme ships --color-link as
-               var(--color-accent) outright, so an accent that is merely lighter
-               than the brand and still dark reads as an unclickable link. */
+            /* The link rows are the exception, and they are not a hedge. Light
+               mode already makes link DARKER than the accent, because accent-
+               coloured text on a card needs more contrast than an accent fill
+               does; dark mode needs the same move in the other direction. Left
+               deriving, dark ships --color-link as var(--color-accent) outright
+               and a deep brand lands accent-coloured text at 2.6:1 -- 1.61:1
+               for a purple. Lifted to the AA line instead. */
+            var linkSeed = seed;
             if (isDark) {
+                linkSeed = { L: Math.max(S.L, Ad.L),
+                             C: S.C * (Al.C > 0.002 ? Ad.C / Al.C : 1), H: S.H };
                 var surfDef = parseCol(defOf('--color-surface'));
                 var guard = 0;
-                while (surfDef && contrast(lchToRgb(seed.L, seed.C, seed.H), surfDef.rgb) < 4.5
-                       && seed.L < 0.92 && guard++ < 80) {
-                    seed.L += 0.01; lifted = true;
+                while (surfDef && contrast(lchToRgb(linkSeed.L, linkSeed.C, linkSeed.H), surfDef.rgb) < 4.5
+                       && linkSeed.L < 0.92 && guard++ < 80) {
+                    linkSeed.L += 0.01; lifted = true;
                 }
             }
 
@@ -818,6 +821,17 @@
             if (want.brand) {
                 ['--color-accent-hover', '--color-link', '--color-link-hover'].forEach(function(n){
                     var e = el(n); if (!e) return;
+                    /* In DARK the two link rows are written, not reset: the CSS
+                       would otherwise derive them from an accent that is now
+                       the unlifted brand colour. Accent hover still derives --
+                       it is a fill, so its ink is handled at the crossover. */
+                    if (isDark && n !== '--color-accent-hover') {
+                        var L = n === '--color-link-hover'
+                            ? Math.min(0.95, linkSeed.L + 0.05) : linkSeed.L;
+                        put(n, toHex(lchToRgb(L, linkSeed.C, linkSeed.H)));
+                        written++;
+                        return;
+                    }
                     if (e.value !== e.getAttribute('data-default')) cleared++;
                     put(n, e.getAttribute('data-default'));
                 });
@@ -848,7 +862,7 @@
             '<p class="mt-gen-sum"><b>' + written + '</b> rows filled in below &middot; '
             + (checked - fails) + ' of ' + checked + ' checked pairs clear AA'
             + (fails ? ', <span class="is-bad">' + fails + ' below 4.5</span>' : '')
-            + (lifted ? ' &middot; the accent was <b>lifted</b> to stay legible on a dark card' : '')
+            + (lifted ? ' &middot; the accent is identical in both modes; dark <b>link</b> colours were lifted to stay legible on a dark card' : '')
             + (cleared ? ' &middot; <b>' + cleared + '</b> pinned row(s) released back to following the accent' : '')
             + '. Nothing is stored until you press <strong>Save colors</strong>.'
             + ' Accent hover, link and link hover keep deriving in CSS, so their swatches stay stock.</p>'
