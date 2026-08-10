@@ -173,14 +173,17 @@
     });
 
     /* ------------------------------------------------------------------
-       Sidebar tint: Off / Follow brand / Custom.
+       Sidebar style: Light / the named styles from colors.php / Custom.
 
-       The buttons hold no value of their own. They write '', 'brand' or a hex
-       into the same c[--sidebar-color] field every other row posts through, so
-       there is no new input, no new POST key and no new storage -- the mode is
-       READ BACK from the value, which means the two can never disagree.
+       The buttons hold no value of their own. They write '', a style NAME or a
+       hex into the same c[--sidebar-color] field every other row posts through,
+       so there is no new input, no new POST key and no new storage -- and the
+       mode is READ BACK from the value, which means the two can never disagree.
 
-       Placed above the generator's early return on purpose: the tint switch is
+       The style vocabulary is read off the buttons rather than duplicated here,
+       so adding a style is a row in colors.php and nothing else.
+
+       Placed above the generator's early return on purpose: the style switch is
        not part of the generator and must still work if that section is absent.
        ------------------------------------------------------------------ */
     var sbt = form.querySelector('[data-sbt]');
@@ -188,13 +191,17 @@
         var sbtField  = sbt.querySelector('input.mt-color-text'),
             sbtSwatch = sbt.querySelector('input.mt-color-swatch-input'),
             sbtCustom = sbt.querySelector('.mt-sbt-custom'),
-            // Remembered so flipping Off -> Custom -> Off -> Custom does not
+            sbtNames  = [].slice.call(sbt.querySelectorAll('.mt-sbt-mode'))
+                          .map(function(b){ return b.getAttribute('data-sbt-mode'); })
+                          .filter(function(k){ return k !== 'off' && k !== 'custom'; }),
+            // Remembered so flipping Light -> Custom -> Light -> Custom does not
             // lose the colour that was picked.
             sbtLast   = clean(sbtField.value) ? '#' + clean(sbtField.value) : '';
 
         function sbtMode(){
             var v = (sbtField.value || '').trim().toLowerCase();
-            return v === '' ? 'off' : (v === 'brand' ? 'brand' : 'custom');
+            if (v === '') return 'off';
+            return sbtNames.indexOf(v) !== -1 ? v : 'custom';
         }
         function sbtSync(){
             var m = sbtMode();
@@ -214,7 +221,10 @@
                 sbtField.value = seed; sbtSwatch.value = seed;
             } else {
                 if (sbtMode() === 'custom' && clean(sbtField.value)) sbtLast = '#' + clean(sbtField.value);
-                sbtField.value = m === 'brand' ? 'brand' : '';
+                // 'off' is the ABSENCE of a value -- that emptiness is the
+                // tint's off switch in apple-theme.css, not a colour meaning
+                // "neutral". Every other mode stores its own name.
+                sbtField.value = m === 'off' ? '' : m;
             }
             sbtSync();
         });

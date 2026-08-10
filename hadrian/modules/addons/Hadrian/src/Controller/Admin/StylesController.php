@@ -558,10 +558,11 @@ final class StylesController extends AbstractController
                         continue;
                     }
                     $val = trim((string)$declared[$var]);
-                    // Same sentinel as saveColorsAction, so a style preset can
-                    // ship a nav that follows the accent rather than a frozen hex.
-                    if ($var === '--sidebar-color' && strtolower($val) === 'brand') {
-                        $out[$var] = 'brand';
+                    // Same vocabulary as saveColorsAction, so a style preset can
+                    // ship a named nav rather than a frozen hex.
+                    if ($var === '--sidebar-color'
+                        && isset($cfg['sidebarStyles'][strtolower($val)])) {
+                        $out[$var] = strtolower($val);
                         continue;
                     }
                     if ($val === '' || !$this->isColor($val)) {
@@ -654,6 +655,11 @@ final class StylesController extends AbstractController
             'presets' => $cfg['presets'] ?? [],
             'mode'    => $mode,
             'accents' => $accents,
+            // Named sidebar styles render the picker on the --sidebar-color row.
+            // Light and Custom are not entries: Light is the ABSENCE of a value
+            // and Custom is any literal, so both are states of the field rather
+            // than rows of this table.
+            'sbStyles' => $cfg['sidebarStyles'] ?? [],
         ];
     }
 
@@ -672,6 +678,7 @@ final class StylesController extends AbstractController
         $cfg  = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/colors.php');
         $mode = $scope;
         $in   = is_array($_POST['c'] ?? null) ? $_POST['c'] : [];
+        $sbStyles = is_array($cfg['sidebarStyles'] ?? null) ? $cfg['sidebarStyles'] : [];
 
         $out = [];
         foreach (($cfg['groups'] ?? []) as $tokens) {
@@ -681,14 +688,14 @@ final class StylesController extends AbstractController
                     continue;
                 }
                 $val = trim((string)$in[$var]);
-                /* "brand" is the sidebar tint's follow-the-accent state, and it
-                   is deliberately NOT a colour: Hooks::buildColorsHead turns it
-                   into `var(--color-accent)` on the way out so the nav tracks a
-                   rebrand instead of freezing the hex that was current when it
-                   was picked. Accepted only for this one token -- anywhere else
-                   a non-colour is still a typo. */
-                if ($var === '--sidebar-color' && strtolower($val) === 'brand') {
-                    $out[$var] = 'brand';
+                /* A named sidebar style is deliberately NOT a colour: it is a
+                   word from colors.php's sidebarStyles, and buildColorsHead
+                   turns it into the mapped CSS on the way out -- so Tinted and
+                   Brand track a rebrand instead of freezing the hex that
+                   happened to be current when they were picked. Accepted only
+                   for this one token; anywhere else a non-colour is a typo. */
+                if ($var === '--sidebar-color' && isset($sbStyles[strtolower($val)])) {
+                    $out[$var] = strtolower($val);
                     continue;
                 }
                 if ($val === '' || !$this->isColor($val)) {

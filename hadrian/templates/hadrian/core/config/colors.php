@@ -25,6 +25,38 @@ return [
         ['name' => 'Slate',   'accent' => '#64748b'],
     ],
 
+    /* Named sidebar styles, modelled on the five-way toggle in the v18 mockup
+       (apple-client-area: Light / Tinted / Dark / Graphite / Brand).
+       Each entry's `value` is what Hooks::buildColorsHead emits as
+       --sidebar-color; the theme's existing @supports derivation does the rest
+       -- background, three ink steps, hover, active, hairline and scrollbar,
+       with black-or-white label ink chosen at the WCAG crossover. So a style is
+       ONE stored word, not a set of tokens, and adding one here needs no CSS.
+
+       Light is the absence of a value (empty = the tint's off switch) and
+       Custom is any literal colour, so neither belongs in this list.
+
+       Tinted and Brand emit a var()/color-mix() rather than a resolved hex on
+       purpose: they must FOLLOW a rebrand, and html[data-palette] redefines
+       --color-accent in static CSS the server cannot see.
+
+       Brand is deepened 6% toward black. Raw var(--color-accent) measures 4.30
+       for the primary label on the shipped blue -- under AA -- and 6% is the
+       smallest step that clears 4.5 on every accent tested (blue 4.74,
+       terracotta 5.35, purple 5.06, teal 5.25, green 4.97, yellow 13.4).
+       The mockup uses the raw accent and does not clear it.
+
+       KNOWN, MEASURED, NOT FIXED: on Brand the SOFTENED steps stay 3.0-3.4
+       whatever the deepening, because they are a 70/30 mix of the ink into a
+       mid-tone base. apple-theme.css's tint block documents the same ceiling.
+       The dark styles have plenty of headroom (6.9-7.6). */
+    'sidebarStyles' => [
+        'tinted'   => ['label' => 'Tinted',   'value' => 'color-mix(in srgb, var(--color-accent) 10%, #ffffff)'],
+        'dark'     => ['label' => 'Dark',     'value' => '#1c1c1e'],
+        'graphite' => ['label' => 'Graphite', 'value' => '#21252e'],
+        'brand'    => ['label' => 'Brand',    'value' => 'color-mix(in srgb, var(--color-accent) 94%, #000000)'],
+    ],
+
     // Editable tokens, grouped for the form. Each: var, label, light, dark,
     // and an optional `hint` shown under the label.
     //
