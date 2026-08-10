@@ -131,10 +131,19 @@
                     <span class="mt-sbt-modes" role="group" aria-label="Sidebar style">
                         <button type="button" class="mt-sbt-mode" data-sbt-mode="off" aria-pressed="{if $t.value == ''}true{else}false{/if}">Light</button>
                         {foreach $colors.sbStyles as $sbKey => $sb}
-                        <button type="button" class="mt-sbt-mode" data-sbt-mode="{$sbKey|escape}" aria-pressed="{if $t.value == $sbKey}true{else}false{/if}">{$sb.label|escape}</button>
+                        {* data-sbt-css carries the style's CSS verbatim from
+                           colors.php so the preview dot can be painted with the
+                           exact declaration that ships. The browser resolves the
+                           color-mix() for us -- no colour maths here, and no
+                           second copy of the values to drift. *}
+                        <button type="button" class="mt-sbt-mode" data-sbt-mode="{$sbKey|escape}" data-sbt-css="{$sb.value|escape}" aria-pressed="{if $t.value == $sbKey}true{else}false{/if}">{$sb.label|escape}</button>
                         {/foreach}
                         <button type="button" class="mt-sbt-mode" data-sbt-mode="custom" aria-pressed="false">Custom</button>
                     </span>
+                    {* Always visible except in Custom, where the real picker
+                       takes its place -- so the row never sits there with no
+                       colour on it, the way every other row shows one. *}
+                    <span class="mt-sbt-preview" aria-hidden="true"></span>
                     {* Both open hidden and sbtSync() reveals them for Custom.
                        A `hidden` text input still POSTs, which is what lets the
                        whole control ride the existing c[--sidebar-color] field. *}

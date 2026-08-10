@@ -187,10 +187,15 @@
        not part of the generator and must still work if that section is absent.
        ------------------------------------------------------------------ */
     var sbt = form.querySelector('[data-sbt]');
+    // No-op stand-in so callers outside the block (the generator, the form-wide
+    // input listener) can refresh the picker without caring whether the row is
+    // on the page at all.
+    var sbtRefresh = function(){};
     if (sbt) {
         var sbtField  = sbt.querySelector('input.mt-color-text'),
             sbtSwatch = sbt.querySelector('input.mt-color-swatch-input'),
             sbtCustom = sbt.querySelector('.mt-sbt-custom'),
+            sbtPrev   = sbt.querySelector('.mt-sbt-preview'),
             sbtNames  = [].slice.call(sbt.querySelectorAll('.mt-sbt-mode'))
                           .map(function(b){ return b.getAttribute('data-sbt-mode'); })
                           .filter(function(k){ return k !== 'off' && k !== 'custom'; }),
@@ -203,13 +208,47 @@
             if (v === '') return 'off';
             return sbtNames.indexOf(v) !== -1 ? v : 'custom';
         }
+        /* Paint the preview with the style's own CSS, straight off the button.
+           The browser resolves the color-mix() -- no colour maths here, and no
+           second copy of the values to drift from colors.php. Light has no
+           entry of its own, so it borrows the --sidebar-bg default, which is
+           literally what the nav renders when no tint is set. */
+        function sbtPaint(m){
+            if (!sbtPrev) return;
+            var css;
+            if (m === 'off') css = defVal('--sidebar-bg') || '#f6f6f8';
+            else {
+                var b = sbt.querySelector('.mt-sbt-mode[data-sbt-mode="' + m + '"]');
+                css = b ? (b.getAttribute('data-sbt-css') || '') : '';
+            }
+            if (!css) { sbtPrev.style.background = ''; return; }
+            // The admin page has no --color-accent of its own, so substitute the
+            // value sitting in the Accent field: the dot then tracks it live and
+            // shows Tinted and Brand actually following a rebrand.
+            var acc = clean(fieldVal('--color-accent'));
+            sbtPrev.style.background = css.replace(/var\(--color-accent\)/g, acc ? '#' + acc : '#0071e3');
+        }
         function sbtSync(){
             var m = sbtMode();
             [].slice.call(sbt.querySelectorAll('.mt-sbt-mode')).forEach(function(b){
                 b.setAttribute('aria-pressed', String(b.getAttribute('data-sbt-mode') === m)); });
             sbtCustom.hidden = m !== 'custom';
             sbtField.hidden  = m !== 'custom';
+            // In Custom the real picker IS the swatch, so two would be one too many
+            if (sbtPrev) sbtPrev.hidden = m === 'custom';
+            sbtPaint(m);
         }
+        sbtRefresh = sbtSync;
+        /* Delegated, because the Accent can change without its text field ever
+           firing input: the swatch handler assigns .value directly, and the
+           palette generator writes through setToken. Listening on the form
+           catches both, and repainting one dot is free. */
+        form.addEventListener('input', function(e){
+            // ...but never while the buyer is typing in this row's OWN field.
+            // Clearing it to retype would read as mode 'off' and yank the input
+            // out from under the cursor mid-keystroke.
+            if (e.target !== sbtField) sbtSync();
+        });
         sbt.addEventListener('click', function(e){
             var b = e.target.closest('.mt-sbt-mode'); if (!b) return;
             var m = b.getAttribute('data-sbt-mode');
@@ -486,6 +525,9 @@
             });
         }
 
+        // The generator writes the Accent through setToken, which fires no
+        // input event, so the sidebar preview has to be told a rebrand happened.
+        sbtRefresh();
         genUndoState(snapshot);
         genRender(written, before, PAIRS.map(function(p){ return pairRatio(p[0], p[1]); }), lifted, cleared);
     }
