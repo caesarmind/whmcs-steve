@@ -86,9 +86,6 @@
     .mt-seg button:hover{color:var(--mt-text)}
     .mt-seg button.on{background:var(--mt-surface);color:var(--mt-text);box-shadow:0 1px 2px rgba(0,0,0,.12)}
     .mt-lay-optnone{border-top:1px dashed var(--mt-border);padding-top:11px;font-size:11.5px;color:var(--mt-text-3);font-style:italic}
-    .mt-lay-size{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-    .mt-lay-size .mt-input{max-width:96px}
-    .mt-lay-size-def{font-size:11px;color:var(--mt-text-3)}
     .mt-flag-form{display:flex;align-items:center;gap:8px;margin:0;flex-shrink:0}
 
     /* Not-yet-wired placeholders. Dimmed and non-interactive so they read as
@@ -267,35 +264,6 @@
                                 <div class="mt-lay-optnone">No alignment option &mdash; content is always centered.</div>
                             {/if}
 
-                            {* Dimensions this layout shapes, declared in its own
-                               layout.php and moved here from Styles > Layout:
-                               "how wide is the sidebar" is a property of the
-                               sidebar layout, not of a colour style. Shown only
-                               on an ACTIVE card, same rule as the options above
-                               -- sizing a layout nobody is served is noise.
-                               Each posts on change and saves into the same
-                               _layout_vars blob the Content fields below use. *}
-                            {foreach $layout.sizes as $sz}
-                            <div class="mt-lay-opt">
-                                <span class="mt-lay-opt-lbl">{$sz.label|escape}</span>
-                                {* Explicit Apply, no autosubmit -- same reason
-                                   the Content fields below give: a number field
-                                   posting on every keystroke stores half-typed
-                                   values (a 2 on the way to 260). *}
-                                <form method="post" action="" class="mt-lay-size">
-                                    <input type="hidden" name="layout_size" value="{$sz.field|escape}">
-                                    <span class="mt-affix">
-                                        <input type="number" name="value" class="mt-input mt-input-compact"
-                                               value="{$sz.value}" data-default="{$sz.default}"
-                                               min="0" max="4000" step="1" inputmode="numeric"
-                                               aria-label="{$sz.label|escape} in pixels">
-                                        <span class="mt-affix-unit">px</span>
-                                    </span>
-                                    <button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button>
-                                    <span class="mt-lay-size-def">default {$sz.default}px</span>
-                                </form>
-                            </div>
-                            {/foreach}
                         {/if}
 
                         {* Live preview. The mechanism already existed and was
@@ -444,6 +412,42 @@
             <button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button>
         </form>
     </div>
+
+    {* The dimensions that belong to particular layouts, moved here from
+       Styles > Layout. They sit with the content width and padding rather than
+       on the layout cards: all four are page-structure geometry and reading
+       them as one set is the point of a Containers section.
+
+       Which layouts each one shapes comes from the layout manifests, not from a
+       string typed here, so the note stays true when a layout is added. That
+       mapping is measured, not assumed: header.tpl renders the inner topbar
+       only when the layout is NOT 'top', so topbar height belongs to Sidebar
+       and Icon Rail -- the opposite of the obvious guess. *}
+    {foreach $layoutSizes as $sz}
+    <div class="mt-row">
+        <div>
+            <div class="mt-row-label">{$sz.label|escape}</div>
+            <div class="mt-row-help">
+                Applies to the <strong>{$sz.applies|escape}</strong> {if $sz.plural}layouts{else}layout{/if}.
+                Default {$sz.default}px.
+            </div>
+        </div>
+        {* Explicit Apply, no autosubmit -- same reason the fields above give:
+           a number field posting on every keystroke stores half-typed values
+           (a 2 on the way to 260). *}
+        <form method="post" action="" class="mt-flag-form">
+            <input type="hidden" name="layout_size" value="{$sz.field|escape}">
+            <span class="mt-affix">
+                <input type="number" name="value" class="mt-input mt-input-compact"
+                       value="{$sz.value}" data-default="{$sz.default}"
+                       min="0" max="4000" step="1" inputmode="numeric"
+                       aria-label="{$sz.label|escape} in pixels">
+                <span class="mt-affix-unit">px</span>
+            </span>
+            <button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button>
+        </form>
+    </div>
+    {/foreach}
 </section>
 
 {* Remaining planned sections. Rendered disabled so the finished shape of the

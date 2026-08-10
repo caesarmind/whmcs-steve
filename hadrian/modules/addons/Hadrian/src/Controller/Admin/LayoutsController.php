@@ -161,6 +161,7 @@ final class LayoutsController extends AbstractController
 
         // Build BOTH kinds so the tabs are pure client-side toggles.
         $groups = [];
+        $sizeAppliesTo = [];
         foreach (['main-menu', 'footer'] as $kind) {
             $default       = self::DEFAULT_BY_KIND[$kind] ?? 'default';
             $currentGuest  = $this->resolvePointer($template, $kind, 'guest',  $default);
@@ -185,29 +186,17 @@ final class LayoutsController extends AbstractController
                     ];
                 }
 
-                /* Page-structure dimensions this layout shapes, declared in its
-                   own layout.php. They render on the layout's card instead of
-                   in a separate Styles > Layout panel, because "how wide is the
-                   sidebar" is a property of the sidebar layout, not of a colour
-                   style. Only ONE main-menu layout is active at a time, so the
-                   values still live in the global _layout_vars blob and
-                   Hooks::buildLayoutHead is untouched -- this is a UI grouping,
-                   not a second storage. A layout that shapes neither dimension
-                   (top: no sidebar, and it swaps the inner topbar for topnav)
-                   declares no sizes and renders none. */
-                $sizes = [];
-                foreach ((array)($meta['sizes'] ?? []) as $var) {
-                    $spec = $this->layoutSizeSpec((string)$var);
-                    if ($spec === null) {
-                        continue;
+                /* Which layouts each dimension shapes. The manifests stay the
+                   source of that fact -- a layout knows whether it has a
+                   sidebar -- but the CONTROLS render once, under Containers,
+                   beside the content width and padding they belong with.
+                   Declaring it per layout and rendering it once is what lets
+                   each row say "Sidebar layout only" without that being a
+                   hardcoded string that goes stale when a layout is added. */
+                if ($kind === 'main-menu') {
+                    foreach ((array)($meta['sizes'] ?? []) as $var) {
+                        $sizeAppliesTo[(string)$var][] = (string)($meta['displayName'] ?? ucfirst($name));
                     }
-                    $sizes[] = [
-                        'var'     => (string)$var,
-                        'field'   => str_replace('-', '_', ltrim((string)$var, '-')),
-                        'label'   => $spec['label'],
-                        'default' => $spec['default'],
-                        'value'   => $this->layoutVar((string)$var),
-                    ];
                 }
 
                 $list[] = [
@@ -217,7 +206,6 @@ final class LayoutsController extends AbstractController
                     'isActiveGuest'  => $name === $currentGuest,
                     'isActiveClient' => $name === $currentClient,
                     'options'        => $options,
-                    'sizes'          => $sizes,
                     // Feeds the "Live preview" link. header.tpl honours
                     // ?preview=1&layout=<side|top|rail> and that value is this
                     // manifest's dataLayout, NOT the folder name -- the sidebar
@@ -272,6 +260,12 @@ final class LayoutsController extends AbstractController
             'contentMaxWidthDefault' => $this->layoutVarDefault('--content-max-width'),
             'contentPadX'            => $this->layoutVar('--content-pad-x'),
             'contentPadXDefault'     => $this->layoutVarDefault('--content-pad-x'),
+            /* The remaining page-structure dimensions, rendered as Container
+               rows beside the content width and padding they sit with. Built
+               from what the layout manifests declare, so "Sidebar layout only"
+               is derived rather than a hardcoded string that goes stale the
+               day a fourth layout lands. */
+            'layoutSizes'            => $this->buildSizeRows($sizeAppliesTo),
             // Client-area root for the "Live preview" links. WEB_ROOT is the
             // same source ViewHelper::assetUrl() uses, so it is present in the
             // admin area and already respects a subdirectory install; the empty
@@ -315,6 +309,39 @@ final class LayoutsController extends AbstractController
         return (is_array($stored) && isset($stored[$var]))
             ? (int)$stored[$var]
             : $this->layoutVarDefault($var);
+    }
+
+    /**
+     * Container rows for the dimensions layouts declare. Content max width and
+     * side padding are NOT here: they apply to every layout and already have
+     * their own rows, so folding them in would only make two of the four look
+     * conditional when they are not.
+     *
+     * @param array<string, list<string>> $appliesTo  var => layout display names
+     * @return list<array>
+     */
+    private function buildSizeRows(array $appliesTo): array
+    {
+        $rows = [];
+        foreach ($appliesTo as $var => $layouts) {
+            $spec = $this->layoutSizeSpec((string)$var);
+            if ($spec === null) {
+                continue;
+            }
+            $names = array_values(array_unique($layouts));
+            $rows[] = [
+                'field'   => str_replace('-', '_', ltrim((string)$var, '-')),
+                'label'   => $spec['label'],
+                'default' => $spec['default'],
+                'value'   => $this->layoutVar((string)$var),
+                // "Sidebar" / "Sidebar and Icon Rail" / "Sidebar, Icon Rail and X"
+                'plural'  => count($names) > 1,
+                'applies' => count($names) > 1
+                    ? implode(', ', array_slice($names, 0, -1)) . ' and ' . end($names)
+                    : ($names[0] ?? ''),
+            ];
+        }
+        return $rows;
     }
 
     /**
