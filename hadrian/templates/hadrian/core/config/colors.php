@@ -42,10 +42,10 @@ return [
     'groups' => [
         'Brand' => [
             ['var' => '--color-accent',       'label' => 'Accent',       'light' => '#0071e3',              'dark' => '#2997ff',              'hint' => 'Primary buttons, active states, focus rings.'],
-            ['var' => '--color-accent-hover', 'label' => 'Accent hover', 'light' => '#0077ed',              'dark' => '#40a3ff',              'hint' => 'Follows the Accent automatically -- it is the same hue two points lighter. Set a colour here only to break that link; the swatch shows the shipped value, not the one being derived.'],
+            ['var' => '--color-accent-hover', 'label' => 'Accent hover', 'light' => '#0077ed',              'dark' => '#40a3ff',              'hint' => 'Follows the Accent. Set a value only to break that link; the swatch shows stock, not the derived colour.'],
             ['var' => '--color-accent-light', 'label' => 'Accent tint',  'light' => 'rgba(0,113,227,0.08)', 'dark' => 'rgba(41,151,255,0.12)', 'hint' => 'The translucent wash behind selected rows and info badges.'],
             ['var' => '--color-on-accent',    'label' => 'On accent',    'light' => '#ffffff',              'dark' => '#ffffff',              'hint' => 'Text and icons sitting ON a filled accent surface. Stays light in both modes.'],
-            ['var' => '--color-link',         'label' => 'Link',         'light' => '#0066cc',              'dark' => '#2997ff',              'hint' => 'Follows the Accent automatically. Deliberately DARKER than it in light mode, where link text needs more contrast on white than a button fill does, and equal to it in dark mode where it is already bright enough.'],
+            ['var' => '--color-link',         'label' => 'Link',         'light' => '#0066cc',              'dark' => '#2997ff',              'hint' => 'Follows the Accent: darker than it in light mode, equal in dark.'],
             ['var' => '--color-link-hover',   'label' => 'Link hover',   'light' => '#0071e3',              'dark' => '#40a3ff',              'hint' => 'Follows the Accent automatically.'],
         ],
 
@@ -56,13 +56,13 @@ return [
             ['var' => '--color-bg',                'label' => 'Page',      'light' => '#fbfbfd', 'dark' => '#1c1c1e', 'hint' => 'Behind everything.'],
             ['var' => '--color-surface',           'label' => 'Surface',   'light' => '#ffffff', 'dark' => '#2c2c2e', 'hint' => 'Cards, panels, tables.'],
             ['var' => '--color-surface-secondary', 'label' => 'Surface 2', 'light' => '#f5f5f7', 'dark' => '#3a3a3c', 'hint' => 'Insets on a card: fields, wells, table headers.'],
-            ['var' => '--color-surface-tertiary',  'label' => 'Surface 3', 'light' => '#fafafa', 'dark' => '#252527', 'hint' => 'Note the ordinal INVERTS by mode: lighter than Surface 2 in light, darker in dark.'],
+            ['var' => '--color-surface-tertiary',  'label' => 'Surface 3', 'light' => '#fafafa', 'dark' => '#252527', 'hint' => 'The ordinal inverts: lighter than Surface 2 in light, darker in dark.'],
         ],
 
         'Text' => [
             ['var' => '--color-text-primary',    'label' => 'Primary',    'light' => '#1d1d1f', 'dark' => '#f5f5f7', 'hint' => 'Headings and body copy.'],
             ['var' => '--color-text-secondary',  'label' => 'Secondary',  'light' => '#6e6e73', 'dark' => '#a1a1a6'],
-            ['var' => '--color-text-tertiary',   'label' => 'Tertiary',   'light' => '#86868b', 'dark' => '#8e8e93', 'hint' => 'Captions and meta. Measures ~3.4:1 on a light card, so avoid it for anything that must be read.'],
+            ['var' => '--color-text-tertiary',   'label' => 'Tertiary',   'light' => '#86868b', 'dark' => '#8e8e93', 'hint' => 'Captions and meta. Only ~3.4:1 on a light card -- never for text that matters.'],
             ['var' => '--color-text-quaternary', 'label' => 'Quaternary', 'light' => '#aeaeb2', 'dark' => '#636366', 'hint' => 'Placeholders only.'],
         ],
 
@@ -99,7 +99,7 @@ return [
             ['var' => '--color-red',         'label' => 'Danger',       'light' => '#ff3b30',               'dark' => '#ff3b30'],
             ['var' => '--color-red-text',    'label' => 'Danger text',  'light' => '#d70015',               'dark' => '#ff453a'],
             ['var' => '--color-red-bg',      'label' => 'Danger fill',  'light' => 'rgba(255,59,48,0.10)',  'dark' => 'rgba(255,59,48,0.16)'],
-            ['var' => '--color-blue-text',   'label' => 'Info',         'light' => '#0071e3',               'dark' => '#2997ff', 'hint' => 'Ships equal to Brand accent, but is a separate token so an info badge need not follow a rebrand.'],
+            ['var' => '--color-blue-text',   'label' => 'Info',         'light' => '#0071e3',               'dark' => '#2997ff', 'hint' => 'Separate from the Accent on purpose, so info need not follow a rebrand.'],
             ['var' => '--color-blue-bg',     'label' => 'Info fill',    'light' => 'rgba(0,113,227,0.08)',  'dark' => 'rgba(41,151,255,0.14)'],
             ['var' => '--color-gray-text',   'label' => 'Neutral',      'light' => '#6e6e73',               'dark' => '#a1a1a6'],
             ['var' => '--color-gray-bg',     'label' => 'Neutral fill', 'light' => 'rgba(142,142,147,0.12)','dark' => 'rgba(142,142,147,0.18)'],
@@ -127,7 +127,7 @@ return [
             // check-color-defaults.mjs skips any token with an empty default
             // for this reason -- it is the one token that MUST NOT appear in
             // apple-theme.css.
-            ['var' => '--sidebar-color',          'label' => 'Sidebar colour',     'light' => '',                       'dark' => '',                    'hint' => 'Optional. One colour for the whole nav -- text, borders and hovers derive from it automatically. Leave empty to set the rows below by hand.'],
+            ['var' => '--sidebar-color',          'label' => 'Sidebar colour',     'light' => '',                       'dark' => '',                    'hint' => 'Off keeps the nav neutral. Follow brand tracks the Accent; Custom stays fixed.'],
             ['var' => '--sidebar-bg',             'label' => 'Sidebar background', 'light' => 'rgba(246,246,248,0.80)', 'dark' => 'rgba(28,28,30,0.80)', 'hint' => 'Translucent: it frosts whatever scrolls under it.'],
             ['var' => '--sidebar-panel-bg',       'label' => 'Flyout panel',       'light' => '#ffffff',                'dark' => '#2c2c2e', 'hint' => 'The rail layout only. Not the sidebar itself.'],
             ['var' => '--sidebar-text',           'label' => 'Text',               'light' => '#1d1d1f',                'dark' => '#f5f5f7', 'hint' => 'Set this whenever you darken the background, or the menu goes dark-on-dark.'],
@@ -136,7 +136,7 @@ return [
             ['var' => '--sidebar-text-faint',     'label' => 'Placeholder',        'light' => '#aeaeb2',                'dark' => '#636366'],
             ['var' => '--sidebar-border',         'label' => 'Border',             'light' => '#e8e8ed',                'dark' => '#3a3a3c'],
             ['var' => '--sidebar-field-bg',       'label' => 'Search field',       'light' => '#f5f5f7',                'dark' => '#3a3a3c'],
-            ['var' => '--sidebar-item-hover-bg',  'label' => 'Item hover',         'light' => 'rgba(0,0,0,0.04)',       'dark' => 'rgba(255,255,255,0.05)', 'hint' => 'Sidebar only. The similarly named shared token is read by 127 rules across the product and is deliberately not editable here.'],
+            ['var' => '--sidebar-item-hover-bg',  'label' => 'Item hover',         'light' => 'rgba(0,0,0,0.04)',       'dark' => 'rgba(255,255,255,0.05)', 'hint' => 'Sidebar only -- the similarly named shared token is not editable here.'],
             ['var' => '--sidebar-item-active-bg', 'label' => 'Item active',        'light' => 'rgba(0,0,0,0.06)',       'dark' => 'rgba(255,255,255,0.08)'],
             ['var' => '--sidebar-scroll-thumb',   'label' => 'Scrollbar',          'light' => 'rgba(0,0,0,0.15)',       'dark' => 'rgba(255,255,255,0.15)'],
             ['var' => '--topbar-bg',              'label' => 'Topbar background',  'light' => 'rgba(251,251,253,0.72)', 'dark' => 'rgba(44,44,46,0.72)', 'hint' => 'Also translucent -- keep some alpha or the frost effect is lost.'],
@@ -145,7 +145,7 @@ return [
         // Avatars joined the icon tiles: both are small painted identity
         // shapes, and neither had anywhere else sensible to live.
         'Icons & avatars' => [
-            ['var' => '--color-icon-blue',   'label' => 'Blue',   'light' => '#007aff', 'dark' => '#007aff', 'hint' => 'The nine tiles are the same in both modes -- they sit on a coloured chip, not on the page.'],
+            ['var' => '--color-icon-blue',   'label' => 'Blue',   'light' => '#007aff', 'dark' => '#007aff', 'hint' => 'Same in both modes: they sit on a coloured chip, not the page.'],
             ['var' => '--color-icon-purple', 'label' => 'Purple', 'light' => '#af52de', 'dark' => '#af52de'],
             ['var' => '--color-icon-orange', 'label' => 'Orange', 'light' => '#ff9500', 'dark' => '#ff9500'],
             ['var' => '--color-icon-green',  'label' => 'Green',  'light' => '#34c759', 'dark' => '#34c759'],

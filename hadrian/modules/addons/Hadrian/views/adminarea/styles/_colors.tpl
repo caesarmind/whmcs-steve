@@ -102,16 +102,7 @@
         <div class="mt-color-rows">
             {foreach $tokens as $t}
             <div class="mt-color-row" data-var="{$t.var|escape}">
-                <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">
-                    {$t.label|escape}
-                    {* Optional per-token note from colors.php. Several labels
-                       are honestly ambiguous on their own -- "Surface 3" says
-                       nothing about the fact that its ordinal INVERTS between
-                       light and dark, and six tokens ship values byte-identical
-                       to a page token, so a buyer cannot tell them apart by
-                       swatch alone. *}
-                    {if $t.hint|default:''}<span class="mt-color-row-hint">{$t.hint|escape}</span>{/if}
-                </label>
+                <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">{$t.label|escape}</label>
                 {* The sidebar tint is the one row that is not simply a colour.
                    It has three states, and which one you are in is not
                    inferable from a hex: Off (empty, neutral nav), Follow brand
@@ -135,14 +126,27 @@
                     <span class="mt-sbt-custom"{if $t.value == '' || $t.value == 'brand'} hidden{/if}>
                         <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
                     </span>
-                    <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false"{if $t.value == '' || $t.value == 'brand'} hidden{/if}>
+                    <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false" {if $t.hint|default:''}aria-describedby="h{$t.var|replace:'--':'_'}"{/if}{if $t.value == '' || $t.value == 'brand'} hidden{/if}>
                 </span>
                 {else}
                 <span class="mt-color-control">
                     <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
-                    <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false">
+                    <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false" {if $t.hint|default:''}aria-describedby="h{$t.var|replace:'--':'_'}"{/if}>
                 </span>
                 {/if}
+                {* Optional per-token note from colors.php. Several labels are
+                   honestly ambiguous on their own -- "Surface 3" says nothing
+                   about the fact that its ordinal INVERTS between light and
+                   dark, and six tokens ship values byte-identical to a page
+                   token, so a buyer cannot tell them apart by swatch alone.
+
+                   A SIBLING of the label, and placed AFTER the control, for two
+                   reasons. It can then span the whole row instead of sharing a
+                   ~150px column with the control, which is what turned a
+                   twelve-word note into six lines. And a screen reader stops
+                   reading the paragraph as part of the field's NAME --
+                   aria-describedby announces it separately, after the label. *}
+                {if $t.hint|default:''}<span class="mt-color-row-hint" id="h{$t.var|replace:'--':'_'}">{$t.hint|escape}</span>{/if}
             </div>
             {/foreach}
         </div>

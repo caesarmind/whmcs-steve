@@ -303,7 +303,9 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 /* Per-token note under a Colors label. Muted and small, but --mt-text-2 not
    --mt-text-3: these carry real information (which mode inverts, which token
    is a private alias) and tertiary measures ~3.6:1 on a panel. */
-.mt-color-row-hint { display: block; margin-top: 2px; font-size: 11.5px; line-height: 1.4; font-weight: 400; color: var(--mt-text-2); max-width: 46ch; }
+/* Dimmer than the label it describes. At --mt-text-2 the note carried the same
+   weight as the field name and every row read as two equal lines of prose. */
+.mt-color-row-hint { display: block; font-size: 11.5px; line-height: 1.45; font-weight: 400; color: var(--mt-text-3); max-width: 52ch; }
 
 /* -- Style preset cards --------------------------------------------------
    Private to the Styles picker. .mt-card above is shared with the Templates
@@ -632,8 +634,14 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 /* -- Colors panel (per-token editor) -------------------------------------- */
 .mt-colors .mt-scheme { font-family: inherit; }
 .mt-color-rows { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px 18px; }
-.mt-color-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
-.mt-color-row-label { font-size: 13px; color: var(--mt-text-2); font-weight: 500; }
+/* Two rows, not one line. The hint used to sit INSIDE the label and share the
+   flex line with the control, which left it about 150px: a twelve-word note
+   wrapped to six lines and the row grew to match. Spanning the full column
+   roughly doubles the measure and halves the height. */
+.mt-color-row { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 4px 10px; min-width: 0; }
+.mt-color-row-label { grid-column: 1; grid-row: 1; font-size: 13px; color: var(--mt-text-2); font-weight: 500; }
+.mt-color-row > .mt-color-control { grid-column: 2; grid-row: 1; }
+.mt-color-row > .mt-color-row-hint { grid-column: 1 / -1; grid-row: 2; }
 .mt-color-control { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .mt-color-swatch-input { width: 30px; height: 30px; padding: 2px; border: 1px solid var(--mt-input-border); border-radius: 6px; background: var(--mt-surface); cursor: pointer; flex-shrink: 0; }
 .mt-color-swatch-input::-webkit-color-swatch-wrapper { padding: 0; }
