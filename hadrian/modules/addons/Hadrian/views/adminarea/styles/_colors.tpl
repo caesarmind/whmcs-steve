@@ -14,12 +14,14 @@
     <section class="mt-section">
         <header class="mt-section-header">
             <h2 class="mt-section-title">Color Scheme</h2>
-            {* Light/Dark scope toggle — each style carries both color sets.
-               Switching reloads the editor for that scope (full nav, like the
-               subcat links); unsaved edits in the other scope aren't kept. *}
-            <div class="mt-tabs">
-                <a class="mt-tab {if $colors.mode != 'dark'}is-active{/if}" href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=colors&scope=light">Light</a>
-                <a class="mt-tab {if $colors.mode == 'dark'}is-active{/if}" href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=colors&scope=dark">Dark</a>
+            {* Light/Dark scope toggle. Both scopes are IN THE PAGE -- the one
+               you are not looking at rides along in a hidden field per row --
+               so switching swaps values client-side with no reload, and one
+               Save writes both. It used to be a link that reloaded and threw
+               away unsaved edits in the scope you were leaving. *}
+            <div class="mt-tabs" data-scope-switch>
+                <button type="button" class="mt-tab {if $colors.mode != 'dark'}is-active{/if}" data-scope-set="light">Light</button>
+                <button type="button" class="mt-tab {if $colors.mode == 'dark'}is-active{/if}" data-scope-set="dark">Dark</button>
             </div>
         </header>
         <p class="mt-field-help">Every token below is editable independently. Quick presets just cascade the brand fields (accent, hover, tint, link) &mdash; tweak any value after. Editing the <strong>{$styleName|escape}</strong> style changes its <strong>{$colors.mode}</strong> colors; only changed tokens are saved, and they apply site-wide.</p>
@@ -122,8 +124,9 @@
                straight from colors.php, so the admin holds no second copy of
                the values and cannot drift from what ships. *}
             <button type="button" class="mt-scheme mt-sbt-mode" data-sbt-mode="{$sbKey|escape}"
-                    data-sbt-css="{$sb.value|escape}"
-                    data-sbt-tokens="{$sb.json|escape}">
+                    data-sbt-css="{$sb.dot|escape}" data-sbt-css-other="{$sb.dotOther|escape}"
+                    data-sbt-tokens="{$sb.json|escape}" data-sbt-tokens-other="{$sb.jsonOther|escape}"
+                    {if $sb.autoInk|default:false}data-sbt-autoink="1"{/if}>
                 <span class="mt-scheme-dot mt-sbt-dot"></span>{$sb.label|escape}</button>
             {/foreach}
         </div>
@@ -136,6 +139,10 @@
                 <span class="mt-color-control">
                     <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
                     <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false" {if $t.hint|default:''}aria-describedby="h{$t.var|replace:'--':'_'}"{/if}>
+                    {* The scope you are NOT editing. Carried, posted and saved
+                       alongside; the switch just swaps the two values and their
+                       defaults, so no reload and nothing unsaved is lost. *}
+                    <input type="hidden" name="o[{$t.var}]" class="mt-color-other" data-var="{$t.var|escape}" value="{$t.other|escape}" data-default="{$t.otherDef|escape}">
                 </span>
                 {* Optional per-token note from colors.php. Several labels are
                    honestly ambiguous on their own -- "Surface 3" says nothing

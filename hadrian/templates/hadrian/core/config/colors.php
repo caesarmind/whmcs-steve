@@ -58,70 +58,90 @@ return [
     'sidebarStyles' => [
         'tinted' => [
             'label'  => 'Tinted',
-            'value'  => 'color-mix(in srgb, var(--color-accent) 10%, #ffffff)',
-            'tokens' => [
-                '--sidebar-bg'             => 'color-mix(in srgb, var(--color-accent) 10%, #ffffff)',
-                '--sidebar-panel-bg'       => 'color-mix(in srgb, var(--color-accent) 6%, #ffffff)',
-                '--sidebar-text'           => '#1d1d1f',
-                '--sidebar-text-secondary' => '#6e6e73',
-                '--sidebar-text-muted'     => '#86868b',
-                '--sidebar-text-faint'     => '#aeaeb2',
-                '--sidebar-border'         => 'color-mix(in srgb, var(--color-accent) 16%, #ffffff)',
-                '--sidebar-field-bg'       => 'color-mix(in srgb, var(--color-accent) 6%, #ffffff)',
-                '--sidebar-item-hover-bg'  => 'color-mix(in srgb, var(--color-accent) 14%, transparent)',
-                '--sidebar-item-active-bg' => 'color-mix(in srgb, var(--color-accent) 22%, transparent)',
-                '--sidebar-scroll-thumb'   => 'color-mix(in srgb, var(--color-accent) 30%, transparent)',
+            'value'  => [
+                'light' => 'color-mix(in srgb, var(--color-accent) 10%, #ffffff)',
+                'dark'  => 'color-mix(in srgb, var(--color-accent) 16%, #1c1c1e)',
             ],
-        ],
-        'dark' => [
-            'label'  => 'Dark',
-            'value'  => '#1c1c1e',
             'tokens' => [
-                '--sidebar-bg'             => 'rgba(28,28,30,0.85)',
-                '--sidebar-panel-bg'       => '#1c1c1e',
-                '--sidebar-text'           => '#f5f5f7',
-                '--sidebar-text-secondary' => '#a1a1a6',
-                '--sidebar-text-muted'     => '#98989d',
-                '--sidebar-text-faint'     => '#6e6e73',
-                '--sidebar-border'         => 'rgba(255,255,255,0.10)',
-                '--sidebar-field-bg'       => 'rgba(255,255,255,0.08)',
-                '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.06)',
-                '--sidebar-item-active-bg' => 'rgba(255,255,255,0.10)',
-                '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.15)',
-            ],
-        ],
-        'graphite' => [
-            'label'  => 'Graphite',
-            'value'  => '#21252e',
-            'tokens' => [
-                '--sidebar-bg'             => 'rgba(33,37,46,0.94)',
-                '--sidebar-panel-bg'       => '#21252e',
-                '--sidebar-text'           => '#f5f5f7',
-                '--sidebar-text-secondary' => '#a1a1a6',
-                '--sidebar-text-muted'     => '#98989d',
-                '--sidebar-text-faint'     => '#6e6e73',
-                '--sidebar-border'         => 'rgba(255,255,255,0.10)',
-                '--sidebar-field-bg'       => 'rgba(255,255,255,0.08)',
-                '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.06)',
-                '--sidebar-item-active-bg' => 'rgba(255,255,255,0.10)',
-                '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.15)',
+                'light' => [
+                    '--sidebar-bg'             => 'color-mix(in srgb, var(--color-accent) 10%, #ffffff)',
+                    '--sidebar-panel-bg'       => 'color-mix(in srgb, var(--color-accent) 6%, #ffffff)',
+                    '--sidebar-text'           => '#1d1d1f',
+                    '--sidebar-text-secondary' => '#6e6e73',
+                    '--sidebar-text-muted'     => '#86868b',
+                    '--sidebar-text-faint'     => '#aeaeb2',
+                    '--sidebar-border'         => 'color-mix(in srgb, var(--color-accent) 16%, #ffffff)',
+                    '--sidebar-field-bg'       => 'color-mix(in srgb, var(--color-accent) 6%, #ffffff)',
+                    '--sidebar-item-hover-bg'  => 'color-mix(in srgb, var(--color-accent) 14%, transparent)',
+                    '--sidebar-item-active-bg' => 'color-mix(in srgb, var(--color-accent) 22%, transparent)',
+                    '--sidebar-scroll-thumb'   => 'color-mix(in srgb, var(--color-accent) 30%, transparent)',
+                ],
+                /* Dark mixes toward the dark surface, not toward white, and the
+                   ink flips. A tint is "the nav, faintly coloured" in BOTH
+                   modes -- reusing the light recipe would paint a pale blue
+                   panel into a dark app. */
+                'dark' => [
+                    '--sidebar-bg'             => 'color-mix(in srgb, var(--color-accent) 16%, #1c1c1e)',
+                    '--sidebar-panel-bg'       => 'color-mix(in srgb, var(--color-accent) 12%, #1c1c1e)',
+                    '--sidebar-text'           => '#f5f5f7',
+                    '--sidebar-text-secondary' => '#a1a1a6',
+                    '--sidebar-text-muted'     => '#98989d',
+                    '--sidebar-text-faint'     => '#6e6e73',
+                    '--sidebar-border'         => 'color-mix(in srgb, var(--color-accent) 26%, #1c1c1e)',
+                    '--sidebar-field-bg'       => 'color-mix(in srgb, var(--color-accent) 12%, #1c1c1e)',
+                    '--sidebar-item-hover-bg'  => 'color-mix(in srgb, var(--color-accent) 18%, transparent)',
+                    '--sidebar-item-active-bg' => 'color-mix(in srgb, var(--color-accent) 28%, transparent)',
+                    '--sidebar-scroll-thumb'   => 'color-mix(in srgb, var(--color-accent) 34%, transparent)',
+                ],
             ],
         ],
         'brand' => [
             'label'  => 'Brand',
-            'value'  => 'color-mix(in srgb, var(--color-accent) 94%, #000000)',
+            /* Brand is the one style whose background is arbitrary -- it IS the
+               buyer's colour -- so its ink cannot be a constant. With white
+               hardcoded, a yellow brand measured 2.60:1 no matter how far the
+               background was deepened, because a deepened yellow is still
+               light. autoInk makes the admin pick black or white at the WCAG
+               crossover from the RESOLVED background, and scale the softened
+               steps to match, exactly as the theme's own ink primitive does.
+               Tinted does not set it: its backgrounds sit near the surface and
+               its tuned greys read better than pure black would. */
+            'autoInk' => true,
+            'value'  => [
+                'light' => 'color-mix(in srgb, var(--color-accent) 94%, #000000)',
+                'dark'  => 'color-mix(in srgb, var(--color-accent) 74%, #000000)',
+            ],
+            /* Identical ramp in both scopes because each resolves against ITS
+               OWN accent, and the shipped dark accent is the brighter of the
+               pair -- so dark is deepened a little further to keep white ink
+               clear of the 4.5 line. */
             'tokens' => [
-                '--sidebar-bg'             => 'color-mix(in srgb, var(--color-accent) 94%, #000000)',
-                '--sidebar-panel-bg'       => 'color-mix(in srgb, var(--color-accent) 94%, #000000)',
-                '--sidebar-text'           => '#ffffff',
-                '--sidebar-text-secondary' => 'rgba(255,255,255,0.82)',
-                '--sidebar-text-muted'     => 'rgba(255,255,255,0.70)',
-                '--sidebar-text-faint'     => 'rgba(255,255,255,0.55)',
-                '--sidebar-border'         => 'rgba(255,255,255,0.20)',
-                '--sidebar-field-bg'       => 'rgba(255,255,255,0.16)',
-                '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.14)',
-                '--sidebar-item-active-bg' => 'rgba(255,255,255,0.22)',
-                '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.30)',
+                'light' => [
+                    '--sidebar-bg'             => 'color-mix(in srgb, var(--color-accent) 94%, #000000)',
+                    '--sidebar-panel-bg'       => 'color-mix(in srgb, var(--color-accent) 94%, #000000)',
+                    '--sidebar-text'           => '#ffffff',
+                    '--sidebar-text-secondary' => 'rgba(255,255,255,0.82)',
+                    '--sidebar-text-muted'     => 'rgba(255,255,255,0.70)',
+                    '--sidebar-text-faint'     => 'rgba(255,255,255,0.55)',
+                    '--sidebar-border'         => 'rgba(255,255,255,0.20)',
+                    '--sidebar-field-bg'       => 'rgba(255,255,255,0.16)',
+                    '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.14)',
+                    '--sidebar-item-active-bg' => 'rgba(255,255,255,0.22)',
+                    '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.30)',
+                ],
+                'dark' => [
+                    '--sidebar-bg'             => 'color-mix(in srgb, var(--color-accent) 74%, #000000)',
+                    '--sidebar-panel-bg'       => 'color-mix(in srgb, var(--color-accent) 74%, #000000)',
+                    '--sidebar-text'           => '#ffffff',
+                    '--sidebar-text-secondary' => 'rgba(255,255,255,0.82)',
+                    '--sidebar-text-muted'     => 'rgba(255,255,255,0.70)',
+                    '--sidebar-text-faint'     => 'rgba(255,255,255,0.55)',
+                    '--sidebar-border'         => 'rgba(255,255,255,0.20)',
+                    '--sidebar-field-bg'       => 'rgba(255,255,255,0.16)',
+                    '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.14)',
+                    '--sidebar-item-active-bg' => 'rgba(255,255,255,0.22)',
+                    '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.30)',
+                ],
             ],
         ],
     ],

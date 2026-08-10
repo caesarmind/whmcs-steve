@@ -631,7 +631,6 @@ final class Hooks
         ];
 
         $blocks = '';
-        $sbStyles = null;   // lazily loaded from colors.php on first style name
         foreach ($scopes as $selector => $keys) {
             $stored = null;
             foreach ($keys as $k) {
@@ -646,40 +645,6 @@ final class Hooks
                 $var = (string)$var;
                 if (!preg_match('/^--[a-z0-9-]+$/', $var)) {
                     continue;
-                }
-                /* Named sidebar styles. --sidebar-color otherwise holds a
-                   LITERAL, which is why a nav set to today's accent does not
-                   move when the accent does. Stored as a NAME -- tinted, dark,
-                   graphite, brand -- it is emitted as whatever colors.php maps
-                   it to, and the whole existing derivation (background, three
-                   ink steps, hover, active, hairline) falls out of that.
-
-                   Emitted as CSS on purpose, never resolved to a hex here:
-                   html[data-palette] redefines --color-accent in static CSS the
-                   server cannot see, so a server-computed colour goes stale
-                   there while a var() chain resolves at computed-value time and
-                   stays correct through presets, palettes and dark mode.
-                   Verified: color(from var(--sidebar-color) ...) resolves the
-                   full chain when fed either a var() or a color-mix().
-
-                   A style name is not a colour, so isColorValue rightly rejects
-                   it -- hence the branch rather than a loosened validator. The
-                   map is loaded LAZILY, only once a name is actually seen, so
-                   the common case still costs no file read. */
-                if ($var === '--sidebar-color') {
-                    $key = strtolower(trim((string)$val));
-                    if ($key !== '' && !$this->isColorValue((string)$val)) {
-                        if ($sbStyles === null) {
-                            $cfg = ThemeManifest::loadVariantMeta(
-                                $template->getFullPath() . '/core/config/colors.php'
-                            );
-                            $sbStyles = is_array($cfg['sidebarStyles'] ?? null) ? $cfg['sidebarStyles'] : [];
-                        }
-                        if (isset($sbStyles[$key]['value'])) {
-                            $decls .= $var . ':' . $sbStyles[$key]['value'] . ';';
-                        }
-                        continue;
-                    }
                 }
                 if (!$this->isColorValue((string)$val)) {
                     continue;

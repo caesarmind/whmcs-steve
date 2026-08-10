@@ -127,6 +127,8 @@
 
     function textFor(name){ return form.querySelector('input.mt-color-text[data-var="' + name + '"]'); }
     function swatchFor(name){ return form.querySelector('input.mt-color-swatch-input[data-for="' + name + '"]'); }
+    // The scope you are NOT looking at, carried in a hidden twin of every row.
+    function otherFor(name){ return form.querySelector('input.mt-color-other[data-var="' + name + '"]'); }
 
     function syncSwatch(name, value){
         var sw = swatchFor(name); if (!sw) return;
@@ -164,10 +166,57 @@
         });
     });
 
+    /* ------------------------------------------------------------------
+       Light <-> Dark without a reload.
+
+       Every row carries its other scope in a hidden twin, so switching is a
+       swap of values and defaults rather than a page load: no round trip, and
+       nothing unsaved is thrown away. Both post, and saveColorsAction writes
+       both, so one Save covers light and dark.
+       ------------------------------------------------------------------ */
+    var scopeField  = form.querySelector('input[name="scope"]');
+    var scopeSwitch = form.querySelector('[data-scope-switch]');
+    function curScope(){ return scopeField && scopeField.value === 'dark' ? 'dark' : 'light'; }
+    function swapScope(want){
+        if (want === curScope()) return;
+        [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
+            var name = t.getAttribute('data-var'), o = otherFor(name);
+            if (!o) return;
+            var v = t.value, d = t.getAttribute('data-default');
+            t.value = o.value; t.setAttribute('data-default', o.getAttribute('data-default'));
+            o.value = v;       o.setAttribute('data-default', d);
+            syncSwatch(name, t.value);
+        });
+        // Anything holding a per-scope value has to swap with them, or it goes
+        // on describing the scope you just left.
+        [].slice.call(form.querySelectorAll('[data-sbt-tokens]')).forEach(function(b){
+            ['-tokens', '-css'].forEach(function(sfx){
+                var a = b.getAttribute('data-sbt' + sfx), z = b.getAttribute('data-sbt' + sfx + '-other');
+                b.setAttribute('data-sbt' + sfx, z === null ? '' : z);
+                b.setAttribute('data-sbt' + sfx + '-other', a === null ? '' : a);
+            });
+        });
+        var genEl = form.querySelector('.mt-gen');
+        if (genEl) genEl.setAttribute('data-scope', want);
+        if (scopeField) scopeField.value = want;
+        if (scopeSwitch) [].slice.call(scopeSwitch.querySelectorAll('[data-scope-set]')).forEach(function(x){
+            x.classList.toggle('is-active', x.getAttribute('data-scope-set') === want); });
+        sbtRefresh();
+    }
+    if (scopeSwitch) scopeSwitch.addEventListener('click', function(e){
+        var b = e.target.closest('[data-scope-set]');
+        if (b) swapScope(b.getAttribute('data-scope-set'));
+    });
+
     var reset = form.querySelector('#mt-colors-reset');
     if (reset) reset.addEventListener('click', function(){
+        // Both scopes: "Reset all to default" that left dark overridden would
+        // be a reset in name only, now that one Save writes both.
         [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
             setToken(t.getAttribute('data-var'), t.getAttribute('data-default'));
+        });
+        [].slice.call(form.querySelectorAll('input.mt-color-other')).forEach(function(o){
+            o.value = o.getAttribute('data-default');
         });
         genUndoState(null);
     });
@@ -217,16 +266,19 @@
         var sbCvs = document.createElement('canvas'); sbCvs.width = sbCvs.height = 1;
         var sbCtx = sbCvs.getContext('2d', { willReadFrequently: true });
 
-        function sbAccent(){
-            var t = textFor('--color-accent'), h = t ? clean(t.value) : null;
+        function sbAccent(other){
+            var el = other ? otherFor('--color-accent') : textFor('--color-accent');
+            var h = el ? clean(el.value) : null;
             return h ? '#' + h : '#0071e3';
         }
         /* Declare the token ON the probe rather than string-substituting it.
            A style value is CSS, so let CSS resolve it: any token a future style
            references just needs declaring here, and there is no regex to get
            wrong. (The regex version silently matched nothing.) */
-        function sbResolve(css){
-            sbProbe.style.setProperty('--color-accent', sbAccent());
+        function sbResolve(css, other){
+            // Each scope resolves against ITS OWN accent, which is the whole
+            // reason a style can fill both at once and be right in each.
+            sbProbe.style.setProperty('--color-accent', sbAccent(other));
             sbProbe.style.color = '';
             sbProbe.style.color = String(css);
             var c = getComputedStyle(sbProbe).color;
@@ -269,16 +321,56 @@
             if (!raw) {
                 // Light: reset rather than write, so the rows go back to being
                 // unstored and saveColorsAction persists nothing for them.
+                // Both scopes, or picking Light would leave dark still tinted.
                 Object.keys(sbRows).forEach(function(v){
-                    var t = textFor(v); if (t) setToken(v, t.getAttribute('data-default'));
+                    var t = textFor(v), o = otherFor(v);
+                    if (t) setToken(v, t.getAttribute('data-default'));
+                    if (o) o.value = o.getAttribute('data-default');
                 });
                 return;
             }
-            var map; try { map = JSON.parse(raw); } catch (e) { return; }
-            Object.keys(map).forEach(function(v){
-                var lit = sbResolve(map[v]);
-                if (lit) setToken(v, lit);
-            });
+            /* Fill BOTH scopes. A style is a look, not a light-mode look, and
+               the buyer's dark mode is a click away on the same page -- having
+               to switch scope and pick again would be the reload we just
+               removed, wearing a different hat. */
+            var auto = btn.getAttribute('data-sbt-autoink') === '1';
+            var fill = function(json, other){
+                if (!json) return;
+                var map; try { map = JSON.parse(json); } catch (e) { return; }
+                var put = function(v, lit){
+                    if (other) { var o = otherFor(v); if (o) o.value = lit; }
+                    else setToken(v, lit);
+                };
+                Object.keys(map).forEach(function(v){
+                    var lit = sbResolve(map[v], other);
+                    if (lit) put(v, lit);
+                });
+                /* Ink chosen from the RESOLVED background, at the WCAG
+                   crossover, for styles that say so -- the same primitive the
+                   theme uses. Without it a pale brand keeps the hardcoded white
+                   ramp and measures 2.6:1, and no amount of deepening the
+                   background rescues it because a deepened yellow is still
+                   light. Runs after the loop so it overrides the declared ink. */
+                if (!auto) return;
+                var bgLit = sbResolve(map['--sidebar-bg'], other);
+                if (!bgLit) return;
+                var c = toRgb(bgLit) || [0, 0, 0];
+                var f = function(x){ x /= 255; return x <= 0.03928 ? x/12.92 : Math.pow((x+0.055)/1.055, 2.4); };
+                var dark = (0.2126*f(c[0]) + 0.7152*f(c[1]) + 0.0722*f(c[2])) > 0.179129;
+                var ink = dark ? '0,0,0' : '255,255,255';
+                put('--sidebar-text', dark ? '#000000' : '#ffffff');
+                [['--sidebar-text-secondary', dark ? 0.78 : 0.82],
+                 ['--sidebar-text-muted',     dark ? 0.62 : 0.70],
+                 ['--sidebar-text-faint',     dark ? 0.45 : 0.55],
+                 ['--sidebar-border',         dark ? 0.16 : 0.20],
+                 ['--sidebar-field-bg',       dark ? 0.10 : 0.16],
+                 ['--sidebar-item-hover-bg',  dark ? 0.08 : 0.14],
+                 ['--sidebar-item-active-bg', dark ? 0.14 : 0.22],
+                 ['--sidebar-scroll-thumb',   dark ? 0.22 : 0.30]
+                ].forEach(function(p){ put(p[0], 'rgba(' + ink + ',' + p[1] + ')'); });
+            };
+            fill(raw, false);
+            fill(btn.getAttribute('data-sbt-tokens-other'), true);
         }
         sbt.addEventListener('click', function(e){
             var b = e.target.closest('.mt-sbt-mode'); if (b) sbApply(b);

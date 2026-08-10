@@ -558,13 +558,6 @@ final class StylesController extends AbstractController
                         continue;
                     }
                     $val = trim((string)$declared[$var]);
-                    // Same vocabulary as saveColorsAction, so a style preset can
-                    // ship a named nav rather than a frozen hex.
-                    if ($var === '--sidebar-color'
-                        && isset($cfg['sidebarStyles'][strtolower($val)])) {
-                        $out[$var] = strtolower($val);
-                        continue;
-                    }
                     if ($val === '' || !$this->isColor($val)) {
                         continue;
                     }
@@ -618,10 +611,17 @@ final class StylesController extends AbstractController
         // edit session, not the style. Each style stores its two scopes under
         // _colors_<style>_light / _colors_<style>_dark.
         $mode   = $scope === 'dark' ? 'dark' : 'light';
-        $stored = Settings::getValue($template->getName() . '_colors_' . $style . '_' . $mode, []);
-        if (!is_array($stored)) {
-            $stored = [];
-        }
+        $other  = $mode === 'dark' ? 'light' : 'dark';
+        /* BOTH scopes are loaded and both go into the form. The Light/Dark
+           switch used to be a link that reloaded the page and threw away
+           unsaved edits in the scope you were leaving; now it swaps values
+           client-side and one Save writes both. */
+        $load = function (string $m) use ($template, $style) {
+            $v = Settings::getValue($template->getName() . '_colors_' . $style . '_' . $m, []);
+            return is_array($v) ? $v : [];
+        };
+        $stored      = $load($mode);
+        $storedOther = $load($other);
 
         $groups = [];
         // Which display group holds the sidebar rows, so the style presets can
@@ -642,6 +642,12 @@ final class StylesController extends AbstractController
                 $t['default'] = $default;
                 $t['value']   = $value;
                 $t['hex']     = $this->toHexInput($value);
+                // The other scope rides along in a hidden field, so switching
+                // costs no round trip and no unsaved work.
+                $defaultOther  = (string)($t[$other] ?? $t['light'] ?? '#000000');
+                $t['otherDef'] = $defaultOther;
+                $t['other']    = isset($storedOther[$t['var']])
+                    ? (string)$storedOther[$t['var']] : $defaultOther;
                 $groups[$groupName][] = $t;
             }
         }
@@ -658,7 +664,13 @@ final class StylesController extends AbstractController
            switched off underneath us. */
         $sbStyles = [];
         foreach ((array)($cfg['sidebarStyles'] ?? []) as $key => $sb) {
-            $sb['json'] = json_encode((object)($sb['tokens'] ?? []), JSON_UNESCAPED_SLASHES);
+            // Both scopes' token sets go to the browser: one click fills the
+            // visible rows AND the hidden other-scope fields, so a style lands
+            // in light and dark together.
+            $sb['json']     = json_encode((object)($sb['tokens'][$mode] ?? []), JSON_UNESCAPED_SLASHES);
+            $sb['jsonOther'] = json_encode((object)($sb['tokens'][$other] ?? []), JSON_UNESCAPED_SLASHES);
+            $sb['dot']      = (string)($sb['value'][$mode] ?? '');
+            $sb['dotOther'] = (string)($sb['value'][$other] ?? '');
             $sbStyles[$key] = $sb;
         }
 
@@ -698,41 +710,41 @@ final class StylesController extends AbstractController
             $style = 'default';
         }
         $scope = ((string)($_POST['scope'] ?? 'light')) === 'dark' ? 'dark' : 'light';
-        $cfg  = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/colors.php');
-        $mode = $scope;
-        $in   = is_array($_POST['c'] ?? null) ? $_POST['c'] : [];
-        $sbStyles = is_array($cfg['sidebarStyles'] ?? null) ? $cfg['sidebarStyles'] : [];
+        $cfg   = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/colors.php');
+        $other = $scope === 'dark' ? 'light' : 'dark';
 
-        $out = [];
-        foreach (($cfg['groups'] ?? []) as $tokens) {
-            foreach ($tokens as $t) {
-                $var = (string)$t['var'];
-                if (!isset($in[$var])) {
-                    continue;
+        /* Both scopes now post together -- `c` is whichever the buyer was
+           looking at, `o` is the one riding along in hidden fields -- so a
+           single Save writes light AND dark and switching between them never
+           loses work. */
+        $collect = function (array $in, string $mode) use ($cfg) {
+            $out = [];
+            foreach (($cfg['groups'] ?? []) as $tokens) {
+                foreach ($tokens as $t) {
+                    $var = (string)$t['var'];
+                    if (!isset($in[$var])) {
+                        continue;
+                    }
+                    $val = trim((string)$in[$var]);
+                    if ($val === '' || !$this->isColor($val)) {
+                        continue;
+                    }
+                    $default = (string)($t[$mode] ?? $t['light'] ?? '');
+                    if ($this->normColor($val) === $this->normColor($default)) {
+                        continue;
+                    }
+                    $out[$var] = $val;
                 }
-                $val = trim((string)$in[$var]);
-                /* A named sidebar style is deliberately NOT a colour: it is a
-                   word from colors.php's sidebarStyles, and buildColorsHead
-                   turns it into the mapped CSS on the way out -- so Tinted and
-                   Brand track a rebrand instead of freezing the hex that
-                   happened to be current when they were picked. Accepted only
-                   for this one token; anywhere else a non-colour is a typo. */
-                if ($var === '--sidebar-color' && isset($sbStyles[strtolower($val)])) {
-                    $out[$var] = strtolower($val);
-                    continue;
-                }
-                if ($val === '' || !$this->isColor($val)) {
-                    continue;
-                }
-                $default = (string)($t[$mode] ?? $t['light'] ?? '');
-                if ($this->normColor($val) === $this->normColor($default)) {
-                    continue;
-                }
-                $out[$var] = $val;
             }
-        }
+            return $out;
+        };
 
-        Settings::setValue($template->getName() . '_colors_' . $style . '_' . $scope, $out, 'json');
+        $name = $template->getName();
+        Settings::setValue($name . '_colors_' . $style . '_' . $scope,
+            $collect(is_array($_POST['c'] ?? null) ? $_POST['c'] : [], $scope), 'json');
+        Settings::setValue($name . '_colors_' . $style . '_' . $other,
+            $collect(is_array($_POST['o'] ?? null) ? $_POST['o'] : [], $other), 'json');
+
         $this->redirect('?module=Hadrian&action=editStyle&style=' . urlencode($style) . '&subcat=colors&scope=' . $scope . '&colors_saved=1');
     }
 
