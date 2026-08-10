@@ -624,6 +624,17 @@ final class StylesController extends AbstractController
         }
 
         $groups = [];
+        // Which display group holds the sidebar rows, so the style presets can
+        // render at the head of it. Found by MEMBERSHIP, not by name: group
+        // names are display strings this file says are free to change.
+        $navGroup = '';
+        foreach (($cfg['groups'] ?? []) as $groupName => $tokens) {
+            foreach ($tokens as $t) {
+                if ((string)($t['var'] ?? '') === '--sidebar-bg') {
+                    $navGroup = (string)$groupName;
+                }
+            }
+        }
         foreach (($cfg['groups'] ?? []) as $groupName => $tokens) {
             foreach ($tokens as $t) {
                 $default      = (string)($t[$mode] ?? $t['light'] ?? '#000000');
@@ -640,6 +651,17 @@ final class StylesController extends AbstractController
         // the shipped pair sits at, and the dark scope's lightness FLOOR is the
         // dark accent itself. Only this scope's rows are on the page, so the
         // other one has to be handed over explicitly.
+        /* Each style's token set is JSON-encoded HERE rather than through a
+           `|json_encode` modifier in the template: Smarty only exposes PHP
+           functions as modifiers when the security policy allows it, and this
+           renders inside WHMCS's admin. Encoding in the controller cannot be
+           switched off underneath us. */
+        $sbStyles = [];
+        foreach ((array)($cfg['sidebarStyles'] ?? []) as $key => $sb) {
+            $sb['json'] = json_encode((object)($sb['tokens'] ?? []), JSON_UNESCAPED_SLASHES);
+            $sbStyles[$key] = $sb;
+        }
+
         $accents = ['light' => '', 'dark' => ''];
         foreach (($cfg['groups'] ?? []) as $tokens) {
             foreach ($tokens as $t) {
@@ -655,11 +677,12 @@ final class StylesController extends AbstractController
             'presets' => $cfg['presets'] ?? [],
             'mode'    => $mode,
             'accents' => $accents,
-            // Named sidebar styles render the picker on the --sidebar-color row.
-            // Light and Custom are not entries: Light is the ABSENCE of a value
-            // and Custom is any literal, so both are states of the field rather
-            // than rows of this table.
-            'sbStyles' => $cfg['sidebarStyles'] ?? [],
+            // Named sidebar styles render as preset chips at the head of the
+            // group holding the sidebar rows -- the same relationship the accent
+            // chips have to the brand rows. Light is not an entry: it is the
+            // defaults, so picking it resets rather than writes.
+            'sbStyles' => $sbStyles,
+            'navGroup' => $navGroup,
         ];
     }
 

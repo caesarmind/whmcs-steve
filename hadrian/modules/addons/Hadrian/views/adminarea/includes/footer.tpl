@@ -173,108 +173,126 @@
     });
 
     /* ------------------------------------------------------------------
-       Sidebar style: Light / the named styles from colors.php / Custom.
+       Sidebar style presets.
 
-       The buttons hold no value of their own. They write '', a style NAME or a
-       hex into the same c[--sidebar-color] field every other row posts through,
-       so there is no new input, no new POST key and no new storage -- and the
-       mode is READ BACK from the value, which means the two can never disagree.
+       A STYLE IS A SET OF COLOURS. Clicking a chip writes that style's whole
+       token set into the sidebar rows -- the same thing the palette generator
+       does for the palette -- and every row keeps its own picker afterwards.
+       Nothing is stored until Save colors, and saveColorsAction still drops any
+       row that ends up equal to its default.
 
-       The style vocabulary is read off the buttons rather than duplicated here,
-       so adding a style is a row in colors.php and nothing else.
+       An earlier pass had a style be ONE value that the CSS derivation expanded.
+       That left these ten rows inert: whatever you typed into them was
+       overridden by the derived value, so the pickers were decoration.
 
-       Placed above the generator's early return on purpose: the style switch is
-       not part of the generator and must still work if that section is absent.
+       Values may contain var(--color-accent). The admin has no --color-accent of
+       its own, so the Accent FIELD is substituted and the browser resolves the
+       color-mix() down to a literal at click time. Correct for the accent you
+       have; re-pick to follow a rebrand. That is the trade for keeping the rows
+       editable, since what gets stored has to be a literal either way.
+
+       Placed above the generator's early return: the presets are not part of the
+       generator and must still work if that section is absent.
        ------------------------------------------------------------------ */
     var sbt = form.querySelector('[data-sbt]');
-    // No-op stand-in so callers outside the block (the generator, the form-wide
-    // input listener) can refresh the picker without caring whether the row is
-    // on the page at all.
     var sbtRefresh = function(){};
     if (sbt) {
-        var sbtField  = sbt.querySelector('input.mt-color-text'),
-            sbtSwatch = sbt.querySelector('input.mt-color-swatch-input'),
-            sbtCustom = sbt.querySelector('.mt-sbt-custom'),
-            sbtPrev   = sbt.querySelector('.mt-sbt-preview'),
-            sbtNames  = [].slice.call(sbt.querySelectorAll('.mt-sbt-mode'))
-                          .map(function(b){ return b.getAttribute('data-sbt-mode'); })
-                          .filter(function(k){ return k !== 'off' && k !== 'custom'; }),
-            // Remembered so flipping Light -> Custom -> Light -> Custom does not
-            // lose the colour that was picked.
-            sbtLast   = clean(sbtField.value) ? '#' + clean(sbtField.value) : '';
+        /* Resolving CSS to a literal needs somewhere to compute it. The probe
+           lives inside the form so it inherits the same context, and the canvas
+           converts whatever colour space the browser hands back -- color-mix()
+           computes to color(srgb ...), which is not something the save path
+           accepts. */
+        /* The probe sits inside a wrapper whose colour is a sentinel, because a
+           failed var() does NOT leave the previous value behind -- it is
+           invalid at computed-value time, and for an inherited property that
+           means INHERIT. Without the wrapper every unresolvable style quietly
+           produced the admin's own text colour and stored it as if it had
+           worked: eleven rows of #1d1d1f. */
+        var sbWrap = document.createElement('span');
+        sbWrap.style.display = 'none';
+        sbWrap.style.color = 'rgb(1, 2, 3)';
+        var sbProbe = document.createElement('span');
+        sbWrap.appendChild(sbProbe);
+        form.appendChild(sbWrap);
+        var sbCvs = document.createElement('canvas'); sbCvs.width = sbCvs.height = 1;
+        var sbCtx = sbCvs.getContext('2d', { willReadFrequently: true });
 
-        function sbtMode(){
-            var v = (sbtField.value || '').trim().toLowerCase();
-            if (v === '') return 'off';
-            return sbtNames.indexOf(v) !== -1 ? v : 'custom';
+        function sbAccent(){
+            var t = textFor('--color-accent'), h = t ? clean(t.value) : null;
+            return h ? '#' + h : '#0071e3';
         }
-        /* Paint the preview with the style's own CSS, straight off the button.
-           The browser resolves the color-mix() -- no colour maths here, and no
-           second copy of the values to drift from colors.php. Light has no
-           entry of its own, so it borrows the --sidebar-bg default, which is
-           literally what the nav renders when no tint is set. */
-        function sbtPaint(m){
-            if (!sbtPrev) return;
-            var css;
-            if (m === 'off') css = defVal('--sidebar-bg') || '#f6f6f8';
-            else {
-                var b = sbt.querySelector('.mt-sbt-mode[data-sbt-mode="' + m + '"]');
-                css = b ? (b.getAttribute('data-sbt-css') || '') : '';
-            }
-            if (!css) { sbtPrev.style.background = ''; return; }
-            // The admin page has no --color-accent of its own, so substitute the
-            // value sitting in the Accent field: the dot then tracks it live and
-            // shows Tinted and Brand actually following a rebrand.
-            var acc = clean(fieldVal('--color-accent'));
-            sbtPrev.style.background = css.replace(/var\(--color-accent\)/g, acc ? '#' + acc : '#0071e3');
+        /* Declare the token ON the probe rather than string-substituting it.
+           A style value is CSS, so let CSS resolve it: any token a future style
+           references just needs declaring here, and there is no regex to get
+           wrong. (The regex version silently matched nothing.) */
+        function sbResolve(css){
+            sbProbe.style.setProperty('--color-accent', sbAccent());
+            sbProbe.style.color = '';
+            sbProbe.style.color = String(css);
+            var c = getComputedStyle(sbProbe).color;
+            if (!c || c === 'rgb(1, 2, 3)') return null;
+            sbCtx.clearRect(0, 0, 1, 1);
+            sbCtx.fillStyle = '#000'; sbCtx.fillStyle = c;
+            sbCtx.fillRect(0, 0, 1, 1);
+            var d = sbCtx.getImageData(0, 0, 1, 1).data, a = d[3] / 255;
+            // Output must match what the row expects: hex when opaque, rgba when
+            // not. isColor() accepts both and nothing else.
+            return a >= 0.999 ? toHex([d[0], d[1], d[2]])
+                              : rgba([d[0], d[1], d[2]], Math.round(a * 100) / 100);
         }
-        function sbtSync(){
-            var m = sbtMode();
+
+        // Which rows a style owns, learned from the styles themselves so Light
+        // resets exactly the set the others write.
+        var sbRows = {};
+        [].slice.call(sbt.querySelectorAll('.mt-sbt-mode')).forEach(function(b){
+            var raw = b.getAttribute('data-sbt-tokens'); if (!raw) return;
+            try { Object.keys(JSON.parse(raw)).forEach(function(v){ sbRows[v] = true; }); }
+            catch (e) {}
+        });
+
+        function sbPaintDots(){
+            // Same trick as the probe: declare the token on the container and
+            // the chips' own var() references resolve against it.
+            sbt.style.setProperty('--color-accent', sbAccent());
             [].slice.call(sbt.querySelectorAll('.mt-sbt-mode')).forEach(function(b){
-                b.setAttribute('aria-pressed', String(b.getAttribute('data-sbt-mode') === m)); });
-            sbtCustom.hidden = m !== 'custom';
-            sbtField.hidden  = m !== 'custom';
-            // In Custom the real picker IS the swatch, so two would be one too many
-            if (sbtPrev) sbtPrev.hidden = m === 'custom';
-            sbtPaint(m);
+                var dot = b.querySelector('.mt-sbt-dot'); if (!dot) return;
+                var css = b.getAttribute('data-sbt-css');
+                // Light has no CSS of its own: it IS --sidebar-bg's default,
+                // which is literally what the nav renders untinted.
+                dot.style.background = css || defVal('--sidebar-bg') || '#f6f6f8';
+            });
         }
-        sbtRefresh = sbtSync;
-        /* Delegated, because the Accent can change without its text field ever
-           firing input: the swatch handler assigns .value directly, and the
-           palette generator writes through setToken. Listening on the form
-           catches both, and repainting one dot is free. */
-        form.addEventListener('input', function(e){
-            // ...but never while the buyer is typing in this row's OWN field.
-            // Clearing it to retype would read as mode 'off' and yank the input
-            // out from under the cursor mid-keystroke.
-            if (e.target !== sbtField) sbtSync();
-        });
-        sbt.addEventListener('click', function(e){
-            var b = e.target.closest('.mt-sbt-mode'); if (!b) return;
-            var m = b.getAttribute('data-sbt-mode');
-            if (m === 'custom') {
-                // Opening Custom with nothing remembered seeds from the Accent
-                // rather than #000000, which is what an empty colour input
-                // shows and is never what anyone wants.
-                var seed = sbtLast || (clean(fieldVal('--color-accent')) ? '#' + clean(fieldVal('--color-accent')) : '#1b2a4a');
-                sbtField.value = seed; sbtSwatch.value = seed;
-            } else {
-                if (sbtMode() === 'custom' && clean(sbtField.value)) sbtLast = '#' + clean(sbtField.value);
-                // 'off' is the ABSENCE of a value -- that emptiness is the
-                // tint's off switch in apple-theme.css, not a colour meaning
-                // "neutral". Every other mode stores its own name.
-                sbtField.value = m === 'off' ? '' : m;
+        function sbApply(btn){
+            [].slice.call(sbt.querySelectorAll('.mt-sbt-mode')).forEach(function(b){
+                b.classList.toggle('is-active', b === btn); });
+            var raw = btn.getAttribute('data-sbt-tokens');
+            if (!raw) {
+                // Light: reset rather than write, so the rows go back to being
+                // unstored and saveColorsAction persists nothing for them.
+                Object.keys(sbRows).forEach(function(v){
+                    var t = textFor(v); if (t) setToken(v, t.getAttribute('data-default'));
+                });
+                return;
             }
-            sbtSync();
+            var map; try { map = JSON.parse(raw); } catch (e) { return; }
+            Object.keys(map).forEach(function(v){
+                var lit = sbResolve(map[v]);
+                if (lit) setToken(v, lit);
+            });
+        }
+        sbt.addEventListener('click', function(e){
+            var b = e.target.closest('.mt-sbt-mode'); if (b) sbApply(b);
         });
-        sbtField.addEventListener('input', function(){
-            if (clean(this.value)) sbtLast = '#' + clean(this.value);
+        sbtRefresh = sbPaintDots;
+        /* Delegated, because the Accent changes without its own field ever
+           firing input: the swatch handler assigns .value directly and the
+           generator writes through setToken. Repainting five dots is free. */
+        form.addEventListener('input', sbPaintDots);
+        if (reset) reset.addEventListener('click', function(){
+            [].slice.call(sbt.querySelectorAll('.mt-sbt-mode')).forEach(function(b){
+                b.classList.remove('is-active'); });
         });
-        // Reset-all writes every field back to its default (empty here), so the
-        // three buttons have to be told; otherwise the row reads Off while
-        // Custom still looks selected.
-        if (reset) reset.addEventListener('click', sbtSync);
-        sbtSync();
+        sbPaintDots();
     }
     function fieldVal(name){ var t = textFor(name); return t ? t.value : ''; }
 

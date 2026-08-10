@@ -27,18 +27,25 @@ return [
 
     /* Named sidebar styles, modelled on the five-way toggle in the v18 mockup
        (apple-client-area: Light / Tinted / Dark / Graphite / Brand).
-       Each entry's `value` is what Hooks::buildColorsHead emits as
-       --sidebar-color; the theme's existing @supports derivation does the rest
-       -- background, three ink steps, hover, active, hairline and scrollbar,
-       with black-or-white label ink chosen at the WCAG crossover. So a style is
-       ONE stored word, not a set of tokens, and adding one here needs no CSS.
 
-       Light is the absence of a value (empty = the tint's off switch) and
-       Custom is any literal colour, so neither belongs in this list.
+       A STYLE IS A SET OF COLOURS, not one colour that implies the rest. The
+       mockup makes that plain -- each of its styles declares eight or nine
+       token values -- and an earlier pass here got it wrong by collapsing a
+       style into a single --sidebar-color and letting the derivation invent
+       everything else, which left the ten sidebar rows inert and uneditable.
 
-       Tinted and Brand emit a var()/color-mix() rather than a resolved hex on
-       purpose: they must FOLLOW a rebrand, and html[data-palette] redefines
-       --color-accent in static CSS the server cannot see.
+       So `tokens` is a PRESET: picking a style writes these values into the
+       matching rows of the form, exactly as the palette generator writes the
+       palette, and every row keeps its own colour picker afterwards. Nothing is
+       stored until Save colors, and saveColorsAction still drops any row that
+       equals its default.
+
+       Values may reference var(--color-accent): the admin substitutes the
+       Accent field and lets the browser resolve the color-mix() down to a
+       literal at the moment you click. That means Tinted and Brand are correct
+       for the accent you have, and re-picking is how you follow a rebrand --
+       the deliberate trade, because storing a literal is what keeps the rows
+       editable. `value` is the background alone, used for the preview dot.
 
        Brand is deepened 6% toward black. Raw var(--color-accent) measures 4.30
        for the primary label on the shipped blue -- under AA -- and 6% is the
@@ -46,15 +53,77 @@ return [
        terracotta 5.35, purple 5.06, teal 5.25, green 4.97, yellow 13.4).
        The mockup uses the raw accent and does not clear it.
 
-       KNOWN, MEASURED, NOT FIXED: on Brand the SOFTENED steps stay 3.0-3.4
-       whatever the deepening, because they are a 70/30 mix of the ink into a
-       mid-tone base. apple-theme.css's tint block documents the same ceiling.
-       The dark styles have plenty of headroom (6.9-7.6). */
+       Light is not a row here: it is the DEFAULTS, so picking it resets these
+       tokens rather than writing anything. */
     'sidebarStyles' => [
-        'tinted'   => ['label' => 'Tinted',   'value' => 'color-mix(in srgb, var(--color-accent) 10%, #ffffff)'],
-        'dark'     => ['label' => 'Dark',     'value' => '#1c1c1e'],
-        'graphite' => ['label' => 'Graphite', 'value' => '#21252e'],
-        'brand'    => ['label' => 'Brand',    'value' => 'color-mix(in srgb, var(--color-accent) 94%, #000000)'],
+        'tinted' => [
+            'label'  => 'Tinted',
+            'value'  => 'color-mix(in srgb, var(--color-accent) 10%, #ffffff)',
+            'tokens' => [
+                '--sidebar-bg'             => 'color-mix(in srgb, var(--color-accent) 10%, #ffffff)',
+                '--sidebar-panel-bg'       => 'color-mix(in srgb, var(--color-accent) 6%, #ffffff)',
+                '--sidebar-text'           => '#1d1d1f',
+                '--sidebar-text-secondary' => '#6e6e73',
+                '--sidebar-text-muted'     => '#86868b',
+                '--sidebar-text-faint'     => '#aeaeb2',
+                '--sidebar-border'         => 'color-mix(in srgb, var(--color-accent) 16%, #ffffff)',
+                '--sidebar-field-bg'       => 'color-mix(in srgb, var(--color-accent) 6%, #ffffff)',
+                '--sidebar-item-hover-bg'  => 'color-mix(in srgb, var(--color-accent) 14%, transparent)',
+                '--sidebar-item-active-bg' => 'color-mix(in srgb, var(--color-accent) 22%, transparent)',
+                '--sidebar-scroll-thumb'   => 'color-mix(in srgb, var(--color-accent) 30%, transparent)',
+            ],
+        ],
+        'dark' => [
+            'label'  => 'Dark',
+            'value'  => '#1c1c1e',
+            'tokens' => [
+                '--sidebar-bg'             => 'rgba(28,28,30,0.85)',
+                '--sidebar-panel-bg'       => '#1c1c1e',
+                '--sidebar-text'           => '#f5f5f7',
+                '--sidebar-text-secondary' => '#a1a1a6',
+                '--sidebar-text-muted'     => '#98989d',
+                '--sidebar-text-faint'     => '#6e6e73',
+                '--sidebar-border'         => 'rgba(255,255,255,0.10)',
+                '--sidebar-field-bg'       => 'rgba(255,255,255,0.08)',
+                '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.06)',
+                '--sidebar-item-active-bg' => 'rgba(255,255,255,0.10)',
+                '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.15)',
+            ],
+        ],
+        'graphite' => [
+            'label'  => 'Graphite',
+            'value'  => '#21252e',
+            'tokens' => [
+                '--sidebar-bg'             => 'rgba(33,37,46,0.94)',
+                '--sidebar-panel-bg'       => '#21252e',
+                '--sidebar-text'           => '#f5f5f7',
+                '--sidebar-text-secondary' => '#a1a1a6',
+                '--sidebar-text-muted'     => '#98989d',
+                '--sidebar-text-faint'     => '#6e6e73',
+                '--sidebar-border'         => 'rgba(255,255,255,0.10)',
+                '--sidebar-field-bg'       => 'rgba(255,255,255,0.08)',
+                '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.06)',
+                '--sidebar-item-active-bg' => 'rgba(255,255,255,0.10)',
+                '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.15)',
+            ],
+        ],
+        'brand' => [
+            'label'  => 'Brand',
+            'value'  => 'color-mix(in srgb, var(--color-accent) 94%, #000000)',
+            'tokens' => [
+                '--sidebar-bg'             => 'color-mix(in srgb, var(--color-accent) 94%, #000000)',
+                '--sidebar-panel-bg'       => 'color-mix(in srgb, var(--color-accent) 94%, #000000)',
+                '--sidebar-text'           => '#ffffff',
+                '--sidebar-text-secondary' => 'rgba(255,255,255,0.82)',
+                '--sidebar-text-muted'     => 'rgba(255,255,255,0.70)',
+                '--sidebar-text-faint'     => 'rgba(255,255,255,0.55)',
+                '--sidebar-border'         => 'rgba(255,255,255,0.20)',
+                '--sidebar-field-bg'       => 'rgba(255,255,255,0.16)',
+                '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.14)',
+                '--sidebar-item-active-bg' => 'rgba(255,255,255,0.22)',
+                '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.30)',
+            ],
+        ],
     ],
 
     // Editable tokens, grouped for the form. Each: var, label, light, dark,
@@ -159,7 +228,7 @@ return [
             // check-color-defaults.mjs skips any token with an empty default
             // for this reason -- it is the one token that MUST NOT appear in
             // apple-theme.css.
-            ['var' => '--sidebar-color',          'label' => 'Sidebar colour',     'light' => '',                       'dark' => '',                    'hint' => 'Light is neutral. Tinted and Brand follow the Accent; Dark and Graphite do not.'],
+            ['var' => '--sidebar-color',          'label' => 'Sidebar colour',     'light' => '',                       'dark' => '',                    'hint' => 'Shortcut: one colour and every row below derives from it. Leave empty when using a style.'],
             ['var' => '--sidebar-bg',             'label' => 'Sidebar background', 'light' => 'rgba(246,246,248,0.80)', 'dark' => 'rgba(28,28,30,0.80)', 'hint' => 'Translucent: it frosts whatever scrolls under it.'],
             ['var' => '--sidebar-panel-bg',       'label' => 'Flyout panel',       'light' => '#ffffff',                'dark' => '#2c2c2e', 'hint' => 'The rail layout only. Not the sidebar itself.'],
             ['var' => '--sidebar-text',           'label' => 'Text',               'light' => '#1d1d1f',                'dark' => '#f5f5f7', 'hint' => 'Set this whenever you darken the background, or the menu goes dark-on-dark.'],

@@ -99,65 +99,44 @@
     {foreach $colors.groups as $groupName => $tokens}
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">{$groupName|escape}</h2></header>
+
+        {* Sidebar style presets, at the head of the group that owns the sidebar
+           rows -- the same relationship the accent chips at the top of the page
+           have to the brand rows, and rendered with the same .mt-schemes markup.
+
+           A STYLE IS A SET OF COLOURS. Clicking one fills the rows below with
+           that style's values, resolving any var(--color-accent) against the
+           Accent you currently have; every row then keeps its own picker and can
+           be tweaked. Nothing is stored until Save colors.
+
+           Light carries no tokens of its own because it IS the defaults, so it
+           resets those rows rather than writing to them. *}
+        {if $groupName == $colors.navGroup && $colors.sbStyles}
+        <div class="mt-schemes mt-sbt" data-sbt>
+            <span class="mt-sbt-lab">Style</span>
+            <button type="button" class="mt-scheme mt-sbt-mode" data-sbt-mode="off">
+                <span class="mt-scheme-dot mt-sbt-dot"></span>Light</button>
+            {foreach $colors.sbStyles as $sbKey => $sb}
+            {* data-sbt-tokens carries the style's whole token set as JSON, and
+               data-sbt-css just its background for the chip dot. Both come
+               straight from colors.php, so the admin holds no second copy of
+               the values and cannot drift from what ships. *}
+            <button type="button" class="mt-scheme mt-sbt-mode" data-sbt-mode="{$sbKey|escape}"
+                    data-sbt-css="{$sb.value|escape}"
+                    data-sbt-tokens="{$sb.json|escape}">
+                <span class="mt-scheme-dot mt-sbt-dot"></span>{$sb.label|escape}</button>
+            {/foreach}
+        </div>
+        {/if}
+
         <div class="mt-color-rows">
             {foreach $tokens as $t}
             <div class="mt-color-row" data-var="{$t.var|escape}">
                 <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">{$t.label|escape}</label>
-                {* The sidebar is the one row that is not simply a colour. It is
-                   a STYLE, and which one you are in is not inferable from a hex:
-                   Light (empty -- the neutral default), the named styles from
-                   colors.php (Tinted / Dark / Graphite / Brand), and Custom (a
-                   literal, deliberately frozen). Modelled on the v18 mockup's
-                   five-way toggle; Tinted and Brand follow a rebrand, the rest
-                   do not, and a light nav has no business following one at all,
-                   which is why Light stays the default.
-
-                   Every style is ONE stored word and the theme's --sidebar-color
-                   derivation builds the whole nav from it, so this list is data:
-                   adding a style means adding a row to colors.php, not CSS here.
-
-                   The buttons carry no value of their own -- the JS in
-                   footer.tpl writes '' / the style name / the hex into the SAME
-                   c[--sidebar-color] field every other row posts through, so
-                   the save path needs no new input and no new storage. *}
-                {if $t.var == '--sidebar-color'}
-                <span class="mt-color-control mt-sbt" data-sbt>
-                    {* The style list is not duplicated into an attribute: the
-                       JS reads the button keys straight off the DOM, so this
-                       markup stays the single description of what exists.
-                       Custom opens unpressed and sbtSync() corrects it from the
-                       field value on load -- cheaper than asking Smarty whether
-                       a variable key is a member of an array. *}
-                    <span class="mt-sbt-modes" role="group" aria-label="Sidebar style">
-                        <button type="button" class="mt-sbt-mode" data-sbt-mode="off" aria-pressed="{if $t.value == ''}true{else}false{/if}">Light</button>
-                        {foreach $colors.sbStyles as $sbKey => $sb}
-                        {* data-sbt-css carries the style's CSS verbatim from
-                           colors.php so the preview dot can be painted with the
-                           exact declaration that ships. The browser resolves the
-                           color-mix() for us -- no colour maths here, and no
-                           second copy of the values to drift. *}
-                        <button type="button" class="mt-sbt-mode" data-sbt-mode="{$sbKey|escape}" data-sbt-css="{$sb.value|escape}" aria-pressed="{if $t.value == $sbKey}true{else}false{/if}">{$sb.label|escape}</button>
-                        {/foreach}
-                        <button type="button" class="mt-sbt-mode" data-sbt-mode="custom" aria-pressed="false">Custom</button>
-                    </span>
-                    {* Always visible except in Custom, where the real picker
-                       takes its place -- so the row never sits there with no
-                       colour on it, the way every other row shows one. *}
-                    <span class="mt-sbt-preview" aria-hidden="true"></span>
-                    {* Both open hidden and sbtSync() reveals them for Custom.
-                       A `hidden` text input still POSTs, which is what lets the
-                       whole control ride the existing c[--sidebar-color] field. *}
-                    <span class="mt-sbt-custom" hidden>
-                        <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
-                    </span>
-                    <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false" {if $t.hint|default:''}aria-describedby="h{$t.var|replace:'--':'_'}"{/if} hidden>
-                </span>
-                {else}
                 <span class="mt-color-control">
                     <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
                     <input type="text" id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}" class="mt-input mt-input-compact mt-color-text" value="{$t.value|escape}" data-default="{$t.default|escape}" spellcheck="false" {if $t.hint|default:''}aria-describedby="h{$t.var|replace:'--':'_'}"{/if}>
                 </span>
-                {/if}
                 {* Optional per-token note from colors.php. Several labels are
                    honestly ambiguous on their own -- "Surface 3" says nothing
                    about the fact that its ordinal INVERTS between light and
