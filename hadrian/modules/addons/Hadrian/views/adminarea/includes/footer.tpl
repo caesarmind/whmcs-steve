@@ -153,16 +153,51 @@
         t.addEventListener('input', function(){ syncSwatch(t.getAttribute('data-var'), t.value); });
     });
 
+    /* Accent presets. Two things were wrong here and both are the same shape as
+       the generator's bug: it wrote only the scope on screen, and it wrote
+       through setToken, which assigns .value directly and fires no input event
+       -- so the dark-follows-light link never heard about it either.
+
+       It also FROZE the three rows that are meant to derive. Writing a literal
+       into accent hover, link and link hover is exactly what their own hints
+       warn against ("Set a value only to break that link"), so a preset was
+       quietly pinning the very family it was supposed to move. They are reset
+       to their defaults instead, which lets apple-theme.css derive them from
+       the new accent. */
+    function applyAccentPreset(hex){
+        var h = clean(hex); if (!h) return;
+        // Always drive from the LIGHT scope: propagate() reads the visible
+        // input as light and the hidden twin as dark, so a preset clicked while
+        // viewing Dark has to swap first or it writes the pair backwards.
+        var wasDark = curScope() === 'dark';
+        if (wasDark) swapScope('light');
+
+        setToken('--color-accent', '#' + h);
+        propagate('--color-accent');          // dark follows by the shipped delta
+
+        // The tint is the accent at whatever alpha each scope's default carries
+        var accD = otherFor('--color-accent');
+        [['--color-accent-light', textFor, '#' + h], ['--color-accent-light', otherFor, accD && accD.value]]
+            .forEach(function(spec){
+                var el = spec[1]('--color-accent-light'); if (!el || !spec[2]) return;
+                var d = parseCol(el.getAttribute('data-default')), src = parseCol(spec[2]);
+                if (!src) return;
+                var v = (d && d.a !== null) ? rgba(src.rgb, d.a) : toHex(src.rgb);
+                if (spec[1] === textFor) setToken('--color-accent-light', v); else el.value = v;
+            });
+
+        ['--color-accent-hover', '--color-link', '--color-link-hover'].forEach(function(n){
+            var t = textFor(n), o = otherFor(n);
+            if (t) setToken(n, t.getAttribute('data-default'));
+            if (o) o.value = o.getAttribute('data-default');
+        });
+
+        if (wasDark) swapScope('dark');
+        sbtRefresh();
+    }
     [].slice.call(form.querySelectorAll('.mt-scheme[data-accent]')).forEach(function(chip){
         chip.addEventListener('click', function(){
-            var h = clean(chip.getAttribute('data-accent')); if (!h) return;
-            var rgb = toRgb('#' + h);
-            var dark = toHex(shade(rgb, -0.08));
-            setToken('--color-accent', '#' + h);
-            setToken('--color-accent-hover', dark);
-            setToken('--color-accent-light', rgba(rgb, 0.08));
-            setToken('--color-link', '#' + h);
-            setToken('--color-link-hover', dark);
+            applyAccentPreset(chip.getAttribute('data-accent'));
         });
     });
 

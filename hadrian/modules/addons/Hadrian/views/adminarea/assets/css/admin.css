@@ -649,6 +649,10 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-color-swatch-input::-moz-color-swatch { border: 0; border-radius: 3px; }
 .mt-color-text { max-width: 132px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; text-transform: lowercase; }
 
+/* The scope switch, sitting directly above the rows it governs. */
+.mt-scope-bar { display: flex; align-items: center; gap: 10px; padding: 18px 0 0; border-top: 1px solid var(--mt-border); margin-top: 4px; }
+.mt-scope-lab { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mt-text-3); }
+
 /* Rows the Dark scope has no opinion about, and the way back to them. */
 .mt-shared-note { margin: 14px 0 0; }
 .mt-shared-note[hidden] { display: none; }

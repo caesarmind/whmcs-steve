@@ -14,15 +14,6 @@
     <section class="mt-section">
         <header class="mt-section-header">
             <h2 class="mt-section-title">Color Scheme</h2>
-            {* Light/Dark scope toggle. Both scopes are IN THE PAGE -- the one
-               you are not looking at rides along in a hidden field per row --
-               so switching swaps values client-side with no reload, and one
-               Save writes both. It used to be a link that reloaded and threw
-               away unsaved edits in the scope you were leaving. *}
-            <div class="mt-tabs" data-scope-switch>
-                <button type="button" class="mt-tab {if $colors.mode != 'dark'}is-active{/if}" data-scope-set="light">Light</button>
-                <button type="button" class="mt-tab {if $colors.mode == 'dark'}is-active{/if}" data-scope-set="dark">Dark</button>
-            </div>
         </header>
         <p class="mt-field-help">Every token below is editable independently. Quick presets just cascade the brand fields (accent, hover, tint, link) &mdash; tweak any value after. Editing the <strong>{$styleName|escape}</strong> style changes its <strong>{$colors.mode}</strong> colors; only changed tokens are saved, and they apply site-wide.</p>
         <div class="mt-schemes">
@@ -106,6 +97,22 @@
 
         <div class="mt-gen-report" hidden></div>
     </section>
+
+    {* Light/Dark sits here rather than in the Color Scheme header: it governs
+       the rows BELOW it, not the presets and generator above, and reading it
+       immediately before the first group is what makes that obvious.
+
+       Both scopes are IN THE PAGE -- the one you are not looking at rides along
+       in a hidden field per row -- so switching swaps values client-side with
+       no reload, and one Save writes both. It used to be a link that reloaded
+       and threw away unsaved edits in the scope you were leaving. *}
+    <div class="mt-scope-bar">
+        <span class="mt-scope-lab">Editing</span>
+        <div class="mt-tabs" data-scope-switch>
+            <button type="button" class="mt-tab {if $colors.mode != 'dark'}is-active{/if}" data-scope-set="light">Light</button>
+            <button type="button" class="mt-tab {if $colors.mode == 'dark'}is-active{/if}" data-scope-set="dark">Dark</button>
+        </div>
+    </div>
 
     {foreach $colors.groups as $groupName => $tokens}
     <section class="mt-section">
