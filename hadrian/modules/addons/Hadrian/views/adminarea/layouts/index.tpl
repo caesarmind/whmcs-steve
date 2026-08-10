@@ -86,6 +86,9 @@
     .mt-seg button:hover{color:var(--mt-text)}
     .mt-seg button.on{background:var(--mt-surface);color:var(--mt-text);box-shadow:0 1px 2px rgba(0,0,0,.12)}
     .mt-lay-optnone{border-top:1px dashed var(--mt-border);padding-top:11px;font-size:11.5px;color:var(--mt-text-3);font-style:italic}
+    .mt-lay-size{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+    .mt-lay-size .mt-input{max-width:96px}
+    .mt-lay-size-def{font-size:11px;color:var(--mt-text-3)}
     .mt-flag-form{display:flex;align-items:center;gap:8px;margin:0;flex-shrink:0}
 
     /* Not-yet-wired placeholders. Dimmed and non-interactive so they read as
@@ -263,6 +266,36 @@
                             {elseif $k == 'main-menu'}
                                 <div class="mt-lay-optnone">No alignment option &mdash; content is always centered.</div>
                             {/if}
+
+                            {* Dimensions this layout shapes, declared in its own
+                               layout.php and moved here from Styles > Layout:
+                               "how wide is the sidebar" is a property of the
+                               sidebar layout, not of a colour style. Shown only
+                               on an ACTIVE card, same rule as the options above
+                               -- sizing a layout nobody is served is noise.
+                               Each posts on change and saves into the same
+                               _layout_vars blob the Content fields below use. *}
+                            {foreach $layout.sizes as $sz}
+                            <div class="mt-lay-opt">
+                                <span class="mt-lay-opt-lbl">{$sz.label|escape}</span>
+                                {* Explicit Apply, no autosubmit -- same reason
+                                   the Content fields below give: a number field
+                                   posting on every keystroke stores half-typed
+                                   values (a 2 on the way to 260). *}
+                                <form method="post" action="" class="mt-lay-size">
+                                    <input type="hidden" name="layout_size" value="{$sz.field|escape}">
+                                    <span class="mt-affix">
+                                        <input type="number" name="value" class="mt-input mt-input-compact"
+                                               value="{$sz.value}" data-default="{$sz.default}"
+                                               min="0" max="4000" step="1" inputmode="numeric"
+                                               aria-label="{$sz.label|escape} in pixels">
+                                        <span class="mt-affix-unit">px</span>
+                                    </span>
+                                    <button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button>
+                                    <span class="mt-lay-size-def">default {$sz.default}px</span>
+                                </form>
+                            </div>
+                            {/foreach}
                         {/if}
 
                         {* Live preview. The mechanism already existed and was
@@ -366,9 +399,9 @@
             <noscript><button type="submit" class="mt-btn mt-btn-ghost mt-btn-sm">Apply</button></noscript>
         </form>
     </div>
-    {* Same stored value as Styles > Layout > Content > Max width (the
-       --content-max-width layout var) -- two doors onto one setting, not a
-       second one. No data-autosubmit: a number field would post on every
+    {* The --content-max-width layout var. Styles > Layout used to be a second
+       door onto this same value; that panel is gone and this is now the only
+       one. No data-autosubmit: a number field would post on every
        keystroke and store half-typed values. *}
     <div class="mt-row">
         <div>
@@ -376,7 +409,7 @@
             <div class="mt-row-help">
                 Exact width of the content column when Boxed is selected above.
                 {if $contentWidth != 'boxed'}<strong>Currently overridden</strong> &mdash; &ldquo;{$contentWidths[$contentWidth]|escape}&rdquo; ignores this value.{/if}
-                Also editable at Styles &rsaquo; Layout &rsaquo; Content; both edit the same setting. Default {$contentMaxWidthDefault}px.
+                Default {$contentMaxWidthDefault}px.
             </div>
         </div>
         <form method="post" action="" class="mt-flag-form">
@@ -392,7 +425,7 @@
     {* Was the entire difference between the old "Full width" and "Fluid"
        options (24px vs 48px). Promoted to its own field so it applies in BOTH
        modes instead of being the hidden payload of a mode choice. Same stored
-       value as Styles > Layout > Content > Padding X. *}
+       value the --content-pad-x layout var holds; this is now its only editor. *}
     <div class="mt-row">
         <div>
             <div class="mt-row-label">Side padding</div>

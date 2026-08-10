@@ -21,6 +21,14 @@ return [
     'variables'   => [
         'dataLayout' => 'side',
     ],
+    /* Page-structure dimensions this layout actually shapes, rendered on its
+       card in the admin Layouts page. Only ONE main-menu layout is active at
+       a time, so these still live in the global _layout_vars blob and
+       Hooks::buildLayoutHead is unchanged -- declaring them here is a UI
+       grouping, not a second storage. Sidebar width is this layout's alone;
+       the topbar is shared with the rail (header.tpl renders inner-topbar
+       whenever the layout is not 'top'). */
+    'sizes' => ['--sidebar-width', '--topbar-height'],
     'supportedOptions' => [
         'align' => [
             'label'   => 'Content alignment',

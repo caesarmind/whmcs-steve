@@ -100,7 +100,7 @@ final class StylesController extends AbstractController
         // (?subcat=navigation, ?subcat=site) rendered the shell with every
         // panel hidden -- a blank page with no indication why. Whitelist it and
         // fall back to the first panel.
-        if (!in_array($subcat, ['colors', 'typography', 'general', 'layout', 'buttons', 'forms', 'elements'], true)) {
+        if (!in_array($subcat, ['colors', 'typography', 'general', 'buttons', 'forms', 'elements'], true)) {
             $subcat = 'colors';
         }
         $this->migrateColors($template);

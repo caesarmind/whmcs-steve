@@ -25,7 +25,6 @@
         <a class="mt-subcat {if $subcat == 'colors'}is-active{/if}"     data-subcat="colors"     href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=colors">Colors</a>
         <a class="mt-subcat {if $subcat == 'typography'}is-active{/if}" data-subcat="typography" href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=typography">Typography</a>
         <a class="mt-subcat {if $subcat == 'general'}is-active{/if}"    data-subcat="general"    href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=general">General</a>
-        <a class="mt-subcat {if $subcat == 'layout'}is-active{/if}"     data-subcat="layout"     href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=layout">Layout</a>
         <a class="mt-subcat {if $subcat == 'buttons'}is-active{/if}"    data-subcat="buttons"    href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=buttons">Buttons</a>
         <a class="mt-subcat {if $subcat == 'forms'}is-active{/if}"      data-subcat="forms"      href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=forms">Forms</a>
         <a class="mt-subcat {if $subcat == 'elements'}is-active{/if}"   data-subcat="elements"   href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=elements">Elements</a>
@@ -52,9 +51,6 @@
             {include file="styles/_forms.tpl"}
         </div>
 
-        <div class="mt-subcat-panel" data-panel="layout"{if $subcat != 'layout'} hidden{/if}>
-            {include file="styles/_layout.tpl"}
-        </div>
 
         <div class="mt-subcat-panel" data-panel="elements"{if $subcat != 'elements'} hidden{/if}>
             {include file="styles/_elements.tpl"}

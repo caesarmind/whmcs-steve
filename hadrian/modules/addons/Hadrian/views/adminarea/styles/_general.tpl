@@ -5,7 +5,8 @@
 
    Elements/Buttons/Forms let a buyer pick "Card radius = Large"; this panel is
    where Large gets its number. Site-wide -> global mt_general form. Mirrors
-   _layout.tpl for the px fields and _elements.tpl for the dropdowns. *}
+   _elements.tpl for the dropdowns. (The px fields moved to the Layouts
+   page, onto the layout each dimension belongs to.) *}
 <form method="post" action="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=general" class="mt-general">
     <input type="hidden" name="mt_general" value="1">
     <input type="hidden" name="style" value="{$style|escape}">

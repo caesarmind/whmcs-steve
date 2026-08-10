@@ -140,6 +140,19 @@ final class LayoutsController extends AbstractController
             $this->redirect('?module=Hadrian&action=layouts&kind=main-menu&flag=1');
         }
 
+        /* A dimension edited on a layout card. The field name is the token with
+           its dashes flattened (--sidebar-width -> sidebar_width), and it is
+           mapped back through layoutSizeSpec so only vars the schema still
+           declares can be written -- a POST naming anything else is ignored
+           rather than merged into the blob. */
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['layout_size'])) {
+            $var = '--' . str_replace('_', '-', (string)$_POST['layout_size']);
+            if ($this->layoutSizeSpec($var) !== null) {
+                $this->saveLayoutVar($var, (string)($_POST['value'] ?? ''));
+            }
+            $this->redirect('?module=Hadrian&action=layouts&kind=main-menu');
+        }
+
         // Which tab opens first — preserved across save-redirects via ?kind.
         $activeKind = (string)($_GET['kind'] ?? 'main-menu');
         if (!in_array($activeKind, ['main-menu', 'footer'], true)) {
@@ -172,6 +185,31 @@ final class LayoutsController extends AbstractController
                     ];
                 }
 
+                /* Page-structure dimensions this layout shapes, declared in its
+                   own layout.php. They render on the layout's card instead of
+                   in a separate Styles > Layout panel, because "how wide is the
+                   sidebar" is a property of the sidebar layout, not of a colour
+                   style. Only ONE main-menu layout is active at a time, so the
+                   values still live in the global _layout_vars blob and
+                   Hooks::buildLayoutHead is untouched -- this is a UI grouping,
+                   not a second storage. A layout that shapes neither dimension
+                   (top: no sidebar, and it swaps the inner topbar for topnav)
+                   declares no sizes and renders none. */
+                $sizes = [];
+                foreach ((array)($meta['sizes'] ?? []) as $var) {
+                    $spec = $this->layoutSizeSpec((string)$var);
+                    if ($spec === null) {
+                        continue;
+                    }
+                    $sizes[] = [
+                        'var'     => (string)$var,
+                        'field'   => str_replace('-', '_', ltrim((string)$var, '-')),
+                        'label'   => $spec['label'],
+                        'default' => $spec['default'],
+                        'value'   => $this->layoutVar((string)$var),
+                    ];
+                }
+
                 $list[] = [
                     'name'           => $name,
                     'displayName'    => $meta['displayName'] ?? ucfirst($name),
@@ -179,6 +217,7 @@ final class LayoutsController extends AbstractController
                     'isActiveGuest'  => $name === $currentGuest,
                     'isActiveClient' => $name === $currentClient,
                     'options'        => $options,
+                    'sizes'          => $sizes,
                     // Feeds the "Live preview" link. header.tpl honours
                     // ?preview=1&layout=<side|top|rail> and that value is this
                     // manifest's dataLayout, NOT the folder name -- the sidebar
@@ -246,9 +285,9 @@ final class LayoutsController extends AbstractController
      *
      * Deliberately NOT new settings. These read and write the exact
      * '--content-max-width' / '--content-pad-x' entries of the
-     * '<template>_layout_vars' blob that Styles > Layout > Content already
-     * edits, so the two panels are two doors onto one value instead of
-     * competing sources of truth. Hooks::buildLayoutHead() emits them as
+     * '<template>_layout_vars' blob. Styles > Layout used to be a second door
+     * onto the same value; that panel is gone and this page is now the only
+     * editor, but the storage is unchanged so saved values carried over. Hooks::buildLayoutHead() emits them as
      * :root{--content-max-width:Npx;--content-pad-x:Npx}.
      *
      * Generic over the var name so Padding X reuses the merge + clamp logic
@@ -276,6 +315,29 @@ final class LayoutsController extends AbstractController
         return (is_array($stored) && isset($stored[$var]))
             ? (int)$stored[$var]
             : $this->layoutVarDefault($var);
+    }
+
+    /**
+     * Label + default for a dimension a layout declares, looked up in
+     * core/config/layout.php so the schema stays in one place. Returns null for
+     * a var no longer in the schema, which is what stops a stale 'sizes' entry
+     * in a layout manifest from rendering a field that saves nowhere.
+     */
+    private function layoutSizeSpec(string $var): ?array
+    {
+        $template = AddonHelper::getTemplate();
+        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');
+        foreach (($cfg['sizeGroups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                if ((string)($f['var'] ?? '') === $var) {
+                    return [
+                        'label'   => (string)($f['label'] ?? $var),
+                        'default' => (int)($f['default'] ?? 0),
+                    ];
+                }
+            }
+        }
+        return null;
     }
 
     /**

@@ -21,6 +21,10 @@ return [
     'variables'   => [
         'dataLayout' => 'rail',
     ],
+    /* The rail's own width is fixed in CSS with no token, so the only
+       dimension it exposes is the inner topbar it shares with the sidebar
+       layout. */
+    'sizes' => ['--topbar-height'],
     'supportedOptions' => [
         'align' => [
             'label'   => 'Content alignment',
