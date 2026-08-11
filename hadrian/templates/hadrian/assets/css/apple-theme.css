@@ -616,19 +616,20 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
 .sidebar-item-badge { margin-left: auto; font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--sidebar-text-muted); background: var(--sidebar-badge-bg); padding: 1px 7px; border-radius: var(--radius-pill); min-width: 20px; text-align: center; }
 .sidebar-footer { padding: 12px; border-top: 0.5px solid var(--sidebar-border); }
 
-/* Account profile off (admin Layouts card -> body[data-nav-profile="hide"]).
-   The FOOTER goes, not just the block inside it: .sidebar-footer carries 12px
-   of padding and its own top border, so hiding only the profile would leave a
+/* Account block off (admin Layouts card -> body[data-nav-profile="hide"]).
+   The whole footer goes, in BOTH auth states: the profile when signed in, the
+   Login / Create-account buttons when signed out. It is one region of the nav
+   and an admin switching it off means the region, not one of its two faces.
+
+   Hiding the footer rather than its contents is deliberate -- .sidebar-footer
+   carries 12px of padding and its own top border, so emptying it would leave a
    24px strip with a divider line hanging under the nav.
 
-   :has() is what keeps this from taking the logged-OUT footer with it -- that
-   one holds the Login / Create-account buttons, and an admin hiding a profile
-   has not asked to remove the way in. The profile wrapper is .only-in, so
-   matching on it targets exactly the signed-in case.
-
-   The inner topbar keeps its own avatar and the same menu on this layout, so
-   nothing here removes the last route to the account pages. */
-body[data-nav-profile="hide"] .sidebar-footer:has(> .profile-dropdown-wrapper) { display: none; }
+   Neither state loses its last affordance, which is what makes this safe to
+   offer: header.tpl renders inner-topbar.tpl on every layout that is not
+   `top`, and that topbar carries the account avatar when signed in and a Sign
+   in link when signed out. */
+body[data-nav-profile="hide"] .sidebar-footer { display: none; }
 .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: var(--radius-sm); cursor: pointer; transition: background var(--transition-fast); }
 .sidebar-user:hover { background: var(--sidebar-item-hover-bg); }
 .sidebar-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--color-avatar-from), var(--color-avatar-to)); color: var(--color-on-accent); font-size: var(--text-base); font-weight: var(--fw-semibold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }

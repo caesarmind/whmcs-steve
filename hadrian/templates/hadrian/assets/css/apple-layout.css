@@ -750,12 +750,18 @@ body[data-affixed-nav="1"].nav-open .ph-side-topbar { transform: translateY(0); 
    .homepage-nav / .ph-side-topbar, so in the rail the panel would otherwise
    resolve against .ph-rail. */
 .ph-rail .profile-dropdown-wrapper { position: relative; }
-/* Account profile off (admin Layouts card -> body[data-nav-profile="hide"]).
-   Simpler than the sidebar's case: the rail's avatar sits directly on the
-   column with no footer chrome around it, and .ph-rail-spacer above it is
-   flex:1, so removing it just lets the icons run to the bottom. The logged-out
-   Login item is a sibling, not inside this wrapper, so it is untouched. */
-body[data-nav-profile="hide"] .ph-rail > .profile-dropdown-wrapper { display: none; }
+/* Account block off (admin Layouts card -> body[data-nav-profile="hide"]).
+   Two selectors, not one, because the rail draws its two auth states as
+   siblings rather than as one wrapper: the avatar lives in
+   .profile-dropdown-wrapper, the signed-out Login is a plain .ph-rail-item.
+   Both are the same region of the column and go together.
+
+   No footer chrome to collapse here -- they sit directly on the column, and
+   .ph-rail-spacer above them is flex:1, so removing them just lets the icons
+   run down to the bottom. The inner topbar keeps an avatar or a Sign in link
+   for whichever state the visitor is in. */
+body[data-nav-profile="hide"] .ph-rail > .profile-dropdown-wrapper,
+body[data-nav-profile="hide"] .ph-rail > .ph-rail-item.only-out { display: none; }
 .ph-rail .profile-dropdown {
     top: auto; bottom: 0; left: calc(100% + 8px); right: auto; width: 240px;
 }

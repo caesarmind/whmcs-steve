@@ -39,14 +39,19 @@ return [
             'default' => 'left',
             'choices' => ['left' => 'Left', 'right' => 'Right'],
         ],
-        // The avatar at the foot of the rail and the account menu it opens.
-        // Stored per layout like `side`, so hiding it on the rail says nothing
-        // about the sidebar. Safe to turn off for the same reason: this layout
-        // also renders the inner topbar, whose avatar opens the same menu.
+        // The foot of the rail in BOTH auth states: the avatar and the account
+        // menu it opens when signed in, the Login item when signed out. Stored
+        // per layout like `side`, so hiding it on the rail says nothing about
+        // the sidebar. Safe to turn off for the same reason: this layout also
+        // renders the inner topbar, which carries the same menu when signed in
+        // and a Sign in link when signed out.
+        //
+        // Key stays 'profile' though the label widened -- it is the stored
+        // settings key.
         //
         // 'show' is the default and emits no attribute.
         'profile' => [
-            'label'   => 'Account profile',
+            'label'   => 'Account block',
             'default' => 'show',
             'choices' => ['show' => 'Show', 'hide' => 'Hide'],
         ],
