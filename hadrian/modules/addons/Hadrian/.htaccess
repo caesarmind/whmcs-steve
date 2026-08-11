@@ -1,0 +1,28 @@
+# Deny direct HTTP access to files the browser never requests.
+#
+# Every .tpl in this tree was readable at its public URL -- full template
+# source including developer comments. Smarty compiles templates server-side
+# and WHMCS never links to one, so denying direct access changes nothing about
+# rendering. Same for .scss (the source the shipped .css is built from), .json
+# (theme.json is server-side config), .md and .yaml.
+#
+# NOT denied, because the browser genuinely fetches them: css, js, woff2, gif.
+#
+# NOT denied: .php. Those already return no source -- the server executes them
+# -- and a deny here would only affect direct HTTP requests, never the
+# server-side require() that actually loads them. Left alone because the
+# benefit is nil and the risk of catching an endpoint is not.
+#
+# Guarded both ways on purpose. Under Apache 2.4 the mod_authz_core branch
+# applies; under 2.2 `Require` is an unknown directive and would 500 the whole
+# subtree, so the Order/Deny fallback runs there instead. Under a pure-nginx
+# server this file is simply ignored -- inert, never harmful.
+<FilesMatch "\.(tpl|scss|json|md|ya?ml|lock|dist|sql|log|sh|ini)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

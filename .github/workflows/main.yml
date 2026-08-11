@@ -59,10 +59,17 @@ jobs:
           # fetchable at https://<site>/scripts/, including a curl cookie jar
           # holding a live session cookie. Anything outside these two paths is
           # repo-side tooling and has no business on a billing site.
+          #
+          # The dotfile filter below was `grep -v '/\.'`, which excluded EVERY
+          # dotfile — including the .htaccess files that deny direct HTTP access
+          # to .tpl source. Adding those files to the repo would have looked
+          # like a fix and shipped nothing. The awk keeps the same protection
+          # (.git, .env, .DS_Store and even .htaccess.bak are still excluded)
+          # and lets exactly `.htaccess` through, at any depth.
           UPLOAD_PATHS='hadrian/modules/addons/Hadrian/**'
           UPLOAD_PATHS2='hadrian/templates/hadrian/**'
-          CHANGED_MAIN=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- "$UPLOAD_PATHS" "$UPLOAD_PATHS2" | grep -v '/\.' || true)
-          DELETED_MAIN=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- "$UPLOAD_PATHS" "$UPLOAD_PATHS2" | grep -v '/\.' || true)
+          CHANGED_MAIN=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- "$UPLOAD_PATHS" "$UPLOAD_PATHS2" | awk '!/\/\./ || /\/\.htaccess$/' || true)
+          DELETED_MAIN=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- "$UPLOAD_PATHS" "$UPLOAD_PATHS2" | awk '!/\/\./ || /\/\.htaccess$/' || true)
 
           if [ -n "$CHANGED_MAIN" ]; then
             echo "=== Uploading hadrian/ changes ==="
@@ -97,8 +104,8 @@ jobs:
           # PASS 2 is inherently safe — the sed hardcodes the destination
           # subtree, so deletes can ONLY happen inside templates/orderforms/hadrian_cart/.
           # --------------------------------------------------------------
-          CHANGED_CART=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'hadrian_cart/**' | grep -v '/\.' || true)
-          DELETED_CART=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'hadrian_cart/**' | grep -v '/\.' || true)
+          CHANGED_CART=$(git diff --name-only --diff-filter=ACMRT "$BEFORE" "$AFTER" -- 'hadrian_cart/**' | awk '!/\/\./ || /\/\.htaccess$/' || true)
+          DELETED_CART=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'hadrian_cart/**' | awk '!/\/\./ || /\/\.htaccess$/' || true)
 
           if [ -n "$CHANGED_CART" ]; then
             echo "=== Uploading hadrian_cart/ changes ==="
