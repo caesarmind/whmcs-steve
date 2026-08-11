@@ -53,7 +53,23 @@ final class ToolsController extends AbstractController
         return [true, 'Pages discovery rebuilt — ' . count($pages) . ' pages found.'];
     }
 
-    /** @return array{0:bool,1:string} */
+    /**
+     * NO LONGER HAS A BUTTON. Kept reachable by POST (tool=migrate_menu_pages)
+     * as the escape hatch for a legacy install, but the Tools row was removed
+     * because it could only ever report "nothing to do":
+     * MenuController::ensureMenuPagesMigration() runs the same conversion
+     * automatically, once per install, and nothing the presets or the menu
+     * editor produce today matches a WhmcsDefaults URL exactly.
+     *
+     * Not merely useless -- the row it lost also claimed "Safe to re-run",
+     * which it is not: the conversion destroys config.url irreversibly, hides
+     * the "Open in new tab" control on any item that had target=_blank, and
+     * turns a store/* link into an unknown templatefile the picker cannot
+     * re-point. Fix those before giving it a button again. Full reasoning in
+     * views/adminarea/tools/index.tpl.
+     *
+     * @return array{0:bool,1:string}
+     */
     private function migrateMenuPages(): array
     {
         $count = (new MenuSeeder())->migrateCustomLinksToWhmcsPages();
