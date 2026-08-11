@@ -625,8 +625,34 @@ final class Hooks
         // flipped to near-white, giving 1.01:1. Adding the element bumps it to
         // (0,1,1) so the dark scope always outranks the light one, which is what
         // "light -> :root, dark -> dark block" was always meant to mean.
+        //
+        // That armour only works for tokens the dark block actually declares,
+        // and a whole class of them never does. The seven `follows` sidebar
+        // tokens are declared ONCE, at :root, as var() chains --
+        //     --sidebar-text: var(--_sb-ink, var(--color-text-primary));
+        // (apple-theme.css:121-124) -- and dark-ness reaches them through
+        // --color-text-primary flipping, not through a second declaration. So a
+        // LIGHT override of --sidebar-text lands at :root, later in the cascade
+        // than the theme's own :root, and there is nothing in the dark block to
+        // beat it. Dark mode then paints near-black menu text on the near-black
+        // sidebar: measured 1.01:1, against 15.63:1 with the override removed.
+        //
+        // It needs an override to exist in light and NOT in dark, which is
+        // exactly what "Generate from one colour" produces: it nudges the light
+        // neutrals a few units towards the seed hue (#1d1d1f -> #1d1d21) while
+        // the dark ones come back byte-identical to their defaults, and
+        // saveColorsAction leaves anything equal to its default unstored.
+        //
+        // Fixed by scoping the light block so it cannot match in dark mode at
+        // all, rather than by racing it. `:not([data-palette])` keeps the one
+        // precedence this changes: html[data-palette] (apple-layout.css, set
+        // from ?palette= for previews) scores (0,1,1) and used to outrank the
+        // light block's (0,1,0). Without the second :not() the light block
+        // would reach (0,1,1) too and win on source order, silently breaking
+        // palette previews.
         $scopes = [
-            ':root'                    => ['_colors_' . $active . '_light', '_colors_' . $active],
+            'html:not([data-theme="dark"]):not([data-palette])'
+                                       => ['_colors_' . $active . '_light', '_colors_' . $active],
             'html[data-theme="dark"]'  => ['_colors_' . $active . '_dark',  '_colors_dark'],
         ];
 
