@@ -41,8 +41,14 @@
         {/foreach}
     </section>
 
-    <div class="mt-typo-actions">
-        <button type="button" class="mt-btn mt-btn-secondary" id="mt-elements-reset">Reset all to default</button>
-        <button type="submit" class="mt-btn mt-btn-primary">Save elements</button>
-    </div>
+    {* The inline action row became the floating save bar that every page with
+       a page-level save now carries. Safe here even though all six style panels
+       render into one document: the five inactive ones sit inside a [hidden]
+       .mt-subcat-panel, and a position:fixed element inside a display:none
+       ancestor has a zero rect -- measured, so exactly one bar paints.
+
+       Reset keeps its id: the footer.tpl IIFE for this panel finds it by id
+       inside the form, and the bar is inside the form. *}
+    {assign var=mtCancel value="?module=Hadrian&action=editStyle&style=`$style|escape`&subcat=elements"}
+    {include file="includes/savebar.tpl" cancel=$mtCancel quiet="Reset all to default" quietId="mt-elements-reset" label="Save elements"}
 </form>

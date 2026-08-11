@@ -194,13 +194,16 @@
     </section>
     {/foreach}
 
-    {* Floating save bar, ported from the demo. Restore sits far left because
-       margin-right:auto puts distance between the destructive action and the
-       confirming one; Cancel reloads, which is the honest way to discard when
-       every edit so far lives only in the form. *}
-    <div class="mt-savebar">
-        <button type="button" class="mt-savebar-quiet" id="mt-colors-reset">Restore defaults</button>
-        <a class="mt-btn mt-btn-secondary" href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=colors&scope={$colors.mode}">Cancel</a>
-        <button type="submit" class="mt-btn mt-btn-primary">Save changes</button>
-    </div>
+    {* Floating save bar, ported from the demo. The markup moved to
+       includes/savebar.tpl when it went out to every page with a save; this was
+       the copy it was lifted from, so it reads through the partial like the
+       rest rather than keeping a private twin that can drift.
+
+       Restore sits far left because margin-right:auto puts distance between the
+       destructive action and the confirming one; Cancel reloads, which is the
+       honest way to discard when every edit so far lives only in the form. *}
+    {assign var=mtCancel value="?module=Hadrian&action=editStyle&style=`$style|escape`&subcat=colors&scope=`$colors.mode`"}
+    {include file="includes/savebar.tpl"
+             quiet="Restore defaults" quietId="mt-colors-reset"
+             cancel=$mtCancel label="Save changes"}
 </form>

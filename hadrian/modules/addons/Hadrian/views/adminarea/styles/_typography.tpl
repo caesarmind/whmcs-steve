@@ -90,7 +90,14 @@
         </div>
     </section>
 
-    <div class="mt-typo-actions">
-        <button type="submit" class="mt-btn mt-btn-primary">Save typography</button>
-    </div>
+    {* The inline action row became the floating save bar that every page with
+       a page-level save now carries. Safe here even though all six style panels
+       render into one document: the five inactive ones sit inside a [hidden]
+       .mt-subcat-panel, and a position:fixed element inside a display:none
+       ancestor has a zero rect -- measured, so exactly one bar paints.
+
+       No quiet action here: this panel is the one without a "Reset all to
+       default", and the bar draws only what it is given. *}
+    {assign var=mtCancel value="?module=Hadrian&action=editStyle&style=`$style|escape`&subcat=typography"}
+    {include file="includes/savebar.tpl" cancel=$mtCancel label="Save typography"}
 </form>

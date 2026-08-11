@@ -34,9 +34,7 @@
                    value="{$key|escape}" placeholder="hadrian-XXXXX-XXXXX-XXXXX">
             <div class="mt-field-help">The key from your order.</div>
         </div>
-        <div class="mt-form-actions">
-            <button type="submit" class="mt-btn mt-btn-primary">Save &amp; check</button>
-        </div>
+        {include file="includes/savebar.tpl" label="Save & check"}
     </form>
 </section>
 </div>

@@ -71,7 +71,9 @@
                 if you want the defaults back.
             </span>
         {/if}
-        <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
+        {* Save moved to the floating bar at the foot of the form; the toolbar
+           keeps the Back link and the flash messages, which are context rather
+           than actions. *}
     </div>
 
     {* HARD-FAIL BANNER — shown when saveAction refused to save because
@@ -285,6 +287,8 @@
         </section>
 
     </div>
+    {assign var=mtCancel value="?module=Hadrian&action=menu&tab=`$menu->location|escape`"}
+    {include file="includes/savebar.tpl" cancel=$mtCancel label="Save changes"}
 </form>
 
 {* ────── PARKED PROPERTY PANEL ──────

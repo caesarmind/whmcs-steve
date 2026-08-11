@@ -133,7 +133,11 @@
         border: 1px solid var(--mt-border);
         border-radius: 8px;
         box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-        z-index: 30;
+        /* Above .mt-savebar's 80. The bar is position:fixed in the root
+           stacking context and .mt-multi-wrap creates none of its own, so at
+           the old z-index of 30 the floating bar painted straight over an open
+           language or page picker near the foot of the page. */
+        z-index: 90;
         max-height: 300px;
         display: flex;
         flex-direction: column;
@@ -247,9 +251,10 @@
     <section class="mt-section">
         <header class="mt-section-header">
             <h2 class="mt-section-title">{if $tab == 'order'}Order Process{else}General{/if} Settings</h2>
-            <div class="mt-section-tools">
-                <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
-            </div>
+            {* No Save here, and none at the foot either. This page had one at
+               each end of a form long enough to scroll, so which one you
+               reached depended on where you gave up. The floating bar is the
+               single save affordance now. *}
         </header>
 
         {* Rows are grouped into named sections so the eye can land somewhere.
@@ -707,9 +712,8 @@
     </section>
     </div>
 
-    <div style="margin-top:16px;display:flex;justify-content:flex-end">
-        <button type="submit" class="mt-btn mt-btn-primary">Save changes</button>
-    </div>
+    {assign var=mtCancel value="?module=Hadrian&action=settings&tab=`$tab|escape`"}
+    {include file="includes/savebar.tpl" cancel=$mtCancel label="Save changes"}
 </form>
 
 <script>

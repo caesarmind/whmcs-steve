@@ -83,7 +83,8 @@
             <textarea name="custom_css" class="mt-textarea mt-code" rows="18" spellcheck="false" placeholder="/* Your CSS — e.g. */&#10;.card { border-radius: 18px; }">{$customCss|escape}</textarea>
         </section>
         </div>
-        <div class="mt-typo-actions"><button type="submit" class="mt-btn mt-btn-primary">Save CSS</button></div>
+        {assign var=mtCancel value="?module=Hadrian&action=editStyle&style=`$style|escape`&tab=custom-css"}
+        {include file="includes/savebar.tpl" cancel=$mtCancel label="Save CSS"}
     </form>
 {/if}
 

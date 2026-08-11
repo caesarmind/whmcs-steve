@@ -3,7 +3,11 @@
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
     <h1 class="mt-page-title">Branding</h1>
-    <p class="mt-page-subtitle">Upload your logo and favicon. Each file is saved the moment you pick it -- no Save needed.</p>
+    {* Reworded when the floating save bar arrived: "no Save needed" was true of
+       the whole page while the only Save was a button you had to scroll to, but
+       it now contradicts a bar pinned to the viewport. Images still upload on
+       pick; the bar exists for the Brand Info text, and says so. *}
+    <p class="mt-page-subtitle">Upload your logo and favicon &mdash; each file is saved the moment you pick it. The Brand Info fields below need Save.</p>
 </header>
 
 {* Server-rendered flash banner -- only shows when the page is reached via
@@ -90,9 +94,11 @@
        the .is-ajax class added on load -- under JS, every pick auto-uploads.
        Brand Info fields, however, still need the Save button under JS since
        the AJAX path only handles $_FILES. *}
-    <div class="mt-branding-save-row" style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
-        <button type="submit" class="mt-btn mt-btn-primary">Save changes</button>
-    </div>
+    {* The bar is honest about what it saves on THIS page: image picks upload
+       the moment you choose them (see the note above), so what is left for Save
+       is the Brand Info text. Labelling it plainly beats a bare "Save changes"
+       that implies the images are still pending. *}
+    {include file="includes/savebar.tpl" label="Save brand info"}
 </form>
 
 {* Smarty 4 (WHMCS 9) still parses `{ ... }` inside <style>/<script>

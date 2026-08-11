@@ -1,8 +1,10 @@
 {include file="includes/header.tpl"}
 
 <div class="mt-toolbar">
+    {* The note stays; the button moved to the floating bar. It used to reach
+       its form across the page with form="sitemap-form" -- inside the form it
+       needs no association at all. *}
     <div class="mt-row-help" style="margin:0;">Written to your WHMCS web root as <code>sitemap.xml</code>{if $cfg.robots} and a managed block in <code>robots.txt</code>{/if}.</div>
-    <button form="sitemap-form" class="mt-btn mt-btn-primary mt-btn-sm">Save &amp; generate</button>
 </div>
 
 <header class="mt-page-header">
@@ -113,6 +115,7 @@
     </section>
 
     </div>
+    {include file="includes/savebar.tpl" label="Save & generate"}
 </form>
 
 <div class="mt-panel">

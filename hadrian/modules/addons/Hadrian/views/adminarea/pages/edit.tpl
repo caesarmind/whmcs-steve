@@ -26,7 +26,10 @@
         {elseif $publicUrlReason}
             <span class="mt-viewpage-none" title="{$publicUrlReason|escape}">No public URL</span>
         {/if}
-        <button form="page-edit-form" class="mt-btn mt-btn-primary mt-btn-sm">Save changes</button>
+        {* Save moved to the floating bar at the foot of the form. It used to
+           reach its form across 128 lines with form="page-edit-form"; inside
+           the form it needs no association. The toolbar keeps View page, which
+           is navigation, not an action on this form. *}
     </div>
 </div>
 
@@ -482,6 +485,9 @@
             </div>
         </div>
     {/if}
+    {* Outside the {if} above, or the page's only Save would be gated on the
+       SEO bulk modal existing (it renders only when there are 2+ languages). *}
+    {include file="includes/savebar.tpl" label="Save changes"}
 </form>
 
 {literal}

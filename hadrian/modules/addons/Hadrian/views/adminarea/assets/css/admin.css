@@ -618,6 +618,14 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 
 /* -- Typography panel ----------------------------------------------------- */
 .mt-subcat-panel { min-width: 0; }
+/* All six style panels render into one document and each now carries its own
+   position:fixed save bar, so exactly one thing keeps five of them from
+   stacking at bottom:0 -- [hidden] resolving to display:none, which a fixed
+   descendant cannot escape. That held only because the rule above happens not
+   to set `display`; adding one here later would put five bars on the page.
+   Re-asserted explicitly so the invariant is written down rather than implied,
+   as admin.css already does in six other places. */
+.mt-subcat-panel[hidden] { display: none !important; }
 .mt-typo-fonts { display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
 .mt-typo-radio { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--mt-text); }
 .mt-typo-radio em { font-style: normal; color: var(--mt-text-3); font-weight: 400; }
