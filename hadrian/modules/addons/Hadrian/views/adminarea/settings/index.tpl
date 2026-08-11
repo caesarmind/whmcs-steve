@@ -1,5 +1,28 @@
 {include file="includes/header.tpl"}
 
+{* KNOWN DEFECTS ON THIS PAGE, all live.
+   Fixes exist and are reviewed -- commit 3dd081b, reverted whole because the
+   styling it rode with was not wanted. Cherry-pick from there rather than
+   re-deriving:
+
+   1. Every <select> here renders without its chevron. The page-local
+      .mt-select below redeclares the global with a `background` SHORTHAND,
+      which resets admin.css's background-image to none, and its 10px right
+      padding leaves no room for the image either. .mt-input carries the
+      identical construct; harmless only because that global sets no image.
+   2. Open a sub-panel with its toggle, type anything in the search box, and
+      it shuts -- clearing the box does not bring it back. Search and the
+      reveal toggles both write .hidden and search runs last; the restore
+      reads a snapshot taken at page load.
+   3. The three Order Process rows carry no data-set-row/data-search, so a
+      search empties every other row on the page and leaves those standing.
+   4. A group's visible-row count treats .mt-tab-off rows as visible. Not
+      reachable while no group mixes tabs.
+
+   Render this page for real -- includes, {literal}, the lot -- with
+   .dashbuild/build-settings-admin-harness.php (real Smarty, real controller).
+   The stand-in in build-admin-harness.mjs cannot see any of the above. *}
+
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
     <h1 class="mt-page-title">Settings</h1>

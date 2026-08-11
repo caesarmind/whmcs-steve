@@ -118,6 +118,11 @@ final class SettingsController extends AbstractController
      * Declaration order here is the render order. The FLAGS array itself must
      * NOT be reordered: LayoutsController reads its slots positionally.
      */
+    // A 4th positional element carrying each group's icon -- so the view can
+    // draw the Hadrian demo's head (tinted chip + label + rule + count) -- was
+    // added and then reverted with commit 3dd081b. If it comes back, note that
+    // three groups here have no demo counterpart, and that the <svg> wrapper
+    // belongs in the template so no group can ship its own stroke weight.
     private const FLAG_GROUPS = [
         // slug        => [label, one-line description, which tab it belongs to]
         'appearance'   => ['Appearance',            'Colour mode, label casing and card treatment.', 'general'],
