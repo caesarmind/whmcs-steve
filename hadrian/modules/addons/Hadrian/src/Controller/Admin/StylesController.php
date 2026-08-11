@@ -231,7 +231,6 @@ final class StylesController extends AbstractController
         };
 
         $light = (array)($meta['colors']['light'] ?? []);
-        $dark  = (array)($meta['colors']['dark'] ?? []);
 
         // The buyer's SAVED overrides come first, or the card keeps advertising
         // the colours the style shipped with no matter what they change in
@@ -242,46 +241,45 @@ final class StylesController extends AbstractController
         // Same read order as Hooks::buildColorsHead, including the pre-refactor
         // key names, so the card and the rendered site agree about which value
         // is in force. Per style, not per active style: every card shows its own.
-        $stored = function (string $scope) use ($template, $styleName): array {
+        // Light scope only: the chip describes the style, and a style IS its
+        // light palette -- dark is a mode applied on top, which the Styles page
+        // says in as many words.
+        $sLight = (function () use ($template, $styleName): array {
             $tName = $template->getName();
-            $keys  = $scope === 'dark'
-                ? [$tName . '_colors_' . $styleName . '_dark',  $tName . '_colors_dark']
-                : [$tName . '_colors_' . $styleName . '_light', $tName . '_colors_' . $styleName];
-            foreach ($keys as $k) {
+            foreach ([$tName . '_colors_' . $styleName . '_light',
+                      $tName . '_colors_' . $styleName] as $k) {
                 $v = Settings::getValue($k, null);
                 if (is_array($v) && $v !== []) {
                     return $v;
                 }
             }
             return [];
-        };
-        $sLight = $stored('light');
-        $sDark  = $stored('dark');
+        })();
 
+        // EVERY card says the same sentence: the surface this style paints,
+        // then the accent it paints on top. That is the pair that actually
+        // distinguishes these styles from one another.
+        //
+        // It used to say two different sentences in the same shape. Five styles
+        // declare a surface and showed surface + accent; the three that declare
+        // none -- default, imperial, porphyry -- fell through to "accent in
+        // light, accent in dark", which is a different fact drawn identically,
+        // with nothing on the card to tell you which you were reading. It broke
+        // visibly once the brand accent became deliberately the same in both
+        // modes: both halves came back one colour and the chip went solid.
+        //
+        // Surface means the navigation panel where a style paints one, else the
+        // page. The three with neither now show the stock page, which is the
+        // truth about them -- they use it.
         $accent  = (string)($sLight['--color-accent'] ?? $light['--color-accent'] ?? $fallback('--color-accent', 'light'));
         $surface = (string)($sLight['--sidebar-bg'] ?? $sLight['--color-bg']
                             ?? $light['--sidebar-bg'] ?? $light['--color-bg'] ?? '');
-
-        if ($surface !== '') {
-            $primary = $surface;
-            $second  = $accent;
-        } else {
-            // No surface of its own, so the pair falls back to the accent in
-            // each mode. That reads as ONE solid block whenever the two are the
-            // same -- which is now the normal case, because the brand accent is
-            // deliberately identical in light and dark. Pair it with the page
-            // instead, which is what the five styles that declare a surface
-            // already show and what makes all eight chips mean the same thing.
-            //
-            // Not reached when the two accents genuinely differ, so Imperial and
-            // Porphyry keep the light->dark pair they ship with.
-            $primary = $accent;
-            $second  = (string)($sDark['--color-accent'] ?? $dark['--color-accent'] ?? $fallback('--color-accent', 'dark'));
-            if (strcasecmp(trim($primary), trim($second)) === 0) {
-                $primary = (string)($sLight['--color-bg'] ?? $light['--color-bg'] ?? $fallback('--color-bg', 'light'));
-                $second  = $accent;
-            }
+        if ($surface === '') {
+            $surface = (string)($fallback('--color-bg', 'light'));
         }
+
+        $primary = $surface;
+        $second  = $accent;
 
         // These land in a style="" attribute. Everything here comes from files
         // we ship, but validating rather than trusting keeps that true if a
