@@ -750,6 +750,12 @@ body[data-affixed-nav="1"].nav-open .ph-side-topbar { transform: translateY(0); 
    .homepage-nav / .ph-side-topbar, so in the rail the panel would otherwise
    resolve against .ph-rail. */
 .ph-rail .profile-dropdown-wrapper { position: relative; }
+/* Account profile off (admin Layouts card -> body[data-nav-profile="hide"]).
+   Simpler than the sidebar's case: the rail's avatar sits directly on the
+   column with no footer chrome around it, and .ph-rail-spacer above it is
+   flex:1, so removing it just lets the icons run to the bottom. The logged-out
+   Login item is a sibling, not inside this wrapper, so it is untouched. */
+body[data-nav-profile="hide"] .ph-rail > .profile-dropdown-wrapper { display: none; }
 .ph-rail .profile-dropdown {
     top: auto; bottom: 0; left: calc(100% + 8px); right: auto; width: 240px;
 }

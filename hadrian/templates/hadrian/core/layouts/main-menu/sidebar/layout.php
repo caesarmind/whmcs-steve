@@ -43,5 +43,19 @@ return [
             'default' => 'left',
             'choices' => ['left' => 'Left', 'right' => 'Right'],
         ],
+        // The account block at the foot of the sidebar (avatar, name, email and
+        // the menu they open). Off is a reasonable choice here because this
+        // layout ALSO renders the inner topbar, which carries its own avatar
+        // and the same menu -- header.tpl includes inner-topbar.tpl for every
+        // layout that is not `top` -- so the sidebar copy is the second of two
+        // entry points, not the only one.
+        //
+        // 'show' is the default and emits no attribute, so an install that
+        // never touches this renders byte-identically to before.
+        'profile' => [
+            'label'   => 'Account profile',
+            'default' => 'show',
+            'choices' => ['show' => 'Show', 'hide' => 'Hide'],
+        ],
     ],
 ];

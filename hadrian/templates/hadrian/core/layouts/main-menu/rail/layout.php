@@ -39,5 +39,16 @@ return [
             'default' => 'left',
             'choices' => ['left' => 'Left', 'right' => 'Right'],
         ],
+        // The avatar at the foot of the rail and the account menu it opens.
+        // Stored per layout like `side`, so hiding it on the rail says nothing
+        // about the sidebar. Safe to turn off for the same reason: this layout
+        // also renders the inner topbar, whose avatar opens the same menu.
+        //
+        // 'show' is the default and emits no attribute.
+        'profile' => [
+            'label'   => 'Account profile',
+            'default' => 'show',
+            'choices' => ['show' => 'Show', 'hide' => 'Hide'],
+        ],
     ],
 ];

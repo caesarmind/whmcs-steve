@@ -89,6 +89,19 @@
 {/if}
 {if $mt_sidebarSide != 'right'}{assign var=mt_sidebarSide value=''}{/if}
 
+{* nav profile (on/off) — the account block at the foot of the sidebar / rail.
+   Only `sidebar` and `rail` declare it; `top` has no supportedOptions at all,
+   so a top-layout install never emits it. Both layouts also render the inner
+   topbar, which keeps its own avatar and the same menu, so hiding this does
+   not strand the account pages. 'show' emits nothing, so an untouched install
+   renders exactly as before. *}
+{assign var=mt_navProfile value=$hadrian.layouts['main-menu'].options.profile|default:'show'}
+{if $mt_preview && isset($smarty.get.navprofile)}
+    {assign var=_q value=$smarty.get.navprofile}
+    {if $_q == 'show' || $_q == 'hide'}{assign var=mt_navProfile value=$_q}{/if}
+{/if}
+{if $mt_navProfile != 'hide'}{assign var=mt_navProfile value=''}{/if}
+
 {* subnav (on/off) *}
 {assign var=mt_subnav value=''}
 {if isset($smarty.get.subnav)}
@@ -358,7 +371,7 @@
       data-layout="{$mt_layout}"
       data-active-nav="{$mt_activeNav|escape}"
       data-page-title="{$pagetitle|escape|default:'Page'}"
-      data-tpl="{$templatefile|default:''|escape}"{if ($templatefile|default:''|strstr:'store') && !($templatefile|default:''|strstr:'order') && !($templatefile|default:''|strstr:'not-found')} data-bleed="1"{/if}{if $mt_align} data-align="{$mt_align|escape}"{/if}{if $mt_sidebarSide} data-sidebar-side="{$mt_sidebarSide|escape}"{/if}{if $mt_subnav} data-subnav="{$mt_subnav|escape}"{/if}{if $mt_subnavOrder} data-subnav-order="{$mt_subnavOrder|escape}"{/if}{if $mt_subnavWebsite} data-subnav-website="{$mt_subnavWebsite|escape}"{/if}{if $mt_subnavSide} data-subnav-side="{$mt_subnavSide|escape}"{/if}{if $mt_svcLayout} data-svc-layout="{$mt_svcLayout|escape}"{/if}{if $mt_data} data-data="{$mt_data|escape}"{/if}{if $mt_tiles} data-tiles="{$mt_tiles|escape}"{/if}{if $mt_form} data-form="{$mt_form|escape}"{/if}{if $mt_plan} data-plan="{$mt_plan|escape}"{/if}{if $mt_product} data-product="{$mt_product|escape}"{/if}{if $hadrian.addonSettings.hide_breadcrumb} data-hide-breadcrumb="1"{/if}{if $hadrian.addonSettings.content_width && $hadrian.addonSettings.content_width != 'boxed'} data-content-width="{$hadrian.addonSettings.content_width|escape}"{/if}{if $hadrian.addonSettings.affixed_navigation} data-affixed-nav="1"{/if}{if $hadrian.addonSettings.unpin_sidebar} data-unpin-sidebar="1"{/if}{if !($hadrian.addonSettings.capitalize_titles|default:true)} data-capitalize-titles="0"{/if}{if $hadrian.addonSettings.hide_cycle_discounts} data-hide-discounts="1"{/if}{if $hadrian.addonSettings.free_label} data-free-label="1" data-free-label-text="{$LANG.orderfree|default:'Free'|escape}"{/if}>
+      data-tpl="{$templatefile|default:''|escape}"{if ($templatefile|default:''|strstr:'store') && !($templatefile|default:''|strstr:'order') && !($templatefile|default:''|strstr:'not-found')} data-bleed="1"{/if}{if $mt_align} data-align="{$mt_align|escape}"{/if}{if $mt_sidebarSide} data-sidebar-side="{$mt_sidebarSide|escape}"{/if}{if $mt_navProfile} data-nav-profile="{$mt_navProfile|escape}"{/if}{if $mt_subnav} data-subnav="{$mt_subnav|escape}"{/if}{if $mt_subnavOrder} data-subnav-order="{$mt_subnavOrder|escape}"{/if}{if $mt_subnavWebsite} data-subnav-website="{$mt_subnavWebsite|escape}"{/if}{if $mt_subnavSide} data-subnav-side="{$mt_subnavSide|escape}"{/if}{if $mt_svcLayout} data-svc-layout="{$mt_svcLayout|escape}"{/if}{if $mt_data} data-data="{$mt_data|escape}"{/if}{if $mt_tiles} data-tiles="{$mt_tiles|escape}"{/if}{if $mt_form} data-form="{$mt_form|escape}"{/if}{if $mt_plan} data-plan="{$mt_plan|escape}"{/if}{if $mt_product} data-product="{$mt_product|escape}"{/if}{if $hadrian.addonSettings.hide_breadcrumb} data-hide-breadcrumb="1"{/if}{if $hadrian.addonSettings.content_width && $hadrian.addonSettings.content_width != 'boxed'} data-content-width="{$hadrian.addonSettings.content_width|escape}"{/if}{if $hadrian.addonSettings.affixed_navigation} data-affixed-nav="1"{/if}{if $hadrian.addonSettings.unpin_sidebar} data-unpin-sidebar="1"{/if}{if !($hadrian.addonSettings.capitalize_titles|default:true)} data-capitalize-titles="0"{/if}{if $hadrian.addonSettings.hide_cycle_discounts} data-hide-discounts="1"{/if}{if $hadrian.addonSettings.free_label} data-free-label="1" data-free-label-text="{$LANG.orderfree|default:'Free'|escape}"{/if}>
 
 {$headeroutput}
 
