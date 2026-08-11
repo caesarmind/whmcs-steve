@@ -133,16 +133,20 @@ function Hadrian_upgrade($vars)
     // from a version that predates the menu manager). Idempotent.
     (new Hadrian\Menu\Seeder())->run();
 
-    // v1.2.0: convert existing custom_link items whose URL matches a known
-    // WHMCS page → whmcs_page. Safe to re-run; converts nothing on next pass.
-    try {
-        $migrated = (new Hadrian\Menu\Seeder())->migrateCustomLinksToWhmcsPages();
-        if ($migrated > 0) {
-            error_log("Hadrian upgrade: migrated {$migrated} custom_link menu items to whmcs_page");
-        }
-    } catch (\Throwable $e) {
-        error_log('Hadrian: custom_link → whmcs_page migration failed: ' . $e->getMessage());
-    }
+    // The custom_link → whmcs_page conversion used to run here, unconditionally,
+    // on every upgrade, under a comment claiming it was "safe to re-run". It
+    // was not: it rewrote menu items the admin owns, with no gate, no
+    // confirmation and no record of what they had been.
+    //
+    // Removed rather than gated. It is a one-shot repair for installs seeded
+    // during a ~14 hour window in May 2026 (8200dff → the preset rewrite in
+    // c57d7ab), and MenuController::ensureMenuPagesMigration() already performs
+    // exactly that repair on the first admin Menu page hit, marker-gated so it
+    // runs at most once. Nothing here depended on it -- the block was
+    // self-contained and only logged -- so an upgrade now leaves menus alone.
+    //
+    // The conversion itself is unchanged in purpose but no longer destructive;
+    // see the guards in Seeder::migrateCustomLinksToWhmcsPages().
 
     // Refresh pages discovery so any new core/pages/ directories shipped
     // with the upgrade are picked up without the buyer touching anything.

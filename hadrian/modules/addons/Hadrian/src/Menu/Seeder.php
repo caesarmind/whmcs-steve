@@ -78,14 +78,42 @@ final class Seeder
     /**
      * Convert every `custom_link` menu item whose `config.url` matches a known
      * WHMCS page URL → `whmcs_page` item with `config.page` set to the
-     * corresponding templatefile name. Idempotent + safe to re-run:
+     * corresponding templatefile name.
      *
-     *   - Only matches items with an exact URL match against WhmcsDefaults.
-     *   - Items pointing to cart deeplinks, external scripts, or unknown
-     *     URLs stay as custom_link.
-     *   - Already-whmcs_page items are skipped (the query filters by type).
+     * WHAT IT WILL NOT TOUCH, and why. The governing rule is that a conversion
+     * must never take away something the editor can no longer give back --
+     * an item left as a custom_link still works, so declining is always the
+     * cheaper mistake:
      *
-     * Used at upgrade time (Hadrian_upgrade) and from the admin Tools tab.
+     *   - No exact URL match against WhmcsDefaults. Cart deeplinks, external
+     *     links and anything carrying an extra query param (Mass Payment's
+     *     `&all=true`) stay put.
+     *   - The target page is not in the picker. MenuPages::ELIGIBLE is a
+     *     CURATED subset, not every WhmcsDefaults entry: of the 37 distinct
+     *     convertible URLs, 13 resolve to a page with no tile -- every store/*
+     *     one -- so a converted item could not be shown or re-pointed in the
+     *     drawer. (Count them AFTER first-wins, not by listing unpickable page
+     *     keys: clientarea.php?action=changepw is claimed by user-password,
+     *     changepassword and changepw, and the pickable one wins.)
+     *   - The item opens in a new tab. TreeRenderer applies config.target for
+     *     any item type, but the "Open in new tab" checkbox lives in the
+     *     custom_link-only section of the drawer (edit.tpl:372-378), so
+     *     converting would leave a new-tab link with no control to turn it off.
+     *   - Already-whmcs_page items (the query filters by type).
+     *
+     * config.url is KEPT, not deleted. The drawer tells the admin "Existing
+     * label / icon / URL values are kept in case you switch back"
+     * (edit.tpl:329); unsetting it made that false -- flipping the type back
+     * gave an empty URL field that saved a dead link. Nothing reads config.url
+     * on a whmcs_page item (TreeRenderer resolves from config.page), so
+     * carrying it costs nothing and keeps the promise true.
+     *
+     * Genuinely idempotent: a second pass finds no custom_link items left that
+     * pass the guards above.
+     *
+     * Called from MenuController::ensureMenuPagesMigration() (marker-gated,
+     * once per install) and from ToolsController by POST. It is NO LONGER
+     * called from Hadrian_upgrade -- see the note there.
      * Returns the number of items converted.
      */
     public function migrateCustomLinksToWhmcsPages(): int
@@ -96,6 +124,12 @@ final class Seeder
         $urlToPage = [];
         foreach (WhmcsDefaults::all() as $page => $defaults) {
             $url = (string)($defaults['url'] ?? '');
+            // '/' is excluded deliberately, not by oversight. It is the site
+            // root, and a menu item pointing there means "home" in a way that
+            // is not necessarily the `homepage` templatefile -- the shipped
+            // presets themselves use customLink(..., '/') for exactly that.
+            // Auto-claiming every '/' link for one page is a guess, and the
+            // guess is not worth making when the link already works.
             if ($url === '' || $url === '/') continue;
             if (!isset($urlToPage[$url])) {
                 $urlToPage[$url] = $page;
@@ -110,9 +144,20 @@ final class Seeder
             $url = trim((string)($config['url'] ?? ''));
             if ($url === '' || !isset($urlToPage[$url])) continue;
 
-            // Convert: swap url for page, retype.
             $page = $urlToPage[$url];
-            unset($config['url']);
+
+            // The picker cannot offer this page, so the drawer could neither
+            // display nor re-point the converted item. Same eligibility rule
+            // the picker itself uses, rather than a second list to keep in sync.
+            if (!MenuPages::isEligible($page)) continue;
+
+            // Opens in a new tab. The behaviour survives the type flip; the
+            // control that governs it does not.
+            if (trim((string)($config['target'] ?? '')) !== '') continue;
+
+            // Retype, and KEEP config.url -- see the docblock. Nothing reads it
+            // on a whmcs_page, and it is what lets the admin switch the type
+            // back and still have their URL, as the drawer promises.
             $config['page'] = $page;
 
             $item->item_type   = 'whmcs_page';
