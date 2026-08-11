@@ -266,8 +266,21 @@ final class StylesController extends AbstractController
             $primary = $surface;
             $second  = $accent;
         } else {
+            // No surface of its own, so the pair falls back to the accent in
+            // each mode. That reads as ONE solid block whenever the two are the
+            // same -- which is now the normal case, because the brand accent is
+            // deliberately identical in light and dark. Pair it with the page
+            // instead, which is what the five styles that declare a surface
+            // already show and what makes all eight chips mean the same thing.
+            //
+            // Not reached when the two accents genuinely differ, so Imperial and
+            // Porphyry keep the light->dark pair they ship with.
             $primary = $accent;
             $second  = (string)($sDark['--color-accent'] ?? $dark['--color-accent'] ?? $fallback('--color-accent', 'dark'));
+            if (strcasecmp(trim($primary), trim($second)) === 0) {
+                $primary = (string)($sLight['--color-bg'] ?? $light['--color-bg'] ?? $fallback('--color-bg', 'light'));
+                $second  = $accent;
+            }
         }
 
         // These land in a style="" attribute. Everything here comes from files
