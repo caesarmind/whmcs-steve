@@ -43,7 +43,7 @@ final class StylesController extends AbstractController
                 'displayName' => $meta['name'] ?? ucfirst($name),
                 'preview'     => $meta['preview'] ?? 'thumb.png',
                 'description' => (string)($meta['description'] ?? ''),
-                'swatch'      => $this->buildStyleSwatch($template, $meta),
+                'swatch'      => $this->buildStyleSwatch($template, $meta, $name),
                 'isActive'    => $name === $current,
             ];
         }
@@ -215,7 +215,7 @@ final class StylesController extends AbstractController
      * @param  array $meta the style manifest, already loaded
      * @return array{primary:string, accent:string}
      */
-    private function buildStyleSwatch($template, array $meta): array
+    private function buildStyleSwatch($template, array $meta, string $styleName): array
     {
         $cfg = ThemeManifest::loadVariantMeta(
             $template->getFullPath() . '/core/config/colors.php'
@@ -233,15 +233,41 @@ final class StylesController extends AbstractController
         $light = (array)($meta['colors']['light'] ?? []);
         $dark  = (array)($meta['colors']['dark'] ?? []);
 
-        $accent  = (string)($light['--color-accent'] ?? $fallback('--color-accent', 'light'));
-        $surface = (string)($light['--sidebar-bg'] ?? $light['--color-bg'] ?? '');
+        // The buyer's SAVED overrides come first, or the card keeps advertising
+        // the colours the style shipped with no matter what they change in
+        // Customize > Colors -- which is what it did: the swatch was built from
+        // the manifest and the schema alone, so a regenerated palette never
+        // reached it.
+        //
+        // Same read order as Hooks::buildColorsHead, including the pre-refactor
+        // key names, so the card and the rendered site agree about which value
+        // is in force. Per style, not per active style: every card shows its own.
+        $stored = function (string $scope) use ($template, $styleName): array {
+            $tName = $template->getName();
+            $keys  = $scope === 'dark'
+                ? [$tName . '_colors_' . $styleName . '_dark',  $tName . '_colors_dark']
+                : [$tName . '_colors_' . $styleName . '_light', $tName . '_colors_' . $styleName];
+            foreach ($keys as $k) {
+                $v = Settings::getValue($k, null);
+                if (is_array($v) && $v !== []) {
+                    return $v;
+                }
+            }
+            return [];
+        };
+        $sLight = $stored('light');
+        $sDark  = $stored('dark');
+
+        $accent  = (string)($sLight['--color-accent'] ?? $light['--color-accent'] ?? $fallback('--color-accent', 'light'));
+        $surface = (string)($sLight['--sidebar-bg'] ?? $sLight['--color-bg']
+                            ?? $light['--sidebar-bg'] ?? $light['--color-bg'] ?? '');
 
         if ($surface !== '') {
             $primary = $surface;
             $second  = $accent;
         } else {
             $primary = $accent;
-            $second  = (string)($dark['--color-accent'] ?? $fallback('--color-accent', 'dark'));
+            $second  = (string)($sDark['--color-accent'] ?? $dark['--color-accent'] ?? $fallback('--color-accent', 'dark'));
         }
 
         // These land in a style="" attribute. Everything here comes from files
