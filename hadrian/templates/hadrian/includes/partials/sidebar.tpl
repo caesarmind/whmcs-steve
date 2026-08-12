@@ -96,8 +96,19 @@
 <aside class="sidebar only-side">
     <div class="sidebar-header">
         <a href="{$WEB_ROOT}/" class="sidebar-home-link">
-            {* Prefer the square logo for this slot (better proportions in a
-               vertical layout); fall back to the full logo, then to text.
+            {* FULL logo first here, square only as the fallback.
+               It used to be the other way round, on the reasoning that a square
+               mark has "better proportions in a vertical layout". That holds for
+               the RAIL, which is 80px wide and has nowhere to put a wordmark. It
+               does not hold here: this column is 260px, the header has ~227px of
+               usable width, and a typical wordmark renders about 90px at the
+               28px row height -- it fits with room to spare.
+
+               The practical effect of square-first was that an install with both
+               slots filled showed the same small mark on the rail AND on the
+               wide sidebar, so the two layouts were indistinguishable at the
+               brand and the full logo had nowhere to appear on desktop. Square
+               still wins on the rail, which reads branding.square directly.
 
                data-logo-dark carries the dark-surface variant; the generic
                swap in apple-layout.js (initLogoSwap) exchanges src whenever
@@ -107,12 +118,12 @@
                when the two files actually differ, so a single upload (the
                resolver mirrors it into both variants) doesn't add a no-op
                attribute and a redundant MutationObserver target. *}
-            {if !empty($hadrian.branding.square.light)}
-                <img src="{$hadrian.branding.square.light|escape}" alt="{$companyname|escape}" class="sidebar-brand-logo"
-                     {if !empty($hadrian.branding.square.dark) && $hadrian.branding.square.dark != $hadrian.branding.square.light}data-logo-dark="{$hadrian.branding.square.dark|escape}"{/if}>
-            {elseif !empty($hadrian.branding.logo.light)}
+            {if !empty($hadrian.branding.logo.light)}
                 <img src="{$hadrian.branding.logo.light|escape}" alt="{$companyname|escape}" class="sidebar-brand-logo"
                      {if !empty($hadrian.branding.logo.dark) && $hadrian.branding.logo.dark != $hadrian.branding.logo.light}data-logo-dark="{$hadrian.branding.logo.dark|escape}"{/if}>
+            {elseif !empty($hadrian.branding.square.light)}
+                <img src="{$hadrian.branding.square.light|escape}" alt="{$companyname|escape}" class="sidebar-brand-logo"
+                     {if !empty($hadrian.branding.square.dark) && $hadrian.branding.square.dark != $hadrian.branding.square.light}data-logo-dark="{$hadrian.branding.square.dark|escape}"{/if}>
             {else}
                 <span class="sidebar-brand">{$companyname|escape}</span>
             {/if}
