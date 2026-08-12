@@ -2,44 +2,37 @@
 /**
  * Style preset manifest -- Slate.
  *
- * Muted blue-grey used as both accent and navigation. Lets your content carry the colour.
+ * The slate palette used as both accent and navigation.
  *
- * Brand tone: the menu IS the accent, deepened until white ink clears AA.
- * Sidebar tone: Brand   -- the accent itself, deepened (mockup: data-sidebar="brand").
+ * THE PALETTE IS THE DEMO'S, VERBATIM.
+ * --color-accent and its whole chain (hover, tint, link, badge) plus the avatar
+ * gradient are copied from the v18 mockup's own html[data-palette="slate"]
+ * block in apple-client-area/css/apple-layout.css. They are not retyped and not
+ * adjusted: the brand colour a buyer picks here is the brand colour they saw.
+ * Both scopes carry the same values because the demo's palette blocks are not
+ * mode-scoped either -- they apply in dark exactly as in light.
  *
- * WHERE THE COLOURS COME FROM
- * The hue is the slate entry of the palette in core/config/colors.php
- * ('presets'), which is the same palette the v18 mockup ships. The mockup's raw
- * value is NOT reused: it was picked to look right, not to pass AA, and white
- * ink on it measures under 4.5 for most of the set. Each accent here is that
- * hue walked down (light) or up (dark) in HSL lightness until it clears the
- * contrast it actually has to clear, so the palette keeps its identity and the
- * buttons stay legible. Measured values are in the table at the bottom.
+ * Contrast, stated rather than silently corrected: white ink on this accent
+ * measures 4.76, and because contrast is symmetric that is also what the
+ * accent measures as TEXT on white -- which matters, since the theme uses
+ * color: var(--color-accent) in ~400 places. An earlier pass deepened these
+ * hues to clear 4.5 and was reverted: matching the palette is the requirement,
+ * and the buyer can raise contrast per token in Styles > Colors.
  *
- * The `colors` block is the payload: StylesController::seedStyleColors writes
- * it into this style's stored colours the FIRST time the style is activated,
- * after which the rows belong to the buyer and are never overwritten. That is
- * what makes a preset a starting point rather than a locked skin -- every value
- * below shows up in Styles > Colors as the live value and can be edited there.
+ * The SIDEBAR tokens are different in kind -- they are this style's own
+ * navigation treatment, not part of the palette -- so they are still solved
+ * rather than copied, and every one of them clears AA against its own panel.
  *
  * Constraints worth knowing before editing:
  *   - A token must appear in core/config/colors.php or it is dropped.
  *   - A value must satisfy Hooks::isColorValue -- hex, or COMMA-form rgb()/
- *     rgba()/hsl()/hsla(). var(), color-mix(), oklch() and modern slash syntax
- *     are silently dropped. That is why the tone recipes in colors.php, which
- *     are written as color-mix(), appear RESOLVED to literals here.
- *   - Both scopes declare the sidebar tokens even when the values match. Seven
- *     of them are var() chains declared once at :root, so a light-only override
- *     has nothing in the dark block to beat it -- that is the bug that painted
- *     near-black text on a near-black panel at 1.01:1.
- *   - colorMode must stay 'light'. 'dark' makes StylesController drop the card
- *     from the picker -- dark is a MODE, not a preset.
- *   - The first letter of `name` is the tile glyph on the Styles page, so the
- *     shipped presets deliberately start with distinct letters.
+ *     rgba()/hsl()/hsla(). var() and color-mix() are silently dropped, which is
+ *     why the tone recipes appear RESOLVED to literals here.
+ *   - colorMode must stay 'light'. 'dark' drops the card from the picker.
  */
 return [
     'name'        => 'Slate',
-    'description' => 'Muted blue-grey used as both accent and navigation. Lets your content carry the colour.',
+    'description' => 'The slate palette used as both accent and navigation.',
     'preview'     => 'thumb.png',
     'iconType'    => 'default',
     'variables'   => [
@@ -49,12 +42,14 @@ return [
     'colors'      => [
         'light' => [
             '--color-accent'           => '#64748b',
-            '--color-accent-hover'     => '#6f7f97',
-            '--color-accent-light'     => 'rgba(100,116,139,0.08)',
-            '--color-link'             => '#5d6b81',
+            '--color-accent-hover'     => '#475569',
+            '--color-accent-light'     => 'rgba(100,116,139,0.10)',
+            '--color-link'             => '#475569',
             '--color-link-hover'       => '#64748b',
-            '--color-blue-text'        => '#5d6b81',
-            '--color-blue-bg'          => 'rgba(100,116,139,0.08)',
+            '--color-blue-text'        => '#475569',
+            '--color-blue-bg'          => 'rgba(100,116,139,0.10)',
+            '--color-avatar-from'      => '#64748b',
+            '--color-avatar-to'        => '#94a3b8',
             '--sidebar-bg'             => '#444f5f',
             '--sidebar-panel-bg'       => '#444f5f',
             '--sidebar-text'           => '#ffffff',
@@ -68,15 +63,17 @@ return [
             '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.30)',
         ],
         'dark'  => [
-            '--color-accent'           => '#8795a9',
-            '--color-accent-hover'     => '#97a3b5',
-            '--color-accent-light'     => 'rgba(135,149,169,0.14)',
-            '--color-link'             => '#8795a9',
-            '--color-link-hover'       => '#97a3b5',
-            '--color-blue-text'        => '#9ca7b8',
-            '--color-blue-bg'          => 'rgba(135,149,169,0.14)',
-            '--sidebar-bg'             => '#474e59',
-            '--sidebar-panel-bg'       => '#474e59',
+            '--color-accent'           => '#64748b',
+            '--color-accent-hover'     => '#475569',
+            '--color-accent-light'     => 'rgba(100,116,139,0.10)',
+            '--color-link'             => '#475569',
+            '--color-link-hover'       => '#64748b',
+            '--color-blue-text'        => '#475569',
+            '--color-blue-bg'          => 'rgba(100,116,139,0.10)',
+            '--color-avatar-from'      => '#64748b',
+            '--color-avatar-to'        => '#94a3b8',
+            '--sidebar-bg'             => '#444f5f',
+            '--sidebar-panel-bg'       => '#444f5f',
             '--sidebar-text'           => '#ffffff',
             '--sidebar-text-secondary' => 'rgba(255,255,255,0.82)',
             '--sidebar-text-muted'     => 'rgba(255,255,255,0.70)',

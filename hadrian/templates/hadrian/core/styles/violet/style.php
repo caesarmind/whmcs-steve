@@ -2,44 +2,37 @@
 /**
  * Style preset manifest -- Violet.
  *
- * Electric violet against a near-black navigation. The most dramatic of the set.
+ * The violet palette against a near-black navigation.
  *
- * The warm near-black panel from the mockup, with the theme own dark ink ramp.
- * Sidebar tone: Dark    -- fixed warm near-black panel (mockup: data-sidebar="dark").
+ * THE PALETTE IS THE DEMO'S, VERBATIM.
+ * --color-accent and its whole chain (hover, tint, link, badge) plus the avatar
+ * gradient are copied from the v18 mockup's own html[data-palette="violet"]
+ * block in apple-client-area/css/apple-layout.css. They are not retyped and not
+ * adjusted: the brand colour a buyer picks here is the brand colour they saw.
+ * Both scopes carry the same values because the demo's palette blocks are not
+ * mode-scoped either -- they apply in dark exactly as in light.
  *
- * WHERE THE COLOURS COME FROM
- * The hue is the violet entry of the palette in core/config/colors.php
- * ('presets'), which is the same palette the v18 mockup ships. The mockup's raw
- * value is NOT reused: it was picked to look right, not to pass AA, and white
- * ink on it measures under 4.5 for most of the set. Each accent here is that
- * hue walked down (light) or up (dark) in HSL lightness until it clears the
- * contrast it actually has to clear, so the palette keeps its identity and the
- * buttons stay legible. Measured values are in the table at the bottom.
+ * Contrast, stated rather than silently corrected: white ink on this accent
+ * measures 4.13, and because contrast is symmetric that is also what the
+ * accent measures as TEXT on white -- which matters, since the theme uses
+ * color: var(--color-accent) in ~400 places. An earlier pass deepened these
+ * hues to clear 4.5 and was reverted: matching the palette is the requirement,
+ * and the buyer can raise contrast per token in Styles > Colors.
  *
- * The `colors` block is the payload: StylesController::seedStyleColors writes
- * it into this style's stored colours the FIRST time the style is activated,
- * after which the rows belong to the buyer and are never overwritten. That is
- * what makes a preset a starting point rather than a locked skin -- every value
- * below shows up in Styles > Colors as the live value and can be edited there.
+ * The SIDEBAR tokens are different in kind -- they are this style's own
+ * navigation treatment, not part of the palette -- so they are still solved
+ * rather than copied, and every one of them clears AA against its own panel.
  *
  * Constraints worth knowing before editing:
  *   - A token must appear in core/config/colors.php or it is dropped.
  *   - A value must satisfy Hooks::isColorValue -- hex, or COMMA-form rgb()/
- *     rgba()/hsl()/hsla(). var(), color-mix(), oklch() and modern slash syntax
- *     are silently dropped. That is why the tone recipes in colors.php, which
- *     are written as color-mix(), appear RESOLVED to literals here.
- *   - Both scopes declare the sidebar tokens even when the values match. Seven
- *     of them are var() chains declared once at :root, so a light-only override
- *     has nothing in the dark block to beat it -- that is the bug that painted
- *     near-black text on a near-black panel at 1.01:1.
- *   - colorMode must stay 'light'. 'dark' makes StylesController drop the card
- *     from the picker -- dark is a MODE, not a preset.
- *   - The first letter of `name` is the tile glyph on the Styles page, so the
- *     shipped presets deliberately start with distinct letters.
+ *     rgba()/hsl()/hsla(). var() and color-mix() are silently dropped, which is
+ *     why the tone recipes appear RESOLVED to literals here.
+ *   - colorMode must stay 'light'. 'dark' drops the card from the picker.
  */
 return [
     'name'        => 'Violet',
-    'description' => 'Electric violet against a near-black navigation. The most dramatic of the set.',
+    'description' => 'The violet palette against a near-black navigation.',
     'preview'     => 'thumb.png',
     'iconType'    => 'default',
     'variables'   => [
@@ -48,13 +41,15 @@ return [
     ],
     'colors'      => [
         'light' => [
-            '--color-accent'           => '#8451ff',
-            '--color-accent-hover'     => '#9468ff',
-            '--color-accent-light'     => 'rgba(132,81,255,0.08)',
-            '--color-link'             => '#773fff',
-            '--color-link-hover'       => '#8451ff',
-            '--color-blue-text'        => '#773fff',
-            '--color-blue-bg'          => 'rgba(132,81,255,0.08)',
+            '--color-accent'           => '#8c5cff',
+            '--color-accent-hover'     => '#7a46ff',
+            '--color-accent-light'     => 'rgba(140,92,255,0.12)',
+            '--color-link'             => '#7a46ff',
+            '--color-link-hover'       => '#8c5cff',
+            '--color-blue-text'        => '#7a46ff',
+            '--color-blue-bg'          => 'rgba(140,92,255,0.12)',
+            '--color-avatar-from'      => '#8c5cff',
+            '--color-avatar-to'        => '#c28cff',
             '--sidebar-bg'             => 'rgba(28,28,30,0.94)',
             '--sidebar-panel-bg'       => '#1c1c1e',
             '--sidebar-text'           => '#f5f5f7',
@@ -68,13 +63,15 @@ return [
             '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.18)',
         ],
         'dark'  => [
-            '--color-accent'           => '#a27cff',
-            '--color-accent-hover'     => '#b698ff',
-            '--color-accent-light'     => 'rgba(162,124,255,0.14)',
-            '--color-link'             => '#a27cff',
-            '--color-link-hover'       => '#b698ff',
-            '--color-blue-text'        => '#b293ff',
-            '--color-blue-bg'          => 'rgba(162,124,255,0.14)',
+            '--color-accent'           => '#8c5cff',
+            '--color-accent-hover'     => '#7a46ff',
+            '--color-accent-light'     => 'rgba(140,92,255,0.12)',
+            '--color-link'             => '#7a46ff',
+            '--color-link-hover'       => '#8c5cff',
+            '--color-blue-text'        => '#7a46ff',
+            '--color-blue-bg'          => 'rgba(140,92,255,0.12)',
+            '--color-avatar-from'      => '#8c5cff',
+            '--color-avatar-to'        => '#c28cff',
             '--sidebar-bg'             => 'rgba(28,28,30,0.94)',
             '--sidebar-panel-bg'       => '#1c1c1e',
             '--sidebar-text'           => '#f5f5f7',

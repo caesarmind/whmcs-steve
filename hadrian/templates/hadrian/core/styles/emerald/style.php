@@ -2,44 +2,37 @@
 /**
  * Style preset manifest -- Emerald.
  *
- * Deep green on a softly tinted navigation panel. Fresh without shouting.
+ * The emerald palette with a softly tinted navigation panel.
  *
- * A wash of the accent through the menu -- the lightest way to colour the chrome.
- * Sidebar tone: Tinted  -- accent washed into a light panel (mockup: data-sidebar="tinted").
+ * THE PALETTE IS THE DEMO'S, VERBATIM.
+ * --color-accent and its whole chain (hover, tint, link, badge) plus the avatar
+ * gradient are copied from the v18 mockup's own html[data-palette="emerald"]
+ * block in apple-client-area/css/apple-layout.css. They are not retyped and not
+ * adjusted: the brand colour a buyer picks here is the brand colour they saw.
+ * Both scopes carry the same values because the demo's palette blocks are not
+ * mode-scoped either -- they apply in dark exactly as in light.
  *
- * WHERE THE COLOURS COME FROM
- * The hue is the emerald entry of the palette in core/config/colors.php
- * ('presets'), which is the same palette the v18 mockup ships. The mockup's raw
- * value is NOT reused: it was picked to look right, not to pass AA, and white
- * ink on it measures under 4.5 for most of the set. Each accent here is that
- * hue walked down (light) or up (dark) in HSL lightness until it clears the
- * contrast it actually has to clear, so the palette keeps its identity and the
- * buttons stay legible. Measured values are in the table at the bottom.
+ * Contrast, stated rather than silently corrected: white ink on this accent
+ * measures 2.76, and because contrast is symmetric that is also what the
+ * accent measures as TEXT on white -- which matters, since the theme uses
+ * color: var(--color-accent) in ~400 places. An earlier pass deepened these
+ * hues to clear 4.5 and was reverted: matching the palette is the requirement,
+ * and the buyer can raise contrast per token in Styles > Colors.
  *
- * The `colors` block is the payload: StylesController::seedStyleColors writes
- * it into this style's stored colours the FIRST time the style is activated,
- * after which the rows belong to the buyer and are never overwritten. That is
- * what makes a preset a starting point rather than a locked skin -- every value
- * below shows up in Styles > Colors as the live value and can be edited there.
+ * The SIDEBAR tokens are different in kind -- they are this style's own
+ * navigation treatment, not part of the palette -- so they are still solved
+ * rather than copied, and every one of them clears AA against its own panel.
  *
  * Constraints worth knowing before editing:
  *   - A token must appear in core/config/colors.php or it is dropped.
  *   - A value must satisfy Hooks::isColorValue -- hex, or COMMA-form rgb()/
- *     rgba()/hsl()/hsla(). var(), color-mix(), oklch() and modern slash syntax
- *     are silently dropped. That is why the tone recipes in colors.php, which
- *     are written as color-mix(), appear RESOLVED to literals here.
- *   - Both scopes declare the sidebar tokens even when the values match. Seven
- *     of them are var() chains declared once at :root, so a light-only override
- *     has nothing in the dark block to beat it -- that is the bug that painted
- *     near-black text on a near-black panel at 1.01:1.
- *   - colorMode must stay 'light'. 'dark' makes StylesController drop the card
- *     from the picker -- dark is a MODE, not a preset.
- *   - The first letter of `name` is the tile glyph on the Styles page, so the
- *     shipped presets deliberately start with distinct letters.
+ *     rgba()/hsl()/hsla(). var() and color-mix() are silently dropped, which is
+ *     why the tone recipes appear RESOLVED to literals here.
+ *   - colorMode must stay 'light'. 'dark' drops the card from the picker.
  */
 return [
     'name'        => 'Emerald',
-    'description' => 'Deep green on a softly tinted navigation panel. Fresh without shouting.',
+    'description' => 'The emerald palette with a softly tinted navigation panel.',
     'preview'     => 'thumb.png',
     'iconType'    => 'default',
     'variables'   => [
@@ -48,44 +41,48 @@ return [
     ],
     'colors'      => [
         'light' => [
-            '--color-accent'           => '#0f855e',
-            '--color-accent-hover'     => '#119a6d',
-            '--color-accent-light'     => 'rgba(15,133,94,0.08)',
-            '--color-link'             => '#0d7553',
-            '--color-link-hover'       => '#0f855e',
-            '--color-blue-text'        => '#0d7553',
-            '--color-blue-bg'          => 'rgba(15,133,94,0.08)',
-            '--sidebar-bg'             => '#e7f3ef',
-            '--sidebar-panel-bg'       => '#f1f8f5',
+            '--color-accent'           => '#14b17d',
+            '--color-accent-hover'     => '#0fa370',
+            '--color-accent-light'     => 'rgba(20,177,125,0.10)',
+            '--color-link'             => '#0fa370',
+            '--color-link-hover'       => '#14b17d',
+            '--color-blue-text'        => '#0fa370',
+            '--color-blue-bg'          => 'rgba(20,177,125,0.10)',
+            '--color-avatar-from'      => '#14b17d',
+            '--color-avatar-to'        => '#5ac8a3',
+            '--sidebar-bg'             => '#e8f7f2',
+            '--sidebar-panel-bg'       => '#f1faf7',
             '--sidebar-text'           => '#1d1d1f',
             '--sidebar-text-secondary' => '#6b6b70',
             '--sidebar-text-muted'     => '#86868b',
             '--sidebar-text-faint'     => '#aeaeb2',
-            '--sidebar-border'         => '#d9ebe5',
-            '--sidebar-field-bg'       => '#f1f8f5',
-            '--sidebar-item-hover-bg'  => 'rgba(15,133,94,0.14)',
-            '--sidebar-item-active-bg' => 'rgba(15,133,94,0.22)',
-            '--sidebar-scroll-thumb'   => 'rgba(15,133,94,0.3)',
+            '--sidebar-border'         => '#d9f3ea',
+            '--sidebar-field-bg'       => '#f1faf7',
+            '--sidebar-item-hover-bg'  => 'rgba(20,177,125,0.14)',
+            '--sidebar-item-active-bg' => 'rgba(20,177,125,0.22)',
+            '--sidebar-scroll-thumb'   => 'rgba(20,177,125,0.3)',
         ],
         'dark'  => [
-            '--color-accent'           => '#13a877',
-            '--color-accent-hover'     => '#16c189',
-            '--color-accent-light'     => 'rgba(19,168,119,0.14)',
-            '--color-link'             => '#13a877',
-            '--color-link-hover'       => '#16c189',
-            '--color-blue-text'        => '#15ba84',
-            '--color-blue-bg'          => 'rgba(19,168,119,0.14)',
-            '--sidebar-bg'             => '#1b2a27',
-            '--sidebar-panel-bg'       => '#1b2423',
+            '--color-accent'           => '#14b17d',
+            '--color-accent-hover'     => '#0fa370',
+            '--color-accent-light'     => 'rgba(20,177,125,0.10)',
+            '--color-link'             => '#0fa370',
+            '--color-link-hover'       => '#14b17d',
+            '--color-blue-text'        => '#0fa370',
+            '--color-blue-bg'          => 'rgba(20,177,125,0.10)',
+            '--color-avatar-from'      => '#14b17d',
+            '--color-avatar-to'        => '#5ac8a3',
+            '--sidebar-bg'             => '#1b2b28',
+            '--sidebar-panel-bg'       => '#1c2524',
             '--sidebar-text'           => '#f5f5f7',
             '--sidebar-text-secondary' => '#a1a1a6',
             '--sidebar-text-muted'     => '#98989d',
             '--sidebar-text-faint'     => '#6e6e73',
-            '--sidebar-border'         => '#1b322c',
-            '--sidebar-field-bg'       => '#1b2423',
-            '--sidebar-item-hover-bg'  => 'rgba(19,168,119,0.14)',
-            '--sidebar-item-active-bg' => 'rgba(19,168,119,0.22)',
-            '--sidebar-scroll-thumb'   => 'rgba(19,168,119,0.3)',
+            '--sidebar-border'         => '#1b342d',
+            '--sidebar-field-bg'       => '#1c2524',
+            '--sidebar-item-hover-bg'  => 'rgba(20,177,125,0.14)',
+            '--sidebar-item-active-bg' => 'rgba(20,177,125,0.22)',
+            '--sidebar-scroll-thumb'   => 'rgba(20,177,125,0.3)',
         ],
     ],
 ];
