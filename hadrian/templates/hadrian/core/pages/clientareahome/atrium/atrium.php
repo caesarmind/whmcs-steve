@@ -57,7 +57,15 @@ return [
             // by default. It describes how the panel is FILLED, so it belongs
             // beside the colour source and the fill.
             'group'   => 'colour',
-            'tooltip' => 'Light is the shipped look: a plain panel in the page surface with a hairline border and no colour in it. Gradient fills it with the accent, deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint of the accent. Plain drops the panel altogether and sets the greeting on the page background. Colour source applies to gradient, solid and soft; light and plain are neutral by definition.',
+            // The three treatments that are BUILT from a colour. The drawer
+            // reads this to drop "None" from Colour source and seed the theme
+            // accent instead: --at-band already falls back to var(--color-accent)
+            // when nothing is painted, so "None" on a gradient was never a real
+            // state -- the band was accent-coloured either way and the control
+            // said otherwise. light and plain are absent because they are
+            // neutral by definition, built from --color-surface.
+            'needsColour' => ['gradient', 'solid', 'soft'],
+            'tooltip' => 'Light is the shipped look: a plain panel in the page surface with a hairline border and no colour in it. Gradient fills it with the accent, deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint of the accent. Plain drops the panel altogether and sets the greeting on the page background. Gradient, solid and soft are built from a colour, so they always carry one; light and plain are neutral by definition.',
         ],
         'atr_hero_width' => [
             'type'    => 'select',

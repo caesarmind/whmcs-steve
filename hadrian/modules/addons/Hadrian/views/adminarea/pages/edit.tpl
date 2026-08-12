@@ -1427,6 +1427,11 @@
                     // is where an admin looks for something that describes that
                     // block. The hidden input the page form already renders is
                     // the source of truth; this control writes to it.
+                    // Set by the SELECTS loop when a per-block option's current
+                    // value declares that it needs a colour, and read by the
+                    // Colour source row below. Declared here so it exists even
+                    // when the block has no selects at all.
+                    var blockNeedsColour = false;
                     var SELECTS = (spec.inBlock && spec.inBlock[s.key]) || null;
                     if (SELECTS) {
                         Object.keys(SELECTS).forEach(function (optKey) {
@@ -1445,6 +1450,14 @@
                             sw.appendChild(sl); sw.appendChild(sh);
                             var seg = document.createElement('span');
                             seg.className = 'mt-seclay-w';
+                            // Does THIS option's current value require the block
+                            // to carry a colour? Recorded for the Colour source
+                            // row rendered further down, which cannot see the
+                            // option fields otherwise.
+                            var needList = D.needsColour || [];
+                            if (needList.length && needList.indexOf(field.value || D.default) !== -1) {
+                                blockNeedsColour = true;
+                            }
                             (D.options || []).forEach(function (v) {
                                 var b = document.createElement('button');
                                 b.type = 'button';
@@ -1454,6 +1467,30 @@
                                     field.value = v;
                                     [].slice.call(seg.children).forEach(function (x) { x.className = ''; });
                                     b.className = 'is-active';
+                                    // Switching TO a treatment built from colour
+                                    // gives the block one, rather than leaving
+                                    // Colour source reading None over a band the
+                                    // CSS is already painting with the accent.
+                                    // Only when it has none: an existing choice,
+                                    // theme or custom, is the admin's and stays.
+                                    if (needList.indexOf(v) !== -1 && !s.colour) {
+                                        openMode = 'theme';
+                                        openLastKey = openLastKey || 'accent';
+                                        // Bare paint key: the grammar is
+                                        // paint[_fill[_memo]] and the fill slot
+                                        // is optional, so the block's own default
+                                        // applies. Writing a fill here would need
+                                        // curFill, which is computed further down
+                                        // in the colour block, after this runs.
+                                        s.colour = openLastKey;
+                                        commit();
+                                        return;
+                                    }
+                                    // Repaint so the Colour source row re-renders
+                                    // against the new style -- None is offered for
+                                    // neutral treatments and withheld for coloured
+                                    // ones, and that list is built at render time.
+                                    paint();
                                 });
                                 seg.appendChild(b);
                             });
@@ -1490,12 +1527,20 @@
                         // has legitimately emptied. `=== null` and not a truthy
                         // test, because 'none' is a real mode.
                         if (openMode === null) {
-                            openMode = curKind === 'hex' ? 'custom' : (curKind === 'key' ? 'theme' : 'none');
+                            // Nothing stored on a block whose style is built from
+                            // a colour opens on Theme, not None. The band is
+                            // already accent-coloured in that state -- --at-band
+                            // falls back to var(--color-accent) -- so None was
+                            // describing a state the page does not have.
+                            openMode = curKind === 'hex' ? 'custom'
+                                     : (curKind === 'key' ? 'theme'
+                                     : (blockNeedsColour ? 'theme' : 'none'));
                             // The active paint, plus the memo for the other mode.
                             // This pair IS the feature -- it is what lets the
                             // switch flip back without re-picking.
                             openLastKey = curKind === 'key' ? curPaint
-                                        : (paintKind(curMemo) === 'key' ? curMemo : '');
+                                        : (paintKind(curMemo) === 'key' ? curMemo
+                                        : (blockNeedsColour ? 'accent' : ''));
                             openLastHex = curKind === 'hex' ? curPaint
                                         : (paintKind(curMemo) === 'hex' ? curMemo : '');
                         }
@@ -1539,7 +1584,14 @@
 
                         var modeSeg = document.createElement('span');
                         modeSeg.className = 'mt-seclay-w';
-                        [['none', 'None'], ['theme', 'Theme'], ['custom', 'Custom']].forEach(function (m) {
+                        // None is withheld when the block's style is built from a
+                        // colour: there is no uncoloured rendering of a gradient,
+                        // so offering the option only invited the disagreement
+                        // this control had with the page.
+                        var MODES = blockNeedsColour
+                            ? [['theme', 'Theme'], ['custom', 'Custom']]
+                            : [['none', 'None'], ['theme', 'Theme'], ['custom', 'Custom']];
+                        MODES.forEach(function (m) {
                             var b = document.createElement('button');
                             b.type = 'button';
                             b.textContent = m[1];

@@ -242,6 +242,14 @@ final class PagesController extends AbstractController
                     // alone leaves it behind here and the control silently
                     // stays in the default group.
                     'group'   => (string)($oSpec['group'] ?? ''),
+                    // Which of this option's values REQUIRE the block to carry a
+                    // colour. The drawer uses it to drop "None" from Colour
+                    // source and to seed the theme accent instead, because a
+                    // band filled with a gradient has no uncoloured reading --
+                    // it was already falling back to the accent in CSS while the
+                    // control claimed None.
+                    'needsColour' => is_array($oSpec['needsColour'] ?? null)
+                        ? array_values(array_map('strval', $oSpec['needsColour'])) : [],
                 ];
             }
             $owner = (string)($spec['_variant'] ?? '');
