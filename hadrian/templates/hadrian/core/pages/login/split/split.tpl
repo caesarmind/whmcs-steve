@@ -21,8 +21,15 @@
        admin "Info panel on the right" option moves it to the right) ── *}
     <aside class="mt-ls-panel">
         <a href="{$WEB_ROOT}/" class="mt-ls-brand">
+            {* data-logo-dark was missing here and nowhere else: this was the one
+               branding <img> in the theme that never swapped for dark mode, so a
+               dark-on-transparent logo sat invisible on the dark panel. The
+               attribute is all initLogoSwap needs -- it selects
+               img[data-logo-dark] document-wide -- and it is emitted only when
+               the two uploads differ, matching every other render site. *}
             {if !empty($hadrian.branding.logo.light)}
-                <img src="{$hadrian.branding.logo.light|escape}" alt="{$companyname|escape}">
+                <img src="{$hadrian.branding.logo.light|escape}" alt="{$companyname|escape}"
+                     {if !empty($hadrian.branding.logo.dark) && $hadrian.branding.logo.dark != $hadrian.branding.logo.light}data-logo-dark="{$hadrian.branding.logo.dark|escape}"{/if}>
             {else}
                 <span class="mt-ls-brand-mark">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/><line x1="6" y1="7.5" x2="6.01" y2="7.5"/><line x1="6" y1="16.5" x2="6.01" y2="16.5"/></svg>

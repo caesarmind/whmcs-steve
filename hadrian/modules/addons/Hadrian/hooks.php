@@ -443,8 +443,17 @@ if (AddonHelper::isActive()) {
             return [
                 'mtBrand' => [
                     'description' => (string)Hadrian\Models\Settings::getValue('footer_description', ''),
-                    'logoUrl'     => $logoLight !== '' ? $uploader->webUrlFor($logoLight) : '',
-                    'logoDarkUrl' => $logoDark  !== '' ? $uploader->webUrlFor($logoDark)  : '',
+                    // Each variant falls back to the other, matching
+                    // Hooks::buildBranding. Without the mirror, an install with
+                    // only a light logo emitted an empty logoDarkUrl -- the
+                    // footer template skips the <img> entirely, and the footer
+                    // CSS hides .is-light under [data-theme="dark"], so the
+                    // brand vanished from the footer in dark mode rather than
+                    // falling back to the one file that was uploaded.
+                    'logoUrl'     => $logoLight !== '' ? $uploader->webUrlFor($logoLight)
+                                                       : ($logoDark !== '' ? $uploader->webUrlFor($logoDark) : ''),
+                    'logoDarkUrl' => $logoDark  !== '' ? $uploader->webUrlFor($logoDark)
+                                                       : ($logoLight !== '' ? $uploader->webUrlFor($logoLight) : ''),
                     'socials'     => $socials,
                 ],
             ];
