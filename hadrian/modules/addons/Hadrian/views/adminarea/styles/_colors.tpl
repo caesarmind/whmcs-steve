@@ -10,6 +10,7 @@
     <input type="hidden" name="scope" value="{$colors.mode}">
 
     {if $colorsSaved}<div class="mt-alert mt-alert-success">Colors saved.</div>{/if}
+    {if $presetRestored}<div class="mt-alert mt-alert-success">{$styleName|escape} restored to its preset colours.</div>{/if}
 
     <section class="mt-section">
         <header class="mt-section-header mt-cs-head">
@@ -36,6 +37,20 @@
                 </button>
             {/foreach}
         </div>
+        {* Seeding is once-only by design, so a style keeps whatever palette it
+           had when you FIRST activated it -- your later edits are never stamped
+           over. The cost is that an updated preset can otherwise never reach a
+           style you already activated. This is the way back, and it is a real
+           delete of the stored rows rather than a form reset: "Restore defaults"
+           in the save bar sets the fields to stock Hadrian, this sets them to
+           the palette THIS preset ships. *}
+        <p class="mt-field-help">
+            Edited this style, or want the palette it shipped with?
+            <button type="submit" name="mt_colors_preset_reset" value="1" class="mt-btn mt-btn-ghost"
+                    onclick="return confirm('Discard your saved colours for {$styleName|escape:'javascript'} and restore the palette this preset ships with?');">
+                Reset to the {$styleName|escape} preset
+            </button>
+        </p>
         {* Shown only in the Dark scope. Rows that ship the same value in both
            modes are not dark-mode decisions -- asking for them twice is asking
            the same question twice -- so Dark hides them and says how many.

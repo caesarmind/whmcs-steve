@@ -52,6 +52,25 @@ final class Settings
         self::$cache[$key] = $value;
     }
 
+    /**
+     * Remove a setting entirely, so the next read falls through to its default.
+     *
+     * Distinct from setValue($key, null) or setValue($key, [], 'json'), and the
+     * difference is load-bearing: several call sites treat ROW EXISTENCE as the
+     * sentinel rather than the value. StylesController::hasStoredColors is the
+     * one that matters -- an empty row means "the buyer cleared every token",
+     * which must survive re-seeding, while NO row means "never seeded", which is
+     * what lets a preset write its palette. Only a real delete can say the
+     * second thing.
+     */
+    public static function deleteValue(string $key): void
+    {
+        \WHMCS\Database\Capsule::table('hadrian_settings')
+            ->where('setting', $key)
+            ->delete();
+        unset(self::$cache[$key]);
+    }
+
     /** @return array<string, mixed> */
     public static function all(): array
     {

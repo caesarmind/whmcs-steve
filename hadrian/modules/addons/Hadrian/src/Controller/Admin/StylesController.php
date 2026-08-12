@@ -71,6 +71,9 @@ final class StylesController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_custom_css_save'])) {
             return $this->saveCustomCss($template);
         }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_colors_preset_reset'])) {
+            return $this->resetPresetColorsAction($template);
+        }
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_colors'])) {
             return $this->saveColorsAction($template);
         }
@@ -132,6 +135,7 @@ final class StylesController extends AbstractController
             'elements'    => $tab === 'variables' ? $this->buildElementsViewModel($template) : null,
             'saved'       => isset($_GET['saved']),
             'colorsSaved' => isset($_GET['colors_saved']),
+            'presetRestored' => isset($_GET['preset_restored']),
             'buttonsSaved'=> isset($_GET['buttons_saved']),
             'formsSaved'  => isset($_GET['forms_saved']),
             'layoutSaved' => isset($_GET['layout_saved']),
@@ -624,6 +628,51 @@ final class StylesController extends AbstractController
             // seeded and will not be re-seeded over the buyer's later edits.
             Settings::setValue($name . '_colors_' . $style . '_' . $scope, $out, 'json');
         }
+    }
+
+    /**
+     * Put a style back to the palette its manifest ships.
+     *
+     * Needed because seeding is deliberately ONCE-ONLY: seedStyleColors writes a
+     * preset's palette the first time the style is activated and never again, so
+     * the buyer's later edits are safe. The cost of that guarantee is that a
+     * preset whose manifest CHANGES in a later release can never reach a buyer
+     * who already activated it -- the stored rows win forever, and there was no
+     * way to ask for the new ones. That is not hypothetical: the 1.7.0 presets
+     * shipped deepened hues, then shipped again with the demo palette, and any
+     * style activated in between was stuck on the first set.
+     *
+     * DELETING the rows is the whole point, and is why Settings::deleteValue
+     * exists. Writing [] would leave a row behind, and hasStoredColors treats a
+     * row -- empty or not -- as buyer-owned, so the re-seed below would no-op.
+     *
+     * Distinct from the panel's "Restore defaults", which resets the FORM to the
+     * schema defaults: that answers "make this look like stock Hadrian", this
+     * answers "make this look like the preset I picked". For `default`, which
+     * ships no palette of its own, the two coincide -- deleting its rows leaves
+     * the schema defaults standing, which IS the Default style.
+     */
+    private function resetPresetColorsAction($template): string
+    {
+        $style = $template->resolveStyleName((string)($_POST['style'] ?? 'default'));
+        $scope = (($_POST['scope'] ?? 'light') === 'dark') ? 'dark' : 'light';
+        $name  = $template->getName();
+
+        foreach (['light', 'dark'] as $s) {
+            Settings::deleteValue($name . '_colors_' . $style . '_' . $s);
+        }
+        // The pre-refactor keys map to the DEFAULT style alone; leaving them
+        // behind would let hasStoredColors keep reporting "stored" for default
+        // and silently defeat the reset on the one style most likely to need it.
+        if ($style === 'default') {
+            Settings::deleteValue($name . '_colors_default');
+            Settings::deleteValue($name . '_colors_dark');
+        }
+
+        $this->seedStyleColors($template, $style);
+
+        $this->redirect('?module=Hadrian&action=editStyle&style=' . urlencode($style)
+            . '&subcat=colors&scope=' . $scope . '&preset_restored=1');
     }
 
     /**
