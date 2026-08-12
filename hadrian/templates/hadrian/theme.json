@@ -1,7 +1,7 @@
 {
   "$schema": "https://your-domain.com/schemas/hadrian-theme.json",
   "name": "hadrian",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "displayName": "Hadrian",
   "description": "A modern WHMCS client area theme.",
   "author": "Your Studio",
@@ -14,7 +14,7 @@
   },
 
   "provides": {
-    "styles": ["default", "rose", "emerald", "slate", "amber", "violet", "dark"],
+    "styles": ["default", "emerald", "violet", "rose", "amber", "slate", "dark"],
     "layouts": {
       "main-menu": ["top", "sidebar", "rail"],
       "footer": ["default", "extended", "extended-info"]

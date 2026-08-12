@@ -2,37 +2,41 @@
 /**
  * Style preset manifest -- Violet.
  *
- * The violet palette against a near-black navigation.
+ * The violet palette on the stock light chrome. Moves the colour, leaves the layout alone.
  *
- * THE PALETTE IS THE DEMO'S, VERBATIM.
- * --color-accent and its whole chain (hover, tint, link, badge) plus the avatar
- * gradient are copied from the v18 mockup's own html[data-palette="violet"]
- * block in apple-client-area/css/apple-layout.css. They are not retyped and not
- * adjusted: the brand colour a buyer picks here is the brand colour they saw.
- * Both scopes carry the same values because the demo's palette blocks are not
- * mode-scoped either -- they apply in dark exactly as in light.
+ * WHAT A STYLE IS, IN THIS SET
+ * A palette and nothing more. Every value below comes from the v18 mockup's own
+ * html[data-palette="violet"] block in apple-client-area/css/apple-layout.css,
+ * read by the generator rather than retyped, so the brand colour a buyer picks
+ * here is exactly the one they saw in the demo. Both scopes carry the same
+ * values because the demo's palette blocks are not mode-scoped either.
  *
- * Contrast, stated rather than silently corrected: white ink on this accent
- * measures 4.13, and because contrast is symmetric that is also what the
- * accent measures as TEXT on white -- which matters, since the theme uses
- * color: var(--color-accent) in ~400 places. An earlier pass deepened these
- * hues to clear 4.5 and was reverted: matching the palette is the requirement,
- * and the buyer can raise contrast per token in Styles > Colors.
+ * NO SIDEBAR TOKENS, deliberately. An earlier pass paired each hue with a
+ * navigation tone -- tinted, graphite, near-black, brand -- which conflated two
+ * things the demo keeps on separate axes: its palette chips and its five-way
+ * sidebar tone chip are independent, and 6x5 combinations do not belong in a
+ * list of six cards. Colour is what a style is here; the navigation treatment
+ * stays stock.
  *
- * The SIDEBAR tokens are different in kind -- they are this style's own
- * navigation treatment, not part of the palette -- so they are still solved
- * rather than copied, and every one of them clears AA against its own panel.
+ * Contrast is stated, not silently corrected. This accent measures
+ * 4.13 against white -- which is both what white ink scores ON it and
+ * what it scores AS TEXT on a light surface, contrast being symmetric, and the
+ * theme writes color: var(--color-accent) in roughly 400 places. Deepening the
+ * hues to clear 4.5 was tried and reverted: matching the palette is the
+ * requirement, and any single token can be raised in Styles > Colors.
  *
  * Constraints worth knowing before editing:
  *   - A token must appear in core/config/colors.php or it is dropped.
  *   - A value must satisfy Hooks::isColorValue -- hex, or COMMA-form rgb()/
- *     rgba()/hsl()/hsla(). var() and color-mix() are silently dropped, which is
- *     why the tone recipes appear RESOLVED to literals here.
+ *     rgba()/hsl()/hsla(). var() and color-mix() are silently dropped.
  *   - colorMode must stay 'light'. 'dark' drops the card from the picker.
+ *   - Seeding is once-only, so editing this file does NOT reach a buyer who has
+ *     already activated the style. That is what the Colors panel's "Reset to
+ *     the Violet preset" button is for.
  */
 return [
     'name'        => 'Violet',
-    'description' => 'The violet palette against a near-black navigation.',
+    'description' => 'The violet palette on the stock light chrome. Moves the colour, leaves the layout alone.',
     'preview'     => 'thumb.png',
     'iconType'    => 'default',
     'variables'   => [
@@ -41,48 +45,26 @@ return [
     ],
     'colors'      => [
         'light' => [
-            '--color-accent'           => '#8c5cff',
-            '--color-accent-hover'     => '#7a46ff',
-            '--color-accent-light'     => 'rgba(140,92,255,0.12)',
-            '--color-link'             => '#7a46ff',
-            '--color-link-hover'       => '#8c5cff',
-            '--color-blue-text'        => '#7a46ff',
-            '--color-blue-bg'          => 'rgba(140,92,255,0.12)',
-            '--color-avatar-from'      => '#8c5cff',
-            '--color-avatar-to'        => '#c28cff',
-            '--sidebar-bg'             => 'rgba(28,28,30,0.94)',
-            '--sidebar-panel-bg'       => '#1c1c1e',
-            '--sidebar-text'           => '#f5f5f7',
-            '--sidebar-text-secondary' => '#a1a1a6',
-            '--sidebar-text-muted'     => '#98989d',
-            '--sidebar-text-faint'     => '#6e6e73',
-            '--sidebar-border'         => 'rgba(255,255,255,0.10)',
-            '--sidebar-field-bg'       => 'rgba(255,255,255,0.07)',
-            '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.06)',
-            '--sidebar-item-active-bg' => 'rgba(255,255,255,0.12)',
-            '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.18)',
+            '--color-accent'       => '#8c5cff',
+            '--color-accent-hover' => '#7a46ff',
+            '--color-accent-light' => 'rgba(140,92,255,0.12)',
+            '--color-link'         => '#7a46ff',
+            '--color-link-hover'   => '#8c5cff',
+            '--color-blue-text'    => '#7a46ff',
+            '--color-blue-bg'      => 'rgba(140,92,255,0.12)',
+            '--color-avatar-from'  => '#8c5cff',
+            '--color-avatar-to'    => '#c28cff',
         ],
         'dark'  => [
-            '--color-accent'           => '#8c5cff',
-            '--color-accent-hover'     => '#7a46ff',
-            '--color-accent-light'     => 'rgba(140,92,255,0.12)',
-            '--color-link'             => '#7a46ff',
-            '--color-link-hover'       => '#8c5cff',
-            '--color-blue-text'        => '#7a46ff',
-            '--color-blue-bg'          => 'rgba(140,92,255,0.12)',
-            '--color-avatar-from'      => '#8c5cff',
-            '--color-avatar-to'        => '#c28cff',
-            '--sidebar-bg'             => 'rgba(28,28,30,0.94)',
-            '--sidebar-panel-bg'       => '#1c1c1e',
-            '--sidebar-text'           => '#f5f5f7',
-            '--sidebar-text-secondary' => '#a1a1a6',
-            '--sidebar-text-muted'     => '#98989d',
-            '--sidebar-text-faint'     => '#6e6e73',
-            '--sidebar-border'         => 'rgba(255,255,255,0.10)',
-            '--sidebar-field-bg'       => 'rgba(255,255,255,0.07)',
-            '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.06)',
-            '--sidebar-item-active-bg' => 'rgba(255,255,255,0.12)',
-            '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.18)',
+            '--color-accent'       => '#8c5cff',
+            '--color-accent-hover' => '#7a46ff',
+            '--color-accent-light' => 'rgba(140,92,255,0.12)',
+            '--color-link'         => '#7a46ff',
+            '--color-link-hover'   => '#8c5cff',
+            '--color-blue-text'    => '#7a46ff',
+            '--color-blue-bg'      => 'rgba(140,92,255,0.12)',
+            '--color-avatar-from'  => '#8c5cff',
+            '--color-avatar-to'    => '#c28cff',
         ],
     ],
 ];
