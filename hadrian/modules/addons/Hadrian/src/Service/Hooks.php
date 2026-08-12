@@ -605,11 +605,13 @@ final class Hooks
      */
     private function buildColorsHead(Template $template): string
     {
-        $name   = $template->getName();
-        $active = (string)Settings::getValue($name . '_active_style', 'default');
-        if ($active === 'dark' || $active === '') {
-            $active = 'default'; // legacy dark/empty pointer -> base style
-        }
+        $name = $template->getName();
+        // Resolves the legacy 'dark'/empty pointer AND a pointer left behind by
+        // a retired style -- otherwise the saved rows of a style that no longer
+        // exists keep painting a site whose Styles page cannot show or edit it.
+        $active = $template->resolveStyleName(
+            (string)Settings::getValue($name . '_active_style', 'default')
+        );
 
         // Each style now carries BOTH scopes: light -> :root, dark ->
         // [data-theme="dark"]. Read the per-scope keys, falling back to the
@@ -2255,7 +2257,9 @@ final class Hooks
 
     private function resolveActiveStyle(Template $template): array
     {
-        $active   = (string)Settings::getValue($template->getName() . '_active_style', 'default');
+        $active   = $template->resolveStyleName(
+            (string)Settings::getValue($template->getName() . '_active_style', 'default')
+        );
         $metaPath = $template->getFullPath() . "/core/styles/{$active}/style.php";
         $meta     = ThemeManifest::loadVariantMeta($metaPath);
         return [

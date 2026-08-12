@@ -108,6 +108,40 @@ final class Template
         return $this->manifest['provides']['styles'] ?? [];
     }
 
+    /**
+     * The stored active-style pointer, resolved to a style that ACTUALLY EXISTS.
+     *
+     * The pointer is a plain settings row; nothing constrains it to the styles
+     * this version ships. Three ways it goes stale:
+     *
+     *   - a style is retired between releases (the 1.7.0 palette replaced the
+     *     seven Roman presets outright);
+     *   - 'dark', the legacy pointer from before dark became a per-style colour
+     *     SCOPE rather than a style you switch to;
+     *   - empty, on a fresh install.
+     *
+     * Left unresolved, a dangling pointer does not fail loudly -- it fails
+     * QUIETLY and worse. buildColorsHead reads `_colors_<pointer>_light`, and
+     * that row survives the style's removal, so the site keeps rendering the
+     * palette of a style the Styles page can no longer show or edit. Meanwhile
+     * resolveActiveStyle loads a manifest that isn't there and the bodyClass
+     * silently empties, taking any Custom CSS scoped to `.theme-<name>` with it.
+     *
+     * Resolving to 'default' is the honest answer: the buyer sees the stock
+     * theme and a Styles page where picking a card fixes it. Their old rows are
+     * left in place rather than deleted -- re-adding a style by that name
+     * restores its colours, and seedStyleColors treats an existing row as
+     * buyer-owned so it will not stamp over them.
+     */
+    public function resolveStyleName(string $stored): string
+    {
+        $stored = trim($stored);
+        if ($stored === '' || $stored === 'dark') {
+            return 'default';
+        }
+        return in_array($stored, $this->getStyles(), true) ? $stored : 'default';
+    }
+
     /** @return list<string> */
     public function getLayouts(string $kind): array
     {

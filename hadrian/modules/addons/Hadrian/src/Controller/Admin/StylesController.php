@@ -24,8 +24,12 @@ final class StylesController extends AbstractController
         $this->migrateColors($template);
 
         $available = $template->getStyles();
-        $current   = Settings::getValue($template->getName() . '_active_style', 'default');
-        if ($current === 'dark') { $current = 'default'; }
+        // Same resolution the renderer uses, so the highlighted card and the
+        // live site never disagree -- including when the stored pointer names a
+        // style this version no longer ships.
+        $current   = $template->resolveStyleName(
+            (string)Settings::getValue($template->getName() . '_active_style', 'default')
+        );
 
         $list = [];
         foreach ($available as $name) {
@@ -86,7 +90,11 @@ final class StylesController extends AbstractController
             return $this->saveElementsAction($template);
         }
 
-        $style  = (string)($_GET['style'] ?? 'default');
+        // ?style= is a URL parameter, so it can name a style this version does
+        // not ship -- a bookmark to a retired preset, most likely. Unresolved it
+        // renders a full editor whose Save is then refused by saveColorsAction's
+        // own getStyles() guard, which reads as the form being broken.
+        $style  = $template->resolveStyleName((string)($_GET['style'] ?? 'default'));
         $subcat = (string)($_GET['subcat'] ?? 'colors');
         $tab    = (string)($_GET['tab'] ?? 'variables');
         $scope  = (($_GET['scope'] ?? 'light') === 'dark') ? 'dark' : 'light';
@@ -260,17 +268,18 @@ final class StylesController extends AbstractController
         // then the accent it paints on top. That is the pair that actually
         // distinguishes these styles from one another.
         //
-        // It used to say two different sentences in the same shape. Five styles
-        // declare a surface and showed surface + accent; the three that declare
-        // none -- default, imperial, porphyry -- fell through to "accent in
-        // light, accent in dark", which is a different fact drawn identically,
-        // with nothing on the card to tell you which you were reading. It broke
-        // visibly once the brand accent became deliberately the same in both
-        // modes: both halves came back one colour and the chip went solid.
+        // It used to say two different sentences in the same shape. Styles that
+        // declare a surface showed surface + accent; those that declare none
+        // fell through to "accent in light, accent in dark", which is a
+        // different fact drawn identically, with nothing on the card to tell you
+        // which you were reading. It broke visibly once the brand accent became
+        // deliberately the same in both modes: both halves came back one colour
+        // and the chip went solid.
         //
         // Surface means the navigation panel where a style paints one, else the
-        // page. The three with neither now show the stock page, which is the
-        // truth about them -- they use it.
+        // page. In the 1.7.0 set that is Emerald (tinted), Amber (graphite),
+        // Violet (dark) and Slate (brand); Default and Rose paint no panel and
+        // show the stock page, which is the truth about them -- they use it.
         $accent  = (string)($sLight['--color-accent'] ?? $light['--color-accent'] ?? $fallback('--color-accent', 'light'));
         $surface = (string)($sLight['--sidebar-bg'] ?? $sLight['--color-bg']
                             ?? $light['--sidebar-bg'] ?? $light['--color-bg'] ?? '');
