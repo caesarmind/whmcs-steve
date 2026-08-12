@@ -712,6 +712,39 @@ body[data-sidebar-side="right"] .main-content { margin-left: 0; margin-right: va
 .topbar-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--color-avatar-from), var(--color-avatar-to)); color: var(--color-on-accent); font-size: var(--text-sm); font-weight: var(--fw-semibold); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity var(--transition-fast); }
 .topbar-avatar:hover { opacity: 0.85; }
 
+/* --- Monogram ink, derived from the avatar's OWN colours -----------------
+   The three avatars are painted with the avatar gradient but took their ink
+   from --color-on-accent, which is the ink computed for --color-accent. Those
+   are different colours: the generator rotates the avatar pair away from the
+   accent deliberately, so the letter was being chosen against one colour and
+   painted on another. A generated palette can land them on opposite sides of
+   the crossover, and then the monogram is simply wrong.
+
+   Derived from the MIDPOINT of the gradient, which is what sits under a
+   centred glyph at 135deg -- deriving from either stop would be right at one
+   corner of the circle and wrong at the other.
+
+   Same crossover primitive as --blk-ink and --at-ink, and the same reason the
+   floor comes first: custom properties are not parse-validated, so on a
+   browser without relative colour the color(from ...) declaration would still
+   win and leave the letter inheriting. The floor is the OLD value, so an
+   unsupported browser renders exactly what it does today.
+
+   The welcome band's avatar is handled in clientareahome.css instead: it only
+   takes this gradient on the three neutral band styles, and on the saturated
+   ones it is a translucent white disc that must keep its white ink. */
+.topbar-avatar,
+.sidebar-avatar {
+    --_av-mid: color-mix(in srgb, var(--color-avatar-from), var(--color-avatar-to));
+}
+@supports (color: color(from red srgb-linear r g b)) {
+    .topbar-avatar,
+    .sidebar-avatar {
+        --_av-ink: clamp(0, (var(--ink-crossover, 0.179129) - (0.2126*r + 0.7152*g + 0.0722*b)) * 100000, 1);
+        color: color(from var(--_av-mid) srgb-linear var(--_av-ink) var(--_av-ink) var(--_av-ink) / 1);
+    }
+}
+
 /* --- System Status Indicator --- */
 .topbar-status { display: flex; align-items: center; gap: 6px; font-size: var(--text-xs); color: var(--color-text-tertiary); }
 .topbar-status-dot { width: 6px; height: 6px; background: var(--color-green); border-radius: 50%; flex-shrink: 0; }

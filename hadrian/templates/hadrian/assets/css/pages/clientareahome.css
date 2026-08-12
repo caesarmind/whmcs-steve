@@ -1664,7 +1664,20 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
 .at-hero[data-at-style="light"] .at-hero-avatar,
 .at-hero[data-at-style="plain"] .at-hero-avatar {
     background: linear-gradient(135deg, var(--color-avatar-from), var(--color-avatar-to));
+    /* Ink derived from the gradient's midpoint, not borrowed from
+       --color-on-accent -- see the note beside .topbar-avatar in
+       apple-theme.css. Only these three band styles take the gradient; the
+       saturated ones keep the translucent white disc above. */
+    --_av-mid: color-mix(in srgb, var(--color-avatar-from), var(--color-avatar-to));
     color: var(--color-on-accent); box-shadow: none;
+}
+@supports (color: color(from red srgb-linear r g b)) {
+    .at-hero[data-at-style="soft"] .at-hero-avatar,
+    .at-hero[data-at-style="light"] .at-hero-avatar,
+    .at-hero[data-at-style="plain"] .at-hero-avatar {
+        --_av-ink: clamp(0, (var(--ink-crossover, 0.179129) - (0.2126*r + 0.7152*g + 0.0722*b)) * 100000, 1);
+        color: color(from var(--_av-mid) srgb-linear var(--_av-ink) var(--_av-ink) var(--_av-ink) / 1);
+    }
 }
 .at-hero[data-at-style="soft"] .at-hero-avatar:hover,
 .at-hero[data-at-style="light"] .at-hero-avatar:hover,
