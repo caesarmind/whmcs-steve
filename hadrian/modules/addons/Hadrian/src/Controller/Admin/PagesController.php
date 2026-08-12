@@ -248,6 +248,8 @@ final class PagesController extends AbstractController
                     // band filled with a gradient has no uncoloured reading --
                     // it was already falling back to the accent in CSS while the
                     // control claimed None.
+                    // Declared in the variant (see atrium.php's atr_hero_style).
+                    // Empty array, not null: the drawer calls .indexOf on it.
                     'needsColour' => is_array($oSpec['needsColour'] ?? null)
                         ? array_values(array_map('strval', $oSpec['needsColour'])) : [],
                 ];

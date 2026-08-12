@@ -1454,6 +1454,8 @@
                             // to carry a colour? Recorded for the Colour source
                             // row rendered further down, which cannot see the
                             // option fields otherwise.
+                            // || [] matters: the key only exists for options that
+                            // declare it, and every use below is .indexOf.
                             var needList = D.needsColour || [];
                             if (needList.length && needList.indexOf(field.value || D.default) !== -1) {
                                 blockNeedsColour = true;

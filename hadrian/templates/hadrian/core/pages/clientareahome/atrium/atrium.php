@@ -64,6 +64,9 @@ return [
             // state -- the band was accent-coloured either way and the control
             // said otherwise. light and plain are absent because they are
             // neutral by definition, built from --color-surface.
+            // Declaring it here is only half: PagesController's inBlock
+            // projection is a whitelist and drops any key it does not name, so
+            // this list and that projection have to move together.
             'needsColour' => ['gradient', 'solid', 'soft'],
             'tooltip' => 'Light is the shipped look: a plain panel in the page surface with a hairline border and no colour in it. Gradient fills it with the accent, deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint of the accent. Plain drops the panel altogether and sets the greeting on the page background. Gradient, solid and soft are built from a colour, so they always carry one; light and plain are neutral by definition.',
         ],
