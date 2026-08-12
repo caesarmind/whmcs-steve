@@ -93,7 +93,7 @@
 
                 <div class="form-group">
                     <label class="form-label" for="loginEmail">{$LANG.loginemail}</label>
-                    <input type="email" id="loginEmail" name="username" class="form-input" placeholder="you@example.com" autocomplete="email" autofocus required>
+                    <input type="email" id="loginEmail" name="username" class="form-input" placeholder="{$hadrianLang.auth.emailPlaceholder}" autocomplete="email" autofocus required>
                 </div>
 
                 <div class="form-group">

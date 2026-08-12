@@ -182,6 +182,7 @@ return [
         'loginDetailsIncorrect' => 'The email address or password you entered is incorrect. Please try again.',
         'verifyLinkExpired'    => 'This email-verification link has expired. Sign in to request a new one.',
         'pwResetSuccess'       => 'Your password has been reset. Sign in with your new password.',
+        'emailPlaceholder'     => 'you@example.com',
         'passwordPlaceholder'  => 'Enter your password',
         'togglePassword'       => 'Show or hide password',
         'forgotPassword'       => 'Forgot password?',
