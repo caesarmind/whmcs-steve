@@ -225,12 +225,30 @@ final class PagesController extends AbstractController
             if (!is_array($spec) || ($spec['type'] ?? '') !== 'sections') {
                 continue;
             }
+            // Which variant owns THIS sections option. Read before the loop
+            // below because that loop has to filter on it.
+            $owner = (string)($spec['_variant'] ?? '');
+
             // Options tagged inBlock => '<sectionKey>' are shown in that
             // block's drawer instead of the page form.
+            //
+            // SCOPED TO THE OWNING VARIANT. $supportedOptions is the MERGED set
+            // across every variant of this page (declaredOptions stamps
+            // `_variant` on each as it walks them), so an unfiltered loop here
+            // attaches every variant's inBlock options to every variant's
+            // sections spec. That was invisible only because atrium was the sole
+            // variant using the mechanism and no other catalogue had a block by
+            // the same name to look them up under -- the moment a second variant
+            // declares a block sharing a key, both variants' controls render in
+            // the one drawer, and the writes go to the other variant's hidden
+            // field. Matching '' too keeps options that deliberately apply to
+            // every variant working.
             $inBlockOpts = [];
             foreach ($supportedOptions as $oKey => $oSpec) {
                 $blk = is_array($oSpec) ? (string)($oSpec['inBlock'] ?? '') : '';
                 if ($blk === '') { continue; }
+                $oVariant = (string)($oSpec['_variant'] ?? '');
+                if ($oVariant !== '' && $owner !== '' && $oVariant !== $owner) { continue; }
                 $inBlockOpts[$blk][$oKey] = [
                     'label'   => (string)($oSpec['label'] ?? $oKey),
                     'hint'    => (string)($oSpec['tooltip'] ?? ''),
@@ -254,7 +272,6 @@ final class PagesController extends AbstractController
                         ? array_values(array_map('strval', $oSpec['needsColour'])) : [],
                 ];
             }
-            $owner = (string)($spec['_variant'] ?? '');
             $sectionSpecs[(string)$key] = [
                 // Heading for the builder's own card. Falls back to the option
                 // label, which reads fine but carries the variant suffix.

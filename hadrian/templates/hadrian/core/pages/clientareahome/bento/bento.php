@@ -28,6 +28,69 @@ return [
     // with no default merge, so every template read carries its own |default:
     // matching the value declared here.
     'supportedOptions' => [
+        /* ---- Welcome band ----------------------------------------------
+           The same five controls atrium carries, against the same shared
+           markup in ../welcome-band.tpl. They are DECLARED here as ordinary
+           options -- which is what makes them store and round-trip -- and
+           marked inBlock so their page-form rows are hidden and the controls
+           re-presented inside the Welcome band's own drawer, where an admin
+           looks for something that describes the band.
+
+           Keys are bnt_-prefixed, not shared with atrium's atr_ ones, because
+           options are variant-scoped: the two bands are configured
+           independently and switching variant must not carry one's band
+           settings onto the other. */
+        'bnt_hero_style' => [
+            'type'    => 'select',
+            'label'   => 'Band style',
+            'default' => 'light',
+            'options' => ['light', 'gradient', 'solid', 'soft', 'plain'],
+            'inBlock' => 'hero',
+            // Files the control under Colour & style in the drawer rather than
+            // Content & behaviour, which is where an inBlock option lands by
+            // default. It describes how the panel is FILLED, so it belongs
+            // beside the colour source.
+            'group'   => 'colour',
+            // The treatments BUILT from a colour. The drawer reads this to drop
+            // "None" from Colour source and seed the theme accent instead:
+            // --at-band already falls back to var(--color-accent) when nothing
+            // is painted, so "None" on a gradient was never a real state.
+            'needsColour' => ['gradient', 'solid', 'soft'],
+            'tooltip' => 'Light is the shipped look: a plain panel in the page surface with a hairline border and no colour in it. Gradient fills it with the accent, deepened at one end and lightened at the other. Solid is a flat accent panel. Soft is a pale tint of the accent. Plain drops the panel altogether and sets the greeting on the page background. Gradient, solid and soft are built from a colour, so they always carry one; light and plain are neutral by definition.',
+        ],
+        'bnt_hero_width' => [
+            'type'    => 'select',
+            'label'   => 'Band width',
+            'default' => 'boxed',
+            'options' => ['boxed', 'edge'],
+            'inBlock' => 'hero',
+            'tooltip' => 'Boxed keeps the band inside the content column. Edge runs it to the full width of the content area with the text still aligned to the column, which reads as a header rather than a card.',
+        ],
+        'bnt_hero_actions' => [
+            'type'    => 'select',
+            'label'   => 'Band buttons',
+            'default' => 'right',
+            'options' => ['right', 'below', 'off'],
+            'inBlock' => 'hero',
+            'tooltip' => 'Right places Pay balance and Order a service opposite the greeting. Below stacks them under it, for a narrow content column. Off hides them; the same actions are reachable from the tiles underneath.',
+        ],
+        'bnt_hero_size' => [
+            'type'    => 'select',
+            'label'   => 'Band height',
+            'default' => 'full',
+            'options' => ['full', 'slim'],
+            'inBlock' => 'hero',
+            'tooltip' => 'Full is the shipped band: date, greeting and a line of copy. Slim drops the copy line and tightens the padding to a one-line bar -- the date and greeting on the left, buttons or the avatar on the right. Useful when the tiles below are what the page is really for.',
+        ],
+        'bnt_hero_profile' => [
+            'type'    => 'select',
+            'label'   => 'Band profile',
+            'default' => 'off',
+            'options' => ['off', 'avatar'],
+            'inBlock' => 'hero',
+            'tooltip' => 'Avatar puts the account monogram at the right of the band, opening the same account menu the topbar and sidebar use -- details, users, payment methods, contacts, security and log out. It sits after the buttons, so set Band buttons to off if you want the profile alone.',
+        ],
+
         'bnt_section_titles' => [
             'type'    => 'select',
             'label'   => 'Tile titles',
@@ -73,6 +136,24 @@ return [
             'default' => '',
             'tooltip' => 'Drag to reorder, switch a tile off to hide it, and set each one to full, two thirds, one half or one third width. Widths run on a six-column grid, so a row fills up when its widths add to a whole. Leave blank for the built-in arrangement. Every tile can be coloured and takes a solid, wash or gradient fill.',
             'sections' => [
+                // The welcome band, shared with atrium via
+                // ../welcome-band.tpl. It replaced the hardcoded .bn-head
+                // strip, which could not be reordered, hidden or coloured
+                // because it was never a catalogue block at all.
+                //
+                // prepend, so an install with a layout saved before the band
+                // existed gets it at the TOP rather than appended below the
+                // grid -- the greeting has always been the first thing on this
+                // page and appending it last would read as a regression.
+                //
+                // fills is deliberately ['solid'] ALONE, and that single entry
+                // is what suppresses the Fill row in the drawer. The band does
+                // not use the generic .bn-cell fill rules: it builds its own
+                // surface from --at-band via data-at-style (light / gradient /
+                // solid / soft / plain), so offering wash and gradient here
+                // would draw a control that decides nothing.
+                'hero'          => ['label' => 'Welcome band', 'w' => '1/1', 'prepend' => true,
+                                    'paintable' => true, 'fills' => ['solid']],
                 // A banner, not a collection: no rows, no empty state, and it
                 // renders nothing at all when there is nothing to act on. It is
                 // in the catalogue so it can be reordered, resized and switched

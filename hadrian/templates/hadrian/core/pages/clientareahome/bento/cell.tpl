@@ -124,7 +124,20 @@
    pages/clientareahome.css, so a custom colour and a palette colour go
    through exactly the same contrast maths. *}
 <div class="min-section bn-cell" data-sec="{$sec}" data-w="{$secW}"{if $secPaint|default:''} data-blk-paint="{$secPaint|escape}" data-blk-fill="{$secFillOut|escape}"{/if}{if $secCustom|default:''} style="--blk-base:{$secCustom|escape}"{/if}>
-{if $secPanel}
+{if $sec == 'hero'}
+    {* ---------- Welcome band ----------
+       Shared with atrium (../welcome-band.tpl). It stays INSIDE the .min-section
+       wrapper above rather than replacing it: the wrapper is what emits
+       --blk-base for a painted block, and the band's own fill reads
+       `--at-band: var(--blk-base, var(--color-accent))`. So the generic colour
+       control paints the band through exactly the same path it paints every
+       other tile, with no band-specific admin wiring.
+
+       The five appearance variables come from bento.tpl's scope, not from here
+       -- see the note there on why they are assigned once per page rather than
+       once per tile. *}
+    {include file="`$template`/core/pages/clientareahome/welcome-band.tpl"}
+{elseif $secPanel}
     {* ---------- Panels ----------
        Shared byte-for-byte with the minimal variant's rows.tpl: the .blk
        vocabulary, its named container query (container-name: blk) and the paint

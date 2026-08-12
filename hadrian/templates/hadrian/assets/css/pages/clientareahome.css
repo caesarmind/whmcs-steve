@@ -2108,3 +2108,15 @@ body[data-at-title="outside"] .at-panel .at-card-head { padding: 0 0 12px; }
     .at-body { grid-template-columns: minmax(0, 1fr); }
     .at-side { order: -1; }
 }
+
+/* -- Welcome band inside the bento grid ------------------------
+   The band is shared with atrium (core/pages/clientareahome/welcome-band.tpl).
+   In atrium it stacks in normal flow inside .at-band, where its own
+   `margin: 0 0 26px` IS the separation. In bento it is a grid item, and the
+   grid already supplies 16px of row-gap -- so the margin becomes 26px of dead
+   space inside the cell and the visible gap under the band measures 42px where
+   every other tile gets 16px.
+
+   Zero it and let the gap do the work. Scoped to .bn-cell so atrium, which has
+   no grid gap to inherit, keeps its own spacing untouched. */
+.bn-cell > .at-hero { margin-bottom: 0; }

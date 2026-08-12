@@ -96,6 +96,26 @@
     {assign var=dashIsEmpty value='empty'}
 {/if}
 
+{* ---- Welcome band ----
+   The band shared with atrium (../welcome-band.tpl). It reads these five from
+   the INCLUDING scope, so they are assigned here rather than in cell.tpl: an
+   {include} gets the caller's scope, and cell.tpl is itself included per block,
+   so assigning them there would repeat the work for every tile on the page.
+
+   $atHero* rather than $bnHero*: the partial names them, and giving them a
+   bento-specific alias would mean the partial reading a different variable per
+   caller -- which is the drift the shared file exists to prevent. The STORED
+   keys are still bento's own (bnt_hero_*), so the two variants' bands are
+   configured independently. *}
+{assign var=atHeroStyle   value=$hadrian.pages.clientareahome.options.bnt_hero_style|default:'light'}
+{assign var=atHeroWidth   value=$hadrian.pages.clientareahome.options.bnt_hero_width|default:'boxed'}
+{assign var=atHeroActs    value=$hadrian.pages.clientareahome.options.bnt_hero_actions|default:'right'}
+{assign var=atHeroSize    value=$hadrian.pages.clientareahome.options.bnt_hero_size|default:'full'}
+{assign var=atHeroProfile value=$hadrian.pages.clientareahome.options.bnt_hero_profile|default:'off'}
+{* The Pay balance pill is gated on this. Same source atrium uses -- the COUNT,
+   not the summed amount, so a zero-value unpaid invoice still counts. *}
+{assign var=atInvN        value=$clientsstats.numunpaidinvoices|default:0}
+
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareahome.css?v={$hadrian.version|default:'1.0'}">
 
 {* Page-level signals. header.tpl owns data-layout / data-subnav / data-svc-layout,
@@ -109,56 +129,27 @@
     if (!b) return;
     b.setAttribute('data-data', '{$dashIsEmpty}');
     b.setAttribute('data-bn-title', '{$bnTitles|escape:'javascript'}');
+    // The welcome band's edge-width geometry keys off the BODY, not off the
+    // band, because it has to break out of the content column. Shared verbatim
+    // with atrium -- same attribute name, because the CSS that reads it
+    // (clientareahome.css) is not scoped to either variant and duplicating it
+    // under a data-bn- name would mean maintaining the geometry twice. Only one
+    // variant renders per request, so they can never both set it.
+    b.setAttribute('data-at-hero-width', '{$atHeroWidth|escape:'javascript'}');
 })();
 </script>
 
 {* ---------- head ----------
-   Greeting, the account's real scale, and the identity card. The scale line is
-   three count/label pairs rather than a sentence: a translated sentence with
-   three numbers embedded in it cannot be assembled from fragments without
-   getting the word order wrong in half the languages the theme ships to. *}
-<div class="bn-head">
-    <div class="bn-headline">
-        <h1 class="bn-greeting">{if $dashboard.greeting == 'morning'}{$hadrianLang.dashboard.goodMorning}{elseif $dashboard.greeting == 'evening'}{$hadrianLang.dashboard.goodEvening}{else}{$hadrianLang.dashboard.goodAfternoon}{/if}{if $clientsdetails.firstname}, {$clientsdetails.firstname|escape}{/if}.</h1>
-        <p class="bn-scale">
-            <span class="bn-scale-i"><b>{$clientsstats.productsnumactive|default:0}</b> {$LANG.navservices|default:'Services'}</span>
-            <span class="bn-dot">&middot;</span>
-            <span class="bn-scale-i"><b>{$clientsstats.numactivedomains|default:0}</b> {$LANG.navdomains|default:'Domains'}</span>
-            <span class="bn-dot">&middot;</span>
-            <span class="bn-scale-i"><b>{$clientsstats.numactivetickets|default:0}</b> {$LANG.navtickets|default:'Support'}</span>
-        </p>
-    </div>
-    {if $bnAcct}
-        {assign var=bnFirst value=$clientsdetails.firstname|default:''}
-        {assign var=bnLast value=$clientsdetails.lastname|default:''}
-        {assign var=bnCo value=$clientsdetails.companyname|default:''}
-        {assign var=bnFull value="`$bnFirst` `$bnLast`"|trim}
-        {* Initials follow whichever name is the heading, so the mark and the
-           label always agree. Recomputed here rather than reusing
-           $user_initials: that is assigned inside whichever chrome partial the
-           active layout happens to include, so it is not reliably in scope. *}
-        {assign var=bnI1 value=$bnFirst|truncate:1:''|upper}
-        {assign var=bnI2 value=$bnLast|truncate:1:''|upper}
-        {if $bnCo}
-            {assign var=bnMark value=$bnCo|truncate:2:''|upper}
-        {else}
-            {assign var=bnMark value=$bnI1|cat:$bnI2}
-        {/if}
-    <div class="bn-acct">
-        <span class="bn-acct-av">{$bnMark|escape}</span>
-        <span class="bn-acct-main">
-            <span class="bn-acct-nm">{if $bnCo}{$bnCo|escape}{else}{$bnFull|escape}{/if}</span>
-            <span class="bn-acct-links">
-                <a href="{$WEB_ROOT}/clientarea.php?action=details">{$hadrianLang.dashboard.editProfile}</a>
-                <span class="bn-dot">&middot;</span>
-                <a href="{routePath('user-security')}">{$LANG.navsecuritysettings|default:'Security'}</a>
-                <span class="bn-dot">&middot;</span>
-                <a href="{routePath('account-paymentmethods')}">{$LANG.paymentMethods.title|default:'Payment Methods'}</a>
-            </span>
-        </span>
-    </div>
-    {/if}
-</div>
+   Was a hardcoded .bn-head strip -- greeting, a three-figure scale line and an
+   optional identity card -- sitting above the grid. It is now the shared
+   Welcome band (../welcome-band.tpl), rendered through the catalogue as the
+   'hero' block, so it reorders, hides, paints and takes the same five
+   appearance controls atrium's band does.
+
+   Nothing is emitted here any more: the band renders in tile order below.
+   The old identity card's links (profile, security, payment methods) are the
+   same items the band's account menu offers, which is what bnt_hero_profile
+   turns on. *}
 
 {* ---------- tiles ----------
    $bnSecs is resolved in PHP (Hooks::resolveCurrentPage -> SectionLayout). An
@@ -182,12 +173,18 @@
                interpolate a stored value into a file path -- an unresolvable
                {include} drops the whole client area to the Six theme, and the
                poisoned compiled-template cache survives a git revert. *}
-            {if $s.key == 'attention' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'domainreg' || $s.key == 'profile'}
+            {if $s.key == 'hero' || $s.key == 'attention' || $s.key == 'services' || $s.key == 'domains' || $s.key == 'invoices' || $s.key == 'tickets' || $s.key == 'announcements' || $s.key == 'domainreg' || $s.key == 'profile'}
                 {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec=$s.key secSpan=$s.span secHideEmpty=$s.hideEmpty secHideList=$s.hideList secCompact=$s.compact secPaint=$s.paint secFill=$s.fill secRowsIn=$s.rows secCustom=$s.custom}
             {/if}
         {/if}
     {/foreach}
 {else}
+    {* The band leads the built-in arrangement, as the greeting always has.
+       `prepend` in the catalogue only covers the OTHER case -- an install with a
+       layout already saved -- so without this line a fresh install, which is
+       exactly the install with no saved layout, would render no greeting at
+       all. The two paths have to be kept in step by hand. *}
+    {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec='hero' secSpan=6}
     {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec='attention' secSpan=6}
     {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec='services' secSpan=4}
     {include file="`$template`/core/pages/clientareahome/bento/cell.tpl" sec='domains' secSpan=2}
