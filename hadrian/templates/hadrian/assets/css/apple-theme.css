@@ -571,10 +571,23 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
 .sidebar-logo { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--sidebar-text); }
 .sidebar-logo svg { width: 28px; height: 28px; }
 .sidebar-brand { font-size: var(--text-lg); font-weight: var(--fw-semibold); color: var(--sidebar-text); letter-spacing: -0.01em; }
-.sidebar-brand-logo { max-height: 28px; max-width: 160px; object-fit: contain; display: block; }
+/* height, not max-height, on every uploaded logo.
+   An SVG exported with a viewBox and no width/height attributes carries no
+   intrinsic size -- and a cap has nothing to cap, so the image laid out at
+   0x0 and the logo simply was not there. Measured on a live install: an
+   Illustrator-exported square logo rendered 0x0 in the sidebar while the same
+   file rendered 28x28 in the rail, whose rule sets width/height outright.
+   Raster logos were unaffected, which is why this looked like "SVG logos are
+   broken" rather than a CSS bug.
+   A definite height plus width:auto resolves against the viewBox's aspect
+   ratio, so SVG and PNG both size correctly; max-width still caps a very wide
+   mark and object-fit keeps it undistorted when it does. Same shape as
+   .hp-footer-brand-logo, which had it right all along and was the one logo on
+   the page that kept working. */
+.sidebar-brand-logo { height: 28px; width: auto; max-width: 160px; object-fit: contain; display: block; }
 .homepage-nav .nav-logo.img-logo { padding: 0; }
-.homepage-nav .nav-logo.img-logo img { max-height: 28px; max-width: 180px; object-fit: contain; display: block; }
-.brand-logo img { max-height: 32px; max-width: 200px; object-fit: contain; display: block; }
+.homepage-nav .nav-logo.img-logo img { height: 28px; width: auto; max-width: 180px; object-fit: contain; display: block; }
+.brand-logo img { height: 32px; width: auto; max-width: 200px; object-fit: contain; display: block; }
 .sidebar-search { padding: 8px 12px 4px; }
 .sidebar-search-input {
     width: 100%; height: 32px;

@@ -891,7 +891,9 @@ body[data-layout="rail"] .ph-hero-inner { max-width: none; }
    sidebar/rail itself shows the logo. Revealed <=900px (see media block). */
 .ph-side-logo { display: none; align-items: center; flex-shrink: 0; text-decoration: none; color: var(--color-text-primary); font-weight: var(--fw-semibold); font-size: var(--text-lg); letter-spacing: -0.01em; }
 .ph-side-logo:hover { color: var(--color-accent); text-decoration: none; }
-.ph-side-logo.img-logo img { max-height: 24px; max-width: 140px; object-fit: contain; display: block; }
+/* height, not max-height -- a viewBox-only SVG has no intrinsic size to cap and
+   lays out at 0x0. See the note on .sidebar-brand-logo in apple-theme.css. */
+.ph-side-logo.img-logo img { height: 24px; width: auto; max-width: 140px; object-fit: contain; display: block; }
 .ph-side-iconbtn {
     width: 32px; height: 32px; border-radius: 10px;
     border: 0; background: transparent;
