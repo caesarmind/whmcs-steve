@@ -93,7 +93,9 @@ function toggleDarkMode() {
     }
 })();
 
-// Password visibility toggle
+// Password visibility toggle. The icon swap is optional: login variants ship
+// a single static eye SVG, only reset-confirm style buttons carry the
+// .eye-open/.eye-closed pair -- unguarded access threw and killed the toggle.
 document.addEventListener('click', function(e) {
     const btn = e.target.closest('.password-toggle');
     if (!btn) return;
@@ -101,8 +103,10 @@ document.addEventListener('click', function(e) {
     if (input) {
         const isPassword = input.type === 'password';
         input.type = isPassword ? 'text' : 'password';
-        btn.querySelector('.eye-open').style.display = isPassword ? 'none' : 'block';
-        btn.querySelector('.eye-closed').style.display = isPassword ? 'block' : 'none';
+        const eyeOpen = btn.querySelector('.eye-open');
+        const eyeClosed = btn.querySelector('.eye-closed');
+        if (eyeOpen) eyeOpen.style.display = isPassword ? 'none' : 'block';
+        if (eyeClosed) eyeClosed.style.display = isPassword ? 'block' : 'none';
     }
 });
 

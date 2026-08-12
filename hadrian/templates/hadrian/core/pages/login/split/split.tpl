@@ -100,7 +100,7 @@
                     <label class="form-label" for="loginPassword">{$LANG.clientareapassword}</label>
                     <div class="password-wrapper">
                         <input type="password" id="loginPassword" name="password" class="form-input" placeholder="{$hadrianLang.auth.passwordPlaceholder}" autocomplete="current-password" required>
-                        <button type="button" class="password-toggle" aria-label="{$hadrianLang.auth.togglePassword}" data-toggle-pwd>
+                        <button type="button" class="password-toggle" aria-label="{$hadrianLang.auth.togglePassword}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
@@ -143,17 +143,3 @@
     </main>
 
 </div>
-
-{literal}
-<script>
-(function () {
-    document.querySelectorAll('[data-toggle-pwd]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            var input = btn.parentNode.querySelector('input');
-            if (!input) return;
-            input.type = (input.type === 'password') ? 'text' : 'password';
-        });
-    });
-})();
-</script>
-{/literal}
