@@ -1422,8 +1422,12 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
        and gradient fills, which is exactly when this band is saturated.
        Unpainted it is undefined and the band keeps its hardcoded white. The
        eyebrow and sub-line inherit this and dim it with opacity, so they follow
-       without needing their own rule. */
-    color: var(--blk-ink, #fff);
+       without needing their own rule.
+
+       --at-ink takes precedence: --blk-ink is derived from --blk-base, the
+       colour the CELL was painted, and in dark mode the band paints something
+       else -- see the --at-fill block below. */
+    color: var(--at-ink, var(--blk-ink, #fff));
     /* Accent stop at 78%, not the mockup's 55%. MEASURED: the heading runs to
        ~63% of the width, and with the accent at 55% that lands in the pale
        tail where white text falls to 4.17:1 -- fine for the 29px bold title
@@ -1821,6 +1825,43 @@ html[data-theme="dark"] .at-hero[data-at-style="solid"] {
     background: color-mix(in srgb, var(--at-band) 65%, #000);
 }
 html[data-theme="dark"] .at-hero-btn-primary { color: color-mix(in srgb, var(--at-band) 65%, #000); }
+
+/* --- Band ink, derived from what the band ACTUALLY paints ----------------
+   --blk-ink is derived from --blk-base, the colour the CELL was painted. The
+   band is not the cell: the two dark rules above deepen the background 65%
+   toward black without touching --blk-base, so ink derived from the base was
+   computed against a colour that is never on screen. With the shipped dark
+   accent that is not academic -- #2997ff has luminance 0.298, above the
+   0.179129 crossover, so the derivation picks BLACK, while the background it
+   lands on is ~#1b62a6 at luminance 0.117: black measures 3.34:1 there and
+   white 6.28:1.
+
+   --at-fill names the colour the band paints, so the ink follows the surface
+   rather than its ingredient. Light is unchanged -- --at-fill IS --at-band
+   there, so the derivation sees exactly what it saw before.
+
+   NOT done by redeclaring --blk-base on .at-hero: --at-band reads --blk-base
+   on this same element, so setting it here would make the two reference each
+   other and both go invalid-at-computed-value-time.
+
+   Same crossover primitive as .min-section above, and the same reason for the
+   unconditional floor first: custom properties are not parse-validated, so an
+   unsupported color(from ...) would still win and leave `color` inheriting. */
+.at-hero[data-at-style="gradient"],
+.at-hero[data-at-style="solid"] { --at-fill: var(--at-band); --at-ink: #fff; }
+
+html[data-theme="dark"] .at-hero[data-at-style="gradient"],
+html[data-theme="dark"] .at-hero[data-at-style="solid"] {
+    --at-fill: color-mix(in srgb, var(--at-band) 65%, #000);
+}
+
+@supports (color: color(from red srgb-linear r g b)) {
+    .at-hero[data-at-style="gradient"],
+    .at-hero[data-at-style="solid"] {
+        --_atink: clamp(0, (var(--ink-crossover, 0.179129) - (0.2126*r + 0.7152*g + 0.0722*b)) * 100000, 1);
+        --at-ink: color(from var(--at-fill) srgb-linear var(--_atink) var(--_atink) var(--_atink) / 1);
+    }
+}
 
 @media (max-width: 900px) {
     .at-hero { padding: 24px 26px; align-items: flex-start; }
