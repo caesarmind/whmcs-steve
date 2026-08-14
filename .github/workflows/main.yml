@@ -136,10 +136,9 @@ jobs:
   # committed to diff. CI runs the same build you run locally and
   # ships what it produces.
   #
-  # SET REMOTE_LANDING_BASE before the first run. It is deliberately
-  # NOT $REMOTE_BASE: that is the WHMCS billing root, and dropping a
-  # marketing site's index.html on top of it would replace the
-  # client area's own entry point.
+  # REMOTE_LANDING_BASE is deliberately NOT $REMOTE_BASE: that is the
+  # WHMCS billing root, and a marketing index.html on top of it would
+  # sit in front of the client area's own entry point.
   # ================================================================
   deploy-landing:
     runs-on: ubuntu-latest
@@ -147,8 +146,8 @@ jobs:
       REMOTE_HOST: cp2.de.namespace.life
       REMOTE_USER: whymege
       REMOTE_PORT: '22'
-      REMOTE_LANDING_BASE: /home/whymege/CHANGE-ME.hostnodes.com   # <-- the landing docroot
-      LANDING_SITE_URL: https://CHANGE-ME.hostnodes.com/           # <-- canonical + og:url
+      REMOTE_LANDING_BASE: /home/whymege/hadrianthegreat.com
+      LANDING_SITE_URL: https://hadrianthegreat.com/
     steps:
       - uses: actions/checkout@v4
         with:
@@ -214,10 +213,6 @@ jobs:
       - name: Upload dist/
         if: steps.changed.outputs.run == 'yes'
         run: |
-          if echo "$REMOTE_LANDING_BASE" | grep -q 'CHANGE-ME'; then
-            echo "::error::REMOTE_LANDING_BASE is still the placeholder — set it in this workflow."
-            exit 1
-          fi
           SSH="ssh -i $HOME/.ssh/id_ed25519 -p $REMOTE_PORT -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST"
 
           # Whole tree every time, not a diff: dist/ is regenerated from
