@@ -1,0 +1,28 @@
+/* hadrian-imperial.css — Cinzel hero treatment, layered over hadrian-lp5.css */
+.hp-silicon-hero.imperial h1.rom{font-family:'Cinzel',Georgia,serif;font-weight:800;font-size:clamp(38px,7vw,104px);line-height:1;letter-spacing:.035em;text-transform:uppercase;margin:20px 0 0}
+.hp-silicon-hero.imperial h1.rom .rom-2{display:block;font-weight:500;font-size:.42em;letter-spacing:.3em;color:var(--color-accent);margin-top:.22em}
+.hp-silicon-hero.imperial .rom-sub{font-family:'Cinzel',Georgia,serif;font-size:clamp(11px,1.15vw,14.5px);font-weight:600;letter-spacing:.44em;text-transform:uppercase;color:var(--color-text-secondary);margin-top:22px;padding-top:20px;border-top:2px solid var(--color-text-primary);display:inline-block}
+.hp-silicon-hero.imperial .chip{font-family:var(--font)}
+.hp-silicon-hero.imperial .copy{margin-top:24px}
+/* the epithet stack, as cut beneath a name in stone */
+.hp-silicon-hero.imperial .rom-stack{margin:clamp(22px,2.6vw,34px) auto 0;padding-top:clamp(16px,2vw,24px);border-top:2px solid var(--color-text-primary);display:flex;flex-direction:column;gap:8px;max-width:max-content}
+.hp-silicon-hero.imperial .rom-stack div{font-family:'Cinzel',Georgia,serif;font-size:clamp(11px,1.15vw,15px);font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--color-text-secondary)}
+.hp-silicon-hero.imperial .rom-stack div:first-child{color:var(--color-text-primary)}
+.hp-silicon-hero.imperial.sans .rom-stack div{font-family:var(--font);font-weight:700;letter-spacing:.16em}
+@media (max-width:600px){.hp-silicon-hero.imperial .rom-stack div{letter-spacing:.14em}}
+
+/* ── .sans variant: the same imperial structure, the original system font ── */
+.hp-silicon-hero.imperial.sans h1.rom{font-family:var(--font);font-weight:700;letter-spacing:-.035em;text-transform:none;font-size:clamp(42px,7.8vw,116px)}
+.hp-silicon-hero.imperial.sans h1.rom .rom-2{font-family:var(--font);font-weight:600;font-size:.7em;letter-spacing:-.03em;text-transform:none;margin-top:0}
+.hp-silicon-hero.imperial.sans .rom-sub{font-family:var(--font);font-weight:700;font-size:clamp(11px,1.1vw,13px);letter-spacing:.22em}
+/* the page keeps its original heading font too */
+.imperial-page.sans-page .hp-h2,.imperial-page.sans-page .hp-spot h2,.imperial-page.sans-page .hp-founding h2,.imperial-page.sans-page .hp-cta-immersive h2{font-family:var(--font);font-weight:700;letter-spacing:-.035em;text-transform:none}
+.imperial-page.sans-page .hp-h2{font-size:clamp(30px,4vw,56px)}
+.imperial-page.sans-page .hp-spot h2{font-size:clamp(30px,4vw,56px)}
+.imperial-page.sans-page .hp-founding h2{font-size:clamp(30px,3.8vw,54px)}
+.imperial-page.sans-page .hp-eyebrow{font-family:var(--font);letter-spacing:.12em}
+.imperial-page.sans-page .hp-faq-item .q span{font-family:var(--font);font-weight:600;letter-spacing:-.01em}
+
+/* ── Cinzel is reserved for the hero and the wordmark ── */
+.imperial-page:not(.sans-page) .homepage-nav .word,
+.imperial-page:not(.sans-page) .hp-footer .brandcol .word{font-family:'Cinzel',Georgia,serif;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
