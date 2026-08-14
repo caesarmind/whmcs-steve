@@ -195,33 +195,22 @@ const HF_PAGES = [
   { id: 'support', t: 'Support', src: 'supportticketslist.html' },
   { id: 'login', t: 'Login', src: 'login.html', auth: 'out' },
 ];
-/* The dashboard is the one page with more than one design drawn for it, so it
-   gets a second control. Each entry is a real file in ../apple-client-area;
-   picking one swaps the frame's src, which the A/B slot absorbs without a
-   flash. `solo` marks a design that brings its own shell — no partials, so the
-   layout and tone controls have nothing to act on and switch themselves off. */
+/* The four dashboard designs the module ships, and the mockup file each one was
+   drawn as. Names and descriptions are the module's own, straight out of
+   core/pages/clientareahome/<v>/<v>.php, so this list says exactly what the
+   Pages editor says. Picking one swaps the frame src, which the A/B slot
+   absorbs without a flash.
+   (The mockup holds nineteen further explorations, v2-v19 and -boxed. They are
+   not offered here: a buyer cannot choose them.) */
 const HF_DESIGNS = [
-  { id: 'default', t: 'Default', s: 'The shipped dashboard', f: 'clientareahome.html' },
-  { id: 'v19', t: 'v19', s: 'v18’s band, revised', f: 'clientareahome-v19.html' },
-  { id: 'v18', t: 'v18', s: 'Gradient band, four figures, two columns', f: 'clientareahome-v18.html' },
-  { id: 'v17', t: 'v17', s: 'Bento, drawn for a busy account', f: 'clientareahome-v17.html' },
-  { id: 'v16', t: 'v16', s: 'Blocks, with an account card', f: 'clientareahome-v16.html' },
-  { id: 'v15', t: 'v15', s: 'Minimal — greeting, three figures, one list', f: 'clientareahome-v15.html' },
-  { id: 'v15h', t: 'v15 heavy', s: 'The minimal one, fully loaded', f: 'clientareahome-v15-heavy.html' },
-  { id: 'v14', t: 'v14', s: 'Three variations per block, three layouts', f: 'clientareahome-v14.html' },
-  { id: 'v13', t: 'v13', s: 'Real-information blocks, illustrative', f: 'clientareahome-v13.html' },
-  { id: 'v12', t: 'v12', s: 'Landing-style bento, real features only', f: 'clientareahome-v12.html' },
-  { id: 'v11', t: 'v11', s: 'Illustrative bento, landing colours', f: 'clientareahome-v11.html' },
-  { id: 'v10', t: 'v10', s: 'Master–detail, System Settings style', f: 'clientareahome-v10.html' },
-  { id: 'v9', t: 'v9', s: 'Greeting hero and tables', f: 'clientareahome-v9.html' },
-  { id: 'v8', t: 'v8', s: 'Tiles over stacked tables, data first', f: 'clientareahome-v8.html' },
-  { id: 'v7', t: 'v7', s: 'Tabbed data hub', f: 'clientareahome-v7.html' },
-  { id: 'v6', t: 'v6', s: 'Classic two columns and a right rail', f: 'clientareahome-v6.html' },
-  { id: 'v5', t: 'v5', s: 'Activity rings, health summary', f: 'clientareahome-v5.html' },
-  { id: 'v4', t: 'v4', s: 'Spotlight command centre', f: 'clientareahome-v4.html' },
-  { id: 'v3', t: 'v3', s: 'Bento with a health hero', f: 'clientareahome-v3.html' },
-  { id: 'v2', t: 'v2', s: 'Time-aware greeting, one primary action', f: 'clientareahome-v2.html' },
-  { id: 'boxed', t: 'Boxed', s: 'Brings its own shell', f: 'clientareahome-boxed.html', solo: true },
+  { id: 'default', t: 'Default', f: 'clientareahome-v9.html',
+    s: 'The dashboard as it ships: a greeting hero over plain tables.' },
+  { id: 'atrium', t: 'Atrium', f: 'clientareahome-v18.html',
+    s: 'A welcome band over four summary figures, then an asymmetric two-column body: the collections you read down the wide side, the things you act on down the narrow one. Width assigns a block to a column rather than sizing it on a grid, so reordering moves a block within its column.' },
+  { id: 'bento', t: 'Bento', f: 'clientareahome-v17.html',
+    s: 'A bento grid of self-contained cards. Each collection gets its own tile with a count and its rows, arranged two-up on a six-column grid. Adds an attention strip that pulls the few things needing action out of the many rows, and an identity card beside the greeting.' },
+  { id: 'minimal', t: 'Minimal', f: 'clientareahome-v15.html',
+    s: 'A quieter dashboard: greeting, four summary tiles, quick actions, then services, domains, invoices, tickets and announcements as plain rows on one surface. No panel grid or account sub-nav aside.' },
 ];
 const hfDesign = (id) => HF_DESIGNS.find((d) => d.id === id) || HF_DESIGNS[0];
 /* the captures stay on as posters — they cover the first boot, and they are the
@@ -374,12 +363,10 @@ function HeroStage({ dark }) {
   // only the dashboard has more than one design, and one of those brings its own
   // shell — a design with no partials has nothing for layout or tone to act on
   const dsn = pg.designs ? hfDesign(design) : null;
-  const solo = !!(dsn && dsn.solo);
   const src = dsn ? dsn.f : pg.src;
   // a top bar has no side menu to retone, and the login page ships its own chrome
-  const toneable = lay !== 'top' && !solo;
-  const layIds = !CA_EMBEDDABLE ? Object.keys(HF_SHOTS[pg.id] || { side: 1 })
-    : solo ? [] : HF_LAYOUTS.map((l) => l.wire);
+  const toneable = lay !== 'top';
+  const layIds = CA_EMBEDDABLE ? HF_LAYOUTS.map((l) => l.wire) : Object.keys(HF_SHOTS[pg.id] || { side: 1 });
   const layId = layIds.indexOf(lay) === -1 ? (layIds[0] || 'top') : lay;
   const reel = useHFReel({ layIds, layId, setLay, palette, setPalette });
   const state = React.useMemo(() => ({
@@ -403,14 +390,14 @@ function HeroStage({ dark }) {
       </div>
       {pg.designs && (
         <div className="hf-designs">
-          <label className="hf-lbl" htmlFor="hf-design">Dashboard design</label>
-          <span className="hf-select">
-            <select id="hf-design" value={design} onChange={reel.manual((e) => setDesign(e.target.value))}>
-              {HF_DESIGNS.map((d) => <option key={d.id} value={d.id}>{d.t} — {d.s}</option>)}
-            </select>
-            <span className="ic" aria-hidden="true">▾</span>
+          <span className="hf-lbl">Dashboard design</span>
+          <span className="hf-seg" role="tablist" aria-label="Dashboard design">
+            {HF_DESIGNS.map((d) => (
+              <button key={d.id} role="tab" aria-selected={design === d.id}
+                      onClick={reel.manual(() => setDesign(d.id))}>{d.t}</button>
+            ))}
           </span>
-          <span className="hf-designnote">{HF_DESIGNS.length} drawn, all live</span>
+          <p className="hf-designnote">{dsn ? dsn.s : ''}</p>
         </div>
       )}
       <div className="hf-picker" role="tablist" aria-label="Navigation layout">

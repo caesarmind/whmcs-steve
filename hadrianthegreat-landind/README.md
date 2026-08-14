@@ -13,6 +13,17 @@ npx serve -l 3011 .
 
 Then open `/hadrianthegreat-landind/Hadrian Landing Imperial.html`.
 
+To browse the client-area mockups on their own — including the design
+explorations the hero does not offer — serve that folder as its own root:
+
+```bash
+npx serve -l 3066 apple-client-area
+```
+
+Pages are then `/clientareahome-v17` and so on, and because the path carries no
+`.html` there is no clean-URL redirect to strip the query string, so the state
+params work directly: `?layout=side&palette=violet&sidebar=gradient&preview=off`.
+
 Opening the files off disk (`file://`) does not work: the JSX is loaded through
 Babel by XHR, which CORS blocks, and the client-area pages fetch their layout
 partials the same way. The hero falls back to the captures in `screens/` when it
@@ -64,22 +75,28 @@ of it. `ThemeFrame` (hadrian-lp5-frames.jsx) handles it:
 
 ### Dashboard designs
 
-The dashboard is the one page with more than one design drawn for it, so it gets
-a second control: a select listing all 21 (`clientareahome.html`, v2-v19,
-v15-heavy and -boxed), each a real file that loads live. Picking one swaps the
-frame src, which the A/B slot absorbs without a flash. It is a select rather than
-another segmented strip because twenty-one will not sit in a row beside the four
-controls already on the stage.
+The dashboard is the one page with more than one design, so it gets a second
+control: a segmented strip of the four the module ships, with that design's own
+description underneath. Picking one swaps the frame src, which the A/B slot
+absorbs without a flash, and the layout, palette, tone and colour mode carry
+across the swap.
 
-The list is one array, `HF_DESIGNS` in hadrian-lp5-app.jsx — add, reorder or
-prune there. `solo: true` marks a design that brings its own shell rather than
-the layout partials (only -boxed today); the layout picker hides and the tone
-rail disables for those, since there is nothing for them to act on, and the
-showreel falls back to cycling the palette alone.
+Each maps to the mockup file it was drawn as:
 
-Note these are the mockup's design explorations. The shipped module offers four
-dashboard variants — Default, Atrium, Bento and Minimal — so the picker shows
-more than a buyer can choose today.
+| shipped variant | mockup file |
+|---|---|
+| Default | `clientareahome-v9.html` |
+| Atrium  | `clientareahome-v18.html` |
+| Bento   | `clientareahome-v17.html` |
+| Minimal | `clientareahome-v15.html` |
+
+Names and descriptions are lifted verbatim from
+`core/pages/clientareahome/<v>/<v>.php`, so the strip says exactly what the
+Pages editor says. The list is one array, `HF_DESIGNS` in hadrian-lp5-app.jsx.
+
+The mockup holds nineteen further explorations (v2-v19, v15-heavy, -boxed).
+They are deliberately not offered: a buyer cannot choose them. Browse those
+directly on the client-area server instead — see Open.
 
 ### Sidebar tones
 

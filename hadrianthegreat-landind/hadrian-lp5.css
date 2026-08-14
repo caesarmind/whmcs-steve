@@ -95,18 +95,12 @@
 .hf-reel .ic{font-size:8px;line-height:1;letter-spacing:0}
 .hf-reel .prog{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--color-accent);transform-origin:left center;animation:hfProg linear forwards}
 @keyframes hfProg{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-/* dashboard design picker — a select rather than another segmented strip,
-   because twenty-one designs will not sit in a row and this one control has to
-   stay legible next to the four already on the stage */
-.hf-designs{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:14px}
+/* dashboard design picker — four shipped variants, so a segmented strip like
+   the page control, with the module's own description of the active one under it */
+.hf-designs{display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:16px}
 .hf-designs .hf-lbl{padding:0}
-.hf-select{position:relative;display:inline-flex;align-items:center}
-.hf-select select{appearance:none;-webkit-appearance:none;font-family:var(--font);font-size:12.5px;font-weight:650;color:var(--color-text-primary);background:var(--color-surface);border:1px solid var(--color-border);border-radius:999px;padding:7px 30px 7px 14px;cursor:pointer;max-width:min(74vw,420px);text-overflow:ellipsis;transition:border-color .2s var(--ease),box-shadow .2s var(--ease)}
-.hf-select select:hover{border-color:color-mix(in srgb,var(--color-accent) 50%,transparent)}
-.hf-select select:focus-visible{outline:none;border-color:var(--color-accent);box-shadow:0 0 0 3px var(--color-accent-light)}
-.hf-select .ic{position:absolute;right:12px;font-size:10px;color:var(--color-text-tertiary);pointer-events:none}
-.hf-designnote{font-family:var(--font);font-size:11px;color:var(--color-text-quaternary);white-space:nowrap}
-@media (max-width:700px){.hf-designnote{display:none}}
+.hf-designnote{margin:2px auto 0;max-width:62ch;text-align:center;font-family:var(--font);font-size:12px;line-height:1.5;color:var(--color-text-tertiary);text-wrap:pretty;min-height:2.2em}
+@media (max-width:700px){.hf-designnote{font-size:11.5px;padding:0 14px}}
 .hf-picker{display:flex;justify-content:center;gap:clamp(8px,1.2vw,14px);flex-wrap:wrap;margin-top:clamp(16px,2vw,22px)}
 .hf-picker button{font-family:var(--font);background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;padding:9px;cursor:pointer;display:flex;flex-direction:column;align-items:stretch;gap:2px;text-align:left;transition:all .22s var(--ease)}
 .hf-picker button:hover:not(:disabled){transform:translateY(-2px);border-color:color-mix(in srgb,var(--color-accent) 50%,transparent)}
