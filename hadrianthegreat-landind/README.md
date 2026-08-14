@@ -265,13 +265,11 @@ A whole page load is now about 210 KB.
 is gitignored — there is nothing committed to diff. So it runs the same build
 you run locally and ships what comes out.
 
-Two values in that job need setting before the first run, both marked
-`CHANGE-ME`, and the upload step fails loudly rather than deploying to a
-placeholder:
+Two values live in that job:
 
-    REMOTE_LANDING_BASE   the landing docroot on the server
-    LANDING_SITE_URL      canonical and og:url — the build reads this env var
-                          in place of the SITE constant
+    REMOTE_LANDING_BASE   /home/whymege/hadrianthegreat.com
+    LANDING_SITE_URL      https://hadrianthegreat.com/ — canonical and og:url,
+                          read by the build in place of the SITE constant
 
 `REMOTE_LANDING_BASE` is deliberately not `REMOTE_BASE`. That one is the WHMCS
 billing root, and an `index.html` landing on top of it would sit in front of the
