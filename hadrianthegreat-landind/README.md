@@ -232,9 +232,23 @@ unpkg; the only third-party call left is Google Fonts, for Cinzel.
 3. **It works in a subdirectory.** Every path is relative, and the two the app
    resolves at runtime come from `window.HADRIAN_PATHS`, which the build writes
    into each page's `<head>`.
-4. **Still to do before launch:** there is no meta description and no OG tags,
-   so the page previews as nothing when shared, and the body is an empty
-   `#root` until JS runs — a sales page that Google has to execute to read.
+4. **Set `SITE` at the top of the build script** before you upload. The
+   canonical, `og:url` and `og:image` are absolute and cannot be derived from a
+   relative build, so they come from that one constant — and the build prints a
+   NOTE on every run until it stops being the placeholder.
+
+The build also writes the description, Open Graph and Twitter tags, a canonical,
+a favicon and an apple-touch-icon, and generates `assets/og.png` at 1200x630
+from the top of the dashboard capture. Page descriptions live in `META` in the
+build script, one entry per page.
+
+And it puts the hero into `#root` as real markup rather than leaving it empty
+until React mounts — same classes as the JSX, built from the same
+`window.HERO_COPY` the page already declares, so there is one source of truth
+and `createRoot()` simply replaces it. A crawler that runs no JavaScript now
+gets the h1 and every epithet instead of a blank div; a visitor gets the hero a
+few hundred milliseconds sooner. It is not a full prerender — that would want a
+headless browser in the build — but it is the part worth indexing.
 
 The build re-encodes `screens/` on the way out: 2,894 KB of 2880px PNG becomes
 328 KB of 1600px WebP, and the compiled JS is rewritten to match. The captures

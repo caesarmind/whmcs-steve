@@ -46,6 +46,78 @@ const RENAME = {
    page to build. Both maps are applied wherever text is rewritten. */
 const ASSET_RENAME = {};
 
+/* ── what a crawler and a link preview see ────────────────────────────────
+   SET THIS BEFORE LAUNCH. The canonical and og:url have to be absolute, so
+   they cannot be derived from a relative build. */
+const SITE = 'https://caesarthemes.com/hadrian/';   // <-- your URL, with the trailing slash
+const META = {
+  'index.html': {
+    description: 'Hadrian is a WHMCS client area theme: three navigation layouts, six styles, four dashboard designs, a homepage composer, a menu manager and per-page SEO — every one an admin setting, not a template fork.',
+    ogImage: 'assets/og.png',
+  },
+  'about.html': {
+    description: 'Caesarthemes builds WHMCS themes that are configured, not forked. Hadrian is the first: a client area rebuilt around an admin panel rather than a set of files to edit.',
+    ogImage: 'assets/og.png',
+  },
+};
+
+/* The hero copy lives in a script tag in the page, and the static block below
+   has to say the same thing, so it is read from there rather than restated
+   here. Evaluating our own file, not anyone else's input. */
+function heroCopy(html) {
+  const m = html.match(/window\.HERO_COPY\s*=\s*(\{[\s\S]*?\});/);
+  if (!m) return null;
+  try { return new Function(`return ${m[1]}`)(); } catch (e) { return null; }
+}
+
+/* A crawler that does not run JavaScript, and every visitor for the few hundred
+   milliseconds before React mounts, currently gets an empty <div id="root">.
+   This puts the hero in it as real markup, using the same classes the JSX uses,
+   so it renders identically and createRoot() simply replaces it on mount. Not a
+   full prerender -- that would want a headless browser in the build -- but it is
+   the part of the page worth indexing. */
+function staticHero(copy) {
+  if (!copy) return '';
+  const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const stack = (copy.stack || []).map((t) => `<div>${esc(t)}</div>`).join('');
+  return `<header class="hp-silicon-hero${copy.cls ? ' ' + copy.cls : ''}">
+<div class="hp-wrap" style="text-align:center">
+<div class="chip">${esc(copy.chip)}</div>
+<h1 class="rom">${esc(copy.line1)}<br><span class="rom-2">${esc(copy.line2)}</span></h1>
+${stack ? `<div class="rom-stack">${stack}</div>` : ''}
+<p class="copy">${esc(copy.copy)}</p>
+</div>
+</header>`;
+}
+
+function seoTags(out, html, copy) {
+  const m = META[out];
+  if (!m) return '';
+  const title = (html.match(/<title>([^<]*)<\/title>/) || [, ''])[1];
+  const url = SITE + (out === 'index.html' ? '' : out);
+  const img = SITE + m.ogImage;
+  const t = (name, content, prop) => `<meta ${prop ? 'property' : 'name'}="${name}" content="${content.replace(/"/g, '&quot;')}">`;
+  return [
+    `<link rel="canonical" href="${url}">`,
+    t('description', m.description),
+    t('theme-color', '#0071e3'),
+    t('og:type', 'website', true),
+    t('og:site_name', 'Caesarthemes', true),
+    t('og:title', title, true),
+    t('og:description', m.description, true),
+    t('og:url', url, true),
+    t('og:image', img, true),
+    t('og:image:width', '1200', true),
+    t('og:image:height', '630', true),
+    t('twitter:card', 'summary_large_image'),
+    t('twitter:title', title),
+    t('twitter:description', m.description),
+    t('twitter:image', img),
+    `<link rel="icon" href="assets/favicon.png" sizes="any">`,
+    `<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">`,
+  ].join('\n');
+}
+
 const REACT = [
   ['react.production.min.js', 'https://unpkg.com/react@18.3.1/umd/react.production.min.js'],
   ['react-dom.production.min.js', 'https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js'],
@@ -112,13 +184,16 @@ function applyRenames(text) {
   }
   return text;
 }
-function rewriteHtml(html, jsName) {
+function rewriteHtml(html, jsName, outName) {
   const scripts = REACT.map(([f]) => `<script src="assets/${f}"></script>`).join('\n');
   html = html
     .replace(RE_CDN, '')
     .replace(RE_BABEL, '')
     .replace(/<link rel="stylesheet" href="([^"]+)">/g, '<link rel="stylesheet" href="assets/$1">')
-    .replace('</head>', `<script>window.HADRIAN_PATHS = ${JSON.stringify(PATHS)};</script>\n</head>`)
+    .replace('</head>', `${seoTags(outName, html, heroCopy(html))}
+<script>window.HADRIAN_PATHS = ${JSON.stringify(PATHS)};</script>
+</head>`)
+    .replace('<div id="root"></div>', `<div id="root">${staticHero(heroCopy(html))}</div>`)
     .replace('</body>', `${scripts}\n<script src="assets/${jsName}"></script>\n</body>`);
   return applyRenames(html);
 }
@@ -177,13 +252,39 @@ const pages = Object.keys(RENAME).map((file) => {
 for (const p of pages) {
   const jsName = p.out.replace(/\.html$/, '.js');
   fs.writeFileSync(path.join(OUT, 'assets', jsName), applyRenames(compile(p.jsx)));
-  fs.writeFileSync(path.join(OUT, p.out), rewriteHtml(p.html, jsName));
+  fs.writeFileSync(path.join(OUT, p.out), rewriteHtml(p.html, jsName, p.out));
   say(`${p.out.padEnd(12)} ${p.jsx.length} jsx -> assets/${jsName}  ${kb(sizeOf(path.join(OUT, 'assets', jsName)))}`);
 }
 
 // css and images travel as they are
 for (const f of fs.readdirSync(SRC)) {
   if (/\.(css|png|jpe?g|svg|webp|ico)$/i.test(f)) copy(path.join(SRC, f), path.join(OUT, 'assets', f));
+}
+
+
+/* ── the share image and the icons ────────────────────────────────────────
+   og:image wants 1200x630; the captures are tall, so this takes the top of
+   the sidebar dashboard, which is the part with the greeting and the figures.
+   The icons come from the brand mark. All three go through the encoder that
+   is already here, and are skipped with a note if it cannot be reached. */
+{
+  const shot = path.join(SRC, 'screens', 'sidebar-dashboard.png');
+  const mark = path.join(SRC, 'caesar-silhouette.png');
+  const jobs = [
+    ['og.png', shot, ['resize', '1200', '630', '--position', 'top', '--fit', 'cover']],
+    ['favicon.png', mark, ['resize', '64', '64', '--fit', 'contain', '--background', '#ffffff']],
+    ['apple-touch-icon.png', mark, ['resize', '180', '180', '--fit', 'contain', '--background', '#ffffff']],
+  ];
+  const made = [];
+  for (const [name, src, args] of jobs) {
+    const dest = path.join(OUT, 'assets', name);
+    try {
+      execFileSync('npx', ['--yes', 'sharp-cli', '-i', `"${src}"`, '-o', `"${dest}"`, '-f', 'png', ...args],
+        { stdio: 'ignore', shell: true, timeout: 180000 });
+      if (fs.existsSync(dest)) made.push(`${name} ${kb(sizeOf(dest))}`);
+    } catch (e) { /* noted below */ }
+  }
+  say(made.length ? `assets/      ${made.join(' · ')}` : 'assets/      og image and icons SKIPPED (encoder unavailable)');
 }
 
 // React, fetched once and served from your own domain
@@ -224,6 +325,16 @@ say('apple-client-area/ and hadrian-admin-panel/ copied');
 
 /* Walked in Node rather than shelled out to du, for the same reason the
    compile reads stdin: a path with a space in it does not survive a shell. */
+
+/* The canonical and og:url are absolute and cannot be derived, so they are a
+   constant at the top of this file -- which means they are also the easiest
+   thing to ship wrong. Say so on every build until it is changed. */
+if (SITE === 'https://caesarthemes.com/hadrian/') {
+  console.log('  NOTE  SITE is still the placeholder URL. canonical, og:url and og:image');
+  console.log('        point at https://caesarthemes.com/hadrian/ — set SITE at the top of');
+  console.log('        this script to wherever this is actually going, then rebuild.');
+}
+
 const weigh = (dir) => fs.readdirSync(dir, { withFileTypes: true })
   .reduce((n, e) => n + (e.isDirectory() ? weigh(path.join(dir, e.name)) : sizeOf(path.join(dir, e.name))), 0);
 console.log(`
