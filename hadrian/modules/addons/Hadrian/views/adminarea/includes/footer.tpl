@@ -125,7 +125,11 @@
     function shade(rgb, p){ return [0, 1, 2].map(function(i){ var c = rgb[i]; return clamp(p >= 0 ? c + (255 - c) * p : c * (1 + p)); }); }
     function rgba(rgb, a){ return 'rgba(' + clamp(rgb[0]) + ',' + clamp(rgb[1]) + ',' + clamp(rgb[2]) + ',' + a + ')'; }
 
-    function textFor(name){ return form.querySelector('input.mt-color-text[data-var="' + name + '"]'); }
+    /* `input.mt-color-text` OR `select.mt-color-text`. Not every token in the
+       schema is a colour -- the Gradient direction is a select -- and a row that
+       this cannot find is a row the style chips silently fail to write and the
+       scope switch silently fails to swap, with nothing anywhere saying so. */
+    function textFor(name){ return form.querySelector('.mt-color-text[data-var="' + name + '"]'); }
     function swatchFor(name){ return form.querySelector('input.mt-color-swatch-input[data-for="' + name + '"]'); }
     // The scope you are NOT looking at, carried in a hidden twin of every row.
     function otherFor(name){ return form.querySelector('input.mt-color-other[data-var="' + name + '"]'); }
@@ -578,16 +582,69 @@
         sbt.addEventListener('click', function(e){
             var b = e.target.closest('.mt-sbt-mode'); if (b) sbApply(b);
         });
+        /* WHICH STYLE IS IN FORCE is a property of the saved values, not of the
+           markup. It used to be hardcoded onto the Light chip, so every reload
+           claimed Light: the colours applied correctly on the site while the
+           panel disagreed with itself, which reads as "my save was lost".
+
+           Compare, not guess. A chip is active when EVERY token it would write
+           already equals what the field holds -- both scopes, since a style
+           fills both and matching one alone would call a half-applied style
+           active. Resolution goes through sbResolve, the same path sbApply
+           writes with, so a color-mix() recipe and a stored literal are compared
+           as the same colour rather than as two different strings.
+
+           Nothing matching is a real answer and stays unmarked: a buyer who
+           hand-edited one row is not on any style, and lighting a chip up would
+           claim their edit away. Light is the exception -- it IS the defaults,
+           so it matches when every row the styles touch sits at its default. */
+        function sbDetectActive(){
+            var modes = [].slice.call(sbt.querySelectorAll('.mt-sbt-mode'));
+            var same = function(a, b){
+                return String(a || '').trim().toLowerCase().replace(/\s+/g, '')
+                    === String(b || '').trim().toLowerCase().replace(/\s+/g, '');
+            };
+            var matches = function(json, other){
+                if (!json) return true;              // no set for this scope -> nothing to contradict
+                var map; try { map = JSON.parse(json); } catch (e) { return false; }
+                return Object.keys(map).every(function(v){
+                    var el = other ? otherFor(v) : textFor(v);
+                    if (!el) return true;            // row not on the page (hidden scope) -> ignore
+                    var lit = sbResolve(map[v], other);
+                    return lit ? same(el.value, lit) : true;
+                });
+            };
+            var hit = null;
+            modes.forEach(function(b){
+                if (hit || b.getAttribute('data-sbt-mode') === 'off') return;
+                if (matches(b.getAttribute('data-sbt-tokens'), false)
+                 && matches(b.getAttribute('data-sbt-tokens-other'), true)) { hit = b; }
+            });
+            if (!hit) {
+                // Light: every row the styles touch is at its default.
+                var allDefault = Object.keys(sbRows).every(function(v){
+                    var t = textFor(v);
+                    return !t || same(t.value, t.getAttribute('data-default'));
+                });
+                if (allDefault) { hit = modes[0]; }
+            }
+            modes.forEach(function(b){ b.classList.toggle('is-active', b === hit); });
+        }
+
         sbtRefresh = sbPaintDots;
         /* Delegated, because the Accent changes without its own field ever
            firing input: the swatch handler assigns .value directly and the
            generator writes through setToken. Repainting five dots is free. */
         form.addEventListener('input', sbPaintDots);
         if (reset) reset.addEventListener('click', function(){
-            [].slice.call(sbt.querySelectorAll('.mt-sbt-mode')).forEach(function(b){
-                b.classList.remove('is-active'); });
+            /* Re-derive rather than blank. "Restore defaults" puts every row
+               back to its default, which IS the Light style -- clearing all the
+               chips left the control claiming no style at all. Deferred a tick
+               so it reads the fields the reset handler has just written. */
+            setTimeout(sbDetectActive, 0);
         });
         sbPaintDots();
+        sbDetectActive();
     }
     function fieldVal(name){ var t = textFor(name); return t ? t.value : ''; }
 

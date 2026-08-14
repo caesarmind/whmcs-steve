@@ -132,6 +132,7 @@
        shows until the style is picked. They are COLOURS, not a gradient value,
        because Hooks::isColorValue rejects linear-gradient() on save and on
        emit -- see the note beside 'gradient' in core/config/colors.php. */
+    --sidebar-grad-angle: 180deg;
     --sidebar-grad-from: rgba(0, 0, 0, 0);
     --sidebar-grad-to: rgba(0, 0, 0, 0);
     /* Private aliases for the two interactive fills. --sidebar-item-hover and
@@ -468,6 +469,7 @@ html[data-theme="dark"] {
        shows until the style is picked. They are COLOURS, not a gradient value,
        because Hooks::isColorValue rejects linear-gradient() on save and on
        emit -- see the note beside 'gradient' in core/config/colors.php. */
+    --sidebar-grad-angle: 180deg;
     --sidebar-grad-from: rgba(0, 0, 0, 0);
     --sidebar-grad-to: rgba(0, 0, 0, 0);
     /* Same values as light on purpose -- the accent stays saturated in dark

@@ -148,7 +148,12 @@
         {if $groupName == $colors.navGroup && $colors.sbStyles}
         <div class="mt-schemes mt-sbt" data-sbt>
             <span class="mt-sbt-lab">Style</span>
-            <button type="button" class="mt-scheme mt-sbt-mode is-active" data-sbt-mode="off">
+            {* No is-active here. Which style is in force is a property of the
+               SAVED VALUES, not of the markup, and hardcoding it on Light meant
+               every reload claimed Light no matter what was stored -- the values
+               applied correctly on the site while the panel said otherwise.
+               sbDetectActive() in footer.tpl marks the right one on load. *}
+            <button type="button" class="mt-scheme mt-sbt-mode" data-sbt-mode="off">
                 <span class="mt-scheme-dot mt-sbt-dot"></span>Light</button>
             {foreach $colors.sbStyles as $sbKey => $sb}
             {* data-sbt-tokens carries the style's whole token set as JSON, and
@@ -176,7 +181,23 @@
                    and announced -- a title on a bare span is neither. The text
                    is still colors.php's `hint`, so nothing was rewritten to fit
                    a smaller space; it simply stopped occupying one. *}
-                <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">{$t.label|escape}{if $t.hint|default:''}<button type="button" class="mt-info" tabindex="0" aria-label="About {$t.label|escape}" title="{$t.hint|escape}">i</button>{/if}</label>
+                {* The hint used to be a .mt-info button carrying a native title=,
+                   sitting INSIDE this label. Two things wrong with that, and
+                   includes/tip.tpl names both in its own docblock:
+                     - a button inside <label for=...> inherits the label's
+                       activation, so clicking the icon opened the colour picker
+                       instead of the tip;
+                     - a native title= is not the admin's tooltip. Every other
+                       panel uses .mt-tip + data-tip, drawn by the ONE body-level
+                       popup in footer.tpl, which appears immediately and is
+                       styled; title= waits on the browser's own delay and looks
+                       like nothing happened.
+                   So the trigger moves OUT of the label and onto the shared
+                   partial. .mt-tip-line keeps the two on one row. *}
+                <span class="mt-tip-line">
+                    <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">{$t.label|escape}</label>
+                    {if $t.hint|default:''}{include file="includes/tip.tpl" text=$t.hint}{/if}
+                </span>
                 {* The swatch is a PAINTED LABEL with the native picker hidden
                    inside it at opacity 0, as the demo draws it. A bare
                    input[type=color] can only ever show an opaque hex, so the
@@ -189,6 +210,29 @@
                    a black chip: --sidebar-color's whole contract is that empty
                    means off, and toHexInput() turning '' into #000000 made the
                    one row that means "nothing" read as "black is set". *}
+                {* A row whose value is NOT a colour. Only the Gradient direction so
+                   far: a swatch and a hex field would both be nonsense for it,
+                   and a free-text box would invite values the save path is
+                   right to reject. The options come from colors.php, so this
+                   template holds no second copy of them.
+
+                   It keeps the SAME field names and data-var as a colour row --
+                   c[--token], data-var, and the hidden o[] twin -- so every
+                   mechanism built around those keeps working on it unchanged:
+                   the scope switch swaps it, the style chips write it, Save
+                   persists it, and saveColorsAction still drops it when it
+                   equals its default. Only the control is different. *}
+                {if ($t.type|default:'') == 'select' && $t.options|default:false}
+                <span class="mt-color-control mt-color-control-select">
+                    <select id="c{$t.var|replace:'--':'_'}" name="c[{$t.var}]" data-var="{$t.var|escape}"
+                            class="mt-input mt-color-text" data-default="{$t.default|escape}">
+                        {foreach $t.options as $optVal => $optLabel}
+                        <option value="{$optVal|escape}"{if $t.value == $optVal} selected{/if}>{$optLabel|escape}</option>
+                        {/foreach}
+                    </select>
+                    <input type="hidden" name="o[{$t.var}]" class="mt-color-other" data-var="{$t.var|escape}" value="{$t.other|escape}" data-default="{$t.otherDef|escape}">
+                </span>
+                {else}
                 <span class="mt-color-control">
                     <label class="mt-color-swatch{if $t.value == ''} is-empty{/if}" title="Open colour picker"{if $t.value != ''} style="background:{$t.value|escape}"{/if}>
                         <input type="color" class="mt-color-swatch-input" value="{$t.hex|escape}" data-for="{$t.var|escape}" aria-label="{$t.label|escape} picker">
@@ -203,6 +247,7 @@
                        defaults, so no reload and nothing unsaved is lost. *}
                     <input type="hidden" name="o[{$t.var}]" class="mt-color-other" data-var="{$t.var|escape}" value="{$t.other|escape}" data-default="{$t.otherDef|escape}">
                 </span>
+                {/if}
             </div>
             {/foreach}
         </div>

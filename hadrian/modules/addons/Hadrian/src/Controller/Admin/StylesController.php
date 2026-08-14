@@ -490,6 +490,32 @@ final class StylesController extends AbstractController
         $this->redirect('?module=Hadrian&action=editStyle&style=' . urlencode($style) . '&tab=custom-css&css_saved=1');
     }
 
+    /**
+     * Tokens whose value is NOT a colour, and the shape each one accepts.
+     *
+     * The colour pipeline is deliberately narrow -- isColor/isColorValue take
+     * hex and comma-form rgb/rgba/hsl/hsla and nothing else -- because it is
+     * writing values straight into a <style> block. That narrowness is why the
+     * Gradient nav style stores two colour STOPS and composes the gradient in
+     * CSS rather than storing `linear-gradient(...)`, which would be dropped
+     * silently on save and again on emit.
+     *
+     * The direction cannot be expressed as a colour at all, so it gets an
+     * entry here instead of a hole in the validator: an angle in whole degrees,
+     * nothing else. Keep this list short and each pattern anchored -- every key
+     * added is a value that reaches a stylesheet without the colour check.
+     */
+    private const NON_COLOR_TOKENS = [
+        '--sidebar-grad-angle' => '/^\d{1,3}deg$/',
+    ];
+
+    /** True when $var is a declared non-colour token AND $v fits its shape. */
+    private function isNonColorToken(string $var, string $v): bool
+    {
+        $pat = self::NON_COLOR_TOKENS[$var] ?? null;
+        return $pat !== null && (bool)preg_match($pat, trim($v));
+    }
+
     /** Accept a hex (#rgb/#rgba/#rrggbb/#rrggbbaa) or rgb()/rgba()/hsl()/hsla() value. */
     private function isColor(string $v): bool
     {
@@ -612,7 +638,8 @@ final class StylesController extends AbstractController
                         continue;
                     }
                     $val = trim((string)$declared[$var]);
-                    if ($val === '' || !$this->isColor($val)) {
+                    if ($val === ''
+                        || (!$this->isColor($val) && !$this->isNonColorToken($var, $val))) {
                         continue;
                     }
                     $default = (string)($t[$scope] ?? $t['light'] ?? '');
@@ -839,7 +866,8 @@ final class StylesController extends AbstractController
                         continue;
                     }
                     $val = trim((string)$in[$var]);
-                    if ($val === '' || !$this->isColor($val)) {
+                    if ($val === ''
+                        || (!$this->isColor($val) && !$this->isNonColorToken($var, $val))) {
                         continue;
                     }
                     $default = (string)($t[$mode] ?? $t['light'] ?? '');

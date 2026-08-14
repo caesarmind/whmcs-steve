@@ -385,6 +385,10 @@ return [
             // shows. Every OTHER nav style resets these two, or a gradient
             // picked once would survive underneath a later Brand or Dark.
             ['var' => '--sidebar-grad-from',      'label' => 'Gradient top',       'light' => 'rgba(0,0,0,0)',          'dark' => 'rgba(0,0,0,0)',       'hint' => 'Top stop of the Gradient nav style. Transparent means no gradient -- the panel is the flat Sidebar background above.'],
+            // Direction. NOT a colour, so it rides the NON_COLOR_TOKENS escape
+            // hatch in Hooks/StylesController -- whole degrees only, anchored.
+            // 180deg is top-to-bottom, which is the shipped gradient.
+            ['var' => '--sidebar-grad-angle',     'label' => 'Gradient direction', 'light' => '180deg',                 'dark' => '180deg',              'type' => 'select', 'options' => ['180deg' => 'Top to bottom', '0deg' => 'Bottom to top', '135deg' => 'Diagonal', '90deg' => 'Left to right', '270deg' => 'Right to left'], 'hint' => 'Which way the Gradient nav style runs. Only has an effect while that style is picked -- with no gradient there is nothing to point.'],
             ['var' => '--sidebar-grad-to',        'label' => 'Gradient bottom',    'light' => 'rgba(0,0,0,0)',          'dark' => 'rgba(0,0,0,0)',       'hint' => 'Bottom stop. Set both to see a gradient; the Gradient style sets them for you from the accent.'],
             ['var' => '--topbar-bg',              'label' => 'Topbar background',  'light' => 'rgba(251,251,253,0.72)', 'dark' => 'rgba(44,44,46,0.72)', 'hint' => 'Also translucent -- keep some alpha or the frost effect is lost.'],
         ],

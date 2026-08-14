@@ -674,7 +674,8 @@ final class Hooks
                 if (!preg_match('/^--[a-z0-9-]+$/', $var)) {
                     continue;
                 }
-                if (!$this->isColorValue((string)$val)) {
+                if (!$this->isColorValue((string)$val)
+                    && !$this->isNonColorToken((string)$var, (string)$val)) {
                     continue;
                 }
                 $decls .= $var . ':' . trim((string)$val) . ';';
@@ -1033,6 +1034,32 @@ final class Hooks
     }
 
     /** Re-validate a stored color before emitting (defense-in-depth vs CSS injection). */
+    /**
+     * Tokens whose value is NOT a colour, and the shape each one accepts.
+     *
+     * The colour pipeline is deliberately narrow -- isColor/isColorValue take
+     * hex and comma-form rgb/rgba/hsl/hsla and nothing else -- because it is
+     * writing values straight into a <style> block. That narrowness is why the
+     * Gradient nav style stores two colour STOPS and composes the gradient in
+     * CSS rather than storing `linear-gradient(...)`, which would be dropped
+     * silently on save and again on emit.
+     *
+     * The direction cannot be expressed as a colour at all, so it gets an
+     * entry here instead of a hole in the validator: an angle in whole degrees,
+     * nothing else. Keep this list short and each pattern anchored -- every key
+     * added is a value that reaches a stylesheet without the colour check.
+     */
+    private const NON_COLOR_TOKENS = [
+        '--sidebar-grad-angle' => '/^\d{1,3}deg$/',
+    ];
+
+    /** True when $var is a declared non-colour token AND $v fits its shape. */
+    private function isNonColorToken(string $var, string $v): bool
+    {
+        $pat = self::NON_COLOR_TOKENS[$var] ?? null;
+        return $pat !== null && (bool)preg_match($pat, trim($v));
+    }
+
     private function isColorValue(string $v): bool
     {
         $v = trim($v);
