@@ -215,7 +215,7 @@
         // Sidebar tone (light / dark / tinted — retones the side menu only)
         var sidebarButtons = document.querySelectorAll('.state-chip [data-sidebar-set]');
         function applySidebar(tone) {
-            if (['light', 'dark', 'tinted', 'graphite', 'brand'].indexOf(tone) === -1) tone = 'light';
+            if (['light', 'dark', 'tinted', 'graphite', 'brand', 'gradient'].indexOf(tone) === -1) tone = 'light';
             if (tone === 'light') {
                 body.removeAttribute('data-sidebar');
             } else {
@@ -380,6 +380,93 @@
         ].forEach(function (cfg) {
             if (document.querySelector(cfg.selector)) return;
             var btn = document.querySelector('.state-chip ' + cfg.pickerAttr);
+            var group = btn && btn.closest('.chip-group');
+            if (group) group.style.display = 'none';
+        });
+
+        // ── Brand logo ─────────────────────────────────────────
+        // Swap the "Hostnodes" text wordmark for the real Hadrian logo wherever
+        // a brand appears. Done here rather than in ~150 page files so every
+        // mockup picks it up from one place, and so the partials (sidebar, rail)
+        // are already in the DOM by the time it runs.
+        (function () {
+            var SRC = 'img/branding/hadrian-logo.png';
+            function mark() {
+                var el = document.createElement('img');
+                el.className = 'brand-logo';
+                el.src = SRC;
+                el.alt = 'Hadrian';
+                return el;
+            }
+            function swap(el, keepClass) {
+                if (!el || el.querySelector('.brand-logo')) return;
+                el.textContent = '';
+                /* the deployed theme marks an image brand as .img-logo (which
+                   drops the text logo's padding), so mirror that here */
+                if (!keepClass) { el.classList.remove('text-logo'); el.classList.add('img-logo'); }
+                el.appendChild(mark());
+            }
+            [].slice.call(document.querySelectorAll('.nav-logo.text-logo')).forEach(function (a) { swap(a); });
+            swap(document.querySelector('.sidebar-brand'), true);
+            // the rail carries the mark only; CSS crops the wordmark away
+            var rail = document.querySelector('.ph-rail-logo');
+            if (rail && !rail.querySelector('.brand-logo')) { rail.innerHTML = ''; rail.appendChild(mark()); }
+        })();
+
+        // ── Simple body-attribute toggles ──────────────────────
+        // Chip groups whose whole job is to flip one attribute on <body>; the
+        // CSS does the rest. Wiring them here is what makes them clickable --
+        // without it the buttons render but nothing listens, which reads as a
+        // broken control. Each entry:
+        //   set   - the data-*-set attribute on the buttons
+        //   attr  - the body attribute its CSS keys off
+        //   def   - fallback when the page sets no default and nothing is saved
+        //   key   - localStorage key, or null for page-scoped (not persisted)
+        //   needs - selector the page must contain, else the group is hidden
+        [
+            { set: 'header',      attr: 'data-header',       def: 'light',   key: 'hn.header' },
+            { set: 'mintitle',    attr: 'data-min-title',    def: 'outside', key: 'hn.minTitle', needs: '.min-section' },
+            { set: 'sidebarlogo', attr: 'data-sidebar-logo', def: 'show',    key: 'hn.sidebarLogo' },
+            { set: 'boxsidebar',  attr: 'data-box-sidebar',  def: 'show',    key: null },
+            { set: 'boxframe',    attr: 'data-box-frame',    def: 'card',    key: null },
+            { set: 'status',      attr: 'data-status',       def: 'active',  key: 'hn.status' }
+        ].forEach(function (cfg) {
+            var buttons = document.querySelectorAll('.state-chip [data-' + cfg.set + '-set]');
+            if (!buttons.length) return;
+            var group = buttons[0].closest('.chip-group');
+            // nothing on this page responds to it, so don't offer a dead control
+            if (cfg.needs && !document.querySelector(cfg.needs)) {
+                if (group) group.style.display = 'none';
+                return;
+            }
+            var valid = [];
+            buttons.forEach(function (b) { valid.push(b.getAttribute('data-' + cfg.set + '-set')); });
+            function apply(v) {
+                if (valid.indexOf(v) === -1) v = cfg.def;
+                // always written, never removed: some CSS matches the default
+                // value explicitly (body[data-status="active"]), so dropping the
+                // attribute on the default would silently unstyle the page
+                body.setAttribute(cfg.attr, v);
+                buttons.forEach(function (b) {
+                    b.classList.toggle('active', b.getAttribute('data-' + cfg.set + '-set') === v);
+                });
+                if (cfg.key) { try { localStorage.setItem(cfg.key, v); } catch (e) {} }
+            }
+            // the page's own attribute wins over the shared default, so a page
+            // can ship its own starting state (box sidebar, service status)
+            var saved = null;
+            if (cfg.key) { try { saved = localStorage.getItem(cfg.key); } catch (e) {} }
+            apply(params.get(cfg.set) || saved || body.getAttribute(cfg.attr) || cfg.def);
+            buttons.forEach(function (b) {
+                b.addEventListener('click', function () { apply(this.getAttribute('data-' + cfg.set + '-set')); });
+            });
+        });
+
+        // Retired controls: these two shipped in the chip partial but never had
+        // any CSS or JS behind them on any page, so they were permanently dead
+        // buttons. Hide them rather than leave something unclickable on show.
+        ['[data-blkstyle-set]', '[data-layoutmap-set]'].forEach(function (sel) {
+            var btn = document.querySelector('.state-chip ' + sel);
             var group = btn && btn.closest('.chip-group');
             if (group) group.style.display = 'none';
         });

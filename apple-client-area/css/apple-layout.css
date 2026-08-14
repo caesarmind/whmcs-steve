@@ -73,6 +73,32 @@ body[data-layout="top"] .ph-main-wrap .content-area {
 /* Rail panel overlays content on hover — does NOT shift main wrap */
 body:not([data-layout="top"]) { background: var(--color-bg); }
 
+/* -- Full-bleed marketing pages (store landings) ----------- */
+/* The hp-* marketing sections are built to span the viewport with their
+   backgrounds reaching the screen edges, each capping its own inner content
+   (like the apple-client-area mockups, where <body> is display:block). The
+   standard .content-area (max-width + 48px gutter) traps them at the column
+   width, so on wide screens a section's coloured background stops short of
+   both edges. For these pages drop the cap + side gutter so backgrounded
+   sections bleed edge-to-edge; re-cap the non-section blocks (the theme
+   page-header + the when-empty card) that still want the centred column.
+   data-bleed is emitted server-side for store pages EXCEPT order/not-found
+   (header.tpl) -- those keep the normal boxed content column. */
+body[data-bleed="1"] .ph-main-wrap .content-area {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+body[data-bleed="1"] .content-area > .page-header,
+body[data-bleed="1"] .content-area > .when-empty {
+    max-width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 22px;
+    padding-right: 22px;
+    box-sizing: border-box;
+}
+
 /* ── Dev preview chip / options tab ───────────────────────── */
 /* Top-center floating, draggable. Drag by the "preview" tag on
    the left; double-click the tag to snap back to default. */
@@ -213,9 +239,14 @@ html[data-palette="slate"]   .sidebar-avatar { background: linear-gradient(135de
    sidebar is already dark, so the tone toggle is a no-op there. */
 
 /* Dark family (Dark + Graphite) — shared light-on-dark treatment; only
-   --sidebar-bg differs per tone (set just below). */
+   --sidebar-bg differs per tone (set just below). The icon rail and its
+   flyout panel read the same tokens, so every tone covers all three. */
 html:not([data-theme="dark"]) body[data-sidebar="dark"] .sidebar,
-html:not([data-theme="dark"]) body[data-sidebar="graphite"] .sidebar {
+html:not([data-theme="dark"]) body[data-sidebar="graphite"] .sidebar,
+html:not([data-theme="dark"]) body[data-sidebar="dark"] .ph-rail,
+html:not([data-theme="dark"]) body[data-sidebar="graphite"] .ph-rail,
+html:not([data-theme="dark"]) body[data-sidebar="dark"] .ph-rail-panel,
+html:not([data-theme="dark"]) body[data-sidebar="graphite"] .ph-rail-panel {
     --sidebar-item-hover: rgba(255, 255, 255, 0.06);
     --sidebar-item-active: rgba(255, 255, 255, 0.10);
     --sidebar-icon-bg: #3a3a3c;
@@ -225,22 +256,39 @@ html:not([data-theme="dark"]) body[data-sidebar="graphite"] .sidebar {
     --color-text-quaternary: #6e6e73;
     --color-border: rgba(255, 255, 255, 0.10);
     --color-surface-secondary: rgba(255, 255, 255, 0.08);
+    /* --color-section-label is declared once on :root as a mix of the accent
+       and the ROOT tertiary grey, so it resolves there and is merely inherited
+       here — remapping --color-text-tertiary on the menu never reaches it. On a
+       solid accent field that left the SERVICES / DOMAINS headers at 1.05:1,
+       which is invisible. Each tone therefore restates it in its own ink. */
+    --color-section-label: rgba(255, 255, 255, 0.66);
 }
-html:not([data-theme="dark"]) body[data-sidebar="dark"] .sidebar     { --sidebar-bg: rgba(28, 28, 30, 0.85); }   /* warm near-black */
-html:not([data-theme="dark"]) body[data-sidebar="graphite"] .sidebar { --sidebar-bg: rgba(33, 37, 46, 0.94); }   /* cool blue-gray */
+html:not([data-theme="dark"]) body[data-sidebar="dark"] .sidebar,
+html:not([data-theme="dark"]) body[data-sidebar="dark"] .ph-rail,
+html:not([data-theme="dark"]) body[data-sidebar="dark"] .ph-rail-panel     { --sidebar-bg: rgba(28, 28, 30, 0.85); }   /* warm near-black */
+html:not([data-theme="dark"]) body[data-sidebar="graphite"] .sidebar,
+html:not([data-theme="dark"]) body[data-sidebar="graphite"] .ph-rail,
+html:not([data-theme="dark"]) body[data-sidebar="graphite"] .ph-rail-panel { --sidebar-bg: rgba(33, 37, 46, 0.94); }   /* cool blue-gray */
 
 /* Tinted — a soft wash of the active accent palette, still a light menu. */
-html:not([data-theme="dark"]) body[data-sidebar="tinted"] .sidebar {
+html:not([data-theme="dark"]) body[data-sidebar="tinted"] .sidebar,
+html:not([data-theme="dark"]) body[data-sidebar="tinted"] .ph-rail,
+html:not([data-theme="dark"]) body[data-sidebar="tinted"] .ph-rail-panel {
     --sidebar-bg: color-mix(in srgb, var(--color-accent) 10%, #ffffff);
     --sidebar-item-hover: color-mix(in srgb, var(--color-accent) 14%, transparent);
     --sidebar-item-active: color-mix(in srgb, var(--color-accent) 22%, transparent);
     --color-border: color-mix(in srgb, var(--color-accent) 16%, #ffffff);
+    --color-section-label: color-mix(in srgb, var(--color-accent) 42%, #3a3a3c);
 }
 
 /* Brand — bold solid-accent menu, follows the active palette. Icon tiles
    collapse to frosted-white so they don't clash with the colored field. */
-html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar {
-    --sidebar-bg: var(--color-accent);
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .sidebar,
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail,
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail-panel ,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail-panel {
     --sidebar-item-hover: rgba(255, 255, 255, 0.14);
     --sidebar-item-active: rgba(255, 255, 255, 0.22);
     --color-text-primary: #ffffff;
@@ -249,15 +297,215 @@ html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar {
     --color-text-quaternary: rgba(255, 255, 255, 0.55);
     --color-border: rgba(255, 255, 255, 0.20);
     --color-surface-secondary: rgba(255, 255, 255, 0.16);
+    /* Opaque, not a soft alpha: --sb-top is solved so that PURE white clears
+       4.5 on the field, which means any translucent ink lands under it, and at
+       11px this is normal text by WCAG. Its size, tracking and caps carry the
+       hierarchy instead of a dimmer colour. */
+    --color-section-label: #ffffff;
 }
-html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar-item-icon { background: rgba(255, 255, 255, 0.18); color: #ffffff; }
-html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar-avatar    { background: rgba(255, 255, 255, 0.25); color: #ffffff; }
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar-item-icon ,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .sidebar-item-icon { background: rgba(255, 255, 255, 0.18); color: #ffffff; }
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar-avatar    ,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .sidebar-avatar    { background: rgba(255, 255, 255, 0.25); color: #ffffff; }
+/* rail equivalents of the brand collapses: the logo is accent-on-accent
+   without this, and the colored icon tiles clash with the solid field */
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail-logo ,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail-logo { color: #ffffff; }
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail-item .rail-ico ,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail-item .rail-ico { background: rgba(255, 255, 255, 0.18); color: #ffffff; }
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail-user ,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail-user { background: rgba(255, 255, 255, 0.25); color: #ffffff; }
+
+/* HOW DEEP THE ACCENT GOES, shared by Solid and Gradient.
+
+   Both tones put white labels on the buyer's own colour, and the raw accent
+   cannot carry them: white measures 2.52 on Amber, 2.76 on Emerald and 3.60 on
+   Rose, against the 4.5 a menu label needs, while Default already passes at
+   4.70. So the field is mixed toward black, per palette, by the LIGHTEST amount
+   that still clears 4.5 — one figure for all six would have meant 72%, which
+   reads muddy on the blues. Solid uses --sb-top flat; Gradient falls from it.
+   (The module solves the same problem for an arbitrary buyer accent with
+   autoInk, which flips the ink instead of deepening the field.) */
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .sidebar,
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail,
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail-panel,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail-panel {
+    --sb-top: 94%;   /* Default 5.22 · Violet 4.59 · Slate 5.26 */
+    --sb-mid: 73%;
+    --sb-bot: 53%;
+}
+html[data-palette="rose"]:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar,
+html[data-palette="rose"]:not([data-theme="dark"]) body[data-sidebar="gradient"] .sidebar,
+html[data-palette="rose"]:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail,
+html[data-palette="rose"]:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail,
+html[data-palette="rose"]:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail-panel,
+html[data-palette="rose"]:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail-panel {
+    --sb-top: 88%; --sb-mid: 69%; --sb-bot: 49%;   /* 4.53 */
+}
+html[data-palette="emerald"]:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar,
+html[data-palette="emerald"]:not([data-theme="dark"]) body[data-sidebar="gradient"] .sidebar,
+html[data-palette="emerald"]:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail,
+html[data-palette="emerald"]:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail,
+html[data-palette="emerald"]:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail-panel,
+html[data-palette="emerald"]:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail-panel {
+    --sb-top: 76%; --sb-mid: 59%; --sb-bot: 43%;   /* 4.52 */
+}
+html[data-palette="amber"]:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar,
+html[data-palette="amber"]:not([data-theme="dark"]) body[data-sidebar="gradient"] .sidebar,
+html[data-palette="amber"]:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail,
+html[data-palette="amber"]:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail,
+html[data-palette="amber"]:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail-panel,
+html[data-palette="amber"]:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail-panel {
+    --sb-top: 72%; --sb-mid: 56%; --sb-bot: 40%;   /* 4.60 */
+}
+
+/* Solid — one flat field at the deepened accent. */
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar,
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail,
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail-panel {
+    --sidebar-bg: color-mix(in srgb, var(--color-accent) var(--sb-top), #000);
+}
+
+/* Gradient — the same top, with a fall through it. --sidebar-bg feeds a
+   `background` shorthand, not background-color, so this needs no other change. */
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .sidebar,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail-panel {
+    --sidebar-bg: linear-gradient(170deg,
+        color-mix(in srgb, var(--color-accent) var(--sb-top), #000) 0%,
+        color-mix(in srgb, var(--color-accent) var(--sb-mid), #000) 46%,
+        color-mix(in srgb, var(--color-accent) var(--sb-bot), #000) 100%);
+}
+
+/* The flyout panel's own surface follows the tone (its default is the plain
+   page surface), with the rail's frosted blur so it reads as one piece. */
+html:not([data-theme="dark"]) body[data-sidebar="dark"] .ph-rail-panel,
+html:not([data-theme="dark"]) body[data-sidebar="graphite"] .ph-rail-panel,
+html:not([data-theme="dark"]) body[data-sidebar="tinted"] .ph-rail-panel,
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail-panel ,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail-panel {
+    background: var(--sidebar-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
 
 /* Every dark-ish tone: the footer profile menu floats on its own light
-   card, so reset its tokens to dark-on-light for readability. */
+   card, so reset its tokens to dark-on-light for readability — in the
+   sidebar and beside the rail alike. */
 html:not([data-theme="dark"]) body[data-sidebar="dark"] .sidebar .profile-dropdown,
 html:not([data-theme="dark"]) body[data-sidebar="graphite"] .sidebar .profile-dropdown,
-html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar .profile-dropdown {
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar .profile-dropdown,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .sidebar .profile-dropdown,
+html:not([data-theme="dark"]) body[data-sidebar="dark"] .ph-rail .profile-dropdown,
+html:not([data-theme="dark"]) body[data-sidebar="graphite"] .ph-rail .profile-dropdown,
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail .profile-dropdown ,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail .profile-dropdown {
+    --color-text-primary: #1d1d1f;
+    --color-text-secondary: #6e6e73;
+    --color-text-tertiary: #86868b;
+    --color-text-quaternary: #aeaeb2;
+    --color-border: #e8e8ed;
+    --color-surface-secondary: #f5f5f7;
+}
+
+/* ── Brand logo ───────────────────────────────────────────────
+   The real Hadrian wordmark, swapped in for the text brand by
+   apple-layout.js so all pages pick it up from one place. The
+   artwork is near-black, so it has to invert on every dark field:
+   dark mode, and the dark / graphite / brand menu + header tones. */
+/* Sizes match the deployed theme exactly, so the demos read the same as
+   bill.hostnodes.com: 28px tall everywhere, capped at 180px in the nav and
+   160px in the sidebar (see .nav-logo.img-logo img / .sidebar-brand-logo). */
+.brand-logo { display: block; width: auto; object-fit: contain; }
+.homepage-nav .brand-logo { height: 28px; max-width: 180px; }
+.sidebar-header .brand-logo { height: 28px; max-width: 160px; }
+/* The rail is the one place we differ from the theme on purpose: at 80px wide
+   there is no room for the wordmark, and the theme's `contain` would letterbox
+   a 3.2:1 image down to an 9px sliver. Crop to the square mark instead. */
+.ph-rail-logo .brand-logo { width: 28px; height: 28px; object-fit: cover; object-position: left center; }
+[data-theme="dark"] .brand-logo { filter: invert(1) brightness(1.9); }
+html:not([data-theme="dark"]) body[data-sidebar="dark"] .sidebar .brand-logo,
+html:not([data-theme="dark"]) body[data-sidebar="graphite"] .sidebar .brand-logo,
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar .brand-logo,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .sidebar .brand-logo,
+html:not([data-theme="dark"]) body[data-sidebar="dark"] .ph-rail .brand-logo,
+html:not([data-theme="dark"]) body[data-sidebar="graphite"] .ph-rail .brand-logo,
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .ph-rail .brand-logo,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail .brand-logo,
+html:not([data-theme="dark"]) body[data-header="dark"] .homepage-nav .brand-logo,
+html:not([data-theme="dark"]) body[data-header="graphite"] .homepage-nav .brand-logo,
+html:not([data-theme="dark"]) body[data-header="brand"] .homepage-nav .brand-logo {
+    filter: invert(1) brightness(1.9);
+}
+
+/* ── Header tones (chip: Header) ──────────────────────────────
+   The same five tones as the sidebar, but applied to the top
+   navigation independently — so a dark sidebar can sit under a light
+   header, or the header can go brand while the menu stays quiet.
+   body[data-header] covers the top-layout nav, the side/rail inner
+   topbar, and the auth strip. The nav's own bg/border are hardcoded
+   light, so each tone sets background + border-color directly and
+   retones the text through the same --color-* tokens the links read.
+   Light-mode only, like the sidebar tones. */
+
+/* Dark family (Dark + Graphite) */
+html:not([data-theme="dark"]) body[data-header="dark"] .homepage-nav,
+html:not([data-theme="dark"]) body[data-header="graphite"] .homepage-nav,
+html:not([data-theme="dark"]) body[data-header="dark"] .ph-side-topbar,
+html:not([data-theme="dark"]) body[data-header="graphite"] .ph-side-topbar,
+html:not([data-theme="dark"]) body[data-header="dark"] .ph-auth-strip,
+html:not([data-theme="dark"]) body[data-header="graphite"] .ph-auth-strip {
+    --color-text-primary: #f5f5f7;
+    --color-text-secondary: #a1a1a6;
+    --color-text-tertiary: #98989d;
+    --color-text-quaternary: #6e6e73;
+    --color-border: rgba(255, 255, 255, 0.10);
+    --color-surface-secondary: rgba(255, 255, 255, 0.08);
+    border-bottom-color: rgba(255, 255, 255, 0.10);
+}
+html:not([data-theme="dark"]) body[data-header="dark"] .homepage-nav,
+html:not([data-theme="dark"]) body[data-header="dark"] .ph-side-topbar,
+html:not([data-theme="dark"]) body[data-header="dark"] .ph-auth-strip     { background: rgba(28, 28, 30, 0.85); }
+html:not([data-theme="dark"]) body[data-header="graphite"] .homepage-nav,
+html:not([data-theme="dark"]) body[data-header="graphite"] .ph-side-topbar,
+html:not([data-theme="dark"]) body[data-header="graphite"] .ph-auth-strip { background: rgba(33, 37, 46, 0.94); }
+
+/* Tinted — soft accent wash, still a light bar */
+html:not([data-theme="dark"]) body[data-header="tinted"] .homepage-nav,
+html:not([data-theme="dark"]) body[data-header="tinted"] .ph-side-topbar,
+html:not([data-theme="dark"]) body[data-header="tinted"] .ph-auth-strip {
+    background: color-mix(in srgb, var(--color-accent) 10%, #ffffff);
+    --color-border: color-mix(in srgb, var(--color-accent) 16%, #ffffff);
+    border-bottom-color: color-mix(in srgb, var(--color-accent) 16%, #ffffff);
+}
+
+/* Brand — solid accent bar, follows the palette */
+html:not([data-theme="dark"]) body[data-header="brand"] .homepage-nav,
+html:not([data-theme="dark"]) body[data-header="brand"] .ph-side-topbar,
+html:not([data-theme="dark"]) body[data-header="brand"] .ph-auth-strip {
+    background: var(--color-accent);
+    --color-text-primary: #ffffff;
+    --color-text-secondary: rgba(255, 255, 255, 0.82);
+    --color-text-tertiary: rgba(255, 255, 255, 0.70);
+    --color-text-quaternary: rgba(255, 255, 255, 0.55);
+    --color-border: rgba(255, 255, 255, 0.20);
+    --color-surface-secondary: rgba(255, 255, 255, 0.16);
+    border-bottom-color: rgba(255, 255, 255, 0.20);
+}
+/* the accent-colored logo and hover accents vanish on their own hue */
+html:not([data-theme="dark"]) body[data-header="brand"] .homepage-nav .nav-logo,
+html:not([data-theme="dark"]) body[data-header="brand"] .homepage-nav a:hover,
+html:not([data-theme="dark"]) body[data-header="brand"] .ph-side-topbar .ph-side-iconbtn:hover { color: #ffffff; }
+
+/* Dark-ish tones: the dropdown panels float on their own light frosted
+   cards, so put their ink back to dark-on-light. Covers every dropdown
+   family the header carries (simple menus, classic menus, notifications,
+   profile, language). Same reset for the side/rail inner topbar. */
+html:not([data-theme="dark"]) body:is([data-header="dark"], [data-header="graphite"], [data-header="brand"])
+    :is(.homepage-nav, .ph-side-topbar)
+    :is(.nav-simple-menu, .nav-classic-menu, .notification-dropdown, .profile-dropdown, .nav-lang-menu) {
     --color-text-primary: #1d1d1f;
     --color-text-secondary: #6e6e73;
     --color-text-tertiary: #86868b;
@@ -502,6 +750,16 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .ph-breadcrumb-inner a.ph-back-link svg { width: 15px; height: 15px; margin-left: -3px; }
 .ph-breadcrumb-inner a.ph-back-link:hover { color: var(--color-accent); text-decoration: none; opacity: 0.7; }
 
+/* -- Hide Breadcrumb (admin "Hide Breadcrumb" toggle) ------- */
+/* One rule covers every main-menu layout: the top-layout "Portal Home"
+   back-link AND the sidebar/rail topbar "Home / Page" trail. Driven by
+   body[data-hide-breadcrumb] (emitted from $myTheme.addonSettings.hide_breadcrumb). */
+body[data-hide-breadcrumb="1"] .ph-breadcrumb,
+body[data-hide-breadcrumb="1"] .ph-side-crumbs { display: none; }
+/* The side/rail topbar row is justify-content:space-between; with the trail
+   gone, keep the actions group pinned right instead of sliding to the left. */
+body[data-hide-breadcrumb="1"] .ph-side-topbar-actions { margin-left: auto; }
+
 /* Back mode: drop the grey band + hairline so the link reads as a content
    affordance (Apple back buttons don't live in their own chrome bar). */
 body[data-crumbs="back"] .ph-breadcrumb {
@@ -524,7 +782,14 @@ body[data-crumbs="none"] .ph-breadcrumb { display: none; }
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-right: 0.5px solid var(--color-border);
     display: flex; flex-direction: column; align-items: stretch;
-    padding: 12px 0; z-index: 100; overflow-y: auto;
+    padding: 12px 0; z-index: 100;
+    /* NOT overflow-y:auto. A scroll container clips its descendants on BOTH
+       axes, which trapped the account menu inside this 80px column -- it could
+       not be positioned beside the rail at all. The item list scrolls instead
+       (below), which is the better behaviour anyway: logo and avatar stay
+       pinned while a long nav list scrolls, rather than the avatar scrolling
+       out of reach with everything else. */
+    overflow: visible;
 }
 .ph-rail-logo {
     width: 44px; height: 44px; margin: 0 auto 10px;
@@ -535,7 +800,13 @@ body[data-crumbs="none"] .ph-breadcrumb { display: none; }
 }
 .ph-rail-logo:hover { background: var(--sidebar-item-hover); }
 .ph-rail-logo svg { width: 24px; height: 24px; }
-.ph-rail-items { display: flex; flex-direction: column; gap: 2px; padding: 4px 8px; }
+/* Uploaded square logo. 28px matches .sidebar-brand-logo's max-height, so the
+   brand reads at the same optical size in both nav layouts; object-fit keeps a
+   not-quite-square upload from stretching inside the fixed box. */
+.ph-rail-logo img { width: 28px; height: 28px; object-fit: contain; display: block; }
+/* min-height:0 is what actually lets this shrink below its content height --
+   without it a flex child refuses to shrink and overflow-y never engages. */
+.ph-rail-items { display: flex; flex-direction: column; gap: 2px; padding: 4px 8px; overflow-y: auto; min-height: 0; }
 .ph-rail-item {
     display: flex; flex-direction: column; align-items: center; gap: 6px;
     padding: 8px 4px; border: 0; background: transparent;
@@ -579,6 +850,17 @@ body[data-icons="mono"] .ph-rail-item .rail-ico {
     color: #fff; font-size: 13px; font-weight: 600;
     display: flex; align-items: center; justify-content: center;
     margin: 8px auto 4px; cursor: pointer;
+}
+.ph-rail-user:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+/* Account menu. The shared --up variant is left:0;right:0;width:auto, which is
+   right for the 260px sidebar but would give an unreadable 80px panel here, so
+   the rail opens it to the RIGHT of the column at the standard 240px instead.
+   The wrapper needs an explicit position: it is only set relative for
+   .homepage-nav / .ph-side-topbar, so in the rail the panel would otherwise
+   resolve against .ph-rail. */
+.ph-rail .profile-dropdown-wrapper { position: relative; }
+.ph-rail .profile-dropdown {
+    top: auto; bottom: 0; left: calc(100% + 8px); right: auto; width: 240px;
 }
 
 /* Flyout panel — overlays content on hover; content below doesn't shift */
@@ -918,15 +1200,19 @@ body[data-svc-layout="outside"] .content-area .card:has(> .card-body):not(:has(>
    content sits directly inside (payment-method tiles .pm-card-row, choice tiles
    .mp-choice, article cards, ticket cards, billing-contact rows, etc.). "outside"
    flattens them onto the page background as a plain divided list, same as the
-   header-less case. Excludes .subnav-card so the sidebar nav stays boxed. */
-body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(:has(> .card-header)):not(:has(> .card-body)) {
+   header-less case. Excludes .subnav-card so the sidebar nav stays boxed.
+   Also excludes the bespoke list table-cards (.svc/.inv/.q/.tk-table-card): those are
+   bare .card wrappers too, so this rule would win on specificity (0,6,1) over each
+   page's own `[data-svc-layout="outside"] .X-stack > .X-table-card { background: surface }`
+   (0,3,1) and strip the table's white surface. They keep their own page CSS. */
+body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(.svc-table-card):not(.inv-table-card):not(.q-table-card):not(.tk-table-card):not(:has(> .card-header)):not(:has(> .card-body)) {
     background: transparent;
     border: 0;
     border-radius: 0;
     box-shadow: none;
     border-bottom: 0.5px solid var(--color-border);
 }
-body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(:has(> .card-header)):not(:has(> .card-body)):last-child {
+body[data-svc-layout="outside"] .content-area .card:not(.subnav-card):not(.svc-table-card):not(.inv-table-card):not(.q-table-card):not(.tk-table-card):not(:has(> .card-header)):not(:has(> .card-body)):last-child {
     border-bottom: 0;
 }
 /* Bespoke surface wrappers on non-.card pages -- the shared .settings-group
@@ -970,6 +1256,12 @@ body[data-svc-layout="outside"] .content-area .settings-group > .settings-item:l
     border-bottom-left-radius: var(--radius-lg);
     border-bottom-right-radius: var(--radius-lg);
 }
+
+/* The product-details "Manage" card wraps its CTA/alert bodies + trailing
+   .settings-item action rows in a single .card-body (.pd-manage-body), so the
+   generic "outside" float above applies to it like every other card -- the
+   caption floats out and the wrapped body becomes the white box. No opt-out
+   needed. */
 
 /* ── Responsive sidebar drawer (≤900px, side layout) ──────── */
 /* On narrow viewports the fixed 260px sidebar would crowd content,
@@ -1099,4 +1391,149 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
 
 @media (max-width: 420px) {
     .homepage-nav .icon-btn { display: none; }
+}
+
+/* ============================================================
+   BOXED LAYOUT  (chip Layout -> "Boxed", body[data-layout="boxed"])
+   A floating 1320px card on a decorative background. The current
+   top menu (homepage-nav) is kept ABOVE the box; the sidebar sits
+   INSIDE it. .app-shell (added in the page DOM, wrapping the
+   sidebar + content) is a transparent passthrough in every other
+   layout and only becomes the card here.
+   ============================================================ */
+.ph-main-wrap > .app-shell { display: contents; }
+
+body.client-area-layout[data-layout="boxed"] {
+    padding: 24px;
+    background:
+        radial-gradient(1200px 620px at 10% -10%, rgba(0,122,255,0.20), transparent 60%),
+        radial-gradient(1100px 640px at 105% 0%, rgba(88,86,214,0.18), transparent 55%),
+        radial-gradient(960px 720px at 50% 120%, rgba(48,209,88,0.12), transparent 60%),
+        var(--color-surface-secondary);
+}
+html[data-theme="dark"] body.client-area-layout[data-layout="boxed"] {
+    background:
+        radial-gradient(1200px 620px at 10% -10%, rgba(41,151,255,0.22), transparent 60%),
+        radial-gradient(1100px 640px at 105% 0%, rgba(94,92,230,0.20), transparent 55%),
+        radial-gradient(960px 720px at 50% 120%, rgba(48,209,88,0.12), transparent 60%),
+        #0a0a0c;
+}
+
+/* Current top menu — kept, but no container: transparent, full box width,
+   logo pinned left + account pinned right, edges symmetrical with the card. */
+body[data-layout="boxed"] .homepage-nav.only-top {
+    display: flex !important;
+    position: static;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto 14px;
+    padding: 0;
+    background: transparent !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+}
+body[data-layout="boxed"] .homepage-nav.only-top .homepage-nav-inner {
+    max-width: none;
+    width: 100%;
+    padding: 0 4px;
+}
+/* Float the menu to the centre: logo left, account right, equal auto-gaps either side */
+body[data-layout="boxed"] .homepage-nav-inner > .nav-spacer { flex: none; width: 0; min-width: 0; }
+body[data-layout="boxed"] .homepage-nav-inner > .nav-logo { margin-right: auto; }
+body[data-layout="boxed"] .homepage-nav-inner > .nav-spacer + * { margin-left: auto; }
+
+/* The floating card */
+body[data-layout="boxed"] .ph-main-wrap > .app-shell {
+    display: flex !important;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    background: var(--color-bg);
+    border-radius: 22px;
+    box-shadow: 0 30px 80px -24px rgba(0,0,0,0.30), 0 0 0 0.5px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+/* Sidebar -> in-box column (undo the fixed positioning + only-side hide) */
+body[data-layout="boxed"] .app-shell > .app-shell-aside {
+    flex: 0 0 var(--sidebar-width);
+    align-self: stretch;
+}
+body[data-layout="boxed"] .app-shell > .app-shell-aside .sidebar.only-side {
+    display: flex !important;
+    position: relative;
+    top: auto; left: auto; bottom: auto;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+}
+/* Box sidebar -> Hide (chip), or page default via body[data-box-sidebar="hide"]:
+   drop the in-box sidebar so the content fills the whole card. */
+body[data-layout="boxed"][data-box-sidebar="hide"] .app-shell > .app-shell-aside { display: none; }
+
+/* Box frame -> Flat (chip): no shadow, no rounded card, no decorative gradient.
+   The card blends into a uniform page so it's just centered content, no visible
+   frame or lines. */
+body.client-area-layout[data-layout="boxed"][data-box-frame="flat"] { background: var(--color-bg); }
+body[data-layout="boxed"][data-box-frame="flat"] .ph-main-wrap > .app-shell {
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+}
+
+/* Content fills the rest of the card */
+body[data-layout="boxed"] .app-shell > .content-area {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+/* Full-bleed pages (marketing) use .app-shell-content instead of .content-area:
+   transparent passthrough in top/side/rail, a real content column inside the box. */
+.app-shell > .app-shell-content { display: contents; }
+body[data-layout="boxed"] .app-shell > .app-shell-content {
+    display: block;
+    flex: 1 1 0;
+    min-width: 0;
+    padding-top: 20px;
+}
+body[data-layout="boxed"] .app-shell-content > .box-breadcrumb { padding: 0 22px; }
+
+/* The slim inner footer isn't needed inside the card */
+body[data-layout="boxed"] .app-shell > [data-include]:not(.app-shell-aside) { display: none; }
+
+/* Drop the floating inner-topbar (breadcrumb + dup actions) from above the box;
+   the breadcrumb lives inside the card instead (see .box-breadcrumb). */
+body[data-layout="boxed"] .ph-main-wrap > [data-include*="inner-topbar"] { display: none; }
+
+/* In-box breadcrumb — top of the content column, left-aligned. Boxed only. */
+.box-breadcrumb { display: none; }
+body[data-layout="boxed"] .box-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    margin: 0 0 18px;
+}
+body[data-layout="boxed"] .box-breadcrumb a { color: var(--color-text-secondary); text-decoration: none; }
+body[data-layout="boxed"] .box-breadcrumb a:hover { color: var(--color-text-primary); }
+body[data-layout="boxed"] .box-breadcrumb .sep { color: var(--color-text-tertiary); opacity: 0.7; }
+body[data-layout="boxed"] .box-breadcrumb .current { color: var(--color-text-primary); }
+
+/* #4 — hide toggles. Sidebar logo: chip "Side logo -> Hide" (any layout with a sidebar). */
+body[data-sidebar-logo="hide"] .sidebar-header { display: none; }
+/* Breadcrumb: chip "Crumbs -> None" also hides the in-box breadcrumb. */
+body[data-layout="boxed"][data-crumbs="none"] .box-breadcrumb { display: none; }
+
+@media (max-width: 768px) {
+    body.client-area-layout[data-layout="boxed"] { padding: 0; }
+    body[data-layout="boxed"] .homepage-nav.only-top { max-width: none; margin-bottom: 0; border-radius: 0; }
+    body[data-layout="boxed"] .ph-main-wrap > .app-shell { border-radius: 0; box-shadow: none; }
+    body[data-layout="boxed"] .app-shell > .app-shell-aside { display: none; }
 }
