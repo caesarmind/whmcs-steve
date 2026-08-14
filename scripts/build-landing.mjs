@@ -47,9 +47,10 @@ const RENAME = {
 const ASSET_RENAME = {};
 
 /* ── what a crawler and a link preview see ────────────────────────────────
-   SET THIS BEFORE LAUNCH. The canonical and og:url have to be absolute, so
-   they cannot be derived from a relative build. */
-const SITE = 'https://caesarthemes.com/hadrian/';   // <-- your URL, with the trailing slash
+   The canonical and og:url have to be absolute, so they cannot be derived from
+   a relative build. CI passes the real one in; the constant is the fallback for
+   a local build. Set one or the other before anything goes live. */
+const SITE = (process.env.LANDING_SITE_URL || 'https://caesarthemes.com/hadrian/').replace(/\/?$/, '/');
 const META = {
   'index.html': {
     description: 'Hadrian is a WHMCS client area theme: three navigation layouts, six styles, four dashboard designs, a homepage composer, a menu manager and per-page SEO — every one an admin setting, not a template fork.',
@@ -329,10 +330,10 @@ say('apple-client-area/ and hadrian-admin-panel/ copied');
 /* The canonical and og:url are absolute and cannot be derived, so they are a
    constant at the top of this file -- which means they are also the easiest
    thing to ship wrong. Say so on every build until it is changed. */
-if (SITE === 'https://caesarthemes.com/hadrian/') {
+if (!process.env.LANDING_SITE_URL && SITE === 'https://caesarthemes.com/hadrian/') {
   console.log('  NOTE  SITE is still the placeholder URL. canonical, og:url and og:image');
   console.log('        point at https://caesarthemes.com/hadrian/ — set SITE at the top of');
-  console.log('        this script to wherever this is actually going, then rebuild.');
+  console.log('        this script, or set LANDING_SITE_URL, then rebuild.');
 }
 
 const weigh = (dir) => fs.readdirSync(dir, { withFileTypes: true })

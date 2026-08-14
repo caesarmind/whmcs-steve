@@ -7,6 +7,11 @@ on:
       - 'hadrian/modules/addons/Hadrian/**'
       - 'hadrian/templates/hadrian/**'
       - 'hadrian_cart/**'
+      # the landing page and the two folders it embeds
+      - 'hadrianthegreat-landind/**'
+      - 'apple-client-area/**'
+      - 'Hadrian by Caesarthemes/hadrian-admin-panel/**'
+      - 'scripts/build-landing.mjs'
       - '.github/workflows/main.yml'
   workflow_dispatch:
 
@@ -124,3 +129,102 @@ jobs:
           if [ -z "$CHANGED_MAIN" ] && [ -z "$CHANGED_CART" ] && [ -z "$DELETED_MAIN" ] && [ -z "$DELETED_CART" ]; then
             echo "No files to upload or delete."
           fi
+
+  # ================================================================
+  # The landing page. Unlike the theme, this is NOT copied from the
+  # repo: dist/ is build output and gitignored, so there is nothing
+  # committed to diff. CI runs the same build you run locally and
+  # ships what it produces.
+  #
+  # SET REMOTE_LANDING_BASE before the first run. It is deliberately
+  # NOT $REMOTE_BASE: that is the WHMCS billing root, and dropping a
+  # marketing site's index.html on top of it would replace the
+  # client area's own entry point.
+  # ================================================================
+  deploy-landing:
+    runs-on: ubuntu-latest
+    env:
+      REMOTE_HOST: cp2.de.namespace.life
+      REMOTE_USER: whymege
+      REMOTE_PORT: '22'
+      REMOTE_LANDING_BASE: /home/whymege/CHANGE-ME.hostnodes.com   # <-- the landing docroot
+      LANDING_SITE_URL: https://CHANGE-ME.hostnodes.com/           # <-- canonical + og:url
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # The workflow-level `paths:` fires for theme changes too, so the
+      # build only runs when something the landing is made of moved.
+      - name: Did the landing change?
+        id: changed
+        run: |
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            BEFORE="$AFTER~1"
+          fi
+          # workflow_dispatch has no before/after worth diffing — always build
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=yes" >> "$GITHUB_OUTPUT"
+            echo "Manual run — building."
+            exit 0
+          fi
+          HITS=$(git diff --name-only "$BEFORE" "$AFTER" -- \
+            'hadrianthegreat-landind/**' \
+            'apple-client-area/**' \
+            'Hadrian by Caesarthemes/hadrian-admin-panel/**' \
+            'scripts/build-landing.mjs' | grep -v '^hadrianthegreat-landind/dist/' || true)
+          if [ -n "$HITS" ]; then
+            echo "run=yes" >> "$GITHUB_OUTPUT"
+            echo "$HITS"
+          else
+            echo "run=no" >> "$GITHUB_OUTPUT"
+            echo "Nothing the landing is built from changed."
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.changed.outputs.run == 'yes'
+        with:
+          node-version: '20'
+
+      - name: Build dist/
+        if: steps.changed.outputs.run == 'yes'
+        run: |
+          node scripts/build-landing.mjs
+          test -f hadrianthegreat-landind/dist/index.html || { echo "::error::build produced no index.html"; exit 1; }
+          # The build falls back to copying PNGs when the encoder cannot be
+          # reached. That is fine locally and wrong here — it would quietly ship
+          # 2.9 MB of images — so fail instead.
+          if ls hadrianthegreat-landind/dist/screens/*.png >/dev/null 2>&1; then
+            echo "::error::screens/ did not re-encode to webp — sharp-cli unavailable?"
+            exit 1
+          fi
+          du -sh hadrianthegreat-landind/dist
+
+      - name: Setup SSH
+        if: steps.changed.outputs.run == 'yes'
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.CPANEL }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "$REMOTE_PORT" -t ed25519 "$REMOTE_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Upload dist/
+        if: steps.changed.outputs.run == 'yes'
+        run: |
+          if echo "$REMOTE_LANDING_BASE" | grep -q 'CHANGE-ME'; then
+            echo "::error::REMOTE_LANDING_BASE is still the placeholder — set it in this workflow."
+            exit 1
+          fi
+          SSH="ssh -i $HOME/.ssh/id_ed25519 -p $REMOTE_PORT -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST"
+
+          # Whole tree every time, not a diff: dist/ is regenerated from
+          # scratch on each build, so a "changed files" list would be every
+          # file anyway. Extract is additive — nothing on the server is
+          # removed. Renaming or deleting a source file therefore leaves the
+          # old copy behind; see the note in the landing README for the
+          # rsync --delete version if that ever matters.
+          tar czf - -C hadrianthegreat-landind/dist . \
+            | $SSH "mkdir -p '$REMOTE_LANDING_BASE' && tar xzpf - -C '$REMOTE_LANDING_BASE' && echo '✅ landing upload complete'"

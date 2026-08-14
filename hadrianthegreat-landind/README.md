@@ -258,6 +258,37 @@ are the poster behind the hero frame and the `file://` fallback, shown at about
 copied through unchanged, on the grounds that a heavy page beats a broken one.
 A whole page load is now about 210 KB.
 
+### Deploying it from CI
+
+`.github/workflows/main.yml` has a second job, `deploy-landing`. It cannot copy
+`dist/` out of the repo the way the theme job copies its files, because `dist/`
+is gitignored — there is nothing committed to diff. So it runs the same build
+you run locally and ships what comes out.
+
+Two values in that job need setting before the first run, both marked
+`CHANGE-ME`, and the upload step fails loudly rather than deploying to a
+placeholder:
+
+    REMOTE_LANDING_BASE   the landing docroot on the server
+    LANDING_SITE_URL      canonical and og:url — the build reads this env var
+                          in place of the SITE constant
+
+`REMOTE_LANDING_BASE` is deliberately not `REMOTE_BASE`. That one is the WHMCS
+billing root, and an `index.html` landing on top of it would sit in front of the
+client area's own entry point.
+
+The upload is the whole tree each time, not a diff — `dist/` is regenerated from
+scratch, so a changed-file list would be every file anyway. The extract is
+additive: nothing on the server is removed, which means renaming or deleting a
+source file leaves the old copy behind. If that starts to matter, swap the tar
+for `rsync -az --delete`, but point it at a docroot you are certain of first: an
+additive upload that gets the path wrong makes a mess, and a `--delete` one that
+gets it wrong empties a directory.
+
+The job also fails if `screens/` still holds PNGs after the build, which is how
+it catches the encoder having been unreachable. Locally that falls back to
+copying them; in CI it would quietly ship 2.9 MB of images instead of 328 KB.
+
 ### Editing after a build
 
 Keep editing the source in `hadrianthegreat-landind/` and re-run the build. The
