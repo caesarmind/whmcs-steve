@@ -62,6 +62,25 @@ of it. `ThemeFrame` (hadrian-lp5-frames.jsx) handles it:
 - **Fallback.** `data-loaded="error"` on any partial, or a non-http origin, drops
   the frame and shows the matching capture from `screens/`.
 
+### Dashboard designs
+
+The dashboard is the one page with more than one design drawn for it, so it gets
+a second control: a select listing all 21 (`clientareahome.html`, v2-v19,
+v15-heavy and -boxed), each a real file that loads live. Picking one swaps the
+frame src, which the A/B slot absorbs without a flash. It is a select rather than
+another segmented strip because twenty-one will not sit in a row beside the four
+controls already on the stage.
+
+The list is one array, `HF_DESIGNS` in hadrian-lp5-app.jsx — add, reorder or
+prune there. `solo: true` marks a design that brings its own shell rather than
+the layout partials (only -boxed today); the layout picker hides and the tone
+rail disables for those, since there is nothing for them to act on, and the
+showreel falls back to cycling the palette alone.
+
+Note these are the mockup's design explorations. The shipped module offers four
+dashboard variants — Default, Atrium, Bento and Minimal — so the picker shows
+more than a buyer can choose today.
+
 ### Sidebar tones
 
 Light, Tinted, Solid and **Gradient**. The gradient is new: `--sidebar-bg` feeds a

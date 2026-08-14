@@ -188,13 +188,42 @@ function AccentPanel({ dark, onDark }) {
    hadrian-lp5-frames.jsx. Every control writes a real setting into a real page,
    so there is nothing here the theme cannot actually do. */
 const HF_PAGES = [
-  { id: 'dashboard', t: 'Dashboard', src: 'clientareahome.html' },
+  { id: 'dashboard', t: 'Dashboard', src: 'clientareahome.html', designs: true },
   { id: 'services', t: 'Services', src: 'clientareaproducts.html' },
   { id: 'store', t: 'Store', src: 'store.html' },
   { id: 'invoice', t: 'Invoice', src: 'viewinvoice.html' },
   { id: 'support', t: 'Support', src: 'supportticketslist.html' },
   { id: 'login', t: 'Login', src: 'login.html', auth: 'out' },
 ];
+/* The dashboard is the one page with more than one design drawn for it, so it
+   gets a second control. Each entry is a real file in ../apple-client-area;
+   picking one swaps the frame's src, which the A/B slot absorbs without a
+   flash. `solo` marks a design that brings its own shell — no partials, so the
+   layout and tone controls have nothing to act on and switch themselves off. */
+const HF_DESIGNS = [
+  { id: 'default', t: 'Default', s: 'The shipped dashboard', f: 'clientareahome.html' },
+  { id: 'v19', t: 'v19', s: 'v18’s band, revised', f: 'clientareahome-v19.html' },
+  { id: 'v18', t: 'v18', s: 'Gradient band, four figures, two columns', f: 'clientareahome-v18.html' },
+  { id: 'v17', t: 'v17', s: 'Bento, drawn for a busy account', f: 'clientareahome-v17.html' },
+  { id: 'v16', t: 'v16', s: 'Blocks, with an account card', f: 'clientareahome-v16.html' },
+  { id: 'v15', t: 'v15', s: 'Minimal — greeting, three figures, one list', f: 'clientareahome-v15.html' },
+  { id: 'v15h', t: 'v15 heavy', s: 'The minimal one, fully loaded', f: 'clientareahome-v15-heavy.html' },
+  { id: 'v14', t: 'v14', s: 'Three variations per block, three layouts', f: 'clientareahome-v14.html' },
+  { id: 'v13', t: 'v13', s: 'Real-information blocks, illustrative', f: 'clientareahome-v13.html' },
+  { id: 'v12', t: 'v12', s: 'Landing-style bento, real features only', f: 'clientareahome-v12.html' },
+  { id: 'v11', t: 'v11', s: 'Illustrative bento, landing colours', f: 'clientareahome-v11.html' },
+  { id: 'v10', t: 'v10', s: 'Master–detail, System Settings style', f: 'clientareahome-v10.html' },
+  { id: 'v9', t: 'v9', s: 'Greeting hero and tables', f: 'clientareahome-v9.html' },
+  { id: 'v8', t: 'v8', s: 'Tiles over stacked tables, data first', f: 'clientareahome-v8.html' },
+  { id: 'v7', t: 'v7', s: 'Tabbed data hub', f: 'clientareahome-v7.html' },
+  { id: 'v6', t: 'v6', s: 'Classic two columns and a right rail', f: 'clientareahome-v6.html' },
+  { id: 'v5', t: 'v5', s: 'Activity rings, health summary', f: 'clientareahome-v5.html' },
+  { id: 'v4', t: 'v4', s: 'Spotlight command centre', f: 'clientareahome-v4.html' },
+  { id: 'v3', t: 'v3', s: 'Bento with a health hero', f: 'clientareahome-v3.html' },
+  { id: 'v2', t: 'v2', s: 'Time-aware greeting, one primary action', f: 'clientareahome-v2.html' },
+  { id: 'boxed', t: 'Boxed', s: 'Brings its own shell', f: 'clientareahome-boxed.html', solo: true },
+];
+const hfDesign = (id) => HF_DESIGNS.find((d) => d.id === id) || HF_DESIGNS[0];
 /* the captures stay on as posters — they cover the first boot, and they are the
    whole show when this folder is opened off disk, where the theme's own pages
    cannot fetch their layout partials */
@@ -318,9 +347,11 @@ function useHFReel({ layIds, layId, setLay, palette, setPalette, ms = 3200 }) {
   React.useEffect(() => {
     if (!on || hover || (layIds.length < 2 && palIds.length < 2)) return;
     const t = setTimeout(() => {
-      // layout is the inner loop, palette the outer: all three navigations, then the next brand colour
-      const nextLay = (layIds.indexOf(layId) + 1) % layIds.length;
-      setLay(layIds[nextLay]);
+      // layout is the inner loop, palette the outer: all three navigations, then
+      // the next brand colour. A design that brings its own shell offers no
+      // layouts at all, so there the palette becomes the only loop.
+      const nextLay = layIds.length ? (layIds.indexOf(layId) + 1) % layIds.length : 0;
+      if (layIds.length) setLay(layIds[nextLay]);
       if (nextLay === 0) setPalette(palIds[(palIds.indexOf(palette) + 1) % palIds.length]);
       setTick((k) => k + 1);
     }, ms);
@@ -336,13 +367,20 @@ function HeroStage({ dark }) {
   const [page, setPage] = React.useState(pages[0].id);
   const [lay, setLay] = React.useState('side');
   const [tone, setTone] = React.useState('light');
+  const [design, setDesign] = React.useState('default');
   const [palette, setPalette] = React.useState('blue');
   const pg = pages.find((p) => p.id === page) || pages[0];
   const pal = HF_PALETTES.find((p) => p.id === palette) || HF_PALETTES[0];
+  // only the dashboard has more than one design, and one of those brings its own
+  // shell — a design with no partials has nothing for layout or tone to act on
+  const dsn = pg.designs ? hfDesign(design) : null;
+  const solo = !!(dsn && dsn.solo);
+  const src = dsn ? dsn.f : pg.src;
   // a top bar has no side menu to retone, and the login page ships its own chrome
-  const toneable = lay !== 'top';
-  const layIds = CA_EMBEDDABLE ? HF_LAYOUTS.map((l) => l.wire) : Object.keys(HF_SHOTS[pg.id] || { side: 1 });
-  const layId = layIds.indexOf(lay) === -1 ? layIds[0] : lay;
+  const toneable = lay !== 'top' && !solo;
+  const layIds = !CA_EMBEDDABLE ? Object.keys(HF_SHOTS[pg.id] || { side: 1 })
+    : solo ? [] : HF_LAYOUTS.map((l) => l.wire);
+  const layId = layIds.indexOf(lay) === -1 ? (layIds[0] || 'top') : lay;
   const reel = useHFReel({ layIds, layId, setLay, palette, setPalette });
   const state = React.useMemo(() => ({
     layout: layId, palette, sidebar: toneable ? tone : 'light', dark, auth: pg.auth || 'in',
@@ -363,6 +401,18 @@ function HeroStage({ dark }) {
           ))}
         </span>
       </div>
+      {pg.designs && (
+        <div className="hf-designs">
+          <label className="hf-lbl" htmlFor="hf-design">Dashboard design</label>
+          <span className="hf-select">
+            <select id="hf-design" value={design} onChange={reel.manual((e) => setDesign(e.target.value))}>
+              {HF_DESIGNS.map((d) => <option key={d.id} value={d.id}>{d.t} — {d.s}</option>)}
+            </select>
+            <span className="ic" aria-hidden="true">▾</span>
+          </span>
+          <span className="hf-designnote">{HF_DESIGNS.length} drawn, all live</span>
+        </div>
+      )}
       <div className="hf-picker" role="tablist" aria-label="Navigation layout">
         {HF_LAYOUTS.filter((p) => layIds.indexOf(p.wire) !== -1).map((p) => (
           <button key={p.wire} role="tab" aria-selected={layId === p.wire} onClick={reel.manual(() => setLay(p.wire))} title={p.t}>
@@ -384,7 +434,7 @@ function HeroStage({ dark }) {
         <div className="hf-win">
           <div className="hf-art">
             <ThemeFrame
-              page={CA_BASE + pg.src}
+              page={CA_BASE + src}
               state={state}
               poster={hfPoster(pg.id, layId)}
               alt={`Hadrian ${pg.t.toLowerCase()} — ${(HF_LAYOUTS.find((l) => l.wire === layId) || {}).t} layout`}
