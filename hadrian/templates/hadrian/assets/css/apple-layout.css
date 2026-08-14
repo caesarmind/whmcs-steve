@@ -3316,3 +3316,31 @@ body[data-sidebar-side="right"][data-layout="rail"].rail-panel-open .ph-rail-pan
     body[data-sidebar-side="right"]:not([data-layout="top"]) .ph-side-topbar-actions { order: 3; }
     body[data-sidebar-side="right"]:not([data-layout="top"]) .ph-mobile-toggle       { order: 4; }
 }
+
+/* -- Gradient nav style -----------------------------------------
+   The Gradient style in Styles > Colors > Navigation & bars paints the side
+   menu with the accent deepening down the panel.
+
+   IT CANNOT BE ONE TOKEN. Hooks::isColorValue accepts hex and comma-form
+   rgb/rgba/hsl/hsla and nothing else, so a `linear-gradient(...)` stored in
+   --sidebar-bg is dropped on save and again on emit, silently both times. So
+   the style stores two ordinary COLOUR stops and the gradient is composed
+   here -- the same move the welcome band makes, building its fill from
+   --at-band rather than storing a gradient.
+
+   INERT BY DEFAULT. Both stops default to fully transparent, so this paints a
+   transparent-to-transparent image over --sidebar-bg and nothing shows. Every
+   other nav style resets the pair, so switching away from Gradient clears it
+   rather than leaving it under the new fill.
+
+   Declared AFTER the three background: shorthands it has to survive -- the
+   shorthand resets background-image to none, and .sidebar's lives in
+   apple-theme.css, which header.tpl loads before this file. Equal specificity,
+   so source order is what makes this win. */
+.sidebar,
+.ph-rail,
+.ph-rail-panel {
+    background-image: linear-gradient(180deg,
+        var(--sidebar-grad-from, transparent),
+        var(--sidebar-grad-to, transparent));
+}

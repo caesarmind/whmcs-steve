@@ -126,6 +126,14 @@
     --sidebar-panel-bg: var(--_sb-base, var(--color-surface));
     --sidebar-field-bg: var(--_sb-field, var(--color-surface-secondary));
     --sidebar-scroll-thumb: var(--_sb-thumb, rgba(0, 0, 0, 0.15));
+    /* The two stops of the Gradient nav style. Fully transparent by default,
+       which is what keeps the composing rule in apple-layout.css inert: it
+       paints a transparent-to-transparent image over --sidebar-bg and nothing
+       shows until the style is picked. They are COLOURS, not a gradient value,
+       because Hooks::isColorValue rejects linear-gradient() on save and on
+       emit -- see the note beside 'gradient' in core/config/colors.php. */
+    --sidebar-grad-from: rgba(0, 0, 0, 0);
+    --sidebar-grad-to: rgba(0, 0, 0, 0);
     /* Private aliases for the two interactive fills. --sidebar-item-hover and
        --sidebar-item-active are MISNAMED: 137 declarations across 48 files
        read them from OUTSIDE the sidebar -- .subnav-item on 45 page
@@ -454,6 +462,14 @@ html[data-theme="dark"] {
        it is the only one that must be redeclared here -- every other one
        re-derives from the page tokens redeclared in this block. */
     --sidebar-scroll-thumb: var(--_sb-thumb, rgba(255, 255, 255, 0.15));
+    /* The two stops of the Gradient nav style. Fully transparent by default,
+       which is what keeps the composing rule in apple-layout.css inert: it
+       paints a transparent-to-transparent image over --sidebar-bg and nothing
+       shows until the style is picked. They are COLOURS, not a gradient value,
+       because Hooks::isColorValue rejects linear-gradient() on save and on
+       emit -- see the note beside 'gradient' in core/config/colors.php. */
+    --sidebar-grad-from: rgba(0, 0, 0, 0);
+    --sidebar-grad-to: rgba(0, 0, 0, 0);
     /* Same values as light on purpose -- the accent stays saturated in dark
        mode, so its ink stays white -- but they MUST be declared here anyway.
        This block outranks an emitted :root override, so a token absent from it

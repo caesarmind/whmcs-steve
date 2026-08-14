@@ -75,6 +75,8 @@ return [
                     '--sidebar-item-hover-bg'  => 'color-mix(in srgb, var(--color-accent) 14%, transparent)',
                     '--sidebar-item-active-bg' => 'color-mix(in srgb, var(--color-accent) 22%, transparent)',
                     '--sidebar-scroll-thumb'   => 'color-mix(in srgb, var(--color-accent) 30%, transparent)',
+                    '--sidebar-grad-from'      => 'rgba(0,0,0,0)',
+                    '--sidebar-grad-to'        => 'rgba(0,0,0,0)',
                 ],
                 /* Dark mixes toward the dark surface, not toward white, and the
                    ink flips. A tint is "the nav, faintly coloured" in BOTH
@@ -92,6 +94,8 @@ return [
                     '--sidebar-item-hover-bg'  => 'color-mix(in srgb, var(--color-accent) 18%, transparent)',
                     '--sidebar-item-active-bg' => 'color-mix(in srgb, var(--color-accent) 28%, transparent)',
                     '--sidebar-scroll-thumb'   => 'color-mix(in srgb, var(--color-accent) 34%, transparent)',
+                    '--sidebar-grad-from'      => 'rgba(0,0,0,0)',
+                    '--sidebar-grad-to'        => 'rgba(0,0,0,0)',
                 ],
             ],
         ],
@@ -128,10 +132,117 @@ return [
                     '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.14)',
                     '--sidebar-item-active-bg' => 'rgba(255,255,255,0.22)',
                     '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.30)',
+                    '--sidebar-grad-from'      => 'rgba(0,0,0,0)',
+                    '--sidebar-grad-to'        => 'rgba(0,0,0,0)',
                 ],
                 'dark' => [
                     '--sidebar-bg'             => 'color-mix(in srgb, var(--color-accent) 74%, #000000)',
                     '--sidebar-panel-bg'       => 'color-mix(in srgb, var(--color-accent) 74%, #000000)',
+                    '--sidebar-text'           => '#ffffff',
+                    '--sidebar-text-secondary' => 'rgba(255,255,255,0.82)',
+                    '--sidebar-text-muted'     => 'rgba(255,255,255,0.70)',
+                    '--sidebar-text-faint'     => 'rgba(255,255,255,0.55)',
+                    '--sidebar-border'         => 'rgba(255,255,255,0.20)',
+                    '--sidebar-field-bg'       => 'rgba(255,255,255,0.16)',
+                    '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.14)',
+                    '--sidebar-item-active-bg' => 'rgba(255,255,255,0.22)',
+                    '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.30)',
+                    '--sidebar-grad-from'      => 'rgba(0,0,0,0)',
+                    '--sidebar-grad-to'        => 'rgba(0,0,0,0)',
+                ],
+            ],
+        ],
+        /* Dark -- a fixed near-black panel, independent of the accent. The one
+           nav style that says nothing about the brand colour, which is the
+           point: it is what you pick when the accent is too loud to live in
+           the chrome. Identical in both scopes because the panel is already
+           dark; dark mode has nothing left to flip. */
+        'dark' => [
+            'label'  => 'Dark',
+            'value'  => [
+                'light' => '#1c1c1e',
+                'dark'  => '#1c1c1e',
+            ],
+            'tokens' => [
+                'light' => [
+                    '--sidebar-bg'             => 'rgba(28,28,30,0.94)',
+                    '--sidebar-panel-bg'       => '#1c1c1e',
+                    '--sidebar-text'           => '#f5f5f7',
+                    '--sidebar-text-secondary' => '#a1a1a6',
+                    '--sidebar-text-muted'     => '#98989d',
+                    '--sidebar-text-faint'     => '#6e6e73',
+                    '--sidebar-border'         => 'rgba(255,255,255,0.10)',
+                    '--sidebar-field-bg'       => 'rgba(255,255,255,0.07)',
+                    '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.06)',
+                    '--sidebar-item-active-bg' => 'rgba(255,255,255,0.12)',
+                    '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.18)',
+                    '--sidebar-grad-from'      => 'rgba(0,0,0,0)',
+                    '--sidebar-grad-to'        => 'rgba(0,0,0,0)',
+                ],
+                'dark' => [
+                    '--sidebar-bg'             => 'rgba(28,28,30,0.94)',
+                    '--sidebar-panel-bg'       => '#1c1c1e',
+                    '--sidebar-text'           => '#f5f5f7',
+                    '--sidebar-text-secondary' => '#a1a1a6',
+                    '--sidebar-text-muted'     => '#98989d',
+                    '--sidebar-text-faint'     => '#6e6e73',
+                    '--sidebar-border'         => 'rgba(255,255,255,0.10)',
+                    '--sidebar-field-bg'       => 'rgba(255,255,255,0.07)',
+                    '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.06)',
+                    '--sidebar-item-active-bg' => 'rgba(255,255,255,0.12)',
+                    '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.18)',
+                    '--sidebar-grad-from'      => 'rgba(0,0,0,0)',
+                    '--sidebar-grad-to'        => 'rgba(0,0,0,0)',
+                ],
+            ],
+        ],
+
+        /* Gradient -- the accent, deepening down the panel.
+           THE GRADIENT IS NOT A TOKEN, and cannot be. Hooks::isColorValue
+           accepts hex and comma-form rgb/rgba/hsl/hsla and nothing else, so a
+           stored `linear-gradient(...)` is dropped on save and again on emit --
+           silently, both times. So this writes two ordinary COLOUR stops and
+           apple-layout.css composes them into
+             background-image: linear-gradient(180deg, from, to)
+           over the flat --sidebar-bg. Same shape as the welcome band, which
+           builds its fill from --at-band rather than storing a gradient.
+
+           --sidebar-bg is set to the TOP stop as well: it is what shows if the
+           background-image rule is ever missing, and it keeps the translucent
+           frost consistent with the other styles.
+
+           autoInk for the reason Brand needs it -- the stops ARE the buyer's
+           colour, so the ink cannot be a constant. */
+        'gradient' => [
+            'label'   => 'Gradient',
+            'autoInk' => true,
+            'value'  => [
+                'light' => 'color-mix(in srgb, var(--color-accent) 72%, #000000)',
+                'dark'  => 'color-mix(in srgb, var(--color-accent) 55%, #000000)',
+            ],
+            'tokens' => [
+                'light' => [
+                    '--sidebar-bg'             => 'color-mix(in srgb, var(--color-accent) 72%, #000000)',
+                    '--sidebar-panel-bg'       => 'color-mix(in srgb, var(--color-accent) 72%, #000000)',
+                    '--sidebar-grad-from'      => 'color-mix(in srgb, var(--color-accent) 72%, #000000)',
+                    '--sidebar-grad-to'        => 'color-mix(in srgb, var(--color-accent) 40%, #000000)',
+                    '--sidebar-text'           => '#ffffff',
+                    '--sidebar-text-secondary' => 'rgba(255,255,255,0.82)',
+                    '--sidebar-text-muted'     => 'rgba(255,255,255,0.70)',
+                    '--sidebar-text-faint'     => 'rgba(255,255,255,0.55)',
+                    '--sidebar-border'         => 'rgba(255,255,255,0.20)',
+                    '--sidebar-field-bg'       => 'rgba(255,255,255,0.16)',
+                    '--sidebar-item-hover-bg'  => 'rgba(255,255,255,0.14)',
+                    '--sidebar-item-active-bg' => 'rgba(255,255,255,0.22)',
+                    '--sidebar-scroll-thumb'   => 'rgba(255,255,255,0.30)',
+                ],
+                /* Deepened further in dark for the same reason Brand is: the
+                   shipped dark accent is the brighter of the pair. */
+                'dark' => [
+                    '--sidebar-bg'             => 'color-mix(in srgb, var(--color-accent) 55%, #000000)',
+                    '--sidebar-panel-bg'       => 'color-mix(in srgb, var(--color-accent) 55%, #000000)',
+                    '--sidebar-grad-from'      => 'color-mix(in srgb, var(--color-accent) 55%, #000000)',
+                    '--sidebar-grad-to'        => 'color-mix(in srgb, var(--color-accent) 30%, #000000)',
                     '--sidebar-text'           => '#ffffff',
                     '--sidebar-text-secondary' => 'rgba(255,255,255,0.82)',
                     '--sidebar-text-muted'     => 'rgba(255,255,255,0.70)',
@@ -260,6 +371,21 @@ return [
             ['var' => '--sidebar-item-hover-bg',  'label' => 'Item hover',         'light' => 'rgba(0,0,0,0.04)',       'dark' => 'rgba(255,255,255,0.05)', 'hint' => 'Sidebar only -- the similarly named shared token is not editable here.'],
             ['var' => '--sidebar-item-active-bg', 'label' => 'Item active',        'light' => 'rgba(0,0,0,0.06)',       'dark' => 'rgba(255,255,255,0.08)'],
             ['var' => '--sidebar-scroll-thumb',   'label' => 'Scrollbar',          'light' => 'rgba(0,0,0,0.15)',       'dark' => 'rgba(255,255,255,0.15)'],
+            // The two stops of the GRADIENT nav style. Ordinary colours, not a
+            // gradient value: Hooks::isColorValue accepts hex and comma-form
+            // rgb/rgba/hsl/hsla and nothing else, so a stored
+            // `linear-gradient(...)` is dropped silently on save AND on emit.
+            // The gradient is therefore BUILT IN CSS from these two stops
+            // (apple-layout.css, .sidebar/.ph-rail/.ph-rail-panel), exactly the
+            // way the welcome band builds its fill from --at-band.
+            //
+            // Default is fully transparent, which is what makes the rule inert
+            // for every install that never picks the style: the CSS paints a
+            // transparent-to-transparent gradient over --sidebar-bg and nothing
+            // shows. Every OTHER nav style resets these two, or a gradient
+            // picked once would survive underneath a later Brand or Dark.
+            ['var' => '--sidebar-grad-from',      'label' => 'Gradient top',       'light' => 'rgba(0,0,0,0)',          'dark' => 'rgba(0,0,0,0)',       'hint' => 'Top stop of the Gradient nav style. Transparent means no gradient -- the panel is the flat Sidebar background above.'],
+            ['var' => '--sidebar-grad-to',        'label' => 'Gradient bottom',    'light' => 'rgba(0,0,0,0)',          'dark' => 'rgba(0,0,0,0)',       'hint' => 'Bottom stop. Set both to see a gradient; the Gradient style sets them for you from the accent.'],
             ['var' => '--topbar-bg',              'label' => 'Topbar background',  'light' => 'rgba(251,251,253,0.72)', 'dark' => 'rgba(44,44,46,0.72)', 'hint' => 'Also translucent -- keep some alpha or the frost effect is lost.'],
         ],
 
