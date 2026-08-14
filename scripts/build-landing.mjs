@@ -30,7 +30,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 
 const ROOT = path.resolve(HERE, '..');
 const SRC = path.join(ROOT, 'hadrianthegreat-landind');
-const OUT = path.join(ROOT, 'dist');
+const OUT = path.join(SRC, 'dist');   // beside the source it is built from
 const say = (...a) => console.log(' ', ...a);
 
 /* The landing sits at the document root once deployed, so its siblings move

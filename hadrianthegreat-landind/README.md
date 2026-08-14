@@ -202,10 +202,11 @@ Build first:
 node scripts/build-landing.mjs
 ```
 
-That writes `dist/`, which is what you upload — its **contents** go in
-`public_html`, not the folder itself:
+That writes **`hadrianthegreat-landind/dist/`**, beside the source it was built
+from. Its **contents** are what you upload — they go in `public_html`, not the
+folder itself:
 
-    dist/
+    hadrianthegreat-landind/dist/
       index.html            the landing (was "Hadrian Landing Imperial.html")
       about.html            (was "Hadrian About.html")
       assets/               css, the compiled app, React, images
@@ -261,7 +262,7 @@ A whole page load is now about 210 KB.
 
 Keep editing the source in `hadrianthegreat-landind/` and re-run the build. The
 source still runs unbuilt for development — see Open, above — so nothing about
-the way you work changes. `dist/` is gitignored; it is output, not source.
+the way you work changes. `dist/` is gitignored wherever it sits; it is output, not source.
 
 Stop anything serving `dist/` before rebuilding. Windows holds a handle on every
 file a server has touched, and the build says so rather than failing obscurely.
