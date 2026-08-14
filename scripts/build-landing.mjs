@@ -1,0 +1,192 @@
+/* build-landing.mjs — turn the landing into a folder you can upload
+   ---------------------------------------------------------------------------
+   The site runs on Babel-in-the-browser during development, which costs a
+   visitor 4.2 MB of JavaScript (React dev 107 KB + ReactDOM dev 1,055 KB +
+   Babel 3,064 KB) and a compile of 131 KB of JSX on every single view, before
+   anything paints. That is a prototyping setup, not a shipping one.
+
+   This compiles the JSX once, self-hosts React's production builds, and lays
+   the three folders out as one document root:
+
+       dist/
+         index.html              the landing
+         about.html
+         assets/                 css, the compiled app, vendor React, images
+         apple-client-area/      the hero embeds this
+         hadrian-admin-panel/    the Menu spotlight embeds this
+
+   Upload the CONTENTS of dist/ to your public_html. Nothing here needs Node or
+   PHP on the server -- it is all static files.
+
+   Run: node scripts/build-landing.mjs
+*/
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// HERE landed in Node 20; this has to run on 18 too
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+
+const ROOT = path.resolve(HERE, '..');
+const SRC = path.join(ROOT, 'hadrianthegreat-landind');
+const OUT = path.join(ROOT, 'dist');
+const say = (...a) => console.log(' ', ...a);
+
+/* The landing sits at the document root once deployed, so its siblings move
+   underneath it. Everything else about the source is unchanged. */
+const PATHS = { clientArea: 'apple-client-area/', admin: 'hadrian-admin-panel/' };
+/* Old file name -> new. The About page links to the landing nine times. */
+const RENAME = {
+  'Hadrian Landing Imperial.html': 'index.html',
+  'Hadrian About.html': 'about.html',
+};
+const REACT = [
+  ['react.production.min.js', 'https://unpkg.com/react@18.3.1/umd/react.production.min.js'],
+  ['react-dom.production.min.js', 'https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js'],
+];
+
+// maxRetries: on Windows a server still serving dist/ holds handles open, and
+// the first rmdir loses to it
+/* The tag shapes the build rewrites, in one place: the two pages and the admin
+   panel all strip the same CDN and text/babel tags. */
+const RE_CDN = /<script src="https:\/\/unpkg\.com[\s\S]*?<\/script>\s*/g;
+const RE_BABEL = /<script type="text\/babel"[\s\S]*?<\/script>\s*/g;
+const RE_BABEL_SRC = /<script type="text\/babel" src="([^"]+)"/g;
+
+
+/* Windows keeps a handle on every file a running server has served, so the
+   first rmdir loses to it. Retry for a few seconds, then say plainly what is
+   holding the folder rather than dumping an ENOTEMPTY stack. */
+const rm = (p) => {
+  try {
+    fs.rmSync(p, { recursive: true, force: true, maxRetries: 40, retryDelay: 150 });
+  } catch (e) {
+    console.error(`\n  Could not clear ${path.relative(ROOT, p)} — something is holding it open.`);
+    console.error('  Stop anything serving dist/ (a preview, a terminal, an open Explorer window) and run again.\n');
+    process.exit(1);
+  }
+};
+const mk = (p) => fs.mkdirSync(p, { recursive: true });
+const copy = (from, to) => { mk(path.dirname(to)); fs.cpSync(from, to, { recursive: true }); };
+const kb = (n) => `${(n / 1024).toFixed(0)} KB`;
+const sizeOf = (p) => fs.statSync(p).size;
+
+/* ── 1. the compiled app ──────────────────────────────────────────────────
+   The five JSX files are classic scripts sharing one global scope, not
+   modules, so concatenating them in the order the HTML lists them is exactly
+   equivalent -- and safer than bundling, which would give each its own scope
+   and break every cross-file reference. Only the JSX is transformed; the
+   syntax the files use beyond that is native in every browser React 18
+   supports, so there is nothing to down-level. */
+function compile(files, dir = SRC) {
+  const parts = files.map((f) => {
+    // Through stdin, not as a path argument: this repo lives under a directory
+    // with a space in it, and a shelled-out command splits that into two
+    // filenames. No --bundle and no --format either -- a bare transform, so each
+    // file keeps the top-level scope a classic script tag gave it.
+    const source = fs.readFileSync(path.join(dir, f), 'utf8');
+    const js = execFileSync('npx', ['--yes', 'esbuild', '--loader=jsx', '--jsx=transform'],
+      { input: source, encoding: 'utf8', shell: true, maxBuffer: 32 * 1024 * 1024 });
+    return `/* ${f} */
+${js}`;
+  });
+  return parts.join('\n');
+}
+
+/* ── 2. the HTML ──────────────────────────────────────────────────────────
+   Swap the three CDN script tags and the text/babel tags for one compiled
+   file and self-hosted React, point the assets at assets/, tell the app where
+   its siblings went, and rewrite the links the renames broke. */
+/* Renames apply to markup and to compiled code alike -- the About page holds
+   nine links to the landing inside its JSX, which no amount of HTML rewriting
+   would have reached. */
+function applyRenames(text) {
+  for (const [from, to] of Object.entries(RENAME)) {
+    text = text.split(from).join(to).split(encodeURI(from)).join(to);
+  }
+  return text;
+}
+function rewriteHtml(html, jsName) {
+  const scripts = REACT.map(([f]) => `<script src="assets/${f}"></script>`).join('\n');
+  html = html
+    .replace(RE_CDN, '')
+    .replace(RE_BABEL, '')
+    .replace(/<link rel="stylesheet" href="([^"]+)">/g, '<link rel="stylesheet" href="assets/$1">')
+    .replace('</head>', `<script>window.HADRIAN_PATHS = ${JSON.stringify(PATHS)};</script>\n</head>`)
+    .replace('</body>', `${scripts}\n<script src="assets/${jsName}"></script>\n</body>`);
+  return applyRenames(html);
+}
+
+/* ── run ──────────────────────────────────────────────────────────────── */
+console.log('\nBuilding the landing page for upload\n');
+rm(OUT); mk(path.join(OUT, 'assets'));
+
+// the two pages, and the scripts each one loads, in their own order
+const pages = Object.keys(RENAME).map((file) => {
+  const html = fs.readFileSync(path.join(SRC, file), 'utf8');
+  const jsx = [...html.matchAll(RE_BABEL_SRC)].map((m) => m[1]);
+  return { file, out: RENAME[file], html, jsx };
+});
+
+for (const p of pages) {
+  const jsName = p.out.replace(/\.html$/, '.js');
+  fs.writeFileSync(path.join(OUT, 'assets', jsName), applyRenames(compile(p.jsx)));
+  fs.writeFileSync(path.join(OUT, p.out), rewriteHtml(p.html, jsName));
+  say(`${p.out.padEnd(12)} ${p.jsx.length} jsx -> assets/${jsName}  ${kb(sizeOf(path.join(OUT, 'assets', jsName)))}`);
+}
+
+// css and images travel as they are
+for (const f of fs.readdirSync(SRC)) {
+  if (/\.(css|png|jpe?g|svg|webp|ico)$/i.test(f)) copy(path.join(SRC, f), path.join(OUT, 'assets', f));
+}
+/* screens/ stays at the root, NOT under assets/: the JSX asks for
+   "screens/sidebar-dashboard.png" relative to the page, and the page is the
+   document root here. The images the CSS asks for do live in assets/, because
+   they resolve relative to the stylesheet. Two different bases, both correct. */
+copy(path.join(SRC, 'screens'), path.join(OUT, 'screens'));
+say('assets/      css and images copied · screens/ at the root');
+
+// React, fetched once and served from your own domain
+for (const [file, url] of REACT) {
+  const dest = path.join(OUT, 'assets', file);
+  const cache = path.join(ROOT, 'build', 'vendor', file);   // gitignored
+  if (fs.existsSync(cache)) { copy(cache, dest); }
+  else {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`could not fetch ${url}: ${res.status}`);
+    const buf = Buffer.from(await res.arrayBuffer());
+    mk(path.dirname(cache)); fs.writeFileSync(cache, buf); fs.writeFileSync(dest, buf);
+  }
+  say(`assets/${file.padEnd(30)} ${kb(sizeOf(dest))}`);
+}
+
+// the two folders the page embeds, side by side beneath it
+copy(path.join(ROOT, 'apple-client-area'), path.join(OUT, 'apple-client-area'));
+copy(path.join(ROOT, 'Hadrian by Caesarthemes', 'hadrian-admin-panel'), path.join(OUT, 'hadrian-admin-panel'));
+say('apple-client-area/ and hadrian-admin-panel/ copied');
+
+/* The admin panel gets the same treatment. It is only ever loaded inside the
+   Menu spotlight, but left as a Babel page it would pull 3 MB from unpkg the
+   moment a visitor scrolled to that block -- on a live site, for one card. */
+{
+  const dir = path.join(OUT, 'hadrian-admin-panel');
+  const html = fs.readFileSync(path.join(dir, 'index.html'), 'utf8');
+  const jsx = [...html.matchAll(RE_BABEL_SRC)].map((m) => m[1]);
+  fs.writeFileSync(path.join(dir, 'apple-admin.js'), compile(jsx, dir));
+  for (const f of jsx) fs.rmSync(path.join(dir, f), { force: true });
+  const scripts = REACT.map(([f]) => `<script src="../assets/${f}"></script>`).join('\n');
+  fs.writeFileSync(path.join(dir, 'index.html'), html
+    .replace(RE_CDN, '')
+    .replace(RE_BABEL, '')
+    .replace('</body>', `${scripts}\n<script src="apple-admin.js"></script>\n</body>`));
+  say('hadrian-admin-panel/apple-admin.js'.padEnd(38) + kb(sizeOf(path.join(dir, 'apple-admin.js'))));
+}
+
+/* Walked in Node rather than shelled out to du, for the same reason the
+   compile reads stdin: a path with a space in it does not survive a shell. */
+const weigh = (dir) => fs.readdirSync(dir, { withFileTypes: true })
+  .reduce((n, e) => n + (e.isDirectory() ? weigh(path.join(dir, e.name)) : sizeOf(path.join(dir, e.name))), 0);
+console.log(`
+  dist/ is ${(weigh(OUT) / 1024 / 1024).toFixed(1)} MB — upload its CONTENTS to public_html
+`);

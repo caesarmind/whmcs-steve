@@ -188,6 +188,65 @@ The panel is a second Babel app on the page (~1.8s to mount here) and loads
 eagerly, because the give-up timer starts at mount: `loading="lazy"` would
 expire it before a visitor ever scrolled down, pinning the block to the mock.
 
+## Putting it on a server
+
+The site is static — no Node, no PHP, nothing to install on the host. But do not
+upload the source folder: it runs on Babel-in-the-browser, which costs a visitor
+**4.2 MB of JavaScript** (React dev 107 KB + ReactDOM dev 1,055 KB + Babel
+3,064 KB) and a compile of 131 KB of JSX on every single view, before anything
+paints. That is a prototyping setup.
+
+Build first:
+
+```bash
+node scripts/build-landing.mjs
+```
+
+That writes `dist/`, which is what you upload — its **contents** go in
+`public_html`, not the folder itself:
+
+    dist/
+      index.html            the landing (was "Hadrian Landing Imperial.html")
+      about.html            (was "Hadrian About.html")
+      assets/               css, the compiled app, React, images
+      screens/              the poster captures
+      apple-client-area/    the hero embeds this
+      hadrian-admin-panel/  the Menu spotlight embeds this
+
+The build compiles the JSX once, self-hosts React's production builds, and
+compiles the admin panel too — a visitor scrolling to the Menu block would
+otherwise pull Babel from unpkg for one card. Nothing in `dist/` requests
+unpkg; the only third-party call left is Google Fonts, for Cinzel.
+
+### Four things about the host
+
+1. **Keep the `.html` extensions and do not turn on clean URLs.** `npx serve`
+   rewrites `/x.html` to `/x`, and that cost two real bugs: the redirect drops
+   the query string, breaking the Live Demos deep links, and it normalises
+   `/dir/index.html` down to `/dir`, which moves the base path and 404s the
+   admin panel's relative scripts into an empty frame. Plain Apache does
+   neither — just do not add `MultiViews` or a "pretty URLs" option.
+2. **The three folders must stay siblings under one document root.** The hero
+   reads into `apple-client-area/` and `hadrian-admin-panel/` as same-origin
+   iframes. Neither can move to a subdomain or a CDN.
+3. **It works in a subdirectory.** Every path is relative, and the two the app
+   resolves at runtime come from `window.HADRIAN_PATHS`, which the build writes
+   into each page's `<head>`.
+4. **Still to do before launch:** `screens/` is 2.9 MB of PNG at 2880px wide,
+   displayed at about 890 and only used as a poster and the `file://` fallback —
+   resized and converted to WebP that is under 200 KB. There is also no meta
+   description and no OG tags, so the page previews as nothing when shared, and
+   the body is an empty `#root` until JS runs.
+
+### Editing after a build
+
+Keep editing the source in `hadrianthegreat-landind/` and re-run the build. The
+source still runs unbuilt for development — see Open, above — so nothing about
+the way you work changes. `dist/` is gitignored; it is output, not source.
+
+Stop anything serving `dist/` before rebuilding. Windows holds a handle on every
+file a server has touched, and the build says so rather than failing obscurely.
+
 ## Claims
 
 Everything the page states about the product was checked against

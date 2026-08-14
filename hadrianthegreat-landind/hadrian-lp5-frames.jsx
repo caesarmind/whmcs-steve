@@ -11,7 +11,11 @@
 // write the same attributes the theme's own state chip writes. Switching is
 // instant, needs no reload, and leaves nothing behind in the theme's localStorage.
 
-const CA_BASE = '../apple-client-area/';
+/* Where the client area sits, relative to this page. The build writes a different
+   value into window.HADRIAN_PATHS because the deployed landing sits at the doc
+   root with its siblings beneath it, rather than beside them. */
+const CA_PATHS = (typeof window !== 'undefined' && window.HADRIAN_PATHS) || {};
+const CA_BASE = CA_PATHS.clientArea || '../apple-client-area/';
 const CA_WIDTH = 1440;    // below ~1100px the client area takes its tablet treatment
 const CA_BOOT_MS = 7000;  // stop waiting for partials and keep the capture
 

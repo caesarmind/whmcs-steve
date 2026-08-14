@@ -650,7 +650,7 @@ function Tiles() {
    a file -- so the panel's relative apple-admin.jsx resolves one directory too
    high and 404s, leaving an empty #root. Asking for the directory keeps the
    base where the assets are. */
-const ADMIN_BASE = '../Hadrian by Caesarthemes/hadrian-admin-panel/';
+const ADMIN_BASE = (CA_PATHS.admin || '../Hadrian by Caesarthemes/hadrian-admin-panel/');
 const ADMIN_WIDTH = 760;   // the item list alone, so nearer life size than the full panel
 function AdminSpot({ view, dark, label }) {
   const state = React.useMemo(() => ({ admin: true, dark }), [dark]);
