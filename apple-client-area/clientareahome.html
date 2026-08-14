@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — WHMCS by Apple</title>
     <link rel="stylesheet" href="css/apple-theme.css?v=12">
-    <link rel="stylesheet" href="css/apple-layout.css?v=17">
+    <link rel="stylesheet" href="css/apple-layout.css?v=24">
     <style>
         body { display: block; }
 
@@ -371,7 +371,7 @@
 <div data-include="partials/rail-panels.html"></div>
 
 <!-- ═══════════ Sidebar layout — fixed 260px rail ═══════════ -->
-<div data-include="partials/sidebar.html"></div>
+<!-- sidebar moved into .app-shell below (boxed layout wraps sidebar + content) -->
 
 <!-- ═══════════ MAIN WRAP (shifts right when layout=side|rail) ═══════════ -->
 <div class="ph-main-wrap">
@@ -562,7 +562,15 @@
 </nav>
 
 <!-- ═══════════ PAGE CONTENT ═══════════ -->
+<!-- .app-shell: boxed layout wraps sidebar + content into the floating card; transparent passthrough in top/side/rail -->
+<div class="app-shell">
+<div class="app-shell-aside" data-include="partials/sidebar.html"></div>
 <div class="content-area">
+<nav class="box-breadcrumb" aria-label="breadcrumb">
+    <a href="portal-home.html">Home</a>
+    <span class="sep">&rsaquo;</span>
+    <span class="current" aria-current="page">Dashboard</span>
+</nav>
     <!-- Sentinel: enables the state-chip Services: Controls inside/outside pill on this page -->
     <div class="svc-table-card" aria-hidden="true"></div>
     <h1 class="dash-heading">My Dashboard</h1>
@@ -1011,13 +1019,15 @@
 <!-- ═══════════ Inner-layout slim footer (sidebar + rail) ═══════════ -->
 <div data-include="partials/sidebar-footer.html"></div>
 
+</div><!-- /.app-shell -->
+
 </div><!-- /.ph-main-wrap -->
 
 <!-- ═══════════ Language / currency modal ═══════════ -->
 <div data-include="partials/locale-modal.html"></div>
 
 <script src="js/apple-theme.js?v=12"></script>
-<script src="js/apple-layout.js?v=17"></script>
+<script src="js/apple-layout.js?v=24"></script>
 <script>
 // Page-specific interactions for the Dashboard
 document.addEventListener('apple-layout:ready', function () {

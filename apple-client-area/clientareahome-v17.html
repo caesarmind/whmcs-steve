@@ -1,0 +1,2625 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard (busy account) — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=12">
+    <link rel="stylesheet" href="css/apple-layout.css?v=17">
+    <style>
+body { display: block; }
+
+        /* =====================================================================
+           v17 - v16's bento, authored for a BUSY account
+           8 services / 7 domains / 10 open tickets / 4 unpaid invoices / 6 posts
+
+           The question this page answers: a bento block is a fixed-height card,
+           so what happens when the collection inside it is longer than the card?
+           Five interchangeable answers, switchable from the preview chip
+           ("Overflow"), all driving body[data-ovf]:
+
+             pages   fit rows to the space the card got, then a two-arrow
+                     "3/40" pager when there is more than fits (default)
+             peek    top N by urgency + "+N more"          (card never grows)
+             scroll  fixed slot, native scroll + fade mask (no controls at all)
+             table   the collection graduates out of the bento into a full-width
+                     section with search, column headers and real pagination
+             digest  no list: a count, a status bar, and only the exceptions
+
+           A second chip ("Volume") clones rows up to 24 / 120 per collection so
+           the pagination UI can be checked at a scale nobody authors by hand.
+           ===================================================================== */
+
+        /* ---- page head ---- */
+        .lp-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 28px; margin: 0 0 18px; flex-wrap: wrap; }
+        .lp-headline { min-width: 0; }
+        .lp-greeting { font-size: 34px; font-weight: 600; letter-spacing: -0.03em; margin: 0 0 7px; line-height: 1.05; }
+        /* the status pill moves in beside the counts, freeing the right side. It
+           drops its own surface too: one solid object in this zone (the account
+           card) reads as composed, three competing ones read as clutter. */
+        .lp-subrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .lp-sub { font-size: 15px; color: var(--color-text-secondary); margin: 0; letter-spacing: -0.01em; }
+        .lp-subrow .sep { color: var(--color-text-quaternary); }
+        .lp-status { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--color-text-secondary); white-space: nowrap; text-decoration: none; letter-spacing: -0.01em; }
+        .lp-status:hover { color: var(--color-text-primary); text-decoration: none; }
+
+        /* ---- account cluster in the title area ---- */
+        /* The account sits on the same surface as the cards and the attention
+           strip below it - same radius family, same shadow token - so it reads as
+           part of the page rather than text floating on the background. */
+        .hd-account { display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+            padding: 10px 16px 10px 10px; border-radius: 14px;   /* header furniture: 14, like the strip below. Content cards keep 18 */
+            background: var(--color-surface); box-shadow: var(--shadow-card);
+            border: 0.5px solid var(--color-border); }
+        .hd-account .pf-avatar { width: 40px; height: 40px; font-size: 15px; }
+        .hd-name { font-size: 15px; font-weight: 600; letter-spacing: -0.012em; line-height: 1.2; }
+        .hd-links { display: flex; align-items: center; gap: 7px; margin-top: 3px; flex-wrap: wrap; }
+        .hd-links a { font-size: 12px; font-weight: 500; color: var(--color-accent); text-decoration: none; white-space: nowrap; }
+        .hd-links a:hover { text-decoration: none; opacity: 0.75; }
+        .hd-links .sep { font-size: 11px; color: var(--color-text-quaternary); }
+        @media (max-width: 700px) { .hd-account { width: 100%; } }
+        .lp-status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-green); box-shadow: 0 0 8px rgba(48,209,88,0.5); }
+
+        /* ---- attention strip: the first answer to volume is not pagination,
+                it is pulling the few exceptions out of the many rows ---- */
+        .atn { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin: 0 0 20px; padding: 11px 14px; border-radius: 14px; background: var(--color-surface); box-shadow: var(--shadow-card); }
+        .atn-lead { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
+        .atn-lead .n { width: 20px; height: 20px; border-radius: 50%; background: var(--color-red); color: #fff; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+        .atn-chip { font-size: 12.5px; font-weight: 500; text-decoration: none; padding: 5px 11px; border-radius: var(--radius-pill); white-space: nowrap; }
+        .atn-chip:hover { text-decoration: none; filter: brightness(0.97); }
+        .atn-chip.red { background: var(--color-red-bg); color: var(--color-red-text); }
+        .atn-chip.orange { background: var(--color-orange-bg); color: var(--color-orange-text); }
+        .atn-chip.blue { background: var(--color-blue-bg); color: var(--color-blue-text); }
+        .atn-sp { flex: 1 1 8px; }
+        .atn-dismiss { border: 0; background: none; font: inherit; font-size: 12px; color: var(--color-text-tertiary); cursor: pointer; padding: 4px 6px; border-radius: 8px; }
+        .atn-dismiss:hover { background: var(--color-surface-secondary); color: var(--color-text-secondary); }
+
+        /* ---- preview-only caption: what the current mode is doing ---- */
+        .ovf-note { display: flex; align-items: flex-start; gap: 9px; font-size: 12.5px; line-height: 1.45; color: var(--color-text-secondary); background: var(--color-surface-secondary); border-radius: 12px; padding: 10px 13px; margin: 0 0 18px; }
+        .ovf-note b { color: var(--color-text-primary); font-weight: 600; }
+        .ovf-note .tag { flex-shrink: 0; font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); background: var(--color-surface); border-radius: 5px; padding: 3px 6px; margin-top: 1px; }
+        body[data-preview="off"] .ovf-note, body.screenshot .ovf-note { display: none; }
+
+        /* ---- bento: card modes keep v16's shape, but the two long collections
+                (services, tickets) get the 2-column slots, and domains - short
+                strings that tile well - take a full-width multi-column strip ---- */
+        /* ---- PAIRED ROWS: 1/3 + 2/3 -----------------------------------------
+           No named areas and no full-width slabs. Blocks are grouped into three
+           kinship pairs, and each pair owns one row - assets, then the things
+           that want an answer, then reference:
+
+               services + domains        invoices + tickets        profile + news
+
+           A row always sums to 3, so there are exactly two blocks per row - three
+           different blocks in a row was too much variety - and the wide 2/3 slot
+           is earned by whichever block of the pair has more rows. A collection
+           that shrinks drops to 1/3 and hands the width to its partner, so small
+           data never sits in an oversized block.
+
+           Grid chip:  "1/3 + 2/3"  -> 331px + 677px
+                       "1/2 + 1/2"  -> two 504px halves, same pairing
+
+           data-span places the block; data-width names the fraction it got
+           (third / twothirds / half / full) and is what the inner column count and
+           the table treatment key off, so "full" means full width in any grid.
+           --------------------------------------------------------------------- */
+        /* SIX-COLUMN TRACK. A 2- or 3-column grid can offer thirds OR halves but
+           never both - 1/3 and 1/2 don't share a column system. Six is the lowest
+           common multiple, so every fraction the layout map offers lands on a whole
+           number of columns and all four coexist:
+               1/3 -> 2 cols   1/2 -> 3 cols   2/3 -> 4 cols   1/1 -> 6 cols
+           grid-column is keyed off data-width (the fraction), so data-span is no
+           longer needed to place a block. The Grid chip (thirds/halves) now only
+           sets the rhythm the Auto pairing uses, not the column count. */
+        .lp-bento { display: grid; gap: 16px; grid-auto-flow: row dense;
+            grid-template-columns: repeat(6, minmax(0, 1fr)); }
+        .lp-bento > [data-width="third"] { grid-column: span 2; }
+        .lp-bento > [data-width="half"] { grid-column: span 3; }
+        .lp-bento > [data-width="twothirds"] { grid-column: span 4; }
+        .lp-bento > [data-width="full"] { grid-column: span 6; }
+        /* Responsive ladder. Between 700 and 900 the small fractions collapse to a
+           half (3 of 6) and the big ones to full, so a laptop window - or a zoom
+           level - just under the line keeps two-up pairing instead of stacking. */
+        @media (max-width: 900px) {
+            .lp-bento > [data-width="third"], .lp-bento > [data-width="half"] { grid-column: span 3; }
+            .lp-bento > [data-width="twothirds"], .lp-bento > [data-width="full"] { grid-column: span 6; } }
+        @media (max-width: 700px) {
+            .lp-bento > [data-width] { grid-column: span 6; } }
+
+        /* Table mode does not pair, so by DOM order the two fixed cards would end
+           up stranded between full-width tables. Pull them to the front instead -
+           the only use of `order` here, and only in that alternative view. */
+        body[data-ovf="table"] .inv-block { order: -1; }
+
+        /* inner columns follow the width the block actually got */
+        [data-width="third"] .dom-rows, [data-width="third"] .ann-rows { grid-template-columns: minmax(0, 1fr); }
+        [data-width="half"] .dom-rows, [data-width="half"] .ann-rows,
+        [data-width="twothirds"] .dom-rows, [data-width="twothirds"] .ann-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        [data-width="full"] .dom-rows, [data-width="full"] .ann-rows { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        /* inner columns follow the width the block ends up with at each stage */
+        @media (max-width: 900px) {
+            [data-width="full"] .dom-rows, [data-width="full"] .ann-rows,
+            [data-width="twothirds"] .dom-rows, [data-width="twothirds"] .ann-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            [data-width="third"] .dom-rows, [data-width="third"] .ann-rows { grid-template-columns: minmax(0, 1fr); } }
+        @media (max-width: 700px) {
+            [data-width] .dom-rows, [data-width] .ann-rows { grid-template-columns: minmax(0, 1fr); } }
+
+        /* ---- utility tile: shown only to fill a leftover cell.
+                !important is load-bearing - .lp-card.hp-tile{display:flex} has the
+                same specificity and comes later, so without it the tile renders
+                in every state and the hidden attribute looks like it did nothing. */
+        .fill-block { display: flex; flex-direction: column; }
+        .lp-bento > [hidden] { display: none !important; }
+        .fill-title { font-size: 17px; font-weight: 600; letter-spacing: -0.015em; margin: 2px 0 6px; }
+        .fill-sub { font-size: 12.5px; opacity: 0.66; line-height: 1.45; margin: 0 0 16px; }
+        .fill-search { position: relative; display: flex; align-items: center; margin-bottom: 10px; }
+        .fill-search input { height: 34px; width: 100%; margin: 0; padding: 0 12px; font: inherit; font-size: 13px; border-radius: 10px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-primary); }
+        .fill-search input:focus { outline: none; border-color: var(--color-accent); }
+        .fill-block .btn-primary { margin-top: 0; height: 34px; font-size: 13px; align-self: flex-start; }
+        .fill-foot { margin-top: auto; padding-top: 13px; }
+
+        /* ---- REGISTER-A-DOMAIN block: one markup, four footprints ------------
+           The register card is a first-class block, so the layout map can hand it
+           any of the four widths the grid offers. Rather than stretch a narrow
+           column, it reshapes to each:
+
+             1/3 third      compact vertical prompt (input over button)
+             1/2 half       same head, but an inline search bar
+             2/3 twothirds  two columns - message | action - and the TLD pricing row
+             1/1 full       a full-width hero band: bigger title, wide search, pricing
+
+           head + action are the two groups the 2/3 grid splits into; at the other
+           widths they simply stack. --------------------------------------------- */
+        .reg-action { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+        .reg-block .fill-title { margin: 0 0 5px; }
+        /* font-size repeated at .reg-block specificity to beat apple-theme's
+           .hp-tile p { font-size: 21px } (the card carries the hp-tile class) */
+        .reg-block .fill-sub { margin: 0 0 14px; font-size: 12.5px; }
+        /* the form now carries the button; arrangement is per-width */
+        .reg-block .fill-search { gap: 8px; margin: 0; }
+        .reg-block .fill-search input { flex: 1; width: auto; min-width: 0; }
+        .reg-block .fill-search .btn-primary { margin: 0; flex-shrink: 0; padding: 0 18px; }
+        .reg-tlds { display: none; flex-wrap: wrap; gap: 6px; margin-top: 13px; }
+        .reg-tld { font-size: 11.5px; font-weight: 500; padding: 4px 10px; border-radius: var(--radius-pill); background: rgba(0,0,0,0.05); color: var(--color-text-secondary); white-space: nowrap; }
+        .reg-tld b { color: var(--color-text-primary); font-weight: 600; margin-left: 4px; }
+        .reg-block .fill-foot { margin-top: auto; padding-top: 14px; }
+
+        /* 1/3 - compact vertical prompt: input over a left-aligned button.
+           flex:1 is for the inline (row) layouts; in this column it would grow the
+           input's height to nothing, so pin it back to a normal full-width field */
+        .reg-block[data-width="third"] .fill-search { flex-direction: column; align-items: stretch; }
+        .reg-block[data-width="third"] .fill-search input { flex: none; width: 100%; }
+        .reg-block[data-width="third"] .fill-search .btn-primary { align-self: flex-start; }
+
+        /* 1/2 - inline search, head still stacked above */
+        .reg-block[data-width="half"] .fill-search { flex-direction: row; align-items: center; }
+
+        /* 2/3 - two-column panel: message on the left, action on the right, and
+           the card earns its pricing row. margin-top:auto can't reach the bottom
+           inside a grid, so the transfer link takes a fixed gap instead. */
+        /* .lp-card prefix lifts this over .lp-card.hp-tile{display:flex}, which is
+           the same 2-class specificity but comes later in the sheet */
+        .lp-card.reg-block[data-width="twothirds"] { display: grid; grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr); gap: 30px; align-items: center; }
+        .reg-block[data-width="twothirds"] .fill-sub { margin-bottom: 0; }
+        .reg-block[data-width="twothirds"] .fill-search { flex-direction: row; align-items: center; }
+        .reg-block[data-width="twothirds"] .reg-tlds { display: flex; }
+        .reg-block[data-width="twothirds"] .fill-foot { margin-top: 14px; }
+
+        /* 1/1 - full-width hero band: bigger title, a wide (capped) search, pricing */
+        .reg-block[data-width="full"] .fill-title { font-size: 22px; letter-spacing: -0.02em; }
+        .reg-block[data-width="full"] .fill-sub { margin-bottom: 16px; }
+        .reg-block[data-width="full"] .fill-search { flex-direction: row; align-items: center; max-width: 620px; }
+        .reg-block[data-width="full"] .fill-search .btn-primary { padding: 0 22px; }
+        .reg-block[data-width="full"] .reg-tlds { display: flex; }
+
+        /* below the 2-col grid breakpoint, a 2/3 card is really a wide single
+           column again, so drop the split and let it behave like 1/1 */
+        @media (max-width: 760px) {
+            .lp-card.reg-block[data-width="twothirds"] { display: flex; }
+        }
+        [data-theme="dark"] .reg-tld { background: rgba(255,255,255,0.1); }
+
+        /* ---- PROFILE block: one identity card, four footprints (mirrors the
+                register block). head = avatar + name + company; action = a fact
+                list (email / phone / address) + buttons. The facts give the card
+                enough substance to fill each footprint: they stack under the
+                identity at 1/3 and 1/2, sit in the second column at 2/3, and run
+                as a horizontal strip in the 1/1 band. ------------------------------ */
+        .pro-action { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+        .pro-id { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+        .pro-avatar { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 600; letter-spacing: 0.02em; color: #fff;
+            background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 55%, #ffffff)); }
+        .pro-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+        .pro-company { font-size: 12.5px; color: var(--color-text-secondary); margin-top: 1px; }
+        .pro-facts { margin: 15px 0 0; display: flex; flex-direction: column; gap: 11px; }
+        .pro-fact { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .pro-fact dt { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); }
+        .pro-fact dd { margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--color-text-secondary); }
+        .pro-foot { margin-top: auto; padding-top: 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .pro-block .btn-primary.pro-go { margin: 0; height: 34px; font-size: 13px; padding: 0 16px; align-self: flex-start; }
+
+        /* the identity card is lighter than a data card, so it doesn't need the
+           210px floor - let it size to its content (a slim band at 1/1). The
+           .lp-bento prefix lifts it over .lp-card.hp-tile{min-height:210px}, which
+           ties on class count but comes later in the sheet. */
+        .lp-bento .lp-card.pro-block { min-height: 0; }
+
+        /* 2/3 - two columns: identity | facts + actions */
+        .lp-card.pro-block[data-width="twothirds"] { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 28px; align-items: center; }
+        .pro-block[data-width="twothirds"] .pro-facts { margin-top: 0; }
+        .pro-block[data-width="twothirds"] .pro-foot { margin-top: 16px; }
+
+        /* 1/1 - horizontal band: identity | email · phone · address (spread) | actions */
+        .lp-card.pro-block[data-width="full"] { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto; gap: 40px; align-items: center; }
+        .pro-block[data-width="full"] .pro-action { display: contents; }
+        .pro-block[data-width="full"] .pro-facts { flex-direction: row; gap: 40px; margin: 0; }
+        .pro-block[data-width="full"] .pro-fact { flex: 1; }
+        .pro-block[data-width="full"] .pro-fact-addr { flex: 1.7; }
+        .pro-block[data-width="full"] .pro-foot { margin-top: 0; padding-top: 0; flex-shrink: 0; }
+
+        @media (max-width: 760px) {
+            .lp-card.pro-block[data-width="twothirds"], .lp-card.pro-block[data-width="full"] { display: flex; }
+            .pro-block[data-width="full"] .pro-action { display: flex; }
+            .pro-block[data-width="full"] .pro-facts { flex-direction: column; gap: 11px; margin-top: 15px; }
+        }
+
+        .lp-card.hp-tile { min-height: 210px; padding: 22px 24px; border-radius: 18px; align-items: stretch; text-align: left; display: flex; flex-direction: column; gap: 0; }
+        .lp-card > .when-full, .lp-card > .when-empty { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+        /* ---- COLOUR POLICY ---------------------------------------------------
+           Three layers, and only one of them is decoration:
+
+             1. state   - status pills, the tally dots, the attention strip. These
+                          are the only saturated colours, and they mean something.
+             2. action  - links and primary buttons, always the accent.
+             3. surface - the tile tone. Decoration, so it must stay quieter than
+                          any pill, and it must follow the palette.
+
+           Tone chip: quiet (all tiles the same surface) / paired (one soft
+           accent-mixed wash per row) / mixed (the original sky + cream + graphite
+           set). The first two derive every colour from --color-accent and
+           --color-surface, so they track the palette switcher and dark mode; the
+           hardcoded hex of "mixed" does not - an emerald palette leaves the
+           domains tile blue.
+           --------------------------------------------------------------------- */
+        .lp-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 11px; color: var(--color-accent); }
+        .lp-eyebrow.is-alert { color: var(--color-red-text); }
+        .lp-viewall, .lp-link, .lp-more a { color: var(--color-accent); }
+
+        /* quiet + paired: one neutral surface for every tile */
+        body[data-tone="quiet"] .lp-card, body[data-tone="paired"] .lp-card {
+            background: var(--color-surface); color: var(--color-text-primary);
+            box-shadow: var(--shadow-card); border: 0.5px solid var(--color-border); }
+        /* paired: the narrow block of each row carries a soft wash, mixed from the
+           accent so switching palette or theme carries it along */
+        body[data-tone="paired"] .lp-card[data-tint="on"] {
+            background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface));
+            border-color: color-mix(in srgb, var(--color-accent) 18%, var(--color-border)); }
+        /* An eyebrow is a label, not an action or a state, so in the two derived
+           tones it goes quiet and the accent is left to the links. This also
+           clears a real contrast problem: accent on the wash measures 4.27:1,
+           under AA for 11px text, where text-secondary measures over 5. */
+        body[data-tone="quiet"] .lp-eyebrow,
+        body[data-tone="paired"] .lp-eyebrow { color: var(--color-text-secondary); }
+        /* the one label that keeps its colour, because it reports a state */
+        body[data-tone="quiet"] .lp-eyebrow.is-alert,
+        body[data-tone="paired"] .lp-eyebrow.is-alert { color: var(--color-red-text); }
+        /* links on a washed card are darkened toward the text colour in light mode
+           and lightened in dark mode - one mix that works both ways */
+        body[data-tone="paired"] [data-tint="on"] .lp-viewall,
+        body[data-tone="paired"] [data-tint="on"] .lp-link,
+        body[data-tone="paired"] [data-tint="on"] .lp-more a {
+            color: color-mix(in srgb, var(--color-accent) 84%, var(--color-text-primary)); }
+
+        /* Charcoal can now land on any narrow block, not just the ticket card it
+           was designed around, and the accent measures 3.05:1 there. Rebinding the
+           accent inside the tile fixes every ink at once - eyebrow, links, active
+           pager, tally chips - instead of enumerating elements and missing one. */
+        body[data-tone="mixed"] .hp-tile-graphite { --color-accent: #6fb8ff; }
+        /* the button still needs a dark-enough fill to carry white text */
+        body[data-tone="mixed"] .hp-tile-graphite .btn-primary { background: #0071e3; color: #fff; }
+        /* mixed keeps the original palette, including the yellow-on-charcoal card */
+        body[data-tone="mixed"] .hp-tile-graphite .lp-eyebrow.is-support,
+        body[data-tone="mixed"] .hp-tile-graphite .lp-viewall.is-support { color: #ffd60a; }
+        /* the alert eyebrow's #d70015 is unreadable on charcoal */
+        body[data-tone="mixed"] .hp-tile-graphite .lp-eyebrow.is-alert { color: #ff9089; }
+        /* Give the original palette an edge. hp-tile-light is #fbfbfd, the same
+           value as the page, so those cards had no boundary at all - they were
+           built for a white marketing section, not a tinted app background. */
+        body[data-tone="mixed"] .lp-card { box-shadow: var(--shadow-card); }
+        body[data-tone="mixed"] .lp-card.hp-tile-light { background: var(--color-surface); }
+        body[data-tone="mixed"] .lp-card.hp-tile-cream,
+        body[data-tone="mixed"] .lp-card.hp-tile-sky { border: 0.5px solid rgba(0,0,0,0.05); }
+        .lp-titlerow { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+        .lp-title { font-size: 17px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.25; margin: 0; }
+        .lp-hint { font-size: 11px; opacity: 0.5; white-space: nowrap; }
+        .lp-cardsub { font-size: 12.5px; opacity: 0.66; margin: 0; line-height: 1.4; }
+
+        /* ---- block footer: one auto-margin slot holding whichever overflow
+                affordance the current mode uses ---- */
+        .lp-foot { margin-top: auto; padding-top: 13px; display: flex; flex-direction: column; align-items: stretch; gap: 9px; }
+        /* peek + digest have a single quiet line, so pair it with the link on one row.
+           peek is a per-card mode (a block can be peek while the page is not), so it
+           keys off the card's own data-ovf; digest stays a page-wide mode on body. */
+        .lp-card[data-ovf="peek"] .lp-foot, body[data-ovf="digest"] .lp-foot { flex-direction: row; align-items: baseline; justify-content: space-between; gap: 14px; }
+        .lp-card[data-ovf="peek"] .lp-more, body[data-ovf="digest"] .lp-more { min-width: 0; }
+        /* the pager sits opposite the "view all" link, on one line */
+        .lp-card[data-ovf="pages"] .lp-foot { flex-direction: row; align-items: center; justify-content: space-between; gap: 14px; flex-shrink: 0; }
+        .lp-viewall { font-size: 13px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; }
+        .lp-viewall:hover { opacity: 0.78; text-decoration: none; }
+        .lp-more { display: none; font-size: 12.5px; opacity: 0.7; }
+        .lp-more a { font-weight: 500; text-decoration: none; }
+        .lp-card[data-ovf="peek"] .lp-more, body[data-ovf="digest"] .lp-more { display: block; }
+
+        /* ---- rows (one markup, five presentations) ---- */
+        /* --row-h is the measured row height (58.4px for a name + sub-line row),
+           rounded up by a hair so N rows always clear their slot. --slot is the
+           minimum number of rows a card reserves before it starts paging. */
+        .lp-rows { margin-top: 13px; --row-h: 59px; }
+        .lp-rows > [hidden] { display: none !important; }
+        .lp-srow { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid rgba(0,0,0,0.07); }
+        .lp-srow.is-last { border-bottom: 0; }
+        .lp-srow-main { flex: 1; min-width: 0; }
+        .lp-srow-name { font-size: 13.5px; font-weight: 500; letter-spacing: -0.008em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lp-srow-sub { font-size: 11.5px; opacity: 0.62; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lp-srow-price { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .lp-cell { display: none; font-size: 12.5px; opacity: 0.78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lp-num { font-variant-numeric: tabular-nums; }
+
+        /* domains tile as a multi-column strip: 7 (or 24) short names all fit,
+           so this collection needs no overflow control at all in card modes */
+        .dom-rows { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 26px; --row-h: 41px; }
+        .dom-rows .lp-srow-main { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+        .dom-rows .lp-srow-sub { margin-top: 0; flex-shrink: 0; }
+        /* in the tiled strip only the exceptions carry a pill - "Active" on all
+           seven rows is noise, and the tally above already gives the split */
+        .dom-rows .pill-green { display: none; }
+        body[data-ovf="table"] [data-width="full"] .dom-rows .pill-green { display: block; }
+        @media (max-width: 760px) { .dom-rows { grid-template-columns: 1fr; } }
+
+        .pill { font-size: 10.5px; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-pill); white-space: nowrap; }
+        .pill-green { background: var(--color-green-bg); color: var(--color-green-text); }
+        .pill-orange { background: var(--color-orange-bg); color: var(--color-orange-text); }
+        .pill-red { background: var(--color-red-bg); color: var(--color-red-text); }
+        .pill-blue { background: var(--color-blue-bg); color: var(--color-blue-text); }
+        .pill-gray { background: var(--color-gray-bg); color: var(--color-gray-text); }
+
+        /* ---- status tally: doubles as the filter control. At 10 tickets the
+                useful question is "which 3 need me", not "which page am I on" ---- */
+        .lp-tally { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+        .lp-tally button { font: inherit; font-size: 11.5px; font-weight: 500; border: 0; cursor: pointer; padding: 3px 9px; border-radius: var(--radius-pill); background: rgba(0,0,0,0.05); color: inherit; opacity: 0.8; display: inline-flex; align-items: center; gap: 6px; transition: opacity var(--transition-fast), background var(--transition-fast); }
+        .lp-tally button:hover { opacity: 1; }
+        .lp-tally button .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.9; }
+        .lp-tally button .c { font-variant-numeric: tabular-nums; opacity: 0.75; }
+        .lp-tally button.active { opacity: 1; }
+        .lp-tally button.active.t-green { background: var(--color-green-bg); color: var(--color-green-text); }
+        .lp-tally button.active.t-orange { background: var(--color-orange-bg); color: var(--color-orange-text); }
+        .lp-tally button.active.t-red { background: var(--color-red-bg); color: var(--color-red-text); }
+        .lp-tally button.active.t-blue { background: var(--color-blue-bg); color: var(--color-blue-text); }
+        .lp-tally button.active.t-gray { background: var(--color-gray-bg); color: var(--color-gray-text); }
+        .lp-tally button.t-green .dot { color: var(--color-green); }
+        .lp-tally button.t-orange .dot { color: var(--color-orange); }
+        .lp-tally button.t-red .dot { color: var(--color-red); }
+        .lp-tally button.t-blue .dot { color: var(--color-accent); }
+        .lp-tally button.t-gray .dot { color: var(--color-text-tertiary); }
+
+        /* ---- digest mode: count + proportion bar + exceptions only ---- */
+        .lp-dbig { display: none; align-items: baseline; gap: 9px; margin: 2px 0 0; }
+        .lp-dbig .n { font-size: 42px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+        .lp-dbig .w { font-size: 14px; opacity: 0.62; }
+        .lp-bar { display: none; height: 7px; border-radius: var(--radius-pill); overflow: hidden; background: rgba(0,0,0,0.06); margin-top: 13px; }
+        .lp-bar i { display: block; height: 100%; }
+        .lp-bar i.s-green { background: var(--color-green); }
+        .lp-bar i.s-orange { background: var(--color-orange); }
+        .lp-bar i.s-red { background: var(--color-red); }
+        .lp-bar i.s-blue { background: var(--color-accent); }
+        .lp-bar i.s-gray { background: var(--color-text-quaternary); }
+        body[data-ovf="digest"] .lp-titlerow, body[data-ovf="digest"] .lp-tally { display: none; }
+        body[data-ovf="digest"] .inv-block .lp-titlerow { display: flex; } /* money card is already a digest */
+        body[data-ovf="digest"] .lp-dbig { display: flex; }
+        body[data-ovf="digest"] .lp-bar { display: flex; }
+        body[data-ovf="digest"] .lp-rows { margin-top: 9px; }
+
+        /* ---- pages mode: paging driven by the space the card actually got.
+                flex-basis 0 keeps the row area out of the card's intrinsic
+                height, so the grid row is sized by its other content (and by
+                the taller card beside it) and the row area then grows into
+                whatever is left. --slot is only the floor. JS measures the
+                resulting height, fits whole rows into it, and shows the pager
+                only when there is more than fits. ---- */
+        /* align-content:start keeps grid rows at their natural height - without
+           it they stretch to fill the slot and the measured row height would
+           grow with the space, so a bigger card could never fit more rows */
+        /* flex-basis must be a unitless 0, not 0% - a percentage basis resolves
+           against an indefinite parent height and silently falls back to
+           content sizing, which would put every row back into the card's
+           intrinsic height. And the footer's margin-top:auto has to go, because
+           auto margins swallow free space before flex-grow ever sees it. */
+        .lp-card[data-ovf="pages"] .lp-rows { flex: 1 1 0; min-height: calc(var(--row-h) * var(--slot, 3)); overflow: hidden; align-content: start; }
+        .lp-card[data-ovf="pages"] .lp-foot { margin-top: 0; }
+        .lp-pager { display: none; align-items: center; gap: 1px; margin-left: auto; }
+        .lp-card[data-ovf="pages"] .lp-pager { display: inline-flex; }
+        /* color:inherit matters: a button defaults to buttontext (black), which
+           would be invisible on the graphite card */
+        .lp-pager .arw { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: 0; background: none; padding: 0; cursor: pointer; color: inherit; opacity: 0.55; border-radius: 7px; transition: background var(--transition-fast), opacity var(--transition-fast); }
+        .lp-pager .arw:hover:not(:disabled) { opacity: 1; background: rgba(0,0,0,0.06); }
+        .lp-pager .arw:disabled { opacity: 0.18; cursor: default; }
+        .lp-pager .arw svg { width: 12px; height: 12px; }
+        /* min-width wide enough for "40/40" so the control does not shift width
+           as you page - tabular-nums alone only equalises single digits */
+        .lp-pager .pos { font-size: 11.5px; font-weight: 500; opacity: 0.6; font-variant-numeric: tabular-nums; padding: 0 3px; min-width: 46px; text-align: center; }
+        .lp-pager .pos .sep { opacity: 0.45; padding: 0 1px; }
+        /* a 22px arrow is a fine mouse target and a poor thumb one, so the hit
+           area grows on touch-width viewports while the chevron stays quiet */
+        @media (max-width: 760px) {
+            .lp-pager { gap: 0; }
+            .lp-pager .arw { width: 40px; height: 36px; border-radius: 9px; }
+            .lp-pager .arw svg { width: 14px; height: 14px; }
+        }
+        .hp-tile-graphite .lp-pager .arw:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
+        [data-theme="dark"] .lp-pager .arw:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+        [data-theme="dark"] .hp-tile-sky .lp-pager .arw:hover:not(:disabled) { background: rgba(0,0,0,0.06); }
+
+        /* ---- numbered pagination belongs to the full list, not to a card ---- */
+        .lp-pagefoot { display: none; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 11.5px; opacity: 0.75; }
+        body[data-ovf="table"] [data-width="full"] .lp-pagefoot { display: flex; }
+        .lp-pagefoot .sp { flex: 1 1 6px; }
+        .lp-range { font-variant-numeric: tabular-nums; }
+        .lp-perpage { display: none; align-items: center; gap: 6px; }
+        body[data-ovf="table"] [data-width="full"] .lp-perpage { display: inline-flex; }
+        .lp-perpage select { height: 24px; padding: 0 20px 0 7px; border: 0; background: transparent; border-radius: 7px; font: inherit; font-size: 11.5px; font-weight: 500; color: inherit; appearance: none; -webkit-appearance: none; cursor: pointer;
+            background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 6px center; background-size: 9px; }
+        .lp-perpage select:hover { background-color: rgba(0,0,0,0.05); }
+        .lp-pages { display: inline-flex; gap: 2px; align-items: center; }
+        .lp-pages button { min-width: 26px; height: 26px; padding: 0 7px; border: 0; background: transparent; border-radius: 8px; font: inherit; font-size: 12px; font-weight: 500; color: inherit; opacity: 0.7; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background var(--transition-fast), opacity var(--transition-fast); }
+        .lp-pages button:hover:not(:disabled) { background: rgba(0,0,0,0.06); opacity: 1; }
+        .lp-pages button.active { background: rgba(0,0,0,0.05); color: var(--color-accent); opacity: 1; font-weight: 600; }
+        .lp-pages button:disabled { opacity: 0.25; cursor: default; }
+        .lp-pages .gap { opacity: 0.4; padding: 0 1px; }
+        .lp-pages svg { width: 11px; height: 11px; }
+
+        /* ---- scroll mode: fixed slot, native scroll, fade at the cut line.
+                Cheapest to build, but the count has to be in the header or the
+                remaining rows are invisible. Falls back to a full list on
+                mobile, where a nested scroller fights the page. ---- */
+        .lp-card[data-ovf="scroll"] .lp-rows { overflow-y: auto; overscroll-behavior: contain; max-height: calc(var(--row-h) * var(--slot, 4) + 4px); padding-right: 6px; scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.22) transparent;
+            -webkit-mask-image: linear-gradient(180deg, #000 0, #000 calc(100% - 20px), transparent 100%);
+            mask-image: linear-gradient(180deg, #000 0, #000 calc(100% - 20px), transparent 100%); }
+        .lp-card[data-ovf="scroll"] .lp-rows::-webkit-scrollbar { width: 6px; }
+        .lp-card[data-ovf="scroll"] .lp-rows::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.22); border-radius: 3px; }
+        .hp-tile-graphite[data-ovf="scroll"] .lp-rows::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.28); }
+        @media (max-width: 900px) { .lp-card[data-ovf="scroll"] .lp-rows { max-height: none; overflow: visible; -webkit-mask-image: none; mask-image: none; } }
+
+        /* ---- table mode: the block stops being a summary card and becomes the
+                real list - toolbar, column headers, rows-per-page ---- */
+        .lp-toolbar { display: none; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+        body[data-ovf="table"] [data-width="full"] .lp-toolbar { display: flex; }
+        .lp-search { position: relative; display: inline-flex; align-items: center; flex: 1 1 220px; max-width: 300px; }
+        .lp-search svg { position: absolute; left: 11px; width: 13px; height: 13px; opacity: 0.45; pointer-events: none; }
+        .lp-search input { height: 30px; width: 100%; margin: 0; padding: 0 12px 0 31px; font: inherit; font-size: 12.5px; border-radius: var(--radius-pill); border: 1px solid transparent; background: rgba(0,0,0,0.05); color: inherit; }
+        .lp-search input:focus { outline: none; border-color: var(--color-accent); background: var(--color-surface); }
+        .lp-toolcount { font-size: 11.5px; opacity: 0.6; font-variant-numeric: tabular-nums; }
+        .lp-colhead { display: none; grid-template-columns: var(--cols); gap: 12px; margin-top: 14px; padding-bottom: 8px; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.45; border-bottom: 0.5px solid rgba(0,0,0,0.09); }
+        body[data-ovf="table"] [data-width="full"] .lp-colhead { display: grid; }
+        body[data-ovf="table"] [data-width="full"] .lp-rows { margin-top: 0; }
+        body[data-ovf="table"] [data-width="full"] .lp-srow, body[data-ovf="table"] .inv-list .lp-srow { display: grid; grid-template-columns: var(--cols); gap: 12px; padding: 12px 0; }
+        body[data-ovf="table"] [data-width="full"] .lp-cell, body[data-ovf="table"] .inv-list .lp-cell { display: block; }
+        body[data-ovf="table"] [data-width="full"] .lp-srow-sub { display: none; }
+        body[data-ovf="table"] [data-width="full"] .lp-srow .pill, body[data-ovf="table"] .inv-list .pill { justify-self: start; }
+        body[data-ovf="table"] [data-width="full"] .dom-rows { display: block; }
+        body[data-ovf="table"] [data-width="full"] .dom-rows .lp-srow-main { display: block; }
+        body[data-ovf="table"] .lp-viewall { align-self: flex-start; }
+        @media (max-width: 760px) {
+            body[data-ovf="table"] [data-width="full"] .ann-rows { grid-template-columns: 1fr; }
+            body[data-ovf="table"] [data-width="full"] .lp-colhead { display: none; }
+            body[data-ovf="table"] [data-width="full"] .lp-srow, body[data-ovf="table"] .inv-list .lp-srow { display: flex; }
+            body[data-ovf="table"] [data-width="full"] .lp-cell, body[data-ovf="table"] .inv-list .lp-cell { display: none; }
+            body[data-ovf="table"] [data-width="full"] .lp-srow-sub { display: block; }
+        }
+
+        /* ---- profile block (unchanged from v16) ---- */
+        .pf-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--color-accent), #5856d6); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; flex-shrink: 0; letter-spacing: -0.01em; }
+
+        /* ---- money block: deliberately never paginated. Four unpaid invoices
+                are one number and one button, not a list to page through. ---- */
+        .lp-big { font-size: 30px; font-weight: 600; letter-spacing: -0.025em; font-variant-numeric: tabular-nums; margin: 9px 0 3px; }
+        .lp-card .btn-primary { margin-top: 14px; height: 34px; font-size: 13px; align-self: flex-start; }
+        .lp-invmore { font-size: 12px; opacity: 0.62; margin-top: auto; padding-top: 13px; border-top: 0.5px solid rgba(0,0,0,0.07); }
+        .inv-list { display: none; margin-top: 14px; }
+        body[data-ovf="table"] .inv-list { display: block; }
+        body[data-ovf="table"] .inv-block .lp-big { font-size: 26px; }
+
+        /* ---- announcements ---- */
+        /* --row-h here includes the 18px row gap, so slot maths stays honest */
+        .ann-rows { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 26px; --row-h: 76px; }
+        @media (max-width: 760px) { .ann-rows { grid-template-columns: 1fr; } }
+        .lp-ann { display: flex; gap: 13px; text-decoration: none; color: inherit; }
+        .lp-ann:hover .lp-ann-title { color: var(--color-accent); }
+        .lp-ann-date { flex-shrink: 0; width: 48px; text-align: center; background: rgba(0,0,0,0.05); border-radius: 11px; padding: 8px 0; height: fit-content; }
+        .lp-ann-date .m { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.55; }
+        .lp-ann-date .d { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
+        .lp-ann-title { font-size: 13.5px; font-weight: 500; line-height: 1.35; transition: color var(--transition-fast); }
+        .lp-ann-meta { font-size: 11.5px; opacity: 0.58; margin-top: 4px; display: flex; align-items: center; gap: 7px; }
+        .lp-ann-new { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; background: var(--color-accent); border-radius: var(--radius-pill); padding: 1px 7px; }
+        body[data-ovf="table"] [data-width="full"] .ann-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+        /* ---- per-block empty states. Centred so they stay balanced at any width:
+                a left-aligned message stranded ~470px of dead space in a 2/3 card. */
+        .lp-bempty { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; flex: 1; padding: 14px 0; }
+        .lp-bempty .ico { width: 44px; height: 44px; border-radius: 12px; background: rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; margin-bottom: 13px; }
+        .lp-bempty .ico svg { width: 21px; height: 21px; opacity: 0.6; }
+        .lp-bempty .t { font-size: 14.5px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 5px; }
+        .lp-bempty p { font-size: 12.5px; opacity: 0.66; margin: 0 auto 16px; line-height: 1.45; max-width: 300px; }
+        .lp-bempty .acts { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: center; }
+        .lp-bempty .btn-primary { height: 32px; font-size: 12.5px; padding: 0 14px; margin: 0; align-self: auto; }
+        .lp-bempty .acts .lp-link { margin: 0; font-size: 13px; font-weight: 500; text-decoration: none; }
+
+        /* ---- TITLES OUTSIDE THE BOX (chip toggle) --------------------------------
+                Lift each block's eyebrow out of its card and float it above, on the
+                page background. The card keeps its surface, so tone and per-block
+                colour are untouched; a coloured block even keeps its coloured title.
+                The row gap opens up to make room, and the card is positioned so the
+                absolute title anchors to it whatever the block's inner layout. */
+        body[data-titles="outside"] .lp-bento { row-gap: 48px; margin-top: 30px; }
+        body[data-titles="outside"] .lp-bento > .lp-card { position: relative; overflow: visible; }
+        body[data-titles="outside"] .lp-bento > .lp-card .lp-eyebrow {
+            position: absolute; top: -27px; left: 5px; margin: 0; z-index: 2;
+            color: var(--color-text-tertiary); }
+
+        /* ---- graphite (tickets) + dark-mode corrections ---- */
+        .hp-tile-graphite .lp-srow { border-color: rgba(255,255,255,0.13); }
+        .hp-tile-graphite .lp-tally button { background: rgba(255,255,255,0.1); }
+        .hp-tile-graphite .lp-bar { background: rgba(255,255,255,0.14); }
+        .hp-tile-graphite .lp-colhead { border-color: rgba(255,255,255,0.16); }
+        .hp-tile-graphite .lp-pages button:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+        .hp-tile-graphite .lp-pages button.active { background: rgba(255,255,255,0.12); color: #ffd60a; }
+        .hp-tile-graphite .lp-perpage select:hover { background-color: rgba(255,255,255,0.1); }
+        .hp-tile-graphite .lp-search input { background: rgba(255,255,255,0.1); }
+        .hp-tile-graphite .lp-search input:focus { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); }
+        .hp-tile-graphite .lp-bempty .ico { background: rgba(255,255,255,0.09); }
+        .hp-tile-graphite .pill-green { background: rgba(48,209,88,0.18); color: #5ee38a; }
+        .hp-tile-graphite .pill-orange { background: rgba(255,159,10,0.2); color: #ffca6a; }
+        .hp-tile-graphite .pill-red { background: rgba(255,59,48,0.2); color: #ff9089; }
+        .hp-tile-graphite .pill-blue { background: rgba(10,132,255,0.24); color: #6fb8ff; }
+        .hp-tile-graphite .pill-gray { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.82); }
+        .hp-tile-graphite .lp-tally button.active.t-blue { background: rgba(10,132,255,0.24); color: #6fb8ff; }
+        .hp-tile-graphite .lp-tally button.active.t-orange { background: rgba(255,159,10,0.2); color: #ffca6a; }
+        .hp-tile-graphite .lp-tally button.active.t-gray { background: rgba(255,255,255,0.16); color: #fff; }
+        .hp-tile-graphite .lp-tally button.t-blue .dot { color: #6fb8ff; }
+        .hp-tile-graphite .lp-tally button.t-gray .dot { color: rgba(255,255,255,0.6); }
+
+        [data-theme="dark"] .lp-srow, [data-theme="dark"] .lp-invmore { border-color: rgba(255,255,255,0.1); }
+        [data-theme="dark"] .lp-colhead { border-color: rgba(255,255,255,0.12); }
+        [data-theme="dark"] .lp-tally button, [data-theme="dark"] .lp-search input { background: rgba(255,255,255,0.09); }
+        [data-theme="dark"] .lp-bar, [data-theme="dark"] .lp-ann-date, [data-theme="dark"] .lp-bempty .ico { background: rgba(255,255,255,0.1); }
+        [data-theme="dark"] .lp-pages button:hover:not(:disabled), [data-theme="dark"] .lp-pages button.active { background: rgba(255,255,255,0.1); }
+        /* the sky tile keeps its light surface in dark mode, so put its ink back */
+        [data-theme="dark"] .hp-tile-sky .lp-srow { border-color: rgba(0,0,0,0.08); }
+        [data-theme="dark"] .hp-tile-sky .lp-tally button, [data-theme="dark"] .hp-tile-sky .lp-search input { background: rgba(0,0,0,0.05); }
+        [data-theme="dark"] .hp-tile-sky .lp-bar, [data-theme="dark"] .hp-tile-sky .lp-bempty .ico { background: rgba(0,0,0,0.06); }
+
+        /* ---- PER-BLOCK OPTIONS (set from the layout map) ----------------------
+           An override layer on top of the page-wide Tone / Overflow chips, so a
+           single block can carry its own palette colour, a search box, or the
+           pager regardless of the page default.
+
+           colour: each block can be pinned to a palette hue, so the whole grid can
+           be toned block-by-block (a controllable "Mixed"). data-blockcolor rebinds
+           --color-accent for that card, then a wash mixed from it. Because the tone
+           pass leaves a coloured block class-less (see applyMixedTones), the
+           !important surface is enough and the graphite/sky ink rules never reach
+           it. The accent rebind re-tones the links in one move. */
+        .lp-card[data-blockcolor="blue"]    { --color-accent: #0071e3; --color-accent-hover: #0077ed; }
+        .lp-card[data-blockcolor="emerald"] { --color-accent: #14b17d; --color-accent-hover: #0fa370; }
+        .lp-card[data-blockcolor="violet"]  { --color-accent: #8c5cff; --color-accent-hover: #7a46ff; }
+        .lp-card[data-blockcolor="rose"]    { --color-accent: #ff2d6b; --color-accent-hover: #e61f5b; }
+        .lp-card[data-blockcolor="amber"]   { --color-accent: #f08a00; --color-accent-hover: #d97a00; }
+        .lp-card[data-blockcolor="slate"]   { --color-accent: #64748b; --color-accent-hover: #475569; }
+        .lp-bento .lp-card[data-blockcolor] {
+            background: color-mix(in srgb, var(--color-accent) 9%, var(--color-surface)) !important;
+            border: 0.5px solid color-mix(in srgb, var(--color-accent) 22%, var(--color-border)) !important;
+            color: var(--color-text-primary) !important; box-shadow: var(--shadow-card); }
+        .lp-card[data-blockcolor] .lp-viewall,
+        .lp-card[data-blockcolor] .lp-link,
+        .lp-card[data-blockcolor] .lp-more a,
+        .lp-card[data-blockcolor] .lp-eyebrow:not(.is-alert) {
+            color: color-mix(in srgb, var(--color-accent) 82%, var(--color-text-primary)) !important; }
+        [data-theme="dark"] .lp-bento .lp-card[data-blockcolor] {
+            background: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface)) !important; }
+
+        /* search: reveal the toolbar (its input is already wired to the filter) in
+           any mode, not just table */
+        .lp-card[data-blocksearch="on"] .lp-toolbar { display: flex; }
+
+        /* filter off: drop the status tally chips (All / Active / …) for this block */
+        .lp-card[data-notally="on"] .lp-tally { display: none; }
+
+        /* list mode disabled (page is in a whole-page mode): the segment greys out */
+        .lm-seg.is-locked { opacity: 0.4; pointer-events: none; }
+
+        /* ---- LAYOUT MAP -------------------------------------------------------
+           A preview-only controller for the grid: which blocks appear, in what
+           order, and how wide. Styled as dev chrome (dark glass, like the state
+           chip) so it never reads as part of the dashboard. Anchored bottom-left,
+           clear of the palette FAB that apple-layout.js puts bottom-right.
+           --------------------------------------------------------------------- */
+        .lm-fab { position: fixed; left: 16px; bottom: 16px; z-index: 99998; display: inline-flex; align-items: center; gap: 7px;
+            padding: 9px 14px; border: 0; border-radius: var(--radius-pill); background: #1d1d1f; color: #fff;
+            font: 600 13px var(--font-family, -apple-system, system-ui, sans-serif); cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+        .lm-fab svg { width: 13px; height: 13px; }
+        .lm-panel { position: fixed; left: 16px; bottom: 62px; z-index: 99998; width: 330px; max-height: 74vh; overflow: auto;
+            background: rgba(28,28,30,0.94); backdrop-filter: saturate(180%) blur(14px); -webkit-backdrop-filter: saturate(180%) blur(14px);
+            color: #f5f5f7; border-radius: 16px; padding: 13px 14px; box-shadow: 0 12px 44px rgba(0,0,0,0.4);
+            font: 500 12px var(--font-family, -apple-system, system-ui, sans-serif); }
+        .lm-panel[hidden] { display: none; }
+        .lm-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .lm-head .t { flex: 1; font-size: 13px; font-weight: 600; }
+        .lm-head button { border: 0; background: rgba(255,255,255,0.12); color: inherit; font: inherit; font-size: 11px; padding: 4px 9px; border-radius: 7px; cursor: pointer; }
+        .lm-head button:hover { background: rgba(255,255,255,0.2); }
+        .lm-hint { font-size: 11px; opacity: 0.55; line-height: 1.4; margin: 2px 0 8px; }
+        /* two lines: the top row is reorder/name/size/hide, the width segment gets
+           its own full-width line below - five options don't fit beside the name */
+        .lm-row { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 9px 0; border-bottom: 0.5px solid rgba(255,255,255,0.1); }
+        .lm-row:last-child { border-bottom: 0; }
+        .lm-top { display: flex; align-items: center; gap: 6px; }
+        .lm-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lm-size { flex-shrink: 0; font-size: 10px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.1); min-width: 30px; text-align: center; }
+        /* an Auto size is derived, not chosen, so it reads quieter than a fixed one */
+        .lm-size.is-auto { background: none; opacity: 0.5; font-weight: 500; }
+        .lm-row.off .lm-name { opacity: 0.38; }
+        .lm-row.off .lm-size { opacity: 0.32; }
+        .lm-row.off .lm-seg { opacity: 0.35; pointer-events: none; }
+        .lm-btn { border: 0; background: rgba(255,255,255,0.1); color: inherit; font: inherit; width: 22px; height: 22px; border-radius: 6px;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .lm-btn:hover:not(:disabled) { background: rgba(255,255,255,0.2); }
+        .lm-btn:disabled { opacity: 0.22; cursor: default; }
+        .lm-btn svg { width: 11px; height: 11px; }
+        .lm-btn.on { background: rgba(48,209,88,0.28); }
+        /* a labelled segment row: a fixed "Size" / "List" tag beside the segment */
+        .lm-seg-row { display: flex; align-items: center; gap: 8px; }
+        .lm-seg-lab { flex-shrink: 0; width: 26px; font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.45; }
+        .lm-seg { display: flex; flex: 1; min-width: 0; background: rgba(255,255,255,0.1); border-radius: 7px; overflow: hidden; }
+        .lm-seg button { flex: 1; border: 0; background: none; color: inherit; font: inherit; font-size: 11px; padding: 5px 4px; cursor: pointer; opacity: 0.6; text-align: center; font-variant-numeric: tabular-nums; }
+        .lm-seg button + button { border-left: 0.5px solid rgba(255,255,255,0.12); }
+        .lm-seg button:hover { opacity: 1; background: rgba(255,255,255,0.08); }
+        .lm-seg button.active { background: #f5f5f7; color: #1d1d1f; opacity: 1; font-weight: 600; }
+        /* the list segment carries a long default label ("As authored"), so it runs
+           a touch smaller and never wraps */
+        .lm-seg-list button { font-size: 10px; padding: 5px 2px; white-space: nowrap; letter-spacing: -0.01em; }
+        /* per-block colour swatches */
+        .lm-colors { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+        .lm-swatch { width: 17px; height: 17px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.18); position: relative; }
+        .lm-swatch:hover { transform: scale(1.12); }
+        .lm-swatch.active { box-shadow: 0 0 0 2px #1c1c1e, 0 0 0 3.5px #fff; }
+        /* default swatch: a neutral chip with a diagonal "none" slash */
+        .lm-swatch-def { background: rgba(255,255,255,0.14); }
+        .lm-swatch-def::after { content: ''; position: absolute; inset: 3px; border-radius: 50%;
+            background: linear-gradient(135deg, transparent 44%, rgba(255,255,255,0.55) 44%, rgba(255,255,255,0.55) 56%, transparent 56%); }
+        /* per-block option toggles (filter · search · pages) */
+        .lm-opts { display: flex; gap: 6px; flex-wrap: wrap; }
+        .lm-opt { border: 0; background: rgba(255,255,255,0.1); color: inherit; font: inherit; font-size: 10.5px; font-weight: 500; padding: 4px 11px; border-radius: 6px; cursor: pointer; opacity: 0.7; display: inline-flex; align-items: center; gap: 6px; }
+        .lm-opt:hover { opacity: 1; }
+        .lm-opt::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.35; }
+        .lm-opt.on { background: rgba(255,255,255,0.92); color: #1d1d1f; opacity: 1; font-weight: 600; }
+        .lm-opt.on::before { opacity: 1; background: #30d158; }
+        .lm-row.off .lm-opts { opacity: 0.35; pointer-events: none; }
+        .lm-extra { margin-top: 10px; padding-top: 9px; border-top: 0.5px solid rgba(255,255,255,0.12); display: flex; flex-direction: column; gap: 7px; }
+        .lm-extra label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .lm-note { margin-top: 10px; padding-top: 9px; border-top: 0.5px solid rgba(255,255,255,0.12); font-size: 11px; opacity: 0.62; line-height: 1.45; font-variant-numeric: tabular-nums; }
+        .lm-note b { opacity: 0.95; font-weight: 600; }
+        body[data-preview="off"] .lm-fab, body[data-preview="off"] .lm-panel,
+        body.screenshot .lm-fab, body.screenshot .lm-panel { display: none !important; }
+
+        body[data-data="empty"] .when-full { display: none !important; }
+        body:not([data-data="empty"]) .when-empty { display: none !important; }
+
+        /* ═══ BLOCK STYLE — how every bento card is filled (chip: Block style)
+           White leaves the Tone chip in charge. The other three fill every card
+           from --color-accent, which the per-block colour swatches rebind per
+           card, so the two compose: the swatch picks the HUE, this picks the
+           TREATMENT. accent and gradient also carry .hp-tile-graphite (added in
+           applyBlockFill) so the card's pills, row rules and scrollbars flip to
+           their light-on-dark form instead of duplicating thirty overrides. */
+        body[data-blk-style="tint"] .lp-bento > .lp-card.blk-fill {
+            background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface)) !important;
+            border: 0.5px solid color-mix(in srgb, var(--color-accent) 22%, var(--color-border)) !important; }
+        body[data-blk-style="accent"] .lp-bento > .lp-card.blk-fill {
+            background: var(--color-accent) !important; border-color: transparent !important; }
+        body[data-blk-style="gradient"] .lp-bento > .lp-card.blk-fill {
+            background: linear-gradient(150deg,
+                color-mix(in srgb, var(--color-accent) 92%, #002050) 0%,
+                var(--color-accent) 58%,
+                color-mix(in srgb, var(--color-accent) 60%, #fff) 100%) !important;
+            border-color: transparent !important; }
+        /* the accent-coloured links and eyebrows would vanish on a saturated fill */
+        body[data-blk-style="accent"] .lp-bento > .lp-card.blk-fill :is(.lp-viewall, .lp-link, .lp-eyebrow, .lp-more a),
+        body[data-blk-style="gradient"] .lp-bento > .lp-card.blk-fill :is(.lp-viewall, .lp-link, .lp-eyebrow, .lp-more a) {
+            color: #fff !important; }
+
+        /* ═══ GRADIENT HERO — ported from v18 ═══════════════════════════
+           Same markup contract, same chip variants (width / size / tone).
+           v17 keeps its DOM-derived counts in the subtitle, so the Volume
+           chip still cannot make the header lie. */
+        /* ---- hero ----
+           Base is the boxed card, trimmed down (the first cut felt too tall).
+           Two chip-driven variants compose on top:
+             body[data-hero-width="edge"]  - bleeds to the edge of the screen
+             body[data-hero-size="slim"]   - one-line bar with action buttons,
+                                             like the Billing reference
+           The wrap is an inline-size container so 50cqw = half the main column
+           in ANY layout (top / sidebar / rail) - the edge bleed stops at the
+           sidebar instead of running under it. */
+        .ph-main-wrap { container-type: inline-size; }
+        /* the gradient is mixed from --color-accent, so it follows the palette
+           switcher (emerald, violet, rose, …) instead of staying blue */
+        .dash-hero { position: relative; overflow: hidden; border-radius: 22px; padding: 28px 40px; margin: 0 0 26px; color: #fff;
+            display: flex; align-items: center; gap: 24px;
+            background: linear-gradient(115deg,
+                color-mix(in srgb, var(--color-accent) 90%, #002050) 0%,
+                var(--color-accent) 55%,
+                color-mix(in srgb, var(--color-accent) 58%, #fff) 100%); }
+        .dash-hero-main { flex: 1; min-width: 0; position: relative; z-index: 2; }
+        .dash-hero-date { font-size: 11.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.82; margin: 0 0 9px; }
+        .dash-hero h1 { font-size: 29px; font-weight: 700; letter-spacing: -0.025em; margin: 0 0 7px; line-height: 1.05; color: #fff; }
+        .dash-hero-sub { font-size: 14.5px; opacity: 0.9; margin: 0; font-weight: 500; }
+        /* the avatar is a real profile link, and a normal flex child - so the
+           hero's padding keeps it inside the content column even in edge mode */
+        .dash-hero-avatar { position: relative; z-index: 2; flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 600; color: #fff; text-decoration: none; transition: background var(--transition-fast); }
+        .dash-hero-avatar:hover { background: rgba(255,255,255,0.16); color: #fff; text-decoration: none; }
+        /* concentric rings, centred on the avatar (they live inside it) so they
+           follow it in every hero mode - boxed, edge, slim - instead of drifting
+           to the bleed edge. pointer-events off so clicks land on the avatar. */
+        .dash-hero-rings, .dash-hero-rings::before, .dash-hero-rings::after {
+            position: absolute; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.22); pointer-events: none; }
+        .dash-hero-rings { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 130px; height: 130px; z-index: -1; }
+        .dash-hero-rings::before { content: ''; inset: -42px; }
+        .dash-hero-rings::after { content: ''; inset: -84px; }
+        /* action buttons: authored in the markup, revealed by the slim bar */
+        .dash-hero-actions { display: none; align-items: center; gap: 10px; position: relative; z-index: 2; flex-shrink: 0; }
+        .dash-hero-btn { background: #fff; color: var(--color-accent); font-size: 13.5px; font-weight: 600; padding: 10px 19px; border-radius: 999px; text-decoration: none; white-space: nowrap; }
+        .dash-hero-btn:hover { opacity: 0.92; color: var(--color-accent); text-decoration: none; }
+        .dash-hero-btn.ghost { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.5); }
+        .dash-hero-btn.ghost:hover { background: rgba(255,255,255,0.22); color: #fff; opacity: 1; }
+
+        /* edge-to-edge: negative margins out to the wrap, square corners, and the
+           inner padding grows so the text stays aligned with the content column.
+           (Skipped in the boxed layout, where a bleed would break the box.) */
+        body[data-hero-width="edge"]:not([data-layout="boxed"]) .dash-hero {
+            margin-left: calc(50% - 50cqw); margin-right: calc(50% - 50cqw);
+            border-radius: 0;
+            /* (100cqw - 100%)/2 = the column's own offset from the wrap edge, so the
+               text lands exactly where the boxed hero's text sits (column + 40px) */
+            padding-left: calc((100cqw - 100%) / 2 + 40px); padding-right: calc((100cqw - 100%) / 2 + 40px); }
+        /* (avatar needs no edge override - it's in-flow, so the padding contains
+           it, and the rings ride inside it wherever it goes) */
+
+        /* slim: a one-line bar - eyebrow + title left, and on the right either the
+           action pills (default) or the profile avatar, picked by the
+           "Slim right" chip option (body[data-slim-right]) */
+        body[data-hero-size="slim"] .dash-hero { flex-wrap: wrap; gap: 20px; padding-top: 17px; padding-bottom: 17px; }
+        body[data-hero-size="slim"] .dash-hero-main { min-width: 200px; }
+        body[data-hero-size="slim"] .dash-hero-date { margin: 0 0 4px; font-size: 10.5px; }
+        body[data-hero-size="slim"] .dash-hero h1 { font-size: 23px; margin: 0; }
+        body[data-hero-size="slim"] .dash-hero-sub,
+        body[data-hero-size="slim"] .dash-hero-rings { display: none; }
+        body[data-hero-size="slim"] .dash-hero-actions { display: flex; }
+        body[data-hero-size="slim"] .dash-hero-avatar { display: none; width: 42px; height: 42px; font-size: 15px; }
+        body[data-hero-size="slim"][data-slim-right="profile"] .dash-hero-avatar { display: flex; }
+        body[data-hero-size="slim"][data-slim-right="profile"] .dash-hero-actions { display: none; }
+
+        /* ---- title-area tones (chip: Title area) ----------------------------
+           The hero defaults to the accent gradient; these retone just the
+           title area, independent of the sidebar and nav. Light and Tinted
+           flip to dark ink and re-fill the avatar and action pills; Dark,
+           Graphite and Brand keep the light ink. Every tone composes with
+           the width (edge) and size (slim) variants. */
+        body[data-hero-tone="light"] .dash-hero { background: var(--color-surface); border: 1px solid var(--color-border); }
+        body[data-hero-tone="tinted"] .dash-hero { background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+            border: 1px solid color-mix(in srgb, var(--color-accent) 18%, var(--color-surface)); }
+        body[data-hero-tone="dark"] .dash-hero { background: #1d1d1f; }
+        body[data-hero-tone="graphite"] .dash-hero { background: #272c36; }
+        body[data-hero-tone="brand"] .dash-hero { background: var(--color-accent); }
+
+        /* light-ink family: dark text, token-driven so it adapts to dark mode */
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero,
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero h1 { color: var(--color-text-primary); }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-date { color: var(--color-text-tertiary); opacity: 1; }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-sub { color: var(--color-text-secondary); opacity: 1; }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-avatar {
+            border-color: transparent; color: #fff;
+            background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 55%, #ffffff)); }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-avatar:hover { opacity: 0.9; }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings,
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings::before,
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings::after { border-color: rgba(0,0,0,0.08); }
+        [data-theme="dark"] body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings,
+        [data-theme="dark"] body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings::before,
+        [data-theme="dark"] body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings::after { border-color: rgba(255,255,255,0.14); }
+        /* pills: on a light bar the white pill vanishes, so it takes the accent */
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-btn { background: var(--color-accent); color: #fff; }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-btn:hover { color: #fff; }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-btn.ghost {
+            background: transparent; border-color: var(--color-border); color: var(--color-text-primary); }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-btn.ghost:hover { background: rgba(0,0,0,0.045); color: var(--color-text-primary); }
+
+        /* ---- title-area tones (chip: Title area) ----------------------------
+           The hero defaults to the accent gradient; these retone just the
+           title area, independent of the sidebar and nav. Light and Tinted
+           flip to dark ink and re-fill the avatar and action pills; Dark,
+           Graphite and Brand keep the light ink. Every tone composes with
+           the width (edge) and size (slim) variants. */
+        body[data-hero-tone="light"] .dash-hero { background: var(--color-surface); border: 1px solid var(--color-border); }
+        body[data-hero-tone="tinted"] .dash-hero { background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+            border: 1px solid color-mix(in srgb, var(--color-accent) 18%, var(--color-surface)); }
+        body[data-hero-tone="dark"] .dash-hero { background: #1d1d1f; }
+        body[data-hero-tone="graphite"] .dash-hero { background: #272c36; }
+        body[data-hero-tone="brand"] .dash-hero { background: var(--color-accent); }
+
+        /* light-ink family: dark text, token-driven so it adapts to dark mode */
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero,
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero h1 { color: var(--color-text-primary); }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-date { color: var(--color-text-tertiary); opacity: 1; }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-sub { color: var(--color-text-secondary); opacity: 1; }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-avatar {
+            border-color: transparent; color: #fff;
+            background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 55%, #ffffff)); }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-avatar:hover { opacity: 0.9; }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings,
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings::before,
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings::after { border-color: rgba(0,0,0,0.08); }
+        [data-theme="dark"] body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings,
+        [data-theme="dark"] body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings::before,
+        [data-theme="dark"] body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-rings::after { border-color: rgba(255,255,255,0.14); }
+        /* pills: on a light bar the white pill vanishes, so it takes the accent */
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-btn { background: var(--color-accent); color: #fff; }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-btn:hover { color: #fff; }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-btn.ghost {
+            background: transparent; border-color: var(--color-border); color: var(--color-text-primary); }
+        body:is([data-hero-tone="light"], [data-hero-tone="tinted"]) .dash-hero-btn.ghost:hover { background: rgba(0,0,0,0.045); color: var(--color-text-primary); }
+
+        /* ---- stat cards ---- */
+        .dash-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin: 0 0 26px; }
+        @media (max-width: 880px) { .dash-stats { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 460px) { .dash-stats { grid-template-columns: 1fr; } }
+        .dash-stat { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 15px; padding: 22px 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .dash-stat-label { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); margin: 0 0 12px; }
+        .dash-stat-value { display: flex; align-items: baseline; gap: 9px; font-size: 30px; font-weight: 700; letter-spacing: -0.025em; color: var(--color-text-primary); line-height: 1; font-variant-numeric: tabular-nums; }
+        .dash-stat-delta { font-size: 13px; font-weight: 600; color: var(--color-green-text, #17914a); }
+        .dash-stat-meta { font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); }
+        .dash-stat-sub { font-size: 12.5px; color: var(--color-text-tertiary); margin-top: 10px; }
+        /* compact stats (chip: Stats) - just the label and the number, no
+           bottom line ("3 renewing soon" / "next 14 Sep" / …) */
+        body[data-stats="compact"] .dash-stat-sub { display: none; }
+
+    </style>
+</head>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="dashboard" data-page-title="Dashboard" data-ovf="pages" data-vol="real" data-grid="thirds" data-tone="paired">
+
+<!-- ═══════════ Dev preview chip — auth / layout / palette ═══════════ -->
+<div data-include="partials/state-chip.html"></div>
+
+<!-- ═══════════ Rail layout — icon rail + flyout panels ═══════════ -->
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+
+<!-- ═══════════ Sidebar layout — fixed 260px rail ═══════════ -->
+<div data-include="partials/sidebar.html"></div>
+
+<!-- ═══════════ MAIN WRAP (shifts right when layout=side|rail) ═══════════ -->
+<div class="ph-main-wrap">
+
+<!-- ═══════════ Auth strip — logged-in + top-layout only ═══════════ -->
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span>3 Notifications</span>
+        </button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ Top-layout standard header ═══════════ -->
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+
+    <!-- Logged-out menu -->
+    <div class="nav-simple-dropdown only-out">
+        <a href="#" class="nav-simple-trigger">Store <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="#">Browse All</a>
+            <div class="divider"></div>
+            <a href="socialbee.html">SocialBee</a>
+            <a href="ssl-certificates.html">SSL Certificates</a>
+            <a href="email-services.html">E-mail Services</a>
+            <a href="website-builder.html">Website Builder</a>
+            <div class="divider"></div>
+            <a href="cart-domain-register.html">Register a New Domain</a>
+            <a href="cart-domain-transfer.html">Transfer Domains to Us</a>
+        </div>
+    </div>
+    <a href="announcements.html" class="only-out">Announcements</a>
+    <a href="knowledgebase.html" class="only-out">Knowledgebase</a>
+    <a href="serverstatus.html" class="only-out">Network Status</a>
+    <a href="contact.html" class="only-out">Contact Us</a>
+
+    <!-- Logged-in menu -->
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareaproducts.html">My Services</a>
+            <div class="divider"></div>
+            <a href="store.html">Order New Services</a>
+            <a href="#">View Available Addons</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareadomains.html">My Domains</a>
+            <div class="divider"></div>
+            <a href="#">Renew Domains</a>
+            <a href="cart-domain-register.html">Register a New Domain</a>
+            <a href="cart-domain-transfer.html">Transfer a Domain to Us</a>
+            <div class="divider"></div>
+            <a href="domainchecker.html">Domain Search</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Website &amp; Security <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="socialbee.html">SocialBee</a>
+            <a href="ssl-certificates.html">SSL Certificates</a>
+            <a href="monitoring-360.html">Site &amp; Server Monitoring</a>
+            <a href="nordvpn.html">VPN</a>
+            <a href="email-services.html">E-mail Services</a>
+            <a href="website-backup.html">Website Backup</a>
+            <a href="website-security.html">Website Security</a>
+            <a href="website-builder.html">Website Builder</a>
+            <div class="divider"></div>
+            <a href="managessl.html">Manage SSL Certificates</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareainvoices.html">My Invoices</a>
+            <a href="clientareaquotes.html">My Quotes</a>
+            <div class="divider"></div>
+            <a href="account-paymentmethods.html">Payment Methods</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="supportticketslist.html">Tickets</a>
+            <a href="announcements.html">Announcements</a>
+            <a href="knowledgebase.html">Knowledgebase</a>
+            <a href="downloads.html">Downloads</a>
+            <a href="serverstatus.html">Network Status</a>
+        </div>
+    </div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+
+    <!-- Notifications -->
+    <div class="notification-wrapper only-in" id="navNotifyWrap">
+        <button type="button" class="topbar-btn" title="Notifications" onclick="togglePortalNotifications(event, 'nav')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <div class="topbar-notification-dot"></div>
+        </button>
+        <div class="notification-dropdown" id="notificationDropdownNav">
+            <div class="notification-dropdown-header">
+                <span class="notification-dropdown-title">Notifications</span>
+                <button class="notification-dropdown-clear" type="button">Mark all read</button>
+            </div>
+            <a href="viewinvoice.html" class="notification-item">
+                <div class="notification-dot-indicator orange"></div>
+                <div class="notification-content">
+                    <div class="notification-text">Invoice #10233 is 9 days overdue</div>
+                    <div class="notification-time">2 hours ago</div>
+                </div>
+            </a>
+            <a href="viewticket.html" class="notification-item">
+                <div class="notification-dot-indicator green"></div>
+                <div class="notification-content">
+                    <div class="notification-text">Ticket #4821 has been answered</div>
+                    <div class="notification-time">2 hours ago</div>
+                </div>
+            </a>
+            <a href="clientareaproductdetails.html" class="notification-item">
+                <div class="notification-dot-indicator blue"></div>
+                <div class="notification-content">
+                    <div class="notification-text">staging.lockworth.com was suspended</div>
+                    <div class="notification-time">Yesterday</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Cart -->
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+
+    <!-- Right-side auth affordance -->
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <a href="#" onclick="toggleDarkMode(); return false;" class="topbar-btn only-out" title="Toggle theme" style="margin-right:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap">
+        <div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-dropdown-header">
+                <div class="profile-dropdown-name">Arshile Gogia</div>
+                <div class="profile-dropdown-email">arshileg@gmail.com</div>
+            </div>
+            <a href="clientareadetails.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                My Details
+            </a>
+            <a href="clientareasecurity.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                Security Settings
+            </a>
+            <a href="clientareaemails.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Email History
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <div class="theme-toggle-row">
+                <span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span>
+                <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="login.html" class="profile-dropdown-item danger">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sign Out
+            </a>
+        </div>
+    </div>
+</div></nav>
+
+<!-- ═══════════ Inner-layout topbar (sidebar + rail) ═══════════ -->
+<div data-include="partials/inner-topbar.html"></div>
+
+<!-- ═══════════ Breadcrumb — top-layout only ═══════════ -->
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="index.html">Portal Home</a>
+        <span class="sep">/</span>
+        <span class="current" aria-current="page">Client Area</span>
+    </div>
+</nav>
+
+<!-- ═══════════ PAGE CONTENT ═══════════ -->
+<div class="content-area">
+
+    <!-- ══ HERO — the gradient title area (ported from v18). The subtitle
+            still reads its numbers from the rows via data-count, so Volume and
+            Content stay honest. The avatar is the account mark + profile menu,
+            replacing the old .hd-account cluster. ══ -->
+    <div class="dash-hero">
+        <div class="dash-hero-main">
+            <div class="dash-hero-date">Tuesday &middot; 2 June</div>
+            <h1>Welcome back, Petey.</h1>
+            <p class="dash-hero-sub"><span class="lp-num" data-count="svc">8</span> services,
+                <span class="lp-num" data-count="dom">7</span> domains and
+                <span class="lp-num" data-count="tkt">10</span> open tickets on this account.</p>
+        </div>
+        <!-- action pills: revealed by the slim hero variant -->
+        <div class="dash-hero-actions">
+            <a href="clientareainvoices.html" class="dash-hero-btn when-full">Pay balance &mdash; $18.00</a>
+            <a href="store.html" class="dash-hero-btn ghost">Order a service</a>
+        </div>
+        <!-- the account's mark: LockWorth, and the profile menu -->
+        <a href="clientareadetails.html" class="dash-hero-avatar" aria-label="Your profile"
+           aria-haspopup="menu" aria-expanded="false" data-profile-trigger><span class="dash-hero-rings" aria-hidden="true"></span>LW</a>
+    </div>
+
+    <!-- ══ ATTENTION STRIP — the exceptions, lifted out of 25 rows ══ -->
+    <div class="atn when-full">
+        <span class="atn-lead"><span class="n" data-attn-total>6</span> Needs your attention</span>
+        <a href="clientareainvoices.html" class="atn-chip red">1 invoice overdue &middot; $18.00</a>
+        <a href="clientareaproducts.html" class="atn-chip orange" data-attn-chip="svc"><span data-attn="svc">2</span> services need action</a>
+        <a href="supportticketslist.html" class="atn-chip blue" data-attn-chip="tkt"><span data-attn="tkt">3</span> tickets awaiting your reply</a>
+        <span class="atn-sp"></span>
+        <button type="button" class="atn-dismiss" data-atn-dismiss>Dismiss</button>
+    </div>
+
+    <!-- Preview-only caption: explains what the selected Overflow mode does -->
+    <div class="ovf-note"><span class="tag">Overflow</span><span data-ovf-note></span></div>
+
+    <div class="lp-bento">
+
+        <!-- ══ SERVICES — 8 rows, sorted exceptions-first ══ -->
+        <div class="hp-tile hp-tile-light lp-card svc-block">
+            <div class="lp-eyebrow">MY SERVICES</div>
+            <div class="when-full">
+                <div class="lp-titlerow">
+                    <div class="lp-title"><span class="lp-num" data-count="svc">8</span> services</div>
+                    <div class="lp-hint">Needs attention first</div>
+                </div>
+                <div class="lp-dbig"><span class="n lp-num" data-count="svc">8</span><span class="w">services</span></div>
+                <div class="lp-bar" data-bar="svc"></div>
+                <div class="lp-tally" data-tally="svc"></div>
+
+                <div class="lp-toolbar">
+                    <label class="lp-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                        <input type="search" placeholder="Search services" data-search="svc" aria-label="Search services">
+                    </label>
+                    <span class="lp-toolcount" data-toolcount="svc"></span>
+                </div>
+                <div class="lp-colhead" style="--cols: minmax(0,1fr) 150px 110px 100px 74px;">
+                    <span>Service</span><span>Plan</span><span>Next due</span><span>Status</span><span>Price</span>
+                </div>
+
+                <div class="lp-rows" data-list="svc" data-page-size="3" data-page-size-table="5" data-peek="3" style="--slot: 3; --cols: minmax(0,1fr) 150px 110px 100px 74px;">
+                    <div class="lp-srow" data-state="suspended" data-flag="attn" data-few="1">
+                        <div class="lp-srow-main"><div class="lp-srow-name">staging.lockworth.com</div><div class="lp-srow-sub">Business Hosting &middot; suspended Jun 1</div></div>
+                        <span class="lp-cell c-type">Business Hosting</span><span class="lp-cell c-due">Jun 1</span>
+                        <span class="pill pill-red">Suspended</span><span class="lp-srow-price">$12.00</span>
+                    </div>
+                    <div class="lp-srow" data-state="pending" data-flag="attn">
+                        <div class="lp-srow-main"><div class="lp-srow-name">mail-relay-02.hostnodes.io</div><div class="lp-srow-sub">SMTP Relay &middot; awaiting setup</div></div>
+                        <span class="lp-cell c-type">SMTP Relay</span><span class="lp-cell c-due">&mdash;</span>
+                        <span class="pill pill-orange">Pending</span><span class="lp-srow-price">$7.00</span>
+                    </div>
+                    <div class="lp-srow" data-state="active" data-tpl="1" data-few="1">
+                        <div class="lp-srow-main"><div class="lp-srow-name">db-02.hostnodes.io</div><div class="lp-srow-sub">Managed MySQL &middot; renews Jun 3</div></div>
+                        <span class="lp-cell c-type">Managed MySQL</span><span class="lp-cell c-due">Jun 3</span>
+                        <span class="pill pill-green">Active</span><span class="lp-srow-price">$18.00</span>
+                    </div>
+                    <div class="lp-srow" data-state="active" data-few="1">
+                        <div class="lp-srow-main"><div class="lp-srow-name">vps-01.hostnodes.io</div><div class="lp-srow-sub">Cloud VPS 4 GB &middot; renews Jun 14</div></div>
+                        <span class="lp-cell c-type">Cloud VPS 4 GB</span><span class="lp-cell c-due">Jun 14</span>
+                        <span class="pill pill-green">Active</span><span class="lp-srow-price">$24.00</span>
+                    </div>
+                    <div class="lp-srow" data-state="active">
+                        <div class="lp-srow-main"><div class="lp-srow-name">edge-cdn.lockworth.com</div><div class="lp-srow-sub">CDN Starter &middot; renews Jun 28</div></div>
+                        <span class="lp-cell c-type">CDN Starter</span><span class="lp-cell c-due">Jun 28</span>
+                        <span class="pill pill-green">Active</span><span class="lp-srow-price">$9.00</span>
+                    </div>
+                    <div class="lp-srow" data-state="active">
+                        <div class="lp-srow-main"><div class="lp-srow-name">web-01.lockworth.com</div><div class="lp-srow-sub">Business Hosting &middot; renews Jul 2</div></div>
+                        <span class="lp-cell c-type">Business Hosting</span><span class="lp-cell c-due">Jul 2</span>
+                        <span class="pill pill-green">Active</span><span class="lp-srow-price">$12.00</span>
+                    </div>
+                    <div class="lp-srow" data-state="active">
+                        <div class="lp-srow-main"><div class="lp-srow-name">mail.lockworth.com</div><div class="lp-srow-sub">Professional Email, 5 mailboxes &middot; renews Aug 19</div></div>
+                        <span class="lp-cell c-type">Professional Email</span><span class="lp-cell c-due">Aug 19</span>
+                        <span class="pill pill-green">Active</span><span class="lp-srow-price">$6.00</span>
+                    </div>
+                    <div class="lp-srow" data-state="active">
+                        <div class="lp-srow-main"><div class="lp-srow-name">backup-vault.hostnodes.io</div><div class="lp-srow-sub">Website Backup 100 GB &middot; renews Sep 1</div></div>
+                        <span class="lp-cell c-type">Website Backup</span><span class="lp-cell c-due">Sep 1</span>
+                        <span class="pill pill-green">Active</span><span class="lp-srow-price">$4.00</span>
+                    </div>
+                </div>
+
+                <div class="lp-foot">
+                    <div class="lp-more" data-more="svc"></div>
+                    <div class="lp-pagefoot">
+                        <span class="lp-perpage">Show
+                            <select data-perpage="svc" aria-label="Services per page"><option>5</option><option>10</option><option>25</option></select>
+                        </span>
+                        <span class="lp-range" data-range="svc"></span>
+                        <span class="sp"></span>
+                        <span class="lp-pages" data-pages="svc"></span>
+                    </div>
+                    <a href="clientareaproducts.html" class="lp-viewall">View all services &rsaquo;</a>
+                    <span class="lp-pager" data-pager="svc" role="group" aria-label="Service pages"></span>
+                </div>
+            </div>
+            <div class="when-empty">
+                <div class="lp-bempty">
+                    <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div>
+                    <div class="t">No active services</div>
+                    <p>Order hosting, a VPS, or email to get started.</p>
+                    <div class="acts"><a href="store.html" class="btn-primary">Order a service</a><a href="store.html" class="lp-link">Browse store &rsaquo;</a></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ DOMAINS — 7 short strings; tiles into columns when the slot is wide ══ -->
+        <div class="hp-tile hp-tile-sky lp-card dom-block">
+            <div class="lp-eyebrow">DOMAINS</div>
+            <div class="when-full">
+                <div class="lp-titlerow">
+                    <div class="lp-title"><span class="lp-num" data-count="dom">7</span> domains</div>
+                    <div class="lp-hint">Expiring first</div>
+                </div>
+                <div class="lp-dbig"><span class="n lp-num" data-count="dom">7</span><span class="w">domains</span></div>
+                <div class="lp-bar" data-bar="dom"></div>
+                <div class="lp-tally" data-tally="dom"></div>
+
+                <div class="lp-toolbar">
+                    <label class="lp-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                        <input type="search" placeholder="Search domains" data-search="dom" aria-label="Search domains">
+                    </label>
+                    <span class="lp-toolcount" data-toolcount="dom"></span>
+                </div>
+                <div class="lp-colhead" style="--cols: minmax(0,1fr) 150px 130px 120px;">
+                    <span>Domain</span><span>Expiry</span><span>Status</span><span>Auto-renew</span>
+                </div>
+
+                <div class="lp-rows dom-rows" data-list="dom" data-page-size="9" data-page-size-table="5" data-peek="9" style="--slot: 3; --cols: minmax(0,1fr) 150px 130px 120px;">
+                    <div class="lp-srow" data-state="expired" data-flag="attn">
+                        <div class="lp-srow-main"><div class="lp-srow-name">oldsite.org</div><span class="lp-srow-sub">expired May 18</span></div>
+                        <span class="lp-cell c-exp">May 18, 2026</span>
+                        <span class="pill pill-red">Expired</span><span class="lp-cell c-auto">Off</span>
+                    </div>
+                    <div class="lp-srow" data-state="expiring" data-flag="attn">
+                        <div class="lp-srow-main"><div class="lp-srow-name">lockworth.io</div><span class="lp-srow-sub">in 9 days</span></div>
+                        <span class="lp-cell c-exp">Jun 3, 2026</span>
+                        <span class="pill pill-orange">Expiring</span><span class="lp-cell c-auto">Off</span>
+                    </div>
+                    <div class="lp-srow" data-state="pending">
+                        <div class="lp-srow-main"><div class="lp-srow-name">macgibbon.co</div><span class="lp-srow-sub">transfer in</span></div>
+                        <span class="lp-cell c-exp">&mdash;</span>
+                        <span class="pill pill-blue">Transfer</span><span class="lp-cell c-auto">&mdash;</span>
+                    </div>
+                    <div class="lp-srow" data-state="active" data-tpl="1" data-few="1">
+                        <div class="lp-srow-main"><div class="lp-srow-name">hostnodes.io</div><span class="lp-srow-sub">renews Jun 2</span></div>
+                        <span class="lp-cell c-exp">Jun 2, 2026</span>
+                        <span class="pill pill-green">Active</span><span class="lp-cell c-auto">On</span>
+                    </div>
+                    <div class="lp-srow" data-state="active" data-few="1">
+                        <div class="lp-srow-main"><div class="lp-srow-name">lockworth.net</div><span class="lp-srow-sub">renews Nov 8</span></div>
+                        <span class="lp-cell c-exp">Nov 8, 2026</span>
+                        <span class="pill pill-green">Active</span><span class="lp-cell c-auto">On</span>
+                    </div>
+                    <div class="lp-srow" data-state="active" data-few="1">
+                        <div class="lp-srow-main"><div class="lp-srow-name">lockworth.com</div><span class="lp-srow-sub">renews Apr 12</span></div>
+                        <span class="lp-cell c-exp">Apr 12, 2027</span>
+                        <span class="pill pill-green">Active</span><span class="lp-cell c-auto">On</span>
+                    </div>
+                    <div class="lp-srow" data-state="active">
+                        <div class="lp-srow-main"><div class="lp-srow-name">petey.dev</div><span class="lp-srow-sub">renews Jan 22</span></div>
+                        <span class="lp-cell c-exp">Jan 22, 2027</span>
+                        <span class="pill pill-green">Active</span><span class="lp-cell c-auto">On</span>
+                    </div>
+                </div>
+
+                <div class="lp-foot">
+                    <div class="lp-more" data-more="dom"></div>
+                    <div class="lp-pagefoot">
+                        <span class="lp-perpage">Show
+                            <select data-perpage="dom" aria-label="Domains per page"><option>5</option><option>10</option><option>25</option></select>
+                        </span>
+                        <span class="lp-range" data-range="dom"></span>
+                        <span class="sp"></span>
+                        <span class="lp-pages" data-pages="dom"></span>
+                    </div>
+                    <a href="clientareadomains.html" class="lp-viewall">Manage domains &rsaquo;</a>
+                    <span class="lp-pager" data-pager="dom" role="group" aria-label="Domain pages"></span>
+                </div>
+            </div>
+            <div class="when-empty">
+                <div class="lp-bempty">
+                    <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 014 10 15 15 0 01-4 10 15 15 0 01-4-10 15 15 0 014-10z"/></svg></div>
+                    <div class="t">No domains yet</div>
+                    <p>Register a new domain or transfer one you own.</p>
+                    <div class="acts"><a href="cart-domain-register.html" class="btn-primary">Register</a><a href="cart-domain-transfer.html" class="lp-link">Transfer in &rsaquo;</a></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ INVOICES — aggregate on purpose: money is a number, not a list ══ -->
+        <div class="hp-tile hp-tile-light lp-card inv-block">
+            <div class="lp-eyebrow is-alert">INVOICES</div>
+            <div class="when-full">
+                <div class="lp-titlerow">
+                    <div class="lp-title">4 unpaid invoices</div>
+                </div>
+                <div class="lp-big">$126.00</div>
+                <div class="lp-cardsub">$18.00 of it is <strong>9 days overdue</strong> (#10233)</div>
+                <a href="viewinvoice.html" class="btn-primary">Pay all</a>
+
+                <!-- table mode gets room for the actual four rows -->
+                <div class="inv-list">
+                    <!-- --cols is required: table mode sets grid-template-columns
+                         from it, and an undefined var collapses every cell onto
+                         its own row -->
+                    <div class="lp-rows" style="margin-top:0; --cols: minmax(0,1fr) 130px 110px 90px;">
+                        <div class="lp-srow"><div class="lp-srow-main"><div class="lp-srow-name">#10233</div></div><span class="lp-cell c-due">Due May 20</span><span class="pill pill-red">Overdue</span><span class="lp-srow-price">$18.00</span></div>
+                        <div class="lp-srow"><div class="lp-srow-main"><div class="lp-srow-name">#10247</div></div><span class="lp-cell c-due">Due Jun 4</span><span class="pill pill-orange">Due soon</span><span class="lp-srow-price">$42.00</span></div>
+                        <div class="lp-srow"><div class="lp-srow-main"><div class="lp-srow-name">#10251</div></div><span class="lp-cell c-due">Due Jun 12</span><span class="pill pill-gray">Unpaid</span><span class="lp-srow-price">$36.00</span></div>
+                        <div class="lp-srow is-last"><div class="lp-srow-main"><div class="lp-srow-name">#10258</div></div><span class="lp-cell c-due">Due Jun 26</span><span class="pill pill-gray">Unpaid</span><span class="lp-srow-price">$30.00</span></div>
+                    </div>
+                </div>
+
+                <div class="lp-invmore">$25.00 account credit will be applied first</div>
+            </div>
+            <div class="when-empty">
+                <div class="lp-bempty">
+                    <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+                    <div class="t">You're all paid up</div>
+                    <p>No invoices due. $25.00 credit is ready for next time.</p>
+                    <div class="acts"><a href="clientareainvoices.html" class="lp-link">Invoice history &rsaquo;</a></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ TICKETS — 10 open, tally chips double as filters ══ -->
+        <div class="hp-tile hp-tile-graphite lp-card tkt-block">
+            <div class="lp-eyebrow is-support">SUPPORT</div>
+            <div class="when-full">
+                <div class="lp-titlerow">
+                    <div class="lp-title"><span class="lp-num" data-count="tkt">10</span> open tickets</div>
+                    <div class="lp-hint">Your replies first</div>
+                </div>
+                <div class="lp-dbig"><span class="n lp-num" data-count="tkt">10</span><span class="w">open tickets</span></div>
+                <div class="lp-bar" data-bar="tkt"></div>
+                <div class="lp-tally" data-tally="tkt"></div>
+
+                <div class="lp-toolbar">
+                    <label class="lp-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                        <input type="search" placeholder="Search tickets" data-search="tkt" aria-label="Search tickets">
+                    </label>
+                    <span class="lp-toolcount" data-toolcount="tkt"></span>
+                </div>
+                <div class="lp-colhead" style="--cols: minmax(0,1fr) 120px 120px 130px;">
+                    <span>Subject</span><span>Department</span><span>Last update</span><span>Status</span>
+                </div>
+
+                <div class="lp-rows" data-list="tkt" data-page-size="3" data-page-size-table="5" data-peek="3" style="--slot: 3; --cols: minmax(0,1fr) 120px 120px 130px;">
+                    <div class="lp-srow" data-state="reply" data-flag="attn" data-few="1">
+                        <div class="lp-srow-main"><div class="lp-srow-name">#4821 &middot; Re: Backup schedule</div><div class="lp-srow-sub">Technical &middot; 2h ago</div></div>
+                        <span class="lp-cell c-dept">Technical</span><span class="lp-cell c-upd">2h ago</span>
+                        <span class="pill pill-blue">Awaiting you</span>
+                    </div>
+                    <div class="lp-srow" data-state="reply" data-flag="attn">
+                        <div class="lp-srow-main"><div class="lp-srow-name">#4818 &middot; SSL won't install on staging</div><div class="lp-srow-sub">Technical &middot; 4h ago</div></div>
+                        <span class="lp-cell c-dept">Technical</span><span class="lp-cell c-upd">4h ago</span>
+                        <span class="pill pill-blue">Awaiting you</span>
+                    </div>
+                    <div class="lp-srow" data-state="reply" data-flag="attn">
+                        <div class="lp-srow-main"><div class="lp-srow-name">#4812 &middot; Invoice #10247 charged twice</div><div class="lp-srow-sub">Billing &middot; yesterday</div></div>
+                        <span class="lp-cell c-dept">Billing</span><span class="lp-cell c-upd">Yesterday</span>
+                        <span class="pill pill-blue">Awaiting you</span>
+                    </div>
+                    <div class="lp-srow" data-state="progress">
+                        <div class="lp-srow-main"><div class="lp-srow-name">#4809 &middot; IP change request for vps-01</div><div class="lp-srow-sub">Technical &middot; yesterday</div></div>
+                        <span class="lp-cell c-dept">Technical</span><span class="lp-cell c-upd">Yesterday</span>
+                        <span class="pill pill-orange">In progress</span>
+                    </div>
+                    <div class="lp-srow" data-state="progress">
+                        <div class="lp-srow-main"><div class="lp-srow-name">#4783 &middot; CDN cache purge frequency</div><div class="lp-srow-sub">Technical &middot; 5 days ago</div></div>
+                        <span class="lp-cell c-dept">Technical</span><span class="lp-cell c-upd">5d ago</span>
+                        <span class="pill pill-orange">In progress</span>
+                    </div>
+                    <div class="lp-srow" data-state="open" data-tpl="1" data-few="1">
+                        <div class="lp-srow-main"><div class="lp-srow-name">#4802 &middot; Enable IMAP on a mailbox</div><div class="lp-srow-sub">Technical &middot; 2 days ago</div></div>
+                        <span class="lp-cell c-dept">Technical</span><span class="lp-cell c-upd">2d ago</span>
+                        <span class="pill pill-gray">With support</span>
+                    </div>
+                    <div class="lp-srow" data-state="open">
+                        <div class="lp-srow-main"><div class="lp-srow-name">#4795 &middot; Domain transfer auth code</div><div class="lp-srow-sub">Domains &middot; 3 days ago</div></div>
+                        <span class="lp-cell c-dept">Domains</span><span class="lp-cell c-upd">3d ago</span>
+                        <span class="pill pill-gray">With support</span>
+                    </div>
+                    <div class="lp-srow" data-state="open" data-few="1">
+                        <div class="lp-srow-main"><div class="lp-srow-name">#4790 &middot; Add a billing contact</div><div class="lp-srow-sub">Billing &middot; 4 days ago</div></div>
+                        <span class="lp-cell c-dept">Billing</span><span class="lp-cell c-upd">4d ago</span>
+                        <span class="pill pill-gray">With support</span>
+                    </div>
+                    <div class="lp-srow" data-state="open">
+                        <div class="lp-srow-main"><div class="lp-srow-name">#4771 &middot; Second account contact</div><div class="lp-srow-sub">Account &middot; 1 week ago</div></div>
+                        <span class="lp-cell c-dept">Account</span><span class="lp-cell c-upd">1w ago</span>
+                        <span class="pill pill-gray">With support</span>
+                    </div>
+                    <div class="lp-srow" data-state="open">
+                        <div class="lp-srow-main"><div class="lp-srow-name">#4762 &middot; Renewal reminder settings</div><div class="lp-srow-sub">Billing &middot; 1 week ago</div></div>
+                        <span class="lp-cell c-dept">Billing</span><span class="lp-cell c-upd">1w ago</span>
+                        <span class="pill pill-gray">With support</span>
+                    </div>
+                </div>
+
+                <div class="lp-foot">
+                    <div class="lp-more" data-more="tkt"></div>
+                    <div class="lp-pagefoot">
+                        <span class="lp-perpage">Show
+                            <select data-perpage="tkt" aria-label="Tickets per page"><option>5</option><option>10</option><option>25</option></select>
+                        </span>
+                        <span class="lp-range" data-range="tkt"></span>
+                        <span class="sp"></span>
+                        <span class="lp-pages" data-pages="tkt"></span>
+                    </div>
+                    <a href="supportticketslist.html" class="lp-viewall is-support">View all tickets &rsaquo;</a>
+                    <span class="lp-pager" data-pager="tkt" role="group" aria-label="Ticket pages"></span>
+                </div>
+            </div>
+            <div class="when-empty">
+                <div class="lp-bempty">
+                    <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                    <div class="t">No open tickets</div>
+                    <p>Need a hand? Open a ticket any time.</p>
+                    <div class="acts"><a href="supportticketsubmit.html" class="btn-primary">Open a ticket</a></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ ANNOUNCEMENTS — 6 posts ══ -->
+        <div class="hp-tile hp-tile-cream lp-card news-block">
+            <div class="lp-eyebrow">RECENT ANNOUNCEMENTS</div>
+            <div class="when-full">
+                <div class="lp-titlerow">
+                    <div class="lp-title"><span class="lp-num" data-count="news">6</span> posts this quarter</div>
+                    <div class="lp-hint">Newest first</div>
+                </div>
+                <div class="lp-dbig"><span class="n lp-num" data-count="news">6</span><span class="w">posts this quarter</span></div>
+
+                <div class="lp-rows ann-rows" data-list="news" data-page-size="6" data-page-size-table="6" data-peek="3" style="--slot: 2;">
+                    <a class="lp-ann" href="announcements.html" data-state="new" data-flag="attn" data-few="1">
+                        <div class="lp-ann-date"><div class="m">May</div><div class="d">26</div></div>
+                        <div><div class="lp-ann-title">Scheduled network maintenance &mdash; 02:00&ndash;03:00 UTC</div><div class="lp-ann-meta"><span class="lp-ann-new">New</span>3 days ago</div></div>
+                    </a>
+                    <a class="lp-ann" href="announcements.html" data-state="read" data-few="1">
+                        <div class="lp-ann-date"><div class="m">May</div><div class="d">20</div></div>
+                        <div><div class="lp-ann-title">Two-factor authentication is now available on every account</div><div class="lp-ann-meta">9 days ago</div></div>
+                    </a>
+                    <a class="lp-ann" href="announcements.html" data-state="read" data-tpl="1" data-few="1">
+                        <div class="lp-ann-date"><div class="m">May</div><div class="d">12</div></div>
+                        <div><div class="lp-ann-title">New data center region now live: Singapore</div><div class="lp-ann-meta">1 week ago</div></div>
+                    </a>
+                    <a class="lp-ann" href="announcements.html" data-state="read">
+                        <div class="lp-ann-date"><div class="m">May</div><div class="d">4</div></div>
+                        <div><div class="lp-ann-title">TLS 1.0 / 1.1 retirement &mdash; action may be required</div><div class="lp-ann-meta">2 weeks ago</div></div>
+                    </a>
+                    <a class="lp-ann" href="announcements.html" data-state="read">
+                        <div class="lp-ann-date"><div class="m">Apr</div><div class="d">28</div></div>
+                        <div><div class="lp-ann-title">Invoice PDFs now include per-service usage detail</div><div class="lp-ann-meta">4 weeks ago</div></div>
+                    </a>
+                    <a class="lp-ann" href="announcements.html" data-state="read">
+                        <div class="lp-ann-date"><div class="m">Apr</div><div class="d">16</div></div>
+                        <div><div class="lp-ann-title">Domain renewal reminders now start 45 days out</div><div class="lp-ann-meta">6 weeks ago</div></div>
+                    </a>
+                </div>
+
+                <div class="lp-foot">
+                    <div class="lp-more" data-more="news"></div>
+                    <div class="lp-pagefoot">
+                        <span class="lp-range" data-range="news"></span>
+                        <span class="sp"></span>
+                        <span class="lp-pages" data-pages="news"></span>
+                    </div>
+                    <a href="announcements.html" class="lp-viewall">View all announcements &rsaquo;</a>
+                    <span class="lp-pager" data-pager="news" role="group" aria-label="Announcement pages"></span>
+                </div>
+            </div>
+            <div class="when-empty">
+                <div class="lp-bempty">
+                    <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 11-5.8-1.6"/></svg></div>
+                    <div class="t">Nothing new</div>
+                    <p>Announcements and maintenance notices will show up here.</p>
+                    <div class="acts"><a href="announcements.html" class="lp-link">Announcement archive &rsaquo;</a></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ REGISTER A DOMAIN — a first-class action block, not a collection.
+                It carries no rows, so like the money card it always hands the wide
+                slot of its row to the partner and settles into the 1/3. Reorder,
+                resize or hide it from the layout map. It keeps the .fill-* styling
+                the gap tile used to have. ══ -->
+        <div class="hp-tile hp-tile-light lp-card reg-block fill-block" data-span="1">
+            <div class="reg-head">
+                <div class="lp-eyebrow">REGISTER A DOMAIN</div>
+                <div class="fill-title">Add another domain</div>
+                <p class="fill-sub">Search for a new name, or transfer one you already own.</p>
+            </div>
+            <div class="reg-action">
+                <form class="fill-search" onsubmit="return false;">
+                    <input type="text" placeholder="yourname.com" aria-label="Search for a domain">
+                    <a href="cart-domain-register.html" class="btn-primary reg-go">Search</a>
+                </form>
+                <!-- pricing row: revealed only once the card is wide enough (2/3, 1/1) -->
+                <div class="reg-tlds" aria-hidden="true">
+                    <span class="reg-tld">.com <b>$9.99</b></span>
+                    <span class="reg-tld">.net <b>$11.99</b></span>
+                    <span class="reg-tld">.io <b>$39.99</b></span>
+                    <span class="reg-tld">.dev <b>$14.99</b></span>
+                    <span class="reg-tld">.org <b>$10.99</b></span>
+                    <span class="reg-tld">.co <b>$24.99</b></span>
+                </div>
+                <div class="fill-foot"><a href="cart-domain-transfer.html" class="lp-viewall">Transfer a domain in &rsaquo;</a></div>
+            </div>
+        </div>
+
+        <!-- ══ PROFILE — a first-class identity block, no rows (count 0), so it
+                yields the wide slot like the money/register cards. Two groups
+                (head = identity, action = address + buttons) so the 2/3 grid and
+                the full-width band can split; at 1/3 and 1/2 they stack. ══ -->
+        <div class="hp-tile hp-tile-light lp-card pro-block fill-block" data-span="1">
+            <div class="pro-head">
+                <div class="lp-eyebrow">PROFILE</div>
+                <div class="pro-id">
+                    <div class="pro-avatar" aria-hidden="true">PM</div>
+                    <div class="pro-idtext">
+                        <div class="pro-name">Petey MacGibbon</div>
+                        <div class="pro-company">LockWorth</div>
+                    </div>
+                </div>
+            </div>
+            <div class="pro-action">
+                <dl class="pro-facts">
+                    <div class="pro-fact"><dt>Email</dt><dd>petey@lockworth.com</dd></div>
+                    <div class="pro-fact"><dt>Phone</dt><dd>+1 757 555 0148</dd></div>
+                    <div class="pro-fact pro-fact-addr"><dt>Address</dt><dd>Waubesa Center, Norfolk, Virginia 54839, United States</dd></div>
+                </dl>
+                <div class="pro-foot">
+                    <a href="clientareadetails.html" class="btn-primary pro-go">Edit profile</a>
+                    <a href="clientarea.php?action=contacts" class="lp-viewall">Contacts &rsaquo;</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="#">Dedicated Servers</a></li><li><a href="domains.html">Domains</a></li><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="email.html">Email</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security &amp; Tools</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="website-security.html">Website Security</a></li><li><a href="website-backup.html">Website Backup</a></li><li><a href="seo-tools.html">SEO Tools</a></li><li><a href="monitoring-360.html">360 Monitoring</a></li><li><a href="nordvpn.html">NordVPN</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li><li><a href="clientregister.html">Create an account</a></li><li><a href="#">Billing</a></li><li><a href="#">Refer a friend</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="support-page.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li><li><a href="serverstatus.html">Network status</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Newsroom</a></li><li><a href="#">Careers</a></li><li><a href="#">Legal</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <span class="hp-footer-copyright">Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Legal</a><a href="#">Site Map</a></div>
+            <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open>
+                    <span class="flag">🇺🇸</span>
+                    <span>English</span>
+                    <span class="sep">/</span>
+                    <span>$ USD</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+        </div>
+    </div>
+</footer>
+
+<!-- ═══════════ Inner-layout slim footer (sidebar + rail) ═══════════ -->
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+
+<!-- ═══════════ Language / currency modal ═══════════ -->
+<div data-include="partials/locale-modal.html"></div>
+
+<!-- ═══════════ Layout map — preview-only grid controller ═══════════ -->
+<button type="button" class="lm-fab" data-lm-toggle>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="18" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+    Layout
+</button>
+<div class="lm-panel" hidden data-lm-panel>
+    <div class="lm-head">
+        <span class="t">Layout map</span>
+        <button type="button" data-lm-reset>Reset</button>
+        <button type="button" data-lm-toggle aria-label="Close">Close</button>
+    </div>
+    <p class="lm-hint">Order, width and visibility of each block. <b>Auto</b> lets the pairing rule decide: two adjacent Auto blocks share a row, a lone one takes the row.</p>
+    <div data-lm-list></div>
+    <div class="lm-extra">
+        <label><input type="checkbox" data-lm-part="atn" checked> Attention strip</label>
+        <label><input type="checkbox" data-lm-part="acct" checked> Account card in header</label>
+    </div>
+    <div class="lm-note" data-lm-note></div>
+</div>
+
+<script src="js/apple-theme.js?v=12"></script>
+<script src="js/apple-layout.js?v=17"></script>
+<script>
+/* clientareahome-v17 — overflow engine (page-local).
+   One row markup per collection; the mode decides how much of it you see.
+   Counts, tallies, ranges and page buttons are all derived from the DOM, so
+   cloning rows for the Volume test keeps every number honest. */
+(function () {
+    var BLOCKS = {
+        svc:  { unit: 'service', unitp: 'services', states: [['active','Active','green'],['pending','Pending','orange'],['suspended','Suspended','red']] },
+        tkt:  { unit: 'ticket',  unitp: 'tickets',  states: [['reply','Awaiting you','blue'],['progress','In progress','orange'],['open','With support','gray']] },
+        dom:  { unit: 'domain',  unitp: 'domains',  states: [['active','Active','green'],['expiring','Expiring','orange'],['pending','Transfer','blue'],['expired','Expired','red']] },
+        news: { unit: 'post',    unitp: 'posts',    states: [],
+                digest: function (attn, rest, shown) {
+                    if (!attn) return 'You are up to date.';
+                    return attn > shown ? '+' + (attn - shown) + ' more unread' : attn + ' unread &middot; ' + rest + ' already seen';
+                } }
+    };
+    var NOTES = {
+        pages:  '<b>Pages</b> &mdash; each card measures the height it actually got, fits as many whole rows as fit, and shows a pager <em>only</em> when there is more than fits. Two arrows and a position, never a row of page numbers: the control is the same size at 3 pages or at 40, so the footer never reflows as the account grows.',
+        peek:   '<b>Peek</b> &mdash; each block shows its top rows only, sorted so exceptions come first, and names the remainder ("+5 more"). Card heights stay fixed, nothing to operate, one tap to the full list.',
+        scroll: '<b>Scroll</b> &mdash; fixed slot, native scroll, fade at the cut line. Cheapest to build and the count in the header carries the total; the hidden rows are easy to miss, and it drops to a plain list under 900px.',
+        table:  '<b>Table</b> &mdash; past a threshold the collection stops pretending to be a summary: it takes a full-width row and turns into the real list with search, column headers, rows-per-page and numbered pages. Numbers belong here, not in a card. Domains and services graduate, the money card does not.',
+        digest: '<b>Digest</b> &mdash; no list at all. A count, the status split as one bar, and only the rows that need a decision. Scales to 120 items without changing shape.'
+    };
+    var CLONE = {
+        svc: { types: ['Cloud VPS 2 GB','Business Hosting','Managed MySQL','SMTP Relay','CDN Starter','Website Backup'],
+               dues: ['Jun 19','Jul 8','Jul 24','Aug 3','Sep 11','Oct 2','Nov 15'],
+               prices: ['$6.00','$9.00','$12.00','$18.00','$24.00','$32.00'],
+               fill: function (row, i) {
+                   var t = this.types[i % this.types.length], d = this.dues[i % this.dues.length];
+                   row.querySelector('.lp-srow-name').textContent = 'node-' + (100 + i) + '.hostnodes.io';
+                   row.querySelector('.lp-srow-sub').textContent = t + ' · renews ' + d;
+                   row.querySelector('.c-type').textContent = t;
+                   row.querySelector('.c-due').textContent = d;
+                   row.querySelector('.lp-srow-price').textContent = this.prices[i % this.prices.length];
+               } },
+        tkt: { subjects: ['Nameserver update','Mailbox quota increase','Firewall rule request','Restore from backup','Renewal invoice query','SSH key rotation','Bandwidth report'],
+               depts: ['Technical','Billing','Domains','Account'],
+               upds: ['1w ago','2w ago','3w ago','1mo ago'],
+               fill: function (row, i) {
+                   var s = this.subjects[i % this.subjects.length], dp = this.depts[i % this.depts.length], u = this.upds[i % this.upds.length];
+                   row.querySelector('.lp-srow-name').textContent = '#' + (4700 - i) + ' · ' + s;
+                   row.querySelector('.lp-srow-sub').textContent = dp + ' · ' + u;
+                   row.querySelector('.c-dept').textContent = dp;
+                   row.querySelector('.c-upd').textContent = u;
+               } },
+        dom: { tlds: ['.com','.net','.io','.dev','.co','.org'],
+               months: ['Jan','Mar','May','Jul','Sep','Nov'],
+               fill: function (row, i) {
+                   var name = 'lockworth-' + (100 + i) + this.tlds[i % this.tlds.length];
+                   var m = this.months[i % this.months.length], d = (i % 27) + 1;
+                   row.querySelector('.lp-srow-name').textContent = name;
+                   row.querySelector('.lp-srow-sub').textContent = 'renews ' + m + ' ' + d;
+                   row.querySelector('.c-exp').textContent = m + ' ' + d + ', 2027';
+                   row.querySelector('.c-auto').textContent = 'On';
+               } },
+        news: { titles: ['Maintenance window completed as scheduled','New payment gateway added','Knowledgebase reorganised by product','API rate limits raised for all plans','Legacy control panel retired','Status page moved to a new host'],
+                months: ['Apr','Mar','Feb','Jan'],
+                fill: function (row, i) {
+                    row.querySelector('.lp-ann-title').textContent = this.titles[i % this.titles.length];
+                    row.querySelector('.lp-ann-date .m').textContent = this.months[i % this.months.length];
+                    row.querySelector('.lp-ann-date .d').textContent = String((i % 28) + 1);
+                    row.querySelector('.lp-ann-meta').textContent = (i + 2) + ' months ago';
+                } }
+    };
+    var VOL = { few: 0, real: 0, many: 24, huge: 120 };
+
+    var st = {};
+    Object.keys(BLOCKS).forEach(function (k) { st[k] = { page: 1, filter: 'all', q: '', perPage: null, cap: 0 }; });
+
+    function q(sel, root) { return (root || document).querySelector(sel); }
+    function listOf(key) { return q('[data-list="' + key + '"]'); }
+    /* data-vol-off rows are authored but not part of the current volume, so they
+       are invisible to counts, tallies, paging and capacity alike */
+    function rowsOf(key) {
+        var l = listOf(key);
+        return l ? [].slice.call(l.children).filter(function (r) { return !r.hasAttribute('data-vol-off'); }) : [];
+    }
+    function mode() { return document.body.getAttribute('data-ovf') || 'peek'; }
+    /* a block's effective list mode: its own override, else the page default. The
+       override only applies while the page is in a card mode (pages/peek/scroll) -
+       table and digest are whole-page layouts the per-block segment can't sit inside. */
+    function blockMode(key) {
+        var pm = mode();
+        if (pm === 'table' || pm === 'digest') return pm;
+        if (LAYOUT.paged[key]) return 'pages';        /* the Pages toggle forces the < 1/N > pager */
+        return LAYOUT.ovf[key] || pm;
+    }
+    function pageSize(key) {
+        var l = listOf(key);
+        if (mode() === 'table') { return st[key].perPage || +l.getAttribute('data-page-size-table') || 5; }
+        return st[key].cap || +l.getAttribute('data-page-size') || 4;
+    }
+
+    /* How many whole rows fit in the height this card ended up with? Reading
+       clientHeight forces layout, so the answer reflects the real grid row. */
+    function measureCapacity(key) {
+        var l = listOf(key);
+        var vis = [].slice.call(l.children).filter(function (r) { return !r.hidden; });
+        if (!vis.length) return 0;
+        var cs = getComputedStyle(l);
+        var cols = cs.display.indexOf('grid') > -1
+            ? cs.gridTemplateColumns.split(' ').filter(function (v) { return v; }).length : 1;
+        var gap = parseFloat(cs.rowGap); if (isNaN(gap)) gap = 0;
+        var rowH = vis[0].getBoundingClientRect().height;
+        if (!rowH) return 0;
+        /* 1.5px of slack: the last row drops its 0.5px rule and clientHeight is
+           an integer, so an exact floor would drop a row that really does fit */
+        var fit = Math.floor((l.clientHeight + gap + 1.5) / (rowH + gap));
+        return Math.max(1, fit) * cols;
+    }
+
+    /* ---- Volume: trim to the curated few, or clone the template row up ---- */
+    function setVolume(vol) {
+        var target = VOL[vol] || 0;
+        Object.keys(BLOCKS).forEach(function (key) {
+            var l = listOf(key); if (!l) return;
+            [].slice.call(l.querySelectorAll('[data-clone]')).forEach(function (r) { r.remove(); });
+            var authored = [].slice.call(l.children);
+            authored.forEach(function (r) { r.removeAttribute('data-vol-off'); });
+            st[key].page = 1;
+            if (vol === 'few') {
+                /* keep the rows marked data-few - a plausible small account, not
+                   just the first three, which would be all the exceptions */
+                authored.forEach(function (r) {
+                    if (!r.hasAttribute('data-few')) { r.setAttribute('data-vol-off', '1'); r.hidden = true; }
+                });
+                return;
+            }
+            if (!target || target <= authored.length) return;
+            var tpl = q('[data-tpl]', l) || authored[authored.length - 1];
+            for (var i = authored.length; i < target; i++) {
+                var row = tpl.cloneNode(true);
+                row.setAttribute('data-clone', '1');
+                row.removeAttribute('data-tpl');
+                row.removeAttribute('data-flag');
+                row.removeAttribute('data-few');
+                try { CLONE[key].fill(row, i); } catch (e) {}
+                l.appendChild(row);
+            }
+        });
+    }
+
+    /* ---- FOOTPRINT: how many columns a block deserves, from its row count.
+            A three-domain account should not be handed a full-width strip, and
+            the cell that frees up becomes a utility tile whose offer is
+            relevant precisely because that collection is small. ---- */
+    function gridCols() { return document.body.getAttribute('data-grid') === 'halves' ? 2 : 3; }
+    /* Kinship pairs, in DOM order, which is what places them. Each owns one row and
+       the wide slot goes to the block with more rows; the money card has no rows of
+       its own, so its partner keeps it.
+       [first block, second block, bias, who holds the width when both are empty].
+       Bias multiplies the second count, so 0.5 reads "the first block keeps the
+       width unless the second has more than twice as many rows" - a one-item
+       difference must never flip the layout. */
+    var PAIRS = [
+        /* a service row carries a hostname, plan, status and price; a domain row is
+           a short name and a date, so services want the width */
+        ['svc', 'dom', 0.5, 'svc'],
+        /* the money card has no rows of its own, so tickets takes it */
+        ['inv', 'tkt', 1, 'tkt']
+    ];
+    /* ---- LAYOUT MAP state: the grid's source of truth ----
+       order  - block keys, in the order they are placed (and in the DOM)
+       off    - blocks switched off
+       width  - a width name (third/half/…), or unset for Auto (pairing decides)
+       color     - per-block palette colour: an accent wash in one of the palette
+                   hues (blue/emerald/…), else default (follows the page Tone)
+       search    - collection blocks forced to show their search box
+       ovf       - per-block list display override (peek/scroll); unset = as authored
+       paged     - collection blocks paginated: the < 1/N > arrow pager, overrides ovf
+       hideTally - blocks whose status filter chips (All / Active / …) are hidden
+       parts     - page furniture outside the grid */
+    var BLOCK_LABEL = { svc: 'Services', dom: 'Domains', inv: 'Invoices', tkt: 'Tickets', news: 'Announcements', reg: 'Register domain', pro: 'Profile' };
+    var DEFAULT_ORDER = ['svc', 'dom', 'inv', 'tkt', 'news', 'reg', 'pro'];
+    /* the palette hues a block can be tinted with (values mirror the palette chip) */
+    var BLOCK_COLORS = [
+        ['blue', '#0071e3', '#0077ed'], ['emerald', '#14b17d', '#0fa370'],
+        ['violet', '#8c5cff', '#7a46ff'], ['rose', '#ff2d6b', '#e61f5b'],
+        ['amber', '#f08a00', '#d97a00'], ['slate', '#64748b', '#475569']
+    ];
+    var BLOCK_COLOR_NAMES = BLOCK_COLORS.map(function (c) { return c[0]; });
+    /* which blocks can take a search box / pagination - the ones with a row list */
+    var LISTED = { svc: 1, dom: 1, tkt: 1, news: 1 };
+    /* which blocks carry a status tally (and so can offer the Filter toggle) */
+    var TALLIED = { svc: 1, dom: 1, tkt: 1 };
+    /* per-block list DISPLAY modes offered by the layout map (pagination is a
+       separate toggle; table + digest stay page-wide) */
+    var BLOCK_OVF = ['peek', 'scroll'];
+    var LAYOUT = { order: DEFAULT_ORDER.slice(), off: {}, width: {}, color: {}, search: {}, ovf: {}, paged: {}, hideTally: {}, parts: { atn: true, acct: true } };
+    var lastFit = { rows: 0, holes: 0 };
+
+    function saveLayout() { try { localStorage.setItem('hn.v17.layout', JSON.stringify(LAYOUT)); } catch (e) {} }
+    function loadLayout() {
+        var raw = null; try { raw = localStorage.getItem('hn.v17.layout'); } catch (e) {}
+        if (!raw) return;
+        try {
+            var v = JSON.parse(raw);
+            if (!v || !Array.isArray(v.order)) return;
+            /* rebuild the order from known keys only, appending anything the saved
+               copy is missing - a stale entry must not drop a block off the page */
+            var clean = v.order.filter(function (k) { return DEFAULT_ORDER.indexOf(k) > -1; });
+            DEFAULT_ORDER.forEach(function (k) { if (clean.indexOf(k) < 0) clean.push(k); });
+            LAYOUT.order = clean;
+            LAYOUT.off = v.off || {};
+            /* widths are now names (third/half/…); drop any legacy integer widths a
+               layout saved before the six-column switch, or they'd set a bad size */
+            LAYOUT.width = {};
+            if (v.width) Object.keys(v.width).forEach(function (k) {
+                if (WIDTHS.indexOf(v.width[k]) > -1) LAYOUT.width[k] = v.width[k];
+            });
+            /* per-block option layers */
+            LAYOUT.color = {};
+            if (v.color) Object.keys(v.color).forEach(function (k) { if (BLOCK_COLOR_NAMES.indexOf(v.color[k]) > -1) LAYOUT.color[k] = v.color[k]; });
+            LAYOUT.search = {};
+            if (v.search) Object.keys(v.search).forEach(function (k) { if (v.search[k] && LISTED[k]) LAYOUT.search[k] = true; });
+            LAYOUT.ovf = {};
+            if (v.ovf) Object.keys(v.ovf).forEach(function (k) { if (LISTED[k] && BLOCK_OVF.indexOf(v.ovf[k]) > -1) LAYOUT.ovf[k] = v.ovf[k]; });
+            LAYOUT.paged = {};
+            if (v.paged) Object.keys(v.paged).forEach(function (k) { if (v.paged[k] && LISTED[k]) LAYOUT.paged[k] = true; });
+            LAYOUT.hideTally = {};
+            if (v.hideTally) Object.keys(v.hideTally).forEach(function (k) { if (v.hideTally[k] && TALLIED[k]) LAYOUT.hideTally[k] = true; });
+            LAYOUT.parts = { atn: v.parts ? v.parts.atn !== false : true, acct: v.parts ? v.parts.acct !== false : true };
+        } catch (e) {}
+    }
+    var WIDTH = { '1/3': 'third', '2/3': 'twothirds', '1/2': 'half', '2/2': 'full', '3/3': 'full' };
+    /* the fraction each width occupies on the six-column track */
+    var WIDTH6 = { third: 2, half: 3, twothirds: 4, full: 6 };
+    var WIDTHS = ['third', 'half', 'twothirds', 'full'];   /* valid explicit widths */
+    function countOf(key) {
+        if (document.body.getAttribute('data-data') === 'empty') return 0;
+        return rowsOf(key).length;
+    }
+    function applyFootprint() {
+        var m = mode(), C = gridCols(), total = 0;
+        /* explicit path: a width name, straight onto the block. total is kept in
+           sixths so the gap maths below reads the same grid the CSS renders. */
+        function apply(key, widthStr) {
+            var el = q('.' + key + '-block'); if (!el) return;
+            el.setAttribute('data-width', widthStr);
+            el.setAttribute('data-tint', 'off');
+            total += WIDTH6[widthStr] || 6;
+        }
+        /* auto path: the pairing rule still thinks in C-column spans, so translate
+           the span it picked (1..C) into the matching width name */
+        function set(key, span) { apply(key, WIDTH[Math.min(span, C) + '/' + C] || 'full'); }
+        /* one washed block per row (paired tone): the narrow one, so the wide
+           list keeps a plain surface and its status pills stay the loudest thing */
+        function tint(key) { var el = q('.' + key + '-block'); if (el) el.setAttribute('data-tint', 'on'); }
+        /* the money, register and profile cards carry no rows to count */
+        var count = { inv: 0, reg: 0, pro: 0 };
+        Object.keys(BLOCKS).forEach(function (k) { count[k] = countOf(k); });
+
+        /* visibility and DOM order come from the layout map */
+        var bento = q('.lp-bento');
+        DEFAULT_ORDER.forEach(function (k) { var el = q('.' + k + '-block'); if (el) el.hidden = !!LAYOUT.off[k]; });
+        LAYOUT.order.forEach(function (k) { var el = q('.' + k + '-block'); if (el) bento.appendChild(el); });
+        var visible = LAYOUT.order.filter(function (k) { return !LAYOUT.off[k]; });
+
+        /* which of two adjacent blocks earns the wide slot */
+        function wideOf(a, b) {
+            var pair = null;
+            PAIRS.forEach(function (p) { if ((p[0] === a && p[1] === b) || (p[0] === b && p[1] === a)) pair = p; });
+            if (!count[a] && !count[b]) return pair ? pair[3] : a;
+            var bias = pair ? pair[2] : 1;
+            if (pair && pair[0] === b) return count[b] > count[a] * bias ? b : a;
+            return count[a] > count[b] * bias ? a : b;
+        }
+
+        if (m === 'table') {
+            /* table mode is "show me the real lists", so it does not pair - every
+               block takes its own full-width row, money card included, since that
+               is where its four unpaid invoices are listed out */
+            visible.forEach(function (k) { set(k, C); });
+        } else {
+            /* Walk the order and pack rows: an explicit width is taken as given,
+               two adjacent Auto blocks share a row, and an Auto block with no Auto
+               neighbour left takes the row on its own. */
+            for (var i = 0; i < visible.length;) {
+                var a = visible[i], wa = LAYOUT.width[a];   /* a width name, or undefined for Auto */
+                if (wa) { apply(a, wa); i++; continue; }
+                var b = visible[i + 1], wb = b ? LAYOUT.width[b] : null;
+                if (b && !wb && C > 1) {
+                    var wide = wideOf(a, b);
+                    set(a, C === 2 ? 1 : (wide === a ? 2 : 1));
+                    set(b, C === 2 ? 1 : (wide === b ? 2 : 1));
+                    /* in halves there is no narrow block, so wash the first of the pair */
+                    tint(C === 2 ? a : (wide === a ? b : a));
+                    i += 2;
+                } else { set(a, C); i++; }
+            }
+        }
+
+        /* gap maths in sixths: a full row is 6, so a row is left part-empty only
+           when explicit widths don't tile evenly (e.g. a lone 1/2 among thirds) */
+        var holes = (6 - (total % 6)) % 6;
+        lastFit = { rows: Math.ceil(total / 6), holes: holes, blocks: visible.length };
+
+        applyMixedTones();   /* needs the widths that were just assigned */
+        applyBlockFill();    /* ...and overrides them when a fill style is on */
+    }
+
+    /* ---- tally chips (also the filter control) ---- */
+    function buildTally(key, all) {
+        var host = q('[data-tally="' + key + '"]'); if (!host) return;
+        /* the map can switch this block's status filter off */
+        if (LAYOUT.hideTally[key]) { host.innerHTML = ''; return; }
+        var defs = BLOCKS[key].states; if (!defs.length) { host.innerHTML = ''; return; }
+        var counts = {};
+        all.forEach(function (r) { var s = r.getAttribute('data-state'); counts[s] = (counts[s] || 0) + 1; });
+        host.innerHTML = '';
+        var opts = [['all', 'All', 'gray', all.length]];
+        defs.forEach(function (d) { if (counts[d[0]]) opts.push([d[0], d[1], d[2], counts[d[0]]]); });
+        opts.forEach(function (o) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 't-' + o[2] + (st[key].filter === o[0] ? ' active' : '');
+            b.innerHTML = (o[0] === 'all' ? '' : '<span class="dot"></span>') +
+                '<span>' + o[1] + '</span><span class="c">' + o[3] + '</span>';
+            b.addEventListener('click', function () {
+                st[key].filter = (st[key].filter === o[0] && o[0] !== 'all') ? 'all' : o[0];
+                st[key].page = 1;
+                render(key);
+            });
+            host.appendChild(b);
+        });
+    }
+
+    /* ---- proportion bar (digest mode) ---- */
+    function buildBar(key, all) {
+        var host = q('[data-bar="' + key + '"]'); if (!host) return;
+        var defs = BLOCKS[key].states;
+        host.innerHTML = '';
+        if (!defs.length || !all.length) return;
+        defs.forEach(function (d) {
+            var n = all.filter(function (r) { return r.getAttribute('data-state') === d[0]; }).length;
+            if (!n) return;
+            var i = document.createElement('i');
+            i.className = 's-' + d[2];
+            i.style.width = (n / all.length * 100) + '%';
+            i.title = d[1] + ': ' + n;
+            host.appendChild(i);
+        });
+    }
+
+    /* ---- page buttons, with an ellipsis once there are too many ---- */
+    var CHEV_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+    var CHEV_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+    function buildPages(key, pages) {
+        var host = q('[data-pages="' + key + '"]'); if (!host) return;
+        var cur = st[key].page;
+        host.innerHTML = '';
+        function nav(label, target, disabled, aria) {
+            var b = document.createElement('button');
+            b.type = 'button'; b.innerHTML = label; b.disabled = !!disabled;
+            if (aria) b.setAttribute('aria-label', aria);
+            if (!disabled) b.addEventListener('click', function () { st[key].page = target; render(key); });
+            host.appendChild(b);
+        }
+        nav(CHEV_L, cur - 1, cur <= 1, 'Previous page');
+        var want = [1, pages, cur, cur - 1, cur + 1];
+        var shown = [];
+        for (var p = 1; p <= pages; p++) { if (want.indexOf(p) > -1) shown.push(p); }
+        var last = 0;
+        shown.forEach(function (p) {
+            if (last && p - last > 1) { var g = document.createElement('span'); g.className = 'gap'; g.textContent = '…'; host.appendChild(g); }
+            var b = document.createElement('button');
+            b.type = 'button'; b.textContent = String(p);
+            if (p === cur) b.className = 'active';
+            b.addEventListener('click', function () { st[key].page = p; render(key); });
+            host.appendChild(b);
+            last = p;
+        });
+        nav(CHEV_R, cur + 1, cur >= pages, 'Next page');
+    }
+
+    /* ---- the in-card pager: two arrows and a position. One control, the same
+            size at 2 pages or at 40, so a card's footer never reflows as the
+            account grows - which is why it wins over a dot per page. Nothing is
+            drawn at all when everything already fits. ---- */
+    function buildPager(key, pages) {
+        var host = q('[data-pager="' + key + '"]'); if (!host) return;
+        var cur = st[key].page;
+        host.innerHTML = '';
+        if (pages < 2) return;
+        function arrow(html, target, disabled, label) {
+            var b = document.createElement('button');
+            b.type = 'button'; b.className = 'arw'; b.innerHTML = html;
+            b.disabled = !!disabled; b.setAttribute('aria-label', label);
+            if (!disabled) b.addEventListener('click', function () { st[key].page = target; render(key); });
+            host.appendChild(b);
+        }
+        arrow(CHEV_L, cur - 1, cur <= 1, 'Previous ' + BLOCKS[key].unitp);
+        var pos = document.createElement('span');
+        pos.className = 'pos';
+        pos.innerHTML = cur + '<span class="sep">/</span>' + pages;
+        pos.setAttribute('aria-live', 'polite');
+        pos.setAttribute('aria-label', BLOCKS[key].unitp + ', page ' + cur + ' of ' + pages);
+        host.appendChild(pos);
+        arrow(CHEV_R, cur + 1, cur >= pages, 'More ' + BLOCKS[key].unitp);
+    }
+
+    function setText(sel, html) { var el = q(sel); if (el) el.innerHTML = html; }
+
+    function render(key, pass) {
+        var l = listOf(key); if (!l) return;
+        var all = rowsOf(key), m = blockMode(key), s = st[key];
+        var B = BLOCKS[key];
+        /* with the status filter hidden there is no way to clear it, so it can't
+           be allowed to hold rows back - fall back to showing all states */
+        var effFilter = LAYOUT.hideTally[key] ? 'all' : s.filter;
+        var filtered = all.filter(function (r) {
+            if (effFilter !== 'all' && r.getAttribute('data-state') !== effFilter) return false;
+            if (s.q && (r.textContent || '').toLowerCase().indexOf(s.q) === -1) return false;
+            return true;
+        });
+        var n = filtered.length, vis = filtered, start = 0, pages = 1;
+
+        if (m === 'peek') {
+            vis = filtered.slice(0, +l.getAttribute('data-peek') || 3);
+        } else if (m === 'digest') {
+            vis = filtered.filter(function (r) { return r.getAttribute('data-flag') === 'attn'; }).slice(0, 3);
+        } else if (m === 'pages' || m === 'table') {
+            var ps = pageSize(key);
+            pages = Math.max(1, Math.ceil(n / ps));
+            if (s.page > pages) s.page = pages;
+            if (s.page < 1) s.page = 1;
+            start = (s.page - 1) * ps;
+            vis = filtered.slice(start, start + ps);
+        }
+
+        all.forEach(function (r) { r.hidden = true; r.classList.remove('is-last'); });
+        vis.forEach(function (r) { r.hidden = false; });
+        if (vis.length) vis[vis.length - 1].classList.add('is-last');
+
+        /* counts derived from the DOM, never hardcoded */
+        [].slice.call(document.querySelectorAll('[data-count="' + key + '"]')).forEach(function (el) { el.textContent = all.length; });
+        setText('[data-toolcount="' + key + '"]', n === all.length ? all.length + ' ' + B.unitp : n + ' of ' + all.length + ' ' + B.unitp);
+
+        /* "+N more" / digest summary */
+        var rest = n - vis.length;
+        var moreHtml = '';
+        if (m === 'digest') {
+            var attn = filtered.filter(function (r) { return r.getAttribute('data-flag') === 'attn'; }).length;
+            moreHtml = B.digest ? B.digest(attn, n - attn, vis.length) : attn
+                ? (attn > vis.length
+                    ? '+' + (attn - vis.length) + ' more need a decision &middot; the other ' + (n - attn) + ' are fine'
+                    : 'The other ' + (n - attn) + ' need nothing from you.')
+                : 'Nothing here needs a decision.';
+        } else if (rest > 0) {
+            moreHtml = '+' + rest + ' more' + (s.filter !== 'all' || s.q ? ' in this filter' : '');
+        }
+        setText('[data-more="' + key + '"]', moreHtml);
+
+        /* numbered pagination lives in table mode (the full list) */
+        if (m === 'table') {
+            setText('[data-range="' + key + '"]', n ? (start + 1) + '–' + (start + vis.length) + ' of ' + n + (n === all.length ? '' : ' filtered') : '0 of 0');
+            buildPages(key, pages);
+        } else {
+            setText('[data-range="' + key + '"]', '');
+            setText('[data-pages="' + key + '"]', '');
+        }
+
+        /* the arrow pager: pages mode (the block's effective mode) */
+        if (m === 'pages') { buildPager(key, pages); } else { setText('[data-pager="' + key + '"]', ''); }
+
+        buildTally(key, all);
+        buildBar(key, all);
+
+        /* attention-strip chip: count, wording and presence all follow the rows */
+        var attnCount = all.filter(function (r) { return r.getAttribute('data-flag') === 'attn'; }).length;
+        var chip = q('[data-attn-chip="' + key + '"]');
+        if (chip) {
+            chip.hidden = attnCount === 0;
+            var w = ATTN_WORDS[key];
+            if (w) chip.innerHTML = '<span data-attn="' + key + '">' + attnCount + '</span> ' + (attnCount === 1 ? w[0] : w[1]);
+        }
+
+        /* Second pass: now that the rows are laid out, ask the card how much room
+           it really has and re-page if the answer changed. Then a shrink guard:
+           in a 1/3 slot an announcement title can wrap to a taller row than the
+           one that was measured, so if the content still overflows, drop a row.
+           Both are pass-counted, so a rounding disagreement cannot loop. */
+        var p = pass || 0;
+        if (m === 'pages') {
+            if (p === 0) {
+                var measured = measureCapacity(key);
+                if (measured && measured !== s.cap) { s.cap = measured; return render(key, 1); }
+            }
+            if (p < 4 && s.cap > 1 && l.scrollHeight > l.clientHeight + 1) {
+                s.cap -= 1;
+                return render(key, p + 1);
+            }
+        }
+    }
+
+    /* singular / plural, because "1 services need action" is a tell */
+    var ATTN_WORDS = {
+        svc: ['service needs action', 'services need action'],
+        tkt: ['ticket awaiting your reply', 'tickets awaiting your reply']
+    };
+
+    /* The strip's badge is the sum of its chips: 1 overdue invoice (authored,
+       the money card is not row-driven) + whatever the collections flag. */
+    var STATIC_ATTN = 1;
+    function renderAttnTotal() {
+        var total = STATIC_ATTN;
+        [].slice.call(document.querySelectorAll('[data-attn]')).forEach(function (el) { total += (+el.textContent || 0); });
+        var badge = q('[data-attn-total]');
+        if (badge) badge.textContent = total;
+    }
+
+    /* Footprint first: the span decides the inner column count and the height a
+       card gets, both of which the row-fitting pass then measures.
+       (forEach would pass the index as `pass` and silently skip the measuring
+       pass for every block after the first - always call render explicitly.) */
+    /* Per-block option layers from the layout map, expressed as data-attributes
+       the CSS and render() key off. Style is applied to every block; search and
+       pagination only mean something on a block that owns a row list. */
+    function applyBlockOpts() {
+        DEFAULT_ORDER.forEach(function (k) {
+            var el = q('.' + k + '-block'); if (!el) return;
+            /* the card carries its own list mode, so peek/pages/scroll CSS can key
+               off it and a block can differ from the page default */
+            el.setAttribute('data-ovf', blockMode(k));
+            if (LAYOUT.color[k]) el.setAttribute('data-blockcolor', LAYOUT.color[k]);
+            else el.removeAttribute('data-blockcolor');
+            if (LAYOUT.search[k] && LISTED[k]) el.setAttribute('data-blocksearch', 'on');
+            else el.removeAttribute('data-blocksearch');
+            if (LAYOUT.hideTally[k] && TALLIED[k]) el.setAttribute('data-notally', 'on');
+            else el.removeAttribute('data-notally');
+        });
+    }
+
+    function renderAll() {
+        applyFootprint();
+        applyBlockOpts();   /* before render(), which reads data-blockpage */
+        Object.keys(BLOCKS).forEach(function (k) { render(k); });
+        renderAttnTotal();
+        if (typeof buildMap === 'function') buildMap();   /* keep the map's row count honest */
+    }
+
+    function applyOvf(m) {
+        document.body.setAttribute('data-ovf', m);
+        setText('[data-ovf-note]', NOTES[m] || '');
+        /* capacity is a property of this mode's layout, so re-measure from scratch */
+        Object.keys(st).forEach(function (k) { st[k].page = 1; st[k].cap = 0; });
+        renderAll();
+    }
+    function applyVol(v) {
+        document.body.setAttribute('data-vol', v);
+        setVolume(v);
+        renderAll();
+    }
+    /* The original tone classes. Stripping them in the other tones is what
+       switches off every .hp-tile-graphite descendant rule - the dark pills, the
+       light row borders, the yellow links - in a single move, instead of writing
+       an override for each one. */
+    var TONE_ALL = ['hp-tile-light', 'hp-tile-sky', 'hp-tile-cream', 'hp-tile-graphite'];
+    function applyTone(t) {
+        document.body.setAttribute('data-tone', t);
+        /* the classes themselves are assigned in applyFootprint, which is the only
+           place that knows how wide each block ended up */
+        [].slice.call(document.querySelectorAll('.lp-card')).forEach(function (el) {
+            TONE_ALL.forEach(function (c) { el.classList.remove(c); });
+        });
+        /* borders change the content box, so re-measure the row fit */
+        Object.keys(st).forEach(function (k) { st[k].cap = 0; });
+        renderAll();
+    }
+
+    /* Mixed assigns the original palette BY SLOT rather than by block. In v16 the
+       charcoal card was one column of three; under the paired layout that same
+       block is 2/3 wide, which doubles the dark mass. Tying the heavy tones to the
+       narrow slots keeps the original balance whatever the pairing does. */
+    function applyMixedTones() {
+        if (document.body.getAttribute('data-tone') !== 'mixed') return;
+        var pool = ['hp-tile-sky', 'hp-tile-graphite'], pi = 0;
+        LAYOUT.order.forEach(function (k) {
+            var el = q('.' + k + '-block'); if (!el) return;
+            TONE_ALL.forEach(function (c) { el.classList.remove(c); });
+            if (el.hidden) return;   /* a hidden block must not consume a tone */
+            /* a block with an explicit palette colour owns its own surface - leave
+               it class-less so the per-block colour rule controls it, and don't let
+               it eat a slot from the sky/graphite pool */
+            if (LAYOUT.color[k]) return;
+            var w = el.getAttribute('data-width');
+            var cls = (k === 'news') ? 'hp-tile-cream'
+                : ((w === 'third' || w === 'half') ? (pool[pi++] || 'hp-tile-light') : 'hp-tile-light');
+            el.classList.add(cls);
+        });
+        var fill = q('[data-fill]');
+        if (fill) { TONE_ALL.forEach(function (c) { fill.classList.remove(c); }); fill.classList.add('hp-tile-light'); }
+    }
+
+    /* Block style: the fill treatment every card wears. Runs after the tone pass
+       so it can take the classes over - accent and gradient borrow
+       .hp-tile-graphite purely for its light-on-dark ink (pills, row rules,
+       scrollbars), while the CSS above replaces the background it came with. */
+    function applyBlockFill() {
+        var s = document.body.getAttribute('data-blk-style') || 'white';
+        DEFAULT_ORDER.forEach(function (k) {
+            var el = q('.' + k + '-block'); if (!el) return;
+            el.classList.remove('blk-fill');
+            if (s === 'white' || el.hidden) return;
+            TONE_ALL.forEach(function (c) { el.classList.remove(c); });
+            el.classList.add('blk-fill');
+            el.classList.add(s === 'tint' ? 'hp-tile-light' : 'hp-tile-graphite');
+        });
+    }
+    function applyBlkStyle(v) {
+        document.body.setAttribute('data-blk-style', v);
+        /* Strip the tone classes first. A filled card borrows .hp-tile-graphite
+           purely for its ink, so leaving it on would keep the card dark after the
+           fill is switched back off; applyMixedTones re-assigns them where they
+           actually belong. Same reset applyTone does, for the same reason. */
+        [].slice.call(document.querySelectorAll('.lp-card')).forEach(function (el) {
+            TONE_ALL.forEach(function (c) { el.classList.remove(c); });
+        });
+        /* borders change the content box, so the row fit has to be re-measured */
+        Object.keys(st).forEach(function (k) { st[k].cap = 0; });
+        renderAll();
+    }
+
+    function applyGrid(c) {
+        document.body.setAttribute('data-grid', c);
+        /* slot widths change, so every capacity has to be measured again */
+        Object.keys(st).forEach(function (k) { st[k].page = 1; st[k].cap = 0; });
+        renderAll();
+    }
+
+    /* ---- wire the in-card controls ---- */
+    [].slice.call(document.querySelectorAll('[data-search]')).forEach(function (input) {
+        input.addEventListener('input', function () {
+            var key = input.getAttribute('data-search');
+            st[key].q = input.value.trim().toLowerCase();
+            st[key].page = 1;
+            render(key);
+        });
+    });
+    [].slice.call(document.querySelectorAll('[data-perpage]')).forEach(function (sel) {
+        sel.addEventListener('change', function () {
+            var key = sel.getAttribute('data-perpage');
+            st[key].perPage = +sel.value;
+            st[key].page = 1;
+            render(key);
+        });
+    });
+    var dismiss = q('[data-atn-dismiss]');
+    if (dismiss) dismiss.addEventListener('click', function () { var a = q('.atn'); if (a) a.style.display = 'none'; });
+
+    /* left/right arrows page a focused dot group */
+    [].slice.call(document.querySelectorAll('[data-pager]')).forEach(function (host) {
+        host.addEventListener('keydown', function (e) {
+            if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+            var key = host.getAttribute('data-pager');
+            st[key].page += (e.key === 'ArrowRight' ? 1 : -1);
+            render(key);
+            e.preventDefault();
+            var next = host.querySelector('.dot.active') || host.querySelector('.arw:not(:disabled)');
+            if (next) next.focus();
+        });
+    });
+
+    // Profile menu: the hero avatar opens a small account menu. It's appended to
+    // <body> and positioned fixed, because the wrap is a size container (making it
+    // the containing block for fixed descendants) and the hero clips its overflow.
+    (function () {
+        var trigger = document.querySelector('[data-profile-trigger]');
+        if (!trigger) return;
+        var menu = document.createElement('div');
+        menu.className = 'dash-profile-menu'; menu.hidden = true;
+        menu.setAttribute('role', 'menu');
+        menu.innerHTML =
+            '<div class="dash-pmenu-head"><div class="dash-pmenu-name">Marcus Vitruvius</div><div class="dash-pmenu-mail">marcus@vitruvius.io</div></div>' +
+            '<a class="dash-pmenu-item" role="menuitem" href="clientareadetails.html">Edit profile</a>' +
+            '<a class="dash-pmenu-item" role="menuitem" href="clientareainvoices.html">Billing &amp; invoices</a>' +
+            '<a class="dash-pmenu-item" role="menuitem" href="supportticketslist.html">Support tickets</a>' +
+            '<a class="dash-pmenu-item danger" role="menuitem" href="login.html">Log out</a>';
+        document.body.appendChild(menu);
+        function close() { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); }
+        trigger.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (!menu.hidden) { close(); return; }
+            menu.hidden = false;
+            var r = trigger.getBoundingClientRect();
+            var left = Math.min(Math.max(12, r.right - menu.offsetWidth), window.innerWidth - menu.offsetWidth - 12);
+            menu.style.left = left + 'px';
+            menu.style.top = (r.bottom + 10) + 'px';
+            trigger.setAttribute('aria-expanded', 'true');
+        });
+        document.addEventListener('click', function (e) {
+            if (!menu.hidden && !menu.contains(e.target) && !trigger.contains(e.target)) close();
+        });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+        window.addEventListener('scroll', close, true);
+        window.addEventListener('resize', close);
+    })();
+
+    /* ---- the layout map panel ---- */
+    var CHEV_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>';
+    var CHEV_DN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+    var EYE_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+    var EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10 10 0 0112 20c-7 0-11-8-11-8a18 18 0 015.06-5.94M9.9 4.24A9 9 0 0112 4c7 0 11 8 11 8a18 18 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+    function layoutChanged() {
+        saveLayout();
+        /* a block that just appeared or changed width has to re-measure its rows */
+        Object.keys(st).forEach(function (k) { st[k].page = 1; st[k].cap = 0; });
+        renderAll();
+        buildMap();
+    }
+
+    function applyParts() {
+        var atn = q('.atn'), acct = q('.dash-hero-avatar');
+        if (atn) atn.style.display = LAYOUT.parts.atn ? '' : 'none';
+        if (acct) acct.style.display = LAYOUT.parts.acct ? '' : 'none';
+    }
+
+    function buildMap() {
+        var host = q('[data-lm-list]'); if (!host) return;
+        var C = gridCols();
+        /* every fraction is offered on every block now that the grid is six
+           columns - Auto lets the pairing rule pick, the rest are fixed */
+        var widths = [['', 'Auto'], ['third', '1/3'], ['half', '1/2'], ['twothirds', '2/3'], ['full', '1/1']];
+        host.innerHTML = '';
+        LAYOUT.order.forEach(function (key, idx) {
+            var off = !!LAYOUT.off[key];
+            var row = document.createElement('div');
+            row.className = 'lm-row' + (off ? ' off' : '');
+
+            function iconBtn(html, disabled, onClick, label, cls) {
+                var b = document.createElement('button');
+                b.type = 'button'; b.className = 'lm-btn' + (cls ? ' ' + cls : ''); b.innerHTML = html;
+                b.disabled = !!disabled; b.setAttribute('aria-label', label);
+                if (!disabled) b.addEventListener('click', onClick);
+                return b;
+            }
+            /* top line: reorder · name · live size · hide */
+            var top = document.createElement('div'); top.className = 'lm-top';
+            top.appendChild(iconBtn(CHEV_UP, idx === 0, function () {
+                LAYOUT.order.splice(idx - 1, 0, LAYOUT.order.splice(idx, 1)[0]); layoutChanged();
+            }, 'Move ' + BLOCK_LABEL[key] + ' up'));
+            top.appendChild(iconBtn(CHEV_DN, idx === LAYOUT.order.length - 1, function () {
+                LAYOUT.order.splice(idx + 1, 0, LAYOUT.order.splice(idx, 1)[0]); layoutChanged();
+            }, 'Move ' + BLOCK_LABEL[key] + ' down'));
+
+            var name = document.createElement('span');
+            name.className = 'lm-name'; name.textContent = BLOCK_LABEL[key];
+            top.appendChild(name);
+
+            /* Live size badge: the fraction the block is actually rendering right
+               now. When the width is Auto, this is the only place the resolved
+               size shows - so the map visibly updates as the pairing changes it. */
+            var FR = { third: '1/3', twothirds: '2/3', half: '1/2', full: '1/1' };
+            var bEl = q('.' + key + '-block');
+            var dw = bEl ? bEl.getAttribute('data-width') : null;
+            var isAuto = !(LAYOUT.width[key]);
+            var size = document.createElement('span');
+            size.className = 'lm-size' + (isAuto ? ' is-auto' : '');
+            size.textContent = off ? 'off' : (FR[dw] || '—');
+            size.title = off ? 'Hidden' : (isAuto ? 'Auto — the pairing rule chose ' + (FR[dw] || '?') : 'Fixed at ' + (FR[dw] || '?'));
+            top.appendChild(size);
+
+            top.appendChild(iconBtn(off ? EYE_OFF : EYE_ON, false, function () {
+                if (off) { delete LAYOUT.off[key]; } else { LAYOUT.off[key] = true; }
+                layoutChanged();
+            }, (off ? 'Show ' : 'Hide ') + BLOCK_LABEL[key], off ? '' : 'on'));
+            row.appendChild(top);
+
+            /* second line: the width segment - Auto and the four fractions, labelled
+               "Size" so it can't be confused with the "List" segment below it.
+               Table mode forces every block full-width, so the size choice can't
+               apply there - lock the segment and say why, like the List lock. */
+            var sizeLocked = (mode() === 'table');
+            var sizeRow = document.createElement('div'); sizeRow.className = 'lm-seg-row';
+            var sizeLab = document.createElement('span'); sizeLab.className = 'lm-seg-lab'; sizeLab.textContent = 'Size';
+            sizeRow.appendChild(sizeLab);
+            var seg = document.createElement('span'); seg.className = 'lm-seg' + (sizeLocked ? ' is-locked' : '');
+            if (sizeLocked) seg.title = 'Table mode makes every block full-width — switch Overflow off Table to change sizes';
+            widths.forEach(function (w) {
+                var b = document.createElement('button');
+                b.type = 'button'; b.textContent = w[1];
+                if ((LAYOUT.width[key] || '') === w[0]) b.className = 'active';
+                b.addEventListener('click', function () {
+                    if (w[0]) { LAYOUT.width[key] = w[0]; } else { delete LAYOUT.width[key]; }
+                    layoutChanged();
+                });
+                seg.appendChild(b);
+            });
+            sizeRow.appendChild(seg);
+            row.appendChild(sizeRow);
+
+            /* third line: per-block list DISPLAY mode - a segment with an "As
+               authored" default (like the Volume chip). Pagination is a separate
+               toggle below, so this covers the non-paginated views. Locked while the
+               whole page is in table/digest, or while this block is paginated. */
+            if (LISTED[key]) {
+                var pm = mode();
+                var pageWide = (pm === 'table' || pm === 'digest');
+                var lLocked = pageWide || !!LAYOUT.paged[key];
+                var lseg = document.createElement('span');
+                lseg.className = 'lm-seg lm-seg-list' + (lLocked ? ' is-locked' : '');
+                if (pageWide) lseg.title = 'Page is in ' + pm + ' mode — per-block list modes apply under Pages / Peek / Scroll';
+                else if (LAYOUT.paged[key]) lseg.title = 'Pagination is on — turn Pages off to choose a display mode';
+                [['', 'As authored'], ['peek', 'Peek'], ['scroll', 'Scroll']].forEach(function (o) {
+                    var b = document.createElement('button');
+                    b.type = 'button'; b.textContent = o[1];
+                    if ((LAYOUT.ovf[key] || '') === o[0]) b.className = 'active';
+                    b.addEventListener('click', function () {
+                        if (o[0]) { LAYOUT.ovf[key] = o[0]; } else { delete LAYOUT.ovf[key]; }
+                        layoutChanged();
+                    });
+                    lseg.appendChild(b);
+                });
+                var listRow = document.createElement('div'); listRow.className = 'lm-seg-row';
+                var listLab = document.createElement('span'); listLab.className = 'lm-seg-lab'; listLab.textContent = 'List';
+                listRow.appendChild(listLab);
+                listRow.appendChild(lseg);
+                row.appendChild(listRow);
+            }
+
+            /* fourth line: per-block colour - a swatch per palette hue plus a
+               "default" (follow the page Tone). Lets the whole grid be toned
+               block-by-block, a controllable Mixed. */
+            var colors = document.createElement('div'); colors.className = 'lm-colors';
+            (function () {
+                var def = document.createElement('button');
+                def.type = 'button'; def.className = 'lm-swatch lm-swatch-def' + (LAYOUT.color[key] ? '' : ' active');
+                def.title = 'Default — follow the page tone';
+                def.addEventListener('click', function () { delete LAYOUT.color[key]; layoutChanged(); });
+                colors.appendChild(def);
+                BLOCK_COLORS.forEach(function (c) {
+                    var b = document.createElement('button');
+                    b.type = 'button'; b.className = 'lm-swatch' + (LAYOUT.color[key] === c[0] ? ' active' : '');
+                    b.style.background = c[1]; b.title = c[0].charAt(0).toUpperCase() + c[0].slice(1);
+                    b.addEventListener('click', function () { LAYOUT.color[key] = c[0]; layoutChanged(); });
+                    colors.appendChild(b);
+                });
+            })();
+            row.appendChild(colors);
+
+            /* fifth line: per-block option toggles. Filter/Search/Pages only on
+               blocks that own a row list. */
+            var opts = document.createElement('div'); opts.className = 'lm-opts';
+            function optChip(label, store, mapKey, title) {
+                var b = document.createElement('button');
+                b.type = 'button'; b.className = 'lm-opt' + (store[key] ? ' on' : '');
+                b.textContent = label; b.title = title;
+                b.setAttribute('aria-pressed', store[key] ? 'true' : 'false');
+                b.addEventListener('click', function () {
+                    if (store[key]) { delete store[key]; } else { store[key] = true; }
+                    layoutChanged();
+                });
+                opts.appendChild(b);
+            }
+            /* Filter is opt-OUT: the status tally shows by default, so this chip
+               starts on and clicking it hides the All / Active / … filter chips */
+            if (TALLIED[key]) {
+                var fb = document.createElement('button');
+                fb.type = 'button'; fb.className = 'lm-opt' + (LAYOUT.hideTally[key] ? '' : ' on');
+                fb.textContent = 'Filter'; fb.title = 'Show the status filter chips (All / Active / …)';
+                fb.setAttribute('aria-pressed', LAYOUT.hideTally[key] ? 'false' : 'true');
+                fb.addEventListener('click', function () {
+                    if (LAYOUT.hideTally[key]) { delete LAYOUT.hideTally[key]; }
+                    else { LAYOUT.hideTally[key] = true; st[key].filter = 'all'; st[key].page = 1; }
+                    layoutChanged();
+                });
+                opts.appendChild(fb);
+            }
+            if (LISTED[key]) {
+                optChip('Search', LAYOUT.search, 'search', 'Show a search box in this block');
+                optChip('Pages', LAYOUT.paged, 'paged', 'Paginate this block — the ‹ 1/N › pager (overrides the list mode)');
+            }
+            row.appendChild(opts);
+
+            host.appendChild(row);
+        });
+
+        [].slice.call(document.querySelectorAll('[data-lm-part]')).forEach(function (cb) {
+            cb.checked = LAYOUT.parts[cb.getAttribute('data-lm-part')] !== false;
+        });
+
+        var note = q('[data-lm-note]');
+        if (note) {
+            var GAP = { 1: '1/6', 2: '1/3', 3: '1/2', 4: '2/3', 5: '5/6' };
+            note.innerHTML = '<b>' + lastFit.blocks + '</b> blocks in <b>' + lastFit.rows + '</b> row' + (lastFit.rows === 1 ? '' : 's')
+                + (lastFit.holes ? ' &middot; <b>' + (GAP[lastFit.holes] || '') + '</b> of a row free' : ' &middot; no gaps');
+        }
+    }
+
+    (function wireMap() {
+        [].slice.call(document.querySelectorAll('[data-lm-toggle]')).forEach(function (b) {
+            b.addEventListener('click', function () { var p = q('[data-lm-panel]'); if (p) p.hidden = !p.hidden; });
+        });
+        var reset = q('[data-lm-reset]');
+        if (reset) reset.addEventListener('click', function () {
+            LAYOUT = { order: DEFAULT_ORDER.slice(), off: {}, width: {}, color: {}, search: {}, ovf: {}, paged: {}, hideTally: {}, parts: { atn: true, acct: true } };
+            applyParts(); layoutChanged();
+        });
+        [].slice.call(document.querySelectorAll('[data-lm-part]')).forEach(function (cb) {
+            cb.addEventListener('change', function () {
+                LAYOUT.parts[cb.getAttribute('data-lm-part')] = cb.checked;
+                applyParts(); saveLayout();
+            });
+        });
+    })();
+
+    /* the Full/Empty chip lives in the shared partial, so watch the attribute it
+       flips - an empty account has to reflow the footprint too */
+    if (window.MutationObserver) {
+        new MutationObserver(function () { renderAll(); })
+            .observe(document.body, { attributes: true, attributeFilter: ['data-data'] });
+    }
+
+    /* the space a card has changes with the viewport, so re-fit on resize */
+    var rzT = null;
+    window.addEventListener('resize', function () {
+        if (mode() !== 'pages') return;
+        clearTimeout(rzT);
+        rzT = setTimeout(function () {
+            Object.keys(st).forEach(function (k) { st[k].cap = 0; });
+            renderAll();
+        }, 120);
+    });
+
+    /* ---- inject the two preview-chip groups (page-local, like v14) ---- */
+    /* Content: flips the whole account between its authored data and the empty
+       state, so the per-block empty cards can be previewed. The shared partial
+       carries a "Data" toggle too, but it's buried far from these v17 controls -
+       this puts it right where the rest of the page options live. */
+    function applyData(v) { document.body.setAttribute('data-data', v === 'empty' ? 'empty' : 'full'); renderAll(); }
+    /* Titles: inside the card (default) or floated out onto the page background */
+    function applyTitles(v) { document.body.setAttribute('data-titles', v === 'outside' ? 'outside' : 'inside'); renderAll(); }
+    /* the hero variants are pure body attributes, so one setter serves all */
+    function heroAttr(name) { return function (v) { document.body.setAttribute(name, v); }; }
+    var GROUPS = [
+        { key: 'heroWidth', label: 'Hero', apply: heroAttr('data-hero-width'), def: 'boxed',
+          opts: [['boxed','Boxed'],['edge','Edge to edge']] },
+        { key: 'heroSize', label: 'Hero size', apply: heroAttr('data-hero-size'), def: 'tall',
+          opts: [['tall','Tall'],['slim','Slim']] },
+        { key: 'heroTone', label: 'Title area', apply: heroAttr('data-hero-tone'), def: 'gradient',
+          opts: [['gradient','Gradient'],['light','Light'],['tinted','Tinted'],['dark','Dark'],['graphite','Graphite'],['brand','Brand']] },
+        { key: 'slimRight', label: 'Slim right', apply: heroAttr('data-slim-right'), def: 'actions',
+          opts: [['actions','Actions'],['profile','Profile']] },
+        { key: 'blk', label: 'Block style', apply: applyBlkStyle, def: 'white',
+          opts: [['white','White'],['tint','Tint'],['accent','Accent'],['gradient','Gradient']] },
+        { key: 'data', label: 'Content', apply: applyData, def: 'full',
+          opts: [['full','Full'],['empty','Empty']] },
+        { key: 'titles', label: 'Titles', apply: applyTitles, def: 'inside',
+          opts: [['inside','Inside'],['outside','Outside']] },
+        { key: 'ovf', label: 'Overflow', apply: applyOvf, def: 'pages',
+          opts: [['pages','Pages'],['peek','Peek'],['scroll','Scroll'],['table','Table'],['digest','Digest']] },
+        { key: 'grid', label: 'Grid', apply: applyGrid, def: 'thirds',
+          opts: [['thirds','1/3 + 2/3'],['halves','1/2 + 1/2']] },
+        { key: 'tone', label: 'Tone', apply: applyTone, def: 'paired',
+          opts: [['paired','Paired wash'],['quiet','Quiet'],['mixed','Mixed (original)']] },
+        { key: 'vol', label: 'Volume', apply: applyVol, def: 'real',
+          opts: [['few','3 each'],['real','As authored'],['many','24 each'],['huge','120 each']] }
+    ];
+    function buildChip(chip) {
+        if (chip.getAttribute('data-v17') === '1') return;
+        chip.setAttribute('data-v17', '1');
+        GROUPS.forEach(function (g) {
+            var grp = document.createElement('div'); grp.className = 'chip-group';
+            var lab = document.createElement('span'); lab.className = 'label'; lab.textContent = g.label + ':';
+            grp.appendChild(lab);
+            var pg = document.createElement('div'); pg.className = 'pill-group';
+            var saved = null; try { saved = localStorage.getItem('hn.v17.' + g.key); } catch (e) {}
+            /* a value saved before an option was renamed would leave the page in
+               a mode with no CSS, so only honour one that still exists */
+            var known = g.opts.some(function (o) { return o[0] === saved; });
+            var initial = known ? saved : g.def;
+            g.opts.forEach(function (o) {
+                var b = document.createElement('button'); b.type = 'button'; b.textContent = o[1];
+                b.setAttribute('data-vp', g.key); b.setAttribute('data-vp-val', o[0]);
+                if (o[0] === initial) b.classList.add('active');
+                b.addEventListener('click', function () {
+                    pg.querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+                    try { localStorage.setItem('hn.v17.' + g.key, o[0]); } catch (e) {}
+                    g.apply(o[0]);
+                });
+                pg.appendChild(b);
+            });
+            grp.appendChild(pg); chip.appendChild(grp);
+            g.apply(initial);
+        });
+    }
+
+    setText('[data-ovf-note]', NOTES.pages);
+    loadLayout();
+    applyParts();
+    /* apply the tone before first paint: the markup carries the original tone
+       classes, so without this the graphite card flashes in before the chip
+       (which builds asynchronously) gets a chance to strip it */
+    var savedTone = null; try { savedTone = localStorage.getItem('hn.v17.tone'); } catch (e) {}
+    applyTone(['paired', 'quiet', 'mixed'].indexOf(savedTone) > -1 ? savedTone : 'paired');
+    var n = 0, iv = setInterval(function () {
+        var chip = document.querySelector('.state-chip');
+        if (chip) { clearInterval(iv); buildChip(chip); }
+        else if (++n > 120) { clearInterval(iv); }
+    }, 80);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=12">
+    <link rel="stylesheet" href="css/apple-layout.css?v=17">
+    <style>
+body { display: block; }
+
+        /* --- v15: minimal dashboard. Greeting + three stat cards + one list.
+           Cards and list are white, hairline-bordered, softly shadowed -- the
+           only surfaces on the page. Everything else is type and whitespace. --- */
+        .min-head { margin: 0 0 28px; }
+        .min-greeting { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; margin: 0 0 6px; line-height: 1.1; color: var(--color-text-primary); }
+        .min-sub { font-size: 15px; color: var(--color-text-secondary); margin: 0; letter-spacing: -0.01em; }
+
+        /* Three cards, left-aligned. The Due card carries the only accent on the
+           page, so the one number worth acting on is the one that draws the eye. */
+        .min-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        @media (max-width: 860px) { .min-tiles { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 480px) { .min-tiles { grid-template-columns: 1fr; } }
+        .min-tile { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 26px 28px; text-decoration: none; color: inherit; box-shadow: 0 1px 2px rgba(0,0,0,0.03); transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
+        .min-tile:hover { border-color: var(--color-text-quaternary, var(--color-text-secondary)); box-shadow: 0 3px 12px rgba(0,0,0,0.07); text-decoration: none; color: inherit; }
+        .min-tile .n { font-size: 40px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); font-variant-numeric: tabular-nums; line-height: 1; }
+        .min-tile.due .n { color: var(--color-accent); }
+        .min-tile .l { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary, var(--color-text-secondary)); margin-top: 12px; }
+
+        /* Quick actions. The primary things a client comes here to DO -- order,
+           register, open a ticket -- as a row directly under the summary cards,
+           so they are visible without hunting. One filled primary + bordered
+           secondaries, matching Apple's button hierarchy. Always shown (a new
+           account needs these most), so NOT wrapped in when-full. */
+        .min-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+        .min-act { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 12px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-primary); font-size: 14px; font-weight: 500; letter-spacing: -0.01em; text-decoration: none; transition: background var(--transition-fast), border-color var(--transition-fast), filter var(--transition-fast); }
+        .min-act svg { width: 17px; height: 17px; flex-shrink: 0; }
+        .min-act:hover { background: var(--color-surface-secondary); border-color: var(--color-text-quaternary, var(--color-text-secondary)); text-decoration: none; color: var(--color-text-primary); }
+        .min-act.primary { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+        .min-act.primary:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; filter: brightness(0.93); }
+
+        /* One list. A single white card; every active thing you own -- service,
+           domain, SSL -- as a row with a status pill, no type labels needed. */
+        .min-list { margin-top: 20px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); overflow: hidden; }
+        .min-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 24px; border-bottom: 0.5px solid var(--color-border); text-decoration: none; color: inherit; transition: background var(--transition-fast); }
+        .min-row:last-child { border-bottom: none; }
+        .min-row:hover { background: var(--color-surface-secondary); text-decoration: none; }
+        .min-name { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: var(--color-text-primary); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .min-pill { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: var(--radius-pill); background: var(--color-green-bg); color: var(--color-green-text); white-space: nowrap; flex-shrink: 0; }
+        .min-pill.warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
+
+        /* Per-service rows carry their own actions, so the row can't be a single
+           <a> (a link can't nest a link). The foot script rebuilds each Services
+           row as: a name-link (-> product) + a right cluster (cPanel button on
+           hosting products, then the status pill). cPanel SSO is per hosting
+           account, which is why the button lives here and not in the global row. */
+        .min-row-link { flex: 1; min-width: 0; display: block; text-decoration: none; color: inherit; overflow: hidden; }
+        .min-row-link:hover { text-decoration: none; }
+        .min-row-end { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .min-cpanel { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); text-decoration: none; white-space: nowrap; transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast); }
+        .min-cpanel svg { width: 13px; height: 13px; }
+        .min-cpanel:hover { background: var(--color-blue-bg); border-color: var(--color-accent); color: var(--color-accent); text-decoration: none; }
+
+        /* Empty state lives INSIDE the list card, centered, so the page keeps its
+           one-surface rhythm even for a brand-new account. */
+        .min-empty { padding: 48px 24px; text-align: center; }
+        .min-empty p { font-size: 15px; color: var(--color-text-secondary); margin: 0 0 18px; letter-spacing: -0.01em; }
+        .min-empty .acts { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        /* Compact empty for secondary blocks -- one muted line, no CTA, left-aligned,
+           so five empty sections on a new account don't become five big cards. */
+        .min-empty.compact { padding: 20px 24px; text-align: left; }
+        .min-empty.compact p { margin: 0; }
+
+        /* A section = an uppercase label (+ optional View all) above a boxed list.
+           Turns the single list into named groups without adding any new surface;
+           the label and link sit on the page background, the list keeps the card. */
+        .min-section { margin-top: 34px; }
+        .min-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding: 0 2px; }
+        .min-section-label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); }
+        .min-section-link { font-size: 13px; color: var(--color-accent); text-decoration: none; white-space: nowrap; }
+        .min-section-link:hover { text-decoration: none; opacity: 0.75; }
+
+        /* Title INSIDE the card (preview chip: Title -> Inside block). The section
+           head becomes the card header -- white surface, rounded top corners, a
+           hairline divider to the rows -- and the list drops its own top edge so
+           head + list read as one card. Default (attribute absent) keeps titles
+           OUTSIDE, on the page background above each card. */
+        body[data-min-title="inside"] .min-section-head {
+            margin: 0; padding: 15px 20px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-bottom: 0.5px solid var(--color-border);
+            border-radius: 16px 16px 0 0;
+        }
+        body[data-min-title="inside"] .min-list {
+            margin-top: 0; border-top: none;
+            border-top-left-radius: 0; border-top-right-radius: 0;
+            box-shadow: none;
+        }
+
+        /* Right-hand cluster for rows that carry more than a status pill -- an
+           amount then a pill (invoices), or just a quiet date (domains, news). */
+        .min-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+        .min-amt { font-size: 14px; font-weight: 500; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
+        .min-when { font-size: 13px; color: var(--color-text-secondary); white-space: nowrap; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+        .min-pill.info { background: var(--color-blue-bg); color: var(--color-blue-text); }
+
+        /* Bottom variation. The primary blocks (services, domains) stay full-width
+           and calm; the secondary blocks drop into an asymmetric two-column grid
+           so the lower page reads as composed, not a stack of identical bars.
+           align-items:start lets the left column be tall (invoices) beside two
+           shorter stacked blocks on the right without stretching either. */
+        .min-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 34px 24px; align-items: start; margin-top: 34px; }
+        @media (max-width: 720px) { .min-grid { grid-template-columns: 1fr; gap: 30px; } }
+        .min-gcol { display: flex; flex-direction: column; gap: 30px; }
+        /* Inside the grid the column gap owns the spacing, so the section's own
+           top margin would double it. */
+        .min-grid .min-section { margin-top: 0; }
+
+        /* Overflow. A dashboard list shows the first few and reveals the rest in
+           place -- progressive disclosure, not page numbers, which belong on the
+           dedicated Services page the "View all" link points to. Rows past the
+           cap carry .min-more and stay hidden until the card gets .expanded. */
+        .min-more { display: none; }
+        .min-list.expanded .min-more { display: flex; }
+        .min-showmore { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 14px; border: none; border-top: 0.5px solid var(--color-border); background: transparent; color: var(--color-accent); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: background var(--transition-fast); }
+        .min-showmore:hover { background: var(--color-surface-secondary); }
+        .min-showmore .chev { transition: transform var(--transition-fast); font-size: 11px; }
+        .min-list.expanded .min-showmore .chev { transform: rotate(180deg); }
+
+        /* Search, shown only on lists long enough to need it. The script at the
+           foot injects it into any list whose row count reaches the threshold;
+           short lists keep just Show more. While a query is active, .searching
+           reveals the capped .min-more rows so every row is a search candidate,
+           .min-hidden removes the non-matches, and Show more steps aside. */
+        .min-search { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-bottom: 0.5px solid var(--color-border); color: var(--color-text-tertiary); }
+        .min-search svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .min-search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font: inherit; font-size: 14px; color: var(--color-text-primary); }
+        .min-search input::placeholder { color: var(--color-text-tertiary); }
+        .min-search .clear { border: none; background: transparent; cursor: pointer; color: var(--color-text-tertiary); font-size: 16px; line-height: 1; padding: 0 2px; display: none; }
+        .min-search.has-q .clear { display: block; }
+        .min-hidden { display: none !important; }
+        .min-list.searching .min-more { display: flex; }
+        .min-noresults { display: none; padding: 30px 24px; text-align: center; font-size: 14px; color: var(--color-text-secondary); }
+
+        body[data-data="empty"] .when-full { display: none !important; }
+        body:not([data-data="empty"]) .when-empty { display: none !important; }
+    </style>
+</head>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="dashboard" data-page-title="Dashboard">
+
+<!-- ═══════════ Dev preview chip — auth / layout / palette ═══════════ -->
+<div data-include="partials/state-chip.html"></div>
+
+<!-- ═══════════ Rail layout — icon rail + flyout panels ═══════════ -->
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+
+<!-- ═══════════ Sidebar layout — fixed 260px rail ═══════════ -->
+<div data-include="partials/sidebar.html"></div>
+
+<!-- ═══════════ MAIN WRAP (shifts right when layout=side|rail) ═══════════ -->
+<div class="ph-main-wrap">
+
+<!-- ═══════════ Auth strip — logged-in + top-layout only ═══════════ -->
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span>No Notifications</span>
+        </button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ Top-layout standard header ═══════════ -->
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+
+    <!-- Logged-out menu -->
+    <div class="nav-simple-dropdown only-out">
+        <a href="#" class="nav-simple-trigger">Store <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="#">Browse All</a>
+            <div class="divider"></div>
+            <a href="socialbee.html">SocialBee</a>
+            <a href="ssl-certificates.html">SSL Certificates</a>
+            <a href="email-services.html">E-mail Services</a>
+            <a href="website-builder.html">Website Builder</a>
+            <div class="divider"></div>
+            <a href="cart-domain-register.html">Register a New Domain</a>
+            <a href="cart-domain-transfer.html">Transfer Domains to Us</a>
+        </div>
+    </div>
+    <a href="announcements.html" class="only-out">Announcements</a>
+    <a href="knowledgebase.html" class="only-out">Knowledgebase</a>
+    <a href="serverstatus.html" class="only-out">Network Status</a>
+    <a href="contact.html" class="only-out">Contact Us</a>
+
+    <!-- Logged-in menu -->
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareaproducts.html">My Services</a>
+            <div class="divider"></div>
+            <a href="store.html">Order New Services</a>
+            <a href="#">View Available Addons</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareadomains.html">My Domains</a>
+            <div class="divider"></div>
+            <a href="#">Renew Domains</a>
+            <a href="cart-domain-register.html">Register a New Domain</a>
+            <a href="cart-domain-transfer.html">Transfer a Domain to Us</a>
+            <div class="divider"></div>
+            <a href="domainchecker.html">Domain Search</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Website &amp; Security <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="socialbee.html">SocialBee</a>
+            <a href="ssl-certificates.html">SSL Certificates</a>
+            <a href="monitoring-360.html">Site &amp; Server Monitoring</a>
+            <a href="nordvpn.html">VPN</a>
+            <a href="email-services.html">E-mail Services</a>
+            <a href="website-backup.html">Website Backup</a>
+            <a href="website-security.html">Website Security</a>
+            <a href="website-builder.html">Website Builder</a>
+            <div class="divider"></div>
+            <a href="managessl.html">Manage SSL Certificates</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareainvoices.html">My Invoices</a>
+            <a href="clientareaquotes.html">My Quotes</a>
+            <div class="divider"></div>
+            <a href="account-paymentmethods.html">Payment Methods</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="supportticketslist.html">Tickets</a>
+            <a href="announcements.html">Announcements</a>
+            <a href="knowledgebase.html">Knowledgebase</a>
+            <a href="downloads.html">Downloads</a>
+            <a href="serverstatus.html">Network Status</a>
+        </div>
+    </div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+
+    <!-- Notifications -->
+    <div class="notification-wrapper only-in" id="navNotifyWrap">
+        <button type="button" class="topbar-btn" title="Notifications" onclick="togglePortalNotifications(event, 'nav')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <div class="topbar-notification-dot"></div>
+        </button>
+        <div class="notification-dropdown" id="notificationDropdownNav">
+            <div class="notification-dropdown-header">
+                <span class="notification-dropdown-title">Notifications</span>
+                <button class="notification-dropdown-clear" type="button">Mark all read</button>
+            </div>
+            <a href="viewinvoice.html" class="notification-item">
+                <div class="notification-dot-indicator orange"></div>
+                <div class="notification-content">
+                    <div class="notification-text">Invoice #10247 is due in 2 days</div>
+                    <div class="notification-time">2 hours ago</div>
+                </div>
+            </a>
+            <a href="viewticket.html" class="notification-item">
+                <div class="notification-dot-indicator green"></div>
+                <div class="notification-content">
+                    <div class="notification-text">Ticket #TKT-4821 has been answered</div>
+                    <div class="notification-time">Yesterday</div>
+                </div>
+            </a>
+            <a href="announcements.html" class="notification-item">
+                <div class="notification-dot-indicator blue"></div>
+                <div class="notification-content">
+                    <div class="notification-text">Scheduled maintenance on Apr 20</div>
+                    <div class="notification-time">3 days ago</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Cart -->
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+
+    <!-- Right-side auth affordance -->
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <a href="#" onclick="toggleDarkMode(); return false;" class="topbar-btn only-out" title="Toggle theme" style="margin-right:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap">
+        <div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-dropdown-header">
+                <div class="profile-dropdown-name">Arshile Gogia</div>
+                <div class="profile-dropdown-email">arshileg@gmail.com</div>
+            </div>
+            <a href="clientareadetails.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                My Details
+            </a>
+            <a href="clientareasecurity.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                Security Settings
+            </a>
+            <a href="clientareaemails.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Email History
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <div class="theme-toggle-row">
+                <span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span>
+                <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="login.html" class="profile-dropdown-item danger">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sign Out
+            </a>
+        </div>
+    </div>
+</div></nav>
+
+<!-- ═══════════ Inner-layout topbar (sidebar + rail) ═══════════ -->
+<div data-include="partials/inner-topbar.html"></div>
+
+<!-- ═══════════ Breadcrumb — top-layout only ═══════════ -->
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="index.html">Portal Home</a>
+        <span class="sep">/</span>
+        <span class="current" aria-current="page">Client Area</span>
+    </div>
+</nav>
+
+<!-- ═══════════ PAGE CONTENT ═══════════ -->
+<div class="content-area">
+
+    <div class="min-head">
+        <h1 class="min-greeting">Good afternoon, Arshile.</h1>
+        <p class="min-sub">Account overview</p>
+    </div>
+
+    <div class="min-tiles">
+        <a href="clientareaproducts.html" class="min-tile"><div class="n"><span class="when-full">8</span><span class="when-empty">0</span></div><div class="l">Services</div></a>
+        <a href="clientareadomains.html" class="min-tile"><div class="n"><span class="when-full">6</span><span class="when-empty">0</span></div><div class="l">Domains</div></a>
+        <a href="clientareainvoices.html" class="min-tile due"><div class="n"><span class="when-full">$42</span><span class="when-empty">$0</span></div><div class="l">Unpaid Invoices</div></a>
+        <a href="supportticketslist.html" class="min-tile"><div class="n"><span class="when-full">5</span><span class="when-empty">0</span></div><div class="l">Support</div></a>
+    </div>
+
+    <!-- Quick actions: the primary things a client comes here to do -->
+    <div class="min-actions">
+        <a href="store.html" class="min-act primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Order a service</a>
+        <a href="cart-domain-register.html" class="min-act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg>Register a domain</a>
+        <a href="supportticketsubmit.html" class="min-act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Open a ticket</a>
+    </div>
+
+    <!-- Services. Shows the first 5; rows past the cap carry .min-more and the
+         "Show more" button reveals them in place. "View all" carries the total
+         and links to the real, paginated Services page. -->
+    <div class="min-section">
+        <div class="min-section-head"><span class="min-section-label">Services</span><a href="clientareaproducts.html" class="min-section-link when-full">View all (8) &rarr;</a></div>
+        <div class="min-list" data-cpanel-list>
+            <div class="when-full">
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Cloud VPS &mdash; vps-01</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Business Hosting &mdash; web-01</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Managed WordPress &mdash; blog-01</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Professional Email &mdash; 5 mailboxes</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">SSL &mdash; Wildcard</span><span class="min-pill warn">Renew</span></a>
+                <a href="clientareaproductdetails.html" class="min-row min-more"><span class="min-name">Cloud VPS &mdash; vps-02</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row min-more"><span class="min-name">Object Storage &mdash; 500 GB</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row min-more"><span class="min-name">Website Backup &mdash; daily</span><span class="min-pill">Active</span></a>
+                <button type="button" class="min-showmore" data-label="Show 3 more" onclick="var l=this.closest('.min-list');this.querySelector('.t').textContent=l.classList.toggle('expanded')?'Show less':this.dataset.label;"><span class="t">Show 3 more</span><span class="chev">&#9662;</span></button>
+            </div>
+            <div class="when-empty min-empty">
+                <p>You don't have any active services yet.</p>
+                <div class="acts"><a href="store.html" class="btn-primary">Order a service</a></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Domains -->
+    <div class="min-section">
+        <div class="min-section-head"><span class="min-section-label">Domains</span><a href="clientareadomains.html" class="min-section-link when-full">View all (6) &rarr;</a></div>
+        <div class="min-list">
+            <div class="when-full">
+                <a href="clientareadomaindetails.html" class="min-row"><span class="min-name">hostnodes.io</span><span class="min-when">Renews Aug 24</span></a>
+                <a href="clientareadomaindetails.html" class="min-row"><span class="min-name">mysite.com</span><span class="min-when">Renews Sep 02</span></a>
+                <a href="clientareadomaindetails.html" class="min-row"><span class="min-name">myshop.store</span><span class="min-when">Renews Sep 15</span></a>
+                <a href="clientareadomaindetails.html" class="min-row min-more"><span class="min-name">devsite.io</span><span class="min-when">Renews Oct 01</span></a>
+                <a href="clientareadomaindetails.html" class="min-row min-more"><span class="min-name">portfolio.dev</span><span class="min-when">Renews Oct 12</span></a>
+                <a href="clientareadomaindetails.html" class="min-row min-more"><span class="min-name">blog.example</span><span class="min-when">Renews Nov 03</span></a>
+                <button type="button" class="min-showmore" data-label="Show 3 more" onclick="var l=this.closest('.min-list');this.querySelector('.t').textContent=l.classList.toggle('expanded')?'Show less':this.dataset.label;"><span class="t">Show 3 more</span><span class="chev">&#9662;</span></button>
+            </div>
+            <div class="when-empty min-empty">
+                <p>No domains registered yet.</p>
+                <div class="acts"><a href="cart-domain-register.html" class="btn-primary">Register a domain</a></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom: asymmetric two-column grid so the lower page isn't a plain stack.
+         Left = the taller invoices block; right = Support + Announcements stacked. -->
+    <div class="min-grid">
+        <div class="min-gcol">
+            <!-- Recent invoices -->
+            <div class="min-section">
+                <div class="min-section-head"><span class="min-section-label">Recent invoices</span><a href="clientareainvoices.html" class="min-section-link when-full">View all (6) &rarr;</a></div>
+                <div class="min-list">
+                    <div class="when-full">
+                        <a href="viewinvoice.html" class="min-row"><span class="min-name">Invoice #1048</span><span class="min-right"><span class="min-amt">$42.00</span><span class="min-pill warn">Unpaid</span></span></a>
+                        <a href="viewinvoice.html" class="min-row"><span class="min-name">Invoice #1042</span><span class="min-right"><span class="min-amt">$120.00</span><span class="min-pill">Paid</span></span></a>
+                        <a href="viewinvoice.html" class="min-row"><span class="min-name">Invoice #1031</span><span class="min-right"><span class="min-amt">$18.00</span><span class="min-pill">Paid</span></span></a>
+                        <a href="viewinvoice.html" class="min-row min-more"><span class="min-name">Invoice #1025</span><span class="min-right"><span class="min-amt">$42.00</span><span class="min-pill">Paid</span></span></a>
+                        <a href="viewinvoice.html" class="min-row min-more"><span class="min-name">Invoice #1018</span><span class="min-right"><span class="min-amt">$9.00</span><span class="min-pill">Paid</span></span></a>
+                        <a href="viewinvoice.html" class="min-row min-more"><span class="min-name">Invoice #1007</span><span class="min-right"><span class="min-amt">$120.00</span><span class="min-pill">Paid</span></span></a>
+                        <button type="button" class="min-showmore" data-label="Show 3 more" onclick="var l=this.closest('.min-list');this.querySelector('.t').textContent=l.classList.toggle('expanded')?'Show less':this.dataset.label;"><span class="t">Show 3 more</span><span class="chev">&#9662;</span></button>
+                    </div>
+                    <div class="when-empty min-empty compact"><p>No invoices yet.</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="min-gcol">
+            <!-- Support tickets -->
+            <div class="min-section">
+                <div class="min-section-head"><span class="min-section-label">Support</span><a href="supportticketslist.html" class="min-section-link when-full">View all (5) &rarr;</a></div>
+                <div class="min-list">
+                    <div class="when-full">
+                        <a href="viewticket.html" class="min-row"><span class="min-name">SSL renewal question</span><span class="min-pill info">Open</span></a>
+                        <a href="viewticket.html" class="min-row"><span class="min-name">Migration help for web-01</span><span class="min-pill">Answered</span></a>
+                        <a href="viewticket.html" class="min-row"><span class="min-name">Billing question</span><span class="min-pill">Answered</span></a>
+                        <a href="viewticket.html" class="min-row min-more"><span class="min-name">DNS not resolving</span><span class="min-pill">Closed</span></a>
+                        <a href="viewticket.html" class="min-row min-more"><span class="min-name">Upgrade to VPS plan</span><span class="min-pill">Closed</span></a>
+                        <button type="button" class="min-showmore" data-label="Show 2 more" onclick="var l=this.closest('.min-list');this.querySelector('.t').textContent=l.classList.toggle('expanded')?'Show less':this.dataset.label;"><span class="t">Show 2 more</span><span class="chev">&#9662;</span></button>
+                    </div>
+                    <div class="when-empty min-empty compact"><p>No open tickets.</p></div>
+                </div>
+            </div>
+            <!-- Announcements -->
+            <div class="min-section">
+                <div class="min-section-head"><span class="min-section-label">Announcements</span><a href="announcements.html" class="min-section-link when-full">View all (5) &rarr;</a></div>
+                <div class="min-list">
+                    <div class="when-full">
+                        <a href="announcements.html" class="min-row"><span class="min-name">Scheduled maintenance &mdash; Aug 25</span><span class="min-when">Aug 12</span></a>
+                        <a href="announcements.html" class="min-row"><span class="min-name">New data center: Frankfurt</span><span class="min-when">Aug 1</span></a>
+                        <a href="announcements.html" class="min-row"><span class="min-name">Network upgrade complete</span><span class="min-when">Jul 20</span></a>
+                        <a href="announcements.html" class="min-row min-more"><span class="min-name">Summer promo &mdash; 20% off renewals</span><span class="min-when">Jul 5</span></a>
+                        <a href="announcements.html" class="min-row min-more"><span class="min-name">New one-click backup feature</span><span class="min-when">Jun 22</span></a>
+                        <button type="button" class="min-showmore" data-label="Show 2 more" onclick="var l=this.closest('.min-list');this.querySelector('.t').textContent=l.classList.toggle('expanded')?'Show less':this.dataset.label;"><span class="t">Show 2 more</span><span class="chev">&#9662;</span></button>
+                    </div>
+                    <div class="when-empty min-empty compact"><p>No announcements.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="#">Dedicated Servers</a></li><li><a href="domains.html">Domains</a></li><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="email.html">Email</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security &amp; Tools</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="website-security.html">Website Security</a></li><li><a href="website-backup.html">Website Backup</a></li><li><a href="seo-tools.html">SEO Tools</a></li><li><a href="monitoring-360.html">360 Monitoring</a></li><li><a href="nordvpn.html">NordVPN</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li><li><a href="clientregister.html">Create an account</a></li><li><a href="#">Billing</a></li><li><a href="#">Refer a friend</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="support-page.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li><li><a href="serverstatus.html">Network status</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Newsroom</a></li><li><a href="#">Careers</a></li><li><a href="#">Legal</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <span class="hp-footer-copyright">Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Legal</a><a href="#">Site Map</a></div>
+            <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open>
+                    <span class="flag">🇺🇸</span>
+                    <span>English</span>
+                    <span class="sep">/</span>
+                    <span>$ USD</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+        </div>
+    </div>
+</footer>
+
+<!-- ═══════════ Inner-layout slim footer (sidebar + rail) ═══════════ -->
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+
+<!-- ═══════════ Language / currency modal ═══════════ -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js?v=12"></script>
+<script src="js/apple-layout.js?v=17"></script>
+<script>
+// clientareahome-v15 (minimal) - static; layout/palette/data toggles handled by js/apple-layout.js
+
+// Per-service cPanel SSO. cPanel is per hosting account, so each hosting row in
+// the Services list gets its OWN login button (not one global button). A row
+// can't stay a single <a> once it carries its own action (a link can't nest a
+// link), so each is rebuilt: name-link + right cluster (cPanel for hosting
+// products, then the status pill). Runs BEFORE the search enhancer so that
+// caches the rebuilt rows. Real theme: the cPanel href is
+// clientarea.php?action=productdetails&id=<id>&dosinglesignon=1.
+(function () {
+    var HOSTING = /(vps|hosting|wordpress|dedicated|server|reseller|cpanel)/i;
+    var ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>';
+    document.querySelectorAll('[data-cpanel-list] a.min-row').forEach(function (a) {
+        var name = a.querySelector('.min-name');
+        if (!name) return;
+        var div = document.createElement('div');
+        div.className = a.className;
+        var link = document.createElement('a');
+        link.className = 'min-row-link';
+        link.href = a.getAttribute('href') || '#';
+        link.appendChild(name);
+        div.appendChild(link);
+        var end = document.createElement('span');
+        end.className = 'min-row-end';
+        if (HOSTING.test(name.textContent)) {
+            var cp = document.createElement('a');
+            cp.className = 'min-cpanel';
+            cp.href = a.getAttribute('href') || '#';   // real theme: SSO url
+            cp.title = 'Log in to cPanel (single sign-on)';
+            cp.innerHTML = ICON + 'cPanel';
+            end.appendChild(cp);
+        }
+        var badge = a.querySelector('.min-pill, .min-right, .min-when');
+        if (badge) end.appendChild(badge);
+        div.appendChild(end);
+        a.replaceWith(div);
+    });
+})();
+
+// Progressive overflow: a list with few rows just shows them; past the show-more
+// cap it reveals in place; and once it reaches SEARCH_AT rows, a search field is
+// added so you can filter instead of scrolling. Search + Show more coexist: no
+// query keeps the capped view + button; a query reveals all rows, filters to the
+// matches, and hides the button.
+(function () {
+    var SEARCH_AT = 8;   // inject a search field once a list has this many rows
+    var ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>';
+
+    document.querySelectorAll('.min-list').forEach(function (list) {
+        var full = list.querySelector('.when-full');
+        if (!full) return;
+        var rows = Array.prototype.slice.call(full.querySelectorAll('.min-row'));
+        if (rows.length < SEARCH_AT) return;               // short list: Show more is enough
+        var moreBtn = full.querySelector('.min-showmore');
+
+        var noun = (list.closest('.min-section').querySelector('.min-section-label') || {}).textContent || 'items';
+        var search = document.createElement('div');
+        search.className = 'min-search';
+        search.innerHTML = ICON + '<input type="text" placeholder="Search ' + noun.toLowerCase() + '…" aria-label="Search ' + noun + '"><button type="button" class="clear" aria-label="Clear search">×</button>';
+        full.insertBefore(search, full.firstChild);
+
+        var noRes = document.createElement('div');
+        noRes.className = 'min-noresults';
+        noRes.textContent = 'No ' + noun.toLowerCase() + ' match your search.';
+        full.appendChild(noRes);
+
+        var input = search.querySelector('input');
+        var clear = search.querySelector('.clear');
+
+        function apply() {
+            var q = input.value.trim().toLowerCase();
+            var matches = 0;
+            list.classList.toggle('searching', !!q);
+            search.classList.toggle('has-q', !!q);
+            rows.forEach(function (r) {
+                var name = r.querySelector('.min-name').textContent.toLowerCase();
+                var hit = !q || name.indexOf(q) !== -1;
+                if (q) { r.classList.toggle('min-hidden', !hit); } else { r.classList.remove('min-hidden'); }
+                if (hit) matches++;
+            });
+            noRes.style.display = (q && matches === 0) ? 'block' : 'none';
+            if (moreBtn) moreBtn.style.display = q ? 'none' : '';
+        }
+        input.addEventListener('input', apply);
+        clear.addEventListener('click', function () { input.value = ''; apply(); input.focus(); });
+    });
+})();
+
+// Preview chip: surface a prominent Full / Empty content toggle. The shared chip
+// carries a "Data" toggle too, but it's buried among ~20 layout groups, so drop
+// that one and put an accessible "Content" toggle right at the front - flipping it
+// to Empty shows every section's empty state (and the stat tiles read 0).
+(function () {
+    function build(chip) {
+        if (chip.getAttribute('data-v15c') === '1') return;
+        chip.setAttribute('data-v15c', '1');
+        var sd = chip.querySelector('[data-data-set]');
+        if (sd) { var g = sd.closest('.chip-group'); if (g) g.remove(); }
+        var grp = document.createElement('div'); grp.className = 'chip-group';
+        var lab = document.createElement('span'); lab.className = 'label'; lab.textContent = 'Content:';
+        grp.appendChild(lab);
+        var pg = document.createElement('div'); pg.className = 'pill-group';
+        /* stay in sync with the hn.data key the other pages' chips persist */
+        var initial = 'full';
+        try { if (localStorage.getItem('hn.data') === 'empty') initial = 'empty'; } catch (e) {}
+        [['full', 'Full'], ['empty', 'Empty']].forEach(function (o) {
+            var b = document.createElement('button'); b.type = 'button'; b.textContent = o[1];
+            if (o[0] === initial) b.classList.add('active');
+            b.addEventListener('click', function () {
+                pg.querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+                document.body.setAttribute('data-data', o[0]);
+                try { localStorage.setItem('hn.data', o[0]); } catch (e) {}
+            });
+            pg.appendChild(b);
+        });
+        grp.appendChild(pg);
+        var tag = chip.querySelector('.dev-tag');
+        if (tag && tag.nextSibling) { chip.insertBefore(grp, tag.nextSibling); } else { chip.appendChild(grp); }
+    }
+    var n = 0, iv = setInterval(function () {
+        var chip = document.querySelector('.state-chip');
+        if (chip) { clearInterval(iv); build(chip); }
+        else if (++n > 120) { clearInterval(iv); }
+    }, 80);
+})();
+</script>
+</body>
+</html>

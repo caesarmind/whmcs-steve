@@ -1,0 +1,174 @@
+/* ============================================
+   WHMCS by Apple — Boxed Layout add-on
+   --------------------------------------------
+   A centered, fixed-width "app shell" that floats
+   on a soft decorative background, with a top bar
+   (logo + account actions) above it. Hexa-inspired,
+   but kept Cupertino-clean.
+
+   Everything inside (sidebar, cards, tiles) stays
+   identical — this file only re-shapes the outer
+   layout shell.
+
+   HOW TO USE
+   1. Load AFTER css/apple-theme.css.
+   2. Add class="boxed-layout" to <body>.
+   3. Structure the page as:
+         <header class="app-header"> logo + actions </header>
+         <div class="app-shell">
+             <aside class="sidebar"> … </aside>
+             <main class="main-content"> … </main>
+         </div>
+   ============================================ */
+
+:root {
+    --box-max-width: 1320px;   /* the fixed container width */
+    --box-gap: 24px;           /* breathing room around the box */
+    --box-radius: 22px;        /* rounded corners of the box */
+    --box-shadow: 0 30px 80px -24px rgba(0, 0, 0, 0.30),
+                  0 0 0 0.5px rgba(0, 0, 0, 0.05);
+    --app-header-height: 56px; /* the bar above the box */
+    --app-header-gap: 12px;    /* space between that bar and the box */
+}
+
+/* --- Page background behind the floating box --- */
+body.boxed-layout {
+    display: block;            /* base theme sets body to flex — undo it */
+    min-height: 100vh;
+    padding: var(--box-gap);
+    background:
+        radial-gradient(1200px 620px at 10% -10%, rgba(0, 122, 255, 0.20), transparent 60%),
+        radial-gradient(1100px 640px at 105% 0%, rgba(88, 86, 214, 0.18), transparent 55%),
+        radial-gradient(960px 720px at 50% 120%, rgba(48, 209, 88, 0.12), transparent 60%),
+        var(--color-surface-secondary);
+}
+
+[data-theme="dark"] body.boxed-layout {
+    background:
+        radial-gradient(1200px 620px at 10% -10%, rgba(41, 151, 255, 0.22), transparent 60%),
+        radial-gradient(1100px 640px at 105% 0%, rgba(94, 92, 230, 0.20), transparent 55%),
+        radial-gradient(960px 720px at 50% 120%, rgba(48, 209, 88, 0.12), transparent 60%),
+        #0a0a0c;
+}
+
+/* --- Top bar above the box: logo (left) + account actions (right) --- */
+.boxed-layout .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    max-width: var(--box-max-width);
+    height: var(--app-header-height);
+    margin: 0 auto var(--app-header-gap);
+    padding: 0 10px;
+}
+.boxed-layout .app-header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--color-text-primary);
+}
+.boxed-layout .app-header-logo:hover { opacity: 0.8; text-decoration: none; color: var(--color-text-primary); }
+.boxed-layout .app-header-logo .sidebar-logo { width: 28px; height: 28px; }
+.boxed-layout .app-header-logo .sidebar-brand { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+.boxed-layout .app-header-actions { display: flex; align-items: center; gap: 6px; }
+
+/* --- Current top menu, kept and injected into the header (logo | menu | actions) --- */
+.boxed-layout .app-header { position: relative; }
+.boxed-layout .boxed-topnav {
+    display: flex; align-items: center; gap: 24px;
+    margin-left: 28px; flex: 1 1 auto;
+}
+.boxed-layout .boxed-topnav > a,
+.boxed-layout .boxed-topnav .nav-dropdown-trigger {
+    color: var(--color-text-secondary);
+    font-size: 14px; font-weight: 500; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px;
+    cursor: pointer; transition: color 0.15s ease; white-space: nowrap;
+}
+.boxed-layout .boxed-topnav > a:hover,
+.boxed-layout .boxed-topnav .nav-dropdown-trigger:hover { color: var(--color-text-primary); }
+.boxed-layout .boxed-topnav .nav-dropdown-trigger .chevron { width: 12px; height: 12px; }
+/* Anchor the hover mega-menu to the full header width, dropping below the 56px bar */
+.boxed-layout .app-header .nav-mega-menu {
+    top: var(--app-header-height); left: 0; right: 0;
+    border-radius: 0 0 18px 18px; overflow: hidden;
+}
+@media (max-width: 860px) { .boxed-layout .boxed-topnav { display: none; } }
+
+/* Dedicated dark/light switch in the header: show the moon in light mode
+   (click → dark), the sun in dark mode (click → light). */
+.boxed-layout .theme-switch .icon-sun { display: none; }
+[data-theme="dark"] .boxed-layout .theme-switch .icon-moon { display: none; }
+[data-theme="dark"] .boxed-layout .theme-switch .icon-sun { display: block; }
+
+/* --- The centered fixed-width container --- */
+.boxed-layout .app-shell {
+    position: relative;
+    display: flex;              /* sidebar + content; flex-stretch keeps both full height */
+    width: 100%;
+    max-width: var(--box-max-width);
+    /* fill at least to the bottom of the viewport, then grow with content */
+    min-height: calc(100vh - (2 * var(--box-gap)) - var(--app-header-height) - var(--app-header-gap));
+    margin: 0 auto;
+    background: var(--color-bg);
+    border-radius: var(--box-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;           /* clips children to the rounded corners */
+}
+
+/* --- Sidebar: in-box column. No fixed positioning; it stretches to the
+       full height of the box (so its background reaches the bottom) and the
+       whole page scrolls — no nested scrollbar. --- */
+.boxed-layout .sidebar {
+    position: relative;         /* base theme pins it with position: fixed */
+    top: auto; left: auto; bottom: auto;
+    flex-shrink: 0;
+    padding-top: 6px;           /* the logo now lives in the header */
+    border-radius: var(--box-radius) 0 0 var(--box-radius);
+}
+
+/* --- Main content: no inner scroll; grows with its content --- */
+.boxed-layout .main-content {
+    margin-left: 0;             /* base theme offsets it by --sidebar-width */
+    min-width: 0;
+    overflow: visible;
+}
+
+/* The in-box context bar (breadcrumb + status) sits at the box's
+   top-right corner — no longer sticky since the page scrolls as one. */
+.boxed-layout .topbar {
+    position: static;
+    border-radius: 0 var(--box-radius) 0 0;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+/* Tighten the frame on smaller laptops */
+@media (max-width: 1024px) {
+    :root { --box-gap: 14px; --box-radius: 16px; }
+}
+
+/* On phones, go full-bleed. The base theme already hides the sidebar,
+   so the header becomes the top nav. */
+@media (max-width: 768px) {
+    body.boxed-layout {
+        padding: 0;
+        background: var(--color-bg);
+    }
+    .boxed-layout .app-header {
+        height: 52px;
+        padding: 0 16px;
+        margin-bottom: 0;
+    }
+    .boxed-layout .app-shell {
+        min-height: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .boxed-layout .topbar { border-radius: 0; }
+}

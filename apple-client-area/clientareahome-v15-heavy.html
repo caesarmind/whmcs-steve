@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — WHMCS by Apple</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=12">
+    <link rel="stylesheet" href="css/apple-layout.css?v=17">
+    <style>
+body { display: block; }
+
+        /* --- v15: minimal dashboard. Greeting + three stat cards + one list.
+           Cards and list are white, hairline-bordered, softly shadowed -- the
+           only surfaces on the page. Everything else is type and whitespace. --- */
+        .min-head { margin: 0 0 28px; }
+        .min-greeting { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; margin: 0 0 6px; line-height: 1.1; color: var(--color-text-primary); }
+        .min-sub { font-size: 15px; color: var(--color-text-secondary); margin: 0; letter-spacing: -0.01em; }
+
+        /* Title row: greeting left, a compact profile block right. */
+        .min-head-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin: 0 0 28px; flex-wrap: wrap; }
+        .min-head-row .min-head { margin: 0; }
+        .pblk-inline { display: flex; align-items: center; gap: 6px; padding: 7px 9px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 999px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .pblk-inline-link { display: flex; align-items: center; gap: 11px; padding: 2px 4px 2px 2px; text-decoration: none; color: inherit; }
+        .pblk-inline-link:hover { text-decoration: none; }
+        .pblk-inline-link:hover .pblk-nm { color: var(--color-accent); }
+        .pblk-inline .pblk-av { width: 38px; height: 38px; border-radius: 50%; background: var(--color-accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; flex-shrink: 0; }
+        .pblk-inline .pblk-txt { display: flex; flex-direction: column; line-height: 1.3; }
+        .pblk-inline .pblk-nm { font-size: 14px; font-weight: 600; color: var(--color-text-primary); }
+        .pblk-inline .pblk-mt { font-size: 12px; color: var(--color-text-secondary); }
+        .pblk-inline-acts { display: flex; align-items: center; gap: 4px; padding-left: 6px; border-left: 1px solid var(--color-border); }
+        .pblk-ibtn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-secondary); text-decoration: none; transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast); }
+        .pblk-ibtn:hover { background: var(--color-blue-bg); border-color: var(--color-accent); color: var(--color-accent); text-decoration: none; }
+        .pblk-ibtn svg { width: 15px; height: 15px; }
+
+        /* Fractional size grid on a 6-column track: 1/1=6, 2/3=4, 1/2=3, 1/3=2. */
+        .blk-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; }
+        .blk-grid > .span-1-1 { grid-column: span 6; }
+        .blk-grid > .span-2-3 { grid-column: span 4; }
+        .blk-grid > .span-1-2 { grid-column: span 3; }
+        .blk-grid > .span-1-3 { grid-column: span 2; }
+        @media (max-width: 860px) { .blk-grid > [class*="span-"] { grid-column: span 6; } }
+
+        /* Adaptable block base. Each block is its OWN container, so its inner
+           layout responds to the width it actually gets (1/3, 1/2, full...),
+           not the viewport -- one markup, every size, via @container below. */
+        .blk { container-type: inline-size; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); overflow: hidden; }
+
+        /* --- Domain-register block --- */
+        .dblk-body { padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+        .dblk-title { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; color: var(--color-text-primary); }
+        .dblk-sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 3px; }
+        .dblk-form { display: flex; flex-direction: column; gap: 10px; }
+        .dblk-input { flex: 1; min-width: 0; padding: 11px 14px; border: 1px solid var(--color-border); border-radius: 10px; background: var(--color-surface-secondary); font: inherit; font-size: 14px; color: var(--color-text-primary); outline: none; }
+        .dblk-input:focus { border-color: var(--color-accent); background: var(--color-surface); }
+        .dblk-btn { display: inline-flex; align-items: center; justify-content: center; padding: 11px 18px; border: 1px solid var(--color-accent); border-radius: 10px; background: var(--color-accent); color: #fff; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; text-decoration: none; }
+        .dblk-btn:hover { text-decoration: none; }
+        .dblk-btns { display: flex; gap: 8px; }
+        .dblk-btns .dblk-btn { flex: 1; }
+        .dblk-btn.ghost { background: var(--color-surface); border-color: var(--color-border); color: var(--color-text-primary); }
+        .dblk-btn.ghost:hover { background: var(--color-surface-secondary); }
+        .dblk-tlds { display: flex; flex-wrap: wrap; gap: 8px; }
+        .dblk-tld { display: inline-flex; gap: 5px; align-items: baseline; padding: 5px 10px; border-radius: 8px; background: var(--color-surface-secondary); font-size: 12px; color: var(--color-text-secondary); }
+        .dblk-tld b { color: var(--color-text-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
+        @container (min-width: 340px) { .dblk-form { flex-direction: row; } .dblk-btns { flex-shrink: 0; } .dblk-btns .dblk-btn { flex: none; } }
+        @container (min-width: 520px) { .dblk-body { padding: 28px; } .dblk-title { font-size: 18px; } }
+
+        /* --- Profile block (card) --- */
+        .pblk-body { padding: 22px; display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 14px; }
+        .pblk-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--color-accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 600; flex-shrink: 0; }
+        .pblk-main { min-width: 0; }
+        .pblk-name { font-size: 16px; font-weight: 600; color: var(--color-text-primary); }
+        .pblk-person { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-top: 1px; }
+        .pblk-addr { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+        .pblk-addr:first-of-type { margin-top: 6px; }
+        .pblk-email { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pblk-badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px; }
+        .pblk-badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--color-green-bg); color: var(--color-green-text); }
+        .pblk-badge.plan { background: var(--color-blue-bg); color: var(--color-blue-text); }
+        .pblk-actions { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 4px; }
+        .pblk-btn { padding: 9px 14px; border: 1px solid var(--color-border); border-radius: 10px; background: var(--color-surface); color: var(--color-text-primary); font-size: 13px; font-weight: 500; text-decoration: none; text-align: center; white-space: nowrap; transition: background var(--transition-fast); }
+        .pblk-btn:hover { background: var(--color-surface-secondary); text-decoration: none; color: var(--color-text-primary); }
+        .pblk-btn.primary { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+        @container (min-width: 340px) {
+            .pblk-body { flex-direction: row; align-items: center; text-align: left; }
+            .pblk-main { flex: 1; }
+            .pblk-badges { justify-content: flex-start; }
+            .pblk-actions { width: auto; flex-shrink: 0; }
+        }
+        @container (min-width: 520px) {
+            .pblk-body { padding: 26px; }
+            .pblk-actions { flex-direction: row; }
+            .pblk-avatar { width: 64px; height: 64px; font-size: 26px; }
+        }
+
+        /* Accent variant: the SAME block filled with the accent colour. Inner
+           controls flip to white / translucent-white so they read on the field.
+           Add class "accent" to any .blk. */
+        .blk.accent { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+        .blk.accent .dblk-title, .blk.accent .pblk-name, .blk.accent .pblk-person { color: #fff; }
+        .blk.accent .dblk-sub, .blk.accent .pblk-addr { color: rgba(255,255,255,0.82); }
+        .blk.accent .dblk-input { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.28); color: #fff; }
+        .blk.accent .dblk-input::placeholder { color: rgba(255,255,255,0.7); }
+        .blk.accent .dblk-input:focus { background: rgba(255,255,255,0.24); border-color: #fff; }
+        .blk.accent .dblk-btn { background: #fff; color: var(--color-accent); border-color: #fff; }
+        .blk.accent .dblk-btn.ghost { background: rgba(255,255,255,0.14); color: #fff; border-color: rgba(255,255,255,0.45); }
+        .blk.accent .dblk-btn.ghost:hover { background: rgba(255,255,255,0.24); }
+        .blk.accent .dblk-tld { background: rgba(255,255,255,0.16); color: rgba(255,255,255,0.92); }
+        .blk.accent .dblk-tld b { color: #fff; }
+        .blk.accent .pblk-avatar { background: #fff; color: var(--color-accent); }
+        .blk.accent .pblk-btn { background: rgba(255,255,255,0.14); color: #fff; border-color: rgba(255,255,255,0.35); }
+        .blk.accent .pblk-btn:hover { background: rgba(255,255,255,0.24); }
+        .blk.accent .pblk-btn.primary { background: #fff; color: var(--color-accent); border-color: #fff; }
+
+        /* Tinted variant: a soft accent wash, text stays dark. The one change the
+           tint needs is a white input, so the field doesn't vanish into the wash. */
+        .blk.tint { background: var(--color-blue-bg); border-color: rgba(0,113,227,0.22); }
+        .blk.tint .dblk-input { background: var(--color-surface); }
+        .blk.tint .pblk-avatar { background: var(--color-accent); color: #fff; }
+
+        /* Gradient hero: used WITH accent (class="blk accent gradient") so it
+           inherits every white-on-colour control rule and only swaps the fill. */
+        .blk.gradient { background: linear-gradient(135deg, var(--color-accent) 0%, #0a5bd0 100%); border-color: transparent; }
+
+        /* Three cards, left-aligned. The Due card carries the only accent on the
+           page, so the one number worth acting on is the one that draws the eye. */
+        .min-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        @media (max-width: 860px) { .min-tiles { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 480px) { .min-tiles { grid-template-columns: 1fr; } }
+        .min-tile { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 26px 28px; text-decoration: none; color: inherit; box-shadow: 0 1px 2px rgba(0,0,0,0.03); transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
+        .min-tile:hover { border-color: var(--color-text-quaternary, var(--color-text-secondary)); box-shadow: 0 3px 12px rgba(0,0,0,0.07); text-decoration: none; color: inherit; }
+        .min-tile .n { font-size: 40px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); font-variant-numeric: tabular-nums; line-height: 1; }
+        .min-tile.due .n { color: var(--color-accent); }
+        .min-tile .l { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary, var(--color-text-secondary)); margin-top: 12px; }
+
+        /* Quick actions. The primary things a client comes here to DO -- order,
+           register, open a ticket -- as a row directly under the summary cards,
+           so they are visible without hunting. One filled primary + bordered
+           secondaries, matching Apple's button hierarchy. Always shown (a new
+           account needs these most), so NOT wrapped in when-full. */
+        .min-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+        .min-act { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 12px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-primary); font-size: 14px; font-weight: 500; letter-spacing: -0.01em; text-decoration: none; transition: background var(--transition-fast), border-color var(--transition-fast), filter var(--transition-fast); }
+        .min-act svg { width: 17px; height: 17px; flex-shrink: 0; }
+        .min-act:hover { background: var(--color-surface-secondary); border-color: var(--color-text-quaternary, var(--color-text-secondary)); text-decoration: none; color: var(--color-text-primary); }
+        .min-act.primary { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+        .min-act.primary:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; filter: brightness(0.93); }
+
+        /* One list. A single white card; every active thing you own -- service,
+           domain, SSL -- as a row with a status pill, no type labels needed. */
+        .min-list { margin-top: 20px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); overflow: hidden; }
+        .min-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 24px; border-bottom: 0.5px solid var(--color-border); text-decoration: none; color: inherit; transition: background var(--transition-fast); }
+        .min-row:last-child { border-bottom: none; }
+        .min-row:hover { background: var(--color-surface-secondary); text-decoration: none; }
+        .min-name { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: var(--color-text-primary); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .min-pill { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: var(--radius-pill); background: var(--color-green-bg); color: var(--color-green-text); white-space: nowrap; flex-shrink: 0; }
+        .min-pill.warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
+
+        /* Per-service rows carry their own actions, so the row can't be a single
+           <a> (a link can't nest a link). The foot script rebuilds each Services
+           row as: a name-link (-> product) + a right cluster (cPanel button on
+           hosting products, then the status pill). cPanel SSO is per hosting
+           account, which is why the button lives here and not in the global row. */
+        .min-row-link { flex: 1; min-width: 0; display: block; text-decoration: none; color: inherit; overflow: hidden; }
+        .min-row-link:hover { text-decoration: none; }
+        .min-row-end { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .min-cpanel { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); text-decoration: none; white-space: nowrap; transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast); }
+        .min-cpanel svg { width: 13px; height: 13px; }
+        .min-cpanel:hover { background: var(--color-blue-bg); border-color: var(--color-accent); color: var(--color-accent); text-decoration: none; }
+
+        /* Empty state lives INSIDE the list card, centered, so the page keeps its
+           one-surface rhythm even for a brand-new account. */
+        .min-empty { padding: 48px 24px; text-align: center; }
+        .min-empty p { font-size: 15px; color: var(--color-text-secondary); margin: 0 0 18px; letter-spacing: -0.01em; }
+        .min-empty .acts { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        /* Compact empty for secondary blocks -- one muted line, no CTA, left-aligned,
+           so five empty sections on a new account don't become five big cards. */
+        .min-empty.compact { padding: 20px 24px; text-align: left; }
+        .min-empty.compact p { margin: 0; }
+
+        /* A section = an uppercase label (+ optional View all) above a boxed list.
+           Turns the single list into named groups without adding any new surface;
+           the label and link sit on the page background, the list keeps the card. */
+        .min-section { margin-top: 34px; }
+        .min-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding: 0 2px; }
+        .min-section-label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); }
+        .min-section-link { font-size: 13px; color: var(--color-accent); text-decoration: none; white-space: nowrap; }
+        .min-section-link:hover { text-decoration: none; opacity: 0.75; }
+
+        /* Title INSIDE the card (preview chip: Title -> Inside block). The section
+           head becomes the card header -- white surface, rounded top corners, a
+           hairline divider to the rows -- and the list drops its own top edge so
+           head + list read as one card. Default (attribute absent) keeps titles
+           OUTSIDE, on the page background above each card. */
+        body[data-min-title="inside"] .min-section-head {
+            margin: 0; padding: 15px 20px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-bottom: 0.5px solid var(--color-border);
+            border-radius: 16px 16px 0 0;
+        }
+        body[data-min-title="inside"] .min-list {
+            margin-top: 0; border-top: none;
+            border-top-left-radius: 0; border-top-right-radius: 0;
+            box-shadow: none;
+        }
+
+        /* Right-hand cluster for rows that carry more than a status pill -- an
+           amount then a pill (invoices), or just a quiet date (domains, news). */
+        .min-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+        .min-amt { font-size: 14px; font-weight: 500; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
+        .min-when { font-size: 13px; color: var(--color-text-secondary); white-space: nowrap; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+        .min-pill.info { background: var(--color-blue-bg); color: var(--color-blue-text); }
+
+        /* Bottom variation. The primary blocks (services, domains) stay full-width
+           and calm; the secondary blocks drop into an asymmetric two-column grid
+           so the lower page reads as composed, not a stack of identical bars.
+           align-items:start lets the left column be tall (invoices) beside two
+           shorter stacked blocks on the right without stretching either. */
+        .min-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 34px 24px; align-items: start; margin-top: 34px; }
+        @media (max-width: 720px) { .min-grid { grid-template-columns: 1fr; gap: 30px; } }
+        .min-gcol { display: flex; flex-direction: column; gap: 30px; }
+        /* Inside the grid the column gap owns the spacing, so the section's own
+           top margin would double it. */
+        .min-grid .min-section { margin-top: 0; }
+
+        /* Overflow. A dashboard list shows the first few and reveals the rest in
+           place -- progressive disclosure, not page numbers, which belong on the
+           dedicated Services page the "View all" link points to. Rows past the
+           cap carry .min-more and stay hidden until the card gets .expanded. */
+        .min-more { display: none; }
+        .min-list.expanded .min-more { display: flex; }
+        .min-showmore { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 14px; border: none; border-top: 0.5px solid var(--color-border); background: transparent; color: var(--color-accent); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: background var(--transition-fast); }
+        .min-showmore:hover { background: var(--color-surface-secondary); }
+        .min-showmore .chev { transition: transform var(--transition-fast); font-size: 11px; }
+        .min-list.expanded .min-showmore .chev { transform: rotate(180deg); }
+
+        /* Overflow, Apple-style: a search field to filter the list (Spotlight /
+           Settings) plus a "Load more" button that reveals the next batch
+           (Apple.com). No numbered pagination -- Apple's own UIs never use it.
+           Search and Load more compose: with a query the full match set shows and
+           the button hides; cleared, it returns to the batched view. */
+        .min-hidden { display: none !important; }
+        /* Pre-JS / no-JS guard: show only the first 8 rows by default, so the
+           list never paints as a 24-row wall before the script runs (or if it
+           never does). JS adds .min-ready and manages visibility from there.
+           Keep the count here (nth-child n+9 => first 8 show) in sync with
+           data-initial on the list. */
+        .min-list:not(.min-ready) .min-rows .min-row:nth-child(n+9) { display: none; }
+
+        .min-search { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-bottom: 0.5px solid var(--color-border); color: var(--color-text-tertiary); }
+        .min-search svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .min-search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font: inherit; font-size: 14px; color: var(--color-text-primary); }
+        .min-search input::placeholder { color: var(--color-text-tertiary); }
+        .min-search .clear { border: none; background: transparent; cursor: pointer; color: var(--color-text-tertiary); font-size: 16px; line-height: 1; padding: 0 2px; display: none; }
+        .min-search.has-q .clear { display: block; }
+        .min-search .clear:hover { color: var(--color-text-secondary); }
+
+        .min-loadmore { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 14px; border: none; border-top: 0.5px solid var(--color-border); background: transparent; color: var(--color-accent); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: background var(--transition-fast); }
+        .min-loadmore:hover { background: var(--color-surface-secondary); }
+
+        .min-noresults { display: none; padding: 34px 24px; text-align: center; font-size: 14px; color: var(--color-text-secondary); }
+
+        body[data-data="empty"] .when-full { display: none !important; }
+        body:not([data-data="empty"]) .when-empty { display: none !important; }
+    </style>
+</head>
+<body class="client-area-layout" data-auth="in" data-layout="top" data-active-nav="dashboard" data-page-title="Dashboard">
+
+<!-- ═══════════ Dev preview chip — auth / layout / palette ═══════════ -->
+<div data-include="partials/state-chip.html"></div>
+
+<!-- ═══════════ Rail layout — icon rail + flyout panels ═══════════ -->
+<div data-include="partials/rail.html"></div>
+<div data-include="partials/rail-panels.html"></div>
+
+<!-- ═══════════ Sidebar layout — fixed 260px rail ═══════════ -->
+<div data-include="partials/sidebar.html"></div>
+
+<!-- ═══════════ MAIN WRAP (shifts right when layout=side|rail) ═══════════ -->
+<div class="ph-main-wrap">
+
+<!-- ═══════════ Auth strip — logged-in + top-layout only ═══════════ -->
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span>No Notifications</span>
+        </button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="#" class="masq-chip" title="Return to admin area">↺ Return to admin</a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ Top-layout standard header ═══════════ -->
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="index.html" class="nav-logo text-logo only-out">Hostnodes</a>
+    <a href="clientareahome.html" class="nav-logo text-logo only-in">Hostnodes</a>
+
+    <!-- Logged-out menu -->
+    <div class="nav-simple-dropdown only-out">
+        <a href="#" class="nav-simple-trigger">Store <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="#">Browse All</a>
+            <div class="divider"></div>
+            <a href="socialbee.html">SocialBee</a>
+            <a href="ssl-certificates.html">SSL Certificates</a>
+            <a href="email-services.html">E-mail Services</a>
+            <a href="website-builder.html">Website Builder</a>
+            <div class="divider"></div>
+            <a href="cart-domain-register.html">Register a New Domain</a>
+            <a href="cart-domain-transfer.html">Transfer Domains to Us</a>
+        </div>
+    </div>
+    <a href="announcements.html" class="only-out">Announcements</a>
+    <a href="knowledgebase.html" class="only-out">Knowledgebase</a>
+    <a href="serverstatus.html" class="only-out">Network Status</a>
+    <a href="contact.html" class="only-out">Contact Us</a>
+
+    <!-- Logged-in menu -->
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Services <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareaproducts.html">My Services</a>
+            <div class="divider"></div>
+            <a href="store.html">Order New Services</a>
+            <a href="#">View Available Addons</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Domains <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareadomains.html">My Domains</a>
+            <div class="divider"></div>
+            <a href="#">Renew Domains</a>
+            <a href="cart-domain-register.html">Register a New Domain</a>
+            <a href="cart-domain-transfer.html">Transfer a Domain to Us</a>
+            <div class="divider"></div>
+            <a href="domainchecker.html">Domain Search</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Website &amp; Security <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="socialbee.html">SocialBee</a>
+            <a href="ssl-certificates.html">SSL Certificates</a>
+            <a href="monitoring-360.html">Site &amp; Server Monitoring</a>
+            <a href="nordvpn.html">VPN</a>
+            <a href="email-services.html">E-mail Services</a>
+            <a href="website-backup.html">Website Backup</a>
+            <a href="website-security.html">Website Security</a>
+            <a href="website-builder.html">Website Builder</a>
+            <div class="divider"></div>
+            <a href="managessl.html">Manage SSL Certificates</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Billing <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="clientareainvoices.html">My Invoices</a>
+            <a href="clientareaquotes.html">My Quotes</a>
+            <div class="divider"></div>
+            <a href="account-paymentmethods.html">Payment Methods</a>
+        </div>
+    </div>
+    <div class="nav-simple-dropdown only-in">
+        <a href="#" class="nav-simple-trigger">Support <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-simple-menu">
+            <a href="supportticketslist.html">Tickets</a>
+            <a href="announcements.html">Announcements</a>
+            <a href="knowledgebase.html">Knowledgebase</a>
+            <a href="downloads.html">Downloads</a>
+            <a href="serverstatus.html">Network Status</a>
+        </div>
+    </div>
+    <a href="supportticketsubmit.html" class="only-in">Open Ticket</a>
+
+    <div class="nav-spacer"></div>
+    <a href="#" class="icon-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+
+    <!-- Notifications -->
+    <div class="notification-wrapper only-in" id="navNotifyWrap">
+        <button type="button" class="topbar-btn" title="Notifications" onclick="togglePortalNotifications(event, 'nav')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <div class="topbar-notification-dot"></div>
+        </button>
+        <div class="notification-dropdown" id="notificationDropdownNav">
+            <div class="notification-dropdown-header">
+                <span class="notification-dropdown-title">Notifications</span>
+                <button class="notification-dropdown-clear" type="button">Mark all read</button>
+            </div>
+            <a href="viewinvoice.html" class="notification-item">
+                <div class="notification-dot-indicator orange"></div>
+                <div class="notification-content">
+                    <div class="notification-text">Invoice #10247 is due in 2 days</div>
+                    <div class="notification-time">2 hours ago</div>
+                </div>
+            </a>
+            <a href="viewticket.html" class="notification-item">
+                <div class="notification-dot-indicator green"></div>
+                <div class="notification-content">
+                    <div class="notification-text">Ticket #TKT-4821 has been answered</div>
+                    <div class="notification-time">Yesterday</div>
+                </div>
+            </a>
+            <a href="announcements.html" class="notification-item">
+                <div class="notification-dot-indicator blue"></div>
+                <div class="notification-content">
+                    <div class="notification-text">Scheduled maintenance on Apr 20</div>
+                    <div class="notification-time">3 days ago</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Cart -->
+    <a href="cart.html" class="topbar-btn" title="Shopping Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></a>
+
+    <!-- Right-side auth affordance -->
+    <a href="login.html" class="nav-signin only-out">Sign in</a>
+    <a href="#" onclick="toggleDarkMode(); return false;" class="topbar-btn only-out" title="Toggle theme" style="margin-right:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
+    <div class="profile-dropdown-wrapper only-in" id="navUserWrap">
+        <div class="topbar-avatar" onclick="togglePortalProfile(event)" title="Account">A</div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-dropdown-header">
+                <div class="profile-dropdown-name">Arshile Gogia</div>
+                <div class="profile-dropdown-email">arshileg@gmail.com</div>
+            </div>
+            <a href="clientareadetails.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                My Details
+            </a>
+            <a href="clientareasecurity.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                Security Settings
+            </a>
+            <a href="clientareaemails.html" class="profile-dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Email History
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <div class="theme-toggle-row">
+                <span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span>
+                <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="login.html" class="profile-dropdown-item danger">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sign Out
+            </a>
+        </div>
+    </div>
+</div></nav>
+
+<!-- ═══════════ Inner-layout topbar (sidebar + rail) ═══════════ -->
+<div data-include="partials/inner-topbar.html"></div>
+
+<!-- ═══════════ Breadcrumb — top-layout only ═══════════ -->
+<nav class="ph-breadcrumb only-top" aria-label="breadcrumb">
+    <div class="ph-breadcrumb-inner">
+        <a href="index.html">Portal Home</a>
+        <span class="sep">/</span>
+        <span class="current" aria-current="page">Client Area</span>
+    </div>
+</nav>
+
+<!-- ═══════════ PAGE CONTENT ═══════════ -->
+<div class="content-area">
+
+    <!-- Title row: greeting + a compact profile block beside it -->
+    <div class="min-head-row">
+        <div class="min-head">
+            <h1 class="min-greeting">Good afternoon, Petey.</h1>
+            <p class="min-sub">Account overview</p>
+        </div>
+        <div class="pblk-inline">
+            <a class="pblk-inline-link" href="clientareadetails.html" title="Account details">
+                <span class="pblk-av">PM</span>
+                <span class="pblk-txt"><span class="pblk-nm">Petey MacGibbon</span><span class="pblk-mt">Norfolk, Virginia</span></span>
+            </a>
+            <span class="pblk-inline-acts">
+                <a href="clientareadetails.html" class="pblk-ibtn" title="Edit profile" aria-label="Edit profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></a>
+                <a href="clientareasecurity.html" class="pblk-ibtn" title="Security" aria-label="Security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></a>
+            </span>
+        </div>
+    </div>
+
+    <div class="min-tiles">
+        <a href="clientareaproducts.html" class="min-tile"><div class="n"><span class="when-full">24</span><span class="when-empty">0</span></div><div class="l">Services</div></a>
+        <a href="clientareadomains.html" class="min-tile"><div class="n"><span class="when-full">21</span><span class="when-empty">0</span></div><div class="l">Domains</div></a>
+        <a href="clientareainvoices.html" class="min-tile due"><div class="n"><span class="when-full">$1,284</span><span class="when-empty">$0</span></div><div class="l">Unpaid Invoices</div></a>
+        <a href="supportticketslist.html" class="min-tile"><div class="n"><span class="when-full">5</span><span class="when-empty">0</span></div><div class="l">Support</div></a>
+    </div>
+
+    <!-- Quick actions: the primary things a client comes here to do -->
+    <div class="min-actions">
+        <a href="store.html" class="min-act primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Order a service</a>
+        <a href="cart-domain-register.html" class="min-act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg>Register a domain</a>
+        <a href="supportticketsubmit.html" class="min-act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Open a ticket</a>
+    </div>
+
+    <!-- Adaptable blocks. Domain-register + profile at fractional sizes on a
+         6-column grid (1/1, 2/3, 1/2, 1/3). Each block is a CSS container, so the
+         SAME markup reflows to whatever width it lands in -- stacked when narrow,
+         side-by-side when wide. -->
+    <div class="min-section">
+        <div class="min-section-head"><span class="min-section-label">Adaptable blocks &mdash; 1/1 &middot; 1/2 &middot; 2/3 &middot; 1/3</span></div>
+        <div class="blk-grid">
+
+            <!-- Domain register @ 1/1 -->
+            <div class="blk chip-styled span-1-1">
+                <div class="dblk-body">
+                    <div><div class="dblk-title">Register a domain</div><div class="dblk-sub">Find your perfect domain name</div></div>
+                    <div class="dblk-form">
+                        <input class="dblk-input" type="text" placeholder="yourdomain.com" aria-label="Domain name">
+                        <div class="dblk-btns">
+                            <a class="dblk-btn" href="cart-domain-register.html">Search</a>
+                            <a class="dblk-btn ghost" href="cart-domain-transfer.html">Transfer</a>
+                        </div>
+                    </div>
+                    <div class="dblk-tlds"><span class="dblk-tld">.com <b>$9.99</b></span><span class="dblk-tld">.io <b>$32</b></span><span class="dblk-tld">.dev <b>$12</b></span><span class="dblk-tld">.co <b>$24</b></span></div>
+                </div>
+            </div>
+
+            <!-- Domain register @ 1/2 -->
+            <div class="blk chip-styled span-1-2">
+                <div class="dblk-body">
+                    <div><div class="dblk-title">Register a domain</div><div class="dblk-sub">Find your perfect domain name</div></div>
+                    <div class="dblk-form">
+                        <input class="dblk-input" type="text" placeholder="yourdomain.com" aria-label="Domain name">
+                        <div class="dblk-btns">
+                            <a class="dblk-btn" href="cart-domain-register.html">Search</a>
+                            <a class="dblk-btn ghost" href="cart-domain-transfer.html">Transfer</a>
+                        </div>
+                    </div>
+                    <div class="dblk-tlds"><span class="dblk-tld">.com <b>$9.99</b></span><span class="dblk-tld">.io <b>$32</b></span><span class="dblk-tld">.dev <b>$12</b></span></div>
+                </div>
+            </div>
+
+            <!-- Profile @ 1/2 -->
+            <div class="blk chip-styled span-1-2">
+                <div class="pblk-body">
+                    <div class="pblk-avatar">PM</div>
+                    <div class="pblk-main">
+                        <div class="pblk-name">Company name</div>
+                        <div class="pblk-person">Petey MacGibbon</div>
+                        <div class="pblk-addr">Waubesa Center</div>
+                        <div class="pblk-addr">Norfolk, Virginia, 54839</div>
+                        <div class="pblk-addr">United States</div>
+                    </div>
+                    <div class="pblk-actions"><a href="clientareadetails.html" class="pblk-btn primary">Edit profile</a><a href="clientareasecurity.html" class="pblk-btn">Security</a></div>
+                </div>
+            </div>
+
+            <!-- Domain register @ 2/3 -->
+            <div class="blk chip-styled span-2-3">
+                <div class="dblk-body">
+                    <div><div class="dblk-title">Register a domain</div><div class="dblk-sub">Find your perfect domain name</div></div>
+                    <div class="dblk-form">
+                        <input class="dblk-input" type="text" placeholder="yourdomain.com" aria-label="Domain name">
+                        <div class="dblk-btns">
+                            <a class="dblk-btn" href="cart-domain-register.html">Search</a>
+                            <a class="dblk-btn ghost" href="cart-domain-transfer.html">Transfer</a>
+                        </div>
+                    </div>
+                    <div class="dblk-tlds"><span class="dblk-tld">.com <b>$9.99</b></span><span class="dblk-tld">.io <b>$32</b></span><span class="dblk-tld">.dev <b>$12</b></span><span class="dblk-tld">.co <b>$24</b></span><span class="dblk-tld">.net <b>$11</b></span></div>
+                </div>
+            </div>
+
+            <!-- Profile @ 1/3 -->
+            <div class="blk chip-styled span-1-3">
+                <div class="pblk-body">
+                    <div class="pblk-avatar">PM</div>
+                    <div class="pblk-main">
+                        <div class="pblk-name">Company name</div>
+                        <div class="pblk-person">Petey MacGibbon</div>
+                        <div class="pblk-addr">Waubesa Center</div>
+                        <div class="pblk-addr">Norfolk, Virginia, 54839</div>
+                        <div class="pblk-addr">United States</div>
+                    </div>
+                    <div class="pblk-actions"><a href="clientareadetails.html" class="pblk-btn primary">Edit profile</a><a href="clientareasecurity.html" class="pblk-btn">Security</a></div>
+                </div>
+            </div>
+
+            <!-- Profile @ 1/1 -->
+            <div class="blk chip-styled span-1-1">
+                <div class="pblk-body">
+                    <div class="pblk-avatar">PM</div>
+                    <div class="pblk-main">
+                        <div class="pblk-name">Company name</div>
+                        <div class="pblk-person">Petey MacGibbon</div>
+                        <div class="pblk-addr">Waubesa Center</div>
+                        <div class="pblk-addr">Norfolk, Virginia, 54839</div>
+                        <div class="pblk-addr">United States</div>
+                    </div>
+                    <div class="pblk-actions"><a href="clientareadetails.html" class="pblk-btn primary">Edit profile</a><a href="clientareasecurity.html" class="pblk-btn">Security</a></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Block styles: the same domain-register and profile blocks in each fill
+         style (accent / tint / gradient). Add the class to any .blk. -->
+    <div class="min-section">
+        <div class="min-section-head"><span class="min-section-label">Block styles &mdash; accent &middot; tint &middot; gradient</span></div>
+        <div class="blk-grid">
+
+            <!-- Accent domain register @ 2/3 -->
+            <div class="blk accent span-2-3">
+                <div class="dblk-body">
+                    <div><div class="dblk-title">Register a domain</div><div class="dblk-sub">Find your perfect domain name</div></div>
+                    <div class="dblk-form">
+                        <input class="dblk-input" type="text" placeholder="yourdomain.com" aria-label="Domain name">
+                        <div class="dblk-btns">
+                            <a class="dblk-btn" href="cart-domain-register.html">Search</a>
+                            <a class="dblk-btn ghost" href="cart-domain-transfer.html">Transfer</a>
+                        </div>
+                    </div>
+                    <div class="dblk-tlds"><span class="dblk-tld">.com <b>$9.99</b></span><span class="dblk-tld">.io <b>$32</b></span><span class="dblk-tld">.dev <b>$12</b></span><span class="dblk-tld">.co <b>$24</b></span></div>
+                </div>
+            </div>
+
+            <!-- Tint profile @ 1/3 -->
+            <div class="blk tint span-1-3">
+                <div class="pblk-body">
+                    <div class="pblk-avatar">PM</div>
+                    <div class="pblk-main">
+                        <div class="pblk-name">Company name</div>
+                        <div class="pblk-person">Petey MacGibbon</div>
+                        <div class="pblk-addr">Waubesa Center</div>
+                        <div class="pblk-addr">Norfolk, Virginia, 54839</div>
+                        <div class="pblk-addr">United States</div>
+                    </div>
+                    <div class="pblk-actions"><a href="clientareadetails.html" class="pblk-btn primary">Edit profile</a><a href="clientareasecurity.html" class="pblk-btn">Security</a></div>
+                </div>
+            </div>
+
+            <!-- Gradient domain register @ 1/1 (full-width hero) -->
+            <div class="blk accent gradient span-1-1">
+                <div class="dblk-body">
+                    <div><div class="dblk-title">Find your perfect domain</div><div class="dblk-sub">Search, register or transfer &mdash; hundreds of extensions</div></div>
+                    <div class="dblk-form">
+                        <input class="dblk-input" type="text" placeholder="yourdomain.com" aria-label="Domain name">
+                        <div class="dblk-btns">
+                            <a class="dblk-btn" href="cart-domain-register.html">Search</a>
+                            <a class="dblk-btn ghost" href="cart-domain-transfer.html">Transfer</a>
+                        </div>
+                    </div>
+                    <div class="dblk-tlds"><span class="dblk-tld">.com <b>$9.99</b></span><span class="dblk-tld">.io <b>$32</b></span><span class="dblk-tld">.dev <b>$12</b></span><span class="dblk-tld">.co <b>$24</b></span><span class="dblk-tld">.net <b>$11</b></span><span class="dblk-tld">.org <b>$10</b></span></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Services (heavy: 24). The rows scroll inside a fixed-height pane -- the
+         macOS list pattern -- so the card stays a calm ~6 rows tall no matter how
+         many services exist. "View all" links to the full, dedicated page. -->
+    <div class="min-section">
+        <div class="min-section-head"><span class="min-section-label">Services</span><a href="clientareaproducts.html" class="min-section-link when-full">View all (24) &rarr;</a></div>
+        <div class="min-list" data-batch="6" data-initial="8" data-cpanel-list>
+            <div class="when-full">
+                <div class="min-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+                    <input type="text" placeholder="Search services&hellip;" aria-label="Search services">
+                    <button type="button" class="clear" aria-label="Clear search">&times;</button>
+                </div>
+                <div class="min-rows">
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Cloud VPS &mdash; vps-01</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Cloud VPS &mdash; vps-02</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Cloud VPS &mdash; vps-03</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Business Hosting &mdash; web-01</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Business Hosting &mdash; web-02</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Managed WordPress &mdash; blog-01</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Managed WordPress &mdash; shop-01</span><span class="min-pill warn">Renew</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Professional Email &mdash; 5 mailboxes</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Professional Email &mdash; 20 mailboxes</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Object Storage &mdash; 500 GB</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Object Storage &mdash; 2 TB</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Website Backup &mdash; daily</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Website Backup &mdash; hourly</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">SSL &mdash; Wildcard (hostnodes.io)</span><span class="min-pill warn">Renew</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">SSL &mdash; DV (mysite.com)</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">SSL &mdash; EV (store.example)</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Dedicated Server &mdash; ded-01</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Load Balancer &mdash; lb-01</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Managed Database &mdash; db-01</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">CDN &mdash; global</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">360 Monitoring &mdash; 10 checks</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">SEO Tools &mdash; Pro</span><span class="min-pill warn">Renew</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">NordVPN &mdash; 5 devices</span><span class="min-pill">Active</span></a>
+                <a href="clientareaproductdetails.html" class="min-row"><span class="min-name">Site Builder &mdash; Business</span><span class="min-pill">Active</span></a>
+                </div>
+                <div class="min-noresults">No services match your search.</div>
+                <button type="button" class="min-loadmore"><span class="t">Load more</span></button>
+            </div>
+            <div class="when-empty min-empty">
+                <p>You don't have any active services yet.</p>
+                <div class="acts"><a href="store.html" class="btn-primary">Order a service</a></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Domains -->
+    <div class="min-section">
+        <div class="min-section-head"><span class="min-section-label">Domains</span><a href="clientareadomains.html" class="min-section-link when-full">View all (21) &rarr;</a></div>
+        <div class="min-list">
+            <div class="when-full">
+                <a href="clientareadomaindetails.html" class="min-row"><span class="min-name">hostnodes.io</span><span class="min-when">Renews Aug 24</span></a>
+                <a href="clientareadomaindetails.html" class="min-row"><span class="min-name">mysite.com</span><span class="min-when">Renews Sep 02</span></a>
+            </div>
+            <div class="when-empty min-empty">
+                <p>No domains registered yet.</p>
+                <div class="acts"><a href="cart-domain-register.html" class="btn-primary">Register a domain</a></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom: asymmetric two-column grid so the lower page isn't a plain stack.
+         Left = the taller invoices block; right = Support + Announcements stacked. -->
+    <div class="min-grid">
+        <div class="min-gcol">
+            <!-- Recent invoices -->
+            <div class="min-section">
+                <div class="min-section-head"><span class="min-section-label">Recent invoices</span><a href="clientareainvoices.html" class="min-section-link when-full">View all (18) &rarr;</a></div>
+                <div class="min-list">
+                    <div class="when-full">
+                        <a href="viewinvoice.html" class="min-row"><span class="min-name">Invoice #1048</span><span class="min-right"><span class="min-amt">$42.00</span><span class="min-pill warn">Unpaid</span></span></a>
+                        <a href="viewinvoice.html" class="min-row"><span class="min-name">Invoice #1042</span><span class="min-right"><span class="min-amt">$120.00</span><span class="min-pill">Paid</span></span></a>
+                        <a href="viewinvoice.html" class="min-row"><span class="min-name">Invoice #1031</span><span class="min-right"><span class="min-amt">$18.00</span><span class="min-pill">Paid</span></span></a>
+                    </div>
+                    <div class="when-empty min-empty compact"><p>No invoices yet.</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="min-gcol">
+            <!-- Support tickets -->
+            <div class="min-section">
+                <div class="min-section-head"><span class="min-section-label">Support</span><a href="supportticketslist.html" class="min-section-link when-full">View all (5) &rarr;</a></div>
+                <div class="min-list">
+                    <div class="when-full">
+                        <a href="viewticket.html" class="min-row"><span class="min-name">SSL renewal question</span><span class="min-pill info">Open</span></a>
+                        <a href="viewticket.html" class="min-row"><span class="min-name">Migration help for web-01</span><span class="min-pill">Answered</span></a>
+                    </div>
+                    <div class="when-empty min-empty compact"><p>No open tickets.</p></div>
+                </div>
+            </div>
+            <!-- Announcements -->
+            <div class="min-section">
+                <div class="min-section-head"><span class="min-section-label">Announcements</span><a href="announcements.html" class="min-section-link when-full">View all &rarr;</a></div>
+                <div class="min-list">
+                    <div class="when-full">
+                        <a href="announcements.html" class="min-row"><span class="min-name">Scheduled maintenance &mdash; Aug 25</span><span class="min-when">Aug 12</span></a>
+                        <a href="announcements.html" class="min-row"><span class="min-name">New data center: Frankfurt</span><span class="min-when">Aug 1</span></a>
+                    </div>
+                    <div class="when-empty min-empty compact"><p>No announcements.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="#">Dedicated Servers</a></li><li><a href="domains.html">Domains</a></li><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="email.html">Email</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security &amp; Tools</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li><li><a href="website-security.html">Website Security</a></li><li><a href="website-backup.html">Website Backup</a></li><li><a href="seo-tools.html">SEO Tools</a></li><li><a href="monitoring-360.html">360 Monitoring</a></li><li><a href="nordvpn.html">NordVPN</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li><li><a href="clientregister.html">Create an account</a></li><li><a href="#">Billing</a></li><li><a href="#">Refer a friend</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="support-page.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li><li><a href="serverstatus.html">Network status</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Newsroom</a></li><li><a href="#">Careers</a></li><li><a href="#">Legal</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <span class="hp-footer-copyright">Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Legal</a><a href="#">Site Map</a></div>
+            <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open>
+                    <span class="flag">🇺🇸</span>
+                    <span>English</span>
+                    <span class="sep">/</span>
+                    <span>$ USD</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+        </div>
+    </div>
+</footer>
+
+<!-- ═══════════ Inner-layout slim footer (sidebar + rail) ═══════════ -->
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+
+<!-- ═══════════ Language / currency modal ═══════════ -->
+<div data-include="partials/locale-modal.html"></div>
+
+<script src="js/apple-theme.js?v=12"></script>
+<script src="js/apple-layout.js?v=17"></script>
+<script>
+// clientareahome-v15-heavy (minimal, power account) - static.
+// Overflow on the long Services list = search + Load more, composed:
+//   - no query: show the first `data-batch` rows; "Load more" adds a batch.
+//   - query:    show ALL matching rows, hide "Load more", show a no-results line
+//               when nothing matches. Clearing the query restores the batch view.
+// Other toggles (layout / palette / data) are handled by js/apple-layout.js.
+
+// Per-service cPanel SSO: each hosting row in the Services list gets its own
+// login button. A row can't stay a single <a> once it carries its own action,
+// so each is rebuilt as name-link + right cluster (cPanel for hosting products,
+// then the status pill). Runs BEFORE the search/load-more enhancer so that
+// caches the rebuilt rows. Real theme href:
+// clientarea.php?action=productdetails&id=<id>&dosinglesignon=1.
+(function () {
+    var HOSTING = /(vps|hosting|wordpress|dedicated|server|reseller|cpanel)/i;
+    var ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>';
+    document.querySelectorAll('[data-cpanel-list] a.min-row').forEach(function (a) {
+        var name = a.querySelector('.min-name');
+        if (!name) return;
+        var div = document.createElement('div');
+        div.className = a.className;
+        var link = document.createElement('a');
+        link.className = 'min-row-link';
+        link.href = a.getAttribute('href') || '#';
+        link.appendChild(name);
+        div.appendChild(link);
+        var end = document.createElement('span');
+        end.className = 'min-row-end';
+        if (HOSTING.test(name.textContent)) {
+            var cp = document.createElement('a');
+            cp.className = 'min-cpanel';
+            cp.href = a.getAttribute('href') || '#';
+            cp.title = 'Log in to cPanel (single sign-on)';
+            cp.innerHTML = ICON + 'cPanel';
+            end.appendChild(cp);
+        }
+        var badge = a.querySelector('.min-pill, .min-right, .min-when');
+        if (badge) end.appendChild(badge);
+        div.appendChild(end);
+        a.replaceWith(div);
+    });
+})();
+
+(function () {
+    document.querySelectorAll('.min-list[data-batch]').forEach(function (list) {
+        var batch = parseInt(list.getAttribute('data-batch'), 10) || 6;
+        var initialN = parseInt(list.getAttribute('data-initial'), 10) || batch;
+        var full = list.querySelector('.when-full');
+        if (!full) return;
+        list.classList.add('min-ready');   // take over from the CSS pre-JS guard
+        var rowsWrap = full.querySelector('.min-rows');
+        var rows = Array.prototype.slice.call(rowsWrap.querySelectorAll('.min-row'));
+        var search = full.querySelector('.min-search');
+        var input = search.querySelector('input');
+        var clear = search.querySelector('.clear');
+        var loadBtn = full.querySelector('.min-loadmore');
+        var loadTxt = loadBtn.querySelector('.t');
+        var noRes = full.querySelector('.min-noresults');
+        var shown = initialN;
+
+        function apply() {
+            var q = input.value.trim().toLowerCase();
+            var matches = 0;
+            rows.forEach(function (r, i) {
+                var name = r.querySelector('.min-name').textContent.toLowerCase();
+                var hit = !q || name.indexOf(q) !== -1;
+                if (q) {
+                    r.classList.toggle('min-hidden', !hit);       // search: all matches
+                } else {
+                    r.classList.toggle('min-hidden', i >= shown); // batch: first N
+                }
+                if (hit) matches++;
+            });
+            search.classList.toggle('has-q', !!q);
+            noRes.style.display = (q && matches === 0) ? 'block' : 'none';
+            if (q || shown >= rows.length) {
+                loadBtn.style.display = 'none';
+            } else {
+                loadBtn.style.display = '';
+                loadTxt.textContent = 'Load more (' + (rows.length - shown) + ' more)';
+            }
+        }
+        input.addEventListener('input', apply);
+        clear.addEventListener('click', function () { input.value = ''; apply(); input.focus(); });
+        loadBtn.addEventListener('click', function () { shown = Math.min(shown + batch, rows.length); apply(); });
+        apply();
+    });
+})();
+</script>
+</body>
+</html>

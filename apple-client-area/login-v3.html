@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in — Hostnodes</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=12">
+    <link rel="stylesheet" href="css/apple-layout.css?v=17">
+    <style>
+        /* ===== login-v3 — Centered keynote: frosted card on full-bleed gradient ===== */
+        body.lv3 {
+            margin: 0; min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 40px 20px;
+            color: #fff; font-family: var(--font-family);
+            background:
+                radial-gradient(80% 70% at 15% 10%, color-mix(in srgb, var(--color-accent) 60%, #fff 4%), transparent 55%),
+                radial-gradient(70% 70% at 88% 18%, color-mix(in srgb, var(--brand-info) 60%, #fff), transparent 50%),
+                radial-gradient(90% 80% at 75% 100%, color-mix(in srgb, var(--color-accent) 55%, #1a0f40), transparent 60%),
+                linear-gradient(155deg, color-mix(in srgb, var(--color-accent) 82%, #2a1a55), color-mix(in srgb, var(--color-accent) 55%, #000));
+        }
+
+        .lv3-brand { display: flex; align-items: center; gap: 9px; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; color: #fff; margin-bottom: 26px; }
+        .lv3-brand-dot { width: 26px; height: 26px; border-radius: 8px; background: rgba(255,255,255,0.22); display: inline-flex; align-items: center; justify-content: center; }
+        .lv3-brand-dot svg { width: 15px; height: 15px; }
+
+        /* Frosted card — adapts to light/dark via surface token */
+        .lv3-card {
+            width: 100%; max-width: 410px;
+            background: color-mix(in srgb, var(--color-surface) 86%, transparent);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 0.5px solid color-mix(in srgb, var(--color-border), transparent 30%);
+            border-radius: 22px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.12);
+            padding: 36px 36px 32px;
+            color: var(--color-text-primary);
+        }
+        @media (max-width: 460px) { .lv3-card { padding: 28px 24px; } }
+        .lv3-card h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.03em; margin: 0 0 6px; text-align: center; }
+        .lv3-card .lv3-sub { font-size: 14px; color: var(--color-text-secondary); text-align: center; margin: 0 0 28px; }
+
+        .checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; }
+        .auth-link { color: var(--color-link); font-size: 13px; }
+        .auth-link:hover { color: var(--color-link-hover); }
+        .lv3-inline { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+        .btn-full { width: 100%; }
+        .lv3-foot { text-align: center; font-size: 13px; color: var(--color-text-secondary); margin-top: 22px; }
+
+        /* Featured announcements — frosted chips beneath the card, floating on the gradient */
+        .lv3-news { width: 100%; max-width: 560px; margin-top: 26px; }
+        .lv3-news-head { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.78); margin-bottom: 14px; }
+        .lv3-news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        @media (max-width: 600px) { .lv3-news-grid { grid-template-columns: 1fr; } }
+        .lv3-news-card {
+            display: block; text-decoration: none; color: #fff;
+            background: rgba(255,255,255,0.12);
+            border: 0.5px solid rgba(255,255,255,0.18);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            border-radius: 14px; padding: 13px 15px;
+            transition: background var(--transition-fast), transform var(--transition-fast);
+        }
+        .lv3-news-card:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); color: #fff; }
+        .lv3-news-title { font-size: 13px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.35; }
+        .lv3-news-date { font-size: 10.5px; color: rgba(255,255,255,0.7); margin-top: 6px; }
+        .lv3-news-empty { text-align: center; color: rgba(255,255,255,0.8); font-size: 13px; border: 0.5px dashed rgba(255,255,255,0.3); border-radius: 14px; padding: 18px; }
+
+        /* Floating theme toggle */
+        .lv3-theme {
+            position: fixed; top: 22px; right: 26px;
+            width: 38px; height: 38px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.16); border: 0.5px solid rgba(255,255,255,0.28);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            color: #fff; cursor: pointer; z-index: 5; transition: background var(--transition-fast);
+        }
+        .lv3-theme:hover { background: rgba(255,255,255,0.26); }
+        .lv3-theme svg { width: 18px; height: 18px; }
+        .lv3-theme .ico-sun { display: none; }
+        [data-theme="dark"] .lv3-theme .ico-sun { display: block; }
+        [data-theme="dark"] .lv3-theme .ico-moon { display: none; }
+
+        body[data-data="empty"] .lv3-news .when-full { display: none; }
+        body:not([data-data="empty"]) .lv3-news .when-empty { display: none; }
+    </style>
+</head>
+<body class="lv3" data-data="full" data-page-title="Sign in">
+
+<div data-include="partials/state-chip.html"></div>
+
+<button type="button" class="lv3-theme" onclick="toggleDarkMode()" aria-label="Toggle appearance" title="Toggle light / dark">
+    <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+
+<a href="index.html" class="lv3-brand">
+    <span class="lv3-brand-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/><line x1="6" y1="7.5" x2="6.01" y2="7.5"/><line x1="6" y1="16.5" x2="6.01" y2="16.5"/></svg></span>
+    Hostnodes
+</a>
+
+<div class="lv3-card">
+    <h1>Sign in</h1>
+    <p class="lv3-sub">Welcome back. Manage your services and billing.</p>
+
+    <form class="auth-form" onsubmit="return false;">
+        <div class="form-group">
+            <label class="form-label" for="email">Email address</label>
+            <input type="email" id="email" class="form-input" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="password-wrapper">
+                <input type="password" id="password" class="form-input" placeholder="Enter your password" autocomplete="current-password">
+                <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)" aria-label="Show password">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="lv3-inline">
+            <label class="checkbox-label"><input type="checkbox" class="form-checkbox"><span>Remember me</span></label>
+            <a href="password-reset.html" class="auth-link">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn-primary btn-lg btn-full">Sign in</button>
+    </form>
+
+    <div class="lv3-foot">New to Hostnodes? <a href="clientregister.html" class="auth-link">Create an account</a></div>
+</div>
+
+<!-- Featured announcements -->
+<div class="lv3-news">
+    <div class="lv3-news-head">Latest from Hostnodes</div>
+    <div class="when-full">
+        <div class="lv3-news-grid">
+            <a href="viewannouncement.html" class="lv3-news-card">
+                <div class="lv3-news-title">Singapore data center now live</div>
+                <div class="lv3-news-date">Apr 5, 2026</div>
+            </a>
+            <a href="viewannouncement.html" class="lv3-news-card">
+                <div class="lv3-news-title">Two-factor authentication available</div>
+                <div class="lv3-news-date">Mar 28, 2026</div>
+            </a>
+            <a href="viewannouncement.html" class="lv3-news-card">
+                <div class="lv3-news-title">Network upgrade — London DC</div>
+                <div class="lv3-news-date">Apr 10, 2026</div>
+            </a>
+        </div>
+    </div>
+    <div class="when-empty">
+        <div class="lv3-news-empty">No announcements right now — you're all caught up.</div>
+    </div>
+</div>
+
+<script src="js/apple-theme.js?v=12"></script>
+<script src="js/apple-layout.js?v=17"></script>
+<script>
+    function togglePasswordVisibility(btn) {
+        var input = btn.closest('.password-wrapper').querySelector('.form-input');
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in — Hostnodes</title>
+    <link rel="stylesheet" href="css/apple-theme.css?v=12">
+    <link rel="stylesheet" href="css/apple-layout.css?v=17">
+    <style>
+        /* ===== login-v5 — Split layout, styled native to the theme (calm surfaces + real cards) ===== */
+        body.lv5 { display: block; margin: 0; min-height: 100vh; background: var(--color-bg); color: var(--color-text-primary); font-family: var(--font-family); }
+        .lv5-grid { display: grid; grid-template-columns: 1fr 2fr; min-height: 100vh; }
+        @media (max-width: 900px) { .lv5-grid { grid-template-columns: 1fr; } }
+
+        /* --- Left: subtle theme panel with "what's new" --- */
+        .lv5-aside {
+            background: var(--color-surface-secondary);
+            border-right: 1px solid var(--color-border);
+            padding: 80px 52px; display: flex; flex-direction: column; justify-content: center;
+        }
+        @media (max-width: 900px) { .lv5-aside { display: none; } }
+        .lv5-brand { display: inline-flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 600; letter-spacing: -0.02em; color: var(--color-text-primary); }
+        .lv5-brand:hover { color: var(--color-text-primary); text-decoration: none; }
+        .lv5-brand-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--color-accent); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+        .lv5-brand-mark svg { width: 17px; height: 17px; }
+
+        .lv5-aside-copy { margin: 28px 0 24px; max-width: 420px; }
+        .lv5-aside-copy h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.025em; margin: 0 0 8px; color: var(--color-text-primary); }
+        .lv5-aside-copy p { font-size: 15px; line-height: 1.5; color: var(--color-text-secondary); margin: 0; }
+
+        .lv5-news { margin-top: 140px; }
+        .lv5-news-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .lv5-news-head h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-tertiary); margin: 0; }
+        .lv5-news-head a { font-size: 13px; color: var(--color-link); display: inline-flex; align-items: center; gap: 4px; }
+        .lv5-news-head a:hover { color: var(--color-link-hover); }
+        .lv5-news-list { display: flex; flex-direction: column; gap: 12px; }
+        .lv5-news-list .card { margin-bottom: 0; border: 0.5px solid var(--color-border); }
+
+        .lv5-news .announcement-title { font-size: 14px; letter-spacing: -0.012em; margin-bottom: 0; }
+        .lv5-news .announcement-excerpt { font-size: 13px; margin-top: 6px; -webkit-line-clamp: 2; }
+
+        .lv5-news-empty { background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 28px 20px; text-align: center; color: var(--color-text-secondary); font-size: 13px; }
+
+        /* --- Right: sign-in --- */
+        .lv5-main { display: flex; align-items: center; justify-content: center; padding: 48px 32px; position: relative; }
+        .lv5-card { width: 100%; max-width: 380px; }
+        .lv5-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 8px; }
+        .lv5-card h1 { font-size: 30px; font-weight: 600; letter-spacing: -0.03em; margin: 0 0 8px; color: var(--color-text-primary); }
+        .lv5-card .lv5-sub { font-size: 14px; color: var(--color-text-secondary); margin: 0 0 28px; line-height: 1.5; }
+        .checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; }
+        .auth-link { color: var(--color-link); font-size: 13px; }
+        .auth-link:hover { color: var(--color-link-hover); }
+        .lv5-inline { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+        .btn-full { width: 100%; }
+        .lv5-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; color: var(--color-text-tertiary); font-size: 12px; }
+        .lv5-divider::before, .lv5-divider::after { content: ""; flex: 1; height: 1px; background: var(--color-border); }
+        .lv5-sso { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .lv5-foot { text-align: center; font-size: 13px; color: var(--color-text-secondary); margin-top: 26px; }
+
+        /* Floating theme toggle — native surface style */
+        .lv5-theme {
+            position: absolute; top: 22px; right: 26px;
+            width: 36px; height: 36px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--color-surface); border: 0.5px solid var(--color-border);
+            color: var(--color-text-secondary); cursor: pointer; z-index: 5;
+            box-shadow: var(--shadow-card); transition: all var(--transition-fast);
+        }
+        .lv5-theme:hover { color: var(--color-text-primary); box-shadow: var(--shadow-card-hover); }
+        .lv5-theme svg { width: 17px; height: 17px; }
+        .lv5-theme .ico-sun { display: none; }
+        [data-theme="dark"] .lv5-theme .ico-sun { display: block; }
+        [data-theme="dark"] .lv5-theme .ico-moon { display: none; }
+
+        body[data-data="empty"] .lv5-news .when-full { display: none; }
+        body:not([data-data="empty"]) .lv5-news .when-empty { display: none; }
+    </style>
+</head>
+<body class="lv5" data-data="full" data-page-title="Sign in">
+
+<div data-include="partials/state-chip.html"></div>
+
+<div class="lv5-grid">
+
+    <!-- LEFT: theme-native panel + featured announcements -->
+    <aside class="lv5-aside">
+        <a href="index.html" class="lv5-brand">
+            <span class="lv5-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/><line x1="6" y1="7.5" x2="6.01" y2="7.5"/><line x1="6" y1="16.5" x2="6.01" y2="16.5"/></svg></span>
+            Hostnodes
+        </a>
+
+        <div class="lv5-aside-copy">
+            <h2>Welcome back.</h2>
+            <p>Manage your services, domains, invoices and support tickets — all from one control panel.</p>
+        </div>
+
+        <!-- Featured announcements (native cards) -->
+        <div class="lv5-news">
+            <div class="lv5-news-head">
+                <h3>What's new</h3>
+                <a href="announcements.html">All announcements <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+            </div>
+
+            <div class="when-full">
+                <div class="lv5-news-list">
+                    <div class="card">
+                        <div class="card-body">
+                            <a href="viewannouncement.html" class="announcement-link">
+                                <h3 class="announcement-title">New Singapore data center now available</h3>
+                                <p class="announcement-excerpt">All hosting plans can now be provisioned in our new Singapore region for lower latency across Asia-Pacific.</p>
+                                <div class="announcement-footer">
+                                    <div class="announcement-date">Apr 5, 2026</div>
+                                    <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <a href="viewannouncement.html" class="announcement-link">
+                                <h3 class="announcement-title">Two-factor authentication now available</h3>
+                                <p class="announcement-excerpt">Add an extra layer of security to your account — authenticator apps and SMS verification are both supported.</p>
+                                <div class="announcement-footer">
+                                    <div class="announcement-date">Mar 28, 2026</div>
+                                    <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <a href="viewannouncement.html" class="announcement-link">
+                                <h3 class="announcement-title">Scheduled network upgrade — London DC</h3>
+                                <p class="announcement-excerpt">A scheduled upgrade runs Apr 20, 02:00–06:00 UTC. Brief intermittent connectivity may occur during the window.</p>
+                                <div class="announcement-footer">
+                                    <div class="announcement-date">Apr 10, 2026</div>
+                                    <span class="service-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="when-empty">
+                <div class="lv5-news-empty">No announcements right now — you're all caught up.</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- RIGHT: sign-in -->
+    <main class="lv5-main">
+        <button type="button" class="lv5-theme" onclick="toggleDarkMode()" aria-label="Toggle appearance" title="Toggle light / dark">
+            <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+
+        <div class="lv5-card">
+            <p class="lv5-eyebrow">Account</p>
+            <h1>Sign in</h1>
+            <p class="lv5-sub">Use your Hostnodes email and password.</p>
+
+            <form class="auth-form" onsubmit="return false;">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email address</label>
+                    <input type="email" id="email" class="form-input" placeholder="you@example.com" autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" class="form-input" placeholder="Enter your password" autocomplete="current-password">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)" aria-label="Show password">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="lv5-inline">
+                    <label class="checkbox-label"><input type="checkbox" class="form-checkbox"><span>Remember me</span></label>
+                    <a href="password-reset.html" class="auth-link">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn-primary btn-lg btn-full">Sign in</button>
+            </form>
+
+            <div class="lv5-divider">or continue with</div>
+            <div class="lv5-sso">
+                <a href="#" class="btn-secondary"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16.365 1.43c0 1.14-.46 2.21-1.21 3-.83.88-2.19 1.56-3.32 1.47-.14-1.13.42-2.31 1.13-3.06.8-.84 2.22-1.46 3.4-1.41zM20.5 17.2c-.6 1.38-.88 2-1.66 3.22-1.08 1.7-2.6 3.82-4.5 3.84-1.68.02-2.11-1.1-4.39-1.08-2.28.01-2.76 1.1-4.44 1.08-1.9-.02-3.34-1.93-4.42-3.63C-1.5 16.6-1.86 9.9 1.34 6.6c1.13-1.17 2.6-1.86 4.18-1.86 1.7 0 2.77 1.1 4.18 1.1 1.36 0 2.19-1.1 4.16-1.1 1.4 0 2.88.76 3.94 2.08-3.46 1.9-2.9 6.84.7 8.28z"/></svg>Apple</a>
+                <a href="#" class="btn-secondary"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.57c2.08-1.92 3.27-4.74 3.27-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.76c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.47 14.97.5 12 .5A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 4.75 12 4.75z"/></svg>Google</a>
+            </div>
+
+            <div class="lv5-foot">New to Hostnodes? <a href="clientregister.html" class="auth-link">Create an account</a></div>
+        </div>
+    </main>
+
+</div>
+
+<script src="js/apple-theme.js?v=12"></script>
+<script src="js/apple-layout.js?v=17"></script>
+<script>
+    function togglePasswordVisibility(btn) {
+        var input = btn.closest('.password-wrapper').querySelector('.form-input');
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    }
+</script>
+</body>
+</html>
