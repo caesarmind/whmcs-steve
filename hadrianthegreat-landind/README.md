@@ -139,6 +139,36 @@ The three thumbnails in the announcement banner are deliberately still captures:
 they render at about 7% scale behind a mask, where a live frame would cost three
 more page renders above the fold to draw something illegible.
 
+### The Menu spotlight runs the admin panel
+
+The "Menu manager" block embeds the real panel from
+`../Hadrian by Caesarthemes/hadrian-admin-panel` rather than redrawing it. That
+app is hash-routed with a `hashchange` listener, so `#menu` deep-links straight
+to its Menu screen — the nav, the audience table, the Main/Secondary/Footer
+tabs. `AdminSpot` in hadrian-lp5-app.jsx; `view` picks the route, so `#pages`
+or `#styles` would work the same way.
+
+Two things this needed from `ThemeFrame`:
+
+- **A React root is not ready at load.** The client-area pages announce
+  themselves through `data-loaded` on their includes; this one has none and
+  mounts through Babel, so `frameStatus` now also waits for `#root` to have a
+  child. Without it the frame is revealed blank.
+- **`state.admin`** stops `paintFrame` after the colour mode. The panel keys off
+  the same `data-theme` and has no use for `data-layout` or the rest.
+
+The URL is the **directory, with its trailing slash** — not `index.html`. A host
+that rewrites `/x.html` to `/x` normalises `/dir/index.html` down to `/dir`, and
+without the trailing slash the browser treats the last segment as a file, so the
+panel's relative `apple-admin.jsx` resolves one directory too high and 404s into
+an empty root. This cost an hour once; leave the slash alone.
+
+`MenuSpot` stays as the fallback — off a `file://` URL, or with no network for
+the React and Babel the panel loads, the block shows the drawn mock instead.
+The panel is a second Babel app on the page (~1.8s to mount here) and loads
+eagerly, because the give-up timer starts at mount: `loading="lazy"` would
+expire it before a visitor ever scrolled down, pinning the block to the mock.
+
 ## Claims
 
 Everything the page states about the product was checked against

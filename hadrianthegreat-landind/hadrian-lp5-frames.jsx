@@ -31,12 +31,15 @@ function attr(el, name, value, dflt) {
 function paintFrame(doc, s) {
   if (!doc || !doc.body) return false;
   const html = doc.documentElement, body = doc.body;
+  html.setAttribute('data-theme', s.dark ? 'dark' : 'light');
+  // The admin panel keys off the same data-theme and nothing else here, so stop
+  // rather than writing client-area attributes onto a page with no use for them.
+  if (s.admin) return true;
   body.dataset.layout = s.layout || 'top';           // top | side | rail
   attr(body, 'data-sidebar', s.sidebar, 'light');    // light | dark | tinted | graphite | brand
   attr(body, 'data-align', s.align, 'center');       // center | left | content
   attr(body, 'data-icons', s.icons, 'colorful');     // colorful | mono
   attr(html, 'data-palette', s.palette, 'blue');     // blue | emerald | violet | rose | amber | slate
-  html.setAttribute('data-theme', s.dark ? 'dark' : 'light');
   if (s.auth) body.dataset.auth = s.auth;
   // the floating dev panel is ours, not the visitor's
   body.setAttribute('data-preview', 'off');
@@ -81,7 +84,12 @@ function sealFrame(doc) {
 function frameStatus(doc) {
   const inc = Array.prototype.slice.call(doc.querySelectorAll('[data-include]'));
   if (inc.some((n) => n.getAttribute('data-loaded') === 'error')) return 'failed';
-  return inc.every((n) => n.hasAttribute('data-loaded')) ? 'ready' : 'booting';
+  if (!inc.every((n) => n.hasAttribute('data-loaded'))) return 'booting';
+  // A page that mounts into #root -- the admin demo does, through Babel -- has a
+  // root still empty at load. Reveal it then and you reveal a blank frame.
+  const root = doc.getElementById('root');
+  if (root && !root.firstElementChild) return 'booting';
+  return 'ready';
 }
 
 /* ── scale ──────────────────────────────────────────────────────────────────
@@ -183,7 +191,7 @@ function Frame({ src, state, box, width, onReady, title, seal }) {
    Holds up to two mounted pages: the one on screen, and a new one booting behind
    it. The incoming page is only revealed once its partials have landed and its
    state has been written, so a page change never flashes the theme's defaults. */
-function ThemeFrame({ page, state, poster, alt, width = CA_WIDTH, className = '', inert = false }) {
+function ThemeFrame({ page, state, poster, fallback, alt, width = CA_WIDTH, className = '', inert = false }) {
   const wrap = React.useRef(null);
   const box = useFrameBox(wrap, width);
   const seq = React.useRef(1);
@@ -202,6 +210,8 @@ function ThemeFrame({ page, state, poster, alt, width = CA_WIDTH, className = ''
 
   return (
     <div ref={wrap} className={`hf-live${dead ? ' is-poster' : ''} ${className}`}>
+      {/* a capture when there is one, otherwise whatever the caller drew by hand */}
+      {dead && fallback ? <div className="hf-fallback">{fallback}</div> : null}
       {poster && <img className="hf-poster" src={poster} alt={dead ? alt : ''} loading="lazy" aria-hidden={dead ? undefined : 'true'} />}
       {!dead && slots.map((s, i) => (
         <div key={s.k} className="hf-slot" style={{ zIndex: i + 1 }} {...(inert ? { inert: '' } : {})}>

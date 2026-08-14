@@ -637,9 +637,39 @@ function Tiles() {
   );
 }
 
+/* ── the Menu spotlight runs the real admin panel ──
+   ../Hadrian by Caesarthemes/hadrian-admin-panel is the panel the module's
+   design follows, and it is hash-routed with a hashchange listener, so #menu
+   deep-links straight to its Menu page. Embedding it beats redrawing it: the
+   tree, the item form and the three menus are the actual screens.
+   MenuSpot stays as the fallback for the cases a frame cannot serve -- off a
+   file:// URL, or with no network for the React and Babel the panel loads. */
+/* The directory, with the trailing slash, not index.html: a static host that
+   rewrites /x.html to /x normalises /dir/index.html all the way down to /dir,
+   and a URL with no trailing slash makes the browser treat the last segment as
+   a file -- so the panel's relative apple-admin.jsx resolves one directory too
+   high and 404s, leaving an empty #root. Asking for the directory keeps the
+   base where the assets are. */
+const ADMIN_BASE = '../Hadrian by Caesarthemes/hadrian-admin-panel/';
+const ADMIN_WIDTH = 1180;   // narrower than the client area: the panel is one column of cards
+function AdminSpot({ view, dark, label }) {
+  const state = React.useMemo(() => ({ admin: true, dark }), [dark]);
+  return (
+    <div className="sp-adminframe">
+      <ThemeFrame
+        page={`${ADMIN_BASE}#${view}`}
+        state={state}
+        width={ADMIN_WIDTH}
+        alt={label}
+        fallback={<MenuSpot />}
+      />
+    </div>
+  );
+}
+
 /* ── .hp-spot: one block per feature, alternating side ── */
 const SPOTS = [
-  { id: 'menu', side: 'right', k: 'Menu manager', h: 'Three menus.\nEvery item, yours.', C: MenuSpot,
+  { id: 'menu', side: 'right', k: 'Menu manager', h: 'Three menus.\nEvery item, yours.', C: (p) => <AdminSpot view="menu" label="The Hadrian admin panel, Menu" {...p} />,
     p: 'Main, Secondary and Footer menus, each with its own tree. Drag items into order, nest them as deep as you need, and give every one its own type, icon and audience.',
     li: ['Nested items with drag-and-drop ordering', 'Per-item visibility by layout and login state', 'Language variables or a custom string, per item'] },
   { id: 'composer', side: 'left', k: 'Homepage composer', h: 'Compose the page\nthey land on.', C: BlocksSpot,
@@ -649,7 +679,7 @@ const SPOTS = [
     p: 'Titles, descriptions and indexing per page — and when a translation pass is due, the mass editor opens every installed language side by side instead of one at a time.',
     li: ['Per-page title, description and indexing', 'All installed WHMCS languages in one editor', 'Coverage shown per page, so nothing is missed'] },
 ];
-function Spotlights() {
+function Spotlights({ dark }) {
   return (
     <>
       {SPOTS.map((s) => (
@@ -663,7 +693,7 @@ function Spotlights() {
                 <ul>{s.li.map((t) => <li key={t}>{t}</li>)}</ul>
                 <a href="#demo" className="more">See it in the demo<span aria-hidden="true">›</span></a>
               </Up>
-              <Up className="vis"><Safe name={s.k}><s.C /></Safe></Up>
+              <Up className="vis"><Safe name={s.k}><s.C dark={dark} /></Safe></Up>
             </div>
           </div>
         </section>
@@ -1054,7 +1084,7 @@ function App() {
       <Nav dark={dark} onDark={() => setDark(!dark)} onDemo={openDemo} />
       <Hero onDemo={openDemo} dark={dark} />
       <Tiles />
-      <Spotlights />
+      <Spotlights dark={dark} />
       <LayoutTabs />
       <Pricing onDemo={openDemo} onFounding={openFounding} />
       <Extensions onFounding={openFounding} />
