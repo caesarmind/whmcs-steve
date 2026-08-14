@@ -1,0 +1,8 @@
+# Signing keys — NEVER commit. Covers both the Node dev keypair (keys/) and the
+# WHMCS module keypair (whmcs-module/MyThemeLicensing/keys/). They are local-only;
+# regenerate as needed. The theme embeds only the PUBLIC key (in License.php).
+**/*.pem
+
+node_modules/
+test/sample-response.json
+test/sample-nonce.txt

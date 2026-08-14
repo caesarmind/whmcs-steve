@@ -1,0 +1,20 @@
+{
+  "HOSTNODES-DEV-ACTIVE-0001": {
+    "status": "Active",
+    "expires": "2027-06-04T00:00:00Z",
+    "allowed_domains": ["bill.hostnodes.com", "localhost", "127.0.0.1"],
+    "features": ["dark-mode", "cms-pages"]
+  },
+  "HOSTNODES-DEV-EXPIRES-SOON": {
+    "status": "Active",
+    "expires": "2026-06-12T00:00:00Z",
+    "allowed_domains": ["bill.hostnodes.com", "localhost", "127.0.0.1"],
+    "features": ["dark-mode"]
+  },
+  "HOSTNODES-DEV-CANCELLED": {
+    "status": "Cancelled",
+    "expires": "2026-01-01T00:00:00Z",
+    "allowed_domains": ["bill.hostnodes.com"],
+    "features": []
+  }
+}

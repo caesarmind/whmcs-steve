@@ -1,0 +1,30 @@
+{
+  "768dc063be332276702018d716688497a2aa23d6457aba1d653ffdd07e4f0792": {
+    "status": "Active",
+    "expires": "2027-06-04T00:00:00Z",
+    "allowed_domains": ["bill.hostnodes.com"],
+    "features": ["dark-mode", "cms-pages"],
+    "max_domains": 2
+  },
+  "HOSTNODES-DEV-ACTIVE-0001": {
+    "status": "Active",
+    "expires": "2027-06-04T00:00:00Z",
+    "allowed_domains": ["bill.hostnodes.com", "localhost", "127.0.0.1"],
+    "features": ["dark-mode", "cms-pages"],
+    "max_domains": 3
+  },
+  "HOSTNODES-DEV-CANCELLED": {
+    "status": "Cancelled",
+    "expires": "2026-01-01T00:00:00Z",
+    "allowed_domains": ["bill.hostnodes.com"],
+    "features": [],
+    "max_domains": 1
+  },
+  "HOSTNODES-DEV-TOFU-UNBOUND": {
+    "status": "Active",
+    "expires": "2027-06-04T00:00:00Z",
+    "allowed_domains": [],
+    "features": ["dark-mode"],
+    "max_domains": 1
+  }
+}
