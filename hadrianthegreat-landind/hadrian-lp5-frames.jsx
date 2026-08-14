@@ -38,10 +38,6 @@ function paintFrame(doc, s) {
   attr(html, 'data-palette', s.palette, 'blue');     // blue | emerald | violet | rose | amber | slate
   html.setAttribute('data-theme', s.dark ? 'dark' : 'light');
   if (s.auth) body.dataset.auth = s.auth;
-  /* Per-design page options. Always written, never removed at the default:
-     apple-layout.js treats these the same way, because some CSS matches the
-     default value explicitly and dropping the attribute would unstyle it. */
-  if (s.attrs) Object.keys(s.attrs).forEach((k) => { if (s.attrs[k] != null) body.setAttribute(k, s.attrs[k]); });
   // the floating dev panel is ours, not the visitor's
   body.setAttribute('data-preview', 'off');
   body.classList.add('screenshot');
@@ -134,7 +130,7 @@ function Frame({ src, state, box, width, onReady, title, seal }) {
     if (!live) return;
     const f = ref.current;
     try { if (f && f.contentDocument) paintFrame(f.contentDocument, state); } catch (e) {}
-  }, [live, state.layout, state.palette, state.sidebar, state.align, state.icons, state.dark, state.auth, state.attrKey]);
+  }, [live, state.layout, state.palette, state.sidebar, state.align, state.icons, state.dark, state.auth]);
 
   React.useEffect(() => {
     const f = ref.current;

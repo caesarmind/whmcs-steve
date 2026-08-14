@@ -106,29 +106,6 @@ The mockup holds nineteen further explorations (v2-v19, v15-heavy, -boxed).
 They are deliberately not offered: a buyer cannot choose them. Browse those
 directly on the client-area server instead — see Open.
 
-Three of the four carry a page option of their own, and the strip shows it while
-that design is up — an inside/outside switch for the block labels, which each
-design names differently because each grew its own:
-
-| design | control | attribute | default |
-|---|---|---|---|
-| Atrium  | Block titles   | `data-card-titles` | inside |
-| Bento   | Tile titles    | `data-titles`      | inside |
-| Minimal | Section titles | `data-min-title`   | outside |
-| Classic | —              | —                  | — |
-
-Labels, defaults and tooltips are the module's, from each variant's
-`supportedOptions`. Inside keeps a label on its card; outside floats it on the
-page background above, so a column reads as labelled groups rather than boxes.
-Setting the attribute is enough — all three express it in CSS, so nothing has to
-re-render, and the switch is instant like the rest of the stage.
-
-`HF_DESIGN_OPTS` in hadrian-lp5-app.jsx holds the list, keyed by design. The
-variants declare further options the strip does not surface yet (band style,
-width, height and profile on Atrium and Bento; row counts and search thresholds
-on Minimal) — adding one is an entry in that array, provided the mockup honours
-the same attribute.
-
 ### Sidebar tones
 
 Light, Tinted, Solid and **Gradient**. The gradient is new: `--sidebar-bg` feeds a
