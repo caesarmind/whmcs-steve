@@ -651,13 +651,13 @@ function Tiles() {
    high and 404s, leaving an empty #root. Asking for the directory keeps the
    base where the assets are. */
 const ADMIN_BASE = '../Hadrian by Caesarthemes/hadrian-admin-panel/';
-const ADMIN_WIDTH = 1180;   // narrower than the client area: the panel is one column of cards
+const ADMIN_WIDTH = 760;   // the item list alone, so nearer life size than the full panel
 function AdminSpot({ view, dark, label }) {
   const state = React.useMemo(() => ({ admin: true, dark }), [dark]);
   return (
     <div className="sp-adminframe">
       <ThemeFrame
-        page={`${ADMIN_BASE}#${view}`}
+        page={`${ADMIN_BASE}?embed=1#${view}`}
         state={state}
         width={ADMIN_WIDTH}
         alt={label}

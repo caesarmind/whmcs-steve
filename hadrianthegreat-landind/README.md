@@ -142,17 +142,25 @@ more page renders above the fold to draw something illegible.
 ### The Menu spotlight runs the admin panel
 
 The "Menu manager" block embeds the real panel from
-`../Hadrian by Caesarthemes/hadrian-admin-panel` rather than redrawing it, and
-lands on the **item editor** — the nested tree with its drag handles, type
-badges, visibility toggles and up/down arrows — because that is what the block
-is selling. `AdminSpot` in hadrian-lp5-app.jsx takes the route as a prop.
+`../Hadrian by Caesarthemes/hadrian-admin-panel`, cropped to the item tree
+alone — the rows with their grips, type badges, nesting, visibility toggles,
+arrows and "+ Add item". No brand bar, no nav, no page head, no settings aside:
+the block sells drag-and-drop menu editing, so that is all it shows.
 
-The panel is hash-routed, and the route now takes an optional second segment:
-`#menu` still opens the menus list, `#menu/1` opens that menu's items. That is
-a two-line change in `apple-admin.jsx` (`route()` splits on `/`, `MenuPage`
-takes an `open` prop) and it leaves every existing route untouched — the
-alternative was reaching into the frame and clicking a row, which would have
-been a selector waiting to break.
+Two additions to the panel make that possible, and both are contracts rather
+than the landing page reaching into another app's DOM to hide things:
+
+- **`#menu/<id>`** — the route takes an optional second segment. `#menu` still
+  opens the menus list; `#menu/1` opens that menu's items.
+- **`?embed=1`** — renders the section on its own, without the shell. `MenuPage`
+  also drops its page head and settings column under it.
+
+Neither changes the panel's own behaviour: `''`, `#info`, `#menu`, `#pages` and
+`#styles` are unaffected, and `#menu/1` without the flag is still the full page.
+
+`AdminSpot` in hadrian-lp5-app.jsx takes the route as a prop, so `#pages` or
+`#styles` could be framed the same way. It renders at 760px and scales, nearer
+life size than the whole panel would be.
 
 Two things this needed from `ThemeFrame`:
 
@@ -169,9 +177,10 @@ without the trailing slash the browser treats the last segment as a file, so the
 panel's relative `apple-admin.jsx` resolves one directory too high and 404s into
 an empty root. Leave the slash alone.
 
-Dragging works inside the scaled frame — verified by dispatching a real
-dragstart/dragover/drop through the frame's own `DataTransfer`, and the arrow
-buttons move rows too, which is the path that survives a touch screen.
+Dragging works inside the scaled frame — verified by dispatching
+dragstart/dragover/drop through the frame's own `DataTransfer`, with a tick
+between them so React commits each one, and the arrow buttons move rows too,
+which is the path that survives a touch screen.
 
 `MenuSpot` stays as the fallback — off a `file://` URL, or with no network for
 the React and Babel the panel loads, the block shows the drawn mock instead.

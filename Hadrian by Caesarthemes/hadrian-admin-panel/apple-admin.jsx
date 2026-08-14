@@ -611,7 +611,7 @@ function ToolsPage() {
   );
 }
 
-function MenuPage({ open }) {
+function MenuPage({ open, embed }) {
   const [tab, setTab] = React.useState('main');
   const [saved, setSaved] = React.useState(false);
   const [items, setItems] = React.useState([
@@ -684,13 +684,13 @@ function MenuPage({ open }) {
   return (
     <div>
       {!selMenu && <PageHead eyebrow="Theme" title="Menu" sub="Build navigation menus and assign them to client or guest audiences — no hooks, no template edits." />}
-      {selMenu && (
+      {selMenu && !embed && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0 4px' }}>
           <button onClick={() => setSelectedMenu(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-secondary)', fontFamily: 'var(--font)', fontSize: 14, fontWeight: 500 }}>‹ Menus</button>
           <SaveBar onSave={save} />
         </div>
       )}
-      {selMenu && <PageHead eyebrow={`${selMenu.loc === 'main' ? 'Main' : selMenu.loc === 'secondary' ? 'Secondary' : 'Footer'} menu · ${audLabel(selMenu.audience)}`} title={selMenu.name} sub="Drag to reorder · expand an item to edit it." />}
+      {selMenu && !embed && <PageHead eyebrow={`${selMenu.loc === 'main' ? 'Main' : selMenu.loc === 'secondary' ? 'Secondary' : 'Footer'} menu · ${audLabel(selMenu.audience)}`} title={selMenu.name} sub="Drag to reorder · expand an item to edit it." />}
       {!selMenu && (
         <div className="adm-tabs">
           {tabs.map((t) => <button key={t.id} className={`adm-tab ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>{t.label}</button>)}
@@ -727,10 +727,10 @@ function MenuPage({ open }) {
       )}
 
       {selMenu && (
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: embed ? '1fr' : '1fr 300px', gap: 20, alignItems: 'start' }}>
         {/* items */}
         <div className="adm-card pad">
-          <Section title="Menu items" sub="Drag to reorder · toggle visibility · expand dropdowns">
+          <Section title={embed ? null : 'Menu items'} sub={embed ? null : 'Drag to reorder · toggle visibility · expand dropdowns'}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {items.map((it, i) => {
                 const next = items[i + 1];
@@ -790,6 +790,7 @@ function MenuPage({ open }) {
         </div>
 
         {/* settings */}
+        {!embed && (
         <div className="adm-card pad" style={{ position: 'sticky', top: 84 }}>
           <div style={{ fontFamily: 'var(--font)', fontSize: 17, fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--color-text-primary)', marginBottom: 16 }}>Menu settings</div>
           <div style={{ marginBottom: 16 }}>
@@ -802,6 +803,7 @@ function MenuPage({ open }) {
             <div style={{ fontFamily: 'var(--font)', fontSize: 11.5, color: 'var(--color-text-tertiary)', lineHeight: 1.5 }}>Changes apply when you save from the bar below.</div>
           </div>
         </div>
+        )}
       </div>
       )}
     </div>
@@ -2167,6 +2169,10 @@ const NAV = [
 
 function AppleAdmin() {
   /* #menu/1 -- a section, optionally a thing inside it */
+  /* ?embed=1 renders the section on its own -- no brand bar, no nav, no page
+     head -- so another page can frame one part of the panel without reaching
+     into this app's DOM to hide the rest. */
+  const embed = new URLSearchParams(location.search).get('embed') === '1';
   const route = () => ((location.hash || '#info').replace('#', '') || 'info').split('/');
   const [view, setView] = React.useState(() => route()[0]);
   const [sub, setSub] = React.useState(() => route()[1]);
@@ -2188,12 +2194,13 @@ function AppleAdmin() {
     case 'layouts': page = <LayoutsPage />; break;
     case 'branding': page = <BrandingPage />; break;
     case 'tools': page = <ToolsPage />; break;
-    case 'menu': page = <MenuPage open={sub} />; break;
+    case 'menu': page = <MenuPage open={sub} embed={embed} />; break;
     case 'pages': page = <PagesPage />; break;
     case 'styles': page = <StylesPage />; break;
     default: page = <Placeholder title={NAV.find((n) => n.id === view)?.label || 'Section'} />;
   }
 
+  if (embed) return <div className="admin adm-embedded"><div className="adm-body">{page}</div></div>;
   return (
     <div className="admin">
       <div className="adm-brandbar">

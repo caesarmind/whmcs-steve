@@ -159,3 +159,11 @@
   .adm-field-grid { grid-template-columns: 1fr; }
   .adm-title { font-size: 32px; }
 }
+
+/* ── ?embed=1 ──────────────────────────────────────────────────────────────
+   One section of the panel, framed by another page. The shell is gone in the
+   JSX; this just takes the body padding off so the card sits flush in whatever
+   box it was given. */
+.adm-embedded .adm-body { padding: 0; max-width: none; }
+.adm-embedded .adm-card { border: 0; box-shadow: none; background: transparent; }
+.adm-embedded .adm-card.pad { padding: 0; }
