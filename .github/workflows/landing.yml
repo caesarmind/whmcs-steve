@@ -1,0 +1,76 @@
+name: Deploy landing page
+
+# Its own file, not another job in main.yml, because `paths:` applies to a whole
+# workflow rather than to one job: sharing a file would mean every theme push
+# also rebuilt and re-uploaded the landing site. Here it fires only when
+# something the landing is actually made of has changed.
+#
+# The destination is deliberately NOT main.yml's REMOTE_BASE. That is the WHMCS
+# billing root, and a marketing index.html on top of it would sit in front of
+# the client area's own entry point.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'hadrianthegreat-landind/**'          # the page itself
+      - 'apple-client-area/**'                # the hero embeds these live
+      - 'Hadrian by Caesarthemes/hadrian-admin-panel/**'   # so does the Menu block
+      - 'scripts/build-landing.mjs'
+      - '.github/workflows/landing.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy-landing:
+    runs-on: ubuntu-latest
+    env:
+      REMOTE_HOST: cp2.de.namespace.life
+      REMOTE_USER: whymege
+      REMOTE_PORT: '22'
+      REMOTE_LANDING: /home/whymege/hadrianthegreat.com
+      LANDING_SITE_URL: https://hadrianthegreat.com/
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # dist/ is build output. Ship it if it was committed, build it if it was
+      # gitignored — so this works either way and needs no decision made first.
+      - name: Get dist/
+        run: |
+          if [ -f hadrianthegreat-landind/dist/index.html ]; then
+            echo "Using the committed dist/"
+          else
+            echo "No dist/ in the checkout — building it"
+            node scripts/build-landing.mjs
+          fi
+          test -f hadrianthegreat-landind/dist/index.html \
+            || { echo "::error::no dist/index.html to deploy"; exit 1; }
+          du -sh hadrianthegreat-landind/dist
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.CPANEL }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          # Non-fatal, as in main.yml: the deploy below uses
+          # StrictHostKeyChecking=no, so known_hosts is never consulted.
+          ssh-keyscan -p "$REMOTE_PORT" -t ed25519 "$REMOTE_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Upload to hadrianthegreat.com
+        run: |
+          SSH="ssh -i $HOME/.ssh/id_ed25519 -p $REMOTE_PORT -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST"
+
+          # The whole tree, every time. dist/ is regenerated from scratch by the
+          # build, so "only the changed files" would be all of them anyway.
+          # `-C dist .` is what strips the wrapper: dist/index.html arrives as
+          # index.html, not dist/index.html.
+          # Extract is additive — nothing already on the server is removed, so a
+          # renamed file leaves its old copy behind. Swap the tar for
+          # `rsync -az --delete` if that ever matters, but only once you have
+          # watched this land in the right directory at least once.
+          tar czf - -C hadrianthegreat-landind/dist . \
+            | $SSH "mkdir -p '$REMOTE_LANDING' && tar xzpf - -C '$REMOTE_LANDING' && echo '✅ landing upload complete'"
