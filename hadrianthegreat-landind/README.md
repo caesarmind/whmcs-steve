@@ -232,11 +232,16 @@ unpkg; the only third-party call left is Google Fonts, for Cinzel.
 3. **It works in a subdirectory.** Every path is relative, and the two the app
    resolves at runtime come from `window.HADRIAN_PATHS`, which the build writes
    into each page's `<head>`.
-4. **Still to do before launch:** `screens/` is 2.9 MB of PNG at 2880px wide,
-   displayed at about 890 and only used as a poster and the `file://` fallback —
-   resized and converted to WebP that is under 200 KB. There is also no meta
-   description and no OG tags, so the page previews as nothing when shared, and
-   the body is an empty `#root` until JS runs.
+4. **Still to do before launch:** there is no meta description and no OG tags,
+   so the page previews as nothing when shared, and the body is an empty
+   `#root` until JS runs — a sales page that Google has to execute to read.
+
+The build re-encodes `screens/` on the way out: 2,894 KB of 2880px PNG becomes
+328 KB of 1600px WebP, and the compiled JS is rewritten to match. The captures
+are the poster behind the hero frame and the `file://` fallback, shown at about
+890px, so nothing visible is lost. If the encoder cannot be reached the PNGs are
+copied through unchanged, on the grounds that a heavy page beats a broken one.
+A whole page load is now about 210 KB.
 
 ### Editing after a build
 

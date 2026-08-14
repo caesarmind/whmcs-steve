@@ -41,6 +41,11 @@ const RENAME = {
   'Hadrian Landing Imperial.html': 'index.html',
   'Hadrian About.html': 'about.html',
 };
+/* Asset renames are kept apart from RENAME because the page list is derived
+   from RENAME's keys -- a screens/*.png entry in there would be treated as a
+   page to build. Both maps are applied wherever text is rewritten. */
+const ASSET_RENAME = {};
+
 const REACT = [
   ['react.production.min.js', 'https://unpkg.com/react@18.3.1/umd/react.production.min.js'],
   ['react-dom.production.min.js', 'https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js'],
@@ -102,7 +107,7 @@ ${js}`;
    nine links to the landing inside its JSX, which no amount of HTML rewriting
    would have reached. */
 function applyRenames(text) {
-  for (const [from, to] of Object.entries(RENAME)) {
+  for (const [from, to] of Object.entries({ ...RENAME, ...ASSET_RENAME })) {
     text = text.split(from).join(to).split(encodeURI(from)).join(to);
   }
   return text;
@@ -129,6 +134,46 @@ const pages = Object.keys(RENAME).map((file) => {
   return { file, out: RENAME[file], html, jsx };
 });
 
+/* screens/ stays at the root, NOT under assets/: the JSX asks for
+   "screens/sidebar-dashboard.png" relative to the page, and the page is the
+   document root here. The images the CSS asks for do live in assets/, because
+   they resolve relative to the stylesheet. Two different bases, both correct.
+
+   The captures are 2880px wide and shown at about 890 -- and since the hero went
+   live they are only the poster and the file:// fallback. Re-encoded to WebP at
+   1600px they drop from 2.9 MB to about 340 KB with nothing visible lost. The
+   rename is added to RENAME so the compiled JS follows, exactly as the page
+   renames do. If the encoder cannot be reached the PNGs are copied as they are,
+   because a heavy page beats a broken one. */
+{
+  const from = path.join(SRC, 'screens');
+  const to = path.join(OUT, 'screens');
+  mk(to);
+  let before = 0, after = 0, encoded = 0;
+  for (const f of fs.readdirSync(from).filter((n) => /\.png$/i.test(n))) {
+    const src = path.join(from, f);
+    const webp = f.replace(/\.png$/i, '.webp');
+    before += sizeOf(src);
+    try {
+      // paths quoted by hand: shell:true does not quote for us, and this repo
+      // sits under a directory with a space in it
+      execFileSync('npx', ['--yes', 'sharp-cli', '-i', `"${src}"`, '-o', `"${path.join(to, webp)}"`,
+        '-f', 'webp', '-q', '78', 'resize', '1600'],
+        { stdio: 'ignore', shell: true, timeout: 180000 });
+      if (!fs.existsSync(path.join(to, webp))) throw new Error('no output');
+      ASSET_RENAME[`screens/${f}`] = `screens/${webp}`;
+      after += sizeOf(path.join(to, webp));
+      encoded++;
+    } catch (e) {
+      copy(src, path.join(to, f));
+      after += sizeOf(path.join(to, f));
+    }
+  }
+  say(encoded
+    ? `screens/     ${encoded} re-encoded to webp — ${kb(before)} down to ${kb(after)}`
+    : `screens/     copied as png (encoder unavailable) — ${kb(after)}`);
+}
+
 for (const p of pages) {
   const jsName = p.out.replace(/\.html$/, '.js');
   fs.writeFileSync(path.join(OUT, 'assets', jsName), applyRenames(compile(p.jsx)));
@@ -140,12 +185,6 @@ for (const p of pages) {
 for (const f of fs.readdirSync(SRC)) {
   if (/\.(css|png|jpe?g|svg|webp|ico)$/i.test(f)) copy(path.join(SRC, f), path.join(OUT, 'assets', f));
 }
-/* screens/ stays at the root, NOT under assets/: the JSX asks for
-   "screens/sidebar-dashboard.png" relative to the page, and the page is the
-   document root here. The images the CSS asks for do live in assets/, because
-   they resolve relative to the stylesheet. Two different bases, both correct. */
-copy(path.join(SRC, 'screens'), path.join(OUT, 'screens'));
-say('assets/      css and images copied · screens/ at the root');
 
 // React, fetched once and served from your own domain
 for (const [file, url] of REACT) {
