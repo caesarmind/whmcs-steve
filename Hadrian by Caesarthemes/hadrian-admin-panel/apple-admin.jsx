@@ -611,7 +611,7 @@ function ToolsPage() {
   );
 }
 
-function MenuPage() {
+function MenuPage({ open }) {
   const [tab, setTab] = React.useState('main');
   const [saved, setSaved] = React.useState(false);
   const [items, setItems] = React.useState([
@@ -638,7 +638,10 @@ function MenuPage() {
     { id: 8, loc: 'footer', name: 'Footer · Guest', audience: 'guest', items: 3, active: false },
   ];
   const menus = allMenus.filter((m) => m.loc === tab);
-  const [selectedMenu, setSelectedMenu] = React.useState(null);
+  /* `open` comes from the #menu/<id> route, so the item editor can be linked to
+     directly -- the landing page embeds it that way to show the tree. Absent, it
+     opens on the menus list exactly as before. */
+  const [selectedMenu, setSelectedMenu] = React.useState(open ? Number(open) : null);
   const selMenu = allMenus.find((m) => m.id === selectedMenu);
   const audClass = (a) => a === 'guest' ? 'orange' : a === 'all' ? 'gray' : 'blue';
   const audLabel = (a) => a === 'guest' ? 'Guest' : a === 'all' ? 'All' : 'Client';
@@ -2163,17 +2166,20 @@ const NAV = [
 ];
 
 function AppleAdmin() {
-  const [view, setView] = React.useState(() => (location.hash || '#info').replace('#', '') || 'info');
+  /* #menu/1 -- a section, optionally a thing inside it */
+  const route = () => ((location.hash || '#info').replace('#', '') || 'info').split('/');
+  const [view, setView] = React.useState(() => route()[0]);
+  const [sub, setSub] = React.useState(() => route()[1]);
   const [dark, setDark] = React.useState(() => { try { return localStorage.getItem('hadrian-aadm-theme') === 'dark'; } catch (e) { return false; } });
   React.useEffect(() => {
-    const h = () => setView((location.hash || '#info').replace('#', '') || 'info');
+    const h = () => { const r = route(); setView(r[0]); setSub(r[1]); };
     window.addEventListener('hashchange', h); return () => window.removeEventListener('hashchange', h);
   }, []);
   React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
     try { localStorage.setItem('hadrian-aadm-theme', dark ? 'dark' : 'light'); } catch (e) {}
   }, [dark]);
-  const go = (id) => { location.hash = `#${id}`; setView(id); };
+  const go = (id) => { location.hash = `#${id}`; setView(id); setSub(undefined); };
 
   let page;
   switch (view) {
@@ -2182,7 +2188,7 @@ function AppleAdmin() {
     case 'layouts': page = <LayoutsPage />; break;
     case 'branding': page = <BrandingPage />; break;
     case 'tools': page = <ToolsPage />; break;
-    case 'menu': page = <MenuPage />; break;
+    case 'menu': page = <MenuPage open={sub} />; break;
     case 'pages': page = <PagesPage />; break;
     case 'styles': page = <StylesPage />; break;
     default: page = <Placeholder title={NAV.find((n) => n.id === view)?.label || 'Section'} />;

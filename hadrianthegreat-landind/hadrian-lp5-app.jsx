@@ -669,7 +669,7 @@ function AdminSpot({ view, dark, label }) {
 
 /* ── .hp-spot: one block per feature, alternating side ── */
 const SPOTS = [
-  { id: 'menu', side: 'right', k: 'Menu manager', h: 'Three menus.\nEvery item, yours.', C: (p) => <AdminSpot view="menu" label="The Hadrian admin panel, Menu" {...p} />,
+  { id: 'menu', side: 'right', k: 'Menu manager', h: 'Three menus.\nEvery item, yours.', C: (p) => <AdminSpot view="menu/1" label="The Hadrian admin panel, Menu items" {...p} />,
     p: 'Main, Secondary and Footer menus, each with its own tree. Drag items into order, nest them as deep as you need, and give every one its own type, icon and audience.',
     li: ['Nested items with drag-and-drop ordering', 'Per-item visibility by layout and login state', 'Language variables or a custom string, per item'] },
   { id: 'composer', side: 'left', k: 'Homepage composer', h: 'Compose the page\nthey land on.', C: BlocksSpot,

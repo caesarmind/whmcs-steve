@@ -142,11 +142,17 @@ more page renders above the fold to draw something illegible.
 ### The Menu spotlight runs the admin panel
 
 The "Menu manager" block embeds the real panel from
-`../Hadrian by Caesarthemes/hadrian-admin-panel` rather than redrawing it. That
-app is hash-routed with a `hashchange` listener, so `#menu` deep-links straight
-to its Menu screen — the nav, the audience table, the Main/Secondary/Footer
-tabs. `AdminSpot` in hadrian-lp5-app.jsx; `view` picks the route, so `#pages`
-or `#styles` would work the same way.
+`../Hadrian by Caesarthemes/hadrian-admin-panel` rather than redrawing it, and
+lands on the **item editor** — the nested tree with its drag handles, type
+badges, visibility toggles and up/down arrows — because that is what the block
+is selling. `AdminSpot` in hadrian-lp5-app.jsx takes the route as a prop.
+
+The panel is hash-routed, and the route now takes an optional second segment:
+`#menu` still opens the menus list, `#menu/1` opens that menu's items. That is
+a two-line change in `apple-admin.jsx` (`route()` splits on `/`, `MenuPage`
+takes an `open` prop) and it leaves every existing route untouched — the
+alternative was reaching into the frame and clicking a row, which would have
+been a selector waiting to break.
 
 Two things this needed from `ThemeFrame`:
 
@@ -161,7 +167,11 @@ The URL is the **directory, with its trailing slash** — not `index.html`. A ho
 that rewrites `/x.html` to `/x` normalises `/dir/index.html` down to `/dir`, and
 without the trailing slash the browser treats the last segment as a file, so the
 panel's relative `apple-admin.jsx` resolves one directory too high and 404s into
-an empty root. This cost an hour once; leave the slash alone.
+an empty root. Leave the slash alone.
+
+Dragging works inside the scaled frame — verified by dispatching a real
+dragstart/dragover/drop through the frame's own `DataTransfer`, and the arrow
+buttons move rows too, which is the path that survives a touch screen.
 
 `MenuSpot` stays as the fallback — off a `file://` URL, or with no network for
 the React and Babel the panel loads, the block shows the drawn mock instead.
