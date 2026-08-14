@@ -351,6 +351,38 @@ function useHFReel({ layIds, layId, setLay, palette, setPalette, ms = 3200 }) {
     bind: { onMouseEnter: () => setHover(true), onMouseLeave: () => setHover(false) },
     manual: (fn) => (...a) => { setOn(false); fn(...a); } };
 }
+/* The stage is a fraction of the panel, and saying so with figures reads better
+   than saying so with an apology. Every number here was counted in ../hadrian:
+   102 page dirs, 133 'var' rows across core/config, 4 menu locations, 11 blocks
+   on Atrium. Keep them counted, not estimated. */
+const HF_MISSING = [
+  ['96 more pages', 'each with its own template, SEO and layout override'],
+  ['133 design tokens', 'colours, typography, buttons, forms, elements'],
+  ['The homepage composer', 'up to eleven blocks, dragged into order and sized'],
+  ['Four menu locations', 'nested, each item shown by layout and login state'],
+  ['A layout per audience', 'guests get one, clients another, on the same URL'],
+  ['Alignment, menu side, the account block', 'and a sub-nav with per-page exceptions'],
+];
+function HeroMore() {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <div className={`hf-more${open ? ' open' : ''}`}>
+      <p className="hf-more-line">
+        Every control on this stage is real. It is also a corner of the panel —
+        <b> six of 102 pages</b>, and not one of the <b>133 tokens</b>.
+      </p>
+      <button className="hf-more-btn" onClick={() => setOpen(!open)} aria-expanded={open}>
+        {open ? 'Close' : 'What would not fit'}
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+      </button>
+      {open && (
+        <ul className="hf-more-list">
+          {HF_MISSING.map(([h, s]) => <li key={h}><b>{h}</b><span>{s}</span></li>)}
+        </ul>
+      )}
+    </div>
+  );
+}
 function HeroStage({ dark }) {
   // off a file:// URL nothing can embed, so offer only the pages we hold a capture of
   const pages = React.useMemo(() => (CA_EMBEDDABLE ? HF_PAGES : HF_PAGES.filter((p) => hfPoster(p.id, 'side'))), []);
@@ -439,6 +471,7 @@ function HeroStage({ dark }) {
         </div>
       </div>
       <div className="hf-note">{CA_EMBEDDABLE ? 'The real client area, live — scroll inside the window ↓' : 'Serve this folder over http to run the client area live in the window'}</div>
+      <HeroMore />
     </div>
   );
 }
@@ -505,7 +538,7 @@ const TILES = [
     long2: 'Because it is tokens in the database rather than edits in a template, a restyle survives every WHMCS update. Shape lives elsewhere on purpose: corner radius, shadows, button and form treatment are their own panels, so changing the brand colour never quietly changes the furniture.',
     steps: [['Pick a style', 'Default, Emerald, Violet, Rose, Amber or Slate — applied across the client area.'], ['Edit any row', 'The preset seeds the colour editor; every token stays editable in place.'], ['Go further', 'Typography, buttons, forms and elements are separate panels — 129 tokens in all.']],
     caption: 'One palette, every accent follows',
-    points: ['Six shipped styles: Default, Emerald, Violet, Rose, Amber, Slate', 'Activating a style seeds its palette into editable rows', '130 tokens across colours, type, buttons, forms and elements', 'Dark mode runs across all six, as a mode rather than a seventh style'],
+    points: ['Six shipped styles: Default, Emerald, Violet, Rose, Amber, Slate', 'Activating a style seeds its palette into editable rows', '133 tokens across colours, type, buttons, forms and elements', 'Dark mode runs across all six, as a mode rather than a seventh style'],
     meta: ['Styles editor', '6 styles', 'Light + dark'],
   },
   {

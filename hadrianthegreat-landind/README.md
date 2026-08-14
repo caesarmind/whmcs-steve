@@ -73,6 +73,17 @@ of it. `ThemeFrame` (hadrian-lp5-frames.jsx) handles it:
 - **Fallback.** `data-loaded="error"` on any partial, or a non-http origin, drops
   the frame and shows the matching capture from `screens/`.
 
+### Saying it is only a corner
+
+Under the stage sits one line and a disclosure: what the hero holds against what
+ships — six of 102 pages, none of the 133 tokens — with a short list behind
+"What would not fit". Figures rather than an apology: a demo that admits its own
+edges is more convincing than one that implies it is the whole product.
+
+Every number in `HF_MISSING` and that line was counted in `../hadrian`, not
+estimated: 102 page directories, 133 `'var'` rows across `core/config`, four
+menu locations, eleven blocks on Atrium. Recount before editing them.
+
 ### Dashboard designs
 
 The dashboard is the one page with more than one design, so it gets a second
@@ -146,7 +157,7 @@ Everything the page states about the product was checked against
   Minimal 7), not twelve, and there is no Knowledge base block
 - SEO has character counters at 64/160, not a Google-style snippet preview
 - typography has one `--font-family`; headings and body cannot take different
-  families. 130 tokens in total, and the editor has no search
+  families. 133 tokens in total, and the editor has no search
 - Custom CSS is site-wide, not per style; there is no fork/duplicate path
 - alignment is a Sidebar and Icon Rail option (along with menu side and the
   account block). Top Nav declares none
