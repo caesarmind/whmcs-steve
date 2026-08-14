@@ -83,14 +83,22 @@ across the swap.
 
 Each maps to the mockup file it was drawn as:
 
-| shipped variant | mockup file |
-|---|---|
-| Default | `clientareahome-v9.html` |
-| Atrium  | `clientareahome-v18.html` |
-| Bento   | `clientareahome-v17.html` |
-| Minimal | `clientareahome-v15.html` |
+| strip | module variant | mockup file |
+|---|---|---|
+| Atrium  | Atrium  | `clientareahome-v18.html` |
+| Bento   | Bento   | `clientareahome-v17.html` |
+| Minimal | Minimal | `clientareahome-v15.html` |
+| Classic | Default | `clientareahome-v9.html` |
 
-Names and descriptions are lifted verbatim from
+Atrium leads and opens the hero; Classic sits last. The strip calls the module
+variant Default "Classic", because it reads as the older shape rather than a
+fallback -- the only label here that is not the module word.
+
+Atrium runs with its Summary figures block switched off: the module ships that
+row as a toggle, so the mockup hides it with one rule in
+`clientareahome-v18.html` rather than deleting the markup.
+
+Names and descriptions are otherwise lifted verbatim from
 `core/pages/clientareahome/<v>/<v>.php`, so the strip says exactly what the
 Pages editor says. The list is one array, `HF_DESIGNS` in hadrian-lp5-app.jsx.
 

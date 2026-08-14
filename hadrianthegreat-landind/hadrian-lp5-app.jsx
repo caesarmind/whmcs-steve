@@ -188,7 +188,7 @@ function AccentPanel({ dark, onDark }) {
    hadrian-lp5-frames.jsx. Every control writes a real setting into a real page,
    so there is nothing here the theme cannot actually do. */
 const HF_PAGES = [
-  { id: 'dashboard', t: 'Dashboard', src: 'clientareahome.html', designs: true },
+  { id: 'dashboard', t: 'Dashboard', src: 'clientareahome-v18.html', designs: true },
   { id: 'services', t: 'Services', src: 'clientareaproducts.html' },
   { id: 'store', t: 'Store', src: 'store.html' },
   { id: 'invoice', t: 'Invoice', src: 'viewinvoice.html' },
@@ -197,20 +197,21 @@ const HF_PAGES = [
 ];
 /* The four dashboard designs the module ships, and the mockup file each one was
    drawn as. Names and descriptions are the module's own, straight out of
-   core/pages/clientareahome/<v>/<v>.php, so this list says exactly what the
-   Pages editor says. Picking one swaps the frame src, which the A/B slot
-   absorbs without a flash.
+   core/pages/clientareahome/<v>/<v>.php, so this list says what the Pages
+   editor says -- except Default, which the module leaves undescribed and which
+   reads as Classic here, since it is the older shape rather than the fallback.
+   Picking one swaps the frame src, which the A/B slot absorbs without a flash.
    (The mockup holds nineteen further explorations, v2-v19 and -boxed. They are
    not offered here: a buyer cannot choose them.) */
 const HF_DESIGNS = [
-  { id: 'default', t: 'Default', f: 'clientareahome-v9.html',
-    s: 'The dashboard as it ships: a greeting hero over plain tables.' },
   { id: 'atrium', t: 'Atrium', f: 'clientareahome-v18.html',
-    s: 'A welcome band over four summary figures, then an asymmetric two-column body: the collections you read down the wide side, the things you act on down the narrow one. Width assigns a block to a column rather than sizing it on a grid, so reordering moves a block within its column.' },
+    s: 'A welcome band, then an asymmetric two-column body: the collections you read down the wide side, the things you act on down the narrow one. Width assigns a block to a column rather than sizing it on a grid, so reordering moves a block within its column.' },
   { id: 'bento', t: 'Bento', f: 'clientareahome-v17.html',
     s: 'A bento grid of self-contained cards. Each collection gets its own tile with a count and its rows, arranged two-up on a six-column grid. Adds an attention strip that pulls the few things needing action out of the many rows, and an identity card beside the greeting.' },
   { id: 'minimal', t: 'Minimal', f: 'clientareahome-v15.html',
     s: 'A quieter dashboard: greeting, four summary tiles, quick actions, then services, domains, invoices, tickets and announcements as plain rows on one surface. No panel grid or account sub-nav aside.' },
+  { id: 'default', t: 'Classic', f: 'clientareahome-v9.html',
+    s: 'The familiar shape: a greeting hero over plain tables, one after another.' },
 ];
 const hfDesign = (id) => HF_DESIGNS.find((d) => d.id === id) || HF_DESIGNS[0];
 /* the captures stay on as posters — they cover the first boot, and they are the
@@ -356,7 +357,7 @@ function HeroStage({ dark }) {
   const [page, setPage] = React.useState(pages[0].id);
   const [lay, setLay] = React.useState('side');
   const [tone, setTone] = React.useState('light');
-  const [design, setDesign] = React.useState('default');
+  const [design, setDesign] = React.useState('atrium');
   const [palette, setPalette] = React.useState('blue');
   const pg = pages.find((p) => p.id === page) || pages[0];
   const pal = HF_PALETTES.find((p) => p.id === palette) || HF_PALETTES[0];
