@@ -587,3 +587,6 @@ button.hp-foundtag:hover{border-color:var(--color-accent)}
 
 /* .pg — frame for the admin mocks in hadrian-lp5-spotlight.jsx */
 .pg{font-family:var(--font);background:var(--color-surface);color:var(--color-text-primary)}
+/* a design's own page options, shown only while that design is up */
+.hf-designopt{display:inline-flex;align-items:center;gap:9px;margin-top:2px}
+.hf-designopt .hf-lbl{padding:0}

@@ -213,6 +213,35 @@ const HF_DESIGNS = [
   { id: 'default', t: 'Classic', f: 'clientareahome-v9.html',
     s: 'The familiar shape: a greeting hero over plain tables, one after another.' },
 ];
+/* Per-design page options. These are variant-scoped in the module too -- a
+   supportedOptions block on the variant rather than a theme-wide setting -- so
+   each control only exists while the design that declares it is showing.
+   Labels and defaults are the module's; `attr` is what the mockup keys off, and
+   all three differ because each design grew its own. Setting the attribute is
+   enough: the pages express this in CSS, so nothing needs re-rendering. */
+const HF_DESIGN_OPTS = {
+  atrium: [{
+    key: 'titles', attr: 'data-card-titles', def: 'inside', label: 'Block titles',
+    values: [
+      { id: 'inside', t: 'Inside', hint: 'Each block stays self-contained: its label sits on the card, which is how the dashboard was drawn' },
+      { id: 'outside', t: 'Outside', hint: 'The label floats on the page background above the card, so a column reads as labelled groups rather than boxes' },
+    ],
+  }],
+  bento: [{
+    key: 'titles', attr: 'data-titles', def: 'inside', label: 'Tile titles',
+    values: [
+      { id: 'inside', t: 'Inside', hint: 'Label and count sit on the card, which is how the bento grid was drawn' },
+      { id: 'outside', t: 'Outside', hint: 'Label and count float above the card, so a row of tiles reads as labelled groups' },
+    ],
+  }],
+  minimal: [{
+    key: 'titles', attr: 'data-min-title', def: 'outside', label: 'Section titles',
+    values: [
+      { id: 'outside', t: 'Outside', hint: 'Each section label floats on the page background above its list' },
+      { id: 'inside', t: 'Inside', hint: 'The label row becomes a card header joined to the list below it' },
+    ],
+  }],
+};
 const hfDesign = (id) => HF_DESIGNS.find((d) => d.id === id) || HF_DESIGNS[0];
 /* the captures stay on as posters — they cover the first boot, and they are the
    whole show when this folder is opened off disk, where the theme's own pages
@@ -358,6 +387,7 @@ function HeroStage({ dark }) {
   const [lay, setLay] = React.useState('side');
   const [tone, setTone] = React.useState('light');
   const [design, setDesign] = React.useState('atrium');
+  const [opts, setOpts] = React.useState({});
   const [palette, setPalette] = React.useState('blue');
   const pg = pages.find((p) => p.id === page) || pages[0];
   const pal = HF_PALETTES.find((p) => p.id === palette) || HF_PALETTES[0];
@@ -365,14 +395,20 @@ function HeroStage({ dark }) {
   // shell — a design with no partials has nothing for layout or tone to act on
   const dsn = pg.designs ? hfDesign(design) : null;
   const src = dsn ? dsn.f : pg.src;
+  const dsnOpts = (dsn && HF_DESIGN_OPTS[dsn.id]) || [];
+  const optVal = (o) => opts[dsn.id + '.' + o.key] || o.def;
+  const attrs = {};
+  dsnOpts.forEach((o) => { attrs[o.attr] = optVal(o); });
   // a top bar has no side menu to retone, and the login page ships its own chrome
   const toneable = lay !== 'top';
   const layIds = CA_EMBEDDABLE ? HF_LAYOUTS.map((l) => l.wire) : Object.keys(HF_SHOTS[pg.id] || { side: 1 });
   const layId = layIds.indexOf(lay) === -1 ? (layIds[0] || 'top') : lay;
   const reel = useHFReel({ layIds, layId, setLay, palette, setPalette });
+  const attrKey = JSON.stringify(attrs);
   const state = React.useMemo(() => ({
     layout: layId, palette, sidebar: toneable ? tone : 'light', dark, auth: pg.auth || 'in',
-  }), [layId, palette, tone, toneable, dark, pg.auth]);
+    attrs: JSON.parse(attrKey), attrKey,
+  }), [layId, palette, tone, toneable, dark, pg.auth, attrKey]);
   return (
     <div className="hf" style={{ '--color-accent': pal.c, '--color-accent-light': `color-mix(in srgb, ${pal.c} 12%, transparent)`, '--on-accent-tint': `color-mix(in srgb, ${pal.c} 74%, #000)`, '--color-chrome': hfChromeSolid(toneable ? tone : 'light', pal.c, dark, pal.id), '--color-chrome-ink': hfChromeInk(toneable ? tone : 'light', dark) }} {...reel.bind} data-screen-label="Hero screens">
       <div className="hf-pagectl">
@@ -399,6 +435,19 @@ function HeroStage({ dark }) {
             ))}
           </span>
           <p className="hf-designnote">{dsn ? dsn.s : ''}</p>
+          {dsnOpts.map((o) => (
+            <span key={o.key} className="hf-designopt">
+              <span className="hf-lbl">{o.label}</span>
+              <span className="hf-seg" role="tablist" aria-label={o.label}>
+                {o.values.map((v) => (
+                  <button key={v.id} role="tab" aria-selected={optVal(o) === v.id} title={v.hint}
+                          onClick={reel.manual(() => setOpts((p) => ({ ...p, [dsn.id + '.' + o.key]: v.id })))}>
+                    {v.t}
+                  </button>
+                ))}
+              </span>
+            </span>
+          ))}
         </div>
       )}
       <div className="hf-picker" role="tablist" aria-label="Navigation layout">
