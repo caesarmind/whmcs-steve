@@ -44,6 +44,12 @@ function paintFrame(doc, s) {
   attr(body, 'data-align', s.align, 'center');       // center | left | content
   attr(body, 'data-icons', s.icons, 'colorful');     // colorful | mono
   attr(html, 'data-palette', s.palette, 'blue');     // blue | emerald | violet | rose | amber | slate
+  // Top-bar controls. menu and toplinks are generic rows in apple-layout.js,
+  // which ALWAYS write their attribute -- some CSS matches the default value
+  // explicitly -- so they are set rather than removed at the default.
+  body.setAttribute('data-menu', s.menu || 'left');            // left | center
+  body.setAttribute('data-toplinks', s.toplinks || 'show');   // show | hide
+  attr(body, 'data-crumbs', s.crumbs, 'trail');              // trail | plain | pill | chevron | back | none
   if (s.auth) body.dataset.auth = s.auth;
   // the floating dev panel is ours, not the visitor's
   body.setAttribute('data-preview', 'off');
@@ -142,7 +148,7 @@ function Frame({ src, state, box, width, onReady, title, seal }) {
     if (!live) return;
     const f = ref.current;
     try { if (f && f.contentDocument) paintFrame(f.contentDocument, state); } catch (e) {}
-  }, [live, state.layout, state.palette, state.sidebar, state.align, state.icons, state.dark, state.auth]);
+  }, [live, state.layout, state.palette, state.sidebar, state.align, state.icons, state.dark, state.auth, state.menu, state.toplinks, state.crumbs]);
 
   React.useEffect(() => {
     const f = ref.current;
