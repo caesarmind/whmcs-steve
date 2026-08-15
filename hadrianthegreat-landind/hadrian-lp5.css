@@ -619,12 +619,12 @@ button.hp-foundtag:hover{border-color:var(--color-accent)}
    and clips — so it stays within the window rather than floating on the page.
    Kept small: it overlays a live demo, and anything bigger stops being a nudge
    and starts being a panel in the way. */
-.hf-toast{position:absolute;top:10px;right:10px;z-index:4;max-width:min(240px,74%);font-family:var(--font)}
-.hf-toast-cue{display:flex;align-items:center;gap:6px;padding:5px 9px 5px 8px;border-radius:999px;border:1px solid var(--color-border);background:color-mix(in srgb,var(--color-surface) 88%,transparent);backdrop-filter:blur(14px) saturate(180%);-webkit-backdrop-filter:blur(14px) saturate(180%);box-shadow:0 8px 22px -12px rgba(0,0,0,.45);font-family:var(--font);font-size:11px;font-weight:600;letter-spacing:-.005em;color:var(--color-text-primary);cursor:pointer;white-space:nowrap;animation:hfToastIn .34s var(--ease) both}
+.hf-toast{position:absolute;top:10px;right:10px;transition:top .25s var(--ease),right .25s var(--ease);z-index:4;max-width:min(240px,74%);font-family:var(--font)}
+.hf-toast-cue{display:flex;align-items:center;gap:6px;padding:5px 9px 5px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--color-border) 70%,transparent);background:color-mix(in srgb,var(--color-surface) 62%,transparent);backdrop-filter:blur(18px) saturate(200%);-webkit-backdrop-filter:blur(18px) saturate(200%);box-shadow:0 6px 18px -10px rgba(0,0,0,.38);font-family:var(--font);font-size:11px;font-weight:600;letter-spacing:-.005em;color:var(--color-text-primary);cursor:pointer;white-space:nowrap;animation:hfToastIn .34s var(--ease) both}
 .hf-toast-cue:hover{border-color:color-mix(in srgb,var(--color-accent) 55%,transparent)}
 .hf-toast-cue .dot{width:5px;height:5px;border-radius:50%;background:var(--color-accent);flex-shrink:0;animation:hfToastPulse 2.4s ease-out infinite}
 .hf-toast-cue .go{color:var(--color-text-tertiary);font-size:12px;line-height:1}
-.hf-toast-panel{border-radius:12px;border:1px solid var(--color-border);background:color-mix(in srgb,var(--color-surface) 94%,transparent);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);box-shadow:0 14px 36px -16px rgba(0,0,0,.5);padding:9px;animation:hfToastIn .26s var(--ease) both}
+.hf-toast-panel{border-radius:12px;border:1px solid color-mix(in srgb,var(--color-border) 70%,transparent);background:color-mix(in srgb,var(--color-surface) 78%,transparent);backdrop-filter:blur(22px) saturate(200%);-webkit-backdrop-filter:blur(22px) saturate(200%);box-shadow:0 12px 30px -14px rgba(0,0,0,.42);padding:9px;animation:hfToastIn .26s var(--ease) both}
 .hf-toast-panel .hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hf-toast-panel .hd b{font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--color-text-tertiary)}
 .hf-toast-panel .hd button{background:none;border:none;cursor:pointer;font-size:11px;line-height:1;color:var(--color-text-tertiary);padding:1px}

@@ -242,9 +242,45 @@ const hfDesign = (id) => HF_DESIGNS.find((d) => d.id === id) || HF_DESIGNS[0];
    Shown once per visit: an offer that keeps coming back is an interruption.
    1.6s, not longer: the frame settles near 1.3s, so this lands just after the
    band paints and while a visitor is still looking at it. */
-function HFBandToast({ band, onPick, onClose, open, onOpen }) {
+/* Where the band actually is, in the parent's coordinates.
+   The frame is laid out at 1440 and transform-scaled, so a rect read inside it
+   has to be multiplied by that scale to mean anything out here. Measured rather
+   than assumed: the band sits lower in the Top Nav layout than in the Sidebar
+   one, and the scale changes with the viewport, so a fixed offset would drift
+   off the band on half the combinations. Returns null while the frame is still
+   booting, which keeps the prompt hidden until there is something to point at. */
+function useBandAnchor(active) {
+  const [pos, setPos] = React.useState(null);
+  React.useEffect(() => {
+    if (!active) { setPos(null); return; }
+    let stop = false;
+    const measure = () => {
+      if (stop) return;
+      const art = document.querySelector('.hf-art');
+      const frame = art && art.querySelector('.hf-frame');
+      if (!art || !frame) return setPos(null);
+      let band = null;
+      try { band = frame.contentDocument.querySelector('.dash-hero, .at-hero, .lp-hero'); } catch (e) {}
+      if (!band) return setPos(null);
+      const scale = frame.getBoundingClientRect().width / (frame.offsetWidth || CA_WIDTH);
+      const b = band.getBoundingClientRect();
+      const artW = art.getBoundingClientRect().width;
+      setPos({
+        top: Math.max(6, b.top * scale + 8),
+        right: Math.max(6, artW - b.right * scale + 8),
+      });
+    };
+    measure();
+    const t = setInterval(measure, 500);      // the frame scrolls and rescales under it
+    window.addEventListener('resize', measure);
+    return () => { stop = true; clearInterval(t); window.removeEventListener('resize', measure); };
+  }, [active]);
+  return pos;
+}
+
+function HFBandToast({ band, onPick, onClose, open, onOpen, pos }) {
   return (
-    <div className={`hf-toast${open ? ' open' : ''}`} role="region" aria-label="Welcome band style">
+    <div className={`hf-toast${open ? ' open' : ''}`} style={pos ? { top: pos.top, right: pos.right } : undefined} role="region" aria-label="Welcome band style">
       {!open ? (
         <button className="hf-toast-cue" onClick={onOpen}>
           <span className="dot" aria-hidden="true"></span>
@@ -467,6 +503,7 @@ function HeroStage({ dark }) {
   // Only where there is a band to change, and only once: the timer starts on
   // mount rather than per design, so switching dashboards does not re-offer it.
   const hasBand = !!(dsn && dsn.band);
+  const bandPos = useBandAnchor(hasBand && (toast === 'cue' || toast === 'open'));
   React.useEffect(() => {
     if (!hasBand || toast !== null) return;
     const t = setTimeout(() => setToast((s) => (s === null ? 'cue' : s)), 1600);
@@ -536,6 +573,7 @@ function HeroStage({ dark }) {
             />
             {hasBand && (toast === 'cue' || toast === 'open') && (
               <HFBandToast
+                pos={bandPos}
                 open={toast === 'open'}
                 band={band}
                 onOpen={reel.manual(() => setToast('open'))}
