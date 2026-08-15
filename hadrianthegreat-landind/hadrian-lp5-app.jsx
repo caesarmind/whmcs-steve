@@ -260,8 +260,6 @@ const HF_BANDS = [
    Labels are the ones the pages are known by rather than their headlines,
    which are marketing sentences. */
 const HF_STORE = [
-  { id: 'order', t: 'Order', f: 'store.html',
-    s: 'The store index — every plan a client can order, with a 30-day money-back guarantee on all of them.' },
   { id: 'ssl', t: 'SSL Certificates', f: 'ssl-certificates.html',
     s: 'Trusted certificates by validation level, from domain validation up to extended and wildcard.' },
   { id: 'security', t: 'Website Security', f: 'website-security.html',
@@ -550,7 +548,7 @@ function HeroStage({ dark }) {
   const [tone, setTone] = React.useState('light');
   // one remembered pick per page that ships more than one design, so leaving the
   // page and coming back does not reset the choice
-  const [variant, setVariant] = React.useState({ dashboard: 'atrium', login: 'split', store: 'order' });
+  const [variant, setVariant] = React.useState({ dashboard: 'atrium', login: 'split', store: 'ssl' });
   const [band, setBand] = React.useState('gradient');
   const [bandSize, setBandSize] = React.useState('full');
   // null = not yet offered, 'cue' = the nudge is up, 'open' = the options are,

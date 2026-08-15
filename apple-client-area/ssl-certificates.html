@@ -35,7 +35,7 @@
 <!-- Rail + Sidebar layouts -->
 <div data-include="partials/rail.html"></div>
 <div data-include="partials/rail-panels.html"></div>
-<div data-include="partials/sidebar.html"></div>
+<!-- sidebar moved into .app-shell below (boxed layout wraps sidebar + content) -->
 
 <div class="ph-main-wrap">
 
@@ -147,13 +147,11 @@
     </div>
 </nav>
 
-<!-- PAGE CONTENT -->
-<div class="content-area">
-    <header class="page-header">
-        <p class="page-eyebrow">SSL</p>
-        <h1>SSL Certificates</h1>
-        <p class="page-subtitle">Protect your sites with trusted certificates</p>
-    </header>
+<!-- PAGE CONTENT - full-bleed sections, no content-area cap (each manages its own width) -->
+<!-- .app-shell: boxed layout wraps sidebar + content; transparent passthrough in top/side/rail -->
+<div class="app-shell">
+<div class="app-shell-aside" data-include="partials/sidebar.html"></div>
+<div class="app-shell-content">
 
     <div class="when-full">
         <!-- 1. Hero Split -->
@@ -572,7 +570,10 @@
         <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">SSL info is being updated. Try again later.</p>
         <a href="index.html" class="btn-primary">Home</a>
     </div>
-</div>
+
+
+</div><!-- /.app-shell-content -->
+</div><!-- /.app-shell -->
 
 <!-- Inner-layout slim footer -->
 <div data-include="partials/sidebar-footer.html"></div>
