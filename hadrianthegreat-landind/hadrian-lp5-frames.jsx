@@ -50,9 +50,6 @@ function paintFrame(doc, s) {
   body.setAttribute('data-menu', s.menu || 'left');            // left | center
   body.setAttribute('data-toplinks', s.toplinks || 'show');   // show | hide
   attr(body, 'data-crumbs', s.crumbs, 'trail');              // trail | plain | pill | chevron | back | none
-  // the welcome band, on the dashboards that have one. gradient is the base
-  // look with no rule behind it, so it is expressed by removing the attribute.
-  attr(body, 'data-hero-tone', s.band, 'gradient');
   if (s.auth) body.dataset.auth = s.auth;
   // the floating dev panel is ours, not the visitor's
   body.setAttribute('data-preview', 'off');
@@ -151,7 +148,7 @@ function Frame({ src, state, box, width, onReady, title, seal }) {
     if (!live) return;
     const f = ref.current;
     try { if (f && f.contentDocument) paintFrame(f.contentDocument, state); } catch (e) {}
-  }, [live, state.layout, state.palette, state.sidebar, state.align, state.icons, state.dark, state.auth, state.menu, state.toplinks, state.crumbs, state.band]);
+  }, [live, state.layout, state.palette, state.sidebar, state.align, state.icons, state.dark, state.auth, state.menu, state.toplinks, state.crumbs]);
 
   React.useEffect(() => {
     const f = ref.current;
