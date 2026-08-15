@@ -404,7 +404,7 @@ function HeroStage({ dark }) {
   const layId = layIds.indexOf(lay) === -1 ? (layIds[0] || 'top') : lay;
   const reel = useHFReel({ layIds, layId, setLay, palette, setPalette });
   const state = React.useMemo(() => ({
-    dark, auth: pg.auth || 'in',
+    layout: layId, palette, sidebar: toneable ? tone : 'light', dark, auth: pg.auth || 'in',
     // Fixed, not offered: the hero shows the top bar the way the demo is set
     // up, rather than making a visitor assemble it. Change these three, not a
     // control -- they are the same values the state chip writes.
