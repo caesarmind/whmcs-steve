@@ -283,34 +283,6 @@ const hfChrome = (tone, accent, dark, paletteId) => {
 const hfChromeSolid = (tone, accent, dark, paletteId) =>
   (!dark && tone === 'gradient' ? hfMix(accent, hfGradStops(paletteId)[1]) : hfChrome(tone, accent, dark, paletteId));
 const hfChromeInk = (tone, dark) => (dark || tone === 'brand' || tone === 'gradient' ? '#f5f5f7' : '#1d1d1f');
-/* ── the chrome controls under the layout picker ──
-   Straight out of the state chip in apple-client-area: same attributes, same
-   values, same defaults. Menu and Top links only exist in the Top Nav layout --
-   .homepage-nav is `only-top`, so there is no bar to move or strip in the other
-   two, and they are not offered there rather than being offered and doing
-   nothing. */
-const HF_CRUMBS = [
-  { id: 'trail', t: 'Trail' },
-  { id: 'plain', t: 'Plain' },
-  { id: 'pill', t: 'Pill' },
-  { id: 'chevron', t: 'Chevron' },
-  { id: 'back', t: 'Back' },
-  { id: 'none', t: 'Off' },
-];
-const HF_MENU = [{ id: 'left', t: 'Left' }, { id: 'center', t: 'Centred' }];
-const HF_TOPLINKS = [{ id: 'show', t: 'Show' }, { id: 'hide', t: 'Hide' }];
-function HFOpt({ label, value, onPick, opts }) {
-  return (
-    <span className="hf-opt">
-      <span className="hf-lbl">{label}</span>
-      <span className="hf-seg sm" role="tablist" aria-label={label}>
-        {opts.map((o) => (
-          <button key={o.id} role="tab" aria-selected={value === o.id} onClick={() => onPick(o.id)}>{o.t}</button>
-        ))}
-      </span>
-    </span>
-  );
-}
 
 /* the layout wireframes, same geometry as Hadrian's admin Layouts page */
 function HFWire({ kind, active }) {
@@ -420,9 +392,6 @@ function HeroStage({ dark }) {
   const [tone, setTone] = React.useState('light');
   const [design, setDesign] = React.useState('atrium');
   const [palette, setPalette] = React.useState('blue');
-  const [crumbs, setCrumbs] = React.useState('trail');
-  const [menu, setMenu] = React.useState('left');
-  const [toplinks, setToplinks] = React.useState('show');
   const pg = pages.find((p) => p.id === page) || pages[0];
   const pal = HF_PALETTES.find((p) => p.id === palette) || HF_PALETTES[0];
   // only the dashboard has more than one design, and one of those brings its own
@@ -435,8 +404,12 @@ function HeroStage({ dark }) {
   const layId = layIds.indexOf(lay) === -1 ? (layIds[0] || 'top') : lay;
   const reel = useHFReel({ layIds, layId, setLay, palette, setPalette });
   const state = React.useMemo(() => ({
-    layout: layId, palette, sidebar: toneable ? tone : 'light', dark, auth: pg.auth || 'in', crumbs, menu, toplinks,
-  }), [layId, palette, tone, toneable, dark, pg.auth, crumbs, menu, toplinks]);
+    dark, auth: pg.auth || 'in',
+    // Fixed, not offered: the hero shows the top bar the way the demo is set
+    // up, rather than making a visitor assemble it. Change these three, not a
+    // control -- they are the same values the state chip writes.
+    menu: 'center', toplinks: 'show', crumbs: 'none',
+  }), [layId, palette, tone, toneable, dark, pg.auth]);
   return (
     <div className="hf" style={{ '--color-accent': pal.c, '--color-accent-light': `color-mix(in srgb, ${pal.c} 12%, transparent)`, '--on-accent-tint': `color-mix(in srgb, ${pal.c} 74%, #000)`, '--color-chrome': hfChromeSolid(toneable ? tone : 'light', pal.c, dark, pal.id), '--color-chrome-ink': hfChromeInk(toneable ? tone : 'light', dark) }} {...reel.bind} data-screen-label="Hero screens">
       <div className="hf-pagectl">
@@ -472,11 +445,6 @@ function HeroStage({ dark }) {
             <b>{p.t}</b><span>{p.s}</span>
           </button>
         ))}
-      </div>
-      <div className="hf-opts">
-        <HFOpt label="Breadcrumb" value={crumbs} opts={HF_CRUMBS} onPick={reel.manual((v) => setCrumbs(v))} />
-        {layId === 'top' && <HFOpt label="Menu" value={menu} opts={HF_MENU} onPick={reel.manual((v) => setMenu(v))} />}
-        {layId === 'top' && <HFOpt label="Top links" value={toplinks} opts={HF_TOPLINKS} onPick={reel.manual((v) => setToplinks(v))} />}
       </div>
       <div className="hf-stage">
         <div className="hf-rail left" role="tablist" aria-label="Sidebar tone">

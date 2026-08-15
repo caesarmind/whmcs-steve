@@ -611,12 +611,3 @@ button.hp-foundtag:hover{border-color:var(--color-accent)}
 .sp-adminframe{background:var(--color-surface);border:1px solid var(--color-border);border-radius:16px;overflow:hidden;box-shadow:0 34px 80px -38px rgba(0,0,0,.34);height:clamp(360px,42vw,520px)}
 .hf-fallback{position:absolute;inset:0;overflow:auto;overscroll-behavior:contain}
 .hf-fallback .sp-mock{border:0;border-radius:0;box-shadow:none}
-
-/* ── chrome controls: breadcrumb, and the top bar's own two ────────────────
-   One wrapping row under the layout picker. Smaller than the page control
-   above it on purpose — these are refinements, not the headline choice. */
-.hf-opts{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 22px;margin-top:16px;padding:0 clamp(16px,2.6vw,40px)}
-.hf-opt{display:inline-flex;align-items:center;gap:8px}
-.hf-opt .hf-lbl{padding:0}
-.hf-seg.sm button{font-size:11px;padding:4px 10px}
-@media (max-width:700px){.hf-opts{gap:8px 14px}.hf-seg.sm button{padding:4px 9px}}
