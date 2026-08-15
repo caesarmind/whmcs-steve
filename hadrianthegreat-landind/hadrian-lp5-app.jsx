@@ -239,14 +239,16 @@ const hfDesign = (id) => HF_DESIGNS.find((d) => d.id === id) || HF_DESIGNS[0];
    It waits until the frame has settled, points at the thing it is offering to
    change, and is gone the moment it is used or dismissed -- so the hero keeps
    four controls and still tells a visitor the band is a setting.
-   Shown once per visit: an offer that keeps coming back is an interruption. */
+   Shown once per visit: an offer that keeps coming back is an interruption.
+   1.6s, not longer: the frame settles near 1.3s, so this lands just after the
+   band paints and while a visitor is still looking at it. */
 function HFBandToast({ band, onPick, onClose, open, onOpen }) {
   return (
     <div className={`hf-toast${open ? ' open' : ''}`} role="region" aria-label="Welcome band style">
       {!open ? (
         <button className="hf-toast-cue" onClick={onOpen}>
           <span className="dot" aria-hidden="true"></span>
-          <span>This band is a setting — change it</span>
+          <span>Change this band</span>
           <span className="go" aria-hidden="true">›</span>
         </button>
       ) : (
@@ -262,7 +264,7 @@ function HFBandToast({ band, onPick, onClose, open, onOpen }) {
                       onClick={() => onPick(b.id)}>{b.t}</button>
             ))}
           </div>
-          <p className="ft">Four of the five that ship. Set per dashboard in the Pages editor.</p>
+          <p className="ft">Four of the five that ship.</p>
         </div>
       )}
     </div>
@@ -467,7 +469,7 @@ function HeroStage({ dark }) {
   const hasBand = !!(dsn && dsn.band);
   React.useEffect(() => {
     if (!hasBand || toast !== null) return;
-    const t = setTimeout(() => setToast((s) => (s === null ? 'cue' : s)), 4200);
+    const t = setTimeout(() => setToast((s) => (s === null ? 'cue' : s)), 1600);
     return () => clearTimeout(t);
   }, [hasBand, toast]);
   const state = React.useMemo(() => ({
