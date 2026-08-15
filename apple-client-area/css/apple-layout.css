@@ -421,6 +421,15 @@ html:not([data-theme="dark"]) body[data-sidebar="gradient"] .ph-rail .profile-dr
 .brand-logo { display: block; width: auto; object-fit: contain; }
 .homepage-nav .brand-logo { height: 28px; max-width: 180px; }
 .sidebar-header .brand-logo { height: 28px; max-width: 160px; }
+/* The artwork is near-black, so it disappears on every dark field. The comment
+   above has always said so; this is the rule that does it. Dark mode covers the
+   whole page; the tone selectors cover a dark menu or header while the rest of
+   the page stays light. */
+html[data-theme="dark"] .brand-logo,
+html:not([data-theme="dark"]) body[data-sidebar="dark"] .sidebar-header .brand-logo,
+html:not([data-theme="dark"]) body[data-sidebar="graphite"] .sidebar-header .brand-logo,
+html:not([data-theme="dark"]) body[data-sidebar="brand"] .sidebar-header .brand-logo,
+html:not([data-theme="dark"]) body[data-sidebar="gradient"] .sidebar-header .brand-logo { filter: invert(1) brightness(1.9); }
 /* Breathing room between the brand and the first menu item: the nav row gap
    (28px) alone leaves the logo crowding "Services". The deployed theme adds
    this same margin on .nav-logo, so matching it keeps the demos in step. */

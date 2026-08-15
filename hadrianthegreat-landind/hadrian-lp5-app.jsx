@@ -252,27 +252,27 @@ const HF_BANDS = [
   { id: 'brand', t: 'Solid', s: 'Filled with the accent' },
 ];
 
-/* The storefront pages the theme ships, under the Store tab. Two families:
-   the order index and the two client-area pages take the portal chrome and so
-   answer the layout and tone controls; the four marketing pages are
-   homepage-layout, carry their own <nav class="homepage-nav"> and never read
-   data-layout or data-sidebar, so they are flagged shell + marketing and those
-   controls grey out on them rather than no-op. Labels are the ones the pages
-   are known by rather than their headlines, which are marketing sentences. */
+/* The storefront pages the theme ships, under the Store tab. All seven now carry
+   the portal chrome -- four of them were homepage-layout with no layout engine
+   loaded at all, and were converted to match the two that already had it -- so
+   every one answers the layout and tone controls. Their marketing nav is marked
+   only-top, so it shows under Top Nav and gives way to the sidebar or rail.
+   Labels are the ones the pages are known by rather than their headlines,
+   which are marketing sentences. */
 const HF_STORE = [
   { id: 'order', t: 'Order', f: 'store.html',
     s: 'The store index — every plan a client can order, with a 30-day money-back guarantee on all of them.' },
   { id: 'ssl', t: 'SSL Certificates', f: 'ssl-certificates.html',
     s: 'Trusted certificates by validation level, from domain validation up to extended and wildcard.' },
-  { id: 'security', t: 'Website Security', f: 'website-security.html', shell: false, marketing: true,
+  { id: 'security', t: 'Website Security', f: 'website-security.html',
     s: 'SiteLock malware scanning — automatic scans and reputation protection, sold as a storefront page.' },
-  { id: 'backup', t: 'Website Backup', f: 'website-backup.html', shell: false, marketing: true,
+  { id: 'backup', t: 'Website Backup', f: 'website-backup.html',
     s: 'CodeGuard daily automated backups, against viruses, hackers and your own code breaking the site.' },
-  { id: 'seo', t: 'SEO Tools', f: 'seo-tools.html', shell: false, marketing: true,
+  { id: 'seo', t: 'SEO Tools', f: 'seo-tools.html',
     s: 'marketgoo SEO tools — visibility, traffic and the reporting that goes with them.' },
   { id: 'monitoring', t: '360 Monitoring', f: 'monitoring-360.html',
     s: 'Uptime and performance checks from global probes, with a free assessment on the way in.' },
-  { id: 'nordvpn', t: 'NordVPN', f: 'nordvpn.html', shell: false, marketing: true,
+  { id: 'nordvpn', t: 'NordVPN', f: 'nordvpn.html',
     s: 'Connection encryption and IP concealment, sold alongside the hosting.' },
 ];
 /* Which list a page's design picker draws from, and what that picker is called. */

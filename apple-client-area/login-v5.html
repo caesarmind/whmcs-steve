@@ -19,6 +19,68 @@
             padding: 80px 52px; display: flex; flex-direction: column; justify-content: center;
         }
         @media (max-width: 900px) { .lv5-aside { display: none; } }
+
+        /* ===== PANEL TONES (chip: Panel) =========================
+           The left panel is this page's coloured field, so it takes the same
+           six treatments the left sidebar offers. Light is the authored look;
+           the dark family flips the ink that sits on the panel, while the
+           announcement cards inside keep their own surface. */
+        body.lv5[data-panel="tinted"] .lv5-aside {
+            background: color-mix(in srgb, var(--color-accent) 10%, #ffffff);
+            border-right-color: color-mix(in srgb, var(--color-accent) 16%, #ffffff);
+        }
+        body.lv5[data-panel="dark"] .lv5-aside { background: #1c1c1e; }
+        body.lv5[data-panel="graphite"] .lv5-aside { background: #21252e; }
+        body.lv5[data-panel="brand"] .lv5-aside { background: var(--color-accent); }
+        body.lv5[data-panel="gradient"] .lv5-aside {
+            background: linear-gradient(160deg,
+                color-mix(in srgb, var(--color-accent) 86%, #2a1a55),
+                color-mix(in srgb, var(--color-accent) 56%, #000));
+        }
+        /* dark family: the panel's own text has to come up off the field */
+        body.lv5:is([data-panel="dark"], [data-panel="graphite"], [data-panel="brand"], [data-panel="gradient"]) .lv5-aside {
+            border-right-color: rgba(255,255,255,0.14);
+        }
+        body.lv5:is([data-panel="dark"], [data-panel="graphite"], [data-panel="brand"], [data-panel="gradient"]) .lv5-aside :is(h2, .lv5-brand, .lv5-news-head h3) { color: #fff; }
+        body.lv5:is([data-panel="dark"], [data-panel="graphite"], [data-panel="brand"], [data-panel="gradient"]) .lv5-aside :is(p, .lv5-news-head a) { color: rgba(255,255,255,0.8); }
+        /* Outside mode drops the white card the posts were sitting on, so their
+           own ink (announcement-title, chevron, date) has to come up too or the
+           headings render dark-on-dark. */
+        body.lv5:is([data-panel="dark"], [data-panel="graphite"], [data-panel="brand"], [data-panel="gradient"]) .lv5-news-list :is(.announcement-title, .service-chevron) { color: #fff; }
+        body.lv5:is([data-panel="dark"], [data-panel="graphite"], [data-panel="brand"], [data-panel="gradient"]) .lv5-news-list :is(.announcement-date, .announcement-excerpt, .card p, .card time) { color: rgba(255,255,255,0.72); }
+        /* while the cards ARE showing, they keep their own light surface, so put
+           the dark ink back inside them */
+        body.lv5:is([data-panel="dark"], [data-panel="graphite"], [data-panel="brand"], [data-panel="gradient"]):not([data-news="outside"]) .lv5-news-list .card :is(.announcement-title, .service-chevron) { color: var(--color-text-primary); }
+        body.lv5:is([data-panel="dark"], [data-panel="graphite"], [data-panel="brand"], [data-panel="gradient"]):not([data-news="outside"]) .lv5-news-list .card :is(.announcement-date, .announcement-excerpt, .card p, time) { color: var(--color-text-secondary); }
+
+        /* ===== ANNOUNCEMENTS: inside / outside the container =====
+           Inside (default) = each post keeps its card. Outside = the cards
+           dissolve so the posts sit straight on the panel, split by rules. */
+        body.lv5[data-news="outside"] .lv5-news-list .card {
+            background: none; border: 0; border-radius: 0; box-shadow: none;
+            border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+            padding-left: 0; padding-right: 0;
+        }
+        body.lv5[data-news="outside"] .lv5-news-list { gap: 0; }
+        body.lv5[data-news="outside"] .lv5-news-empty { background: none; border: 0; }
+
+        /* Titles inside: the panel's announcements gather into one container
+           with "What's new" as its header, rather than a bare heading above. */
+        body.lv5[data-titles="inside"] .lv5-news {
+            background: var(--color-surface); border: 1px solid var(--color-border);
+            border-radius: 16px; padding: 0 0 6px;
+        }
+        body.lv5[data-titles="inside"] .lv5-news-head { margin: 0; padding: 14px 16px 12px; border-bottom: 1px solid var(--color-border); }
+        body.lv5[data-titles="inside"] .lv5-news-list { padding: 6px 16px 4px; }
+        /* the container carries its own light surface, so its ink is dark again
+           even when the panel behind it is one of the dark tones */
+        body.lv5[data-titles="inside"] .lv5-news :is(h3, .announcement-title, .service-chevron) { color: var(--color-text-primary); }
+        body.lv5[data-titles="inside"] .lv5-news :is(a, p, time, .announcement-date) { color: var(--color-text-secondary); }
+        body.lv5[data-titles="inside"] .lv5-news-list .card {
+            background: none; border: 0; box-shadow: none; border-radius: 0;
+            border-top: 1px solid var(--color-border); padding-left: 0; padding-right: 0;
+        }
+
         .lv5-brand { display: inline-flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 600; letter-spacing: -0.02em; color: var(--color-text-primary); }
         .lv5-brand:hover { color: var(--color-text-primary); text-decoration: none; }
         .lv5-brand-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--color-accent); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
@@ -202,6 +264,45 @@
         input.type = show ? 'text' : 'password';
         btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
     }
+</script>
+<script>
+// Page chip: the left panel's tone (same set the sidebar offers) and whether
+// each announcement keeps its card. Injected into the shared chip once loaded.
+(function () {
+    var GROUPS = [
+        ['Panel:', 'data-panel', [['light','Light'],['tinted','Tinted'],['dark','Dark'],['graphite','Graphite'],['brand','Brand'],['gradient','Gradient']]],
+        ['News:', 'data-news', [['inside','Inside'],['outside','Outside']]],
+        ['Titles:', 'data-titles', [['outside','Outside'],['inside','Inside']]]
+    ];
+    function build(chip) {
+        if (chip.getAttribute('data-lv5') === '1') return;
+        chip.setAttribute('data-lv5', '1');
+        var anchor = chip.querySelector('.dev-tag');
+        GROUPS.forEach(function (spec) {
+            var grp = document.createElement('div'); grp.className = 'chip-group';
+            var lab = document.createElement('span'); lab.className = 'label'; lab.textContent = spec[0];
+            grp.appendChild(lab);
+            var pg = document.createElement('div'); pg.className = 'pill-group';
+            spec[2].forEach(function (o, i) {
+                var b = document.createElement('button'); b.type = 'button'; b.textContent = o[1];
+                if (i === 0) b.classList.add('active');
+                b.addEventListener('click', function () {
+                    pg.querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+                    document.body.setAttribute(spec[1], o[0]);
+                });
+                pg.appendChild(b);
+            });
+            grp.appendChild(pg);
+            if (anchor && anchor.nextSibling) { chip.insertBefore(grp, anchor.nextSibling); anchor = grp; }
+            else { chip.appendChild(grp); anchor = grp; }
+        });
+    }
+    var n = 0, iv = setInterval(function () {
+        var chip = document.querySelector('.state-chip');
+        if (chip) { clearInterval(iv); build(chip); }
+        else if (++n > 120) { clearInterval(iv); }
+    }, 80);
+})();
 </script>
 </body>
 </html>

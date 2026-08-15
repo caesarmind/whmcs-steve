@@ -8,23 +8,43 @@
     <link rel="stylesheet" href="css/apple-layout.css?v=17">
     <style>
         /* ===== login-v4 — Hero band + sign-in card, announcements grid below ===== */
-        body.lv4 { display: block; margin: 0; min-height: 100vh; background: var(--color-bg); color: var(--color-text-primary); font-family: var(--font-family); }
+        /* full-page gradient: the accent field runs the whole page rather than
+           stopping under the sign-in card, so the announcements below sit ON the
+           colour as cards. background-attachment:fixed keeps it covering the full
+           scroll length without stretching the radial stops. */
+        body.lv4 {
+            display: block; margin: 0; min-height: 100vh;
+            color: #fff; font-family: var(--font-family);
+            background:
+                radial-gradient(70% 60% at 18% 4%, color-mix(in srgb, var(--color-accent) 58%, #fff 4%), transparent 55%),
+                radial-gradient(60% 50% at 90% 8%, color-mix(in srgb, var(--brand-info) 60%, #fff), transparent 50%),
+                linear-gradient(155deg, color-mix(in srgb, var(--color-accent) 86%, #2a1a55), color-mix(in srgb, var(--color-accent) 56%, #000));
+            background-attachment: fixed;
+            background-size: cover;
+        }
 
         /* Hero band */
+        /* the band is now just a layout box - the page behind it carries the colour */
+        /* the page is one centred column now: hero + announcements share the
+           viewport and sit in its middle, instead of the card floating in a
+           600px band with the posts trailing under it. The brand bar is lifted
+           out of that flow so it stays pinned to the top-left. */
+        body.lv4 { display: flex; flex-direction: column; justify-content: center; position: relative; }
         .lv4-hero {
-            position: relative; overflow: hidden;
-            min-height: 600px; padding: 28px 24px 64px;
+            position: relative;
+            min-height: 0; padding: 28px 24px 40px;
             display: flex; flex-direction: column; align-items: center;
-            color: #fff;
-            background:
-                radial-gradient(70% 80% at 18% 8%, color-mix(in srgb, var(--color-accent) 58%, #fff 4%), transparent 55%),
-                radial-gradient(60% 70% at 90% 12%, color-mix(in srgb, var(--brand-info) 60%, #fff), transparent 50%),
-                linear-gradient(155deg, color-mix(in srgb, var(--color-accent) 86%, #2a1a55), color-mix(in srgb, var(--color-accent) 56%, #000));
+            color: #fff; background: none;
         }
-        .lv4-hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--color-bg) 88%, transparent)); pointer-events: none; }
         .lv4-hero > * { position: relative; z-index: 1; }
 
-        .lv4-bar { width: 100%; max-width: 1080px; display: flex; align-items: center; justify-content: space-between; }
+        .lv4-bar {
+            position: absolute; top: 28px; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 1080px; padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        /* the hero's own top padding was only there to clear the bar */
+        body.lv4 .lv4-hero { padding-top: 96px; }
         .lv4-brand { display: flex; align-items: center; gap: 9px; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; color: #fff; }
         .lv4-brand-dot { width: 26px; height: 26px; border-radius: 8px; background: rgba(255,255,255,0.22); display: inline-flex; align-items: center; justify-content: center; }
         .lv4-brand-dot svg { width: 15px; height: 15px; }
@@ -52,6 +72,60 @@
 
         /* Announcements section */
         .lv4-section { max-width: 1080px; margin: 0 auto; padding: 8px 24px 64px; }
+        /* Titles inside: the announcements collapse into one container with the
+           heading as its header, instead of the heading floating above them. */
+        body.lv4[data-titles="inside"] .lv4-section > .lv4-section-head { margin: 0; padding: 18px 22px 14px; border-bottom: 1px solid var(--color-border); }
+        body.lv4[data-titles="inside"] .lv4-section {
+            background: var(--color-surface); border: 1px solid var(--color-border);
+            border-radius: 20px; padding: 0 0 8px; margin-bottom: 56px;
+        }
+        body.lv4[data-titles="inside"] .lv4-news-grid { padding: 14px 18px 10px; }
+        body.lv4[data-titles="inside"] .lv4-section-head h3 { color: var(--color-text-primary); }
+        body.lv4[data-titles="inside"] .lv4-section-head a { color: var(--color-link); }
+        /* inside a container the posts should not be cards again */
+        body.lv4[data-titles="inside"] .lv4-news-card {
+            background: none; border: 0; box-shadow: none; border-radius: 0;
+            border-top: 1px solid var(--color-border); padding: 16px 4px 18px;
+        }
+
+        /* ===== PANEL TONES (chip: Panel) =========================
+           The same six treatments the left sidebar offers, applied to this
+           page's coloured field. Gradient is the default (the authored look);
+           the rest swap the field and, for the two light tones, flip the ink
+           that sits directly on it. Cards keep their own surface either way. */
+        body.lv4[data-panel="light"], body.lv4[data-panel="tinted"] { color: var(--color-text-primary); }
+        body.lv4[data-panel="light"] { background: var(--color-bg); }
+        body.lv4[data-panel="tinted"] { background: color-mix(in srgb, var(--color-accent) 10%, var(--color-bg)); }
+        body.lv4[data-panel="dark"] { background: #1c1c1e; }
+        body.lv4[data-panel="graphite"] { background: #21252e; }
+        body.lv4[data-panel="brand"] { background: var(--color-accent); }
+        /* light tones: everything painted white for the gradient has to come back */
+        body.lv4:is([data-panel="light"], [data-panel="tinted"]) .lv4-brand,
+        body.lv4:is([data-panel="light"], [data-panel="tinted"]) .lv4-hero-copy h2,
+        body.lv4:is([data-panel="light"], [data-panel="tinted"]) .lv4-section-head h3 { color: var(--color-text-primary); }
+        body.lv4:is([data-panel="light"], [data-panel="tinted"]) .lv4-hero-copy p { color: var(--color-text-secondary); }
+        body.lv4:is([data-panel="light"], [data-panel="tinted"]) .lv4-section-head a { color: var(--color-link); }
+        body.lv4:is([data-panel="light"], [data-panel="tinted"]) .lv4-brand-dot { background: var(--color-accent); }
+        body.lv4:is([data-panel="light"], [data-panel="tinted"]) .lv4-theme {
+            background: var(--color-surface-secondary); border-color: var(--color-border); color: var(--color-text-primary); }
+        body.lv4:is([data-panel="light"], [data-panel="tinted"]) .lv4-theme:hover { background: var(--color-surface); }
+
+        /* ===== ANNOUNCEMENTS: inside / outside the container =====
+           Inside (default) = each post in its own card. Outside = the cards
+           dissolve and the posts sit straight on the page, separated by rules. */
+        body.lv4[data-news="outside"] .lv4-news-card {
+            background: none; border: 0; border-radius: 0; box-shadow: none;
+            border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+            padding: 18px 0 20px;
+        }
+        body.lv4[data-news="outside"] .lv4-news-grid { gap: 0 32px; }
+        body.lv4[data-news="outside"] .lv4-news-empty { background: none; border: 0; }
+
+        /* on the coloured field the section furniture reads light; the cards keep
+           their own surface + dark text, so only the chrome around them flips */
+        .lv4-section .lv4-section-head h3 { color: #fff; }
+        .lv4-section .lv4-section-head a { color: rgba(255,255,255,0.9); }
+        .lv4-section .lv4-section-head a:hover { color: #fff; }
         .lv4-section-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
         .lv4-section-head h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 0; color: var(--color-text-primary); }
         .lv4-section-head a { font-size: 13px; color: var(--color-link); display: inline-flex; align-items: center; gap: 4px; }
@@ -184,6 +258,46 @@
         input.type = show ? 'text' : 'password';
         btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
     }
+</script>
+<script>
+// Page chip: the sign-in field's tone (same set the left sidebar offers) and
+// whether each announcement keeps its card. Injected into the shared chip once
+// the partial lands, the same way the dashboards add their own groups.
+(function () {
+    var GROUPS = [
+        ['Panel:', 'data-panel', [['gradient','Gradient'],['light','Light'],['tinted','Tinted'],['dark','Dark'],['graphite','Graphite'],['brand','Brand']]],
+        ['News:', 'data-news', [['inside','Inside'],['outside','Outside']]],
+        ['Titles:', 'data-titles', [['outside','Outside'],['inside','Inside']]]
+    ];
+    function build(chip) {
+        if (chip.getAttribute('data-lv4') === '1') return;
+        chip.setAttribute('data-lv4', '1');
+        var anchor = chip.querySelector('.dev-tag');
+        GROUPS.forEach(function (spec) {
+            var grp = document.createElement('div'); grp.className = 'chip-group';
+            var lab = document.createElement('span'); lab.className = 'label'; lab.textContent = spec[0];
+            grp.appendChild(lab);
+            var pg = document.createElement('div'); pg.className = 'pill-group';
+            spec[2].forEach(function (o, i) {
+                var b = document.createElement('button'); b.type = 'button'; b.textContent = o[1];
+                if (i === 0) b.classList.add('active');
+                b.addEventListener('click', function () {
+                    pg.querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+                    document.body.setAttribute(spec[1], o[0]);
+                });
+                pg.appendChild(b);
+            });
+            grp.appendChild(pg);
+            if (anchor && anchor.nextSibling) { chip.insertBefore(grp, anchor.nextSibling); anchor = grp; }
+            else { chip.appendChild(grp); anchor = grp; }
+        });
+    }
+    var n = 0, iv = setInterval(function () {
+        var chip = document.querySelector('.state-chip');
+        if (chip) { clearInterval(iv); build(chip); }
+        else if (++n > 120) { clearInterval(iv); }
+    }, 80);
+})();
 </script>
 </body>
 </html>
