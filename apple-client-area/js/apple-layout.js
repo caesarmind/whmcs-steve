@@ -413,6 +413,68 @@
             if (rail && !rail.querySelector('.brand-logo')) { rail.innerHTML = ''; rail.appendChild(mark()); }
         })();
 
+        // ── Top-bar utility links ──────────────────────────────
+        // The quiet resource links live in the TOP BAR (the thin auth strip
+        // above the header), right-aligned beside "Return to admin" - not in
+        // the header itself, which belongs to the product nav. Built here so
+        // every page carries them without touching ~150 files.
+        (function () {
+            var strip = document.querySelector('.ph-auth-strip-inner');
+            if (!strip || strip.querySelector('.nav-utility')) return;
+            var LINKS = [
+                ['knowledgebase.html', 'Docs'],
+                ['serverstatus.html', 'Status'],
+                ['contact.html', 'Support']
+            ];
+            var wrap = document.createElement('div');
+            wrap.className = 'nav-utility';
+            LINKS.forEach(function (l) {
+                var a = document.createElement('a');
+                a.href = l[0]; a.textContent = l[1];
+                wrap.appendChild(a);
+            });
+            /* sit just before the right-hand cluster that holds the masq chip */
+            var right = strip.lastElementChild;
+            if (right && right !== strip.firstElementChild) { strip.insertBefore(wrap, right); }
+            else { strip.appendChild(wrap); }
+        })();
+
+        // ── Top-nav menu group ─────────────────────────────────
+        // The nav items sit as flat siblings between the brand and the spacer,
+        // so there is nothing to center as a unit. Wrap them once here; the
+        // wrapper is display:contents by default, which leaves the flex layout
+        // byte-identical until the Menu chip switches it to centered.
+        (function () {
+            var inner = document.querySelector('.homepage-nav-inner');
+            if (!inner || inner.querySelector('.nav-menu-group')) return;
+            var spacer = inner.querySelector('.nav-spacer');
+            if (!spacer) return;
+            var items = [], n = spacer.previousElementSibling;
+            while (n && !n.classList.contains('nav-logo')) { items.unshift(n); n = n.previousElementSibling; }
+            if (!items.length) return;
+            var group = document.createElement('div');
+            group.className = 'nav-menu-group';
+            spacer.parentNode.insertBefore(group, spacer);
+            items.forEach(function (el) { group.appendChild(el); });
+        })();
+
+        // Everything after the spacer (utility links + icon cluster) becomes
+        // the right zone. With the brand as the left zone and both set to
+        // flex:1, the menu group centers exactly in the bar while staying IN
+        // FLOW - absolute centering collided with the utility links once the
+        // 1024px bar got busy.
+        (function () {
+            var inner = document.querySelector('.homepage-nav-inner');
+            if (!inner || inner.querySelector('.nav-right')) return;
+            var spacer = inner.querySelector('.nav-spacer');
+            if (!spacer) return;
+            var right = document.createElement('div');
+            right.className = 'nav-right';
+            inner.appendChild(right);
+            var n = spacer.nextElementSibling;
+            while (n && n !== right) { var next = n.nextElementSibling; right.appendChild(n); n = next; }
+        })();
+
         // ── Simple body-attribute toggles ──────────────────────
         // Chip groups whose whole job is to flip one attribute on <body>; the
         // CSS does the rest. Wiring them here is what makes them clickable --
@@ -425,6 +487,8 @@
         //   needs - selector the page must contain, else the group is hidden
         [
             { set: 'header',      attr: 'data-header',       def: 'light',   key: 'hn.header' },
+            { set: 'menu',        attr: 'data-menu',         def: 'left',    key: 'hn.menu',     needs: '.homepage-nav' },
+            { set: 'toplinks',    attr: 'data-toplinks',     def: 'show',    key: 'hn.topLinks', needs: '.homepage-nav' },
             { set: 'mintitle',    attr: 'data-min-title',    def: 'outside', key: 'hn.minTitle', needs: '.min-section' },
             { set: 'sidebarlogo', attr: 'data-sidebar-logo', def: 'show',    key: 'hn.sidebarLogo' },
             { set: 'boxsidebar',  attr: 'data-box-sidebar',  def: 'show',    key: null },
@@ -515,9 +579,30 @@
 
         // Crumbs (trail/back/none — top-layout breadcrumb treatment; markup lives
         // per-page, e.g. user-profile.html has both .crumbs-trail and .crumbs-back)
+        // Back mode needs a back-link to show. Only a couple of pages author
+        // one, so build it here from the first crumb - otherwise "Back" just
+        // strips the grey band and leaves the full trail behind.
+        (function () {
+            var bar = document.querySelector('.ph-breadcrumb');
+            if (!bar || bar.querySelector('.crumbs-back')) return;
+            var trail = bar.querySelector('.ph-breadcrumb-inner');
+            if (!trail) return;
+            trail.classList.add('crumbs-trail');
+            var first = trail.querySelector('a');
+            var back = document.createElement('div');
+            back.className = 'ph-breadcrumb-inner crumbs-back';
+            var a = document.createElement('a');
+            a.className = 'ph-back-link';
+            a.href = first ? first.getAttribute('href') : 'index.html';
+            a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+            a.appendChild(document.createTextNode(first ? first.textContent.trim() : 'Back'));
+            back.appendChild(a);
+            bar.appendChild(back);
+        })();
+
         var crumbsButtons = document.querySelectorAll('.state-chip [data-crumbs-set]');
         function applyCrumbs(variant) {
-            var valid = ['trail', 'back', 'none'];
+            var valid = ['trail', 'plain', 'pill', 'chevron', 'back', 'none'];
             if (valid.indexOf(variant) === -1) variant = 'trail';
             if (variant === 'trail') body.removeAttribute('data-crumbs');
             else body.setAttribute('data-crumbs', variant);

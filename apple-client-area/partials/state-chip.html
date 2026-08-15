@@ -43,6 +43,20 @@
         </div>
     </div>
     <div class="chip-group">
+        <span class="label">Menu:</span>
+        <div class="pill-group">
+            <button type="button" data-menu-set="left" class="active" title="Menu sits beside the logo (default)">Left</button>
+            <button type="button" data-menu-set="center" title="Menu centered in the top bar">Center</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Top links:</span>
+        <div class="pill-group">
+            <button type="button" data-toplinks-set="show" class="active" title="Show Docs / Status / Support on the right of the top bar">Show</button>
+            <button type="button" data-toplinks-set="hide" title="Hide the right-side utility links">Hide</button>
+        </div>
+    </div>
+    <div class="chip-group">
         <span class="label">Side logo:</span>
         <div class="pill-group">
             <button type="button" data-sidebarlogo-set="show" class="active" title="Show the logo at the top of the left sidebar">Show</button>
@@ -74,8 +88,11 @@
         <span class="label">Crumbs:</span>
         <div class="pill-group">
             <button type="button" data-crumbs-set="trail" class="active" title="Full breadcrumb trail (current)">Trail</button>
+            <button type="button" data-crumbs-set="plain" title="Trail with no grey band — sits straight on the page">Plain</button>
+            <button type="button" data-crumbs-set="pill" title="Trail inside a rounded capsule">Pill</button>
+            <button type="button" data-crumbs-set="chevron" title="Chevron separators, no band">Chevron</button>
             <button type="button" data-crumbs-set="back" title="Apple-style single back link, no grey bar">Back</button>
-            <button type="button" data-crumbs-set="none" title="No breadcrumb — rely on the page title">None</button>
+            <button type="button" data-crumbs-set="none" title="No breadcrumb at all — rely on the page title">Off</button>
         </div>
     </div>
     <div class="chip-group">
