@@ -225,7 +225,7 @@ const HF_DESIGNS = [
    controls rather than leaving them to no-op. Default keeps the full chrome.
    (The mockup holds two further splits, v2 and v3, not offered here.) */
 const HF_LOGINS = [
-  { id: 'split', t: 'Split', f: 'login-v5.html', shell: false,
+  { id: 'split', t: 'Split', f: 'login-v5.html', shell: false, tones: true,
     s: 'Full-bleed two columns: the sign-in form on one side, the latest announcements as cards on the other, both on the theme’s own calm surfaces.' },
   { id: 'marquee', t: 'Marquee', f: 'login-v4.html', shell: false,
     s: 'A welcome band across the top, the sign-in card beneath it, and the latest announcements in a grid below — the closest of the three to the dashboard’s own shape.' },
@@ -544,7 +544,13 @@ function HeroStage({ dark }) {
   // nothing to act on. Disable them there rather than let them silently no-op.
   const hasShell = !dsn || dsn.shell !== false;
   // a top bar has no side menu to retone
-  const toneable = lay !== 'top' && hasShell;
+  // Split has no sidebar but its brand panel is the page's coloured field, and it
+  // takes the same four treatments, so the tone rail drives that instead. Marquee
+  // tones its whole background the same way but ships no gradient, so it is left
+  // out rather than offered a treatment that does nothing.
+  const panelToned = !!(dsn && dsn.tones);
+  const toneable = panelToned || (lay !== 'top' && hasShell);
+  const toneLbl = panelToned ? 'Panel tone' : 'Sidebar tone';
   const layIds = CA_EMBEDDABLE ? HF_LAYOUTS.map((l) => l.wire) : Object.keys(HF_SHOTS[pg.id] || { side: 1 });
   const layId = layIds.indexOf(lay) === -1 ? (layIds[0] || 'top') : lay;
   const reel = useHFReel({ layIds, layId, setLay, palette, setPalette });
@@ -564,9 +570,10 @@ function HeroStage({ dark }) {
     // control -- they are the same values the state chip writes.
     menu: 'center', toplinks: 'show', crumbs: 'none',
     subnav: pg.subnav || 'on',
+    panel: panelToned ? tone : null,
     band: dsn && dsn.band ? band : null,
     bandSize: dsn && dsn.band ? bandSize : null,
-  }), [layId, palette, tone, toneable, dark, pg.auth, pg.subnav, dsn, band, bandSize]);
+  }), [layId, palette, tone, toneable, dark, pg.auth, pg.subnav, dsn, panelToned, band, bandSize]);
   return (
     <div className="hf" style={{ '--color-accent': pal.c, '--color-accent-light': `color-mix(in srgb, ${pal.c} 12%, transparent)`, '--on-accent-tint': `color-mix(in srgb, ${pal.c} 74%, #000)`, '--color-chrome': hfChromeSolid(toneable ? tone : 'light', pal.c, dark, pal.id), '--color-chrome-ink': hfChromeInk(toneable ? tone : 'light', dark) }} {...reel.bind} data-screen-label="Hero screens">
       <div className="hf-pagectl">
@@ -605,8 +612,8 @@ function HeroStage({ dark }) {
         ))}
       </div>
       <div className="hf-stage">
-        <div className="hf-rail left" role="tablist" aria-label="Sidebar tone">
-          <span className="hf-lbl">Sidebar tone</span>
+        <div className="hf-rail left" role="tablist" aria-label={toneLbl}>
+          <span className="hf-lbl">{toneLbl}</span>
           {HF_TONES.map((x) => (
             <button key={x.id} role="tab" aria-selected={toneable && tone === x.id} disabled={!toneable} title={toneable ? x.t : (hasShell ? 'Top Nav has no side menu to retone' : `${dsn.t} is full-bleed — it carries no side menu`)} onClick={reel.manual(() => setTone(x.id))}>
               <HFToneGlyph tone={x.id} accent={pal.c} dark={dark} paletteId={pal.id} />
