@@ -54,6 +54,7 @@ function paintFrame(doc, s) {
   // look with no rule behind it, so it is expressed by removing the attribute.
   attr(body, 'data-hero-tone', s.band, 'gradient');
   attr(body, 'data-hero-size', s.bandSize, 'full');   // full | slim
+  attr(body, 'data-subnav', s.subnav, 'on');           // on | off — the in-page aside
   if (s.auth) body.dataset.auth = s.auth;
   // the floating dev panel is ours, not the visitor's
   body.setAttribute('data-preview', 'off');
@@ -152,7 +153,7 @@ function Frame({ src, state, box, width, onReady, title, seal }) {
     if (!live) return;
     const f = ref.current;
     try { if (f && f.contentDocument) paintFrame(f.contentDocument, state); } catch (e) {}
-  }, [live, state.layout, state.palette, state.sidebar, state.align, state.icons, state.dark, state.auth, state.menu, state.toplinks, state.crumbs, state.band, state.bandSize]);
+  }, [live, state.layout, state.palette, state.sidebar, state.align, state.icons, state.dark, state.auth, state.menu, state.toplinks, state.crumbs, state.band, state.bandSize, state.subnav]);
 
   React.useEffect(() => {
     const f = ref.current;

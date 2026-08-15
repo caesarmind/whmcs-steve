@@ -189,7 +189,9 @@ function AccentPanel({ dark, onDark }) {
    so there is nothing here the theme cannot actually do. */
 const HF_PAGES = [
   { id: 'dashboard', t: 'Dashboard', src: 'clientareahome-v18.html', designs: true },
-  { id: 'services', t: 'Services', src: 'clientareaproducts.html' },
+  // no in-page aside: the services table is the point of this page, and the
+  // sub-nav repeats links the main navigation already carries
+  { id: 'services', t: 'Services', src: 'clientareaproducts.html', subnav: 'off' },
   { id: 'store', t: 'Store', src: 'store.html' },
   { id: 'invoice', t: 'Invoice', src: 'viewinvoice.html' },
   { id: 'support', t: 'Support', src: 'supportticketslist.html' },
@@ -533,9 +535,10 @@ function HeroStage({ dark }) {
     // up, rather than making a visitor assemble it. Change these three, not a
     // control -- they are the same values the state chip writes.
     menu: 'center', toplinks: 'show', crumbs: 'none',
+    subnav: pg.subnav || 'on',
     band: dsn && dsn.band ? band : null,
     bandSize: dsn && dsn.band ? bandSize : null,
-  }), [layId, palette, tone, toneable, dark, pg.auth, dsn, band, bandSize]);
+  }), [layId, palette, tone, toneable, dark, pg.auth, pg.subnav, dsn, band, bandSize]);
   return (
     <div className="hf" style={{ '--color-accent': pal.c, '--color-accent-light': `color-mix(in srgb, ${pal.c} 12%, transparent)`, '--on-accent-tint': `color-mix(in srgb, ${pal.c} 74%, #000)`, '--color-chrome': hfChromeSolid(toneable ? tone : 'light', pal.c, dark, pal.id), '--color-chrome-ink': hfChromeInk(toneable ? tone : 'light', dark) }} {...reel.bind} data-screen-label="Hero screens">
       <div className="hf-pagectl">
