@@ -278,7 +278,7 @@ function useBandAnchor(active) {
   return pos;
 }
 
-function HFBandToast({ band, onPick, onClose, open, onOpen, pos }) {
+function HFBandToast({ band, onPick, onClose, open, onOpen, pos, size, onSize }) {
   return (
     <div className={`hf-toast${open ? ' open' : ''}`} style={pos ? { top: pos.top, right: pos.right } : undefined} role="region" aria-label="Welcome band style">
       {!open ? (
@@ -300,7 +300,20 @@ function HFBandToast({ band, onPick, onClose, open, onOpen, pos }) {
                       onClick={() => onPick(b.id)}>{b.t}</button>
             ))}
           </div>
-          <p className="ft">Four of the five that ship.</p>
+          {/* The module calls this Band height, full|slim. "Compact" is the
+              clearer word for what slim does: it drops the copy line and
+              tightens the padding to a one-line bar. */}
+          <div className="row" role="radiogroup" aria-label="Band height">
+            <span>Height</span>
+            <span className="seg">
+              <button role="radio" aria-checked={size === 'full'}
+                      className={size === 'full' ? 'on' : ''}
+                      onClick={() => onSize('full')}>Full</button>
+              <button role="radio" aria-checked={size === 'slim'}
+                      className={size === 'slim' ? 'on' : ''}
+                      onClick={() => onSize('slim')}>Compact</button>
+            </span>
+          </div>
         </div>
       )}
     </div>
@@ -485,6 +498,7 @@ function HeroStage({ dark }) {
   const [tone, setTone] = React.useState('light');
   const [design, setDesign] = React.useState('atrium');
   const [band, setBand] = React.useState('gradient');
+  const [bandSize, setBandSize] = React.useState('full');
   // null = not yet offered, 'cue' = the nudge is up, 'open' = the options are,
   // 'done' = used or dismissed and not coming back this visit
   const [toast, setToast] = React.useState(null);
@@ -516,7 +530,8 @@ function HeroStage({ dark }) {
     // control -- they are the same values the state chip writes.
     menu: 'center', toplinks: 'show', crumbs: 'none',
     band: dsn && dsn.band ? band : null,
-  }), [layId, palette, tone, toneable, dark, pg.auth, dsn, band]);
+    bandSize: dsn && dsn.band ? bandSize : null,
+  }), [layId, palette, tone, toneable, dark, pg.auth, dsn, band, bandSize]);
   return (
     <div className="hf" style={{ '--color-accent': pal.c, '--color-accent-light': `color-mix(in srgb, ${pal.c} 12%, transparent)`, '--on-accent-tint': `color-mix(in srgb, ${pal.c} 74%, #000)`, '--color-chrome': hfChromeSolid(toneable ? tone : 'light', pal.c, dark, pal.id), '--color-chrome-ink': hfChromeInk(toneable ? tone : 'light', dark) }} {...reel.bind} data-screen-label="Hero screens">
       <div className="hf-pagectl">
@@ -578,7 +593,9 @@ function HeroStage({ dark }) {
                 band={band}
                 onOpen={reel.manual(() => setToast('open'))}
                 onClose={() => setToast('done')}
-                onPick={reel.manual((v) => { setBand(v); setToast('done'); })}
+                onPick={reel.manual((v) => setBand(v))}
+                size={bandSize}
+                onSize={reel.manual((v) => setBandSize(v))}
               />
             )}
           </div>

@@ -638,3 +638,8 @@ button.hp-foundtag:hover{border-color:var(--color-accent)}
 @keyframes hfToastPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--color-accent) 55%,transparent)}70%{box-shadow:0 0 0 6px transparent}100%{box-shadow:0 0 0 0 transparent}}
 @media (prefers-reduced-motion:reduce){.hf-toast-cue,.hf-toast-panel{animation:none}.hf-toast-cue .dot{animation:none}}
 @media (max-width:700px){.hf-toast{top:7px;right:7px;max-width:82%}.hf-toast-cue{font-size:10.5px;padding:4px 8px}}
+.hf-toast-panel .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:7px;padding-top:7px;border-top:1px solid color-mix(in srgb,var(--color-border) 60%,transparent)}
+.hf-toast-panel .row>span:first-child{font-size:10.5px;font-weight:600;color:var(--color-text-tertiary)}
+.hf-toast-panel .row .seg{display:inline-flex;gap:2px;padding:2px;border-radius:999px;background:color-mix(in srgb,var(--color-surface-secondary) 70%,transparent);border:1px solid color-mix(in srgb,var(--color-border) 60%,transparent)}
+.hf-toast-panel .row .seg button{font-family:var(--font);font-size:10.5px;font-weight:650;padding:3px 9px;border:none;border-radius:999px;background:none;color:var(--color-text-secondary);cursor:pointer;transition:all .16s var(--ease)}
+.hf-toast-panel .row .seg button.on{background:var(--color-accent);color:#fff}
