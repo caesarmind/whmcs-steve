@@ -548,7 +548,7 @@ function HeroStage({ dark }) {
   const [tone, setTone] = React.useState('light');
   // one remembered pick per page that ships more than one design, so leaving the
   // page and coming back does not reset the choice
-  const [variant, setVariant] = React.useState({ dashboard: 'atrium', login: 'split', store: 'ssl' });
+  const [variant, setVariant] = React.useState({ dashboard: 'atrium', login: 'split', store: 'nordvpn' });
   const [band, setBand] = React.useState('gradient');
   const [bandSize, setBandSize] = React.useState('full');
   // null = not yet offered, 'cue' = the nudge is up, 'open' = the options are,
