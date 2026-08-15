@@ -875,7 +875,16 @@ body[data-crumbs="none"] .ph-breadcrumb { display: none; }
 /* Uploaded square logo. 28px matches .sidebar-brand-logo's max-height, so the
    brand reads at the same optical size in both nav layouts; object-fit keeps a
    not-quite-square upload from stretching inside the fixed box. */
-.ph-rail-logo img { width: 28px; height: 28px; object-fit: contain; display: block; }
+/* The rail is 80px, so the logo goes in a square well — but the brand PNG is
+   the mark AND the wordmark (616x192, 3.2:1). `contain` fitted the whole thing
+   into 28px, which shrank the mark to a smudge and rendered the wordmark as
+   unreadable mush.
+   The mark is exactly the leftmost 192x192 of that file (measured: ink runs
+   0-191, then 50px blank, then the letters from 242). So `cover` + a left
+   origin scales the image by height and shows precisely that square — the logo
+   without its text, with no second asset to keep in step with the first.
+   If the brand PNG is ever replaced, keep the mark square and leftmost. */
+.ph-rail-logo img { width: 28px; height: 28px; object-fit: cover; object-position: left center; display: block; }
 /* min-height:0 is what actually lets this shrink below its content height --
    without it a flex child refuses to shrink and overflow-y never engages. */
 .ph-rail-items { display: flex; flex-direction: column; gap: 2px; padding: 4px 8px; overflow-y: auto; min-height: 0; }
