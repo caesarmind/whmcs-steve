@@ -188,14 +188,15 @@ function AccentPanel({ dark, onDark }) {
    hadrian-lp5-frames.jsx. Every control writes a real setting into a real page,
    so there is nothing here the theme cannot actually do. */
 const HF_PAGES = [
-  { id: 'dashboard', t: 'Dashboard', src: 'clientareahome-v18.html', designs: true },
+  { id: 'dashboard', t: 'Dashboard', src: 'clientareahome-v18.html', variants: 'dashboard' },
   // no in-page aside: the services table is the point of this page, and the
   // sub-nav repeats links the main navigation already carries
   { id: 'services', t: 'Services', src: 'clientareaproducts.html', subnav: 'off' },
   { id: 'store', t: 'Store', src: 'store.html' },
   { id: 'invoice', t: 'Invoice', src: 'viewinvoice.html' },
   { id: 'support', t: 'Support', src: 'supportticketslist.html' },
-  { id: 'login', t: 'Login', src: 'login.html', auth: 'out' },
+  // the module ships two sign-in designs, and Split brings its own chrome
+  { id: 'login', t: 'Login', src: 'login.html', auth: 'out', variants: 'login' },
 ];
 /* The four dashboard designs the module ships, and the mockup file each one was
    drawn as. Names and descriptions are the module's own, straight out of
@@ -214,6 +215,19 @@ const HF_DESIGNS = [
     s: 'A quieter dashboard: greeting, four summary tiles, quick actions, then services, domains, invoices, tickets and announcements as plain rows on one surface. No panel grid or account sub-nav aside.' },
   { id: 'default', t: 'Classic', f: 'clientareahome-v9.html',
     s: 'The familiar shape: a greeting hero over plain tables, one after another.' },
+];
+/* The two sign-in designs the module ships, from core/pages/login/. Split is
+   described in its own words, out of split/split.php; Default the module leaves
+   undescribed, as it does the Classic dashboard. The mockup drew Split as
+   login-v2 -- its lv2-news/-list/-date/-head/-empty vocabulary is the shipped
+   mt-ls-news* one under an earlier prefix -- and carries three further splits,
+   v3-v5, that the module does not ship and so are not offered.
+   Split suppresses the portal nav, sidebar and footer, hence shell: false. */
+const HF_LOGINS = [
+  { id: 'default', t: 'Default', f: 'login.html',
+    s: 'The sign-in form on a card in the middle of the page, with the portal navigation and footer still around it.' },
+  { id: 'split', t: 'Split', f: 'login-v2.html', shell: false,
+    s: 'Full-bleed two-column sign-in — brand and the latest announcements on one side, the login form on the other. Hides the portal nav and footer.' },
 ];
 /* Welcome band styles. The module and the mockup grew these separately and use
    different words for the same fills, so the labels are the module's -- what a
@@ -235,7 +249,12 @@ const HF_BANDS = [
   { id: 'brand', t: 'Solid', s: 'Filled with the accent' },
 ];
 
-const hfDesign = (id) => HF_DESIGNS.find((d) => d.id === id) || HF_DESIGNS[0];
+/* Which list a page's design picker draws from, and what that picker is called. */
+const HF_VARIANTS = {
+  dashboard: { lbl: 'Dashboard design', list: HF_DESIGNS },
+  login: { lbl: 'Sign-in design', list: HF_LOGINS },
+};
+const hfVariant = (set, id) => set.list.find((d) => d.id === id) || set.list[0];
 
 /* A prompt over the band itself rather than another control on the stage.
    It waits until the frame has settled, points at the thing it is offering to
@@ -502,7 +521,9 @@ function HeroStage({ dark }) {
   const [page, setPage] = React.useState(pages[0].id);
   const [lay, setLay] = React.useState('side');
   const [tone, setTone] = React.useState('light');
-  const [design, setDesign] = React.useState('atrium');
+  // one remembered pick per page that ships more than one design, so leaving the
+  // page and coming back does not reset the choice
+  const [variant, setVariant] = React.useState({ dashboard: 'atrium', login: 'default' });
   const [band, setBand] = React.useState('gradient');
   const [bandSize, setBandSize] = React.useState('full');
   // null = not yet offered, 'cue' = the nudge is up, 'open' = the options are,
@@ -511,12 +532,16 @@ function HeroStage({ dark }) {
   const [palette, setPalette] = React.useState('blue');
   const pg = pages.find((p) => p.id === page) || pages[0];
   const pal = HF_PALETTES.find((p) => p.id === palette) || HF_PALETTES[0];
-  // only the dashboard has more than one design, and one of those brings its own
-  // shell — a design with no partials has nothing for layout or tone to act on
-  const dsn = pg.designs ? hfDesign(design) : null;
+  // the two pages that ship more than one design: the dashboard's four, the login's two
+  const vset = pg.variants ? HF_VARIANTS[pg.variants] : null;
+  const dsn = vset ? hfVariant(vset, variant[pg.variants]) : null;
   const src = dsn ? dsn.f : pg.src;
-  // a top bar has no side menu to retone, and the login page ships its own chrome
-  const toneable = lay !== 'top';
+  // A design may bring its own shell: Split is full-bleed and suppresses the
+  // portal nav, sidebar and footer, leaving the layout and tone controls with
+  // nothing to act on. Disable them there rather than let them silently no-op.
+  const hasShell = !dsn || dsn.shell !== false;
+  // a top bar has no side menu to retone
+  const toneable = lay !== 'top' && hasShell;
   const layIds = CA_EMBEDDABLE ? HF_LAYOUTS.map((l) => l.wire) : Object.keys(HF_SHOTS[pg.id] || { side: 1 });
   const layId = layIds.indexOf(lay) === -1 ? (layIds[0] || 'top') : lay;
   const reel = useHFReel({ layIds, layId, setLay, palette, setPalette });
@@ -555,13 +580,13 @@ function HeroStage({ dark }) {
           ))}
         </span>
       </div>
-      {pg.designs && (
+      {vset && (
         <div className="hf-designs">
-          <span className="hf-lbl">Dashboard design</span>
-          <span className="hf-seg" role="tablist" aria-label="Dashboard design">
-            {HF_DESIGNS.map((d) => (
-              <button key={d.id} role="tab" aria-selected={design === d.id}
-                      onClick={reel.manual(() => setDesign(d.id))}>{d.t}</button>
+          <span className="hf-lbl">{vset.lbl}</span>
+          <span className="hf-seg" role="tablist" aria-label={vset.lbl}>
+            {vset.list.map((d) => (
+              <button key={d.id} role="tab" aria-selected={dsn.id === d.id}
+                      onClick={reel.manual(() => setVariant((v) => ({ ...v, [pg.variants]: d.id })))}>{d.t}</button>
             ))}
           </span>
           <p className="hf-designnote">{dsn ? dsn.s : ''}</p>
@@ -569,7 +594,8 @@ function HeroStage({ dark }) {
       )}
       <div className="hf-picker" role="tablist" aria-label="Navigation layout">
         {HF_LAYOUTS.filter((p) => layIds.indexOf(p.wire) !== -1).map((p) => (
-          <button key={p.wire} role="tab" aria-selected={layId === p.wire} onClick={reel.manual(() => setLay(p.wire))} title={p.t}>
+          <button key={p.wire} role="tab" aria-selected={hasShell && layId === p.wire} disabled={!hasShell}
+                  onClick={reel.manual(() => setLay(p.wire))} title={hasShell ? p.t : 'Split is full-bleed — it carries no portal navigation'}>
             <HFWire kind={p.wire} active={layId === p.wire} />
             <b>{p.t}</b><span>{p.s}</span>
           </button>
@@ -579,7 +605,7 @@ function HeroStage({ dark }) {
         <div className="hf-rail left" role="tablist" aria-label="Sidebar tone">
           <span className="hf-lbl">Sidebar tone</span>
           {HF_TONES.map((x) => (
-            <button key={x.id} role="tab" aria-selected={toneable && tone === x.id} disabled={!toneable} title={toneable ? x.t : 'Top Nav has no side menu to retone'} onClick={reel.manual(() => setTone(x.id))}>
+            <button key={x.id} role="tab" aria-selected={toneable && tone === x.id} disabled={!toneable} title={toneable ? x.t : (hasShell ? 'Top Nav has no side menu to retone' : 'Split is full-bleed — it carries no side menu')} onClick={reel.manual(() => setTone(x.id))}>
               <HFToneGlyph tone={x.id} accent={pal.c} dark={dark} paletteId={pal.id} />
               <em><b>{x.t}</b><i>{x.s}</i></em>
             </button>
