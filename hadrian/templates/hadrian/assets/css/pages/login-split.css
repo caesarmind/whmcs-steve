@@ -169,3 +169,69 @@ body.mt-login-fullpage { display: block; margin: 0; }
     .mt-ls-panel { display: none; }
     .mt-ls-main { padding: 36px 24px; }
 }
+
+/* ============================================================
+   Panel style (admin: Pages > Sign in > Panel style)
+   core/pages/login/split/split.php -> spl_panel_style
+
+   Retones the INFO PANEL only; the sign-in column beside it is untouched, so
+   the form always sits on the page surface with the theme's own field colours.
+
+   Every arm works by overriding --color-* ON THE PANEL rather than by
+   restyling its children one at a time. The panel's brand name, copy, news
+   cards, dates and empty state each already read a --color-* token, so a token
+   override cascades to all of them -- the same move the sidebar tones make on
+   .sidebar. Adding an element to the panel therefore needs no new rule here.
+
+   Light is absent on purpose: it IS the defaults, so there is nothing to
+   declare. That also means an unset or unrecognised value renders the shipped
+   look rather than an unstyled one.
+   ============================================================ */
+
+/* ---- soft: a pale tint of the accent, page ink kept ---- */
+.mt-loginscreen[data-ls-style="soft"] .mt-ls-panel {
+    background: color-mix(in srgb, var(--color-accent) 10%, var(--color-bg));
+    border-right-color: color-mix(in srgb, var(--color-accent) 18%, var(--color-bg));
+}
+
+/* ---- gradient / solid: a coloured panel, so the ink flips ----
+   Deepened 92% toward the accent rather than using it raw: white on the raw
+   shipped blue measures 4.30, under AA, and this is the same deepening the nav
+   Brand tone settled on after the selected-row case was measured. */
+.mt-loginscreen[data-ls-style="gradient"] .mt-ls-panel,
+.mt-loginscreen[data-ls-style="solid"] .mt-ls-panel {
+    --color-text-primary: #ffffff;
+    --color-text-secondary: rgba(255, 255, 255, 0.82);
+    --color-text-tertiary: rgba(255, 255, 255, 0.66);
+    --color-surface: rgba(255, 255, 255, 0.12);
+    --color-border: rgba(255, 255, 255, 0.20);
+    --color-surface-secondary: rgba(255, 255, 255, 0.16);
+    border-right-color: rgba(255, 255, 255, 0.16);
+}
+.mt-loginscreen[data-ls-style="solid"] .mt-ls-panel {
+    background: color-mix(in srgb, var(--color-accent) 92%, #000);
+}
+.mt-loginscreen[data-ls-style="gradient"] .mt-ls-panel {
+    background: linear-gradient(160deg,
+        color-mix(in srgb, var(--color-accent) 92%, #000),
+        color-mix(in srgb, var(--color-accent) 58%, #000));
+}
+
+/* A news card on a coloured panel: its hover borrows the accent by default,
+   which is invisible against an accent field. Use the ink instead. */
+.mt-loginscreen[data-ls-style="gradient"] .mt-ls-news-item:hover,
+.mt-loginscreen[data-ls-style="solid"] .mt-ls-news-item:hover {
+    border-color: rgba(255, 255, 255, 0.42);
+}
+.mt-loginscreen[data-ls-style="gradient"] .mt-ls-news-item:hover .mt-ls-news-title,
+.mt-loginscreen[data-ls-style="solid"] .mt-ls-news-item:hover .mt-ls-news-title {
+    color: #ffffff;
+}
+
+/* The brand mark's plate is a neutral chip; on a coloured panel it needs the
+   frosted treatment the rest of the panel uses or it reads as a hole. */
+.mt-loginscreen[data-ls-style="gradient"] .mt-ls-brand-mark,
+.mt-loginscreen[data-ls-style="solid"] .mt-ls-brand-mark {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+}

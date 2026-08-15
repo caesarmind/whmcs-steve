@@ -1,0 +1,231 @@
+/* ============================================================
+   Sign in -- BEACON variant
+   core/pages/login/beacon/beacon.tpl
+
+   One centred column on a full-page colour field: brand bar pinned top-left,
+   a line of copy, the sign-in card, and the announcements as cards below.
+   Built from apple-client-area/login-v4.html.
+
+   THE FIELD IS PAINTED ON .mt-bcn, NOT ON <body>. The reference paints
+   body.lv4 directly, but this template is included INTO the theme's shell and
+   does not own <body> -- header.tpl does. A min-height wrapper carrying the
+   same background gets the identical result with no body script, and keeps the
+   colour from leaking onto any other page rendered through the same shell.
+
+   FOUR STYLES, one per data-bcn-style value, and every one of them is built
+   from --color-accent so the page follows the active style preset rather than
+   carrying a second copy of the brand colour:
+
+     gradient  the shipped look -- two radial sweeps over a diagonal ramp
+     solid     one flat accent field
+     soft      a pale tint of the accent, with DARK text
+     light     no colour at all; the card sits on the page surface
+
+   --bcn-ink is the switch that makes the difference safe. Everything on the
+   field reads it rather than hardcoding #fff, so `soft` and `light` flip the
+   whole column to dark text in one declaration instead of overriding a dozen.
+   ============================================================ */
+
+.mt-bcn {
+    --bcn-ink: #fff;
+    /* 0.92, not the 0.82 the reference uses: at 0.82 the sub-line measured
+       4.14 on the solid field and under 3 on the gradient. This is the one
+       alpha on the page that carries a whole sentence. */
+    --bcn-ink-soft: rgba(255, 255, 255, 0.92);
+    --bcn-ink-faint: rgba(255, 255, 255, 0.62);
+    --bcn-card-bg: var(--color-surface);
+    --bcn-news-bg: rgba(255, 255, 255, 0.10);
+    --bcn-news-border: rgba(255, 255, 255, 0.16);
+
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    color: var(--bcn-ink);
+    font-family: var(--font-family);
+    /* fixed, so the field covers the whole scroll length without the radial
+       stops stretching as the announcements push the page taller */
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+/* ---- gradient (default) ---- */
+/* Three layers: two corner glows over a diagonal ramp.
+   The second glow is deliberately NOT the reference's own value. It writes
+   `color-mix(..., var(--brand-info) 60%, #fff)` -- a bare #fff, so the second
+   weight defaults to the remaining 40% and the stop lands at rgb(108,181,255).
+   Measured against that, white ink is 2.16 and the sub-line 1.90.
+   Matching the first glow's `#fff 4%` idiom was not enough on its own: it took
+   the stop to rgb(29,141,255) and white ink to 3.32, because --brand-info is
+   ITSELF too light to carry white -- it is a status colour, sized for a badge
+   on a card, not for a field with text on it. So this glow mixes toward BLACK
+   instead, which keeps the hue shift that makes the corner read as a separate
+   light source while landing near the solid field's own luminance. */
+.mt-bcn[data-bcn-style="gradient"] {
+    background-image:
+        radial-gradient(70% 60% at 18% 4%, color-mix(in srgb, var(--color-accent) 58%, #fff 4%), transparent 55%),
+        radial-gradient(60% 50% at 90% 8%, color-mix(in srgb, var(--brand-info, var(--color-accent)) 62%, #000), transparent 50%),
+        linear-gradient(155deg, color-mix(in srgb, var(--color-accent) 86%, #2a1a55), color-mix(in srgb, var(--color-accent) 56%, #000));
+}
+
+/* ---- solid ---- */
+/* Deepened 8% toward black rather than raw. The raw accent measures 4.30 for
+   white text on the shipped blue -- under AA -- and the same deepening the nav
+   Brand tone uses clears it on every accent in the palette. */
+.mt-bcn[data-bcn-style="solid"] {
+    background-image: none;
+    background-color: color-mix(in srgb, var(--color-accent) 92%, #000);
+}
+
+/* ---- soft ---- */
+/* A pale tint, so the ink flips. Text tokens rather than alpha-white: on a
+   near-white field, white-at-0.82 is invisible. */
+.mt-bcn[data-bcn-style="soft"] {
+    --bcn-ink: var(--color-text-primary);
+    /* NOT the stock --color-text-secondary. On this tint it measures 4.29, the
+       same trap the tinted sidebar hit: the ink was judged against the page
+       rather than against the surface it is actually drawn on. Pulled a third
+       of the way toward primary, which clears 4.5 without going black. */
+    --bcn-ink-soft: color-mix(in srgb, var(--color-text-secondary) 66%, var(--color-text-primary));
+    --bcn-ink-faint: var(--color-text-tertiary);
+    --bcn-news-bg: var(--color-surface);
+    --bcn-news-border: var(--color-border);
+    background-image: none;
+    background-color: color-mix(in srgb, var(--color-accent) 10%, var(--color-bg));
+}
+
+/* ---- light ---- */
+.mt-bcn[data-bcn-style="light"] {
+    --bcn-ink: var(--color-text-primary);
+    --bcn-ink-soft: var(--color-text-secondary);
+    --bcn-ink-faint: var(--color-text-tertiary);
+    --bcn-news-bg: var(--color-surface);
+    --bcn-news-border: var(--color-border);
+    background-image: none;
+    background-color: var(--color-bg);
+}
+
+/* ---- brand bar ---- */
+/* Absolute, so it cannot add height to the centred column: the card stays in
+   the middle of the viewport whatever the bar contains. */
+.mt-bcn-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: 22px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 2;
+}
+.mt-bcn-brand {
+    display: inline-flex; align-items: center; gap: 10px;
+    color: var(--bcn-ink); text-decoration: none;
+    font-size: var(--text-lg); font-weight: var(--fw-semibold); letter-spacing: -0.01em;
+}
+.mt-bcn-brand:hover { color: var(--bcn-ink); text-decoration: none; opacity: 0.85; }
+/* height + width:auto, never max-height alone: an SVG with a viewBox and no
+   width/height has no intrinsic size, and max-height collapses it to 0x0. */
+.mt-bcn-brand img { height: 30px; width: auto; display: block; }
+.mt-bcn-brand-mark {
+    inline-size: 30px; block-size: 30px; border-radius: 9px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(255, 255, 255, 0.16);
+}
+.mt-bcn-brand-mark svg { width: 17px; height: 17px; }
+.mt-bcn[data-bcn-style="soft"] .mt-bcn-brand-mark,
+.mt-bcn[data-bcn-style="light"] .mt-bcn-brand-mark { background: var(--color-surface-secondary); }
+
+/* ---- hero: copy + card ---- */
+.mt-bcn-hero {
+    padding: 84px 24px 40px;
+    display: flex; flex-direction: column; align-items: center;
+}
+.mt-bcn-copy { text-align: center; margin-bottom: 26px; max-width: 34rem; }
+.mt-bcn-copy h2 {
+    margin: 0 0 8px; color: var(--bcn-ink);
+    font-size: var(--text-4xl); font-weight: var(--fw-bold); letter-spacing: -0.03em;
+}
+.mt-bcn-copy p { margin: 0; color: var(--bcn-ink-soft); font-size: var(--text-lg); }
+
+.mt-bcn-card {
+    inline-size: 100%; max-inline-size: 27rem;
+    background: var(--bcn-card-bg);
+    border-radius: 18px;
+    padding: 32px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+    /* The card is the ONE thing on the field that keeps page ink: it is a page
+       surface, not part of the coloured field, so every form control inside it
+       inherits the theme's own colours untouched. */
+    color: var(--color-text-primary);
+}
+.mt-bcn[data-bcn-style="light"] .mt-bcn-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--color-border);
+}
+
+/* ---- announcements ---- */
+.mt-bcn-news {
+    inline-size: 100%; max-inline-size: var(--w-wide, 68rem);
+    margin: 0 auto; padding: 0 24px 56px;
+}
+.mt-bcn-news-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; margin-bottom: 14px;
+}
+.mt-bcn-news-head h3 {
+    margin: 0; color: var(--bcn-ink);
+    font-size: var(--text-lg); font-weight: var(--fw-semibold); letter-spacing: -0.01em;
+}
+.mt-bcn-news-head a {
+    color: var(--bcn-ink-soft); text-decoration: none;
+    font-size: var(--text-base); font-weight: var(--fw-medium); white-space: nowrap;
+}
+.mt-bcn-news-head a:hover { color: var(--bcn-ink); text-decoration: none; }
+
+.mt-bcn-news-grid {
+    display: grid; gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+.mt-bcn-news-card {
+    display: block; padding: 18px 20px;
+    background: var(--bcn-news-bg);
+    border: 1px solid var(--bcn-news-border);
+    border-radius: 14px;
+    text-decoration: none; color: var(--bcn-ink);
+    transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.mt-bcn-news-card:hover {
+    text-decoration: none; color: var(--bcn-ink);
+    background: color-mix(in srgb, var(--bcn-news-bg) 70%, #fff 12%);
+    transform: translateY(-1px);
+}
+.mt-bcn-news-card h4 {
+    margin: 0 0 6px; color: var(--bcn-ink);
+    font-size: var(--text-md); font-weight: var(--fw-semibold); letter-spacing: -0.01em;
+}
+.mt-bcn-news-card p {
+    margin: 0 0 10px; color: var(--bcn-ink-soft);
+    font-size: var(--text-base); line-height: 1.5;
+    /* Two lines, then ellipsis: the excerpt is a whole sentence and an
+       uncapped one makes the three cards different heights. */
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.mt-bcn-news-date { color: var(--bcn-ink-faint); font-size: var(--text-sm); }
+
+.mt-bcn-news-empty {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 34px 20px; text-align: center;
+    background: var(--bcn-news-bg);
+    border: 1px solid var(--bcn-news-border);
+    border-radius: 14px;
+    color: var(--bcn-ink-soft);
+}
+.mt-bcn-news-empty .ico { color: var(--bcn-ink-faint); }
+.mt-bcn-news-empty .ico svg { width: 26px; height: 26px; }
+.mt-bcn-news-empty p { margin: 0; font-size: var(--text-base); }
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+    .mt-bcn-hero { padding: 76px 16px 28px; }
+    .mt-bcn-card { padding: 24px; }
+    .mt-bcn-news { padding: 0 16px 40px; }
+    .mt-bcn-copy h2 { font-size: var(--text-3xl); }
+}
