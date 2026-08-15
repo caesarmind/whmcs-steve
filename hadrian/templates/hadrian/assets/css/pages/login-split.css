@@ -43,7 +43,7 @@ body.mt-login-fullpage { display: block; margin: 0; }
 .mt-ls-brand-mark {
     width: 30px; height: 30px;
     border-radius: var(--radius-sm);
-    background: var(--color-accent);
+    background: var(--ls-base, var(--color-accent));
     color: #fff;
     display: inline-flex; align-items: center; justify-content: center;
     flex-shrink: 0;
@@ -88,7 +88,7 @@ body.mt-login-fullpage { display: block; margin: 0; }
 }
 .mt-ls-news-head a {
     font-size: var(--text-base);
-    color: var(--color-accent);
+    color: var(--ls-base, var(--color-accent));
     text-decoration: none;
     display: inline-flex; align-items: center; gap: 4px;
 }
@@ -106,7 +106,7 @@ body.mt-login-fullpage { display: block; margin: 0; }
     transition: border-color var(--transition-fast), transform var(--transition-fast);
 }
 .mt-ls-news-item:hover {
-    border-color: var(--color-accent);
+    border-color: var(--ls-base, var(--color-accent));
     transform: translateY(-1px);
     text-decoration: none;
 }
@@ -117,7 +117,7 @@ body.mt-login-fullpage { display: block; margin: 0; }
     line-height: 1.35;
     color: var(--color-text-primary);
 }
-.mt-ls-news-item:hover .mt-ls-news-title { color: var(--color-accent); }
+.mt-ls-news-item:hover .mt-ls-news-title { color: var(--ls-base, var(--color-accent)); }
 .mt-ls-news-excerpt {
     font-size: var(--text-base);
     line-height: 1.45;
@@ -190,8 +190,8 @@ body.mt-login-fullpage { display: block; margin: 0; }
 
 /* ---- soft: a pale tint of the accent, page ink kept ---- */
 .mt-loginscreen[data-ls-style="soft"] .mt-ls-panel {
-    background: color-mix(in srgb, var(--color-accent) 10%, var(--color-bg));
-    border-right-color: color-mix(in srgb, var(--color-accent) 18%, var(--color-bg));
+    background: color-mix(in srgb, var(--ls-base, var(--color-accent)) 10%, var(--color-bg));
+    border-right-color: color-mix(in srgb, var(--ls-base, var(--color-accent)) 18%, var(--color-bg));
 }
 
 /* ---- gradient / solid: a coloured panel, so the ink flips ----
@@ -209,12 +209,12 @@ body.mt-login-fullpage { display: block; margin: 0; }
     border-right-color: rgba(255, 255, 255, 0.16);
 }
 .mt-loginscreen[data-ls-style="solid"] .mt-ls-panel {
-    background: color-mix(in srgb, var(--color-accent) 92%, #000);
+    background: color-mix(in srgb, var(--ls-base, var(--color-accent)) 92%, #000);
 }
 .mt-loginscreen[data-ls-style="gradient"] .mt-ls-panel {
     background: linear-gradient(160deg,
-        color-mix(in srgb, var(--color-accent) 92%, #000),
-        color-mix(in srgb, var(--color-accent) 58%, #000));
+        color-mix(in srgb, var(--ls-base, var(--color-accent)) 92%, #000),
+        color-mix(in srgb, var(--ls-base, var(--color-accent)) 58%, #000));
 }
 
 /* A news card on a coloured panel: its hover borrows the accent by default,
@@ -234,4 +234,37 @@ body.mt-login-fullpage { display: block; margin: 0; }
 .mt-loginscreen[data-ls-style="solid"] .mt-ls-brand-mark {
     background: rgba(255, 255, 255, 0.18);
     color: #ffffff;
+}
+
+/* The panel's "View all" link takes the panel colour by default, which is
+   invisible once the panel IS that colour. It was already accent-on-accent
+   before the colour control existed; --ls-base only made it exact. Use the ink
+   on any arm that paints the panel. */
+.mt-loginscreen[data-ls-style="gradient"] .mt-ls-news-head a,
+.mt-loginscreen[data-ls-style="solid"] .mt-ls-news-head a {
+    color: rgba(255, 255, 255, 0.88);
+}
+.mt-loginscreen[data-ls-style="gradient"] .mt-ls-news-head a:hover,
+.mt-loginscreen[data-ls-style="solid"] .mt-ls-news-head a:hover { color: #ffffff; }
+
+/* -- Ink derived from the panel, not assumed ---------------------
+   Same reasoning as login-beacon.css: Panel colour can be pointed at a light
+   palette entry, and the arms above hardcode white. Derive it from the
+   resolved fill at the WCAG crossover instead.
+
+   The white ramp in the gradient/solid arms above is the unconditional floor
+   this needs -- see the note in login-beacon.css for why a custom property
+   cannot be given a fallback by declaring it twice. */
+.mt-loginscreen[data-ls-style="gradient"] .mt-ls-panel,
+.mt-loginscreen[data-ls-style="solid"] .mt-ls-panel {
+    --ls-fill: color-mix(in srgb, var(--ls-base, var(--color-accent)) 92%, #000);
+}
+@supports (color: color(from red srgb-linear r g b)) {
+    .mt-loginscreen[data-ls-style="gradient"] .mt-ls-panel,
+    .mt-loginscreen[data-ls-style="solid"] .mt-ls-panel {
+        --_li: clamp(0, (0.179129 - (0.2126 * r + 0.7152 * g + 0.0722 * b)) * 100000, 1);
+        --color-text-primary:   color(from var(--ls-fill) srgb-linear var(--_li) var(--_li) var(--_li) / 1);
+        --color-text-secondary: color(from var(--ls-fill) srgb-linear var(--_li) var(--_li) var(--_li) / 0.86);
+        --color-text-tertiary:  color(from var(--ls-fill) srgb-linear var(--_li) var(--_li) var(--_li) / 0.70);
+    }
 }

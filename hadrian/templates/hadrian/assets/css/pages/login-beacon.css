@@ -64,9 +64,9 @@
    light source while landing near the solid field's own luminance. */
 .mt-bcn[data-bcn-style="gradient"] {
     background-image:
-        radial-gradient(70% 60% at 18% 4%, color-mix(in srgb, var(--color-accent) 58%, #fff 4%), transparent 55%),
-        radial-gradient(60% 50% at 90% 8%, color-mix(in srgb, var(--brand-info, var(--color-accent)) 62%, #000), transparent 50%),
-        linear-gradient(155deg, color-mix(in srgb, var(--color-accent) 86%, #2a1a55), color-mix(in srgb, var(--color-accent) 56%, #000));
+        radial-gradient(70% 60% at 18% 4%, color-mix(in srgb, var(--bcn-base, var(--color-accent)) 58%, #fff 4%), transparent 55%),
+        radial-gradient(60% 50% at 90% 8%, color-mix(in srgb, var(--brand-info, var(--bcn-base, var(--color-accent))) 62%, #000), transparent 50%),
+        linear-gradient(155deg, color-mix(in srgb, var(--bcn-base, var(--color-accent)) 86%, #2a1a55), color-mix(in srgb, var(--bcn-base, var(--color-accent)) 56%, #000));
 }
 
 /* ---- solid ---- */
@@ -75,7 +75,7 @@
    Brand tone uses clears it on every accent in the palette. */
 .mt-bcn[data-bcn-style="solid"] {
     background-image: none;
-    background-color: color-mix(in srgb, var(--color-accent) 92%, #000);
+    background-color: color-mix(in srgb, var(--bcn-base, var(--color-accent)) 92%, #000);
 }
 
 /* ---- soft ---- */
@@ -92,7 +92,7 @@
     --bcn-news-bg: var(--color-surface);
     --bcn-news-border: var(--color-border);
     background-image: none;
-    background-color: color-mix(in srgb, var(--color-accent) 10%, var(--color-bg));
+    background-color: color-mix(in srgb, var(--bcn-base, var(--color-accent)) 10%, var(--color-bg));
 }
 
 /* ---- light ---- */
@@ -228,4 +228,37 @@
     .mt-bcn-card { padding: 24px; }
     .mt-bcn-news { padding: 0 16px 40px; }
     .mt-bcn-copy h2 { font-size: var(--text-3xl); }
+}
+
+/* -- Ink derived from the field, not assumed ---------------------
+   The Field colour control can be pointed at any palette entry, including the
+   light ones -- teal, green, orange. White ink is right for a deepened blue
+   and wrong for those, and nothing above knows which was picked.
+
+   So derive it, with the theme's own primitive: convert the resolved fill to
+   linear-light channels, take the WCAG luminance as a dot product, and clamp
+   the result to 0 or 1 at the exact white/black crossover (0.179129).
+
+   THE UNCONDITIONAL FLOOR ABOVE IS LOAD-BEARING. Custom properties are not
+   parse-validated, so a browser without relative colour syntax still accepts
+   these declarations and they win on source order -- the failure then lands on
+   the CONSUMER as invalid-at-computed-value-time, and `color` inherits. The
+   @supports gate is what keeps that from happening; --bcn-ink's plain white on
+   .mt-bcn is what renders when the gate is false.
+
+   Only the two arms that PAINT need it. soft and light already flip to the
+   page's own text tokens, which are correct on a near-white field by
+   construction. */
+.mt-bcn[data-bcn-style="gradient"],
+.mt-bcn[data-bcn-style="solid"] {
+    --bcn-fill: color-mix(in srgb, var(--bcn-base, var(--color-accent)) 92%, #000);
+}
+@supports (color: color(from red srgb-linear r g b)) {
+    .mt-bcn[data-bcn-style="gradient"],
+    .mt-bcn[data-bcn-style="solid"] {
+        --_bi: clamp(0, (0.179129 - (0.2126 * r + 0.7152 * g + 0.0722 * b)) * 100000, 1);
+        --bcn-ink:       color(from var(--bcn-fill) srgb-linear var(--_bi) var(--_bi) var(--_bi) / 1);
+        --bcn-ink-soft:  color(from var(--bcn-fill) srgb-linear var(--_bi) var(--_bi) var(--_bi) / 0.92);
+        --bcn-ink-faint: color(from var(--bcn-fill) srgb-linear var(--_bi) var(--_bi) var(--_bi) / 0.68);
+    }
 }

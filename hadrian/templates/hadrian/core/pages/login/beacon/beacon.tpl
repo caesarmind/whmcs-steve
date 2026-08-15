@@ -28,6 +28,43 @@
 {if isset($hadrian.pages.login.options.bcn_news)}{assign var=bcnNews value=$hadrian.pages.login.options.bcn_news}{/if}
 {assign var=bcnStyle value=$hadrian.pages.login.options.bcn_field_style|default:'gradient'}
 
+{* The stored colour, resolved to a CSS custom property.
+
+     ''                 -> nothing emitted; the CSS falls back to the accent
+     'theme:<key>'      -> var(--<token>), so it follows Styles > Colors and
+                           moves with a preset change
+     'custom:hexRRGGBB' -> the literal hex, fixed
+
+   The palette key -> token map is the SAME list the admin control offers
+   (core/config/paints.php). It is walked here rather than hardcoded, so a key
+   added there cannot render as nothing. An unknown key emits nothing at all,
+   which leaves the accent fallback standing -- a visible page rather than an
+   invisible one. *}
+{assign var=lcRaw value=$hadrian.pages.login.options.bcn_field_colour|default:''}
+{assign var=lcBase value=''}
+{if $lcRaw|truncate:7:'':true == 'custom:'}
+    {assign var=lcHex value=$lcRaw|substr:7}
+    {if $lcHex|truncate:3:'':true == 'hex'}{assign var=lcBase value='#'|cat:($lcHex|substr:3)}{/if}
+{elseif $lcRaw|truncate:6:'':true == 'theme:'}
+    {assign var=lcKey value=$lcRaw|substr:6}
+    {assign var=lcMap value=[
+        'accent'  => '--color-accent',
+        'quiet'   => '--color-accent',
+        'neutral' => '--color-surface-secondary',
+        'indigo'  => '--color-icon-indigo',
+        'purple'  => '--color-icon-purple',
+        'green'   => '--color-icon-green',
+        'teal'    => '--color-icon-teal',
+        'orange'  => '--color-icon-orange',
+        'red'     => '--color-icon-red',
+        'gray'    => '--color-icon-gray',
+        'block1'  => '--color-block-1',
+        'block2'  => '--color-block-2',
+        'block3'  => '--color-block-3'
+    ]}
+    {if isset($lcMap.$lcKey)}{assign var=lcBase value='var('|cat:$lcMap.$lcKey|cat:')'}{/if}
+{/if}
+
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/login.css?v={$hadrian.version|default:'1.0'}">
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/login-beacon.css?v={$hadrian.version|default:'1.0'}">
 
@@ -37,7 +74,7 @@
    same background gets the identical result without a body script, and keeps
    the variant from leaking its colour onto any other page that happens to
    render through the same shell. *}
-<div class="mt-bcn" data-bcn-style="{$bcnStyle|escape}">
+<div class="mt-bcn" data-bcn-style="{$bcnStyle|escape}"{if $lcBase} style="--bcn-base:{$lcBase|escape}"{/if}>
 
     {* Brand bar. Pinned top-left, out of the centred column's flow, so the card
        stays vertically centred no matter how tall the bar's contents are. *}

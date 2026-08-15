@@ -12,13 +12,50 @@
      ClientAreaPageLogin hook (Hooks::clientAreaPageLogin). Empty/unset is fine.
 *}
 
+{* The stored colour, resolved to a CSS custom property.
+
+     ''                 -> nothing emitted; the CSS falls back to the accent
+     'theme:<key>'      -> var(--<token>), so it follows Styles > Colors and
+                           moves with a preset change
+     'custom:hexRRGGBB' -> the literal hex, fixed
+
+   The palette key -> token map is the SAME list the admin control offers
+   (core/config/paints.php). It is walked here rather than hardcoded, so a key
+   added there cannot render as nothing. An unknown key emits nothing at all,
+   which leaves the accent fallback standing -- a visible page rather than an
+   invisible one. *}
+{assign var=lcRaw value=$hadrian.pages.login.options.spl_panel_colour|default:''}
+{assign var=lcBase value=''}
+{if $lcRaw|truncate:7:'':true == 'custom:'}
+    {assign var=lcHex value=$lcRaw|substr:7}
+    {if $lcHex|truncate:3:'':true == 'hex'}{assign var=lcBase value='#'|cat:($lcHex|substr:3)}{/if}
+{elseif $lcRaw|truncate:6:'':true == 'theme:'}
+    {assign var=lcKey value=$lcRaw|substr:6}
+    {assign var=lcMap value=[
+        'accent'  => '--color-accent',
+        'quiet'   => '--color-accent',
+        'neutral' => '--color-surface-secondary',
+        'indigo'  => '--color-icon-indigo',
+        'purple'  => '--color-icon-purple',
+        'green'   => '--color-icon-green',
+        'teal'    => '--color-icon-teal',
+        'orange'  => '--color-icon-orange',
+        'red'     => '--color-icon-red',
+        'gray'    => '--color-icon-gray',
+        'block1'  => '--color-block-1',
+        'block2'  => '--color-block-2',
+        'block3'  => '--color-block-3'
+    ]}
+    {if isset($lcMap.$lcKey)}{assign var=lcBase value='var('|cat:$lcMap.$lcKey|cat:')'}{/if}
+{/if}
+
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/login.css?v={$hadrian.version|default:'1.0'}">
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/login-split.css?v={$hadrian.version|default:'1.0'}">
 
 {* The panel fill. An attribute rather than a class so the CSS arms read as
    one axis, matching how the Welcome band and the nav tones are written. *}
 {assign var=splStyle value=$hadrian.pages.login.options.spl_panel_style|default:'light'}
-<div class="mt-loginscreen{if !empty($hadrian.pages.login.options.info_right)} is-info-right{/if}" data-ls-style="{$splStyle|escape}">
+<div class="mt-loginscreen{if !empty($hadrian.pages.login.options.info_right)} is-info-right{/if}" data-ls-style="{$splStyle|escape}"{if $lcBase} style="--ls-base:{$lcBase|escape}"{/if}>
 
     {* ── Info panel: brand + welcome + latest announcements (left by default;
        admin "Info panel on the right" option moves it to the right) ── *}

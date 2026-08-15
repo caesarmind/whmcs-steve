@@ -211,6 +211,23 @@ final class PagesController extends AbstractController
                 // The view tags each control with it so the client can swap the
                 // visible set the instant a different template is picked.
                 'variant' => (string)($spec['_variant'] ?? ''),
+                // A 'colour' option renders the same Colour source + swatches
+                // control a block drawer does, so it needs the same palette.
+                // Resolved through the SAME method the sections path uses --
+                // the swatch values are computed from the theme's colour config
+                // and restating them here would let the two lists drift.
+                // Empty for every other type, and the view skips the row then.
+                'paints'  => ($spec['type'] ?? '') === 'colour'
+                    ? $this->resolvePaintSwatches($template,
+                        is_array($spec['paints'] ?? null) ? $spec['paints'] : [])
+                    : [],
+                // Which values of the SIBLING style option require a colour.
+                // Same idea as a block's needsColour: a style built from a
+                // colour has no uncoloured rendering, so None is withheld.
+                'needsColourOn' => is_array($spec['needsColourOn'] ?? null)
+                    ? array_values(array_map('strval', $spec['needsColourOn'])) : [],
+                // The option key whose value decides that.
+                'stylePeer' => (string)($spec['stylePeer'] ?? ''),
             ];
         }
 

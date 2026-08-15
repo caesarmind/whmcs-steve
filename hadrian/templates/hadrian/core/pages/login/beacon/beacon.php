@@ -42,6 +42,21 @@ return [
             'options' => ['gradient', 'solid', 'soft', 'light'],
             'tooltip' => 'Gradient is the shipped look: the accent swept across the whole page, deepened at one corner. Solid is a flat accent field. Soft is a pale tint of the accent with dark text, for a quieter page. Light drops the colour altogether and puts the card on the page surface.',
         ],
+        'bcn_field_colour' => [
+            'type'    => 'colour',
+            'label'   => 'Field colour',
+            'help'    => 'Which colour the field is built from. Theme follows Styles > Colors, so the sign-in page moves with a preset change; Custom is fixed. None falls back to the accent.',
+            'default' => '',
+            // The same palette the dashboard blocks offer, from one file so the
+            // two cannot drift.
+            'paints'  => require __DIR__ . '/../../../config/paints.php',
+            // None is withheld while the style is one BUILT from a colour:
+            // gradient, solid and soft have no uncoloured rendering -- the CSS
+            // falls back to the accent -- so offering None described a state
+            // the page does not have.
+            'stylePeer'     => 'bcn_field_style',
+            'needsColourOn' => ['gradient', 'solid', 'soft'],
+        ],
         'bcn_news' => [
             'type'    => 'bool',
             'label'   => 'Show announcements',

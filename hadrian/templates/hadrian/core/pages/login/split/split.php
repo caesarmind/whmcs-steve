@@ -32,5 +32,16 @@ return [
             'options' => ['light', 'soft', 'gradient', 'solid'],
             'tooltip' => 'Which fill the brand + announcements panel carries. Light is the shipped look: the page surface with a hairline divider. Soft is a pale tint of the accent. Gradient sweeps the accent down the panel, deepened at one end. Solid is a flat accent panel. Gradient and Solid carry light text; Light and Soft keep the page ink.',
         ],
+        'spl_panel_colour' => [
+            'type'    => 'colour',
+            'label'   => 'Panel colour',
+            'help'    => 'Which colour the info panel is built from. Theme follows Styles > Colors, so the panel moves with a preset change; Custom is fixed. None falls back to the accent.',
+            'default' => '',
+            'paints'  => require __DIR__ . '/../../../config/paints.php',
+            // light is absent: it is the neutral panel, built from the page
+            // surface rather than from a colour.
+            'stylePeer'     => 'spl_panel_style',
+            'needsColourOn' => ['soft', 'gradient', 'solid'],
+        ],
     ],
 ];

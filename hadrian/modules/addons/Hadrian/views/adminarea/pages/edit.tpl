@@ -231,6 +231,27 @@
                                 {/foreach}
                             </select>
                         </div>
+                    {elseif $opt.type == 'colour'}
+                        {* The same Colour source + swatches control a block
+                           drawer draws, mounted on a page option. The row is
+                           STACKED because the swatch strips are as wide as the
+                           panel; the compact label-left/control-right shape the
+                           toggles use has nowhere to put them.
+
+                           The hidden input is the whole storage contract:
+                           'theme:<key>' | 'custom:hexRRGGBB' | ''. The control
+                           itself is built in JS below, from data-paints. *}
+                        <div class="mt-row is-stacked" data-opt-variant="{$opt.variant|escape}">
+                            <div>
+                                <div class="mt-row-label">{$opt.label|escape}</div>
+                                {if $opt.help}<div class="mt-row-help">{$opt.help|escape}</div>{/if}
+                            </div>
+                            <input type="hidden" id="opt-{$opt.key|escape}" name="option[{$opt.key|escape}]" value="{$opt.value|escape}">
+                            <div class="mt-optcolour" data-for="opt-{$opt.key|escape}"
+                                 data-paints="{$opt.paints|@json_encode|escape}"
+                                 data-style-peer="{$opt.stylePeer|escape}"
+                                 data-needs-colour-on="{$opt.needsColourOn|@json_encode|escape}"></div>
+                        </div>
                     {elseif $opt.type == 'int'}
                         {* A number is a two-character value; without this branch
                            it fell into the free-text catch-all below and drew a
@@ -886,6 +907,151 @@
     var vGrid = document.querySelector('.mt-variant-grid');
     if (vGrid) {
         vGrid.addEventListener('click', function () { setTimeout(applyVariantFilter, 0); });
+    }
+
+    /* ------------------------------------------------------------------
+       COLOUR SOURCE + VALUE PICKER -- shared control.
+
+       Two rows: the None/Theme/Custom switch, and the picker that swaps with
+       it. Lifted out of the section drawer when the login variants needed the
+       same control, so there is ONE implementation rather than two that drift.
+
+       It owns only the rows. The CALLER owns where the value goes -- the
+       section drawer serialises it into field 4 of the layout DSL and adds its
+       own Fill row underneath; a page option writes it to a hidden input. That
+       split is the seam: everything above is about picking a colour, everything
+       below is about where the colour lives.
+
+       opts = {
+         paints      map of key -> {label, swatch, track}
+         mode        'none' | 'theme' | 'custom'
+         key         the palette key, when a key was ever picked
+         hex         the 'hexRRGGBB' token, when one was ever picked
+         needsColour true drops None -- for a style that is BUILT from a colour
+                     and so has no uncoloured rendering
+         onChange(mode, key, hex)
+       }
+       Returns an array of row elements for the caller to append.
+       ------------------------------------------------------------------ */
+    function mtColourRows(opts) {
+        var PAINTS     = opts.paints || {};
+        var PAINT_KEYS = Object.keys(PAINTS);
+        var mode       = opts.mode;
+        var lastKey    = opts.key || '';
+        var lastHex    = opts.hex || '';
+        var rows       = [];
+        if (!PAINT_KEYS.length) return rows;
+
+        var fire = function () { opts.onChange(mode, lastKey, lastHex); };
+
+        // --- Row A: the mode switch -------------------------
+        var co = document.createElement('div');
+        co.className = 'mt-seclay-opt';
+        var cwrap = document.createElement('div');
+        var cl = document.createElement('div');
+        cl.className = 'mt-seclay-opt-l';
+        cl.textContent = 'Colour source';
+        var ch = document.createElement('div');
+        ch.className = 'mt-seclay-opt-h';
+        ch.textContent = 'A theme colour is set on Styles > Colors, and every block using it '
+                       + 'changes when you change it there. A custom colour is fixed: it stays '
+                       + 'exactly as you set it, whatever the style does.';
+        cwrap.appendChild(cl); cwrap.appendChild(ch);
+        co.appendChild(cwrap);
+
+        var modeSeg = document.createElement('span');
+        modeSeg.className = 'mt-seclay-w';
+        // None is withheld when the style is built from a colour: there is no
+        // uncoloured rendering of a gradient, so offering the option only
+        // invited the disagreement this control had with the page.
+        var MODES = opts.needsColour
+            ? [['theme', 'Theme'], ['custom', 'Custom']]
+            : [['none', 'None'], ['theme', 'Theme'], ['custom', 'Custom']];
+        MODES.forEach(function (m) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = m[1];
+            if (mode === m[0]) b.className = 'is-active';
+            b.setAttribute('aria-pressed', mode === m[0] ? 'true' : 'false');
+            b.addEventListener('click', function () { mode = m[0]; fire(); });
+            modeSeg.appendChild(b);
+        });
+        co.appendChild(modeSeg);
+        rows.push(co);
+
+        // --- Row B: the value picker, swapped by mode -------
+        if (mode !== 'none') {
+            var vo = document.createElement('div');
+            vo.className = 'mt-seclay-opt is-stacked';
+
+            if (mode === 'theme') {
+                // Keep the preset/token split: which colours move when you
+                // switch preset and which do not is the genuinely surprising
+                // part, and the mode switch does not express it.
+                var mkSwatch = function (k) {
+                    var b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'mt-sw' + (lastKey === k ? ' is-active' : '');
+                    b.title = PAINTS[k].label;
+                    var v = PAINTS[k].swatch;
+                    if (v) { b.style.background = v; }
+                    else { b.classList.add('is-bare'); b.textContent = PAINTS[k].label.slice(0, 2); }
+                    b.setAttribute('aria-pressed', lastKey === k ? 'true' : 'false');
+                    b.addEventListener('click', function () { lastKey = k; fire(); });
+                    return b;
+                };
+                var group = function (caption, keys) {
+                    if (!keys.length) return;
+                    var g = document.createElement('div');
+                    g.className = 'mt-sw-group';
+                    var cap = document.createElement('div');
+                    cap.className = 'mt-sw-cap';
+                    cap.textContent = caption;
+                    var strip = document.createElement('div');
+                    strip.className = 'mt-seclay-sw';
+                    keys.forEach(function (k) { strip.appendChild(mkSwatch(k)); });
+                    g.appendChild(cap); g.appendChild(strip);
+                    vo.appendChild(g);
+                };
+                group('Moves with the preset',
+                      PAINT_KEYS.filter(function (k) { return PAINTS[k].track === 'preset'; }));
+                group('Its own row on Styles > Colors',
+                      PAINT_KEYS.filter(function (k) { return PAINTS[k].track !== 'preset'; }));
+            } else {
+                var cg = document.createElement('div');
+                cg.className = 'mt-sw-group';
+                var ccap = document.createElement('div');
+                ccap.className = 'mt-sw-cap';
+                ccap.textContent = 'Fixed: does not follow Styles > Colors';
+                var cstrip = document.createElement('div');
+                cstrip.className = 'mt-seclay-sw';
+                var cwrapc = document.createElement('span');
+                cwrapc.className = 'mt-sw-custom is-active';
+                cwrapc.title = 'Custom colour';
+                var ci = document.createElement('input');
+                ci.type = 'color';
+                ci.className = 'mt-sw-cin';
+                ci.value = lastHex ? ('#' + lastHex.slice(3)) : '#5856d6';
+                // 'change', not 'input': input fires continuously while dragging
+                // in the OS picker, and every fire repaints, destroying the very
+                // input being dragged.
+                ci.addEventListener('change', function () {
+                    var v = (ci.value || '').toLowerCase();
+                    if (!/^#[0-9a-f]{6}$/.test(v)) return;
+                    lastHex = 'hex' + v.slice(1); fire();
+                });
+                cwrapc.appendChild(ci);
+                cstrip.appendChild(cwrapc);
+                var hexLabel = document.createElement('span');
+                hexLabel.className = 'mt-sw-hex';
+                hexLabel.textContent = lastHex ? '#' + lastHex.slice(3) : 'Pick a colour';
+                cstrip.appendChild(hexLabel);
+                cg.appendChild(ccap); cg.appendChild(cstrip);
+                vo.appendChild(cg);
+            }
+            rows.push(vo);
+        }
+        return rows;
     }
 
     Object.keys(specs).forEach(function (key) {
@@ -1569,118 +1735,20 @@
                             commit();
                         };
 
-                        // --- Row A: the mode switch -------------------------
-                        var co = document.createElement('div');
-                        co.className = 'mt-seclay-opt';
-                        var cwrap = document.createElement('div');
-                        var cl = document.createElement('div');
-                        cl.className = 'mt-seclay-opt-l';
-                        cl.textContent = 'Colour source';
-                        var ch = document.createElement('div');
-                        ch.className = 'mt-seclay-opt-h';
-                        ch.textContent = 'A theme colour is set on Styles > Colors, and every block using it '
-                                       + 'changes when you change it there. A custom colour is fixed: it stays '
-                                       + 'exactly as you set it, whatever the style does.';
-                        cwrap.appendChild(cl); cwrap.appendChild(ch);
-                        co.appendChild(cwrap);
-
-                        var modeSeg = document.createElement('span');
-                        modeSeg.className = 'mt-seclay-w';
-                        // None is withheld when the block's style is built from a
-                        // colour: there is no uncoloured rendering of a gradient,
-                        // so offering the option only invited the disagreement
-                        // this control had with the page.
-                        var MODES = blockNeedsColour
-                            ? [['theme', 'Theme'], ['custom', 'Custom']]
-                            : [['none', 'None'], ['theme', 'Theme'], ['custom', 'Custom']];
-                        MODES.forEach(function (m) {
-                            var b = document.createElement('button');
-                            b.type = 'button';
-                            b.textContent = m[1];
-                            if (mode === m[0]) b.className = 'is-active';
-                            b.setAttribute('aria-pressed', mode === m[0] ? 'true' : 'false');
-                            b.addEventListener('click', function () {
-                                openMode = m[0]; mode = m[0]; setColour();
-                            });
-                            modeSeg.appendChild(b);
-                        });
-                        co.appendChild(modeSeg);
-                        gColour.appendChild(co);
-
-                        // --- Row B: the value picker, swapped by mode -------
-                        if (mode !== 'none') {
-                            var vo = document.createElement('div');
-                            vo.className = 'mt-seclay-opt is-stacked';
-
-                            if (mode === 'theme') {
-                                // Keep the preset/token split: which colours move
-                                // when you switch preset and which do not is the
-                                // genuinely surprising part, and the mode switch
-                                // does not express it.
-                                var mkSwatch = function (key) {
-                                    var b = document.createElement('button');
-                                    b.type = 'button';
-                                    b.className = 'mt-sw' + (lastKey === key ? ' is-active' : '');
-                                    b.title = PAINTS[key].label;
-                                    var v = PAINTS[key].swatch;
-                                    if (v) { b.style.background = v; }
-                                    else { b.classList.add('is-bare'); b.textContent = PAINTS[key].label.slice(0, 2); }
-                                    b.setAttribute('aria-pressed', lastKey === key ? 'true' : 'false');
-                                    b.addEventListener('click', function () { lastKey = key; setColour(); });
-                                    return b;
-                                };
-                                var group = function (caption, keys) {
-                                    if (!keys.length) return;
-                                    var g = document.createElement('div');
-                                    g.className = 'mt-sw-group';
-                                    var cap = document.createElement('div');
-                                    cap.className = 'mt-sw-cap';
-                                    cap.textContent = caption;
-                                    var strip = document.createElement('div');
-                                    strip.className = 'mt-seclay-sw';
-                                    keys.forEach(function (k) { strip.appendChild(mkSwatch(k)); });
-                                    g.appendChild(cap); g.appendChild(strip);
-                                    vo.appendChild(g);
-                                };
-                                group('Moves with the preset',
-                                      PAINT_KEYS.filter(function (k) { return PAINTS[k].track === 'preset'; }));
-                                group('Its own row on Styles > Colors',
-                                      PAINT_KEYS.filter(function (k) { return PAINTS[k].track !== 'preset'; }));
-                            } else {
-                                var cg = document.createElement('div');
-                                cg.className = 'mt-sw-group';
-                                var ccap = document.createElement('div');
-                                ccap.className = 'mt-sw-cap';
-                                ccap.textContent = 'Fixed: does not follow Styles > Colors';
-                                var cstrip = document.createElement('div');
-                                cstrip.className = 'mt-seclay-sw';
-                                var cwrapc = document.createElement('span');
-                                cwrapc.className = 'mt-sw-custom is-active';
-                                cwrapc.title = 'Custom colour';
-                                var ci = document.createElement('input');
-                                ci.type = 'color';
-                                ci.className = 'mt-sw-cin';
-                                ci.value = lastHex ? ('#' + lastHex.slice(3)) : '#5856d6';
-                                // 'change', not 'input': input fires continuously
-                                // while dragging in the OS picker, and every fire
-                                // repaints the list, destroying the very input
-                                // being dragged.
-                                ci.addEventListener('change', function () {
-                                    var v = (ci.value || '').toLowerCase();
-                                    if (!/^#[0-9a-f]{6}$/.test(v)) return;
-                                    lastHex = 'hex' + v.slice(1); setColour();
-                                });
-                                cwrapc.appendChild(ci);
-                                cstrip.appendChild(cwrapc);
-                                var hexLabel = document.createElement('span');
-                                hexLabel.className = 'mt-sw-hex';
-                                hexLabel.textContent = lastHex ? '#' + lastHex.slice(3) : 'Pick a colour';
-                                cstrip.appendChild(hexLabel);
-                                cg.appendChild(ccap); cg.appendChild(cstrip);
-                                vo.appendChild(cg);
+                        // Rows A and B come from the shared control, so the
+                        // drawer and the page-level colour option cannot drift.
+                        // The drawer keeps what is ITS OWN: writing the value
+                        // into field 4 of the layout DSL, and the Fill row below.
+                        mtColourRows({
+                            paints: PAINTS,
+                            mode: mode, key: lastKey, hex: lastHex,
+                            needsColour: blockNeedsColour,
+                            onChange: function (m, k, h) {
+                                mode = m; lastKey = k; lastHex = h;
+                                openMode = m;
+                                setColour();
                             }
-                            gColour.appendChild(vo);
-                        }
+                        }).forEach(function (r) { gColour.appendChild(r); });
 
                         // --- Fill: shared by both modes ---------------------
                         // It is segment 2 structurally, and "how a paint is
@@ -1873,6 +1941,84 @@
     // Run last, so the freshly built cards are filtered along with everything else.
     applyVariantFilter();
 })();
+    /* ------------------------------------------------------------------
+       PAGE-LEVEL COLOUR OPTIONS.
+
+       A variant that declares `'type' => 'colour'` gets the same Colour source
+       + swatches control a block drawer draws -- the same function, so the two
+       cannot drift apart.
+
+       Storage is a plain option value rather than the layout DSL, because a
+       page option has no layout entry to be field 4 of:
+
+           ''                 no colour; the style falls back to the accent
+           'theme:<key>'      follows Styles > Colors
+           'custom:hexRRGGBB' fixed
+
+       The MEMO the drawer keeps -- the other mode's last pick, so the switch
+       flips back without losing it -- is held in JS here rather than stored.
+       A page option is one field; appending a memo to it would change the
+       value every consumer reads for a state the page never renders.
+
+       None is withheld when the SIBLING style option is currently set to a
+       value that is built from a colour (declared as stylePeer +
+       needsColourOn). That is the same rule the band uses: a gradient has no
+       uncoloured rendering, so offering None only invites the control to
+       disagree with the page.
+       ------------------------------------------------------------------ */
+    document.querySelectorAll('.mt-optcolour').forEach(function (mount) {
+        var field = document.getElementById(mount.getAttribute('data-for'));
+        if (!field) return;
+
+        var paints = {};
+        try { paints = JSON.parse(mount.getAttribute('data-paints') || '{}') || {}; } catch (e) { paints = {}; }
+        if (!Object.keys(paints).length) return;   // nothing to pick from
+
+        var needsOn = [];
+        try { needsOn = JSON.parse(mount.getAttribute('data-needs-colour-on') || '[]') || []; } catch (e) { needsOn = []; }
+        var peer = mount.getAttribute('data-style-peer') || '';
+        var peerEl = peer ? document.getElementById('opt-' + peer) : null;
+
+        // Seed from the stored value; the memo starts from whatever is there.
+        var raw  = (field.value || '').trim();
+        var mode = raw.indexOf('theme:') === 0 ? 'theme'
+                 : (raw.indexOf('custom:') === 0 ? 'custom' : 'none');
+        var key  = mode === 'theme'  ? raw.slice(6) : '';
+        var hex  = mode === 'custom' ? raw.slice(7) : '';
+
+        var needsColour = function () {
+            return !!(peerEl && needsOn.indexOf(peerEl.value) !== -1);
+        };
+
+        var paint = function () {
+            mount.innerHTML = '';
+            // Opening on None when the style is built from a colour would
+            // describe a state the page does not have -- it is accent-coloured
+            // either way -- so seed Theme/accent instead, exactly as the drawer
+            // does for a band.
+            var m = mode;
+            if (needsColour() && m === 'none') { m = 'theme'; if (!key) { key = 'accent'; } }
+            mtColourRows({
+                paints: paints,
+                mode: m, key: key, hex: hex,
+                needsColour: needsColour(),
+                onChange: function (nm, nk, nh) {
+                    mode = nm; key = nk; hex = nh;
+                    field.value = nm === 'theme'  && nk ? 'theme:' + nk
+                                : nm === 'custom' && nh ? 'custom:' + nh
+                                : '';
+                    paint();
+                }
+            }).forEach(function (r) { mount.appendChild(r); });
+        };
+        paint();
+
+        // Repaint when the style peer changes: whether None is offered is a
+        // function of ITS value, so a control that did not follow it would go
+        // on offering None for a gradient.
+        if (peerEl) { peerEl.addEventListener('change', paint); }
+    });
+
 </script>
 {/literal}
 
