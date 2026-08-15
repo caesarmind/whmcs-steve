@@ -216,18 +216,21 @@ const HF_DESIGNS = [
   { id: 'default', t: 'Classic', f: 'clientareahome-v9.html',
     s: 'The familiar shape: a greeting hero over plain tables, one after another.' },
 ];
-/* The two sign-in designs the module ships, from core/pages/login/. Split is
-   described in its own words, out of split/split.php; Default the module leaves
-   undescribed, as it does the Classic dashboard. The mockup drew Split as
-   login-v2 -- its lv2-news/-list/-date/-head/-empty vocabulary is the shipped
-   mt-ls-news* one under an earlier prefix -- and carries three further splits,
-   v3-v5, that the module does not ship and so are not offered.
-   Split suppresses the portal nav, sidebar and footer, hence shell: false. */
+/* The three sign-in designs, from core/pages/login/. Names are ours: the module
+   describes only its split, and these read better as a set. Default goes last --
+   it is the plain fallback, and the two full-bleed designs are what a buyer is
+   here to see -- so Split leads and is what the page opens on.
+   Split and Marquee both drop every partial but the state chip: no portal nav,
+   no sidebar, no footer. Hence shell: false, which greys out the layout and tone
+   controls rather than leaving them to no-op. Default keeps the full chrome.
+   (The mockup holds two further splits, v2 and v3, not offered here.) */
 const HF_LOGINS = [
+  { id: 'split', t: 'Split', f: 'login-v5.html', shell: false,
+    s: 'Full-bleed two columns: the sign-in form on one side, the latest announcements as cards on the other, both on the theme’s own calm surfaces.' },
+  { id: 'marquee', t: 'Marquee', f: 'login-v4.html', shell: false,
+    s: 'A welcome band across the top, the sign-in card beneath it, and the latest announcements in a grid below — the closest of the three to the dashboard’s own shape.' },
   { id: 'default', t: 'Default', f: 'login.html',
-    s: 'The sign-in form on a card in the middle of the page, with the portal navigation and footer still around it.' },
-  { id: 'split', t: 'Split', f: 'login-v2.html', shell: false,
-    s: 'Full-bleed two-column sign-in — brand and the latest announcements on one side, the login form on the other. Hides the portal nav and footer.' },
+    s: 'The sign-in form on a card in the middle of the page, with the portal navigation, sidebar and footer still around it.' },
 ];
 /* Welcome band styles. The module and the mockup grew these separately and use
    different words for the same fills, so the labels are the module's -- what a
@@ -523,7 +526,7 @@ function HeroStage({ dark }) {
   const [tone, setTone] = React.useState('light');
   // one remembered pick per page that ships more than one design, so leaving the
   // page and coming back does not reset the choice
-  const [variant, setVariant] = React.useState({ dashboard: 'atrium', login: 'default' });
+  const [variant, setVariant] = React.useState({ dashboard: 'atrium', login: 'split' });
   const [band, setBand] = React.useState('gradient');
   const [bandSize, setBandSize] = React.useState('full');
   // null = not yet offered, 'cue' = the nudge is up, 'open' = the options are,
@@ -595,7 +598,7 @@ function HeroStage({ dark }) {
       <div className="hf-picker" role="tablist" aria-label="Navigation layout">
         {HF_LAYOUTS.filter((p) => layIds.indexOf(p.wire) !== -1).map((p) => (
           <button key={p.wire} role="tab" aria-selected={hasShell && layId === p.wire} disabled={!hasShell}
-                  onClick={reel.manual(() => setLay(p.wire))} title={hasShell ? p.t : 'Split is full-bleed — it carries no portal navigation'}>
+                  onClick={reel.manual(() => setLay(p.wire))} title={hasShell ? p.t : `${dsn.t} is full-bleed — it carries no portal navigation`}>
             <HFWire kind={p.wire} active={layId === p.wire} />
             <b>{p.t}</b><span>{p.s}</span>
           </button>
@@ -605,7 +608,7 @@ function HeroStage({ dark }) {
         <div className="hf-rail left" role="tablist" aria-label="Sidebar tone">
           <span className="hf-lbl">Sidebar tone</span>
           {HF_TONES.map((x) => (
-            <button key={x.id} role="tab" aria-selected={toneable && tone === x.id} disabled={!toneable} title={toneable ? x.t : (hasShell ? 'Top Nav has no side menu to retone' : 'Split is full-bleed — it carries no side menu')} onClick={reel.manual(() => setTone(x.id))}>
+            <button key={x.id} role="tab" aria-selected={toneable && tone === x.id} disabled={!toneable} title={toneable ? x.t : (hasShell ? 'Top Nav has no side menu to retone' : `${dsn.t} is full-bleed — it carries no side menu`)} onClick={reel.manual(() => setTone(x.id))}>
               <HFToneGlyph tone={x.id} accent={pal.c} dark={dark} paletteId={pal.id} />
               <em><b>{x.t}</b><i>{x.s}</i></em>
             </button>
@@ -716,7 +719,7 @@ const TILES = [
   {
     k: 'Page templates', h: 'Four dashboards.\nOne page editor.', V: VizTemplates,
     p: 'The pages worth arguing over ship more than one design — the dashboard has four. Assign per page, then open the real page to check.',
-    long: 'All 102 client-area pages are listed in one editor. Three of them carry a choice of design: the dashboard ships Default, Atrium, Bento and Minimal; the homepage ships Default, Portal and Simple; the login page ships Default and Split. The rest ship the one design they were drawn with.',
+    long: 'All 102 client-area pages are listed in one editor. Three of them carry a choice of design: the dashboard ships Default, Atrium, Bento and Minimal; the homepage ships Default, Portal and Simple; the login page ships Default, Split and Marquee. The rest ship the one design they were drawn with.',
     long2: 'When a template carries its own options they appear directly beneath the selector; when it has none, the panel says so rather than leaving an empty box. A per-page Custom layout override is there for the pages that need to break from the site-wide setting.',
     steps: [['Select the page', 'Search or browse all 102 pages in the Pages editor.'], ['Choose a template', 'Where the page offers more than one, with its own settings below.'], ['Open the page', 'View page opens it on the site itself, not a mockup.']],
     caption: 'Default, Atrium, Bento and Minimal',
