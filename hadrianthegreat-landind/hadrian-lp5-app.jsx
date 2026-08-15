@@ -192,7 +192,7 @@ const HF_PAGES = [
   // no in-page aside: the services table is the point of this page, and the
   // sub-nav repeats links the main navigation already carries
   { id: 'services', t: 'Services', src: 'clientareaproducts.html', subnav: 'off' },
-  { id: 'store', t: 'Store', src: 'store.html' },
+  { id: 'store', t: 'Store', src: 'store.html', variants: 'store' },
   { id: 'invoice', t: 'Invoice', src: 'viewinvoice.html' },
   { id: 'support', t: 'Support', src: 'supportticketslist.html' },
   // the module ships two sign-in designs, and Split brings its own chrome
@@ -252,10 +252,34 @@ const HF_BANDS = [
   { id: 'brand', t: 'Solid', s: 'Filled with the accent' },
 ];
 
+/* The storefront pages the theme ships, under the Store tab. Two families:
+   the order index and the two client-area pages take the portal chrome and so
+   answer the layout and tone controls; the four marketing pages are
+   homepage-layout, carry their own <nav class="homepage-nav"> and never read
+   data-layout or data-sidebar, so they are flagged shell + marketing and those
+   controls grey out on them rather than no-op. Labels are the ones the pages
+   are known by rather than their headlines, which are marketing sentences. */
+const HF_STORE = [
+  { id: 'order', t: 'Order', f: 'store.html',
+    s: 'The store index — every plan a client can order, with a 30-day money-back guarantee on all of them.' },
+  { id: 'ssl', t: 'SSL Certificates', f: 'ssl-certificates.html',
+    s: 'Trusted certificates by validation level, from domain validation up to extended and wildcard.' },
+  { id: 'security', t: 'Website Security', f: 'website-security.html', shell: false, marketing: true,
+    s: 'SiteLock malware scanning — automatic scans and reputation protection, sold as a storefront page.' },
+  { id: 'backup', t: 'Website Backup', f: 'website-backup.html', shell: false, marketing: true,
+    s: 'CodeGuard daily automated backups, against viruses, hackers and your own code breaking the site.' },
+  { id: 'seo', t: 'SEO Tools', f: 'seo-tools.html', shell: false, marketing: true,
+    s: 'marketgoo SEO tools — visibility, traffic and the reporting that goes with them.' },
+  { id: 'monitoring', t: '360 Monitoring', f: 'monitoring-360.html',
+    s: 'Uptime and performance checks from global probes, with a free assessment on the way in.' },
+  { id: 'nordvpn', t: 'NordVPN', f: 'nordvpn.html', shell: false, marketing: true,
+    s: 'Connection encryption and IP concealment, sold alongside the hosting.' },
+];
 /* Which list a page's design picker draws from, and what that picker is called. */
 const HF_VARIANTS = {
   dashboard: { lbl: 'Dashboard design', list: HF_DESIGNS },
   login: { lbl: 'Sign-in design', list: HF_LOGINS },
+  store: { lbl: 'Storefront page', list: HF_STORE },
 };
 const hfVariant = (set, id) => set.list.find((d) => d.id === id) || set.list[0];
 
@@ -526,7 +550,7 @@ function HeroStage({ dark }) {
   const [tone, setTone] = React.useState('light');
   // one remembered pick per page that ships more than one design, so leaving the
   // page and coming back does not reset the choice
-  const [variant, setVariant] = React.useState({ dashboard: 'atrium', login: 'split' });
+  const [variant, setVariant] = React.useState({ dashboard: 'atrium', login: 'split', store: 'order' });
   const [band, setBand] = React.useState('gradient');
   const [bandSize, setBandSize] = React.useState('full');
   // null = not yet offered, 'cue' = the nudge is up, 'open' = the options are,
@@ -551,6 +575,12 @@ function HeroStage({ dark }) {
   const panelToned = !!(dsn && dsn.tones);
   const toneable = panelToned || (lay !== 'top' && hasShell);
   const toneLbl = panelToned ? 'Panel tone' : 'Sidebar tone';
+  // why the layout and tone controls are off, in the words of whichever design is
+  // showing: a full-bleed sign-in has no chrome at all, a storefront page has its
+  // own marketing nav instead of the portal's.
+  const shellWhy = !dsn ? '' : dsn.marketing
+    ? `${dsn.t} is a storefront page — it carries its own marketing nav, not the portal chrome`
+    : `${dsn.t} is full-bleed — it carries no portal navigation`;
   const layIds = CA_EMBEDDABLE ? HF_LAYOUTS.map((l) => l.wire) : Object.keys(HF_SHOTS[pg.id] || { side: 1 });
   const layId = layIds.indexOf(lay) === -1 ? (layIds[0] || 'top') : lay;
   const reel = useHFReel({ layIds, layId, setLay, palette, setPalette });
@@ -605,7 +635,7 @@ function HeroStage({ dark }) {
       <div className="hf-picker" role="tablist" aria-label="Navigation layout">
         {HF_LAYOUTS.filter((p) => layIds.indexOf(p.wire) !== -1).map((p) => (
           <button key={p.wire} role="tab" aria-selected={hasShell && layId === p.wire} disabled={!hasShell}
-                  onClick={reel.manual(() => setLay(p.wire))} title={hasShell ? p.t : `${dsn.t} is full-bleed — it carries no portal navigation`}>
+                  onClick={reel.manual(() => setLay(p.wire))} title={hasShell ? p.t : shellWhy}>
             <HFWire kind={p.wire} active={layId === p.wire} />
             <b>{p.t}</b><span>{p.s}</span>
           </button>
@@ -615,7 +645,7 @@ function HeroStage({ dark }) {
         <div className="hf-rail left" role="tablist" aria-label={toneLbl}>
           <span className="hf-lbl">{toneLbl}</span>
           {HF_TONES.map((x) => (
-            <button key={x.id} role="tab" aria-selected={toneable && tone === x.id} disabled={!toneable} title={toneable ? x.t : (hasShell ? 'Top Nav has no side menu to retone' : `${dsn.t} is full-bleed — it carries no side menu`)} onClick={reel.manual(() => setTone(x.id))}>
+            <button key={x.id} role="tab" aria-selected={toneable && tone === x.id} disabled={!toneable} title={toneable ? x.t : (hasShell ? 'Top Nav has no side menu to retone' : shellWhy)} onClick={reel.manual(() => setTone(x.id))}>
               <HFToneGlyph tone={x.id} accent={pal.c} dark={dark} paletteId={pal.id} />
               <em><b>{x.t}</b><i>{x.s}</i></em>
             </button>
