@@ -611,3 +611,8 @@ button.hp-foundtag:hover{border-color:var(--color-accent)}
 .sp-adminframe{background:var(--color-surface);border:1px solid var(--color-border);border-radius:16px;overflow:hidden;box-shadow:0 34px 80px -38px rgba(0,0,0,.34);height:clamp(360px,42vw,520px)}
 .hf-fallback{position:absolute;inset:0;overflow:auto;overscroll-behavior:contain}
 .hf-fallback .sp-mock{border:0;border-radius:0;box-shadow:none}
+
+/* the welcome band picker, under the dashboard description */
+.hf-band{display:inline-flex;align-items:center;gap:9px;margin-top:2px}
+.hf-band .hf-lbl{padding:0}
+.hf-seg.sm button{font-size:11px;padding:4px 10px}

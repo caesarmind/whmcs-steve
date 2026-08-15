@@ -204,15 +204,35 @@ const HF_PAGES = [
    (The mockup holds nineteen further explorations, v2-v19 and -boxed. They are
    not offered here: a buyer cannot choose them.) */
 const HF_DESIGNS = [
-  { id: 'atrium', t: 'Atrium', f: 'clientareahome-v18.html',
+  { id: 'atrium', t: 'Atrium', band: true, f: 'clientareahome-v18.html',
     s: 'A welcome band, then an asymmetric two-column body: the collections you read down the wide side, the things you act on down the narrow one. Width assigns a block to a column rather than sizing it on a grid, so reordering moves a block within its column.' },
-  { id: 'bento', t: 'Bento', f: 'clientareahome-v17.html',
+  { id: 'bento', t: 'Bento', band: true, f: 'clientareahome-v17.html',
     s: 'A bento grid of self-contained cards. Each collection gets its own tile with a count and its rows, arranged two-up on a six-column grid. Adds an attention strip that pulls the few things needing action out of the many rows, and an identity card beside the greeting.' },
   { id: 'minimal', t: 'Minimal', f: 'clientareahome-v15.html',
     s: 'A quieter dashboard: greeting, four summary tiles, quick actions, then services, domains, invoices, tickets and announcements as plain rows on one surface. No panel grid or account sub-nav aside.' },
   { id: 'default', t: 'Classic', f: 'clientareahome-v9.html',
     s: 'The familiar shape: a greeting hero over plain tables, one after another.' },
 ];
+/* Welcome band styles. The module and the mockup grew these separately and use
+   different words for the same fills, so the labels are the module's -- what a
+   buyer sees in the Pages editor -- and the values are the mockup's attribute:
+
+     module data-at-style   mockup data-hero-tone   what it is
+     gradient  (default)    gradient  (base)        the shipped accent gradient
+     light                  light                   surface + a hairline, no colour
+     soft                   tinted                  a pale wash of the accent
+     solid                  brand                   filled with the accent
+     plain                  --                      no panel at all; mockup lacks it
+
+   The mockup also carries dark and graphite, which the module does not ship, so
+   they are not offered. Only Atrium and Bento have a band at all. */
+const HF_BANDS = [
+  { id: 'gradient', t: 'Gradient', s: 'The shipped accent gradient' },
+  { id: 'light', t: 'Light', s: 'Surface and a hairline, no colour' },
+  { id: 'tinted', t: 'Soft', s: 'A pale wash of the accent' },
+  { id: 'brand', t: 'Solid', s: 'Filled with the accent' },
+];
+
 const hfDesign = (id) => HF_DESIGNS.find((d) => d.id === id) || HF_DESIGNS[0];
 /* the captures stay on as posters — they cover the first boot, and they are the
    whole show when this folder is opened off disk, where the theme's own pages
@@ -391,6 +411,7 @@ function HeroStage({ dark }) {
   const [lay, setLay] = React.useState('side');
   const [tone, setTone] = React.useState('light');
   const [design, setDesign] = React.useState('atrium');
+  const [band, setBand] = React.useState('gradient');
   const [palette, setPalette] = React.useState('blue');
   const pg = pages.find((p) => p.id === page) || pages[0];
   const pal = HF_PALETTES.find((p) => p.id === palette) || HF_PALETTES[0];
@@ -409,7 +430,8 @@ function HeroStage({ dark }) {
     // up, rather than making a visitor assemble it. Change these three, not a
     // control -- they are the same values the state chip writes.
     menu: 'center', toplinks: 'show', crumbs: 'none',
-  }), [layId, palette, tone, toneable, dark, pg.auth]);
+    band: dsn && dsn.band ? band : null,
+  }), [layId, palette, tone, toneable, dark, pg.auth, dsn, band]);
   return (
     <div className="hf" style={{ '--color-accent': pal.c, '--color-accent-light': `color-mix(in srgb, ${pal.c} 12%, transparent)`, '--on-accent-tint': `color-mix(in srgb, ${pal.c} 74%, #000)`, '--color-chrome': hfChromeSolid(toneable ? tone : 'light', pal.c, dark, pal.id), '--color-chrome-ink': hfChromeInk(toneable ? tone : 'light', dark) }} {...reel.bind} data-screen-label="Hero screens">
       <div className="hf-pagectl">
@@ -436,6 +458,17 @@ function HeroStage({ dark }) {
             ))}
           </span>
           <p className="hf-designnote">{dsn ? dsn.s : ''}</p>
+          {dsn && dsn.band && (
+            <span className="hf-band">
+              <span className="hf-lbl">Welcome band</span>
+              <span className="hf-seg sm" role="tablist" aria-label="Welcome band style">
+                {HF_BANDS.map((b) => (
+                  <button key={b.id} role="tab" aria-selected={band === b.id} title={b.s}
+                          onClick={reel.manual(() => setBand(b.id))}>{b.t}</button>
+                ))}
+              </span>
+            </span>
+          )}
         </div>
       )}
       <div className="hf-picker" role="tablist" aria-label="Navigation layout">
