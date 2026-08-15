@@ -234,6 +234,41 @@ const HF_BANDS = [
 ];
 
 const hfDesign = (id) => HF_DESIGNS.find((d) => d.id === id) || HF_DESIGNS[0];
+
+/* A prompt over the band itself rather than another control on the stage.
+   It waits until the frame has settled, points at the thing it is offering to
+   change, and is gone the moment it is used or dismissed -- so the hero keeps
+   four controls and still tells a visitor the band is a setting.
+   Shown once per visit: an offer that keeps coming back is an interruption. */
+function HFBandToast({ band, onPick, onClose, open, onOpen }) {
+  return (
+    <div className={`hf-toast${open ? ' open' : ''}`} role="region" aria-label="Welcome band style">
+      {!open ? (
+        <button className="hf-toast-cue" onClick={onOpen}>
+          <span className="dot" aria-hidden="true"></span>
+          <span>This band is a setting — change it</span>
+          <span className="go" aria-hidden="true">›</span>
+        </button>
+      ) : (
+        <div className="hf-toast-panel">
+          <div className="hd">
+            <b>Welcome band</b>
+            <button onClick={onClose} aria-label="Close">✕</button>
+          </div>
+          <div className="opts" role="radiogroup" aria-label="Band style">
+            {HF_BANDS.map((b) => (
+              <button key={b.id} role="radio" aria-checked={band === b.id}
+                      className={band === b.id ? 'on' : ''} title={b.s}
+                      onClick={() => onPick(b.id)}>{b.t}</button>
+            ))}
+          </div>
+          <p className="ft">Four of the five that ship. Set per dashboard in the Pages editor.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* the captures stay on as posters — they cover the first boot, and they are the
    whole show when this folder is opened off disk, where the theme's own pages
    cannot fetch their layout partials */
@@ -412,6 +447,9 @@ function HeroStage({ dark }) {
   const [tone, setTone] = React.useState('light');
   const [design, setDesign] = React.useState('atrium');
   const [band, setBand] = React.useState('gradient');
+  // null = not yet offered, 'cue' = the nudge is up, 'open' = the options are,
+  // 'done' = used or dismissed and not coming back this visit
+  const [toast, setToast] = React.useState(null);
   const [palette, setPalette] = React.useState('blue');
   const pg = pages.find((p) => p.id === page) || pages[0];
   const pal = HF_PALETTES.find((p) => p.id === palette) || HF_PALETTES[0];
@@ -424,6 +462,14 @@ function HeroStage({ dark }) {
   const layIds = CA_EMBEDDABLE ? HF_LAYOUTS.map((l) => l.wire) : Object.keys(HF_SHOTS[pg.id] || { side: 1 });
   const layId = layIds.indexOf(lay) === -1 ? (layIds[0] || 'top') : lay;
   const reel = useHFReel({ layIds, layId, setLay, palette, setPalette });
+  // Only where there is a band to change, and only once: the timer starts on
+  // mount rather than per design, so switching dashboards does not re-offer it.
+  const hasBand = !!(dsn && dsn.band);
+  React.useEffect(() => {
+    if (!hasBand || toast !== null) return;
+    const t = setTimeout(() => setToast((s) => (s === null ? 'cue' : s)), 4200);
+    return () => clearTimeout(t);
+  }, [hasBand, toast]);
   const state = React.useMemo(() => ({
     layout: layId, palette, sidebar: toneable ? tone : 'light', dark, auth: pg.auth || 'in',
     // Fixed, not offered: the hero shows the top bar the way the demo is set
@@ -458,17 +504,6 @@ function HeroStage({ dark }) {
             ))}
           </span>
           <p className="hf-designnote">{dsn ? dsn.s : ''}</p>
-          {dsn && dsn.band && (
-            <span className="hf-band">
-              <span className="hf-lbl">Welcome band</span>
-              <span className="hf-seg sm" role="tablist" aria-label="Welcome band style">
-                {HF_BANDS.map((b) => (
-                  <button key={b.id} role="tab" aria-selected={band === b.id} title={b.s}
-                          onClick={reel.manual(() => setBand(b.id))}>{b.t}</button>
-                ))}
-              </span>
-            </span>
-          )}
         </div>
       )}
       <div className="hf-picker" role="tablist" aria-label="Navigation layout">
@@ -497,6 +532,15 @@ function HeroStage({ dark }) {
               poster={hfPoster(pg.id, layId)}
               alt={`Hadrian ${pg.t.toLowerCase()} — ${(HF_LAYOUTS.find((l) => l.wire === layId) || {}).t} layout`}
             />
+            {hasBand && (toast === 'cue' || toast === 'open') && (
+              <HFBandToast
+                open={toast === 'open'}
+                band={band}
+                onOpen={reel.manual(() => setToast('open'))}
+                onClose={() => setToast('done')}
+                onPick={reel.manual((v) => { setBand(v); setToast('done'); })}
+              />
+            )}
           </div>
         </div>
         <div className="hf-rail right" role="tablist" aria-label="Brand colour">

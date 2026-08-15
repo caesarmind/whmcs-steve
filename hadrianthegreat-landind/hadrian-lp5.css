@@ -136,7 +136,7 @@
 .hf-rail.right button:hover em,.hf-rail.right button:focus-visible em{opacity:1;transform:translateY(-50%)}
 .hf-win{border-radius:16px;overflow:hidden;border:1px solid var(--color-border);background:var(--color-surface);transition:border-radius .35s var(--ease),box-shadow .35s var(--ease),border-color .35s var(--ease)}
 
-.hf-art{height:clamp(300px,34vw,560px);overflow-y:auto;overscroll-behavior:contain;text-align:left;scrollbar-width:thin;scrollbar-color:var(--color-border) transparent}
+.hf-art{position:relative;height:clamp(300px,34vw,560px);overflow-y:auto;overscroll-behavior:contain;text-align:left;scrollbar-width:thin;scrollbar-color:var(--color-border) transparent}
 .hf-art::-webkit-scrollbar{width:9px}
 .hf-art::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:9px;border:2px solid var(--color-surface)}
 .hf-art img{display:block;width:100%;height:auto}
@@ -612,7 +612,27 @@ button.hp-foundtag:hover{border-color:var(--color-accent)}
 .hf-fallback{position:absolute;inset:0;overflow:auto;overscroll-behavior:contain}
 .hf-fallback .sp-mock{border:0;border-radius:0;box-shadow:none}
 
-/* the welcome band picker, under the dashboard description */
-.hf-band{display:inline-flex;align-items:center;gap:9px;margin-top:2px}
-.hf-band .hf-lbl{padding:0}
-.hf-seg.sm button{font-size:11px;padding:4px 10px}
+
+/* ── the welcome-band prompt ───────────────────────────────────────────────
+   Sits over the frame, top-right of where the band renders, so it points at
+   what it is offering to change. Inside .hf-live, which is position:relative
+   and clips — so it stays within the window rather than floating on the page. */
+.hf-toast{position:absolute;top:14px;right:14px;z-index:4;max-width:min(300px,72%);font-family:var(--font)}
+.hf-toast-cue{display:flex;align-items:center;gap:8px;padding:8px 12px 8px 11px;border-radius:999px;border:1px solid var(--color-border);background:color-mix(in srgb,var(--color-surface) 88%,transparent);backdrop-filter:blur(14px) saturate(180%);-webkit-backdrop-filter:blur(14px) saturate(180%);box-shadow:0 10px 28px -12px rgba(0,0,0,.45);font-family:var(--font);font-size:12px;font-weight:600;color:var(--color-text-primary);cursor:pointer;white-space:nowrap;animation:hfToastIn .42s var(--ease) both}
+.hf-toast-cue:hover{border-color:color-mix(in srgb,var(--color-accent) 55%,transparent)}
+.hf-toast-cue .dot{width:7px;height:7px;border-radius:50%;background:var(--color-accent);flex-shrink:0;box-shadow:0 0 0 0 color-mix(in srgb,var(--color-accent) 60%,transparent);animation:hfToastPulse 2.4s ease-out infinite}
+.hf-toast-cue .go{color:var(--color-text-tertiary);font-size:13px}
+.hf-toast-panel{border-radius:14px;border:1px solid var(--color-border);background:color-mix(in srgb,var(--color-surface) 94%,transparent);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);box-shadow:0 18px 44px -18px rgba(0,0,0,.5);padding:12px;animation:hfToastIn .3s var(--ease) both}
+.hf-toast-panel .hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hf-toast-panel .hd b{font-size:12.5px;font-weight:700;letter-spacing:-.01em;color:var(--color-text-primary)}
+.hf-toast-panel .hd button{background:none;border:none;cursor:pointer;font-size:12px;line-height:1;color:var(--color-text-tertiary);padding:2px}
+.hf-toast-panel .hd button:hover{color:var(--color-text-primary)}
+.hf-toast-panel .opts{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:9px}
+.hf-toast-panel .opts button{font-family:var(--font);font-size:11.5px;font-weight:650;padding:6px 8px;border-radius:8px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text-secondary);cursor:pointer;transition:all .18s var(--ease)}
+.hf-toast-panel .opts button:hover{border-color:color-mix(in srgb,var(--color-accent) 50%,transparent);color:var(--color-text-primary)}
+.hf-toast-panel .opts button.on{background:var(--color-accent);border-color:var(--color-accent);color:#fff}
+.hf-toast-panel .ft{margin:9px 0 0;font-size:10.5px;line-height:1.45;color:var(--color-text-tertiary)}
+@keyframes hfToastIn{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes hfToastPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--color-accent) 55%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){.hf-toast-cue,.hf-toast-panel{animation:none}.hf-toast-cue .dot{animation:none}}
+@media (max-width:700px){.hf-toast{top:8px;right:8px;max-width:80%}.hf-toast-cue{font-size:11px;padding:6px 10px}}
