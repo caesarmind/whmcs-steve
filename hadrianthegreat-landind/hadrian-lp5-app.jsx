@@ -265,9 +265,13 @@ function useBandAnchor(active) {
       const scale = frame.getBoundingClientRect().width / (frame.offsetWidth || CA_WIDTH);
       const b = band.getBoundingClientRect();
       const artW = art.getBoundingClientRect().width;
+      // BELOW the band, not on it. On it, the prompt covered most of a compact
+      // band -- 78px tall against a 25px cue with its inset -- and hid the very
+      // thing it was offering to change. Under it, the band is always whole and
+      // the prompt overlays the row of blocks beneath, which are not the subject.
       setPos({
-        top: Math.max(6, b.top * scale + 8),
-        right: Math.max(6, artW - b.right * scale + 8),
+        top: Math.max(6, b.bottom * scale + 10),
+        right: Math.max(6, artW - b.right * scale),
       });
     };
     measure();
