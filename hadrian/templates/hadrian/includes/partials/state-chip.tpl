@@ -19,6 +19,17 @@
             <button type="button" data-layout-set="top">Top nav</button>
             <button type="button" data-layout-set="side" class="active">Sidebar</button>
             <button type="button" data-layout-set="rail">Icon rail</button>
+            {* Custom layouts are ANCHORS, not data-layout-set buttons — the
+               instant CSS switch depends on all candidate markup being in the
+               DOM, and only the shipped three render simultaneously in
+               preview. A custom layout's markup arrives via a reload, so the
+               control that triggers it is honestly a link. Token map is
+               preview-only (Hooks::resolvePreviewLayoutTokens). *}
+            {foreach $hadrian.preview.layoutTokens as $_tok => $_dir}
+                {if $_tok != 'top' && $_tok != 'side' && $_tok != 'rail'}
+                    <a data-layout-link="{$_tok}" href="?preview=1&layout={$_tok|escape:'url'}">{$_dir|escape}</a>
+                {/if}
+            {/foreach}
         </div>
     </div>
 

@@ -1,0 +1,49 @@
+/* Topbar Minimal -- the layout's OWN chrome. Authored, not generated: the
+   engine emits the structural minimum (the .only-topbar-minimal gate; a
+   content offset + mobile collapse when the manifest declares one), and this
+   file styles everything the layout itself is.
+
+   Written against theme tokens, never hex, so it follows the buyer's Style
+   Manager palette and dark mode automatically -- same rule as Custom CSS. */
+
+.tbm-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 60;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 0 20px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.tbm-brand { display: flex; align-items: center; text-decoration: none; }
+.tbm-brand img { height: 28px; width: auto; display: block; }
+.tbm-brand-name { font-weight: 600; font-size: 16px; color: var(--color-text-primary); }
+
+.tbm-links { display: flex; gap: 4px; overflow-x: auto; }
+.tbm-links a {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+.tbm-links a:hover {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+}
+
+/* A fixed bar needs the content pushed down; a TOP offset is this layout's own
+   concern (the generated css block only does left/right column margins). */
+body[data-layout="topbar-minimal"] .ph-main-wrap { padding-top: 52px; }
+
+/* Below the shell's 900px collapse the inner-topbar's hamburger + drawer take
+   over (rendered for every non-top token); this bar bows out. */
+@media (max-width: 900px) {
+    .tbm-bar { display: none; }
+    body[data-layout="topbar-minimal"] .ph-main-wrap { padding-top: 0; }
+}

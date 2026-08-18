@@ -12,6 +12,19 @@
 {if $flagSaved}
     <div class="mt-alert mt-alert-success">Header setting saved.</div>
 {/if}
+{if $layoutsRejected|default:[]}
+    {* Discovery rejections — a dropped-in layout folder that failed
+       validation. Loud on purpose: the alternative is a buyer staring at a
+       Layouts page that silently lacks the folder they just uploaded. *}
+    <div class="mt-alert mt-alert-warning">
+        <strong>Some layout folders were not loaded:</strong>
+        <ul style="margin:6px 0 0 18px;padding:0">
+            {foreach $layoutsRejected as $rej}
+                <li><code>core/layouts/{$rej.kind|escape}/{$rej.dir|escape}/</code> &mdash; {$rej.reason|escape}</li>
+            {/foreach}
+        </ul>
+    </div>
+{/if}
 
 <style>
 {literal}
@@ -181,9 +194,20 @@
                                 <rect x="12" y="76" width="30" height="4" rx="2" fill="#fff" opacity=".65"/>
                                 <rect x="108" y="76" width="30" height="4" rx="2" fill="#fff" opacity=".45"/>
                             </svg>
+                        {elseif $k == 'main-menu'}
+                            {* Fallback for a main-menu layout without its own
+                               wireframe — i.e. a buyer-dropped custom folder.
+                               Used to fall through to the FOOTER drawing, which
+                               made every custom nav layout look like a footer. *}
+                            <svg viewBox="0 0 150 86" role="img" aria-label="Custom layout wireframe">
+                                <rect x="0" y="0" width="150" height="14" fill="currentColor" opacity=".55"/>
+                                <rect x="8" y="4" width="22" height="6" rx="3" fill="#fff" opacity=".85"/>
+                                <rect x="16" y="24" width="118" height="52" rx="5" fill="currentColor" opacity=".11"/>
+                                <path d="M69 44h12M75 38v12" stroke="currentColor" stroke-width="2.4" opacity=".45" stroke-linecap="round"/>
+                            </svg>
                         {else}
                             {* Default / single-row footer, and the fallback for any
-                               layout that ships without its own wireframe. *}
+                               FOOTER layout that ships without its own wireframe. *}
                             <svg viewBox="0 0 150 86" role="img" aria-label="Default footer wireframe">
                                 <rect x="16" y="12" width="118" height="46" rx="5" fill="currentColor" opacity=".11"/>
                                 <rect x="0" y="66" width="150" height="20" fill="currentColor"/>
@@ -194,7 +218,7 @@
                     </div>
 
                     <div class="mt-lay-b">
-                        <div class="mt-lay-title">{$layout.displayName|escape}</div>
+                        <div class="mt-lay-title">{$layout.displayName|escape}{if $layout.isCustom|default:false} <span class="mt-badge mt-badge-neutral" title="Discovered in core/layouts/ — not part of the shipped theme">Custom</span>{/if}</div>
                         {* title carries the untruncated text, since the box clamps to two lines. *}
                         {if $layout.description}<div class="mt-lay-desc" title="{$layout.description|escape}">{$layout.description|escape}</div>{/if}
 

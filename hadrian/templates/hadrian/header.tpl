@@ -62,9 +62,34 @@
    per-page-override-aware; see Hooks::resolveActiveLayout). vars.dataLayout is
    the body[data-layout] token: top|side|rail. ?layout= overrides in preview. *}
 {assign var=mt_layout value=$hadrian.layouts['main-menu'].vars.dataLayout|default:'side'}
+{* mt_layout_dir = the layout's FOLDER name (dispatch is by folder, token is by
+   dataLayout — dir `sidebar` owns token `side`, so the two namespaces differ).
+   The generic custom-layout branch below includes core/layouts/main-menu/
+   <dir>/default.tpl, the same contract footer.tpl already uses. *}
+{assign var=mt_layout_dir value=$hadrian.layouts['main-menu'].name|default:'sidebar'}
 {if $mt_preview && isset($smarty.get.layout)}
     {assign var=_q value=$smarty.get.layout}
-    {if $_q == 'top' || $_q == 'rail' || $_q == 'side'}{assign var=mt_layout value=$_q}{/if}
+    {* Data-driven whitelist: any token registered in theme.json OR discovered
+       by LayoutsCache qualifies (Hooks::resolvePreviewLayoutTokens, built only
+       under ?preview=1). Replaces the old hardcoded top|rail|side check that
+       silently ignored custom layouts' own preview links. *}
+    {if isset($hadrian.preview.layoutTokens[$_q])}
+        {assign var=mt_layout value=$_q}
+        {assign var=mt_layout_dir value=$hadrian.preview.layoutTokens[$_q]}
+    {/if}
+{/if}
+{* Is the effective layout one of the three shipped ones (rendered from
+   includes/partials/) or a custom folder (rendered from its own default.tpl)? *}
+{assign var=mt_layout_custom value=($mt_layout != 'top' && $mt_layout != 'side' && $mt_layout != 'rail')}
+{* Existence guard HERE, before body[data-layout] is emitted — not at the
+   dispatch. If a custom folder vanished after the (admin-refreshed) cache last
+   saw it, falling back at the include site alone would render sidebar chrome
+   under the custom token, where its own .only-side gate hides it: an invisible
+   nav. Reverting the token itself keeps attribute, gates and markup agreeing. *}
+{if $mt_layout_custom && !file_exists("templates/`$template`/core/layouts/main-menu/`$mt_layout_dir`/default.tpl")}
+    {assign var=mt_layout value='side'}
+    {assign var=mt_layout_dir value='sidebar'}
+    {assign var=mt_layout_custom value=false}
 {/if}
 
 {* align — default from the active main-menu layout's saved option (admin
@@ -315,6 +340,14 @@
     {/if}
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v={$hadrian.version|default:'1.0'}">
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-layout.css?v={$hadrian.version|default:'1.0'}">
+    {* A custom layout's own chrome CSS, if it ships one. Authored, not
+       generated — the generated structural minimum (gates, offset, mobile
+       collapse) arrives via Hooks::buildLayoutGatesHead in {$headoutput}.
+       file_exists-guarded like the footer dispatch, and version-stamped so
+       theme upgrades bust the cache. *}
+    {if $mt_layout_custom && file_exists("templates/`$template`/core/layouts/main-menu/`$mt_layout_dir`/layout.css")}
+        <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/core/layouts/main-menu/{$mt_layout_dir}/layout.css?v={$hadrian.version|default:'1.0'}">
+    {/if}
 
     {* ── jQuery + Bootstrap 4 + plugins for all cart-flow pages ──
        Loaded on cart-flow pages regardless of which cart theme is
@@ -396,6 +429,20 @@
    to body[data-layout="top"] keeps it hidden until .nav-open. *}
 {if $mt_preview || $mt_layout == 'side' || $mt_layout == 'top'}
     {include file="`$template`/includes/partials/sidebar.tpl"}
+{/if}
+
+{* CUSTOM layout dispatch — the same generic file_exists contract footer.tpl
+   uses (footer.tpl:38-43), so a dropped-in core/layouts/main-menu/<dir>/
+   folder renders with no edit to this file. The included tpl's root must
+   carry class "only-<token>" (gated by Hooks::buildLayoutGatesHead) and
+   renders here as a sibling BEFORE .ph-main-wrap, where shell chrome lives.
+   Fallback when the folder vanished mid-request: sidebar, matching the
+   stale-pointer default in Hooks::resolveActiveLayout. *}
+{if $mt_layout_custom}
+    {* Existence already guaranteed by the assign-time guard above, which
+       reverts vanished folders to the sidebar before the body attribute was
+       emitted — so this include cannot miss. *}
+    {include file="`$template`/core/layouts/main-menu/`$mt_layout_dir`/default.tpl"}
 {/if}
 
 <div class="ph-main-wrap">

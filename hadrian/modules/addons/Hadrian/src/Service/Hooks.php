@@ -128,6 +128,15 @@ final class Hooks
                 'locales'       => [
                     'languages' => LocaleHelper::effectiveList(),
                 ],
+                // Preview-only affordances. layoutTokens (token => folder) is
+                // what header.tpl's ?layout= whitelist and the state-chip's
+                // custom-layout anchors read; empty outside ?preview=1 so
+                // production requests never pay the manifest reads.
+                'preview'       => [
+                    'layoutTokens' => ($_GET['preview'] ?? '') === '1'
+                        ? $this->resolvePreviewLayoutTokens($template)
+                        : [],
+                ],
             ],
             'hadrianLang' => $this->loadLanguage($template, $vars['language'] ?? 'english'),
             // Convenience root alias — templates that just want "the logo"
@@ -470,7 +479,7 @@ final class Hooks
         $typo    = $this->buildTypographyHead($template);
         $buttons = $this->buildButtonsHead($template);
         $forms   = $this->buildFormsHead($template);
-        $layout  = $this->buildLayoutHead($template);
+        $layout  = $this->buildLayoutHead($template) . $this->buildLayoutGatesHead($template);
         $elements = $this->buildElementsHead($template);
         // General is the SCALE layer (radius/shadow/control/motion), so it is
         // emitted BEFORE the panels that select between its steps -- Elements
@@ -976,6 +985,111 @@ final class Hooks
         }
 
         return $decls !== '' ? '<style id="hadrian-layout">:root{' . $decls . '}</style>' : '';
+    }
+
+    /**
+     * Generated structural CSS for CUSTOM (non-declared) main-menu layouts —
+     * the piece that makes a dropped-in layout folder work without editing
+     * apple-layout.css. For each emitted token:
+     *
+     *   body:not([data-layout=X]) .only-X { display:none !important }   gate
+     *   body[data-layout=X] .ph-main-wrap { margin-<side>: Npx }        offset
+     *   @media (max-width:900px) { ... margin-<side>: 0 }               collapse
+     *
+     * driven by an optional `css` block in the layout's manifest:
+     *   'css' => ['contentOffset' => 240, 'offsetSide' => 'left',
+     *             'mobileCollapse' => true]
+     *
+     * SHIPPED tokens (top/side/rail) are deliberately NOT emitted here — their
+     * rules stay hand-written in apple-layout.css, so existing installs get
+     * byte-identical output. The engine guarantees a positioned, gated,
+     * mobile-collapsing shell; the layout's own chrome lives in its layout.css
+     * (linked by header.tpl), which is authored, not generated — the middle
+     * path between Lagom (nothing generated, new layouts get zero styling)
+     * and pretending CSS authoring can disappear.
+     *
+     * Cost discipline: in production only the ACTIVE layout's manifest is read
+     * (one file, the same price buildLayoutMeta already pays); the every-
+     * custom-layout emission runs only under ?preview=1, where the state-chip
+     * can point the session at any registered token.
+     *
+     * Token re-validated here even though LayoutsCache validated at rebuild —
+     * it is interpolated into selectors, so both ends check (the colour
+     * pipeline's stance).
+     */
+    private function buildLayoutGatesHead(Template $template): string
+    {
+        $declared = $template->getDeclaredLayouts('main-menu');
+        $custom   = \Hadrian\Template\LayoutsCache::readTrusted($template)['layouts']['main-menu'] ?? [];
+        if ($custom === []) {
+            return '';
+        }
+
+        $preview = ($_GET['preview'] ?? '') === '1';
+        $active  = $this->resolveActiveLayout($template, 'main-menu');
+        $activeName = (string)($active['name'] ?? '');
+
+        $css = '';
+        foreach ($custom as $name => $token) {
+            if (in_array($name, $declared, true)) {
+                continue;                                 // shipped: hand-written rules own it
+            }
+            if (!$preview && $name !== $activeName) {
+                continue;                                 // production: only the active layout costs a read
+            }
+            if (!preg_match(\Hadrian\Template\LayoutsCache::TOKEN_PATTERN, (string)$token)) {
+                continue;                                 // emit-side re-validation
+            }
+
+            $meta = ThemeManifest::loadVariantMeta(
+                $template->getFullPath() . '/core/layouts/main-menu/' . $name . '/layout.php'
+            );
+            $cfg    = is_array($meta['css'] ?? null) ? $meta['css'] : [];
+            $offset = (int)($cfg['contentOffset'] ?? 0);
+            $offset = max(0, min(4000, $offset));         // clamp to the layout.php schema bounds
+            $side   = ($cfg['offsetSide'] ?? 'left') === 'right' ? 'right' : 'left';
+            $collapse = ($cfg['mobileCollapse'] ?? true) !== false;
+
+            $css .= 'body:not([data-layout="' . $token . '"]) .only-' . $token . '{display:none !important;}';
+            if ($offset > 0) {
+                $css .= 'body[data-layout="' . $token . '"] .ph-main-wrap{margin-' . $side . ':' . $offset . 'px;}';
+                if ($collapse) {
+                    $css .= '@media (max-width:900px){body[data-layout="' . $token . '"] .ph-main-wrap{margin-' . $side . ':0;}}';
+                }
+            }
+        }
+
+        return $css !== '' ? '<style id="hadrian-layout-gates">' . $css . '</style>' : '';
+    }
+
+    /**
+     * The valid ?layout= tokens for preview mode, as token => folder-name.
+     * Built ONLY under ?preview=1 (N manifest reads are a preview-only cost;
+     * production requests never call this). header.tpl uses it to replace the
+     * old hardcoded top|side|rail whitelist, and the state-chip uses it to
+     * render an anchor per custom token.
+     */
+    private function resolvePreviewLayoutTokens(Template $template): array
+    {
+        $tokens = [];
+        $custom = \Hadrian\Template\LayoutsCache::readTrusted($template)['layouts']['main-menu'] ?? [];
+        foreach ($template->getDeclaredLayouts('main-menu') as $name) {
+            $meta  = ThemeManifest::loadVariantMeta(
+                $template->getFullPath() . '/core/layouts/main-menu/' . $name . '/layout.php'
+            );
+            $token = (string)($meta['variables']['dataLayout'] ?? '');
+            if ($token !== '') {
+                $tokens[$token] = $name;
+            }
+        }
+        foreach ($custom as $name => $token) {
+            $token = (string)$token;
+            if ($token !== '' && !isset($tokens[$token])
+                && preg_match(\Hadrian\Template\LayoutsCache::TOKEN_PATTERN, $token)) {
+                $tokens[$token] = $name;
+            }
+        }
+        return $tokens;
     }
 
     /**
@@ -2390,6 +2504,20 @@ final class Hooks
         if ($active === '') {
             $legacyKey = $template->getName() . '_active_layout_' . $kind;
             $active    = (string)Settings::getValue($legacyKey, $default);
+        }
+
+        /* A pointer at a layout that no longer exists (a deleted custom folder,
+           a renamed dir) must resolve to the default, NOT be rendered from a
+           missing manifest. Without this, buildLayoutMeta loads [] and the page
+           silently falls back to the sidebar via header.tpl's |default:'side'
+           while the admin still shows the stale name as Active — the render and
+           the badge disagreeing is exactly Lagom's stale-pointer defect.
+           Resolving to default is the honest answer (the resolveStyleName
+           philosophy); the Settings row is left in place, so re-dropping the
+           folder restores the pick. getLayouts() reads the cached union — no
+           filesystem work on this client path. */
+        if (!in_array($active, $template->getLayouts($kind), true)) {
+            $active = $default;
         }
 
         return $this->buildLayoutMeta($template, $kind, $active);

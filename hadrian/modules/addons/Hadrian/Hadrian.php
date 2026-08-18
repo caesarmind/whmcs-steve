@@ -81,8 +81,9 @@ function Hadrian_activate()
         foreach (Hadrian\Template\Template::getAll() as $tpl) {
             try {
                 Hadrian\Template\PagesCache::rebuild($tpl);
+                Hadrian\Template\LayoutsCache::rebuild($tpl);
             } catch (\Throwable $e) {
-                error_log('Hadrian: pages discovery rebuild failed for '
+                error_log('Hadrian: discovery rebuild failed for '
                     . $tpl->getName() . ': ' . $e->getMessage());
             }
         }
@@ -148,13 +149,15 @@ function Hadrian_upgrade($vars)
     // The conversion itself is unchanged in purpose but no longer destructive;
     // see the guards in Seeder::migrateCustomLinksToWhmcsPages().
 
-    // Refresh pages discovery so any new core/pages/ directories shipped
-    // with the upgrade are picked up without the buyer touching anything.
+    // Refresh pages + layouts discovery so any new core/pages/ or
+    // core/layouts/ directories shipped with the upgrade are picked up
+    // without the buyer touching anything.
     foreach (Hadrian\Template\Template::getAll() as $tpl) {
         try {
             Hadrian\Template\PagesCache::rebuild($tpl);
+            Hadrian\Template\LayoutsCache::rebuild($tpl);
         } catch (\Throwable $e) {
-            error_log('Hadrian: pages discovery rebuild failed for '
+            error_log('Hadrian: discovery rebuild failed for '
                 . $tpl->getName() . ': ' . $e->getMessage());
         }
     }

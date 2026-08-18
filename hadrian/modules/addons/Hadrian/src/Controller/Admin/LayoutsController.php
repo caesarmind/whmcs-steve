@@ -7,6 +7,7 @@ use Hadrian\Controller\AbstractController;
 use Hadrian\Helpers\AddonHelper;
 use Hadrian\Helpers\ThemeManifest;
 use Hadrian\Models\Settings;
+use Hadrian\Template\LayoutsCache;
 
 /**
  * Admin: pick a layout per kind (main-menu, footer), per audience
@@ -102,6 +103,12 @@ final class LayoutsController extends AbstractController
         if ($template === null) {
             return $this->view('error', ['error' => 'No active template']);
         }
+
+        // Freshness for buyer-dropped layout folders: the scan runs HERE (an
+        // admin entry point), never on the client path. A folder dropped in
+        // since the last visit appears as a card on this render, and a broken
+        // one appears in the rejected-folders notice — never silently.
+        $discovery = LayoutsCache::ensure($template);
 
         // POST = activation OR an option change. The form carries its own `kind`
         // because the Main-menu/Footer tabs are client-side (no page reload), so
@@ -220,6 +227,10 @@ final class LayoutsController extends AbstractController
                     // as .vars.dataLayout because Hooks renames the key on the
                     // way out; the manifest itself says 'variables'.
                     'dataLayout'     => (string)($meta['variables']['dataLayout'] ?? ''),
+                    // Buyer-dropped folder (discovered, not declared in
+                    // theme.json). Drives the "Custom" badge — support triage
+                    // reads it off a screenshot instantly.
+                    'isCustom'       => !in_array($name, $template->getDeclaredLayouts($kind), true),
                 ];
             }
             $groups[$kind] = $list;
@@ -253,6 +264,10 @@ final class LayoutsController extends AbstractController
             'layoutFlags' => $layoutFlags,
             'footerFlags' => $footerFlags,
             'flagSaved'   => isset($_GET['flag']),
+            // Buyer folders that failed discovery validation, with reasons —
+            // rendered as a notice so a broken drop-in NEVER fails silently
+            // (Lagom's scanner admits anything and lets typos die downstream).
+            'layoutsRejected' => $discovery['rejected'] ?? [],
             'planned'     => self::PLANNED_CONTROLS,
             'contentWidths'  => self::CONTENT_WIDTHS,
             'contentWidth'   => $this->contentWidthMode(),
@@ -443,11 +458,17 @@ final class LayoutsController extends AbstractController
     {
         $newKey = $template->getName() . '_active_layout_' . $kind . '_' . $audience;
         $value  = (string)Settings::getValue($newKey, '');
-        if ($value !== '') {
-            return $value;
+        if ($value === '') {
+            $legacyKey = $template->getName() . '_active_layout_' . $kind;
+            $value     = (string)Settings::getValue($legacyKey, $default);
         }
-        $legacyKey = $template->getName() . '_active_layout_' . $kind;
-        return (string)Settings::getValue($legacyKey, $default);
+
+        /* Mirror of Hooks::resolveActiveLayout's stale-pointer guard, and it
+           MUST stay in sync with it: this method decides which card wears the
+           Active badge, that one decides what actually renders. If only one
+           validated, a deleted custom layout would show Active here while the
+           client area serves the default. */
+        return in_array($value, $template->getLayouts($kind), true) ? $value : $default;
     }
 
     private function saveAction($template, string $kind): string

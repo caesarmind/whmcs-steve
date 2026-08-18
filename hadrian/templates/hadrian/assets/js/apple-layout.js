@@ -201,8 +201,21 @@
         // MUST honor the server's data-layout, or we'd point it at markup that
         // isn't on the page.
         var layoutButtons = document.querySelectorAll('.state-chip [data-layout-set]');
+        // The server-rendered token is ALWAYS valid — for a custom layout it
+        // names markup that genuinely is on the page. The old hardcoded
+        // ['top','side','rail'] check coerced any unknown token to 'top' even
+        // outside preview, which pointed the page at markup that was NOT in
+        // the DOM and hid the custom layout's own chrome: the exact bug the
+        // comment above this block warns against. Valid = a chip button's
+        // token (switchable markup is in the preview DOM) or the server's own.
+        var serverLayout = body.dataset.layout || 'side';
+        var chipTokens = Array.prototype.map.call(layoutButtons, function (b) {
+            return b.dataset.layoutSet;
+        });
         function applyLayout(layout, persist) {
-            if (['top', 'side', 'rail'].indexOf(layout) === -1) layout = 'top';
+            if (chipTokens.indexOf(layout) === -1 && layout !== serverLayout) {
+                layout = serverLayout;
+            }
             body.dataset.layout = layout;
             layoutButtons.forEach(function (b) {
                 b.classList.toggle('active', b.dataset.layoutSet === layout);
@@ -212,10 +225,10 @@
         }
         if (previewMode) {
             var savedLayout; try { savedLayout = localStorage.getItem(KEYS.layout); } catch (e) {}
-            applyLayout(params.get('layout') || savedLayout || body.dataset.layout || 'top');
+            applyLayout(params.get('layout') || savedLayout || serverLayout);
         } else {
             // Respect the server-rendered layout; don't clobber the dev's saved choice.
-            applyLayout(body.dataset.layout || 'top', false);
+            applyLayout(serverLayout, false);
         }
         layoutButtons.forEach(function (btn) {
             btn.addEventListener('click', function () { applyLayout(this.dataset.layoutSet); });

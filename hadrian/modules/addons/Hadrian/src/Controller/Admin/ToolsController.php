@@ -49,8 +49,11 @@ final class ToolsController extends AbstractController
         if ($template === null) {
             return [false, 'No active template — cannot rebuild discovery.'];
         }
-        $pages = PagesCache::rebuild($template);
-        return [true, 'Pages discovery rebuilt — ' . count($pages) . ' pages found.'];
+        $pages   = PagesCache::rebuild($template);
+        $layouts = \Hadrian\Template\LayoutsCache::rebuild($template);
+        $custom  = 0;
+        foreach ($layouts['layouts'] as $names) { $custom += count($names); }
+        return [true, 'Discovery rebuilt — ' . count($pages) . ' pages, ' . $custom . ' custom layout(s) found.'];
     }
 
     /**

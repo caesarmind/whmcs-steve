@@ -50,34 +50,69 @@ npm run build
 
 ## Add a new layout
 
+One folder. No `theme.json` edit, no `header.tpl` edit, no core CSS edit.
+`LayoutsCache` scans `core/layouts/main-menu/` and `core/layouts/footer/` from
+the admin entry points (Layouts page, Pages editor, activate, Tools → Rebuild);
+any folder holding `layout.php` **and** `default.tpl` becomes an admin card,
+badged **Custom**. The shipped `main-menu/topbar-minimal/` folder is a working
+example of everything below — copy it to start.
+
 ```bash
-# 1. Create directory
+# 1. The folder — its name is internal; lowercase letters, digits, hyphens
 mkdir -p templates/hadrian/core/layouts/main-menu/condensed
 
-# 2. Manifest
+# 2. layout.php — the manifest
 cat > templates/hadrian/core/layouts/main-menu/condensed/layout.php <<'EOF'
 <?php
 return [
     'displayName' => 'Condensed',
     'description' => 'Smaller navbar with icons',
-    'preview'     => 'thumb.png',
-    'order'       => 3,
     'variables'   => [
-        'bodyClass' => 'layout-condensed',
-        'sidebarPresent' => false,
+        // REQUIRED. Becomes body[data-layout] and the .only-<token> gate
+        // class. Must match /^[a-z][a-z0-9-]{1,30}$/ or the folder is
+        // rejected (the Layouts page shows the reason).
+        'dataLayout' => 'condensed',
+    ],
+    // OPTIONAL. The generated structural minimum, emitted server-side into
+    // <style id="hadrian-layout-gates"> for the active layout. Omit the whole
+    // block for a top bar; declare it for a pinned side column.
+    'css' => [
+        'contentOffset'  => 240,     // px margin on .ph-main-wrap
+        'offsetSide'     => 'left',  // left | right
+        'mobileCollapse' => true,    // offset -> 0 at <=900px (default true)
     ],
 ];
 EOF
 
-# 3. The actual layout tpl
+# 3. default.tpl — the markup. THE CONTRACT:
+#    - root element carries class "only-<dataLayout>" (the generated gate
+#      hides it whenever another layout is active, incl. ?preview=1)
+#    - renders as a body-level sibling BEFORE .ph-main-wrap; close everything
+#      you open
+#    - the admin-driven menu arrives as $mtSidebarItems (same list the
+#      shipped sidebar renders); branding as $hadrian.branding.logo.*
+#    - mobile: the shell's inner-topbar + drawer render for every non-top
+#      token — hide your chrome under 900px and you are done
 cat > templates/hadrian/core/layouts/main-menu/condensed/default.tpl <<'EOF'
-<header class="app-nav app-nav--condensed">
-    {* your markup *}
-</header>
+<nav class="cnd-bar only-condensed">
+    {* your markup; see topbar-minimal/default.tpl for the full treatment *}
+</nav>
 EOF
 
-# 4. Add to theme.json provides.layouts.main-menu
+# 4. layout.css (OPTIONAL) — your layout's own chrome, auto-linked with a
+#    version stamp whenever your layout is active or previewed. Write it
+#    against theme tokens (var(--color-surface) etc.), never hex, so it
+#    follows the buyer's Style Manager palette and dark mode.
 ```
+
+Then open **Hadrian → Layouts** — the card is there. `Activate` stores it per
+audience, `Live preview` opens `?preview=1&layout=<token>`. The client area
+picks it up through the same discovery cache; like new page variants, a
+dropped-in folder appears after the next admin visit, not instantly.
+
+Validation happens at scan time and failures are loud: a folder with a broken
+manifest, a bad token, or a token colliding with a shipped layout is listed on
+the Layouts page with the reason, instead of silently not appearing.
 
 ## Add a new page variant
 
@@ -194,5 +229,6 @@ The overrides escape hatch is per-file: each tpl that includes another via `{inc
 | "Access has been blocked!" page on every request | Forgot `npm run build:integrity` after a PHP edit |
 | Template isn't selectable in WHMCS admin | License invalid; check addon → License tab |
 | Style change not visible | CSS cached; bump `theme.json` version OR clear browser cache |
-| Variant not appearing in admin UI | Forgot to add it to `theme.json` `provides.styles` / `provides.layouts.main-menu` |
+| Style not appearing in admin UI | Forgot to add it to `theme.json` `provides.styles` |
+| Layout not appearing in admin UI | Folder missing `layout.php` or `default.tpl`, or rejected — the Layouts page lists rejected folders with the reason |
 | Smarty error "unknown template" | Check the `{include file=...}` path; should start with backtick-delimited `{$template}/` |

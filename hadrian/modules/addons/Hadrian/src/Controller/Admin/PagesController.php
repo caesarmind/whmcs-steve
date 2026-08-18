@@ -53,6 +53,9 @@ final class PagesController extends AbstractController
         // so this honors the "no runtime filesystem scans" rule for the
         // client-area path while still surfacing every page in the editor.
         PagesCache::ensure($template);
+        // Same self-heal for layouts: the per-page "Custom layout" selects list
+        // dropped-in folders, so freshness must be checked on this admin path.
+        \Hadrian\Template\LayoutsCache::ensure($template);
 
         // Self-heal: create/upgrade the hadrian_pages table and seed a row for
         // every discovered page (importing any legacy hadrian_settings page

@@ -142,10 +142,46 @@ final class Template
         return in_array($stored, $this->getStyles(), true) ? $stored : 'default';
     }
 
-    /** @return list<string> */
-    public function getLayouts(string $kind): array
+    /**
+     * Only what theme.json declares — the shipped, authored list. Used by
+     * LayoutsCache to reserve shipped names/tokens against shadowing, and by
+     * the admin to badge non-declared layouts as "Custom".
+     *
+     * @return list<string>
+     */
+    public function getDeclaredLayouts(string $kind): array
     {
         return $this->manifest['provides']['layouts'][$kind] ?? [];
+    }
+
+    /**
+     * Union of declared (theme.json) and discovered (LayoutsCache) layouts —
+     * the same declared-first/dedupe contract as getPages(), and for the same
+     * reason: this is the single validation choke point. Admin cards, Activate
+     * validation, the per-page override choices AND Hooks' re-validation all
+     * flow through here, so custom layouts join every one of those the moment
+     * this returns them.
+     *
+     * readTrusted(), NOT ensure(): unlike getPages() this runs on the CLIENT
+     * path (Hooks validates per-page layout overrides during ClientAreaPage),
+     * so it must never touch the filesystem. Admin entry points call
+     * LayoutsCache::ensure() first, which is what keeps the row fresh.
+     *
+     * @return list<string>
+     */
+    public function getLayouts(string $kind): array
+    {
+        $declared   = $this->manifest['provides']['layouts'][$kind] ?? [];
+        $discovered = array_keys(LayoutsCache::readTrusted($this)['layouts'][$kind] ?? []);
+
+        $seen = [];
+        $out  = [];
+        foreach ([...$declared, ...$discovered] as $name) {
+            if (!is_string($name) || $name === '' || isset($seen[$name])) continue;
+            $seen[$name] = true;
+            $out[] = $name;
+        }
+        return $out;
     }
 
     /**
