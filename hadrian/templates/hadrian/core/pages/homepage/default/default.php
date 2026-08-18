@@ -14,7 +14,8 @@
  * NOTE for whoever edits default.tpl next: it reads its toggles as
  * $hadrian.pages.homepage.config.*, and resolveCurrentPage builds no 'config'
  * member at all -- so those reads return null and the |default: always wins.
- * The real path is .options.*, as core/pages/homepage/simple/simple.tpl uses.
+ * The real path is .options.* (see the login variants for working reads; the
+ * removed homepage/simple variant did it correctly and is in git history).
  */
 return [
     'name'        => 'Marketing landing',

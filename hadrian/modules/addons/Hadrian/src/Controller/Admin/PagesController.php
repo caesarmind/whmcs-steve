@@ -781,9 +781,23 @@ final class PagesController extends AbstractController
 
         $lo = is_array($settings['layout_overrides'] ?? null) ? $settings['layout_overrides'] : [];
 
+        // Trust the stored variant only while its template still exists on
+        // disk. A variant removed from the theme (e.g. homepage/simple)
+        // otherwise lingers in the admin forever: the list shows its label and
+        // the editor marks no card Active, both reading a row the render path
+        // already ignores — Hooks::resolveCurrentPage does this same
+        // file_exists fallback before including anything. Admin-only path, so
+        // the extra stat costs nothing a client ever sees.
+        $storedVariant = (string)($row['variant'] ?? '');
+        if ($storedVariant !== '' && !file_exists(
+            $template->getFullPath() . "/core/pages/{$page}/{$storedVariant}/{$storedVariant}.tpl"
+        )) {
+            $storedVariant = '';
+        }
+
         return [
-            'variant'    => (string)($row['variant'] ?? '') !== ''
-                ? (string)$row['variant'] : (string)($meta['defaultVariant'] ?? 'default'),
+            'variant'    => $storedVariant !== ''
+                ? $storedVariant : (string)($meta['defaultVariant'] ?? 'default'),
             'url'        => (string)($row['url'] ?? ''),
             'indexing'   => (string)($row['indexing'] ?? $seoDefaults['indexing'] ?? 'inherit'),
             'visibility' => (string)($row['visibility'] ?? 'public'),
