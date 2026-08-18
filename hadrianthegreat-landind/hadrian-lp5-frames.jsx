@@ -66,6 +66,18 @@ function paintFrame(doc, s) {
   // written when the design asked for it, so pages that carry their own
   // data-panel are left alone.
   if (s.panel) attr(body, 'data-panel', s.panel, 'light');
+  // The Atrium dashboard reinvented the inside/outside title treatment under its
+  // own attribute -- its blocks are .dash-card and match none of the generic
+  // data-svc-layout selectors -- so this is the one it actually reads.
+  attr(body, 'data-card-titles', s.cardTitles, 'inside');
+  // Per-block paint, on the one block the stage offers it for. Paint and fill
+  // travel together: a fill with no paint leaves --blk-base unset, which paints
+  // the card transparent rather than coloured.
+  const blk = doc.querySelector('[data-block="dom"]');
+  if (blk) {
+    attr(blk, 'data-blk-paint', s.blkPaint);
+    attr(blk, 'data-blk-fill', s.blkPaint ? s.blkFill : null);
+  }
   if (s.auth) body.dataset.auth = s.auth;
   // the floating dev panel is ours, not the visitor's
   body.setAttribute('data-preview', 'off');
@@ -176,7 +188,7 @@ function Frame({ src, state, box, width, onReady, title, seal }) {
     if (!live) return;
     const f = ref.current;
     try { if (f && f.contentDocument) paintFrame(f.contentDocument, state); } catch (e) {}
-  }, [live, state.layout, state.palette, state.sidebar, state.align, state.icons, state.dark, state.auth, state.menu, state.toplinks, state.crumbs, state.band, state.bandSize, state.subnav, state.panel]);
+  }, [live, state.layout, state.palette, state.sidebar, state.align, state.icons, state.dark, state.auth, state.menu, state.toplinks, state.crumbs, state.band, state.bandSize, state.subnav, state.panel, state.cardTitles, state.blkPaint, state.blkFill]);
 
   React.useEffect(() => {
     const f = ref.current;

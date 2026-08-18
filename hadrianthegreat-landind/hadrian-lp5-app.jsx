@@ -339,6 +339,116 @@ function useBandAnchor(active) {
   return pos;
 }
 
+/* ── the block prompt ──────────────────────────────────────────────────────
+   The same offer, made about a block instead of the band. It points at the
+   Domains card because that card is the clearest example of the two settings
+   it carries: where its title sits, and what colour it is painted.
+
+   Both are the module's own. Titles ride v18's data-card-titles (the Atrium
+   dashboard reinvented this privately -- its cards are .dash-card and match
+   none of the generic data-svc-layout selectors, so the shared chip is hidden
+   on this page). Colour rides data-blk-paint + data-blk-fill, the mechanism
+   the shipped theme stores in the section-layout DSL, with the same paint keys
+   and the same solid | tint | grad fills. */
+const HF_PAINTS = [
+  { id: 'accent',  t: 'Accent' },
+  { id: 'quiet',   t: 'Passive' },
+  { id: 'neutral', t: 'Neutral' },
+  { id: 'indigo',  t: 'Indigo' },
+  { id: 'green',   t: 'Green' },
+  { id: 'orange',  t: 'Orange' },
+  { id: 'red',     t: 'Red' },
+  { id: 'teal',    t: 'Teal' },
+];
+const HF_FILLS = [['solid', 'Solid'], ['tint', 'Tint'], ['grad', 'Gradient']];
+
+/* Same measuring trick as the band, pointed at the Domains card. Anchored to
+   its top-right rather than below it: the card is tall and the rows under it
+   are the subject, so sitting beside the head keeps both visible. */
+function useBlockAnchor(active) {
+  const [pos, setPos] = React.useState(null);
+  React.useEffect(() => {
+    if (!active) { setPos(null); return; }
+    let stop = false;
+    const measure = () => {
+      if (stop) return;
+      const art = document.querySelector('.hf-art');
+      const frame = art && art.querySelector('.hf-frame');
+      if (!art || !frame) return setPos(null);
+      let card = null;
+      try { card = frame.contentDocument.querySelector('[data-block="dom"]'); } catch (e) {}
+      if (!card) return setPos(null);
+      const scale = frame.getBoundingClientRect().width / (frame.offsetWidth || CA_WIDTH);
+      const b = card.getBoundingClientRect();
+      const artW = art.getBoundingClientRect().width;
+      setPos({
+        top: Math.max(6, b.top * scale + 10),
+        right: Math.max(6, artW - b.right * scale + 10),
+      });
+    };
+    measure();
+    const t = setInterval(measure, 500);
+    window.addEventListener('resize', measure);
+    return () => { stop = true; clearInterval(t); window.removeEventListener('resize', measure); };
+  }, [active]);
+  return pos;
+}
+
+function HFBlockToast({ titles, onTitles, paint, fill, onPaint, onFill, open, onOpen, onClose, pos }) {
+  return (
+    <div className="hf-toast" style={pos ? { top: pos.top, right: pos.right } : undefined} role="region" aria-label="Block style">
+      {!open ? (
+        <button className="hf-toast-cue" onClick={onOpen}>
+          <span className="dot" aria-hidden="true"></span>
+          <span>Change this block</span>
+          <span className="go" aria-hidden="true">›</span>
+        </button>
+      ) : (
+        <div className="hf-toast-panel">
+          <div className="hd">
+            <b>Domains block</b>
+            <button onClick={onClose} aria-label="Close">✕</button>
+          </div>
+          <div className="row" role="radiogroup" aria-label="Card title">
+            <span>Title</span>
+            <span className="seg">
+              <button role="radio" aria-checked={titles === 'inside'} className={titles === 'inside' ? 'on' : ''}
+                      onClick={() => onTitles('inside')}>Inside</button>
+              <button role="radio" aria-checked={titles === 'outside'} className={titles === 'outside' ? 'on' : ''}
+                      onClick={() => onTitles('outside')}>Outside</button>
+            </span>
+          </div>
+          {/* No paint is a real choice, not the absence of one -- the card keeps
+              the page surface, which is what every block ships as. */}
+          <div className="row" role="radiogroup" aria-label="Block colour">
+            <span>Colour</span>
+            <span className="sw">
+              <button role="radio" aria-checked={!paint} className={`none${!paint ? ' on' : ''}`}
+                      title="No fill" onClick={() => onPaint(null)} />
+              {HF_PAINTS.map((c) => (
+                <button key={c.id} role="radio" aria-checked={paint === c.id}
+                        className={`p-${c.id}${paint === c.id ? ' on' : ''}`}
+                        title={c.t} onClick={() => onPaint(c.id)} />
+              ))}
+            </span>
+          </div>
+          <div className="row" role="radiogroup" aria-label="Fill">
+            <span>Fill</span>
+            <span className="seg">
+              {HF_FILLS.map(([id, t]) => (
+                <button key={id} role="radio" aria-checked={fill === id} disabled={!paint}
+                        className={fill === id ? 'on' : ''}
+                        title={paint ? t : 'Pick a colour first'}
+                        onClick={() => onFill(id)}>{t}</button>
+              ))}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function HFBandToast({ band, onPick, onClose, open, onOpen, pos, size, onSize }) {
   return (
     <div className={`hf-toast${open ? ' open' : ''}`} style={pos ? { top: pos.top, right: pos.right } : undefined} role="region" aria-label="Welcome band style">
@@ -519,39 +629,27 @@ function useHFReel({ layIds, layId, setLay, palette, setPalette, ms = 3200 }) {
     bind: { onMouseEnter: () => setHover(true), onMouseLeave: () => setHover(false) },
     manual: (fn) => (...a) => { setOn(false); fn(...a); } };
 }
-/* The stage is a fraction of the panel, and saying so with figures reads better
-   than saying so with an apology. Every number here was counted in ../hadrian:
-   102 page dirs, 133 'var' rows across core/config, 4 menu locations, 11 blocks
-   on Atrium. Keep them counted, not estimated. */
-const HF_MISSING = [
-  ['96 more pages', 'each with its own template, SEO and layout override'],
-  ['133 design tokens', 'colours, typography, buttons, forms, elements'],
-  ['The homepage composer', 'up to eleven blocks, dragged into order and sized'],
-  ['Four menu locations', 'nested, each item shown by layout and login state'],
-  ['A layout per audience', 'guests get one, clients another, on the same URL'],
-  ['Alignment, menu side, the account block', 'and a sub-nav with per-page exceptions'],
-];
-function HeroMore() {
-  const [open, setOpen] = React.useState(false);
+/* What the stage is, and what it is not. The chips name the parts of the panel
+   the hero has no room for; each one is a real section further down the page. */
+const HF_BEYOND = ['40+ pages', '120+ tokens', 'Custom CSS', 'Menu builder', 'Homepage composer', 'Multi-language SEO'];
+function HeroMore({ onDemo }) {
   return (
-    <div className={`hf-more${open ? ' open' : ''}`}>
+    <div className="hf-more">
       <p className="hf-more-line">
-        Every control on this stage is real. It is also a corner of the panel —
-        <b> six of 102 pages</b>, and not one of the <b>133 tokens</b>.
+        Three pages, three layouts, three styles — <b>and that is what fits in a hero.</b> The
+        theme has forty more pages, a token editor, and builders for menus and the homepage.{' '}
+        <button type="button" className="hf-more-demo" onClick={onDemo}>
+          Open the demo
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" /></svg>
+        </button>
       </p>
-      <button className="hf-more-btn" onClick={() => setOpen(!open)} aria-expanded={open}>
-        {open ? 'Close' : 'What would not fit'}
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
-      </button>
-      {open && (
-        <ul className="hf-more-list">
-          {HF_MISSING.map(([h, s]) => <li key={h}><b>{h}</b><span>{s}</span></li>)}
-        </ul>
-      )}
+      <ul className="hf-beyond">
+        {HF_BEYOND.map((t) => <li key={t}>{t}</li>)}
+      </ul>
     </div>
   );
 }
-function HeroStage({ dark }) {
+function HeroStage({ dark, onDemo }) {
   // off a file:// URL nothing can embed, so offer only the pages we hold a capture of
   const pages = React.useMemo(() => (CA_EMBEDDABLE ? HF_PAGES : HF_PAGES.filter((p) => hfPoster(p.id, 'side'))), []);
   const [page, setPage] = React.useState(pages[0].id);
@@ -565,6 +663,11 @@ function HeroStage({ dark }) {
   // null = not yet offered, 'cue' = the nudge is up, 'open' = the options are,
   // 'done' = used or dismissed and not coming back this visit
   const [toast, setToast] = React.useState(null);
+  // the block prompt, its own state machine on the same four values
+  const [blkToast, setBlkToast] = React.useState(null);
+  const [blkTitles, setBlkTitles] = React.useState('inside');
+  const [blkPaint, setBlkPaint] = React.useState(null);
+  const [blkFill, setBlkFill] = React.useState('solid');
   const [palette, setPalette] = React.useState('blue');
   const pg = pages.find((p) => p.id === page) || pages[0];
   const pal = HF_PALETTES.find((p) => p.id === palette) || HF_PALETTES[0];
@@ -597,11 +700,23 @@ function HeroStage({ dark }) {
   // mount rather than per design, so switching dashboards does not re-offer it.
   const hasBand = !!(dsn && dsn.band);
   const bandPos = useBandAnchor(hasBand && (toast === 'cue' || toast === 'open'));
+  // Only Atrium carries the .dash-card family the paint CSS and data-card-titles
+  // are written against, so the prompt is offered there and nowhere else.
+  const hasBlocks = !!(dsn && dsn.id === 'atrium');
+  // and never while the band prompt is up: two prompts over one frame is clutter
+  const bandBusy = toast === 'cue' || toast === 'open';
+  const blkPos = useBlockAnchor(hasBlocks && (blkToast === 'cue' || blkToast === 'open'));
   React.useEffect(() => {
     if (!hasBand || toast !== null) return;
     const t = setTimeout(() => setToast((s) => (s === null ? 'cue' : s)), 1600);
     return () => clearTimeout(t);
   }, [hasBand, toast]);
+  // The block prompt waits for the band prompt to be gone, then offers itself.
+  React.useEffect(() => {
+    if (!hasBlocks || blkToast !== null || bandBusy) return;
+    const t = setTimeout(() => setBlkToast((v) => (v === null ? 'cue' : v)), 1400);
+    return () => clearTimeout(t);
+  }, [hasBlocks, blkToast, bandBusy]);
   const state = React.useMemo(() => ({
     layout: layId, palette, sidebar: toneable ? tone : 'light', dark, auth: (dsn && dsn.auth) || pg.auth || 'in',
     // Fixed, not offered: the hero shows the top bar the way the demo is set
@@ -609,10 +724,13 @@ function HeroStage({ dark }) {
     // control -- they are the same values the state chip writes.
     menu: 'center', toplinks: 'show', crumbs: 'none',
     subnav: pg.subnav || 'on',
+    cardTitles: hasBlocks ? blkTitles : null,
+    blkPaint: hasBlocks ? blkPaint : null,
+    blkFill: hasBlocks && blkPaint ? blkFill : null,
     panel: panelToned ? tone : null,
     band: dsn && dsn.band ? band : null,
     bandSize: dsn && dsn.band ? bandSize : null,
-  }), [layId, palette, tone, toneable, dark, pg.auth, pg.subnav, dsn, panelToned, band, bandSize]);
+  }), [layId, palette, tone, toneable, dark, pg.auth, pg.subnav, dsn, panelToned, band, bandSize, hasBlocks, blkTitles, blkPaint, blkFill]);
   return (
     <div className="hf" style={{ '--color-accent': pal.c, '--color-accent-light': `color-mix(in srgb, ${pal.c} 12%, transparent)`, '--on-accent-tint': `color-mix(in srgb, ${pal.c} 74%, #000)`, '--color-chrome': hfChromeSolid(toneable ? tone : 'light', pal.c, dark, pal.id), '--color-chrome-ink': hfChromeInk(toneable ? tone : 'light', dark) }} {...reel.bind} data-screen-label="Hero screens">
       <div className="hf-pagectl">
@@ -680,6 +798,20 @@ function HeroStage({ dark }) {
                 onSize={reel.manual((v) => setBandSize(v))}
               />
             )}
+            {hasBlocks && !bandBusy && (blkToast === 'cue' || blkToast === 'open') && (
+              <HFBlockToast
+                pos={blkPos}
+                open={blkToast === 'open'}
+                titles={blkTitles}
+                paint={blkPaint}
+                fill={blkFill}
+                onOpen={reel.manual(() => setBlkToast('open'))}
+                onClose={() => setBlkToast('done')}
+                onTitles={reel.manual((v) => setBlkTitles(v))}
+                onPaint={reel.manual((v) => setBlkPaint(v))}
+                onFill={reel.manual((v) => setBlkFill(v))}
+              />
+            )}
           </div>
         </div>
         <div className="hf-rail right" role="tablist" aria-label="Brand colour">
@@ -692,7 +824,7 @@ function HeroStage({ dark }) {
         </div>
       </div>
       <div className="hf-note">{CA_EMBEDDABLE ? 'The real client area, live — scroll inside the window ↓' : 'Serve this folder over http to run the client area live in the window'}</div>
-      <HeroMore />
+      <HeroMore onDemo={onDemo} />
     </div>
   );
 }
@@ -715,7 +847,7 @@ function Hero({ onDemo, dark }) {
           <a href="#features" className="hp-btn ghost">See the features<span aria-hidden="true">›</span></a>
         </div>
       </div>
-      <Safe name="HeroStage"><HeroStage dark={dark} /></Safe>
+      <Safe name="HeroStage"><HeroStage dark={dark} onDemo={onDemo} /></Safe>
     </header>
   );
 }

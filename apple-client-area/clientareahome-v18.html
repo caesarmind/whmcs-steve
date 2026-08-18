@@ -188,6 +188,69 @@ body { display: block; }
         body[data-card-titles="outside"] .dash-card-head + .dash-row,
         body[data-card-titles="outside"] .dash-card-head + .when-full > .dash-row:first-child { border-top: 0; }
 
+        /* ===== BLOCK PAINT (data-blk-paint / data-blk-fill) ================
+           The shipped theme lets each dashboard block carry a colour: WHICH via
+           data-blk-paint, HOW via data-blk-fill (solid | tint | grad). There it
+           paints .min-section > .blk; this mockup's blocks are .dash-card with
+           no inner wrapper, so the card itself takes the fill. Paint keys,
+           fill maths and the AA deepening below are the theme's own, from
+           assets/css/pages/clientareahome.css -- kept identical so the demo
+           shows the real feature rather than an approximation.
+           ASCII only, per this install's Chrome section-skipping hazard. */
+        .dash-card[data-blk-paint] { --blk-base: var(--color-accent, #0071e3); }
+
+        /* Ink: unconditional floor first, derivation second and gated. A custom
+           property is not parse-validated, so an unsupported color(from ...)
+           would win the cascade and fail at the consumer -- @supports is what
+           keeps the floor reachable. Only the two saturated fills get ink; a
+           10% wash keeps the page's own text colour. */
+        .dash-card[data-blk-fill="solid"],
+        .dash-card[data-blk-fill="grad"] { --blk-ink: #fff; --blk-shade: #000; }
+        @supports (color: color(from red srgb-linear r g b)) {
+            .dash-card[data-blk-fill="solid"],
+            .dash-card[data-blk-fill="grad"] {
+                --_ink:  clamp(0, (var(--ink-crossover, 0.179129) - (0.2126*r + 0.7152*g + 0.0722*b)) * 100000, 1);
+                --_anti: clamp(0, ((0.2126*r + 0.7152*g + 0.0722*b) - var(--ink-crossover, 0.179129)) * 100000, 1);
+                --blk-ink:   color(from var(--blk-base) srgb-linear var(--_ink)  var(--_ink)  var(--_ink)  / 1);
+                --blk-shade: color(from var(--blk-base) srgb-linear var(--_anti) var(--_anti) var(--_anti) / 1);
+            }
+        }
+
+        /* WHICH colour. quiet and neutral take their ink from the text token
+           rather than a literal, which is what makes them mode-correct without
+           a [data-theme] rule of their own. */
+        .dash-card[data-blk-paint="accent"]  { --blk-base: var(--color-accent, #0071e3); }
+        .dash-card[data-blk-paint="quiet"]   { --blk-base: color-mix(in srgb, var(--color-accent, #0071e3) 45%, var(--color-surface, #ffffff)); --blk-ink: var(--color-text-primary, #1d1d1f); }
+        .dash-card[data-blk-paint="neutral"] { --blk-base: var(--color-surface-secondary, #f5f5f7); --blk-ink: var(--color-text-primary, #1d1d1f); }
+        .dash-card[data-blk-paint="indigo"]  { --blk-base: var(--color-icon-indigo, #5856d6); }
+        .dash-card[data-blk-paint="purple"]  { --blk-base: var(--color-icon-purple, #af52de); }
+        .dash-card[data-blk-paint="green"]   { --blk-base: var(--color-icon-green, #34c759); }
+        .dash-card[data-blk-paint="teal"]    { --blk-base: var(--color-icon-teal, #5ac8fa); }
+        .dash-card[data-blk-paint="orange"]  { --blk-base: var(--color-icon-orange, #ff9500); }
+        .dash-card[data-blk-paint="red"]     { --blk-base: var(--color-icon-red, #ff3b30); }
+        .dash-card[data-blk-paint="gray"]    { --blk-base: var(--color-icon-gray, #8e8e93); }
+
+        /* Three hues do not clear 4.5:1 with white ink as a block fill, so they
+           are deepened -- and only for the saturated fills, since a 10% wash of
+           a deeper hue is indistinguishable. Named, not generic: one factor big
+           enough to rescue teal would turn accent into navy. */
+        .dash-card[data-blk-fill="solid"][data-blk-paint="red"],
+        .dash-card[data-blk-fill="grad"][data-blk-paint="red"]    { --blk-base: var(--color-red-text, #d70015); }
+        .dash-card[data-blk-fill="solid"][data-blk-paint="gray"],
+        .dash-card[data-blk-fill="grad"][data-blk-paint="gray"]   { --blk-base: var(--color-text-secondary, #6e6e73); }
+        .dash-card[data-blk-fill="solid"][data-blk-paint="purple"],
+        .dash-card[data-blk-fill="grad"][data-blk-paint="purple"] { --blk-base: color-mix(in srgb, var(--color-icon-purple, #af52de) 78%, #000); }
+
+        /* HOW it is applied. */
+        .dash-card[data-blk-fill="solid"] { background: var(--blk-base); border-color: transparent; }
+        .dash-card[data-blk-fill="grad"]  { background: linear-gradient(135deg, var(--blk-base), color-mix(in srgb, var(--blk-base), var(--blk-shade, #000) 22%)); border-color: transparent; }
+        .dash-card[data-blk-fill="tint"]  { background: color-mix(in srgb, var(--blk-base) 10%, var(--color-surface)); }
+
+        /* The card's own contents come up off a saturated fill. */
+        .dash-card:is([data-blk-fill="solid"], [data-blk-fill="grad"]) :is(.dash-card-title, .dash-row-name) { color: var(--blk-ink); }
+        .dash-card:is([data-blk-fill="solid"], [data-blk-fill="grad"]) :is(.dash-card-link, .dash-row-sub) { color: var(--blk-ink); opacity: 0.82; }
+        .dash-card:is([data-blk-fill="solid"], [data-blk-fill="grad"]) .dash-row { border-color: rgba(255,255,255,0.16); }
+
         /* ---- two-column body ---- */
         .dash-main { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 22px; align-items: start;
             /* a narrow card backfills the gap a wider one leaves beside it, so a

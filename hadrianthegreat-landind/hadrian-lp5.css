@@ -699,15 +699,28 @@ button.hp-foundtag:hover{border-color:var(--color-accent)}
 .hf-more{margin:14px auto 0;max-width:70ch;padding:0 clamp(16px,2.6vw,40px);text-align:center}
 .hf-more-line{font-family:var(--font);font-size:13px;line-height:1.6;color:var(--color-text-tertiary);margin:0;text-wrap:pretty}
 .hf-more-line b{font-weight:650;color:var(--color-text-secondary);font-variant-numeric:tabular-nums}
-.hf-more-btn{display:inline-flex;align-items:center;gap:5px;margin-top:9px;padding:5px 13px;border-radius:999px;border:1px solid var(--color-border);background:var(--color-surface);font-family:var(--font);font-size:11.5px;font-weight:650;color:var(--color-text-secondary);cursor:pointer;transition:all .2s var(--ease)}
-.hf-more-btn:hover{color:var(--color-text-primary);border-color:color-mix(in srgb,var(--color-accent) 45%,transparent)}
-.hf-more-btn svg{transition:transform .25s var(--ease)}
-.hf-more.open .hf-more-btn svg{transform:rotate(180deg)}
-.hf-more-list{list-style:none;margin:16px 0 0;padding:16px 0 0;border-top:1px solid var(--color-border);display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 26px;text-align:left}
-.hf-more-list li{display:flex;flex-direction:column;gap:2px}
-.hf-more-list b{font-family:var(--font);font-size:12.5px;font-weight:650;color:var(--color-text-primary);letter-spacing:-.01em}
-.hf-more-list span{font-family:var(--font);font-size:12px;line-height:1.45;color:var(--color-text-tertiary)}
-@media (prefers-reduced-motion:reduce){.hf-more-btn svg{transition:none}}
+/* the inline demo link, and the chips naming what the hero has no room for */
+.hf-more-demo{display:inline-flex;align-items:center;gap:4px;padding:0;border:none;background:none;font-family:var(--font);font-size:13px;font-weight:650;color:var(--color-accent);cursor:pointer;text-decoration:none;border-bottom:1px solid transparent;transition:border-color .2s var(--ease)}
+.hf-more-demo:hover{border-bottom-color:currentColor}
+.hf-beyond{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:14px 0 0;padding:0}
+.hf-beyond li{font-family:var(--font);font-size:11.5px;font-weight:650;color:var(--color-accent);background:color-mix(in srgb,var(--color-accent) 9%,transparent);border:1px solid color-mix(in srgb,var(--color-accent) 22%,transparent);border-radius:999px;padding:5px 13px;white-space:nowrap}
+/* the block prompt's colour row: swatches, not words. Each dot is painted with
+   the same token the block would take, so the choice is shown rather than named. */
+.hf-toast-panel .sw{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.hf-toast-panel .sw button{width:16px;height:16px;padding:0;border-radius:50%;border:1px solid rgba(0,0,0,.16);cursor:pointer;transition:transform .15s var(--ease),box-shadow .15s var(--ease)}
+.hf-toast-panel .sw button:hover{transform:scale(1.14)}
+.hf-toast-panel .sw button.on{box-shadow:0 0 0 2px var(--color-surface),0 0 0 3.5px var(--color-accent)}
+.hf-toast-panel .sw .none{background:var(--color-surface);position:relative;overflow:hidden}
+.hf-toast-panel .sw .none::after{content:'';position:absolute;left:-2px;top:6.5px;width:20px;height:1.5px;background:var(--color-text-quaternary);transform:rotate(-45deg)}
+.hf-toast-panel .sw .p-accent{background:var(--color-accent)}
+.hf-toast-panel .sw .p-quiet{background:color-mix(in srgb,var(--color-accent) 45%,#fff)}
+.hf-toast-panel .sw .p-neutral{background:var(--color-surface-secondary)}
+.hf-toast-panel .sw .p-indigo{background:#5856d6}
+.hf-toast-panel .sw .p-green{background:#34c759}
+.hf-toast-panel .sw .p-orange{background:#ff9500}
+.hf-toast-panel .sw .p-red{background:#ff3b30}
+.hf-toast-panel .sw .p-teal{background:#5ac8fa}
+.hf-toast-panel .seg button:disabled{opacity:.4;cursor:not-allowed}
 
 /* ── admin panel embedded in a spotlight ───────────────────────────────────
    Same browser-frame chrome as the drawn mocks beside it, so the block reads as
