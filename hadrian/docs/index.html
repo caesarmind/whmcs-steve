@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hadrian Theme Documentation</title>
+  <meta name="description" content="Developer documentation for the Hadrian WHMCS 9 client theme and its admin addon.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
+  <style>
+    :root {
+      --base-font-size: 15px;
+      --theme-color: #0071e3;
+      --sidebar-width: 290px;
+      --sidebar-nav-link-color--active: #0071e3;
+      --sidebar-nav-link-border-color--active: #0071e3;
+      --sidebar-nav-link-font-weight--active: 600;
+      --code-font-size: 0.875em;
+      --blockquote-border-color: #0071e3;
+      --base-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .sidebar-nav > ul > li > a,
+    .sidebar-nav > ul > li > p {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.8em;
+      letter-spacing: 0.06em;
+      color: #86868b;
+    }
+    .sidebar-nav > ul > li > ul > li > a {
+      font-weight: normal;
+      text-transform: none;
+      font-size: 0.95em;
+      letter-spacing: normal;
+    }
+    .markdown-section table {
+      display: table;
+      width: 100%;
+    }
+    .markdown-section pre > code {
+      font-family: 'SF Mono', 'JetBrains Mono', 'Consolas', monospace;
+    }
+    .markdown-section h1 {
+      border-bottom: 2px solid #0071e3;
+      padding-bottom: 10px;
+    }
+    .tip, .warning, .attention {
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    // Served with `hadrian/` as the document root, not `hadrian/docs/`: the existing
+    // cross-links point both ways (docs/ARCHITECTURE.md -> ../LICENSING-SETUP.md,
+    // README.md -> docs/EXTENDING.md), and only that root resolves both.
+    window.$docsify = {
+      name: 'Hadrian Theme Docs',
+      repo: '',
+      basePath: '/',
+      homepage: 'README.md',
+      loadSidebar: true,
+      // One sidebar for every route, since the Markdown lives at two depths.
+      alias: {
+        '/_sidebar.md': '/docs/_sidebar.md',
+        '/.*/_sidebar.md': '/docs/_sidebar.md',
+      },
+      // The docs link each other with plain relative paths, so resolve against
+      // the current file's directory rather than the root.
+      relativePath: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      search: {
+        maxAge: 86400000,
+        // Listed explicitly, not 'auto': auto walks the sidebar, which would try
+        // to index the four .html tool links as Markdown (and it is unsupported
+        // alongside relativePath anyway).
+        paths: [
+          '/README.md',
+          '/BUILD.md',
+          '/LICENSING-SETUP.md',
+          '/docs/ARCHITECTURE.md',
+          '/docs/HYBRID-STRUCTURE.md',
+          '/docs/TEMPLATE-STRUCTURE.md',
+          '/docs/PAGE-CHECKLIST.md',
+          '/docs/WHMCS-PAGES.md',
+          '/docs/EXTENDING.md',
+          '/docs/CONTENT-SPECS.md',
+          '/docs/ADMIN-CONTENT-SPECS.md',
+          '/docs/I18N-AUDIT.md',
+        ],
+        placeholder: 'Search the Hadrian docs...',
+        noData: 'No results found',
+        depth: 3,
+        hideOtherSidebarContent: false,
+      },
+      copyCode: {
+        buttonText: 'Copy',
+        errorText: 'Error',
+        successText: 'Copied!'
+      },
+      pagination: {
+        previousText: 'Previous',
+        nextText: 'Next',
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      themeColor: '#0071e3',
+      notFoundPage: true,
+    }
+  </script>
+  <!-- Docsify core -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <!-- Plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2/dist/docsify-copy-code.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js"></script>
+  <!-- Syntax highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-php.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-scss.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-smarty.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+</body>
+</html>
