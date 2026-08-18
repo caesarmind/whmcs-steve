@@ -167,7 +167,11 @@ body[data-bleed="1"] .content-area > .when-empty {
 .state-chip .swatch-group button[data-palette="amber"]   { color: #f08a00; }
 .state-chip .swatch-group button[data-palette="slate"]   { color: #64748b; }
 body[data-preview="off"] .state-chip,
-body.screenshot .state-chip { display: none !important; }
+body.screenshot .state-chip,
+/* homepage.html carries its own small footer-variant chip; it is a preview
+   control like the main one and was surviving ?screenshot=1 */
+body[data-preview="off"] .fp-chip,
+body.screenshot .fp-chip { display: none !important; }
 
 /* ── Palette overrides ────────────────────────────────────── */
 /* Each data-palette on <html> swaps the accent token chain so
@@ -894,6 +898,9 @@ body[data-crumbs="none"] .ph-breadcrumb { display: none; }
    without its text, with no second asset to keep in step with the first.
    If the brand PNG is ever replaced, keep the mark square and leftmost. */
 .ph-rail-logo img { width: 28px; height: 28px; object-fit: cover; object-position: left center; display: block; }
+/* .brand-mark is the square mark asset, so it needs no crop -- contain keeps
+   the whole glyph and its rounded plate intact. */
+.ph-rail-logo img.brand-mark { object-fit: contain; object-position: center; }
 /* min-height:0 is what actually lets this shrink below its content height --
    without it a flex child refuses to shrink and overflow-y never engages. */
 .ph-rail-items { display: flex; flex-direction: column; gap: 2px; padding: 4px 8px; overflow-y: auto; min-height: 0; }
@@ -936,7 +943,7 @@ body[data-icons="mono"] .ph-rail-item .rail-ico {
 .ph-rail-spacer { flex: 1; }
 .ph-rail-user {
     width: 32px; height: 32px; border-radius: 50%;
-    background: linear-gradient(135deg, #007aff, #5856d6);
+    background: linear-gradient(135deg, var(--color-accent), #5856d6);
     color: #fff; font-size: 13px; font-weight: 600;
     display: flex; align-items: center; justify-content: center;
     margin: 8px auto 4px; cursor: pointer;
@@ -1496,14 +1503,14 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
 body.client-area-layout[data-layout="boxed"] {
     padding: 24px;
     background:
-        radial-gradient(1200px 620px at 10% -10%, rgba(0,122,255,0.20), transparent 60%),
+        radial-gradient(1200px 620px at 10% -10%, color-mix(in srgb, var(--color-accent) 20%, transparent), transparent 60%),
         radial-gradient(1100px 640px at 105% 0%, rgba(88,86,214,0.18), transparent 55%),
         radial-gradient(960px 720px at 50% 120%, rgba(48,209,88,0.12), transparent 60%),
         var(--color-surface-secondary);
 }
 html[data-theme="dark"] body.client-area-layout[data-layout="boxed"] {
     background:
-        radial-gradient(1200px 620px at 10% -10%, rgba(41,151,255,0.22), transparent 60%),
+        radial-gradient(1200px 620px at 10% -10%, color-mix(in srgb, var(--color-accent) 22%, transparent), transparent 60%),
         radial-gradient(1100px 640px at 105% 0%, rgba(94,92,230,0.20), transparent 55%),
         radial-gradient(960px 720px at 50% 120%, rgba(48,209,88,0.12), transparent 60%),
         #0a0a0c;

@@ -94,8 +94,8 @@ body { display: block; }
 
         /* Order accent cell */
         .c-order { background: var(--color-accent-light); box-shadow: none; align-items: flex-start; justify-content: center; gap: 12px; }
-        .c-order:hover { background: rgba(0,113,227,0.12); transform: translateY(-1px); }
-        [data-theme="dark"] .c-order:hover { background: rgba(41,151,255,0.18); }
+        .c-order:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); transform: translateY(-1px); }
+        [data-theme="dark"] .c-order:hover { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
         .order-ico { width: 42px; height: 42px; border-radius: 13px; background: var(--color-accent); color: #fff; display: flex; align-items: center; justify-content: center; }
         .order-ico svg { width: 20px; height: 20px; }
         .order-h { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: var(--color-accent); }

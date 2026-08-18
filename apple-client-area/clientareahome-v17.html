@@ -317,7 +317,7 @@ body { display: block; }
            pager, tally chips - instead of enumerating elements and missing one. */
         body[data-tone="mixed"] .hp-tile-graphite { --color-accent: #6fb8ff; }
         /* the button still needs a dark-enough fill to carry white text */
-        body[data-tone="mixed"] .hp-tile-graphite .btn-primary { background: #0071e3; color: #fff; }
+        body[data-tone="mixed"] .hp-tile-graphite .btn-primary { background: var(--color-accent); color: #fff; }
         /* mixed keeps the original palette, including the yellow-on-charcoal card */
         body[data-tone="mixed"] .hp-tile-graphite .lp-eyebrow.is-support,
         body[data-tone="mixed"] .hp-tile-graphite .lp-viewall.is-support { color: #ffd60a; }
@@ -610,7 +610,7 @@ body { display: block; }
            pass leaves a coloured block class-less (see applyMixedTones), the
            !important surface is enough and the graphite/sky ink rules never reach
            it. The accent rebind re-tones the links in one move. */
-        .lp-card[data-blockcolor="blue"]    { --color-accent: #0071e3; --color-accent-hover: #0077ed; }
+        .lp-card[data-blockcolor="blue"]    { --color-accent: var(--color-accent); --color-accent-hover: var(--color-accent-hover); }
         .lp-card[data-blockcolor="emerald"] { --color-accent: #14b17d; --color-accent-hover: #0fa370; }
         .lp-card[data-blockcolor="violet"]  { --color-accent: #8c5cff; --color-accent-hover: #7a46ff; }
         .lp-card[data-blockcolor="rose"]    { --color-accent: #ff2d6b; --color-accent-hover: #e61f5b; }
@@ -1794,7 +1794,7 @@ body { display: block; }
     var DEFAULT_ORDER = ['svc', 'dom', 'inv', 'tkt', 'news', 'reg', 'pro'];
     /* the palette hues a block can be tinted with (values mirror the palette chip) */
     var BLOCK_COLORS = [
-        ['blue', '#0071e3', '#0077ed'], ['emerald', '#14b17d', '#0fa370'],
+        ['blue', 'var(--color-accent)', 'var(--color-accent-hover)'], ['emerald', '#14b17d', '#0fa370'],
         ['violet', '#8c5cff', '#7a46ff'], ['rose', '#ff2d6b', '#e61f5b'],
         ['amber', '#f08a00', '#d97a00'], ['slate', '#64748b', '#475569']
     ];
@@ -1806,7 +1806,7 @@ body { display: block; }
     /* per-block list DISPLAY modes offered by the layout map (pagination is a
        separate toggle; table + digest stay page-wide) */
     var BLOCK_OVF = ['peek', 'scroll'];
-    var LAYOUT = { order: DEFAULT_ORDER.slice(), off: {}, width: {}, color: {}, search: {}, ovf: {}, paged: {}, hideTally: {}, parts: { atn: true, acct: true } };
+    var LAYOUT = { order: DEFAULT_ORDER.slice(), off: {}, width: {}, color: {}, search: {}, ovf: {}, paged: {}, hideTally: {}, parts: { atn: true, acct: true, hero: true } };
     var lastFit = { rows: 0, holes: 0 };
 
     function saveLayout() { try { localStorage.setItem('hn.v17.layout', JSON.stringify(LAYOUT)); } catch (e) {} }
@@ -2330,10 +2330,40 @@ body { display: block; }
         buildMap();
     }
 
+    /* -- embed bridge --------------------------------------------------------
+       The landing page's Homepage composer drives this page instead of drawing
+       a mock of it: it writes the same LAYOUT this page's own map writes, then
+       asks for a re-render. Deliberately does NOT saveLayout() -- an embedder's
+       edits must not land in this visitor's own stored layout. */
+    window.hnComposer = {
+        keys: DEFAULT_ORDER.slice(),
+        listed: Object.keys(LISTED),
+        tallied: Object.keys(TALLIED),
+        colors: BLOCK_COLOR_NAMES.slice(),
+        read: function () { return JSON.parse(JSON.stringify(LAYOUT)); },
+        write: function (patch) {
+            if (!patch) return false;
+            if (Array.isArray(patch.order)) {
+                var clean = patch.order.filter(function (k) { return DEFAULT_ORDER.indexOf(k) > -1; });
+                DEFAULT_ORDER.forEach(function (k) { if (clean.indexOf(k) < 0) clean.push(k); });
+                LAYOUT.order = clean;
+            }
+            ['off', 'width', 'color', 'search', 'paged', 'hideTally'].forEach(function (k) {
+                if (patch[k]) LAYOUT[k] = patch[k];
+            });
+            if (patch.parts) Object.keys(patch.parts).forEach(function (k) { LAYOUT.parts[k] = patch.parts[k]; });
+            /* a block that just appeared or changed width has to re-measure */
+            Object.keys(st).forEach(function (k) { st[k].page = 1; st[k].cap = 0; });
+            applyParts();
+            renderAll();
+            return true;
+        }
+    };
     function applyParts() {
-        var atn = q('.atn'), acct = q('.dash-hero-avatar');
+        var atn = q('.atn'), acct = q('.dash-hero-avatar'), hero = q('.dash-hero');
         if (atn) atn.style.display = LAYOUT.parts.atn ? '' : 'none';
         if (acct) acct.style.display = LAYOUT.parts.acct ? '' : 'none';
+        if (hero) hero.style.display = LAYOUT.parts.hero === false ? 'none' : '';
     }
 
     function buildMap() {

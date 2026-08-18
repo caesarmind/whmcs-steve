@@ -25,11 +25,11 @@
         .mon-check-form .mon-location { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #e8e8ed; border-radius: 16px; padding: 0 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.06); }
         .mon-check-form .mon-location svg { width: 16px; height: 16px; color: var(--color-accent); flex-shrink: 0; }
         .mon-check-form .mon-location select { flex: 1; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: #1d1d1f; padding: 14px 0; appearance: none; cursor: pointer; -webkit-appearance: none; }
-        .mon-check-form .mon-check-btn { background: #0071e3; color: #fff; border: 0; border-radius: 16px; padding: 0 22px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.15s; }
-        .mon-check-form .mon-check-btn:hover { background: #0077ed; }
+        .mon-check-form .mon-check-btn { background: var(--color-accent); color: #fff; border: 0; border-radius: 16px; padding: 0 22px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.15s; }
+        .mon-check-form .mon-check-btn:hover { background: var(--color-accent-hover); }
         [data-theme="dark"] .mon-check-form .mon-location { background: #1c1c1e; border-color: #3a3a3c; }
         [data-theme="dark"] .mon-check-form .mon-location select { color: #f5f5f7; }
-        [data-theme="dark"] .mon-check-form .mon-location svg { color: #2997ff; }
+        [data-theme="dark"] .mon-check-form .mon-location svg { color: var(--color-accent); }
         @media (max-width: 720px) {
             .mon-check-form { grid-template-columns: 1fr; }
         }
@@ -37,9 +37,9 @@
         /* Sub-tab pills on features section */
         .mon-subtabs { display: flex; justify-content: center; gap: 6px; margin: 8px 0 40px; }
         .mon-subtabs button { border: none; background: transparent; padding: 10px 22px; font-size: 14px; font-weight: 500; border-radius: 980px; cursor: pointer; color: #6e6e73; transition: all 0.2s ease; font-family: inherit; }
-        .mon-subtabs button.active { background: #0071e3; color: #fff; }
+        .mon-subtabs button.active { background: var(--color-accent); color: #fff; }
         [data-theme="dark"] .mon-subtabs button { color: #a1a1a6; }
-        [data-theme="dark"] .mon-subtabs button.active { background: #2997ff; color: #fff; }
+        [data-theme="dark"] .mon-subtabs button.active { background: var(--color-accent); color: #fff; }
 
         .mon-pane { display: none; }
         .mon-pane.active { display: block; }
@@ -204,12 +204,12 @@
                 <svg viewBox="0 0 240 80" style="width: 100%; height: 80px;">
                     <defs>
                         <linearGradient id="monitorGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#0071e3" stop-opacity="0.3"/>
-                            <stop offset="100%" stop-color="#0071e3" stop-opacity="0"/>
+                            <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.3"/>
+                            <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0"/>
                         </linearGradient>
                     </defs>
                     <path d="M0,60 L24,45 L48,52 L72,30 L96,38 L120,22 L144,28 L168,18 L192,25 L216,12 L240,20 L240,80 L0,80 Z" fill="url(#monitorGrad)"/>
-                    <path d="M0,60 L24,45 L48,52 L72,30 L96,38 L120,22 L144,28 L168,18 L192,25 L216,12 L240,20" fill="none" stroke="#0071e3" stroke-width="2"/>
+                    <path d="M0,60 L24,45 L48,52 L72,30 L96,38 L120,22 L144,28 L168,18 L192,25 L216,12 L240,20" fill="none" stroke="var(--color-accent)" stroke-width="2"/>
                 </svg>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px;">
                     <div style="padding: 8px; background: #f5f5f7; border-radius: 8px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: #1d1d1f;">99.98%</div><div style="font-size: 9px; color: #86868b;">Uptime</div></div>
@@ -319,7 +319,7 @@
     <h2 style="font-size: 40px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 8px;">Get alerts via your favorite app.</h2>
     <p style="color: var(--color-text-secondary); margin: 0 0 40px; font-size: 17px;">Be the first to know when your site is down or performing poorly.</p>
     <div class="mon-alerts-grid">
-        <div class="mon-alert-cell"><div class="mon-alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></div><div class="mon-alert-label">Email</div></div>
+        <div class="mon-alert-cell"><div class="mon-alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></div><div class="mon-alert-label">Email</div></div>
         <div class="mon-alert-cell"><div class="mon-alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="mon-alert-label">SMS</div></div>
         <div class="mon-alert-cell"><div class="mon-alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="mon-alert-label">Pushbullet</div></div>
         <div class="mon-alert-cell"><div class="mon-alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="mon-alert-label">Google Chat</div></div>
@@ -330,7 +330,7 @@
         <div class="mon-alert-cell"><div class="mon-alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#4a90e2" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div><div class="mon-alert-label">Stride</div></div>
         <div class="mon-alert-cell"><div class="mon-alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#06ac38" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l2.5 2.5L16 9"/></svg></div><div class="mon-alert-label">PagerDuty</div></div>
         <div class="mon-alert-cell"><div class="mon-alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2aabee" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></div><div class="mon-alert-label">Telegram</div></div>
-        <div class="mon-alert-cell"><div class="mon-alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="2"><rect x="2" y="4" width="9" height="9" rx="1"/><rect x="13" y="4" width="9" height="9" rx="1"/><rect x="2" y="15" width="9" height="5" rx="1"/><rect x="13" y="15" width="9" height="5" rx="1"/></svg></div><div class="mon-alert-label">Microsoft 365</div></div>
+        <div class="mon-alert-cell"><div class="mon-alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2"><rect x="2" y="4" width="9" height="9" rx="1"/><rect x="13" y="4" width="9" height="9" rx="1"/><rect x="2" y="15" width="9" height="5" rx="1"/><rect x="13" y="15" width="9" height="5" rx="1"/></svg></div><div class="mon-alert-label">Microsoft 365</div></div>
         <div class="mon-alert-cell"><div class="mon-alert-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#172b4d" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><div class="mon-alert-label">OpsGenie</div></div>
     </div>
 </section>
@@ -354,7 +354,7 @@
                         <span style="font-size: 10px; color: #30d158;">● Healthy</span>
                     </div>
                     <svg viewBox="0 0 240 60" style="width: 100%; height: 60px;">
-                        <path d="M0,40 L30,30 L60,35 L90,20 L120,25 L150,15 L180,22 L210,10 L240,18" fill="none" stroke="#0071e3" stroke-width="2"/>
+                        <path d="M0,40 L30,30 L60,35 L90,20 L120,25 L150,15 L180,22 L210,10 L240,18" fill="none" stroke="var(--color-accent)" stroke-width="2"/>
                     </svg>
                 </div>
                 <div style="display: flex; gap: 10px; width: 100%; max-width: 300px;">
@@ -396,7 +396,7 @@
                         <div style="flex: 1;">
                             <div style="font-size: 10px; color: #86868b; margin-bottom: 4px;">CPU</div>
                             <div style="font-size: 18px; font-weight: 700; color: #1d1d1f;">47%</div>
-                            <div style="height: 4px; background: #f5f5f7; border-radius: 2px; margin-top: 4px;"><div style="width: 47%; height: 100%; background: #0071e3; border-radius: 2px;"></div></div>
+                            <div style="height: 4px; background: #f5f5f7; border-radius: 2px; margin-top: 4px;"><div style="width: 47%; height: 100%; background: var(--color-accent); border-radius: 2px;"></div></div>
                         </div>
                         <div style="flex: 1;">
                             <div style="font-size: 10px; color: #86868b; margin-bottom: 4px;">Memory</div>
@@ -410,7 +410,7 @@
                         </div>
                     </div>
                     <svg viewBox="0 0 240 50" style="width: 100%; height: 50px;">
-                        <path d="M0,30 Q30,15 60,25 T120,22 T180,18 T240,15" fill="none" stroke="#0071e3" stroke-width="2"/>
+                        <path d="M0,30 Q30,15 60,25 T120,22 T180,18 T240,15" fill="none" stroke="var(--color-accent)" stroke-width="2"/>
                         <path d="M0,38 Q30,32 60,36 T120,30 T180,34 T240,28" fill="none" stroke="#30d158" stroke-width="2"/>
                     </svg>
                 </div>

@@ -50,6 +50,11 @@ function paintFrame(doc, s) {
   body.setAttribute('data-menu', s.menu || 'left');            // left | center
   body.setAttribute('data-toplinks', s.toplinks || 'show');   // show | hide
   attr(body, 'data-crumbs', s.crumbs, 'trail');              // trail | plain | pill | chevron | back | none
+  // The theme renders crumbs in two places: .ph-breadcrumb on the top layout,
+  // and .ph-side-crumbs on the sidebar and rail. data-crumbs only reaches the
+  // first, so asking for none needs the hide flag that covers both.
+  if (s.crumbs === 'none') body.setAttribute('data-hide-breadcrumb', '1');
+  else body.removeAttribute('data-hide-breadcrumb');
   // the welcome band, on the dashboards that have one. gradient is the base
   // look with no rule behind it, so it is expressed by removing the attribute.
   attr(body, 'data-hero-tone', s.band, 'gradient');
@@ -84,6 +89,14 @@ const FOCUSABLE = 'a[href],button,input,select,textarea,summary,[tabindex]:not([
 function sealFrame(doc) {
   if (doc.__sealed) return;
   doc.__sealed = true;
+  /* The mockups carry their own dev controls -- the shared state chip, and the
+     homepage's own footer picker. They belong to the mockup, not to an embed of
+     it, and a visitor cannot tell the difference. */
+  try {
+    var devcss = doc.createElement('style');
+    devcss.textContent = '.state-chip,.fp-chip{display:none !important}';
+    (doc.head || doc.documentElement).appendChild(devcss);
+  } catch (e) {}
   doc.addEventListener('click', (e) => {
     const a = e.target.closest && e.target.closest('a[href]');
     if (a && !a.getAttribute('href').startsWith('#')) e.preventDefault();
@@ -125,8 +138,12 @@ function useFrameBox(ref, width) {
     const r = el.getBoundingClientRect();
     if (r.width < 2 || r.height < 2) return;
     const scale = r.width / width;
-    // only a real change commits, so this is safe to call from a render effect
-    setBox((p) => (Math.abs(p.scale - scale) < 0.0005 ? p : { scale, h: r.height / scale }));
+    // only a real change commits, so this is safe to call from a render effect.
+    // Height is compared as well as scale: a box that changes height but not
+    // width leaves the scale identical, and bailing on scale alone would keep
+    // the old iframe height — a strip of empty page under a grown container.
+    const h = r.height / scale;
+    setBox((p) => (Math.abs(p.scale - scale) < 0.0005 && Math.abs(p.h - h) < 0.5 ? p : { scale, h }));
   }, [width]);
   React.useLayoutEffect(() => {
     window.addEventListener('resize', measure);

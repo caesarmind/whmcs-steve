@@ -17,18 +17,53 @@ function Chrome({ label, children, pad = 12 }) {
 }
 // Login-based layouts: guest vs client
 function VizLogin() {
-  return (
-    <Chrome label="same URL · two experiences">
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {[['Guest', 'var(--color-accent)'], ['Client', '#30d158']].map(([who, c]) => (
-          <div key={who} style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 8, overflow: 'hidden' }}>
-            <div style={{ background: c, padding: '5px 8px', fontSize: 8, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#fff' }}>{who}</div>
-            <div style={{ padding: 8, display: 'grid', gap: 5 }}>
-              {who === 'Guest' ? <>{V.bar('70%', .5, 7)}{V.bar('90%', .12)}{V.bar('55%', .12)}<div style={{ height: 20, borderRadius: 5, background: c, opacity: .85, marginTop: 2 }}></div></>
-                : <><div style={{ display: 'flex', gap: 4 }}>{[0, 1, 2].map(k => <div key={k} style={{ flex: 1, height: 22, borderRadius: 4, background: 'var(--color-surface-secondary)' }}></div>)}</div>{V.bar('80%', .12)}{V.bar('60%', .12)}{V.bar('70%', .12)}</>}
-            </div>
+  // The point is the NAVIGATION, not the content: the same URL renders a top bar
+  // for a stranger and a sidebar for a customer, so draw the chrome, not filler.
+  const acc = 'var(--color-accent)';
+  const bar = (w, o) => <span style={{ display: 'block', width: w, height: 5, borderRadius: 3, background: 'var(--color-text-primary)', opacity: o }}></span>;
+  const side = (who, state, layout, tint) => (
+    <div style={{ border: '1px solid var(--color-border)', borderRadius: 10, overflow: 'hidden', background: 'var(--color-surface)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 9px', borderBottom: '1px solid var(--color-border)', background: 'var(--color-surface-secondary)' }}>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: tint }}></span>
+        <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '.09em', textTransform: 'uppercase', color: 'var(--color-text-secondary)' }}>{state}</span>
+        <span style={{ marginLeft: 'auto', fontSize: 8, fontWeight: 800, letterSpacing: '.05em', color: tint }}>{layout}</span>
+      </div>
+      {who === 'guest' ? (
+        <div>
+          {/* top nav: the whole navigation sits in one bar across the top */}
+          <div style={{ background: acc, display: 'flex', alignItems: 'center', gap: 5, padding: '6px 9px' }}>
+            <span style={{ width: 22, height: 5, borderRadius: 3, background: 'rgba(255,255,255,.95)' }}></span>
+            {[0, 1, 2].map((k) => <span key={k} style={{ width: 15, height: 4, borderRadius: 2, background: 'rgba(255,255,255,.55)' }}></span>)}
+            <span style={{ marginLeft: 'auto', width: 24, height: 9, borderRadius: 999, background: 'rgba(255,255,255,.95)' }}></span>
           </div>
-        ))}
+          <div style={{ padding: 10, display: 'grid', gap: 5, justifyItems: 'center', minHeight: 74 }}>
+            {bar('68%', .8)}{bar('84%', .16)}{bar('52%', .16)}
+            <span style={{ marginTop: 3, width: 54, height: 13, borderRadius: 999, background: acc }}></span>
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: '34px 1fr', minHeight: 96 }}>
+          {/* sidebar: the navigation moves down the left edge */}
+          <div style={{ background: acc, padding: '8px 6px', display: 'grid', gap: 5, alignContent: 'start' }}>
+            <span style={{ height: 5, borderRadius: 3, background: 'rgba(255,255,255,.95)' }}></span>
+            {[0, 1, 2, 3].map((k) => <span key={k} style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,.5)' }}></span>)}
+          </div>
+          <div style={{ padding: 9, display: 'grid', gap: 5 }}>
+            <div style={{ display: 'flex', gap: 4 }}>
+              {[0, 1, 2].map((k) => <div key={k} style={{ flex: 1, height: 20, borderRadius: 5, background: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)' }}></div>)}
+            </div>
+            <div style={{ height: 30, borderRadius: 5, background: 'var(--color-surface-secondary)', border: '1px solid var(--color-border)' }}></div>
+            {bar('62%', .14)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+  return (
+    <Chrome label="one URL · the session picks the layout">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        {side('guest', 'Logged out', 'Top Nav', 'var(--color-accent)')}
+        {side('client', 'Logged in', 'Sidebar', '#30d158')}
       </div>
     </Chrome>
   );
@@ -112,19 +147,124 @@ function VizStyles() {
     </Chrome>
   );
 }
-// Fonts
+// Font manager — the four sources the theme will take a family from
 function VizFonts() {
-  const fonts = [['System', 'var(--font)'], ['Georgia', 'Georgia,serif'], ['Menlo', 'ui-monospace,Menlo,monospace']];
+  const MODES = [
+    ['Default', 'San Francisco on Apple, bundled Inter elsewhere', 'var(--font)'],
+    ['System fonts', "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", 'system-ui,sans-serif'],
+    ['Google Font', "'Roboto', system-ui, sans-serif", 'Georgia,serif'],
+    ['Self-hosted', "'BrandSans' — drop the file into /assets/fonts/custom", 'ui-monospace,Menlo,monospace'],
+  ];
   const [i, setI] = React.useState(0);
-  React.useEffect(() => { const t = setInterval(() => setI((v) => (v + 1) % 3), 1800); return () => clearInterval(t); }, []);
+  React.useEffect(() => { const t = setInterval(() => setI((v) => (v + 1) % MODES.length), 2200); return () => clearInterval(t); }, []);
   return (
-    <Chrome label={fonts[i][0]}>
-      <div style={{ fontFamily: fonts[i][1], transition: 'font-family .2s' }}>
-        <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-.02em', color: 'var(--color-text-primary)', lineHeight: 1.1 }}>Good evening, Marcus</div>
-        <div style={{ fontSize: 11.5, color: 'var(--color-text-tertiary)', marginTop: 6, lineHeight: 1.5 }}>Everything's running smoothly today. Three services renew this month.</div>
+    <Chrome label="Styles → Typography · font family">
+      <div style={{ display: 'grid', gap: 4 }}>
+        {MODES.map(([name, detail], k) => {
+          const on = k === i;
+          return (
+            <div key={name} style={{
+              borderRadius: 8, border: '1px solid ' + (on ? 'color-mix(in srgb, var(--color-accent) 45%, transparent)' : 'var(--color-border)'),
+              background: on ? 'var(--color-accent-light)' : 'var(--color-surface)',
+              padding: '6px 9px', transition: 'background .3s ease, border-color .3s ease',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <span style={{
+                  width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
+                  border: '1.5px solid ' + (on ? 'var(--color-accent)' : 'var(--color-border)'),
+                  background: on ? 'var(--color-accent)' : 'transparent',
+                  boxShadow: on ? 'inset 0 0 0 1.5px var(--color-surface)' : 'none', transition: 'all .3s ease',
+                }}></span>
+                <span style={{ fontSize: 10.5, fontWeight: 650, color: 'var(--color-text-primary)' }}>{name}</span>
+              </div>
+              {/* the field that mode fills in */}
+              {on && (
+                <div style={{
+                  marginTop: 5, marginLeft: 17, padding: '4px 7px', borderRadius: 6,
+                  background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                  fontSize: 8.5, fontFamily: 'ui-monospace,Menlo,monospace', color: 'var(--color-text-tertiary)',
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>{detail}</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {/* and what the client area is set in as a result */}
+      <div style={{ marginTop: 10, paddingTop: 9, borderTop: '1px solid var(--color-border)' }}>
+        <div style={{ fontFamily: MODES[i][2], fontSize: 15, fontWeight: 700, letterSpacing: '-.02em', color: 'var(--color-text-primary)', transition: 'font-family .2s' }}>Good evening, Marcus</div>
+        <div style={{ fontFamily: MODES[i][2], fontSize: 9.5, color: 'var(--color-text-tertiary)', marginTop: 3 }}>Three services renew this month.</div>
+      </div>
+    </Chrome>
+  );
+}
+
+// Per-page layout override — a page can refuse the site-wide main menu or footer
+function VizPageLayout() {
+  const ROWS = [
+    ['Dashboard', 'Site default', false],
+    ['Shopping cart', 'Minimal menu', true],
+    ['Checkout', 'No footer', true],
+    ['Knowledgebase', 'Site default', false],
+  ];
+  return (
+    <Chrome label="Pages → layout override">
+      <div style={{ display: 'grid', gap: 4 }}>
+        {ROWS.map(([page, val, over]) => (
+          <div key={page} style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '7px 9px', borderRadius: 8,
+            background: 'var(--color-surface)',
+            border: '1px solid ' + (over ? 'color-mix(in srgb, var(--color-accent) 45%, transparent)' : 'var(--color-border)'),
+          }}>
+            <span style={{ flex: 1, fontSize: 10.5, fontWeight: 600, color: 'var(--color-text-primary)' }}>{page}</span>
+            <span style={{
+              fontSize: 8.5, fontWeight: 700, padding: '3px 8px', borderRadius: 999,
+              background: over ? 'var(--color-accent)' : 'var(--color-surface-secondary)',
+              color: over ? '#fff' : 'var(--color-text-tertiary)',
+              border: '1px solid ' + (over ? 'var(--color-accent)' : 'var(--color-border)'),
+            }}>{val}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: 9, fontSize: 8.5, fontWeight: 650, color: 'var(--color-text-quaternary)' }}>
+        Two rows overriding · the rest inherit
+      </div>
+    </Chrome>
+  );
+}
+
+// The WHMCS sidebar — the panel WHMCS drops beside the content, on or off per page
+function VizSubnav() {
+  const [on, setOn] = React.useState(true);
+  React.useEffect(() => { const t = setInterval(() => setOn((v) => !v), 2000); return () => clearInterval(t); }, []);
+  return (
+    <Chrome label={on ? 'Sidebar on' : 'Sidebar off — this page only'}>
+      <div style={{ display: 'grid', gridTemplateColumns: on ? '86px 1fr' : '0px 1fr', gap: on ? 8 : 0, transition: 'grid-template-columns .4s ease, gap .4s ease' }}>
+        {/* what WHMCS populates: a titled panel with its own links */}
+        <div style={{ overflow: 'hidden', opacity: on ? 1 : 0, transition: 'opacity .3s ease' }}>
+          <div style={{ border: '1px solid var(--color-border)', borderRadius: 8, background: 'var(--color-surface)', overflow: 'hidden' }}>
+            <div style={{ fontSize: 7.5, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--color-text-tertiary)', padding: '6px 8px', borderBottom: '1px solid var(--color-border)' }}>Support</div>
+            {[0, 1, 2].map((k) => (
+              <div key={k} style={{ padding: '6px 8px', borderTop: k ? '1px solid var(--color-border)' : 'none', background: k === 0 ? 'var(--color-accent-light)' : 'transparent' }}>
+                <span style={{ display: 'block', height: 4, borderRadius: 2, width: k === 0 ? '80%' : '64%', background: 'var(--color-text-primary)', opacity: k === 0 ? .55 : .2 }}></span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ display: 'grid', gap: 5 }}>
+          <div style={{ height: 13, width: '42%', borderRadius: 5, background: 'var(--color-text-primary)', opacity: .72 }}></div>
+          <div style={{ height: 44, borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}></div>
+          <div style={{ height: 30, borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}></div>
+        </div>
       </div>
       <div style={{ display: 'flex', gap: 4, marginTop: 10 }}>
-        {fonts.map(([n], k) => <span key={n} style={{ fontSize: 8.5, fontWeight: 700, padding: '3px 8px', borderRadius: 999, background: k === i ? 'var(--color-text-primary)' : 'var(--color-surface)', color: k === i ? 'var(--color-bg)' : 'var(--color-text-tertiary)', border: '1px solid var(--color-border)' }}>{n}</span>)}
+        {['Global: on', 'This page: off'].map((n, k) => (
+          <span key={n} style={{
+            fontSize: 8.5, fontWeight: 700, padding: '3px 8px', borderRadius: 999,
+            background: (k === 0) === on ? 'var(--color-accent)' : 'var(--color-surface)',
+            color: (k === 0) === on ? '#fff' : 'var(--color-text-tertiary)', border: '1px solid var(--color-border)',
+          }}>{n}</span>
+        ))}
       </div>
     </Chrome>
   );
@@ -148,21 +288,60 @@ function VizSidebar() {
     </Chrome>
   );
 }
-// Page templates
-function VizTemplates() {
-  const [i, setI] = React.useState(0);
-  React.useEffect(() => { const t = setInterval(() => setI((v) => (v + 1) % 3), 1800); return () => clearInterval(t); }, []);
-  // the dashboard's real designs — core/pages/clientareahome/{default,atrium,bento,minimal}
-  const kinds = ['Default', 'Atrium', 'Bento'];
+// Languages — WHMCS installs its whole set; this is the shortlist you actually sell in
+function VizLanguages() {
+  // a slice of the WHMCS language folder, in the order the admin lists them
+  const LANGS = [
+    ['English', 'en', true, true],
+    ['Deutsch', 'de', true, false],
+    ['Français', 'fr', true, false],
+    ['Español', 'es', false, false],
+    ['Português', 'pt', false, false],
+    ['Nederlands', 'nl', false, false],
+  ];
+  const [on, setOn] = React.useState(() => LANGS.map((l) => l[2]));
+  // the switcher fills as the rows come on, so the connection reads without a caption
+  React.useEffect(() => {
+    let i = 3;
+    const t = setInterval(() => {
+      setOn((v) => { const c = v.slice(); c[i] = !c[i]; return c; });
+      i = i === 5 ? 3 : i + 1;
+    }, 1500);
+    return () => clearInterval(t);
+  }, []);
+  const live = LANGS.filter((l, i) => on[i]);
   return (
-    <Chrome label={`${kinds[i]} template`}>
-      <div style={{ display: 'grid', gap: 5 }}>
-        {i === 0 && [0, 1, 2].map(k => <div key={k} style={{ height: 22, borderRadius: 6, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}></div>)}
-        {i === 1 && <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 }}>{[0, 1, 2, 3].map(k => <div key={k} style={{ height: 34, borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}></div>)}</div>}
-        {i === 2 && [0, 1, 2, 3, 4].map(k => <div key={k} style={{ height: 12, borderRadius: 3, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}></div>)}
+    <Chrome label={`${live.length} of ${LANGS.length} enabled`}>
+      <div style={{ display: 'grid', gap: 4 }}>
+        {LANGS.map(([n, code, , def], i) => (
+          <div key={code} style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '6px 9px', borderRadius: 8,
+            background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+            opacity: on[i] ? 1 : 0.55, transition: 'opacity .3s ease',
+          }}>
+            <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--color-text-tertiary)', width: 16 }}>{code}</span>
+            <span style={{ flex: 1, fontSize: 10.5, fontWeight: 600, color: 'var(--color-text-primary)' }}>{n}</span>
+            {def && <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--color-accent)' }}>Default</span>}
+            <span style={{
+              width: 22, height: 13, borderRadius: 999, padding: 2, display: 'flex',
+              background: on[i] ? 'var(--color-accent)' : 'var(--color-border)', transition: 'background .3s ease',
+            }}>
+              <i style={{ width: 9, height: 9, borderRadius: '50%', background: '#fff', transform: on[i] ? 'translateX(9px)' : 'none', transition: 'transform .3s ease' }}></i>
+            </span>
+          </div>
+        ))}
       </div>
-      <div style={{ display: 'flex', gap: 4, marginTop: 10 }}>
-        {kinds.map((n, k) => <span key={n} style={{ fontSize: 8.5, fontWeight: 700, padding: '3px 8px', borderRadius: 999, background: k === i ? 'var(--color-accent)' : 'var(--color-surface)', color: k === i ? '#fff' : 'var(--color-text-tertiary)', border: '1px solid var(--color-border)' }}>{n}</span>)}
+      {/* what the client area's switcher ends up offering */}
+      <div style={{ marginTop: 10, paddingTop: 9, borderTop: '1px solid var(--color-border)' }}>
+        <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--color-text-quaternary)', marginBottom: 6 }}>Client-area switcher</div>
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+          {live.map(([n, code]) => (
+            <span key={code} style={{
+              fontSize: 8.5, fontWeight: 700, padding: '3px 8px', borderRadius: 999,
+              background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)',
+            }}>{n}</span>
+          ))}
+        </div>
       </div>
     </Chrome>
   );
@@ -201,4 +380,49 @@ function VizLayout({ kind }) {
     </div>
   );
 }
-Object.assign(window, { Chrome, VizLogin, VizBlocks, VizSeo, VizStyles, VizFonts, VizSidebar, VizTemplates, VizLayout });
+// Colour generator — one base, and the ramp the theme needs computed from it.
+// The swatches below run the SAME color-mix the theme's tokens run, so what you
+// see here is the derivation itself rather than a picture of one.
+function VizPalette() {
+  const BRANDS = [['#0071e3', 'Blue'], ['#14b17d', 'Emerald'], ['#8c5cff', 'Violet'], ['#ff2d6b', 'Rose'], ['#f08a00', 'Amber']];
+  const [i, setI] = React.useState(0);
+  React.useEffect(() => { const t = setInterval(() => setI((v) => (v + 1) % BRANDS.length), 2100); return () => clearInterval(t); }, []);
+  const base = BRANDS[i][0];
+  // exactly the steps apple-theme.css derives: four lighter, the base, one darker
+  const SHADES = [
+    ['lighter-4', `color-mix(in srgb, ${base}, #fff 92%)`],
+    ['lighter-3', `color-mix(in srgb, ${base}, #fff 84%)`],
+    ['lighter-2', `color-mix(in srgb, ${base}, #fff 70%)`],
+    ['lighter', `color-mix(in srgb, ${base}, #fff 30%)`],
+    ['base', base],
+    ['darker', `color-mix(in srgb, ${base}, #000 22%)`],
+  ];
+  const FAMILIES = [['primary', base], ['secondary', '#64748b'], ['info', '#0a84ff'], ['success', '#30d158'], ['warning', '#ff9f0a'], ['danger', '#ff453a']];
+  return (
+    <Chrome label="6 families · 5 shades each">
+      {/* the one value you set */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 9px', borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+        <span style={{ width: 18, height: 18, borderRadius: 5, background: base, transition: 'background .4s ease', flexShrink: 0 }}></span>
+        <span style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--color-text-primary)' }}>--brand-primary</span>
+        <code style={{ marginLeft: 'auto', fontSize: 9.5, fontFamily: 'ui-monospace,Menlo,monospace', color: 'var(--color-text-tertiary)' }}>{base}</code>
+      </div>
+      {/* and everything that falls out of it */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 4, marginTop: 8 }}>
+        {SHADES.map(([name, css]) => (
+          <div key={name} style={{ display: 'grid', gap: 3, justifyItems: 'center' }}>
+            <span style={{ width: '100%', height: 26, borderRadius: 6, background: css, border: '1px solid var(--color-border)', transition: 'background .4s ease' }}></span>
+            <span style={{ fontSize: 7, fontWeight: 700, color: 'var(--color-text-quaternary)', whiteSpace: 'nowrap' }}>{name}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: 10, paddingTop: 9, borderTop: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: 6 }}>
+        {FAMILIES.map(([n, c]) => (
+          <span key={n} title={'--brand-' + n} style={{ width: 13, height: 13, borderRadius: '50%', background: c, border: '1px solid var(--color-border)', transition: 'background .4s ease' }}></span>
+        ))}
+        <span style={{ marginLeft: 'auto', fontSize: 8.5, fontWeight: 650, color: 'var(--color-text-quaternary)' }}>every ramp recomputes live</span>
+      </div>
+    </Chrome>
+  );
+}
+
+Object.assign(window, { Chrome, VizLogin, VizBlocks, VizSeo, VizStyles, VizPalette, VizFonts, VizPageLayout, VizSubnav, VizSidebar, VizLanguages, VizLayout });

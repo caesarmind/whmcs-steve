@@ -36,6 +36,39 @@ body { display: block; }
                 color-mix(in srgb, var(--color-accent) 90%, #002050) 0%,
                 var(--color-accent) 55%,
                 color-mix(in srgb, var(--color-accent) 58%, #fff) 100%); }
+        /* ── the welcome band takes a fill and a hue too ─────────────────────
+           The authored look is the gradient; --blk lets any palette colour drive
+           it, and the two light fills flip the ink so the copy stays legible. */
+        .dash-hero { --blk: var(--color-accent); }
+        .dash-hero[data-blockcolor="blue"]    { --blk: #0071e3; }
+        .dash-hero[data-blockcolor="emerald"] { --blk: #14b17d; }
+        .dash-hero[data-blockcolor="violet"]  { --blk: #8c5cff; }
+        .dash-hero[data-blockcolor="rose"]    { --blk: #ff2d6b; }
+        .dash-hero[data-blockcolor="amber"]   { --blk: #f08a00; }
+        .dash-hero[data-blockcolor="slate"]   { --blk: #64748b; }
+        .dash-hero, .dash-hero[data-blockstyle="gradient"] {
+            background: linear-gradient(115deg,
+                color-mix(in srgb, var(--blk) 90%, #002050) 0%,
+                var(--blk) 55%,
+                color-mix(in srgb, var(--blk) 58%, #fff) 100%); }
+        .dash-hero[data-blockstyle="accent"] { background: var(--blk); }
+        .dash-hero[data-blockstyle="tint"] {
+            background: color-mix(in srgb, var(--blk) 12%, var(--color-surface));
+            border: 1px solid color-mix(in srgb, var(--blk) 30%, transparent); }
+        .dash-hero[data-blockstyle="plain"] {
+            background: var(--color-surface); border: 1px solid var(--color-border); }
+        /* light fills need dark copy, and the avatar loses its white-on-white */
+        .dash-hero[data-blockstyle="tint"], .dash-hero[data-blockstyle="plain"] { color: var(--color-text-primary); }
+        .dash-hero[data-blockstyle="tint"] h1, .dash-hero[data-blockstyle="plain"] h1 { color: var(--color-text-primary); }
+        .dash-hero[data-blockstyle="tint"] .dash-hero-date, .dash-hero[data-blockstyle="plain"] .dash-hero-date,
+        .dash-hero[data-blockstyle="tint"] .dash-hero-sub, .dash-hero[data-blockstyle="plain"] .dash-hero-sub { color: var(--color-text-secondary); opacity: 1; }
+        .dash-hero[data-blockstyle="tint"] .dash-hero-avatar, .dash-hero[data-blockstyle="plain"] .dash-hero-avatar {
+            background: var(--blk); color: #fff; border-color: transparent; }
+        .dash-hero[data-blockstyle="tint"] .dash-hero-rings, .dash-hero[data-blockstyle="plain"] .dash-hero-rings { opacity: .35; }
+        .dash-hero[data-blockstyle="tint"] .dash-hero-btn, .dash-hero[data-blockstyle="plain"] .dash-hero-btn {
+            background: var(--blk); color: #fff; }
+        .dash-hero[data-blockstyle="tint"] .dash-hero-btn.ghost, .dash-hero[data-blockstyle="plain"] .dash-hero-btn.ghost {
+            background: transparent; color: var(--color-text-primary); border-color: var(--color-border); }
         .dash-hero-main { flex: 1; min-width: 0; position: relative; z-index: 2; }
         .dash-hero-date { font-size: 11.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; opacity: 0.82; margin: 0 0 9px; }
         .dash-hero h1 { font-size: 29px; font-weight: 700; letter-spacing: -0.025em; margin: 0 0 7px; line-height: 1.05; color: #fff; }
@@ -156,9 +189,74 @@ body { display: block; }
         body[data-card-titles="outside"] .dash-card-head + .when-full > .dash-row:first-child { border-top: 0; }
 
         /* ---- two-column body ---- */
-        .dash-main { display: grid; grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+        .dash-main { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 22px; align-items: start;
+            /* a narrow card backfills the gap a wider one leaves beside it, so a
+               mixed set of widths packs instead of leaving a column of holes */
+            grid-auto-flow: row dense;
+            grid-auto-rows: 2px; row-gap: 0; column-gap: 22px; }
+        .dash-main .dash-card { margin-bottom: 22px; }
+                /* the columns hand their cards straight to the grid above */
+                .dash-col { display: contents; }
+                .dash-card[data-width="third"] { grid-column: span 2; }
+                .dash-card[data-width="half"] { grid-column: span 3; }
+                .dash-card[data-width="twothirds"] { grid-column: span 4; }
+                .dash-card[data-width="full"] { grid-column: span 6; }
+                @media (max-width: 900px) {
+                    .dash-card[data-width="third"], .dash-card[data-width="half"] { grid-column: span 3; }
+                    .dash-card[data-width="twothirds"], .dash-card[data-width="full"] { grid-column: span 6; } }
+        
+                /* ── per-card style and colour ──────────────────────────────────────
+                   Four fills, on any of the palette hues. --blk carries the chosen hue
+                   so one set of rules covers every colour. */
+                .dash-card { --blk: var(--color-accent); }
+                .dash-card[data-blockcolor="blue"]    { --blk: #0071e3; }
+                .dash-card[data-blockcolor="emerald"] { --blk: #14b17d; }
+                .dash-card[data-blockcolor="violet"]  { --blk: #8c5cff; }
+                .dash-card[data-blockcolor="rose"]    { --blk: #ff2d6b; }
+                .dash-card[data-blockcolor="amber"]   { --blk: #f08a00; }
+                .dash-card[data-blockcolor="slate"]   { --blk: #64748b; }
+                .dash-card[data-blockstyle="tint"] {
+                    background: color-mix(in srgb, var(--blk) 11%, var(--color-surface));
+                    border-color: color-mix(in srgb, var(--blk) 30%, transparent); }
+                .dash-card[data-blockstyle="accent"] { background: var(--blk); border-color: var(--blk); }
+                .dash-card[data-blockstyle="gradient"] {
+                    background: linear-gradient(135deg, var(--blk) 0%, color-mix(in srgb, var(--blk) 62%, #000) 100%);
+                    border-color: transparent; }
+                /* a filled card carries its own ink, the way the credit card already does */
+                .dash-card[data-blockstyle="accent"], .dash-card[data-blockstyle="gradient"] { color: #fff; }
+                .dash-card[data-blockstyle="accent"] .dash-card-title,
+                .dash-card[data-blockstyle="gradient"] .dash-card-title { color: rgba(255,255,255,0.62); }
+                .dash-card[data-blockstyle="accent"] .dash-row-name,
+                .dash-card[data-blockstyle="gradient"] .dash-row-name,
+                .dash-card[data-blockstyle="accent"] .dash-row-inv,
+                .dash-card[data-blockstyle="gradient"] .dash-row-inv,
+                .dash-card[data-blockstyle="accent"] .dash-inv-amt,
+                .dash-card[data-blockstyle="gradient"] .dash-inv-amt,
+                .dash-card[data-blockstyle="accent"] .dash-credit-amt,
+                .dash-card[data-blockstyle="gradient"] .dash-credit-amt { color: #fff; }
+                .dash-card[data-blockstyle="accent"] .dash-row-sub,
+                .dash-card[data-blockstyle="gradient"] .dash-row-sub,
+                .dash-card[data-blockstyle="accent"] .dash-row-price,
+                .dash-card[data-blockstyle="gradient"] .dash-row-price,
+                .dash-card[data-blockstyle="accent"] .dash-row-invsub,
+                .dash-card[data-blockstyle="gradient"] .dash-row-invsub,
+                .dash-card[data-blockstyle="accent"] .dash-inv-meta,
+                .dash-card[data-blockstyle="gradient"] .dash-inv-meta,
+                .dash-card[data-blockstyle="accent"] .dash-credit-sub,
+                .dash-card[data-blockstyle="gradient"] .dash-credit-sub { color: rgba(255,255,255,0.72); }
+                .dash-card[data-blockstyle="accent"] .dash-card-link,
+                .dash-card[data-blockstyle="gradient"] .dash-card-link { color: #fff; }
+                .dash-card[data-blockstyle="accent"] .dash-row,
+                .dash-card[data-blockstyle="gradient"] .dash-row { border-top-color: rgba(255,255,255,0.18); }
+                .dash-card[data-blockstyle="accent"] .dash-row:hover,
+                .dash-card[data-blockstyle="gradient"] .dash-row:hover { background: rgba(255,255,255,0.06); }
+                /* a status pill has to survive a filled card */
+        .dash-card[data-blockstyle="accent"] .dash-pill,
+        .dash-card[data-blockstyle="gradient"] .dash-pill { background: rgba(255,255,255,0.22) !important; color: #fff !important; }
+        .dash-card[data-blockstyle="accent"] .dash-row-icon,
+                .dash-card[data-blockstyle="gradient"] .dash-row-icon { background: rgba(255,255,255,0.16); }
         @media (max-width: 900px) { .dash-main { grid-template-columns: 1fr; } }
-        .dash-col { display: flex; flex-direction: column; gap: 22px; }
+        
 
         /* ---- generic card ---- */
         .dash-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); overflow: hidden; }
@@ -474,7 +572,7 @@ body { display: block; }
 <div class="content-area">
 
     <!-- ======= HERO ======= -->
-    <div class="dash-hero">
+    <div data-block="hero" class="dash-hero">
         <div class="dash-hero-main">
             <div class="dash-hero-date">Tuesday &middot; 2 June</div>
             <h1>Good evening, Marcus</h1>
@@ -492,7 +590,7 @@ body { display: block; }
     </div>
 
     <!-- ======= STAT CARDS ======= -->
-    <div class="dash-stats">
+    <div data-block="stats" class="dash-stats">
         <div class="dash-stat">
             <div class="dash-stat-label">Active services</div>
             <div class="dash-stat-value"><span class="when-full">12</span><span class="when-empty">0</span><span class="dash-stat-delta when-full">+2</span></div>
@@ -519,10 +617,10 @@ body { display: block; }
     <div class="dash-main">
 
         <!-- LEFT: domains, services, invoices -->
-        <div class="dash-col">
+        <div data-col="wide" class="dash-col">
 
             <!-- Domains -->
-            <div class="dash-card">
+            <div data-block="dom" data-width="twothirds" class="dash-card">
                 <div class="dash-card-head"><span class="dash-card-title">Domains</span><a href="clientareadomains.html" class="dash-card-link when-full">Manage &rsaquo;</a></div>
                 <div class="when-full">
                     <a class="dash-row" href="clientareadomaindetails.html"><div class="dash-row-main"><div class="dash-row-name">hostnodes.io</div><div class="dash-row-sub">Auto-renew on &middot; renews 14 Sep</div></div><span class="dash-pill green">Active</span></a>
@@ -533,7 +631,7 @@ body { display: block; }
             </div>
 
             <!-- Services -->
-            <div class="dash-card">
+            <div data-block="svc" data-width="twothirds" class="dash-card">
                 <div class="dash-card-head"><span class="dash-card-title">Services</span><a href="clientareaproducts.html" class="dash-card-link when-full">Manage &rsaquo;</a></div>
                 <div class="when-full">
                     <a class="dash-row" href="clientareaproductdetails.html"><span class="dash-row-icon"></span><div class="dash-row-main"><div class="dash-row-name">Cloud VPS &mdash; 4 vCPU</div><div class="dash-row-sub">Frankfurt &middot; renews 14 Sep</div></div><span class="dash-row-price">$32/mo</span><span class="dash-pill green">Active</span></a>
@@ -555,7 +653,7 @@ body { display: block; }
             </div>
 
             <!-- Recent invoices -->
-            <div class="dash-card">
+            <div data-block="inv" data-width="twothirds" class="dash-card">
                 <div class="dash-card-head"><span class="dash-card-title">Recent invoices</span><a href="clientareainvoices.html" class="dash-card-link when-full">View all &rsaquo;</a></div>
                 <div class="when-full">
                     <a class="dash-row" href="viewinvoice.html"><div class="dash-row-main"><span class="dash-row-inv">#1048</span><span class="dash-row-invsub">Due 2 Aug 2026</span></div><span class="dash-row-price">$72.00</span><span class="dash-pill orange">Unpaid</span></a>
@@ -568,7 +666,7 @@ body { display: block; }
             <!-- Support tickets — the full block (the right column used to carry a
                  2-row mini card; this replaces it with the same treatment the
                  other collections get) -->
-            <div class="dash-card">
+            <div data-block="tkt" data-width="twothirds" class="dash-card">
                 <div class="dash-card-head"><span class="dash-card-title">Support tickets</span><a href="supportticketslist.html" class="dash-card-link when-full">View all &rsaquo;</a></div>
                 <div class="when-full">
                     <a class="dash-row" href="viewticket.html"><div class="dash-row-main"><div class="dash-row-name">#4821 &middot; Migration help for web-01</div><div class="dash-row-sub">Technical &middot; updated 2h ago</div></div><span class="dash-pill blue">Open</span></a>
@@ -580,17 +678,17 @@ body { display: block; }
         </div>
 
         <!-- RIGHT: announcements, unpaid invoice, support, quick actions -->
-        <div class="dash-col">
+        <div data-col="narrow" class="dash-col">
 
             <!-- Announcements (global - shown even for a new account) -->
-            <div class="dash-card">
+            <div data-block="news" data-width="third" class="dash-card">
                 <div class="dash-card-head"><span class="dash-card-title">Announcements</span></div>
                 <a class="dash-row" href="announcements.html"><div class="dash-row-main"><div class="dash-row-name">Scheduled maintenance</div><div class="dash-row-sub">18 Jul</div></div></a>
                 <a class="dash-row" href="announcements.html"><div class="dash-row-main"><div class="dash-row-name">New EU datacentre</div><div class="dash-row-sub">02 Jul</div></div></a>
             </div>
 
             <!-- Unpaid invoice (hidden when the account is empty) -->
-            <div class="dash-card dash-inv-card when-full">
+            <div data-block="due" data-width="third" class="dash-card dash-inv-card when-full">
                 <div class="dash-inv-head"><span class="dash-card-title">Unpaid invoice</span><span class="dash-pill orange">Due in 5d</span></div>
                 <div class="dash-inv-amt">$72.00</div>
                 <div class="dash-inv-meta">#1048 &middot; due 2 Aug 2026</div>
@@ -599,7 +697,7 @@ body { display: block; }
 
             <!-- Account credit — the dark card from the billing reference. Stays in
                  the empty state too (adding funds is how a new account starts). -->
-            <div class="dash-card dash-credit-card">
+            <div data-block="credit" data-width="third" class="dash-card dash-credit-card">
                 <div class="dash-card-title">Account credit</div>
                 <div class="dash-credit-amt"><span class="when-full">$128.00</span><span class="when-empty">$0.00</span></div>
                 <div class="dash-credit-sub"><span class="when-full">Applied automatically to new invoices</span><span class="when-empty">No credit on the account yet</span></div>
@@ -610,7 +708,7 @@ body { display: block; }
             </div>
 
             <!-- Payment methods (from the billing reference) -->
-            <div class="dash-card">
+            <div data-block="pay" data-width="third" class="dash-card">
                 <div class="dash-card-head"><span class="dash-card-title">Payment methods</span><a href="#" class="dash-card-link">+ Add</a></div>
                 <div class="when-full">
                     <a class="dash-row" href="#"><span class="dash-pm-brand">VISA</span><div class="dash-row-main"><div class="dash-row-name">&bull;&bull;&bull;&bull; 4242</div><div class="dash-row-sub">Expires 04/28</div></div><span class="dash-pill blue">Default</span></a>
@@ -621,7 +719,7 @@ body { display: block; }
             </div>
 
             <!-- Quick actions (always available) — one card, soft grey rows inside -->
-            <div class="dash-card dash-actions">
+            <div data-block="act" data-width="third" class="dash-card dash-actions">
                 <a class="dash-action" href="store.html"><span>New order</span><span class="chev">&rsaquo;</span></a>
                 <a class="dash-action" href="supportticketsubmit.html"><span>Open ticket</span><span class="chev">&rsaquo;</span></a>
                 <a class="dash-action" href="cart-domain-register.html"><span>Register domain</span><span class="chev">&rsaquo;</span></a>
@@ -772,6 +870,112 @@ body { display: block; }
         if (chip) { clearInterval(iv); build(chip); }
         else if (++n > 120) { clearInterval(iv); }
     }, 80);
+})();
+</script>
+
+<script>
+/* ── embed bridge ──────────────────────────────────────────────────────────
+   Atrium composes by column, not by width: nine cards live in a wide column
+   and a narrow one, and composing the page means choosing which column a card
+   sits in and where in that column it falls. The landing page's Homepage
+   composer drives this directly rather than drawing a mock of it.
+
+   Deliberately does not persist — an embedder's edits must not land in this
+   visitor's own view of the page. */
+(function () {
+    var KEYS = ['svc', 'dom', 'inv', 'tkt', 'news', 'due', 'credit', 'pay', 'act'];
+    var COLS = ['wide', 'narrow'];
+    var q = function (sel) { return document.querySelector(sel); };
+    var card = function (k) { return q('[data-block="' + k + '"]'); };
+    /* the page as authored, read from the DOM rather than repeated here, so
+       this cannot drift from the markup above */
+    var WIDTHS = ['full', 'twothirds', 'half', 'third'];
+    var LAYOUT = { order: [], off: {}, col: {}, width: {}, color: {}, style: {}, heroSize: 'full', parts: { hero: true, stats: true } };
+    KEYS.forEach(function (k) {
+        var el = card(k); if (!el) return;
+        LAYOUT.order.push(k);
+        var host = el.closest('[data-col]');
+        LAYOUT.col[k] = host ? host.getAttribute('data-col') : 'wide';
+        LAYOUT.width[k] = el.getAttribute('data-width') || 'third';
+    });
+
+    function apply() {
+        /* One six-column grid, so DOM order is simply LAYOUT.order — grouping by
+           the authored columns would pin a card to the end of its group however
+           far up the admin list it was dragged. */
+        var host = q('[data-col="wide"]') || q('.dash-main');
+        if (host) LAYOUT.order.forEach(function (k) { var el = card(k); if (el) host.appendChild(el); });
+        KEYS.forEach(function (k) {
+            var el = card(k); if (!el) return;
+            el.style.display = LAYOUT.off[k] ? 'none' : '';
+            el.setAttribute('data-width', LAYOUT.width[k] || 'third');
+            if (LAYOUT.color[k]) el.setAttribute('data-blockcolor', LAYOUT.color[k]); else el.removeAttribute('data-blockcolor');
+            if (LAYOUT.style[k] && LAYOUT.style[k] !== 'plain') el.setAttribute('data-blockstyle', LAYOUT.style[k]); else el.removeAttribute('data-blockstyle');
+        });
+        /* the page ships Summary figures switched off through a stylesheet rule,
+           so an empty inline display would hand it straight back — name the value */
+        var hero = card('hero');
+        if (hero) {
+            if (LAYOUT.color.hero) hero.setAttribute('data-blockcolor', LAYOUT.color.hero); else hero.removeAttribute('data-blockcolor');
+            if (LAYOUT.style.hero) hero.setAttribute('data-blockstyle', LAYOUT.style.hero); else hero.removeAttribute('data-blockstyle');
+            document.body.setAttribute('data-hero-size', LAYOUT.heroSize === 'slim' ? 'slim' : 'full');
+        }
+        var PART_ON = { hero: '', stats: 'grid' };
+        ['hero', 'stats'].forEach(function (k) {
+            var el = card(k); if (el) el.style.display = LAYOUT.parts[k] === false ? 'none' : PART_ON[k];
+        });
+        pack();
+    }
+
+    /* masonry, on a grid: each card claims the number of 2px rows its own
+       height needs, so the next card in that column starts right under it */
+    var ROW = 2, GAP = 22;
+    function pack() {
+        var main = q('.dash-main'); if (!main) return;
+        KEYS.forEach(function (k) {
+            var el = card(k); if (!el) return;
+            if (LAYOUT.off[k]) { el.style.gridRowEnd = ''; return; }
+            el.style.gridRowEnd = '';
+            var h = el.getBoundingClientRect().height;
+            el.style.gridRowEnd = 'span ' + Math.max(1, Math.ceil((h + GAP) / ROW));
+        });
+    }
+    /* content settles after the webfont and any late layout, and the card widths
+       change with the viewport, so re-pack rather than trusting one measurement */
+    window.addEventListener('resize', pack);
+    setTimeout(pack, 400);
+    setTimeout(pack, 1200);
+    if (typeof ResizeObserver !== 'undefined') {
+        var ro = new ResizeObserver(function () { pack(); });
+        var main0 = q('.dash-main'); if (main0) ro.observe(main0);
+    }
+
+    window.hnComposer = {
+        keys: KEYS.slice(),
+        cols: COLS.slice(),
+        widths: WIDTHS.slice(),
+        read: function () { return JSON.parse(JSON.stringify(LAYOUT)); },
+        write: function (patch) {
+            if (!patch) return false;
+            if (Array.isArray(patch.order)) {
+                var clean = patch.order.filter(function (k) { return KEYS.indexOf(k) > -1; });
+                KEYS.forEach(function (k) { if (clean.indexOf(k) < 0) clean.push(k); });
+                LAYOUT.order = clean;
+            }
+            if (patch.off) LAYOUT.off = patch.off;
+            if (patch.col) Object.keys(patch.col).forEach(function (k) {
+                if (COLS.indexOf(patch.col[k]) > -1) LAYOUT.col[k] = patch.col[k];
+            });
+            if (patch.width) Object.keys(patch.width).forEach(function (k) {
+                if (WIDTHS.indexOf(patch.width[k]) > -1) LAYOUT.width[k] = patch.width[k];
+            });
+            ['color', 'style'].forEach(function (key) { if (patch[key]) LAYOUT[key] = patch[key]; });
+            if (patch.heroSize) LAYOUT.heroSize = patch.heroSize;
+            if (patch.parts) Object.keys(patch.parts).forEach(function (k) { LAYOUT.parts[k] = patch.parts[k]; });
+            apply();
+            return true;
+        }
+    };
 })();
 </script>
 </body>

@@ -89,9 +89,9 @@
 
         /* Buttons demo */
         .sg-buttons-demo { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 16px 0 24px; }
-        .demo-btn-primary { background: #0071e3; color: #fff; padding: 10px 24px; border-radius: 980px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; }
+        .demo-btn-primary { background: var(--color-accent); color: #fff; padding: 10px 24px; border-radius: 980px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; }
         .demo-btn-outline { background: none; color: #1d1d1f; padding: 9px 22px; border-radius: 980px; font-size: 14px; font-weight: 500; border: 1.5px solid rgba(0,0,0,0.2); cursor: pointer; }
-        .demo-btn-text { color: #0066cc; font-size: 15px; text-decoration: none; }
+        .demo-btn-text { color: var(--color-link); font-size: 15px; text-decoration: none; }
 
         /* Card demo */
         .sg-card-demo { background: var(--color-surface); border: 1px solid var(--color-border-card); border-radius: 18px; padding: 24px; margin: 16px 0; }
@@ -110,7 +110,7 @@
         .sg-icon-demo { display: flex; gap: 14px; margin: 16px 0 24px; flex-wrap: wrap; }
         .sg-icon-circle { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
         .sg-icon-circle svg { width: 24px; height: 24px; }
-        .ic-blue { background: rgba(0,113,227,0.1); color: var(--color-accent); }
+        .ic-blue { background: color-mix(in srgb, var(--color-accent) 10%, transparent); color: var(--color-accent); }
         .ic-green { background: rgba(48,209,88,0.1); color: #30d158; }
         .ic-purple { background: rgba(175,130,255,0.1); color: #af82ff; }
         .ic-orange { background: rgba(255,159,10,0.1); color: #ff9f0a; }
@@ -121,7 +121,7 @@
         .sg-form-demo { max-width: 360px; margin: 16px 0 24px; }
         .sg-form-demo label { display: block; font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
         .sg-form-demo input { display: block; width: 100%; background: var(--color-surface); border: 1px solid #d2d2d7; border-radius: 12px; padding: 12px 16px; font-size: 15px; color: var(--color-text-primary); transition: border-color 0.15s, box-shadow 0.15s; box-sizing: border-box; }
-        .sg-form-demo input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 4px rgba(0,113,227,0.15); }
+        .sg-form-demo input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 15%, transparent); }
         .sg-form-demo .hint { font-size: 12px; color: var(--color-text-secondary); margin-top: 6px; }
 
         /* Section anchor scroll offset */
@@ -365,9 +365,9 @@
 
             <h3 class="sg-h">Accent &amp; Brand</h3>
             <div class="sg-swatches">
-                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#0071e3;"></div><div class="sg-swatch-info"><div class="label">--color-accent</div><div class="hex">#0071e3</div></div></div>
-                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#0077ed;"></div><div class="sg-swatch-info"><div class="label">accent-hover</div><div class="hex">#0077ED</div></div></div>
-                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:#0066cc;"></div><div class="sg-swatch-info"><div class="label">--color-link</div><div class="hex">#0066cc</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:var(--color-accent);"></div><div class="sg-swatch-info"><div class="label">--color-accent</div><div class="hex">var(--color-accent)</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:var(--color-accent-hover);"></div><div class="sg-swatch-info"><div class="label">accent-hover</div><div class="hex">var(--color-accent-hover)</div></div></div>
+                <div class="sg-swatch-card"><div class="sg-swatch-color" style="background:var(--color-link);"></div><div class="sg-swatch-info"><div class="label">--color-link</div><div class="hex">var(--color-link)</div></div></div>
             </div>
 
             <h3 class="sg-h">Semantic Status</h3>
@@ -377,7 +377,7 @@
                     <tr><td>Success / Active</td><td><span class="swatch" style="background:#30d158;"></span><code>#30d158</code></td><td><code>rgba(48, 209, 88, 0.10)</code></td><td><code>#248a3d</code></td></tr>
                     <tr><td>Warning / Pending</td><td><span class="swatch" style="background:#ff9f0a;"></span><code>#ff9f0a</code></td><td><code>rgba(255, 159, 10, 0.10)</code></td><td><code>#c27400</code></td></tr>
                     <tr><td>Error / Danger</td><td><span class="swatch" style="background:#ff3b30;"></span><code>#ff3b30</code></td><td><code>rgba(255, 59, 48, 0.10)</code></td><td><code>#d70015</code></td></tr>
-                    <tr><td>Info</td><td><span class="swatch" style="background:#0071e3;"></span><code>#0071e3</code></td><td><code>rgba(0, 113, 227, 0.08)</code></td><td><code>#0071e3</code></td></tr>
+                    <tr><td>Info</td><td><span class="swatch" style="background:var(--color-accent);"></span><code>var(--color-accent)</code></td><td><code>color-mix(in srgb, var(--color-accent) 8%, transparent)</code></td><td><code>var(--color-accent)</code></td></tr>
                     <tr><td>Neutral</td><td><span class="swatch" style="background:#8e8e93;"></span><code>#8e8e93</code></td><td><code>rgba(142, 142, 147, 0.12)</code></td><td><code>#6e6e73</code></td></tr>
                 </tbody>
             </table>
@@ -590,7 +590,7 @@ box-shadow: 0 20px 60px rgba(48,209,88,0.3); /* tinted glow (matches element col
 
             <h3 class="sg-h">Primary Button (Pill)</h3>
             <pre><code>.btn-primary, .hp-buy-btn {
-    background: #0071e3;
+    background: var(--color-accent);
     color: #fff;
     padding: 10px 24px;
     border-radius: 980px;
@@ -599,7 +599,7 @@ box-shadow: 0 20px 60px rgba(48,209,88,0.3); /* tinted glow (matches element col
     border: none;
     transition: background 0.2s ease;
 }
-.btn-primary:hover { background: #0077ed; }</code></pre>
+.btn-primary:hover { background: var(--color-accent-hover); }</code></pre>
 
             <h3 class="sg-h">Secondary (Outline Pill)</h3>
             <pre><code>.btn-outline-pill {
@@ -612,7 +612,7 @@ box-shadow: 0 20px 60px rgba(48,209,88,0.3); /* tinted glow (matches element col
 
             <h3 class="sg-h">Tertiary (Text Link with Arrow)</h3>
             <pre><code>&lt;a href="#" class="link-arrow"&gt;Learn more ›&lt;/a&gt;
-/* color: #0066cc; font-size: 17px; */</code></pre>
+/* color: var(--color-link); font-size: 17px; */</code></pre>
 
             <h3 class="sg-h">Sizes</h3>
             <table class="sg-table">
@@ -679,7 +679,7 @@ box-shadow: 0 20px 60px rgba(48,209,88,0.3); /* tinted glow (matches element col
 .form-input:focus {
     outline: none;
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 15%, transparent);
 }</code></pre>
 
             <div class="sg-callout do">

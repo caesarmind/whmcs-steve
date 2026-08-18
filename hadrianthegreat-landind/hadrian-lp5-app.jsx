@@ -89,13 +89,12 @@ function Utility({ dark, onDark }) {
 
 /* ── .homepage-nav · main bar ── */
 function Nav({ dark, onDark, onDemo }) {
-  const links = [['#features', 'Features', true], ['#layouts', 'Layouts', false], ['#extensions', 'Extensions', false], ['#pricing', 'Pricing', false], ['#faq', 'FAQ', false]];
+  const links = [['#features', 'Features', true], ['#extensions', 'Extensions', false], ['#pricing', 'Pricing', false], ['#faq', 'FAQ', false]];
   return (
     <nav className="homepage-nav">
       <div className="inner">
         <a href="#top" className="brand">
-          <span className="hp-mark"></span>
-          <span className="word">Hadrian</span>
+          <img className="hp-brand-logo" src={CA_BASE + 'img/branding/hadrian-logo.png'} alt="Hadrian" />
         </a>
         <div className="links">
           {links.map(([h, l, on]) => <a key={h} href={h} className={on ? 'on' : ''}>{l}</a>)}
@@ -121,20 +120,26 @@ const STYLES = [
   { id: 'amber', n: 'Amber', brand: '#f08a00', d: 'Warm and quiet.' },
   { id: 'slate', n: 'Slate', brand: '#64748b', d: 'Neutral, near-monochrome.' },
 ].map((s) => ({ ...s, chrome: `color-mix(in srgb, ${s.brand} 10%, #ffffff)`, ink: '#1d1d1f' }));
+/* One brand application for the whole document. Both the hero's colour rail and
+   the floating style panel call this, so picking a colour in either place retints
+   the site itself - not just the demo frame - and the two controls stay in step
+   through the shared 'hadrian-style' key. */
+function applyBrandToSite(id) {
+  const st = STYLES.find((s) => s.id === id) || STYLES[0];
+  const r = document.documentElement;
+  r.style.setProperty('--color-accent', st.brand);
+  r.style.setProperty('--color-accent-hover', st.brand);
+  r.style.setProperty('--color-accent-light', `color-mix(in srgb, ${st.brand} 12%, transparent)`);
+  r.style.setProperty('--color-link', st.brand);
+  r.style.setProperty('--on-accent-tint', `color-mix(in srgb, ${st.brand} 74%, #000)`);
+  r.style.setProperty('--color-chrome', st.chrome);
+  r.style.setProperty('--color-chrome-ink', st.ink);
+  try { localStorage.setItem('hadrian-style', st.id); } catch (e) {}
+}
 function AccentPanel({ dark, onDark }) {
   const [open, setOpen] = React.useState(false);
   const [i, setI] = React.useState(0);
-  const apply = (st) => {
-    const r = document.documentElement;
-    r.style.setProperty('--color-accent', st.brand);
-    r.style.setProperty('--color-accent-hover', st.brand);
-    r.style.setProperty('--color-accent-light', `color-mix(in srgb, ${st.brand} 12%, transparent)`);
-    r.style.setProperty('--color-link', st.brand);
-    r.style.setProperty('--on-accent-tint', `color-mix(in srgb, ${st.brand} 74%, #000)`);
-    r.style.setProperty('--color-chrome', st.chrome);
-    r.style.setProperty('--color-chrome-ink', st.ink);
-    try { localStorage.setItem('hadrian-style', st.id); } catch (e) {}
-  };
+  const apply = (st) => applyBrandToSite(st.id);
   React.useEffect(() => {
     try {
       const saved = localStorage.getItem('hadrian-style');
@@ -189,12 +194,11 @@ function AccentPanel({ dark, onDark }) {
    so there is nothing here the theme cannot actually do. */
 const HF_PAGES = [
   { id: 'dashboard', t: 'Dashboard', src: 'clientareahome-v18.html', variants: 'dashboard' },
+  { id: 'homepage', t: 'Homepage', src: 'homepage.html', variants: 'homepage' },
   // no in-page aside: the services table is the point of this page, and the
   // sub-nav repeats links the main navigation already carries
   { id: 'services', t: 'Services', src: 'clientareaproducts.html', subnav: 'off' },
   { id: 'store', t: 'Store', src: 'store.html', variants: 'store' },
-  { id: 'invoice', t: 'Invoice', src: 'viewinvoice.html' },
-  { id: 'support', t: 'Support', src: 'supportticketslist.html' },
   // the module ships two sign-in designs, and Split brings its own chrome
   { id: 'login', t: 'Login', src: 'login.html', auth: 'out', variants: 'login' },
 ];
@@ -274,8 +278,15 @@ const HF_STORE = [
     s: 'Connection encryption and IP concealment, sold alongside the hosting.' },
 ];
 /* Which list a page's design picker draws from, and what that picker is called. */
+const HF_HOMEPAGES = [
+  { id: 'default', t: 'Modern', f: 'homepage.html', auth: 'out',
+    s: 'A marketing-led landing page: a full-width hero, the product range, pricing and the proof a stranger needs before signing up. What a visitor meets before they have an account.' },
+  { id: 'portal', t: 'Classic', f: 'portal-home.html',
+    s: 'The WHMCS portal home, kept: domain search across the top, the product tiles beneath it, and the client’s own navigation around it. What a signed-in client lands on.' },
+];
 const HF_VARIANTS = {
   dashboard: { lbl: 'Dashboard design', list: HF_DESIGNS },
+  homepage: { lbl: 'Homepage Designs', list: HF_HOMEPAGES },
   login: { lbl: 'Sign-in design', list: HF_LOGINS },
   store: { lbl: 'Storefront page', list: HF_STORE },
 };
@@ -548,7 +559,7 @@ function HeroStage({ dark }) {
   const [tone, setTone] = React.useState('light');
   // one remembered pick per page that ships more than one design, so leaving the
   // page and coming back does not reset the choice
-  const [variant, setVariant] = React.useState({ dashboard: 'atrium', login: 'split', store: 'nordvpn' });
+  const [variant, setVariant] = React.useState({ dashboard: 'atrium', homepage: 'default', login: 'split', store: 'nordvpn' });
   const [band, setBand] = React.useState('gradient');
   const [bandSize, setBandSize] = React.useState('full');
   // null = not yet offered, 'cue' = the nudge is up, 'open' = the options are,
@@ -592,7 +603,7 @@ function HeroStage({ dark }) {
     return () => clearTimeout(t);
   }, [hasBand, toast]);
   const state = React.useMemo(() => ({
-    layout: layId, palette, sidebar: toneable ? tone : 'light', dark, auth: pg.auth || 'in',
+    layout: layId, palette, sidebar: toneable ? tone : 'light', dark, auth: (dsn && dsn.auth) || pg.auth || 'in',
     // Fixed, not offered: the hero shows the top bar the way the demo is set
     // up, rather than making a visitor assemble it. Change these three, not a
     // control -- they are the same values the state chip writes.
@@ -674,7 +685,7 @@ function HeroStage({ dark }) {
         <div className="hf-rail right" role="tablist" aria-label="Brand colour">
           <span className="hf-lbl">Brand colour</span>
           {HF_PALETTES.map((x) => (
-            <button key={x.id} role="tab" aria-selected={palette === x.id} onClick={reel.manual(() => setPalette(x.id))} title={x.t}>
+            <button key={x.id} role="tab" aria-selected={palette === x.id} onClick={reel.manual(() => { setPalette(x.id); applyBrandToSite(x.id); })} title={x.t}>
               <span className="pair"><i style={{ background: hfChrome(toneable ? tone : 'light', x.c, dark, x.id) }}></i><i style={{ background: x.c }}></i></span><em><b>{x.t}</b></em>
             </button>
           ))}
@@ -712,27 +723,27 @@ function Hero({ onDemo, dark }) {
 /* ── .hp-tiles-section.rich ── */
 const TILES = [
   {
-    k: 'Login-based layouts', h: 'Two audiences.\nOne URL.', V: VizLogin, wide: true,
-    p: 'Guests land on a marketing page; clients land on a focused dashboard. Assigned per layout, no hooks required.',
+    k: 'Login-based layouts', h: 'Different layout\nfor guests and clients.', V: VizLogin, wide: true,
+    p: 'Every layout carries its own switch for logged-out and logged-in visitors. Give guests the top nav and clients the sidebar — one URL, decided from the WHMCS session, no hooks and no second theme.',
     long: 'Every layout in Hadrian carries two independent activation states — one for guest visitors and one for signed-in clients. The same URL can therefore serve a marketing-led page to a stranger and a dense account dashboard to a customer, decided at render time from the WHMCS session.',
     long2: 'That means no duplicated pages to keep in sync, and no conditional blocks bolted into a template. A host can run a Top Nav marketing shell for acquisition and a Sidebar dashboard for retention, and change either one without touching the other.',
     steps: [['Pick a layout', 'Open Layouts and choose Top Nav, Sidebar or Icon Rail.'], ['Set the two states', 'Toggle Guest client and Existing client independently — Active or Inactive.'], ['Preview it live', 'The preview button opens the real client area, not a mockup.']],
-    caption: 'One URL, two rendered experiences',
-    points: ['Separate Active / Inactive state per audience on every layout', 'Guests can get Top Nav while clients get the Sidebar', 'Sidebar and Icon Rail add alignment, menu side and the account block', 'No action hooks, no template forks, no duplicated pages'],
+    caption: 'Logged out gets the top nav; logged in gets the sidebar',
+    points: ['Every layout has its own Active / Inactive switch per audience', 'Guests can get Top Nav while clients get the Sidebar', 'Sidebar and Icon Rail add alignment, menu side and the account block', 'No action hooks, no template forks, no duplicated pages'],
     meta: ['Layouts editor', 'Per-audience', 'Live preview'],
   },
   {
-    k: 'Homepage composer', h: 'Build the homepage\nfrom blocks.', V: VizBlocks,
-    p: 'Pick blocks, drag to order, size them 1/1 to 1/3. Each block carries its own settings.',
-    long: 'The client-area homepage is assembled from a block library rather than a fixed template. Toggle a block off, drag it to a new position, and choose how much of the row it occupies. Each block also exposes its own options — row counts, pagination, empty-state copy.',
-    long2: 'The editor shows a live wireframe of the resulting grid as you arrange it, so the layout is decided visually rather than by trial and error on the live site. Blocks that support extra configuration open an inline accordion in place, matching the menu editor.',
-    steps: [['Choose your blocks', 'Toggle any of the shipped blocks on or off.'], ['Drag to order', 'Grab the handle and reorder — the wireframe updates as you go.'], ['Set each width', 'Assign 1/1, 1/2, 1/3 or 2/3 per block to build the grid.']],
-    caption: 'Drag to reorder, toggle to include',
-    points: ['Drag-and-drop ordering with live wireframe preview', 'Width per block: 1/1, 1/2, 1/3 or 2/3', 'Per-block additional settings in an inline accordion', 'Blocks: Services, Domains, Invoices, Tickets, Announcements, Quick actions'],
-    meta: ['Pages → Homepage', 'Drag to order', 'Per-block settings'],
+    k: 'Colour generator', h: 'Set one brand colour.\nThe rest matches it.', V: VizPalette,
+    p: 'Paste your hex once. Every shade the client area needs — hovers, tints, borders, states — is computed from it, six families deep, so matching your brand stops being a job.',
+    long: 'Colour in Hadrian is a ramp, not a list of values to fill in. Six families — primary, secondary, info, success, warning and danger — each carry four lighter steps and one darker, and every one of those thirty shades is derived from its family base with color-mix rather than stored. --brand-primary follows the theme accent, so setting your brand colour recomputes the whole primary ramp on the spot.',
+    long2: 'That is what makes a rebrand cheap: buttons, hovers, focus rings, tinted backgrounds and borders all point at derived tokens, so they move together and stay in proportion instead of drifting apart. Any single token can still be overridden by hand when a brand guideline demands an exact value — the derivation is the default, not a cage.',
+    steps: [['Set the base', 'Your brand hex on --brand-primary, in Styles → Colors.'], ['The ramp recomputes', 'Four lighter steps and one darker, live, with no rebuild.'], ['Override if you must', 'Any individual token stays editable where an exact value is required.']],
+    caption: 'One base, and the thirty shades that fall out of it',
+    points: ['Six families: primary, secondary, info, success, warning, danger', 'Five shades per family — four lighter, one darker — thirty in all', 'Derived with color-mix, so a base change recomputes the ramp live', 'Any single token can still be overridden by hand'],
+    meta: ['Styles → Colors', '6 families', '30 derived shades'],
   },
   {
-    k: 'Basic SEO', h: 'Every page.\nEvery language.', V: VizSeo,
+    k: 'Basic SEO', h: 'SEO title and description,\nper page and language.', V: VizSeo,
     p: 'Titles, descriptions and indexing per page — with a mass editor across all installed languages.',
     long: 'Each client-area page gets its own SEO title, meta description and indexing rule. Because WHMCS installs can run twenty or more languages, the editor also opens a mass view showing every language at once so a translator can work down the list in a single pass.',
     long2: 'Title and description carry live character counters at 64 and 160, so you can see the truncation point before publishing. Pages left empty inherit the WHMCS page title, which makes partial coverage safe.',
@@ -742,34 +753,44 @@ const TILES = [
     meta: ['Pages → SEO', 'All languages', 'Per page'],
   },
   {
-    k: 'Styles', h: 'Change the colour,\nnot the template.', V: VizStyles, wide: true,
-    p: 'Six shipped palettes. Pick one and every accent, link and active state in the client area follows it.',
-    long: 'A style here is a palette and nothing more: Default, Emerald, Violet, Rose, Amber and Slate, each carrying nine colour values per mode. Activate one and it seeds those values into the colour editor as ordinary rows, so the preset is your starting point rather than a locked bundle — every row keeps its own picker afterwards.',
-    long2: 'Because it is tokens in the database rather than edits in a template, a restyle survives every WHMCS update. Shape lives elsewhere on purpose: corner radius, shadows, button and form treatment are their own panels, so changing the brand colour never quietly changes the furniture.',
-    steps: [['Pick a style', 'Default, Emerald, Violet, Rose, Amber or Slate — applied across the client area.'], ['Edit any row', 'The preset seeds the colour editor; every token stays editable in place.'], ['Go further', 'Typography, buttons, forms and elements are separate panels — 129 tokens in all.']],
-    caption: 'One palette, every accent follows',
-    points: ['Six shipped styles: Default, Emerald, Violet, Rose, Amber, Slate', 'Activating a style seeds its palette into editable rows', '133 tokens across colours, type, buttons, forms and elements', 'Dark mode runs across all six, as a mode rather than a seventh style'],
-    meta: ['Styles editor', '6 styles', 'Light + dark'],
+    k: 'Per-page layout', h: 'Give one page\na different layout.', V: VizPageLayout,
+    p: 'A page that needs different chrome says so on its own row. Override the main menu or the footer for that page; every other page carries on inheriting the site-wide setting.',
+    long: 'Layouts are set site-wide, which is right until one page needs to behave differently — a checkout that should not offer the full menu, a landing page that should not carry the footer. Each page in the Pages editor holds its own layout_overrides: a main-menu choice and a footer choice, either of which can be left on the site default.',
+    long2: 'An override is stored against that page alone, so the site-wide setting stays the source of truth for everything else. Change the global layout later and every inheriting page follows; the overridden ones keep the exception you set deliberately.',
+    steps: [['Open the page', 'Any of the client-area pages in the Pages editor.'], ['Override what it needs', 'Main menu, footer, or both — the rest stays on the site default.'], ['Leave the rest alone', 'Pages with no override follow the site-wide layout, as before.']],
+    caption: 'Two pages overriding, the rest inheriting',
+    points: ['Per-page override for the main menu and for the footer', 'Stored per page — the site-wide setting stays the default', 'Pages with no override follow global changes automatically', 'Set in the Pages editor, beside that page’s SEO and options'],
+    meta: ['Pages editor', 'Main menu + footer', 'Per page'],
   },
   {
-    k: 'Page templates', h: 'Four dashboards.\nOne page editor.', V: VizTemplates,
-    p: 'The pages worth arguing over ship more than one design — the dashboard has four. Assign per page, then open the real page to check.',
-    long: 'All 102 client-area pages are listed in one editor. Three of them carry a choice of design: the dashboard ships Default, Atrium, Bento and Minimal; the homepage ships Default, Portal and Simple; the login page ships Default, Split and Marquee. The rest ship the one design they were drawn with.',
-    long2: 'When a template carries its own options they appear directly beneath the selector; when it has none, the panel says so rather than leaving an empty box. A per-page Custom layout override is there for the pages that need to break from the site-wide setting.',
-    steps: [['Select the page', 'Search or browse all 102 pages in the Pages editor.'], ['Choose a template', 'Where the page offers more than one, with its own settings below.'], ['Open the page', 'View page opens it on the site itself, not a mockup.']],
-    caption: 'Default, Atrium, Bento and Minimal',
-    points: ['Dashboard: Default, Atrium, Bento and Minimal', 'Homepage: Default, Portal and Simple · Login: Default and Split', 'Template-specific settings appear when the template has them', 'Per-page custom layout override, and per-page SEO'],
-    meta: ['Pages editor', '102 pages', 'View page'],
+    k: 'WHMCS sidebar', h: 'Turn the sidebar\non or off, per page.', V: VizSubnav,
+    p: 'WHMCS drops a sidebar beside the content on page after page. Switch it off across a whole scope, list the exceptions, or let a single page answer for itself.',
+    long: 'WHMCS builds a sidebar for most client-area pages — the support panel, the knowledgebase categories, the service actions — and drops it beside the content whether that page needs it or not. Hadrian makes that a setting rather than a given: the sidebar runs on two independent scopes, the order flow and the website pages, each with its own switch.',
+    long2: 'Per page, three answers are possible: inherit the global, force it on, or force it off. An exception list in Settings flips the global for the pages you name, which covers the handful of pages that want the opposite of everything else. The most specific answer wins, so a page can always overrule both.',
+    steps: [['Set the global', 'One switch per scope — the order flow, the website pages.'], ['Name the exceptions', 'A page picker in Settings flips the global for the pages you list.'], ['Or answer on the page', 'The page’s own field — inherit, on, off — beats both.']],
+    caption: 'Sidebar on globally, and one page saying otherwise',
+    points: ['Two scopes: the order flow and the website pages, each with its own switch', 'Per-page field: inherit, force on, or force off', 'Exception list in Settings flips the global for named pages', 'Most specific wins: page field > exception list > global'],
+    meta: ['Settings → Sidebar', '2 scopes', 'Per-page override'],
   },
   {
-    k: 'Typography', h: 'Type that\nbehaves.', V: VizFonts, wide: true,
-    p: 'System, Google, or your own stack — and a full size scale, so one family never means one size.',
-    long: 'Typography is a first-class token group. Choose the system stack, pick one of twelve curated Google fonts, or paste your own font-family declaration. Sizes are defined as a scale — from Extra Small through Display XL — so headings and body text stay in proportion when you change one value.',
-    long2: 'Eighteen size steps and six weight slots, each stored as a token rather than written into a template. One family runs the whole client area; the scale is what does the work of separating a heading from a caption.',
-    steps: [['Choose the source', 'System stack, one of twelve Google fonts, or your own custom stack.'], ['Set the scale', 'Body sizes (8 steps), headings h1–h6, and four display sizes.'], ['Map the weights', 'Six slots, each pointing at a weight from 100 to 900.']],
-    caption: 'Same layout, three type stacks',
-    points: ['System, twelve curated Google fonts, or a custom font stack', 'Full size scale: body (8 steps), headings (h1–h6), display (4 steps)', 'Six weight slots, each mapped from 100 to 900', 'One family across the client area — the scale carries the hierarchy'],
-    meta: ['Styles → Typography', 'Google Fonts', '18 size steps'],
+    k: 'Languages', h: 'Choose which languages\nclients can pick.', V: VizLanguages,
+    p: 'WHMCS installs its whole language set whether you use it or not. Switch on the ones you want and the client-area switcher offers only those.',
+    long: 'A WHMCS install carries more than twenty languages out of the box, and the client area offers every one of them in its switcher — including the dozen you have never translated a product description into. This is a shortlist: each installed language gets a row, and only the ones switched on reach the front end.',
+    long2: 'One of them is the default, which is what a guest sees before they choose anything and what the switcher falls back to. Switching a language off hides it from the switcher; it does not touch the WHMCS files, so nothing is lost and turning it back on restores it exactly.',
+    steps: [['See what is installed', 'Every language in the WHMCS lang folder, listed as it comes.'], ['Switch off the ones you do not sell in', 'They disappear from the client-area switcher.'], ['Set the default', 'What a guest lands on, and what the switcher falls back to.']],
+    caption: 'Enabled languages, and the switcher they produce',
+    points: ['Every installed WHMCS language, enabled or disabled per language', 'One default — what a guest sees before choosing', 'The client-area switcher lists only the enabled ones', 'Nothing is deleted: switching a language back on restores it'],
+    meta: ['Settings → Languages', 'Per language', 'Default language'],
+  },
+  {
+    k: 'Font manager', h: 'Change the font,\nor add your own.', V: VizFonts, wide: true,
+    p: 'Four sources, one radio group: the bundled default, the visitor’s own system font, a Google font, or a font file of yours. Whichever you pick, the size scale underneath does not move.',
+    long: 'The family comes from one of four places. Default uses the bundled stack — San Francisco on Apple, Inter elsewhere. System fonts hands the page to whatever the visitor’s OS ships, so nothing downloads at all. Google Font picks from the curated list and writes the stack for you. Self-hosted takes a face name and a font file you drop into /assets/fonts/custom — your licensed brand face, served from your own server.',
+    long2: 'Each mode carries the exact stack string it will write, so you can see what lands in the CSS rather than trusting it. The self-hosted mode can also keep San Francisco on Apple devices and use your face everywhere else, which is how most brand guidelines actually read once you get to the small print.',
+    steps: [['Pick the source', 'Default, system fonts, a Google font, or your own file.'], ['Name it', 'The Google family from the list, or the face name for a self-hosted file.'], ['Check the stack', 'Each mode shows the font-family declaration it writes.']],
+    caption: 'Four sources for one family',
+    points: ['Default: the bundled stack — San Francisco on Apple, Inter elsewhere', 'System fonts: the visitor’s own OS face, nothing downloaded', 'Google Font: chosen from the curated list, stack written for you', 'Self-hosted: your own file in /assets/fonts/custom, optionally Apple-exempt'],
+    meta: ['Styles → Typography', '4 sources', 'Self-hosted fonts'],
   },
 ];
 function FeatureModal({ t, onClose }) {
@@ -823,7 +844,7 @@ function Tiles() {
       <div className="hp-wrap">
         <Up>
           <div className="hp-eyebrow">The feature set</div>
-          <h2 className="hp-h2">Six levers, shipped in the theme.</h2>
+          <h2 className="hp-h2">Seven levers, shipped in the theme.</h2>
           <p className="hp-lead">Every one of these is an admin setting — no child theme, no template edits, no lost work at the next WHMCS update. Tap the info icon on any card for the detail.</p>
         </Up>
         <div className="hp-tiles-section" style={{ marginTop: 34 }}>
@@ -879,35 +900,38 @@ function AdminSpot({ view, dark, label }) {
 
 /* ── .hp-spot: one block per feature, alternating side ── */
 const SPOTS = [
-  { id: 'menu', side: 'right', k: 'Menu manager', h: 'Three menus.\nEvery item, yours.', C: (p) => <AdminSpot view="menu/1" label="The Hadrian admin panel, Menu items" {...p} />,
+  { id: 'menu', side: 'right', k: 'Menu manager', h: 'Three menus.\nEvery item, yours.', C: MenuSpotSimple,
     p: 'Main, Secondary and Footer menus, each with its own tree. Drag items into order, nest them as deep as you need, and give every one its own type, icon and audience.',
     li: ['Nested items with drag-and-drop ordering', 'Per-item visibility by layout and login state', 'Language variables or a custom string, per item'] },
-  { id: 'composer', side: 'left', k: 'Homepage composer', h: 'Compose the page\nthey land on.', C: BlocksSpot,
-    p: 'Pick the blocks that appear on the client homepage, drag them into order, and size each one from a full row down to a third. The preview is the page.',
-    li: ['Up to eleven blocks, each with its own settings', 'Widths from 1/1 to 1/3, cycled in place', 'Toggle any block off without losing its setup'] },
-  { id: 'seo', side: 'right', k: 'Multi-language SEO', h: 'Every language,\none pass.', C: SeoSpot,
-    p: 'Titles, descriptions and indexing per page — and when a translation pass is due, the mass editor opens every installed language side by side instead of one at a time.',
-    li: ['Per-page title, description and indexing', 'All installed WHMCS languages in one editor', 'Coverage shown per page, so nothing is missed'] },
+  { id: 'composer', side: 'left', wide: true, k: 'Homepage composer', h: 'Compose the page\nthey land on.', C: ComposerSpot,
+    p: 'Pick the cards that appear on the client homepage, drag them into order, size each one from a full row down to a third, and give it a fill and a colour. The preview is the page.',
+    li: ['Nine cards to reorder, plus the band and the figures', 'Four widths — 1/1 · 2/3 · 1/2 · 1/3 — set per card', 'A fill and a colour per card, and any card switched off'] },
 ];
 function Spotlights({ dark }) {
   return (
     <>
-      {SPOTS.map((s) => (
-        <section key={s.id} id={s.id} className="hp-spot" data-side={s.side} data-screen-label={s.k}>
-          <div className="hp-wrap">
-            <div className="grid">
-              <Up className="copy">
-                <div className="hp-eyebrow">{s.k}</div>
-                <h2 style={{ whiteSpace: 'pre-line' }}>{s.h}</h2>
-                <p>{s.p}</p>
-                <ul>{s.li.map((t) => <li key={t}>{t}</li>)}</ul>
-                <a href="#demo" className="more">See it in the demo<span aria-hidden="true">›</span></a>
-              </Up>
-              <Up className="vis"><Safe name={s.k}><s.C dark={dark} /></Safe></Up>
+      {SPOTS.map((s) => {
+        const link = <a href="#demo" className="more">See it in the demo<span aria-hidden="true">›</span></a>;
+        const copy = (
+          <Up className="copy">
+            <div className="hp-eyebrow">{s.k}</div>
+            <h2 style={{ whiteSpace: 'pre-line' }}>{s.h}</h2>
+            <p>{s.p}</p>
+            <ul>{s.li.map((t) => <li key={t}>{t}</li>)}</ul>
+            {/* centred copy needs the rule above the link to span the column, and
+                a border on the inline link would only span the words */}
+            {s.wide ? <div className="cta">{link}</div> : link}
+          </Up>
+        );
+        const vis = <Up className="vis"><Safe name={s.k}><s.C dark={dark} /></Safe></Up>;
+        return (
+          <section key={s.id} id={s.id} className="hp-spot" data-side={s.side} data-wide={s.wide ? '' : undefined} data-screen-label={s.k}>
+            <div className="hp-wrap">
+              {s.wide ? <>{copy}{vis}</> : <div className="grid">{copy}{vis}</div>}
             </div>
-          </div>
-        </section>
-      ))}
+          </section>
+        );
+      })}
     </>
   );
 }
@@ -1243,8 +1267,7 @@ function Footer() {
         <div className="hp-footcols">
           <div className="brandcol">
             <a href="#top" className="brand">
-              <span className="hp-mark"></span>
-              <span className="word">Hadrian</span>
+              <img className="hp-brand-logo" src={CA_BASE + 'img/branding/hadrian-logo.png'} alt="Hadrian" />
             </a>
             <p>A premium WHMCS client area theme by Caesarthemes — clarity, speed, and a refined design system.</p>
           </div>
@@ -1295,7 +1318,6 @@ function App() {
       <Hero onDemo={openDemo} dark={dark} />
       <Tiles />
       <Spotlights dark={dark} />
-      <LayoutTabs />
       <Pricing onDemo={openDemo} onFounding={openFounding} />
       <Extensions onFounding={openFounding} />
       <Faq />

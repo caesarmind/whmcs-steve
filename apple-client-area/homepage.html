@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hostnodes — Hosting, redesigned</title>
     <link rel="stylesheet" href="css/apple-theme.css">
+    <link rel="stylesheet" href="css/apple-layout.css?v=24">
     <style>
       body { display: block; }
       /* Footer split-layout option — wrapper is display:contents by default,
@@ -24,6 +25,10 @@
         margin-bottom: 14px;
       }
       .hp-footer-brand-mark svg { width: 18px; height: 18px; flex-shrink: 0; }
+      /* Brand logo. apple-layout.css carries these for every other mockup;
+         this page loads apple-theme.css only, so they live here. */
+      .homepage-nav .nav-logo .brand-logo { height: 28px; width: auto; max-width: 180px; display: block; }
+      .hp-footer-brand-mark .brand-logo { height: 22px; width: auto; display: block; }
       .hp-footer-tagline {
         font-size: 12px; line-height: 1.55;
         color: var(--color-text-secondary);
@@ -128,17 +133,203 @@
       .fp-chip-group button.active { background: #f5f5f7; color: #1d1d1f; }
     </style>
 </head>
-<body class="homepage-layout">
+<body class="homepage-layout client-area-layout" data-auth="out" data-layout="top" data-active-nav="" data-page-title="Home" data-crumb-root>
 
-<nav class="homepage-nav"><div class="homepage-nav-inner">
-    <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
+<!-- Icon rail (rail layout) -->
+<div data-include="partials/rail.html">
+<!-- Icon rail (80px) — shown when body[data-layout="rail"].
+     Paired with rail-panels.html (the flyout content). -->
+<aside class="ph-rail only-rail">
+    <a href="portal-home.html" class="ph-rail-logo" aria-label="Portal Home">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="4"/></svg>
+    </a>
+    <div class="ph-rail-items">
+        <!-- Logged-out rail items -->
+        <button type="button" class="ph-rail-item only-out" data-rail="shop-out">
+            <span class="rail-ico teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></span>
+            <span>Products</span>
+        </button>
+        <button type="button" class="ph-rail-item only-out" data-rail="domains-out">
+            <span class="rail-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span>
+            <span>Domains</span>
+        </button>
+        <button type="button" class="ph-rail-item only-out" data-rail="info-out">
+            <span class="rail-ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
+            <span>Support</span>
+        </button>
+
+        <!-- Logged-in rail items -->
+        <a href="clientareahome.html" class="ph-rail-item only-in" data-nav="dashboard">
+            <span class="rail-ico blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+            <span>Dashboard</span>
+        </a>
+        <button type="button" class="ph-rail-item only-in" data-rail="services" data-nav="services">
+            <span class="rail-ico purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></span>
+            <span>Services</span>
+        </button>
+        <button type="button" class="ph-rail-item only-in" data-rail="domains-in" data-nav="domains">
+            <span class="rail-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span>
+            <span>Domains</span>
+        </button>
+        <button type="button" class="ph-rail-item only-in" data-rail="security" data-nav="security">
+            <span class="rail-ico orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+            <span>Website &amp; Security</span>
+        </button>
+        <button type="button" class="ph-rail-item only-in" data-rail="billing" data-nav="billing">
+            <span class="rail-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
+            <span>Billing</span>
+        </button>
+        <button type="button" class="ph-rail-item only-in" data-rail="support" data-nav="support">
+            <span class="rail-ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
+            <span>Support</span>
+        </button>
+        <button type="button" class="ph-rail-item only-in" data-rail="account" data-nav="account">
+            <span class="rail-ico gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <span>Account</span>
+        </button>
+    </div>
+    <div class="ph-rail-spacer"></div>
+    <a href="user-profile.html" class="ph-rail-user only-in">A</a>
+    <a href="login.html" class="ph-rail-item only-out" style="margin-top: auto;">
+        <span class="rail-ico" style="background: var(--color-accent); color: #fff;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></span>
+        <span>Sign in</span>
+    </a>
+</aside>
+</div>
+<div data-include="partials/rail-panels.html">
+<!-- Secondary flyout panels for the icon rail. Each
+     [data-panel] id matches a [data-rail] button in rail.html. -->
+<aside class="ph-rail-panel only-rail" aria-label="Secondary navigation">
+    <!-- Shop (logged-out) -->
+    <div class="ph-rail-panel-group active" data-panel="shop-out">
+        <div class="ph-rail-panel-header"><h3>Products</h3></div>
+        <div class="ph-rail-panel-items">
+            <a href="#"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Browse All</a>
+            <a href="#"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>WordPress Hosting</a>
+            <a href="socialbee.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/></svg>SocialBee</a>
+            <a href="ssl-certificates.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>SSL Certificates</a>
+            <a href="monitoring-360.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Site &amp; Server Monitoring</a>
+            <a href="nordvpn.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>VPN</a>
+            <a href="email-services.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>E-mail Services</a>
+            <a href="email.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>Professional Email</a>
+            <a href="site-builder.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>Site Builder</a>
+            <a href="seo-tools.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><polyline points="7 14 12 9 16 13 21 8"/></svg>SEO Tools</a>
+            <a href="website-backup.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Website Backup</a>
+            <a href="website-security.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Website Security</a>
+            <a href="website-builder.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>Website Builder</a>
+        </div>
+    </div>
+    <div class="ph-rail-panel-group" data-panel="domains-out">
+        <div class="ph-rail-panel-header"><h3>Domains</h3></div>
+        <div class="ph-rail-panel-items">
+            <a href="cart-domain-register.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/></svg>Register a New Domain</a>
+            <a href="cart-domain-transfer.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17l-4-4 4-4M3 13h14M17 7l4 4-4 4"/></svg>Transfer Domains to Us</a>
+            <a href="domain-pricing.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Domain Pricing</a>
+        </div>
+    </div>
+    <div class="ph-rail-panel-group" data-panel="info-out">
+        <div class="ph-rail-panel-header"><h3>Support</h3></div>
+        <div class="ph-rail-panel-items">
+            <a href="announcements.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l18-8v18L3 13v-2z"/></svg>Announcements</a>
+            <a href="knowledgebase.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M4 4.5A2.5 2.5 0 016.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15z"/></svg>Knowledgebase</a>
+            <a href="serverstatus.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/></svg>Network Status</a>
+            <a href="contact.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Contact Us</a>
+        </div>
+    </div>
+
+    <!-- Logged-in panels -->
+    <div class="ph-rail-panel-group active" data-panel="services">
+        <div class="ph-rail-panel-header"><h3>Services</h3></div>
+        <div class="ph-rail-panel-items">
+            <a href="clientareaproducts.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>My Services</a>
+            <a href="cart.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>Order New Services</a>
+            <a href="#"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>View Available Addons</a>
+        </div>
+    </div>
+    <div class="ph-rail-panel-group" data-panel="domains-in">
+        <div class="ph-rail-panel-header"><h3>Domains</h3></div>
+        <div class="ph-rail-panel-items">
+            <a href="clientareadomains.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/></svg>My Domains</a>
+            <a href="#"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 4v6h-6M1 20v-6h6"/></svg>Renew Domains</a>
+            <a href="cart-domain-register.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>Register a New Domain</a>
+            <a href="cart-domain-transfer.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17l-4-4 4-4M3 13h14M17 7l4 4-4 4"/></svg>Transfer a Domain</a>
+            <a href="domainchecker.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Domain Search</a>
+        </div>
+    </div>
+    <div class="ph-rail-panel-group" data-panel="security">
+        <div class="ph-rail-panel-header"><h3>Website &amp; Security</h3></div>
+        <div class="ph-rail-panel-items">
+            <a href="socialbee.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/></svg>SocialBee</a>
+            <a href="ssl-certificates.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>SSL Certificates</a>
+            <a href="monitoring-360.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Site &amp; Server Monitoring</a>
+            <a href="nordvpn.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/></svg>VPN</a>
+            <a href="email-services.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>E-mail Services</a>
+            <a href="email.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>Professional Email</a>
+            <a href="site-builder.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>Site Builder</a>
+            <a href="seo-tools.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><polyline points="7 14 12 9 16 13 21 8"/></svg>SEO Tools</a>
+            <a href="website-backup.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Website Backup</a>
+            <a href="website-security.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Website Security</a>
+            <a href="website-builder.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>Website Builder</a>
+            <a href="managessl.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Manage SSL Certificates</a>
+        </div>
+    </div>
+    <div class="ph-rail-panel-group" data-panel="billing">
+        <div class="ph-rail-panel-header"><h3>Billing</h3></div>
+        <div class="ph-rail-panel-items">
+            <a href="clientareainvoices.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>My Invoices</a>
+            <a href="clientareaquotes.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>My Quotes</a>
+            <a href="account-paymentmethods.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/></svg>Payment Methods</a>
+        </div>
+    </div>
+    <div class="ph-rail-panel-group" data-panel="support">
+        <div class="ph-rail-panel-header"><h3>Support</h3></div>
+        <div class="ph-rail-panel-items">
+            <a href="supportticketslist.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Tickets</a>
+            <a href="supportticketsubmit.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>Open Ticket</a>
+            <a href="knowledgebase.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/></svg>Knowledgebase</a>
+            <a href="downloads.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>Downloads</a>
+            <a href="announcements.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l18-8v18L3 13v-2z"/></svg>Announcements</a>
+            <a href="serverstatus.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="7" rx="1.5"/></svg>Network Status</a>
+        </div>
+    </div>
+    <div class="ph-rail-panel-group" data-panel="account">
+        <div class="ph-rail-panel-header"><h3>Account</h3></div>
+        <div class="ph-rail-panel-items">
+            <a href="clientareadetails.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Details</a>
+            <a href="clientareasecurity.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/></svg>Security</a>
+            <a href="user-profile.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/></svg>Profile</a>
+            <a href="user-password.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/></svg>Change Password</a>
+            <a href="login.html"><svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</a>
+        </div>
+    </div>
+</aside>
+</div>
+
+<div class="ph-main-wrap">
+
+<!-- Logged-in strip - also where apple-layout.js injects the utility links -->
+<div class="ph-auth-strip only-in only-top">
+    <div class="ph-auth-strip-inner">
+        <button type="button" aria-label="Notifications">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span>No Notifications</span>
+        </button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="#" class="masq-chip" title="Return to admin area">&#8634; Return to admin</a>
+        </div>
+    </div>
+</div>
+
+<!-- Top-layout header (the marketing nav) -->
+<nav class="homepage-nav only-top"><div class="homepage-nav-inner">
+    <a href="index.html" class="nav-logo img-logo"><img class="brand-logo" src="img/branding/hadrian-logo.png" alt="Hadrian"></a>
     <div class="nav-item-classic"><a href="#" class="nav-dropdown-trigger">Hostnodes <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-classic-menu nav-classic-menu--text"><a href="#" class="nav-classic-item"><div class="name">About</div></a><a href="#" class="nav-classic-item"><div class="name">Our story</div></a><a href="#" class="nav-classic-item"><div class="name">Customers</div></a><a href="#" class="nav-classic-item"><div class="name">Careers</div></a><a href="#" class="nav-classic-item"><div class="name">Newsroom</div></a><div class="nav-classic-divider"></div><a href="#" class="nav-classic-item"><div class="name">Partners</div></a><a href="#" class="nav-classic-item"><div class="name">Affiliate program</div></a></div></div><div class="nav-item-dropdown"><a href="#" class="nav-dropdown-trigger">Features<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-mega-menu"><div class="nav-mega-inner"><div class="nav-mega-col"><h4>Platform</h4><a href="cloud-hosting.html" class="nav-mega-item"><div class="name">Cloud Hosting</div><div class="tag">Isolated containers on Google Cloud</div></a><a href="vps.html" class="nav-mega-item"><div class="name">VPS</div><div class="tag">Full root, dedicated resources</div></a></div><div class="nav-mega-col"><h4>Tools</h4><a href="website-builder.html" class="nav-mega-item"><div class="name">Website Builder</div><div class="tag">Drag and drop, 200+ templates</div></a><a href="email.html" class="nav-mega-item"><div class="name">Professional Email</div><div class="tag">Custom domain, 50GB mailbox</div></a></div><div class="nav-mega-col"><h4>Get Started</h4><a href="support-page.html" class="nav-mega-item"><div class="name">Talk to Sales</div><div class="tag">Get expert advice</div></a></div></div></div></div><a href="#pricing">Pricing</a><div class="nav-item-dropdown"><a href="domains.html" class="nav-dropdown-trigger">Domains <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-mega-menu"><div class="nav-mega-inner"><div class="nav-mega-col"><h4>Popular</h4><a href="#" class="nav-mega-item nav-mega-item--icon"><div class="nav-mega-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div><div class="nav-mega-text"><div class="name">.com</div><div class="tag">Most trusted TLD</div></div></a><a href="#" class="nav-mega-item nav-mega-item--icon"><div class="nav-mega-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div class="nav-mega-text"><div class="name">.dev</div><div class="tag">Built for developers</div></div></a><a href="#" class="nav-mega-item nav-mega-item--icon"><div class="nav-mega-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="nav-mega-text"><div class="name">.io</div><div class="tag">For startups &amp; tech</div></div></a><a href="#" class="nav-mega-item nav-mega-item--icon"><div class="nav-mega-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.5 17 14.5 18.5 21.5 12 18 5.5 21.5 7 14.5 2 9.5 9 8.5 12 2"/></svg></div><div class="nav-mega-text"><div class="name">.ai</div><div class="tag">AI-first companies</div></div></a></div><div class="nav-mega-col"><h4>Manage</h4><a href="#" class="nav-mega-item nav-mega-item--icon"><div class="nav-mega-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></div><div class="nav-mega-text"><div class="name">Transfer in</div><div class="tag">Move existing domains</div></div></a><a href="#" class="nav-mega-item nav-mega-item--icon"><div class="nav-mega-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div><div class="nav-mega-text"><div class="name">DNS Manager</div><div class="tag">Records, propagation</div></div></a><a href="#" class="nav-mega-item nav-mega-item--icon"><div class="nav-mega-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="nav-mega-text"><div class="name">WHOIS Privacy</div><div class="tag">Hide registrant info</div></div></a></div><div class="nav-mega-col"><h4>Tools</h4><a href="#" class="nav-mega-item nav-mega-item--icon"><div class="nav-mega-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div><div class="nav-mega-text"><div class="name">Domain search</div><div class="tag">Check availability</div></div></a><a href="#" class="nav-mega-item nav-mega-item--icon"><div class="nav-mega-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div><div class="nav-mega-text"><div class="name">Bulk register</div><div class="tag">50+ domains at once</div></div></a></div></div></div></div><div class="nav-item-classic"><a href="#" class="nav-dropdown-trigger">Support<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a><div class="nav-classic-menu"><a href="support-page.html" class="nav-classic-item"><svg class="nav-classic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div><div class="name">Knowledgebase</div></div></a><a href="#" class="nav-classic-item"><svg class="nav-classic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div><div class="name">Help center</div></div></a><a href="#" class="nav-classic-item"><svg class="nav-classic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><div><div class="name">Contact us</div></div></a><a href="#" class="nav-classic-item"><svg class="nav-classic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div><div class="name">Status page</div></div></a><div class="nav-classic-divider"></div><a href="#" class="nav-classic-item"><svg class="nav-classic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg><div><div class="name">API documentation</div></div></a><a href="#" class="nav-classic-item"><svg class="nav-classic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><div><div class="name">Community blog</div></div></a></div></div>
     <div class="nav-spacer"></div>
-    <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
     <a href="#" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg></a>
     <div class="nav-lang-wrapper">
-        <a href="#" class="icon-btn" onclick="toggleLangMenu(event)" aria-label="Language and region" aria-haspopup="true" aria-expanded="false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></a>
+        <a href="#" class="icon-btn" onclick="toggleLangMenu(event)" aria-label="Language, region and currency" aria-haspopup="true" aria-expanded="false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></a>
         <div class="nav-lang-menu" id="navLangMenu" role="menu">
+            <div class="nav-lang-scroll">
             <div class="nav-lang-menu-header">Language &amp; Region</div>
             <a href="#" class="nav-lang-item active" role="menuitem"><span class="lang-flag">🇺🇸</span><div class="lang-info"><div class="lang-name">English</div><div class="lang-region">United States</div></div><span class="lang-check">✓</span></a>
             <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇬🇧</span><div class="lang-info"><div class="lang-name">English</div><div class="lang-region">United Kingdom</div></div><span class="lang-check">✓</span></a>
@@ -149,6 +340,17 @@
             <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇰🇷</span><div class="lang-info"><div class="lang-name">한국어</div><div class="lang-region">대한민국</div></div><span class="lang-check">✓</span></a>
             <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇨🇳</span><div class="lang-info"><div class="lang-name">简体中文</div><div class="lang-region">中国</div></div><span class="lang-check">✓</span></a>
             <a href="#" class="nav-lang-item" role="menuitem"><span class="lang-flag">🇧🇷</span><div class="lang-info"><div class="lang-name">Português</div><div class="lang-region">Brasil</div></div><span class="lang-check">✓</span></a>
+            </div><!-- /.nav-lang-scroll -->
+            <div class="nav-lang-divider"></div>
+            <div class="nav-lang-menu-header">Currency</div>
+            <div class="nav-cur-grid" role="radiogroup" aria-label="Currency">
+                <button type="button" class="nav-cur-item active" data-currency="usd" role="radio" aria-checked="true">$ USD</button>
+                <button type="button" class="nav-cur-item" data-currency="eur" role="radio" aria-checked="false">€ EUR</button>
+                <button type="button" class="nav-cur-item" data-currency="gbp" role="radio" aria-checked="false">£ GBP</button>
+                <button type="button" class="nav-cur-item" data-currency="cad" role="radio" aria-checked="false">$ CAD</button>
+                <button type="button" class="nav-cur-item" data-currency="aud" role="radio" aria-checked="false">$ AUD</button>
+                <button type="button" class="nav-cur-item" data-currency="jpy" role="radio" aria-checked="false">¥ JPY</button>
+            </div>
         </div>
     </div>
     <a href="#" onclick="toggleDarkMode(); return false;" class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></a>
@@ -176,10 +378,293 @@ document.querySelectorAll('.nav-lang-item').forEach(function(item) {
         e.preventDefault();
         document.querySelectorAll('.nav-lang-item').forEach(function(el) { el.classList.remove('active'); });
         this.classList.add('active');
-        document.getElementById('navLangMenu').classList.remove('open');
+    });
+});
+document.querySelectorAll('.nav-cur-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+        document.querySelectorAll('.nav-cur-item').forEach(function(el) {
+            el.classList.remove('active');
+            el.setAttribute('aria-checked', 'false');
+        });
+        this.classList.add('active');
+        this.setAttribute('aria-checked', 'true');
     });
 });
 </script>
+
+<!-- Inner topbar (sidebar + rail layouts) -->
+<div data-include="partials/inner-topbar.html">
+<!-- Topbar shown on sidebar + rail layouts (hidden on top-nav).
+     Breadcrumb "current" cell auto-fills from body[data-page-title]
+     via apple-layout.js. Parent page controls the crumb chain by
+     overriding the .ph-side-crumbs block after partial loads, or by
+     swapping this partial for a page-specific one. -->
+<div class="ph-side-topbar only-inner">
+    <div class="ph-side-topbar-inner">
+        <button type="button" class="ph-side-iconbtn ph-mobile-toggle" aria-label="Open navigation" aria-controls="appSidebar" aria-expanded="false" data-nav-toggle>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="ph-side-crumbs">
+            <a href="portal-home.html">Home</a>
+            <span class="sep">›</span>
+            <span class="current" aria-current="page" data-current-page>Portal Home</span>
+        </div>
+        <div class="ph-side-topbar-actions">
+            <div class="notification-wrapper only-in" id="sideNotifyWrap">
+                <button type="button" class="ph-side-iconbtn" aria-label="Notifications" onclick="togglePortalNotifications(event, 'side')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    <span class="topbar-notification-dot"></span>
+                </button>
+                <div class="notification-dropdown" id="notificationDropdownSide">
+                    <div class="notification-dropdown-header">
+                        <span class="notification-dropdown-title">Notifications</span>
+                        <button class="notification-dropdown-clear" type="button">Mark all read</button>
+                    </div>
+                    <a href="viewinvoice.html" class="notification-item">
+                        <div class="notification-dot-indicator orange"></div>
+                        <div class="notification-content">
+                            <div class="notification-text">Invoice #10247 is due in 2 days</div>
+                            <div class="notification-time">2 hours ago</div>
+                        </div>
+                    </a>
+                    <a href="viewticket.html" class="notification-item">
+                        <div class="notification-dot-indicator green"></div>
+                        <div class="notification-content">
+                            <div class="notification-text">Ticket #TKT-4821 has been answered</div>
+                            <div class="notification-time">Yesterday</div>
+                        </div>
+                    </a>
+                    <a href="announcements.html" class="notification-item">
+                        <div class="notification-dot-indicator blue"></div>
+                        <div class="notification-content">
+                            <div class="notification-text">Scheduled maintenance on Apr 20</div>
+                            <div class="notification-time">3 days ago</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <a href="cart.html" class="ph-side-iconbtn" aria-label="Cart">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+            </a>
+            <a href="#" onclick="toggleDarkMode(); return false;" class="ph-side-iconbtn" aria-label="Toggle theme">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </a>
+            <a href="login.html" class="ph-side-signin only-out">Sign in</a>
+
+            <div class="profile-dropdown-wrapper only-in" id="sideUserWrap">
+                <div class="topbar-avatar" onclick="togglePortalProfile(event, 'side')" title="Account">A</div>
+                <div class="profile-dropdown" id="profileDropdownSide">
+                    <div class="profile-dropdown-header">
+                        <div class="profile-dropdown-name">Arshile Gogia</div>
+                        <div class="profile-dropdown-email">arshileebay@gmail.com</div>
+                    </div>
+                    <a href="clientareadetails.html" class="profile-dropdown-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        My Details
+                    </a>
+                    <a href="clientareasecurity.html" class="profile-dropdown-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                        Security Settings
+                    </a>
+                    <a href="clientareaemails.html" class="profile-dropdown-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        Email History
+                    </a>
+                    <div class="profile-dropdown-divider"></div>
+                    <div class="theme-toggle-row">
+                        <span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span>
+                        <div class="toggle-switch" onclick="toggleDarkMode()"></div>
+                    </div>
+                    <div class="profile-dropdown-divider"></div>
+                    <a href="login.html" class="profile-dropdown-item danger">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- .app-shell: the floating card in the boxed layout, a passthrough elsewhere -->
+<div class="app-shell">
+<div class="app-shell-aside" data-include="partials/sidebar.html">
+<!-- Fixed 260px sidebar — shown when body[data-layout="side"].
+     Items carry data-nav="..." so apple-layout.js can mark the
+     active one (reads body[data-active-nav]). -->
+<aside class="sidebar only-side">
+    <div class="sidebar-header">
+        <a href="portal-home.html" class="sidebar-home-link">
+            <span class="sidebar-brand">Hostnodes</span>
+        </a>
+    </div>
+    <div class="sidebar-search"><input type="text" class="sidebar-search-input" placeholder="Search"></div>
+    <nav class="sidebar-nav">
+        <!-- Portal Home — top-level flat link -->
+        <a href="portal-home.html" class="sidebar-item" data-nav="portal-home"><div class="sidebar-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg></div>Portal Home</a>
+
+        <!-- Dashboard — logged-in classic client area home -->
+        <a href="clientareahome.html" class="sidebar-item only-in" data-nav="dashboard"><div class="sidebar-item-icon indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>Dashboard</a>
+
+        <!-- ═══ LOGGED-OUT — Tree A ═══ -->
+        <div class="sidebar-section-label only-out">Shop</div>
+        <div class="sidebar-group only-out" data-group="store-out">
+            <button type="button" class="sidebar-group-toggle">
+                <div class="sidebar-item-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></div>
+                <span class="group-label">Products &amp; Services</span>
+                <svg class="group-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+            </button>
+            <div class="sidebar-group-items">
+                <a href="#">Browse All</a>
+                <a href="#">WordPress Hosting</a>
+                <a href="socialbee.html">SocialBee</a>
+                <a href="ssl-certificates.html">SSL Certificates</a>
+                <a href="monitoring-360.html">Site &amp; Server Monitoring</a>
+                <a href="nordvpn.html">VPN</a>
+                <a href="email-services.html">E-mail Services</a>
+                <a href="email.html">Professional Email</a>
+                <a href="site-builder.html">Site Builder</a>
+                <a href="seo-tools.html">SEO Tools</a>
+                <a href="website-backup.html">Website Backup</a>
+                <a href="website-security.html">Website Security</a>
+                <a href="website-builder.html">Website Builder</a>
+            </div>
+        </div>
+
+        <div class="sidebar-section-label only-out">Domains</div>
+        <a href="cart-domain-register.html" class="sidebar-item only-out"><div class="sidebar-item-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>Register a Domain</a>
+        <a href="cart-domain-transfer.html" class="sidebar-item only-out"><div class="sidebar-item-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>Transfer a Domain</a>
+
+        <div class="sidebar-section-label only-out">Information</div>
+        <a href="announcements.html" class="sidebar-item only-out"><div class="sidebar-item-icon pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>Announcements</a>
+        <a href="knowledgebase.html" class="sidebar-item only-out"><div class="sidebar-item-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>Knowledgebase</a>
+        <a href="serverstatus.html" class="sidebar-item only-out"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/></svg></div>Network Status</a>
+        <a href="contact.html" class="sidebar-item only-out"><div class="sidebar-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>Contact Us</a>
+
+        <!-- ═══ LOGGED-IN — Tree B ═══ -->
+        <div class="sidebar-section-label only-in">Services</div>
+        <div class="sidebar-group only-in" data-group="services">
+            <button type="button" class="sidebar-group-toggle">
+                <div class="sidebar-item-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
+                <span class="group-label">My Services</span>
+                <svg class="group-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+            </button>
+            <div class="sidebar-group-items">
+                <a href="clientareaproducts.html" data-nav="services">All Services</a>
+                <a href="store.html">Order New Services</a>
+                <a href="#">View Available Addons</a>
+            </div>
+        </div>
+
+        <div class="sidebar-section-label only-in">Domains</div>
+        <div class="sidebar-group only-in" data-group="domains">
+            <button type="button" class="sidebar-group-toggle">
+                <div class="sidebar-item-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+                <span class="group-label">My Domains</span>
+                <svg class="group-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+            </button>
+            <div class="sidebar-group-items">
+                <a href="clientareadomains.html" data-nav="domains">All Domains</a>
+                <a href="#">Renew Domains</a>
+                <a href="cart-domain-register.html">Register a New Domain</a>
+                <a href="cart-domain-transfer.html">Transfer a Domain</a>
+                <a href="domainchecker.html">Domain Search</a>
+            </div>
+        </div>
+
+        <div class="sidebar-section-label only-in">Shop</div>
+        <div class="sidebar-group only-in" data-group="security">
+            <button type="button" class="sidebar-group-toggle">
+                <div class="sidebar-item-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <span class="group-label">Website &amp; Security</span>
+                <svg class="group-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+            </button>
+            <div class="sidebar-group-items">
+                <a href="socialbee.html">SocialBee</a>
+                <a href="ssl-certificates.html">SSL Certificates</a>
+                <a href="monitoring-360.html">Site &amp; Server Monitoring</a>
+                <a href="nordvpn.html">VPN</a>
+                <a href="email-services.html">E-mail Services</a>
+                <a href="email.html">Professional Email</a>
+                <a href="site-builder.html">Site Builder</a>
+                <a href="seo-tools.html">SEO Tools</a>
+                <a href="website-backup.html">Website Backup</a>
+                <a href="website-security.html">Website Security</a>
+                <a href="website-builder.html">Website Builder</a>
+            </div>
+        </div>
+        <a href="managessl.html" class="sidebar-item only-in"><div class="sidebar-item-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>Manage SSL</a>
+
+        <div class="sidebar-section-label only-in">Billing</div>
+        <a href="clientareainvoices.html" class="sidebar-item only-in" data-nav="invoices"><div class="sidebar-item-icon indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>Invoices</a>
+        <a href="clientareaquotes.html" class="sidebar-item only-in" data-nav="quotes"><div class="sidebar-item-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Quotes</a>
+        <a href="account-paymentmethods.html" class="sidebar-item only-in" data-nav="payment-methods"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 010-4h14v4"/><path d="M3 5v14a2 2 0 002 2h16v-5"/><path d="M18 12a2 2 0 000 4h4v-4Z"/></svg></div>Payment Methods</a>
+
+        <div class="sidebar-section-label only-in">Support</div>
+        <a href="supportticketslist.html" class="sidebar-item only-in" data-nav="tickets"><div class="sidebar-item-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>Tickets</a>
+        <a href="supportticketsubmit.html" class="sidebar-item only-in"><div class="sidebar-item-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>Open Ticket</a>
+        <a href="knowledgebase.html" class="sidebar-item only-in" data-nav="knowledgebase"><div class="sidebar-item-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>Knowledgebase</a>
+        <a href="downloads.html" class="sidebar-item only-in" data-nav="downloads"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>Downloads</a>
+        <a href="announcements.html" class="sidebar-item only-in" data-nav="announcements"><div class="sidebar-item-icon pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>Announcements</a>
+        <a href="serverstatus.html" class="sidebar-item only-in"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/></svg></div>Network Status</a>
+
+        <div class="sidebar-section-label only-in">Account</div>
+        <a href="clientareadetails.html" class="sidebar-item only-in" data-nav="details"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>My Details</a>
+        <a href="clientareasecurity.html" class="sidebar-item only-in" data-nav="security-account"><div class="sidebar-item-icon gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>Security</a>
+    </nav>
+    <!-- Sidebar footer: user info when logged-in, sign-in CTA when logged-out -->
+    <div class="sidebar-footer">
+        <div class="profile-dropdown-wrapper only-in" id="sidebarUserWrap">
+            <div class="sidebar-user" role="button" tabindex="0" aria-haspopup="menu" onclick="togglePortalProfile(event, 'sidebar')">
+                <div class="sidebar-avatar">A</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name">Arshile Gogia</div>
+                    <div class="sidebar-user-email">arshileg@gmail.com</div>
+                </div>
+                <svg class="sidebar-user-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="profile-dropdown profile-dropdown--up" id="profileDropdownSidebar" role="menu">
+                <div class="profile-dropdown-header">
+                    <div class="profile-dropdown-name">Arshile Gogia</div>
+                    <div class="profile-dropdown-email">arshileg@gmail.com</div>
+                </div>
+                <a href="clientareadetails.html" class="profile-dropdown-item" role="menuitem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    My Details
+                </a>
+                <a href="clientareasecurity.html" class="profile-dropdown-item" role="menuitem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    Security Settings
+                </a>
+                <a href="clientareaemails.html" class="profile-dropdown-item" role="menuitem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Email History
+                </a>
+                <a href="user-switch-account.html" class="profile-dropdown-item" role="menuitem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+                    Switch Account
+                </a>
+                <div class="profile-dropdown-divider"></div>
+                <div class="theme-toggle-row">
+                    <span class="theme-toggle-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark Mode</span>
+                    <div class="toggle-switch" onclick="toggleDarkMode()"></div>
+                </div>
+                <div class="profile-dropdown-divider"></div>
+                <a href="login.html" class="profile-dropdown-item danger" role="menuitem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Sign Out
+                </a>
+            </div>
+        </div>
+        <div class="only-out" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <a href="login.html" style="padding: 9px 14px; border-radius: 10px; background: var(--color-accent); color: #fff; text-align: center; font-size: 13px; font-weight: 500; text-decoration: none;">Sign in</a>
+            <a href="clientregister.html" style="padding: 9px 14px; border-radius: 10px; background: var(--color-surface-secondary); color: var(--color-text-primary); text-align: center; font-size: 13px; font-weight: 500; text-decoration: none;">Create account</a>
+        </div>
+    </div>
+</aside>
+</div>
+<div class="app-shell-content">
 
 <!-- 1. Hero Centered — "Hosting, redesigned" -->
 <section class="hp-hero" style="padding: 96px 22px 40px; background: transparent;">
@@ -241,14 +726,14 @@ document.querySelectorAll('.nav-lang-item').forEach(function(item) {
     <div class="hp-duo-card">
         <p class="duo-text"><strong>The Hostnodes way.</strong> A clean, focused panel. Fully isolated containers per site. Premium Google Cloud infrastructure with private resources you can measure. Everything is opinionated, so you can stop configuring and start shipping.</p>
         <div class="duo-visual duo-visual--right">
-            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #0a84ff, #64d2ff); border-radius: 14px; display: flex; align-items: center; justify-content: center; padding: 30px;">
+            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--color-accent), #64d2ff); border-radius: 14px; display: flex; align-items: center; justify-content: center; padding: 30px;">
                 <div style="background: #fff; border-radius: 10px; padding: 16px; width: 100%; max-width: 260px; box-shadow: 0 12px 32px rgba(0,0,0,0.2);">
                     <div style="display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #f5f5f7;">
                         <div style="width: 8px; height: 8px; background: #30d158; border-radius: 50%;"></div>
                         <span style="font-size: 11px; font-weight: 600; color: #1d1d1f;">OpenPanel</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><div style="width: 14px; height: 14px; background: rgba(0,113,227,0.1); border-radius: 4px;"></div><span style="font-size: 11px; color: #1d1d1f;">Sites</span></div>
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><div style="width: 14px; height: 14px; background: color-mix(in srgb, var(--color-accent) 10%, transparent); border-radius: 4px;"></div><span style="font-size: 11px; color: #1d1d1f;">Sites</span></div>
                         <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><div style="width: 14px; height: 14px; background: rgba(48,209,88,0.1); border-radius: 4px;"></div><span style="font-size: 11px; color: #1d1d1f;">Resources</span></div>
                         <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;"><div style="width: 14px; height: 14px; background: rgba(191,90,242,0.1); border-radius: 4px;"></div><span style="font-size: 11px; color: #1d1d1f;">Backups</span></div>
                     </div>
@@ -284,6 +769,16 @@ document.querySelectorAll('.nav-lang-item').forEach(function(item) {
         <div class="icon-circle green"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg></div>
         <h4>Resources</h4>
         <p>CPU and RAM capped per container. No noisy neighbors. Your performance is your performance.</p>
+    </div>
+    <div class="hp-icon-item">
+        <div class="icon-circle orange"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+        <h4>SSH access</h4>
+        <p>A real shell inside your own container, not a shared jump box. Run the tooling you already use.</p>
+    </div>
+    <div class="hp-icon-item">
+        <div class="icon-circle teal"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></div>
+        <h4>Cron jobs</h4>
+        <p>Your own scheduler, running on your own resources. Jobs fire on time instead of queueing behind other accounts.</p>
     </div>
 </section>
 
@@ -382,8 +877,8 @@ document.querySelectorAll('.nav-lang-item').forEach(function(item) {
                     <div style="height: 6px; background: #f5f5f7; border-radius: 3px; margin-bottom: 4px;"></div>
                     <div style="height: 6px; background: #f5f5f7; border-radius: 3px;"></div>
                 </div>
-                <div style="background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); min-width: 140px; border: 2px solid #0071e3;">
-                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;"><div style="width: 22px; height: 22px; background: linear-gradient(135deg, #0071e3, #5ac8fa); border-radius: 6px;"></div><span style="font-size: 11px; font-weight: 600; color: #1d1d1f;">Hostnodes</span></div>
+                <div style="background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); min-width: 140px; border: 2px solid var(--color-accent);">
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;"><div style="width: 22px; height: 22px; background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 50%, #fff)); border-radius: 6px;"></div><span style="font-size: 11px; font-weight: 600; color: #1d1d1f;">Hostnodes</span></div>
                     <div style="height: 6px; background: #eaf4ff; border-radius: 3px; margin-bottom: 4px;"></div>
                     <div style="height: 6px; background: #f5f5f7; border-radius: 3px; margin-bottom: 4px;"></div>
                     <div style="height: 6px; background: #f5f5f7; border-radius: 3px;"></div>
@@ -402,7 +897,7 @@ document.querySelectorAll('.nav-lang-item').forEach(function(item) {
             <div style="background: #fff; border-radius: 14px; padding: 20px; width: 100%; max-width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
                 <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 12px;">PHP version</div>
                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                    <span style="padding: 6px 12px; background: #0071e3; color: #fff; border-radius: 999px; font-size: 11px; font-weight: 600;">8.3</span>
+                    <span style="padding: 6px 12px; background: var(--color-accent); color: #fff; border-radius: 999px; font-size: 11px; font-weight: 600;">8.3</span>
                     <span style="padding: 6px 12px; background: #f5f5f7; color: #1d1d1f; border-radius: 999px; font-size: 11px;">8.2</span>
                     <span style="padding: 6px 12px; background: #f5f5f7; color: #1d1d1f; border-radius: 999px; font-size: 11px;">8.1</span>
                     <span style="padding: 6px 12px; background: #f5f5f7; color: #1d1d1f; border-radius: 999px; font-size: 11px;">8.0</span>
@@ -530,27 +1025,14 @@ document.querySelectorAll('.nav-lang-item').forEach(function(item) {
 </section>
 
 <!-- Footer -->
+</div><!-- /.app-shell-content -->
+</div><!-- /.app-shell -->
+
 <footer class="hp-footer">
     <div class="hp-footer-inner">
         <div class="hp-footer-top">
         <div class="hp-footer-legal">
-            <div class="hp-footer-brand-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg>Hostnodes</div>
-            <p class="hp-footer-tagline">Premium web hosting on Google Cloud. A genuinely free plan, isolated environments, no cPanel clutter.</p>
-            <div class="hp-footer-rating"><span class="hp-footer-rating-stars">★★★★★</span><span>4.9 on Trustpilot</span></div>
-            <div class="hp-footer-socials">
-                <a class="hp-footer-social" href="https://twitter.com/hostnodes" target="_blank" rel="noopener" aria-label="X (Twitter)" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
-                <a class="hp-footer-social" href="https://linkedin.com/company/hostnodes" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>
-                <a class="hp-footer-social" href="https://facebook.com/hostnodes" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.02 10.13 11.93v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.32l-.53 3.49h-2.79V24C19.61 23.09 24 18.09 24 12.07z"/></svg></a>
-                <a class="hp-footer-social" href="https://github.com/hostnodes" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.03c-3.34.72-4.04-1.6-4.04-1.6-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.31 3.5 1 .1-.78.42-1.31.76-1.61-2.66-.3-5.47-1.34-5.47-5.93 0-1.31.47-2.38 1.23-3.22-.12-.3-.53-1.52.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.3-1.55 3.3-1.23 3.3-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.6-2.81 5.62-5.49 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .3"/></svg></a>
-            </div>
-            <div class="hp-footer-payments">
-                <div class="hp-footer-payment" title="Visa"><svg viewBox="0 0 38 12"><text x="19" y="10" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-weight="900" font-style="italic" font-size="12" fill="#1a1f71">VISA</text></svg></div>
-                <div class="hp-footer-payment" title="Mastercard"><svg viewBox="0 0 32 20"><circle cx="12" cy="10" r="8" fill="#eb001b"/><circle cx="20" cy="10" r="8" fill="#f79e1b" fill-opacity="0.9" style="mix-blend-mode:multiply"/></svg></div>
-                <div class="hp-footer-payment" title="American Express"><svg viewBox="0 0 44 14"><rect width="44" height="14" rx="1.5" fill="#006FCF"/><text x="22" y="10" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-weight="900" font-size="8" fill="#fff" letter-spacing="0.6">AMEX</text></svg></div>
-                <div class="hp-footer-payment" title="PayPal"><svg viewBox="0 0 50 14"><text x="0" y="11" font-family="Helvetica,Arial,sans-serif" font-weight="900" font-style="italic" font-size="12" fill="#003087">Pay</text><text x="23" y="11" font-family="Helvetica,Arial,sans-serif" font-weight="900" font-style="italic" font-size="12" fill="#009cde">Pal</text></svg></div>
-                <div class="hp-footer-payment" title="Apple Pay"><svg viewBox="0 0 44 14" fill="#1d1d1f"><path d="M8 3.4c.4-.5.7-1.2.6-1.9-.6 0-1.3.4-1.7.9-.4.4-.7 1.1-.6 1.8.7 0 1.3-.3 1.7-.8zM8.6 4.4c-.9 0-1.7.5-2.1.5s-1.1-.5-1.9-.5C3.6 4.4 2.7 5 2.2 5.9 1.2 7.6 2 10.1 2.9 11.5c.4.7 1 1.4 1.7 1.4.7 0 .9-.4 1.8-.4s1.1.4 1.8.4 1.2-.7 1.7-1.4c.5-.7.7-1.5.7-1.5s-1.4-.6-1.4-2.3c0-1.4 1.2-2.1 1.2-2.1-.7-1-1.7-1.1-2.1-1.2z"/><text x="14" y="11" font-family="Helvetica,Arial,sans-serif" font-weight="500" font-size="10" fill="#1d1d1f">Pay</text></svg></div>
-                <div class="hp-footer-payment" title="Bitcoin"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="6.5" fill="#f7931a"/><text x="7" y="10.5" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-weight="700" font-size="10" fill="#fff">₿</text></svg></div>
-            </div>
+            <div class="hp-footer-brand-mark"><img class="brand-logo" src="img/branding/hadrian-logo.png" alt="Hadrian"></div>
         </div>
         <div class="hp-footer-cols">
             <div class="hp-footer-col"><h4>Product</h4><ul><li><a href="#">Features</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#">Free hosting plan</a></li><li><a href="#">About</a></li></ul></div>
@@ -559,12 +1041,84 @@ document.querySelectorAll('.nav-lang-item').forEach(function(item) {
             <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="support-page.html">Knowledgebase</a></li><li><a href="#">Contact us</a></li><li><a href="#">hello@hostnodes.com</a></li></ul></div>
         </div>
         </div>
-        <div class="hp-footer-bottom">
-            <div>&copy; 2026 Hostnodes. Powered by OpenPanel.</div>
-            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Legal</a></div>
-        </div>
     </div>
 </footer>
+
+<div data-include="partials/sidebar-footer.html">
+<!-- Slim footer shown on sidebar + rail layouts. -->
+<div class="ph-side-footer only-inner">
+    <div class="ph-side-footer-inner">
+        <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open>
+            <span class="flag">🇺🇸</span>
+            <span>English</span>
+            <span class="sep">/</span>
+            <span>$ USD</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <span>Copyright &copy; 2026 Hostnodes LLC.</span>
+    </div>
+</div>
+</div>
+
+</div><!-- /.ph-main-wrap -->
+
+<div data-include="partials/locale-modal.html">
+<!-- Language + currency modal. Opened by any [data-locale-open]
+     button on the page; wired up in apple-layout.js. -->
+<div class="locale-modal" id="localeModal" role="dialog" aria-modal="true" aria-labelledby="localeModalTitle">
+    <div class="locale-modal-panel">
+        <div class="locale-modal-header">
+            <h3 id="localeModalTitle">Choose language &amp; currency</h3>
+            <button type="button" class="locale-modal-close" id="localeModalClose" aria-label="Close">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="locale-modal-body">
+            <div class="locale-modal-section-label">Language</div>
+            <div class="locale-grid" role="radiogroup" aria-label="Language">
+                <button type="button" data-lang="arabic">العربية</button>
+                <button type="button" data-lang="azerbaijani">Azerbaijani</button>
+                <button type="button" data-lang="catalan">Català</button>
+                <button type="button" data-lang="chinese">中文</button>
+                <button type="button" data-lang="croatian">Hrvatski</button>
+                <button type="button" data-lang="czech">Čeština</button>
+                <button type="button" data-lang="danish">Dansk</button>
+                <button type="button" data-lang="dutch">Nederlands</button>
+                <button type="button" data-lang="english" class="active">English</button>
+                <button type="button" data-lang="estonian">Estonian</button>
+                <button type="button" data-lang="farsi">Persian</button>
+                <button type="button" data-lang="french">Français</button>
+                <button type="button" data-lang="german">Deutsch</button>
+                <button type="button" data-lang="hebrew">עברית</button>
+                <button type="button" data-lang="hungarian">Magyar</button>
+                <button type="button" data-lang="italian">Italiano</button>
+                <button type="button" data-lang="macedonian">Macedonian</button>
+                <button type="button" data-lang="norwegian">Norwegian</button>
+                <button type="button" data-lang="portuguese-br">Português (BR)</button>
+                <button type="button" data-lang="portuguese">Português</button>
+                <button type="button" data-lang="romanian">Română</button>
+                <button type="button" data-lang="russian">Русский</button>
+                <button type="button" data-lang="spanish">Español</button>
+                <button type="button" data-lang="swedish">Svenska</button>
+                <button type="button" data-lang="turkish">Türkçe</button>
+                <button type="button" data-lang="ukrainian">Українська</button>
+            </div>
+            <div class="locale-modal-section-label">Currency</div>
+            <div class="locale-grid" role="radiogroup" aria-label="Currency">
+                <button type="button" data-currency="usd" class="active">$ USD</button>
+                <button type="button" data-currency="eur">€ EUR</button>
+                <button type="button" data-currency="gbp">£ GBP</button>
+                <button type="button" data-currency="cad">$ CAD</button>
+                <button type="button" data-currency="aud">$ AUD</button>
+                <button type="button" data-currency="jpy">¥ JPY</button>
+            </div>
+        </div>
+        <div class="locale-modal-footer">
+            <button type="button" class="apply" id="localeApply">Apply</button>
+        </div>
+    </div>
+</div>
+</div>
 
 <script src="js/apple-theme.js"></script>
 
@@ -590,5 +1144,234 @@ document.querySelectorAll('.nav-lang-item').forEach(function(item) {
       setFooter(s || 'stacked');
   })();
 </script>
+<div class="state-chip" role="group" aria-label="Preview options">
+    <span class="dev-tag" title="Drag to move · double-click to reset">preview</span>
+    <div class="chip-group">
+        <span class="label">Auth:</span>
+        <div class="pill-group">
+            <button type="button" data-auth-set="out">Logged out</button>
+            <button type="button" data-auth-set="in" class="active">Logged in</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Layout:</span>
+        <div class="pill-group">
+            <button type="button" data-layout-set="top" class="active">Top nav</button>
+            <button type="button" data-layout-set="side">Sidebar</button>
+            <button type="button" data-layout-set="rail">Icon rail</button>
+            <button type="button" data-layout-set="boxed">Boxed</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Sidebar:</span>
+        <div class="pill-group">
+            <button type="button" data-sidebar-set="light" class="active" title="Frosted light menu (default)">Light</button>
+            <button type="button" data-sidebar-set="tinted" title="Soft wash of the active accent palette">Tinted</button>
+            <button type="button" data-sidebar-set="dark" title="Warm charcoal menu, light content — macOS Finder style">Dark</button>
+            <button type="button" data-sidebar-set="graphite" title="Cool blue-gray dark menu">Graphite</button>
+            <button type="button" data-sidebar-set="brand" title="Bold solid-accent menu — follows the palette">Brand</button>
+            <button type="button" data-sidebar-set="gradient" title="Accent menu with a gradient fall — follows the palette">Gradient</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Header:</span>
+        <div class="pill-group">
+            <button type="button" data-header-set="light" class="active" title="Frosted light top bar (default)">Light</button>
+            <button type="button" data-header-set="tinted" title="Soft wash of the active accent palette">Tinted</button>
+            <button type="button" data-header-set="dark" title="Warm charcoal top bar">Dark</button>
+            <button type="button" data-header-set="graphite" title="Cool blue-gray top bar">Graphite</button>
+            <button type="button" data-header-set="brand" title="Bold solid-accent top bar — follows the palette">Brand</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Menu:</span>
+        <div class="pill-group">
+            <button type="button" data-menu-set="left" class="active" title="Menu sits beside the logo (default)">Left</button>
+            <button type="button" data-menu-set="center" title="Menu centered in the top bar">Center</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Top links:</span>
+        <div class="pill-group">
+            <button type="button" data-toplinks-set="show" class="active" title="Show Docs / Status / Support on the right of the top bar">Show</button>
+            <button type="button" data-toplinks-set="hide" title="Hide the right-side utility links">Hide</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Side logo:</span>
+        <div class="pill-group">
+            <button type="button" data-sidebarlogo-set="show" class="active" title="Show the logo at the top of the left sidebar">Show</button>
+            <button type="button" data-sidebarlogo-set="hide" title="Hide the sidebar logo">Hide</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Box sidebar:</span>
+        <div class="pill-group">
+            <button type="button" data-boxsidebar-set="show" class="active" title="Show the sidebar inside the box (boxed layout)">Show</button>
+            <button type="button" data-boxsidebar-set="hide" title="Hide the sidebar &mdash; content fills the box">Hide</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Box frame:</span>
+        <div class="pill-group">
+            <button type="button" data-boxframe-set="card" class="active" title="Floating card with shadow + rounded corners">Card</button>
+            <button type="button" data-boxframe-set="flat" title="No shadow, no lines &mdash; just centered content">Flat</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Icons:</span>
+        <div class="pill-group">
+            <button type="button" data-icons-set="colorful" class="active" title="Colored icon tiles (default)">Colorful</button>
+            <button type="button" data-icons-set="mono" title="All icons one theme color (set via Icon tiles &rarr; Uniform)">Mono</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Crumbs:</span>
+        <div class="pill-group">
+            <button type="button" data-crumbs-set="trail" class="active" title="Full breadcrumb trail (current)">Trail</button>
+            <button type="button" data-crumbs-set="plain" title="Trail with no grey band — sits straight on the page">Plain</button>
+            <button type="button" data-crumbs-set="pill" title="Trail inside a rounded capsule">Pill</button>
+            <button type="button" data-crumbs-set="chevron" title="Chevron separators, no band">Chevron</button>
+            <button type="button" data-crumbs-set="back" title="Apple-style single back link, no grey bar">Back</button>
+            <button type="button" data-crumbs-set="none" title="No breadcrumb at all — rely on the page title">Off</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Data:</span>
+        <div class="pill-group">
+            <button type="button" data-data-set="full" class="active">Full</button>
+            <button type="button" data-data-set="empty">Empty</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Status:</span>
+        <div class="pill-group">
+            <button type="button" data-status-set="active" class="active">Active</button>
+            <button type="button" data-status-set="suspended">Suspended</button>
+            <button type="button" data-status-set="pending">Pending</button>
+            <button type="button" data-status-set="terminated">Terminated</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Align:</span>
+        <div class="pill-group">
+            <button type="button" data-align-set="center" class="active" title="Center the combined content + sub-nav unit">Center</button>
+            <button type="button" data-align-set="content" title="Center the content column only — ignore the sub-nav for centering math">Content</button>
+            <button type="button" data-align-set="left">Left</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Sub-nav:</span>
+        <div class="pill-group">
+            <button type="button" data-subnav-set="on" class="active">Show</button>
+            <button type="button" data-subnav-set="off">Hide</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Sub-nav side:</span>
+        <div class="pill-group">
+            <button type="button" data-subnav-side-set="left">Left</button>
+            <button type="button" data-subnav-side-set="right" class="active">Right</button>
+            <button type="button" data-subnav-side-set="outside-left" title="Float in the left outer gutter, outside the content column">Outside L</button>
+            <button type="button" data-subnav-side-set="outside" title="Float in the right outer gutter, outside the content column">Outside R</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Services:</span>
+        <div class="pill-group">
+            <button type="button" data-svc-layout-set="inside" class="active" title="Search &amp; pagination inside the white card (column titles outside)">Controls inside</button>
+            <button type="button" data-svc-layout-set="outside" title="Only service rows in the white card; controls float on the page">Controls outside</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Title:</span>
+        <div class="pill-group">
+            <button type="button" data-mintitle-set="outside" class="active" title="Minimal dashboard: section titles on the page background, above each card (default)">Outside block</button>
+            <button type="button" data-mintitle-set="inside" title="Minimal dashboard: section titles inside the white card, as a card header">Inside block</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Block style:</span>
+        <div class="pill-group">
+            <button type="button" data-blkstyle-set="white" class="active" title="Adaptable blocks: white cards (default)">White</button>
+            <button type="button" data-blkstyle-set="accent" title="Adaptable blocks: filled with the accent colour">Accent</button>
+            <button type="button" data-blkstyle-set="tint" title="Adaptable blocks: soft accent tint, dark text">Tint</button>
+            <button type="button" data-blkstyle-set="gradient" title="Adaptable blocks: accent gradient">Gradient</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Layout map:</span>
+        <div class="pill-group">
+            <button type="button" data-layoutmap-set="off" class="active" title="Hide the block position map">Off</button>
+            <button type="button" data-layoutmap-set="on" title="Overlay each block with its grid position, to align them">On</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Tiles:</span>
+        <div class="pill-group">
+            <button type="button" data-tiles-set="all" class="active" title="Show all variants">All</button>
+            <button type="button" data-tiles-set="a" title="Variant A — vertical">A</button>
+            <button type="button" data-tiles-set="b" title="Variant B — horizontal">B</button>
+            <button type="button" data-tiles-set="c" title="Variant C — tinted">C</button>
+            <button type="button" data-tiles-set="d" title="Variant D — list">D</button>
+            <button type="button" data-tiles-set="f" title="Variant F — list horizontal">F</button>
+            <button type="button" data-tiles-set="e" title="Variant E — rings">E</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Form:</span>
+        <div class="pill-group">
+            <button type="button" data-form-set="all" class="active" title="Show all form variants">All</button>
+            <button type="button" data-form-set="a" title="2-col dense grid">A</button>
+            <button type="button" data-form-set="b" title="Sectioned cards">B</button>
+            <button type="button" data-form-set="c" title="Single column stack">C</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Product:</span>
+        <div class="pill-group">
+            <button type="button" data-product-set="all" class="active" title="Show all variants">All</button>
+            <button type="button" data-product-set="a" title="Left sidebar layout">A</button>
+            <button type="button" data-product-set="b" title="Top-tabs layout">B</button>
+            <button type="button" data-product-set="c" title="Stacked sections layout">C</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Plan:</span>
+        <div class="pill-group">
+            <button type="button" data-plan-set="all" class="active" title="Show all plan variants">All</button>
+            <button type="button" data-plan-set="a" title="Variant A — 3 packages, feature list">A</button>
+            <button type="button" data-plan-set="b" title="Variant B — 4 packages, minimal">B</button>
+            <button type="button" data-plan-set="c" title="Variant C — 5 packages, horizontal rows">C</button>
+            <button type="button" data-plan-set="d" title="Variant D — side-by-side comparison">D</button>
+            <button type="button" data-plan-set="e" title="Variant E — bento asymmetric">E</button>
+            <button type="button" data-plan-set="f" title="Variant F — segmented bar">F</button>
+            <button type="button" data-plan-set="g" title="Variant G — spec matrix">G</button>
+            <button type="button" data-plan-set="h" title="Variant H — addon card with radio tiers">H</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Packages:</span>
+        <div class="pill-group">
+            <button type="button" data-packages-set="all" class="active" title="Show every package as authored">All</button>
+            <button type="button" data-packages-set="1" title="Show 1 package">1</button>
+            <button type="button" data-packages-set="2" title="Show 2 packages">2</button>
+            <button type="button" data-packages-set="3" title="Show 3 packages">3</button>
+            <button type="button" data-packages-set="4" title="Show 4 packages">4</button>
+        </div>
+    </div>
+    <div class="chip-group">
+        <span class="label">Palette:</span>
+        <div class="swatch-group" role="group" aria-label="Color palette">
+            <button type="button" data-palette="blue"    class="active" title="Apple Blue"></button>
+            <button type="button" data-palette="emerald"                title="Emerald"></button>
+            <button type="button" data-palette="violet"                 title="Violet"></button>
+            <button type="button" data-palette="rose"                   title="Rose"></button>
+            <button type="button" data-palette="amber"                  title="Amber"></button>
+            <button type="button" data-palette="slate"                  title="Slate"></button>
+        </div>
+    </div>
+</div>
+<script src="js/apple-layout.js?v=24"></script>
 </body>
 </html>

@@ -70,8 +70,12 @@
             return fetch(path, { cache: 'no-cache' })
                 .then(function (r) { return r.ok ? r.text() : ''; })
                 .then(function (html) {
-                    node.innerHTML = html;
-                    node.setAttribute('data-loaded', '');
+                    // Never blank a node that already holds fallback markup.
+                    // Pages opened over file:// cannot fetch a partial at all,
+                    // so they ship the include pre-filled; a 404 here used to
+                    // overwrite that with the empty string.
+                    if (html) node.innerHTML = html;
+                    node.setAttribute('data-loaded', html ? '' : 'error');
                 })
                 .catch(function () {
                     node.setAttribute('data-loaded', 'error');
@@ -198,7 +202,10 @@
         // Layout
         var layoutButtons = document.querySelectorAll('.state-chip [data-layout-set]');
         function applyLayout(layout) {
-            if (['top', 'side', 'rail'].indexOf(layout) === -1) layout = 'top';
+            /* boxed belongs here too: apple-layout.css carries a full set of
+               body[data-layout="boxed"] rules, and leaving it out of this list
+               silently coerced the chip's Boxed button back to Top nav. */
+            if (['top', 'side', 'rail', 'boxed'].indexOf(layout) === -1) layout = 'top';
             body.dataset.layout = layout;
             layoutButtons.forEach(function (b) {
                 b.classList.toggle('active', b.dataset.layoutSet === layout);
@@ -372,6 +379,12 @@
         // Hide variant-picker groups on pages that have nothing to switch.
         // Each picker's parent .chip-group collapses if no matching .*-variant nodes exist.
         [
+            /* Controls that need markup a page may simply not have. A landing
+               page has no breadcrumb, no empty state and no content column to
+               align, so all three groups sat there doing nothing. */
+            { selector: '.ph-breadcrumb', pickerAttr: '[data-crumbs-set]', clears: 'data-crumbs' },
+            { selector: '.when-full, .when-empty', pickerAttr: '[data-data-set]', clears: 'data-data' },
+            { selector: '.content-area', pickerAttr: '[data-align-set]', clears: 'data-align' },
             { selector: '.tile-variant', pickerAttr: '[data-tiles-set]' },
             { selector: '.form-variant', pickerAttr: '[data-form-set]' },
             { selector: '.product-variant', pickerAttr: '[data-product-set]' },
@@ -382,6 +395,12 @@
             var btn = document.querySelector('.state-chip ' + cfg.pickerAttr);
             var group = btn && btn.closest('.chip-group');
             if (group) group.style.display = 'none';
+            /* These groups persist across pages, so a value chosen elsewhere
+               arrives here from storage. Left in place it would keep whatever
+               partial effect it still has -- Align: Left shifts the footer even
+               with no content column -- with the control now hidden and no way
+               to undo it. Put the attribute back to its default. */
+            if (cfg.clears) body.removeAttribute(cfg.clears);
         });
 
         // ── Brand logo ─────────────────────────────────────────
@@ -408,9 +427,18 @@
             }
             [].slice.call(document.querySelectorAll('.nav-logo.text-logo')).forEach(function (a) { swap(a); });
             swap(document.querySelector('.sidebar-brand'), true);
-            // the rail carries the mark only; CSS crops the wordmark away
+            /* The rail slot is 28px square, so it wants the mark on its own.
+               It used to take the wide lockup and crop the wordmark away with
+               object-fit; img/hadrian-mark.svg is that shape already, and being
+               vector it stays sharp at any rail size. */
             var rail = document.querySelector('.ph-rail-logo');
-            if (rail && !rail.querySelector('.brand-logo')) { rail.innerHTML = ''; rail.appendChild(mark()); }
+            if (rail && !rail.querySelector('.brand-logo')) {
+                var m = mark();
+                m.src = 'img/hadrian-mark.svg';
+                m.classList.add('brand-mark');
+                rail.innerHTML = '';
+                rail.appendChild(m);
+            }
         })();
 
         // ── Top-bar utility links ──────────────────────────────
@@ -493,7 +521,7 @@
             { set: 'sidebarlogo', attr: 'data-sidebar-logo', def: 'show',    key: 'hn.sidebarLogo' },
             { set: 'boxsidebar',  attr: 'data-box-sidebar',  def: 'show',    key: null },
             { set: 'boxframe',    attr: 'data-box-frame',    def: 'card',    key: null },
-            { set: 'status',      attr: 'data-status',       def: 'active',  key: 'hn.status' }
+            { set: 'status',      attr: 'data-status',       def: 'active',  key: 'hn.status',   needs: '[class*="pd-sv"]' }
         ].forEach(function (cfg) {
             var buttons = document.querySelectorAll('.state-chip [data-' + cfg.set + '-set]');
             if (!buttons.length) return;
@@ -974,6 +1002,18 @@
         if (!title) return;
         document.querySelectorAll('[data-current-page]').forEach(function (el) {
             el.textContent = title;
+        });
+
+        /* Root pages: <body data-crumb-root> drops everything before the
+           current cell, so the shared partial's "Home > <page>" chain does not
+           read "Home > Home" on the home page itself. Done here rather than by
+           editing the include, which is refetched and overwritten whenever the
+           page is served over http. */
+        if (!document.body.hasAttribute('data-crumb-root')) return;
+        document.querySelectorAll('.ph-side-crumbs, .ph-breadcrumb-inner').forEach(function (bar) {
+            var cur = bar.querySelector('[data-current-page], .current');
+            if (!cur) return;
+            while (bar.firstChild && bar.firstChild !== cur) bar.removeChild(bar.firstChild);
         });
     }
 

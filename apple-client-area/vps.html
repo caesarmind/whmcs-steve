@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VPS - WHMCS by Apple</title>
     <link rel="stylesheet" href="css/apple-theme.css">
+<link rel="stylesheet" href="css/apple-layout.css?v=23">
     <style>body { display: block; }</style>
 </head>
 <body class="homepage-layout">
+<div data-include="partials/state-chip.html"></div>
 
 <nav class="homepage-nav">
     <div class="homepage-nav-inner">
@@ -124,7 +126,7 @@
                 <div style="position: relative; width: 120px; height: 120px;">
                     <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
                         <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.1)" stroke-width="8"/>
-                        <circle cx="60" cy="60" r="50" stroke="#2997ff" stroke-width="8" stroke-linecap="round" stroke-dasharray="280 314" transform="rotate(-90 60 60)"/>
+                        <circle cx="60" cy="60" r="50" stroke="var(--color-accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="280 314" transform="rotate(-90 60 60)"/>
                     </svg>
                     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center;">
                         <div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em;">55</div>
@@ -340,8 +342,8 @@
                             <span style="font-size: 24px; font-weight: 600; color: var(--color-accent); letter-spacing: -0.02em;">4 <span style="font-size: 13px; font-weight: 400; color: #6e6e73;">vCPU</span></span>
                         </div>
                         <div style="background: #e8e8ed; height: 10px; border-radius: 5px; overflow: hidden;">
-                            <div style="width: 50%; height: 100%; background: linear-gradient(90deg, #0071e3, #2997ff); border-radius: 5px; position: relative;">
-                                <div style="position: absolute; right: -6px; top: -3px; width: 16px; height: 16px; background: #fff; border: 2px solid #0071e3; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.15);"></div>
+                            <div style="width: 50%; height: 100%; background: linear-gradient(90deg, var(--color-accent), var(--color-accent)); border-radius: 5px; position: relative;">
+                                <div style="position: absolute; right: -6px; top: -3px; width: 16px; height: 16px; background: #fff; border: 2px solid var(--color-accent); border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.15);"></div>
                             </div>
                         </div>
                         <div style="display: flex; justify-content: space-between; font-size: 10px; color: #a1a1a6; margin-top: 4px;"><span>1</span><span>2</span><span>4</span><span>8</span></div>
@@ -563,5 +565,6 @@
 </footer>
 
 <script src="js/apple-theme.js"></script>
+<script src="js/apple-layout.js?v=23"></script>
 </body>
 </html>

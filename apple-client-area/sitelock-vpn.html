@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SiteLock VPN - WHMCS by Apple</title>
     <link rel="stylesheet" href="css/apple-theme.css">
+<link rel="stylesheet" href="css/apple-layout.css?v=23">
     <style>body { display: block; }</style>
 </head>
 <body class="homepage-layout">
+<div data-include="partials/state-chip.html"></div>
 
 <nav class="homepage-nav"><div class="homepage-nav-inner">
     <a href="index.html" class="nav-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg></a>
@@ -41,7 +43,7 @@
                     <div style="font-size: 9px; text-align: center; color: #6e6e73;">Mobile</div>
                 </div>
                 <div style="position: relative;">
-                    <div style="width: 80px; height: 80px; background: #0071e3; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0, 113, 227, 0.3);">
+                    <div style="width: 80px; height: 80px; background: var(--color-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px color-mix(in srgb, var(--color-accent) 30%, transparent);">
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
                     </div>
                 </div>
@@ -138,12 +140,12 @@
                     </div>
                     <div style="display: flex; justify-content: center; margin: 6px 0;">
                         <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                            <div style="width: 2px; height: 16px; background: linear-gradient(180deg, transparent, #0071e3); border-radius: 2px;"></div>
-                            <div style="width: 42px; height: 42px; background: #0071e3; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 2px; height: 16px; background: linear-gradient(180deg, transparent, var(--color-accent)); border-radius: 2px;"></div>
+                            <div style="width: 42px; height: 42px; background: var(--color-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                             </div>
                             <div style="font-size: 10px; font-weight: 600; color: var(--color-accent);">VPN</div>
-                            <div style="width: 2px; height: 16px; background: linear-gradient(180deg, #0071e3, transparent); border-radius: 2px;"></div>
+                            <div style="width: 2px; height: 16px; background: linear-gradient(180deg, var(--color-accent), transparent); border-radius: 2px;"></div>
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; border-radius: 12px;">
@@ -204,7 +206,7 @@
                             <div style="width: 56px; height: 56px; background: rgba(255,255,255,0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="#1d1d1f"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                             </div>
-                            <div style="position: absolute; bottom: 8px; left: 10px; right: 10px; height: 3px; background: rgba(255,255,255,0.25); border-radius: 2px;"><div style="width: 40%; height: 100%; background: #0071e3; border-radius: 2px;"></div></div>
+                            <div style="position: absolute; bottom: 8px; left: 10px; right: 10px; height: 3px; background: rgba(255,255,255,0.25); border-radius: 2px;"><div style="width: 40%; height: 100%; background: var(--color-accent); border-radius: 2px;"></div></div>
                         </div>
                         <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
@@ -243,7 +245,7 @@
             <div class="feat-icon green"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg></div>
             <h4>Android</h4>
             <p style="font-size: 12px;">Play Store</p>
-            <span style="position: absolute; top: 12px; right: 12px; font-size: 9px; background: #0071e3; color: #fff; padding: 2px 7px; border-radius: 10px; font-weight: 600;">NEW</span>
+            <span style="position: absolute; top: 12px; right: 12px; font-size: 9px; background: var(--color-accent); color: #fff; padding: 2px 7px; border-radius: 10px; font-weight: 600;">NEW</span>
         </div>
         <div class="hp-feature-card" style="align-items: center; text-align: center;">
             <div class="feat-icon orange"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M21.12 12.2c-.07-.56-.22-1.1-.44-1.62-.35-.85-.88-1.61-1.53-2.25-.76-.74-1.67-1.3-2.66-1.66-.53-.19-1.09-.32-1.66-.38-.4-.04-.8-.05-1.2-.04-.57.02-1.13.1-1.69.24-1.69.42-3.18 1.41-4.22 2.79-.63.84-1.1 1.81-1.37 2.83-.27 1.02-.35 2.09-.23 3.14.15 1.32.6 2.6 1.32 3.71.83 1.29 2 2.33 3.38 2.98 1.26.59 2.64.86 4.01.78 1.48-.08 2.92-.55 4.15-1.36 1.29-.85 2.32-2.05 2.95-3.46.28-.64.48-1.32.57-2.01.12-.92.13-1.85.03-2.77-.03-.23-.07-.45-.11-.67zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></div>
@@ -358,5 +360,6 @@
 </footer>
 
 <script src="js/apple-theme.js"></script>
+<script src="js/apple-layout.js?v=23"></script>
 </body>
 </html>
