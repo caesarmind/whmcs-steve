@@ -1,15 +1,22 @@
 <?php
 /**
- * Variant metadata for homepage/default -- the Apple-style marketing landing
- * that has shipped as the active homepage all along. Unchanged.
+ * Variant metadata for homepage/default -- displayed as "Modern", the full
+ * marketing landing that ships as the active homepage. The DIRECTORY stays
+ * `default`: the name is only a label, and renaming the dir would orphan every
+ * stored `variant = 'default'` row.
  *
  * Read by Template::getPageVariants() (admin variant cards) and by
  * Hooks::resolveCurrentPage() at render time, both of which look for
  * core/pages/{page}/{variant}/{variant}.php -- NOT pageoption.php, which
  * nothing in the addon reads. Page options live in ../page.php
- * 'supportedOptions'. (The old default/pageoption.php was dropped for exactly
- * that reason: its declared settings never reached the admin UI. 'portal' still
- * has one and therefore still shows a bare, description-less admin card.)
+ * 'supportedOptions'.
+ *
+ * The description is fact-checked against default.tpl's actual sections:
+ * hp-hero (+ domain search), hp-stats-strip, the iso* grid, the wl* white-label
+ * duo, hp-feature-columns (col1-3), hp-pricing-segmented (+ hp-cat-rows, live
+ * product groups), hp-announce-grid (newsTitle -- ANNOUNCEMENTS, not reviews:
+ * the old text claimed a reviews section this template has never had), and
+ * hp-cta-immersive.
  *
  * NOTE for whoever edits default.tpl next: it reads its toggles as
  * $hadrian.pages.homepage.config.*, and resolveCurrentPage builds no 'config'
@@ -18,7 +25,7 @@
  * removed homepage/simple variant did it correctly and is in git history).
  */
 return [
-    'name'        => 'Marketing landing',
-    'description' => 'The full Apple-style landing: hero + domain search, trust stats, isolation grid, white-label tools, audience columns, pricing, reviews and a closing CTA.',
+    'name'        => 'Modern',
+    'description' => 'The full marketing landing: hero with domain search, trust stats, the isolation grid, white-label tools, audience columns, live product-group pricing, latest announcements and a closing call to action.',
     'fullPage'    => false,
 ];
