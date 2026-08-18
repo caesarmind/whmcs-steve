@@ -551,6 +551,13 @@
         .mt-field[hidden] { display: none !important; }
         .mt-hostname-grid { display: grid; grid-template-columns: 1fr 140px 1fr; gap: 12px; max-width: 520px; }
         @media (max-width: 640px) { .mt-hostname-grid { grid-template-columns: 1fr; } }
+        /* Worked example of what the three fields above will actually produce.
+           The field named "Subdomain zone" lands in the MIDDLE of the result --
+           the random block always leads -- and no arrangement of labels makes
+           that as clear as showing the string. */
+        .mt-hostname-preview { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.5; color: var(--mt-text); background: var(--mt-surface-2, var(--mt-bg)); border: 1px solid var(--mt-border); border-radius: 8px; padding: 9px 10px; max-width: 520px; word-break: break-all; }
+        .mt-hostname-preview .mt-hn-rand { color: var(--mt-text-3); }
+        .mt-hostname-preview .mt-hn-zone { color: var(--mt-primary, #0071e3); }
         </style>{/literal}
 
         {* ── 1. Hide Product Nameservers ─────────────────────────────── *}
@@ -652,7 +659,7 @@
             <div class="mt-row mt-row-with-sub" style="border-top:1px solid var(--mt-border); padding-top:14px; margin-top:6px;">
                 <div>
                     <div class="mt-row-label">Use Custom Hostname</div>
-                    <div class="mt-row-help">The hostname is required by WHMCS even when hidden. Off: a random string is used. On: build it from the fields below — <code>&lt;random&gt;&lt;prefix&gt;&lt;suffix&gt;</code> (e.g. <code>a1b2c3.example.com</code>).</div>
+                    <div class="mt-row-help">The hostname is required by WHMCS even when hidden. Off: a random string is used. On: build it from the fields below — <code>&lt;random&gt;.&lt;zone&gt;&lt;domain&gt;</code> (e.g. <code>a1b2c3.srv.example.com</code>). The random block always leads.</div>
                 </div>
                 <label class="mt-toggle">
                     <input type="checkbox" name="op_custom_hostname" data-toggle-target="op-customhost-fields"{if $opCustomHostname} checked{/if}>
@@ -660,21 +667,33 @@
                 </label>
             </div>
             <div class="mt-row-sub" id="op-customhost-fields"{if !$opCustomHostname} hidden{/if}>
+                {* Labels describe POSITION IN THE RESULT, not the storage keys.
+                   The keys stay op_custom_hostname_prefix / _suffix for Lagom
+                   parity and so no stored value has to migrate, but "Prefix"
+                   was a label that lied: the value lands in the MIDDLE, after
+                   the random block (see the assembly in the cart's
+                   configureproduct.tpl). Lagom's own field tooltip admits the
+                   same thing -- "Shown at the middle of the generated hostname"
+                   -- while still calling the field Prefix. *}
                 <div class="mt-hostname-grid">
                     <div>
-                        <label class="mt-field-label" for="op-host-prefix">Prefix</label>
-                        <input class="mt-input" type="text" id="op-host-prefix" name="op_custom_hostname_prefix" value="{$opCustomHostnamePrefix|escape}" placeholder="(none)">
+                        <label class="mt-field-label" for="op-host-prefix">Subdomain zone</label>
+                        <input class="mt-input" type="text" id="op-host-prefix" name="op_custom_hostname_prefix" value="{$opCustomHostnamePrefix|escape}" placeholder="srv">
                     </div>
                     <div>
                         <label class="mt-field-label" for="op-host-interfix">Random length</label>
                         <input class="mt-input mt-input--sm" type="number" id="op-host-interfix" name="op_custom_hostname_interfix" min="8" max="50" value="{$opCustomHostnameInterfix}">
                     </div>
                     <div>
-                        <label class="mt-field-label" for="op-host-suffix">Suffix</label>
+                        <label class="mt-field-label" for="op-host-suffix">Domain</label>
                         <input class="mt-input" type="text" id="op-host-suffix" name="op_custom_hostname_suffix" value="{$opCustomHostnameSuffix|escape}" placeholder=".example.com">
                     </div>
                 </div>
-                <p class="mt-field-help" style="margin:8px 0 14px;">Random length is the count of random characters at the start (8–50).</p>
+                <p class="mt-field-help" style="margin:8px 0 14px;">The random block leads the hostname (8&ndash;50 characters). The zone becomes its own label after it, and the domain closes it. Leave the zone and the domain both empty and your company name is used as the domain.</p>
+                <div class="mt-field" style="margin-bottom:14px;">
+                    <label class="mt-field-label" for="op-host-preview">Example hostname</label>
+                    <div class="mt-hostname-preview" id="op-host-preview" role="status" aria-live="polite"></div>
+                </div>
                 <div class="mt-field" style="margin-bottom:0;">
                     <label class="mt-field-label">Random character set</label>
                     <div class="mt-subnav-checks">
@@ -1059,6 +1078,93 @@
         sel.addEventListener('change', sync);
         sync();
     });
+})();
+
+// Order Process: live example of the generated hostname.
+//
+// This MIRRORS two pieces of real behaviour and must be changed with them:
+//   1. hadrian_cart/configureproduct.tpl -- a non-empty zone becomes its own
+//      label (a dot is prepended), the random block always leads, and when the
+//      zone and domain are both empty the tail falls back to the company slug.
+//   2. SettingsController::saveOrderProcess() -- a domain typed without a
+//      leading dot gets one at save time, and the random length is clamped to
+//      8-50. Previewing the RAW field values would show a string the install
+//      will never generate, which is worse than no preview at all.
+//
+// The sample re-rolls on every keystroke on purpose: the random block is
+// genuinely different for every order, and a frozen sample would read as a
+// fixed value.
+(function () {
+    var out = document.getElementById('op-host-preview');
+    if (!out) return;
+    var zoneEl = document.getElementById('op-host-prefix');
+    var lenEl  = document.getElementById('op-host-interfix');
+    var domEl  = document.getElementById('op-host-suffix');
+    if (!zoneEl || !lenEl || !domEl) return;
+
+    var UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var LOWER = 'abcdefghijklmnopqrstuvwxyz';
+    var NUM   = '0123456789';
+
+    function charBoxes() {
+        return document.querySelectorAll('input[name="op_custom_hostname_chars[]"]');
+    }
+
+    // Same rule as the cart: none ticked, or all three, means all three.
+    function pool() {
+        var picked = [];
+        Array.prototype.forEach.call(charBoxes(), function (cb) {
+            if (cb.checked) { picked.push(cb.value); }
+        });
+        if (picked.length === 0 || picked.length === 3) { return UPPER + LOWER + NUM; }
+        var chars = '';
+        if (picked.indexOf('upper') !== -1)   { chars += UPPER; }
+        if (picked.indexOf('lower') !== -1)   { chars += LOWER; }
+        if (picked.indexOf('numbers') !== -1) { chars += NUM; }
+        return chars === '' ? UPPER + LOWER + NUM : chars;
+    }
+
+    function sample(len) {
+        var chars = pool();
+        var s = '';
+        for (var i = 0; i < len; i++) {
+            s += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return s;
+    }
+
+    function span(cls, text) {
+        var el = document.createElement('span');
+        el.className = cls;
+        el.textContent = text;                 // never innerHTML: these are admin-typed
+        return el;
+    }
+
+    function render() {
+        var len = parseInt(lenEl.value, 10);
+        if (isNaN(len) || len < 8)  { len = 8; }
+        if (len > 50) { len = 50; }
+
+        var zone = zoneEl.value.replace(/^\s+|\s+$/g, '');
+        var dom  = domEl.value.replace(/^\s+|\s+$/g, '');
+        if (dom !== '' && dom.charAt(0) !== '.') { dom = '.' + dom; }
+
+        var head = zone === '' ? '' : '.' + zone;
+        var tail = head + dom;
+        var fallback = (tail === '');
+        if (fallback) { dom = '.<your company>.com'; }
+
+        out.textContent = '';
+        out.appendChild(span('mt-hn-rand', sample(len)));
+        if (head !== '') { out.appendChild(span('mt-hn-zone', head)); }
+        out.appendChild(span('mt-hn-dom', dom));
+    }
+
+    ['input', 'change'].forEach(function (evt) {
+        [zoneEl, lenEl, domEl].forEach(function (el) { el.addEventListener(evt, render); });
+    });
+    Array.prototype.forEach.call(charBoxes(), function (cb) { cb.addEventListener('change', render); });
+    render();
 })();
 </script>
 {/literal}
