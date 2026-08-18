@@ -19,14 +19,16 @@ final class LicenseController extends AbstractController
 
     public function indexAction(): string
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['license_key'])) {
+        $saved = $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['license_key']);
+        if ($saved) {
             Configuration::setValue(self::CFG_KEY, trim((string) $_POST['license_key']));
             // Drop the cached front-end result so the site re-checks the new key.
             @unlink(sys_get_temp_dir() . '/hn_theme_license.json');
         }
 
         $key    = (string) Configuration::getValue(self::CFG_KEY);
-        $result = LicenseCheck::status($key);
+        // A save is "Save & check": bypass the status cache for the fresh answer.
+        $result = LicenseCheck::status($key, fresh: $saved);
 
         return $this->view('license/index', [
             'key'    => $key,
