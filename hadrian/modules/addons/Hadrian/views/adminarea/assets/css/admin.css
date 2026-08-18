@@ -106,6 +106,17 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 
 .mt-wrap a { color: var(--mt-primary); text-decoration: none; }
 .mt-wrap a:hover { color: var(--mt-primary-h); }
+/* An <a> that is drawn as a button keeps the BUTTON's ink, not the link ink.
+   The two rules above are (0,2,0) and the .mt-btn-* colours further down are
+   (0,1,0), so every anchor-button took the link colour instead of its own --
+   which on .mt-btn-primary meant --mt-primary text on a --mt-primary fill: a
+   filled pill with no readable label ("Generate now" on Sitemap, "Seed the 4
+   preset menus" on Menu). Secondary and ghost anchors were merely the wrong
+   colour. Scoped to anchors so real links are untouched. */
+.mt-wrap a.mt-btn-primary, .mt-wrap a.mt-btn-primary:hover,
+.mt-wrap a.mt-btn-danger,  .mt-wrap a.mt-btn-danger:hover  { color: #fff; }
+.mt-wrap a.mt-btn-secondary, .mt-wrap a.mt-btn-secondary:hover { color: var(--mt-text); }
+.mt-wrap a.mt-btn-ghost, .mt-wrap a.mt-btn-ghost:hover { color: var(--mt-link); }
 .mt-wrap code { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; background: var(--mt-surface-2); padding: 2px 7px; border-radius: 6px; color: var(--mt-text-2); }
 .mt-wrap h1, .mt-wrap h2, .mt-wrap h3, .mt-wrap h4 { color: var(--mt-text); }
 .mt-text-3 { color: var(--mt-text-3); }
