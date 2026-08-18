@@ -98,7 +98,14 @@ final class PageRegistry
             'knowledgebase' => 'knowledgebase.php',
             'serverstatus'  => 'serverstatus.php',
             'contact'       => 'contact.php',
-            'cart'          => 'cart.php',
+            // The storefront entry point. Keys here are PAGE SLUGS, and the
+            // order form has no core/pages dir — its slugs come from
+            // Template::ORDER_PAGES, where cart.php's landing view is
+            // 'products'. (This entry was keyed 'cart' for a while, which
+            // matches nothing and silently seeded no URL.) The per-group
+            // /store/<slug> pages are the sitemap's Product Groups source,
+            // same as Lagom — this row is just the group-less entry.
+            'products'      => 'cart.php',
             'affiliates'    => 'affiliates.php',
         ];
         return $known[$page] ?? null;
