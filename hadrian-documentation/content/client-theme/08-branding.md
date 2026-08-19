@@ -1,6 +1,6 @@
 ---
 title: Branding
-group: Customization
+group: Configuration
 icon: palette
 lead: Put your logo, favicon and company identity into the client area. Five image slots, a footer description and six social links - no template editing, and nothing to regenerate afterwards.
 ---

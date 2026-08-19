@@ -1,0 +1,116 @@
+name: Deploy documentation
+
+# Its own file for the same reason landing.yml is: `paths:` applies to a whole
+# workflow, not to one job, so folding this into another file would rebuild and
+# re-upload the docs on every theme push.
+#
+# Destination is the docs SUBDOMAIN's own document root, a sibling of the
+# landing root -- not a /docs subfolder of it, and not main.yml's REMOTE_BASE
+# (the WHMCS billing install). Links are absolute and baked at build time, so
+# the build below MUST carry the matching --origin/--base flags: a build with
+# the defaults points every href at hadrianthegreat.com/docs and would 404
+# across the whole subdomain while still deploying "successfully".
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'hadrian-documentation/content/**'      # the articles
+      - 'hadrian-documentation/assets/**'       # docs.css + docs.js
+      - 'hadrian-documentation/html/apple-theme.css'        # tokens, copied into dist
+      - 'hadrian-documentation/html/caesar-silhouette.png'  # the mark, likewise
+      - 'scripts/build-docs.mjs'
+      - 'scripts/check-docs.mjs'
+      - 'scripts/test-docs-parser.mjs'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    env:
+      REMOTE_HOST: cp2.de.namespace.life
+      REMOTE_USER: whymege
+      REMOTE_PORT: '22'
+      # The subdomain's document root. A sibling of the landing's
+      # /home/whymege/hadrianthegreat.com, so the two deploys never touch each
+      # other's files.
+      REMOTE_DOCS: /home/whymege/docs.hadrianthegreat.com
+      DOCS_URL: https://docs.hadrianthegreat.com/
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # This NEVER ships a committed dist/. dist/ is gitignored, and whatever a
+      # developer last built locally carries whatever base they were previewing
+      # with. Building here, with the flags that match REMOTE_DOCS, is the only
+      # way the baked-in links are guaranteed correct.
+      #
+      # --base= (empty) because the subdomain serves from its root; --origin
+      # because canonicals, OG urls and sitemap.xml embed the full address.
+      - name: Build
+        run: |
+          node scripts/build-docs.mjs --origin=https://docs.hadrianthegreat.com --base=
+          test -f hadrian-documentation/dist/index.html \
+            || { echo "::error::build produced no dist/index.html"; exit 1; }
+
+      # Gates, not decoration. check-docs catches dead links and un-parsed
+      # markdown; test-docs-parser covers the cases that used to hang the build
+      # outright. A failure here must not reach a customer.
+      - name: Validate
+        run: |
+          node scripts/check-docs.mjs
+          node scripts/test-docs-parser.mjs
+
+      # The built pages hardcode their base. If it ever drifts from what
+      # REMOTE_DOCS serves, the site 404s on every link while still deploying
+      # "successfully", so it is worth one grep. For a subdomain root the
+      # correct base is the empty string.
+      - name: Confirm the base path matches the destination
+        run: |
+          BASE=$(grep -o 'DOCS_BASE = "[^"]*"' hadrian-documentation/dist/client-theme/introduction/index.html | head -1 | sed 's/.*"\(.*\)"/\1/')
+          echo "built base: '${BASE}'  ->  ${REMOTE_DOCS} (${DOCS_URL})"
+          if [ "$BASE" != "" ]; then
+            echo "::error::pages were built for base '${BASE}' but ${DOCS_URL} serves from the subdomain root"
+            exit 1
+          fi
+          SITEMAP_ORIGIN=$(grep -o 'https://[^/<]*' hadrian-documentation/dist/sitemap.xml | head -1)
+          echo "sitemap origin: ${SITEMAP_ORIGIN}"
+          if [ "$SITEMAP_ORIGIN" != "https://docs.hadrianthegreat.com" ]; then
+            echo "::error::sitemap points at ${SITEMAP_ORIGIN}, not the docs subdomain"
+            exit 1
+          fi
+          du -sh hadrian-documentation/dist
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.CPANEL }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          # Non-fatal, as in landing.yml and main.yml: the upload below uses
+          # StrictHostKeyChecking=no, so known_hosts is never consulted.
+          ssh-keyscan -p "$REMOTE_PORT" -t ed25519 "$REMOTE_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Upload to docs.hadrianthegreat.com
+        run: |
+          SSH="ssh -i $HOME/.ssh/id_ed25519 -p $REMOTE_PORT -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST"
+
+          # The whole tree every time: dist/ is regenerated from scratch, so
+          # "only what changed" would be all of it anyway.
+          # `-C dist .` strips the wrapper, so dist/index.html lands as
+          # index.html inside REMOTE_DOCS rather than dist/index.html.
+          #
+          # Extract is additive. A renamed article leaves its old directory on
+          # the server, still reachable and still in nobody's sitemap. That is
+          # the same trade landing.yml makes; switch to `rsync -az --delete`
+          # once you have watched this land in the right directory at least
+          # once, and never before.
+          tar czf - -C hadrian-documentation/dist . \
+            | $SSH "mkdir -p '$REMOTE_DOCS' && tar xzpf - -C '$REMOTE_DOCS' && echo '✅ docs upload complete'"
+
+      - name: Where it landed
+        run: echo "::notice::Deployed to ${DOCS_URL}"

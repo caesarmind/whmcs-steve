@@ -37,24 +37,30 @@ own process with a timeout. Run it after any edit to `render()` or `inline()`.
 
 ### Where it will be served
 
-Links are absolute, so the base path is baked in at build time. The default is
-`hadrianthegreat.com/docs`:
+**Production is `docs.hadrianthegreat.com`, deployed by
+`.github/workflows/docs.yml` on every push to main** that touches the content,
+the assets or the builder. The workflow builds with the right flags itself and
+gates on check-docs + the parser tests, so nothing needs building locally to
+release -- push and it ships.
+
+Links are absolute, so the base path is baked in at build time. The flag-less
+default (`hadrianthegreat.com/docs`) is legacy -- production builds are:
 
 ```bash
-node scripts/build-docs.mjs                    # -> /docs
-node scripts/build-docs.mjs --base=            # -> served from a root
 node scripts/build-docs.mjs --origin=https://docs.hadrianthegreat.com --base=
 ```
 
-**Previewing locally needs `--base=`**, because the preview server roots at
-`dist/` and there is no `/docs` prefix in front of it:
+**Previewing locally needs `--base=`** too, because the preview server roots at
+`dist/`:
 
 ```bash
 node scripts/build-docs.mjs --base=
 ```
 
-then start the `hadrian-docs-built` preview (port 3100). Rebuild with no flag
-before uploading, or every link will point at the wrong place.
+then start the `hadrian-docs-built` preview (port 3100). Since the subdomain
+serves from a root as well, a preview build differs from a production one only
+in the origin baked into canonicals and the sitemap -- never hand-upload a
+preview build; let the Action do it.
 
 > On Windows the preview server holds handles on files it has served. The build
 > retries through that, but if it reports a locked file, stop the preview first.

@@ -1,6 +1,6 @@
 ---
 title: Menu Manager
-group: Customization
+group: Configuration
 icon: puzzle
 lead: Build the navigation itself - what appears in it, in what order, and who sees it. Menus are separate from layouts: the layout decides where navigation sits, the menu decides what is in it.
 ---

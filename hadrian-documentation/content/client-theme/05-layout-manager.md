@@ -1,6 +1,6 @@
 ---
 title: Layout Manager
-group: Customization
+group: Configuration
 icon: layout
 lead: Choose the shell your client area sits in - where navigation lives, how the footer is built, and how wide content runs. Guests and signed-in clients can be given different layouts, and any page can override the lot.
 ---

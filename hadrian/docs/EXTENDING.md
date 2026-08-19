@@ -157,7 +157,21 @@ cp templates/hadrian/core/lang/english.php templates/hadrian/core/lang/spanish.p
 # Edit each value. Don't change keys.
 ```
 
-`Helpers\Lang::factory()` picks the file matching `$_SESSION['Language']`; falls back to English when missing.
+`Hooks::loadLanguage()` (the addon, Service/Hooks.php) builds `$hadrianLang`
+as a three-layer per-key merge, later layers winning:
+
+1. `core/lang/english.php` — the full shipped key set
+2. `core/lang/<language>.php` — may be PARTIAL; missing keys fall back to
+   English key-by-key
+3. `core/lang/overrides/<language>.php` — buyer-owned, never shipped, so
+   update-safe; can also mint brand-new groups/keys
+
+`<language>` is WHMCS's `$vars['language']`, lowercased and validated against
+`/^[a-z][a-z0-9_-]*$/` (it is interpolated into a path). Overlay files load
+inside try/catch — a syntax error means "layer ignored", not a white screen.
+Customer-facing doc: `hadrian-documentation/content/client-theme/08b-languages.md`.
+Verify with `php .dashbuild/check-lang-loading.php` (18 assertions on the real
+loader).
 
 ## Add a hook
 
@@ -212,15 +226,23 @@ Trigger from JS: `fetch('/clientarea.php', { method: 'POST', body: 'mtAction=get
 
 ## Override a partial without forking
 
-Buyers do this. Document it in your customer-facing readme:
+Buyers do this. The customer-facing doc is
+`hadrian-documentation/content/client-theme/07b-customize-pages.md` — keep the
+two lists in step. The REAL override points, verified against the shipped tpls
+(grep `overwrites` across `templates/hadrian/**/*.tpl` before adding to this
+list — an earlier revision of this file claimed a header.tpl override that
+never existed):
 
 ```
-templates/hadrian/overwrites/header.tpl       # overrides header.tpl
-templates/hadrian/includes/common/overwrites/logo.tpl   # overrides includes/common/logo.tpl
-templates/hadrian/core/pages/clientareahome/overwrites/  # not yet supported by dispatcher; document if you add it
+templates/hadrian/overwrites/footer.tpl                  # replaces footer.tpl (footer.tpl:20)
+templates/hadrian/includes/common/overwrites/logo.tpl    # replaces the logo block (includes/common/logo.tpl:15)
+templates/hadrian/core/pages/<page>/overwrites/overwrites.tpl  # replaces the page body, wins over every
+                                                               # variant (Hooks::resolveCurrentPage)
 ```
 
-The overrides escape hatch is per-file: each tpl that includes another via `{include}` checks for an `overwrites/` sibling first.
+There is NO override point for header.tpl. The head, the SEO tags and the
+layout dispatch are theme-managed; the supported way to change their output is
+the admin (Pages SEO, Layouts, Styles).
 
 ## When something breaks
 

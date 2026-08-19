@@ -1,6 +1,6 @@
 ---
 title: Style Manager
-group: Customization
+group: Configuration
 icon: palette
 lead: Recolour and restyle the whole client area from one screen. Pick a preset, generate a palette from a single brand colour, or edit any of the 60 design tokens by hand - no template files, no CSS knowledge required.
 ---

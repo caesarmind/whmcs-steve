@@ -1,6 +1,6 @@
 ---
 title: Page Templates
-group: Customization
+group: Configuration
 slug: page-templates
 icon: book
 lead: The three pages that ship more than one design, what each one renders, every setting they offer, and the block builder the dashboards share.
@@ -403,5 +403,5 @@ Those pages are still configurable: SEO, visibility, sub-navigation and per-page
 layout overrides all live in
 [Page Manager](/client-theme/page-manager/#page-settings). If you want to change
 what one of them actually renders, you can
-[add a template of your own](/client-theme/page-manager/#adding-your-own-page) or
+[add a template of your own](/client-theme/customize-pages/#add-a-template-to-a-page) or
 [replace the page outright](/client-theme/page-manager/#replacing-a-page-you-did-not-write).
