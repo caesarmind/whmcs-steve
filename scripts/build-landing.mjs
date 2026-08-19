@@ -23,6 +23,7 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 // HERE landed in Node 20; this has to run on 18 too
@@ -148,6 +149,22 @@ const rm = (p) => {
 const mk = (p) => fs.mkdirSync(p, { recursive: true });
 const copy = (from, to) => { mk(path.dirname(to)); fs.cpSync(from, to, { recursive: true }); };
 const kb = (n) => `${(n / 1024).toFixed(0)} KB`;
+/* Cache-bust the two assets whose NAMES never change. The server sends no
+   Cache-Control and no ETag -- only Last-Modified -- so a returning browser is
+   free to keep serving its stored copy of assets/index.js after a deploy has
+   already replaced it. That is why a change lands for a first-time visitor and
+   appears not to land for anyone who has been here before.
+   A query stamp, not a hashed filename: the upload untars over the destination
+   without deleting, so hashed names would pile up on the server forever. */
+const stamp = (rel) => {
+  // the compiled JS is already in OUT when the HTML is written; the CSS is
+  // copied from SRC further down, so hash whichever one exists
+  const out = path.join(OUT, rel);
+  const srcFile = path.join(SRC, rel.replace(/^assets\//, ''));
+  const f = fs.existsSync(out) ? out : srcFile;
+  if (!fs.existsSync(f)) return rel;
+  return `${rel}?v=${crypto.createHash('sha1').update(fs.readFileSync(f)).digest('hex').slice(0, 8)}`;
+};
 const sizeOf = (p) => fs.statSync(p).size;
 
 /* ── 1. the compiled app ──────────────────────────────────────────────────
@@ -190,12 +207,12 @@ function rewriteHtml(html, jsName, outName) {
   html = html
     .replace(RE_CDN, '')
     .replace(RE_BABEL, '')
-    .replace(/<link rel="stylesheet" href="([^"]+)">/g, '<link rel="stylesheet" href="assets/$1">')
+    .replace(/<link rel="stylesheet" href="([^"]+)">/g, (_m, href) => `<link rel="stylesheet" href="${stamp('assets/' + href)}">`)
     .replace('</head>', `${seoTags(outName, html, heroCopy(html))}
 <script>window.HADRIAN_PATHS = ${JSON.stringify(PATHS)};</script>
 </head>`)
     .replace('<div id="root"></div>', `<div id="root">${staticHero(heroCopy(html))}</div>`)
-    .replace('</body>', `${scripts}\n<script src="assets/${jsName}"></script>\n</body>`);
+    .replace('</body>', `${scripts}\n<script src="${stamp(`assets/${jsName}`)}"></script>\n</body>`);
   return applyRenames(html);
 }
 
