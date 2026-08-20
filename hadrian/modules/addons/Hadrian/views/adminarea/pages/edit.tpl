@@ -35,7 +35,7 @@
 
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">{$pageGroup|escape}</div>
-    <h1 class="mt-page-title">{$pageLabel|escape}</h1>
+    <h1 class="mt-page-title">{$pageLabel|escape} {include file="includes/doclink.tpl" article="page-manager"}</h1>
     {if $pageDescription}
         <p class="mt-page-subtitle">{$pageDescription|escape}</p>
     {/if}
@@ -305,8 +305,7 @@
             <div class="mt-pd-rows">
                 <div class="mt-row">
                     <div>
-                        <div class="mt-row-label">Visibility</div>
-                        <div class="mt-row-help">Disabled pages return 404 &mdash; signed-in admins still see them. Auth-only pages redirect signed-out visitors to login. Sign-in, checkout and error pages are never blocked.</div>
+                        <div class="mt-row-label mt-tip-line">Visibility {include file="includes/tip.tpl" text="Disabled pages return 404 - signed-in admins still see them. Auth-only pages redirect signed-out visitors to login. Sign-in, checkout and error pages are never blocked." article="page-manager" anchor="visibility"}</div>
                     </div>
                     <select class="mt-select" name="visibility">
                         <option value="public"   {if $visibility == 'public'}selected{/if}>Public</option>
@@ -410,7 +409,7 @@
                         </div>
                         <div class="mt-field mt-seo-title">
                             <div class="mt-field-row">
-                                <span class="mt-tip-line"><label class="mt-field-label" for="seo-title-{$lcode|escape}">SEO title</label>{include file="includes/tip.tpl" text="The page title tag, and the headline shown in search results. Aim for 50-60 characters; longer titles get truncated."}</span>
+                                <span class="mt-tip-line"><label class="mt-field-label" for="seo-title-{$lcode|escape}">SEO title</label>{include file="includes/tip.tpl" text="The page title tag, and the headline shown in search results. Aim for 50-60 characters; longer titles get truncated." article="page-manager" anchor="title-description-and-social-image"}</span>
                                 <div class="mt-field-tools">
                                     <span class="mt-charcount">{$titleMap[$lcode]|default:''|strlen}/64</span>
                                 </div>
@@ -420,7 +419,7 @@
 
                         <div class="mt-field mt-seo-desc">
                             <div class="mt-field-row">
-                                <span class="mt-tip-line"><label class="mt-field-label" for="seo-desc-{$lcode|escape}">SEO description</label>{include file="includes/tip.tpl" text="The snippet under the title in search results. Keep it under 160 characters. It does not affect ranking, but it drives click-through."}</span>
+                                <span class="mt-tip-line"><label class="mt-field-label" for="seo-desc-{$lcode|escape}">SEO description</label>{include file="includes/tip.tpl" text="The snippet under the title in search results. Keep it under 160 characters. It does not affect ranking, but it drives click-through." article="page-manager" anchor="title-description-and-social-image"}</span>
                                 <div class="mt-field-tools">
                                     <span class="mt-charcount">{$descMap[$lcode]|default:''|strlen}/160</span>
                                 </div>

@@ -25,7 +25,7 @@
 
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
-    <h1 class="mt-page-title">Settings</h1>
+    <h1 class="mt-page-title">Settings {include file="includes/doclink.tpl" article="settings"}</h1>
     <p class="mt-page-subtitle">Theme-wide options. Save to apply.</p>
 </header>
 
@@ -285,6 +285,25 @@
             {assign var=mtIsLangToggle value=($key == 'custom_language_list')}
             {assign var=mtFlagTab value=$flagTabs[$key]|default:'general'}
             {assign var=mtHasSub value=($mtIsLangToggle || $key == 'cart_subnav' || $key == 'website_subnav' || $key == 'service_controls_outside' || $key == 'enable_dark_mode' || $key == 'cookie_box')}
+            {* Per-flag doc anchor. Six flags have their own ### heading in the
+               Settings article; the other six have no individual heading and
+               fall back to their group's ## anchor -- the same one the group
+               head link above already uses, which is correct: it is genuinely
+               all the doc says about that flag. Keyed on $key, not
+               $mtGroup.slug, so a flag's anchor moves with IT if it is ever
+               reassigned to a different group. *}
+            {if $key == 'cookie_box'}{assign var=mtRowAnchor value='cookie-box'}
+            {elseif $key == 'enable_alternate_links'}{assign var=mtRowAnchor value='enable-alternate-links'}
+            {elseif $key == 'capitalize_titles'}{assign var=mtRowAnchor value='section-titles-capitalization'}
+            {elseif $key == 'enable_dynamic_ajax'}{assign var=mtRowAnchor value='enable-dynamic-ajax-loading'}
+            {elseif $key == 'custom_language_list'}{assign var=mtRowAnchor value='custom-language-list'}
+            {elseif $key == 'enable_dark_mode'}{assign var=mtRowAnchor value='enable-dark-mode'}
+            {elseif $key == 'cart_subnav'}{assign var=mtRowAnchor value='cart-layout'}
+            {elseif $key == 'free_label' || $key == 'hide_cycle_discounts'}{assign var=mtRowAnchor value='pricing-display'}
+            {elseif $key == 'topnav_show_icons' || $key == 'website_subnav'}{assign var=mtRowAnchor value='navigation'}
+            {elseif $key == 'service_controls_outside'}{assign var=mtRowAnchor value='appearance'}
+            {else}{assign var=mtRowAnchor value=''}
+            {/if}
             {* data-search carries label + help + the synonym list from
                SettingsController::FLAG_SEARCH_TERMS, so "gdpr" finds Cookie Box
                and "hreflang" finds Enable Alternate Links. Filtering only ever
@@ -293,8 +312,12 @@
                  data-set-row
                  data-search="{$meta[0]|lower|escape} {$meta[1]|lower|escape} {$searchTerms[$key]|default:''|escape}">
                 <div>
-                    <div class="mt-row-label">{$meta[0]|escape}</div>
-                    <div class="mt-row-help">{$meta[1]|escape}</div>
+                    {* Row help used to sit here always-visible; it now lives in
+                       the tip popup instead (icon next to the label), which is
+                       why data-search two blocks up still reads {$meta[1]}
+                       directly rather than off anything in this markup -- the
+                       text moved, the search index over it did not. *}
+                    <div class="mt-row-label mt-tip-line">{$meta[0]|escape} {include file="includes/tip.tpl" text=$meta[1] article="settings" anchor=$mtRowAnchor}</div>
                 </div>
                 <label class="mt-toggle">
                     <input type="checkbox" name="{$key|escape}" {if $mtIsLangToggle}data-toggle-target="mt-language-picker" {/if}{if $key == 'enable_dark_mode'}data-toggle-target="mt-darkmode-sub" {/if}{if $key == 'cookie_box'}data-toggle-target="mt-cookiebox-sub" {/if}{if $values[$key]}checked{/if}>
@@ -576,8 +599,7 @@
         {* ── 1. Hide Product Nameservers ─────────────────────────────── *}
         <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}">
             <div>
-                <div class="mt-row-label">Hide Product Nameservers</div>
-                <div class="mt-row-help">Hide the NS1 Prefix and NS2 Prefix fields shown in the Configure Server section during the product configuration step.</div>
+                <div class="mt-row-label mt-tip-line">Hide Product Nameservers {include file="includes/tip.tpl" text="Hide the NS1 Prefix and NS2 Prefix fields shown in the Configure Server section during the product configuration step." article="settings" anchor="hide-product-nameservers"}</div>
             </div>
             <label class="mt-toggle">
                 <input type="checkbox" name="op_hide_nameservers_enabled" data-toggle-target="op-ns-sub"{if $opHideNs != 'off'} checked{/if}>
@@ -624,8 +646,7 @@
         {* ── 2. Hide Product Hostname (+ custom hostname + hide-on-checkout) ── *}
         <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}">
             <div>
-                <div class="mt-row-label">Hide Product Hostname</div>
-                <div class="mt-row-help">Hide the Hostname and Root Password fields shown in the Configure Server section during the product configuration step.</div>
+                <div class="mt-row-label mt-tip-line">Hide Product Hostname {include file="includes/tip.tpl" text="Hide the Hostname and Root Password fields shown in the Configure Server section during the product configuration step." article="settings" anchor="hide-product-hostname"}</div>
             </div>
             <label class="mt-toggle">
                 <input type="checkbox" name="op_hide_hostname_enabled" data-toggle-target="op-host-sub"{if $opHideHost != 'off'} checked{/if}>
@@ -720,8 +741,7 @@
             {* Hide on Checkout — nested toggle, no sub-fields. *}
             <div class="mt-row" style="border-top:1px solid var(--mt-border); padding-top:14px; margin-top:6px;">
                 <div>
-                    <div class="mt-row-label">Hide on Checkout page</div>
-                    <div class="mt-row-help">Also hide the hostname shown under each product in the cart summary on the checkout step.</div>
+                    <div class="mt-row-label mt-tip-line">Hide on Checkout page {include file="includes/tip.tpl" text="Also hide the hostname shown under each product in the cart summary on the checkout step." article="settings" anchor="hide-product-hostname"}</div>
                 </div>
                 <label class="mt-toggle">
                     <input type="checkbox" name="op_hide_hostname_checkout"{if $opHideHostnameCheckout} checked{/if}>
@@ -733,8 +753,7 @@
         {* ── 3. Enable Password Strength for Root Password Field ──────── *}
         <div class="mt-row{if $tab != 'order'} mt-tab-off{/if}">
             <div>
-                <div class="mt-row-label">Enable Password Strength For Root Password Field</div>
-                <div class="mt-row-help">Show a password-strength meter on the Root Password field during the product configuration step. Weak passwords are rejected server-side.</div>
+                <div class="mt-row-label mt-tip-line">Enable Password Strength For Root Password Field {include file="includes/tip.tpl" text="Show a password-strength meter on the Root Password field during the product configuration step. Weak passwords are rejected server-side." article="settings" anchor="enable-password-strength-for-root-password-field"}</div>
             </div>
             <label class="mt-toggle">
                 <input type="checkbox" name="op_root_pw_strength"{if $opRootPwStrength} checked{/if}>

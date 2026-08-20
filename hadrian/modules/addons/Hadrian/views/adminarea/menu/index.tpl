@@ -2,7 +2,7 @@
 
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
-    <h1 class="mt-page-title">Menu</h1>
+    <h1 class="mt-page-title">Menu {include file="includes/doclink.tpl" article="menu-manager"}</h1>
     <p class="mt-page-subtitle">Build navigation menus and assign them to client / guest audiences.</p>
 </header>
 

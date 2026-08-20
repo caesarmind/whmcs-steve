@@ -2,7 +2,7 @@
 
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
-    <h1 class="mt-page-title">Info</h1>
+    <h1 class="mt-page-title">Info {include file="includes/doclink.tpl" article="introduction"}</h1>
     <p class="mt-page-subtitle">Version and license information for this theme.</p>
 </header>
 

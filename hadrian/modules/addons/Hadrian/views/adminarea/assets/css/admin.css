@@ -579,23 +579,22 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-subhead.mt-tip-line { display: flex; }
 
 /* -- Documentation link ---------------------------------------------------- */
-/* Same pill shape as .mt-pagerow-openlink (Pages list' "Open" link), just
-   muted -- this is a secondary, always-available affordance on every block,
-   not a primary per-row action, so it should not compete with real controls
-   for attention. Markup: includes/doclink.tpl. */
-.mt-doclink { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px;
-    border: 1px solid var(--mt-border); border-radius: 999px; background: var(--mt-surface);
-    color: var(--mt-text-3); font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
-    text-decoration: none; white-space: nowrap; flex-shrink: 0;
-    transition: background .12s ease, border-color .12s ease, color .12s ease; }
-.mt-doclink:hover { background: var(--mt-primary-tint); border-color: var(--mt-primary); color: var(--mt-primary); text-decoration: none; }
-.mt-doclink:focus-visible { outline: 2px solid var(--mt-primary); outline-offset: 1px; }
-.mt-doclink svg { width: 12px; height: 12px; display: block; flex-shrink: 0; }
-/* Inline beside a subhead/tip icon (a card heading, not a full .mt-section-header
-   with room to spare) -- tighter padding so it reads as part of the same small
-   heading row rather than a bigger control glued onto it. */
-.mt-subhead .mt-doclink,
-.mt-tip-line .mt-doclink { padding: 2px 7px; }
+/* Plain text + arrow, not a bordered pill -- a heading-level affordance reads
+   as part of the heading, not as a competing control beside it. Markup:
+   includes/doclink.tpl. Deliberately lowercase ("docs", not "Docs"): next to
+   a title-case heading a same-case label reads as a second heading rather
+   than a quiet aside. */
+.mt-doclink { color: var(--mt-primary); font-size: 13px; font-weight: 600;
+    text-decoration: none; white-space: nowrap; flex-shrink: 0; }
+.mt-doclink:hover { text-decoration: underline; }
+.mt-doclink:focus-visible { outline: 2px solid var(--mt-primary); outline-offset: 2px; border-radius: 2px; }
+/* Same glyph technique as .mt-tip-link -- one arrow, defined once, so the
+   page-title link, every block link and every tip's "Learn more" all draw
+   from the same mark instead of three copies of an inline SVG. */
+.mt-doclink::after { content: '\2197'; display: inline-block; margin-left: 2px; }
+/* Beside a page title (h1) the label can afford to be a touch smaller so it
+   reads as a footnote to "Settings", not a second word in the title. */
+.mt-page-title .mt-doclink { font-size: 15px; vertical-align: middle; }
 /* .mt-section-header is flex+space-between already; margin-left:auto is not
    needed there. But .mt-set-group-head (Settings' group heading) is a bare
    div with no such layout, so the link would otherwise sit flush against the
@@ -614,6 +613,16 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
     border-left: 1px solid var(--mt-border); border-top: 1px solid var(--mt-border); }
 .mt-tip-pop[data-side="bottom"] .mt-tip-arrow { top: -5px; transform: rotate(45deg); }
 .mt-tip-pop[data-side="top"]    .mt-tip-arrow { bottom: -5px; transform: rotate(225deg); }
+/* "Learn more" -- present only when the tip carries a doc link (tip.tpl's
+   article/anchor params); footer.tpl's controller toggles [hidden]. A thin
+   rule separates it from the tip copy above so it reads as a second, optional
+   affordance rather than a continuation of the same sentence. */
+.mt-tip-link { display: block; margin-top: 7px; padding-top: 7px;
+    border-top: 1px solid var(--mt-border); font-size: 12px; font-weight: 600;
+    color: var(--mt-primary); text-decoration: none; }
+.mt-tip-link:hover { text-decoration: underline; }
+.mt-tip-link[hidden] { display: none; }
+.mt-tip-link::after { content: '\2197'; display: inline-block; margin-left: 3px; }
 @media (forced-colors: active) {
     .mt-tip-pop { border: 1px solid CanvasText; }
     .mt-tip[data-open] { forced-color-adjust: none; outline: 1px solid Highlight; }

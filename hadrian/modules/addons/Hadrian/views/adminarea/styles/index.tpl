@@ -1,7 +1,7 @@
 {include file="includes/header.tpl"}
 
 <header class="mt-page-header">
-    <h1 class="mt-page-title">Styles</h1>
+    <h1 class="mt-page-title">Styles {include file="includes/doclink.tpl" article="styles"}</h1>
     <p class="mt-page-subtitle">
         Pick the active style preset for <strong>{$template|escape}</strong>. Each style carries its own
         light <em>and</em> dark colors — edit them with the Light/Dark toggle in a style's

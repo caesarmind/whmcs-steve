@@ -2,7 +2,7 @@
 
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
-    <h1 class="mt-page-title">Tools</h1>
+    <h1 class="mt-page-title">Tools {include file="includes/doclink.tpl" article="addon" anchor="sections"}</h1>
     <p class="mt-page-subtitle">Operational utilities — cache flush, pages discovery, license refresh.</p>
 </header>
 

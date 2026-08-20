@@ -111,6 +111,7 @@
         <h1 class="mt-page-title">
             <input type="text" name="name" class="mt-page-title-input" value="{$menu->name|escape}">
             <span class="mt-page-meta">/ Menu editor</span>
+            {include file="includes/doclink.tpl" article="menu-manager"}
         </h1>
         <p class="mt-page-subtitle">Expand a row to edit its properties. Drag the grip to reorder, or use the arrows on touch devices.</p>
     </header>
@@ -282,8 +283,7 @@
 
                 <div class="mt-row">
                     <div>
-                        <div class="mt-row-label">Status</div>
-                        <div class="mt-row-help">Active menus render on the matching pages.</div>
+                        <div class="mt-row-label mt-tip-line">Status {include file="includes/tip.tpl" text="Active menus render on the matching pages." article="menu-manager" anchor="building-a-menu"}</div>
                     </div>
                     <label class="mt-toggle"><input type="checkbox" name="active" value="1" {if $menu->active}checked{/if}><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></label>
                 </div>
@@ -322,7 +322,7 @@
            id/data-attr, so every JS sect selector treats it as transparent. *}
         <div class="mt-menu-fields">
         <div class="mt-menu-sect">
-            <div class="mt-menu-sect-label mt-tip-line">Type {include file="includes/tip.tpl" text="What this item is. The fields below change to match the type you pick."}</div>
+            <div class="mt-menu-sect-label mt-tip-line">Type {include file="includes/tip.tpl" text="What this item is. The fields below change to match the type you pick." article="menu-manager" anchor="item-types"}</div>
             <div>
                 <select id="drawerType" class="mt-select" data-drawer-field="item_type">
                     {foreach $itemTypes as $key => $meta}
@@ -336,7 +336,7 @@
         </div>
 
         <div class="mt-menu-sect" data-drawer-show-when="whmcs_page">
-            <div class="mt-menu-sect-label mt-tip-line">WHMCS Page {include file="includes/tip.tpl" text="The built-in WHMCS page this item opens. Its link is filled in for you."}</div>
+            <div class="mt-menu-sect-label mt-tip-line">WHMCS Page {include file="includes/tip.tpl" text="The built-in WHMCS page this item opens. Its link is filled in for you." article="menu-manager" anchor="item-types"}</div>
             <div class="mt-icon-picker-wrap">
                 <button type="button" class="mt-icon-picker-trigger" id="drawerPagePickerBtn">
                     <span class="mt-page-picker-current" id="drawerPagePickerLabel">— Choose a page —</span>
@@ -374,7 +374,7 @@
         </div>
 
         <div class="mt-menu-sect" data-drawer-show-when="custom_link">
-            <div class="mt-menu-sect-label mt-tip-line">URL {include file="includes/tip.tpl" text="Any internal path or a full external link, for example https://example.com."}</div>
+            <div class="mt-menu-sect-label mt-tip-line">URL {include file="includes/tip.tpl" text="Any internal path or a full external link, for example https://example.com." article="menu-manager" anchor="item-types"}</div>
             <input id="drawerUrl" class="mt-input" type="text" placeholder="https://…" data-drawer-field="config.url">
             <label class="mt-checkbox" style="margin-top:8px">
                 <input type="checkbox" data-drawer-field="config.target" data-drawer-checkbox-value="_blank"> Open in new tab
@@ -382,7 +382,7 @@
         </div>
 
         <div class="mt-menu-sect" data-drawer-show-when="dropdown_parent">
-            <div class="mt-menu-sect-label mt-tip-line">Dropdown Style {include file="includes/tip.tpl" text="Classic is a simple floating list; Mega menu is a wide, multi-column panel."}</div>
+            <div class="mt-menu-sect-label mt-tip-line">Dropdown Style {include file="includes/tip.tpl" text="Classic is a simple floating list; Mega menu is a wide, multi-column panel." article="menu-manager" anchor="item-types"}</div>
             <select id="drawerDropdown" class="mt-select" data-drawer-field="config.dropdown_style">
                 <option value="default">Default (classic)</option>
                 <option value="mega">Mega menu</option>
@@ -401,7 +401,7 @@
            Type -> Page -> Name -> Description -> Icon order. *}
         <div class="mt-menu-sect" data-section="name">
             <div class="mt-menu-sect-label mt-label-head">
-                <span class="mt-label-head-title">Name {include file="includes/tip.tpl" text="Use a custom string, or a WHMCS language variable key so the label follows the client's language."}</span>
+                <span class="mt-label-head-title">Name {include file="includes/tip.tpl" text="Use a custom string, or a WHMCS language variable key so the label follows the client's language." article="menu-manager" anchor="building-a-menu"}</span>
                 {if $extraLocales}
                     <button type="button" class="mt-translate-btn" data-translate-toggle aria-expanded="false">Translate<span class="mt-translate-count" data-translate-count hidden></span></button>
                 {/if}
@@ -449,7 +449,7 @@
         </div>
 
         <div class="mt-menu-sect" data-section="icon">
-            <div class="mt-menu-sect-label mt-tip-line">Icon {include file="includes/tip.tpl" text="Shown on sidebar and rail layouts always; on the top nav only when Top-Nav Icons is enabled."}</div>
+            <div class="mt-menu-sect-label mt-tip-line">Icon {include file="includes/tip.tpl" text="Shown on sidebar and rail layouts always; on the top nav only when Top-Nav Icons is enabled." article="menu-manager" anchor="building-a-menu"}</div>
             <div class="mt-icon-picker-wrap">
                 <button type="button" class="mt-icon-picker-trigger mt-icon-assign" id="drawerIconBtn">
                     <span class="mt-icon-picker-preview" id="drawerIconPreview"></span>
@@ -491,7 +491,7 @@
             <div class="mt-menu-sub-body" hidden>
                 <div class="mt-menu-sub-row">
                     <div class="mt-field">
-                        <span class="mt-tip-line"><label class="mt-field-label" for="drawerTextTransform">Text Transform</label>{include file="includes/tip.tpl" text="Force the label case: leave as-is, all caps, or capitalize each word."}</span>
+                        <span class="mt-tip-line"><label class="mt-field-label" for="drawerTextTransform">Text Transform</label>{include file="includes/tip.tpl" text="Force the label case: leave as-is, all caps, or capitalize each word." article="menu-manager" anchor="building-a-menu"}</span>
                         <select id="drawerTextTransform" class="mt-select" data-drawer-field="config.text_transform">
                             <option value="">None</option>
                             <option value="uppercase">Uppercase</option>
@@ -499,7 +499,7 @@
                         </select>
                     </div>
                     <div class="mt-field">
-                        <span class="mt-tip-line"><label class="mt-field-label" for="drawerBadge">Badge</label>{include file="includes/tip.tpl" text="A small pill shown next to the label, for example New or a count."}</span>
+                        <span class="mt-tip-line"><label class="mt-field-label" for="drawerBadge">Badge</label>{include file="includes/tip.tpl" text="A small pill shown next to the label, for example New or a count." article="menu-manager" anchor="building-a-menu"}</span>
                         <input id="drawerBadge" class="mt-input" type="text" data-drawer-field="config.badge" placeholder="e.g. New">
                     </div>
                 </div>
@@ -521,7 +521,7 @@
             </button>
             <div class="mt-menu-sub-body" hidden>
                 <div class="mt-field">
-                    <span class="mt-tip-line"><label class="mt-field-label" for="drawerPosition">Position</label>{include file="includes/tip.tpl" text="Move this item to the right of the top navigation. Only the top-nav layout uses this; other layouts ignore it."}</span>
+                    <span class="mt-tip-line"><label class="mt-field-label" for="drawerPosition">Position</label>{include file="includes/tip.tpl" text="Move this item to the right of the top navigation. Only the top-nav layout uses this; other layouts ignore it." article="menu-manager" anchor="building-a-menu"}</span>
                     <select id="drawerPosition" class="mt-select" data-drawer-field="config.position_side">
                         <option value="">Auto</option>
                         <option value="left">Left</option>
@@ -530,7 +530,7 @@
                 </div>
 
                 <div class="mt-field">
-                    <span class="mt-tip-line"><label class="mt-field-label" for="drawerAudience">Visible To (Per-Item)</label>{include file="includes/tip.tpl" text="Show this item to everyone, only to signed-in clients, or only to guests."}</span>
+                    <span class="mt-tip-line"><label class="mt-field-label" for="drawerAudience">Visible To (Per-Item)</label>{include file="includes/tip.tpl" text="Show this item to everyone, only to signed-in clients, or only to guests." article="menu-manager" anchor="audiences"}</span>
                     <select id="drawerAudience" class="mt-select" data-drawer-field="config.audience">
                         <option value="all">All</option>
                         <option value="client">Clients only</option>

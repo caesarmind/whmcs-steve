@@ -2,7 +2,7 @@
 
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
-    <h1 class="mt-page-title">Pages</h1>
+    <h1 class="mt-page-title">Pages {include file="includes/doclink.tpl" article="page-manager"}</h1>
     <p class="mt-page-subtitle">Set the template variant, SEO, indexing, visibility and layout overrides for each WHMCS page.</p>
 </header>
 
@@ -28,7 +28,7 @@
     <label class="mt-sys-toggle">
         <input type="checkbox" id="mt-pages-showsys">
         <span>Show {$systemCount} system pages</span>
-        {include file="includes/tip.tpl" text="Wizard steps, partials included by another page, and error states WHMCS renders in place of whatever you asked for. They are hidden because you never navigate to them - not because they cannot be configured."}
+        {include file="includes/tip.tpl" text="Wizard steps, partials included by another page, and error states WHMCS renders in place of whatever you asked for. They are hidden because you never navigate to them - not because they cannot be configured." article="page-manager" anchor="the-page-list"}
     </label>
 {/if}
 

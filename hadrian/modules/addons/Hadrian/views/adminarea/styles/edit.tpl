@@ -12,7 +12,7 @@
 </div>
 
 <header class="mt-page-header">
-    <h1 class="mt-page-title">{$styleName|escape} <span class="mt-page-meta">/ Style editor</span></h1>
+    <h1 class="mt-page-title">{$styleName|escape} <span class="mt-page-meta">/ Style editor</span> {include file="includes/doclink.tpl" article="styles"}</h1>
     <p class="mt-page-subtitle">Edit color scheme, typography, and component variables for this style preset.</p>
 </header>
 

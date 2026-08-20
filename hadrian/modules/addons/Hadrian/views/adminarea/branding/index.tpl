@@ -2,7 +2,7 @@
 
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
-    <h1 class="mt-page-title">Branding</h1>
+    <h1 class="mt-page-title">Branding {include file="includes/doclink.tpl" article="branding"}</h1>
     {* Reworded when the floating save bar arrived: "no Save needed" was true of
        the whole page while the only Save was a button you had to scroll to, but
        it now contradicts a bar pinned to the viewport. Images still upload on

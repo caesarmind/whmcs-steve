@@ -1307,8 +1307,22 @@
         txt.className = 'mt-tip-txt';
         pop.appendChild(txt);
         pop._txt = txt;
+        // Optional "Learn more" line -- shown only when the trigger carries
+        // data-tip-href (includes/tip.tpl's article/anchor params). A real
+        // <a>, not innerHTML on txt: data-tip is plain-text escaped copy, and
+        // building a link by string-concatenating it into markup would be an
+        // XSS hole the moment any tip text ever contained a stray "<".
+        var link = document.createElement('a');
+        link.className = 'mt-tip-link';
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = 'Learn more';
+        pop.appendChild(link);
+        pop._link = link;
         document.body.appendChild(pop);
-        // A hover onto the panel itself keeps it open (so it can be read/copied).
+        // A hover onto the panel itself keeps it open (so it can be read/copied,
+        // and so the Learn more link is reachable by mouse without the popup
+        // vanishing on the trip from trigger to link).
         pop.addEventListener('mouseenter', function(){ clearTimeout(hideT); });
         pop.addEventListener('mouseleave', hideSoon);
     }
@@ -1336,6 +1350,9 @@
         if (!pop) build();
         cur = btn;
         pop._txt.textContent = btn.getAttribute('data-tip') || '';
+        var href = btn.getAttribute('data-tip-href');
+        if (href) { pop._link.href = href; pop._link.hidden = false; }
+        else { pop._link.removeAttribute('href'); pop._link.hidden = true; }
         pop.setAttribute('data-theme', root.getAttribute('data-theme') || 'light');
         btn.setAttribute('data-open', '');
         pop.style.display = 'block';

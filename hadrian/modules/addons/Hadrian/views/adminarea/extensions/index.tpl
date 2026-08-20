@@ -2,7 +2,7 @@
 
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
-    <h1 class="mt-page-title">Extensions</h1>
+    <h1 class="mt-page-title">Extensions {include file="includes/doclink.tpl" article="addon" anchor="sections"}</h1>
     <p class="mt-page-subtitle">Optional theme add-ons (module integrations, custom widgets, etc.).</p>
 </header>
 

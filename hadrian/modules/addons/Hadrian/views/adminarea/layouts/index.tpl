@@ -2,7 +2,7 @@
 
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
-    <h1 class="mt-page-title">Layouts</h1>
+    <h1 class="mt-page-title">Layouts {include file="includes/doclink.tpl" article="layout-manager"}</h1>
     <p class="mt-page-subtitle">
         Pick the navigation and footer arrangement for <strong>{$template|escape}</strong>.
         Each layout has two independent activations &mdash; one for guests (unauthenticated visitors) and one for existing clients (logged in).
@@ -359,8 +359,7 @@
         {foreach $layoutFlags as $flagKey => $flag}
             <div class="mt-row">
                 <div>
-                    <div class="mt-row-label">{$flag.label|escape}</div>
-                    <div class="mt-row-help">{$flag.help|escape}</div>
+                    <div class="mt-row-label mt-tip-line">{$flag.label|escape} {include file="includes/tip.tpl" text=$flag.help article="layout-manager" anchor="header"}</div>
                 </div>
                 <form method="post" action="" class="mt-flag-form">
                     <input type="hidden" name="layout_flag" value="{$flagKey|escape}">
@@ -394,8 +393,7 @@
     </header>
     <div class="mt-row">
         <div>
-            <div class="mt-row-label">Content width</div>
-            <div class="mt-row-help">Boxed keeps long-form pages readable; full width suits data-dense dashboards. Applies to the client area content column.</div>
+            <div class="mt-row-label mt-tip-line">Content width {include file="includes/tip.tpl" text="Boxed keeps long-form pages readable; full width suits data-dense dashboards. Applies to the client area content column." article="layout-manager" anchor="containers"}</div>
         </div>
         <form method="post" action="" class="mt-flag-form">
             <select name="content_width" class="mt-select mt-width-select" data-autosubmit aria-label="Content width">
@@ -435,11 +433,7 @@
        value the --content-pad-x layout var holds; this is now its only editor. *}
     <div class="mt-row">
         <div>
-            <div class="mt-row-label">Side padding</div>
-            <div class="mt-row-help">
-                Gutter between the content and the edge of its column, in both modes.
-                Applies per side. Default {$contentPadXDefault}px.
-            </div>
+            <div class="mt-row-label mt-tip-line">Side padding {include file="includes/tip.tpl" text="Gutter between the content and the edge of its column, in both modes. Applies per side. Default {$contentPadXDefault}px." article="layout-manager" anchor="containers"}</div>
         </div>
         <form method="post" action="" class="mt-flag-form">
             <span class="mt-affix">
@@ -463,13 +457,15 @@
        only when the layout is NOT 'top', so topbar height belongs to Sidebar
        and Icon Rail -- the opposite of the obvious guess. *}
     {foreach $layoutSizes as $sz}
+    {* Plain-text capture for the tip: the visible help below used <strong> for
+       emphasis, but the tip popup renders data-tip as textContent -- a literal
+       "<strong>" would show as text, not bold. A tooltip already reads smaller
+       and quieter than inline help, so losing the bold is a fair trade for
+       not printing tag soup. *}
+    {capture name="mtSizeTip"}Applies to the {$sz.applies} {if $sz.plural}layouts{else}layout{/if}. Default {$sz.default}px.{/capture}
     <div class="mt-row">
         <div>
-            <div class="mt-row-label">{$sz.label|escape}</div>
-            <div class="mt-row-help">
-                Applies to the <strong>{$sz.applies|escape}</strong> {if $sz.plural}layouts{else}layout{/if}.
-                Default {$sz.default}px.
-            </div>
+            <div class="mt-row-label mt-tip-line">{$sz.label|escape} {include file="includes/tip.tpl" text=$smarty.capture.mtSizeTip article="layout-manager" anchor="containers"}</div>
         </div>
         {* Explicit Apply, no autosubmit -- same reason the fields above give:
            a number field posting on every keystroke stores half-typed values
@@ -532,8 +528,7 @@
         {foreach $footerFlags as $flagKey => $flag}
             <div class="mt-row">
                 <div>
-                    <div class="mt-row-label">{$flag.label|escape}</div>
-                    <div class="mt-row-help">{$flag.help|escape}</div>
+                    <div class="mt-row-label mt-tip-line">{$flag.label|escape} {include file="includes/tip.tpl" text=$flag.help article="layout-manager" anchor="footer-options"}</div>
                 </div>
                 <form method="post" action="" class="mt-flag-form">
                     <input type="hidden" name="layout_flag" value="{$flagKey|escape}">

@@ -2,7 +2,7 @@
 
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
-    <h1 class="mt-page-title">License</h1>
+    <h1 class="mt-page-title">License {include file="includes/doclink.tpl" article="licensing"}</h1>
     <p class="mt-page-subtitle">Enter your Hadrian theme license key for this site.</p>
 </header>
 

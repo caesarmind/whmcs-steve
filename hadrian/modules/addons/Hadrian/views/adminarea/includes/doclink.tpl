@@ -1,5 +1,5 @@
 {*
-    Documentation link. One partial so every "Docs" affordance in the admin
+    Documentation link. One partial so every "docs" affordance in the admin
     points at the same base URL and looks identical.
 
       {include file="includes/doclink.tpl" article="styles" anchor="colors"}
@@ -14,6 +14,10 @@
       link the article's top.
     - Opens in a new tab: this is reference material consulted mid-edit, not a
       navigation away from the settings the admin has open.
+    - Plain text + a CSS-drawn arrow (.mt-doclink::after in admin.css), not an
+      inline SVG -- the same arrow the "Learn more" line inside a tip popup
+      uses (includes/tip.tpl's article/anchor params), so every doc link in
+      the admin is visually one mark, defined once.
     - Self-contained on purpose -- the base URL is a literal below, not read
       off $viewHelper or any injected var. Every .dashbuild/build-*-harness.php
       fetches a bare page/section template directly (never through
@@ -25,11 +29,4 @@
 *}
 {assign var="mtDocsBase" value="https://docs.hadrianthegreat.com/client-theme"}
 <a class="mt-doclink" href="{$mtDocsBase}/{$article|escape}/{if $anchor}#{$anchor|escape}{/if}"
-   target="_blank" rel="noopener" title="Open documentation for this section">
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M3 2.5h6.5L13 6v7.5a1 1 0 01-1 1H3a1 1 0 01-1-1v-10a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-        <path d="M9.5 2.5V6H13" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-        <path d="M5 9h6M5 11.5h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-    </svg>
-    <span>Docs</span>
-</a>
+   target="_blank" rel="noopener" title="Open documentation for this section">docs</a>

@@ -9,7 +9,7 @@
 
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">SEO</div>
-    <h1 class="mt-page-title">Sitemap <span class="mt-page-meta">/ robots.txt</span></h1>
+    <h1 class="mt-page-title">Sitemap <span class="mt-page-meta">/ robots.txt</span> {include file="includes/doclink.tpl" article="seo" anchor="sitemap-and-robots-txt"}</h1>
     <p class="mt-page-subtitle">Generate <code>sitemap.xml</code> from your pages and content, and manage a preserved block in <code>robots.txt</code>.</p>
 </header>
 
@@ -71,8 +71,7 @@
 
         <div class="mt-row">
             <div>
-                <div class="mt-row-label">Product groups</div>
-                <div class="mt-row-help">One entry per visible store product group.</div>
+                <div class="mt-row-label mt-tip-line">Product groups {include file="includes/tip.tpl" text="One entry per visible store product group." article="seo" anchor="what-goes-in"}</div>
             </div>
             <label class="mt-toggle">
                 <input type="checkbox" name="productGroups" value="1" {if $cfg.productGroups}checked{/if}>
@@ -82,8 +81,7 @@
 
         <div class="mt-row">
             <div>
-                <div class="mt-row-label">Announcements</div>
-                <div class="mt-row-help">One entry per published announcement.</div>
+                <div class="mt-row-label mt-tip-line">Announcements {include file="includes/tip.tpl" text="One entry per published announcement." article="seo" anchor="what-goes-in"}</div>
             </div>
             <label class="mt-toggle">
                 <input type="checkbox" name="announcements" value="1" {if $cfg.announcements}checked{/if}>
@@ -93,8 +91,7 @@
 
         <div class="mt-row">
             <div>
-                <div class="mt-row-label">Knowledge base</div>
-                <div class="mt-row-help">Public knowledge base categories and articles.</div>
+                <div class="mt-row-label mt-tip-line">Knowledge base {include file="includes/tip.tpl" text="Public knowledge base categories and articles." article="seo" anchor="what-goes-in"}</div>
             </div>
             <label class="mt-toggle">
                 <input type="checkbox" name="knowledgebase" value="1" {if $cfg.knowledgebase}checked{/if}>
@@ -104,8 +101,7 @@
 
         <div class="mt-row">
             <div>
-                <div class="mt-row-label">Downloads</div>
-                <div class="mt-row-help">Visible download categories. Off by default (downloads are often gated).</div>
+                <div class="mt-row-label mt-tip-line">Downloads {include file="includes/tip.tpl" text="Visible download categories. Off by default (downloads are often gated)." article="seo" anchor="what-goes-in"}</div>
             </div>
             <label class="mt-toggle">
                 <input type="checkbox" name="downloads" value="1" {if $cfg.downloads}checked{/if}>

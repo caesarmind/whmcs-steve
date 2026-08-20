@@ -36,7 +36,7 @@
                    2000, so it correctly paints above the dialog. *}
                 <div class="mt-modal-title mt-tip-line">
                     <span id="mt-media-title">Media</span>
-                    {include file="includes/tip.tpl" text="One shared library for the whole admin. Uploads stay here until you delete them, and the same image can be used on any number of pages."}
+                    {include file="includes/tip.tpl" text="One shared library for the whole admin. Uploads stay here until you delete them, and the same image can be used on any number of pages." article="branding" anchor="uploading-replacing-and-removing"}
                 </div>
                 <div class="mt-modal-sub" id="mt-media-sub">Choose an image or upload a new one.</div>
             </div>

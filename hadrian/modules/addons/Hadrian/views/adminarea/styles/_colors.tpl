@@ -127,9 +127,22 @@
     </section>
 
     {foreach $colors.groups as $groupName => $tokens}
+    {* Anchor for both this group's own doclink and every token's tip inside
+       it. Group names are core/config/colors.php's literal array keys
+       (Brand, Surfaces, Text, Borders, "Status & badges", "Navigation &
+       bars", "Icons & avatars", "Block accents") and slugify to exactly the
+       ### heading ids styles.md ships under Colors, so this is a straight
+       lowercase-and-hyphenate, not a guess. *}
+    {if $groupName == 'Status & badges'}{assign var=mtColorAnchor value='status-badges'}
+    {elseif $groupName == 'Navigation & bars'}{assign var=mtColorAnchor value='navigation-bars'}
+    {elseif $groupName == 'Icons & avatars'}{assign var=mtColorAnchor value='icons-avatars'}
+    {elseif $groupName == 'Block accents'}{assign var=mtColorAnchor value='block-accents'}
+    {else}{assign var=mtColorAnchor value=$groupName|lower}
+    {/if}
     <section class="mt-section mt-cs-group">
         <div class="mt-cs-group-head">
             <span class="mt-cs-group-lbl">{$groupName|escape}</span>
+            {include file="includes/doclink.tpl" article="styles" anchor=$mtColorAnchor}
         </div>
 
         {* Sidebar style presets, at the head of the group that owns the sidebar
@@ -196,7 +209,7 @@
                    partial. .mt-tip-line keeps the two on one row. *}
                 <span class="mt-tip-line">
                     <label class="mt-color-row-label" for="c{$t.var|replace:'--':'_'}">{$t.label|escape}</label>
-                    {if $t.hint|default:''}{include file="includes/tip.tpl" text=$t.hint}{/if}
+                    {if $t.hint|default:''}{include file="includes/tip.tpl" text=$t.hint article="styles" anchor=$mtColorAnchor}{/if}
                 </span>
                 {* The swatch is a PAINTED LABEL with the native picker hidden
                    inside it at opacity 0, as the demo draws it. A bare
