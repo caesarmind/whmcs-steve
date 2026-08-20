@@ -10,7 +10,9 @@
 
     <section class="mt-section">
         <header class="mt-section-header">
-            <h2 class="mt-section-title">Elements</h2>
+            {* Docs link nests in the h2 -- a third sibling in this
+               space-between header strands the count badge dead-centre. *}
+            <h2 class="mt-section-title mt-tip-line">Elements {include file="includes/doclink.tpl" article="styles" anchor="general-buttons-forms-and-elements"}</h2>
             <span class="mt-section-count">Applies site-wide</span>
         </header>
         <p class="mt-field-help">Shape of UI components &mdash; radius, shadow and padding. Colours stay in the Colors panel. Sizes reference the theme radius scale; only changed values are saved.</p>

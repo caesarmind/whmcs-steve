@@ -13,7 +13,9 @@
 <div class="mt-panel pad">
     <section class="mt-section">
         <header class="mt-section-header">
-            <h2 class="mt-section-title">Available styles</h2>
+            {* Docs link nests in the h2 -- a third sibling in this
+               space-between header strands the count badge dead-centre. *}
+            <h2 class="mt-section-title mt-tip-line">Available styles {include file="includes/doclink.tpl" article="styles"}</h2>
             <span class="mt-section-count">{$styles|count}</span>
         </header>
 

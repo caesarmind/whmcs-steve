@@ -25,6 +25,7 @@
 <section class="mt-section">
     <header class="mt-section-header">
         <h2 class="mt-section-title">{if $tab == 'footer-secondary'}Footer Secondary Menu{elseif $tab == 'footer'}Footer Menu{elseif $tab == 'secondary'}Secondary Menu{else}Main Menu{/if}</h2>
+        {include file="includes/doclink.tpl" article="menu-manager" anchor="building-a-menu"}
         <div class="mt-section-tools">
             <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=Hadrian&action=menu&sub=seed" title="Re-seed any missing preset items (won't overwrite existing items)">Re-seed presets</a>
             <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=Hadrian&action=menu&sub=reset-defaults" title="Wipe and rebuild the factory preset menus (WHMCS Defaults + Footer Secondary) to match the latest preset" onclick="return confirm('Reset the WHMCS Defaults menus and the Footer Secondary menu? Custom user-curated menus are unaffected.');">Reset WHMCS Defaults</a>

@@ -14,7 +14,7 @@
 
     <section class="mt-section">
         <header class="mt-section-header mt-cs-head">
-            <h2 class="mt-section-title">Color scheme</h2>
+            <h2 class="mt-section-title mt-tip-line">Color scheme {include file="includes/doclink.tpl" article="styles" anchor="colors"}</h2>
             {* Editing scope, top-right of the header per the design. Both scopes
                are IN THE PAGE -- the one you are not looking at rides along in a
                hidden field per row -- so switching swaps values client-side with
@@ -81,7 +81,7 @@
              data-scope="{$colors.mode}"
              data-accent-light="{$colors.accents.light|default:''|escape}"
              data-accent-dark="{$colors.accents.dark|default:''|escape}">
-        <header class="mt-section-header"><h2 class="mt-section-title">Generate from one colour</h2></header>
+        <header class="mt-section-header"><h2 class="mt-section-title">Generate from one colour</h2>{include file="includes/doclink.tpl" article="styles" anchor="generate-from-one-colour"}</header>
         <p class="mt-field-help mt-gen-lede">
             Pick your brand colour and rebuild the whole palette around it. Lightness is preserved
             wherever contrast depends on it, and status colours keep their own hue &mdash; a warning

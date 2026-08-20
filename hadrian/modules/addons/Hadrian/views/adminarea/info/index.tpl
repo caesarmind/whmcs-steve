@@ -10,6 +10,7 @@
 <section class="mt-section">
     <header class="mt-section-header">
         <h2 class="mt-section-title">Theme Information</h2>
+        {include file="includes/doclink.tpl" article="introduction" anchor="requirements"}
     </header>
     <dl class="mt-deflist">
         <dt>Theme Version</dt>
@@ -20,6 +21,7 @@
 <section class="mt-section">
     <header class="mt-section-header">
         <h2 class="mt-section-title">License</h2>
+        {include file="includes/doclink.tpl" article="licensing" anchor="what-each-status-means"}
     </header>
     <dl class="mt-deflist">
         <dt>Status</dt>

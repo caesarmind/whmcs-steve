@@ -24,7 +24,7 @@
     <div class="mt-panel">
 
     <section class="mt-section">
-        <header class="mt-section-header"><h2 class="mt-section-title">Sitemap</h2></header>
+        <header class="mt-section-header"><h2 class="mt-section-title">Sitemap</h2>{include file="includes/doclink.tpl" article="seo" anchor="sitemap-and-robots-txt"}</header>
 
         <div class="mt-row">
             <div>
@@ -59,7 +59,7 @@
     </section>
 
     <section class="mt-section">
-        <header class="mt-section-header"><h2 class="mt-section-title">Include in sitemap</h2></header>
+        <header class="mt-section-header"><h2 class="mt-section-title">Include in sitemap</h2>{include file="includes/doclink.tpl" article="seo" anchor="what-goes-in"}</header>
 
         <div class="mt-row">
             <div>
@@ -121,7 +121,7 @@
 <div class="mt-panel">
 
 <section class="mt-section">
-    <header class="mt-section-header"><h2 class="mt-section-title">Generate</h2></header>
+    <header class="mt-section-header"><h2 class="mt-section-title">Generate</h2>{include file="includes/doclink.tpl" article="seo" anchor="generating"}</header>
     <p class="mt-row-help">
         {if $lastGenerated}Last written: <strong>{$lastGenerated|escape}</strong>.{else}Not generated yet.{/if}
         Saving the settings above also regenerates the files.
@@ -134,7 +134,7 @@
 
 {if $previewXml}
 <section class="mt-section">
-    <header class="mt-section-header"><h2 class="mt-section-title">Preview</h2></header>
+    <header class="mt-section-header"><h2 class="mt-section-title">Preview</h2>{include file="includes/doclink.tpl" article="seo" anchor="generating"}</header>
     <pre style="margin:0; padding:14px; background:var(--mt-surface-2); border:1px solid var(--mt-border); border-radius:var(--mt-radius); font-size:12px; line-height:1.5; overflow:auto; max-height:460px; white-space:pre;">{$previewXml|escape}</pre>
 </section>
 {/if}

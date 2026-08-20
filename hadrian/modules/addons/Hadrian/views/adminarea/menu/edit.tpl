@@ -124,7 +124,11 @@
         {* ────── LEFT: items list ────── *}
         <section class="mt-section mt-menu-tree-col">
             <header class="mt-section-header">
-                <h2 class="mt-section-title">Menu Items</h2>
+                {* Docs link nests in the h2, not as a third sibling in this
+                   space-between header -- see the note in layouts/index.tpl:
+                   with three children the item-count badge lands dead-centre,
+                   isolated from the title it counts. *}
+                <h2 class="mt-section-title mt-tip-line">Menu Items {include file="includes/doclink.tpl" article="menu-manager" anchor="building-a-menu"}</h2>
                 <span class="mt-section-count" id="mtItemCount">0 items</span>
             </header>
 
@@ -263,7 +267,7 @@
 
         {* ────── RIGHT: menu-level settings (sticky sidebar) ────── *}
         <section class="mt-section mt-menu-settings-col">
-            <header class="mt-section-header"><h2 class="mt-section-title">Menu Settings</h2></header>
+            <header class="mt-section-header"><h2 class="mt-section-title">Menu Settings</h2>{include file="includes/doclink.tpl" article="menu-manager" anchor="audiences"}</header>
 
             <div class="mt-menu-settings-card">
                 <div class="mt-field">

@@ -26,6 +26,7 @@
 <section class="mt-section">
     <header class="mt-section-header">
         <h2 class="mt-section-title">License key</h2>
+        {include file="includes/doclink.tpl" article="licensing" anchor="where-the-key-goes"}
     </header>
     <form method="post" action="" class="mt-section-body">
         <div class="mt-field">

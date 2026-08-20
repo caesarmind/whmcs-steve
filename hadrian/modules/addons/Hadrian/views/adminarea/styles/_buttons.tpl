@@ -13,7 +13,9 @@
 
     <section class="mt-section">
         <header class="mt-section-header">
-            <h2 class="mt-section-title">Buttons</h2>
+            {* Docs link nests in the h2 -- a third sibling in this
+               space-between header strands the count badge dead-centre. *}
+            <h2 class="mt-section-title mt-tip-line">Buttons {include file="includes/doclink.tpl" article="styles" anchor="general-buttons-forms-and-elements"}</h2>
             <span class="mt-section-count">Applies site-wide</span>
         </header>
         <p class="mt-field-help">Size and recolour every button variant. Colours are picked from the theme palette (so they track your accent + dark mode automatically) &mdash; only changed values are saved. These settings apply across all styles.</p>

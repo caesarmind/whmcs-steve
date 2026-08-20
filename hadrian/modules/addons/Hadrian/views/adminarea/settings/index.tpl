@@ -255,6 +255,11 @@
                each end of a form long enough to scroll, so which one you
                reached depended on where you gave up. The floating bar is the
                single save affordance now. *}
+            {if $tab == 'order'}
+                {include file="includes/doclink.tpl" article="settings" anchor="order-process"}
+            {else}
+                {include file="includes/doclink.tpl" article="settings"}
+            {/if}
         </header>
 
         {* Rows are grouped into named sections so the eye can land somewhere.
@@ -266,7 +271,15 @@
            exclude a control from submission, so hidden rows still post. *}
         {foreach $flagGroups as $mtGroup}
         <div class="mt-set-group{if $mtGroup.tab != $tab} mt-tab-off{/if}" data-set-group="{$mtGroup.slug|escape}">
-            <div class="mt-subhead mt-set-group-head">{$mtGroup.label|escape}</div>
+            <div class="mt-subhead mt-set-group-head">{$mtGroup.label|escape}
+                {if $mtGroup.slug == 'appearance'}{include file="includes/doclink.tpl" article="settings" anchor="appearance"}
+                {elseif $mtGroup.slug == 'navigation'}{include file="includes/doclink.tpl" article="settings" anchor="navigation"}
+                {elseif $mtGroup.slug == 'pricing'}{include file="includes/doclink.tpl" article="settings" anchor="pricing-display"}
+                {elseif $mtGroup.slug == 'locale'}{include file="includes/doclink.tpl" article="settings" anchor="language-and-seo"}
+                {elseif $mtGroup.slug == 'privacy'}{include file="includes/doclink.tpl" article="settings" anchor="privacy-and-performance"}
+                {elseif $mtGroup.slug == 'cart'}{include file="includes/doclink.tpl" article="settings" anchor="cart-layout"}
+                {/if}
+            </div>
             <div class="mt-set-group-sub">{$mtGroup.sub|escape}</div>
         {foreach $mtGroup.flags as $key => $meta}
             {assign var=mtIsLangToggle value=($key == 'custom_language_list')}

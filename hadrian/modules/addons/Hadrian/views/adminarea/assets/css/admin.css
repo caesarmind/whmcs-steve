@@ -578,6 +578,30 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
    onto a text baseline; a card heading wants to stay its own block row. */
 .mt-subhead.mt-tip-line { display: flex; }
 
+/* -- Documentation link ---------------------------------------------------- */
+/* Same pill shape as .mt-pagerow-openlink (Pages list' "Open" link), just
+   muted -- this is a secondary, always-available affordance on every block,
+   not a primary per-row action, so it should not compete with real controls
+   for attention. Markup: includes/doclink.tpl. */
+.mt-doclink { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px;
+    border: 1px solid var(--mt-border); border-radius: 999px; background: var(--mt-surface);
+    color: var(--mt-text-3); font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+    text-decoration: none; white-space: nowrap; flex-shrink: 0;
+    transition: background .12s ease, border-color .12s ease, color .12s ease; }
+.mt-doclink:hover { background: var(--mt-primary-tint); border-color: var(--mt-primary); color: var(--mt-primary); text-decoration: none; }
+.mt-doclink:focus-visible { outline: 2px solid var(--mt-primary); outline-offset: 1px; }
+.mt-doclink svg { width: 12px; height: 12px; display: block; flex-shrink: 0; }
+/* Inline beside a subhead/tip icon (a card heading, not a full .mt-section-header
+   with room to spare) -- tighter padding so it reads as part of the same small
+   heading row rather than a bigger control glued onto it. */
+.mt-subhead .mt-doclink,
+.mt-tip-line .mt-doclink { padding: 2px 7px; }
+/* .mt-section-header is flex+space-between already; margin-left:auto is not
+   needed there. But .mt-set-group-head (Settings' group heading) is a bare
+   div with no such layout, so the link would otherwise sit flush against the
+   title text with no gap control beyond the parent's own. Give it one. */
+.mt-set-group-head { display: flex; align-items: center; gap: 8px; }
+
 .mt-tip-pop { position: fixed; z-index: 10000; display: none;
     min-height: 0; padding: 9px 12px;
     max-width: min(280px, calc(100vw - 16px));

@@ -32,7 +32,7 @@
                 <span class="mt-brand-ver">v1.0.0</span>
             </div>
             <div class="mt-brandbar-right">
-                <a class="mt-brandbar-link" href="https://docs.hostnodes.com" target="_blank" rel="noopener">
+                <a class="mt-brandbar-link" href="https://docs.hadrianthegreat.com/" target="_blank" rel="noopener">
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
                         <path d="M3 2.5h6.5L13 6v7.5a1 1 0 01-1 1H3a1 1 0 01-1-1v-10a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
                         <path d="M9.5 2.5V6H13" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>

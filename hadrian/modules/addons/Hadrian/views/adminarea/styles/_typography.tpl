@@ -9,7 +9,7 @@
     {if $saved}<div class="mt-alert mt-alert-success">Typography saved.</div>{/if}
 
     <section class="mt-section">
-        <header class="mt-section-header"><h2 class="mt-section-title">Font Family</h2></header>
+        <header class="mt-section-header"><h2 class="mt-section-title">Font Family</h2>{include file="includes/doclink.tpl" article="styles" anchor="font-family"}</header>
         <div class="mt-typo-fonts" data-ff-fallback="{$typography.ffFallback|escape}" data-ff-apple="{$typography.ffApplePrefix|escape}">
             <label class="mt-typo-radio">
                 <input type="radio" name="ff_mode" value="default"{if $typography.fontFamily.mode == 'default'} checked{/if}>
@@ -57,7 +57,7 @@
     </section>
 
     <section class="mt-section">
-        <header class="mt-section-header"><h2 class="mt-section-title">Font Size</h2></header>
+        <header class="mt-section-header"><h2 class="mt-section-title">Font Size</h2>{include file="includes/doclink.tpl" article="styles" anchor="font-size-and-font-weight"}</header>
         {foreach $typography.sizeGroups as $groupName => $items}
             <div class="mt-typo-group-label">{$groupName|escape}</div>
             <div class="mt-typo-grid">
@@ -75,7 +75,7 @@
     </section>
 
     <section class="mt-section">
-        <header class="mt-section-header"><h2 class="mt-section-title">Font Weight</h2></header>
+        <header class="mt-section-header"><h2 class="mt-section-title">Font Weight</h2>{include file="includes/doclink.tpl" article="styles" anchor="font-size-and-font-weight"}</header>
         <div class="mt-typo-grid">
             {foreach $typography.weights as $it}
                 <div class="mt-typo-field">

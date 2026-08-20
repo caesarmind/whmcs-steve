@@ -78,7 +78,7 @@
         {if $cssSaved}<div class="mt-alert mt-alert-success">Custom CSS saved.</div>{/if}
         <div class="mt-panel">
         <section class="mt-section">
-            <header class="mt-section-header"><h2 class="mt-section-title">Custom CSS</h2></header>
+            <header class="mt-section-header"><h2 class="mt-section-title">Custom CSS</h2>{include file="includes/doclink.tpl" article="styles" anchor="custom-css"}</header>
             <p class="mt-field-help">Injected into every client-area page <em>after</em> the theme styles, so it overrides them. Applies site-wide (regardless of active style).</p>
             <textarea name="custom_css" class="mt-textarea mt-code" rows="18" spellcheck="false" placeholder="/* Your CSS — e.g. */&#10;.card { border-radius: 18px; }">{$customCss|escape}</textarea>
         </section>

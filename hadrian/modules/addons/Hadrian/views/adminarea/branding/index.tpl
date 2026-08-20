@@ -44,6 +44,13 @@
             {else}
                 <h2 class="mt-section-title">{$section.title|escape}</h2>
             {/if}
+            {if $sectionKey == 'full'}
+                {include file="includes/doclink.tpl" article="branding" anchor="full-logo"}
+            {elseif $sectionKey == 'square'}
+                {include file="includes/doclink.tpl" article="branding" anchor="square-logo"}
+            {elseif $sectionKey == 'favicon'}
+                {include file="includes/doclink.tpl" article="branding" anchor="favicon"}
+            {/if}
         </header>
         {if $sectionKey == 'favicon'}
             {* Favicon is a single-tile section. *}
@@ -67,7 +74,7 @@
    everything together. Under JS, the AJAX upload path only touches
    $_FILES so these fields are unaffected by per-tile uploads. *}
 <section class="mt-section">
-    <header class="mt-section-header"><h2 class="mt-section-title">Brand Info</h2></header>
+    <header class="mt-section-header"><h2 class="mt-section-title">Brand Info</h2>{include file="includes/doclink.tpl" article="branding" anchor="brand-info"}</header>
     {if isset($brandInfo.footer_description)}
         {$row = $brandInfo.footer_description}
         <div class="mt-brand-field">

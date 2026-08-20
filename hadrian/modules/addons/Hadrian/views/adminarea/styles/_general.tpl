@@ -15,7 +15,9 @@
 
     <section class="mt-section">
         <header class="mt-section-header">
-            <h2 class="mt-section-title">General</h2>
+            {* Docs link nests in the h2 -- a third sibling in this
+               space-between header strands the count badge dead-centre. *}
+            <h2 class="mt-section-title mt-tip-line">General {include file="includes/doclink.tpl" article="styles" anchor="general-buttons-forms-and-elements"}</h2>
             <span class="mt-section-count">Applies site-wide</span>
         </header>
         <p class="mt-field-help">The shared scales the rest of the theme is built from. Corner radius, shadow depth, control sizing and animation speed &mdash; the Elements, Buttons and Forms panels choose <em>which</em> step to use, and this is where each step gets its value. Only changed values are saved.</p>

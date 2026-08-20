@@ -11,7 +11,9 @@
 
     <section class="mt-section">
         <header class="mt-section-header">
-            <h2 class="mt-section-title">Forms</h2>
+            {* Docs link nests in the h2 -- a third sibling in this
+               space-between header strands the count badge dead-centre. *}
+            <h2 class="mt-section-title mt-tip-line">Forms {include file="includes/doclink.tpl" article="styles" anchor="general-buttons-forms-and-elements"}</h2>
             <span class="mt-section-count">Applies site-wide</span>
         </header>
         <p class="mt-field-help">Style inputs, labels and checkboxes. Sizes reference your Typography &amp; radius scales; colours come from the theme palette, so they track your accent and dark mode automatically. Only changed values are saved.</p>

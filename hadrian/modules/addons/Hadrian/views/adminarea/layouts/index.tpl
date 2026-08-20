@@ -121,7 +121,20 @@
 {foreach $groups as $k => $list}
     <section class="mt-section" data-kind-panel="{$k}"{if $k != $activeKind} hidden{/if}>
         <header class="mt-section-header">
-            <h2 class="mt-section-title">{if $k == 'main-menu'}Main menu layouts{else}Footer layouts{/if}</h2>
+            {* Docs link lives INSIDE the h2 (mt-tip-line), not as a third
+               sibling of .mt-section-header's space-between row -- with three
+               children the count badge lands dead-centre, isolated from both
+               the title it counts and the link beside it. Nesting it keeps
+               the original two-slot layout (title cluster left, count right)
+               and the count where an admin's eye already expects it. *}
+            <h2 class="mt-section-title mt-tip-line">
+                {if $k == 'main-menu'}Main menu layouts{else}Footer layouts{/if}
+                {if $k == 'main-menu'}
+                    {include file="includes/doclink.tpl" article="layout-manager" anchor="main-menu-layouts"}
+                {else}
+                    {include file="includes/doclink.tpl" article="layout-manager" anchor="footer-layouts"}
+                {/if}
+            </h2>
             <span class="mt-section-count">{$list|count}</span>
         </header>
 
@@ -340,6 +353,7 @@
                section renders under {if $layoutFlags} anyway, so it can never be
                the empty case the label was guarding. *}
             <h2 class="mt-section-title">Header</h2>
+            {include file="includes/doclink.tpl" article="layout-manager" anchor="header"}
         </header>
 
         {foreach $layoutFlags as $flagKey => $flag}
@@ -376,6 +390,7 @@
            hardcoded rather than computed, so it would have gone stale the moment
            a third control landed in this section. *}
         <h2 class="mt-section-title">Containers</h2>
+        {include file="includes/doclink.tpl" article="layout-manager" anchor="containers"}
     </header>
     <div class="mt-row">
         <div>
@@ -494,7 +509,19 @@
 {foreach $planned['footer'] as $sectionName => $rows}
     <section class="mt-section" data-kind-panel="footer"{if $activeKind != 'footer'} hidden{/if}>
         <header class="mt-section-header">
-            <h2 class="mt-section-title">{$sectionName|escape}</h2>
+            {* Docs link nests in the h2, not as a sibling of the count badge --
+               see the note on Main menu layouts / Footer layouts above; the
+               same three-children-in-space-between problem applies here
+               whenever the empty-state "Not wired yet" badge is showing. *}
+            <h2 class="mt-section-title mt-tip-line">
+                {$sectionName|escape}
+                {* $planned['footer'] has exactly one key, 'Footer options' --
+                   see LayoutsController::PLANNED_CONTROLS -- so this is never
+                   a guess at an unwired placeholder's doc coverage. *}
+                {if $sectionName == 'Footer options'}
+                    {include file="includes/doclink.tpl" article="layout-manager" anchor="footer-options"}
+                {/if}
+            </h2>
             {* The "N wired" half is gone (see Containers), but the EMPTY case is
                kept: if every footer flag were ever removed this section would
                otherwise render as a bare heading over nothing, which reads as a
