@@ -253,6 +253,16 @@
    tabs -- so it is dimmed and the group headings carry the context instead. */
 .mt-set-searching .mt-tabs { opacity: 0.45; }
 .mt-set-noresults { font-size: 13px; color: var(--mt-text-3); padding: 20px 0 4px; }
+
+/* A toggle-row genuinely nested inside a sub-panel (Order Process's "Use
+   Custom Hostname" / "Hide on Checkout page", both revealed under Hide
+   Product Hostname) otherwise reads as a peer of its parent: same label
+   weight, same full-size toggle. Demoted to the exact ratio General already
+   demotes .mt-field-label from .mt-row-label (14/600 -> 13/500), and the
+   toggle scaled to match -- this isn't a second toggle component, just a
+   smaller rendering of the one that already exists everywhere else. */
+.mt-row-sub > .mt-row .mt-row-label { font-size: 13px; font-weight: 500; }
+.mt-row-sub > .mt-row .mt-toggle { transform: scale(0.82); transform-origin: right center; }
 </style>
 {/literal}
 
