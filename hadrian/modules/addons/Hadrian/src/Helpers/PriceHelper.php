@@ -19,10 +19,17 @@ use Hadrian\Models\Settings;
  * decimal currencies (0.000 — BHD, KWD), &nbsp; separators and "-0.00", and
  * the copies can drift. Deciding on the number avoids all of it.
  *
- * The Smarty partials (includes/common/price.tpl in both the theme and the
- * order form) can't reach PHP, so they re-do the test on the formatted
- * string — but with a digits-only match rather than an equality check, and
- * they fail SAFE: anything not provably zero renders as the normal price.
+ * The Smarty side can't reach PHP, so it re-does the test on the formatted
+ * string — with a digits-only match rather than an equality check, failing
+ * SAFE: anything not provably zero renders as the normal price. Two partials,
+ * one per tree: the theme's includes/common/price.tpl (client-area pages),
+ * and hadrian_cart/includes/free-price.tpl (every order-form price — the
+ * cart deliberately never includes the theme partial, since a $template
+ * include resolves against the ACTIVE System Theme and would fatal under
+ * six/twenty-one). The cart partial reads the flag from
+ * $hadrian.addonSettings when present; in the AJAX-rendered ordersummary
+ * fragment, where it isn't, it always emits label+amount spans and
+ * hadrian_cart/css/custom.css picks one off body[data-free-label].
  */
 final class PriceHelper
 {

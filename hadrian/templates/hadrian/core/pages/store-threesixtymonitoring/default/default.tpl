@@ -12,7 +12,7 @@
    (mon-prefixed keys); terse spec bullets, decorative illustrations, and
    testimonials are kept verbatim. The page-specific mon-* CSS and the
    mode/sub-tab/pricing toggles are carried inline (literal-wrapped) since they
-   are unique to this page and not part of apple-theme.css. *}
+   are unique to this page and not part of core-theme.css. *}
 
 {assign var=_monWebCount value=0}
 {assign var=_monSrvCount value=0}

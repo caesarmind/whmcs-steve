@@ -64,7 +64,7 @@
                         {if $upType == 'configoptions'}{$upg.configname|default:''|escape}: {$upg.originalvalue|default:''|escape} &rarr; {$upg.newvalue|default:''|escape}
                         {else}{$upg.oldproductname|default:''|escape} &rarr; {$upg.newproductname|default:''|escape}{/if}
                     </span>
-                    <span class="up-line-price">{$upg.price|default:''}</span>
+                    <span class="up-line-price">{include file="`$template`/includes/common/price.tpl" hPrice=$upg.price|default:'' hEscape=false}</span>
                 </div>
                 {/foreach}
                 {if $upType == 'package' && isset($upgrades.0.daysuntilrenewal)}

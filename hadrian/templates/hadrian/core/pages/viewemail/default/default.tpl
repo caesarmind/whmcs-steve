@@ -1,7 +1,7 @@
 {* Hostnodes - View email (Apple-style): standalone popup window.
 
    viewemail.php opens in a popup and does NOT load the client-area chrome, so this
-   tpl emits its own HTML document (like Lagom's viewemail.tpl) and loads apple-theme.css
+   tpl emits its own HTML document (like Lagom's viewemail.tpl) and loads core-theme.css
    for design tokens.
    WHMCS variables (Lagom viewemail.tpl): $message (email body HTML),
    $attachments (array of filenames), $companyname.
@@ -17,7 +17,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{$LANG.clientareaemails} - {$companyname|default:'Hostnodes'|escape}</title>
-    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v={$hadrian.version|default:'1.0'}">
+    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/core-theme.css?v={$hadrian.version|default:'1.0'}">
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/viewemail.css?v={$hadrian.version|default:'1.0'}">
 </head>
 <body class="vem-popup">

@@ -4,7 +4,7 @@
  *
  * Replaces hardcoded color literals (hex + rgb/rgba) across the theme's
  * hand-authored CSS with `var(--token)` references, mapping each value to the
- * design-system token whose LIGHT default equals it (apple-theme.css :root).
+ * design-system token whose LIGHT default equals it (core-theme.css :root).
  *
  * Why it's safe: every token's light default == the value it replaces, so
  * light mode renders byte-identically; the only change is that the color
@@ -34,7 +34,7 @@ const UNMAPPED_ONLY = args.includes('--unmapped');
 const SKIP = new Set(['theme.css', 'site.css']);
 
 /**
- * value (normalized) -> token name. LIGHT defaults from apple-theme.css :root.
+ * value (normalized) -> token name. LIGHT defaults from core-theme.css :root.
  * Ambiguous values (same hex for >1 token) resolve to the canonical/primary
  * token; light-mode output is identical either way, so this only decides which
  * panel control governs it + its dark-mode value.

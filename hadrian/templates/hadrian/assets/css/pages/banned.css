@@ -10,7 +10,7 @@
    which is what made the centred card look orphaned. */
 
 /* Full-bleed: no shell, so centre the card in the viewport itself.
-   Loaded after apple-theme.css, so this wins over the global display:block. */
+   Loaded after core-theme.css, so this wins over the global display:block. */
 body.mt-login-fullpage {
     display: flex;
     align-items: center;

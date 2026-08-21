@@ -1,7 +1,7 @@
 /* ============================================================
-   apple-layout.js — Shared layout system for every page
+   core-layout.js — Shared layout system for every page
    ------------------------------------------------------------
-   Pairs with css/apple-layout.css and ./partials/. Handles:
+   Pairs with css/core-layout.css and ./partials/. Handles:
      · Partial loader for <div data-include="partials/x.html">
      · State chip (drag, auth/layout/palette toggles)
      · Notification + profile dropdowns (nav + inner-topbar)
@@ -329,7 +329,7 @@
 
         // Hide the Services (inside/outside) chip on pages where the toggle does
         // nothing. It now responds wherever there's a content card, a settings-group,
-        // or a known bespoke surface wrapper (see apple-layout.css svc-layout rules) --
+        // or a known bespoke surface wrapper (see core-layout.css svc-layout rules) --
         // so show it on any such page, not just the legacy table-card/.pd3-stack pages.
         if (!document.querySelector('.content-area .card:not(.subnav-card), .content-area .settings-group, .content-area .bdm-group, .content-area .email-card, .content-area .ds-suggested-list, .content-area .hp-feature-card, .svc-table-card, .dom-list-card, .inv-table-card, .tk-table-card, .pd3-stack')) {
             var svcLayoutGroup = svcLayoutButtons[0] && svcLayoutButtons[0].closest('.chip-group');
@@ -827,7 +827,7 @@
     // ── Affixed navigation (admin "Affixed Navigation" toggle) ─
     // Scroll-direction reveal: the top bar hides while scrolling DOWN and
     // returns on the first scroll UP. Gated on <body data-affixed-nav="1">;
-    // all the showing/hiding is CSS (apple-layout.css) keyed off the three
+    // all the showing/hiding is CSS (core-layout.css) keyed off the three
     // body classes set here, so this function only classifies scroll state.
     //
     // Deliberately different from Lagom's implementation in three ways:

@@ -26,7 +26,7 @@ final class SettingsController extends AbstractController
         'affixed_navigation'     => ['Affixed Navigation',       'Keep the navbar pinned while scrolling. It slides out of the way as you scroll down and returns the moment you scroll up. Off lets the navbar scroll away with the page.', false, 'bool'],
         'hide_breadcrumb'        => ['Hide Breadcrumb',          'Hide the breadcrumb above the page title on every layout (the "Portal Home" back-link on top nav, and the "Home / Page" trail on the sidebar and icon-rail layouts).', false, 'bool'],
         'cookie_box'             => ['Cookie Box',               'Show a cookie consent banner on first visit.',                          false, 'bool'],
-        // Negative key on purpose: the sidebar IS pinned today (apple-theme.css:291
+        // Negative key on purpose: the sidebar IS pinned today (core-theme.css:291
         // position:fixed), so a "Sticky sidebar" label would imply the toggle adds
         // stickiness that already exists. Default false == today's rendering.
         // SIDE LAYOUT ONLY -- the icon rail is the sole navigation on its layout and
@@ -43,7 +43,7 @@ final class SettingsController extends AbstractController
         'free_label'             => ['"0.00" → "Free"',          'Display free items as "Free" instead of "$0.00".',                       false, 'bool'],
         'enable_alternate_links' => ['Enable Alternate Links',   'Add SEO multi-language alternate links.',                               true,  'bool'],
         // Scope spelled out: this covers marketing/store section labels only,
-        // NOT client-area table headers or sidebar labels (see apple-layout.css).
+        // NOT client-area table headers or sidebar labels (see core-layout.css).
         // Lagom scopes its equivalent the same way.
         'capitalize_titles'      => ['Section Titles Capitalization', 'Uppercase the eyebrows, tags and tier labels on homepage and store pages. Client-area table headings and sidebar labels are unaffected.', true,  'bool'],
         'hide_cycle_discounts'   => ['Hide Billing Cycle Discounts', 'Hide the "Save X%" pills shown next to the billing cycle choices when configuring a product.', false, 'bool'],
@@ -54,7 +54,7 @@ final class SettingsController extends AbstractController
         'cart_subnav'            => ['Order Category Sidebar',   'Show the Categories / Actions sidebar on order (cart) pages.',          true,  'bool'],
         'website_subnav'         => ['Website Section Sidebar',  'Show the per-page section sub-nav (Account, Domain Tools, etc.) on client-area pages.', true, 'bool'],
         // Label widened to match what this actually does now. The CSS rule it
-        // drives (apple-layout.css, body[data-svc-layout="outside"]) stopped
+        // drives (core-layout.css, body[data-svc-layout="outside"]) stopped
         // being list-page-specific: it floats the .card-header — the TITLE — of
         // every standard card page onto the page background above a flat
         // .card-body. Calling it "Service List Controls" undersold it and left

@@ -8,7 +8,7 @@
  * LayoutsCache, appears as an admin card (badged "Custom"), activates per
  * audience, previews via ?preview=1&layout=topbar-minimal, and renders through
  * header.tpl's generic dispatch — with zero edits to theme.json, header.tpl or
- * apple-layout.css. Copy this folder to start your own layout.
+ * core-layout.css. Copy this folder to start your own layout.
  *
  * The contract (see docs/EXTENDING.md):
  *   - variables.dataLayout: lowercase token, /^[a-z][a-z0-9-]{1,30}$/. Becomes

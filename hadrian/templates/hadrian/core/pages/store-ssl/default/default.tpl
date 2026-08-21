@@ -29,7 +29,7 @@
 
 
 {* Hand the resolved data state to the body - the global rule in
-   apple-layout.css (body[data-data="empty"] .when-full / .when-empty)
+   core-layout.css (body[data-data="empty"] .when-full / .when-empty)
    keys off it; the preview chip can override under ?preview=1. *}
 <script>
 (function () {

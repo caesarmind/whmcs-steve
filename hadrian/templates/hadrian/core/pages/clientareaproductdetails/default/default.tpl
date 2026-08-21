@@ -29,7 +29,7 @@
 
    Layout: single stacked column of standard settings-group / card sections
    (parity with the apple-client-area mockup). settings-group + card respond
-   to the preview chip's Controls inside/outside (apple-layout.css svc-layout).
+   to the preview chip's Controls inside/outside (core-layout.css svc-layout).
 *}
 
 {assign var=svcStatusText  value=$status|default:''|strip_tags}
@@ -492,13 +492,13 @@
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.clientareahostingnextduedate}</div></div><div class="settings-item-action"><span class="settings-item-value">{$nextduedate|escape}</span></div></div>
     {/if}
     {if !empty($recurringamount)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.recurringamount}</div></div><div class="settings-item-action"><span class="settings-item-value">{$recurringamount|escape}{if !empty($billingcycle)} / {$billingcycle|escape}{/if}</span></div></div>
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.recurringamount}</div></div><div class="settings-item-action"><span class="settings-item-value">{include file="`$template`/includes/common/price.tpl" hPrice=$recurringamount}{if !empty($billingcycle)} / {$billingcycle|escape}{/if}</span></div></div>
     {/if}
     {if !empty($paymentmethodname)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.paymentmethod}</div></div><div class="settings-item-action"><span class="settings-item-value">{$paymentmethodname|escape}</span></div></div>
     {/if}
     {if !empty($firstpaymentamount)}
-    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.firstpaymentamount}</div></div><div class="settings-item-action"><span class="settings-item-value">{$firstpaymentamount|escape}</span></div></div>
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.firstpaymentamount}</div></div><div class="settings-item-action"><span class="settings-item-value">{include file="`$template`/includes/common/price.tpl" hPrice=$firstpaymentamount}</span></div></div>
     {/if}
 </div>
 {/if}

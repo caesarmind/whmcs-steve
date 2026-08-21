@@ -9,7 +9,7 @@
 
     Params:
       $ddId       - element id. Must match the key togglePortalProfile()
-                    maps `which` to in apple-layout.js, and must be listed
+                    maps `which` to in core-layout.js, and must be listed
                     in that file's ALL[] so outside-click closes it:
                       (default) -> profileDropdown         topnav
                       'side'    -> profileDropdownSide     inner-topbar
@@ -18,7 +18,7 @@
       $ddUp       - bool. Opens upward (panel anchored to a trigger that
                     sits at the BOTTOM of its column: sidebar, rail).
       $ddToggleId - optional id for the dark-mode slider. Only ONE element
-                    per document may carry it (apple-theme.js does a
+                    per document may carry it (core-theme.js does a
                     getElementById to sync the .active class), so only the
                     top layout's copy passes it: side/rail render TWO of
                     these panels at once (chrome + inner-topbar), and

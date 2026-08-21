@@ -218,7 +218,7 @@ Universal globals always available:
 
 The state-chip (top-floating panel from `partials/state-chip.tpl`) drives
 these body data-attrs. Every page must respond to all of them via CSS in
-its page-specific stylesheet or via `apple-layout.css`:
+its page-specific stylesheet or via `core-layout.css`:
 
 | Chip control | Body/html attr | CSS rule must do… |
 |---|---|---|
@@ -234,7 +234,7 @@ its page-specific stylesheet or via `apple-layout.css`:
 
 **Test routine for a new page:**
 1. Open `?layout=top&data=empty&palette=violet` → should render top-nav with the violet accent and empty-state markup
-2. Click each chip on the live preview → page should re-render the right state without a reload (apple-layout.js handles it)
+2. Click each chip on the live preview → page should re-render the right state without a reload (core-layout.js handles it)
 
 ---
 
@@ -250,8 +250,8 @@ Every page CSS must:
    - Invoices: `.inv-*`
    - Tickets: `.tk-*`
 3. Honor the universal toggles via `body[data-data]`, `body[data-svc-layout]`, etc. — don't comment them out as "Smarty handles it"
-4. Use design tokens from `apple-theme.css` (`--color-surface`, `--color-accent`, `--radius-lg`, `--transition-fast`, etc.) — not raw hex values
-5. **NEVER include `body { display: block; }`** — that's mockup leftover. The real theme's `apple-theme.css` sets `body { display: flex; min-height: 100vh; }` to hold sidebar + main-wrap as flex children; overriding it to `block` collapses the entire layout (especially visible when switching to **top nav** because the sticky `.homepage-nav` needs the flex chain intact)
+4. Use design tokens from `core-theme.css` (`--color-surface`, `--color-accent`, `--radius-lg`, `--transition-fast`, etc.) — not raw hex values
+5. **NEVER include `body { display: block; }`** — that's mockup leftover. The real theme's `core-theme.css` sets `body { display: flex; min-height: 100vh; }` to hold sidebar + main-wrap as flex children; overriding it to `block` collapses the entire layout (especially visible when switching to **top nav** because the sticky `.homepage-nav` needs the flex chain intact)
 6. **Scope `body[data-subnav-side="outside"]` / `[outside-left"]` content-area transforms to non-top layouts** — they shift the content column horizontally to make room for a floated sub-nav, but in top layout there's no sidebar to offset against, so the shift pushes content off-center. Required pattern:
    ```css
    body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-132px); }
@@ -296,7 +296,7 @@ Verification — switch to top layout, then click every Align and Sub-nav-side b
 Required scoping patterns:
 
 ```css
-/* core in apple-layout.css */
+/* core in core-layout.css */
 body[data-align="left"]:not([data-layout="top"]) .ph-main-wrap .content-area { margin-left: 0; margin-right: auto; }
 
 /* in every page CSS that uses subnav-side */
@@ -616,7 +616,7 @@ curl -s -b cookies.txt "https://bill.hostnodes.com/clientarea.php?action=invoice
 
 **Root cause:** when sidebar / rail are `position: fixed`, they're removed from `body`'s flex flow. `.ph-main-wrap` becomes `body`'s only flex child. Without `flex: 1`, it shrinks to its content's natural width — which is `.content-area`'s `max-width: 1120px`. With `.ph-main-wrap` only 1120px wide, `.content-area`'s `margin: auto` has no remaining space to absorb, so margins collapse to 0 and content sticks to column 0.
 
-**Required rule** in `apple-layout.css` and the mockup `apple-client-area/css/apple-layout.css`:
+**Required rule** in `core-layout.css` and the mockup `apple-client-area/css/apple-layout.css`:
 
 ```css
 .ph-main-wrap {
@@ -648,7 +648,7 @@ curl -s -b cookies.txt "https://bill.hostnodes.com/clientarea.php?action=invoice
 **Curl-based remote check** (no browser needed):
 
 ```bash
-curl -s https://bill.hostnodes.com/templates/hadrian/assets/css/apple-layout.css \
+curl -s https://bill.hostnodes.com/templates/hadrian/assets/css/core-layout.css \
   | grep -A 8 '^\.ph-main-wrap {' \
   | grep -E 'flex: 1|min-width: 0'
 # Both lines must appear. If either is missing, the bug is back.
@@ -671,7 +671,7 @@ Before pushing, run through:
 - [ ] Inline `<script>` (and `<style>` if it contains `{...}`) bodies are wrapped in `{literal}…{/literal}` so Smarty doesn't parse JS curly braces
 - [ ] No bare `$hadrian.layouts['…']` chain — always `isset()`-guarded
 - [ ] No `$x|lower|escape` straight into a class attr when `$x` may contain HTML (e.g. WHMCS invoice statuses)
-- [ ] If both `when-empty` and `when-full` markup coexist, the universal CSS toggle in `apple-layout.css` is **uncommented**
+- [ ] If both `when-empty` and `when-full` markup coexist, the universal CSS toggle in `core-layout.css` is **uncommented**
 - [ ] `data-data` set by the inline `<script>` in the page tpl
 
 ---
@@ -769,8 +769,8 @@ These pages render a real H1 + page-prefixed div + working CSS link so they exis
 - **`{include file="…/includes/flashmessage.tpl"}` silently fails if that file isn't in our theme** → Nexus delegates flash-message rendering to `includes/flashmessage.tpl`, but we never copied it. A Smarty `{include}` targeting a non-existent file produces no output (it doesn't throw on the visible page; the rest of the template may also short-circuit), so the whole page goes blank below the include line. Fix: use the inline pattern Nexus's flashmessage.tpl uses internally — `{if $message = get_flash_message()}<div ...>{$message.text}</div>{/if}`. `get_flash_message()` is a Smarty function WHMCS registers globally for client-area templates.
 - **PHP functions in Smarty `{if}` expressions: only `is_array`, `count`, `time` and a few others are whitelisted** → `{if method_exists($user, 'hasTwoFactorAuthEnabled') && ...}` will compile but fail at render with the rest of the template silently dropped. Symptoms: page renders chrome but `.content-area` is empty in view-source. Fix: don't guard with `method_exists` — call the method directly like Nexus does (`{if $user->hasTwoFactorAuthEnabled()}…`). Same goes for `property_exists`, `function_exists`, `class_exists`. If you genuinely need defense, structure with `{if isset($x)}` + direct method call.
 - **v9 friendly URLs vs `clientarea.php?action=…` legacy URLs** → on a v9 install with friendly URLs enabled, the canonical user-level + account-level URLs are `/user/profile`, `/user/security`, `/user/password`, `/user/accounts`, `/account/users`, `/account/paymentmethods`, `/account/contacts`. The legacy `clientarea.php?action=switchaccount`, `?action=changepw` etc. may not even resolve. Never hardcode either — use `{routePath('user-profile')}`, `{routePath('user-accounts')}`, `{routePath('user-password')}`, `{routePath('account-users')}` etc. Both Nexus AND Lagom do this; the routePath function picks the right URL for whatever WHMCS version + URL-mode is configured.
-- **`viewinvoice.php` and `viewquote.php` do NOT auto-wrap in our client-area chrome** → WHMCS renders these tpls standalone, which means `header.tpl` (and therefore `apple-theme.css`, `apple-layout.css`, and every CSS variable) never loads. The page comes out completely unstyled — raw HTML with the page-CSS color/spacing tokens all `undefined`. Both Lagom AND Nexus handle this: Lagom puts `{include file="\`$template\`/header.tpl"}` at the top of `viewinvoice.tpl` and `{include file="\`$template\`/footer.tpl"}` at the bottom; Nexus inlines an entire `<!DOCTYPE html><html><head>…</head><body>…</body></html>`. We use Lagom's approach in our dispatcher. **Rule:** any new dispatcher tpl at `templates/hadrian/<pagename>.tpl` that targets a WHMCS route that bypasses the chrome — currently just `viewinvoice` and `viewquote`, but watch for new ones — must explicitly `{include}` header.tpl + footer.tpl.
-- **Both `when-empty` and `when-full` markup coexisting** → relies on `apple-layout.css` toggle rules; keep them active, never comment out.
+- **`viewinvoice.php` and `viewquote.php` do NOT auto-wrap in our client-area chrome** → WHMCS renders these tpls standalone, which means `header.tpl` (and therefore `core-theme.css`, `core-layout.css`, and every CSS variable) never loads. The page comes out completely unstyled — raw HTML with the page-CSS color/spacing tokens all `undefined`. Both Lagom AND Nexus handle this: Lagom puts `{include file="\`$template\`/header.tpl"}` at the top of `viewinvoice.tpl` and `{include file="\`$template\`/footer.tpl"}` at the bottom; Nexus inlines an entire `<!DOCTYPE html><html><head>…</head><body>…</body></html>`. We use Lagom's approach in our dispatcher. **Rule:** any new dispatcher tpl at `templates/hadrian/<pagename>.tpl` that targets a WHMCS route that bypasses the chrome — currently just `viewinvoice` and `viewquote`, but watch for new ones — must explicitly `{include}` header.tpl + footer.tpl.
+- **Both `when-empty` and `when-full` markup coexisting** → relies on `core-layout.css` toggle rules; keep them active, never comment out.
 - **`body { display: block; }` leak in page CSS** → kills the body's `display: flex` chain that holds sidebar + main-wrap, most visibly breaking **top-nav layout** since the sticky `.homepage-nav` needs intact flex. Strip this from every page CSS (was in 5 files: clientareahome, clientareaproducts, clientareadomains, clientareainvoices, supporttickets).
 - **`[data-subnav-side="outside"]` content-area transforms unscoped** → in top layout there's no sidebar to offset against, so `translateX(-132px)` shoves content off-center. Always include `:not([data-layout="top"])` in the selector.
 - **`.ph-main-wrap` missing `flex: 1`** → in top layout (sidebar/rail are fixed-positioned, removed from flex flow) the wrap shrinks to its content's max-width (1120px), leaving `.content-area`'s `margin: auto` no space to absorb, so content sticks to column 0 of the viewport. Required rules: `flex: 1; min-width: 0;` on `.ph-main-wrap`. See §6d.

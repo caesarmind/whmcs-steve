@@ -9,7 +9,7 @@
    product (captured by position), falling back to the mockup values otherwise.
    Prose is tokenized into the hadrianLang store group (wbl-prefixed keys); terse
    spec bullets, decorative illustrations, and testimonials are kept verbatim.
-   The mockup's stats strip uses .stat-item, not in apple-theme.css, so we use
+   The mockup's stats strip uses .stat-item, not in core-theme.css, so we use
    the theme's styled .hp-stat. *}
 
 {assign var=_wblCount value=0}

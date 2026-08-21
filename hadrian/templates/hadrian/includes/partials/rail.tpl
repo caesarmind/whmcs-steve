@@ -7,7 +7,7 @@
            deliberately NOT a fallback here: a wide wordmark squeezed into a
            28px square is unreadable, so we drop straight to the built-in
            placeholder glyph. data-logo-dark is exchanged by initLogoSwap()
-           in apple-layout.js when <html data-theme> flips; emitted only when
+           in core-layout.js when <html data-theme> flips; emitted only when
            the two uploads actually differ (the resolver mirrors a single
            upload into both variants). *}
         {if !empty($hadrian.branding.square.light)}

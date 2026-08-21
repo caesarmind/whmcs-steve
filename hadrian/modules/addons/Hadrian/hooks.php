@@ -211,7 +211,7 @@ if (AddonHelper::isActive()) {
     //                                enabled, else 'light'. Server-rendered so
     //                                there's no flash for the default.
     //   $mtDarkMode        (string)— 'off' | 'switcher' | 'forced'; read by
-    //                                apple-theme.js to decide whether a saved
+    //                                core-theme.js to decide whether a saved
     //                                preference may override the default.
     add_hook('ClientAreaPage', 2, function ($vars) {
         $darkEnabled = (bool)Hadrian\Models\Settings::getValue('enable_dark_mode', true);

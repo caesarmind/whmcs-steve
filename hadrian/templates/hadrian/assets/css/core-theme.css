@@ -127,7 +127,7 @@
     --sidebar-field-bg: var(--_sb-field, var(--color-surface-secondary));
     --sidebar-scroll-thumb: var(--_sb-thumb, rgba(0, 0, 0, 0.15));
     /* The two stops of the Gradient nav style. Fully transparent by default,
-       which is what keeps the composing rule in apple-layout.css inert: it
+       which is what keeps the composing rule in core-layout.css inert: it
        paints a transparent-to-transparent image over --sidebar-bg and nothing
        shows until the style is picked. They are COLOURS, not a gradient value,
        because Hooks::isColorValue rejects linear-gradient() on save and on
@@ -223,7 +223,7 @@
        Why it lives here at :root, in CSS, and not in PHP: a custom property
        resolves per element at computed-value time, so one declaration here
        re-derives through ALL FOUR places a colour can be changed -- the
-       [data-theme="dark"] block below, html[data-palette] in apple-layout.css,
+       [data-theme="dark"] block below, html[data-palette] in core-layout.css,
        the buyer's Styles > Colors overrides injected as <style
        id="hadrian-colors">, and any future scope nobody has thought of. PHP
        can see only the second of those: buildColorsHead emits just the tokens
@@ -426,7 +426,7 @@
    while still losing to the panel's own emitted html[data-theme="dark"] block,
    which ties and wins on source order. That is the intended precedence:
    dark-scope override > stock dark > light-scope override. Relationship to
-   html[data-palette] in apple-layout.css is unchanged -- it already outranked
+   html[data-palette] in core-layout.css is unchanged -- it already outranked
    the bare form and, being a later file, still ties-and-wins. */
 html[data-theme="dark"] {
     --color-bg: #1c1c1e;
@@ -464,7 +464,7 @@ html[data-theme="dark"] {
        re-derives from the page tokens redeclared in this block. */
     --sidebar-scroll-thumb: var(--_sb-thumb, rgba(255, 255, 255, 0.15));
     /* The two stops of the Gradient nav style. Fully transparent by default,
-       which is what keeps the composing rule in apple-layout.css inert: it
+       which is what keeps the composing rule in core-layout.css inert: it
        paints a transparent-to-transparent image over --sidebar-bg and nothing
        shows until the style is picked. They are COLOURS, not a gradient value,
        because Hooks::isColorValue rejects linear-gradient() on save and on

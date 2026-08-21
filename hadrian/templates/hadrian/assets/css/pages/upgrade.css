@@ -13,7 +13,7 @@
 .up-callout svg { width: 17px; height: 17px; flex-shrink: 0; margin-top: 1px; }
 
 /* Section split — main flow + Services sub-nav aside. The wrapper ends in "-split"
-   so apple-layout.css's global website-sidebar toggle (body[data-subnav-website="off"]
+   so core-layout.css's global website-sidebar toggle (body[data-subnav-website="off"]
    [class$="-split"]) hides the aside and collapses to one column site-wide. Collapses
    to a single column on its own below 1024px (aside stacks under the cards). */
 .up-split { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 24px; align-items: start; }

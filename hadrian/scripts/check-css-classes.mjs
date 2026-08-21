@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Manual check: every literal CSS class used in a page tpl should be defined in
-// the page's own CSS, the global theme CSS (apple-theme/apple-layout), or be a
+// the page's own CSS, the global theme CSS (core-theme/core-layout), or be a
 // known runtime/state/utility class. Flags likely typos (used but never defined).
 import fs from 'node:fs';
 
@@ -22,7 +22,7 @@ const ALLOW = new Set([
   'auth-link','masq-chip','spacer','dot','big','due','muted','grand','total','first','last',
 ]);
 
-const globalCss = ['apple-theme.css','apple-layout.css']
+const globalCss = ['core-theme.css','core-layout.css']
   .map(f => { try { return fs.readFileSync(`${CSSDIR}/${f}`,'utf8'); } catch { return ''; } }).join('\n');
 const globalDefined = new Set([...globalCss.matchAll(/\.([a-zA-Z][\w-]*)/g)].map(m => m[1]));
 

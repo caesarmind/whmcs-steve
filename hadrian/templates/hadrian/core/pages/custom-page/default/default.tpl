@@ -5,7 +5,7 @@
    below is yours to change -- replace it with your own markup / layout. The
    starter content uses the theme's design tokens (var(--color-*)) so it matches
    the site in light and dark mode. You can also reuse the theme's marketing
-   components (the hp-* classes from apple-theme.css) for hero / pricing /
+   components (the hp-* classes from core-theme.css) for hero / pricing /
    feature sections like the homepage.
 
    When you build your real content, tokenize visible copy into the $hadrianLang

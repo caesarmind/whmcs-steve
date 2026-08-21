@@ -1,8 +1,8 @@
-# Build artifacts (compiled from SCSS — except the apple-* shipped sources)
+# Build artifacts (compiled from SCSS — except the core-* shipped sources)
 templates/hadrian/assets/css/*.css
 templates/hadrian/assets/css/*.css.map
-!templates/hadrian/assets/css/apple-theme.css
-!templates/hadrian/assets/css/apple-layout.css
+!templates/hadrian/assets/css/core-theme.css
+!templates/hadrian/assets/css/core-layout.css
 templates/hadrian/assets/js/dist/
 templates/hadrian/core/styles/*/style.css
 

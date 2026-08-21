@@ -1,7 +1,7 @@
 {* Hostnodes — page footer.
    Closes content-area + ph-main-wrap, dispatches to the admin-picked
    footer layout (core/layouts/footer/<name>/default.tpl), then loads the
-   apple-theme.js + apple-layout.js. *}
+   core-theme.js + core-layout.js. *}
 
 {* Match the gate switch in header.tpl. When the gate is disabled (or the
    addon is active and has set canRender=true), fall through to the normal
@@ -46,7 +46,7 @@
 
 {* Language / currency modal - lives outside .ph-main-wrap so its backdrop
    covers the full viewport. Opened by [data-locale-open] buttons in the
-   footer; JS handler in apple-layout.js. *}
+   footer; JS handler in core-layout.js. *}
 {include file="`$template`/includes/partials/locale-modal.tpl"}
     {/if}{* end portal chrome close (skipped when fullPage) *}
 
@@ -63,8 +63,8 @@
 
 {$footeroutput}
 
-<script src="{$WEB_ROOT}/templates/{$template}/assets/js/apple-theme.js?v={$hadrian.version|default:'1.1'}"></script>
-<script src="{$WEB_ROOT}/templates/{$template}/assets/js/apple-layout.js?v={$hadrian.version|default:'1.1'}"></script>
+<script src="{$WEB_ROOT}/templates/{$template}/assets/js/core-theme.js?v={$hadrian.version|default:'1.1'}"></script>
+<script src="{$WEB_ROOT}/templates/{$template}/assets/js/core-layout.js?v={$hadrian.version|default:'1.1'}"></script>
 
 </body>
 </html>

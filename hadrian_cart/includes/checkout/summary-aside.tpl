@@ -27,25 +27,25 @@
             {foreach $products as $num => $product}
                 <div class="co-summary-line">
                     <span class="label">{$product.productinfo.name}{if $product.billingcyclefriendly} &middot; {$product.billingcyclefriendly}{/if}</span>
-                    <span class="value">{$product.pricing.totalTodayExcludingTaxSetup}</span>
+                    <span class="value">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$product.pricing.totalTodayExcludingTaxSetup}</span>
                 </div>
             {/foreach}
             {foreach $domains as $num => $domain}
                 <div class="co-summary-line">
                     <span class="label">{if $domain.type eq "register"}{$LANG.orderdomainregistration}{else}{$LANG.orderdomaintransfer}{/if} &middot; {$domain.domain}</span>
-                    <span class="value">{$domain.price}</span>
+                    <span class="value">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$domain.price}</span>
                 </div>
             {/foreach}
             {foreach $addons as $num => $addon}
                 <div class="co-summary-line">
                     <span class="label">+ {$addon.name}</span>
-                    <span class="value">{$addon.totaltoday}</span>
+                    <span class="value">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$addon.totaltoday}</span>
                 </div>
             {/foreach}
 
             <div class="co-summary-line divider">
                 <span class="label">{$LANG.ordersubtotal}</span>
-                <span class="value" id="subtotal">{$subtotal}</span>
+                <span class="value" id="subtotal">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$subtotal}</span>
             </div>
             {if $promotioncode}
                 <div class="co-summary-line">
@@ -69,7 +69,7 @@
 
         <div class="co-summary-total">
             <span class="label">{$LANG.ordertotalduetoday}</span>
-            <span class="value" id="totalDueToday">{$total}</span>
+            <span class="value" id="totalDueToday">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$total}</span>
         </div>
 
         {if $totalrecurring}

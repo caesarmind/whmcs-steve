@@ -71,7 +71,7 @@
         window.addEventListener('scroll', onScroll, { passive: true });
         classify();
         btn.addEventListener('click', function () {
-            // apple-theme.css sets html{scroll-behavior:smooth} with no
+            // core-theme.css sets html{scroll-behavior:smooth} with no
             // reduced-motion guard. Per CSSOM-View, behavior:'auto' DEFERS to
             // that CSS value so it cannot force an instant jump, and
             // behavior:'instant' throws on older Safari. Overriding the inline

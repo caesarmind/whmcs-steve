@@ -9,7 +9,7 @@
  * Colors panel (colours only) — no overlap.
  *
  * GLOBAL (site-wide); emitted into :root. Every `default` MUST mirror the
- * matching token in assets/css/apple-theme.css.
+ * matching token in assets/css/core-theme.css.
  */
 return [
     'sizeMin' => 0,

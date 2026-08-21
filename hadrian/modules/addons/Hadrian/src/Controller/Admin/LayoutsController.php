@@ -45,7 +45,7 @@ final class LayoutsController extends AbstractController
      * install that never touches this keeps exactly today's rendering.
      *
      * The width itself is the --content-max-width custom property
-     * (apple-theme.css), so the CSS override is two rules rather than a hunt
+     * (core-theme.css), so the CSS override is two rules rather than a hunt
      * through every layout.
      *
      * 'fluid' was RETIRED (2026-07-24). It differed from 'full' by gutter alone

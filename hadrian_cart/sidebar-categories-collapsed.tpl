@@ -3,7 +3,7 @@
  *
  * Mobile / narrow-viewport reveal of the categories sidebar. Desktop
  * shows the full sidebar-categories.tpl in the gutter; on narrow
- * screens that gutter collapses and the apple-layout.css media query
+ * screens that gutter collapses and the core-layout.css media query
  * (max-width: 880px) un-hides this .sidebar-collapsed wrapper.
  *
  * Each $panel in $secondarySidebar renders as a card-wrapped <select>
@@ -11,7 +11,7 @@
  * sits beneath, for guest visitors with multi-currency enabled.
  *
  * Contract preserved verbatim:
- *   - <div class="sidebar-collapsed"> outer wrapper -- apple-layout.css
+ *   - <div class="sidebar-collapsed"> outer wrapper -- core-layout.css
  *     keys its hide/show on this class.
  *   - $secondarySidebar panel loop with $panel->getClass() applied
  *     directly on the panel root.

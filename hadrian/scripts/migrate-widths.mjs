@@ -3,7 +3,7 @@
  * migrate-widths.mjs
  *
  * Replaces hardcoded container `max-width: Npx` DECLARATIONS with the
- * --w-* container-scale tokens (apple-theme.css), so the admin's single
+ * --w-* container-scale tokens (core-theme.css), so the admin's single
  * "Maximum width" number moves every page-level container in proportion
  * instead of only the outer content column.
  *

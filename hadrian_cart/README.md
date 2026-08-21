@@ -37,7 +37,7 @@ The pragmatic resolution: inherit from `standard_cart` and only override what we
 
 Every other cart-flow template (`viewcart`, `configureproduct`, `configureproductdomain`, `checkout`, `domainregister`, `domaintransfer`, `signup`, `addons`, `complete`, …) falls through to `standard_cart`'s versions. They're styled to look Apple-ish via:
 
-- The **CSS resets + Bootstrap shim** in `hadrian/templates/hadrian/assets/css/apple-layout.css` (search for `Cart-page wrapper integration` and `Bootstrap grid + utilities shim`). Bootstrap classes (`.row`, `.col-md-*`, `.panel`, `.card`, `.list-group`, `.btn`, `.alert`) get rendered using Apple visual tokens, scoped to `body[data-tpl="cart"|"viewcart"|"configureproduct"|…]`.
+- The **CSS resets + Bootstrap shim** in `hadrian/templates/hadrian/assets/css/core-layout.css` (search for `Cart-page wrapper integration` and `Bootstrap grid + utilities shim`). Bootstrap classes (`.row`, `.col-md-*`, `.panel`, `.card`, `.list-group`, `.btn`, `.alert`) get rendered using Apple visual tokens, scoped to `body[data-tpl="cart"|"viewcart"|"configureproduct"|…]`.
 - The **conditional jQuery + Bootstrap + multiselect + csrfToken load** in `hadrian/templates/hadrian/header.tpl`. These are loaded on every cart-flow page (regardless of which cart template is active) so `standard_cart`'s `scripts.min.js` has the dependencies it expects.
 
 ## Why we kept `products.tpl`
@@ -61,7 +61,7 @@ The git history of this folder has the previous full-rewrite TPLs at commit `7e0
 
 `hadrian/` (the client-area theme) wraps every order-form page inside its own `.content-area` regardless of which cart template is active. Three pieces of integration live in `hadrian/` so any cart template — `hadrian_cart`, `standard_cart`, `nexus_cart`, anything else — renders correctly:
 
-1. **Wrapper resets** (`assets/css/apple-layout.css` → `Cart-page wrapper integration`): hide WHMCS's duplicate `.main-navbar-wrapper`, flatten `#main-body` padding, neutralize `#order-standard_cart` so our `.content-area` controls spacing.
+1. **Wrapper resets** (`assets/css/core-layout.css` → `Cart-page wrapper integration`): hide WHMCS's duplicate `.main-navbar-wrapper`, flatten `#main-body` padding, neutralize `#order-standard_cart` so our `.content-area` controls spacing.
 2. **Bootstrap-grid + utilities shim** (same file → `Bootstrap grid + utilities shim for legacy cart templates`): provides `.row` / `.col-md-*` / `.panel` / `.card` / `.list-group` / `.btn` / `.alert` / form / utility rules in Apple visual tokens. Classic WHMCS order-form templates expect Bootstrap to be loaded by the client-area theme; hadrian uses its own design system, so without this shim the layout collapses to an unstyled stack.
 3. **Bootstrap-JS + globals injection** (`header.tpl`): conditionally loads jQuery 3.7.1 + Bootstrap 4.6.2 + bootstrap-multiselect 1.1.2 from CDN, and defines `csrfToken` / `language` / `WEB_ROOT` / `markdownGuideUri` as top-level globals — all the things `standard_cart`'s `scripts.min.js` references at runtime.
 

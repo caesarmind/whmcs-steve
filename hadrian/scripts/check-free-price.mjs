@@ -7,7 +7,7 @@
  *   1. includes/common/price.tpl        (Smarty, for server-rendered prices)
  *   2. src/Helpers/PriceHelper.php      (PHP, for the AJAX data tables)
  *   3. initFreePriceLabels() in
- *      assets/js/apple-layout.js        (JS, for the order form's client-side
+ *      assets/js/core-layout.js        (JS, for the order form's client-side
  *                                        price rewrites)
  *
  * Lagom's equivalent is duplicated inline across ~10 templates plus a JS
@@ -16,7 +16,7 @@
  *
  * None of the three is simulated from a hardcoded copy: the regexes are
  * EXTRACTED from price.tpl and the isZero() body is EXTRACTED from
- * apple-layout.js, so editing either without updating the expectations here
+ * core-layout.js, so editing either without updating the expectations here
  * fails the check.
  *
  * The PHP path runs only when a `php` binary is reachable; otherwise it is
@@ -34,7 +34,7 @@ import { tmpdir } from 'node:os';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const TPL = resolve(root, 'templates/hadrian/includes/common/price.tpl');
 const PHP = resolve(root, 'modules/addons/Hadrian/src/Helpers/PriceHelper.php');
-const JS  = resolve(root, 'templates/hadrian/assets/js/apple-layout.js');
+const JS  = resolve(root, 'templates/hadrian/assets/js/core-layout.js');
 
 // [input, expectedFree, description]
 const CASES = [
@@ -86,13 +86,13 @@ if (patterns.length !== 2) {
 }
 
 // -------------------------------------------------------------------- JS side
-// initFreePriceLabels() in apple-layout.js carries a third copy of the test,
+// initFreePriceLabels() in core-layout.js carries a third copy of the test,
 // for the order form's client-side price rewrites. Extract its isZero() body
 // verbatim rather than restating the logic here.
 const js = readFileSync(JS, 'utf8');
 const isZeroSrc = js.match(/function isZero\(text\) \{([\s\S]*?)\n {8}\}/);
 if (!isZeroSrc) {
-  fail('could not find isZero() in apple-layout.js — did initFreePriceLabels change shape?');
+  fail('could not find isZero() in core-layout.js — did initFreePriceLabels change shape?');
 } else {
   const jsIsFree = new Function('text', isZeroSrc[1]);
   for (const [input, want, desc] of CASES) {

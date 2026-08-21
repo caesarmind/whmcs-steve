@@ -1,7 +1,7 @@
 {* Hostnodes - secondary flyout panels for the 80px icon rail.
 
    Rendered as a SIBLING of .ph-rail (both sit before .ph-main-wrap), never
-   nested inside it: initRail() in assets/js/apple-layout.js binds
+   nested inside it: initRail() in assets/js/core-layout.js binds
    mouseleave/mouseenter to .ph-rail and .ph-rail-panel independently, and the
    180ms cancelClose bridge only works while the two boxes are edge-adjacent
    (panel is left:80px, exactly the rail's width).

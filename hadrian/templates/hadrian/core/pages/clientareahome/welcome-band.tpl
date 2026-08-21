@@ -77,7 +77,7 @@
        The partial resolves $user_fullname and $_email from the INCLUDING
        scope, and each call site sets them itself (see inner-topbar.tpl), so
        they are assigned here too. ddId must match the arm added to
-       togglePortalProfile() and the ALL[] list in apple-layout.js, or the menu
+       togglePortalProfile() and the ALL[] list in core-layout.js, or the menu
        opens and outside-click never closes it. *}
     {if $atHeroProfile == 'avatar' && $loggedin}
     {assign var=_first value=$clientsdetails.firstname|default:''}

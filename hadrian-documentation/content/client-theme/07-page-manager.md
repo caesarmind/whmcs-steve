@@ -1,6 +1,6 @@
 ---
 title: Page Manager
-group: Customization
+group: Configuration
 icon: doc
 lead: Every WHMCS page, in one list. Pick the template that renders it, set who can reach it, write its search-engine and social copy in as many languages as you run, and override the site-wide layout for that page alone.
 ---
@@ -129,24 +129,32 @@ These apply whichever template is selected.
 
 ### Visibility
 
-Visibility marks how public a page is meant to be. It governs where the page is
-*listed*, not who may open it.
+Who can reach the page. Unlike Indexing - which politely asks crawlers - this
+one is enforced when the page is requested.
 
 :::props
-| Option | Stored as | Effect |
+| Option | Stored as | What happens |
 | --- | --- | --- |
-| Public | `public` | The page is eligible for `sitemap.xml`, and Page Manager offers an **Open** link for it. The default. |
-| Authenticated only | `auth` | Kept out of the sitemap - the right marking for anything behind a login. |
-| Disabled (404) | `disabled` | Kept out of the sitemap, and Page Manager stops offering an Open link for it. |
+| Public | `public` | Renders for everyone, is eligible for `sitemap.xml`, and Page Manager offers an **Open** link. The default. |
+| Authenticated only | `auth` | Signed-out visitors are redirected to the login page. Kept out of the sitemap. |
+| Disabled (404) | `disabled` | Every visitor is sent to WHMCS' page-not-found page. Kept out of the sitemap, and the Open link goes too. |
 :::
 
-:::warn Visibility is not access control
-Marking a page Authenticated only or Disabled does not put a lock on it, and it
-does not stop the page rendering for someone who has the URL. Client-area pages
-are already protected by WHMCS' own authentication - that is what actually keeps
-people out. Use Visibility to keep a page out of your sitemap, and WHMCS' own
-authentication to keep people out of it.
+A signed-in admin still sees a Disabled page from the same browser, so you can
+check what you disabled before anyone asks why it is gone.
+
+:::info Three kinds of page ignore this setting, deliberately
+The sign-in and password-reset pages - a login gate on the login page is a
+redirect loop, and locking password reset locks out exactly the people who
+need it. The order form, because a dropdown must not be able to break a
+checkout in progress. And the dead ends WHMCS sends rejected visitors to -
+Banned, Access Denied, store Not Found - which must render for precisely the
+visitors a gate would turn away. Whatever these pages' rows say, they render.
 :::
+
+Client-area pages already sit behind WHMCS' own login. **Authenticated only**
+puts that same gate on pages WHMCS ships public, and **Disabled** takes a page
+off the site without deleting anything - flip it back and it returns intact.
 
 To take a page out of your navigation, edit the menu in
 [Menu Manager](/client-theme/menu-manager/) - that is a separate control and the
@@ -277,53 +285,19 @@ footer stripped back.
 
 Pages the theme does not ship - a landing page, a policy page, anything you build
 yourself - can be registered so they appear in Page Manager with the same
-template, SEO and layout controls as everything else.
+template, SEO and layout controls as everything else. Hadrian ships a working
+example: `custom-page.php` in your WHMCS root, already registered in the Public
+group of this list.
 
-Hadrian ships a working example: `custom-page.php` in your WHMCS root, rendering
-`core/pages/custom-page/default/default.tpl`. Copy it.
-
-:::steps
-1. Copy `custom-page.php` in your WHMCS root to `<name>.php` and change its `setTemplate('custom-page')` call to `setTemplate('<name>')`.
-2. Copy `templates/hadrian/custom-page.tpl` to `templates/hadrian/<name>.tpl` and replace `custom-page` with `<name>` inside it. This file is only a two-line dispatcher - it hands the body off to `core/pages`.
-3. Create `templates/hadrian/core/pages/<name>/` with a `page.php` inside it.
-4. Create `templates/hadrian/core/pages/<name>/default/default.tpl` and put your markup in it.
-5. Open **Hadrian -> Pages**. Your page is in the list.
-:::
-
-`page.php` is what puts it in the list and names it:
-
-```php
-<?php
-return [
-    'display_name' => 'Access Denied',
-    'group'        => 'Client Area',
-    'description'  => 'Shown when a client opens something they cannot see.',
-];
-```
-
-:::props
-| Key | Default | Purpose |
-| --- | --- | --- |
-| `display_name` | the folder name | The name shown in Page Manager and in the menu builder's page picker. |
-| `group` | `Other` | Which tab it files under: Public, Authentication, Client Area, Account, Billing, Shop or Support. |
-| `description` | empty | The line under the name in the list. |
-| `defaultVariant` | `default` | Which template renders it before anyone picks one. |
-| `listDisplay` | `true` | Set `false` to keep it out of the list. It still renders and is still reachable by URL. |
-| `supportedOptions` | `[]` | Options to show under Template settings for every template of this page. |
-| `seoDefaults` | none | Starting `indexing`, `title` and `description`, used until someone edits the page's SEO. |
-:::
+It is four small files, and the full walkthrough - the entry file, the
+dispatcher, the `page.php` reference, full-width pages and login gating - is
+its own article: [Creating Pages](/client-theme/creating-pages/).
 
 :::tip No cache to clear
 Hadrian fingerprints the `core/pages` directory, so a page you just added appears
 on your next visit to the Pages tab. There is no version to bump and no rebuild
 to run.
 :::
-
-To offer a second template for a page, add `core/pages/<name>/<template>/` with a
-`<template>.tpl` inside it. The directory, the `.tpl` and the optional `.php`
-that names it must all share the same name - `beacon/beacon.tpl` and
-`beacon/beacon.php`. Hadrian finds it on the next page load and it appears as a
-card in Page template.
 
 ## Replacing a page you did not write
 

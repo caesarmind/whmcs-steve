@@ -188,7 +188,7 @@
        into accent hover, link and link hover is exactly what their own hints
        warn against ("Set a value only to break that link"), so a preset was
        quietly pinning the very family it was supposed to move. They are reset
-       to their defaults instead, which lets apple-theme.css derive them from
+       to their defaults instead, which lets core-theme.css derive them from
        the new accent. */
     function applyAccentPreset(hex){
         var h = clean(hex); if (!h) return;
@@ -901,7 +901,7 @@
                 written++;
             });
 
-            /* The three rows apple-theme.css derives get RESET, not skipped.
+            /* The three rows core-theme.css derives get RESET, not skipped.
                Left alone they keep whatever was pinned there before, and a
                pinned hover does not follow a rebrand -- generate a terracotta
                palette and the hover stays blue. Reset to default they are
@@ -1326,18 +1326,35 @@
         pop.addEventListener('mouseenter', function(){ clearTimeout(hideT); });
         pop.addEventListener('mouseleave', hideSoon);
     }
+    function bottomLimit(){
+        // A page-level Save bar (includes/savebar.tpl) is position:fixed at
+        // the viewport bottom, z-index 80. .mt-tip-pop's 10000 paints over it
+        // fine, but window.innerHeight alone doesn't know the bar is there --
+        // so a tip on the page's last row(s) sized "below" against the full
+        // viewport and could open straight into the bar's band, dragging the
+        // "Learn more" link into it too. Clamp against whichever savebar is
+        // actually on screen (pages that render several panels give each its
+        // own bar with [hidden] on the rest -- those collapse to a zero rect).
+        var bars = document.querySelectorAll('.mt-savebar');
+        for (var i = 0; i < bars.length; i++) {
+            var br = bars[i].getBoundingClientRect();
+            if (br.height > 0) return br.top;
+        }
+        return window.innerHeight;
+    }
     function place(btn){
         var r = btn.getBoundingClientRect();
         pop.style.visibility = 'hidden'; pop.style.display = 'block';
         pop.style.left = '0px'; pop.style.top = '0px';
         var ph = pop.offsetHeight, pw = pop.offsetWidth;
-        var below = window.innerHeight - r.bottom - 10, above = r.top - 10;
+        var limit = bottomLimit();
+        var below = limit - r.bottom - 10, above = r.top - 10;
         var side = (ph <= below || below >= above) ? 'bottom' : 'top';
         pop.setAttribute('data-side', side);
         var top = side === 'bottom' ? r.bottom + 8 : r.top - ph - 8;
         var mid = r.left + r.width / 2;
         var left = Math.max(8, Math.min(mid - pw / 2, window.innerWidth - pw - 8));
-        pop.style.top = Math.max(8, Math.min(top, window.innerHeight - ph - 8)) + 'px';
+        pop.style.top = Math.max(8, Math.min(top, limit - ph - 8)) + 'px';
         pop.style.left = left + 'px';
         // Arrow tracks the trigger centre within the panel.
         var ax = Math.max(8, Math.min(mid - left - 4, pw - 16));

@@ -21,8 +21,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{$companyname|default:''|escape} - {$pagetitle|escape}</title>
-    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v={$hadrian.version|default:'1.0'}">
-    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-layout.css?v={$hadrian.version|default:'1.0'}">
+    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/core-theme.css?v={$hadrian.version|default:'1.0'}">
+    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/core-layout.css?v={$hadrian.version|default:'1.0'}">
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/viewinvoice.css?v={$hadrian.version|default:'1.0'}">
     <style>{literal}
         body { background: var(--color-bg); margin: 0; min-height: 100vh; }

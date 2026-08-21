@@ -10,7 +10,7 @@
    to the mockup values otherwise. Prose is tokenized into the hadrianLang store
    group (sib-prefixed keys); terse spec bullets, decorative illustrations, and
    testimonials are kept verbatim. The mockup's stats strip uses .stat-item,
-   which is not in apple-theme.css, so we use the theme's styled .hp-stat. *}
+   which is not in core-theme.css, so we use the theme's styled .hp-stat. *}
 
 {assign var=_sibCount value=0}
 {if isset($plans)}{assign var=_sibCount value=$plans|@count}{/if}

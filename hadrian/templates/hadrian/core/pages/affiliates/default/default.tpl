@@ -90,7 +90,7 @@
 {else}
 
     {* Sentinel so the state-chip "Controls inside / outside" option appears in preview
-       (apple-layout.js reveals the Services pill-group when this element is present). *}
+       (core-layout.js reveals the Services pill-group when this element is present). *}
     <div class="svc-table-card" aria-hidden="true"></div>
 
     {if $withdrawrequestsent}

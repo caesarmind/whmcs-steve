@@ -8,11 +8,11 @@
  * px or SCALE references (font / radius / border-width via `scales`); colours
  * are select-colors REFERENCES — each slot stores a `colorOptions` KEY and the
  * emitter turns it into the option's `css` (a var(), hex, or rgba()). The
- * referenced tokens are mode-aware in apple-theme.css, so one GLOBAL mapping
+ * referenced tokens are mode-aware in core-theme.css, so one GLOBAL mapping
  * styles both light + dark — this panel is site-wide, not per-style.
  *
  * Every `default` MUST mirror the matching --input-* / --icheck-* token in
- * assets/css/apple-theme.css, or the "is this an override?" comparison desyncs.
+ * assets/css/core-theme.css, or the "is this an override?" comparison desyncs.
  */
 return [
     /* select-colors palette (focused subset of the theme colours that make
@@ -87,7 +87,7 @@ return [
     ],
 
     /* Colour fields, grouped by section. Each value is a colorOptions key
-       (the per-mode default) and MUST mirror apple-theme.css. */
+       (the per-mode default) and MUST mirror core-theme.css. */
     'colorGroups' => [
         'Field' => [
             ['var' => '--input-bg',                  'label' => 'Background',    'default' => 'surface'],

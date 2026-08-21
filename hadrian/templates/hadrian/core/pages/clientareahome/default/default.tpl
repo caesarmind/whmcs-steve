@@ -76,7 +76,7 @@
 {* Page-specific stylesheet *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientareahome.css?v={$hadrian.version|default:'1.0'}">
 
-{* Hand layout signals to the body — picked up by apple-layout.js + page CSS *}
+{* Hand layout signals to the body — picked up by core-layout.js + page CSS *}
 <script>
 (function () {
     var b = document.body;

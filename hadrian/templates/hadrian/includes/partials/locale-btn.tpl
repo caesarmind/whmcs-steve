@@ -1,5 +1,5 @@
 {* Locale button - opens the language/currency modal. Wired up via
-   [data-locale-open] in apple-layout.js. The currency segment only renders
+   [data-locale-open] in core-layout.js. The currency segment only renders
    when WHMCS has more than one active currency configured (or hasn't
    exposed $currencies on this page yet); single-currency installs get a
    language-only button. *}
@@ -13,7 +13,8 @@
 <button type="button" class="locale-btn" aria-label="{$hadrianLang.common.localeChoose}" data-locale-open>
     <span class="flag">{$hadrian.localeFlag|default:'&#127482;&#127480;'}</span>
     {if $mtLangOn}
-    <span>{$language|default:'english'|capitalize}</span>
+    {assign var=mtActiveLangKey value=$language|default:'english'|lower}
+    <span>{if isset($hadrian.locales.nativeNames[$mtActiveLangKey])}{$hadrian.locales.nativeNames[$mtActiveLangKey]|escape}{else}{$language|default:'english'|capitalize}{/if}</span>
     {/if}
     {if $mtShowCurrencyInLocale}
     {if $mtLangOn}<span class="sep">/</span>{/if}

@@ -199,7 +199,7 @@
                 {if $productCount > 0}
 
                 {* Wrapper class renamed from .when-full to .cart-plans-grid
-                   because hadrian/apple-layout.css ships a global
+                   because hadrian/core-layout.css ships a global
                    `body[data-data="empty"] .when-full { display: none !important; }`
                    toggle for client-area pages with empty-state previews.
                    On cart pages we choose state via Smarty {if/else}, so we
@@ -868,7 +868,11 @@
                 // Fall back to minprice when this product doesn't offer the picked cycle.
                 var min = host.getAttribute('data-price-min');
                 var minCycle = host.getAttribute('data-cycle-min');
-                if (min) amountEl.textContent = min;
+                if (min) {
+                    amountEl.textContent = (window.hnFreePrice && window.hnFreePrice.isZero(min))
+                        ? window.hnFreePrice.label
+                        : min;
+                }
                 if (periodEl) periodEl.textContent = CYCLE_LABEL[minCycle] || '';
             }
         });

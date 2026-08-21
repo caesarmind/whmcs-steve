@@ -7,7 +7,7 @@
  * scripts.min.js + recalctotals() can find the .clearfix rows + the
  * .total-due-today block they expect.
  *
- * Apple styling comes from apple-layout.css scoped via
+ * Apple styling comes from core-layout.css scoped via
  * body[data-tpl="configureproduct"] / [data-tpl="viewcart"], etc.
  *
  * Contract preserved: removeItem('r', id, type) inline handlers,
@@ -23,14 +23,14 @@
 
     <div class="clearfix summary-row">
         <span class="pull-left float-left">{$producttotals.productinfo.name}</span>
-        <span class="pull-right float-right">{$producttotals.pricing.baseprice}</span>
+        <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$producttotals.pricing.baseprice}</span>
     </div>
 
     {foreach $producttotals.configoptions as $configoption}
         {if $configoption}
             <div class="clearfix summary-row summary-row-sub">
                 <span class="pull-left float-left">&nbsp;&raquo; {$configoption.name}: {$configoption.optionname}</span>
-                <span class="pull-right float-right">{$configoption.recurring}{if $configoption.setup} + {$configoption.setup} {$LANG.ordersetupfee}{/if}</span>
+                <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$configoption.recurring}{if $configoption.setup} + {$configoption.setup} {$LANG.ordersetupfee}{/if}</span>
             </div>
         {/if}
     {/foreach}
@@ -38,7 +38,7 @@
     {foreach $producttotals.addons as $addon}
         <div class="clearfix summary-row summary-row-sub">
             <span class="pull-left float-left">+ {$addon.name}</span>
-            <span class="pull-right float-right">{$addon.recurring}</span>
+            <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$addon.recurring}</span>
         </div>
     {/foreach}
 
@@ -47,13 +47,13 @@
             {if $producttotals.pricing.setup}
                 <div class="clearfix summary-row">
                     <span class="pull-left float-left">{$LANG.cartsetupfees}:</span>
-                    <span class="pull-right float-right">{$producttotals.pricing.setup}</span>
+                    <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$producttotals.pricing.setup}</span>
                 </div>
             {/if}
             {foreach from=$producttotals.pricing.recurringexcltax key=cycle item=recurring}
                 <div class="clearfix summary-row">
                     <span class="pull-left float-left">{$cycle}:</span>
-                    <span class="pull-right float-right">{$recurring}</span>
+                    <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$recurring}</span>
                 </div>
             {/foreach}
             {if $producttotals.pricing.tax1}
@@ -72,7 +72,7 @@
     {/if}
 
     <div class="total-due-today">
-        <span class="amt">{$producttotals.pricing.totaltoday}</span>
+        <span class="amt">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$producttotals.pricing.totaltoday}</span>
         <span>{$LANG.ordertotalduetoday}</span>
     </div>
 
@@ -90,7 +90,7 @@
                     <div class="pull-right float-right">
                         <div>{$serviceRenewal.billingCycle}</div>
                         <div>
-                            {$serviceRenewal.recurringBeforeTax}
+                            {include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$serviceRenewal.recurringBeforeTax}
                             <a onclick="removeItem('r','{$serviceId}','service'); return false;" href="#" id="linkCartRemoveServiceRenewal{$serviceId}">
                                 <i class="fas fa-fw fa-trash-alt"></i>
                             </a>
@@ -110,7 +110,7 @@
                     <div class="pull-right float-right">
                         <div>{$serviceAddonRenewal.billingCycle}</div>
                         <div>
-                            {$serviceAddonRenewal.recurringBeforeTax}
+                            {include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$serviceAddonRenewal.recurringBeforeTax}
                             <a onclick="removeItem('r','{$serviceAddonId}','addon'); return false;" href="#" id="linkCartRemoveServiceAddonRenewal{$serviceAddonId}">
                                 <i class="fas fa-fw fa-trash-alt"></i>
                             </a>
@@ -127,7 +127,7 @@
                     {$renewal.domain} - {$renewal.regperiod} {if $renewal.regperiod == 1}{lang key='orderForm.year'}{else}{lang key='orderForm.years'}{/if}
                 </span>
                 <span class="pull-right float-right">
-                    {$renewal.priceBeforeTax}
+                    {include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$renewal.priceBeforeTax}
                     <a onclick="removeItem('r','{$domainId}','domain'); return false;" href="#" id="linkCartRemoveDomainRenewal{$domainId}">
                         <i class="fas fa-fw fa-trash-alt"></i>
                     </a>
@@ -164,7 +164,7 @@
     <div class="summary-totals">
         <div class="clearfix summary-row">
             <span class="pull-left float-left">{lang key='ordersubtotal'}:</span>
-            <span class="pull-right float-right">{$carttotals.subtotal}</span>
+            <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$carttotals.subtotal}</span>
         </div>
         {if ($carttotals.taxrate && $carttotals.taxtotal) || ($carttotals.taxrate2 && $carttotals.taxtotal2)}
             {if $carttotals.taxrate}
@@ -183,7 +183,7 @@
     </div>
 
     <div class="total-due-today">
-        <span class="amt">{$carttotals.total}</span>
+        <span class="amt">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$carttotals.total}</span>
         <span>{lang key='ordertotalduetoday'}</span>
     </div>
 

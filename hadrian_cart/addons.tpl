@@ -74,7 +74,7 @@
                                             {if $addon.free}
                                                 <span class="addon-free-label">{$LANG.orderfree}</span>
                                             {else}
-                                                <span class="price">{$addon.recurringamount} {$addon.billingcycle}</span>
+                                                <span class="price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$addon.recurringamount} {$addon.billingcycle}</span>
                                                 {if $addon.setupfee}
                                                     <br />+ {$addon.setupfee} {$LANG.ordersetupfee}
                                                 {/if}

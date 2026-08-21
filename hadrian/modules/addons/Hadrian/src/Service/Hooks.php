@@ -7,6 +7,8 @@ use Hadrian\Helpers\AddonHelper;
 use Hadrian\Helpers\LocaleHelper;
 use Hadrian\Helpers\ThemeManifest;
 use Hadrian\Helpers\Uploader;
+use Hadrian\Helpers\VisibilityGate;
+use Hadrian\Models\Page;
 use Hadrian\Models\Settings;
 use Hadrian\Template\Template;
 
@@ -78,6 +80,11 @@ final class Hooks
     /** Runs LAST among ClientAreaPage hooks (priority -1). Assembles $hadrian. */
     private function clientAreaPage(array $vars, Template $template): array
     {
+        // Per-page Visibility enforcement — before any payload assembly, since
+        // a gated request never renders. May redirect + exit; returns for the
+        // overwhelmingly common public case.
+        $this->enforceVisibility($vars, $template);
+
         $pages    = $this->resolveCurrentPage($vars, $template);
         $layouts  = [
             'main-menu' => $this->resolveActiveLayout($template, 'main-menu'),
@@ -126,8 +133,16 @@ final class Hooks
                 // the Settings tab; otherwise falls back to every language
                 // installed in WHMCS root /lang/.
                 'locales'       => [
-                    'languages' => LocaleHelper::effectiveList(),
+                    'languages'   => $mtLocaleList = LocaleHelper::effectiveList(),
+                    // code => native name ("french" => "Français") so the
+                    // modal can label each language for its own readers
+                    // instead of |capitalize-ing the English code name.
+                    'nativeNames' => LocaleHelper::nativeNamesFor($mtLocaleList),
                 ],
+                // Flag emoji for the ACTIVE language. The locale button read
+                // $hadrian.localeFlag since day one, but nothing ever assigned
+                // it — every install showed the template's US-flag default.
+                'localeFlag'    => LocaleHelper::flagFor((string)($vars['language'] ?? 'english')),
                 // Preview-only affordances. layoutTokens (token => folder) is
                 // what header.tpl's ?layout= whitelist and the state-chip's
                 // custom-layout anchors read; empty outside ?preview=1 so
@@ -149,6 +164,105 @@ final class Hooks
     }
 
     /**
+     * Act on the page's stored Visibility (admin Pages editor): 'disabled'
+     * sends the visitor to WHMCS's 404 route, 'auth' sends signed-out
+     * visitors to login. The decision — including every guardrail that keeps
+     * this from gating the login page or the checkout — lives in
+     * VisibilityGate::decide(); this wrapper only gathers its inputs and acts.
+     *
+     * One extra Page::get per request, ahead of resolveCurrentPage's own row
+     * read. Kept separate on purpose: enforcement must run before ANY payload
+     * work, and resolveCurrentPage's result is shaped for rendering, not for
+     * an early exit. The lookup is a two-column indexed WHERE.
+     *
+     * Defensive throughout: any failure (no table yet, weird row, session API
+     * differences) renders the page normally. Enforcement must never be the
+     * reason a site breaks.
+     */
+    private function enforceVisibility(array $vars, Template $template): void
+    {
+        try {
+            $page = (string)($vars['templatefile'] ?? '');
+            if ($page === '') {
+                return;
+            }
+            $row = Page::get($template->getName(), $page);
+            if ($row === null) {
+                return;
+            }
+
+            $action = VisibilityGate::decide(
+                isset($row['visibility']) ? (string)$row['visibility'] : null,
+                isset($row['page_group']) ? (string)$row['page_group'] : null,
+                $page,
+                $this->isClientSignedIn(),
+                !empty($_SESSION['adminid'])
+            );
+            if ($action === null) {
+                return;
+            }
+
+            $dest = $this->routeUrl($action === VisibilityGate::LOGIN ? 'login' : 'page-not-found');
+            header('Location: ' . $dest, true, 302);
+            exit;
+        } catch (\Throwable $e) {
+            return; // fail open — see docblock
+        }
+    }
+
+    /**
+     * Is anyone signed in on the client side? Covers clients, users, and an
+     * admin masquerading as a client (which sets the client session). Prefers
+     * the CurrentUser API; falls back to the classic session key.
+     */
+    private function isClientSignedIn(): bool
+    {
+        try {
+            if (class_exists('\\WHMCS\\Authentication\\CurrentUser')) {
+                $cu = new \WHMCS\Authentication\CurrentUser();
+                if ($cu->client() !== null || $cu->user() !== null) {
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+            // fall through to the session key
+        }
+        return !empty($_SESSION['uid']);
+    }
+
+    /**
+     * Root-relative URL for a named WHMCS route, honouring the install's
+     * subdirectory (taken from the PATH of SystemURL, never its scheme/host,
+     * so the redirect can't bounce between http and https). Falls back to the
+     * ?rp= form, which WHMCS resolves whether or not friendly URLs are on.
+     */
+    private function routeUrl(string $route): string
+    {
+        $path = '/index.php?rp=/' . $route;
+        try {
+            if (function_exists('routePath')) {
+                $p = (string)routePath($route);
+                if ($p !== '') {
+                    $path = '/' . ltrim($p, '/');
+                }
+            }
+        } catch (\Throwable $e) {
+            // unknown route name — keep the ?rp= fallback
+        }
+
+        $base = '';
+        try {
+            $sys = (string)\WHMCS\Config\Setting::getValue('SystemURL');
+            if ($sys !== '') {
+                $base = rtrim((string)(parse_url($sys, PHP_URL_PATH) ?: ''), '/');
+            }
+        } catch (\Throwable $e) {
+            // no SystemURL (CLI/test) — root-relative is correct
+        }
+        return $base . $path;
+    }
+
+    /**
      * Login page (priority 1 ClientAreaPageLogin). Surfaces the latest
      * published announcements as $loginAnnouncements for the "split" login
      * variant's featured panel. Other variants ignore the var.
@@ -157,7 +271,7 @@ final class Hooks
      */
     private function clientAreaPageLogin(array $vars, Template $template): array
     {
-        return ['loginAnnouncements' => $this->fetchRecentAnnouncements(3)];
+        return ['loginAnnouncements' => $this->fetchRecentAnnouncements(3, (string)($vars['language'] ?? ''))];
     }
 
     /**
@@ -377,17 +491,30 @@ final class Hooks
     }
 
     /**
-     * Latest published, past-dated announcements. Defensive: any DB failure
-     * returns an empty list so the login page can never break.
+     * Latest published, past-dated announcements, in the visitor's language.
+     *
+     * WHMCS stores announcement translations as CHILD rows of the base
+     * announcement (parentid = base id, language = WHMCS language name), so a
+     * naive query returns the base and every translation as separate items —
+     * duplicates, some in the wrong language. Base rows only here
+     * (parentid 0/NULL), then one whereIn fetches the translations matching
+     * $lang and substitutes title/body per announcement. The id stays the BASE
+     * id — it is what announcements.php links route on.
+     *
+     * Defensive: any DB failure returns an empty list so the login page can
+     * never break.
      *
      * @return list<array{id:int,title:string,date:string,excerpt:string}>
      */
-    private function fetchRecentAnnouncements(int $limit): array
+    private function fetchRecentAnnouncements(int $limit, string $lang = ''): array
     {
         try {
             $rows = \WHMCS\Database\Capsule::table('tblannouncements')
                 ->where('published', 1)
                 ->where('date', '<=', date('Y-m-d H:i:s'))
+                ->where(function ($q) {
+                    $q->where('parentid', 0)->orWhereNull('parentid');
+                })
                 ->orderBy('date', 'desc')
                 ->limit($limit)
                 ->get(['id', 'title', 'date', 'announcement']);
@@ -395,12 +522,35 @@ final class Hooks
             return [];
         }
 
+        // Translations for the fetched set, one query, keyed by base id. The
+        // base row IS the default language, so a visitor on it simply misses.
+        $translations = [];
+        $lang = strtolower(trim($lang));
+        if ($lang !== '' && count($rows) > 0) {
+            try {
+                $ids = [];
+                foreach ($rows as $row) {
+                    $ids[] = (int)($row->id ?? 0);
+                }
+                $childRows = \WHMCS\Database\Capsule::table('tblannouncements')
+                    ->whereIn('parentid', $ids)
+                    ->where('language', $lang)
+                    ->get(['parentid', 'title', 'announcement']);
+                foreach ($childRows as $child) {
+                    $translations[(int)($child->parentid ?? 0)] = $child;
+                }
+            } catch (\Throwable $e) {
+                $translations = []; // untranslated beats broken
+            }
+        }
+
         $out = [];
         foreach ($rows as $row) {
+            $t  = $translations[(int)($row->id ?? 0)] ?? null;
             $ts = strtotime((string)($row->date ?? ''));
             $out[] = [
                 'id'      => (int)($row->id ?? 0),
-                'title'   => (string)($row->title ?? ''),
+                'title'   => (string)(($t->title ?? '') !== '' ? $t->title : ($row->title ?? '')),
                 'date'    => $ts ? date('M j, Y', $ts) : '',
                 // Split for the bento variant's calendar chip. Done here rather
                 // than in Smarty because 'date' above is already one formatted
@@ -410,7 +560,7 @@ final class Hooks
                 // consumer of this fetcher ignores keys it does not read.
                 'dateMonth' => $ts ? date('M', $ts) : '',
                 'dateDay'   => $ts ? date('j', $ts) : '',
-                'excerpt' => $this->announcementExcerpt((string)($row->announcement ?? '')),
+                'excerpt' => $this->announcementExcerpt((string)(($t->announcement ?? '') !== '' ? $t->announcement : ($row->announcement ?? ''))),
             ];
         }
         return $out;
@@ -496,7 +646,7 @@ final class Hooks
     /**
      * Emit a small inline <style> overriding ONLY the typography tokens the
      * admin changed from default (Styles → Typography). Defaults stay in the
-     * cacheable static apple-theme.css; this block lands in {$headoutput},
+     * cacheable static core-theme.css; this block lands in {$headoutput},
      * which header.tpl renders AFTER the stylesheet links, so it wins on
      * source order. Returns '' when nothing is overridden.
      *
@@ -606,7 +756,7 @@ final class Hooks
     /**
      * Emit an inline <style> applying the admin's per-token Color overrides
      * (Styles -> Colors). Mirrors buildTypographyHead: defaults stay in the
-     * cacheable apple-theme.css; this block lands after the stylesheet links so
+     * cacheable core-theme.css; this block lands after the stylesheet links so
      * it wins on source order. Overrides are stored per style; each style emits
      * into the selector matching its colorMode (light => :root, dark =>
      * [data-theme="dark"]). Var names + color values are re-validated on the way
@@ -630,7 +780,7 @@ final class Hooks
         // The dark selector is deliberately `html[data-theme="dark"]` and not
         // the bare `[data-theme="dark"]`. Bare, it scores (0,1,0) -- exactly the
         // same as `:root` -- so a token overridden in the LIGHT scope only would
-        // beat apple-theme.css's own dark value on source order and leak into
+        // beat core-theme.css's own dark value on source order and leak into
         // dark mode. Measured before the fix: a preset with a warm sidebar in
         // light kept that warm panel in dark mode while the text correctly
         // flipped to near-white, giving 1.01:1. Adding the element bumps it to
@@ -641,7 +791,7 @@ final class Hooks
         // and a whole class of them never does. The seven `follows` sidebar
         // tokens are declared ONCE, at :root, as var() chains --
         //     --sidebar-text: var(--_sb-ink, var(--color-text-primary));
-        // (apple-theme.css:121-124) -- and dark-ness reaches them through
+        // (core-theme.css:121-124) -- and dark-ness reaches them through
         // --color-text-primary flipping, not through a second declaration. So a
         // LIGHT override of --sidebar-text lands at :root, later in the cascade
         // than the theme's own :root, and there is nothing in the dark block to
@@ -656,7 +806,7 @@ final class Hooks
         //
         // Fixed by scoping the light block so it cannot match in dark mode at
         // all, rather than by racing it. `:not([data-palette])` keeps the one
-        // precedence this changes: html[data-palette] (apple-layout.css, set
+        // precedence this changes: html[data-palette] (core-layout.css, set
         // from ?palette= for previews) scores (0,1,1) and used to outrank the
         // light block's (0,1,0). Without the second :not() the light block
         // would reach (0,1,1) too and win on source order, silently breaking
@@ -702,7 +852,7 @@ final class Hooks
      * Buttons). GLOBAL (one mapping styles both modes), so it always targets
      * :root — the referenced ramp/base tokens are themselves mode-aware, so the
      * same var() resolves correctly under [data-theme="dark"]. Mirrors
-     * buildColorsHead: defaults stay in the cacheable apple-theme.css; this block
+     * buildColorsHead: defaults stay in the cacheable core-theme.css; this block
      * lands after the stylesheet links so it wins on source order.
      *
      * Stored shape (only changed values): ['sizes' => ['--btn-...'=>int, ...],
@@ -890,7 +1040,7 @@ final class Hooks
      * Emit the Styles > General overrides — the scale layer (corner radius,
      * shadow, control sizing, motion) that Elements/Buttons/Forms select
      * between. Same contract as buildLayoutHead: defaults live in the cacheable
-     * apple-theme.css, only changed values are stored, and this block lands
+     * core-theme.css, only changed values are stored, and this block lands
      * after the stylesheet links so it wins on source order.
      *
      * Values arrive already unit-suffixed from saveGeneralAction (`12px`,
@@ -990,7 +1140,7 @@ final class Hooks
     /**
      * Generated structural CSS for CUSTOM (non-declared) main-menu layouts —
      * the piece that makes a dropped-in layout folder work without editing
-     * apple-layout.css. For each emitted token:
+     * core-layout.css. For each emitted token:
      *
      *   body:not([data-layout=X]) .only-X { display:none !important }   gate
      *   body[data-layout=X] .ph-main-wrap { margin-<side>: Npx }        offset
@@ -1001,7 +1151,7 @@ final class Hooks
      *             'mobileCollapse' => true]
      *
      * SHIPPED tokens (top/side/rail) are deliberately NOT emitted here — their
-     * rules stay hand-written in apple-layout.css, so existing installs get
+     * rules stay hand-written in core-layout.css, so existing installs get
      * byte-identical output. The engine guarantees a positioned, gated,
      * mobile-collapsing shell; the layout's own chrome lives in its layout.css
      * (linked by header.tpl), which is authored, not generated — the middle
@@ -1241,7 +1391,7 @@ final class Hooks
                 // only the "Recent News" $panels tree, whose children carry a label
                 // and a badge and nothing else. Reuse the login page's fetcher so
                 // the dashboard gets real ids, titles and dates.
-                'announcements'  => $this->fetchRecentAnnouncements(self::DASHBOARD_ROWS),
+                'announcements'  => $this->fetchRecentAnnouncements(self::DASHBOARD_ROWS, (string)($vars['language'] ?? '')),
                 // TLD prices for the Register-a-domain block. GATED: this is an
                 // uncached localAPI('GetTLDPricing') on the busiest page in the
                 // client area, so it only runs when a layout actually mentions
@@ -2886,12 +3036,48 @@ final class Hooks
         return '';
     }
 
+    /**
+     * Theme translation strings for the active language, as a three-layer
+     * per-key merge (later layers win):
+     *
+     *   1. core/lang/english.php            — the full shipped key set
+     *   2. core/lang/<language>.php         — a translation; may be PARTIAL,
+     *      untranslated keys fall back to English key-by-key rather than
+     *      rendering as empty strings
+     *   3. core/lang/overrides/<language>.php — buyer-owned edits. The
+     *      overrides/ folder is never shipped, so nothing in it is touched
+     *      by a theme update.
+     *
+     * The language token comes from WHMCS ($vars['language']) but is
+     * re-validated before touching the filesystem — it is interpolated into a
+     * path. Overlay files are buyer-authored, so each is loaded inside its own
+     * try/catch: a syntax error in an override must degrade to "override
+     * ignored", never to a white screen.
+     */
     private function loadLanguage(Template $template, string $lang): array
     {
-        $candidate = $template->getFullPath() . "/core/lang/{$lang}.php";
-        $path      = file_exists($candidate)
-            ? $candidate
-            : $template->getFullPath() . '/core/lang/english.php';
-        return ThemeManifest::loadVariantMeta($path);
+        $lang = strtolower(trim($lang));
+        if (!preg_match('/^[a-z][a-z0-9_-]*$/', $lang)) {
+            $lang = 'english';
+        }
+
+        $dir     = $template->getFullPath() . '/core/lang';
+        $strings = ThemeManifest::loadVariantMeta($dir . '/english.php');
+
+        foreach (["{$dir}/{$lang}.php", "{$dir}/overrides/{$lang}.php"] as $overlay) {
+            if ($lang === 'english' && $overlay === "{$dir}/{$lang}.php") {
+                continue; // layer 1 already is english.php
+            }
+            try {
+                $extra = ThemeManifest::loadVariantMeta($overlay);
+            } catch (\Throwable $e) {
+                $extra = [];
+            }
+            if ($extra !== []) {
+                $strings = array_replace_recursive($strings, $extra);
+            }
+        }
+
+        return $strings;
     }
 }

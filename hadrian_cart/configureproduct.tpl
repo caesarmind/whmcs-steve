@@ -606,7 +606,7 @@ var _localLang = {
 
 <style>{literal}
 /* Page-local layout helpers — most .cp-* classes come from hadrian's
-   apple-theme.css. These bind the page's grid + a few small primitives
+   core-theme.css. These bind the page's grid + a few small primitives
    not covered by the parent theme. */
 .cp-grid {
     display: grid;
@@ -823,7 +823,7 @@ var _localLang = {
 (function () {
     /* Admin "Hide Billing Cycle Discounts" — bail before building anything,
        so the pills are never created rather than created and then hidden.
-       apple-layout.css carries a display:none safety net for cached pages
+       core-layout.css carries a display:none safety net for cached pages
        whose JS predates this guard. */
     if (document.body.getAttribute('data-hide-discounts') === '1') return;
 
@@ -942,7 +942,16 @@ var _localLang = {
             if (row.style.opacity) row.style.opacity = '';
 
             var amt = totalDue.querySelector('.amt');
-            if (amt && amt.textContent.trim() !== promoState.total) amt.textContent = promoState.total;
+            if (amt) {
+                // Route through the cart's shared "0.00" -> "Free" test
+                // (common.tpl): promoState.total is scraped as raw text from
+                // viewcart, so a 100%-off promo would otherwise overwrite the
+                // converted label with "$0.00" on every repatch tick.
+                var amtDisplay = (window.hnCartFreePrice && window.hnCartFreePrice.isZero(promoState.total))
+                    ? window.hnCartFreePrice.label
+                    : promoState.total;
+                if (amt.textContent.trim() !== amtDisplay) amt.textContent = amtDisplay;
+            }
         }
 
         // Insert a "Recalculating promo..." placeholder in place of

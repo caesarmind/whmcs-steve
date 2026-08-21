@@ -853,7 +853,7 @@
        when the cart is empty.
 
        Also clear any stale hn.data preview state from localStorage:
-       apple-layout.js's initStateToggles runs after partials load and
+       core-layout.js's initStateToggles runs after partials load and
        resolves the chip state from (URL param > existing body attr >
        saved localStorage > 'full'). On real-cart routes the server's
        $cartitems is authoritative -- a previous chip click stored as
@@ -999,7 +999,7 @@
                                             <div class="ct-addon-name">{$addon.name}</div>
                                             <div class="ct-addon-sub">{$addon.billingcyclefriendly}{if $addon.setup} &middot; {$addon.setup->toPrefixed()} {$LANG.ordersetupfee}{/if}</div>
                                         </div>
-                                        <div class="ct-addon-price">{$addon.totaltoday}</div>
+                                        <div class="ct-addon-price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$addon.totaltoday}</div>
                                         {if $showAddonQtyOptions && $addon.allowqty === 2}
                                             <div class="ct-qty-row" style="grid-column: 1 / -1;">
                                                 <label>{$LANG.orderForm.qty}</label>
@@ -1024,7 +1024,7 @@
                                     <span class="ct-cycle-value">{$product.billingcyclefriendly}</span>
                                 </div>
                                 <div class="ct-product-price">
-                                    <span class="amount">{$product.pricing.totalTodayExcludingTaxSetup}</span>
+                                    <span class="amount">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$product.pricing.totalTodayExcludingTaxSetup}</span>
                                     <div class="period">
                                         {if $product.pricing.productonlysetup}{$product.pricing.productonlysetup->toPrefixed()} {$LANG.ordersetupfee}{/if}
                                         {if $product.proratadate}{$LANG.orderprorata} {$product.proratadate}{/if}
@@ -1064,7 +1064,7 @@
                                     <span class="ct-cycle-value">{$addon.billingcyclefriendly}</span>
                                 </div>
                                 <div class="ct-product-price">
-                                    <span class="amount">{$addon.totaltoday}</span>
+                                    <span class="amount">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$addon.totaltoday}</span>
                                     <div class="period">
                                         {if $addon.setup}{$addon.setup->toPrefixed()} {$LANG.ordersetupfee}{/if}
                                         {if $addon.isProrated}{$LANG.orderprorata} {$addon.prorataDate}{/if}
@@ -1127,7 +1127,7 @@
                                     {/if}
                                 </div>
                                 <div class="ct-product-price">
-                                    <span class="amount" name="{$domain.domain}Price">{$domain.price}</span>
+                                    <span class="amount" name="{$domain.domain}Price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$domain.price}</span>
                                 </div>
                             </div>
                         </div>
@@ -1152,7 +1152,7 @@
                                     <span class="ct-cycle-label">{$hadrianLang.cart.billingCycle}</span>
                                     <span class="ct-cycle-value">{$service.billingCycle}</span>
                                 </div>
-                                <div class="ct-product-price"><span class="amount">{$service.recurringBeforeTax}</span></div>
+                                <div class="ct-product-price"><span class="amount">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$service.recurringBeforeTax}</span></div>
                             </div>
                         </div>
                     {/foreach}
@@ -1176,7 +1176,7 @@
                                     <span class="ct-cycle-label">{$hadrianLang.cart.billingCycle}</span>
                                     <span class="ct-cycle-value">{$service.billingCycle}</span>
                                 </div>
-                                <div class="ct-product-price"><span class="amount">{$service.recurringBeforeTax}</span></div>
+                                <div class="ct-product-price"><span class="amount">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$service.recurringBeforeTax}</span></div>
                             </div>
                         </div>
                     {/foreach}
@@ -1206,7 +1206,7 @@
                                     <span class="ct-cycle-label">{$hadrianLang.cart.registrationPeriod}</span>
                                     <span class="ct-cycle-value">{$domain.regperiod} {$LANG.orderyears}</span>
                                 </div>
-                                <div class="ct-product-price"><span class="amount">{$domain.price}</span></div>
+                                <div class="ct-product-price"><span class="amount">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$domain.price}</span></div>
                             </div>
                         </div>
                     {/foreach}
@@ -1236,7 +1236,7 @@
                                     <span class="ct-cycle-label">{$hadrianLang.cart.billingCycle}</span>
                                     <span class="ct-cycle-value">{$upgrade->localisedNewCycle}</span>
                                 </div>
-                                <div class="ct-product-price"><span class="amount">{$upgrade->newRecurringAmount}</span></div>
+                                <div class="ct-product-price"><span class="amount">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$upgrade->newRecurringAmount}</span></div>
                             </div>
                             {if $upgrade->totalDaysInCycle > 0}
                                 <div class="ct-manage-addons" style="border-bottom: 0;">
@@ -1386,7 +1386,7 @@
                                 <div class="ct-summary-product-name">{$product.productinfo.name}</div>
                                 <div class="ct-summary-product-sub">{$product.productinfo.groupname} &middot; {$product.billingcyclefriendly}{if $product.domain} &middot; {$product.domain}{/if}</div>
                             </div>
-                            <div class="ct-summary-product-price">{$product.pricing.totalTodayExcludingTaxSetup}</div>
+                            <div class="ct-summary-product-price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$product.pricing.totalTodayExcludingTaxSetup}</div>
                         </div>
                     {/foreach}
                     {foreach $addons as $num => $addon}
@@ -1395,7 +1395,7 @@
                                 <div class="ct-summary-product-name">+ {$addon.name}</div>
                                 <div class="ct-summary-product-sub">{$LANG.orderaddon} &middot; {$addon.billingcyclefriendly}</div>
                             </div>
-                            <div class="ct-summary-product-price">{$addon.totaltoday}</div>
+                            <div class="ct-summary-product-price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$addon.totaltoday}</div>
                         </div>
                     {/foreach}
                     {foreach $domains as $num => $domain}
@@ -1404,7 +1404,7 @@
                                 <div class="ct-summary-product-name">{$domain.domain}</div>
                                 <div class="ct-summary-product-sub">{if $domain.type eq "register"}{$LANG.orderdomainregistration}{else}{$LANG.orderdomaintransfer}{/if} &middot; {$domain.regperiod} {$domain.yearsLanguage}</div>
                             </div>
-                            <div class="ct-summary-product-price">{$domain.price}</div>
+                            <div class="ct-summary-product-price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$domain.price}</div>
                         </div>
                     {/foreach}
                     {foreach $renewalsByType['services'] as $num => $service}
@@ -1413,7 +1413,7 @@
                                 <div class="ct-summary-product-name">{$service.name}</div>
                                 <div class="ct-summary-product-sub">{lang key='renewService.titleAltSingular'} &middot; {$service.billingCycle}{if $service.domainName} &middot; {$service.domainName}{/if}</div>
                             </div>
-                            <div class="ct-summary-product-price">{$service.recurringBeforeTax}</div>
+                            <div class="ct-summary-product-price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$service.recurringBeforeTax}</div>
                         </div>
                     {/foreach}
                     {foreach $renewalsByType['addons'] as $num => $service}
@@ -1422,7 +1422,7 @@
                                 <div class="ct-summary-product-name">{$service.name}</div>
                                 <div class="ct-summary-product-sub">{lang key='renewServiceAddon.titleAltSingular'} &middot; {$service.billingCycle}</div>
                             </div>
-                            <div class="ct-summary-product-price">{$service.recurringBeforeTax}</div>
+                            <div class="ct-summary-product-price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$service.recurringBeforeTax}</div>
                         </div>
                     {/foreach}
                     {foreach $renewalsByType['domains'] as $num => $domain}
@@ -1431,7 +1431,7 @@
                                 <div class="ct-summary-product-name">{$domain.domain}</div>
                                 <div class="ct-summary-product-sub">{$LANG.domainrenewal} &middot; {$domain.regperiod} {$LANG.orderyears}</div>
                             </div>
-                            <div class="ct-summary-product-price">{$domain.price}</div>
+                            <div class="ct-summary-product-price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$domain.price}</div>
                         </div>
                     {/foreach}
                     {foreach $upgrades as $num => $upgrade}
@@ -1440,7 +1440,7 @@
                                 <div class="ct-summary-product-name">{$LANG.upgrade}</div>
                                 <div class="ct-summary-product-sub">{$upgrade->localisedNewCycle}</div>
                             </div>
-                            <div class="ct-summary-product-price">{$upgrade->newRecurringAmount}</div>
+                            <div class="ct-summary-product-price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$upgrade->newRecurringAmount}</div>
                         </div>
                     {/foreach}
 
@@ -1448,7 +1448,7 @@
                     <div class="ct-totals">
                         <div class="ct-totals-row">
                             <span class="label">{$LANG.ordersubtotal}</span>
-                            <span class="value" id="subtotal">{$subtotal}</span>
+                            <span class="value" id="subtotal">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$subtotal}</span>
                         </div>
                         {if $promotioncode}
                             <div class="ct-totals-row discount">
@@ -1498,7 +1498,7 @@
 
                     <div class="ct-summary-total">
                         <span class="label">{$LANG.ordertotalduetoday}</span>
-                        <span class="value" id="totalDueToday">{$total}</span>
+                        <span class="value" id="totalDueToday">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$total}</span>
                     </div>
 
                     {if $expressCheckoutButtons}

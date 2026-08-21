@@ -38,7 +38,7 @@
 
     {* The Apple --primary / --bg / --text variable overrides for the
        Vue SPA AND the page-level chrome (page header + 5-step strip)
-       both live in hadrian/templates/hadrian/assets/js/apple-theme.js
+       both live in hadrian/templates/hadrian/assets/js/core-theme.js
        (loaded globally by hadrian). We can't inject either from this
        TPL because WHMCS strips ANY HTML elements + <style>/<link>/
        <script> tags we add inside cart TPL output when the page is
@@ -46,7 +46,7 @@
 
        Verified live: anonymous CLI fetch sees TPL-added markup,
        browser-with-session render does not. So the global JS appends
-       the chrome to the DOM after page load, and apple-theme.css
+       the chrome to the DOM after page load, and core-theme.css
        (also global) styles it via .vc-* selectors. *}
 
     <div id="order-standard_cart">

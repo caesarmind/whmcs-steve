@@ -12,7 +12,7 @@
 /* Both hero shells, on purpose. The portal variant uses .ph-hero; the default
    and simple variants use .hp-hero. Scoped to .ph-hero alone this rule matched
    only portal, so the segmented Search/Transfer tabs on the other two homepages
-   silently fell back to the barer .ph-domain-tabs base in apple-layout.css --
+   silently fell back to the barer .ph-domain-tabs base in core-layout.css --
    no gap, 3px padding instead of 4, and no margin under the pill row. */
 .ph-hero .ph-domain-tabs,
 .hp-hero .ph-domain-tabs {
@@ -87,7 +87,7 @@
    A row absorbs a missing price in one cell and stays tidy at any count.
 
    1024px to match the marketing column used across the homepage and store
-   pages — see the other hp-* sections in apple-theme.css. */
+   pages — see the other hp-* sections in core-theme.css. */
 .hp-cat-rows {
     max-width: var(--w-prose);
     margin: 0 auto;

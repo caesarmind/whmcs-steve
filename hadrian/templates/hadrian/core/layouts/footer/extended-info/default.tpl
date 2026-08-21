@@ -9,7 +9,7 @@
         as the "Extended" layout.
 
    The two are wrapped in .hp-footer-top which is a CSS grid (brand:
-   1fr | cols: 2fr) defined in apple-theme.css. The horizontal border
+   1fr | cols: 2fr) defined in core-theme.css. The horizontal border
    sits on the wrapper so the brand block and cols share one divider.
 
    Bottom row (.hp-footer-bottom): copyright, the Footer Secondary

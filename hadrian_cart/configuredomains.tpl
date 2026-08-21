@@ -26,7 +26,7 @@
  *     script using ($domains == 0). The page-scoped .cd-when-full /
  *     .cd-when-empty hide rules below pick up that attribute. We use
  *     .cd-* prefix (not the global .when-*) because hadrian's
- *     apple-layout.css unconditionally hides .when-full on cart routes.
+ *     core-layout.css unconditionally hides .when-full on cart routes.
  *   - body[data-subnav="off|on"] collapses the Categories aside via
  *     the .cd-split CSS below -- mirrors .st-split / .dp-split.
  *
@@ -481,7 +481,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
                                                     </label>
                                                     <div class="addon-description">{$LANG.domainaddonsdnsmanagementinfo}</div>
                                                 </div>
-                                                <div class="panel-price">{$domain.dnsmanagementprice} / {$domain.regperiod} {$LANG.orderyears}</div>
+                                                <div class="panel-price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$domain.dnsmanagementprice} / {$domain.regperiod} {$LANG.orderyears}</div>
                                                 <div class="panel-add">+ {$LANG.orderForm.addToCart}</div>
                                             </div>
                                         {/if}
@@ -495,7 +495,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
                                                     </label>
                                                     <div class="addon-description">{$LANG.domainaddonsidprotectioninfo}</div>
                                                 </div>
-                                                <div class="panel-price">{$domain.idprotectionprice} / {$domain.regperiod} {$LANG.orderyears}</div>
+                                                <div class="panel-price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$domain.idprotectionprice} / {$domain.regperiod} {$LANG.orderyears}</div>
                                                 <div class="panel-add">+ {$LANG.orderForm.addToCart}</div>
                                             </div>
                                         {/if}
@@ -509,7 +509,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
                                                     </label>
                                                     <div class="addon-description">{$LANG.domainaddonsemailforwardinginfo}</div>
                                                 </div>
-                                                <div class="panel-price">{$domain.emailforwardingprice} / {$domain.regperiod} {$LANG.orderyears}</div>
+                                                <div class="panel-price">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$domain.emailforwardingprice} / {$domain.regperiod} {$LANG.orderyears}</div>
                                                 <div class="panel-add">+ {$LANG.orderForm.addToCart}</div>
                                             </div>
                                         {/if}

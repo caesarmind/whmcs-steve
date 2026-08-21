@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Assert every colors.php default equals the literal declared in
- * apple-theme.css, for BOTH scopes.
+ * core-theme.css, for BOTH scopes.
  *
  * Why this exists. The admin shows a token's schema default as the baseline and
  * only persists values that DIFFER from it. So a default that drifts from the
@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const CSS = join(ROOT, 'templates/hadrian/assets/css/apple-theme.css');
+const CSS = join(ROOT, 'templates/hadrian/assets/css/core-theme.css');
 const PHP = join(ROOT, 'templates/hadrian/core/config/colors.php');
 
 const css = readFileSync(CSS, 'utf8');
@@ -121,7 +121,7 @@ for (const [, name, wantLight, wantDark] of rows) {
 }
 
 for (const name of missing) {
-  console.error(`FAIL  ${name} is in colors.php but declared nowhere in apple-theme.css :root`);
+  console.error(`FAIL  ${name} is in colors.php but declared nowhere in core-theme.css :root`);
   fail++;
 }
 

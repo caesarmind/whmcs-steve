@@ -13,7 +13,7 @@
  * This file therefore PRESERVES THE STANDARD_CART MARKUP VERBATIM
  * for the form body, and ONLY swaps the page-level chrome (header,
  * help banner, .secondary-cart-sidebar trust strip). The Apple visual
- * comes from the CSS shim in apple-layout.css (which already styles
+ * comes from the CSS shim in core-layout.css (which already styles
  * #order-standard_cart's .sub-heading, .form-group.prepend-icon,
  * .panel-addon, .alert-*, .radio, .btn-*, etc.).
  *
@@ -66,7 +66,7 @@
  *   error feedback classes: .gateway-errors,
  *         .checkout-error-feedback, .vat-error
  *
- * Visual sources used by apple-layout.css to skin this content:
+ * Visual sources used by core-layout.css to skin this content:
  *   - apple-client-area/cart.html (right-rail summary patterns)
  *   - the broad cart-flow CSS shim (#order-standard_cart .form-group
  *     .prepend-icon, .sub-heading, .alert, .btn, .radio, …)
@@ -201,7 +201,7 @@
 /* ── Apple checkout chrome (.co-*) ──
    Page-level wrapper around standard_cart's checkout form. Form body
    classes (.form-group prepend-icon, .sub-heading, .alert, .btn etc)
-   are styled separately by apple-layout.css's cart-flow CSS shim --
+   are styled separately by core-layout.css's cart-flow CSS shim --
    we only own the OUTER layout (page header, 5-step strip, 2-col
    split, sticky summary card on the right). Mirrors
    apple-client-area/checkout.html. */
@@ -777,7 +777,7 @@
 }
 #applyCreditContainer .radio:has(input:checked) .ac-radio::after { transform: scale(1); }
 #applyCreditContainer .ac-text { flex: 1; min-width: 0; }
-/* apple-layout.css carries `#order-standard_cart #applyCreditContainer
+/* core-layout.css carries `#order-standard_cart #applyCreditContainer
    label.radio` (specificity 2,1,1, inside a @media block) setting
    `padding: 6px 0; gap: 8px; align-items: flex-start` -- which leaves the radio
    jammed to the left edge and top-aligned. That stylesheet is emitted AFTER this

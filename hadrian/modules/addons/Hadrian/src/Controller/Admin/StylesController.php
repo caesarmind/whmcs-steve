@@ -152,7 +152,7 @@ final class StylesController extends AbstractController
      * what the buyer sees is painted by production rules rather than by an
      * admin-side imitation that would drift the moment the theme changes.
      *
-     * LINKED, never inlined: apple-theme.css's @font-face points at
+     * LINKED, never inlined: core-theme.css's @font-face points at
      * ../fonts/InterVariable.woff2, and a CSS relative URL resolves against the
      * STYLESHEET's own URL. Inline the text into a <style> and the font 404s.
      *
@@ -173,8 +173,8 @@ final class StylesController extends AbstractController
 
         $out = [];
         foreach ([
-            'apple-theme.css',
-            'apple-layout.css',
+            'core-theme.css',
+            'core-layout.css',
             'pages/clientareahome.css',
             'pages/clientareaproducts.css',
         ] as $file) {

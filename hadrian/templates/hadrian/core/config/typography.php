@@ -5,7 +5,7 @@
  * (Hooks::buildTypographyHead).
  *
  * IMPORTANT: the `default` values MUST mirror the :root tokens in
- * assets/css/apple-theme.css. The admin form shows these as the baseline and
+ * assets/css/core-theme.css. The admin form shows these as the baseline and
  * only values the buyer CHANGES from default are persisted + emitted. If you
  * change a token default in the CSS, change it here too or the "is this an
  * override?" comparison desyncs.
@@ -84,7 +84,7 @@ return [
     // can offer alongside buyer uploads. Combined with the "apple" flag this
     // reproduces 'default' exactly: Bundled Inter + Apple-first === SF on Apple,
     // bundled Inter elsewhere. 'face' = emit an @font-face at render; Inter's is
-    // already declared in apple-theme.css, so it stays false (no duplicate).
+    // already declared in core-theme.css, so it stays false (no duplicate).
     'bundledFonts' => [
         ['file' => 'InterVariable.woff2', 'family' => 'Inter', 'label' => 'Inter (bundled)', 'weight' => '100 900', 'face' => false],
     ],

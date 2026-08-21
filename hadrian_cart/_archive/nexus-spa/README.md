@@ -25,7 +25,7 @@ absolute URL.
 
 ### `apple-theme-spa-bridge.js`
 The two IIFEs that lived at the bottom of
-`hadrian/templates/hadrian/assets/js/apple-theme.js`:
+`hadrian/templates/hadrian/assets/js/core-theme.js`:
 
 1. **CSS variable seeder** -- sets unprefixed `--primary`, `--bg`,
    `--text`, `--rounding-*`, etc. on `document.documentElement`.
@@ -53,7 +53,7 @@ The two IIFEs that lived at the bottom of
 
 The `.vc-page-header / .vc-steps / .vc-step / .vc-step-num /
 .vc-step-sep` CSS rules these scripts depend on are still in
-`hadrian/templates/hadrian/assets/css/apple-theme.css`. Harmless
+`hadrian/templates/hadrian/assets/css/core-theme.css`. Harmless
 when no `.vc-*` markup exists -- left in place so this archive is
 self-contained.
 
@@ -61,9 +61,9 @@ self-contained.
 
 1. Copy `viewcart.spa-shell.tpl` over `hadrian_cart/viewcart.tpl`.
 2. Append the contents of `apple-theme-spa-bridge.js` to the bottom
-   of `hadrian/templates/hadrian/assets/js/apple-theme.js`.
+   of `hadrian/templates/hadrian/assets/js/core-theme.js`.
 3. Bump `hadrian/templates/hadrian/core/hadrian.php` `version` so
-   the cached `apple-theme.js?v=` query string changes and browsers
+   the cached `core-theme.js?v=` query string changes and browsers
    re-fetch.
 4. Push.
 

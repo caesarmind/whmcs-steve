@@ -151,19 +151,19 @@
                     <div class="st-plan-price"><span class="amount">{$LANG.orderfree}</span></div>
                 {elseif $pkg.pricing.type == 'onetime'}
                     <input type="hidden" name="billingcycle" value="onetime">
-                    <div class="st-plan-price"><span class="amount">{$pkg.pricing.onetime}</span> <span class="period">{$LANG.orderpaymenttermonetime}</span></div>
+                    <div class="st-plan-price"><span class="amount">{include file="`$template`/includes/common/price.tpl" hPrice=$pkg.pricing.onetime hEscape=false}</span> <span class="period">{$LANG.orderpaymenttermonetime}</span></div>
                 {else}
                     {* Recurring: the billing-cycle <select> IS the price control — each
                        option already shows its per-term price (e.g. "$50.00 USD Monthly
                        / mo"), so there's no separate price headline above it (that line
                        just duplicated the amount + cycle). *}
                     <select name="billingcycle" class="form-select st-plan-cycle">
-                        {if $pkg.pricing.monthly}<option value="monthly">{$pkg.pricing.monthly} / {$hadrianLang.services.cycleMonthlyShort}</option>{/if}
-                        {if $pkg.pricing.quarterly}<option value="quarterly">{$pkg.pricing.quarterly} / {$hadrianLang.services.cycleQuarterlyShort}</option>{/if}
-                        {if $pkg.pricing.semiannually}<option value="semiannually">{$pkg.pricing.semiannually} / {$hadrianLang.services.cycleSemiannuallyShort}</option>{/if}
-                        {if $pkg.pricing.annually}<option value="annually">{$pkg.pricing.annually} / {$hadrianLang.services.cycleAnnuallyShort}</option>{/if}
-                        {if $pkg.pricing.biennially}<option value="biennially">{$pkg.pricing.biennially} / {$hadrianLang.services.cycleBienniallyShort}</option>{/if}
-                        {if $pkg.pricing.triennially}<option value="triennially">{$pkg.pricing.triennially} / {$hadrianLang.services.cycleTrienniallyShort}</option>{/if}
+                        {if $pkg.pricing.monthly}<option value="monthly">{include file="`$template`/includes/common/price.tpl" hPrice=$pkg.pricing.monthly hEscape=false} / {$hadrianLang.services.cycleMonthlyShort}</option>{/if}
+                        {if $pkg.pricing.quarterly}<option value="quarterly">{include file="`$template`/includes/common/price.tpl" hPrice=$pkg.pricing.quarterly hEscape=false} / {$hadrianLang.services.cycleQuarterlyShort}</option>{/if}
+                        {if $pkg.pricing.semiannually}<option value="semiannually">{include file="`$template`/includes/common/price.tpl" hPrice=$pkg.pricing.semiannually hEscape=false} / {$hadrianLang.services.cycleSemiannuallyShort}</option>{/if}
+                        {if $pkg.pricing.annually}<option value="annually">{include file="`$template`/includes/common/price.tpl" hPrice=$pkg.pricing.annually hEscape=false} / {$hadrianLang.services.cycleAnnuallyShort}</option>{/if}
+                        {if $pkg.pricing.biennially}<option value="biennially">{include file="`$template`/includes/common/price.tpl" hPrice=$pkg.pricing.biennially hEscape=false} / {$hadrianLang.services.cycleBienniallyShort}</option>{/if}
+                        {if $pkg.pricing.triennially}<option value="triennially">{include file="`$template`/includes/common/price.tpl" hPrice=$pkg.pricing.triennially hEscape=false} / {$hadrianLang.services.cycleTrienniallyShort}</option>{/if}
                     </select>
                 {/if}
 
@@ -195,7 +195,7 @@
 
     {* Services section sub-nav — mirrors the services-list aside. Hidden + the split
        collapses to one column when the admin disables the website section sidebar
-       (body[data-subnav-website="off"] [class$="-split"] in apple-layout.css). *}
+       (body[data-subnav-website="off"] [class$="-split"] in core-layout.css). *}
     <aside>
         <div class="card subnav-card">
             <div class="subnav-heading">{$LANG.services|default:'Services'}</div>

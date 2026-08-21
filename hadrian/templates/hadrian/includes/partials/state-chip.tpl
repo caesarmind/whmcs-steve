@@ -1,5 +1,5 @@
 {* Hostnodes — Dev preview chip (layout / palette / data toggles).
-   Floating, draggable. Wired by apple-layout.js (state persists to
+   Floating, draggable. Wired by core-layout.js (state persists to
    localStorage). Renders ONLY on ?preview=1 — never in the live portal,
    admins included. Its toggles drive the all-layout render + dev state
    that must not leak into production. *}

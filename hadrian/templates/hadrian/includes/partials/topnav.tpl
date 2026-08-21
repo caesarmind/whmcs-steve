@@ -112,7 +112,7 @@
         </a>
         {/if}
     {elseif $mtType == 'language' || $mtType == 'currency'}
-        {* data-locale-open, NOT data-switcher: nothing in apple-layout.js has
+        {* data-locale-open, NOT data-switcher: nothing in core-layout.js has
            ever listened for [data-switcher], so language/currency menu items
            were links that did nothing. The locale modal (which covers both) is
            opened by [data-locale-open]. *}
@@ -127,8 +127,8 @@
 
 <nav class="homepage-nav only-top">
     <div class="homepage-nav-inner">
-        {* Mobile drawer toggle — hidden on desktop; shown <=900px (apple-layout.css).
-           data-nav-toggle wires it to the shared body.nav-open drawer (apple-layout.js);
+        {* Mobile drawer toggle — hidden on desktop; shown <=900px (core-layout.css).
+           data-nav-toggle wires it to the shared body.nav-open drawer (core-layout.js);
            the off-canvas sidebar (rendered on this layout too) is what slides in. *}
         <button type="button" class="nav-mobile-toggle" aria-label="{$hadrianLang.nav.openNavigation}" aria-controls="appSidebar" aria-expanded="false" data-nav-toggle>
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -206,7 +206,7 @@
            The right-aligned menu group (Login / Register / Language) is hidden
            from 901px up so the bar runs one set of account controls — but that
            group's "Language" item was a [data-switcher] link, an attribute
-           nothing in apple-layout.js listens for, so it never opened anything.
+           nothing in core-layout.js listens for, so it never opened anything.
            This is the working component the footers already use: it posts to
            the real locale modal via [data-locale-open].
 

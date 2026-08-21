@@ -1,5 +1,5 @@
 {* Language + currency modal - opened by any [data-locale-open] button on the
-   page; wiring is in apple-layout.js. Included once from footer.tpl so it lives
+   page; wiring is in core-layout.js. Included once from footer.tpl so it lives
    outside any per-page wrapper. The language/currency lists fall back to a
    static set when the page doesn't expose $languages / $currencies; the .active
    class tracks the current selection. *}
@@ -28,7 +28,12 @@
             <div class="locale-grid" role="radiogroup" aria-label="{$LANG.chooselanguage}">
                 {if $mtLangList|@count > 0}
                     {foreach $mtLangList as $lang}
-                        <button type="button" data-lang="{$lang|escape}"{if isset($language) && $language == $lang} class="active"{/if}>{$lang|escape|capitalize}</button>
+                        {* Native name from the server-built map ("Français",
+                           not "French") — a reader picking their language is
+                           the one reader guaranteed not to want it labelled in
+                           English. Unmapped codes fall back to |capitalize. *}
+                        {assign var=mtLangKey value=$lang|lower}
+                        <button type="button" data-lang="{$lang|escape}"{if isset($language) && $language == $lang} class="active"{/if}>{if isset($hadrian.locales.nativeNames[$mtLangKey])}{$hadrian.locales.nativeNames[$mtLangKey]|escape}{else}{$lang|escape|capitalize}{/if}</button>
                     {/foreach}
                 {else}
                     <button type="button" data-lang="arabic">&#1575;&#1604;&#1593;&#1585;&#1576;&#1610;&#1577;</button>

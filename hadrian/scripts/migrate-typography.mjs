@@ -4,7 +4,7 @@
  *
  * Replaces hardcoded `font-size: Npx` and `font-weight: NNN` across the theme
  * CSS with `var(--token)` references, snapping each value to the nearest step
- * of the canonical scale defined in apple-theme.css :root.
+ * of the canonical scale defined in core-theme.css :root.
  *
  * Idempotent: the regexes only match numeric literals, never existing var().
  * Line-heights are intentionally left as unitless ratios.

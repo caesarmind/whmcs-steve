@@ -14,7 +14,7 @@
  * and it is the one split we genuinely lacked.
  *
  * GLOBAL (site-wide); emitted into :root. Every `default` MUST mirror the
- * matching token in assets/css/apple-theme.css — the admin shows the default
+ * matching token in assets/css/core-theme.css — the admin shows the default
  * as the baseline and only persists values that DIFFER, so a drifted default
  * here makes the "is this an override?" test wrong in both directions.
  *
@@ -66,7 +66,7 @@ return [
         ],
     ],
 
-    // Authored shadow stacks. Values are copied verbatim from apple-theme.css;
+    // Authored shadow stacks. Values are copied verbatim from core-theme.css;
     // 'none' is offered because "no shadow at all" is a legitimate flat look
     // and cannot be expressed by picking one of the other three.
     'shadowOptions' => [

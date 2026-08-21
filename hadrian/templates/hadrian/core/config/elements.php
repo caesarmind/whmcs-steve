@@ -7,7 +7,7 @@
  *
  * Structurally a px/scale size panel (like the Sizes half of Forms): px fields
  * or SCALE references resolved through `scales`. GLOBAL; emitted into :root.
- * Every `default` MUST mirror the matching token in assets/css/apple-theme.css.
+ * Every `default` MUST mirror the matching token in assets/css/core-theme.css.
  */
 return [
     'sizeMin' => 0,

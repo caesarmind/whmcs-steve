@@ -4,7 +4,7 @@
  * ARCHIVED — NOT LOADED ANYWHERE.
  *
  * Two IIFEs that previously lived at the bottom of
- * hadrian/templates/hadrian/assets/js/apple-theme.js to bridge hadrian's
+ * hadrian/templates/hadrian/assets/js/core-theme.js to bridge hadrian's
  * Apple visual language into nexus_cart's WHMCS-shipped Vue SPA. Removed
  * when /cart.php?a=view was reverted to the Smarty-rendered viewcart.tpl
  * (commit 8cd392a) for pixel-faithful mockup match.
@@ -35,19 +35,19 @@
  *
  * To re-enable:
  *   1. Move both IIFEs back to the bottom of
- *      hadrian/templates/hadrian/assets/js/apple-theme.js
+ *      hadrian/templates/hadrian/assets/js/core-theme.js
  *   2. Restore hadrian_cart/viewcart.tpl from this archive's
  *      viewcart.spa-shell.tpl (or revert hadrian_cart/viewcart.tpl
  *      to commit 80139ad / 16819e2 / 00cfe4f -- the SPA-shell history).
  *   3. Bump hadrian/templates/hadrian/core/hadrian.php version so
- *      cached apple-theme.js refreshes.
+ *      cached core-theme.js refreshes.
  */
 
 // Apple --* CSS variables for nexus_cart Vue SPA
 //
 // Lives here (vs the cart TPL) because WHMCS's cart page render strips
 // any <script src="..."> we add inside viewcart.tpl when the page is
-// served with hadrian's full layout shell. apple-theme.js is loaded
+// served with hadrian's full layout shell. core-theme.js is loaded
 // globally by hadrian on every page including the cart, so this IIFE
 // reliably sets the unprefixed --* variables on document.documentElement
 // before nexus_cart's main.min.js initializes its Vue Shadow DOM.

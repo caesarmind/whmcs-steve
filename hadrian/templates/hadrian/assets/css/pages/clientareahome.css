@@ -89,7 +89,7 @@
             border-radius: var(--radius-md);
             padding: 16px 24px 20px;
         }
-        /* Sentinel element to let apple-layout.js reveal the Services chip-group on this page */
+        /* Sentinel element to let core-layout.js reveal the Services chip-group on this page */
         .svc-table-card { display: none !important; }
 
         /* ─── User card (reuses .card + .sidebar-avatar primitives) ─── */
@@ -127,7 +127,7 @@
         .notice-dismiss:hover { background: var(--color-surface); color: var(--color-text-primary); }
         .notice-dismiss svg { width: 12px; height: 12px; }
 
-        /* Promo slider styles live in css/apple-layout.css (shared across pages). */
+        /* Promo slider styles live in css/core-layout.css (shared across pages). */
 
         /* ─── Tiles row — Variant A (existing .tile primitive, vertical) ─── */
         .tiles-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -303,7 +303,7 @@
         body[data-tiles] .variant-label { display: none; }
 
         /* ─── Service rows with Manage button ─── */
-        /* .service-item from apple-theme.css handles the base row; add a .service-manage slot */
+        /* .service-item from core-theme.css handles the base row; add a .service-manage slot */
         .service-manage { flex-shrink: 0; }
         .service-manage .btn-secondary { height: 30px; padding: 0 14px; font-size: var(--text-sm); }
         .native-home-row .label,
@@ -364,10 +364,10 @@
    Shared stylesheet: both dashboard variants link pages/clientareahome.css,
    matching the homepage precedent where default/marketing/portal share
    pages/homepage.css. Everything below is namespaced .min-* -- verified
-   collision-free against apple-theme.css, apple-layout.css and pages/*.css.
+   collision-free against core-theme.css, core-layout.css and pages/*.css.
 
    Deliberately avoids two shapes the global sheet reserves:
-     - no class ending in -split or -aside (apple-layout.css forces those to a
+     - no class ending in -split or -aside (core-layout.css forces those to a
        single column and hides their children with !important when the website
        sub-nav is off)
      - no .card / .card-body, so the data-svc-layout inside/outside rule
@@ -497,7 +497,7 @@ body[data-min-title="inside"] .min-list {
 .min-noresults { display: none; padding: 30px 24px; text-align: center; font-size: var(--text-md); color: var(--color-text-secondary); }
 .min-list.no-results .min-noresults { display: block; }
 
-/* Status pills this dashboard can emit that apple-theme.css does not define.
+/* Status pills this dashboard can emit that core-theme.css does not define.
    The dashboard lists services, domains, invoices AND tickets on one page, so
    it can produce statuses whose only rules today live inside another page's
    stylesheet -- .expired/.expiring in clientareadomains.css, .terminated in
@@ -602,7 +602,7 @@ body[data-min-title="inside"] .min-list {
    guard; these fallbacks are the second one.
 
    --blk-ink is now DERIVED, not authored, from the ink primitive at :root in
-   apple-theme.css -- so it is correct for a colour the buyer picked, which no
+   core-theme.css -- so it is correct for a colour the buyer picked, which no
    authored table can be. See the gate immediately below.
    ASCII only, per this install's Chrome section-skipping hazard. */
 
@@ -735,7 +735,7 @@ body[data-min-title="inside"] .min-list {
    reflows to whatever width the admin dropped it into, independent of viewport.
 
    The container is NAMED (container-name: blk), matching the house precedent
-   in apple-layout.css, so a nested container can never capture these rules.
+   in core-layout.css, so a nested container can never capture these rules.
 
    BREAKPOINTS ARE NOT THE MOCKUP'S. It used 340/520px, which happen to work at
    the 1120px default content column and silently stop working at others -- the
@@ -1377,7 +1377,7 @@ body[data-bn-title="outside"] .bn-card { padding-top: 18px; }
    literal is written with the mockup value it came from.
 
    Prefix .at-* is private to this variant (verified unused elsewhere), and no
-   class here ends in -split or -aside, which apple-layout.css hijacks with
+   class here ends in -split or -aside, which core-layout.css hijacks with
    [class$=] selectors.
    ============================================================= */
 
@@ -1666,7 +1666,7 @@ html[data-theme="dark"] .at-hero[data-at-style="plain"] .at-hero-btn-primary {
     background: linear-gradient(135deg, var(--color-avatar-from), var(--color-avatar-to));
     /* Ink derived from the gradient's midpoint, not borrowed from
        --color-on-accent -- see the note beside .topbar-avatar in
-       apple-theme.css. Only these three band styles take the gradient; the
+       core-theme.css. Only these three band styles take the gradient; the
        saturated ones keep the translucent white disc above. */
     --_av-mid: color-mix(in srgb, var(--color-avatar-from), var(--color-avatar-to));
     color: var(--color-on-accent); box-shadow: none;

@@ -127,6 +127,81 @@ final class LocaleHelper
         return $map[strtolower(trim($name))] ?? null;
     }
 
+    /**
+     * Flag emoji for a WHMCS language name. Used by the locale button; before
+     * this map existed the template's default meant every install showed the
+     * US flag regardless of active language.
+     *
+     * A flag is a hint, not a statement — languages spanning many countries
+     * get the flag WHMCS's own language file is named after (english→US to
+     * match the long-standing default, portuguese→PT vs portuguese-br→BR).
+     */
+    public static function flagFor(string $name): string
+    {
+        static $map = [
+            'arabic' => "\u{1F1F8}\u{1F1E6}", 'azerbaijani' => "\u{1F1E6}\u{1F1FF}",
+            'bulgarian' => "\u{1F1E7}\u{1F1EC}", 'catalan' => "\u{1F1EA}\u{1F1F8}",
+            'chinese' => "\u{1F1E8}\u{1F1F3}", 'croatian' => "\u{1F1ED}\u{1F1F7}",
+            'czech' => "\u{1F1E8}\u{1F1FF}", 'danish' => "\u{1F1E9}\u{1F1F0}",
+            'dutch' => "\u{1F1F3}\u{1F1F1}", 'english' => "\u{1F1FA}\u{1F1F8}",
+            'estonian' => "\u{1F1EA}\u{1F1EA}", 'farsi' => "\u{1F1EE}\u{1F1F7}",
+            'finnish' => "\u{1F1EB}\u{1F1EE}", 'french' => "\u{1F1EB}\u{1F1F7}",
+            'german' => "\u{1F1E9}\u{1F1EA}", 'greek' => "\u{1F1EC}\u{1F1F7}",
+            'hebrew' => "\u{1F1EE}\u{1F1F1}", 'hungarian' => "\u{1F1ED}\u{1F1FA}",
+            'italian' => "\u{1F1EE}\u{1F1F9}", 'japanese' => "\u{1F1EF}\u{1F1F5}",
+            'korean' => "\u{1F1F0}\u{1F1F7}", 'macedonian' => "\u{1F1F2}\u{1F1F0}",
+            'norwegian' => "\u{1F1F3}\u{1F1F4}", 'polish' => "\u{1F1F5}\u{1F1F1}",
+            'portuguese' => "\u{1F1F5}\u{1F1F9}", 'portuguese-br' => "\u{1F1E7}\u{1F1F7}",
+            'romanian' => "\u{1F1F7}\u{1F1F4}", 'russian' => "\u{1F1F7}\u{1F1FA}",
+            'spanish' => "\u{1F1EA}\u{1F1F8}", 'swedish' => "\u{1F1F8}\u{1F1EA}",
+            'turkish' => "\u{1F1F9}\u{1F1F7}", 'ukrainian' => "\u{1F1FA}\u{1F1E6}",
+        ];
+        return $map[strtolower(trim($name))] ?? "\u{1F310}"; // globe for unknowns
+    }
+
+    /**
+     * Native display name for a WHMCS language name ("french" → "Français").
+     * The locale modal used |capitalize on the raw code, which labelled the
+     * button for a French speaker "French" — the one reader guaranteed not to
+     * be browsing in English got the label in English.
+     */
+    public static function nativeName(string $name): string
+    {
+        static $map = [
+            'arabic' => 'العربية', 'azerbaijani' => 'Azərbaycanca', 'bulgarian' => 'Български',
+            'catalan' => 'Català', 'chinese' => '中文', 'croatian' => 'Hrvatski',
+            'czech' => 'Čeština', 'danish' => 'Dansk', 'dutch' => 'Nederlands',
+            'english' => 'English', 'estonian' => 'Eesti', 'farsi' => 'فارسی',
+            'finnish' => 'Suomi', 'french' => 'Français', 'german' => 'Deutsch',
+            'greek' => 'Ελληνικά', 'hebrew' => 'עברית', 'hungarian' => 'Magyar',
+            'italian' => 'Italiano', 'japanese' => '日本語', 'korean' => '한국어',
+            'macedonian' => 'Македонски', 'norwegian' => 'Norsk', 'polish' => 'Polski',
+            'portuguese' => 'Português', 'portuguese-br' => 'Português (BR)',
+            'romanian' => 'Română', 'russian' => 'Русский', 'spanish' => 'Español',
+            'swedish' => 'Svenska', 'turkish' => 'Türkçe', 'ukrainian' => 'Українська',
+        ];
+        $key = strtolower(trim($name));
+        return $map[$key] ?? ucfirst($key);
+    }
+
+    /**
+     * code => native name map for a list of language codes, for one Smarty
+     * lookup in the locale modal.
+     *
+     * @param list<string> $codes
+     * @return array<string, string>
+     */
+    public static function nativeNamesFor(array $codes): array
+    {
+        $out = [];
+        foreach ($codes as $code) {
+            if (is_string($code) && $code !== '') {
+                $out[strtolower($code)] = self::nativeName($code);
+            }
+        }
+        return $out;
+    }
+
     /** WHMCS system default language, lowercased. Memoised per request. */
     public static function systemDefault(): string
     {

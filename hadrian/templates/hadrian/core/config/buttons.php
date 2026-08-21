@@ -9,11 +9,11 @@
  * — each slot stores a `colorOptions` KEY, and the emitter turns it into the
  * option's `css` (a var(), a literal hex, transparent, or rgba()). Because the
  * referenced ramp/base tokens are themselves mode-aware (defined in :root AND
- * [data-theme="dark"] in apple-theme.css), one GLOBAL mapping styles both light
+ * [data-theme="dark"] in core-theme.css), one GLOBAL mapping styles both light
  * and dark automatically — so this panel is site-wide, not per-style.
  *
  * Every `default` below MUST mirror the matching --btn-* default in
- * assets/css/apple-theme.css, or the "is this an override?" comparison desyncs.
+ * assets/css/core-theme.css, or the "is this an override?" comparison desyncs.
  */
 return [
     /* select-colors palette. key = stored token; css = emitted property value;
@@ -68,10 +68,10 @@ return [
        is built ENTIRELY from the Typography scale — font size + weight +
        line-height + radius, all SCALE references resolved through `scales`
        below. No custom pixels: the button's HEIGHT derives from its font size
-       because apple-theme.css uses em-relative padding, so picking a bigger
+       because core-theme.css uses em-relative padding, so picking a bigger
        Typography size grows the whole button. `default` is a scale KEY; the
        defaults keep the Apple look (radius -> Pill) and MUST mirror the --btn-*
-       tokens in apple-theme.css. (sizeMin/Max guard the px path the code still
+       tokens in core-theme.css. (sizeMin/Max guard the px path the code still
        supports, though no field uses it today.) */
     'sizeMin' => 0,
     'sizeMax' => 999,
@@ -140,7 +140,7 @@ return [
     ],
 
     /* The variant matrix. Each `slots` value is a colorOptions key; these are
-       the per-mode defaults and MUST mirror apple-theme.css --btn-* tokens. */
+       the per-mode defaults and MUST mirror core-theme.css --btn-* tokens. */
     'variants' => [
         ['key' => 'default', 'label' => 'Default', 'slots' => [
             'bg' => 'transparent', 'border' => 'border', 'color' => 'text',

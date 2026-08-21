@@ -1,6 +1,6 @@
 {* viewquote is a special WHMCS route — same as viewinvoice, it does NOT
    auto-wrap in our client-area chrome (header.tpl + footer.tpl). Include
-   them manually here so apple-theme.css and friends load. Without this
+   them manually here so core-theme.css and friends load. Without this
    the page renders with no styling because the CSS variables go undefined. *}
 {include file="`$template`/header.tpl"}
 

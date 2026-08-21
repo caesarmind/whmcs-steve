@@ -111,7 +111,7 @@
                still wins on the rail, which reads branding.square directly.
 
                data-logo-dark carries the dark-surface variant; the generic
-               swap in apple-layout.js (initLogoSwap) exchanges src whenever
+               swap in core-layout.js (initLogoSwap) exchanges src whenever
                <html data-theme> flips. Without it the sidebar was pinned to
                the light mark in dark mode -- the resolver has always built
                branding.square.dark, but nothing consumed it. Emitted only
@@ -129,7 +129,7 @@
             {/if}
         </a>
         {* Close button — only visible when the sidebar is a mobile drawer
-           (<=900px). data-nav-toggle closes the open drawer via apple-layout.js.
+           (<=900px). data-nav-toggle closes the open drawer via core-layout.js.
            Hidden on desktop where the sidebar is a permanent column. *}
         <button type="button" class="sidebar-close" aria-label="{$LANG.close}" data-nav-toggle>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -196,7 +196,7 @@
 <script>{literal}
 (function(){
     // Direct-bind to each .sidebar-group-toggle (idempotent via dataset.mtBound).
-    // apple-layout.js's initSidebarGroups() does the same thing once at boot,
+    // core-layout.js's initSidebarGroups() does the same thing once at boot,
     // but if anything in its promise chain rejects this still works. Runs as
     // soon as the script tag is parsed — sidebar markup is already in the DOM.
     function bind() {

@@ -1,5 +1,5 @@
 /* ============================================================
-   apple-layout.css -- Shared layout system for every page
+   core-layout.css -- Shared layout system for every page
    ------------------------------------------------------------
    Extracted from portal-home.html so every page can opt into
    the three-way layout (top / sidebar / icon-rail), the palette
@@ -7,11 +7,11 @@
    and the shared navigation chrome without copy-pasting a wall
    of <style> into each file.
 
-   This file pairs with js/apple-layout.js and the partials in
+   This file pairs with js/core-layout.js and the partials in
    ./partials/. Include ORDER matters:
-     <link rel="stylesheet" href="css/apple-theme.css">
-     <link rel="stylesheet" href="css/apple-layout.css">
-   apple-theme.css defines the base tokens (.sidebar, .topbar,
+     <link rel="stylesheet" href="css/core-theme.css">
+     <link rel="stylesheet" href="css/core-layout.css">
+   core-theme.css defines the base tokens (.sidebar, .topbar,
    --color-*) this file references.
    ============================================================ */
 
@@ -238,7 +238,7 @@ body.screenshot .state-chip { display: none !important; }
 /* -- Palette overrides -------------------------------------- */
 /* Each data-palette on <html> swaps the accent token chain so
    buttons, links, hovers and dropdown highlights pick up the
-   new hue. Base colors still live in apple-theme.css. */
+   new hue. Base colors still live in core-theme.css. */
 html[data-palette="emerald"] {
     --color-accent: #14b17d;
     --color-accent-hover: #0fa370;
@@ -333,7 +333,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 }
 
 /* -- Homepage-nav adjustments (topbar-btn inside nav) ------- */
-/* apple-theme.css defines .topbar-btn with 34px box; when the
+/* core-theme.css defines .topbar-btn with 34px box; when the
    button is an <a> inside .homepage-nav the parent's <a> rules
    sometimes clip it -- re-assert the box sizing here. */
 .homepage-nav .topbar-btn {
@@ -566,7 +566,7 @@ body[data-hide-breadcrumb="1"] .ph-side-topbar-actions { margin-left: auto; }
 /* Scroll-direction reveal, the same semantics as Lagom's affixed nav: the bar
    hides while scrolling DOWN and comes back on the first scroll UP, so long
    pages reclaim the vertical space without losing quick access to the nav.
-   body[data-affixed-nav] gates it; apple-layout.js sets scroll-down /
+   body[data-affixed-nav] gates it; core-layout.js sets scroll-down /
    scroll-up / scrolled-top on <body>.
 
    Both bars are ALREADY position:sticky, so hiding them is a pure transform
@@ -627,7 +627,7 @@ body[data-hide-discounts="1"] .cp-cycle-save { display: none !important; }
 
 /* OFF (the default) = the bar is NOT pinned: it scrolls away with the page,
    which is what "Pin the navbar on scroll" promises when unchecked. The bars
-   are position:sticky unconditionally in apple-theme.css / above, so without
+   are position:sticky unconditionally in core-theme.css / above, so without
    this the toggle could only ever ADD the hide-on-scroll behaviour and an
    admin who switched it off still saw a pinned bar. Lagom behaves the same
    way -- it only adds .sticky-navigation when the setting is enabled.
@@ -892,7 +892,7 @@ body[data-layout="rail"] .ph-hero-inner { max-width: none; }
 .ph-side-logo { display: none; align-items: center; flex-shrink: 0; text-decoration: none; color: var(--color-text-primary); font-weight: var(--fw-semibold); font-size: var(--text-lg); letter-spacing: -0.01em; }
 .ph-side-logo:hover { color: var(--color-accent); text-decoration: none; }
 /* height, not max-height -- a viewBox-only SVG has no intrinsic size to cap and
-   lays out at 0x0. See the note on .sidebar-brand-logo in apple-theme.css. */
+   lays out at 0x0. See the note on .sidebar-brand-logo in core-theme.css. */
 .ph-side-logo.img-logo img { height: 24px; width: auto; max-width: 140px; object-fit: contain; display: block; }
 .ph-side-iconbtn {
     width: 32px; height: 32px; border-radius: 10px;
@@ -1182,7 +1182,7 @@ body[data-svc-layout="outside"] .content-area .settings-group > .settings-item:l
 
 /* -- Unpin Sidebar (admin flag: unpin_sidebar) ----------------
    Default (attribute absent) = unchanged: .sidebar stays position:fixed
-   (apple-theme.css:291).
+   (core-theme.css:291).
 
    ON swaps fixed -> absolute. <body> declares no position, transform, filter or
    contain, so the containing block is the initial containing block: top:0
@@ -1207,7 +1207,7 @@ body[data-svc-layout="outside"] .content-area .settings-group > .settings-item:l
    still applies to the topbar dropdowns.
 
    min-width:901px is LOAD-BEARING. The drawer block below declares no
-   `position` at all -- it inherits `fixed` from apple-theme.css:291 -- so this
+   `position` at all -- it inherits `fixed` from core-theme.css:291 -- so this
    media guard is the only thing keeping the mobile drawer pinned. */
 @media (min-width: 901px) {
     body[data-unpin-sidebar="1"][data-layout="side"] .sidebar { position: absolute; }
@@ -1253,7 +1253,7 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
     body[data-layout="rail"] .ph-main-wrap { margin-left: 0; }
 
     /* Sidebar becomes a slide-in drawer (overrides the legacy
-       `.sidebar { display: none }` rule at <=768px from apple-theme.css).
+       `.sidebar { display: none }` rule at <=768px from core-theme.css).
        The TOP layout reuses this exact drawer chrome — its sidebar is
        display:none above 900px (the .only-side gate) and only surfaces
        here, as the hamburger drawer the top-nav opens. */
@@ -3237,7 +3237,7 @@ body[data-tpl="fraudcheck"] {
 
 /* Fixed column. The :not([data-layout="top"]) guard is required: under
    ?preview=1 header.tpl renders .sidebar regardless of layout and
-   apple-layout.js can set data-layout=top independently, which would pin the
+   core-layout.js can set data-layout=top independently, which would pin the
    top-layout drawer to right:0 while it kept translateX(-100%) from the drawer
    block -- leaving a slice of drawer permanently on screen. */
 body[data-sidebar-side="right"]:not([data-layout="top"]) .sidebar,
@@ -3335,7 +3335,7 @@ body[data-sidebar-side="right"][data-layout="rail"].rail-panel-open .ph-rail-pan
 
    Declared AFTER the three background: shorthands it has to survive -- the
    shorthand resets background-image to none, and .sidebar's lives in
-   apple-theme.css, which header.tpl loads before this file. Equal specificity,
+   core-theme.css, which header.tpl loads before this file. Equal specificity,
    so source order is what makes this win. */
 .sidebar,
 .ph-rail,

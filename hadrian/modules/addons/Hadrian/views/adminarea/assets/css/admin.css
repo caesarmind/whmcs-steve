@@ -41,7 +41,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
     --mt-primary-h:    #0077ed;
     --mt-primary-tint: rgba(0,113,227,0.08);
     /* Matches the Apple client theme's --color-accent-light exactly
-       (apple-theme.css). Was 0.15, which read as a glow rather than a halo. */
+       (core-theme.css). Was 0.15, which read as a glow rather than a halo. */
     --mt-primary-ring: rgba(0,113,227,0.08);
     --mt-link:         #0066cc;
 

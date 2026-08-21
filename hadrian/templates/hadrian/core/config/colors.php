@@ -5,7 +5,7 @@
  * (Hooks::buildColorsHead).
  *
  * Each token's `light` / `dark` default MUST mirror the :root and
- * [data-theme="dark"] blocks in assets/css/apple-theme.css. The admin form
+ * [data-theme="dark"] blocks in assets/css/core-theme.css. The admin form
  * shows the per-style default as the baseline and only persists/emits the
  * tokens the buyer CHANGES — so if you change a default in the CSS, change it
  * here too or the "is this an override?" comparison desyncs.
@@ -202,7 +202,7 @@ return [
            accepts hex and comma-form rgb/rgba/hsl/hsla and nothing else, so a
            stored `linear-gradient(...)` is dropped on save and again on emit --
            silently, both times. So this writes two ordinary COLOUR stops and
-           apple-layout.css composes them into
+           core-layout.css composes them into
              background-image: linear-gradient(180deg, from, to)
            over the flat --sidebar-bg. Same shape as the welcome band, which
            builds its fill from --at-band rather than storing a gradient.
@@ -316,7 +316,7 @@ return [
             ['var' => '--color-orange',      'label' => 'Warning',      'light' => '#ff9f0a',               'dark' => '#ff9f0a'],
             ['var' => '--color-orange-text', 'label' => 'Warning text', 'light' => '#c27400',               'dark' => '#ff9f0a'],
             ['var' => '--color-orange-bg',   'label' => 'Warning fill', 'light' => 'rgba(255,159,10,0.10)', 'dark' => 'rgba(255,159,10,0.16)'],
-            // dark is #ff3b30, NOT #ff453a. apple-theme.css does not redeclare
+            // dark is #ff3b30, NOT #ff453a. core-theme.css does not redeclare
             // --color-red in the dark block, so dark mode renders the light
             // value. The schema used to claim #ff453a, which made this control
             // silently inert: a buyer typing #ff453a in Dark scope had it
@@ -347,7 +347,7 @@ return [
             // field, hover, active, scrollbar and badge -- with black-or-white
             // label ink chosen by exact WCAG luminance, so the menu is legible
             // whatever colour lands here. See the "Sidebar tint" block in
-            // apple-theme.css.
+            // core-theme.css.
             //
             // Its default is EMPTY on purpose, and that is load-bearing:
             // --sidebar-color is never declared in the CSS, so with nothing
@@ -358,7 +358,7 @@ return [
             //
             // check-color-defaults.mjs skips any token with an empty default
             // for this reason -- it is the one token that MUST NOT appear in
-            // apple-theme.css.
+            // core-theme.css.
             ['var' => '--sidebar-color',          'label' => 'Sidebar colour',     'light' => '',                       'dark' => '',                    'hint' => 'Shortcut: one colour and every row below derives from it. Leave empty when using a style.'],
             ['var' => '--sidebar-bg',             'label' => 'Sidebar background', 'light' => 'rgba(246,246,248,0.80)', 'dark' => 'rgba(28,28,30,0.80)', 'hint' => 'Translucent: it frosts whatever scrolls under it.'],
             ['var' => '--sidebar-panel-bg',       'label' => 'Flyout panel',       'light' => '#ffffff',                'dark' => '#2c2c2e', 'follows' => '--color-surface',            'hint' => 'The rail layout only. Not the sidebar itself.'],
@@ -376,7 +376,7 @@ return [
             // rgb/rgba/hsl/hsla and nothing else, so a stored
             // `linear-gradient(...)` is dropped silently on save AND on emit.
             // The gradient is therefore BUILT IN CSS from these two stops
-            // (apple-layout.css, .sidebar/.ph-rail/.ph-rail-panel), exactly the
+            // (core-layout.css, .sidebar/.ph-rail/.ph-rail-panel), exactly the
             // way the welcome band builds its fill from --at-band.
             //
             // Default is fully transparent, which is what makes the rule inert

@@ -199,3 +199,19 @@ button:focus-visible {
     border-color: var(--vl-primary);
     box-shadow: 0 0 0 3px var(--vl-primary-lifted);
 }
+
+/* "0.00" -> "Free" gate for the AJAX order summary.
+   ordersummary.tpl (via includes/free-price.tpl) emits BOTH a
+   .hn-free-label span and the numeric .hn-free-amt span for a zero amount
+   whenever the fragment renders without $hadrian.addonSettings (the
+   recalctotals() refresh runs outside the ClientAreaPage hook flow, so
+   the template cannot read the admin flag itself). The gate is the
+   data-free-label attribute the hadrian theme's header.tpl stamps on
+   <body> when the flag is on -- it survives every AJAX refresh. These
+   rules live HERE (cart-owned CSS, loaded by common.tpl on every cart
+   page) rather than in the theme stylesheet so the fragment renders
+   correctly under ANY client-area theme: without the attribute the label
+   stays hidden and only the numeric amount shows. */
+.hn-free-label { display: none; }
+body[data-free-label="1"] .hn-free-label { display: inline; }
+body[data-free-label="1"] .hn-free-label + .hn-free-amt { display: none; }

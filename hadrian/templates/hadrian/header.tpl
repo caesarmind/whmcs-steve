@@ -94,7 +94,7 @@
 
 {* align — default from the active main-menu layout's saved option (admin
    Layouts card); ?align= overrides in preview. 'center' emits no attribute.
-   Only non-top layouts honor data-align (apple-layout.css). *}
+   Only non-top layouts honor data-align (core-layout.css). *}
 {assign var=mt_align value=$hadrian.layouts['main-menu'].options.align|default:'center'}
 {if $mt_preview && isset($smarty.get.align)}
     {assign var=_q value=$smarty.get.align}
@@ -148,7 +148,7 @@
 
 {* website (client-area) sub-nav → body[data-subnav-website]. Gated to NON-order
    pages so it never touches the cart's *-split grids (shared class names, e.g.
-   cp-split). Consumed by apple-layout.css ([class$="-split"]). *}
+   cp-split). Consumed by core-layout.css ([class$="-split"]). *}
 {assign var=mt_isOrder value=false}
 {if ($inShoppingCart|default:false) || in_array($templatefile|default:'', ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck']) || (($templatefile|default:'')|strstr:'store')}
     {assign var=mt_isOrder value=true}
@@ -338,8 +338,8 @@
             <link rel="apple-touch-icon" href="{$hadrian.branding.square.light|escape}">
         {/if}
     {/if}
-    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-theme.css?v={$hadrian.version|default:'1.0'}">
-    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/apple-layout.css?v={$hadrian.version|default:'1.0'}">
+    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/core-theme.css?v={$hadrian.version|default:'1.0'}">
+    <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/core-layout.css?v={$hadrian.version|default:'1.0'}">
     {* A custom layout's own chrome CSS, if it ships one. Authored, not
        generated — the generated structural minimum (gates, offset, mobile
        collapse) arrives via Hooks::buildLayoutGatesHead in {$headoutput}.
@@ -420,7 +420,7 @@
     {include file="`$template`/includes/partials/rail.tpl"}
     {* Flyout panels are a SIBLING of the rail, not a child: initRail() binds
        mouseleave/mouseenter to .ph-rail and .ph-rail-panel independently and
-       aborts entirely if .ph-rail-panel is absent (apple-layout.js:629), which
+       aborts entirely if .ph-rail-panel is absent (core-layout.js:629), which
        is why the rail's hover menus never opened before this include existed. *}
     {include file="`$template`/includes/partials/rail-panels.tpl"}
 {/if}

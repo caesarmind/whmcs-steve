@@ -5,7 +5,7 @@
    the inner content. The hero keeps the working domain-search form + captcha
    from the previous portal homepage (now preserved as the 'portal' variant).
 
-   Reuses the hp-* marketing classes (already in apple-theme.css, zero CSS work)
+   Reuses the hp-* marketing classes (already in core-theme.css, zero CSS work)
    and the ph-domain-* hero-form classes (homepage.css). Static marketing copy
    is tokenized into the hadrianLang 'home' group; representative pricing/specs
    and decorative illustration blocks are kept verbatim. CTAs point at real
@@ -94,8 +94,8 @@
 </section>
 
 {* 2. Trust stats strip *}
-{* Full-bleed band — see the body[data-tpl="homepage"] block in apple-layout.css.
-   Padding comes from .hp-stats-strip in apple-theme.css (56px 22px); the inline
+{* Full-bleed band — see the body[data-tpl="homepage"] block in core-layout.css.
+   Padding comes from .hp-stats-strip in core-theme.css (56px 22px); the inline
    48px override that used to sit here is gone so the band has one source. *}
 <section class="hp-stats-strip">
     <div class="stats-inner">
@@ -220,7 +220,7 @@
            gaping void in any card that has no price.
 
            cols-N, never an inline grid-template-columns: an inline value
-           outranks the responsive collapse in apple-theme.css.
+           outranks the responsive collapse in core-theme.css.
 
            No "POPULAR" flag. It used to be pinned to $grp@iteration == 2, so
            whichever group happened to be second got badged as popular — a claim
@@ -294,10 +294,10 @@
      section renders nothing until real quotes are added, so no invented customer
      praise ever goes live. Lagom hardcodes its testimonials in the template; this
      keeps them in the lang system so they stay translatable.
-     Reuses .hp-testimonials-grid, already in apple-theme.css. *}
+     Reuses .hp-testimonials-grid, already in core-theme.css. *}
 {if $hpTestimonials}
 <section class="hp-testimonials-grid">
-    {* .hp-testimonials-grid h2 already centres itself in apple-theme.css. *}
+    {* .hp-testimonials-grid h2 already centres itself in core-theme.css. *}
     <h2>{$hadrianLang.home.testiTitle}</h2>
     <div class="hp-testimonial-cards">
         {foreach $hpTestimonials as $t}
@@ -323,7 +323,7 @@
      six/homepage.tpl iterates the same var). WHMCS announcements carry only a
      title, date and body — there are no categories, so no tag chips here. *}
 {if $annCount > 0}
-{* Uses the .hp-announce-grid component already in apple-theme.css (header +
+{* Uses the .hp-announce-grid component already in core-theme.css (header +
    .hp-announce-cards + .hp-announce-item-card, with dark-mode and mobile rules
    already written) rather than inline styles — inline styles can't be
    overridden by media queries, which is the exact cause of the marketing-page
