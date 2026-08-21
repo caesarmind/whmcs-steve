@@ -184,9 +184,7 @@ selection cannot leave a customer staring at a language you removed.
 :::info Where the chooser itself lives
 This decides what is *in* the chooser. Whether the chooser is shown at all is
 **Hide Language Switcher**, over on
-[Layout Manager -> Header](/client-theme/layout-manager/#header). For the full
-translation story - overrides, adding a language, what the chooser looks like -
-see [Languages](/client-theme/languages/).
+[Layout Manager -> Header](/client-theme/layout-manager/#header).
 :::
 
 ## Privacy and Performance
