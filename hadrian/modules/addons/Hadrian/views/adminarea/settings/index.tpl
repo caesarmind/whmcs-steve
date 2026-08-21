@@ -42,6 +42,24 @@
     .mt-subnav-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 18px; margin-top: 6px; }
     .mt-subnav-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mt-text); padding: 3px 0; cursor: pointer; }
     .mt-subnav-check input { margin: 0; flex-shrink: 0; }
+
+    /* Pill chipset (the demo's .adm-chip), used for the random character set.
+       The checkbox stays in the DOM and keeps its name/value -- it is only
+       visually replaced -- so the POST shape is unchanged and none of
+       saveOrderProcess() has to care. Styling hangs off :checked + span
+       rather than :has(), so the chip does not depend on selector support
+       for its ON state. */
+    .mt-chipset { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 6px; }
+    .mt-chip { display: inline-flex; position: relative; cursor: pointer; }
+    .mt-chip input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+    .mt-chip span {
+        font-size: 12.5px; font-weight: 600; padding: 7px 13px; border-radius: 999px;
+        border: 1px solid var(--mt-border); background: var(--mt-surface); color: var(--mt-text-2);
+        white-space: nowrap; transition: background .18s ease, border-color .18s ease, color .18s ease;
+    }
+    .mt-chip:hover span { border-color: var(--mt-input-border); color: var(--mt-text); }
+    .mt-chip input:checked + span { background: var(--mt-primary); border-color: var(--mt-primary); color: #fff; }
+    .mt-chip input:focus-visible + span { outline: 2px solid var(--mt-primary); outline-offset: 2px; }
     /* 22px left indent, matching the demo's SubBlock exactly -- sub-content
        reads as nested under its row, not flush with it. Kept our own
        border-bottom (closes the combined row+sub-panel unit) rather than the
@@ -238,7 +256,14 @@
 }
 .mt-set-group-ico svg { width: 15px; height: 15px; display: block; }
 .mt-set-group-rule { flex: 1; height: 1px; background: var(--mt-border); }
-.mt-set-group-count { font-size: 11px; color: var(--mt-text-4); white-space: nowrap; }
+/* --mt-text-2, not the --mt-text-4 this started on: the count is real
+   information (it moves as you search), and at quaternary it read as
+   disabled chrome. Matches the demo, which made the same change. */
+.mt-set-group-count { font-size: 11px; color: var(--mt-text-2); white-space: nowrap; }
+/* The group's doc link sits last, after the count -- the demo's order. The
+   shared .mt-doclink carries a translate that assumes a heading baseline;
+   centre it against the count instead. */
+.mt-set-group-head .mt-doclink { transform: none; align-self: center; line-height: 1; }
 
 /* Search box. .mt-search/.mt-search-icon/.mt-search-clear already exist in
    admin.css (the Pages list uses them); only the page-level spacing is new. */
@@ -317,6 +342,7 @@
                 <span class="mt-subhead mt-tip-line">{$mtGroup.label|escape}{include file="includes/tip.tpl" text=$mtGroup.sub article="settings" anchor=$mtGroupAnchor}</span>
                 <span class="mt-set-group-rule" aria-hidden="true"></span>
                 <span class="mt-set-group-count" data-set-group-count>{$mtGroup.flags|@count} setting{if $mtGroup.flags|@count != 1}s{/if}</span>
+                {include file="includes/doclink.tpl" article="settings" anchor=$mtGroupAnchor}
             </div>
         {foreach $mtGroup.flags as $key => $meta}
             {assign var=mtIsLangToggle value=($key == 'custom_language_list')}
@@ -642,6 +668,7 @@
                 <span class="mt-subhead mt-tip-line">Configure Server{include file="includes/tip.tpl" text="Fields shown in the Configure Server section during the product configuration step." article="settings" anchor="order-process"}</span>
                 <span class="mt-set-group-rule" aria-hidden="true"></span>
                 <span class="mt-set-group-count" data-set-group-count>3 settings</span>
+                {include file="includes/doclink.tpl" article="settings" anchor="order-process"}
             </div>
 
         {* ── 1. Hide Product Nameservers ─────────────────────────────── *}
@@ -785,11 +812,15 @@
                 </div>
                 <div class="mt-field" style="margin-bottom:0;">
                     <label class="mt-field-label">Random character set</label>
-                    <div class="mt-subnav-checks">
-                        <label class="mt-subnav-check"><input type="checkbox" name="op_custom_hostname_chars[]" value="upper"{if in_array('upper', $opCustomHostnameChars)} checked{/if}> Uppercase (A–Z)</label>
-                        <label class="mt-subnav-check"><input type="checkbox" name="op_custom_hostname_chars[]" value="lower"{if in_array('lower', $opCustomHostnameChars)} checked{/if}> Lowercase (a–z)</label>
-                        <label class="mt-subnav-check"><input type="checkbox" name="op_custom_hostname_chars[]" value="numbers"{if in_array('numbers', $opCustomHostnameChars)} checked{/if}> Numbers (0–9)</label>
+                    <div class="mt-chipset">
+                        <label class="mt-chip"><input type="checkbox" name="op_custom_hostname_chars[]" value="upper"{if in_array('upper', $opCustomHostnameChars)} checked{/if}><span>Uppercase</span></label>
+                        <label class="mt-chip"><input type="checkbox" name="op_custom_hostname_chars[]" value="lower"{if in_array('lower', $opCustomHostnameChars)} checked{/if}><span>Lowercase</span></label>
+                        <label class="mt-chip"><input type="checkbox" name="op_custom_hostname_chars[]" value="numbers"{if in_array('numbers', $opCustomHostnameChars)} checked{/if}><span>Numbers</span></label>
                     </div>
+                    {* States the none-ticked rule, which is real behaviour on
+                       both sides: the preview's pool() and the cart's own
+                       generator each treat "none" and "all three" alike. *}
+                    <p class="mt-field-help">Tick any combination. None ticked behaves as all three.</p>
                 </div>
             </div>
 
