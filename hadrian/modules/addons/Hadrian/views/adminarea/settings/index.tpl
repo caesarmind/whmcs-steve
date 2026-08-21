@@ -35,7 +35,13 @@
     .mt-subnav-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 18px; margin-top: 6px; }
     .mt-subnav-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mt-text); padding: 3px 0; cursor: pointer; }
     .mt-subnav-check input { margin: 0; flex-shrink: 0; }
-    .mt-row-sub { padding: 4px 0 18px; border-bottom: 1px solid var(--mt-border); }
+    /* 22px left indent, matching the demo's SubBlock exactly -- sub-content
+       reads as nested under its row, not flush with it. Kept our own
+       border-bottom (closes the combined row+sub-panel unit) rather than the
+       demo's border-top: flipping sides would drop the separator between a
+       sub-panel and the next full-weight row, since .mt-row-with-sub already
+       suppresses its own bottom border to let this one carry it. */
+    .mt-row-sub { padding: 4px 0 18px 22px; border-bottom: 1px solid var(--mt-border); }
     .mt-row-sub[hidden] { display: none; }
     .mt-row-sub-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
     .mt-row-sub-title { font-size: 14px; font-weight: 500; margin: 0; }
@@ -309,24 +315,26 @@
             {assign var=mtIsLangToggle value=($key == 'custom_language_list')}
             {assign var=mtFlagTab value=$flagTabs[$key]|default:'general'}
             {assign var=mtHasSub value=($mtIsLangToggle || $key == 'cart_subnav' || $key == 'website_subnav' || $key == 'service_controls_outside' || $key == 'enable_dark_mode' || $key == 'cookie_box')}
-            {* Per-flag doc anchor. Six flags have their own ### heading in the
-               Settings article; the other six have no individual heading and
-               fall back to their group's ## anchor -- the same one the group
-               head link above already uses, which is correct: it is genuinely
-               all the doc says about that flag. Keyed on $key, not
-               $mtGroup.slug, so a flag's anchor moves with IT if it is ever
-               reassigned to a different group. *}
+            {* Per-flag doc anchor. EVERY flag on this page has its own ###
+               heading in the Settings article, so every anchor below is a
+               specific block -- no group-level fallbacks. The values are the
+               slugs the docs builder derives from those headings (lowercase,
+               non-alphanumeric runs collapsed to a hyphen, trimmed), so
+               renaming a heading in 03a-settings.md means changing it here
+               too. Keyed on $key, not $mtGroup.slug, so a flag's anchor moves
+               with IT if it is ever reassigned to a different group. *}
             {if $key == 'cookie_box'}{assign var=mtRowAnchor value='cookie-box'}
             {elseif $key == 'enable_alternate_links'}{assign var=mtRowAnchor value='enable-alternate-links'}
             {elseif $key == 'capitalize_titles'}{assign var=mtRowAnchor value='section-titles-capitalization'}
             {elseif $key == 'enable_dynamic_ajax'}{assign var=mtRowAnchor value='enable-dynamic-ajax-loading'}
             {elseif $key == 'custom_language_list'}{assign var=mtRowAnchor value='custom-language-list'}
             {elseif $key == 'enable_dark_mode'}{assign var=mtRowAnchor value='enable-dark-mode'}
-            {elseif $key == 'cart_subnav'}{assign var=mtRowAnchor value='cart-layout'}
-            {elseif $key == 'free_label' || $key == 'hide_cycle_discounts'}{assign var=mtRowAnchor value='pricing-display'}
-            {elseif $key == 'topnav_show_icons'}{assign var=mtRowAnchor value='navigation'}
+            {elseif $key == 'cart_subnav'}{assign var=mtRowAnchor value='order-category-sidebar'}
+            {elseif $key == 'free_label'}{assign var=mtRowAnchor value='0-00-free'}
+            {elseif $key == 'hide_cycle_discounts'}{assign var=mtRowAnchor value='hide-billing-cycle-discounts'}
+            {elseif $key == 'topnav_show_icons'}{assign var=mtRowAnchor value='top-nav-icons'}
             {elseif $key == 'website_subnav'}{assign var=mtRowAnchor value='website-section-sidebar'}
-            {elseif $key == 'service_controls_outside'}{assign var=mtRowAnchor value='appearance'}
+            {elseif $key == 'service_controls_outside'}{assign var=mtRowAnchor value='card-titles-outside-the-box'}
             {else}{assign var=mtRowAnchor value=''}
             {/if}
             {* data-search carries label + help + the synonym list from
@@ -630,7 +638,7 @@
             </div>
 
         {* ── 1. Hide Product Nameservers ─────────────────────────────── *}
-        <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}" data-set-row data-search="hide product nameservers ns1 ns2 configure server">
+        <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}" data-set-row data-search="hide product nameservers ns1 ns2 prefix configure server">
             <div>
                 <div class="mt-row-label mt-tip-line">Hide Product Nameservers {include file="includes/tip.tpl" text="Hide the NS1 Prefix and NS2 Prefix fields shown in the Configure Server section during the product configuration step." article="settings" anchor="hide-product-nameservers"}</div>
             </div>
@@ -677,7 +685,14 @@
         </div>
 
         {* ── 2. Hide Product Hostname (+ custom hostname + hide-on-checkout) ── *}
-        <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}" data-set-row data-search="hide product hostname root password configure server custom">
+        {* Haystack covers this row AND the two toggles nested inside it (Use
+           Custom Hostname, Hide on Checkout page). Those are documented as
+           settings in their own right, but they cannot carry data-set-row
+           themselves: they live inside this row's [hidden] sub-panel, so
+           search would "reveal" a row with no visible ancestor and leave the
+           group counter claiming a match nobody can see. Folding their words
+           in here lands the admin on the row that contains them. *}
+        <div class="mt-row mt-row-with-sub{if $tab != 'order'} mt-tab-off{/if}" data-set-row data-search="hide product hostname root password configure server custom use custom hostname checkout page cart summary subdomain zone domain random character length prefix suffix">
             <div>
                 <div class="mt-row-label mt-tip-line">Hide Product Hostname {include file="includes/tip.tpl" text="Hide the Hostname and Root Password fields shown in the Configure Server section during the product configuration step." article="settings" anchor="hide-product-hostname"}</div>
             </div>
@@ -774,7 +789,7 @@
             {* Hide on Checkout — nested toggle, no sub-fields. *}
             <div class="mt-row" style="border-top:1px solid var(--mt-border); padding-top:14px; margin-top:6px;">
                 <div>
-                    <div class="mt-row-label mt-tip-line">Hide on Checkout page {include file="includes/tip.tpl" text="Also hide the hostname shown under each product in the cart summary on the checkout step." article="settings" anchor="hide-product-hostname"}</div>
+                    <div class="mt-row-label mt-tip-line">Hide on Checkout page {include file="includes/tip.tpl" text="Also hide the hostname shown under each product in the cart summary on the checkout step." article="settings" anchor="hide-on-checkout-page"}</div>
                 </div>
                 <label class="mt-toggle">
                     <input type="checkbox" name="op_hide_hostname_checkout"{if $opHideHostnameCheckout} checked{/if}>
@@ -784,7 +799,7 @@
         </div>
 
         {* ── 3. Enable Password Strength for Root Password Field ──────── *}
-        <div class="mt-row{if $tab != 'order'} mt-tab-off{/if}" data-set-row data-search="password strength root field meter">
+        <div class="mt-row{if $tab != 'order'} mt-tab-off{/if}" data-set-row data-search="enable password strength for root password field meter weak configure server">
             <div>
                 <div class="mt-row-label mt-tip-line">Enable Password Strength For Root Password Field {include file="includes/tip.tpl" text="Show a password-strength meter on the Root Password field during the product configuration step. Weak passwords are rejected server-side." article="settings" anchor="enable-password-strength-for-root-password-field"}</div>
             </div>
