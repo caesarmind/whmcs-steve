@@ -143,7 +143,7 @@
 .mt-seo-langs.is-table .mt-seo-lang-head { display: flex; align-items: center; gap: 8px; padding-top: 26px; }
 .mt-seo-langs.is-table .mt-field { margin-bottom: 0; }
 .mt-seo-lang-name { font-size: 13px; font-weight: 600; color: var(--mt-text); }
-.mt-seo-lang-code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 10.5px; color: var(--mt-text-4); text-transform: uppercase; }
+.mt-seo-lang-code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 10.5px; color: var(--mt-text-4); text-transform: uppercase; }
 .mt-seo-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mt-text-4); flex-shrink: 0; }
 .mt-seo-lang.is-filled .mt-seo-dot { background: var(--mt-success); }
 .mt-seo-lang[hidden] { display: none !important; }

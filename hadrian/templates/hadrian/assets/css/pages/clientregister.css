@@ -206,7 +206,7 @@ body.cr-gp-open { overflow: hidden; }
 }
 .cr-gp-field input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
 #crGpLength { max-width: 120px; }
-#crGpOutput { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; letter-spacing: 0.02em; }
+#crGpOutput { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.02em; }
 .cr-gp-output-row { display: flex; gap: 8px; }
 .cr-gp-output-row input { flex: 1; min-width: 0; }
 .cr-gp-ghost {

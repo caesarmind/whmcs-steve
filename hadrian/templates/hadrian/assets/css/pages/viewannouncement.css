@@ -153,7 +153,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .article-body a { color: var(--color-accent); text-decoration: underline; text-decoration-thickness: 0.5px; text-underline-offset: 2px; }
 .article-body a:hover { text-decoration-thickness: 1px; }
 .article-body code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: ui-monospace, Menlo, monospace;
     font-size: var(--text-base);
     background: var(--color-surface-secondary);
     padding: 1px 6px;
@@ -165,7 +165,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     padding: 14px 16px;
     border-radius: var(--radius-md);
     overflow-x: auto;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: ui-monospace, Menlo, monospace;
     font-size: var(--text-base);
     line-height: 1.55;
     margin: 0 0 20px;

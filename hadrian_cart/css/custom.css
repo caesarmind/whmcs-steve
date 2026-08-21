@@ -9,76 +9,105 @@
  * the SPA (the wrapper page chrome, traditional-cart pages from
  * standard_cart, etc.) is themed via the same tokens via :root.
  *
- * Token source: apple-client-area/css/apple-theme.css
+ * Token source: the client-area theme's --color-* tokens
+ * (hadrian/templates/hadrian/assets/css/core-theme.css, mirrored for
+ * standalone use by this cart's own css/style.min.css :root block).
  * Spec source: WHMCS9-Theme-Development-Documentation.md §18, §27
  */
 
-/* Light-mode tokens (default). */
+/* Light-mode tokens (default).
+   Every COLOUR below is bridged: `var(--color-*, <literal>)`. The theme
+   token comes first so an admin edit in Styles -> Colors actually reaches
+   the SPA -- custom properties inherit through the Shadow DOM boundary, so
+   a --color-* declared on :root resolves inside the shadow tree too. The
+   literal after the comma is the fallback, kept so the cart still renders
+   correctly under a client-area theme that never defines --color-*; never
+   write a bare var(--x) with no fallback here.
+   Because each bridged token re-resolves when the theme flips --color-* at
+   [data-theme="dark"], dark mode comes for free -- the dark rule below now
+   carries ONLY the few tokens that have no theme counterpart.
+   The non-colour tokens (sizes, rounding, spacing) are deliberately left as
+   literals: the theme's --text- and --radius- scales carry different values,
+   so bridging them would change cart metrics, not colours. */
 :host, :root {
-    /* Primary (Apple blue) */
-    --vl-primary:               #0071e3;
-    --vl-primary-lifted:        rgba(0, 113, 227, 0.08);
-    --vl-primary-accented:      #0077ED;
+    /* Primary -> theme accent (Styles -> Colors -> Accent / Accent hover /
+       Accent tint) */
+    --vl-primary:               var(--color-accent, #0071e3);
+    --vl-primary-lifted:        var(--color-accent-light, rgba(0, 113, 227, 0.08));
+    --vl-primary-accented:      var(--color-accent-hover, #0077ED);
 
-    /* Secondary (Apple dark text on neutral bg) */
-    --vl-secondary:             #1d1d1f;
-    --vl-secondary-lifted:      #f5f5f7;
+    /* Secondary -> primary text over the secondary surface.
+       -accented stays literal: the theme has no pure-black token. */
+    --vl-secondary:             var(--color-text-primary, #1d1d1f);
+    --vl-secondary-lifted:      var(--color-surface-secondary, #f5f5f7);
     --vl-secondary-accented:    #000000;
 
-    /* Success (Apple green) */
-    --vl-success:               #30d158;
-    --vl-success-lifted:        rgba(48, 209, 88, 0.10);
-    --vl-success-accented:      #248a3d;
+    /* Success -> theme green family (Success / Success fill / Success text) */
+    --vl-success:               var(--color-green, #30d158);
+    --vl-success-lifted:        var(--color-green-bg, rgba(48, 209, 88, 0.10));
+    --vl-success-accented:      var(--color-green-text, #248a3d);
 
-    /* Info (uses primary blue family) */
-    --vl-info:                  #0071e3;
-    --vl-info-lifted:           rgba(0, 113, 227, 0.08);
-    --vl-info-accented:         #0066cc;
+    /* Info -> the theme's Info pair, which is deliberately separate from the
+       accent so info badges need not follow a rebrand. -accented takes the
+       Link token, which is itself derived from the accent. */
+    --vl-info:                  var(--color-blue-text, #0071e3);
+    --vl-info-lifted:           var(--color-blue-bg, rgba(0, 113, 227, 0.08));
+    --vl-info-accented:         var(--color-link, #0066cc);
 
-    /* Notice (Apple purple/indigo) */
+    /* Notice (Apple purple/indigo). NOT bridged, in either mode: the theme's
+       status palette is green/orange/red/blue/gray only, and its purples
+       (--color-icon-indigo, --color-block-1) are a sidebar icon tile and a
+       free dashboard-block slot -- neither is a notice colour. */
     --vl-notice:                #5856d6;
     --vl-notice-lifted:         rgba(88, 86, 214, 0.10);
     --vl-notice-accented:       #4a47b8;
 
-    /* Warning (Apple orange) */
-    --vl-warning:               #ff9f0a;
-    --vl-warning-lifted:        rgba(255, 159, 10, 0.10);
-    --vl-warning-accented:      #c27400;
+    /* Warning -> theme orange family (Warning / Warning fill / Warning text) */
+    --vl-warning:               var(--color-orange, #ff9f0a);
+    --vl-warning-lifted:        var(--color-orange-bg, rgba(255, 159, 10, 0.10));
+    --vl-warning-accented:      var(--color-orange-text, #c27400);
 
-    /* Error (Apple red) */
-    --vl-error:                 #ff3b30;
-    --vl-error-lifted:          rgba(255, 59, 48, 0.10);
-    --vl-error-accented:        #d70015;
+    /* Error -> theme red family (Danger / Danger fill / Danger text) */
+    --vl-error:                 var(--color-red, #ff3b30);
+    --vl-error-lifted:          var(--color-red-bg, rgba(255, 59, 48, 0.10));
+    --vl-error-accented:        var(--color-red-text, #d70015);
 
-    /* Grayscale (system gray family) */
-    --vl-grayscale:             #6e6e73;
-    --vl-grayscale-lifted:      #f5f5f7;
-    --vl-grayscale-accented:    #1d1d1f;
+    /* Grayscale -> the theme text + surface scales */
+    --vl-grayscale:             var(--color-text-secondary, #6e6e73);
+    --vl-grayscale-lifted:      var(--color-surface-secondary, #f5f5f7);
+    --vl-grayscale-accented:    var(--color-text-primary, #1d1d1f);
 
-    /* Neutral (Apple tertiary text / soft surfaces) */
-    --vl-neutral:               #86868b;
-    --vl-neutral-lifted:        #f0f0f5;
-    --vl-neutral-accented:      #6e6e73;
+    /* Neutral -> tertiary text over the faintest neutral. -lifted takes
+       Border light: it is the theme token carrying exactly this family's
+       soft-surface pair (#f0f0f5 light / #2c2c2e dark). */
+    --vl-neutral:               var(--color-text-tertiary, #86868b);
+    --vl-neutral-lifted:        var(--color-border-light, #f0f0f5);
+    --vl-neutral-accented:      var(--color-text-secondary, #6e6e73);
 
-    /* Text hierarchy */
+    /* Text hierarchy -> the theme text scale. -inverted stays literal: it has
+       to flip to near-black in dark mode and no theme token does that
+       (--color-on-accent is white in BOTH modes). */
     --vl-text-inverted:         #ffffff;
-    --vl-text-muted:            #aeaeb2;
-    --vl-text-lifted:           #6e6e73;
-    --vl-text-accented:         #1d1d1f;
-    --vl-text:                  #1d1d1f;
+    --vl-text-muted:            var(--color-text-quaternary, #aeaeb2);
+    --vl-text-lifted:           var(--color-text-secondary, #6e6e73);
+    --vl-text-accented:         var(--color-text-primary, #1d1d1f);
+    --vl-text:                  var(--color-text-primary, #1d1d1f);
 
-    /* Border hierarchy */
-    --vl-border-muted:          #f0f0f5;
-    --vl-border:                #e8e8ed;
+    /* Border hierarchy. -lifted stays literal: #d2d2d7 sits between the
+       theme's Border and its text scale and has no token of its own. */
+    --vl-border-muted:          var(--color-border-light, #f0f0f5);
+    --vl-border:                var(--color-border, #e8e8ed);
     --vl-border-lifted:         #d2d2d7;
-    --vl-border-accented:       #0071e3;       /* focus ring */
+    --vl-border-accented:       var(--color-accent, #0071e3);   /* focus ring */
 
-    /* Background hierarchy */
-    --vl-bg:                    #fbfbfd;       /* page bg */
-    --vl-bg-muted:              #f5f5f7;       /* secondary surface */
-    --vl-bg-lifted:             #ffffff;       /* cards / primary surface */
-    --vl-bg-accented:           rgba(0, 113, 227, 0.08);
-    --vl-bg-inverted:           #1d1d1f;       /* dark inverted bg */
+    /* Background hierarchy -> the theme page/surface scale, mapped by role:
+       -lifted is the card surface, -muted the inset behind it. -inverted is
+       the primary TEXT colour by definition, which inverts with the mode. */
+    --vl-bg:                    var(--color-bg, #fbfbfd);                    /* page bg */
+    --vl-bg-muted:              var(--color-surface-secondary, #f5f5f7);     /* secondary surface */
+    --vl-bg-lifted:             var(--color-surface, #ffffff);               /* cards / primary surface */
+    --vl-bg-accented:           var(--color-accent-light, rgba(0, 113, 227, 0.08));
+    --vl-bg-inverted:           var(--color-text-primary, #1d1d1f);          /* inverted bg */
 
     /* Typography sizes (Apple-tight scale) */
     --vl-text-xs:               11.5px;
@@ -101,65 +130,32 @@
     --vl-disabled-opacity:      0.5;
 }
 
-/* Dark mode tokens. Triggered ONLY by an explicit data-theme="dark" on
-   :root (set by the WHMCS theme switcher). Previously this block used
+/* Dark mode tokens -- now ONLY the ones the light block could not bridge.
+   Every --vl-* that reads a --color-* token up there already follows dark
+   mode on its own, because the theme redeclares --color-* on the same
+   element at [data-theme="dark"]; repeating those tokens here would freeze
+   them at a literal and re-break the admin's colour edits, so they are gone.
+
+   Triggered ONLY by an explicit data-theme="dark" on :root (set by
+   hadrian's header.tpl). Previously this block used
    @media (prefers-color-scheme: dark), which made the OS preference
    override the explicit light theme on /store, viewcart, and checkout,
-   leaving body bg dark in light mode. */
-:host[data-theme="dark"],
+   leaving body bg dark in light mode.
+
+   The selector also used to carry a `:host[data-theme="dark"]` half. That
+   was dead code: data-theme is only ever set on <html>, never on a shadow
+   host element, so it could never match. Dark values still reach the SPA --
+   custom properties inherit across the shadow boundary from :root. */
 :root[data-theme="dark"] {
-    --vl-primary:           #2997ff;
-    --vl-primary-lifted:    rgba(41, 151, 255, 0.12);
-    --vl-primary-accented:  #40a3ff;
-
-    --vl-secondary:         #f5f5f7;
-    --vl-secondary-lifted:  #3a3a3c;
     --vl-secondary-accented:#ffffff;
-
-    --vl-success:           #30d158;
-    --vl-success-lifted:    rgba(48, 209, 88, 0.16);
-    --vl-success-accented:  #248a3d;
-
-    --vl-info:              #2997ff;
-    --vl-info-lifted:       rgba(41, 151, 255, 0.14);
-    --vl-info-accented:     #40a3ff;
 
     --vl-notice:            #7a78f0;
     --vl-notice-lifted:     rgba(122, 120, 240, 0.16);
     --vl-notice-accented:   #9491f6;
 
-    --vl-warning:           #ff9f0a;
-    --vl-warning-lifted:    rgba(255, 159, 10, 0.16);
-    --vl-warning-accented:  #ffb340;
-
-    --vl-error:             #ff453a;
-    --vl-error-lifted:      rgba(255, 69, 58, 0.16);
-    --vl-error-accented:    #ff6961;
-
-    --vl-grayscale:         #a1a1a6;
-    --vl-grayscale-lifted:  #3a3a3c;
-    --vl-grayscale-accented:#f5f5f7;
-
-    --vl-neutral:           #8e8e93;
-    --vl-neutral-lifted:    #2c2c2e;
-    --vl-neutral-accented:  #a1a1a6;
-
     --vl-text-inverted:     #1d1d1f;
-    --vl-text-muted:        #636366;
-    --vl-text-lifted:       #a1a1a6;
-    --vl-text-accented:     #ffffff;
-    --vl-text:              #f5f5f7;
 
-    --vl-border-muted:      #2c2c2e;
-    --vl-border:            #3a3a3c;
     --vl-border-lifted:     #545458;
-    --vl-border-accented:   #2997ff;
-
-    --vl-bg:                #1c1c1e;
-    --vl-bg-muted:          #2c2c2e;
-    --vl-bg-lifted:         #3a3a3c;
-    --vl-bg-accented:       rgba(41, 151, 255, 0.14);
-    --vl-bg-inverted:       #f5f5f7;
 }
 
 /* Wrapper-page styling. The Nexus cart SPA renders inside

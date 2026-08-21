@@ -1463,7 +1463,7 @@
     box-shadow: 0 0 0 3px var(--color-accent-light);
 }
 .modal-generate-password #inputGeneratePasswordOutput {
-    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
     font-size: 14px;
     letter-spacing: 0;
 }

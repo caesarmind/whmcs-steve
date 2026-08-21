@@ -250,7 +250,7 @@ body[data-svc-layout="outside"] .aff-card > .aff-payout {
     border: 0.5px solid var(--color-border-light);
     border-radius: var(--radius-md);
     padding: 14px 16px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     overflow-x: auto;

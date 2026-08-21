@@ -25,10 +25,13 @@
  */
 
 /* ---------------------------------------------------------------
-   1. TOKENS -- Apple light mode + system dark mode mirror.
+   1. TOKENS -- Apple light mode only.
    These are the same values apple-client-area/css/apple-theme.css
    exposes; redeclared here so the cart pages don't have to
    depend on the client-area theme bundle being loaded first.
+
+   Dark mode is deliberately NOT declared in this file -- see the
+   note under the block for why mirroring it here was harmful.
    --------------------------------------------------------------- */
 :root {
     --color-bg:                #fbfbfd;
@@ -59,62 +62,36 @@
     --font-family: system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-/* Dark mode is opt-in via [data-theme="dark"] on <html> or <body>.
-   We do NOT gate on @media (prefers-color-scheme: dark) -- the parent
-   hadrian uses explicit data-theme so the deployed site can default
-   to light even when the visitor's OS is in dark mode. The OS
-   preference is honored only as a fallback when no data-theme is
-   set anywhere in the document (see :where(html:not(...)) below). */
-html[data-theme="dark"],
-body[data-theme="dark"],
-[data-theme="dark"] {
-    --color-bg:                #1c1c1e;
-    --color-surface:           #2c2c2e;
-    --color-surface-secondary: #3a3a3c;
-    --color-surface-tertiary:  #252527;
-    --color-border:            #3a3a3c;
-    --color-border-light:      #2c2c2e;
-    --color-text-primary:      #f5f5f7;
-    --color-text-secondary:    #a1a1a6;
-    --color-text-tertiary:     #8e8e93;
-    --color-text-quaternary:   #636366;
-    --color-accent:            #2997ff;
-    --color-accent-hover:      #40a3ff;
-    --color-accent-light:      rgba(41, 151, 255, 0.12);
-    --color-green-bg:          rgba(48, 209, 88, 0.16);
-    --color-green-text:        #30d158;
-    --color-orange-bg:         rgba(255, 159, 10, 0.16);
-    --color-orange-text:       #ff9f0a;
-    --color-red-bg:            rgba(255, 59, 48, 0.16);
-    --color-red-text:          #ff453a;
-}
+/* Dark mode: NOT declared in this file, on purpose.
+   ---------------------------------------------------------------
+   The cart always renders inside hadrian's header.tpl, which loads
+   core-theme.css (header.tpl:341). That file already declares all 19
+   dark tokens this file used to mirror, at byte-identical values,
+   under `html[data-theme="dark"]`. The copy here bought nothing and
+   actively broke the admin Colors panel:
 
-/* OS-preference fallback -- only applies when the page does NOT set
-   data-theme explicitly. The :where() keeps specificity at zero so
-   any [data-theme] attribute on <html>/<body> wins. */
-@media (prefers-color-scheme: dark) {
-    :where(html:not([data-theme]):not([data-theme="light"])) {
-        --color-bg:                #1c1c1e;
-        --color-surface:           #2c2c2e;
-        --color-surface-secondary: #3a3a3c;
-        --color-surface-tertiary:  #252527;
-        --color-border:            #3a3a3c;
-        --color-border-light:      #2c2c2e;
-        --color-text-primary:      #f5f5f7;
-        --color-text-secondary:    #a1a1a6;
-        --color-text-tertiary:     #8e8e93;
-        --color-text-quaternary:   #636366;
-        --color-accent:            #2997ff;
-        --color-accent-hover:      #40a3ff;
-        --color-accent-light:      rgba(41, 151, 255, 0.12);
-        --color-green-bg:          rgba(48, 209, 88, 0.16);
-        --color-green-text:        #30d158;
-        --color-orange-bg:         rgba(255, 159, 10, 0.16);
-        --color-orange-text:       #ff9f0a;
-        --color-red-bg:            rgba(255, 59, 48, 0.16);
-        --color-red-text:          #ff453a;
-    }
-}
+   Hooks::buildColorsHead emits an admin's dark-scope overrides as
+   `html[data-theme="dark"]` (Hooks.php:836) inside {$headoutput}
+   (header.tpl:396). The mirror here opened with that same selector --
+   an exact (0,1,1) specificity tie -- and this file is <link>ed from
+   common.tpl, which emits INSIDE <body> and therefore lands later in
+   source order. Tie + later source order = these stock values won,
+   silently reverting every dark colour override on all 14 cart pages.
+   Light mode was never affected: the admin's light selector scores
+   (0,2,1) against the plain `:root` above.
+
+   With the mirror gone, core-theme.css's `html[data-theme="dark"]`
+   (0,1,1) beats this file's `:root` (0,1,0) on specificity regardless
+   of source order, and the admin's emitted block still ties
+   core-theme.css and wins on order -- the intended precedence of
+   dark-scope override > stock dark > light-scope override.
+
+   There is also no @media (prefers-color-scheme: dark) fallback here,
+   by design: header.tpl:262 always writes a data-theme attribute onto
+   <html> (defaulting to "light"), and core-theme.js states "No OS
+   auto-detect (by design)" -- Default Mode is the source of truth. An
+   OS-preference block would be unreachable dead code contradicting
+   that contract. */
 
 body {
     font-family: var(--font-family);

@@ -663,7 +663,7 @@
            The field named "Subdomain zone" lands in the MIDDLE of the result --
            the random block always leads -- and no arrangement of labels makes
            that as clear as showing the string. */
-        .mt-hostname-preview { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.5; color: var(--mt-text); background: var(--mt-surface-2, var(--mt-bg)); border: 1px solid var(--mt-border); border-radius: 8px; padding: 9px 10px; max-width: 520px; word-break: break-all; }
+        .mt-hostname-preview { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.5; color: var(--mt-text); background: var(--mt-surface-2, var(--mt-bg)); border: 1px solid var(--mt-border); border-radius: 8px; padding: 9px 10px; max-width: 520px; word-break: break-all; }
         .mt-hostname-preview .mt-hn-rand { color: var(--mt-text-3); }
         .mt-hostname-preview .mt-hn-zone { color: var(--mt-primary, #0071e3); }
         </style>{/literal}

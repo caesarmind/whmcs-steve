@@ -35,12 +35,12 @@ body[data-subnav-side="left"] .ef-split > .ef-main { grid-column: 2; grid-row: 1
     border-radius: var(--radius-md);
     background: var(--color-surface);
     font-size: var(--text-base); color: var(--color-text-primary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: ui-monospace, Menlo, monospace;
     width: 100%;
     transition: all var(--transition-fast);
 }
 .ef-input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
-.ef-at { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--text-base); color: var(--color-text-tertiary); white-space: nowrap; }
+.ef-at { font-family: ui-monospace, Menlo, monospace; font-size: var(--text-base); color: var(--color-text-tertiary); white-space: nowrap; }
 
 .ef-row-new { background: var(--color-surface-secondary); }
 

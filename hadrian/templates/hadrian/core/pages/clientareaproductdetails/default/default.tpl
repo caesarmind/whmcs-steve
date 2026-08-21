@@ -258,7 +258,7 @@
 #pd-license .panel-body{padding:0}
 #pd-license h6{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--color-text-tertiary,#86868b);margin:16px 0 6px;font-weight:600}
 #pd-license h6:first-child{margin-top:0}
-#pd-license .form-control{width:100%;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.5;padding:10px 12px;border:1px solid var(--color-border,#e3e8ee);border-radius:8px;background:var(--color-bg-subtle,#f7f8fa);color:var(--color-text,#1d1d1f);resize:vertical}
+#pd-license .form-control{width:100%;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.5;padding:10px 12px;border:1px solid var(--color-border,#e3e8ee);border-radius:8px;background:var(--color-bg-subtle,#f7f8fa);color:var(--color-text,#1d1d1f);resize:vertical}
 #pd-license .label{display:inline-block;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:600}
 #pd-license .label-success{background:#d4f4dd;color:#1a7f37}
 #pd-license .label-info{background:#d6e9ff;color:#0b5cad}

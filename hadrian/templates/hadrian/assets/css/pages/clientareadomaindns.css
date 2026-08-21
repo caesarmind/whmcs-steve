@@ -42,7 +42,7 @@ body[data-subnav-side="left"] .dns-split > .dns-main { grid-column: 2; grid-row:
 }
 .dns-input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
 .dns-input-type { cursor: pointer; padding-right: 28px; }
-.dns-input-host, .dns-input-addr { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--text-base); }
+.dns-input-host, .dns-input-addr { font-family: ui-monospace, Menlo, monospace; font-size: var(--text-base); }
 .dns-row[data-type="MX"] .dns-input-prio { background: var(--color-surface); }
 .dns-row:not([data-type="MX"]) .dns-input-prio { display: none; }
 .dns-na { color: var(--color-text-tertiary); font-size: var(--text-base); }
@@ -61,7 +61,7 @@ body[data-subnav-side="left"] .dns-split > .dns-main { grid-column: 2; grid-row:
 .dns-help { padding: 16px 18px; }
 .dns-help-title { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 10px; }
 .dns-help-list { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; }
-.dns-help-list dt { font-size: var(--text-sm); font-weight: var(--fw-semibold); color: var(--color-text-primary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.dns-help-list dt { font-size: var(--text-sm); font-weight: var(--fw-semibold); color: var(--color-text-primary); font-family: ui-monospace, Menlo, monospace; }
 .dns-help-list dd { margin: 0; font-size: var(--text-sm); color: var(--color-text-tertiary); line-height: 1.45; }
 
 .subnav-card { padding: 8px; }

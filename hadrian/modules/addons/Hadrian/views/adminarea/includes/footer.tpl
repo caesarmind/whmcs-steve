@@ -352,7 +352,17 @@
     /* `input.mt-color-text` OR `select.mt-color-text`. Not every token in the
        schema is a colour -- the Gradient direction is a select -- and a row that
        this cannot find is a row the style chips silently fail to write and the
-       scope switch silently fails to swap, with nothing anywhere saying so. */
+       scope switch silently fails to swap, with nothing anywhere saying so.
+
+       CLASS ONLY, and so is every other query below that walks the rows: the
+       swatch-sync binding, the scope swap, "Reset all", and the generator's
+       snapshot and per-scope pass. Those five matched `input.mt-color-text`,
+       which excluded the select, and the scope swap is where it bit: the
+       Gradient direction stayed on screen while `scope` flipped underneath it,
+       so Save posted the light value into the DARK row while the hidden twin
+       still held the default and the light row was dropped as unchanged. The
+       setting jumped scopes. Only the `o[]` twin is an input in every row and
+       may still be matched as one. */
     function textFor(name){ return form.querySelector('.mt-color-text[data-var="' + name + '"]'); }
     function swatchFor(name){ return form.querySelector('input.mt-color-swatch-input[data-for="' + name + '"]'); }
     // The scope you are NOT looking at, carried in a hidden twin of every row.
@@ -399,7 +409,7 @@
             syncSwatch(name, t.value);
         });
     });
-    [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
+    [].slice.call(form.querySelectorAll('.mt-color-text')).forEach(function(t){
         t.addEventListener('input', function(){ syncSwatch(t.getAttribute('data-var'), t.value); });
     });
 
@@ -609,7 +619,7 @@
     });
     function swapScope(want){
         if (want === curScope()) return;
-        [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
+        [].slice.call(form.querySelectorAll('.mt-color-text')).forEach(function(t){
             var name = t.getAttribute('data-var'), o = otherFor(name);
             if (!o) return;
             var v = t.value, d = t.getAttribute('data-default');
@@ -643,7 +653,7 @@
     if (reset) reset.addEventListener('click', function(){
         // Both scopes: "Reset all to default" that left dark overridden would
         // be a reset in name only, now that one Save writes both.
-        [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
+        [].slice.call(form.querySelectorAll('.mt-color-text')).forEach(function(t){
             setToken(t.getAttribute('data-var'), t.getAttribute('data-default'));
         });
         [].slice.call(form.querySelectorAll('input.mt-color-other')).forEach(function(o){
@@ -1048,7 +1058,7 @@
         // Snapshot BOTH scopes -- Undo has to put back what Generate touched,
         // and Generate now touches both.
         var snapshot = {};
-        [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
+        [].slice.call(form.querySelectorAll('.mt-color-text')).forEach(function(t){
             var n = t.getAttribute('data-var'), o = otherFor(n);
             snapshot[n] = { v: t.value, o: o ? o.value : null };
         });
@@ -1096,7 +1106,7 @@
                 }
             }
 
-            [].slice.call(form.querySelectorAll('input.mt-color-text')).forEach(function(t){
+            [].slice.call(form.querySelectorAll('.mt-color-text')).forEach(function(t){
                 var name = t.getAttribute('data-var'), cls = GEN_CLASS[name];
                 if (!cls || cls === 'skip' || !want[cls]) return;
                 var d = parseCol(defOf(name));

@@ -178,7 +178,7 @@
 .mt-upload-file-meta {
     font-size: 11px;
     color: var(--mt-text-3);
-    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
     text-align: center;
     word-break: break-all;
 }

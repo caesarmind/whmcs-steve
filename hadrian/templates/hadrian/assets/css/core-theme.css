@@ -165,7 +165,9 @@
     --transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
     --transition-medium: 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
     --font-family: system-ui, 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    --font-mono: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
+    /* ui-monospace leads: the standard generic resolves to whatever the visitor's
+       own OS uses as its UI monospace face, so no vendor font name is listed. */
+    --font-mono: ui-monospace, Menlo, monospace;
 
     /* ===== Ramp palette (Lagom-style) ====================================
        A base color per family + color-mix-derived shades. Change a base (e.g.

@@ -29,7 +29,7 @@ body[data-subnav-side="left"] .epp-split > .epp-main { grid-column: 2; grid-row:
     background: var(--color-surface-secondary);
     border: 0.5px solid var(--color-border);
     border-radius: var(--radius-md);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: ui-monospace, Menlo, monospace;
     font-size: var(--text-xl);
     color: var(--color-text-primary);
     letter-spacing: 0.04em;

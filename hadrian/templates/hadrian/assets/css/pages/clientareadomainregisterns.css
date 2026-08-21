@@ -28,7 +28,7 @@ body[data-subnav-side="left"] .rns-split > .rns-main { grid-column: 2; grid-row:
     border-radius: var(--radius-md);
     background: var(--color-surface);
     font-size: var(--text-base); color: var(--color-text-primary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: ui-monospace, Menlo, monospace;
     width: 100%;
     transition: all var(--transition-fast);
 }
@@ -36,7 +36,7 @@ body[data-subnav-side="left"] .rns-split > .rns-main { grid-column: 2; grid-row:
 
 .rns-input-suffix { display: flex; align-items: center; gap: 8px; }
 .rns-input-suffix .rns-input { flex: 1; }
-.rns-suffix { font-size: var(--text-base); color: var(--color-text-tertiary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
+.rns-suffix { font-size: var(--text-base); color: var(--color-text-tertiary); font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
 
 .rns-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
 .rns-actions .btn-primary, .rns-actions .btn-secondary { height: 36px; padding: 0 18px; font-size: var(--text-base); }

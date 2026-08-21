@@ -588,7 +588,7 @@
 .mt-page-picker-tile:hover { background: var(--mt-surface-2); }
 .mt-page-picker-tile.is-active { background: var(--mt-primary-tint); border-color: rgba(0,113,227,0.18); }
 .mt-page-picker-tile-name { font-size: 13px; font-weight: 500; line-height: 1.3; }
-.mt-page-picker-tile-meta { font-size: 11px; color: var(--mt-text-3); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.mt-page-picker-tile-meta { font-size: 11px; color: var(--mt-text-3); font-family: ui-monospace, Menlo, Consolas, monospace; }
 .mt-page-picker-empty { padding: 14px; text-align: center; color: var(--mt-text-3); font-size: 12px; }
 .mt-page-picker-current { flex: 1; text-align: left; font-size: 13px; color: var(--mt-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mt-page-picker-current.is-placeholder { color: var(--mt-text-3); }
