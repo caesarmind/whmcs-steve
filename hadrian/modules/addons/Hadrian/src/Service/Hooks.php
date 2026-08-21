@@ -630,6 +630,10 @@ final class Hooks
         $buttons = $this->buildButtonsHead($template);
         $forms   = $this->buildFormsHead($template);
         $layout  = $this->buildLayoutHead($template) . $this->buildLayoutGatesHead($template);
+        // Navigation geometry. Its own block because it is its own settings row
+        // -- see buildNavigationHead. Order against $layout is irrelevant (the
+        // two token sets are disjoint by construction), so it sits beside it.
+        $nav     = $this->buildNavigationHead($template);
         $elements = $this->buildElementsHead($template);
         // General is the SCALE layer (radius/shadow/control/motion), so it is
         // emitted BEFORE the panels that select between its steps -- Elements
@@ -639,7 +643,7 @@ final class Hooks
         $ext     = (string)$this->extensionOutput($template, $vars, slot: 'headOutput');
         $custom  = $this->buildCustomCss($template);
         // Custom CSS goes LAST so it can override the theme + token overrides.
-        $out     = $colors . $typo . $general . $buttons . $forms . $layout . $elements . $ext . $custom;
+        $out     = $colors . $typo . $general . $buttons . $forms . $layout . $nav . $elements . $ext . $custom;
         return $out !== '' ? $out : null;
     }
 
@@ -1051,11 +1055,6 @@ final class Hooks
     }
 
     /**
-     * Emit the admin's Layout overrides (Styles -> Layout) — page-structure
-     * dimensions, px only, into :root. Var names re-validated against
-     * core/config/layout.php; values are ints. Returns '' when nothing changed.
-     */
-    /**
      * Emit the Styles > General overrides — the scale layer (corner radius,
      * shadow, control sizing, motion) that Elements/Buttons/Forms select
      * between. Same contract as buildLayoutHead: defaults live in the cacheable
@@ -1123,18 +1122,108 @@ final class Hooks
         return $decls !== '' ? '<style id="hadrian-general">:root{' . $decls . '}</style>' : '';
     }
 
+    /**
+     * Emit the page-structure overrides the Layouts page stores (content column
+     * width + gutter), px only, into :root. Var names re-validated against
+     * core/config/layout.php; values are ints. Returns '' when nothing changed.
+     *
+     * The navigation dimensions this used to carry moved to
+     * buildNavigationHead + `<tpl>_navigation_vars`. The re-validation below is
+     * what makes that safe on an install whose `_layout_vars` row still holds a
+     * legacy --sidebar-width: the var is no longer in layout.php's schema, so it
+     * is dropped here rather than emitted twice -- buildNavigationHead is the
+     * one that honours it, by folding the legacy row in at READ time. The
+     * admin's StylesController::migrateNavigationVars then moves and deletes it
+     * properly on the next Styles visit. Dropping it here without that fold
+     * would LOSE the value, not defer it: the client path must never depend on
+     * an admin page having been opened.
+     */
     private function buildLayoutHead(Template $template): string
     {
-        $stored = Settings::getValue($template->getName() . '_layout_vars', null);
-        if (!is_array($stored) || $stored === []) {
+        return $this->buildPxVarsHead(
+            $template,
+            '_layout_vars',
+            '/core/config/layout.php',
+            'sizeGroups',
+            'hadrian-layout'
+        );
+    }
+
+    /**
+     * Emit the Styles > Navigation overrides — main-menu geometry (logo height,
+     * menu icon tile + glyph, and the width/height each layout owns), px only,
+     * into :root.
+     *
+     * Its OWN settings row and its OWN <style> block, deliberately. These ten
+     * tokens used to live in `_layout_vars` beside the content column, but that
+     * row has a merging writer (LayoutsController::saveLayoutVar) while a panel
+     * save is wholesale — one row, two write styles, and whichever saved last
+     * erased the other. Splitting the storage splits the emitters; nothing else
+     * about the output changes, since both blocks land at :root in the same
+     * head and the token sets are disjoint.
+     */
+    private function buildNavigationHead(Template $template): string
+    {
+        return $this->buildPxVarsHead(
+            $template,
+            '_navigation_vars',
+            '/core/config/navigation.php',
+            'groups',
+            'hadrian-navigation',
+            // Pre-move installs kept these ten in _layout_vars; fold them in on
+            // read so nothing reverts before an admin opens Styles.
+            '_layout_vars'
+        );
+    }
+
+    /**
+     * Shared body of the two px-only emitters above: read a stored var=>int
+     * blob, re-validate every row against its schema, emit the survivors.
+     *
+     * Factored out rather than duplicated because the validation IS the
+     * security boundary — these values are buyer-writable state interpolated
+     * into a <style> block, and two copies of a bounds check are two places for
+     * one of them to drift lax. Nothing is trusted from the settings table: the
+     * var must still be declared in the schema (which is what retires a token
+     * cleanly) and the value must be an int inside the schema's bounds.
+     */
+    private function buildPxVarsHead(
+        Template $template,
+        string $settingsSuffix,
+        string $configPath,
+        string $groupsKey,
+        string $styleId,
+        ?string $legacySuffix = null
+    ): string {
+        $stored = Settings::getValue($template->getName() . $settingsSuffix, null);
+        $stored = is_array($stored) ? $stored : [];
+
+        /* Read-time fold-forward for a key whose tokens MOVED here from another
+           row. Values already under our own key win; the legacy row only fills
+           gaps, and the schema filter below drops everything this panel does not
+           own, so unioning the whole blob is safe.
+
+           This is deliberately a READ, not a write. The admin-side migration
+           only runs when someone opens the Styles page, so without this a live
+           site whose buyer had set --sidebar-width: 300 would silently render
+           the 260 default from the moment the update deployed until an admin
+           happened to visit -- the client path must never depend on that. */
+        if ($legacySuffix !== null) {
+            $legacy = Settings::getValue($template->getName() . $legacySuffix, null);
+            if (is_array($legacy) && $legacy !== []) {
+                $stored = $stored + $legacy;
+            }
+        }
+
+        if ($stored === []) {
             return '';
         }
 
-        $cfg   = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');
+        $cfg   = ThemeManifest::loadVariantMeta($template->getFullPath() . $configPath);
         $min   = (int)($cfg['sizeMin'] ?? 0);
         $max   = (int)($cfg['sizeMax'] ?? 4000);
         $valid = [];
-        foreach (($cfg['sizeGroups'] ?? []) as $fields) {
+        foreach (($cfg[$groupsKey] ?? []) as $fields) {
             foreach ($fields as $f) {
                 $valid[(string)$f['var']] = true;
             }
@@ -1153,7 +1242,7 @@ final class Hooks
             $decls .= $var . ':' . $num . 'px;';
         }
 
-        return $decls !== '' ? '<style id="hadrian-layout">:root{' . $decls . '}</style>' : '';
+        return $decls !== '' ? '<style id="' . $styleId . '">:root{' . $decls . '}</style>' : '';
     }
 
     /**

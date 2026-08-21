@@ -21,10 +21,11 @@ return [
     'variables'   => [
         'dataLayout' => 'top',
     ],
-    /* Page-structure dimensions this layout shapes, rendered as Container rows
-       on the admin Layouts page. Declared here (not hardcoded in the admin) so
-       each row's "Applies to..." caption is derived from the layouts that
-       actually claim the token. Defaults + labels live in core/config/layout.php.
+    /* Navigation dimensions this layout shapes, rendered as fields in the admin
+       Styles > Navigation panel. Declared here (not hardcoded in the admin) so
+       each field's "Applies to..." caption is derived from the layouts that
+       actually claim the token. Defaults + labels live in
+       core/config/navigation.php.
 
        Note --topbar-height is deliberately absent: header.tpl renders the inner
        topbar for every layout EXCEPT this one, so that field shapes nothing

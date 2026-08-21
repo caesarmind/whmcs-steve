@@ -32,9 +32,12 @@ return [
     // comment for what a side-column layout would declare here.
     //
     /* 'sizes' is the other half of the discovery contract worth demonstrating:
-       naming a token from core/config/layout.php here renders an admin field
-       for it on the Layouts page, captioned with the layouts that claim it, and
-       Hooks::buildLayoutHead emits it -- with no controller or view edit.
+       naming a NAVIGATION token from core/config/navigation.php here captions
+       its field in Styles > Navigation with the layouts that claim it, and
+       Hooks::buildNavigationHead emits it -- with no controller or view edit.
+       (Naming a token from core/config/layout.php instead renders a whole new
+       field in the Layouts page's Containers section, same contract, different
+       schema. Page structure there, navigation here.)
        --tbm-bar-height is this layout's alone (the bar and the page's top
        padding read it together); the logo height is shared with all four. */
     'sizes' => ['--tbm-bar-height', '--nav-logo-height'],

@@ -61,6 +61,16 @@ final class LayoutsController extends AbstractController
     ];
 
     /**
+     * The layout vars that already have a hand-written row in the Containers
+     * section (Maximum width, Side padding). buildSizeRows skips them so a
+     * layout manifest naming one in its `sizes` array cannot render a SECOND
+     * editor for a value that already has one — the same "a token is editable in
+     * exactly one place" rule the Styles panels keep. Nothing shipped names
+     * them; this guards the drop-in case.
+     */
+    private const CONTENT_ROW_VARS = ['--content-max-width', '--content-pad-x'];
+
+    /**
      * Controls drawn in the design file that have no backing yet. They render
      * DISABLED and badged so the shape of the finished page is visible without
      * anyone believing a dead switch did something — a toggle that silently
@@ -296,8 +306,16 @@ final class LayoutsController extends AbstractController
      * '--content-max-width' / '--content-pad-x' entries of the
      * '<template>_layout_vars' blob. Styles > Layout used to be a second door
      * onto the same value; that panel is gone and this page is now the only
-     * editor, but the storage is unchanged so saved values carried over. Hooks::buildLayoutHead() emits them as
+     * editor, but the storage is unchanged so saved values carried over.
+     * Hooks::buildLayoutHead() emits them as
      * :root{--content-max-width:Npx;--content-pad-x:Npx}.
+     *
+     * Those two are ALL the blob holds now. It also carried the ten navigation
+     * dimensions until they moved to Styles > Navigation and
+     * '<template>_navigation_vars'; StylesController::migrateNavigationVars
+     * folds any left behind across and deletes them from here, so a row on an
+     * upgraded install shrinks to these two the first time the Styles editor is
+     * opened.
      *
      * Generic over the var name so Padding X reuses the merge + clamp logic
      * rather than duplicating it -- the duplicated version is exactly where a
@@ -327,10 +345,30 @@ final class LayoutsController extends AbstractController
     }
 
     /**
-     * Container rows for the dimensions layouts declare. Content max width and
-     * side padding are NOT here: they apply to every layout and already have
-     * their own rows, so folding them in would only make two of the four look
-     * conditional when they are not.
+     * Container rows for the dimensions layouts declare.
+     *
+     * EMPTY ON A STOCK INSTALL as of the Navigation move, and that is the
+     * mechanism working, not a regression. The ten navigation dimensions this
+     * used to draw now live in core/config/navigation.php and are edited in
+     * Styles > Navigation; the four shipped manifests still NAME them in their
+     * `sizes` arrays (which is what that panel's "Applies to" caption is derived
+     * from), so they still arrive in $appliesTo here — and layoutSizeSpec()
+     * returns null for every one of them, because they are gone from
+     * core/config/layout.php. That null is the documented guard against a stale
+     * manifest entry rendering a field that saves nowhere, and it is exactly the
+     * job it is doing: the sole editor of those tokens is the new panel.
+     *
+     * The loop stays because it is the extension point a dropped-in layout uses
+     * — name a layout.php token in `sizes`, get a captioned admin field with no
+     * controller or view edit. It simply has nothing to draw today.
+     *
+     * Content max width and side padding are NOT here: they apply to every
+     * layout and already have their own hand-written rows in the Containers
+     * section, so folding them in would only make two of the four look
+     * conditional when they are not — and, since those rows post to the same
+     * stored var, a manifest naming one would render a second editor for a value
+     * that already has one. CONTENT_ROW_VARS makes that impossible rather than
+     * unlikely.
      *
      * @param array<string, list<string>> $appliesTo  var => layout display names
      * @return list<array>
@@ -339,6 +377,9 @@ final class LayoutsController extends AbstractController
     {
         $rows = [];
         foreach ($appliesTo as $var => $layouts) {
+            if (in_array((string)$var, self::CONTENT_ROW_VARS, true)) {
+                continue;
+            }
             $spec = $this->layoutSizeSpec((string)$var);
             if ($spec === null) {
                 continue;
@@ -383,12 +424,20 @@ final class LayoutsController extends AbstractController
     }
 
     /**
-     * MERGES into the layout-vars blob rather than replacing it. That blob also
-     * carries --sidebar-width and --topbar-height, and
-     * StylesController::saveLayoutAction rebuilds it wholesale from its own
-     * form; a blind setValue() from this panel would silently drop the others.
-     * Storing nothing when the value equals the default matches that panel's
-     * convention, so an untouched install still emits no <style> block.
+     * MERGES into the layout-vars blob rather than replacing it, because two
+     * fields (Maximum width, Side padding) post independently and a blind
+     * setValue() from either would drop the other.
+     *
+     * It also used to have to survive StylesController::saveLayoutAction, which
+     * rebuilt this same row WHOLESALE from a form nothing rendered — a merging
+     * writer and a wholesale writer on one row, where whichever saved last won.
+     * That handler is gone, and the navigation dimensions that made the row
+     * worth fighting over now live in `<tpl>_navigation_vars` with their own
+     * panel and their own emitter. This is the only writer left; the merge stays
+     * because the two fields still need it.
+     *
+     * Storing nothing when the value equals the default matches every Styles
+     * panel's convention, so an untouched install still emits no <style> block.
      */
     private function saveLayoutVar(string $var, string $raw): void
     {

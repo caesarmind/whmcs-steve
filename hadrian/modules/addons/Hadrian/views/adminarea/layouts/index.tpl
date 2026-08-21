@@ -446,16 +446,24 @@
         </form>
     </div>
 
-    {* The dimensions that belong to particular layouts, moved here from
-       Styles > Layout. They sit with the content width and padding rather than
-       on the layout cards: all four are page-structure geometry and reading
-       them as one set is the point of a Containers section.
+    {* Per-layout dimensions declared by a layout manifest's `sizes` array.
 
-       Which layouts each one shapes comes from the layout manifests, not from a
-       string typed here, so the note stays true when a layout is added. That
-       mapping is measured, not assumed: header.tpl renders the inner topbar
-       only when the layout is NOT 'top', so topbar height belongs to Sidebar
-       and Icon Rail -- the opposite of the obvious guess. *}
+       EMPTY ON A STOCK INSTALL, deliberately. This block used to draw the ten
+       navigation measurements (sidebar width, topbar height, rail width, logo
+       and icon sizing...). They moved to Styles > Navigation, which is their
+       only editor now and stores them in its own settings row. The four shipped
+       manifests still name those tokens -- that is where the new panel derives
+       its "Applies to the Sidebar and Icon Rail layouts" caption from -- but
+       LayoutsController::layoutSizeSpec() returns null for a var that is no
+       longer in core/config/layout.php, which is what keeps them from rendering
+       a second time here. A field in two panels is the bug ee9b6ef was written
+       about; one schema entry, one editor.
+
+       The loop stays because it is the drop-in extension point: name a
+       core/config/layout.php token in a custom layout's `sizes` and get a
+       captioned field here with no controller or view edit. Content width and
+       side padding above are the two tokens that schema still declares, and
+       they have their own hand-written rows, so nothing draws twice. *}
     {foreach $layoutSizes as $sz}
     {* Plain-text capture for the tip: the visible help below used <strong> for
        emphasis, but the tip popup renders data-tip as textContent -- a literal

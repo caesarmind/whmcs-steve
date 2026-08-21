@@ -1258,12 +1258,16 @@
     });
 })();
 
-/* Layout panel: "Reset all" puts every px field back to default. */
+/* Navigation panel: "Reset all" puts every px field back to default. Replaces
+   the old Layout-panel handler, which had outlived its form -- .mt-layout has
+   not been rendered by anything since the two content fields moved to the
+   Layouts page. Its own IIFE and its own form class for the reason the General
+   note below spells out: every subcat panel renders into the same document. */
 (function(){
-    var form = document.querySelector('.mt-layout');
+    var form = document.querySelector('.mt-navigation');
     if (!form) return;
-    var lreset = form.querySelector('#mt-layout-reset');
-    if (lreset) lreset.addEventListener('click', function(){
+    var nreset = form.querySelector('#mt-navigation-reset');
+    if (nreset) nreset.addEventListener('click', function(){
         [].slice.call(form.querySelectorAll('input[data-default]')).forEach(function(el){
             el.value = el.getAttribute('data-default');
         });

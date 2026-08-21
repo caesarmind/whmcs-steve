@@ -32,6 +32,12 @@
         <a class="mt-subcat {if $subcat == 'colors'}is-active{/if}"     data-subcat="colors"     href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=colors">Colors</a>
         <a class="mt-subcat {if $subcat == 'typography'}is-active{/if}" data-subcat="typography" href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=typography">Typography</a>
         <a class="mt-subcat {if $subcat == 'general'}is-active{/if}"    data-subcat="general"    href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=general">General</a>
+        {* Navigation sits after General because it is the same kind of thing --
+           measurements, not component variables -- and before the three
+           component panels for the same reason. Its geometry moved off the
+           Layouts page; its colours are still Colors' and its type Typography's,
+           which is the boundary ee9b6ef drew and this panel keeps. *}
+        <a class="mt-subcat {if $subcat == 'navigation'}is-active{/if}" data-subcat="navigation" href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=navigation">Navigation</a>
         <a class="mt-subcat {if $subcat == 'buttons'}is-active{/if}"    data-subcat="buttons"    href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=buttons">Buttons</a>
         <a class="mt-subcat {if $subcat == 'forms'}is-active{/if}"      data-subcat="forms"      href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=forms">Forms</a>
         <a class="mt-subcat {if $subcat == 'elements'}is-active{/if}"   data-subcat="elements"   href="?module=Hadrian&action=editStyle&style={$style|escape}&subcat=elements">Elements</a>
@@ -65,6 +71,10 @@
 
         <div class="mt-subcat-panel" data-panel="general"{if $subcat != 'general'} hidden{/if}>
             {include file="styles/_general.tpl"}
+        </div>
+
+        <div class="mt-subcat-panel" data-panel="navigation"{if $subcat != 'navigation'} hidden{/if}>
+            {include file="styles/_navigation.tpl"}
         </div>
     </div>
   </div>

@@ -21,13 +21,17 @@ return [
     'variables'   => [
         'dataLayout' => 'side',
     ],
-    /* Page-structure dimensions this layout actually shapes, rendered on its
-       card in the admin Layouts page. Only ONE main-menu layout is active at
-       a time, so these still live in the global _layout_vars blob and
-       Hooks::buildLayoutHead is unchanged -- declaring them here is a UI
-       grouping, not a second storage. Sidebar width is this layout's alone;
-       the topbar is shared with the rail (header.tpl renders inner-topbar
-       whenever the layout is not 'top'). */
+    /* Navigation dimensions this layout actually shapes. Declaring them here
+       is a CAPTION, not a storage: the fields render in Styles > Navigation
+       (core/config/navigation.php holds their labels and defaults, and the
+       global <tpl>_navigation_vars row holds their values), and what this array
+       decides is which layout names appear in that panel's "Applies to the
+       Sidebar and Icon Rail layouts" line. Only ONE main-menu layout is active
+       at a time, so one global row is right and per-layout storage would be
+       four copies of a number only one of which is ever read.
+
+       Sidebar width is this layout's alone; the topbar is shared with the rail
+       (header.tpl renders inner-topbar whenever the layout is not 'top'). */
     'sizes' => [
         '--sidebar-width', '--topbar-height',
         // Shared with the rail: both layouts draw the same 26px tile and 15px

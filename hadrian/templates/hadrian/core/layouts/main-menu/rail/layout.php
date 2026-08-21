@@ -21,7 +21,12 @@ return [
     'variables'   => [
         'dataLayout' => 'rail',
     ],
-    /* --topbar-height is the inner topbar this layout shares with the sidebar
+    /* Navigation dimensions this layout shapes. The fields themselves render in
+       Styles > Navigation (labels + defaults in core/config/navigation.php);
+       naming them here is what puts "Icon Rail" into that panel's "Applies to"
+       caption for each one.
+
+       --topbar-height is the inner topbar this layout shares with the sidebar
        (header.tpl renders it for every layout except `top`).
 
        The rail's own width is no longer fixed: --rail-width now drives the rail

@@ -7,6 +7,7 @@ use Hadrian\Controller\AbstractController;
 use Hadrian\Helpers\AddonHelper;
 use Hadrian\Helpers\ThemeManifest;
 use Hadrian\Models\Settings;
+use Hadrian\Template\LayoutsCache;
 
 final class StylesController extends AbstractController
 {
@@ -83,8 +84,16 @@ final class StylesController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_forms'])) {
             return $this->saveFormsAction($template);
         }
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_layout'])) {
-            return $this->saveLayoutAction($template);
+        /* Was `mt_layout` -> saveLayoutAction. That pairing had become a
+           landmine: the Layout panel's view was deleted when its two content
+           fields moved to the Layouts page, but the ROUTE stayed live and its
+           handler did a wholesale setValue() on `<tpl>_layout_vars` -- rebuilt
+           from a form nothing rendered, so any POST carrying mt_layout would
+           have erased the content width and padding the Layouts page merges
+           into that same row. Both the route and the handler are gone; the slot
+           now belongs to Navigation, which writes its own key. */
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_navigation'])) {
+            return $this->saveNavigationAction($template);
         }
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mt_general'])) {
             return $this->saveGeneralAction($template);
@@ -111,10 +120,11 @@ final class StylesController extends AbstractController
         // (?subcat=navigation, ?subcat=site) rendered the shell with every
         // panel hidden -- a blank page with no indication why. Whitelist it and
         // fall back to the first panel.
-        if (!in_array($subcat, ['colors', 'typography', 'general', 'buttons', 'forms', 'elements'], true)) {
+        if (!in_array($subcat, ['colors', 'typography', 'general', 'navigation', 'buttons', 'forms', 'elements'], true)) {
             $subcat = 'colors';
         }
         $this->migrateColors($template);
+        $this->migrateNavigationVars($template);
 
         return $this->view('styles/edit', [
             'template'    => $template->getName(),
@@ -131,15 +141,15 @@ final class StylesController extends AbstractController
             'buttons'     => $tab === 'variables' ? $this->buildButtonsViewModel($template) : null,
             'forms'       => $tab === 'variables' ? $this->buildFormsViewModel($template) : null,
             'general'     => $tab === 'variables' ? $this->buildGeneralViewModel($template) : null,
-            'layoutVars'  => $tab === 'variables' ? $this->buildLayoutViewModel($template) : null,
+            'navigation'  => $tab === 'variables' ? $this->buildNavigationViewModel($template) : null,
             'elements'    => $tab === 'variables' ? $this->buildElementsViewModel($template) : null,
             'saved'       => isset($_GET['saved']),
             'colorsSaved' => isset($_GET['colors_saved']),
             'presetRestored' => isset($_GET['preset_restored']),
             'buttonsSaved'=> isset($_GET['buttons_saved']),
             'formsSaved'  => isset($_GET['forms_saved']),
-            'layoutSaved' => isset($_GET['layout_saved']),
             'generalSaved'=> isset($_GET['general_saved']),
+            'navigationSaved' => isset($_GET['navigation_saved']),
             'elementsSaved'=> isset($_GET['elements_saved']),
             'customCss'   => (string)Settings::getValue($template->getName() . '_custom_css', ''),
             'cssSaved'    => isset($_GET['css_saved']),
@@ -1350,15 +1360,10 @@ final class StylesController extends AbstractController
     }
 
     /**
-     * View-model for the Layout subcat — page-structure dimensions (px). Merges
-     * GLOBAL stored overrides onto the core/config/layout.php defaults so each
-     * field shows its effective value. Site-wide; no per-style key.
-     */
-    /**
      * View model for Styles > General — the scale layer the other panels
      * select between (radius, shadow, control sizing, motion).
      *
-     * Mirrors buildLayoutViewModel, with one difference that matters: fields
+     * Mirrors buildNavigationViewModel, with one difference that matters: fields
      * are not all integers. A `preset` field resolves to an option KEY, not a
      * number, because its stored value is a composite shadow string; matching
      * is done on the normalised css so a stored value that no longer matches
@@ -1468,38 +1473,124 @@ final class StylesController extends AbstractController
         $this->redirect('?module=Hadrian&action=editStyle&style=' . urlencode($style) . '&subcat=general&general_saved=1');
     }
 
-    private function buildLayoutViewModel($template): array
+    /**
+     * Which main-menu layouts claim each navigation dimension, as display
+     * names, read from the layout manifests' `sizes` arrays.
+     *
+     * DERIVED, never typed. The Layouts page has always built its "Applies to
+     * the Sidebar and Icon Rail layouts" caption this way
+     * (LayoutsController::buildSizeRows) so that the sentence cannot go stale
+     * when a layout is added, retired or dropped in by a buyer — and the
+     * mapping is genuinely non-obvious: header.tpl renders the inner topbar for
+     * every layout EXCEPT `top`, so --topbar-height belongs to Sidebar and Icon
+     * Rail, the opposite of the guess. Moving the controls to this panel must
+     * not quietly turn that into a hardcoded string, so the derivation moved
+     * with them.
+     *
+     * LayoutsCache::ensure() first, which is the contract Template::getLayouts()
+     * documents for admin entry points: getLayouts() reads the trusted row
+     * WITHOUT touching the filesystem (it also runs on the client path), so
+     * something has to keep that row fresh, and only an admin screen may. This
+     * is one now. Measured before assuming: the shipped Topbar Minimal layout is
+     * DISCOVERED, not declared in theme.json, so with a cold cache
+     * --tbm-bar-height would render with no caption at all while every other
+     * field had one. ensure() is a settings read plus a stat-based signature
+     * and rebuilds only when a folder actually changed.
+     *
+     * @return array<string, list<string>>  var => layout display names
+     */
+    private function navigationAppliesTo($template): array
     {
-        $cfg    = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');
-        $stored = Settings::getValue($template->getName() . '_layout_vars', []);
-        if (!is_array($stored)) {
-            $stored = [];
-        }
-        $sizeGroups = [];
-        foreach (($cfg['sizeGroups'] ?? []) as $group => $fields) {
-            foreach ($fields as $f) {
-                $f['value'] = (int)($stored[$f['var']] ?? $f['default']);
-                $sizeGroups[(string)$group][] = $f;
+        LayoutsCache::ensure($template);
+
+        $appliesTo = [];
+        foreach ($template->getLayouts('main-menu') as $name) {
+            $meta = ThemeManifest::loadVariantMeta(
+                $template->getFullPath() . "/core/layouts/main-menu/{$name}/layout.php"
+            );
+            $display = (string)($meta['displayName'] ?? ucfirst($name));
+            foreach ((array)($meta['sizes'] ?? []) as $var) {
+                $appliesTo[(string)$var][] = $display;
             }
         }
-        return ['sizeGroups' => $sizeGroups];
+        return $appliesTo;
     }
 
     /**
-     * Validate + persist the Layout form (site-wide). Keeps only in-bounds px
-     * values that differ from default. PRG redirect to the Layout subcat. Uses
-     * the `_layout_vars` key to avoid colliding with the Layouts manager's
-     * `_active_layout_*` / `_layout_opts_*` settings.
+     * View model for Styles > Navigation — main-menu geometry (logo, icons,
+     * and the widths/heights each layout owns).
+     *
+     * Mirrors buildGeneralViewModel: schema groups in, each field carrying its
+     * effective value beside its default, only-changed-values storage. Two
+     * differences, both deliberate:
+     *
+     *  - Storage is `<tpl>_navigation_vars`, NOT the `_layout_vars` blob these
+     *    tokens used to share with the content column. That blob has a MERGING
+     *    writer (LayoutsController::saveLayoutVar, one var at a time) and this
+     *    panel is a wholesale one; a wholesale save into a merged row erases
+     *    whatever the other writer put there. Separate rows make that class of
+     *    bug unrepresentable rather than merely avoided.
+     *  - Each field gains an `applies` caption + `plural` flag derived from the
+     *    layout manifests (see navigationAppliesTo). The SCHEMA decides which
+     *    fields exist — this panel is their only editor, so a token must render
+     *    whether or not a manifest happens to name it — while the manifests
+     *    decide the caption. A token no layout claims gets an EMPTY `applies`,
+     *    and the view drops the "Applies to..." clause and prints the default
+     *    alone rather than inventing a scope it cannot know.
      */
-    private function saveLayoutAction($template): string
+    private function buildNavigationViewModel($template): array
     {
-        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/layout.php');
+        $cfg    = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/navigation.php');
+        $stored = Settings::getValue($template->getName() . '_navigation_vars', []);
+        if (!is_array($stored)) {
+            $stored = [];
+        }
+        $appliesTo = $this->navigationAppliesTo($template);
+
+        $groups = [];
+        foreach (($cfg['groups'] ?? []) as $group => $fields) {
+            foreach ($fields as $f) {
+                $var        = (string)$f['var'];
+                $f['value'] = (int)($stored[$var] ?? $f['default']);
+
+                // "Sidebar" / "Sidebar and Icon Rail" / "Sidebar, Icon Rail and X"
+                // — same joining and pluralisation the Layouts page used, so the
+                // sentence a buyer already knows reads identically here.
+                $names        = array_values(array_unique($appliesTo[$var] ?? []));
+                $f['plural']  = count($names) > 1;
+                $f['applies'] = count($names) > 1
+                    ? implode(', ', array_slice($names, 0, -1)) . ' and ' . end($names)
+                    : ($names[0] ?? '');
+
+                $groups[(string)$group][] = $f;
+            }
+        }
+
+        return ['groups' => $groups];
+    }
+
+    /**
+     * Validate + persist Styles > Navigation (site-wide). Keeps only in-bounds
+     * px values that differ from the schema default, matching every other panel
+     * — so a buyer who never touches a field keeps inheriting whatever a theme
+     * update ships. PRG redirect back to the Navigation subcat.
+     *
+     * Writes `<tpl>_navigation_vars` wholesale, which is safe precisely because
+     * nothing else writes that row. The migration runs first here as well as on
+     * the GET path: a wholesale write is exactly the operation that would strand
+     * un-migrated legacy values in `_layout_vars` forever.
+     */
+    private function saveNavigationAction($template): string
+    {
+        $this->migrateNavigationVars($template);
+
+        $cfg = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/navigation.php');
         $min = (int)($cfg['sizeMin'] ?? 0);
         $max = (int)($cfg['sizeMax'] ?? 4000);
-        $in  = is_array($_POST['size'] ?? null) ? $_POST['size'] : [];
+        $in  = is_array($_POST['nav'] ?? null) ? $_POST['nav'] : [];
 
         $out = [];
-        foreach (($cfg['sizeGroups'] ?? []) as $fields) {
+        foreach (($cfg['groups'] ?? []) as $fields) {
             foreach ($fields as $f) {
                 $var = (string)$f['var'];
                 if (!isset($in[$var]) || $in[$var] === '') {
@@ -1513,9 +1604,70 @@ final class StylesController extends AbstractController
             }
         }
 
-        Settings::setValue($template->getName() . '_layout_vars', $out, 'json');
+        Settings::setValue($template->getName() . '_navigation_vars', $out, 'json');
         $style = (string)($_POST['style'] ?? 'default');
-        $this->redirect('?module=Hadrian&action=editStyle&style=' . urlencode($style) . '&subcat=layout&layout_saved=1');
+        $this->redirect('?module=Hadrian&action=editStyle&style=' . urlencode($style) . '&subcat=navigation&navigation_saved=1');
+    }
+
+    /**
+     * Fold legacy navigation values out of `_layout_vars` into
+     * `_navigation_vars`, once.
+     *
+     * These ten tokens were edited on the Layouts page before this panel
+     * existed and were stored in the shared `_layout_vars` blob —
+     * --sidebar-width and --topbar-height for a long time, the other eight
+     * since 89bb019. A buyer who set a sidebar width must not lose it because
+     * the control moved, so on first read each key found in the old blob is
+     * copied across and REMOVED from it.
+     *
+     * Same shape as migrateColors: idempotent, runs on the admin path only, and
+     * writes nothing when there is nothing to move. Removing the keys from
+     * `_layout_vars` is the half that matters — leaving them would mean
+     * Hooks::buildLayoutHead and Hooks::buildNavigationHead both emitting the
+     * same token, and the value the buyer can no longer edit winning or losing
+     * on source order alone. The target wins on conflict (it is the only row
+     * this panel writes), so re-running after a save cannot resurrect a stale
+     * legacy number over a fresh one.
+     */
+    private function migrateNavigationVars($template): void
+    {
+        $name   = $template->getName();
+        $legacy = Settings::getValue($name . '_layout_vars', []);
+        if (!is_array($legacy) || $legacy === []) {
+            return;
+        }
+
+        $cfg   = ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/navigation.php');
+        $owned = [];
+        foreach (($cfg['groups'] ?? []) as $fields) {
+            foreach ($fields as $f) {
+                $owned[(string)$f['var']] = true;
+            }
+        }
+
+        $target = Settings::getValue($name . '_navigation_vars', []);
+        if (!is_array($target)) {
+            $target = [];
+        }
+
+        $moved = false;
+        foreach ($legacy as $var => $val) {
+            $var = (string)$var;
+            if (!isset($owned[$var])) {
+                continue;                      // --content-* stays where it is
+            }
+            if (!isset($target[$var])) {
+                $target[$var] = (int)$val;
+            }
+            unset($legacy[$var]);
+            $moved = true;
+        }
+        if (!$moved) {
+            return;
+        }
+
+        Settings::setValue($name . '_navigation_vars', $target, 'json');
+        Settings::setValue($name . '_layout_vars', $legacy, 'json');
     }
 
     /**

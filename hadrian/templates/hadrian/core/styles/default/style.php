@@ -6,10 +6,10 @@
  *   - StylesController (admin UI)
  *   - Hooks::resolveActiveStyle (sets $hadrian.styles.vars at render time)
  *
- * The preset's colours, typography, buttons, forms, elements and layout are
- * NOT declared here — those are edited in the admin Styles tabs and stored as
- * <theme>_colors_* / _typography / _buttons / _forms / _elements /
- * _layout_vars, which Hooks reads directly.
+ * The preset's colours, typography, buttons, forms, elements, navigation and
+ * layout are NOT declared here — those are edited in the admin Styles tabs and
+ * stored as <theme>_colors_* / _typography / _general / _buttons / _forms /
+ * _elements / _navigation_vars / _layout_vars, which Hooks reads directly.
  */
 return [
     'name'        => 'Default',
