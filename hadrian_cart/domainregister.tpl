@@ -1,8 +1,8 @@
 {*
  * hadrian_cart/domainregister.tpl
  *
- * Apple visual shell over standard_cart's exact domainregister contract.
- * Visual source: apple-client-area/cart-domain-register.html.
+ * Hadrian visual shell over standard_cart's exact domainregister contract.
+ * Visual source: the v18 client-area mockups.
  *
  * Shell layout matches products.tpl:
  *   .st-page-header (eyebrow + H1 + subtitle)
@@ -65,7 +65,7 @@
  * .domain-promo-box, .no-icheck, .recaptcha-container,
  * .default-captcha, .field-error-msg.
  *
- * Filters (TLDs / max length / safe search) are now an Apple-styled
+ * Filters (TLDs / max length / safe search) are now a theme-styled
  * dropdown (.dr-filters / .dr-tld-option / .dr-length-pill / .dr-switch)
  * that mirrors the hidden native <select>s WHMCS serializes; the old
  * bootstrap-multiselect widgets were removed. The captcha is rendered
@@ -139,11 +139,11 @@
                                       data-placement="top"
                                       data-trigger="manual"
                                       placeholder="{lang key='domainSearch.domainOrAiInstruction'}">{if $showAdvancedSearchOptions}{$message}{/if}</textarea>
-                            {* ---- Filters: Apple-styled dropdown, INSIDE the
+                            {* ---- Filters: theme-styled dropdown, INSIDE the
                                search bar -- between the input and the Search
                                button, divided by a hairline. Functional parity
                                with Lagom's filters
-                               dropdown, Apple visual. The two hidden native
+                               dropdown, Hadrian visual. The two hidden native
                                <select>s are the source of truth WHMCS reads via
                                frmDomainChecker.serialize(); the panel UI mirrors
                                them (see filter JS at the bottom). AI mode only --
@@ -277,7 +277,7 @@
 
                 {* WHMCS DomainSearchResults block -- starts hidden, AJAX
                    populates and reveals it. We wrap its sub-elements in
-                   .dr-result-card for the Apple visual but keep the
+                   .dr-result-card for the Hadrian visual but keep the
                    exact element IDs / class names scripts.min.js binds. *}
                 <div id="DomainSearchResults" class="w-hidden">
 
@@ -668,7 +668,7 @@ jQuery(document).ready(function() {
 });
 
 {if $showAdvancedSearchOptions}
-    // --- Apple Filters dropdown ---
+    // --- Filters dropdown ---
     // Mirrors the panel UI into the hidden native <select>s WHMCS reads via
     // frmDomainChecker.serialize() (tlds[] + maxLength). Safe Search is the
     // real <input name="filter"> living inside the panel. Replaces the old

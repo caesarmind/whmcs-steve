@@ -1,9 +1,9 @@
 {*
- * hadrian_cart/domaintransfer.tpl - Apple-shell rebuild.
+ * hadrian_cart/domaintransfer.tpl - Hadrian-shell rebuild.
  *
  * Rendered URL: cart.php?a=add&domain=transfer
  *
- * Visual source: apple-client-area/cart-domain-transfer.html
+ * Visual source: the v18 client-area mockups
  *
  * Shell = .st-page-header (H1 "Transfer a Domain" + subtitle)
  *         + .st-split (240px Categories sidebar + 1fr main)
@@ -44,7 +44,7 @@
 <style>{literal}
 /* ----------------------------------------------------------------
    Page-local layout (.dt-* tokens, domain Transfer).
-   Apple primitives (.card, .btn-primary, .btn-secondary, .alert) come
+   Hadrian primitives (.card, .btn-primary, .btn-secondary, .alert) come
    from style.min.css; only page-unique tokens live here.
    ---------------------------------------------------------------- */
 

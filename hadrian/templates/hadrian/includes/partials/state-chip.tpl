@@ -107,7 +107,7 @@
     <div class="chip-group">
         <span class="label">Palette:</span>
         <div class="swatch-group" role="group" aria-label="Color palette">
-            <button type="button" data-palette="blue"    class="active" title="Apple Blue"></button>
+            <button type="button" data-palette="blue"    class="active" title="Blue"></button>
             <button type="button" data-palette="emerald"                title="Emerald"></button>
             <button type="button" data-palette="violet"                 title="Violet"></button>
             <button type="button" data-palette="rose"                   title="Rose"></button>

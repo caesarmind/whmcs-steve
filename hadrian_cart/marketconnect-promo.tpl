@@ -22,7 +22,7 @@
  *     between collapsed/expanded body.
  *   - .header / .body / .body > ul structure unchanged.
  *
- * Apple visual layer:
+ * Visual layer:
  *   - Card surface (rounded, hairline border, light shadow) inherited
  *     from style.min.css's .mc-promo restyling.
  *   - .mc-feature-grid wraps the feature <ul> so we can lay it out as

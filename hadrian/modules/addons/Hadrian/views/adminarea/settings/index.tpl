@@ -249,7 +249,7 @@
 <style>
 /* Group heading: one line of chrome -- tinted icon chip, .mt-subhead's house
    eyebrow (11px/700/0.1em uppercase), a hairline rule taking the rest of the
-   width, then a live count. Measured off hadrian-admin-panel/apple-admin.jsx
+   width, then a live count. Measured off the Caesarthemes admin demo
    running in a browser. The group's one-line description used to sit below
    as its own row; it lives in the label's tip popup now (mt-tip-line), the
    same move the per-setting rows already made for their own help text. */

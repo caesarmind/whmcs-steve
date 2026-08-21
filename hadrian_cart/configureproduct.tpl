@@ -1,7 +1,7 @@
 {*
  * hadrian_cart/configureproduct.tpl — mockup-faithful rebuild
  *
- * Visual source: apple-client-area/configureproduct.html
+ * Visual source: the v18 client-area mockups
  *   Shell    = .cp-steps (5-step strip)
  *              + 2-col grid: main column + sticky .cp-summary-card
  *   Sections = .card > .cp-section (Billing cycle | Configuration |
@@ -518,7 +518,7 @@ var _localLang = {
                                 {* .addon-products + .panel-addon hook scripts.js:4980's
                                    delegated 'ifChecked' so toggling an $addons checkbox
                                    triggers recalctotals() and refreshes #producttotal.
-                                   The classes are appended to (not replacing) our Apple
+                                   The classes are appended to (not replacing) our
                                    .st-addon styling -- they're invisible to CSS, used
                                    only as JS selectors. *}
                                 {if $addons}
@@ -682,7 +682,7 @@ var _localLang = {
     font-weight: 500;
 }
 
-/* Inline validation / promo banner (#cpInlineBanner) — Apple-style alert:
+/* Inline validation / promo banner (#cpInlineBanner) — alert styling:
    variant icon + tinted card + comfortable list spacing. Colors inherit via
    currentColor so the icon + bullets + text all match the variant. */
 .cp-alert {
@@ -1080,7 +1080,7 @@ var _localLang = {
         function showInlineError(arg) {
             var opts = (typeof arg === 'string') ? { bodyHtml: arg } : (arg || {});
             var variant = opts.variant || 'error';
-            // Variant icon (Apple-style): triangle / check-circle / info-circle.
+            // Variant icon (line-art): triangle / check-circle / info-circle.
             // Stroke inherits the alert's currentColor via CSS.
             var icons = {
                 error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',

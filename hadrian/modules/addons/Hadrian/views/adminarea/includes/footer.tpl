@@ -71,10 +71,10 @@
     if (!form) return;
     var fonts = form.querySelector('.mt-typo-fonts');
     var FALLBACK = (fonts && fonts.getAttribute('data-ff-fallback')) || 'system-ui, sans-serif';
-    var APPLE    = (fonts && fonts.getAttribute('data-ff-apple')) || '-apple-system, BlinkMacSystemFont';
+    var SYSTEM   = (fonts && fonts.getAttribute('data-ff-system')) || 'system-ui';
     function q(n){ return form.querySelector('[name="' + n + '"]'); }
     var gsel = q('ff_google'),  gstk = q('ff_google_stack');
-    var fname = q('ff_folder'), fstk = q('ff_folder_stack'),  fapp = q('ff_folder_apple');
+    var fname = q('ff_folder'), fstk = q('ff_folder_stack'),  fapp = q('ff_folder_system');
     /* ff_google is a hidden input behind the searchable picker below, not the
        <select> it once was; the button is what a person actually operates, so
        that is what mode-switching enables and disables. The hidden input stays
@@ -96,11 +96,11 @@
         var name = (opt && opt.getAttribute('data-family')) || sel.value.replace(/\.(woff2?|ttf|otf)$/i, '');
         return quote + name + quote;
     }
-    function build(stk, sel, apple, quote) {
+    function build(stk, sel, systemFirst, quote) {
         if (!stk || !sel) return;
         var fam = famOf(sel, quote);
         if (!fam) return;
-        stk.value = (apple ? APPLE + ', ' : '') + fam + ', ' + FALLBACK;
+        stk.value = (systemFirst ? SYSTEM + ', ' : '') + fam + ', ' + FALLBACK;
     }
     if (gsel) gsel.addEventListener('change', function(){ build(gstk, gsel, false, "'"); selectMode('google'); });
     if (fname) fname.addEventListener('input', function(){ build(fstk, fname, fapp && fapp.checked, '"'); });

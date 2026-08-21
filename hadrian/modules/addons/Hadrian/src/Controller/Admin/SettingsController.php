@@ -125,7 +125,7 @@ final class SettingsController extends AbstractController
     // request (ae5ed17); the reason wasn't recorded anywhere and the owner
     // didn't recall it either when asked before this pass. Re-added on
     // explicit request against the demo as it exists NOW, not as it was on
-    // 3dd081b's date -- hadrian-admin-panel/apple-admin.jsx had changed twice
+    // 3dd081b's date -- the Caesarthemes admin demo had changed twice
     // in the same conversation this was redone in, so values were re-measured
     // rather than copied from that commit. Four of seven reuse a demo icon
     // whose group has no 1:1 name match here (appearance<-display,

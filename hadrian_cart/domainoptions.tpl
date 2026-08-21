@@ -46,11 +46,11 @@
  *   - iCheck restyle of .suggested-domains checkboxes at the bottom
  *     -- this script lives globally so we keep the jQuery init.
  *
- * Apple visual layer:
+ * Visual layer:
  *   - .domain-checker-result-headline gets two state classes,
  *     .domain-checker-available (green) / .domain-checker-unavailable
- *     (red), restyled in style.min.css as Apple status banners.
- *   - .dp-pricing wraps the period chooser as an Apple segmented
+ *     (red), restyled in style.min.css as soft status banners.
+ *   - .dp-pricing wraps the period chooser as a segmented
  *     button group. Single-period stays as a static button.
  *   - .dp-suggestion-list lays the suggestions out as a 2-column
  *     grid on wide viewports.

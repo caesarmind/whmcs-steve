@@ -5,7 +5,7 @@
  * placed by the time this renders. Just shows the order number,
  * invoice link, addon HTML hooks, and the "back to client area" CTA.
  *
- * Apple visual sources: success card pattern, large order-number
+ * Visual sources: success card pattern, large order-number
  * chip, optional product-recommendations include below.
  *}
 
@@ -22,7 +22,7 @@
 
             {include file="orderforms/$carttpl/sidebar-categories-collapsed.tpl"}
 
-            {* ─── Apple success hero ─── *}
+            {* ─── Success hero ─── *}
             <div class="order-complete-hero">
                 <div class="order-complete-ico">
                     <i class="fas fa-check"></i>

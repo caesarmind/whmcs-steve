@@ -45,7 +45,7 @@
             {/foreach}
         </div>
         {/foreach}
-        <p class="mt-field-help" style="margin-top:10px;">Each tier is built from your Typography scale &mdash; pick a font size, weight, line-height and radius. The button height follows the font size automatically; defaults keep the Apple look (pill radius).</p>
+        <p class="mt-field-help" style="margin-top:10px;">Each tier is built from your Typography scale &mdash; pick a font size, weight, line-height and radius. The button height follows the font size automatically; defaults keep the theme's pill radius.</p>
     </section>
 
     <section class="mt-section">

@@ -1,7 +1,7 @@
 {*
  * hadrian_cart/configureproductdomain.tpl — mockup-faithful rebuild
  *
- * Visual source: apple-client-area/configureproductdomain.html
+ * Visual source: the v18 client-area mockups
  *   Shell    = .dp-split (240px sidebar + main) wrapping
  *              .dp-steps (5-step progress strip)
  *              .card containing .dp-options (radio cards)
@@ -340,7 +340,7 @@ var _localLang = {
     // Switch visible panel when option radio changes.
     //
     // Bind BOTH native 'change' and iCheck's 'ifChecked' event:
-    //   - 'change'    — used by the apple-client-area mockup (no iCheck).
+    //   - 'change'    — used by the client-area mockups (no iCheck).
     //   - 'ifChecked' — used in production. WHMCS's scripts.min.js wraps
     //     each radio in iCheck (.iradio_square-blue + .iCheck-helper),
     //     which swallows the native 'change' event and exposes its own
@@ -484,14 +484,14 @@ var _localLang = {
             clearOwndomainError(panel);
             var box = document.createElement('div');
             box.className = 'dp-error compact';
-            box.setAttribute('data-apple-owndomain-error', '1');
+            box.setAttribute('data-hadrian-owndomain-error', '1');
             box.style.cssText = 'margin: 12px 24px 0; padding: 10px 14px; background: var(--color-red-bg, rgba(255,59,48,0.08)); color: var(--color-red-text, #d70015); border: 0.5px solid var(--color-red-text, #d70015); border-radius: 8px; font-size: 12.5px; line-height: 1.5;';
             box.textContent = message;
             panel.appendChild(box);
             panel.setAttribute('data-state', 'error');
         }
         function clearOwndomainError(panel) {
-            var existing = panel.querySelector('[data-apple-owndomain-error]');
+            var existing = panel.querySelector('[data-hadrian-owndomain-error]');
             if (existing) existing.parentNode.removeChild(existing);
             panel.removeAttribute('data-state');
         }

@@ -4,7 +4,7 @@
  * Rendered URL:   cart.php?gid=<id>
  *                 (+ any friendly-URL mapping WHMCS exposes — e.g. /store/<slug>)
  *
- * Visual source: apple-client-area/store.html  ← /store on the dev server
+ * Visual source: the v18 client-area mockups  ← /store on the dev server
  *
  *   Shell      = .st-page-header (H1 banner "Order new services")
  *                + .st-split (240px sidebar  |  main card)

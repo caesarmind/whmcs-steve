@@ -1,4 +1,4 @@
-{* ── Active CAPTCHA markup (Apple-styled) ──────────────────────────────────
+{* ── Active CAPTCHA markup (theme-styled) ──────────────────────────────────
    Rendered INSIDE a page's own .X-captcha container, which already gates on
    $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm) and styles
    the image/input/label.

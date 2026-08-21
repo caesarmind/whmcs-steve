@@ -4,7 +4,7 @@
 body.vem-popup {
     background: var(--color-bg, var(--color-surface-secondary));
     margin: 0; padding: 20px;
-    font-family: var(--font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif);
+    font-family: var(--font-family, system-ui, "Segoe UI", sans-serif);
     color: var(--color-text-primary, var(--color-text-primary));
     -webkit-font-smoothing: antialiased;
 }

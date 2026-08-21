@@ -1,5 +1,5 @@
 {*
- * hadrian_cart/configuredomains.tpl - Apple-shell rebuild
+ * hadrian_cart/configuredomains.tpl - Hadrian-shell rebuild
  *
  * Rendered URL:   cart.php?a=confdomains
  *
@@ -52,7 +52,7 @@
 <style>{literal}
 /* ----------------------------------------------------------------
    Page-local layout (.cd-* tokens, configureDomains).
-   The global Apple primitives (.card, .btn-primary, .alert) come
+   The global Hadrian primitives (.card, .btn-primary, .alert) come
    from style.min.css; only the bits unique to this page live here.
    ---------------------------------------------------------------- */
 
@@ -215,7 +215,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
 /* ---- Addon panels (DNS / ID protection / Email forwarding) ----
    Class names panel/panel-default/panel-addon/panel-addon-selected are
    the contract scripts.min.js binds to. We restyle them inside .cd-addons
-   so they get the Apple card look but JS still finds them. */
+   so they get the theme's card look but JS still finds them. */
 .cd-addons {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

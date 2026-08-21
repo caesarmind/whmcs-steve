@@ -10,19 +10,19 @@
 
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Font Family</h2>{include file="includes/doclink.tpl" article="styles" anchor="font-family"}</header>
-        <div class="mt-typo-fonts" data-ff-fallback="{$typography.ffFallback|escape}" data-ff-apple="{$typography.ffApplePrefix|escape}">
+        <div class="mt-typo-fonts" data-ff-fallback="{$typography.ffFallback|escape}" data-ff-system="{$typography.ffSystemPrefix|escape}">
             <label class="mt-typo-radio">
                 <input type="radio" name="ff_mode" value="default"{if $typography.fontFamily.mode == 'default'} checked{/if}>
-                <span>Default <em>(San Francisco on Apple, bundled Inter on other platforms)</em></span>
+                <span>Default <em>(the device's own system font, bundled Inter as fallback)</em></span>
             </label>
 
             <label class="mt-typo-radio">
                 <input type="radio" name="ff_mode" value="system"{if $typography.fontFamily.mode == 'system'} checked{/if}>
-                <span>System fonts <em>(each visitor's OS font &mdash; Segoe UI on Windows, San Francisco on Mac, system default on Linux; nothing downloads)</em></span>
+                <span>System fonts <em>(each visitor's OS font &mdash; Segoe UI on Windows, the system UI face on macOS, system default on Linux; nothing downloads)</em></span>
             </label>
             <div class="mt-typo-dep">
                 <div class="mt-typo-sublabel">How it's written into the system</div>
-                <input type="text" name="ff_system" class="mt-input" value="{$typography.stacks.system|escape}" placeholder="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+                <input type="text" name="ff_system" class="mt-input" value="{$typography.stacks.system|escape}" placeholder="system-ui, 'Segoe UI', Roboto, sans-serif">
             </div>
 
             <label class="mt-typo-radio">
@@ -93,8 +93,8 @@
             <div class="mt-typo-dep">
                 <input type="text" name="ff_folder" class="mt-input" value="{$typography.fontFamily.folder|escape}" placeholder="Font face name, e.g. BrandSans">
                 <label class="mt-typo-check mt-typo-check-inline">
-                    <input type="checkbox" name="ff_folder_apple" value="1"{if $typography.fontFamily.folderApple} checked{/if}>
-                    <span>Keep the device's system font on Apple <em>(San Francisco on Apple, this font on the rest)</em></span>
+                    <input type="checkbox" name="ff_folder_system" value="1"{if $typography.fontFamily.folderSystem} checked{/if}>
+                    <span>Keep the device's own system font first <em>(the visitor's OS font where there is one, this font behind it)</em></span>
                 </label>
                 <div class="mt-typo-sublabel">How it's written into the system</div>
                 <input type="text" name="ff_folder_stack" class="mt-input" value="{$typography.stacks.folder|escape}" placeholder='"BrandSans", system-ui, sans-serif'>

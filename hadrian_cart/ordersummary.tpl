@@ -7,7 +7,7 @@
  * scripts.min.js + recalctotals() can find the .clearfix rows + the
  * .total-due-today block they expect.
  *
- * Apple styling comes from core-layout.css scoped via
+ * Styling comes from core-layout.css scoped via
  * body[data-tpl="configureproduct"] / [data-tpl="viewcart"], etc.
  *
  * Contract preserved: removeItem('r', id, type) inline handlers,

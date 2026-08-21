@@ -33,7 +33,7 @@
 
             {include file="orderforms/$carttpl/sidebar-categories-collapsed.tpl"}
 
-            {* ─── Apple fraud-hold hero ─── *}
+            {* ─── Fraud-hold hero ─── *}
             <div class="order-fraud-hero">
                 <div class="order-fraud-ico">
                     <i class="fas fa-shield-alt"></i>

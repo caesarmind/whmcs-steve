@@ -37,7 +37,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{$hadrianLang.common.licenseRequiredTitle}</title>
     <style>
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f7; color: #1d1d1f; }
+        body { margin: 0; font-family: system-ui, "Segoe UI", sans-serif; background: #f5f5f7; color: #1d1d1f; }
         .mt-license-required { min-height: 100vh; display: grid; place-items: center; padding: 32px; box-sizing: border-box; }
         .mt-license-required-card { width: min(100%, 520px); padding: 32px; border-radius: 24px; background: #fff; box-shadow: 0 24px 80px rgba(0,0,0,.12); text-align: center; }
         .mt-license-required-card h1 { margin: 0 0 10px; font-size: 26px; line-height: 1.2; }
@@ -352,7 +352,7 @@
     {* ── jQuery + Bootstrap 4 + plugins for all cart-flow pages ──
        Loaded on cart-flow pages regardless of which cart theme is
        active. hadrian_cart inherits from standard_cart and only
-       overrides products.tpl with a custom Apple-language version —
+       overrides products.tpl with a version in the theme's design language —
        every other cart template comes from standard_cart and uses
        its scripts.min.js, which needs jQuery + Bootstrap + multiselect
        in scope. Synchronous load (no defer) because scripts.min.js
@@ -454,7 +454,7 @@
         {include file="`$template`/includes/partials/inner-topbar.tpl"}
     {/if}
 
-    {* Breadcrumb (top layout only): Apple-style single back-link to Home.
+    {* Breadcrumb (top layout only): a single back-link to Home.
        The page title below carries the current page, so a "< Home" affordance
        is cleaner than a full "Home / Page" trail. Skipped on the portal home
        page ($_tf == 'homepage'), where "back to Home" would point at itself. *}

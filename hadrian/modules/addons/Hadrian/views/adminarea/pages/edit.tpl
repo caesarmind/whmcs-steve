@@ -712,8 +712,8 @@
    reason, so a control that stopped posting would silently reset an admin's
    layout the next time they edited an unrelated SEO field.
 
-   Design follows the Caesarthemes admin reference (the "Homepage blocks"
-   composer in hadrian-admin-panel/apple-admin.jsx): an uppercase eyebrow, a
+   Design follows the Caesarthemes admin reference (its "Homepage blocks"
+   composer): an uppercase eyebrow, a
    six-column visual preview of the resulting layout, then one row per section
    with a drag grip, a segmented width control, move arrows and an on/off
    toggle. Its per-block settings expander is intentionally not carried over --

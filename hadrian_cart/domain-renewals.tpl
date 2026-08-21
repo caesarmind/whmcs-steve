@@ -42,7 +42,7 @@
  *   - #removeRenewalForm POST contract (a=remove, r=…, i=…).
  *   - <script>recalculateRenewalTotals();</script> at bottom.
  *
- * Apple visual layer:
+ * Visual layer:
  *   - .renewal-pill colour ramp: success / warning / info / danger /
  *     grey -- one status per row, matched to the original .label-*
  *     class so style.min.css can paint the right token.

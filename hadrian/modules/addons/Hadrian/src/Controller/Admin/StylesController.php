@@ -477,16 +477,16 @@ final class StylesController extends AbstractController
         // Effective "how it's written" stack per mode: the stored override for the
         // active mode, else a freshly-derived stack from that mode's pick. The
         // editable field pre-fills with this; on save it becomes the stored value.
-        $fallback    = (string)($cfg['fontFamily']['fallback'] ?? 'system-ui, sans-serif');
-        $applePrefix = (string)($cfg['fontFamily']['applePrefix'] ?? '-apple-system, BlinkMacSystemFont');
-        $ffMode      = (string)($ff['mode'] ?? 'default');
-        $storedStack = (string)($ff['stack'] ?? '');
+        $fallback     = (string)($cfg['fontFamily']['fallback'] ?? 'system-ui, sans-serif');
+        $systemPrefix = (string)($cfg['fontFamily']['systemPrefix'] ?? 'system-ui');
+        $ffMode       = (string)($ff['mode'] ?? 'default');
+        $storedStack  = (string)($ff['stack'] ?? '');
         $stacks = [
             'system' => ($ffMode === 'system' && $storedStack !== '') ? $storedStack : (string)($cfg['fontFamily']['system'] ?? $fallback),
             'google' => ($ffMode === 'google' && $storedStack !== '') ? $storedStack : ((string)($ff['google'] ?? '') !== '' ? "'" . (string)$ff['google'] . "', " . $fallback : ''),
             'folder' => ($ffMode === 'folder' && $storedStack !== '') ? $storedStack : ((string)($ff['folder'] ?? '') !== '' ? '"' . pathinfo((string)$ff['folder'], PATHINFO_FILENAME) . '", ' . $fallback : ''),
         ];
-        $leadsApple = static fn (string $s): bool => (bool)preg_match('/^\s*(-apple-system|BlinkMacSystemFont)/', $s);
+        $leadsSystem = static fn (string $s): bool => (bool)preg_match('/^\s*system-ui\b/', $s);
 
         // Full library for the picker. Handed to the view as one compact JSON
         // blob (embedded, not fetched -- the theme's .htaccess denies .json over
@@ -499,9 +499,9 @@ final class StylesController extends AbstractController
         ));
 
         return [
-            'sizeGroups'    => $sizeGroups,
-            'weights'       => $weights,
-            'weightOptions' => $cfg['weightOptions'] ?? [300, 400, 500, 600, 700, 900],
+            'sizeGroups'     => $sizeGroups,
+            'weights'        => $weights,
+            'weightOptions'  => $cfg['weightOptions'] ?? [300, 400, 500, 600, 700, 900],
             // Both pre-encoded here rather than in the view: Smarty has no
             // json_encode modifier registered, and the encoding of the blob the
             // picker parses is not something to leave to a template filter.
@@ -515,20 +515,20 @@ final class StylesController extends AbstractController
             // top of the per-field validation in loadGoogleFontCatalog -- either
             // alone closes the hole; both together mean a future unvalidated
             // field added to a row still cannot inject.
-            'googleCatalog' => json_encode($catalog, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG),
-            'googleCount'   => count($catalog),
-            'googlePopular' => json_encode($popular, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG),
-            'sizeMin'       => (int)($cfg['sizeMin'] ?? 8),
-            'sizeMax'       => (int)($cfg['sizeMax'] ?? 160),
-            'folderFonts'   => $folderFonts,
-            'stacks'        => $stacks,
-            'ffFallback'    => $fallback,
-            'ffApplePrefix' => $applePrefix,
-            'fontFamily'    => [
-                'mode'        => $ffMode,
-                'google'      => (string)($ff['google'] ?? ''),
-                'folder'      => (string)($ff['folder'] ?? ''),
-                'folderApple' => $leadsApple($stacks['folder']),
+            'googleCatalog'  => json_encode($catalog, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG),
+            'googleCount'    => count($catalog),
+            'googlePopular'  => json_encode($popular, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG),
+            'sizeMin'        => (int)($cfg['sizeMin'] ?? 8),
+            'sizeMax'        => (int)($cfg['sizeMax'] ?? 160),
+            'folderFonts'    => $folderFonts,
+            'stacks'         => $stacks,
+            'ffFallback'     => $fallback,
+            'ffSystemPrefix' => $systemPrefix,
+            'fontFamily'     => [
+                'mode'         => $ffMode,
+                'google'       => (string)($ff['google'] ?? ''),
+                'folder'       => (string)($ff['folder'] ?? ''),
+                'folderSystem' => $leadsSystem($stacks['folder']),
             ],
         ];
     }
@@ -585,8 +585,8 @@ final class StylesController extends AbstractController
 
         // Font family. The admin-editable "stack" string (the exact value written to
         // --font-family) is the source of truth for what's EMITTED; the picked font
-        // drives what's LOADED. Apple-first is encoded directly in the stack string
-        // (a leading -apple-system/BlinkMacSystemFont), so no separate flag is kept.
+        // drives what's LOADED. System-first is encoded directly in the stack string
+        // (a leading system-ui), so no separate flag is kept.
         $mode      = (string)($_POST['ff_mode'] ?? 'default');
         $stackKey  = ['system' => 'ff_system', 'google' => 'ff_google_stack', 'folder' => 'ff_folder_stack', 'bundled' => 'ff_bundled_stack'][$mode] ?? '';
         $stack     = $stackKey !== '' ? trim((string)($_POST[$stackKey] ?? '')) : '';

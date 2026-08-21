@@ -168,7 +168,7 @@
    Style it with the same Apple tokens so the seam between SPA and
    wrapper is invisible. */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background: var(--vl-bg);
     color: var(--vl-text);
     letter-spacing: var(--vl-letter-spacing);

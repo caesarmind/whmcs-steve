@@ -1,7 +1,7 @@
 {*
  * hadrian_cart/addons.tpl
  *
- * Apple visual shell over standard_cart's exact addons-list contract.
+ * Hadrian visual shell over standard_cart's exact addons-list contract.
  *
  * Contract preserved:
  *   - Form posts to PHP_SELF?a=add with hidden aid={$addon.id} and

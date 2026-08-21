@@ -1,5 +1,5 @@
 {* Hostnodes admin shell (Hadrian visual language) -- opens. Footer closes it.
-   Apple-style: flat brand bar, segmented pill nav, off-white bg, light/dark.
+   Flat brand bar, segmented pill nav, off-white bg, light/dark.
    All shell CSS + JS live in footer.tpl so they load once per page. *}
 
 {* Map currentAction -> primary nav section so sub-views highlight their parent. *}

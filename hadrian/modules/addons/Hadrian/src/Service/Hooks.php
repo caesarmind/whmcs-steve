@@ -668,10 +668,10 @@ final class Hooks
         $fontFace = '';
 
         // Font family. The admin-editable "stack" string is the source of truth for
-        // what's EMITTED to --font-family (Apple-first is encoded as a leading
-        // -apple-system/BlinkMacSystemFont right in that string); the picked font
-        // (google/folder/bundled) still drives what's LOADED. With no stored override
-        // we derive a sensible stack from the pick.
+        // what's EMITTED to --font-family (system-first is encoded as a leading
+        // system-ui right in that string); the picked font (google/folder/bundled)
+        // still drives what's LOADED. With no stored override we derive a sensible
+        // stack from the pick.
         $ff    = is_array($stored['fontFamily'] ?? null) ? $stored['fontFamily'] : [];
         $mode  = (string)($ff['mode'] ?? 'default');
         $stack = trim((string)preg_replace('/[^A-Za-z0-9 ,\'"\-]/', '', (string)($ff['stack'] ?? '')));

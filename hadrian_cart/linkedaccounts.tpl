@@ -28,15 +28,15 @@
  *   - #tableLinkedAccounts data-driven attributes + data-ajax-url +
  *     data-on-draw-rebind-confirmation-modal + data-lang-empty-table.
  *
- * Apple visual layer:
+ * Visual layer:
  *   - "or" divider replaces .sub-heading-borderless / .sub-heading
- *     spans -- same semantics, Apple typography.
+ *     spans -- same semantics, Hadrian typography.
  *   - .social-signin-btns is just a flex row; the actual buttons
- *     come from each provider's module and inherit Apple .btn-default
+ *     come from each provider's module and inherit our .btn-default
  *     styling via style.min.css.
  *   - linktable variant uses .data-driven (jQuery DataTables) so we
  *     leave the <table> shell intact; CSS in style.min.css restyles
- *     it as an Apple-flat table.
+ *     it as a flat, borderless table.
  *}
 
 {if ($linkableProviders || $hasLinkedProvidersEnabled) && $linkContext == 'linktable'}
@@ -102,7 +102,7 @@
         </p>
     </div>
 
-    {* ── Apple "or"-divider + intro per context ── *}
+    {* ── "or"-divider + intro per context ── *}
     {if $linkContext == 'registration'}
         <div class="sso-divider sub-heading">
             <span class="primary-bg-color">{lang key='remoteAuthn.titleSignUpVerb'}</span>

@@ -13,7 +13,7 @@
 body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 
 /* ==========================================================================
-   Hostnodes admin (Hadrian visual language) -- Apple HIG aligned.
+   Hostnodes admin (Hadrian visual language) -- aligned to the client theme.
    Self-contained inside .mt-wrap so nothing leaks into WHMCS admin chrome.
    Light + dark via .mt-wrap[data-theme]. ASCII-only comments (Chrome on this
    install silently skips CSS after dense non-ASCII comment glyphs).
@@ -40,7 +40,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
     --mt-primary:      #0071e3;
     --mt-primary-h:    #0077ed;
     --mt-primary-tint: rgba(0,113,227,0.08);
-    /* Matches the Apple client theme's --color-accent-light exactly
+    /* Matches the client theme's --color-accent-light exactly
        (core-theme.css). Was 0.15, which read as a glow rather than a halo. */
     --mt-primary-ring: rgba(0,113,227,0.08);
     --mt-link:         #0066cc;
@@ -65,7 +65,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 
     background: var(--mt-bg);
     color: var(--mt-text);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Open Sans", "Segoe UI", system-ui, sans-serif;
+    font-family: system-ui, "Open Sans", "Segoe UI", sans-serif;
     font-size: 14px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -91,7 +91,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
     --mt-primary:      #2997ff;
     --mt-primary-h:    #2997ff;
     --mt-primary-tint: rgba(41,151,255,0.14);
-    /* Matches the Apple client theme's dark --color-accent-light. Was 0.25. */
+    /* Matches the client theme's dark --color-accent-light. Was 0.25. */
     --mt-primary-ring: rgba(41,151,255,0.12);
     --mt-link:         #2997ff;
 
@@ -248,7 +248,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 
 /* -- Inputs / selects / textareas ----------------------------------------- */
 .mt-input, .mt-select, .mt-textarea { width: 100%; padding: 11px 14px; border: 1px solid var(--mt-input-border); border-radius: var(--mt-radius); background: var(--mt-surface); color: var(--mt-text); font-family: inherit; font-size: 15px; line-height: 1.4; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
-/* 3px, matching every form-control focus ring in the Apple client theme
+/* 3px, matching every form-control focus ring in the client theme
    (.form-input / .form-select / .form-textarea). Was 4px. */
 .mt-input:focus, .mt-select:focus, .mt-textarea:focus { outline: none; border-color: var(--mt-primary); box-shadow: 0 0 0 3px var(--mt-primary-ring); }
 .mt-input::placeholder, .mt-textarea::placeholder { color: var(--mt-text-4); }
@@ -334,8 +334,8 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
    grey thumbnail, a real two-line description instead of a fixed label, and
    the demo's tinted active state instead of a ring.
 
-   Card chrome follows the Caesarthemes admin demo (apple-admin.jsx, the
-   Styles screen): radius/padding, a 48px band above the name, name over a
+   Card chrome follows the Caesarthemes admin demo (its Styles
+   screen): radius/padding, a 48px band above the name, name over a
    muted description, then Active-or-Activate on the left and Customize on
    the right. */
 .mt-sty-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
@@ -707,7 +707,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
    writes `font-family: 'Family', var(--mt-fontpick-fallback)` inline -- the
    obvious `'Family', inherit` is invalid CSS (a CSS-wide keyword may only be a
    declaration's sole value) and would drop the declaration outright. */
-.mt-fontpick-wrap { position: relative; --mt-fontpick-fallback: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif; }
+.mt-fontpick-wrap { position: relative; --mt-fontpick-fallback: system-ui, "Segoe UI", sans-serif; }
 .mt-fontpick {
     width: 100%;
     min-height: 40px;

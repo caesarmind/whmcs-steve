@@ -147,7 +147,7 @@ final class Presets
 
     /**
      * Full WHMCS-default client primary nav, matching Lagom's preset shape
-     * AND matching the apple-client-area mockup's section labels:
+     * AND matching the v18 client-area mockups' section labels:
      *   Header(Home) · Home
      *   Header(Services) · Services▾
      *   Header(Domains) · Domains▾
@@ -390,7 +390,7 @@ final class Presets
     }
 
     /**
-     * Footer menu — pre-seeded from the apple-client-area sitelock-vpn
+     * Footer menu — pre-seeded from the v18 mockups' sitelock-vpn
      * homepage-style landing footer (5 columns of links). Audience is 'all'
      * because the footer renders for both logged-in clients and guests.
      *

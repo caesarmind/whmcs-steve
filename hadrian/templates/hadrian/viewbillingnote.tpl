@@ -4,7 +4,7 @@
    and /billing/debit/{id}). This WHMCS route does NOT supply the client-area nav /
    auth context ($loggedin is false here), so including the normal header/footer
    chrome renders an EMPTY guest sidebar. Stock nexus avoids this by making the
-   billing note a self-contained document with no sidebar - we do the same, apple-
+   billing note a self-contained document with no sidebar - we do the same, theme-
    styled: load the theme CSS directly and render a clean, centred note. (hadrian
    previously shipped no viewbillingnote.tpl at all, so the route was a blank page.)
 

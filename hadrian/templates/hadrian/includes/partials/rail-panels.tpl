@@ -15,7 +15,7 @@
 
    No group carries .active on render. openFor() always sets the correct group
    BEFORE adding body.rail-panel-open, so a preset active group is never seen
-   and two preset groups (as in the apple-client-area mockup) would stack.
+   and two preset groups (as in the v18 client-area mockups) would stack.
 
    Groups render unconditionally, not behind {if $loggedin}: .only-out/.only-in
    on the rail BUTTONS do the gating in CSS, which is also what lets the

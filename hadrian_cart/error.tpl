@@ -13,7 +13,7 @@
  *   $errortitle   short heading (string, may contain HTML)
  *   $errormsg     longer body (string, may contain HTML)
  *
- * Apple visual layer:
+ * Visual layer:
  *   - .order-error-hero -- same composition as .order-complete-hero
  *     in complete.tpl (icon-tile + h1 + p), but using a warning
  *     palette. Both share .cart-hero base styling in style.min.css.
@@ -33,7 +33,7 @@
 
             {include file="orderforms/$carttpl/sidebar-categories-collapsed.tpl"}
 
-            {* ─── Apple error hero ─── *}
+            {* ─── Error hero ─── *}
             <div class="order-error-hero">
                 <div class="order-error-ico">
                     <i class="fas fa-exclamation-triangle"></i>

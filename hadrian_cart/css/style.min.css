@@ -56,7 +56,7 @@
     --radius-pill: 980px;
     --transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
     --shadow-card-hover: 0 0 0 0.5px rgba(0,0,0,0.04), 0 2px 12px rgba(0,0,0,0.06);
-    --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-family: system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 /* Dark mode is opt-in via [data-theme="dark"] on <html> or <body>.

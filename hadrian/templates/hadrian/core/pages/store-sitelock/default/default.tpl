@@ -218,8 +218,8 @@
     </section>
     </div>
 
-    {* 5. Apple-style security full - No compromises (security shield SVG kept verbatim) *}
-    <section class="hp-apple-security-full">
+    {* 5. Full-bleed dark security band - No compromises (security shield SVG kept verbatim) *}
+    <section class="hp-hadrian-security-full">
         <div class="sec-inner">
             <div class="sec-eyebrow">{$hadrianLang.store.slSecEyebrow}</div>
             <h2>{$hadrianLang.store.slSecTitle}</h2>
@@ -260,12 +260,12 @@
                         <path d="M-16 -10 V -32 C -16 -44, -8 -52, 0 -52 C 8 -52, 16 -44, 16 -32 V -10" stroke="url(#sslShield)" stroke-width="5" fill="none" stroke-linecap="round"/>
                         <circle cx="0" cy="8" r="4" fill="#0c1622"/>
                         <rect x="-2" y="8" width="4" height="14" rx="1" fill="#0c1622"/>
-                        <text x="0" y="80" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="12" font-weight="600" fill="#a1d0ff" letter-spacing="2">SITELOCK</text>
-                        <text x="0" y="97" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="10" fill="#6e8aab" letter-spacing="1">Daily scans &middot; WAF &middot; Auto-remove</text>
+                        <text x="0" y="80" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#a1d0ff" letter-spacing="2">SITELOCK</text>
+                        <text x="0" y="97" text-anchor="middle" font-family="system-ui, sans-serif" font-size="10" fill="#6e8aab" letter-spacing="1">Daily scans &middot; WAF &middot; Auto-remove</text>
                     </g>
-                    <g transform="translate(280, 68)"><rect x="-44" y="-14" width="88" height="28" rx="14" fill="#1a1f2e" stroke="#30d158" stroke-width="0.8" opacity="0.9"/><circle cx="-28" cy="0" r="3" fill="#30d158"/><text x="-18" y="4" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="11" font-weight="500" fill="#f5f5f7">Malware Cleaned</text></g>
-                    <g transform="translate(620, 72)"><rect x="-38" y="-14" width="76" height="28" rx="14" fill="#1a1f2e" stroke="#0a84ff" stroke-width="0.8" opacity="0.9"/><circle cx="-22" cy="0" r="3" fill="#0a84ff"/><text x="-12" y="4" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="11" font-weight="500" fill="#f5f5f7">WAF Active</text></g>
-                    <g transform="translate(450, 380)"><rect x="-56" y="-14" width="112" height="28" rx="14" fill="#1a1f2e" stroke="#30d158" stroke-width="0.8" opacity="0.9"/><circle cx="-40" cy="0" r="3" fill="#30d158"/><text x="-30" y="4" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="11" font-weight="500" fill="#f5f5f7">Daily Scan Passed</text></g>
+                    <g transform="translate(280, 68)"><rect x="-44" y="-14" width="88" height="28" rx="14" fill="#1a1f2e" stroke="#30d158" stroke-width="0.8" opacity="0.9"/><circle cx="-28" cy="0" r="3" fill="#30d158"/><text x="-18" y="4" font-family="system-ui, sans-serif" font-size="11" font-weight="500" fill="#f5f5f7">Malware Cleaned</text></g>
+                    <g transform="translate(620, 72)"><rect x="-38" y="-14" width="76" height="28" rx="14" fill="#1a1f2e" stroke="#0a84ff" stroke-width="0.8" opacity="0.9"/><circle cx="-22" cy="0" r="3" fill="#0a84ff"/><text x="-12" y="4" font-family="system-ui, sans-serif" font-size="11" font-weight="500" fill="#f5f5f7">WAF Active</text></g>
+                    <g transform="translate(450, 380)"><rect x="-56" y="-14" width="112" height="28" rx="14" fill="#1a1f2e" stroke="#30d158" stroke-width="0.8" opacity="0.9"/><circle cx="-40" cy="0" r="3" fill="#30d158"/><text x="-30" y="4" font-family="system-ui, sans-serif" font-size="11" font-weight="500" fill="#f5f5f7">Daily Scan Passed</text></g>
                 </svg>
             </div>
             <p class="sec-lead"><strong>{$hadrianLang.store.slSecLeadStrong}</strong> {$hadrianLang.store.slSecLeadText}</p>

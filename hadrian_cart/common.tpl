@@ -21,7 +21,7 @@
  * that goes INSIDE that wrapper.
  *}
 
-{* Apple-language stylesheet -- owns all cart-page typography, layout, components *}
+{* Hadrian design-language stylesheet -- owns all cart-page typography, layout, components *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/style.min.css?v={$hadrian.assetVersion|default:'18'}">
 
 {* --vl-* token overrides (safety net -- applies inside any Vue Shadow DOM that loads) *}
