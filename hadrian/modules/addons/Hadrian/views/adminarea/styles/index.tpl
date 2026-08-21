@@ -55,7 +55,7 @@
                             {/if}
                             {* <a href> is interactive content, so clicking it does NOT
                                toggle the wrapping label's radio — it just navigates. *}
-                            <a class="mt-sty-edit" href="?module=Hadrian&action=editStyle&style={$style.name|escape}&subcat=typography">Customize &rsaquo;</a>
+                            <a class="mt-sty-edit" href="?module=Hadrian&action=editStyle&style={$style.name|escape}&subcat=colors">Customize &rsaquo;</a>
                         </div>
                     </label>
                 {/foreach}
