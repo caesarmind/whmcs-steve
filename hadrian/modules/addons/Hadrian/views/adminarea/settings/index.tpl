@@ -31,7 +31,14 @@
 
 <style>
     .mt-tab-off { display: none !important; }
+    /* The row hands its bottom border to the sub-panel below it, so the pair
+       reads as one unit -- but ONLY while that panel is actually on screen.
+       A panel revealed by its toggle (dark mode, cookie box, the language
+       list) is display:none when the toggle is off, painting no border of its
+       own, which left those rows with no separator at all. Take the border
+       back whenever the panel that owed it is not rendering. */
     .mt-row-with-sub { border-bottom: 0; }
+    .mt-row-with-sub:has(+ .mt-row-sub[hidden]) { border-bottom: 1px solid var(--mt-border); }
     .mt-subnav-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 18px; margin-top: 6px; }
     .mt-subnav-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mt-text); padding: 3px 0; cursor: pointer; }
     .mt-subnav-check input { margin: 0; flex-shrink: 0; }

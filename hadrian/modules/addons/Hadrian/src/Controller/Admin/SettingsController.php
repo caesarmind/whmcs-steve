@@ -143,8 +143,12 @@ final class SettingsController extends AbstractController
             '<path d="M20 10.5 13.5 4H5a1 1 0 0 0-1 1v8.5l6.5 6.5a1.5 1.5 0 0 0 2 0l7.5-7.5a1.5 1.5 0 0 0 0-2z"/><circle cx="8.5" cy="8.5" r="1.5"/>'],
         'locale'       => ['Language & SEO',        'The locale chooser and multi-language link tags.', 'general',
             '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>'],
+        // Bolt shifted +0.9 in x from the demo's own path, which sits with its
+        // ink centred on 11.1 in a 24-wide viewBox and so renders visibly
+        // left-of-centre in the chip. Deliberate deviation from the demo,
+        // which has the same flaw -- every other icon here centres on 12.
         'privacy'      => ['Privacy & Performance', 'Consent banner and data-table loading.', 'general',
-            '<path d="M13 2.5 4.8 13.4H10l-1 8.1 8.4-11.2H12z"/>'],
+            '<path d="M13.9 2.5 5.7 13.4H10.9l-1 8.1 8.4-11.2H12.9z"/>'],
         // Catch-all. Empty today; it exists so a future FLAGS key with no
         // FLAG_GROUP entry lands somewhere VISIBLE rather than vanishing.
         'general'      => ['Other',                 'Options not yet assigned to a category.', 'general',
