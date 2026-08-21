@@ -118,22 +118,39 @@ final class SettingsController extends AbstractController
      * Declaration order here is the render order. The FLAGS array itself must
      * NOT be reordered: LayoutsController reads its slots positionally.
      */
-    // A 4th positional element carrying each group's icon -- so the view can
-    // draw the Hadrian demo's head (tinted chip + label + rule + count) -- was
-    // added and then reverted with commit 3dd081b. If it comes back, note that
-    // three groups here have no demo counterpart, and that the <svg> wrapper
-    // belongs in the template so no group can ship its own stroke weight.
+    // 4th positional element: each group's icon (inner <path>/<circle> markup
+    // only -- the <svg> wrapper lives in the template, per settings/index.tpl,
+    // so no group can ship its own stroke weight). A prior pass at this exact
+    // chrome (commit 3dd081b) shipped and was reverted whole at the owner's
+    // request (ae5ed17); the reason wasn't recorded anywhere and the owner
+    // didn't recall it either when asked before this pass. Re-added on
+    // explicit request against the demo as it exists NOW, not as it was on
+    // 3dd081b's date -- hadrian-admin-panel/apple-admin.jsx had changed twice
+    // in the same conversation this was redone in, so values were re-measured
+    // rather than copied from that commit. Four of seven reuse a demo icon
+    // whose group has no 1:1 name match here (appearance<-display,
+    // privacy<-performance, locale<-the language picker's own globe glyph);
+    // pricing, general and cart have no demo counterpart at all and are drawn
+    // to the same rules (24x24 viewBox, ~1.6 stroke, currentColor, round
+    // caps/joins). If this ever gets reverted again, write down why, here.
     private const FLAG_GROUPS = [
-        // slug        => [label, one-line description, which tab it belongs to]
-        'appearance'   => ['Appearance',            'Colour mode, label casing and card treatment.', 'general'],
-        'navigation'   => ['Navigation',            'Menu icons and the client-area section sidebar.', 'general'],
-        'pricing'      => ['Pricing Display',       'How prices are presented. Nothing here changes a price.', 'general'],
-        'locale'       => ['Language & SEO',        'The locale chooser and multi-language link tags.', 'general'],
-        'privacy'      => ['Privacy & Performance', 'Consent banner and data-table loading.', 'general'],
+        // slug        => [label, one-line description, which tab it belongs to, icon]
+        'appearance'   => ['Appearance',            'Colour mode, label casing and card treatment.', 'general',
+            '<path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/>'],
+        'navigation'   => ['Navigation',            'Menu icons and the client-area section sidebar.', 'general',
+            '<path d="M4 7h16M4 12h16M4 17h9"/>'],
+        'pricing'      => ['Pricing Display',       'How prices are presented. Nothing here changes a price.', 'general',
+            '<path d="M20 10.5 13.5 4H5a1 1 0 0 0-1 1v8.5l6.5 6.5a1.5 1.5 0 0 0 2 0l7.5-7.5a1.5 1.5 0 0 0 0-2z"/><circle cx="8.5" cy="8.5" r="1.5"/>'],
+        'locale'       => ['Language & SEO',        'The locale chooser and multi-language link tags.', 'general',
+            '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>'],
+        'privacy'      => ['Privacy & Performance', 'Consent banner and data-table loading.', 'general',
+            '<path d="M13 2.5 4.8 13.4H10l-1 8.1 8.4-11.2H12z"/>'],
         // Catch-all. Empty today; it exists so a future FLAGS key with no
         // FLAG_GROUP entry lands somewhere VISIBLE rather than vanishing.
-        'general'      => ['Other',                 'Options not yet assigned to a category.', 'general'],
-        'cart'         => ['Cart Layout',           'The order form’s own sidebar.', 'order'],
+        'general'      => ['Other',                 'Options not yet assigned to a category.', 'general',
+            '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>'],
+        'cart'         => ['Cart Layout',           'The order form’s own sidebar.', 'order',
+            '<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2.4l2.1 11.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7.5H6"/>'],
     ];
 
     /** flag key => FLAG_GROUPS slug. Anything unlisted falls into 'general'. */
@@ -202,11 +219,11 @@ final class SettingsController extends AbstractController
         }
 
         $out = [];
-        foreach (self::FLAG_GROUPS as $slug => [$label, $sub, $tab]) {
+        foreach (self::FLAG_GROUPS as $slug => [$label, $sub, $tab, $icon]) {
             if ($buckets[$slug] === []) {
                 continue;
             }
-            $out[] = ['slug' => $slug, 'label' => $label, 'sub' => $sub, 'tab' => $tab, 'flags' => $buckets[$slug]];
+            $out[] = ['slug' => $slug, 'label' => $label, 'sub' => $sub, 'tab' => $tab, 'icon' => $icon, 'flags' => $buckets[$slug]];
         }
         return $out;
     }
