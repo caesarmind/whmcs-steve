@@ -300,7 +300,8 @@
             {elseif $key == 'enable_dark_mode'}{assign var=mtRowAnchor value='enable-dark-mode'}
             {elseif $key == 'cart_subnav'}{assign var=mtRowAnchor value='cart-layout'}
             {elseif $key == 'free_label' || $key == 'hide_cycle_discounts'}{assign var=mtRowAnchor value='pricing-display'}
-            {elseif $key == 'topnav_show_icons' || $key == 'website_subnav'}{assign var=mtRowAnchor value='navigation'}
+            {elseif $key == 'topnav_show_icons'}{assign var=mtRowAnchor value='navigation'}
+            {elseif $key == 'website_subnav'}{assign var=mtRowAnchor value='website-section-sidebar'}
             {elseif $key == 'service_controls_outside'}{assign var=mtRowAnchor value='appearance'}
             {else}{assign var=mtRowAnchor value=''}
             {/if}

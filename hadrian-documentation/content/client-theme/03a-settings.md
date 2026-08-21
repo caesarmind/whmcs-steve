@@ -1,6 +1,6 @@
 ---
 title: Settings
-group: Customization
+group: Configuration
 slug: settings
 icon: sliders
 lead: The theme-wide switches - colour mode, casing, prices, languages, consent, table loading - plus the order-process controls for the Configure Server step. One screen, two tabs, one save.
@@ -28,34 +28,6 @@ Open **Hadrian -> Settings**. The screen has two tabs.
 Both tabs are one form. You can change something on General, switch to Order
 Process, change something there and save once - the tab you happen to be looking
 at when you press Save does not decide what gets written.
-
-### Searching
-
-:::shot img/set-search.png The search box sits above the panel, outside the form.
-
-Typing filters the rows on **both** tabs at once, which is the point: when you
-are hunting for a setting, "which tab is it under" is usually the thing you do
-not know.
-
-Search matches the label, the help text underneath it, and a list of synonyms -
-so `gdpr` finds Cookie Box, `hreflang` finds Enable Alternate Links, and
-`uppercase` finds Section Titles Capitalization.
-
-:::tip It never submits
-The box is deliberately outside the form, so pressing Enter in it cannot save the
-page by accident.
-:::
-
-### Saving
-
-:::shot img/set-savebar.png The floating bar is the only Save on the page.
-
-There is no Save button at the top of the section and none at the foot. This page
-used to have both, and which one you reached depended on where you gave up
-scrolling. The bar floats instead, so it is always the same button.
-
-**Nothing applies until you press Save changes.** A toggle you flipped and did
-not save is a toggle that is still off.
 
 ## Appearance
 
@@ -137,12 +109,23 @@ and this exception list.
 | Setting | What it does | Default |
 | --- | --- | --- |
 | Top-Nav Icons | Shows an icon next to each item in the top navigation | Off |
-| Website Section Sidebar | Shows the per-page section sub-nav - Account, Domain Tools and so on - on client-area pages | On |
+| Website Section Sidebar | Shows or hides the small card of related links beside the page content, on pages that belong to a group | On |
 :::
 
-The section sub-nav is the small card of links beside a page's content that keeps
-related pages together. Its own **Per-page exceptions** picker works exactly like
-the one above: listed pages get the opposite of the toggle, and a page's own
+### Website Section Sidebar
+
+:::shot img/set-subnav.png The section sub-nav on an Account page - its own heading, and links to the rest of that group.
+
+This is the card shown above, on the client area itself rather than in the admin
+panel. It only appears on pages that belong to a **group** - Account, Domain,
+Billing, Support and a few others - and it is scoped to whichever group the
+current page is in: an Account page shows the Account list (Account Details,
+User Management, Payment Methods...), a Domain page swaps to the Domain list
+instead, with its own heading. Turning the toggle off removes this card
+everywhere; it does not thin out one group's list.
+
+Its own **Per-page exceptions** picker works exactly like the one above
+Top-Nav Icons: listed pages get the opposite of the toggle, and a page's own
 setting in Page Manager beats both.
 
 :::info This is not the main menu
@@ -201,7 +184,9 @@ selection cannot leave a customer staring at a language you removed.
 :::info Where the chooser itself lives
 This decides what is *in* the chooser. Whether the chooser is shown at all is
 **Hide Language Switcher**, over on
-[Layout Manager -> Header](/client-theme/layout-manager/#header).
+[Layout Manager -> Header](/client-theme/layout-manager/#header). For the full
+translation story - overrides, adding a language, what the chooser looks like -
+see [Languages](/client-theme/languages/).
 :::
 
 ## Privacy and Performance
