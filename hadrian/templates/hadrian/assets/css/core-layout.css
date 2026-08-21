@@ -23,9 +23,14 @@ body:not([data-layout="side"]) .only-side { display: none !important; }
 body:not([data-layout="rail"]) .only-rail { display: none !important; }
 /* `.only-inner` = show on sidebar OR rail, hide on top layout */
 body[data-layout="top"] .only-inner { display: none !important; }
-/* Layout-specific offsets for main content wrapper */
-body[data-layout="side"] .ph-main-wrap { margin-left: 260px; }
-body[data-layout="rail"] .ph-main-wrap { margin-left: 80px; }
+/* Layout-specific offsets for main content wrapper.
+   These MUST read the same tokens the nav columns themselves are sized from.
+   Both were hardcoded, so raising "Sidebar width" in the admin widened the
+   sidebar and left the gutter at 260px -- the nav simply overlapped the page.
+   The fallbacks are the literals that shipped, so an untouched install is
+   byte-identical. */
+body[data-layout="side"] .ph-main-wrap { margin-left: var(--sidebar-width, 260px); }
+body[data-layout="rail"] .ph-main-wrap { margin-left: var(--rail-width, 80px); }
 
 /* Admin "Website Section Sidebar" toggle (Addons -> Hadrian -> Settings).
    Hides the per-page section sub-nav and reflows the page to full width,
@@ -678,7 +683,7 @@ body[data-affixed-nav="1"].nav-open .ph-side-topbar { transform: translateY(0); 
    RAIL LAYOUT -- icon rail (80px) + flyout panel (240px)
    ============================================================= */
 .ph-rail {
-    position: fixed; top: 0; left: 0; bottom: 0; width: 80px;
+    position: fixed; top: 0; left: 0; bottom: 0; width: var(--rail-width, 80px);
     background: var(--sidebar-bg);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -694,18 +699,31 @@ body[data-affixed-nav="1"].nav-open .ph-side-topbar { transform: translateY(0); 
     overflow: visible;
 }
 .ph-rail-logo {
-    width: 44px; height: 44px; margin: 0 auto 10px;
+    /* The hover target the logo sits in. It has to be able to CONTAIN the logo:
+       left at a flat 44px, raising the shared logo height past 44 would overflow
+       a fixed box and clip the mark. max() keeps the 44px hit area at default
+       (max(44px, 28+16) == 44px, so today's rendering is unchanged) and grows
+       the box only once the logo would no longer fit, preserving the 8px optical
+       inset on each side. */
+    width: max(44px, calc(var(--nav-logo-height, 28px) + 16px));
+    height: max(44px, calc(var(--nav-logo-height, 28px) + 16px));
+    margin: 0 auto 10px;
     border-radius: var(--radius-sm);
     display: flex; align-items: center; justify-content: center;
     color: var(--color-accent);
     transition: background var(--transition-fast);
 }
 .ph-rail-logo:hover { background: var(--sidebar-item-hover-bg); }
-.ph-rail-logo svg { width: 24px; height: 24px; }
+/* Tracks --nav-logo-height so the mark grows with the tile above it. The ratio
+   is the shipped 24/28, so the default is unchanged at 24px; without it,
+   raising the height grew the hover tile while the inline SVG stayed 24px,
+   leaving a large empty box around a small mark on every rail with no uploaded
+   logo. The uploaded .ph-rail-logo img below already tracks the token. */
+.ph-rail-logo svg { width: calc(var(--nav-logo-height, 28px) * 6 / 7); height: calc(var(--nav-logo-height, 28px) * 6 / 7); }
 /* Uploaded square logo. 28px matches .sidebar-brand-logo's max-height, so the
    brand reads at the same optical size in both nav layouts; object-fit keeps a
    not-quite-square upload from stretching inside the fixed box. */
-.ph-rail-logo img { width: 28px; height: 28px; object-fit: contain; display: block; }
+.ph-rail-logo img { width: var(--nav-logo-height, 28px); height: var(--nav-logo-height, 28px); object-fit: contain; display: block; }
 /* min-height:0 is what actually lets this shrink below its content height --
    without it a flex child refuses to shrink and overflow-y never engages. */
 .ph-rail-items { display: flex; flex-direction: column; gap: 2px; padding: 4px 8px; overflow-y: auto; min-height: 0; }
@@ -721,10 +739,13 @@ body[data-affixed-nav="1"].nav-open .ph-side-topbar { transform: translateY(0); 
 .ph-rail-item:hover { background: var(--sidebar-item-hover-bg); color: var(--sidebar-text); text-decoration: none; }
 .ph-rail-item.active { background: var(--sidebar-item-active-bg); font-weight: var(--fw-medium); }
 .ph-rail-item .rail-ico {
-    width: 26px; height: 26px; border-radius: 6px;
+    /* Same two tokens as .sidebar-item-icon in core-theme.css -- the tile and
+       glyph shipped identical literals in both files, so this is one control
+       covering the sidebar and rail layouts, not two that must be kept in sync. */
+    width: var(--nav-icon-size, 26px); height: var(--nav-icon-size, 26px); border-radius: 6px;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.ph-rail-item .rail-ico svg { width: 15px; height: 15px; }
+.ph-rail-item .rail-ico svg { width: var(--nav-icon-glyph, 15px); height: var(--nav-icon-glyph, 15px); }
 .ph-rail-item .rail-ico.blue    { background: #007aff; color: var(--color-surface); }
 .ph-rail-item .rail-ico.purple  { background: #af52de; color: var(--color-surface); }
 .ph-rail-item .rail-ico.orange  { background: #ff9500; color: var(--color-surface); }
@@ -763,12 +784,16 @@ body[data-affixed-nav="1"].nav-open .ph-side-topbar { transform: translateY(0); 
 body[data-nav-profile="hide"] .ph-rail > .profile-dropdown-wrapper,
 body[data-nav-profile="hide"] .ph-rail > .ph-rail-item.only-out { display: none; }
 .ph-rail .profile-dropdown {
-    top: auto; bottom: 0; left: calc(100% + 8px); right: auto; width: 240px;
+    top: auto; bottom: 0; left: calc(100% + 8px); right: auto; width: var(--rail-panel-width, 240px);
 }
 
 /* Flyout panel -- overlays content on hover; content below doesn't shift */
 .ph-rail-panel {
-    position: fixed; top: 0; bottom: 0; left: 80px; width: 240px;
+    /* `left` MUST stay equal to the rail's own width: initRail()'s 180ms
+       cancelClose bridge only survives the pointer crossing from rail to panel
+       because the two boxes are edge-adjacent with a 0px gap. A rail widened
+       without moving this would open a gap and break hover entirely. */
+    position: fixed; top: 0; bottom: 0; left: var(--rail-width, 80px); width: var(--rail-panel-width, 240px);
     background: var(--sidebar-panel-bg);
     border-right: 0.5px solid var(--sidebar-border);
     box-shadow: 4px 0 24px rgba(0,0,0,0.08);
@@ -876,7 +901,14 @@ body[data-layout="rail"] .ph-hero-inner { max-width: none; }
 .ph-side-topbar-inner {
     padding: 10px 28px;
     display: flex; align-items: center; justify-content: space-between;
-    gap: 16px; min-height: 44px;
+    gap: 16px;
+    /* The admin's "Topbar height" (--topbar-height, 44px) reached only
+       core-theme.css's .topbar, and NO template emits class="topbar" -- so the
+       field moved nothing on any shipped layout. This is the bar that actually
+       renders (header.tpl includes inner-topbar.tpl for every layout except
+       `top`), and 44px is the literal it already had, so wiring it here makes
+       the existing control live without changing the default rendering. */
+    min-height: var(--topbar-height, 44px);
 }
 .ph-side-crumbs {
     display: flex; align-items: center; gap: 7px;
@@ -1192,10 +1224,12 @@ body[data-svc-layout="outside"] .content-area .settings-group > .settings-item:l
    that would retarget every position:absolute descendant on a live site.
 
    Absolute is still out of flow, so body[data-layout="side"] .ph-main-wrap
-   { margin-left:260px } (line 27) needs no change.
+   { margin-left: var(--sidebar-width) } near the top of this file needs no
+   change.
 
    SIDE LAYOUT ONLY. The icon rail is the only navigation on its layout, its
-   flyout panel is anchored to the rail itself (position:fixed, left:80px), and
+   flyout panel is anchored to the rail itself (position:fixed, left is
+   --rail-width), and
    .ph-mobile-toggle is display:none above 900px -- unpinning the rail would
    scroll the only nav away while the panel stayed pinned to a rail that is no
    longer beside it, leaving nothing reachable below the fold.
@@ -3252,11 +3286,11 @@ body[data-sidebar-side="right"]:not([data-layout="top"]) .ph-rail {
    rules at the top of this file are still in effect. */
 body[data-sidebar-side="right"][data-layout="side"] .ph-main-wrap {
     margin-left: 0;
-    margin-right: 260px;
+    margin-right: var(--sidebar-width, 260px);
 }
 body[data-sidebar-side="right"][data-layout="rail"] .ph-main-wrap {
     margin-left: 0;
-    margin-right: 80px;
+    margin-right: var(--rail-width, 80px);
 }
 
 /* The flyout must follow the rail across, or it opens 80px from the LEFT edge
@@ -3268,7 +3302,7 @@ body[data-sidebar-side="right"][data-layout="rail"] .ph-main-wrap {
    same reason -- it must slide in FROM the rail, not away from it. */
 body[data-sidebar-side="right"][data-layout="rail"] .ph-rail-panel {
     left: auto;
-    right: 80px;
+    right: var(--rail-width, 80px);
     border-right: 0;
     border-left: 0.5px solid var(--color-border);
     transform: translateX(10px);

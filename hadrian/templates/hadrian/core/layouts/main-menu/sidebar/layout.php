@@ -28,7 +28,14 @@ return [
        grouping, not a second storage. Sidebar width is this layout's alone;
        the topbar is shared with the rail (header.tpl renders inner-topbar
        whenever the layout is not 'top'). */
-    'sizes' => ['--sidebar-width', '--topbar-height'],
+    'sizes' => [
+        '--sidebar-width', '--topbar-height',
+        // Shared with the rail: both layouts draw the same 26px tile and 15px
+        // glyph, from identical literals in two different stylesheets.
+        '--nav-icon-size', '--nav-icon-glyph',
+        // Shared with all four layouts.
+        '--nav-logo-height',
+    ],
     'supportedOptions' => [
         'align' => [
             'label'   => 'Content alignment',

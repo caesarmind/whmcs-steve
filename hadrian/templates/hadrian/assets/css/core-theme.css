@@ -151,6 +151,42 @@
     --sidebar-badge-bg: var(--_sb-badge, var(--color-gray-bg));
     --topbar-height: 44px;
     --topbar-bg: rgba(251, 251, 253, 0.72);
+
+    /* ===== Navigation geometry ==========================================
+       Admin Layouts page > Containers. GEOMETRY ONLY -- nav COLOUR is the 16
+       sidebar/topbar rows on Styles > Colors and nav TYPE is the text/weight
+       scale on Styles > Typography. Nothing here is editable
+       in a second panel; a standalone Navigation panel was removed in ee9b6ef
+       for exactly that reason (it re-exposed --sidebar-bg, which Colors owns).
+
+       Every value below was a hardcoded literal until now, so each rule keeps
+       its original number as the var() fallback: an install that never touches
+       these renders byte-identically. Pure lengths, so none of them differs in
+       dark mode and none is redeclared in the dark block.
+
+       Which layout each one shapes is declared by that layout's manifest
+       (core/layouts/main-menu/<name>/layout.php 'sizes'), which is what lets
+       the admin row say "Applies to the Sidebar and Icon Rail layouts"
+       without hardcoding a list that goes stale. */
+
+    /* All four layouts. Four separate rules shipped the same 28px, so this is
+       genuinely one control, not four. */
+    --nav-logo-height: 28px;
+    /* Sidebar + rail: the coloured tile behind a menu icon, and the glyph in
+       it. Identical literals in core-theme.css and core-layout.css. */
+    --nav-icon-size: 26px;
+    --nav-icon-glyph: 15px;
+    /* Rail layout only. --rail-width has FIVE consumers (the rail, both
+       content gutters, and the flyout's left/right edge) -- they must move
+       together or the flyout detaches from the rail it belongs to. */
+    --rail-width: 80px;
+    --rail-panel-width: 240px;
+    /* Top-nav layout only. NOT --topbar-height: that token styles .topbar,
+       which no template emits; the top layout's bar is .homepage-nav-inner and
+       has always been a separate 44px literal. The product subnav and the
+       mega-menu hang off this height, so all three move together. */
+    --topnav-height: 44px;
+    --topnav-icon-size: 14px;
     /* Soft resting shadow stands in for the removed 1px outline — reads as a hairline edge against the page bg */
     --shadow-card: 0 0 0 0.5px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
     --shadow-card-hover: 0 0 0 0.5px rgba(0,0,0,0.04), 0 2px 12px rgba(0,0,0,0.06);
@@ -604,9 +640,9 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
    mark and object-fit keeps it undistorted when it does. Same shape as
    .hp-footer-brand-logo, which had it right all along and was the one logo on
    the page that kept working. */
-.sidebar-brand-logo { height: 28px; width: auto; max-width: 160px; object-fit: contain; display: block; }
+.sidebar-brand-logo { height: var(--nav-logo-height, 28px); width: auto; max-width: 160px; object-fit: contain; display: block; }
 .homepage-nav .nav-logo.img-logo { padding: 0; }
-.homepage-nav .nav-logo.img-logo img { height: 28px; width: auto; max-width: 180px; object-fit: contain; display: block; }
+.homepage-nav .nav-logo.img-logo img { height: var(--nav-logo-height, 28px); width: auto; max-width: 180px; object-fit: contain; display: block; }
 .brand-logo img { height: 32px; width: auto; max-width: 200px; object-fit: contain; display: block; }
 .sidebar-search { padding: 8px 12px 4px; }
 .sidebar-search-input {
@@ -635,8 +671,8 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
 }
 .sidebar-item:hover { background: var(--sidebar-item-hover-bg); color: var(--sidebar-text); }
 .sidebar-item.active { background: var(--sidebar-item-active-bg); font-weight: var(--fw-medium); }
-.sidebar-item-icon { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.sidebar-item-icon svg { width: 15px; height: 15px; }
+.sidebar-item-icon { width: var(--nav-icon-size, 26px); height: var(--nav-icon-size, 26px); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sidebar-item-icon svg { width: var(--nav-icon-glyph, 15px); height: var(--nav-icon-glyph, 15px); }
 .sidebar-item-icon.blue { background: var(--color-icon-blue); color: white; }
 .sidebar-item-icon.purple { background: var(--color-icon-purple); color: white; }
 .sidebar-item-icon.orange { background: var(--color-icon-orange); color: white; }
@@ -771,7 +807,7 @@ body[data-sidebar-side="right"] .main-content { margin-left: 0; margin-right: va
 
 /* --- Homepage-style Top Nav (for login/register) --- */
 .homepage-nav { position: sticky; top: 0; z-index: 50; background: var(--topbar-bg); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--sidebar-item-active); padding: 0 22px; }
-.homepage-nav-inner { max-width: var(--w-prose); margin: 0 auto; display: flex; align-items: center; gap: 28px; height: 44px; font-size: var(--text-sm); }
+.homepage-nav-inner { max-width: var(--w-prose); margin: 0 auto; display: flex; align-items: center; gap: 28px; height: var(--topnav-height, 44px); font-size: var(--text-sm); }
 .homepage-nav a { color: var(--color-text-primary); opacity: 0.85; font-size: var(--text-sm); transition: opacity 0.15s ease; text-decoration: none; }
 .homepage-nav a:hover { opacity: 1; text-decoration: none; }
 .homepage-nav .nav-logo { font-size: var(--text-xl); opacity: 1; display: flex; align-items: center; margin-inline-end: 20px; }
@@ -785,7 +821,9 @@ body[data-sidebar-side="right"] .main-content { margin-left: 0; margin-right: va
 html { scroll-behavior: smooth; }
 
 /* Product subnav (Apple product-page TOC style) */
-.homepage-subnav { position: sticky; top: 44px; z-index: 49; background: rgba(251,251,253,0.82); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); }
+/* top/left offsets track the top nav's height -- it is sticky above them, so a
+   taller bar must push both of these down or they overlap it. */
+.homepage-subnav { position: sticky; top: var(--topnav-height, 44px); z-index: 49; background: rgba(251,251,253,0.82); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); }
 .homepage-subnav-inner { max-width: var(--w-prose); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 22px; height: 52px; }
 .homepage-subnav .subnav-title { font-size: var(--text-2xl); font-weight: var(--fw-semibold); letter-spacing: -0.015em; color: var(--color-text-primary); text-decoration: none; white-space: nowrap; }
 .homepage-subnav .subnav-title:hover { text-decoration: none; opacity: 0.85; }
@@ -821,7 +859,7 @@ html { scroll-behavior: smooth; }
 .nav-dropdown-trigger:hover { opacity: 1; }
 .nav-dropdown-trigger .chevron { width: 9px; height: 9px; transition: transform 0.2s ease; }
 .nav-item-dropdown:hover .nav-dropdown-trigger .chevron { transform: rotate(180deg); }
-.nav-mega-menu { position: absolute; top: 44px; left: 0; right: 0; background: rgba(251,251,253,0.92); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--sidebar-item-active); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s; pointer-events: none; z-index: 49; }
+.nav-mega-menu { position: absolute; top: var(--topnav-height, 44px); left: 0; right: 0; background: rgba(251,251,253,0.92); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--sidebar-item-active); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s; pointer-events: none; z-index: 49; }
 .nav-item-dropdown:hover .nav-mega-menu, .nav-mega-menu:hover { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
 .nav-mega-inner { max-width: var(--w-prose); margin: 0 auto; padding: 40px 22px 48px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; }
 .nav-mega-col h4 { font-size: var(--text-sm); font-weight: var(--fw-semibold); letter-spacing: 0.02em; text-transform: uppercase; color: var(--color-text-tertiary); margin: 0 0 16px; opacity: 1; }
@@ -3887,7 +3925,10 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 
 /* Topnav item icons */
 .homepage-nav .nav-item-icon { display: inline-flex; align-items: center; margin-right: 6px; color: currentColor; opacity: 0.75; }
-.homepage-nav .nav-item-icon svg { width: 14px; height: 14px; }
+/* topnav.tpl also stamps width="14" height="14" as presentational attributes on
+   each icon. CSS beats a presentational attribute, so this token still wins --
+   but the attribute is a second source of truth worth knowing about. */
+.homepage-nav .nav-item-icon svg { width: var(--topnav-icon-size, 14px); height: var(--topnav-icon-size, 14px); }
 .homepage-nav .nav-dropdown-item-icon { display: inline-flex; align-items: center; margin-right: 8px; color: var(--color-text-tertiary); }
 .homepage-nav .nav-dropdown-item-icon svg { width: 12px; height: 12px; }
 .homepage-nav .nav-chevron { width: 10px; height: 10px; margin-left: 2px; opacity: 0.6; }

@@ -6,11 +6,30 @@
    Written against theme tokens, never hex, so it follows the buyer's Style
    Manager palette and dark mode automatically -- same rule as Custom CSS. */
 
+/* This layout's ONE geometry token. Declared here rather than in
+   core-theme.css deliberately: topbar-minimal is the shipped example of a
+   dropped-in custom layout, and the whole point is that deleting or copying
+   this folder needs no edit to a core file -- a --tbm-bar-height stranded in
+   core-theme.css after the folder is removed would be exactly the kind of
+   dangling reference this layout exists to prove is unnecessary.
+
+   Overriding it from the admin still works: header.tpl links this file at
+   :349 but prints {$headoutput} -- which carries Hooks::buildLayoutHead's
+   `hadrian-layout` style block, a :root{...} rule -- at :396, so the admin's
+   block is later in the cascade and wins at equal specificity.
+
+   (Written without a literal closing style tag on purpose: an HTML parser
+   scanning a <style> element ends it at that byte sequence even inside a CSS
+   comment, so inlining this file would silently truncate everything below.) */
+:root {
+    --tbm-bar-height: 52px;
+}
+
 .tbm-bar {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 60;
-    height: 52px;
+    height: var(--tbm-bar-height, 52px);
     display: flex;
     align-items: center;
     gap: 24px;
@@ -20,14 +39,21 @@
 }
 
 .tbm-brand { display: flex; align-items: center; text-decoration: none; }
-.tbm-brand img { height: 28px; width: auto; display: block; }
-.tbm-brand-name { font-weight: 600; font-size: 16px; color: var(--color-text-primary); }
+.tbm-brand img { height: var(--nav-logo-height, 28px); width: auto; display: block; }
+/* font-weight and border-radius below were raw literals, against this file's
+   own rule at the top ("written against theme tokens, never hex"). 600 IS
+   --fw-semibold, 14px IS --text-md and 8px IS --radius-sm, so swapping them in
+   changes nothing today and makes this layout follow the buyer's Typography and
+   General panels like the other three already did. font-size:16px on the brand
+   name stays a literal: no step of the type scale is 16, and snapping it to 15
+   or 17 would be a visual change, not a tokenisation. */
+.tbm-brand-name { font-weight: var(--fw-semibold); font-size: 16px; color: var(--color-text-primary); }
 
 .tbm-links { display: flex; gap: 4px; overflow-x: auto; }
 .tbm-links a {
     padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 14px;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-md);
     text-decoration: none;
     color: var(--color-text-secondary);
     white-space: nowrap;
@@ -39,7 +65,7 @@
 
 /* A fixed bar needs the content pushed down; a TOP offset is this layout's own
    concern (the generated css block only does left/right column margins). */
-body[data-layout="topbar-minimal"] .ph-main-wrap { padding-top: 52px; }
+body[data-layout="topbar-minimal"] .ph-main-wrap { padding-top: var(--tbm-bar-height, 52px); }
 
 /* Below the shell's 900px collapse the inner-topbar's hamburger + drawer take
    over (rendered for every non-top token); this bar bows out. */

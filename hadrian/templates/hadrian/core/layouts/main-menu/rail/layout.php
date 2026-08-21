@@ -21,10 +21,21 @@ return [
     'variables'   => [
         'dataLayout' => 'rail',
     ],
-    /* The rail's own width is fixed in CSS with no token, so the only
-       dimension it exposes is the inner topbar it shares with the sidebar
-       layout. */
-    'sizes' => ['--topbar-height'],
+    /* --topbar-height is the inner topbar this layout shares with the sidebar
+       (header.tpl renders it for every layout except `top`).
+
+       The rail's own width is no longer fixed: --rail-width now drives the rail
+       column, BOTH content gutters and the flyout's leading edge together --
+       they cannot be split, because the flyout has to stay edge-adjacent to the
+       rail or initRail()'s 180ms hover bridge never fires. */
+    'sizes' => [
+        '--rail-width', '--rail-panel-width',
+        '--topbar-height',
+        // Shared with the sidebar layout, which draws the same tile and glyph.
+        '--nav-icon-size', '--nav-icon-glyph',
+        // Shared with all four layouts.
+        '--nav-logo-height',
+    ],
     'supportedOptions' => [
         'align' => [
             'label'   => 'Content alignment',
