@@ -691,6 +691,118 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-affix { position: relative; display: block; }
 .mt-affix .mt-input { padding-right: 32px !important; }
 .mt-affix-unit { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--mt-text-3); pointer-events: none; }
+/* Google Font picker -- searchable combobox over the full ~1,900-family
+   library (core/config/google-fonts.json).
+
+   Deliberately self-contained, and it reads as a near-copy of the Settings
+   page's .mt-multi chip picker because it is meant to: the two dropdowns are
+   one visual idea. What it is NOT is a reuse of those rules. .mt-multi-* is
+   declared in a <style> block inside settings/index.tpl, so it exists on the
+   Settings page and nowhere else -- borrowing the class names here bought a
+   panel with no border, no background, no z-index and, because overflow-y
+   never applied, no scrolling on 1,900 rows. The same page-local trap that
+   .subnav-card sets. Every rule the panel needs is therefore below. */
+/* What a previewed name falls back to while its face downloads, or forever if
+   the request to Google is blocked. Declared as a token because the picker JS
+   writes `font-family: 'Family', var(--mt-fontpick-fallback)` inline -- the
+   obvious `'Family', inherit` is invalid CSS (a CSS-wide keyword may only be a
+   declaration's sole value) and would drop the declaration outright. */
+.mt-fontpick-wrap { position: relative; --mt-fontpick-fallback: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif; }
+.mt-fontpick {
+    width: 100%;
+    min-height: 40px;
+    padding: 6px 32px 6px 12px;
+    border: 1px solid var(--mt-input-border);
+    border-radius: 8px;
+    background: var(--mt-surface);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    position: relative;
+    text-align: left;
+    font: inherit;
+    color: var(--mt-text);
+    transition: border-color .15s, box-shadow .15s;
+}
+.mt-fontpick:hover { border-color: var(--mt-text-3); }
+.mt-fontpick.is-open, .mt-fontpick:focus-visible { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 3px rgba(0,113,227,0.15); }
+.mt-fontpick:disabled { opacity: 0.5; cursor: default; }
+/* Rendered in the family it names once the preview stylesheet lands; falls
+   back to the panel font, so a blocked Google request costs the preview and
+   nothing else. */
+.mt-fontpick-name { font-size: 14px; line-height: 1.3; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mt-fontpick-name.is-placeholder { color: var(--mt-text-3); font-size: 13px; }
+.mt-fontpick-meta { font-size: 11px; color: var(--mt-text-3); flex: none; white-space: nowrap; }
+.mt-fontpick-caret { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--mt-text-4); pointer-events: none; }
+.mt-fontpick-caret svg { width: 12px; height: 12px; display: block; }
+
+.mt-fontpick-panel {
+    position: absolute;
+    left: 0; right: 0; top: calc(100% + 4px);
+    background: var(--mt-surface);
+    border: 1px solid var(--mt-border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    /* Above .mt-savebar's 80 -- the Typography panel carries a position:fixed
+       save bar that otherwise paints straight over an open picker. */
+    z-index: 90;
+    max-height: 380px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.mt-fontpick-panel[hidden] { display: none; }
+/* Flipped above the field by JS when the field sits too low to open downward. */
+.mt-fontpick-panel--up { top: auto; bottom: calc(100% + 4px); }
+.mt-fontpick-head { padding: 8px; border-bottom: 1px solid var(--mt-border); flex: none; }
+.mt-fontpick-head input[type="search"] { width: 100%; padding: 6px 10px; font: inherit; font-size: 13px; border: 1px solid var(--mt-input-border); border-radius: 6px; background: var(--mt-surface); color: var(--mt-text); }
+.mt-fontpick-head input[type="search"]:focus { outline: none; border-color: var(--mt-primary, #0071e3); box-shadow: 0 0 0 2px rgba(0,113,227,0.15); }
+/* The category row shares the head so search and filter read as one control. */
+.mt-fontpick-cats { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.mt-fontpick-cat {
+    border: 1px solid var(--mt-border);
+    background: var(--mt-surface);
+    color: var(--mt-text-2);
+    border-radius: 999px;
+    padding: 3px 10px;
+    font: inherit;
+    font-size: 11.5px;
+    cursor: pointer;
+    transition: background .12s, border-color .12s, color .12s;
+}
+.mt-fontpick-cat:hover { border-color: var(--mt-text-3); }
+.mt-fontpick-cat.is-active { background: var(--mt-primary, #0071e3); border-color: var(--mt-primary, #0071e3); color: #fff; }
+
+/* The one rule the whole widget stands on: 1,900 rows need a scroll container,
+   and the JS grows the render window off this element's scroll events. */
+.mt-fontpick-options { padding: 4px; overflow-y: auto; flex: 1; max-height: 260px; }
+.mt-fontpick-empty { padding: 14px; text-align: center; color: var(--mt-text-3); font-size: 12px; }
+.mt-fontpick-empty[hidden] { display: none; }
+.mt-fontpick-group { font-size: 10.5px; font-weight: 700; color: var(--mt-text-3); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 10px 5px; }
+.mt-fontpick-group:first-child { padding-top: 4px; }
+.mt-fontpick-option {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    width: 100%;
+    padding: 7px 10px;
+    border: 0;
+    background: transparent;
+    border-radius: 4px;
+    font: inherit;
+    color: var(--mt-text);
+    cursor: pointer;
+    text-align: left;
+}
+.mt-fontpick-option:hover, .mt-fontpick-option.is-cursor { background: var(--mt-surface-2, #f5f5f7); }
+.mt-fontpick-option.is-selected { background: rgba(0,113,227,0.10); }
+/* 16px, not the 13px the rest of the panel uses: at 13px a Handwriting or
+   Display face is unreadable, and reading the face is the entire point. */
+.mt-fontpick-option-name { font-size: 16px; line-height: 1.35; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mt-fontpick-option-meta { font-size: 10.5px; color: var(--mt-text-3); flex: none; white-space: nowrap; }
+.mt-fontpick-more { padding: 9px; text-align: center; font-size: 12px; color: var(--mt-text-3); }
+
 .mt-typo-actions { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--mt-border); display: flex; justify-content: flex-end; }
 .mt-custom-css .mt-textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.5; resize: vertical; min-height: 320px; }
 

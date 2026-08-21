@@ -75,18 +75,24 @@
     function q(n){ return form.querySelector('[name="' + n + '"]'); }
     var gsel = q('ff_google'),  gstk = q('ff_google_stack');
     var fname = q('ff_folder'), fstk = q('ff_folder_stack'),  fapp = q('ff_folder_apple');
+    /* ff_google is a hidden input behind the searchable picker below, not the
+       <select> it once was; the button is what a person actually operates, so
+       that is what mode-switching enables and disables. The hidden input stays
+       enabled either way so a saved family round-trips even while another mode
+       is selected. The save path only reads it when ff_mode is 'google'. */
+    var gbtn = form.querySelector('[data-fontpick-field]');
 
     function mode() { var c = form.querySelector('input[name="ff_mode"]:checked'); return c ? c.value : 'default'; }
     function sync() {
         var m = mode();
-        if (gsel) gsel.disabled = m !== 'google';
+        if (gbtn) gbtn.disabled = m !== 'google';
         if (fname) fname.disabled = m !== 'folder';
         if (fapp) fapp.disabled = m !== 'folder';
     }
     function selectMode(m) { var r = form.querySelector('input[name="ff_mode"][value="' + m + '"]'); if (r) { r.checked = true; sync(); } }
     function famOf(sel, quote) {
         if (!sel || !sel.value) return '';
-        var opt = sel.options[sel.selectedIndex];
+        var opt = sel.options && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
         var name = (opt && opt.getAttribute('data-family')) || sel.value.replace(/\.(woff2?|ttf|otf)$/i, '');
         return quote + name + quote;
     }
@@ -101,6 +107,224 @@
     if (fapp) fapp.addEventListener('change', function(){ build(fstk, fname, fapp.checked, '"'); });
     [].slice.call(form.querySelectorAll('input[name="ff_mode"]')).forEach(function(r){ r.addEventListener('change', sync); });
     sync();
+})();
+
+/* Google Font picker -- searchable combobox over the whole library.
+   Three things make ~1,900 families workable where a <select> was not:
+   search + category filter, a capped render window (the list is filtered in
+   memory but only a slice reaches the DOM), and a preview that renders each
+   name in its own face -- because "Caveat" and "Cinzel" mean nothing as text.
+   Writes to the hidden ff_google input and fires `change` on it, so the stack
+   builder in the block above is untouched by any of this. */
+(function(){
+    var wrap = document.querySelector('[data-fontpick]');
+    if (!wrap) return;
+
+    var value   = wrap.querySelector('[data-fontpick-value]');
+    var field   = wrap.querySelector('[data-fontpick-field]');
+    var label   = wrap.querySelector('[data-fontpick-label]');
+    var meta    = wrap.querySelector('[data-fontpick-meta]');
+    var panel   = wrap.querySelector('[data-fontpick-panel]');
+    var search  = wrap.querySelector('[data-fontpick-search]');
+    var options = wrap.querySelector('[data-fontpick-options]');
+    var empty   = wrap.querySelector('[data-fontpick-empty]');
+    /* label and meta are guarded too: paint() writes to both unconditionally,
+       and it runs on load, so a missing one would throw before the picker was
+       ever opened and take the mode-sync block down with it. */
+    if (!value || !field || !label || !meta || !panel || !options) return;
+
+    var CATS  = { sans: 'Sans Serif', serif: 'Serif', display: 'Display', hand: 'Handwriting', mono: 'Monospace' };
+    var PAGE  = 60;   /* rows per render window */
+    var BATCH = 24;   /* families per preview stylesheet request */
+
+    var catalog = null, popular = [], cat = '', shown = PAGE, rows = [], cursor = -1;
+    var loaded = {};
+    /* The empty-state copy, taken from what the server rendered rather than
+       restated here -- a second copy would drift from the .tpl, and the
+       em dash in it is the one character this otherwise-ASCII file avoids. */
+    var PLACEHOLDER = label.textContent;
+
+    /* Parsed on first open: the catalog is ~88KB of JSON and most visits to the
+       Styles page never touch the font picker. */
+    function load() {
+        if (catalog) return catalog;
+        function parse(sel, dflt) {
+            var el = wrap.querySelector(sel);
+            try { return el ? JSON.parse(el.textContent) : dflt; } catch (_) { return dflt; }
+        }
+        catalog = parse('[data-fontpick-catalog]', []) || [];
+        popular = parse('[data-fontpick-popular]', []) || [];
+        return catalog;
+    }
+
+    /* Ask Google for just the glyphs in the names being previewed (`text=`),
+       the same trick fonts.google.com uses -- a batch of 24 families costs a
+       few KB rather than a few hundred. Nothing here is required for the
+       picker to work: if the request is blocked, names render in the panel
+       font and everything else behaves identically. */
+    function preview(names) {
+        var want = names.filter(function(n){ return !loaded[n]; });
+        if (!want.length) return;
+        while (want.length) {
+            var batch = want.splice(0, BATCH), chars = {};
+            batch.forEach(function(n){
+                loaded[n] = true;
+                n.split('').forEach(function(c){ chars[c] = true; });
+            });
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://fonts.googleapis.com/css2?'
+                + batch.map(function(n){ return 'family=' + encodeURIComponent(n); }).join('&')
+                + '&text=' + encodeURIComponent(Object.keys(chars).join(''))
+                + '&display=swap';
+            document.head.appendChild(link);
+        }
+    }
+
+    function describe(row) {
+        var n = row[2].length;
+        /* CATS maps the five known slugs to labels; the server (loadGoogleFontCatalog)
+           drops any row whose category is not one of them, so row[1] always resolves
+           here. NO `|| row[1]` fallback: describe()'s return is concatenated straight
+           into options.innerHTML below, so echoing an unrecognised category verbatim
+           would be an injection sink. An unknown slug degrades to '' instead. */
+        return (CATS[row[1]] || '') + ', ' + n + (n === 1 ? ' weight' : ' weights') + (row[3] ? ', italic' : '');
+    }
+
+    /* Reflect the current pick onto the closed field. Called on load too, so a
+       saved family shows its category and previews itself without opening. */
+    function paint() {
+        var name = value.value;
+        label.textContent = name || PLACEHOLDER;
+        label.classList.toggle('is-placeholder', !name);
+        /* NOT "'Name', inherit": `inherit` is a CSS-wide keyword, legal only as
+           a declaration's sole value, so that list is invalid and the whole
+           declaration gets dropped -- the preview would silently never render.
+           --mt-fontpick-fallback (admin.css) carries the panel stack instead. */
+        label.style.fontFamily = name ? "'" + name + "', var(--mt-fontpick-fallback)" : '';
+        var row = name ? find(name) : null;
+        meta.textContent = row ? describe(row) : '';
+        if (name) preview([name]);
+    }
+
+    function find(name) {
+        var list = load();
+        for (var i = 0; i < list.length; i++) if (list[i][0] === name) return list[i];
+        return null;
+    }
+
+    function filter() {
+        var qs = (search && search.value || '').trim().toLowerCase();
+        rows = load().filter(function(r){
+            if (cat && r[1] !== cat) return false;
+            return !qs || r[0].toLowerCase().indexOf(qs) !== -1;
+        });
+        /* Popular is a shortcut, not a filter: it only leads when the admin has
+           not started narrowing, otherwise it would push matches down the list. */
+        if (!qs && !cat) {
+            var pinned = popular.map(find).filter(Boolean);
+            var names  = {};
+            pinned.forEach(function(r){ names[r[0]] = true; });
+            rows = pinned.concat(rows.filter(function(r){ return !names[r[0]]; }));
+            rows.pinned = pinned.length;
+        } else {
+            rows.pinned = 0;
+        }
+        shown  = PAGE;
+        cursor = -1;
+        render();
+    }
+
+    function render() {
+        var slice = rows.slice(0, shown);
+        var html  = '';
+        slice.forEach(function(r, i){
+            if (rows.pinned && i === 0)           html += '<div class="mt-fontpick-group">Popular</div>';
+            if (rows.pinned && i === rows.pinned) html += '<div class="mt-fontpick-group">All fonts</div>';
+            html += '<button type="button" class="mt-fontpick-option' + (r[0] === value.value ? ' is-selected' : '')
+                 +  '" role="option" aria-selected="' + (r[0] === value.value) + '" data-name="' + r[0] + '" data-i="' + i + '">'
+                 +  '<span class="mt-fontpick-option-name" style="font-family:\'' + r[0] + '\', var(--mt-fontpick-fallback)">' + r[0] + '</span>'
+                 +  '<span class="mt-fontpick-option-meta">' + describe(r) + '</span>'
+                 +  '</button>';
+        });
+        if (rows.length > shown) {
+            html += '<div class="mt-fontpick-more">' + (rows.length - shown) + ' more - keep scrolling or refine your search</div>';
+        }
+        options.innerHTML = html;
+        if (empty) empty.hidden = rows.length > 0;
+        preview(slice.map(function(r){ return r[0]; }));
+    }
+
+    /* Family names are validated to [A-Za-z0-9 ] both when the catalog is
+       generated and again when the server reads it, so the innerHTML above and
+       this attribute read stay in step with what can actually be in the file. */
+    function pick(name) {
+        value.value = name;
+        paint();
+        value.dispatchEvent(new Event('change', { bubbles: true }));
+        close();
+        field.focus();
+    }
+
+    function open() {
+        load();
+        filter();
+        panel.hidden = false;
+        field.classList.add('is-open');
+        field.setAttribute('aria-expanded', 'true');
+        /* Flip above the field when there is more room up than down -- the
+           picker sits low on a long Typography panel. */
+        var box = field.getBoundingClientRect();
+        panel.classList.toggle('mt-fontpick-panel--up', box.bottom + 380 > window.innerHeight && box.top > 380);
+        if (search) { search.value = ''; search.focus(); }
+    }
+    function close() {
+        panel.hidden = true;
+        field.classList.remove('is-open');
+        field.setAttribute('aria-expanded', 'false');
+    }
+
+    function move(delta) {
+        var last = Math.min(shown, rows.length) - 1;
+        if (last < 0) return;
+        cursor = cursor < 0 ? (delta > 0 ? 0 : last) : Math.max(0, Math.min(last, cursor + delta));
+        var els = options.querySelectorAll('.mt-fontpick-option');
+        [].forEach.call(els, function(el){ el.classList.remove('is-cursor'); });
+        var el = options.querySelector('.mt-fontpick-option[data-i="' + cursor + '"]');
+        if (el) { el.classList.add('is-cursor'); el.scrollIntoView({ block: 'nearest' }); }
+    }
+
+    field.addEventListener('click', function(){ panel.hidden ? open() : close(); });
+    if (search) {
+        search.addEventListener('input', filter);
+        search.addEventListener('keydown', function(e){
+            if (e.key === 'ArrowDown')      { e.preventDefault(); move(1); }
+            else if (e.key === 'ArrowUp')   { e.preventDefault(); move(-1); }
+            else if (e.key === 'Enter')     { e.preventDefault(); if (rows[cursor]) pick(rows[cursor][0]); }
+            else if (e.key === 'Escape')    { e.preventDefault(); close(); field.focus(); }
+        });
+    }
+    [].forEach.call(wrap.querySelectorAll('.mt-fontpick-cat'), function(btn){
+        btn.addEventListener('click', function(){
+            cat = btn.getAttribute('data-cat') || '';
+            [].forEach.call(wrap.querySelectorAll('.mt-fontpick-cat'), function(b){ b.classList.toggle('is-active', b === btn); });
+            filter();
+            if (search) search.focus();
+        });
+    });
+    options.addEventListener('click', function(e){
+        var btn = e.target.closest && e.target.closest('.mt-fontpick-option');
+        if (btn) pick(btn.getAttribute('data-name'));
+    });
+    /* Grow the window as the list is scrolled rather than putting 1,900 rows in
+       the DOM up front. */
+    options.addEventListener('scroll', function(){
+        if (shown >= rows.length) return;
+        if (options.scrollTop + options.clientHeight >= options.scrollHeight - 80) { shown += PAGE; render(); }
+    });
+    document.addEventListener('click', function(e){ if (!wrap.contains(e.target)) close(); });
+
+    paint();
 })();
 
 /* Colors panel: every token row has a native swatch + a hex/rgba text field

@@ -74,11 +74,26 @@ return [
     'sizeMax'       => 160,
     'weightOptions' => [100, 200, 300, 400, 500, 600, 700, 800, 900],
 
-    // Curated Google Font picklist (kept short + safe; admin can also use a custom stack).
-    'googleFonts' => [
+    // The full Google Fonts library, generated into google-fonts.json by
+    // scripts/fetch-google-fonts.mjs from https://fonts.google.com/metadata/fonts.
+    // StylesController reads it for the picker AND allowlists the saved family
+    // against it; nothing fetches from Google at runtime. Re-run the script to
+    // pick up families Google has added since.
+    'googleFontsFile' => 'google-fonts.json',
+
+    // Pinned to the top of the picker under "Popular". These are the twelve that
+    // used to BE the whole list — UI-grade sans faces that suit a client area —
+    // so an admin who just wants a safe choice never has to scroll 1,900 rows.
+    // Every name here must also exist in google-fonts.json.
+    'googleFontsPopular' => [
         'Inter', 'Roboto', 'Open Sans', 'Lato', 'Poppins', 'Montserrat',
         'Nunito Sans', 'Work Sans', 'Manrope', 'DM Sans', 'Source Sans 3', 'Plus Jakarta Sans',
     ],
+
+    // Weights requested from fonts.googleapis.com, intersected with what the
+    // chosen family actually ships. Mirrors the --fw-* token scale above, so a
+    // font arrives with exactly the weights the theme asks it to render.
+    'googleWeights' => [300, 400, 500, 600, 700],
 
     // Theme-shipped, self-hosted fonts (zero external request) the configurator
     // can offer alongside buyer uploads. Combined with the "apple" flag this

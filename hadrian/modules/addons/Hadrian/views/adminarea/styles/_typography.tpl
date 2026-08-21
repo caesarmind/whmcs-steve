@@ -30,12 +30,58 @@
                 <span>Google Font</span>
             </label>
             <div class="mt-typo-dep">
-                <select name="ff_google" class="mt-select">
-                    <option value="">&mdash; select a Google font &mdash;</option>
-                    {foreach $typography.googleFonts as $gf}
-                        <option value="{$gf|escape}"{if $gf == $typography.fontFamily.google} selected{/if}>{$gf|escape}</option>
-                    {/foreach}
-                </select>
+                {* Searchable picker over the whole Google Fonts library. This
+                   used to be a <select> of twelve hand-picked names; the catalog
+                   (core/config/google-fonts.json, refreshed by
+                   scripts/fetch-google-fonts.mjs) now carries every family, which
+                   is far past what a native <select> can be used with.
+
+                   The hidden input IS the form field -- everything visible below
+                   is a view onto it, the same shape the Settings page's .mt-multi
+                   chip picker uses. Same shape, NOT the same classes: .mt-multi-*
+                   is declared in a <style> block inside settings/index.tpl and so
+                   does not exist on this page. .mt-fontpick-* in admin.css carries
+                   every rule this needs.
+
+                   Rows are built by JS in includes/footer.tpl; with JS off the
+                   hidden input still round-trips whatever was already saved, so an
+                   existing choice is never silently lost. *}
+                <div class="mt-fontpick-wrap" data-fontpick data-count="{$typography.googleCount}">
+                    <input type="hidden" name="ff_google" value="{$typography.fontFamily.google|escape}" data-fontpick-value>
+
+                    <button type="button" class="mt-fontpick" data-fontpick-field
+                            aria-haspopup="listbox" aria-expanded="false">
+                        <span class="mt-fontpick-name" data-fontpick-label>&mdash; select a Google font &mdash;</span>
+                        <span class="mt-fontpick-meta" data-fontpick-meta></span>
+                        <span class="mt-fontpick-caret" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        </span>
+                    </button>
+
+                    <div class="mt-fontpick-panel" hidden data-fontpick-panel role="listbox">
+                        <div class="mt-fontpick-head">
+                            <input type="search" placeholder="Search {$typography.googleCount} Google fonts&hellip;" autocomplete="off"
+                                   aria-label="Search Google fonts" data-fontpick-search>
+                            <div class="mt-fontpick-cats" role="group" aria-label="Filter by category">
+                                <button type="button" class="mt-fontpick-cat is-active" data-cat="">All</button>
+                                <button type="button" class="mt-fontpick-cat" data-cat="sans">Sans</button>
+                                <button type="button" class="mt-fontpick-cat" data-cat="serif">Serif</button>
+                                <button type="button" class="mt-fontpick-cat" data-cat="display">Display</button>
+                                <button type="button" class="mt-fontpick-cat" data-cat="hand">Handwriting</button>
+                                <button type="button" class="mt-fontpick-cat" data-cat="mono">Mono</button>
+                            </div>
+                        </div>
+                        <div class="mt-fontpick-options" data-fontpick-options></div>
+                        <div class="mt-fontpick-empty" hidden data-fontpick-empty>No fonts match.</div>
+                    </div>
+
+                    {* Parsed on first open, not at page load -- type="application/json"
+                       means the browser stores it as text and never runs it as script.
+                       Embedded rather than fetched because the theme's .htaccess denies
+                       .json over HTTP. *}
+                    <script type="application/json" data-fontpick-catalog>{$typography.googleCatalog nofilter}</script>
+                    <script type="application/json" data-fontpick-popular>{$typography.googlePopular nofilter}</script>
+                </div>
                 <div class="mt-typo-sublabel">How it's written into the system</div>
                 <input type="text" name="ff_google_stack" class="mt-input" value="{$typography.stacks.google|escape}" placeholder="'Roboto', system-ui, sans-serif">
             </div>

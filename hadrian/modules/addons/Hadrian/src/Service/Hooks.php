@@ -681,8 +681,27 @@ final class Hooks
         } elseif ($mode === 'google' && !empty($ff['google'])) {
             $name = trim((string)preg_replace('/[^A-Za-z0-9 ]/', '', (string)$ff['google']));
             if ($name !== '') {
+                // Weights are resolved at SAVE time against the font catalog
+                // (StylesController::googleWeightsFor) and stored alongside the
+                // pick, so this path never opens the 88KB catalog on a client
+                // page view. Settings saved before that existed have no stored
+                // list; fall back to the theme's --fw-* scale, which is what was
+                // hardcoded here previously. The css2 API drops weights a family
+                // lacks and still returns 200, so the fallback is safe for any
+                // family -- it just over-asks.
+                $weights = [];
+                foreach ((array)($ff['googleWeights'] ?? []) as $w) {
+                    $w = (int)$w;
+                    if ($w >= 100 && $w <= 900) {
+                        $weights[] = $w;
+                    }
+                }
+                if ($weights === []) {
+                    $weights = array_map('intval', (array)($cfg['googleWeights'] ?? [300, 400, 500, 600, 700]));
+                }
+                sort($weights);
                 $href  = 'https://fonts.googleapis.com/css2?family=' . rawurlencode($name)
-                       . ':wght@300;400;500;600;700&display=swap';
+                       . ':wght@' . implode(';', array_unique($weights)) . '&display=swap';
                 $links = '<link rel="preconnect" href="https://fonts.googleapis.com">'
                        . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
                        . '<link rel="stylesheet" href="' . htmlspecialchars($href, ENT_QUOTES) . '">';

@@ -316,6 +316,113 @@ final class StylesController extends AbstractController
     }
 
     /**
+     * The five category slugs scripts/fetch-google-fonts.mjs emits. A catalog
+     * row whose category is not one of these is a tampered row (the JS maps the
+     * slug to a display label and renders it), so loadGoogleFontCatalog drops
+     * it, the same way it drops a row with a bad family name.
+     */
+    private const GOOGLE_FONT_CATEGORIES = ['sans', 'serif', 'display', 'hand', 'mono'];
+
+    /**
+     * The full Google Fonts library, as generated into core/config by
+     * scripts/fetch-google-fonts.mjs. Rows are tuples for size -- 1,900-odd
+     * families is ~88KB as tuples and would be ~200KB as objects, and this
+     * blob is embedded in the Styles page.
+     *
+     *   [family, category, [weights], hasItalic]
+     *
+     * Returns [] when the file is missing or unreadable; every caller degrades
+     * to the "Popular" shortlist rather than failing, so a theme shipped
+     * without the catalog still has a working picker.
+     *
+     * @return list<array{0:string,1:string,2:list<int>,3:int}>
+     */
+    private function loadGoogleFontCatalog($template, array $cfg): array
+    {
+        static $cache = [];
+
+        $file = (string)($cfg['googleFontsFile'] ?? '');
+        if ($file === '' || !preg_match('/^[A-Za-z0-9._-]+$/', $file)) {
+            return [];
+        }
+        $path = $template->getFullPath() . '/core/config/' . $file;
+        if (isset($cache[$path])) {
+            return $cache[$path];
+        }
+        if (!is_file($path) || !is_readable($path)) {
+            return $cache[$path] = [];
+        }
+        $data = json_decode((string)file_get_contents($path), true);
+        $rows = is_array($data) && is_array($data['families'] ?? null) ? $data['families'] : [];
+
+        // Re-validate EVERY field on read rather than trusting the file. This
+        // whole catalog is embedded into the admin Styles page as an inline JSON
+        // island and rendered into option rows via innerHTML, so a row is
+        // untrusted input the moment the file is hand-edited or a build artifact
+        // is tampered -- exactly the supply-chain actor the build-time tripwire
+        // (fetch-google-fonts.mjs) is meant to stop. Name AND category are both
+        // constrained here so neither can carry a `</script>` breakout or an
+        // innerHTML payload; a row that fails either check is dropped, not
+        // sanitized, so nothing partially-valid survives.
+        $out = [];
+        foreach ($rows as $row) {
+            if (!is_array($row) || !isset($row[0], $row[1])) {
+                continue;
+            }
+            $name = (string)$row[0];
+            if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9 ]*$/', $name)) {
+                continue;
+            }
+            // Category is one of the five slugs the generator emits (the JS
+            // maps it to a display label and filters on it). Anything else is a
+            // tampered row: drop it.
+            $category = (string)$row[1];
+            if (!in_array($category, self::GOOGLE_FONT_CATEGORIES, true)) {
+                continue;
+            }
+            $weights = [];
+            foreach ((array)($row[2] ?? []) as $w) {
+                $w = (int)$w;
+                if ($w >= 100 && $w <= 900) {
+                    $weights[] = $w;
+                }
+            }
+            $out[] = [$name, $category, $weights ?: [400], !empty($row[3]) ? 1 : 0];
+        }
+
+        return $cache[$path] = $out;
+    }
+
+    /**
+     * Weights to request from fonts.googleapis.com for $family: the theme's
+     * --fw-* scale intersected with what the family actually ships.
+     *
+     * The css2 API tolerates weights a family lacks (it drops them and still
+     * returns 200), so this is not about avoiding an error -- it is about not
+     * asking for five faces when a family has one, and about the emitted URL
+     * being an honest description of what loads.
+     *
+     * Returns [] when the family isn't in the catalog, which the caller reads
+     * as "fall back to the configured scale".
+     *
+     * @return list<int>
+     */
+    private function googleWeightsFor(array $catalog, array $cfg, string $family): array
+    {
+        $want = array_map('intval', (array)($cfg['googleWeights'] ?? [300, 400, 500, 600, 700]));
+        foreach ($catalog as $row) {
+            if ($row[0] !== $family) {
+                continue;
+            }
+            $have = array_values(array_intersect($want, $row[2]));
+            // A display face that ships only 800 would otherwise resolve to an
+            // empty request; give it its own single weight instead.
+            return $have ?: [$row[2][0]];
+        }
+        return [];
+    }
+
+    /**
      * Scan assets/fonts/custom for buyer-dropped web fonts. Each becomes a
      * pickable "Your fonts" option. The regex doubles as a filename allowlist
      * (letters/numbers/._- + a font extension), so stored values can't traverse.
@@ -381,11 +488,36 @@ final class StylesController extends AbstractController
         ];
         $leadsApple = static fn (string $s): bool => (bool)preg_match('/^\s*(-apple-system|BlinkMacSystemFont)/', $s);
 
+        // Full library for the picker. Handed to the view as one compact JSON
+        // blob (embedded, not fetched -- the theme's .htaccess denies .json over
+        // HTTP) that the picker JS parses the first time it is opened.
+        $catalog = $this->loadGoogleFontCatalog($template, $cfg);
+        $known   = array_flip(array_column($catalog, 0));
+        $popular = array_values(array_filter(
+            (array)($cfg['googleFontsPopular'] ?? []),
+            static fn ($n): bool => $catalog === [] || isset($known[$n])
+        ));
+
         return [
             'sizeGroups'    => $sizeGroups,
             'weights'       => $weights,
             'weightOptions' => $cfg['weightOptions'] ?? [300, 400, 500, 600, 700, 900],
-            'googleFonts'   => $cfg['googleFonts'] ?? [],
+            // Both pre-encoded here rather than in the view: Smarty has no
+            // json_encode modifier registered, and the encoding of the blob the
+            // picker parses is not something to leave to a template filter.
+            //
+            // JSON_HEX_TAG is the load-bearing flag: these blobs are printed with
+            // `nofilter` inside <script type="application/json">, so without it a
+            // literal `</script>` in any value would close the element early and
+            // whatever followed would run as script. It escapes < and > to <
+            // />, which JSON.parse restores, so the picker is unaffected but
+            // no value can break out of the island. It is belt-and-suspenders on
+            // top of the per-field validation in loadGoogleFontCatalog -- either
+            // alone closes the hole; both together mean a future unvalidated
+            // field added to a row still cannot inject.
+            'googleCatalog' => json_encode($catalog, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG),
+            'googleCount'   => count($catalog),
+            'googlePopular' => json_encode($popular, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG),
             'sizeMin'       => (int)($cfg['sizeMin'] ?? 8),
             'sizeMax'       => (int)($cfg['sizeMax'] ?? 160),
             'folderFonts'   => $folderFonts,
@@ -462,7 +594,23 @@ final class StylesController extends AbstractController
         if ($mode === 'system') {
             $out['fontFamily'] = $withStack(['mode' => 'system']);
         } elseif ($mode === 'google' && trim((string)($_POST['ff_google'] ?? '')) !== '') {
-            $out['fontFamily'] = $withStack(['mode' => 'google', 'google' => trim((string)$_POST['ff_google'])]);
+            // Allowlist against the catalog rather than character-filtering the
+            // POST. With 1,942 pickable families the field is no longer a closed
+            // <select>, so "is this a real Google family?" has to be answered
+            // here -- an unknown name would otherwise be written into a
+            // font-family declaration and a fonts.googleapis.com URL.
+            $name    = trim((string)$_POST['ff_google']);
+            $catalog = $this->loadGoogleFontCatalog($template, $cfg);
+            if ($catalog === [] || in_array($name, array_column($catalog, 0), true)) {
+                $family  = ['mode' => 'google', 'google' => $name];
+                // Resolved once, at save, so the render-time emitter never has
+                // to open the 88KB catalog on a client page view.
+                $weights = $this->googleWeightsFor($catalog, $cfg, $name);
+                if ($weights !== []) {
+                    $family['googleWeights'] = $weights;
+                }
+                $out['fontFamily'] = $withStack($family);
+            }
         } elseif ($mode === 'folder' && trim((string)($_POST['ff_folder'] ?? '')) !== '') {
             // Self-hosted: the admin types the font-face NAME; Hooks @font-faces a
             // matching file in assets/fonts/custom. Allow letters/digits/space/_/-.

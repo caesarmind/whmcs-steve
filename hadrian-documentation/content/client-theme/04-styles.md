@@ -161,7 +161,7 @@ One typeface is applied across the whole client area - there is no separate head
 | --- | --- | --- |
 | Default | Nothing | Bundled with the theme |
 | System fonts | Nothing | The visitor's own device |
-| Google Font | One stylesheet, five weights | fonts.googleapis.com |
+| Google Font | One stylesheet, up to five weights | fonts.googleapis.com |
 | Self-hosted font | One font file | Your own domain |
 :::
 
@@ -204,7 +204,15 @@ The difference from **Default** is narrow but real: Default prefers Inter on Win
 
 :::shot img/font-google.png
 
-Choose from twelve curated families: Inter, Roboto, Open Sans, Lato, Poppins, Montserrat, Nunito Sans, Work Sans, Manrope, DM Sans, Source Sans 3 and Plus Jakarta Sans.
+The **whole Google Fonts library** is available here - every family Google publishes, close to 1,900 of them.
+
+Clicking the field opens a searchable picker. Type to narrow by name, or filter by category with the row of chips: Sans, Serif, Display, Handwriting, Mono. Each row previews itself **in its own typeface**, with its category and how many weights it ships beside the name, so you can read a face before choosing it.
+
+Twelve UI-grade families sit pinned at the top under **Popular** - Inter, Roboto, Open Sans, Lato, Poppins, Montserrat, Nunito Sans, Work Sans, Manrope, DM Sans, Source Sans 3 and Plus Jakarta Sans. These are the safe picks for a client area if you would rather not go browsing.
+
+:::tip Previews come from Google, the choice does not
+The picker reads its list from a catalogue shipped inside the theme, so the list works with no internet connection. Only the little previews are fetched live from `fonts.googleapis.com` - if that is blocked, names simply render in the admin font and everything else behaves the same.
+:::
 
 Selecting one emits three tags into every client-area page - two preconnects and the stylesheet:
 
@@ -216,7 +224,7 @@ Selecting one emits three tags into every client-area page - two preconnects and
 
 Three details are worth knowing:
 
-- **Five weights are fetched** - 300, 400, 500, 600 and 700. That covers the whole Hadrian type scale, so no weight falls back to a synthesised bold.
+- **Up to five weights are fetched** - 300, 400, 500, 600 and 700, which is the whole Hadrian type scale, so no weight falls back to a synthesised bold. Hadrian asks only for the ones your chosen family actually ships: pick a display face that comes in a single weight and the URL asks for that one weight, not five.
 - **`display=swap`** means text is painted immediately in the fallback face and swapped when the font arrives. Nothing is ever invisible while loading.
 - The token becomes `'Poppins', system-ui, sans-serif` - your font, then the visitor's own OS font if it fails to load.
 
