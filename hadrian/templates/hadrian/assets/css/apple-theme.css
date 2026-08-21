@@ -3891,7 +3891,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .homepage-nav .nav-chevron { width: 10px; height: 10px; margin-left: 2px; opacity: 0.6; }
 
 /* Topnav: items driven by $primaryNavbar */
-.homepage-nav .nav-item { color: var(--color-text-primary); opacity: 0.85; font-size: var(--text-sm); text-decoration: none; transition: opacity 0.15s; padding: 0; }
+.homepage-nav .nav-item { display: inline-flex; align-items: center; color: var(--color-text-primary); opacity: 0.85; font-size: var(--text-sm); text-decoration: none; transition: opacity 0.15s; padding: 0; }
 .homepage-nav .nav-item:hover { opacity: 1; text-decoration: none; }
 .homepage-nav .nav-item-right { margin-left: auto; }
 .homepage-nav .nav-cta { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 999px; background: var(--color-accent); color: var(--color-surface) !important; font-weight: var(--fw-medium); font-size: var(--text-sm); text-decoration: none; opacity: 1; transition: opacity 0.15s; }
