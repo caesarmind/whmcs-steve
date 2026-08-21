@@ -67,6 +67,12 @@
        sub-panel and the next full-weight row, since .mt-row-with-sub already
        suppresses its own bottom border to let this one carry it. */
     .mt-row-sub { padding: 4px 0 18px 22px; border-bottom: 1px solid var(--mt-border); }
+    /* The same courtesy admin.css already extends to .mt-row:last-child. A
+       group closing on a sub-panel (Order Category Sidebar, Website Section
+       Sidebar, Card Titles Outside the Box, Custom Language List) was
+       drawing a line across the gap to the next group's head -- a separator
+       between two rows, used where there is no next row to separate from. */
+    .mt-set-group > .mt-row-sub:last-child { border-bottom: 0; }
     .mt-row-sub[hidden] { display: none; }
     .mt-row-sub-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
     .mt-row-sub-title { font-size: 14px; font-weight: 500; margin: 0; }
