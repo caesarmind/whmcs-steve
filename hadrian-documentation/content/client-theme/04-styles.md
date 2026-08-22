@@ -20,19 +20,7 @@ Hadrian stores changed variables in the WHMCS database against the active templa
 
 ## The style editor
 
-Open **Hadrian -> Styles**, then **Customize** on the style you want to work on. The screen has three fixed parts.
-
-### Tabs
-
-:::shot img/editor-tabs.png The two top-level tabs.
-
-**Style Variables** holds every variable - the sub-sections below. **Custom CSS** is a plain editor for rules the variables do not reach.
-
-### Sub-sections
-
-:::shot img/editor-subnav.png The sub-sections, down the left of the editor.
-
-Colors is stored **per style preset**. Typography, General, Navigation, Buttons, Forms and Elements are stored **once and shared by every preset** - changing a button radius, or the site's font, changes it whichever style is active.
+Open **Hadrian -> Styles**, then **Customize** on the style you want to work on. **Style Variables** holds every variable, grouped into the sub-sections below: Colors is stored **per style preset**, while Typography, General, Navigation, Buttons, Forms and Elements are stored **once and shared by every preset** - changing a button radius, or the site's font, changes it whichever style is active. **Custom CSS** is a plain editor for rules the variables do not reach.
 
 ### The save bar
 
@@ -57,8 +45,6 @@ Whether visitors ever see the dark palette is a separate setting under **Setting
 :::shot img/colors-presets.png The six presets that ship with the theme.
 
 **Default**, **Emerald**, **Violet**, **Rose**, **Amber** and **Slate**. Clicking one updates the brand fields - accent, accent hover, accent tint and link - and leaves every other variable alone. They are a starting point, not a lock: tweak any value afterwards.
-
-:::shot img/presets-applied.png The same six presets rendered on real client-area components.
 
 ### Generate from one colour
 
