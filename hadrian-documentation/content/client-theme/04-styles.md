@@ -2,7 +2,7 @@
 title: Style Manager
 group: Configuration
 icon: palette
-lead: Recolour and restyle the whole client area from one screen. Pick a preset, generate a palette from a single brand colour, or edit any of the 60 design tokens by hand - no template files, no CSS knowledge required.
+lead: Recolour and restyle the whole client area from one screen. Pick a preset, generate a palette from a single brand colour, or edit any of the design tokens by hand - no template files, no CSS knowledge required.
 ---
 
 ## Introduction
@@ -11,7 +11,7 @@ Hadrian is built entirely on CSS custom properties. Every colour, font size, rad
 
 Two things follow from that, and both are worth knowing before you change anything:
 
-- **Only tokens you actually change are stored.** Editing one value does not freeze the other 59. Anything you leave alone keeps tracking the preset, so a theme update that improves a default still reaches you.
+- **Only tokens you actually change are stored.** Editing one value does not freeze the rest. Anything you leave alone keeps tracking the preset, so a theme update that improves a default still reaches you.
 - **Changes apply site-wide, immediately.** There is no publish step; the tokens are written into the page head on the next request.
 
 :::info Where the values live
@@ -26,17 +26,17 @@ Open **Hadrian -> Styles**, then **Customize** on the style you want to work on.
 
 :::shot img/editor-tabs.png The two top-level tabs.
 
-**Style Variables** holds everything token-based - the six sub-sections below. **Custom CSS** is a plain editor for rules the token system does not reach.
+**Style Variables** holds everything token-based - the sub-sections below. **Custom CSS** is a plain editor for rules the token system does not reach.
 
 ### Sub-sections
 
-:::shot img/editor-subnav.png The six sub-sections, down the left of the editor.
+:::shot img/editor-subnav.png The sub-sections, down the left of the editor.
 
-Colors and Typography are stored **per style preset**. General, Buttons, Forms and Elements are stored **once and shared by every preset** - changing a button radius changes it whichever style is active.
+Colors is stored **per style preset**. Typography, General, Navigation, Buttons, Forms and Elements are stored **once and shared by every preset** - changing a button radius, or the site's font, changes it whichever style is active.
 
 ### The save bar
 
-Pinned to the bottom of the window and always visible. It carries **Cancel**, **Restore defaults** on the left, and a save button named for the section you are in - Save changes, Save typography, Save buttons, and so on.
+Pinned to the bottom of the window and always visible. It always carries **Cancel** and a save button named for the section you are in - Save changes, Save typography, Save buttons, and so on. Most sections also add a reset button on the far left that clears just that section back to its shipped values - **Restore defaults** on Colors, **Reset all to default** on General, Navigation, Buttons, Forms and Elements. Typography has no reset button.
 
 :::warn Each section saves on its own
 The save bar saves only the section you are looking at. Edit Colors, switch to Typography, press Save typography, and your colour edits are gone. Save before moving between sub-sections.
@@ -69,7 +69,7 @@ If no preset matches your brand, build a whole palette from one hex value.
 :::steps
 1. Enter your brand colour in **BRAND COLOUR**, or pick it with the swatch.
 2. Under **WHAT TO REBUILD**, choose which families to touch - **Brand**, **Neutrals**, **Status**, **Icons & blocks**. Anything you deselect keeps its current values.
-3. Adjust **NEUTRAL TINT** to warm the greys toward your brand hue, or leave it for pure neutrals.
+3. Adjust **NEUTRAL TINT** to control how much of your brand hue bleeds into the greys - it starts at 30%. Drag it to 0 for pure, hue-free neutrals, or higher for a stronger wash.
 4. Press **Generate**, then **Save changes**.
 :::
 
@@ -92,13 +92,13 @@ The accent and everything derived from it. `Accent` is the single colour that ma
 
 :::shot img/group-surfaces.png
 
-Page background and three levels of card. `Page` is the body; `Surface` is a card on it; `Surface 2` and `Surface 3` are for panels nested inside cards, such as a table header inside a card.
+Page background and three levels of card. `Page` is the body; `Surface` is a card on it. `Surface 2` is an inset on a card - a field, a well, a table header. `Surface 3` sits one step further and is mostly used as a hover background on rows and list items; its ordinal also flips between modes, lighter than Surface 2 in light mode but darker than it in dark mode.
 
 ### Text
 
 :::shot img/group-text.png
 
-Four levels of ink. `Primary` for headings and body, `Secondary` for supporting copy, `Tertiary` for captions and metadata, `Quaternary` for disabled or de-emphasised text.
+Four levels of ink. `Primary` for headings and body, `Secondary` for supporting copy, `Tertiary` for captions and metadata, `Quaternary` for placeholder text in empty fields.
 
 :::warn Keep contrast in mind when you darken surfaces
 These are tuned to pass WCAG AA against the shipped surfaces. If you darken `Page` or `Surface` substantially, check the text levels still read.
@@ -114,7 +114,7 @@ These are tuned to pass WCAG AA against the shipped surfaces. If you darken `Pag
 
 :::shot img/group-status.png
 
-Success, Warning, Danger, Info and Neutral, each with three tokens: the solid colour, a `text` variant tuned to read on a light tint, and a translucent `fill` for the badge background. These drive invoice states, service status pills and alerts.
+Success, Warning and Danger each have three tokens: the solid colour, a `text` variant tuned to read on a light tint, and a translucent `fill` for the badge background. Info and Neutral have only two - `text` and `fill` - since neither has a separate solid dot colour. These drive invoice states, service status pills and alerts.
 
 :::info Change all three together
 The `text` and `fill` variants are separate tokens so the pair can hit AA contrast. Recolouring only the solid one leaves badges in the old hue.
@@ -138,11 +138,11 @@ Nine named hues used for service and product icons, plus the two-stop gradient b
 
 :::shot img/group-blocks.png
 
-Three accents used by dashboard block headers, so adjacent blocks can be told apart at a glance.
+Three accents you can apply to a whole dashboard block - background, border and text together - so adjacent blocks can be told apart at a glance.
 
 ### Reset to the shipped palette
 
-Under the presets there is a **Reset to the Default preset** link. It discards your colour edits for the current style and restores what it shipped with.
+Under the presets there is a **Reset to the [style name] preset** link, named for whichever style you are editing - for example "Reset to the Nova preset". It discards your colour edits for that style and restores the palette it shipped with.
 
 :::warn Reset cannot be undone
 It clears the stored colour tokens for that style. Note your hex values somewhere first if you might want them back.
@@ -171,14 +171,14 @@ One typeface is applied across the whole client area - there is no separate head
 
 The shipped stack, and the only mode that writes no token at all - the value already in the theme's stylesheet stands.
 
-That value asks for San Francisco first, so Apple devices use their system face. Everywhere else it falls through to **Inter**, which ships inside the theme and is already declared, so nothing is fetched over the network.
+That value asks for the visitor's own system font first, so each platform uses its native face. Everywhere it does not recognise, it falls through to **Inter**, which ships inside the theme and is already declared, so nothing is fetched over the network.
 
 ```css
--apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
-'Inter', 'Segoe UI', Roboto, ... , sans-serif
+system-ui, 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+'Helvetica Neue', Helvetica, Arial, sans-serif
 ```
 
-Leave it here unless you have a brand typeface. It is the fastest of the four and looks native on Apple hardware.
+Leave it here unless you have a brand typeface. It is the fastest of the four and looks native on every platform.
 
 #### System fonts
 
@@ -187,10 +187,10 @@ Leave it here unless you have a brand typeface. It is the fastest of the four an
 Every visitor sees their own operating system's interface font. Segoe UI on Windows, San Francisco on Mac and iOS, the system default on Linux.
 
 ```css
-system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif
+system-ui, 'Segoe UI', Roboto, sans-serif
 ```
 
-`system-ui` is the modern keyword for "whatever this OS uses for its own interface". `-apple-system` follows it only as a backstop for older Safari.
+`system-ui` is the modern keyword for "whatever this OS uses for its own interface" - the same three faces named above, resolved with one keyword instead of one per platform.
 
 No `<link>` and no `@font-face` are emitted, so **nothing downloads at all**.
 
@@ -198,7 +198,7 @@ No `<link>` and no `@font-face` are emitted, so **nothing downloads at all**.
 Text paints on the first frame because there is no font to wait for, and the client area matches the surrounding OS. Pick this when speed matters more than exact brand typography.
 :::
 
-The difference from **Default** is narrow but real: Default prefers Inter on Windows and Linux, giving you the same face across non-Apple platforms; System fonts gives each platform its own.
+In practice this looks almost identical to **Default** - both lead with `system-ui`, so most visitors see the same face either way. The difference is in the fallback tail: Default's stack ends in Inter, bundled with the theme, for the rare browser that does not recognise `system-ui`; System fonts has no such backstop.
 
 #### Google Font
 
@@ -224,7 +224,7 @@ Selecting one emits three tags into every client-area page - two preconnects and
 
 Three details are worth knowing:
 
-- **Up to five weights are fetched** - 300, 400, 500, 600 and 700, which is the whole Hadrian type scale, so no weight falls back to a synthesised bold. Hadrian asks only for the ones your chosen family actually ships: pick a display face that comes in a single weight and the URL asks for that one weight, not five.
+- **Up to five weights are fetched** - 300, 400, 500, 600 and 700. That is five of Hadrian's six weight tokens; the sixth, `--fw-black` (900), is never requested from Google, so text set to that weight is browser-synthesised bold whenever a Google font is active. Hadrian asks only for the five weights your chosen family actually ships: pick a display face that comes in a single weight and the URL asks for that one weight, not five.
 - **`display=swap`** means text is painted immediately in the fallback face and swapped when the font arrives. Nothing is ever invisible while loading.
 - The token becomes `'Poppins', system-ui, sans-serif` - your font, then the visitor's own OS font if it fails to load.
 
@@ -260,35 +260,66 @@ Hadrian looks for `woff2`, `woff`, `ttf` and `otf`, in that order, and uses the 
 The rule declares `font-weight: 100 900`, which is correct for a **variable** font and wrong for a static one. Upload a variable file if you have it. With a static single-weight file the browser will synthesise the other weights, and bold text will look smeared.
 :::
 
-**Keep the device's system font on Apple** is offered on this mode only. Ticking it puts `-apple-system, BlinkMacSystemFont` at the front of the stack, so Apple devices keep San Francisco and your face is used everywhere else - useful when your brand font exists mainly to replace the plain Windows default.
+**Keep the device's own system font first** is offered on this mode only. Ticking it puts `system-ui` at the front of the stack, so every visitor's own OS font - San Francisco on Mac and iOS, Segoe UI on Windows, and so on - takes priority everywhere, with your uploaded font as the fallback behind it. Useful when you would rather every platform keep its native feel and only fall back to your brand font where the browser cannot resolve a system font at all.
 
 #### How it's written into the system
 
-Each mode shows this field beneath it. It is **editable, not a preview**: whatever it contains is exactly what gets written to `--font-family`.
+Three of the four modes show this field beneath them - System fonts, Google Font and Self-hosted font. Default has none, because (as above) it writes no token at all. Where it appears, it is **editable, not a preview**: whatever it contains is exactly what gets written to `--font-family`.
 
-The two halves are independent. The radio button decides what gets **loaded** - the Google stylesheet, the `@font-face`, or nothing. This field decides what gets **applied**. That is what lets the Apple-first trick work: the font still downloads, but the stack asks for San Francisco first, so only non-Apple devices ever use it.
+The two halves are independent. The radio button decides what gets **loaded** - the Google stylesheet, the `@font-face`, or nothing. This field decides what gets **applied**. That is what lets the system-font-first trick on Self-hosted font work: the uploaded font still downloads, but the stack asks for the visitor's own OS font first, so only a browser that cannot resolve `system-ui` at all ever falls through to it.
 
-Edit it if you need a fallback the defaults do not give you - a specific CJK face, say, or a monospace stack. Only letters, digits, spaces, commas, quotes and hyphens are kept; anything else is stripped on save.
+Edit it if you need a fallback the defaults do not give you - a specific CJK face, say, or a monospace stack. Only letters, digits, spaces, commas, quotes and hyphens ever reach the live page; anything else is silently dropped whenever the front-end page head is built, not when you save the form.
 
 ### Font Size and Font Weight
 
-Below Font Family, these expose the type scale. Each step is its own token - `--text-xs` through `--text-2xl` - so you can change one size without shifting the rest.
+Below Font Family, Font Size exposes the full type scale, grouped under three headings you will see in the panel: **Body** (`--text-xs` through `--text-3xl`), **Headings** (`--text-h6` through `--text-h1`) and **Display** (`--text-display-sm` through `--text-display-xl`). Each step is its own token, so you can change one size without shifting the rest.
+
+Font Weight lists six weight tokens - `--fw-light` through `--fw-black` - each a dropdown offering the standard weight values from 100 to 900, so any element's boldness can be tuned independently of the others.
+
+## Navigation
+
+The measurements of the main menu, in pixels. Colours for the same bars are in **Colors** (the *Navigation & bars* group) and their type is in **Typography** - this section is only the geometry.
+
+Hover (or tab to) the (i) next to each field to see which layouts it affects - that line is worked out from the layouts themselves rather than written by hand, so it stays right if you add or remove one.
+
+:::props
+| Field | Default | Applies to |
+| --- | --- | --- |
+| Logo height | 28px | Every main menu layout |
+| Menu icon tile | 26px | Top Navigation, Sidebar, Icon Rail |
+| Menu icon glyph | 15px | Top Navigation, Sidebar, Icon Rail |
+| Sidebar width | 260px | Sidebar |
+| Topbar height | 44px | Sidebar, Icon Rail |
+| Rail width | 80px | Icon Rail |
+| Rail flyout width | 240px | Icon Rail |
+| Top nav height | 44px | Top Navigation |
+| Top nav icon | 14px | Top Navigation |
+| Minimal bar height | 52px | Topbar Minimal |
+:::
+
+:::info Topbar height applies to Sidebar and Icon Rail, not Top Navigation
+The inner topbar is rendered for every layout *except* Top Navigation, which has its own navbar - sized by **Top nav height** - instead. The admin derives that line from the layouts themselves, so it is right even though it reads backwards.
+:::
+
+Only one main menu layout is active at a time, so a field for a layout you do not run changes nothing until you switch to it. The values are kept either way, so switching back restores what you set.
+
+:::info These moved here from the Layout Manager
+They used to sit in the Layout Manager's **Containers** section. Any values you had already saved came across with them - nothing to redo.
+:::
 
 ## General, Buttons, Forms and Elements
 
-The remaining sub-sections cover component variables. They behave alike: colours are picked from the palette you already set, so they follow your accent and dark mode automatically, and only values you change are saved.
+The remaining sub-sections cover component variables. They share one habit: only the values you change are saved. Buttons and Forms also let you recolour from the palette you already set, so those colours track your accent and dark mode; General and Elements are shape and timing only - General has no colour fields at all, and Elements keeps its colours in the Colors panel.
 
-:::props
 | Section | What it controls |
 | --- | --- |
-| General | Shared UI variables - the radius, spacing and shadow steps used across components |
+| General | Shared UI variables - corner radius, shadow depth, control padding, and animation (transition) speed, used across components |
 | Buttons | A size tier per button scale (font size, weight, line height, radius) plus per-variant colours. Height follows the font size automatically |
-| Forms | Input, select and textarea sizing, and the colours for field, border, placeholder and focus |
-| Elements | Remaining component variables not covered above |
-:::
+| Forms | Field, label and checkbox/radio sizing (font size, weight, radius, border width), plus their colours - field background, border, text, placeholder and focus, label text colour, and the checkbox/radio accent colour |
+| Elements | Card shape (radius, shadow, padding) and the pagination button radius - no colours here, those stay in the Colors panel |
 
 :::info These are shared across styles
-Unlike Colors and Typography, the component sections are not stored per preset. Changing a button radius changes it whichever style is active.
+Unlike Colors, the component sections - and Typography - are not stored per preset. Changing a button radius, or the site's font, changes it whichever style is active.
 :::
 
 ## Custom CSS
@@ -312,29 +343,3 @@ Write against the tokens rather than fixed values, and your rules keep working w
 :::
 
 To find the token behind any element, open your browser's developer tools, inspect it, and read the custom property in the Styles panel.
-
-## Common problems
-
-### A colour change did nothing
-
-Three usual causes, in order of likelihood:
-
-- **You saved the wrong section.** Colours are saved by **Save changes** in Colors, not by Save typography.
-- **You edited the wrong scope.** Check the **EDITING Light / Dark** toggle matches the mode you are viewing.
-- **A Custom CSS rule is overriding the token.** Custom CSS loads after the token block, so it wins.
-
-### Dark mode looks wrong after generating
-
-**Generate** writes only the scope selected in the toggle above it. Switch **EDITING** to Dark and generate again.
-
-### Custom CSS is white-on-white in dark mode
-
-A hard-coded colour. Replace it with the matching token - see the warning under [Custom CSS](/client-theme/styles/#custom-css).
-
-### Badges are the wrong colour after a recolour
-
-Each status has three tokens - solid, `text` and `fill`. Changing only the solid one leaves the badge background and label behind. See [Status & badges](/client-theme/styles/#status-badges).
-
-### Everything needs to go back
-
-**Reset to the Default preset** in Colors restores the colour tokens; **Restore defaults** in the save bar restores the section you are in. Neither can be undone.
