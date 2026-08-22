@@ -2,20 +2,20 @@
 title: Style Manager
 group: Configuration
 icon: palette
-lead: Recolour and restyle the whole client area from one screen. Pick a preset, generate a palette from a single brand colour, or edit any of the design tokens by hand - no template files, no CSS knowledge required.
+lead: Recolour and restyle the whole client area from one screen. Pick a preset, generate a palette from a single brand colour, or edit any of the design variables by hand - no template files, no CSS knowledge required.
 ---
 
 ## Introduction
 
-Hadrian is built entirely on CSS custom properties. Every colour, font size, radius and border in the client area resolves to a named token, and the Style Manager is the editor for those tokens.
+Hadrian is built entirely on CSS variables. Every colour, font size, radius and border in the client area resolves to a named variable, and the Style Manager is the editor for those variables.
 
 Two things follow from that, and both are worth knowing before you change anything:
 
-- **Only tokens you actually change are stored.** Editing one value does not freeze the rest. Anything you leave alone keeps tracking the preset, so a theme update that improves a default still reaches you.
-- **Changes apply site-wide, immediately.** There is no publish step; the tokens are written into the page head on the next request.
+- **Only variables you actually change are stored.** Editing one value does not freeze the rest. Anything you leave alone keeps tracking the preset, so a theme update that improves a default still reaches you.
+- **Changes apply site-wide, immediately.** There is no publish step; the variables are written into the page head on the next request.
 
 :::info Where the values live
-Hadrian stores changed tokens in the WHMCS database against the active template, not in files on disk. No theme directory needs to be writable, and your customisations survive re-uploading the theme.
+Hadrian stores changed variables in the WHMCS database against the active template, not in files on disk. No theme directory needs to be writable, and your customisations survive re-uploading the theme.
 :::
 
 ## The style editor
@@ -26,7 +26,7 @@ Open **Hadrian -> Styles**, then **Customize** on the style you want to work on.
 
 :::shot img/editor-tabs.png The two top-level tabs.
 
-**Style Variables** holds everything token-based - the sub-sections below. **Custom CSS** is a plain editor for rules the token system does not reach.
+**Style Variables** holds every variable - the sub-sections below. **Custom CSS** is a plain editor for rules the variables do not reach.
 
 ### Sub-sections
 
@@ -56,7 +56,7 @@ Whether visitors ever see the dark palette is a separate setting under **Setting
 
 :::shot img/colors-presets.png The six presets that ship with the theme.
 
-**Default**, **Emerald**, **Violet**, **Rose**, **Amber** and **Slate**. Clicking one cascades the brand fields - accent, accent hover, accent tint and link - and leaves every other token alone. They are a starting point, not a lock: tweak any value afterwards.
+**Default**, **Emerald**, **Violet**, **Rose**, **Amber** and **Slate**. Clicking one updates the brand fields - accent, accent hover, accent tint and link - and leaves every other variable alone. They are a starting point, not a lock: tweak any value afterwards.
 
 :::shot img/presets-applied.png The same six presets rendered on real client-area components.
 
@@ -92,7 +92,7 @@ The accent and everything derived from it. `Accent` is the single colour that ma
 
 :::shot img/group-surfaces.png
 
-Page background and three levels of card. `Page` is the body; `Surface` is a card on it. `Surface 2` is an inset on a card - a field, a well, a table header. `Surface 3` sits one step further and is mostly used as a hover background on rows and list items; its ordinal also flips between modes, lighter than Surface 2 in light mode but darker than it in dark mode.
+Page background and three levels of card. `Page` is the body; `Surface` is a card on it. `Surface 2` is an inset on a card - a field, a well, a table header. `Surface 3` sits one step further and is mostly used as a hover background on rows and list items. Which one is lighter also flips between modes: Surface 3 is lighter than Surface 2 in light mode, but darker than it in dark mode.
 
 ### Text
 
@@ -101,7 +101,7 @@ Page background and three levels of card. `Page` is the body; `Surface` is a car
 Four levels of ink. `Primary` for headings and body, `Secondary` for supporting copy, `Tertiary` for captions and metadata, `Quaternary` for placeholder text in empty fields.
 
 :::warn Keep contrast in mind when you darken surfaces
-These are tuned to pass WCAG AA against the shipped surfaces. If you darken `Page` or `Surface` substantially, check the text levels still read.
+These are tuned to stay easy to read against the shipped surfaces. If you darken `Page` or `Surface` substantially, check the text levels still read clearly.
 :::
 
 ### Borders
@@ -114,10 +114,10 @@ These are tuned to pass WCAG AA against the shipped surfaces. If you darken `Pag
 
 :::shot img/group-status.png
 
-Success, Warning and Danger each have three tokens: the solid colour, a `text` variant tuned to read on a light tint, and a translucent `fill` for the badge background. Info and Neutral have only two - `text` and `fill` - since neither has a separate solid dot colour. These drive invoice states, service status pills and alerts.
+Success, Warning and Danger each have three variables: the solid colour, a `text` version tuned to stay readable on a light tint, and a translucent `fill` for the badge background. Info and Neutral have only two - `text` and `fill` - since neither has a separate solid dot colour. These drive invoice states, service status pills and alerts.
 
 :::info Change all three together
-The `text` and `fill` variants are separate tokens so the pair can hit AA contrast. Recolouring only the solid one leaves badges in the old hue.
+The `text` and `fill` versions are separate variables so the pair can stay readable together. Recolouring only the solid one leaves badges in the old colour.
 :::
 
 ### Navigation & bars
@@ -126,7 +126,7 @@ The `text` and `fill` variants are separate tokens so the pair can hit AA contra
 
 The whole navigation shell - sidebar, topbar, flyout panel, item hover and active states, scrollbar.
 
-The **STYLE** row at the top is a shortcut: **Light**, **Tinted**, **Brand**, **Dark** and **Gradient** each write a coordinated set of sidebar tokens in one click. The individual rows below stay editable afterwards, so a named style is a starting point too.
+The **STYLE** row at the top is a shortcut: **Light**, **Tinted**, **Brand**, **Dark** and **Gradient** each set a coordinated group of sidebar variables in one click. The individual rows below stay editable afterwards, so a named style is a starting point too.
 
 ### Icons & avatars
 
@@ -145,7 +145,7 @@ Three accents you can apply to a whole dashboard block - background, border and 
 Under the presets there is a **Reset to the [style name] preset** link, named for whichever style you are editing - for example "Reset to the Nova preset". It discards your colour edits for that style and restores the palette it shipped with.
 
 :::warn Reset cannot be undone
-It clears the stored colour tokens for that style. Note your hex values somewhere first if you might want them back.
+It clears the stored colour variables for that style. Note your hex values somewhere first if you might want them back.
 :::
 
 ## Typography
@@ -154,7 +154,7 @@ It clears the stored colour tokens for that style. Note your hex values somewher
 
 :::shot img/type-family.png The four font modes.
 
-One typeface is applied across the whole client area - there is no separate heading face. Pick one of four modes. They differ in what gets **loaded** (a network request, or none) and what gets **written** into the `--font-family` token.
+One typeface is applied across the whole client area - there is no separate heading face. Pick one of four modes. They differ in what gets **loaded** (a network request, or none) and what gets **written** into the `--font-family` variable.
 
 :::props
 | Mode | Loads | Where from |
@@ -169,7 +169,7 @@ One typeface is applied across the whole client area - there is no separate head
 
 :::shot img/font-default.png
 
-The shipped stack, and the only mode that writes no token at all - the value already in the theme's stylesheet stands.
+The shipped stack, and the only mode that writes no variable at all - the value already in the theme's stylesheet stands.
 
 That value asks for the visitor's own system font first, so each platform uses its native face. Everywhere it does not recognise, it falls through to **Inter**, which ships inside the theme and is already declared, so nothing is fetched over the network.
 
@@ -224,9 +224,9 @@ Selecting one emits three tags into every client-area page - two preconnects and
 
 Three details are worth knowing:
 
-- **Up to five weights are fetched** - 300, 400, 500, 600 and 700. That is five of Hadrian's six weight tokens; the sixth, `--fw-black` (900), is never requested from Google, so text set to that weight is browser-synthesised bold whenever a Google font is active. Hadrian asks only for the five weights your chosen family actually ships: pick a display face that comes in a single weight and the URL asks for that one weight, not five.
+- **Up to five weights are fetched** - 300, 400, 500, 600 and 700. That is five of Hadrian's six weight variables; the sixth, `--fw-black` (900), is never requested from Google, so text set to that weight is faked-bold by the browser whenever a Google font is active. Hadrian asks only for the five weights your chosen family actually ships: pick a display face that comes in a single weight and the URL asks for that one weight, not five.
 - **`display=swap`** means text is painted immediately in the fallback face and swapped when the font arrives. Nothing is ever invisible while loading.
-- The token becomes `'Poppins', system-ui, sans-serif` - your font, then the visitor's own OS font if it fails to load.
+- The variable becomes `'Poppins', system-ui, sans-serif` - your font, then the visitor's own OS font if it fails to load.
 
 :::warn This adds a third-party request
 Every client-area page will contact `fonts.googleapis.com` and `fonts.gstatic.com`. If your privacy policy or a GDPR assessment rules out third-party requests, use **Self-hosted font** instead - the same typeface, served from your own domain.
@@ -264,7 +264,7 @@ The rule declares `font-weight: 100 900`, which is correct for a **variable** fo
 
 #### How it's written into the system
 
-Three of the four modes show this field beneath them - System fonts, Google Font and Self-hosted font. Default has none, because (as above) it writes no token at all. Where it appears, it is **editable, not a preview**: whatever it contains is exactly what gets written to `--font-family`.
+Three of the four modes show this field beneath them - System fonts, Google Font and Self-hosted font. Default has none, because (as above) it writes no variable at all. Where it appears, it is **editable, not a preview**: whatever it contains is exactly what gets written to `--font-family`.
 
 The two halves are independent. The radio button decides what gets **loaded** - the Google stylesheet, the `@font-face`, or nothing. This field decides what gets **applied**. That is what lets the system-font-first trick on Self-hosted font work: the uploaded font still downloads, but the stack asks for the visitor's own OS font first, so only a browser that cannot resolve `system-ui` at all ever falls through to it.
 
@@ -272,9 +272,9 @@ Edit it if you need a fallback the defaults do not give you - a specific CJK fac
 
 ### Font Size and Font Weight
 
-Below Font Family, Font Size exposes the full type scale, grouped under three headings you will see in the panel: **Body** (`--text-xs` through `--text-3xl`), **Headings** (`--text-h6` through `--text-h1`) and **Display** (`--text-display-sm` through `--text-display-xl`). Each step is its own token, so you can change one size without shifting the rest.
+Below Font Family, Font Size exposes the full type scale, grouped under three headings you will see in the panel: **Body** (`--text-xs` through `--text-3xl`), **Headings** (`--text-h6` through `--text-h1`) and **Display** (`--text-display-sm` through `--text-display-xl`). Each step is its own variable, so you can change one size without shifting the rest.
 
-Font Weight lists six weight tokens - `--fw-light` through `--fw-black` - each a dropdown offering the standard weight values from 100 to 900, so any element's boldness can be tuned independently of the others.
+Font Weight lists six weight variables - `--fw-light` through `--fw-black` - each a dropdown offering the standard weight values from 100 to 900, so any element's boldness can be tuned independently of the others.
 
 ## Navigation
 
@@ -324,9 +324,9 @@ Unlike Colors, the component sections - and Typography - are not stored per pres
 
 ## Custom CSS
 
-The **Custom CSS** tab takes hand-written CSS, saved with the theme and loaded on every client-area page. Use it for anything the token editor does not reach.
+The **Custom CSS** tab takes hand-written CSS, saved with the theme and loaded on every client-area page. Use it for anything the variables above do not reach.
 
-Write against the tokens rather than fixed values, and your rules keep working when the palette changes or a visitor switches to dark:
+Write against the variables rather than fixed values, and your rules keep working when the palette changes or a visitor switches to dark:
 
 ```css
 /* Follows the accent and the active palette */
@@ -338,8 +338,8 @@ Write against the tokens rather than fixed values, and your rules keep working w
 }
 ```
 
-:::warn Do not paste a hex code where a token exists
+:::warn Do not paste a hex code where a variable exists
 `background: #ffffff` stays white in dark mode and renders white-on-white. `var(--color-surface)` flips with the mode.
 :::
 
-To find the token behind any element, open your browser's developer tools, inspect it, and read the custom property in the Styles panel.
+To find the variable behind any element, open your browser's developer tools, inspect it, and look for it in the Styles panel.
