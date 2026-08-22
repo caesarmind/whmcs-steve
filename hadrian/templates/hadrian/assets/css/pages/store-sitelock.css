@@ -1,14 +1,14 @@
-/* ──────────────────────────────────────────────────────────────────────
-   store-sitelock.css — Website Security store landing.
+/* ----------------------------------------------------------------------
+   store-sitelock.css -- Website Security store landing.
    Loaded by core/pages/store-sitelock/default/default.tpl
 
    Classes named .store-* are shared across every store landing; the
    per-product specifics live under .store-sitelock. When porting the
    next store page (socialbee, ssl, etc.), copy the .store-* block into
    a shared partial and only keep the per-product overrides per-page.
-   ────────────────────────────────────────────────────────────────────── */
+   ---------------------------------------------------------------------- */
 
-/* ── shared store-landing chrome ──────────────────────────────────── */
+/* -- shared store-landing chrome ------------------------------------ */
 .store-landing {
     max-width: 960px;
     margin: 0 auto;
@@ -169,5 +169,5 @@
     line-height: 1.5;
 }
 
-/* ── per-product overrides — none for SiteLock so far ─────────────── */
+/* -- per-product overrides -- none for SiteLock so far --------------- */
 .store-sitelock {}

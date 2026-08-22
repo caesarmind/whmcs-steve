@@ -1,10 +1,10 @@
 /*
- * hadrian_cart — Apple-themed Order-form / Cart theme for WHMCS 9
+ * hadrian_cart -- Apple-themed Order-form / Cart theme for WHMCS 9
  * --------------------------------------------------------------
  * Inherits the Nexus cart SPA (Vue.js) and only overrides the
  * Shadow-DOM CSS variables it exposes (`--vl-*`).
  *
- * The SPA layout is locked by WHMCS — these variable overrides
+ * The SPA layout is locked by WHMCS -- these variable overrides
  * are the only supported customization path. Anything outside
  * the SPA (the wrapper page chrome, traditional-cart pages from
  * standard_cart, etc.) is themed via the same tokens via :root.
@@ -12,7 +12,7 @@
  * Token source: the client-area theme's --color-* tokens
  * (hadrian/templates/hadrian/assets/css/core-theme.css, mirrored for
  * standalone use by this cart's own css/style.min.css :root block).
- * Spec source: WHMCS9-Theme-Development-Documentation.md §18, §27
+ * Spec source: WHMCS9-Theme-Development-Documentation.md sections 18, 27
  */
 
 /* Light-mode tokens (default).

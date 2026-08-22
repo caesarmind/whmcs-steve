@@ -89,7 +89,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     flex-wrap: wrap;
 }
 
-/* Article body — Apple long-form typography */
+/* Article body -- Apple long-form typography */
 .article-body { padding: 24px 28px 28px; }
 .article-body p {
     font-size: var(--text-lg);
@@ -177,7 +177,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     margin: 16px 0;
 }
 
-/* Article footer — back button + share */
+/* Article footer -- back button + share */
 .article-foot {
     padding: 18px 28px 22px;
     border-top: 0.5px solid var(--color-border);

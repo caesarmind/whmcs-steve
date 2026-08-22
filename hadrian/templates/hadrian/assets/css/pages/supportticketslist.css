@@ -1,4 +1,4 @@
-/* supportticketslist forwards to supporttickets — share the styling.
+/* supportticketslist forwards to supporttickets -- share the styling.
    The WHMCS templatefile for /supporttickets.php is 'supportticketslist',
    so this CSS file must exist for the file-completeness audit. The actual
    rules live in supporttickets.css; we import them so any future

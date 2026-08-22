@@ -338,14 +338,14 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 }
 .sec-footer-row a:hover { background: var(--color-red-text); color: var(--color-surface); text-decoration: none; }
 
-/* Linked accounts — third-party OAuth provider buttons (WHMCS-rendered markup) */
+/* Linked accounts -- third-party OAuth provider buttons (WHMCS-rendered markup) */
 .sec-providers { display: flex; flex-wrap: wrap; gap: 10px; padding: 18px 24px 20px; }
 .sec-providers:empty { display: none; }
 .sec-providers a, .sec-providers button { max-width: 100%; }
 .providerLinkingFeedback { padding: 0 24px; font-size: var(--text-sm); color: var(--color-text-secondary); }
 .providerLinkingFeedback:empty { display: none; }
 
-/* Empty state — no security options enabled by the admin */
+/* Empty state -- no security options enabled by the admin */
 .sec-empty { text-align: center; padding: 56px 24px; }
 .sec-empty-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
 .sec-empty-ico svg { width: 24px; height: 24px; }
@@ -371,7 +371,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .sec-alert-warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
 .sec-alert-info { background: var(--color-accent-light); color: var(--color-accent); }
 
-/* Two-factor setup modal (user-security) — vanilla, loads the WHMCS 2FA fragment */
+/* Two-factor setup modal (user-security) -- vanilla, loads the WHMCS 2FA fragment */
 .tfa-modal { display: none; position: fixed; inset: 0; z-index: 1000; align-items: center; justify-content: center; }
 .tfa-modal.open { display: flex; }
 .tfa-modal-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); }

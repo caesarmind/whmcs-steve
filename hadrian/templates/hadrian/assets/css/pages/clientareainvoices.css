@@ -121,8 +121,8 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .inv-search input::placeholder { color: var(--color-text-tertiary); }
 @media (max-width: 600px) { .inv-search { margin-left: 0; max-width: none; width: 100%; } }
 
-/* ── Controls-inside / Controls-outside (preview chip toggle) ───────
-   Default ("inside"): the .inv-stack is one unified white card —
+/* -- Controls-inside / Controls-outside (preview chip toggle) -------
+   Default ("inside"): the .inv-stack is one unified white card --
    column titles, table, and pager share the same surface.
    "Outside": .inv-stack is transparent; only the table card keeps its
    surface and the rest (head row + footer) floats on the page bg. */
@@ -192,7 +192,7 @@ body[data-svc-layout="outside"] .inv-stack > .inv-footer { padding: 12px 4px; bo
 }
 .inv-table thead th .inv-sort-ico::before { top: 1px; border-bottom: 4px solid currentColor; }
 .inv-table thead th .inv-sort-ico::after  { bottom: 1px; border-top: 4px solid currentColor; }
-/* DataTables sort-state classes — active column lights up its arrow */
+/* DataTables sort-state classes -- active column lights up its arrow */
 .inv-table thead th.sorting_asc  { color: var(--color-text-primary); }
 .inv-table thead th.sorting_desc { color: var(--color-text-primary); }
 .inv-table thead th.sorting_asc  .inv-sort-ico::before { opacity: 1; }
@@ -308,13 +308,14 @@ body[data-svc-layout="outside"] .inv-stack > .inv-footer { padding: 12px 4px; bo
     appearance: none;
 }
 .inv-pages { display: inline-flex; gap: 2px; align-items: center; }
+/* Button radius is admin-driven: Styles > Elements > Pagination writes --pagination-radius (default sm = the var(--radius-sm) this used to hardcode). */
 .inv-pages button {
     min-width: 26px;
     height: 26px;
     padding: 0 8px;
     border: 0;
     background: transparent;
-    border-radius: var(--radius-sm);
+    border-radius: var(--pagination-radius);
     font-size: var(--text-sm);
     font-weight: var(--fw-medium);
     font-family: inherit;

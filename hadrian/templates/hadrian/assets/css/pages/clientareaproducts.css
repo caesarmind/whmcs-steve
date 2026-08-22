@@ -1,10 +1,10 @@
-/* ──────────────────────────────────────────────────────────────────────
-   clientareaproducts.css — extracted from apple-client-area/clientareaproducts.html
+/* ----------------------------------------------------------------------
+   clientareaproducts.css -- extracted from apple-client-area/clientareaproducts.html
    Loaded by core/pages/clientareaproducts/default/default.tpl
-   ────────────────────────────────────────────────────────────────────── */
+   ---------------------------------------------------------------------- */
 
 
-/* Page header — Apple-leaning: bigger, tighter title, no uppercase eyebrow, subtle CTA */
+/* Page header -- Apple-leaning: bigger, tighter title, no uppercase eyebrow, subtle CTA */
 .page-header { margin: 8px 0 32px; }
 .page-header h1 {
     font-size: var(--text-h2); font-weight: var(--fw-semibold); letter-spacing: -0.028em;
@@ -31,19 +31,19 @@
 .page-header-action:hover .chev { transform: translateX(2px); }
 .page-header-action .chev { width: 12px; height: 12px; transition: transform var(--transition-fast); }
 
-/* 2-col split — main on the left, content sidebar on the right */
+/* 2-col split -- main on the left, content sidebar on the right */
 .svc-split { display: grid; grid-template-columns: 1fr 240px; gap: 24px; align-items: start; }
 @media (max-width: 880px) { .svc-split { grid-template-columns: 1fr; } }
 .svc-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 
-/* Sub-nav toggle off — hide aside, collapse to single column */
+/* Sub-nav toggle off -- hide aside, collapse to single column */
 body[data-subnav="off"] .svc-split { grid-template-columns: 1fr; }
 body[data-subnav="off"] .svc-split > aside { display: none; }
-/* Sub-nav side — put aside on the left instead of the right */
+/* Sub-nav side -- put aside on the left instead of the right */
 body[data-subnav-side="left"] .svc-split { grid-template-columns: 240px 1fr; }
 body[data-subnav-side="left"] .svc-split > aside { grid-column: 1; grid-row: 1; }
 body[data-subnav-side="left"] .svc-split > .svc-main { grid-column: 2; grid-row: 1; }
-/* Sub-nav side — float the aside in the outer gutter (right or left), outside the content column. */
+/* Sub-nav side -- float the aside in the outer gutter (right or left), outside the content column. */
 body[data-subnav-side="outside"] .svc-split,
 body[data-subnav-side="outside-left"] .svc-split { grid-template-columns: 1fr; position: relative; }
 body[data-subnav-side="outside"] .svc-split > aside,
@@ -119,7 +119,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .svc-banner .spacer { flex: 1; }
 .svc-banner .btn-secondary { height: 28px; padding: 0 12px; font-size: var(--text-sm); }
 
-/* Unified toolbar inside the services card header — search + filters + add new */
+/* Unified toolbar inside the services card header -- search + filters + add new */
 .svc-toolbar-card { padding: 0; }
 .svc-toolbar {
     display: flex; align-items: center; gap: 10px;
@@ -170,7 +170,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .svc-toolbar .btn-primary { height: 32px; padding: 0 14px; font-size: var(--text-base); }
 .svc-toolbar .btn-primary svg { width: 12px; height: 12px; }
 
-/* Services table — simplified variation: product+domain · filled status pill · date · "Manage ›" link */
+/* Services table -- simplified variation: product+domain | filled status pill | date | "Manage >" link */
 .svc-table-card { overflow: hidden; padding: 0; }
 .svc-table { width: 100%; border-collapse: collapse; font-size: var(--text-base); }
 .svc-table thead th {
@@ -188,7 +188,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .svc-table col.svc-col-due      { width: 130px; }
 .svc-table col.svc-col-status   { width: 120px; }
 .svc-table col.svc-col-actions  { width: 72px; }
-/* Hide the in-table thead — we render titles as a standalone row above the card */
+/* Hide the in-table thead -- we render titles as a standalone row above the card */
 .svc-table thead { display: none; }
 
 /* Floating column titles that sit OUTSIDE the card, on the page surface.
@@ -235,7 +235,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .svc-table tbody tr:hover { background: var(--color-surface-secondary); }
 .svc-table td { padding: 16px 20px; vertical-align: middle; color: var(--color-text-primary); }
 
-/* Product cell — bold name + gray subtitle, no icon */
+/* Product cell -- bold name + gray subtitle, no icon */
 .svc-cell-product-info { min-width: 0; line-height: 1.35; }
 .svc-cell-product-name {
     font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-text-primary);
@@ -252,7 +252,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .svc-cell-date   { text-align: center; color: var(--color-text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .svc-cell-action { text-align: right; white-space: nowrap; }
 
-/* Filled status pill — stronger green, like DigitalOcean */
+/* Filled status pill -- stronger green, like DigitalOcean */
 .svc-table .status-pill {
     padding: 4px 14px;
     font-size: var(--text-sm); font-weight: var(--fw-semibold);
@@ -267,7 +267,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .svc-table .status-pill.cancelled,
 .svc-table .status-pill.terminated{ background: var(--color-gray-bg);   color: var(--color-gray-text); }
 
-/* "Manage ›" accent-blue text link (replaces kebab in this variation) */
+/* "Manage >" accent-blue text link (replaces kebab in this variation) */
 .svc-manage-link {
     display: inline-flex; align-items: center; gap: 4px;
     font-size: var(--text-base); font-weight: var(--fw-medium); letter-spacing: -0.008em;
@@ -324,7 +324,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .svc-menu-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
 .svc-menu-item:hover svg { color: var(--color-accent); }
 
-/* Pagination footer — transparent, borderless, Apple-faithful */
+/* Pagination footer -- transparent, borderless, Apple-faithful */
 .svc-footer {
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     padding: 12px 20px;
@@ -348,10 +348,11 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .svc-page-size select:hover { background-color: var(--color-surface-secondary); }
 .svc-page-size select:focus { outline: none; background-color: var(--color-surface-secondary); box-shadow: 0 0 0 3px var(--color-accent-light); }
 .svc-pages { display: inline-flex; gap: 2px; align-items: center; }
+/* Button radius is admin-driven: Styles > Elements > Pagination writes --pagination-radius (default sm = the var(--radius-sm) this used to hardcode). */
 .svc-pages button {
     min-width: 26px; height: 26px; padding: 0 8px;
     border: 0; background: transparent;
-    border-radius: var(--radius-sm);
+    border-radius: var(--pagination-radius);
     font-size: var(--text-sm); font-weight: var(--fw-medium); font-family: inherit;
     color: var(--color-text-secondary);
     cursor: pointer;
@@ -371,9 +372,9 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .svc-main .svc-table thead th:last-child,
 .svc-main .svc-table tbody td:last-child { text-align: center; }
 
-/* ── Services layout = "outside": pull toolbar + footer out of the card visually.
+/* -- Services layout = "outside": pull toolbar + footer out of the card visually.
      Only the table (service rows) keeps the card surface; search + pagination float
-     on the page background above/below it, matching the bare-list reference. ── */
+     on the page background above/below it, matching the bare-list reference. -- */
 body[data-svc-layout="outside"] .svc-table-card {
     background: transparent;
     border: 0;
@@ -386,11 +387,11 @@ body[data-svc-layout="outside"] .svc-table-card .when-full > .svc-table {
     border-radius: var(--radius-md);
     overflow: hidden;
 }
-/* ── Services stack ─────────────────────────────────────────────
-   Default ("Controls inside"): the stack is one unified white card —
+/* -- Services stack ---------------------------------------------
+   Default ("Controls inside"): the stack is one unified white card --
    column titles, toolbar, rows, and pager all share the same surface.
    "Controls outside": the stack is transparent; only the rows card keeps
-   its surface, and the rest floats on the page. ──────────────── */
+   its surface, and the rest floats on the page. ---------------- */
 .svc-stack {
     background: var(--color-surface);
     border: 0.5px solid var(--color-border);
@@ -435,7 +436,7 @@ body[data-svc-layout="outside"] .svc-stack > .svc-footer {
 }
 /* Drop the kebab-menu overflow helper too, so the flat cards stay self-contained */
 
-/* Empty state (rendered by Smarty if/else — no .when-full/.when-empty CSS toggle) */
+/* Empty state (rendered by Smarty if/else -- no .when-full/.when-empty CSS toggle) */
 .svc-empty { padding: 48px 24px 40px; text-align: center; color: var(--color-text-secondary); }
 .svc-empty-ico { width: 52px; height: 52px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; }
 .svc-empty-ico svg { width: 22px; height: 22px; }

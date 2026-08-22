@@ -55,6 +55,20 @@
     --color-red-text:          #d70015;
     --radius-sm: 8px;
     --radius-md: 12px;
+    /* Deliberate divergence, and the reason every `var(--radius-lg, ...)`
+       below now writes 12px as its fallback rather than 14px.
+       The theme ships --radius-lg: 12px (core-theme.css) and the admin
+       Styles > General > Corner radius > Large default is 12 to match
+       (core/config/general.php) -- Large and Medium are knowingly the same
+       number there, because splitting them would repaint every card in the
+       product. This cart wants a rounder 14px panel, so it redeclares the
+       token locally and wins on source order: core-theme.css and the admin's
+       :root override both land in <head>, while common.tpl links this file
+       from the <body>. That means the fallback after the comma can never
+       fire -- the token is always defined, here. It is kept aligned to the
+       theme's real 12px anyway, so that IF this local override is ever
+       dropped the 14 consumers below follow the theme (and the buyer's
+       admin setting) instead of silently re-pinning the stale 14px. */
     --radius-lg: 14px;
     --radius-pill: 980px;
     --transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -904,7 +918,7 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
 .st-plan {
     padding: 24px 22px 22px;
     border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     background: var(--color-surface);
     transition: all var(--transition-fast);
     position: relative;
@@ -1265,7 +1279,7 @@ body[data-plan] .st-variant-label { display: none; }
 .st-plan-b-price .currency { font-size: var(--text-md, 14px); color: var(--color-text-secondary); margin-top: 2px; }
 .st-plan-b-price .amount   { font-size: 28px; font-weight: var(--fw-semibold, 600); letter-spacing: -0.025em; color: var(--color-text-primary); line-height: 1; }
 .st-plan-b-price .period   { font-size: 11.5px; color: var(--color-text-tertiary); margin-left: 2px; }
-/* Description body for Variant B — same admin-authored HTML as Variant A,
+/* Description body for Variant B -- same admin-authored HTML as Variant A,
    smaller scale to suit the denser 4-up card chrome. See .st-plan-features
    for the full pattern. */
 .st-plan-b-specs {
@@ -1463,7 +1477,7 @@ body[data-plan] .st-variant-label { display: none; }
     grid-column: 1 / -1;
     padding: 28px 28px 24px;
     border: 0.5px solid var(--color-accent);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-surface) 70%);
     display: grid; grid-template-columns: 1fr auto; gap: 20px;
     align-items: center;
@@ -1541,7 +1555,7 @@ body[data-plan] .st-variant-label { display: none; }
     grid-template-columns: repeat(3, 1fr);
     margin: 0 20px 24px;
     border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     overflow: hidden;
     background: var(--color-surface);
 }
@@ -1619,7 +1633,7 @@ body[data-plan] .st-variant-label { display: none; }
 }
 .st-matrix-card {
     border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     background: var(--color-surface);
     display: flex; flex-direction: column;
     overflow: hidden;
@@ -1633,7 +1647,7 @@ body[data-plan] .st-variant-label { display: none; }
 .st-matrix-card.featured .st-matrix-head { border-bottom-color: rgba(0,113,227,0.2); }
 .st-matrix-eyebrow { font-size: 10.5px; font-weight: var(--fw-semibold, 600); color: var(--color-accent); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
 .st-matrix-name { font-size: var(--text-xl, 17px); font-weight: var(--fw-semibold, 600); color: var(--color-text-primary); letter-spacing: -0.014em; margin: 0; }
-/* Description body for Variant G — same admin-authored HTML as Variants A
+/* Description body for Variant G -- same admin-authored HTML as Variants A
    and B. Was previously a label/value matrix sourced from $product.features;
    now mirrors A/B so admins write one set of <ul><li>...</li></ul> and it
    renders consistently across all three variants. */
@@ -1702,7 +1716,7 @@ body[data-plan] .st-variant-label { display: none; }
 .st-addon-wrap + .st-addon-wrap { padding-top: 0; }
 .st-addon {
     border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     background: var(--color-surface);
     overflow: hidden;
 }
@@ -2907,7 +2921,7 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
 .card {
     background: var(--color-surface);
     border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
 }
 
 /* ===============================================================
@@ -2926,7 +2940,7 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
 .addon-promo-container {
     background: var(--color-surface) !important;
     border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     overflow: hidden;
     margin: 0;
 }
@@ -3136,7 +3150,7 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
 .dr-search {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     padding: 22px;
     margin-bottom: 24px;
 }
@@ -3288,7 +3302,7 @@ textarea.dr-search-input {
     padding: 14px;
     background: var(--color-surface);
     border: 0.5px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
 }
 .dr-filters-panel[hidden] { display: none; }
@@ -3412,7 +3426,7 @@ textarea.dr-search-input {
 .dr-result-card {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     padding: 20px 22px;
     margin-bottom: 24px;
     transition: border-color var(--transition-fast), background var(--transition-fast);
@@ -3568,7 +3582,7 @@ textarea.dr-search-input {
 .suggested-domains.dr-section {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     overflow: hidden;
     padding: 0;
 }
@@ -3684,7 +3698,7 @@ textarea.dr-search-input {
 .dr-pricing-table {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     overflow: hidden;
 }
 .dr-pricing-head {
@@ -3717,7 +3731,7 @@ textarea.dr-search-input {
     padding: 22px 24px;
     background: var(--color-surface-tertiary);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
     display: flex; align-items: center; justify-content: space-between;
     gap: 18px; flex-wrap: wrap;
 }
@@ -3754,7 +3768,7 @@ textarea.dr-search-input {
     padding: 60px 24px;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg, 14px);
+    border-radius: var(--radius-lg, 12px);
 }
 .dr-empty-ico {
     width: 56px; height: 56px; border-radius: 50%;

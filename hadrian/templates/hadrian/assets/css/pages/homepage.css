@@ -1,10 +1,10 @@
-/* ──────────────────────────────────────────────────────────────────────
-   homepage.css — public landing page (Apple-style hero + sections).
+/* ----------------------------------------------------------------------
+   homepage.css -- public landing page (Apple-style hero + sections).
    Mirrors apple-client-area/portal-home.html.
    Loaded by core/pages/homepage/default/default.tpl
-   ────────────────────────────────────────────────────────────────────── */
+   ---------------------------------------------------------------------- */
 
-/* ─── Hero domain search ─── */
+/* --- Hero domain search --- */
 .ph-hero { padding: 48px 22px 56px; text-align: center; }
 .ph-hero-inner { max-width: 760px; margin: 0 auto; }
 .ph-hero h1 { font-size: var(--text-h1); font-weight: var(--fw-semibold); letter-spacing: -0.025em; margin: 0 0 12px; color: var(--color-text-primary); line-height: 1.08; }
@@ -78,7 +78,7 @@
 .ph-domain-footer a { color: var(--color-accent); text-decoration: none; }
 .ph-domain-footer a:hover { text-decoration: underline; }
 
-/* ── Product categories as rows ─────────────────────────────────────────
+/* -- Product categories as rows -----------------------------------------
    Alternative to the .hp-pricing-grid card layout, chosen per-page in admin
    Pages -> Homepage -> "Categories as rows".
 
@@ -87,7 +87,7 @@
    A row absorbs a missing price in one cell and stays tidy at any count.
 
    1024px to match the marketing column used across the homepage and store
-   pages — see the other hp-* sections in core-theme.css. */
+   pages -- see the other hp-* sections in core-theme.css. */
 .hp-cat-rows {
     max-width: var(--w-prose);
     margin: 0 auto;
@@ -164,7 +164,7 @@
 }
 
 @media (max-width: 560px) {
-    /* Drop the chevron and tuck the price under the name — four columns will
+    /* Drop the chevron and tuck the price under the name -- four columns will
        not fit a phone without truncating the tagline to uselessness. */
     .hp-cat-row { grid-template-columns: 40px 1fr; gap: 14px; padding: 16px 18px; }
     .hp-cat-row .cat-mark { width: 40px; height: 40px; }
@@ -172,7 +172,7 @@
     .hp-cat-row .cat-chev { display: none; }
 }
 
-/* TLD price strip — live register prices under the hero domain search.
+/* TLD price strip -- live register prices under the hero domain search.
    Compact inline row rather than cards: it sits inside the hero, so it has to
    read as a quiet supporting rail and not compete with the search box.
    Wraps on narrow viewports instead of scrolling, so no price is ever cut off. */
@@ -199,7 +199,7 @@
     .hp-tld { padding: 4px 10px; font-size: var(--text-xs); }
 }
 
-/* Captcha — shown on the domain search when enabled for the domain checker */
+/* Captcha -- shown on the domain search when enabled for the domain checker */
 .ph-captcha {
     max-width: 480px; margin: 16px auto 0;
     display: flex; flex-direction: column; align-items: center; gap: 10px;
@@ -215,7 +215,7 @@
 }
 .ph-captcha input[type="text"]:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-light); }
 
-/* ─── Body sections ─── */
+/* --- Body sections --- */
 .ph-section {
     max-width: 1100px; margin: 0 auto;
     padding: 48px 22px 16px;

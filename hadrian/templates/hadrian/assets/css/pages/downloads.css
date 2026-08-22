@@ -1,4 +1,4 @@
-/* Downloads (Apple-style) — category browser + popular files.
+/* Downloads (Apple-style) -- category browser + popular files.
    Ported from apple-client-area/downloads.html. Prefix: .dl-* */
 
 .page-header { margin: 8px 0 24px; }
@@ -19,7 +19,7 @@
 
 .dl-content { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
 
-/* Shared sub-nav (page-local copy — see PAGE-CHECKLIST §6b) */
+/* Shared sub-nav (page-local copy -- see PAGE-CHECKLIST section 6b) */
 .subnav-card { padding: 8px; }
 .subnav-heading { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px 8px; }
 .subnav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); color: var(--color-text-primary); font-size: var(--text-base); letter-spacing: -0.008em; text-decoration: none; transition: background var(--transition-fast); }

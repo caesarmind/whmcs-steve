@@ -103,7 +103,7 @@ body[data-subnav="off"] .pd-split > .pd-aside { display: none; }
 .pd-aside .subnav-card + .subnav-card { margin-top: 4px; }
 html { scroll-behavior: smooth; }
 #pd-service-info, #pd-usage, #pd-addons, #pd-manage, #pd-billing, #pd-changepw { scroll-margin-top: 96px; }
-/* Request Cancellation — destructive accent (icon red, label reddens on hover) */
+/* Request Cancellation -- destructive accent (icon red, label reddens on hover) */
 .subnav-item-danger svg { color: var(--color-red-text); }
 .subnav-item-danger:hover { background: var(--color-red-bg); color: var(--color-red-text); }
 .subnav-item-danger:hover svg { color: var(--color-red-text); }

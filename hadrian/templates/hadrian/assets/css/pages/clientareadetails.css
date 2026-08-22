@@ -78,7 +78,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     margin: 4px 4px 0;
 }
 
-/* Email preference rows — checkbox + bold label + sub-text */
+/* Email preference rows -- checkbox + bold label + sub-text */
 .pref-row {
     display: flex;
     align-items: flex-start;

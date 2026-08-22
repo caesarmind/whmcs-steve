@@ -292,13 +292,14 @@ body[data-svc-layout="outside"] .q-stack > .q-footer { padding: 12px 4px; border
     appearance: none;
 }
 .q-pages { display: inline-flex; gap: 2px; align-items: center; }
+/* Button radius is admin-driven: Styles > Elements > Pagination writes --pagination-radius (default sm = the var(--radius-sm) this used to hardcode). */
 .q-pages button {
     min-width: 26px;
     height: 26px;
     padding: 0 8px;
     border: 0;
     background: transparent;
-    border-radius: var(--radius-sm);
+    border-radius: var(--pagination-radius);
     font-size: var(--text-sm);
     font-weight: var(--fw-medium);
     font-family: inherit;

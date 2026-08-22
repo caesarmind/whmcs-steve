@@ -1,12 +1,12 @@
-/* Error / notice (Apple-style) — IP-block page. Prefix: .err-*
+/* Error / notice (Apple-style) -- IP-block page. Prefix: .err-*
    access-denied.css carries its own copy of the shared .err-* rules; this page
    diverged because it renders full-bleed (see core/pages/banned/default/default.php).
 
    No .page-header here on purpose. Every other focused single-action page in the
    theme (pwreset, two-factor-challenge, user-verify-email, invoice-payment,
    login) renders the card alone with no heading above it. This page used to be
-   the exception, and its h1 restated the card's own h2 — "Account suspended"
-   directly above "Your account access is suspended" — at twice the width,
+   the exception, and its h1 restated the card's own h2 -- "Account suspended"
+   directly above "Your account access is suspended" -- at twice the width,
    which is what made the centred card look orphaned. */
 
 /* Full-bleed: no shell, so centre the card in the viewport itself.

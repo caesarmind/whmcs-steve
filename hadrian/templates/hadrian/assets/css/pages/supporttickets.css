@@ -1,5 +1,5 @@
 
-/* Page header — Apple list-page pattern */
+/* Page header -- Apple list-page pattern */
 .page-header { margin: 8px 0 32px; }
 .page-header h1 {
     font-size: var(--text-h2);
@@ -41,7 +41,7 @@
 .page-header-action:hover .chev { transform: translateX(2px); }
 .page-header-action .chev { width: 12px; height: 12px; transition: transform var(--transition-fast); }
 
-/* Two-column split — main left, sub-nav right */
+/* Two-column split -- main left, sub-nav right */
 .tk-split { display: grid; grid-template-columns: 1fr 240px; gap: 24px; align-items: start; }
 .tk-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .tk-main > .tk-banner { margin-bottom: 6px; }
@@ -133,7 +133,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .tk-main .filter-tabs { flex-wrap: wrap; }
 .tk-main .filter-tab { white-space: nowrap; }
 
-/* Table layout (DataTables-compatible — see PAGE-CHECKLIST §6f) */
+/* Table layout (DataTables-compatible -- see PAGE-CHECKLIST section 6f) */
 .tk-table {
     width: 100%;
     border-collapse: collapse;
@@ -177,7 +177,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 }
 .tk-table thead th .tk-sort-ico::before { top: 1px; border-bottom: 4px solid currentColor; }
 .tk-table thead th .tk-sort-ico::after  { bottom: 1px; border-top: 4px solid currentColor; }
-/* DataTables sort-state classes — active column lights up its arrow */
+/* DataTables sort-state classes -- active column lights up its arrow */
 .tk-table thead th.sorting_asc, .tk-table thead th.sorting_desc { color: var(--color-text-primary); }
 .tk-table thead th.sorting_asc  .tk-sort-ico::before { opacity: 1; }
 .tk-table thead th.sorting_desc .tk-sort-ico::after  { opacity: 1; }
@@ -257,7 +257,7 @@ body[data-svc-layout="outside"] .tk-stack > .tk-table-card {
 }
 body[data-svc-layout="outside"] .tk-stack > .tk-footer { padding: 12px 4px; }
 
-/* Controls outside — column titles float on the page bg above the rows card.
+/* Controls outside -- column titles float on the page bg above the rows card.
    The <thead> remains inside the <table> for DataTables to work, but we make
    it visually separate by giving it no surface, no border, and we restore
    the rows card to a single rounded surface starting at the first <tr>. */
@@ -309,13 +309,14 @@ body[data-svc-layout="outside"] .tk-table tbody tr:last-child  td:last-child  { 
 .tk-page-size select:hover { background-color: var(--color-surface-secondary); }
 .tk-page-size select:focus { outline: none; background-color: var(--color-surface-secondary); box-shadow: 0 0 0 3px var(--color-accent-light); }
 .tk-pages { display: inline-flex; gap: 2px; align-items: center; }
+/* Button radius is admin-driven: Styles > Elements > Pagination writes --pagination-radius (default sm = the var(--radius-sm) this used to hardcode). */
 .tk-pages button {
     min-width: 26px;
     height: 26px;
     padding: 0 8px;
     border: 0;
     background: transparent;
-    border-radius: var(--radius-sm);
+    border-radius: var(--pagination-radius);
     font-size: var(--text-sm);
     font-weight: var(--fw-medium);
     font-family: inherit;

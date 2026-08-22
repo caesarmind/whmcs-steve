@@ -458,7 +458,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 
 /* -- Menu tree ------------------------------------------------------------
    The tree rows / children / drag styling live page-local in
-   views/adminarea/menu/edit.tpl (scoped to .mt-menu-tree-col) — the sole
+   views/adminarea/menu/edit.tpl (scoped to .mt-menu-tree-col) -- the sole
    source of truth. The old UNSCOPED rules that used to sit here
    (.mt-menu-item-row{border/radius}, :hover{border-color:primary},
    .mt-menu-name, .mt-menu-item, plus the never-used .mt-menu-handle /

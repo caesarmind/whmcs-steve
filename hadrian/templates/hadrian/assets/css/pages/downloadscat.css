@@ -1,4 +1,4 @@
-/* Download category (Apple-style) — file list within a category.
+/* Download category (Apple-style) -- file list within a category.
    Ported from apple-client-area/downloadscat.html. Prefix: .dl-* */
 
 .page-header { margin: 8px 0 24px; }
@@ -17,7 +17,7 @@
 
 /* 2-column split */
 .dl-split { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
-/* On mobile the columns stack — show the files first, push the Support sub-nav below. */
+/* On mobile the columns stack -- show the files first, push the Support sub-nav below. */
 @media (max-width: 880px) {
     .dl-split { grid-template-columns: 1fr; }
     .dl-split > aside { order: 2; }

@@ -43,7 +43,7 @@ body[data-subnav-side="outside-left"] .inv-split > .inv-aside { right: calc(100%
 body[data-subnav-side="outside"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(-142px); }
 body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="left"]):not([data-align="content"]) .ph-main-wrap .content-area { transform: translateX(142px); }
 
-/* Sentinel — keep state-chip Services pill compatible */
+/* Sentinel -- keep state-chip Services pill compatible */
 .svc-table-card { display: none !important; }
 
 /* Invoice cards are always rendered "inside". The body script forces

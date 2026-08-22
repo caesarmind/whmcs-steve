@@ -60,7 +60,7 @@
 /* ---- Preview: block title inside / outside the block (data-svc-layout) ----
    Sentinel keeps the state-chip "Controls inside/outside" option visible; the
    "outside" rules drop the card chrome so each block title sits on the page
-   background with its body kept on a surface (the §6e "controls outside" pattern). */
+   background with its body kept on a surface (the section 6e "controls outside" pattern). */
 .svc-table-card { display: none !important; }
 
 body[data-svc-layout="outside"] .aff-card {
@@ -365,7 +365,7 @@ body[data-svc-layout="outside"] .aff-card > .aff-payout {
 }
 
 @media (max-width: 560px) {
-    /* Referral row stays horizontal — a full-width stadium-pill Copy button
+    /* Referral row stays horizontal -- a full-width stadium-pill Copy button
        looks oversized, and column flex collapses the input height. */
     .aff-signup-card { padding: 40px 22px; }
     .aff-signup-title { font-size: var(--text-3xl); }

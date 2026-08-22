@@ -140,7 +140,7 @@ body[data-tpl="homepage"] .ph-main-wrap .content-area {
     /* .content-area's 40px bottom padding left a white band between the final
        full-bleed CTA and the footer. Every homepage section carries its own
        vertical padding and the page always ends on .hp-cta-immersive, so the
-       wrapper has nothing left to space — the gradient should meet the footer
+       wrapper has nothing left to space -- the gradient should meet the footer
        edge to edge, the same way .hp-stats-strip meets its neighbours. */
     padding-bottom: 0;
 }
@@ -155,7 +155,7 @@ body[data-tpl="homepage"] .content-area > .hp-hero {
    column: it carries its own surface-secondary background (and a dark-mode
    variant) and its .stats-inner is already max-width:1024 + margin:auto, so
    letting the section run full width paints the band edge to edge while the
-   figures stay in the centred measure — same shape as .hp-cta-immersive and
+   figures stay in the centred measure -- same shape as .hp-cta-immersive and
    the footer. .hp-hero stays capped because its text sits in direct children
    with no inner wrapper, so full-bleed would stretch the copy across the whole
    viewport. */
@@ -919,7 +919,7 @@ body[data-layout="rail"] .ph-hero-inner { max-width: none; }
 .ph-side-crumbs .sep { opacity: 0.4; font-size: var(--text-xs); }
 .ph-side-crumbs .current { color: var(--color-text-primary); font-weight: var(--fw-medium); }
 .ph-side-topbar-actions { display: flex; align-items: center; gap: 6px; font-size: var(--text-sm); }
-/* Mobile-only brand in the side/rail topbar — hidden on desktop, where the
+/* Mobile-only brand in the side/rail topbar -- hidden on desktop, where the
    sidebar/rail itself shows the logo. Revealed <=900px (see media block). */
 .ph-side-logo { display: none; align-items: center; flex-shrink: 0; text-decoration: none; color: var(--color-text-primary); font-weight: var(--fw-semibold); font-size: var(--text-lg); letter-spacing: -0.01em; }
 .ph-side-logo:hover { color: var(--color-accent); text-decoration: none; }
@@ -1288,7 +1288,7 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
 
     /* Sidebar becomes a slide-in drawer (overrides the legacy
        `.sidebar { display: none }` rule at <=768px from core-theme.css).
-       The TOP layout reuses this exact drawer chrome — its sidebar is
+       The TOP layout reuses this exact drawer chrome -- its sidebar is
        display:none above 900px (the .only-side gate) and only surfaces
        here, as the hamburger drawer the top-nav opens. */
     body[data-layout="side"] .sidebar,
@@ -1349,7 +1349,7 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
 /* Two "Login" links in the top bar.
    The theme hardcodes a utility sign-in (.nav-signin, next to cart + theme
    toggle) AND the menu can carry a login_button item (.nav-cta). Logged out,
-   both rendered — the nav-cta is only suppressed under 900px by the collapse
+   both rendered -- the nav-cta is only suppressed under 900px by the collapse
    rule above, so from 900px up the bar showed Login twice.
 
    The utility sign-in wins: it sits with the cart and theme toggle where the
@@ -1361,7 +1361,7 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
    logged-out branch of topnav.tpl, so if that branch ever stops emitting it
    the menu group reappears rather than leaving no way to sign in.
 
-   min-width pairs with the 900px collapse above — below it these are already
+   min-width pairs with the 900px collapse above -- below it these are already
    folded into the hamburger drawer, so there is nothing to de-duplicate and
    the drawer remains the only place Register and Language live on a phone.
 
@@ -1369,10 +1369,10 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
    login button: Login, Register and Language all carry it, and the point is to
    run ONE set of account controls on desktop rather than two competing ones.
    .nav-cta is listed separately so a login button placed on the LEFT is still
-   caught — it duplicates .nav-signin wherever it sits.
+   caught -- it duplicates .nav-signin wherever it sits.
 
    NOTE this hides admin-configured menu items on desktop, and Register and
-   Language have no counterpart in the utility group — on the top layout the
+   Language have no counterpart in the utility group -- on the top layout the
    .nav-switcher here is the only trigger for the locale modal, and register.php
    is otherwise only linked from sidebar.tpl, which this layout never renders.
    Deleting those items in admin -> Menu is the cleaner fix, after which this
@@ -1384,7 +1384,7 @@ body.nav-open .ph-nav-backdrop { opacity: 1; visibility: visible; }
 
 /* Locale control in the utility group, replacing the Language entry the rule
    above hides. Scoped to .nav-locale rather than a generic .only-desktop
-   utility — a broad visibility class in this file is how the [class$="-split"]
+   utility -- a broad visibility class in this file is how the [class$="-split"]
    collisions started.
 
    Hidden below 901px to mirror that rule: on a phone the hamburger drawer
@@ -1853,7 +1853,7 @@ body[data-tpl="fraudcheck"] {
     #order-standard_cart .cart-sidebar .card-sidebar {
         padding: 8px;
         margin-bottom: 12px;
-        border-radius: var(--radius-lg, 14px);
+        border-radius: var(--radius-lg, 12px);
         border: 0.5px solid var(--color-border, var(--color-border));
         background: var(--color-surface, var(--color-surface));
     }
@@ -1916,7 +1916,7 @@ body[data-tpl="fraudcheck"] {
         border-bottom: 0 !important;
         background: var(--color-surface, var(--color-surface));
         border: 0.5px solid var(--color-border, var(--color-border));
-        border-radius: var(--radius-lg, 14px);
+        border-radius: var(--radius-lg, 12px);
     }
     #order-standard_cart .header-lined h1,
     #order-standard_cart .header-lined .font-size-36 {
@@ -1958,7 +1958,7 @@ body[data-tpl="fraudcheck"] {
     #order-standard_cart .product {
         padding: 24px 22px 22px !important;
         border: 0.5px solid var(--color-border, var(--color-border)) !important;
-        border-radius: var(--radius-lg, 14px) !important;
+        border-radius: var(--radius-lg, 12px) !important;
         background: var(--color-surface, var(--color-surface)) !important;
         display: flex !important;
         flex-direction: column !important;
@@ -2056,7 +2056,7 @@ body[data-tpl="fraudcheck"] {
     #order-standard_cart .domain-selection-options {
         background: var(--color-surface, var(--color-surface));
         border: 0.5px solid var(--color-border, var(--color-border));
-        border-radius: var(--radius-lg, 14px);
+        border-radius: var(--radius-lg, 12px);
         overflow: hidden;
         margin-bottom: 18px;
     }
@@ -2186,7 +2186,7 @@ body[data-tpl="fraudcheck"] {
     #order-standard_cart .summary-container {
         background: var(--color-surface, var(--color-surface));
         border: 0.5px solid var(--color-border, var(--color-border));
-        border-radius: var(--radius-lg, 14px);
+        border-radius: var(--radius-lg, 12px);
         padding: 18px 20px;
         margin-bottom: 16px;
     }

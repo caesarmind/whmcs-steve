@@ -8,7 +8,7 @@
 /* Full-bleed canvas (header.tpl suppresses the portal chrome for fullPage).
    The base `body { display:flex }` (core-theme.css) would shrink a block-level
    child to its content width, so force the full-bleed body back to block.
-   NOTE: class names deliberately avoid the `-split` / `-aside` suffixes —
+   NOTE: class names deliberately avoid the `-split` / `-aside` suffixes --
    core-layout.css hides `[class$="-aside"]` inside `[class$="-split"]` and
    collapses the grid when the website sub-nav is off. */
 body.mt-login-fullpage { display: block; margin: 0; }

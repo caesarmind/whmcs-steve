@@ -125,7 +125,7 @@ html[data-palette="slate"]   .um-row-avatar { background: linear-gradient(135deg
 .um-empty-title { font-size: var(--text-lg); font-weight: var(--fw-medium); color: var(--color-text-primary); margin: 0 0 4px; }
 .um-empty-sub { font-size: var(--text-base); color: var(--color-text-tertiary); margin: 0 auto 18px; max-width: 380px; line-height: 1.45; }
 
-/* "Invite new user" header button — opens the modal */
+/* "Invite new user" header button -- opens the modal */
 .um-invite-btn {
     display: inline-flex; align-items: center; gap: 6px;
     height: 38px; padding: 0 16px;
