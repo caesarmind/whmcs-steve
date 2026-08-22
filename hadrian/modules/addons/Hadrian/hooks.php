@@ -219,12 +219,34 @@ if (AddonHelper::isActive()) {
         $darkDefault = (string)Hadrian\Models\Settings::getValue('dark_mode_default', 'light');
         if (!in_array($darkDisplay, ['switcher', 'forced'], true)) { $darkDisplay = 'switcher'; }
         if (!in_array($darkDefault, ['light', 'dark'], true))      { $darkDefault = 'light'; }
+
+        /* The visitor's own choice, read SERVER-side so the very first painted
+           frame is already right.
+
+           It used to live only in localStorage, which the server cannot see:
+           header.tpl rendered the admin's default, then core-theme.js -- loaded
+           down in footer.tpl -- corrected it after the page had already painted.
+           A returning visitor who had chosen dark on a light-default site
+           therefore saw the whole page flash light on every single load.
+
+           Same shape as the mt_layout cookie in Menu\TreeRenderer: read it,
+           allow-list it, fall back to the configured default. Only honoured
+           under 'switcher' -- 'forced' means the admin decided, so a stale
+           cookie must not override it (core-theme.js clears it in that mode). */
+        $themeMode = $darkEnabled ? $darkDefault : 'light';
+        if ($darkEnabled && $darkDisplay === 'switcher') {
+            $cookie = $_COOKIE['mt_theme'] ?? null;
+            if (in_array($cookie, ['light', 'dark'], true)) {
+                $themeMode = $cookie;
+            }
+        }
+
         return [
             'mtIcons'            => Hadrian\Menu\Icons::all(),
             'mtTopnavShowIcons'  => (bool)Hadrian\Models\Settings::getValue('topnav_show_icons', false),
             'mtEnableDarkMode'   => $darkEnabled,
             'mtShowDarkToggle'   => $darkEnabled && $darkDisplay === 'switcher',
-            'mtThemeMode'        => $darkEnabled ? $darkDefault : 'light',
+            'mtThemeMode'        => $themeMode,
             'mtDarkMode'         => $darkEnabled ? $darkDisplay : 'off',
         ];
     });

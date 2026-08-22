@@ -30,6 +30,37 @@ document.addEventListener('click', function(e) {
     }
 });
 
+// Persistence lives in a COOKIE, not localStorage, so hooks.php can read the
+// visitor's choice and header.tpl can render the right theme in the first
+// painted frame. localStorage is invisible to the server, which is why this
+// used to flash: the page painted the admin default, then this file -- loaded
+// from footer.tpl, at the very bottom -- corrected it afterwards.
+//
+// Name and shape match the mt_layout cookie the menu already reads server-side.
+// A year is arbitrary but long; Lax is right because this is a same-site
+// preference and never needs to survive a cross-site POST; Secure only on
+// https, since setting it on http would make the cookie silently un-writable.
+var MT_THEME_COOKIE = 'mt_theme';
+
+function mtReadTheme() {
+    var m = document.cookie.match(/(?:^|;\s*)mt_theme=(light|dark)(?:;|$)/);
+    return m ? m[1] : null;
+}
+
+function mtWriteTheme(value) {
+    document.cookie = MT_THEME_COOKIE + '=' + value + ';path=/;max-age=31536000;SameSite=Lax'
+        + (location.protocol === 'https:' ? ';Secure' : '');
+    // Mirrored into localStorage purely as a fallback for a visitor whose
+    // browser refuses cookies: the server cannot see it, so they still get the
+    // flash, but their choice at least survives the page.
+    try { localStorage.setItem('apple-theme', value); } catch (e) {}
+}
+
+function mtClearTheme() {
+    document.cookie = MT_THEME_COOKIE + '=;path=/;max-age=0;SameSite=Lax';
+    try { localStorage.removeItem('apple-theme'); } catch (e) {}
+}
+
 // Dark mode toggle. Null-checks #darkModeToggle because some layouts
 // (e.g. logged-out top-nav) render the toggle as a plain .topbar-btn
 // without the sidebar #darkModeToggle slider element -- without the
@@ -40,33 +71,46 @@ function toggleDarkMode() {
     const html = document.documentElement;
     const toggle = document.getElementById('darkModeToggle');
     const isDark = html.getAttribute('data-theme') === 'dark';
+    const next = isDark ? 'light' : 'dark';
 
-    if (isDark) {
-        html.setAttribute('data-theme', 'light');
-        if (toggle) toggle.classList.remove('active');
-        localStorage.setItem('apple-theme', 'light');
-    } else {
-        html.setAttribute('data-theme', 'dark');
-        if (toggle) toggle.classList.add('active');
-        localStorage.setItem('apple-theme', 'dark');
-    }
+    html.setAttribute('data-theme', next);
+    if (toggle) toggle.classList.toggle('active', next === 'dark');
+    mtWriteTheme(next);
 }
 
 // Theme initialization — driven by the admin Default Mode + Display Type,
 // surfaced as <html data-dark-mode> alongside the server-rendered data-theme.
 // No OS auto-detect (by design): Default Mode is the source of truth.
+//
+// Under 'switcher' the server has ALREADY applied the cookie, so this normally
+// changes nothing -- it exists for the two cases the server cannot cover:
+// the one-time migration below, and a cookie-less browser falling back to
+// localStorage.
 (function() {
     var html = document.documentElement;
     var mode = html.getAttribute('data-dark-mode') || 'off';
     if (mode === 'switcher') {
-        // Switcher: a visitor's saved choice overrides the server default.
-        var saved = localStorage.getItem('apple-theme');
+        var saved = mtReadTheme();
+        if (!saved) {
+            // One-time migration off the old localStorage-only persistence.
+            // Without it, everyone who had ever picked a theme would be reset
+            // to the admin default the moment this deployed. The first load
+            // after upgrading still flashes once -- the cookie does not exist
+            // yet when the server renders -- and every load after it is clean.
+            var legacy = null;
+            try { legacy = localStorage.getItem('apple-theme'); } catch (e) {}
+            if (legacy === 'dark' || legacy === 'light') {
+                saved = legacy;
+                mtWriteTheme(legacy);
+            }
+        }
         if (saved === 'dark' || saved === 'light') {
             html.setAttribute('data-theme', saved);
         }
     } else if (mode === 'forced') {
-        // Forced: locked to the server-rendered Default Mode; drop stale prefs.
-        localStorage.removeItem('apple-theme');
+        // Forced: the admin decided. Drop any stored preference so it cannot
+        // resurface if the site is later switched back to 'switcher'.
+        mtClearTheme();
     }
     // mode === 'off' → leave the server-rendered light theme untouched.
     var toggle = document.getElementById('darkModeToggle');
